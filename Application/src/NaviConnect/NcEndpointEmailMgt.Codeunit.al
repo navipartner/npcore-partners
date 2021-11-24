@@ -107,6 +107,7 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
         TextEmailSuccessLbl: Label 'File emailed to %1.';
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
         TempEmailItem: Record "Email Item" temporary;
+        TempErrorMessage: Record "Error Message" temporary;
         IStream: InStream;
         OStream: OutStream;
         TempBlob: Codeunit "Temp Blob";
@@ -114,7 +115,6 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
         CCRecipients: List of [Text];
         BCCRecipients: List of [Text];
         Separators: List of [Text];
-        ErrorMessage: Text;
         EmailSendingHandler: Codeunit "NPR Email Sending Handler";
     begin
         Separators.Add(';');
@@ -136,11 +136,10 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
             EmailSendingHandler.AddRecipientBCC(TempEmailItem, CCRecipients);
         end;
 
-        if EmailSendingHandler.Send(TempEmailItem) then
+        if EmailSendingHandler.Send(TempEmailItem, TempErrorMessage) then
             NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextEmailSuccessLbl, NcEndpointEmail."Recipient E-Mail Address"))
         else begin
-            EmailSendingHandler.GetLastError(ErrorMessage);
-            Error(TextEmailFailedErr, NcEndpointEmail."Recipient E-Mail Address", ErrorMessage);
+            Error(TextEmailFailedErr, NcEndpointEmail."Recipient E-Mail Address", TempErrorMessage.ToString());
         end;
     end;
 
@@ -148,12 +147,12 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
     var
         TextEmailFailedErr: Label 'File could not be emailed to %1. STMP returned error: %2.';
         TempEmailItem: Record "Email Item" temporary;
-        InStream: InStream;
+        TempErrorMessage: Record "Error Message" temporary;
+        InStr: InStream;
         Recipients: List of [Text];
         CCRecipients: List of [Text];
         BCCRecipients: List of [Text];
         Separators: List of [Text];
-        ErrorMessage: Text;
         EmailSendingHandler: Codeunit "NPR Email Sending Handler";
     begin
         Separators.Add(';');
@@ -164,8 +163,8 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
           NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address",
           Recipients, NcEndpointEmail."Subject Text", NcEndpointEmail."Body Text", true);
 
-        NcTaskOutput.Data.CreateInStream(InStream, TEXTENCODING::UTF8);
-        EmailSendingHandler.AddAttachmentFromStream(TempEmailItem, InStream, NcTaskOutput.Name);
+        NcTaskOutput.Data.CreateInStream(InStr, TEXTENCODING::UTF8);
+        EmailSendingHandler.AddAttachmentFromStream(TempEmailItem, InStr, NcTaskOutput.Name);
         if NcEndpointEmail."CC E-Mail Address" <> '' then begin
             CCRecipients := NcEndpointEmail."CC E-Mail Address".Split(Separators);
             EmailSendingHandler.AddRecipientCC(TempEmailItem, CCRecipients);
@@ -176,9 +175,8 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
             EmailSendingHandler.AddRecipientBCC(TempEmailItem, BCCRecipients);
         end;
 
-        if not EmailSendingHandler.Send(TempEmailItem) then begin
-            EmailSendingHandler.GetLastError(ErrorMessage);
-            Error(TextEmailFailedErr, NcEndpointEmail."Recipient E-Mail Address", ErrorMessage);
+        if not EmailSendingHandler.Send(TempEmailItem, TempErrorMessage) then begin
+            Error(TextEmailFailedErr, NcEndpointEmail."Recipient E-Mail Address", TempErrorMessage.ToString());
         end;
     end;
 

@@ -384,10 +384,12 @@ codeunit 6059905 "NPR Mail Task Status"
         EmailSenderHandler.AddAttachmentFromStream(TempEmailItem, InStrAttachment, NewAttachment);
     end;
 
-    procedure Send() MailSent: Boolean
+    procedure Send(): Boolean
+    var
+        TempErrorMessage: Record "Error Message" temporary;
     begin
-        EmailSenderHandler.Send(TempEmailItem);
-        exit(true);
+        EmailSenderHandler.Send(TempEmailItem, TempErrorMessage);
+        exit(TempErrorMessage.IsEmpty());
     end;
 
     local procedure InitMailAdrSeparators(var MailAdrSeparators: List of [Text])

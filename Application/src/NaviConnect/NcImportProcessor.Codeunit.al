@@ -58,6 +58,8 @@ codeunit 6151511 "NPR Nc Import Processor"
     local procedure MarkAsCompleted(Success: Boolean; var NcImportEntry: Record "NPR Nc Import Entry")
     var
         NcImportType: Record "NPR Nc Import Type";
+        TempErrorMessage: Record "Error Message" temporary;
+        TempEmailItem: Record "Email Item" temporary;
         NcImportMgt: Codeunit "NPR Nc Import Mgt.";
         OutStr: OutStream;
         LastErrorText: Text;
@@ -88,7 +90,8 @@ codeunit 6151511 "NPR Nc Import Processor"
         if not NcImportType.Get(NcImportEntry."Import Type") then
             exit;
         if NcImportType."Send e-mail on Error" then begin
-            if NcImportMgt.SendErrorMail(NcImportEntry) then begin
+            NcImportMgt.SendErrorMail(NcImportEntry, TempErrorMessage, TempEmailItem);
+            if TempErrorMessage.IsEmpty() then begin
                 NcImportEntry.LockTable();
                 NcImportEntry.Get(NcImportEntry."Entry No.");
                 NcImportEntry."Last Error E-mail Sent at" := CurrentDateTime;
