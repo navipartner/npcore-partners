@@ -174,16 +174,14 @@
         exit(CRLF);
     end;
 
-    [TryFunction]
-    procedure SendErrorMail(NcImportEntry: Record "NPR Nc Import Entry")
+    procedure SendErrorMail(NcImportEntry: Record "NPR Nc Import Entry"; var ErrorMessage: Record "Error Message"; var EmailItem: Record "Email Item")
     var
         NcImportType: Record "NPR Nc Import Type";
-        InStream: InStream;
+        InStr: InStream;
         Body: Text;
         SenderAddress: Text;
         Subject: Text;
         Separators: List of [Text];
-        TempEmailItem: Record "Email Item" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         Separators.Add(';');
@@ -196,7 +194,7 @@
         SenderAddress := GetErrorMailSenderAddress();
         Subject := GetErrorMailSubject(NcImportEntry);
         Body := GetErrorMailBody(NcImportEntry);
-        EmailSenderHandler.CreateEmailItem(TempEmailItem,
+        EmailSenderHandler.CreateEmailItem(EmailItem,
                   '',
                   SenderAddress,
                   NcImportType."E-mail address on Error".Split(Separators),
@@ -206,27 +204,32 @@
 
         if NcImportEntry."Document Source".HasValue() then begin
             NcImportEntry.CalcFields("Document Source");
-            NcImportEntry."Document Source".CreateInStream(InStream);
-            EmailSenderHandler.AddAttachmentFromStream(TempEmailItem, InStream, NcImportEntry."Document Name");
+            NcImportEntry."Document Source".CreateInStream(InStr);
+            EmailSenderHandler.AddAttachmentFromStream(EmailItem, InStr, NcImportEntry."Document Name");
         end;
-        EmailSenderHandler.Send(TempEmailItem);
+        EmailSenderHandler.Send(EmailItem, ErrorMessage);
     end;
 
     procedure SendTestErrorMail(NcImportType: Record "NPR Nc Import Type")
     var
         NcImportEntry: Record "NPR Nc Import Entry";
-        OutStream: OutStream;
+        TempErrorMessage: Record "Error Message" temporary;
+        TempEmailItem: Record "Email Item" temporary;
+        OutStr: OutStream;
     begin
         NcImportEntry.Init();
         NcImportEntry."Import Type" := NcImportType.Code;
         NcImportEntry.Date := CurrentDateTime;
         NcImportEntry."Document Name" := 'Test ' + NcImportType.Description + '.xml';
-        NcImportEntry."Last Error Message".CreateOutStream(OutStream);
-        OutStream.WriteText('Test Error Line 1' + NewLine() + 'Test Error Line 2');
+        NcImportEntry."Last Error Message".CreateOutStream(OutStr);
+        OutStr.WriteText('Test Error Line 1' + NewLine() + 'Test Error Line 2');
         NcImportEntry.Insert();
 
-        SendErrorMail(NcImportEntry);
-        Message(TestEmailMsg, NcImportType."E-mail address on Error");
+        SendErrorMail(NcImportEntry, TempErrorMessage, TempEmailItem);
+        if not TempErrorMessage.IsEmpty() then
+            TempErrorMessage.ShowErrors()
+        else
+            Message(TestEmailMsg, NcImportType."E-mail address on Error");
     end;
 }
 

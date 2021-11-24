@@ -273,6 +273,7 @@
     var
         TransactionalEmail: Record "NPR Smart Email";
         EmailLog: Record "NPR E-mail Log";
+        TempErrorMessage: Record "Error Message" temporary;
         TransactionalEmailMgt: Codeunit "NPR Transactional Email Mgt.";
         IStream: InStream;
         HandledByTransactional: Boolean;
@@ -331,12 +332,11 @@
             MailManagement.SetHideMailDialog(true);
             MailManagement.SetHideEmailSendingError(true);
 
-            if not EmailSendingHandler.Send(TempEmailItem) then
-                EmailSendingHandler.GetLastError(ErrorMessage);
+            EmailSendingHandler.Send(TempEmailItem, TempErrorMessage);
         end;
         TempAttachmentBuffer.DeleteAll();
 
-        if ErrorMessage = '' then begin
+        if TempErrorMessage.IsEmpty() then begin
             AddEmailLogEntry(EmailLog, RecRef, EmailLogPrepared);
             if Silent then
                 exit('')
@@ -346,9 +346,9 @@
             end;
         end else begin
             if Silent then
-                exit(ErrorMessage)
+                exit(TempErrorMessage.ToString())
             else
-                Error(ErrorMessage);
+                TempErrorMessage.ShowErrors();
         end;
     end;
 
