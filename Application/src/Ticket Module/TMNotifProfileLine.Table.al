@@ -46,6 +46,18 @@ table 6014590 "NPR TM Notif. Profile Line"
             OptionMembers = RESERVATION,FIRST_ADMISSION,REVOKE;
             OptionCaption = 'Reservation Reminder,First Admission,Revoke';
         }
+        field(32; "Detention Time Seconds"; Integer)
+        {
+            Caption = 'Detention Time (Seconds)';
+            DataClassification = CustomerContent;
+        }
+        field(33; "Shared Detention Queue"; Boolean)
+        {
+            Caption = 'Shared Detention Queue';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
+
         field(35; "Notification Engine"; Option)
         {
             Caption = 'Notification Engine';

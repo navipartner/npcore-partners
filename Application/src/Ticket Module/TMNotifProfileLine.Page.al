@@ -67,6 +67,19 @@ page 6014563 "NPR TM Notif. Profile Line"
                     ToolTip = 'Specifies the value of the Notification Extra Text field';
                     ApplicationArea = NPRTicketAdvanced;
                 }
+                field("Detention Time Seconds"; Rec."Detention Time Seconds")
+                {
+                    Caption = 'Detention Time (Seconds)';
+                    ToolTip = 'Specifies the value of the Detention Time (Seconds) field.';
+                    ApplicationArea = NPRTicketAdvanced;
+                    BlankZero = true;
+                }
+                field("Shared Detention Queue"; Rec."Shared Detention Queue")
+                {
+                    ToolTip = 'Specifies the value of the Shared Detention Queue field.';
+                    ApplicationArea = NPRTicketAdvanced;
+                }
+
             }
         }
 

@@ -102,6 +102,16 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Admission";
         }
+        field(75; "Detention Time Seconds"; Integer)
+        {
+            Caption = 'Detention Time Seconds';
+            DataClassification = CustomerContent;
+        }
+        field(76; "Notification Profile Code"; Code[10])
+        {
+            Caption = 'Notification Profile Code';
+            DataClassification = CustomerContent;
+        }
         field(80; "Notification Method"; Enum "NPR TM Not. Method")
         {
             Caption = 'Notification Method';

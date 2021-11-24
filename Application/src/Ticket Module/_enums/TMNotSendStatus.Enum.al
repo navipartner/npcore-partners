@@ -22,4 +22,8 @@ enum 6014476 "NPR TM Not. Send Status"
     {
         Caption = 'Not Sent';
     }
+    value(5; DETAINED)
+    {
+        Caption = 'Detained';
+    }
 }

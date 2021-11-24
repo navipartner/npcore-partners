@@ -34,7 +34,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         NOT_IMPLEMENTED: Label 'Case %1 %2 is not implemented.';
         CONFIRM_SEND_NOTIFICATION: Label 'Do you want to send %1 pending notifications?';
         INVALID: Label 'Invalid %1';
-        NO_SMS_TEMPLATE: Label 'Template for table %1 not found amoung SMS Templates.';
+        NO_SMS_TEMPLATE: Label 'Template for table %1 not found among SMS Templates.';
         StakeholderNotificationGroupType: Option SALES,SELLOUT,WAITINGLIST;
 
     procedure NotifyRecipients(var TicketParticipantWks: Record "NPR TM Ticket Particpt. Wks.")
@@ -187,7 +187,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
     end;
 
-    procedure AquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]): Boolean
+    procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]): Boolean
     begin
 
         exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, false));
@@ -206,7 +206,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         PageAction: Action;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
-        DisplayTicketParticipant: Page "NPR TM Ticket Aquire Particip.";
+        DisplayTicketParticipant: Page "NPR TM Acquire Participant";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketNo: Code[20];
         Ticket: Record "NPR TM Ticket";
@@ -844,6 +844,9 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         if (NotificationEntry."Date To Notify" < Today()) then
             exit(0);
 
+        if (not TicketNotProfileLine."Shared Detention Queue") then
+            NotificationEntry."Notification Profile Code" := TicketNotProfileLine."Profile Code";
+        NotificationEntry."Detention Time Seconds" := TicketNotProfileLine."Detention Time Seconds";
         NotificationEntry."Template Code" := TicketNotProfileLine."Template Code";
         NotificationEntry."Extra Text" := TicketNotProfileLine."Notification Extra Text";
 
@@ -884,6 +887,37 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 #pragma warning restore
     end;
 
+    local procedure SetNotificationDetention(var TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; ResponseMessage: Text): Boolean
+    var
+        DetainNotification: Record "NPR TM Detained Notification";
+    begin
+        if (TicketNotificationEntry."Detention Time Seconds" <= 0) then
+            exit(false); // No detention
+
+        DetainNotification.SetFilter("Notification Address", '=%1', TicketNotificationEntry."Notification Address");
+        DetainNotification.SetFilter("Notification Trigger Type", '=%1', TicketNotificationEntry."Ticket Trigger Type");
+        DetainNotification.SetFilter("Notification Profile Code", '=%1', TicketNotificationEntry."Notification Profile Code");
+        if (not DetainNotification.FindFirst()) then begin
+            DetainNotification."Entry No." := 0;
+            DetainNotification."Notification Address" := TicketNotificationEntry."Notification Address";
+            DetainNotification."Notification Trigger Type" := TicketNotificationEntry."Ticket Trigger Type";
+            DetainNotification."Notification Profile Code" := TicketNotificationEntry."Notification Profile Code";
+            DetainNotification."Detain Until" := CurrentDateTime() + TicketNotificationEntry."Detention Time Seconds" * 1000;
+            if (not DetainNotification.Insert()) then;
+            exit(false); // No detention
+        end;
+
+        if (DetainNotification."Detain Until" < CurrentDateTime()) then begin
+            DetainNotification."Detain Until" := CurrentDateTime() + TicketNotificationEntry."Detention Time Seconds" * 1000;
+            DetainNotification.Modify();
+            exit(false); // No detention
+        end;
+
+        ResponseMessage := 'Notification is detained to minimize spam.';
+        TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::DETAINED;
+        exit(true);
+    end;
+
 
     procedure SendGeneralNotification(var TicketNotificationEntryFilters: Record "NPR TM Ticket Notif. Entry")
     var
@@ -918,27 +952,32 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 TicketNotificationEntry2.Modify();
                 Commit();
 
-                case TicketNotificationEntry2."Notification Method" of
-                    TicketNotificationEntry2."Notification Method"::NA:
-                        begin
-                            TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::NOT_SENT;
-                            ResponseMessage := StrSubstNo(INVALID, TicketNotificationEntry2.FieldCaption("Notification Method"));
-                        end;
+                if (TicketNotificationEntry2."Notification Trigger" = TicketNotificationEntry2."Notification Trigger"::REMINDER) then
+                    SetNotificationDetention(TicketNotificationEntry2, ResponseMessage);
 
-                    TicketNotificationEntry2."Notification Method"::EMAIL:
-                        begin
-                            if (SendMailNotificationEntry(TicketNotificationEntry2, ResponseMessage)) then
-                                TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::SENT;
-                        end;
+                if (TicketNotificationEntry2."Notification Send Status" <> TicketNotificationEntry2."Notification Send Status"::DETAINED) then begin
+                    case TicketNotificationEntry2."Notification Method" of
+                        TicketNotificationEntry2."Notification Method"::NA:
+                            begin
+                                TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::NOT_SENT;
+                                ResponseMessage := StrSubstNo(INVALID, TicketNotificationEntry2.FieldCaption("Notification Method"));
+                            end;
 
-                    TicketNotificationEntry2."Notification Method"::SMS:
-                        begin
-                            if (SendSmsNotificationEntry(TicketNotificationEntry2, ResponseMessage)) then
-                                TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::SENT;
-                        end;
+                        TicketNotificationEntry2."Notification Method"::EMAIL:
+                            begin
+                                if (SendMailNotificationEntry(TicketNotificationEntry2, ResponseMessage)) then
+                                    TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::SENT;
+                            end;
 
-                    else
-                        Error(NOT_IMPLEMENTED, TicketNotificationEntry2.FieldCaption("Notification Method"), TicketNotificationEntry2."Notification Method");
+                        TicketNotificationEntry2."Notification Method"::SMS:
+                            begin
+                                if (SendSmsNotificationEntry(TicketNotificationEntry2, ResponseMessage)) then
+                                    TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::SENT;
+                            end;
+
+                        else
+                            Error(NOT_IMPLEMENTED, TicketNotificationEntry2.FieldCaption("Notification Method"), TicketNotificationEntry2."Notification Method");
+                    end;
                 end;
 
                 TicketNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry2."Failed With Message"));

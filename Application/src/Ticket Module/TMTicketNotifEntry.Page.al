@@ -57,6 +57,16 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Ticket Type Code field';
                 }
+                field("Notification Profile Code"; Rec."Notification Profile Code")
+                {
+                    ToolTip = 'Specifies the value of the Notification Profile Code field.';
+                    ApplicationArea = NPRTicketAdvanced;
+                }
+                field("Detention Time Seconds"; Rec."Detention Time Seconds")
+                {
+                    ToolTip = 'Specifies the value of the Detention Time Seconds field.';
+                    ApplicationArea = NPRTicketAdvanced;
+                }
                 field("Template Code"; Rec."Template Code")
                 {
                     ToolTip = 'Specifies the value of the Template Code field';
@@ -293,7 +303,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
 
     actions
     {
-        area(navigation)
+        area(Processing)
         {
             Action("Recreate eTicket")
             {
@@ -304,6 +314,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
+                Scope = Repeater;
 
                 trigger OnAction()
                 var
@@ -324,6 +335,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
+                Scope = Repeater;
 
                 trigger OnAction()
                 var
@@ -349,6 +361,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
+                Scope = Repeater;
 
                 trigger OnAction()
                 var
@@ -367,6 +380,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
+                Scope = Repeater;
 
                 trigger OnAction()
                 var
@@ -383,6 +397,18 @@ page 6060065 "NPR TM Ticket Notif. Entry"
 
                     CurrPage.Update(false);
                 end;
+            }
+        }
+        area(Navigation)
+        {
+            Action(NotificationDetention)
+            {
+                ToolTip = 'Navigate to Notification Detention List.';
+                ApplicationArea = NPRTicketAdvanced;
+                Caption = 'Notification Detention';
+                Image = BreakRulesList;
+                RunObject = Page "NPR TM Detained Notification";
+                RunPageLink = "Notification Address" = field("Notification Address"), "Notification Profile Code" = field("Notification Profile Code");
             }
         }
     }
