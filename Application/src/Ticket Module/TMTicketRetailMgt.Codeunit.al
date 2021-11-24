@@ -158,7 +158,7 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
             end;
         end;
 
-        exit(TicketNotifyParticipant.AquireTicketParticipant(Token, SuggestMethod, SuggestAddress));
+        exit(TicketNotifyParticipant.AcquireTicketParticipant(Token, SuggestMethod, SuggestAddress));
     end;
 
     procedure AssignSameSchedule(Token: Text[100])
