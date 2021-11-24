@@ -92,8 +92,7 @@ page 6150613 "NPR NP Retail Setup"
                 Caption = 'Upgrade Audit Roll to POS Entry';
                 Image = TransferToLines;
                 ToolTip = 'Start upgrade audit roll entries to POS entries.';
-                Promoted = true;
-                PromotedCategory = Process;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
