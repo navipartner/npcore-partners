@@ -83,7 +83,27 @@ page 6150613 "NPR NP Retail Setup"
             }
         }
     }
+    actions
+    {
+        area(Processing)
+        {
+            action(UpgradeBalV3Setup)
+            {
+                Caption = 'Upgrade Audit Roll to POS Entry';
+                Image = TransferToLines;
+                ToolTip = 'Start upgrade audit roll entries to POS entries.';
+                Promoted = true;
+                PromotedCategory = Process;
 
+                trigger OnAction()
+                var
+                    RetDataModARUpgr: codeunit "NPR UPG RetDataMod AR Upgr.";
+                begin
+                    RetDataModARUpgr.UpgradeSetupsBalancingV3();
+                end;
+            }
+        }
+    }
     trigger OnOpenPage()
     begin
         ActiveSession.Get(ServiceInstanceId, SessionId);

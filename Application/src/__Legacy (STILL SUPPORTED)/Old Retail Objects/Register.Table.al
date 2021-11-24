@@ -141,9 +141,6 @@ table 6014401 "NPR Register"
             TableRelation = IF ("Balanced Type" = CONST(Finans)) "G/L Account"
             ELSE
             IF ("Balanced Type" = CONST(Bank)) "Bank Account";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This table won''t be used anymore';
-            ObsoleteTag = 'NPR Register';
         }
         field(16; "Difference Account - Neg."; Code[20])
         {
