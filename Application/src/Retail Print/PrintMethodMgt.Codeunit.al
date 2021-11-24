@@ -55,6 +55,7 @@ codeunit 6014582 "NPR Print Method Mgt."
         InStream: InStream;
         Separators: List of [Text];
         TempEmailItem: Record "Email Item" temporary;
+        TempErrorMessage: Record "Error Message" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         if Stream.Length < 1 then
@@ -64,13 +65,16 @@ codeunit 6014582 "NPR Print Method Mgt."
 
         EmailSenderHandler.CreateEmailItem(TempEmailItem, 'NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
         EmailSenderHandler.AddAttachmentFromStream(TempEmailItem, Stream, 'Document.pdf');
-        EmailSenderHandler.Send(TempEmailItem);
+        EmailSenderHandler.Send(TempEmailItem, TempErrorMessage);
+        if not TempErrorMessage.IsEmpty() then
+            TempErrorMessage.ShowErrors();
     end;
 
     procedure PrintViaEmail(PrinterName: Text; var Stream: InStream)
     var
         Separators: List of [Text];
         TempEmailItem: Record "Email Item" temporary;
+        TempErrorMessage: Record "Error Message" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         if Stream.EOS then
@@ -80,7 +84,9 @@ codeunit 6014582 "NPR Print Method Mgt."
 
         EmailSenderHandler.CreateEmailItem(TempEmailItem, 'NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
         EmailSenderHandler.AddAttachmentFromStream(TempEmailItem, Stream, 'Document.pdf');
-        EmailSenderHandler.Send(TempEmailItem);
+        EmailSenderHandler.Send(TempEmailItem, TempErrorMessage);
+        if not TempErrorMessage.IsEmpty() then
+            TempErrorMessage.ShowErrors();
     end;
 
     procedure PrintViaPrintNodePdf(PrinterID: Text; var PdfStream: DotNet NPRNetMemoryStream; DocumentDescription: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)

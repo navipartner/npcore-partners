@@ -33,9 +33,10 @@ codeunit 6059767 "NPR NaviDocs Management"
 
     procedure Process(NaviDocsEntry: Record "NPR NaviDocs Entry")
     var
+        TempEmailItem: Record "Email Item" temporary;
+        TempErrorMessage: Record "Error Message" temporary;
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
         ManagementStatus: Boolean;
-
     begin
         if not (NaviDocsSetup.Get() and
                 NaviDocsSetup."Enable NaviDocs" and
@@ -57,7 +58,7 @@ codeunit 6059767 "NPR NaviDocs Management"
         if ManagementStatus then
             NaviDocsEntry.Status := 2
         else
-            if TrySendWarningMail(NaviDocsEntry) then;
+            SendWarningMail(NaviDocsEntry, TempErrorMessage, TempEmailItem);
 
         NaviDocsEntry.Modify(true);
 
@@ -1105,15 +1106,13 @@ codeunit 6059767 "NPR NaviDocs Management"
         InsertedEntryNo := NaviDocsEntry."Entry No.";
     end;
 
-    [TryFunction]
-    procedure TrySendWarningMail(NaviDocsEntry: Record "NPR NaviDocs Entry")
+    procedure SendWarningMail(NaviDocsEntry: Record "NPR NaviDocs Entry"; var ErrorMessage: Record "Error Message"; var EmailItem: Record "Email Item")
     var
         NaviDocsEntryComment: Record "NPR NaviDocs Entry Comment";
         EmailSetup: Record "NPR E-mail Setup";
         MailSeparators: List of [Text];
-        Txt001: Label 'NaviDocs Error %1 - %2';
+        NaviDocsErr: Label 'NaviDocs Error %1 - %2';
         MailManagement: Codeunit "Mail Management";
-        TempEmailItem: Record "Email Item" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         NaviDocsSetup.Get();
@@ -1127,18 +1126,18 @@ codeunit 6059767 "NPR NaviDocs Management"
         MailSeparators.Add(',');
 
 
-        EmailSenderHandler.CreateEmailItem(TempEmailItem, EmailSetup."From Name", EmailSetup."From E-mail Address",
+        EmailSenderHandler.CreateEmailItem(EmailItem, EmailSetup."From Name", EmailSetup."From E-mail Address",
                                             NaviDocsSetup."Warning E-mail".Split(MailSeparators),
-                                            StrSubstNo(Txt001, NaviDocsEntry."Document Description", NaviDocsEntry."No."), '', true);
+                                            StrSubstNo(NaviDocsErr, NaviDocsEntry."Document Description", NaviDocsEntry."No."), '', true);
 
         NaviDocsEntryComment.SetRange("Entry No.", NaviDocsEntry."Entry No.");
         NaviDocsEntryComment.SetRange("Table No.", NaviDocsEntry."Table No.");
         NaviDocsEntryComment.SetRange("Document Type", NaviDocsEntry."Document Type");
         NaviDocsEntryComment.SetRange("Document No.", NaviDocsEntry."No.");
         if NaviDocsEntryComment.FindLast() then
-            EmailSenderHandler.AppendBodyLine(TempEmailItem, NaviDocsEntryComment.Description + '<br><br>');
+            EmailSenderHandler.AppendBodyLine(EmailItem, NaviDocsEntryComment.Description + '<br><br>');
 
-        EmailSenderHandler.Send(TempEmailItem);
+        EmailSenderHandler.Send(EmailItem, ErrorMessage);
     end;
 
     procedure NaviDocsStatusUnhandled(): Integer

@@ -1,5 +1,22 @@
 codeunit 6014553 "NPR Email Sending Handler"
 {
+    TableNo = "Email Item";
+
+    trigger OnRun()
+    var
+        MailManagement: Codeunit "Mail Management";
+        ErrorMessageMgt: Codeunit "Error Message Management";
+        NotEnabledErr: Label 'Mail setup is not enabled.';
+    begin
+        if not MailManagement.IsEnabled() then begin
+            ErrorMessageMgt.LogSimpleErrorMessage(NotEnabledErr);
+        end else begin
+            MailManagement.SetHideMailDialog(true);
+            MailManagement.Send(Rec, Enum::"Email Scenario"::Default);
+        end;
+        ErrorMessageMgt.Finish(Rec);
+    end;
+
     procedure CreateEmailItem(var EmailItem: Record "Email Item"; FromName: Text; FromAddress: Text; Recipients: List of [Text]; Subject: Text; Body: Text; HtmlFormat: Boolean)
     var
         i: Integer;
@@ -179,18 +196,24 @@ codeunit 6014553 "NPR Email Sending Handler"
         EmailItem.Modify();
     end;
 
-    [TryFunction]
-    procedure Send(EmailItem: Record "Email Item")
+    procedure Send(EmailItem: Record "Email Item"; var ErrorMessage: Record "Error Message") IsSuccess: Boolean
     var
-        MailManagement: Codeunit "Mail Management";
-        NotEnabledErr: Label 'Mail setup is not enabled.';
+        ErrorContextElement: Codeunit "Error Context Element";
+        ErrorMessageHandler: Codeunit "Error Message Handler";
+        EmailSendingHandler: Codeunit "NPR Email Sending Handler";
+        ErrorMessageMgt: Codeunit "Error Message Management";
     begin
-        if not MailManagement.IsEnabled() then
-            Error(NotEnabledErr);
-
-        MailManagement.SetHideMailDialog(true);
-        MailManagement.Send(EmailItem, Enum::"Email Scenario"::Default);
-        exit(true);
+        ErrorMessage.DeleteAll();
+        ErrorMessageMgt.Activate(ErrorMessageHandler);
+        ErrorMessageMgt.PushContext(ErrorContextElement, EmailItem.RecordId(), 0, '');
+        Commit();
+        IsSuccess := EmailSendingHandler.Run(EmailItem);
+        if not IsSuccess then begin
+            if not ErrorMessageMgt.GetErrorsInContext(EmailItem, ErrorMessage) then begin
+                ErrorMessageMgt.LogSimpleErrorMessage(GetLastErrorText());
+                ErrorMessageMgt.GetErrorsInContext(EmailItem, ErrorMessage);
+            end;
+        end;
     end;
 
     procedure HtmlMessage(EmailItem: Record "Email Item"; IsHtml: Boolean)
@@ -202,12 +225,5 @@ codeunit 6014553 "NPR Email Sending Handler"
             EmailItem.Validate("Plaintext Formatted", true);
             EmailItem.Validate("Message Type", EmailItem."Message Type"::"Custom Message");
         end;
-    end;
-
-    procedure GetLastError(var ErrorMessage: Text[250])
-    var
-        ErrorMessageManagement: Codeunit "Error Message Management";
-    begin
-        ErrorMessageManagement.GetLastError(ErrorMessage);
     end;
 }
