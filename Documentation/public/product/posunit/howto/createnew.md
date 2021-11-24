@@ -37,9 +37,9 @@ The new POS unit is created, attached to the POS store, and is now fully operati
 
 ### Related links
 
-- [Create a new POS unit (from the top)](https://www.placeholderlink.com)
-- [Configure a payment terminal for a POS unit](https://www.placeholderlink.com)
-- [POS unit profiles](https://www.placeholderlink.com)
+- [Create a new POS unit (from the top)](../../../../public/404.md)
+- [Configure a payment terminal for a POS unit](../../../../public/404.md)
+- [POS unit profiles](../../../../public/404.md)
 
 
 

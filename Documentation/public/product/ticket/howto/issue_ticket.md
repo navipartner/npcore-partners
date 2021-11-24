@@ -7,7 +7,7 @@ To issue tickets from Business Central:
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Ticket BOM** and choose the related link.
 2. On the **Ticket BOM** page, choose the **Item No.** for which you want to create tickets.
-3. Choose the **Create Tickets** action, from the sub-menu, choose either [**Create Prepaid Tickets** or **Create Postpaid Tickets**](../404.md "Prepaid vs Postpaid tickets").
+3. Choose the **Create Tickets** action, from the sub-menu, choose either [**Create Prepaid Tickets** or **Create Postpaid Tickets**](../../../../public/404.md "Prepaid vs Postpaid tickets").
 4. Click **Description** to drill down to schedules and select a date and time for the tickets. Click **OK** to select.
 5. Specify a value for the **Quantity** field.
 6. Specify a value for the **Customer No.** field.
@@ -22,11 +22,11 @@ To issue tickets from Business Central:
 The **Ticket List** pages opens with the created tickets.
 
 ### Next Steps:
- - [Admit an issued ticket](../404.md)
- - [Handle postpaid tickets](../404.md)
+ - [Admit an issued ticket](../../../../public/404.md)
+ - [Handle postpaid tickets](../../../../public/404.md)
  
 
 ### Related Links:
-- [Configure prepaid and postpaid business flow](../404.md)
-- [Issue tickets from POS](../404.md)
-- [Prepaid vs postpaid tickets](../404.md)
+- [Configure prepaid and postpaid business flow](../../../../public/404.md)
+- [Issue tickets from POS](../../../../public/404.md)
+- [Prepaid vs postpaid tickets](../../../../public/404.md)

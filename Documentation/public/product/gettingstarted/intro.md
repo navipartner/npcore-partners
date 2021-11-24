@@ -13,5 +13,5 @@ Our product documentation consists of three distinct groups of articles - explan
 
 - [POS Unit](../../product/posunit/intro.md)
 - [Replication module](../../product/replication/intro.md)
-- [Ticket module introduction](../../product/ticket/intro.md)
+- [Ticket module](../../product/ticket/intro.md)
 - [Electronic Funds Transfer](../../product/eft/intro.md)
