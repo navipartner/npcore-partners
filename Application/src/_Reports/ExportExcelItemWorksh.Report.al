@@ -195,7 +195,7 @@
             trigger OnPostDataItem()
             begin
 
-                TempExcelBuf.CreateBook('', TextItemWorksheetLbl);
+                TempExcelBuf.CreateNewBook(TextItemWorksheetLbl);
                 TempExcelBuf.WriteSheet(
                   PadStr(StrSubstNo(Pct1Lbl, "Item Worksheet Line"."Worksheet Name", ItemWorksheet.Description), 30),
                   CompanyName,
