@@ -38,7 +38,7 @@ xmlport 6060120 "NPR TM Ticket Details"
             {
                 MaxOccurs = Once;
                 MinOccurs = Zero;
-                tableelement(tmpticketreservationresponse; "NPR TM Ticket Reserv. Resp.")
+                tableelement(TempTicketReservationResponse; "NPR TM Ticket Reserv. Resp.")
                 {
                     MinOccurs = Zero;
                     XmlName = 'tickets';
@@ -48,31 +48,31 @@ xmlport 6060120 "NPR TM Ticket Details"
 
                         trigger OnBeforePassVariable()
                         begin
-                            status := Format(tmpTicketReservationResponse.Confirmed, 0, 9);
+                            status := Format(TempTicketReservationResponse.Confirmed, 0, 9);
                         end;
                     }
-                    fieldelement(order_uid; tmpTicketReservationResponse."Session Token ID")
+                    fieldelement(order_uid; TempTicketReservationResponse."Session Token ID")
                     {
                     }
-                    fieldelement(message_text; tmpTicketReservationResponse."Response Message")
+                    fieldelement(message_text; TempTicketReservationResponse."Response Message")
                     {
                     }
-                    tableelement(tmpticket; "NPR TM Ticket")
+                    tableelement(TempTicket; "NPR TM Ticket")
                     {
-                        LinkTable = tmpTicketReservationResponse;
+                        LinkTable = TempTicketReservationResponse;
                         MinOccurs = Zero;
                         XmlName = 'ticket';
                         UseTemporary = true;
-                        fieldelement(ticket_uid; TmpTicket."External Ticket No.")
+                        fieldelement(ticket_uid; TempTicket."External Ticket No.")
                         {
                         }
-                        fieldelement(barcode_no; TmpTicket."Ticket No. for Printing")
+                        fieldelement(barcode_no; TempTicket."Ticket No. for Printing")
                         {
 
                             trigger OnBeforePassField()
                             begin
-                                if (TmpTicket."Ticket No. for Printing" = '') then
-                                    TmpTicket."Ticket No. for Printing" := TmpTicket."External Ticket No.";
+                                if (TempTicket."Ticket No. for Printing" = '') then
+                                    TempTicket."Ticket No. for Printing" := TempTicket."External Ticket No.";
                             end;
                         }
                         textelement(token)
@@ -83,11 +83,10 @@ xmlport 6060120 "NPR TM Ticket Details"
                                 TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
                             begin
 
-                                //-TM1.43 [367471]
                                 token := '';
-                                if (TicketReservationRequest.Get(TmpTicket."Ticket Reservation Entry No.")) then
+                                if (TicketReservationRequest.Get(TempTicket."Ticket Reservation Entry No.")) then
                                     token := TicketReservationRequest."Session Token ID";
-                                //+TM1.43 [367471]
+
                             end;
                         }
                         textelement(valid_from)
@@ -95,7 +94,7 @@ xmlport 6060120 "NPR TM Ticket Details"
 
                             trigger OnBeforePassVariable()
                             begin
-                                valid_from := Format(TmpTicket."Valid From Date", 0, 9);
+                                valid_from := Format(TempTicket."Valid From Date", 0, 9);
                             end;
                         }
                         textelement(valid_until)
@@ -103,7 +102,7 @@ xmlport 6060120 "NPR TM Ticket Details"
 
                             trigger OnBeforePassVariable()
                             begin
-                                valid_until := Format(TmpTicket."Valid To Date", 0, 9);
+                                valid_until := Format(TempTicket."Valid To Date", 0, 9);
                             end;
                         }
                         textelement(pin_code)
@@ -117,10 +116,18 @@ xmlport 6060120 "NPR TM Ticket Details"
                                     pin_code := TicketReservationRequest."Authorization Code";
                             end;
                         }
+                        fieldelement(ItemNumber; TempTicket."Item No.")
+                        {
+                            XmlName = 'item_number';
+                        }
+                        fieldelement(Blocked; TempTicket.Blocked)
+                        {
+                            XmlName = 'blocked';
+                        }
                         tableelement("ticket access entry"; "NPR TM Ticket Access Entry")
                         {
-                            LinkFields = "Ticket No." = FIELD("No.");
-                            LinkTable = TmpTicket;
+                            LinkFields = "Ticket No." = Field("No.");
+                            LinkTable = TempTicket;
                             XmlName = 'admission';
                             fieldattribute(code; "Ticket Access Entry"."Admission Code")
                             {
@@ -203,7 +210,7 @@ xmlport 6060120 "NPR TM Ticket Details"
                         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
                     begin
 
-                        if (TicketReservationRequest.Get(tmpTicketReservationResponse."Request Entry No.")) then begin
+                        if (TicketReservationRequest.Get(TempTicketReservationResponse."Request Entry No.")) then begin
                         end;
                     end;
                 }
@@ -244,7 +251,7 @@ xmlport 6060120 "NPR TM Ticket Details"
     procedure GetResponse(var TmpTicketOut: Record "NPR TM Ticket")
     var
     begin
-        TmpTicketOut.Copy(tmpticket, true);
+        TmpTicketOut.Copy(TempTicket, true);
     end;
 
     procedure CreateResponse()
@@ -254,13 +261,13 @@ xmlport 6060120 "NPR TM Ticket Details"
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         FoundTickets: Boolean;
     begin
-        tmpTicketReservationResponse.DeleteAll();
+        TempTicketReservationResponse.DeleteAll();
 
-        tmpTicketReservationResponse.Reset();
-        tmpTicketReservationResponse."Session Token ID" := '';
-        tmpTicketReservationResponse.Confirmed := false;
-        tmpTicketReservationResponse."Response Message" := 'Not found.';
-        tmpTicketReservationResponse.Insert();
+        TempTicketReservationResponse.Reset();
+        TempTicketReservationResponse."Session Token ID" := '';
+        TempTicketReservationResponse.Confirmed := false;
+        TempTicketReservationResponse."Response Message" := 'Not found.';
+        TempTicketReservationResponse.Insert();
 
         if (filter_value = '') then
             exit;
@@ -272,38 +279,62 @@ xmlport 6060120 "NPR TM Ticket Details"
                 'TICKET':
                     begin
                         Ticket.SetFilter("External Ticket No.", '=%1', filter_value);
+                        Ticket.SetFilter(Blocked, '=%1', false);
                         if (Ticket.FindSet()) then begin
-                            tmpTicketReservationResponse.Confirmed := true;
-                            tmpTicketReservationResponse."Response Message" := '';
-                            tmpTicketReservationResponse.Modify();
+                            TempTicketReservationResponse.Confirmed := true;
+                            TempTicketReservationResponse."Response Message" := '';
+                            TempTicketReservationResponse.Modify();
                             repeat
-                                TmpTicket.TransferFields(Ticket, true);
-                                TmpTicket.Insert();
+                                TempTicket.TransferFields(Ticket, true);
+                                TempTicket.Insert();
                             until (Ticket.Next() = 0);
                         end;
                     end;
-
+                'OWNER':
+                    begin
+                        TicketReservationRequest.SetFilter("Notification Address", '=%1', filter_value);
+                        if (TicketReservationRequest.FindSet()) then begin
+                            repeat
+                                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                                Ticket.SetFilter(Blocked, '=%1', false);
+                                if (Ticket.FindSet()) then begin
+                                    TempTicketReservationResponse.Confirmed := true;
+                                    TempTicketReservationResponse."Response Message" := '';
+                                    TempTicketReservationResponse.Modify();
+                                    repeat
+                                        TempTicket.TransferFields(Ticket, true);
+                                        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                                        TicketAccessEntry.SetFilter("Access Date", '<>%1', 0D);
+                                        if ((TicketAccessEntry.IsEmpty() AND (Ticket."Valid From Date" <= Today()) AND (Ticket."Valid To Date" >= Today())) OR
+                                            (UpperCase(full_history) IN ['YES', 'true'])) then begin
+                                            if (TempTicket.Insert()) then;
+                                        end;
+                                    until (Ticket.Next() = 0);
+                                end;
+                            until (TicketReservationRequest.Next() = 0);
+                        end;
+                    end;
                 'TOKEN':
                     begin
                         TicketReservationRequest.SetFilter("Session Token ID", '=%1', filter_value);
                         //if (TicketReservationRequest.FindFirst()) then begin
                         TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
+                        Ticket.SetFilter(Blocked, '=%1', false);
                         if (TicketReservationRequest.FindSet()) then begin
                             repeat
                                 Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
                                 if (Ticket.FindSet()) then begin
-                                    tmpTicketReservationResponse.Confirmed := true;
-                                    tmpTicketReservationResponse."Response Message" := '';
-                                    tmpTicketReservationResponse.Modify();
+                                    TempTicketReservationResponse.Confirmed := true;
+                                    TempTicketReservationResponse."Response Message" := '';
+                                    TempTicketReservationResponse.Modify();
                                     repeat
-                                        TmpTicket.TransferFields(Ticket, true);
-                                        TmpTicket.Insert();
+                                        TempTicket.TransferFields(Ticket, true);
+                                        TempTicket.Insert();
                                     until (Ticket.Next() = 0);
                                 end;
                             until (TicketReservationRequest.Next() = 0)
                         end;
                     end;
-
                 'CUSTOMER',
                 'MEMBER':
                     begin
@@ -317,26 +348,27 @@ xmlport 6060120 "NPR TM Ticket Details"
                         end;
 
                         if (FoundTickets) then begin
-                            tmpTicketReservationResponse.Confirmed := true;
-                            tmpTicketReservationResponse."Response Message" := '';
-                            tmpTicketReservationResponse.Modify();
+                            TempTicketReservationResponse.Confirmed := true;
+                            TempTicketReservationResponse."Response Message" := '';
+                            TempTicketReservationResponse.Modify();
                             repeat
-                                TmpTicket.TransferFields(Ticket, true);
+                                TempTicket.TransferFields(Ticket, true);
                                 TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                                 TicketAccessEntry.SetFilter("Access Date", '<>%1', 0D);
                                 if ((TicketAccessEntry.IsEmpty() and
                                     (Ticket."Valid From Date" <= Today) and (Ticket."Valid To Date" >= Today) and
                                     (Ticket."Printed Date" = 0D)) or
                                   (UpperCase(full_history) = 'YES')) then begin
-                                    if (TmpTicket.Insert()) then;
+                                    if (TempTicket.Insert()) then;
                                 end;
                             until (Ticket.Next() = 0);
                         end;
                     end;
                 else
-                    Error('Invalid filter type use one of CUSTOMER, MEMBER, TICKET, TOKEN');
+                    Error('Invalid filter type use one of CUSTOMER, MEMBER, OWNER, TICKET, TOKEN');
             end;
         end;
     end;
 }
+
 
