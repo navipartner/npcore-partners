@@ -42,7 +42,8 @@ codeunit 6014416 "NPR Mixed Discount Management"
             ApplyMixDiscount(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, CalculateOnly);
         until (TempMixedDiscount.Next() = 0);
 
-        Clear(TempSaleLinePOS);
+        if (not CalculateOnly) then
+            Clear(TempSaleLinePOS);
     end;
 
     procedure FindPotentiallyImpactedMixesAndLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; RecalculateAllLines: Boolean)
@@ -626,8 +627,17 @@ codeunit 6014416 "NPR Mixed Discount Management"
             TotalDiscAmount := ApplylMultiLevelMixDiscountOnLines(TempSaleLinePOSApply, TempMixedDiscount, TempMixedDiscountLine, LastLineNo, InvQtyDict)
         else
             TotalDiscAmount := ApplyMixDiscountOnLines(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply, InvQtyDict);
-        if (not CalculateOnly) then
-            TransferAppliedDiscountToSale(TempSaleLinePOSApply, TempSaleLinePOS, LastLineNo, InvQtyDict);
+        if ( CalculateOnly) then begin
+            TempSaleLinePOS.Validate(Quantity, TempSaleLinePOSApply."MR Anvendt antal");
+            TempSaleLinePOS."Discount Type" := TempSaleLinePOSApply."Discount Type";
+            TempSaleLinePOS."Discount Code" := TempSaleLinePOSApply."Discount Code";
+            TempSaleLinePOS."Discount %" := 0;
+            TempSaleLinePOS."Discount Amount" := TempSaleLinePOSApply."Discount Amount";
+            TempSaleLinePOS."Custom Disc Blocked" := TempSaleLinePOSApply."Custom Disc Blocked";
+            TempSaleLinePOS.Modify();
+        end else begin
+            TransferAppliedDiscountToSale(TempSaleLinePOSApply, TempSaleLinePOS, LastLineNo, InvQtyDict)
+        end;
 
         exit(TotalDiscAmount);
     end;
