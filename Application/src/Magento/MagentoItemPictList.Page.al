@@ -60,7 +60,20 @@ page 6151413 "NPR Magento Item Pict. List"
             {
                 Caption = 'Magento Picture';
                 ApplicationArea = NPRRetail;
+                Visible = HasVariants;
+                Provider = MagentoPictureLinkSubform;
+                SubPageLink = Type = const(Item),
+                              Name = field("Picture Name");
+            }
 
+            part(MagentoPictureDragDropAddin2; "NPR Magento DragDropPic. Addin")
+            {
+                Caption = 'Magento Picture';
+                ApplicationArea = NPRRetail;
+                Visible = (not HasVariants);
+                Provider = MagentoPictureLinkSubform2;
+                SubPageLink = Type = const(Item),
+                              Name = field("Picture Name");
             }
         }
     }
@@ -71,8 +84,8 @@ page 6151413 "NPR Magento Item Pict. List"
         case MagentoSetup."Picture Variety Type" of
             MagentoSetup."Picture Variety Type"::Fixed:
                 begin
-                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVariantValueCode(Rec."Item No.");
-                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVariantValueCode(Rec."Item No.");
+                    CurrPage.MagentoPictureLinkSubform2.PAGE.SetVariantValueCode(Rec."Item No.");
+                    CurrPage.MagentoPictureDragDropAddin2.PAGE.SetVariantValueCode(Rec."Item No.");
                 end;
             MagentoSetup."Picture Variety Type"::"Select on Item":
                 begin
@@ -124,11 +137,16 @@ page 6151413 "NPR Magento Item Pict. List"
 
     trigger OnOpenPage()
     begin
-        CurrPage.MagentoPictureLinkSubform.PAGE.SetItemNoFilter(ItemNo);
-        CurrPage.MagentoPictureLinkSubform2.PAGE.SetItemNoFilter(ItemNo);
-        CurrPage.MagentoPictureDragDropAddin.PAGE.SetItemNo(ItemNo);
-        CurrPage.MagentoPictureDragDropAddin.PAGE.SetHidePicture(true);
         SetupSourceTable();
+        if HasVariants then begin
+            CurrPage.MagentoPictureLinkSubform.PAGE.SetItemNoFilter(ItemNo);
+            CurrPage.MagentoPictureDragDropAddin.PAGE.SetItemNo(ItemNo);
+            CurrPage.MagentoPictureDragDropAddin.PAGE.SetHidePicture(false);
+        end else begin
+            CurrPage.MagentoPictureLinkSubform2.PAGE.SetItemNoFilter(ItemNo);
+            CurrPage.MagentoPictureDragDropAddin2.PAGE.SetItemNo(ItemNo);
+            CurrPage.MagentoPictureDragDropAddin2.PAGE.SetHidePicture(false);
+        end;
     end;
 
     var
