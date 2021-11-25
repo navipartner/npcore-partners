@@ -275,10 +275,18 @@ table 6150616 "NPR POS Payment Method"
     local procedure CheckReturnProcessingType()
     var
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnedPOSPaymentMethod: Record "NPR POS Payment Method";
     begin
         if ReturnPOSPaymentMethod.Get(Rec."Return Payment Method Code") then
             if ReturnPOSPaymentMethod."Processing Type" = ReturnPOSPaymentMethod."Processing Type"::EFT then
                 ReturnPOSPaymentMethod.FieldError("Processing Type");
+        if Rec."Processing Type" = Rec."Processing Type"::EFT then begin
+            ReturnedPOSPaymentMethod.SetRange("Return Payment Method Code", Rec.Code);
+            if not ReturnedPOSPaymentMethod.IsEmpty() then
+                Rec.FieldError("Processing Type");
+            if Rec.Code = Rec."Return Payment Method Code" then
+                Rec.FieldError("Processing Type");
+        end;
     end;
 
 }
