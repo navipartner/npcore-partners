@@ -51,7 +51,7 @@ table 6014465 "NPR SMS Setup"
         }
         field(8; "Local E-Mail Address"; Text[40])
         {
-            Caption = 'Local E-Mail Adress';
+            Caption = 'Local E-Mail Address';
             DataClassification = CustomerContent;
             ExtendedDatatype = EMail;
             trigger OnValidate()

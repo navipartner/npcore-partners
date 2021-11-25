@@ -6,7 +6,7 @@ page 6014404 "NPR SMS Setup"
     PromotedActionCategories = 'New,Tasks,Reports,Display';
     RefreshOnActivate = true;
     UsageCategory = Administration;
-
+    ContextSensitiveHelpPage = 'product/sms/howto/smshowto.html';
     DeleteAllowed = false;
     InsertAllowed = false;
     ApplicationArea = NPRRetail;
@@ -31,7 +31,7 @@ page 6014404 "NPR SMS Setup"
                 field("Discard Msg. Older Than [Hrs]"; Rec."Discard Msg. Older Than [Hrs]")
                 {
 
-                    ToolTip = 'Specifies the value of the Discard Msg. Older Than [Hrs] field. If message is not sent before Discard time, it will be marked as discarted and it wont''t be sent.';
+                    ToolTip = 'Specifies the value of the Discard Msg. Older Than [Hrs] field. If message is not sent before Discard time, it will be marked as discarded and it wont''t be sent.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Job Queue Category Code"; Rec."Job Queue Category Code")
@@ -43,7 +43,7 @@ page 6014404 "NPR SMS Setup"
                 field("Auto Send Attempts"; Rec."Auto Send Attempts")
                 {
 
-                    ToolTip = 'Specifies the value of the Auto Send Attempts field. Use this field to define how many attempts will system try to send SMS.';
+                    ToolTip = 'Specifies the value of the Auto Send Attempts field. Use this field to define in how many attempts the system will try to send the SMS.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -83,13 +83,13 @@ page 6014404 "NPR SMS Setup"
                 field("SMS-Address Postfix"; Rec."SMS-Address Postfix")
                 {
 
-                    ToolTip = 'Specifies the value of the SMS-Address Postfix field. SMS-Address Postfix is added to Phone Number, depending on Endpoing you use as SMS Provider.';
+                    ToolTip = 'Specifies the value of the SMS-Address Postfix field. SMS-Address Postfix is added to Phone Number, depending on Endpoint you use as SMS Provider.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Local E-Mail Address"; Rec."Local E-Mail Address")
                 {
 
-                    ToolTip = 'Specifies the value of the Local E-Mail Address field. SMS-Address Postfix is added to sender field, depending on Endpoing you use as SMS Provider.';
+                    ToolTip = 'Specifies the value of the Local E-Mail Address field. Local E-Mail Address is added to the Sender field, depending on the Endpoint you use as SMS Provider.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Local SMTP Pickup Library"; Rec."Local SMTP Pickup Library")
