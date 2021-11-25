@@ -18,3 +18,6 @@ We are in sync, and the salesperson is informed about it via a prompt.
 - Lookup failed.   
 NP Retail informs the salesperson about the failed lookup and allows more lookup attempts. 
 
+
+### Related links
+- [**Set up integration with MobilePay in NP Retail**](../howto/mobilepay.md)

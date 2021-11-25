@@ -50,3 +50,7 @@ However, there are special cases when the field names are different. You can use
 ![ReplicationSetupEndpointsFieldMappings.jpg](images/ReplicationSetupEndpointsFieldMappings.jpg)
 
 
+### Related links
+- [**Replication module introduction**](../intro.md)
+
+
