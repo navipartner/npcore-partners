@@ -7,3 +7,4 @@ This section of the documentation will dive into how to configure the EFT module
 
 ### Related links
 - [**Set up integration with MobilePay**](./howto/mobilepay.md)
+- [**Transaction lookup**](./explanation/lookup.md)
