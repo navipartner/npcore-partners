@@ -161,8 +161,8 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         repeat
             Vat := XmlElement.Create('Vat', XmlNs);
             Vat.Add(CleanCashXCCSPProtocol.AddElement('Class', Format(CleanCashTransactionVat."VAT Class", 0, '<Integer>'), XmlNs));
-            Vat.Add(CleanCashXCCSPProtocol.AddElement('Percentage', Format(CleanCashTransactionVat.Percentage, 0, '<Precision,2:2><Integer><Comma,,><Decimals>'), XmlNs));
-            Vat.Add(CleanCashXCCSPProtocol.AddElement('Amount', Format(CleanCashTransactionVat.Amount, 0, '<Precision,2:2><Sign><Integer><Comma,,><Decimals>'), XmlNs));
+            Vat.Add(CleanCashXCCSPProtocol.AddElement('Percentage', Format(CleanCashTransactionVat.Percentage, 0, '<Precision,2:2><Integer><Decimals><Comma,,>'), XmlNs));
+            Vat.Add(CleanCashXCCSPProtocol.AddElement('Amount', Format(CleanCashTransactionVat.Amount, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'), XmlNs));
             VatList.Add(Vat);
         until (CleanCashTransactionVat.Next() = 0);
 
@@ -177,8 +177,8 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('ReceiptId', CleanCashTransactionRequest."Receipt Id", XmlNs));
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('PosId', CleanCashTransactionRequest."Pos Id", XmlNs));
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('OrgNo', CleanCashTransactionRequest."Organisation No.", XmlNs));
-        Receipt.Add(CleanCashXCCSPProtocol.AddElement('ReceiptTotal', Format(CleanCashTransactionRequest."Receipt Total", 0, '<Precision,2:2><Sign><Integer><Comma,,><Decimals>'), XmlNs));
-        Receipt.Add(CleanCashXCCSPProtocol.AddElement('NegativeTotal', Format(CleanCashTransactionRequest."Negative Total", 0, '<Precision,2:2><Sign><Integer><Comma,,><Decimals>'), XmlNs));
+        Receipt.Add(CleanCashXCCSPProtocol.AddElement('ReceiptTotal', Format(CleanCashTransactionRequest."Receipt Total", 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'), XmlNs));
+        Receipt.Add(CleanCashXCCSPProtocol.AddElement('NegativeTotal', Format(CleanCashTransactionRequest."Negative Total", 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'), XmlNs));
         "NPR CleanCash Receipt Type".Names().Get("NPR CleanCash Receipt Type".Ordinals().IndexOf(CleanCashTransactionRequest."Receipt Type".AsInteger()), EnumName);
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('ReceiptType', EnumName, XmlNs));
 
