@@ -100,6 +100,8 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
         ResponseText: Text;
         Username: Text;
         Password: Text;
+        JObject: JsonObject;
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         RequestMethodTok: Label 'POST', Locked = true;
         UserAgentTok: Label 'User-Agent', Locked = true;
         UserAgentTxt: Label 'NP Dynamics Retail / Dynamics 365 Business Central', Locked = true;
@@ -109,24 +111,29 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
         InvalidXmlErr: Label 'CleanCash server did not respond with a valid XML document: (response was %1)';
     begin
         XmlIn.WriteTo(RequestText);
-        Content.WriteFrom(RequestText);
-
-        Request.Method := RequestMethodTok;
-        Request.SetRequestUri(Url);
-        Request.GetHeaders(Headers);
-        Request.Content(Content);
 
         if (not ExtractUserNamePasswordFromUrl(Url, Username, Password)) then
             Error(InvalidConnectStringErr, Url);
 
+        Request.Method := RequestMethodTok;
+        Request.SetRequestUri('https://navipartner.azure-api.net/npcleancash/CleanCash'); //CleanCash API --> CleanCash Azure Function --> DigestAuth Proxy
+        Request.GetHeaders(Headers);
+        Headers.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetSecret('CleanCashApiKey'));
         Headers.Add(UserAgentTok, UserAgentTxt);
-        Client.UseWindowsAuthentication(Username, Password);
+
+        JObject.Add('url', Url);
+        JObject.Add('userName', Username);
+        JObject.Add('password', Password);
+        JObject.Add('requestBody', RequestText);
+        JObject.WriteTo(RequestText);
+        Content.WriteFrom(RequestText);
+        Request.Content(Content);
 
         if (Client.Send(Request, Response)) then begin
 
             if (Response.HttpStatusCode() = 200) then begin
                 Response.Content.ReadAs(ResponseText);
-                if (not XmlDocument.ReadFrom(ResponseText, XmlOut)) then
+                if (not XmlDocument.ReadFrom(ResponseText, XmlOut)) or (ResponseText.Contains('<type>Fault</type>')) then
                     Error(InvalidXmlErr, ResponseText);
             end else begin
                 Error(UnexpectedResponseCodeErr, Response.HttpStatusCode)
