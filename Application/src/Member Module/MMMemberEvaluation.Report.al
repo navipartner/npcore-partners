@@ -209,14 +209,14 @@ report 6014494 "NPR MM Member Evaluation"
                 {
                     Caption = 'General';
 
-                    field(StartDate; LowDate)
+                    field(StartDate; FromDate)
                     {
                         Caption = 'From Date';
 
                         ToolTip = 'Select memberships that was active after this date.';
                         ApplicationArea = NPRRetail;
                     }
-                    field(EndDate; HighDate)
+                    field(EndDate; ToDate)
                     {
                         Caption = 'Until Date';
 
@@ -252,8 +252,8 @@ report 6014494 "NPR MM Member Evaluation"
     }
 
     var
-        LowDate: Date;
-        HighDate: Date;
+        FromDate: Date;
+        ToDate: Date;
         Window: Dialog;
         RecordCount: Integer;
         Index: Integer;
@@ -266,8 +266,8 @@ report 6014494 "NPR MM Member Evaluation"
 
     trigger OnInitReport()
     begin
-        LowDate := 0D;
-        HighDate := Today();
+        FromDate := 0D;
+        ToDate := Today();
     end;
 
     trigger OnPreReport()
@@ -290,39 +290,11 @@ report 6014494 "NPR MM Member Evaluation"
     begin
         // Only From Date is within requested time period
         MembershipEntry.Reset();
-        MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipEntry.SetFilter(Blocked, '=%1', false);
+        MembershipEntry.SetRange("Membership Entry No.", MembershipEntryNo);
+        MembershipEntry.SetRange(Blocked, false);
         MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
-        MembershipEntry.SetFilter("Valid From Date", '%1..%2', LowDate, HighDate);
-        if (not MembershipEntry.IsEmpty()) then
-            exit(true);
-
-        // Only Until Date is within requested time period
-        MembershipEntry.Reset();
-        MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipEntry.SetFilter(Blocked, '=%1', false);
-        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
-        MembershipEntry.SetFilter("Valid Until Date", '%1..%2', LowDate, HighDate);
-        if (not MembershipEntry.IsEmpty()) then
-            exit(true);
-
-        // Requested time period is greater than time frame
-        MembershipEntry.Reset();
-        MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipEntry.SetFilter(Blocked, '=%1', false);
-        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
-        MembershipEntry.SetFilter("Valid From Date", '%1..', LowDate);
-        MembershipEntry.SetFilter("Valid Until Date", '..%1', HighDate);
-        if (not MembershipEntry.IsEmpty()) then
-            exit(true);
-
-        // Requested time period is smaller than time frame
-        MembershipEntry.Reset();
-        MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipEntry.SetFilter(Blocked, '=%1', false);
-        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
-        MembershipEntry.SetFilter("Valid From Date", '..%1', LowDate);
-        MembershipEntry.SetFilter("Valid Until Date", '%1..', HighDate);
+        MembershipEntry.SetFilter("Valid From Date", '..%1', ToDate);
+        MembershipEntry.SetFilter("Valid Until Date", '%1..', FromDate);
         exit(not MembershipEntry.IsEmpty());
     end;
 
@@ -341,13 +313,14 @@ report 6014494 "NPR MM Member Evaluation"
             exit(false);
 
         // Card Scan
+        MemberArrivalLogEntry.SetCurrentKey("External Membership No.", "External Member No.", "Event Type", "Response Type", "Local Date");
         MemberArrivalLogEntry.SetFilter("External Membership No.", '=%1', TmpAgrBuffer.Template);
         MemberArrivalLogEntry.SetFilter("External Member No.", '=%1', Member."External Member No.");
         MemberArrivalLogEntry.SetFilter("Event Type", '=%1', MemberArrivalLogEntry."Event Type"::ARRIVAL);
         MemberArrivalLogEntry.SetFilter("Response Type", '=%1', MemberArrivalLogEntry."Response Type"::SUCCESS);
 
         if (not FullHistory) then
-            MemberArrivalLogEntry.SetFilter("Local Date", '%1..%2', LowDate, HighDate);
+            MemberArrivalLogEntry.SetFilter("Local Date", '%1..%2', FromDate, ToDate);
         TmpAgrBuffer."Indent 3" := MemberArrivalLogEntry.Count();
 
         // Membership ticket count
@@ -361,7 +334,7 @@ report 6014494 "NPR MM Member Evaluation"
             IssuedTicket.SetFilter("External Member Card No.", '=%1', Member."External Member No.");
             IssuedTicket.SetFilter(Blocked, '=%1', false);
             if (not FullHistory) then
-                IssuedTicket.SetFilter("Document Date", '%1..%2', LowDate, HighDate);
+                IssuedTicket.SetFilter("Document Date", '%1..%2', FromDate, ToDate);
             TmpAgrBuffer."Indent 4" := IssuedTicket.Count();
 
             if (TmpAgrBuffer."Indent 4" > 0) then begin
@@ -378,21 +351,21 @@ report 6014494 "NPR MM Member Evaluation"
 
         // Revenue
         if (TmpAgrBuffer."Code 3" <> '') then begin
+            POSEntry.SetCurrentKey("Customer No.", "Sales Document Type", "Document Date");
             POSEntry.SetFilter("Customer No.", '=%1', TmpAgrBuffer."Code 3");
             if (not FullHistory) then
-                POSEntry.SetFilter("Document Date", '%1..%2', LowDate, HighDate);
+                POSEntry.SetFilter("Document Date", '%1..%2', FromDate, ToDate);
             POSEntry.SetFilter("Sales Document Type", '=%1', POSEntry."Sales Document Type"::Quote);
             TmpAgrBuffer.Color := POSEntry.Count(); // POS Sales Count
-            if (POSEntry.FindSet()) then begin
+            if POSEntry.FindSet(false, false) then
                 repeat
                     TmpAgrBuffer."Decimal 1" += POSEntry."Amount Incl. Tax"; // Total POS Amount Including Discount and Tax
                     TmpAgrBuffer."Decimal 2" += POSEntry."Discount Amount"; // Total POS Discount
-                until (POSEntry.Next() = 0);
-            end;
+                until POSEntry.Next() = 0;
 
             SalesInvoiceHeader.SetFilter("Bill-to Customer No.", '=%1', TmpAgrBuffer."Code 3");
             if (not FullHistory) then
-                SalesInvoiceHeader.SetFilter("Document Date", '%1..%2', LowDate, HighDate);
+                SalesInvoiceHeader.SetFilter("Document Date", '%1..%2', FromDate, ToDate);
             TmpAgrBuffer."Color 2" := SalesInvoiceHeader.Count();
             if (SalesInvoiceHeader.FindSet()) then begin
                 repeat
@@ -405,5 +378,4 @@ report 6014494 "NPR MM Member Evaluation"
         exit(true);
 
     end;
-
 }
