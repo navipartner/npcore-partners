@@ -305,8 +305,10 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
         POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
     begin
-        if not EftTransactionRequest.Successful then
-            Message(TRX_ERROR, EftTransactionRequest."Integration Type", Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
+        //TODO: Renable Message in newer than BC17.5:
+        //if not EftTransactionRequest.Successful then
+        //    Message(TRX_ERROR, EftTransactionRequest."Integration Type", Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
+
 
         if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, POSPaymentMethod) then begin
             EftTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;

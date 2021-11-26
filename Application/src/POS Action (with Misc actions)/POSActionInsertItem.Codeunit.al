@@ -711,7 +711,9 @@
     local procedure GetItemFromItemSearch(var ItemIdentifierString: Text): Boolean
     var
         Item: Record Item;
-        ItemList: Page "NPR Items Smart Search";
+        ItemListSmartSearch: Page "NPR Items Smart Search";
+        ItemList: Page "Item List";
+        LookupOk: Boolean;
     begin
         SetItemSearchFilter(ItemIdentifierString, Item, true);
         if not Item.FindFirst() then
@@ -721,15 +723,27 @@
         Item.FindLast();
         if ItemIdentifierString = Item."No." then
             exit(true);
-        ItemList.Editable(true);
-        ItemList.LookupMode(true);
-        ItemList.SetTableView(Item);
-        if ItemList.RunModal() = ACTION::LookupOK then begin
-            ItemList.GetRecord(Item);
+
+        if CurrentClientType = ClientType::Phone then begin
+            //Smart search uses worksheet page type to hide built-in search but phone client does not support worksheet pages.
+            ItemList.Editable(true);
+            ItemList.LookupMode(true);
+            ItemList.SetTableView(Item);
+            LookupOk := ItemList.RunModal() = ACTION::LookupOK;
+            if LookupOk then
+                ItemList.GetRecord(Item);
+        end else begin
+            ItemListSmartSearch.Editable(true);
+            ItemListSmartSearch.LookupMode(true);
+            ItemListSmartSearch.SetTableView(Item);
+            LookupOk := ItemListSmartSearch.RunModal() = ACTION::LookupOK;
+            if LookupOk then
+                ItemListSmartSearch.GetRecord(Item);
+        end;
+
+        if LookupOk then begin
             ItemIdentifierString := Item."No.";
             exit(true);
-        end else begin
-            exit(false);
         end;
     end;
 

@@ -246,7 +246,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     begin
         if not eftTrxRequest.Successful then begin
             if (GuiAllowed) then begin
-                Message(eftTrxRequest."Result Display Text");   // TODO: Problems with MESSAGE (BC17 RTM issue) - what to do now?
+                //Message(eftTrxRequest."Result Display Text");   // TODO: Problems with MESSAGE (BC17 RTM issue) - what to do now?
             end else begin
                 Error(eftTrxRequest."Result Display Text");
             end;

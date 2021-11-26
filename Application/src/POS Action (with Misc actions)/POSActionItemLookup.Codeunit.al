@@ -131,8 +131,14 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         if SaleLinePOS.Type = SaleLinePOS.Type::Item then
             if Item.Get(SaleLinePOS."No.") then;
 
-        if PAGE.RunModal(PAGE::"NPR Items Smart Search", Item) = ACTION::LookupOK then
-            ItemNo := Item."No.";
+        if CurrentClientType = ClientType::Phone then begin
+            //Smart search uses worksheet page type to hide built-in search but phone client does not support worksheet pages.
+            if Page.RunModal(Page::"Item List", Item) = ACTION::LookupOK then
+                ItemNo := Item."No.";
+        end else begin
+            if PAGE.RunModal(PAGE::"NPR Items Smart Search", Item) = ACTION::LookupOK then
+                ItemNo := Item."No.";
+        end;
 
         JSON.SetContext('selected_itemno', ItemNo);
         FrontEnd.SetActionContext(ActionCode(), JSON);
