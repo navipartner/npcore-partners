@@ -4,7 +4,7 @@
   href: posunit/toc.yml
 - name: POS fiscalization
   href: posfiscalization/toc.yml
-- name: POS tax Free
+- name: POS tax free
   href: postaxfree/toc.yml  
 - name: Electronic funds transfer
   href: eft/toc.yml
@@ -14,4 +14,6 @@
   href: member/toc.yml
 - name: Data replication module
   href: replication/toc.yml
+- name: End user communication
+  href: sms/toc.yml
 - name: Webshop integrations
