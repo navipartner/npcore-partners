@@ -527,6 +527,8 @@ table 6150621 "NPR POS Entry"
         { }
         key(Key11; "POS Period Register No.")
         { }
+
+        key(Key12; "Customer No.", "Sales Document Type", "Document Date") { }
     }
 
     fieldgroups

@@ -93,6 +93,8 @@ table 6060145 "NPR MM Member Arr. Log Entry"
         key(Key1; "Entry No.")
         {
         }
+
+        key(Key2; "External Membership No.", "External Member No.", "Event Type", "Response Type", "Local Date") { }
     }
 
     fieldgroups
