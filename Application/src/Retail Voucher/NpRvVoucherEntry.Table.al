@@ -24,8 +24,8 @@ table 6151014 "NPR NpRv Voucher Entry"
             Caption = 'Entry Type';
             DataClassification = CustomerContent;
             Description = 'NPR5.49,NPR5.50';
-            OptionCaption = ',Issue Voucher,Payment,Manual Archive,Partner Issue Voucher,Partner Payment,Top-up';
-            OptionMembers = ,"Issue Voucher",Payment,"Manual Archive","Partner Issue Voucher","Partner Payment","Top-up";
+            OptionCaption = ',Issue Voucher,Payment,Manual Archive,Partner Issue Voucher,Partner Payment,Top-up,Synchronisation,Partner Top-up';
+            OptionMembers = ,"Issue Voucher",Payment,"Manual Archive","Partner Issue Voucher","Partner Payment","Top-up",Synchronisation,"Partner Top-up";
         }
         field(15; "Voucher Type"; Code[20])
         {

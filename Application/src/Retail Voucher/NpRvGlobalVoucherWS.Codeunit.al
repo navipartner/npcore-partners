@@ -330,6 +330,83 @@
         end;
     end;
 
+
+    procedure TopUpVouchers(var vouchers: XMLport "NPR NpRv Global Vouchers")
+    var
+        TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
+    begin
+        SetGlobalLanguage(UserId);
+
+        vouchers.Import();
+        vouchers.GetSourceTable(TempNpRvVoucherBuffer);
+
+        if TempNpRvVoucherBuffer.IsEmpty then
+            exit;
+
+        TempNpRvVoucherBuffer.FindSet();
+        repeat
+            TopUpVoucher(TempNpRvVoucherBuffer);
+        until TempNpRvVoucherBuffer.Next() = 0;
+
+        Commit();
+    end;
+
+    local procedure TopUpVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        InUseQty: Integer;
+    begin
+        if not FindVoucher(NpRvVoucherBuffer."Voucher Type", NpRvVoucherBuffer."Reference No.", NpRvVoucher) then
+            Error(Text000, NpRvVoucherBuffer."Reference No.");
+
+        NpRvVoucherType.Get(NpRvVoucher."Voucher Type");
+
+        NpRvVoucherEntry.Init();
+        NpRvVoucherEntry."Entry No." := 0;
+        NpRvVoucherEntry."Voucher No." := NpRvVoucher."No.";
+        NpRvVoucherEntry."Entry Type" := NpRvVoucherEntry."Entry Type"::"Partner Top-up";
+        NpRvVoucherEntry."Voucher Type" := NpRvVoucher."Voucher Type";
+        NpRvVoucherEntry.Amount := NpRvVoucherBuffer.Amount;
+        NpRvVoucherEntry."Remaining Amount" := NpRvVoucherEntry.Amount;
+        NpRvVoucherEntry.Positive := NpRvVoucherEntry.Amount > 0;
+        NpRvVoucherEntry."Posting Date" := NpRvVoucherBuffer."Redeem Date";
+        NpRvVoucherEntry.Open := NpRvVoucherEntry.Amount <> 0;
+        NpRvVoucherEntry."Register No." := NpRvVoucherBuffer."Redeem Register No.";
+        NpRvVoucherEntry."Document No." := NpRvVoucherBuffer."Redeem Sales Ticket No.";
+        NpRvVoucherEntry."User ID" := NpRvVoucherBuffer."Redeem User ID";
+        NpRvVoucherEntry."Partner Code" := NpRvVoucherBuffer."Redeem Partner Code";
+        NpRvVoucherEntry."Closed by Entry No." := 0;
+        NpRvVoucherEntry.Insert();
+
+        NpRvVoucherMgt.ApplyEntry(NpRvVoucherEntry);
+        Voucher2Buffer(NpRvVoucher, NpRvVoucherBuffer);
+        NpRvVoucherBuffer.Amount := NpRvVoucherEntry.Amount;
+        NpRvVoucherBuffer.Modify();
+
+        NpRvVoucher.CalcFields(Open);
+        if not NpRvVoucher.Open then
+            NpRvVoucherMgt.ArchiveVouchers(NpRvVoucher);
+
+        InUseQty := NpRvVoucher.CalcInUseQty();
+        if InUseQty > 0 then begin
+            NpRvSalesLine.SetRange("Register No.", NpRvVoucherBuffer."Redeem Register No.");
+            NpRvSalesLine.SetRange("Sales Ticket No.", NpRvVoucherBuffer."Redeem Sales Ticket No.");
+            NpRvSalesLine.SetRange("Sale Type", NpRvSalesLine."Sale Type"::Sale);
+            NpRvSalesLine.SetRange("Sale Date", NpRvVoucherBuffer."Redeem Date");
+            NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
+            NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
+            if InUseQty > NpRvSalesLine.Count() then
+                Error(Text001, NpRvVoucherBuffer."Reference No.");
+
+            NpRvSalesLine.DeleteAll();
+        end;
+    end;
+
+
     procedure InvokeRedeemPartnerVouchers(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         NpRvPartner: Record "NPR NpRv Partner";
