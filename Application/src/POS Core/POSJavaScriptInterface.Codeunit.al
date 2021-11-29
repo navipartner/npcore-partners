@@ -55,6 +55,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
 
         Success := Self.Run();
         Handled := OnRunHandled;
+        EmitResult(Success, Handled);
 
         OnRunInitialized := false;
     end;
@@ -72,6 +73,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
 
         Success := Self.Run();
         Handled := OnRunHandled;
+        EmitResult(Success, Handled);
 
         OnRunInitialized := false;
     end;
@@ -89,8 +91,78 @@ codeunit 6150701 "NPR POS JavaScript Interface"
 
         Success := Self.Run();
         Handled := OnRunHandled;
+        EmitResult(Success, Handled);
 
         OnRunInitialized := false;
+    end;
+
+    local procedure EmitResult(Success: Boolean; Handled: Boolean)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+        VerbosityLevel: Verbosity;
+        TempText: Text;
+        MessageText: Text;
+    begin
+
+        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
+            Clear(ActiveSession);
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
+        CustomDimensions.Add('NPR_RunType', Format(OnRunType, 0, 9));
+
+        if (OnRunType = OnRunType::BeforeWorkflow) then begin
+            CustomDimensions.Add('NPR_Action', OnRunPOSAction.Code);
+            OnRunParameters.WriteTo(TempText);
+            CustomDimensions.Add('NPR_Parameters', TempText); // Could contain sensitive data
+            MessageText := StrSubstNo('OnBeforeWorkflow => %1', OnRunPOSAction.Code);
+        end;
+
+        if (OnRunType = OnRunType::InvokeAction) then begin
+            CustomDimensions.Add('NPR_Action', OnRunPOSAction.Code);
+            CustomDimensions.Add('NPR_WorkflowStep', OnRunWorkflowStep);
+            OnRunContext.WriteTo(TempText);
+            CustomDimensions.Add('NPR_Context', TempText); // Could contain sensitive data
+            MessageText := StrSubstNo('InvokeAction => %1, %2', OnRunPOSAction.Code, OnRunWorkflowStep);
+        end;
+
+        if (OnRunType = OnRunType::MethodInvocation) then begin
+            OnRunContext.WriteTo(TempText);
+            CustomDimensions.Add('NPR_Context', TempText); // Could contain sensitive data
+            CustomDimensions.Add('NPR_Method', OnRunMethod);
+            MessageText := StrSubstNo('InvokeMethod => %1 (%2)', GetValueAsText(OnRunContext, 'name'), OnRunMethod);
+        end;
+
+        VerbosityLevel := Verbosity::Normal;
+        if ((not Success) or (not Handled)) then begin
+            VerbosityLevel := Verbosity::Error;
+            CustomDimensions.Add('NPR_ErrorText', GetLastErrorText());
+            CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
+        end;
+
+        Session.LogMessage('NPR_PosAction', MessageText, VerbosityLevel, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+    end;
+
+    local procedure GetValueAsText(JObject: JsonObject; KeyName: Text): Text
+    var
+        JToken: JsonToken;
+    begin
+        if (not JObject.Contains(KeyName)) then
+            exit('');
+
+        if (not JObject.SelectToken(KeyName, JToken)) then
+            exit('');
+
+        if (JToken.AsValue().IsNull()) then
+            exit('');
+
+        exit(JToken.AsValue().AsText());
     end;
 
     // The purpose of this function is to detect if there are action codeunits that respond to either OnBeforeWorkflow or OnAction not intended for them.
