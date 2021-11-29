@@ -19,20 +19,66 @@ codeunit 6151511 "NPR Nc Import Processor"
     procedure ProcessImportEntry(var NcImportEntry: Record "NPR Nc Import Entry") Success: Boolean
     var
         DataLogMgt: Codeunit "NPR Data Log Management";
+        LastErrorMessage: Text;
     begin
         CheckBatchImportEntriesOrder(NcImportEntry);
 
         MarkAsStarted(NcImportEntry);
-
         Success := CODEUNIT.Run(CODEUNIT::"NPR Nc Import Mgt.", NcImportEntry);
         DataLogMgt.DisableDataLog(false);
-
+        LastErrorMessage := GetLastErrorText();
         MarkAsCompleted(Success, NcImportEntry);
+
+        EmitTelemetryData(NcImportEntry, LastErrorMessage);
 
         if Success then
             exit;
 
         ScheduleRetry(NcImportEntry);
+    end;
+
+    local procedure EmitTelemetryData(NcImportEntry: Record "NPR Nc Import Entry"; LastErrorMessage: Text)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+        VerbosityLevel: Verbosity;
+    begin
+
+        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
+            Clear(ActiveSession);
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+
+        CustomDimensions.Add('NPR_Nc_SystemId', NcImportEntry.SystemId);
+        CustomDimensions.Add('NPR_Nc_ImportType', NcImportEntry."Import Type");
+        CustomDimensions.Add('NPR_Nc_DocumentId', NcImportEntry."Document ID");
+        CustomDimensions.Add('NPR_Nc_DocumentName', NcImportEntry."Document Name");
+        CustomDimensions.Add('NPR_Nc_SequenceNo', Format(NcImportEntry."Sequence No.", 0, 9));
+        CustomDimensions.Add('NPR_Nc_ErrorMessage', LastErrorMessage);
+        CustomDimensions.Add('NPR_Nc_ImportStartedAt', Format(NcImportEntry."Import Started at", 0, 9));
+        CustomDimensions.Add('NPR_Nc_ImportCompletedAt', Format(NcImportEntry."Import Completed at", 0, 9));
+        CustomDimensions.Add('NPR_Nc_ImportDuration', Format(NcImportEntry."Import Duration", 0, 9));
+        CustomDimensions.Add('NPR_Nc_ImportCount', Format(NcImportEntry."Import Count", 0, 9));
+        CustomDimensions.Add('NPR_Nc_ImportStartedBy', Format(NcImportEntry."Import Started by", 0, 9));
+        CustomDimensions.Add('NPR_Nc_Imported', Format(NcImportEntry.Imported, 0, 9));
+        CustomDimensions.Add('NPR_Nc_RuntimeError', Format(NcImportEntry."Runtime Error", 0, 9));
+        if (NcImportEntry."Runtime Error") then
+            CustomDimensions.Add('NPR_Nc_CallStack', GetLastErrorCallStack());
+
+        VerbosityLevel := VerbosityLevel::Normal;
+
+        if (LastErrorMessage <> '') then
+            VerbosityLevel := VerbosityLevel::Warning;
+
+        if (NcImportEntry."Runtime Error") then
+            VerbosityLevel := VerbosityLevel::Error;
+
+        Session.LogMessage('NPR_ImportList', 'NC Import List', VerbosityLevel, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     local procedure MarkAsStarted(var NcImportEntry: Record "NPR Nc Import Entry")
