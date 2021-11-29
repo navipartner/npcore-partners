@@ -213,7 +213,7 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             Caption = 'Ticket Holder E-Mail';
             DataClassification = CustomerContent;
         }
-        field(165; "Ticket Holder Name"; Text[80])
+        field(165; "Ticket Holder Name"; Text[100])
         {
             Caption = 'Ticket Holder Name';
             DataClassification = CustomerContent;

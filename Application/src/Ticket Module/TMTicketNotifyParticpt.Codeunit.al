@@ -213,6 +213,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Admission: Record "NPR TM Admission";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
+        Member: Record "NPR MM Member";
         RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
         AdmissionCode: Code[20];
         AttributeManagement: Codeunit "NPR Attribute Management";
@@ -281,6 +282,24 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
         if (AdmissionCode = '') then
             AdmissionCode := Admission."Admission Code";
+
+        // Note, External Member Card No. might not be assigned at this point in time.
+        if (Ticket."External Member Card No." <> '') then begin
+            if (GetMember(Ticket."External Member Card No.", Member)) then begin
+                case (Member."Notification Method") of
+                    Member."Notification Method"::EMAIL:
+                        begin
+                            SuggestNotificationAddress := Member."E-Mail Address";
+                            SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
+                        end;
+                    Member."Notification Method"::SMS:
+                        begin
+                            SuggestNotificationAddress := Member."Phone No.";
+                            SuggestNotificationMethod := SuggestNotificationMethod::SMS;
+                        end;
+                end;
+            end;
+        end;
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.FilterGroup(2);
@@ -629,12 +648,12 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         if (TicketAccessEntry.FindSet()) then begin
             repeat
-                CreateAdmissionReservationReminder(TicketAccessEntry);
+                CreateAdmissionReservationReminder(TicketAccessEntry, Ticket."External Member Card No.");
             until (TicketAccessEntry.Next() = 0);
         end;
     end;
 
-    procedure CreateAdmissionReservationReminder(TicketAccessEntry: Record "NPR TM Ticket Access Entry") NotificationEntryNo: Integer
+    procedure CreateAdmissionReservationReminder(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; MemberNumber: Code[20]) NotificationEntryNo: Integer
     var
         Ticket: Record "NPR TM Ticket";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -642,6 +661,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         ProfileLine: Record "NPR TM Notif. Profile Line";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+        Member: Record "NPR MM Member";
     begin
         if (not Ticket.Get(TicketAccessEntry."Ticket No.")) then
             exit(0);
@@ -675,8 +695,10 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         NotificationEntry.SetFilter("Notification Send Status", '=%1', NotificationEntry."Notification Send Status"::PENDING);
         NotificationEntry.ModifyAll("Notification Send Status", NotificationEntry."Notification Send Status"::CANCELED);
 
+        GetMember(MemberNumber, Member);
+
         repeat
-            NotificationEntryNo := CreateReminderNotification(DetTicketAccessEntry, ProfileLine);
+            NotificationEntryNo := CreateReminderNotification(DetTicketAccessEntry, ProfileLine, Member);
         until (ProfileLine.Next() = 0);
     end;
 
@@ -687,6 +709,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         NotificationProfile: Record "NPR TM Notification Profile";
         ProfileLine: Record "NPR TM Notif. Profile Line";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        Member: Record "NPR MM Member";
     begin
         if (not Ticket.Get(TicketAccessEntry."Ticket No.")) then
             exit(0);
@@ -714,8 +737,10 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         if (not DetTicketAccessEntry.FindFirst()) then
             exit(0);
 
+        GetMember(Ticket."External Member Card No.", Member);
+
         repeat
-            NotificationEntryNo := CreateReminderNotification(DetTicketAccessEntry, ProfileLine);
+            NotificationEntryNo := CreateReminderNotification(DetTicketAccessEntry, ProfileLine, Member);
         until (ProfileLine.Next() = 0);
     end;
 
@@ -727,6 +752,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         ProfileLine: Record "NPR TM Notif. Profile Line";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+        Member: Record "NPR MM Member";
     begin
         NotificationEntry.SetFilter("Ticket No.", '=%1', TicketAccessEntry."Ticket No.");
         NotificationEntry.SetFilter("Admission Code", '=%1', TicketAccessEntry."Admission Code");
@@ -763,12 +789,14 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 exit(0);
         end;
 
+        GetMember(Ticket."External Member Card No.", Member);
+
         repeat
-            NotificationEntryNo := CreateReminderNotification(DetTicketAccessEntry, ProfileLine);
+            NotificationEntryNo := CreateReminderNotification(DetTicketAccessEntry, ProfileLine, Member);
         until (ProfileLine.Next() = 0);
     end;
 
-    local procedure CreateReminderNotification(DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; TicketNotProfileLine: Record "NPR TM Notif. Profile Line"): Integer
+    local procedure CreateReminderNotification(DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; TicketNotProfileLine: Record "NPR TM Notif. Profile Line"; Member: Record "NPR MM Member"): Integer
     var
         Ticket: Record "NPR TM Ticket";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -881,6 +909,9 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         if (TicketNotProfileLine."Notification Engine" = TicketNotProfileLine."Notification Engine"::NPR_EXTERNAL) then
             NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::EXTERNAL;
 
+        if (Member."Entry No." > 0) then
+            NotificationEntry."Ticket Holder Name" := Member."Display Name";
+
         NotificationEntry.Insert();
 
         exit(NotificationEntry."Entry No.");
@@ -916,6 +947,20 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         ResponseMessage := 'Notification is detained to minimize spam.';
         TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::DETAINED;
         exit(true);
+    end;
+
+    local procedure GetMember(MemberNumber: Code[20]; var Member: Record "NPR MM Member"): Boolean
+    begin
+        Clear(Member);
+        if (MemberNumber = '') then
+            exit(false);
+
+        Member.SetFilter("External Member No.", '=%1', MemberNumber);
+        Member.SetFilter(Blocked, '=%1', false);
+        if (not Member.FindFirst()) then
+            Clear(Member);
+
+        exit(Member."Entry No." > 0);
     end;
 
 
