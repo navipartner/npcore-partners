@@ -385,6 +385,9 @@
     var
         Request: Codeunit "NPR Front-End: ReportBug";
     begin
+
+        EmitError(ErrorText);
+
         if MakeSureFrameworkIsAvailable(false) then begin
             POSSession.SetInAction(false);
             Request.Initialize(ErrorText);
@@ -392,6 +395,32 @@
             Error(''); // Transaction must aborted and rolled back. It is mandatory.
         end else
             Error(GetBugErrorMessage(ErrorText));
+    end;
+
+    local procedure EmitError(ErrorText: Text)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+    begin
+
+        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
+            Clear(ActiveSession);
+
+        if (ErrorText = '') then
+            ErrorText := 'Transaction must be aborted and rolled back. It is mandatory.';
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+        CustomDimensions.Add('NPR_ErrorText', ErrorText);
+        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
+        CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
+
+        Session.LogMessage('NPR_ReportBugAndThrowError', ErrorText, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+
     end;
 
     procedure ReportWarning(ErrorText: Text; WithError: Boolean)
