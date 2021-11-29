@@ -12,21 +12,28 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         SocketErr: Label 'Connection failure with hardware connector on the local machine.\Please verify that it is running and try again.';
         PrintLbl: Label 'Printing...';
         ClosedPageErr: Label 'The hardware connector page does not work if you manually close it. Please try again and keep it open.';
+        OperationLbl: Label 'operation', Locked = true;
+        PathLbl: Label 'path', Locked = true;
+        FileLbl: Label 'File', Locked = true;
+        SourceLbl: Label 'source', Locked = true;
+        DestinationLbl: Label 'destination', Locked = true;
+        ContentsLbl: Label 'contents', Locked = true;
 
     procedure SendRawPrintRequest(PrinterName: Text; PrintBytes: Text; TargetCodepage: Integer)
     var
         Base64: Codeunit "Base64 Convert";
-        Content: JsonObject;
+        Request: JsonObject;
+        Response: JsonObject;
     begin
         PrintBytes := Base64.ToBase64(PrintBytes, TextEncoding::Windows, TargetCodepage);
 
-        Content.Add('PrinterName', PrinterName);
-        Content.Add('PrintJob', PrintBytes);
+        Request.Add('PrinterName', PrinterName);
+        Request.Add('PrintJob', PrintBytes);
 
         //Open modal dialog page using JS bridge to invoke socket client.
         Commit();
 
-        if not TrySendGenericRequest('RawPrint', Content, PrintLbl) then
+        if not TrySendGenericRequest('RawPrint', Request, PrintLbl, Response) then
             Message(GetLastErrorText);
     end;
 
@@ -34,58 +41,266 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
     var
         Base64: Codeunit "Base64 Convert";
         InStream: InStream;
-        Content: JsonObject;
+        Request: JsonObject;
         PrintBytes: Text;
+        Response: JsonObject;
     begin
         TempBlob.CreateInStream(InStream);
         PrintBytes := Base64.ToBase64(InStream);
 
-        Content.Add('PrinterName', PrinterName);
-        Content.Add('PrintJob', PrintBytes);
+        Request.Add('PrinterName', PrinterName);
+        Request.Add('PrintJob', PrintBytes);
 
-        if not TrySendGenericRequest('RawPrint', Content, PrintLbl) then
+        if not TrySendGenericRequest('RawPrint', Request, PrintLbl, Response) then
             Message(GetLastErrorText);
     end;
 
-    procedure MoveFileRequest(SourcePath: Text; DestinationPath: Text);
+    procedure ExistsFileRequest(Path: Text): JsonObject
     var
-        Content: JsonObject;
+        Request: JsonObject;
+        Caption: Label 'Checking if file exists...';
+
+    begin
+        Request.Add(OperationLbl, 'exists');
+        Request.Add(PathLbl, Path);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure CopyFileRequest(SourcePath: Text; DestinationPath: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Copying file...';
+
+    begin
+        Request.Add(OperationLbl, 'copy');
+        Request.Add(SourceLbl, SourcePath);
+        Request.Add(DestinationLbl, DestinationPath);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure MoveFileRequest(SourcePath: Text; DestinationPath: Text): JsonObject
+    var
+        Request: JsonObject;
         Caption: Label 'Moving file...';
 
     begin
-        Content.Add('operation', 'move');
-        Content.Add('source', SourcePath);
-        Content.Add('destination', DestinationPath);
+        Request.Add(OperationLbl, 'move');
+        Request.Add(SourceLbl, SourcePath);
+        Request.Add(DestinationLbl, DestinationPath);
 
-        SendGenericRequest('File', Content, Caption);
+        exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure SendGenericRequest(RequestType: Text; Content: JsonObject; WindowCaption: Text)
+    procedure DeleteFileRequest(Path: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Deleting file...';
+
+    begin
+        Request.Add(OperationLbl, 'delete');
+        Request.Add(PathLbl, Path);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure WriteTextRequest(Path: Text; Content: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Writing text into file...';
+
+    begin
+        Request.Add(OperationLbl, 'writeText');
+        Request.Add(PathLbl, Path);
+        Request.Add(ContentsLbl, Content);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure WriteLinesRequest(Path: Text; Content: JsonToken): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Writing lines into file...';
+
+    begin
+        Request.Add(OperationLbl, 'writeLines');
+        Request.Add(PathLbl, Path);
+        Request.Add(ContentsLbl, Content.AsArray());
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure WriteBinaryRequest(Path: Text; var TempBlob: Codeunit "Temp Blob"): JsonObject
+    var
+        Base64: Codeunit "Base64 Convert";
+        InStream: InStream;
+        Bytes: Text;
+        Request: JsonObject;
+        Caption: Label 'Writing binary into file...';
+    begin
+        TempBlob.CreateInStream(InStream);
+        Bytes := Base64.ToBase64(InStream);
+
+        Request.Add(OperationLbl, 'writeBinary');
+        Request.Add(PathLbl, Path);
+        Request.Add(ContentsLbl, Bytes);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure AppendTextRequest(Path: Text; Content: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Appending text into file...';
+
+    begin
+        Request.Add(OperationLbl, 'appendText');
+        Request.Add(PathLbl, Path);
+        Request.Add(ContentsLbl, Content);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure AppendLinesRequest(Path: Text; Content: JsonToken): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Appending lines into file...';
+
+    begin
+        Request.Add(OperationLbl, 'appendLines');
+        Request.Add(PathLbl, Path);
+        Request.Add(ContentsLbl, Content.AsArray());
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure ReadTextRequest(Path: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Reading text from file...';
+
+    begin
+        Request.Add(OperationLbl, 'readText');
+        Request.Add(PathLbl, Path);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure ReadLinesRequest(Path: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Reading lines from file...';
+
+    begin
+        Request.Add(OperationLbl, 'readLines');
+        Request.Add(PathLbl, Path);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure ReadBinaryRequest(Path: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Reading binary from file...';
+
+    begin
+        Request.Add(OperationLbl, 'readBinary');
+        Request.Add(PathLbl, Path);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure ExistsDirectoryRequest(Path: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Checking if directory exists...';
+
+    begin
+        Request.Add(OperationLbl, 'directory.exists');
+        Request.Add(PathLbl, Path);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure CopyDirectoryRequest(SourcePath: Text; DestinationPath: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Copying directory...';
+
+    begin
+        Request.Add(OperationLbl, 'directory.copy');
+        Request.Add(SourceLbl, SourcePath);
+        Request.Add(DestinationLbl, DestinationPath);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure MoveDirectoryRequest(SourcePath: Text; DestinationPath: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Moving directory...';
+
+    begin
+        Request.Add(OperationLbl, 'directory.move');
+        Request.Add(SourceLbl, SourcePath);
+        Request.Add(DestinationLbl, DestinationPath);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure DeleteDirectoryRequest(Path: Text; Force: Boolean): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Deleting directory...';
+
+    begin
+        Request.Add(OperationLbl, 'directory.delete');
+        Request.Add(PathLbl, Path);
+        Request.Add('force', Force);
+
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure GetDirectoryContentRequest(Path: Text): JsonObject
+    var
+        Request: JsonObject;
+        Caption: Label 'Getting directory content...';
+
+    begin
+        Request.Add(OperationLbl, 'directory.getContents');
+        Request.Add(PathLbl, Path);
+
+        exit(SendGenericRequest(FileLbl, Request, Caption));
+    end;
+
+    procedure SendGenericRequest(RequestType: Text; Request: JsonObject; WindowCaption: Text) Response: JsonObject
     begin
         Commit();
 
-        if not TrySendGenericRequest(RequestType, Content, WindowCaption) then
+        if not TrySendGenericRequest(RequestType, Request, WindowCaption, Response) then
             Message(GetLastErrorText);
     end;
     // Auxilliary functions
 
     [TryFunction]
-    local procedure TrySendGenericRequest(Handler: Text; JsonContent: JsonObject; Caption: Text)
-    var
-        Content: Text;
+    local procedure TrySendGenericRequest(Handler: Text; Request: JsonObject; Caption: Text; var ResponseOut: JsonObject)
     begin
-        JsonContent.WriteTo(Content);
-        SendRequestOutsidePOS(Handler, Content, Caption);
+        ResponseOut := SendRequestOutsidePOS(Handler, Request, Caption);
     end;
 
-    local procedure SendRequestOutsidePOS(Handler: Text; Content: Text; Caption: Text)
+    local procedure SendRequestOutsidePOS(Handler: Text; Request: JsonObject; Caption: Text): JsonObject
     var
+        Content: Text;
         HardwareConnector: Page "NPR Hardware Connector";
-        Success: Boolean;
-        ResponseOut: JsonObject;
-        DummyJsonToken: JsonToken;
+        Response: JsonObject;
+        JToken: JsonToken;
         ResponseMethod: Text;
+        SuccessResponse: Boolean;
     begin
+        Request.WriteTo(Content);
+
         HardwareConnector.SetModule('', '',
           GetSocketClientScript() +
           'n$.ready((async () => {' +
@@ -99,7 +314,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
 
         HardwareConnector.RunModal();
         if HardwareConnector.DidAutoClose() then begin
-            HardwareConnector.GetResponse(ResponseMethod, ResponseOut);
+            HardwareConnector.GetResponse(ResponseMethod, Response);
 
             if ResponseMethod = 'error' then
                 Error(SocketErr);
@@ -107,11 +322,15 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
             Error(ClosedPageErr);
         end;
 
-        Success := (ResponseOut.Get('success', DummyJsonToken));
-        if not Success then begin
-            ResponseOut.Get('errorText', DummyJsonToken);
-            Error(DummyJsonToken.AsValue().AsText());
+        if Response.Get('success', JToken) then
+            SuccessResponse := JToken.AsValue().AsBoolean();
+
+        if not SuccessResponse then begin
+            Response.Get('errorText', JToken);
+            Error(JToken.AsValue().AsText());
         end;
+
+        exit(Response);
     end;
 
     procedure GetSocketClientScript(): Text
