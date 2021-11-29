@@ -53,4 +53,10 @@ codeunit 6014404 "NPR Event Subscriber"
                     ConsignorEntry.InsertFromShipmentHeader(SalesShptHeader."No.");
                 end;
     end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Feature Management", 'OnOpenFeatureMgtPage', '', false, false)]
+    local procedure NPRFeatureManagementOnOpenFeatureMgtPage(var IgnoreFilter: Boolean)
+    begin
+        IgnoreFilter := true;
+    end;
 }
