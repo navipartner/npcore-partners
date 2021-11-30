@@ -1,5 +1,7 @@
 enum 6150753 "NPR Button Font Size"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Enum Is not needed anymore. Case 498936';
     Extensible = false;
 
     value(0; XSmall) { }

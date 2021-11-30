@@ -91,12 +91,6 @@ xmlport 6150701 "NPR POS Menu Export/Import"
                     fieldelement(ButtonCustomClassAttribute; "POS Menu Button"."Custom Class Attribute")
                     {
                     }
-                    fieldelement(Bold; "POS Menu Button".Bold)
-                    {
-                    }
-                    fieldelement(FontSize; "POS Menu Button"."Font Size")
-                    {
-                    }
                     fieldelement(PositionX; "POS Menu Button"."Position X")
                     {
                     }
