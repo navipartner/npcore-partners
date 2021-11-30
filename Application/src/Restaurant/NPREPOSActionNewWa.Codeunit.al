@@ -30,7 +30,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         then begin
             Sender.RegisterWorkflowStep('addPresetValuesToContext', 'respond();');
             Sender.RegisterWorkflowStep('seatingInput',
-              'if (!context.seatingCode) || (!param.UseSeatingFromContext) {' +
+              'if ((!context.seatingCode) || (!param.UseSeatingFromContext)) {' +
               '  if (param.FixedSeatingCode) {' +
               '    context.seatingCode = param.FixedSeatingCode;' +
               '    respond();' +
