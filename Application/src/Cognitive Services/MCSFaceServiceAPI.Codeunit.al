@@ -184,11 +184,9 @@
 
     procedure ImportMemberPicture(var MMMember: Record "NPR MM Member")
     var
-        TempBlob: Codeunit "Temp Blob";
         RecRef: RecordRef;
         MemberName: Text;
         ImageInStream: InStream;
-        OutStr: OutStream;
     begin
         RecRef.Get(MMMember.RecordId);
 
@@ -201,12 +199,9 @@
             MemberName := MemberName + ' ' + MMMember."Last Name";
 
         DetectIdentifyPicture(RecRef, MemberName, ImageInStream);
-        // RecRef.SetTable(MMMember);
-        // MMMember.Image.ImportStream(ImageInStream, MMMember.FieldName(Image));
-        // MMMember.Modify();
-        TempBlob.CreateOutStream(OutStr);
-        CopyStream(OutStr, ImageInStream);
-        TempBlob.ToRecordRef(RecRef, MMMember.FieldNo(Picture));
+        RecRef.SetTable(MMMember);
+        MMMember.Image.ImportStream(ImageInStream, MMMember.FieldName(Image));
+        MMMember.Modify();
 
         RecRef.Modify();
     end;

@@ -134,8 +134,8 @@ table 6060134 "NPR MM Member Info Capture"
             Caption = 'Picture';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            // ObsoleteState = Removed;
-            // ObsoleteReason = 'Use Media instead of Blob type.';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(33; Image; Media)
         {
@@ -430,13 +430,13 @@ table 6060134 "NPR MM Member Info Capture"
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         TEXT6060000: Label 'The %1 %2 is already in use.';
 
-    // procedure GetImageContent(var TenantMedia: Record "Tenant Media")
-    // begin
-    //     TenantMedia.Init();
-    //     if not Image.HasValue() then
-    //         exit;
-    //     if TenantMedia.Get(Image.MediaId()) then
-    //         TenantMedia.CalcFields(Content);
-    // end;
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Image.HasValue() then
+            exit;
+        if TenantMedia.Get(Image.MediaId()) then
+            TenantMedia.CalcFields(Content);
+    end;
 }
 
