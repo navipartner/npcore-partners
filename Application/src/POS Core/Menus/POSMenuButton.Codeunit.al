@@ -88,21 +88,25 @@ codeunit 6150889 "NPR POS Menu Button" implements "NPR IJsonSerializable", "NPR 
         _class := NewClass;
     end;
 
+    [Obsolete('Procedure is not needed anymore. Case 498936')]
     procedure Bold(): Boolean;
     begin
         exit(_bold);
     end;
 
+    [Obsolete('Procedure is not needed anymore. Case 498936')]
     procedure SetBold(NewBold: Boolean);
     begin
         _bold := NewBold;
     end;
 
+    [Obsolete('Procedure is not needed anymore. Case 498936')]
     procedure FontSize(): Enum "NPR Button Font Size";
     begin
         exit(_fontSize);
     end;
 
+    [Obsolete('Procedure is not needed anymore. Case 498936')]
     procedure SetFontSize(NewFontSize: Enum "NPR Button Font Size");
     begin
         _fontSize := NewFontSize;
@@ -159,8 +163,6 @@ codeunit 6150889 "NPR POS Menu Button" implements "NPR IJsonSerializable", "NPR 
         Json.Add('Color', _color);
         Json.Add('IconClass', _iconClass);
         Json.Add('Class', _class);
-        Json.Add('Bold', _bold);
-        Json.Add('FontSize', _fontSize.AsInteger());
         Json.Add('Row', _row);
         Json.Add('Column', _column);
         Json.Add('Enabled', _enabledState.AsInteger());

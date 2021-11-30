@@ -140,11 +140,15 @@ table 6150701 "NPR POS Menu Button"
         }
         field(25; Bold; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Field Is not needed anymore. Case 498936';
             Caption = 'Bold';
             DataClassification = CustomerContent;
         }
         field(26; "Font Size"; Enum "NPR Button Font Size")
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Field Is not needed anymore. Case 498936';
             Caption = 'Font Size';
             DataClassification = CustomerContent;
             InitValue = Normal;
