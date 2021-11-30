@@ -153,10 +153,8 @@ codeunit 6150702 "NPR POS UI Management"
         MenuButtonObj.SetColor(MenuButton."Foreground Color");
         MenuButtonObj.SetIconClass(MenuButton."Icon Class");
         MenuButtonObj.SetClass(MenuButton."Custom Class Attribute");
-        MenuButtonObj.SetBold(MenuButton.Bold);
         MenuButtonObj.SetRow(MenuButton."Position Y");
         MenuButtonObj.SetColumn(MenuButton."Position X");
-        MenuButtonObj.SetFontSize(MenuButton."Font Size");
         MenuButtonObj.SetEnabledState(MenuButton.Enabled);
         MenuButtonObj.Content().Add('keyMenu', MenuButton."Menu Code");
         MenuButtonObj.Content().Add('keyId', MenuButton.ID);
