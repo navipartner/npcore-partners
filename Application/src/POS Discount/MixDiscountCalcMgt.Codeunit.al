@@ -71,6 +71,7 @@ codeunit 6014681 "NPR Mix Discount Calc. Mgt."
                 end;
             until TempMixedDiscount.Next() = 0;
 
+        TempMixedDiscount.SetRange("Discount Type");
         TempMixedDiscount.SetCurrentKey("Min. Quantity");
         TempMixedDiscount.Ascending(false);
         if TempMixedDiscount.FindFirst() then begin
