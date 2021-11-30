@@ -5,140 +5,25 @@ resources:
   - repository: scriptsRepo
     type: git
     name: 'NpCore/NpDevOps'
-    ref: 'refs/heads/releases/1.0'
-    
-pool:
-  name: NP Core Pull Request Pipelines
-  demands: 
-  - docker
-  # Now only 2019 is available but in the future it will be every newer version.
-  # Then we will probably remove this requirement as it will alwyas TRUE.
-  - Agent.OS -equals Windows_NT
-  - Agent.OSVersion -equals 10.0.17763
 
-jobs:
-- template: YAML/Templates/Build/MainBuild.yml@scriptsRepo
-  parameters:
-    containerDefinitions:
-    - name: BC17
-      containerImageName: npretail.azurecr.io/np/dynamicsnav:17.3.20469.20605-w1
-
-      artifactUrl: ''
-      endpointName: npretail_ACR
-      serverInstanceName: BC
-      licenseSecureFileName: 'DEV_BC OP 17.flf'
-      
-      majorVersion: 1700    
-      appJsonValues: 
-      - platform: '17.0.0.0'
-      - application: '17.0.0.0'
-      - preprocessorSymbols: [BC17]
-      - runtime: '"6.0"'
-
-    - name: BC18
-      containerImageName: npretail.azurecr.io/np/dynamicsnav:18.4.28601.29139-w1
-      artifactUrl: ''
-      endpointName: npretail_ACR
-      serverInstanceName: BC
-      licenseSecureFileName: 'DEV_BC OP 18.flf'
-
-      majorVersion: 1804
-      appJsonValues:
-      -  platform: '18.0.0.0'
-      -  application: '18.0.0.0'
-      -  preprocessorSymbols: [BC18]
-      -  runtime: '"7.2"'
-
-    - name: BC19
-      containerImageName: npretail.azurecr.io/np/dynamicsnav:19.0.29894.30693-w1
-      artifactUrl: ''
-      endpointName: npretail_ACR
-      serverInstanceName: BC
-      licenseSecureFileName: 'DEV_BC OP 18.flf'
-
-      majorVersion: 1900
-      appJsonValues:
-      -  platform: '19.0.0.0'
-      -  application: '1.0.0.0'
-      -  preprocessorSymbols: [BC19]
-      -  runtime: '"7.2"'
-      -  applicationInsightsConnectionString: '"InstrumentationKey=eed7264a-4861-43ac-88d1-dd554a6b5f08;"'
-      -  applicationInsightsKey: ''
-
-    scriptsRepo: scriptsRepo
-    stepList:
-    - checkout: self
-
-    - template: YAML/Templates/Step/RunAdditionalChecks.yml@scriptsRepo
-      parameters:
-        objectVisibilityCheck:
-          enabled: false
-          alObjectsFolder: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application/src/
-          publicObjectsSubfolder: _public
-
-    - task: PowerShell@2
-      inputs:
-        filePath: $(psScriptsFolder)/BuildDeploy/CalculateNewVersion.ps1
-        arguments: >
-          -MajorVersion $(majorVersion)
-          -Prerelease
-      env:
-        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-      displayName: 'Calculate new version'
-
-    - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
-      parameters:
-        containerName: $(containerName)
-        containerAdminUsername: $(username)
-        containerAdminPassword: $(password)
-        serverInstanceName: $(serverInstanceName)
-        alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
-        appVersion: $(NewAppVersion)
-        analyzers: 'AppSourceCop,UICop,CodeCop'
-
-        keyVaultCert:
-          certPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
-          certPassword: 498eH$??nhxUSSFS
-          azureADtenantID: ec3af438-38fc-4d9b-b8be-058101411d3a
-          azureKeyVaultClientId: b38b8bef-17d2-4368-84ce-f9880a45eed0
-        dependancies:
-        - package:
-            source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
-            id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-            destinationPath: '$(ServiceTierFolder)/Add-Ins'
-        appNuGetSource: 
-          source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
-          id: NaviPartner.NPCore.BC$(majorVersion)
-          download:
-            enabled: true
-            #deployApp: true
-
-    - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
-      parameters:
-        containerName: $(containerName)
-        containerAdminUsername: $(username)
-        containerAdminPassword: $(password)
-        serverInstanceName: $(serverInstanceName)
-        alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test
-        appVersion: $(NewAppVersion)
-        dependancies:
-        - appsToDeploy:
-          - path: 'C:\Applications\TestFramework\TestRunner\Microsoft_Test Runner.app'
-          - path: 'C:\Applications\TestFramework\TestLibraries\Assert\Microsoft_Library Assert.app'
-          - path: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'
-          - path: 'C:\Applications\TestFramework\TestLibraries\Variable Storage\Microsoft_Library Variable Storage.app'
-          - path: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'
-          - path: 'C:\Applications\TestFramework\TestLibraries\Permissions Mock\Microsoft_Permissions Mock.app'
-            versionFilter:
-              min: 1804       
-          - path: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'
-
-    - template: YAML/Templates/Step/SetupAndRunTests.yml@scriptsRepo
-      parameters:
-        serverInstanceName: $(serverInstanceName)
-        username: $(username)
-        password: $(password)
-        testRunName: '$(AppName)'
-        testApps:
-          - appPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test/Output/$(AppName).app
-        failOnFailedTests: TRUE
+stages:
+  - template: /YAML/ZAL Build Definitions/PR Validation build.yml@scriptsRepo
+    parameters:
+      pool:
+        name: NP Core Pull Request Pipelines
+        demands: 
+        - docker
+        # Now only 2019 is available but in the future it will be every newer version.
+        # Then we will probably remove this requirement as it will alwyas TRUE.
+        - Agent.OS -equals Windows_NT
+        - Agent.OSVersion -equals 10.0.17763
+      containerDefinitions:
+        - Auto
+        - BC1804
+        - BC1900          
+      analyzers: 'AppSourceCop,UICop,CodeCop'
+      keyVaultCert:
+        certPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
+        certPassword: 498eH$??nhxUSSFS
+        azureADtenantID: ec3af438-38fc-4d9b-b8be-058101411d3a
+        azureKeyVaultClientId: b38b8bef-17d2-4368-84ce-f9880a45eed0
