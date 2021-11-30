@@ -828,8 +828,7 @@ page 6060134 "NPR MM Member Info Capture"
 
     trigger OnAfterGetCurrRecord()
     begin
-        // Clear(xRec.Image);
-        Clear(xRec.Picture);
+        Clear(xRec.Image);
     end;
 
     trigger OnAfterGetRecord()
@@ -1380,17 +1379,10 @@ page 6060134 "NPR MM Member Info Capture"
         Rec."Member Entry No" := Member."Entry No.";
         Rec."External Member No" := Member."External Member No.";
 
-        // if (Member.Image.HasValue()) then begin
-        //     Rec.Image := Member.Image;
-        // end else begin
-        //     Clear(Rec.Image);
-        // end;
-        Member.CalcFields(Picture);
-        if (Member.Picture.HasValue()) then begin
-            Rec.Picture := Member.Picture;
-        end else begin
-            Clear(Rec.Picture);
-        end;
+        if (Member.Image.HasValue()) then
+            Rec.Image := Member.Image
+        else
+            Clear(Rec.Image);
 
         Rec."First Name" := Member."First Name";
         Rec."Middle Name" := Member."Middle Name";

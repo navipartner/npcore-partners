@@ -56,16 +56,13 @@ report 6060123 "NPR MM Member Card Std Print"
                 column(MemberName; MemberName)
                 {
                 }
-                // column(MemberPicture; TenantMediaMMMember.Content)
-                column(MemberPicture; Picture)
+                column(MemberPicture; TenantMediaMMMember.Content)
                 {
                 }
 
                 trigger OnAfterGetRecord()
                 begin
-                    // "MM Member".GetImageContent(TenantMediaMMMember);
-                    if "MM Member".Picture.HasValue() then
-                        "MM Member".CalcFields(Picture);
+                    "MM Member".GetImageContent(TenantMediaMMMember);
 
                     Clear(MemberName);
                     if "MM Member"."First Name" <> '' then
@@ -122,7 +119,7 @@ report 6060123 "NPR MM Member Card Std Print"
         MMMembershipEntry: Record "NPR MM Membership Entry";
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
         BarcodeSimbiology: Enum "Barcode Symbology";
-        // TenantMediaMMMember: Record "Tenant Media";
+        TenantMediaMMMember: Record "Tenant Media";
         BarCodeText: Text;
         BarCodeEncodedText: Text;
         ExpiryDateCaption: Label 'Expiry date: ';
