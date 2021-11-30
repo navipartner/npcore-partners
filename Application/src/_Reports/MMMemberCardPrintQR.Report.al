@@ -30,16 +30,13 @@ report 6060127 "NPR MM Member Card Print QR"
                 column(MemberName; MemberName)
                 {
                 }
-                // column(MemberPicture; TenantMediaMMMember.Content)
-                column(MemberPicture; Picture)
+                column(MemberPicture; TenantMediaMMMember.Content)
                 {
                 }
 
                 trigger OnAfterGetRecord()
                 begin
-                    // "MM Member".GetImageContent(TenantMediaMMMember);
-                    if "MM Member".Picture.HasValue() then
-                        "MM Member".CalcFields(Picture);
+                    "MM Member".GetImageContent(TenantMediaMMMember);
 
                     Clear(MemberName);
                     if "MM Member"."First Name" <> '' then

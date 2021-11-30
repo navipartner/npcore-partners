@@ -414,9 +414,7 @@ codeunit 6014569 "NPR RegEx"
             TempBlob.CreateOutStream(OutStr);
             Convert.FromBase64(Group2.Value(), OutStr);
             TempBlob.CreateInStream(InStr);
-            // TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
-            TempMagentoPicture.Picture.CreateOutStream(OutStr);
-            CopyStream(OutStr, InStr);
+            TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
             TempMagentoPicture.Insert();
         end;
 #else
@@ -437,9 +435,7 @@ codeunit 6014569 "NPR RegEx"
                     TempBlob.CreateOutStream(OutStr);
                     Convert.FromBase64(TempGroups.ReadValue(), OutStr);
                     TempBlob.CreateInStream(InStr);
-                    // TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
-                    TempMagentoPicture.Picture.CreateOutStream(OutStr);
-                    CopyStream(OutStr, InStr);
+                    TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
                     TempMagentoPicture.Insert();
                 end;
             until TempMatch.Next() = 0;
