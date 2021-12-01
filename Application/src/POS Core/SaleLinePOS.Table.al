@@ -489,10 +489,13 @@ table 6014406 "NPR Sale Line POS"
 
             trigger OnValidate()
             begin
-                if "Price Includes VAT" then begin
-                    Validate("Discount %", "Discount Amount" / "Unit Price" / Quantity * 100);
-                end else begin
-                    Validate("Discount %", "Discount Amount" / "Unit Price" / Quantity / (100 + "VAT %") * 10000);
+                case true of
+                    ("Discount Amount" = 0) OR ("Unit Price" = 0) OR (Quantity = 0):
+                        Validate("Discount %", 0);
+                    "Price Includes VAT":
+                        Validate("Discount %", "Discount Amount" / "Unit Price" / Quantity * 100);
+                    else
+                        Validate("Discount %", "Discount Amount" / "Unit Price" / Quantity / (100 + "VAT %") * 10000);
                 end;
             end;
         }
