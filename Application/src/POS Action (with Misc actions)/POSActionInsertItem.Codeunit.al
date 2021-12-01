@@ -646,7 +646,9 @@
         if StrLen(EanBoxValue) > MaxStrLen(Item."No.") then
             exit;
 
-        if Item.Get(UpperCase(EanBoxValue)) then
+        Item.SetLoadFields("No.");
+        Item.SetRange("No.", UpperCase(EanBoxValue));
+        if not Item.IsEmpty() then
             InScope := true;
     end;
 
@@ -660,6 +662,8 @@
         if StrLen(EanBoxValue) > MaxStrLen(ItemReference."Reference No.") then
             exit;
 
+        ItemReference.SetLoadFields("Reference No.");
+        ItemReference.SetCurrentKey("Reference Type", "Reference No.");
         ItemReference.SetRange("Reference No.", UpperCase(EanBoxValue));
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
         if not ItemReference.IsEmpty() then
