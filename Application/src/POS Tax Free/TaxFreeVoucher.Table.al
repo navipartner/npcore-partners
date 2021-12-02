@@ -58,6 +58,8 @@ table 6014477 "NPR Tax Free Voucher"
             Caption = 'POS Reciept No.';
             Description = 'DEPRECATED';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by link table (6014644)';
         }
         field(10; Print; BLOB)
         {
