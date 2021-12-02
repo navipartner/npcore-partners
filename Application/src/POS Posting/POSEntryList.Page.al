@@ -450,6 +450,10 @@ page 6150652 "NPR POS Entry List"
                         Image = RefreshVoucher;
                         ToolTip = 'Executes the New action';
                         ApplicationArea = NPRRetail;
+                        Promoted = true;
+                        PromotedOnly = true;
+                        PromotedCategory = Category4;
+                        PromotedIsBig = true;
 
                         trigger OnAction()
                         var
@@ -465,6 +469,11 @@ page 6150652 "NPR POS Entry List"
                         Image = PostedPayableVoucher;
                         ToolTip = 'Executes the Issued action';
                         ApplicationArea = NPRRetail;
+                        Promoted = true;
+                        PromotedOnly = true;
+                        PromotedCategory = Category4;
+                        PromotedIsBig = true;
+
                         trigger OnAction()
                         var
                             TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
