@@ -18,7 +18,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('2.6');
+        exit('2.7');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -33,31 +33,30 @@
 
             Sender.RegisterWorkflow20(
               'let workflowstep = "AddSalesLine";' +
-              'let qtyDialogThreshold = 9;' +
-              'let qtyMax = 100;' +
-              'let qtyMin = $parameters.minimumAllowedQuantity || 1;' +
-
               'if ($context.hasOwnProperty ("_additionalContext")) {' +
               '  if ($context._additionalContext.hasOwnProperty("plusMinus"))' +
               '    workflowstep = ($context._additionalContext.quantity > 0) ? "IncreaseQuantity" : "DecreaseQuantity";' +
 
               '  const salesline = runtime.getData("BUILTIN_SALELINE");' +
               '  let row = salesline.find(r => r[6] === $parameters.itemNo) || null;' +
-              '  console.log ("Searching for item: " +$parameters.itemNo+" found row: "+ JSON.stringify (row));' +
-              '  if ((row != null) &&' +
-              '      ((row[12] >= qtyDialogThreshold) && ($context._additionalContext.quantity > 0) ||' +
-              '       (row[12] >  qtyDialogThreshold) && ($context._additionalContext.quantity < 0))' +
+              '  console.log("Searching for item: " + $parameters.itemNo + " found row: " + JSON.stringify(row));' +
+              '  if ((row != null) && ($parameters.qtyDialogThreshold > 0) &&' +
+              '      ((row[12] >= $parameters.qtyDialogThreshold) && ($context._additionalContext.quantity > 0) ||' +
+              '       (row[12] > $parameters.qtyDialogThreshold) && ($context._additionalContext.quantity < 0))' +
               '     ) {' +
-              '     let quantity = ($context._additionalContext.quantity > 0) ? row[12] + 1 : row[12] - 1;' +
-              '     $context.specificQuantity = await popup.intpad ({title: $captions.EnterQuantityCaption, caption: $captions.EnterQuantityCaption, value: quantity});' +
-              '     if ($context.specificQuantity === null) {return;} ' +
-              '     if (parseInt ($context.specificQuantity) > qtyMax || parseInt ($context.specificQuantity) < qtyMin) {' +
-              '       await popup.message ({title: $captions.EnterQuantityCaption, caption: $captions.ValidRangeText.substitute (qtyMin, qtyMax)});' +
-              '       return;' +
-              '     } ' +
-              '     workflowstep = "SetSpecificQuantity";' +
+              '        let incrQty = ($parameters.itemQuantity > 0) ? $parameters.itemQuantity : 1;' +
+              '        let qtyMin = $parameters.minimumAllowedQuantity || 1;' +
+              '        let qtyMax = ($parameters.maximalAllowedQuantity > 0) ? $parameters.maximalAllowedQuantity : (qtyMin < 100) ? 100 : qtyMin;' +
+              '        let quantity = ($context._additionalContext.quantity > 0) ? row[12] + incrQty : row[12] - incrQty;' +
+              '        if (Math.abs(quantity) < qtyMin) quantity = 0;' +
+              '        $context.specificQuantity = await popup.intpad({ title: $captions.EnterQuantityCaption, caption: $captions.EnterQuantityCaption, value: quantity });' +
+              '        if ($context.specificQuantity === null) { return; }' +
+              '        if ((Math.abs($context.specificQuantity) > qtyMax) || (($context.specificQuantity != 0) && (Math.abs($context.specificQuantity) < qtyMin))) {' +
+              '            await popup.message({ title: $captions.EnterQuantityCaption, caption: $captions.ValidRangeText.substitute(qtyMin, qtyMax) });' +
+              '            return;' +
+              '        }' +
+              '        workflowstep = "SetSpecificQuantity";' +
               '  }' +
-
               '}' +
 
               'await (workflow.respond (workflowstep));'
@@ -70,6 +69,8 @@
             Sender.RegisterBooleanParameter('usePreSetUnitPrice', false);
             Sender.RegisterDecimalParameter('preSetUnitPrice', 0);
             Sender.RegisterDecimalParameter('minimumAllowedQuantity', 1);
+            Sender.RegisterDecimalParameter('maximalAllowedQuantity', 0);
+            Sender.RegisterDecimalParameter('qtyDialogThreshold', 10);
             Sender.RegisterBlockingUI(false);
             Sender.SetWorkflowTypeUnattended();
         end;
@@ -176,42 +177,47 @@
         ItemReference: Record "Item Reference";
         ItemIdentifier: Text;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
-        ItemQuantity: Decimal;
+        DecreaseByQty: Decimal;
         ItemMinQuantity: Decimal;
     begin
         JSON.SetScopeParameters(ActionCode());
         ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_DecreaseQuantity', ActionCode()));
         ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
-        ItemQuantity := JSON.GetDecimal('itemQuantity');
+        DecreaseByQty := JSON.GetDecimal('itemQuantity');
         ItemMinQuantity := JSON.GetDecimal('minimumAllowedQuantity');
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
+        If DecreaseByQty = 0 then
+            DecreaseByQty := 1;
 
         GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
-        RemoveQuantityFromItemLine(Item, ItemQuantity, ItemMinQuantity, POSSession);
+        RemoveQuantityFromItemLine(Item, DecreaseByQty, ItemMinQuantity, POSSession);
     end;
 
     local procedure Step_IncreaseQuantity(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
-        ItemQuantity: Decimal;
+        IncreaseByQty: Decimal;
+        ItemMaxQty: Decimal;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemIdentifier: Text;
     begin
         JSON.SetScopeParameters(ActionCode());
         ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_IncreaseQuantity', ActionCode()));
         ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
-        ItemQuantity := JSON.GetDecimal('itemQuantity');
-        JSON.GetDecimal('minimumAllowedQuantity');
+        IncreaseByQty := JSON.GetDecimal('itemQuantity');
+        ItemMaxQty := JSON.GetDecimal('maximalAllowedQuantity');
         JSON.SetScopeRoot();
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
+        if IncreaseByQty = 0 then
+            IncreaseByQty := 1;
 
         GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
-        if (not AddQuantityToItemLine(Item, ItemQuantity, POSSession)) then
+        if (not AddQuantityToItemLine(Item, IncreaseByQty, ItemMaxQty, POSSession)) then
             Step_AddSalesLine(JSON, POSSession, FrontEnd);
 
     end;
@@ -386,13 +392,14 @@
         POSSession.RequestRefreshData();
     end;
 
-    local procedure AddQuantityToItemLine(Item: Record Item; ItemQuantity: Decimal; POSSession: Codeunit "NPR POS Session"): Boolean
+    local procedure AddQuantityToItemLine(Item: Record Item; IncreaseByQty: Decimal; ItemMaxQuantity: Decimal; POSSession: Codeunit "NPR POS Session"): Boolean
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SSActionQtyIncrease: Codeunit "NPR SS Action - Qty Increase";
+        TooBigQtyErr: Label 'Quantity cannot exceed %1 units', Comment = '%1 - number of units';
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -400,20 +407,21 @@
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetFilter("No.", '=%1', Item."No.");
-        SaleLinePOS.SetFilter(Quantity, '>=%1', ItemQuantity);
         if (not SaleLinePOS.FindFirst()) then
             exit(false);
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
+        if (SaleLinePOS.Quantity + IncreaseByQty > ItemMaxQuantity) and (ItemMaxQuantity > 0) then
+            Error(TooBigQtyErr, ItemMaxQuantity);
 
-        SSActionQtyIncrease.IncreaseSalelineQuantity(POSSession, ItemQuantity);
+        SSActionQtyIncrease.IncreaseSalelineQuantity(POSSession, IncreaseByQty);
 
         POSSession.RequestRefreshData();
         exit(true);
     end;
 
-    local procedure RemoveQuantityFromItemLine(Item: Record Item; ItemQuantity: Decimal; ItemMinQuantity: Decimal; POSSession: Codeunit "NPR POS Session")
+    local procedure RemoveQuantityFromItemLine(Item: Record Item; DecreaseByQty: Decimal; ItemMinQuantity: Decimal; POSSession: Codeunit "NPR POS Session")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -428,17 +436,16 @@
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetFilter("No.", '=%1', Item."No.");
-        SaleLinePOS.SetFilter(Quantity, '>=%1', ItemQuantity);
         if (not SaleLinePOS.FindFirst()) then
             exit;
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
 
-        if SaleLinePOS.Quantity - Abs(ItemQuantity) < ItemMinQuantity then begin
+        if SaleLinePOS.Quantity - Abs(DecreaseByQty) < ItemMinQuantity then begin
             SSActionDeletePOSLine.DeletePosLine(POSSession);
         end else begin
-            SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, Abs(ItemQuantity));
+            SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, Abs(DecreaseByQty));
         end;
 
         POSSession.RequestRefreshData();
