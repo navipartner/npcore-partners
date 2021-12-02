@@ -1,12 +1,8 @@
 xmlport 6014484 "NPR Pacsoft Shipment Document"
 {
-    // PS1.00/LS/20140509  CASE 190533 Pacsoft Module - Reference to Pacsoft Setup table
-    // PS1.01/RA/20160809  CASE 228449 Changed Encoding to UTF-8
-
     Caption = 'Pacsoft Shipment Document';
     Direction = Export;
     Encoding = UTF8;
-
     schema
     {
         tableelement(shipmentdocument; "NPR Pacsoft Shipment Document")
@@ -39,6 +35,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             sendername := PacsoftMgt.HandleSpecialChars(CompanyInfo.Name);
+                        if sendername = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(senderaddr1)
@@ -58,6 +56,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             senderaddr1 := PacsoftMgt.HandleSpecialChars(CompanyInfo.Address);
+                        if senderaddr1 = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(senderaddr2)
@@ -77,6 +77,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             senderaddr2 := PacsoftMgt.HandleSpecialChars(CompanyInfo."Address 2");
+                        if senderaddr2 = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(senderzip)
@@ -96,6 +98,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             senderzip := PacsoftMgt.HandleSpecialChars(CompanyInfo."Post Code");
+                        if senderzip = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(sendercity)
@@ -115,6 +119,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             sendercity := PacsoftMgt.HandleSpecialChars(CompanyInfo.City);
+                        if sendercity = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(sendercountry)
@@ -134,6 +140,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             sendercountry := PacsoftMgt.HandleSpecialChars(CompanyInfo."Country/Region Code");
+                        if sendercountry = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(sendercontact)
@@ -153,6 +161,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             sendercontact := PacsoftMgt.HandleSpecialChars(CompanyInfo."Ship-to Contact");
+                        if sendercontact = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(senderphone)
@@ -172,6 +182,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             senderphone := PacsoftMgt.HandleSpecialChars(CompanyInfo."Phone No.");
+                        if senderphone = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(senderfax)
@@ -191,6 +203,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             senderfax := PacsoftMgt.HandleSpecialChars(CompanyInfo."Fax No.");
+                        if senderfax = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(sendervat)
@@ -210,6 +224,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             sendervat := PacsoftMgt.HandleSpecialChars(CompanyInfo."VAT Registration No.");
+                        if sendervat = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(senderemail)
@@ -229,6 +245,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     begin
                         if sndid = '' then
                             senderemail := PacsoftMgt.HandleSpecialChars(CompanyInfo."E-Mail");
+                        if senderemail = '' then
+                            currXMLport.Skip();
                     end;
                 }
             }
@@ -258,6 +276,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvname := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Name);
+                        if rcvname = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvaddr1)
@@ -276,6 +296,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvaddr1 := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Address);
+                        if rcvaddr1 = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvaddr2)
@@ -294,6 +316,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvaddr2 := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Address 2");
+                        if rcvaddr2 = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvzip)
@@ -312,6 +336,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvzip := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Post Code");
+                        if rcvzip = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvcity)
@@ -330,6 +356,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvcity := PacsoftMgt.HandleSpecialChars(ShipmentDocument.City);
+                        if rcvcity = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvstate)
@@ -348,6 +376,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvstate := PacsoftMgt.HandleSpecialChars(ShipmentDocument.County);
+                        if rcvstate = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvcountry)
@@ -366,6 +396,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvcountry := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Country/Region Code");
+                        if rcvcountry = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvcontact)
@@ -384,6 +416,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvcontact := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Contact);
+                        if rcvcontact = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvphone)
@@ -402,6 +436,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvphone := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Phone No.");
+                        if rcvphone = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvfax)
@@ -420,6 +456,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvfax := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Fax No.");
+                        if rcvfax = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvvat)
@@ -438,6 +476,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvvat := PacsoftMgt.HandleSpecialChars(ShipmentDocument."VAT Registration No.");
+                        if rcvvat = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvemail)
@@ -456,6 +496,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvemail := PacsoftMgt.HandleSpecialChars(ShipmentDocument."E-Mail");
+                        if rcvemail = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(rcvsms)
@@ -474,8 +516,15 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvsms := PacsoftMgt.HandleSpecialChars(ShipmentDocument."SMS No.");
+                        if rcvsms = '' then
+                            currXMLport.Skip();
                     end;
                 }
+                trigger OnBeforePassVariable()
+                begin
+                    if ShipmentDocument."Receiver ID" = '' then
+                        currXMLport.Skip();
+                end;
             }
             textelement(dl_receiver)
             {
@@ -505,6 +554,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         dl_rcvname := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Ship-to Name");
+                        if dl_rcvname = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(dl_rcvaddr1)
@@ -523,6 +574,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         dl_rcvaddr1 := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Ship-to Address");
+                        if dl_rcvaddr1 = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(dl_rcvaddr2)
@@ -541,6 +594,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         dl_rcvaddr2 := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Ship-to Address 2");
+                        if dl_rcvaddr2 = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(dl_rcvzip)
@@ -559,6 +614,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         dl_rcvzip := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Ship-to Post Code");
+                        if dl_rcvzip = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(dl_rcvcity)
@@ -577,6 +634,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         dl_rcvcity := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Ship-to City");
+                        if dl_rcvcity = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(dl_rcvstate)
@@ -595,6 +654,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         dl_rcvstate := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Ship-to County");
+                        if dl_rcvstate = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(dl_rcvcountry)
@@ -613,8 +674,18 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         dl_rcvcountry := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Ship-to Country/Region Code");
+                        if dl_rcvcountry = '' then
+                            currXMLport.Skip();
                     end;
                 }
+
+                trigger OnBeforePassVariable()
+                begin
+                    if (ShipmentDocument."Delivery Location" = '') and (ShipmentDocument."Ship-to Name" = '') and
+                     (shipmentdocument."Ship-to Address" = '') and (shipmentdocument."Ship-to Address 2" = '') and
+                     (shipmentdocument."Ship-to Post Code" = '') and (shipmentdocument."Ship-to City" = '') then
+                        currXMLport.Skip();
+                end;
             }
             textelement(shipment)
             {
@@ -642,6 +713,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         from := sndid;
+                        if from = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(tofield)
@@ -660,6 +733,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         tofield := rcvid;
+                        if tofield = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(agentto)
@@ -678,6 +753,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         agentto := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Delivery Location");
+                        if agentto = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(freetext)
@@ -696,6 +773,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         freetext := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Free Text");
+                        if freetext = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(ref)
@@ -714,6 +793,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         ref := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Reference);
+                        if ref = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(shipdate)
@@ -732,6 +813,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         shipdate := PacsoftMgt.HandleSpecialChars(Format(ShipmentDocument."Shipment Date", 0, '<Year4>-<Month,2>-<Day,2>'));
+                        if shipdate = '' then
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(service)
@@ -852,6 +935,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                         trigger OnBeforePassVariable()
                         begin
                             copies := Format(ShipmentDocument."Parcel Qty.");
+                            if copies = '' then
+                                currXMLport.Skip();
                         end;
                     }
                     textelement(marking)
@@ -870,6 +955,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                         trigger OnBeforePassVariable()
                         begin
                             marking := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Marking);
+                            if marking = '' then
+                                currXMLport.Skip();
                         end;
                     }
                     textelement(package)
@@ -888,6 +975,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                         trigger OnBeforePassVariable()
                         begin
                             package := ShipmentDocument."Package Code";
+                            if package = '' then
+                                currXMLport.Skip();
                         end;
                     }
                     textelement(weight)
@@ -908,6 +997,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                             weight := Format(ShipmentDocument."Total Weight");
                             if ShipmentDocument."Total Weight" = 0.01 then
                                 weight := '';
+                            if weight = '' then
+                                currXMLport.Skip();
                         end;
                     }
                     textelement(volume)
@@ -926,6 +1017,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                         trigger OnBeforePassVariable()
                         begin
                             volume := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Volume);
+                            if volume = '' then
+                                currXMLport.Skip();
                         end;
                     }
                     textelement(contents)
@@ -944,6 +1037,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                         trigger OnBeforePassVariable()
                         begin
                             contents := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Contents);
+                            if contents = '' then
+                                currXMLport.Skip();
                         end;
                     }
                 }
@@ -989,6 +1084,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                                 ShipmentDocument."Customs Document"::"Pro Forma Invoice":
                                     invoicetype := 'PROFORMA';
                             end;
+                            if invoicetype = '' then
+                                currXMLport.Skip();
                         end;
                     }
                     textelement(senderorgno)
@@ -1007,7 +1104,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                         trigger OnBeforePassVariable()
                         begin
                             senderorgno := PacsoftMgt.HandleSpecialChars(ShipmentDocument."VAT Registration No.");
-                            ;
+                            if senderorgno = '' then
+                                currXMLport.Skip();
                         end;
                     }
                     textelement(customsunit)
@@ -1026,6 +1124,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                         trigger OnBeforePassVariable()
                         begin
                             customsunit := ShipmentDocument."Customs Currency";
+                            if customsunit = '' then
+                                currXMLport.Skip();
                         end;
                     }
                     tableelement(customsitemrows; "NPR Pacsoft Customs Item Rows")
@@ -1064,6 +1164,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                             trigger OnBeforePassVariable()
                             begin
                                 statno := PacsoftMgt.HandleSpecialChars(CustomsItemRows."Item Code");
+                                if statno = '' then
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(quantity)
@@ -1118,6 +1220,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                             trigger OnBeforePassVariable()
                             begin
                                 rowcontents := PacsoftMgt.HandleSpecialChars(CustomsItemRows.Content);
+                                if rowcontents = '' then
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(sourcecountry)
@@ -1136,6 +1240,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                             trigger OnBeforePassVariable()
                             begin
                                 sourcecountry := PacsoftMgt.HandleSpecialChars(CustomsItemRows."Country of Origin");
+                                if sourcecountry = '' then
+                                    currXMLport.Skip();
                             end;
                         }
                     }
@@ -1233,6 +1339,12 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                             end;
                         }
                     }
+
+                    trigger OnBeforePassVariable()
+                    begin
+                        if not ShipmentDocument."Send Link To Print" then
+                            currXMLport.Skip();
+                    end;
                 }
                 textelement(ufonline2)
                 {
@@ -1302,7 +1414,7 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    mailmessageattr := 'message';
+                                    mailmessageattr2 := 'message';
                                 end;
                             }
 
@@ -1313,6 +1425,16 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                             end;
                         }
                     }
+                    trigger OnBeforePassVariable()
+                    var
+                        PacsoftShipmentDocServices: Record "NPR Pacsoft Shipm. Doc. Serv.";
+                    begin
+                        PacsoftShipmentDocServices.SetRange("Entry No.", ShipmentDocument."Entry No.");
+                        PacsoftShipmentDocServices.SetRange("Shipping Agent Code", ShipmentDocument."Shipping Agent Code");
+                        PacsoftShipmentDocServices.SetRange("Shipping Agent Service Code", PacsoftSetup."Shipping Agent Services Code");
+                        if PacsoftShipmentDocServices.Isempty() then
+                            currXMLport.Skip();
+                    end;
                 }
             }
         }

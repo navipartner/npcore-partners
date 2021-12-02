@@ -1,6 +1,5 @@
 page 6014486 "NPR Pacsoft Shipment Document"
 {
-
     Caption = 'Pacsoft Shipment Document';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -364,6 +363,31 @@ page 6014486 "NPR Pacsoft Shipment Document"
                         OKButtonPressed := true;
                         CurrPage.Close();
                     end;
+                end;
+            }
+        }
+        area(Navigation)
+        {
+            action(ShowRequest)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Request';
+                Image = XMLFile;
+                ToolTip = 'Shows the API Request.';
+                trigger OnAction()
+                begin
+                    Rec.ReadTextFromBlob(Rec.FieldNo("Request XML"));
+                end;
+            }
+            action(ShowResponse)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Response';
+                ToolTip = 'Shows the API Response.';
+                Image = XMLFile;
+                trigger OnAction()
+                begin
+                    Rec.ReadTextFromBlob(Rec.FieldNo("Response XML"));
                 end;
             }
         }

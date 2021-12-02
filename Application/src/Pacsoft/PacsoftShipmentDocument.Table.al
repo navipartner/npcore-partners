@@ -676,5 +676,25 @@ table 6014452 "NPR Pacsoft Shipment Document"
             TrackingInternetAddr := StrSubstNo(ShippingAgent."Internet Address", PacsoftSetup.User, pShipmentDocument."Entry No.");
         HyperLink(TrackingInternetAddr);
     end;
+
+    procedure ReadTextFromBlob(FieldNo: Integer): Text
+    var
+        TempBlob: Codeunit "Temp Blob";
+        FileMgmt: Codeunit "File Management";
+        DataTyeMgmt: Codeunit "Data Type Management";
+        Tb: TextBuilder;
+        RecRef: RecordRef;
+        FldRef: FieldRef;
+    begin
+        DataTyeMgmt.GetRecordRefAndFieldRef(Rec, FieldNo, RecRef, FldRef);
+        TempBlob.FromRecord(Rec, FieldNo);
+        Tb.Append(Rec.TableCaption);
+        Tb.Append('_');
+        Tb.Append(Format(Rec."Entry No."));
+        Tb.Append('_');
+        Tb.Append(FldRef.Caption);
+        Tb.Append('.xml');
+        FileMgmt.BLOBExport(TempBlob, Tb.ToText(), true);
+    end;
 }
 

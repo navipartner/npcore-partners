@@ -267,6 +267,14 @@ page 6014574 "NPR Pacsoft Setup"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        if not rec.Get() then begin
+            rec.Init();
+            rec.Insert();
+        end;
+    end;
+
     [IntegrationEvent(TRUE, FALSE)]
     procedure GetPackageProvider(var tmpAllObjWithCaption: Record AllObjWithCaption temporary)
     begin

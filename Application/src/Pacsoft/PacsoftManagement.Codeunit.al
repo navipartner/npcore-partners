@@ -56,7 +56,7 @@ codeunit 6014484 "NPR Pacsoft Management"
 
         Clear(OutStr);
 
-        RemoveEmptyXmlTags(ShipmentDocument);
+        PrepareXml(ShipmentDocument);
         SendXML(ShipmentDocument);
 
         if WithDialog then
@@ -65,7 +65,6 @@ codeunit 6014484 "NPR Pacsoft Management"
 
     local procedure SendXML(var ShipmentDocument: Record "NPR Pacsoft Shipment Document")
     var
-        Document: XmlDocument;
         Client: HttpClient;
         Content: HttpContent;
         Headers: HttpHeaders;
@@ -73,22 +72,14 @@ codeunit 6014484 "NPR Pacsoft Management"
         ResponseMessage: HttpResponseMessage;
         XMLResponce: XMLport "NPR Pacsoft Response";
         InStr: InStream;
-        OutStr: OutStream;
         URI: Text[250];
     begin
         ShipmentDocument.CalcFields("Request XML");
         if not ShipmentDocument."Request XML".HasValue() then
             exit;
 
-        ShipmentDocument."Request XML".CreateInStream(InStr);
-        XmlDocument.ReadFrom(InStr, Document);
-        Document.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'no'));
-        ShipmentDocument."Request XML".CreateOutStream(OutStr);
-        Document.WriteTo(OutStr);
-
         URI := StrSubstNo(PacsoftSetup."Send Order URI", PacsoftSetup.Session, PacsoftSetup.User, PacsoftSetup.Pin);
 
-        Clear(InStr);
         ShipmentDocument."Request XML".CreateInStream(InStr);
         Content.WriteFrom(InStr);
         Content.GetHeaders(Headers);
@@ -100,7 +91,6 @@ codeunit 6014484 "NPR Pacsoft Management"
         RequestMessage.Method := 'POST';
 
         Client.Timeout(120000);
-        Client.UseDefaultNetworkWindowsAuthentication();
         Client.Send(RequestMessage, ResponseMessage);
 
         if not ResponseMessage.IsSuccessStatusCode() then
@@ -230,11 +220,10 @@ codeunit 6014484 "NPR Pacsoft Management"
         exit(OK);
     end;
 
-    procedure RemoveEmptyXmlTags(var ShipmentDocument: Record "NPR Pacsoft Shipment Document")
+    procedure PrepareXml(var ShipmentDocument: Record "NPR Pacsoft Shipment Document")
     var
         Document: XmlDocument;
         Element: XmlElement;
-        Node: XmlNode;
         InStr: InStream;
         OutStr: OutStream;
     begin
@@ -246,46 +235,12 @@ codeunit 6014484 "NPR Pacsoft Management"
         XmlDocument.ReadFrom(InStr, Document);
         Document.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'no'));
         Document.GetRoot(Element);
-        Node := Element.AsXmlNode();
-
-        DeleteEmptyXMLNodes(Node);
 
         Clear(ShipmentDocument."Request XML");
-        ShipmentDocument.Modify();
 
         ShipmentDocument."Request XML".CreateOutStream(OutStr);
-
         Document.WriteTo(OutStr);
         ShipmentDocument.Modify();
-    end;
-
-    procedure DeleteEmptyXMLNodes(var Node: XmlNode): Boolean
-    var
-        ChildNode: XmlNode;
-        Nodes: XmlNodeList;
-        i: Integer;
-        y: Integer;
-        InnerText: Text;
-    begin
-        if Node.IsXmlElement() then begin
-            if not Node.SelectNodes('//', Nodes) then begin
-                InnerText := Node.AsXmlElement().InnerText();
-                if InnerText.Contains('/>') and (not InnerText.Contains('addon')) then
-                    exit(Node.Remove());
-            end else begin
-                i := Nodes.Count();
-                y := 0;
-                while i > y do begin
-                    Nodes.Get(y, ChildNode);
-                    if not DeleteEmptyXMLNodes(ChildNode) then
-                        y += 1
-                    else
-                        i -= 1;
-                end;
-            end;
-        end;
-
-        exit(false);
     end;
 
     procedure HandleSpecialChars(pText: Text[1024]) ReturnText: Text[1024]
