@@ -1103,7 +1103,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             }
         }
 
-
         addafter(Resources)
         {
             group("NPR Magento")
@@ -1200,6 +1199,27 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
             }
         }
+
+        addlast(Functions)
+        {
+            action("NPR Add to Purchase Order")
+            {
+                Caption = 'Add to Purchase Order';
+                ToolTip = 'You will create new or select one of existing Purcase Orders and add Item with all its variants (if Item has them).';
+                Promoted = true;
+                PromotedCategory = Process;
+                ApplicationArea = All;
+                Image = MakeOrder;
+
+                trigger OnAction();
+                var
+                    CreatePurchaseOrder: Report "NPR Crt. Purc. Order From Item";
+                begin
+                    CreatePurchaseOrder.SetValues(Rec);
+                    CreatePurchaseOrder.Run();
+                end;
+            }
+        }
     }
 
     var
@@ -1217,7 +1237,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
-
         MagentoEnabled: Boolean;
         MagentoEnabledAttributeSet: Boolean;
         MagentoEnabledCustomOptions: Boolean;
@@ -1232,7 +1251,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         ItemCostMgt: Codeunit ItemCostManagement;
         AverageCostACY: Decimal;
         Text6151400: Label 'Update Seo Link?';
-
 
     trigger OnOpenPage()
     begin
@@ -1250,7 +1268,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
         NPRAttrEditable := CurrPage.EDITABLE();
-
     end;
 
     trigger OnAfterGetRecord()
