@@ -83,7 +83,7 @@ codeunit 6014595 "NPR New Prices Upgrade"
             Codeunit.Run(Codeunit::"Update Feature Data", FeatureDataUpdateStatus);
     end;
 
-    local procedure FillPriceListNos()
+    procedure FillPriceListNos()
     var
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
