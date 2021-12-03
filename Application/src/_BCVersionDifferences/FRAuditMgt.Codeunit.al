@@ -1,12 +1,11 @@
-#if BC17
+#if not BC17
 codeunit 6184850 "NPR FR Audit Mgt."
 {
     SingleInstance = true;
 
     var
         FRCertificationSetup: Record "NPR FR Audit Setup";
-        X509Certificate2: DotNet NPRNetX509Certificate2;
-        RSACryptoServiceProvider: DotNet NPRNetRSACryptoServiceProvider;
+        TempSigningKey: Record "Signature Key" temporary;
         Initialized: Boolean;
         Enabled: Boolean;
         CertificateLoaded: Boolean;
@@ -46,13 +45,9 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure LoadCertificate()
     var
-        InStream: InStream;
-        OutStream: OutStream;
-        TempBlob: Codeunit "Temp Blob";
-        MemoryStream: DotNet NPRNetMemoryStream;
+        Regex: Codeunit Regex;
         Base64Convert: Codeunit "Base64 Convert";
-        RegEx: Codeunit DotNet_Regex;
-        Match: Codeunit DotNet_Match;
+        InStr: InStream;
         Base64Cert: Text;
         Base64RegexCheckLbl: Label '^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$', Locked = true;
     begin
@@ -61,31 +56,28 @@ codeunit 6184850 "NPR FR Audit Mgt."
             FRCertificationSetup.Get();
             FRCertificationSetup.TestField("Signing Certificate Thumbprint");
             FRCertificationSetup.TestField("Signing Certificate Password");
-            FRCertificationSetup."Signing Certificate".CreateInStream(InStream, TextEncoding::UTF8);
-            InStream.Read(Base64Cert);
-            Regex.Regex(Base64RegexCheckLbl);
-            Regex.Match(Base64Cert, Match);
-            if Match.Success() then begin
-                TempBlob.CreateOutStream(OutStream);
-                Base64Convert.FromBase64(Base64Cert, OutStream);
-            end;
-            MemoryStream := MemoryStream.MemoryStream();
-            TempBlob.CreateInStream(InStream);
-            CopyStream(MemoryStream, InStream);
-            X509Certificate2 := X509Certificate2.X509Certificate2(MemoryStream.ToArray(), FRCertificationSetup."Signing Certificate Password");
-            RSACryptoServiceProvider := X509Certificate2.PrivateKey;
+            FRCertificationSetup."Signing Certificate".CreateInStream(InStr, TextEncoding::UTF8);
+            InStr.Read(Base64Cert);
+            if not Regex.IsMatch(Base64Cert, Base64RegexCheckLbl) then
+                Base64Cert := Base64Convert.ToBase64(Base64Cert);
+            TempSigningKey.FromBase64String(Base64Cert, FRCertificationSetup."Signing Certificate Password", true);
             CertificateLoaded := true;
         end;
     end;
 
-    procedure VerifySignature(Data: Text; HashAlgo: Text; SignatureBase64: Text): Boolean
+    procedure VerifySignature(Data: Text; HashAlgo: Enum "Hash Algorithm"; SignatureBase64: Text): Boolean
     var
-        CryptoConfig: DotNet NPRNetCryptoConfig;
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
+        CryptoMgt: Codeunit "Cryptography Management";
+        ConvertBase64: Codeunit "Base64 Convert";
+        OutStr: OutStream;
+        InStream: InStream;
+        TempBlob: Codeunit "Temp Blob";
     begin
         LoadCertificate();
-        exit(RSACryptoServiceProvider.VerifyData(Encoding.Unicode.GetBytes(Data), CryptoConfig.MapNameToOID(HashAlgo), Convert.FromBase64String(SignatureBase64)));
+        TempBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
+        ConvertBase64.FromBase64(SignatureBase64, OutStr);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
+        exit(CryptoMgt.VerifyData(Data, TempSigningKey, Enum::"Hash Algorithm"::SHA256, InStream));
     end;
 
     procedure GetLastUnitEventSignature(POSUnitNo: Code[10]; var POSAuditLogOut: Record "NPR POS Audit Log"; ExternalType: Code[20]): Boolean
@@ -119,30 +111,41 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     procedure SignHash(BaseHash: Text): Text
     var
-        CryptoConfig: DotNet NPRNetCryptoConfig;
-        Convert: DotNet NPRNetConvert;
+        CryptoMgt: Codeunit "Cryptography Management";
+        OutStr: OutStream;
+        InStream: InStream;
+        TempBLOB: Codeunit "Temp Blob";
+        ConvertBase64: Codeunit "Base64 Convert";
     begin
-        exit(Convert.ToBase64String(RSACryptoServiceProvider.SignHash(Convert.FromBase64String(BaseHash), CryptoConfig.MapNameToOID('SHA256'))));
+        TempBLOB.CreateOutStream(OutStr, TextEncoding::UTF8);
+        TempBLOB.CreateInStream(InStream, TextEncoding::UTF8);
+        CryptoMgt.SignData(BaseHash, TempSigningKey, Enum::"Hash Algorithm"::SHA256, OutStr);
+        exit(ConvertBase64.ToBase64(InStream));
     end;
 
     procedure CalculateHash(BaseValue: Text): Text
     var
-        SHA256CryptoServiceProvider: DotNet NPRNetSHA256CryptoServiceProvider;
-        Encoding: DotNet NPRNetEncoding;
-        Convert: DotNet NPRNetConvert;
+        CryptoMgt: Codeunit "Cryptography Management";
     begin
-        SHA256CryptoServiceProvider := SHA256CryptoServiceProvider.SHA256CryptoServiceProvider();
-        exit(Convert.ToBase64String(SHA256CryptoServiceProvider.ComputeHash(Encoding.Unicode.GetBytes(BaseValue))));
+        exit(CryptoMgt.GenerateHashAsBase64String(BaseValue, 1));
     end;
 
     procedure ImportCertificate()
     var
+        InStreamBLOB: InStream;
         InStream: InStream;
-        OutStream: OutStream;
-        NPRX509Certificate2: DotNet NPRNetX509Certificate2;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        LocalRSACryptoServiceProvider: DotNet NPRNetRSACryptoServiceProvider;
+        OutStr: OutStream;
+        Base64Text: Text;
+        Base64Text2: Text;
+        X509Certificate2: Codeunit X509Certificate2;
+        Base64Convert: Codeunit "Base64 Convert";
+        FileMgt: Codeunit "File Management";
+        TempBlob: Codeunit "Temp Blob";
+        DialCaption: Label 'Upload Certificate';
+        FileFilter: Label 'Certificate File (*.PFX)|*.PFX';
+        ExtFilter: Label 'pfx';
         FileName: Text;
+        CertificateThumbprint: Text[250];
     begin
         FRCertificationSetup.Get();
         if FRCertificationSetup."Signing Certificate".HasValue() then begin
@@ -150,19 +153,27 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 exit;
             Clear(FRCertificationSetup."Signing Certificate");
         end;
-        FRCertificationSetup."Signing Certificate".CreateOutStream(OutStream, TextEncoding::UTF8);
-        if not UploadIntoStream('Upload Certificate', '', 'Certificate File (*.PFX)|*.PFX', FileName, InStream) then
-            exit;
-        MemoryStream := MemoryStream.MemoryStream();
-        CopyStream(MemoryStream, InStream);
+        FRCertificationSetup."Signing Certificate".CreateOutStream(OutStr, TextEncoding::UTF8);
+        FRCertificationSetup."Signing Certificate".CreateInStream(InStream, TextEncoding::UTF8);
+        TempBlob.CreateInStream(InStreamBLOB, TextEncoding::UTF8);
+        FileName := FileMgt.BLOBImportWithFilter(TempBlob, DialCaption, '', FileFilter, ExtFilter);
 
-        NPRX509Certificate2 := NPRX509Certificate2.X509Certificate2(MemoryStream.ToArray(), FRCertificationSetup."Signing Certificate Password");
-        if (not NPRX509Certificate2.HasPrivateKey) then
+        if FileName = '' then
+            exit;
+
+        CopyStream(OutStr, InStreamBLOB);
+
+        Base64Text := Base64Convert.ToBase64(InStream);
+        Base64Text2 := Base64Text;
+
+
+        X509Certificate2.VerifyCertificate(Base64Text2, FRCertificationSetup."Signing Certificate Password", Enum::"X509 Content Type"::Cert);
+
+        if (not X509Certificate2.HasPrivateKey(Base64Text, FRCertificationSetup."Signing Certificate Password")) then
             Error(ERROR_MISSING_KEY);
-        LocalRSACryptoServiceProvider := NPRX509Certificate2.PrivateKey;
-        FRCertificationSetup."Signing Certificate Thumbprint" := NPRX509Certificate2.Thumbprint;
-        MemoryStream.Position := 0;
-        CopyStream(OutStream, MemoryStream);
+
+        CertificateThumbprint := CopyStr(FRCertificationSetup."Signing Certificate Thumbprint", 1, MaxStrLen(FRCertificationSetup."Signing Certificate Thumbprint"));
+        X509Certificate2.GetCertificateThumbprint(Base64Text, FRCertificationSetup."Signing Certificate Password", CertificateThumbprint);
         FRCertificationSetup.Modify(true);
 
         Message(CAPTION_CERT_SUCCESS, FRCertificationSetup."Signing Certificate Thumbprint");
@@ -218,8 +229,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         if POSAuditLog."Certificate Thumbprint" <> FRCertificationSetup."Signing Certificate Thumbprint" then
             Error(ERROR_VALIDATE_CERT, FRCertificationSetup."Signing Certificate Thumbprint");
         POSAuditLog."Previous Electronic Signature".CreateInStream(InStream, TextEncoding::UTF8);
-        while (not InStream.EOS) do
-            InStream.ReadText(PreviousSignature);
+        InStream.Read(PreviousSignature);
 
         case POSAuditLog."External Type" of
             'JET':
@@ -993,8 +1003,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
     procedure Destruct()
     begin
         Clear(FRCertificationSetup);
-        Clear(X509Certificate2);
-        Clear(RSACryptoServiceProvider);
         Clear(Initialized);
         Clear(Enabled);
         Clear(CertificateLoaded);
@@ -1028,7 +1036,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
         //Export Archive
         POSWorkshiftCheckpoint.SetRecFilter();
-        TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
+        TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         FRPeriodArchive.SetDestination(OutStream);
         FRPeriodArchive.SetTableView(POSWorkshiftCheckpoint);
         FRPeriodArchive.Export();
@@ -1037,7 +1045,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         if Handled then
             exit;
 
-        TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
         FileName := 'Archive.xml';
         DownloadFromStream(InStream, 'Download Archive', '', '', FileName);
         Clear(InStream);
@@ -1135,9 +1143,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
             Error(ERROR_MISSING_SIGNATURE, POSEntry.TableCaption, POSEntry."Entry No.");
 
         AuditLog."Electronic Signature".CreateInStream(InStream, TextEncoding::UTF8);
-        while (not InStream.EOS) do begin
-            InStream.ReadText(Signature);
-        end;
+        InStream.Read(Signature);
 
         PrintSignature := CopyStr(Signature, 3, 1) + CopyStr(Signature, 7, 1) + CopyStr(Signature, 13, 1) + CopyStr(Signature, 19, 1);
         LinePrintMgt.AddTextField(1, TemplateLine.Align, PrintSignature);
@@ -1146,7 +1152,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnValidateLogRecords', '', true, true)]
     local procedure OnValidateLogRecords(var POSAuditLog: Record "NPR POS Audit Log"; var Handled: Boolean)
     var
-        BaseValue: Text;
         Signature: Text;
         PreviousSignature: Text;
         InStream: InStream;
@@ -1164,7 +1169,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
         Handled := true;
 
-        POSAuditLog.SetAutoCalcFields("Electronic Signature", "Previous Electronic Signature", "Signature Base Value");
+        POSAuditLog.SetAutoCalcFields("Electronic Signature", "Previous Electronic Signature");
         POSAuditLog.SetCurrentKey("Entry No.");
         POSAuditLog.SetAscending("Entry No.", true);
 
@@ -1194,13 +1199,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
                     InStream.ReadText(Signature);
                 Clear(InStream);
 
-                Clear(BaseValue);
-                POSAuditLog."Signature Base Value".CreateInStream(InStream, TextEncoding::UTF8);
-                while (not InStream.EOS) do
-                    InStream.ReadText(BaseValue);
-                Clear(InStream);
-
-                if not VerifySignature(BaseValue, 'SHA256', DecodeBase64URL(Signature)) then
+                if not VerifySignature(DecodeBase64URL(POSAuditLog."Signature Base Hash"), Enum::"Hash Algorithm"::SHA256, DecodeBase64URL(Signature)) then
                     Error(ERROR_SIGNATURE_VALUE, POSAuditLog.TableCaption, POSAuditLog."Entry No.");
 
                 First := false;
