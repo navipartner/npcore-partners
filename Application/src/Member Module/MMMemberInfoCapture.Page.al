@@ -1359,6 +1359,9 @@ page 6060134 "NPR MM Member Info Capture"
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        TempBlob: Codeunit "Temp Blob";
+        InStr: InStream;
+        OutStr: OutStream;
     begin
 
         if (pExternalMemberNo = '') then begin
@@ -1379,9 +1382,12 @@ page 6060134 "NPR MM Member Info Capture"
         Rec."Member Entry No" := Member."Entry No.";
         Rec."External Member No" := Member."External Member No.";
 
-        if (Member.Image.HasValue()) then
-            Rec.Image := Member.Image
-        else
+        if (Member.Image.HasValue()) then begin
+            TempBlob.CreateOutStream(OutStr);
+            Member.Image.ExportStream(OutStr);
+            TempBlob.CreateInStream(InStr);
+            Rec.Image.ImportStream(InStr, Rec.FieldName(Image));
+        end else
             Clear(Rec.Image);
 
         Rec."First Name" := Member."First Name";
