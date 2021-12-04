@@ -866,6 +866,9 @@ codeunit 6060127 "NPR MM Membership Mgt."
     procedure IssueMemberCard(MemberInfoCapture: Record "NPR MM Member Info Capture"; var CardEntryNo: Integer; var ResponseMessage: Text): Boolean
     var
         Member: Record "NPR MM Member";
+        TempBlob: Codeunit "Temp Blob";
+        InStr: InStream;
+        OutStr: OutStream;
     begin
 
         // from external
@@ -874,7 +877,10 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         if (MemberInfoCapture.Image.HasValue()) then begin
             if (Member.Get(MemberInfoCapture."Member Entry No")) then begin
-                Member.Image := MemberInfoCapture.Image;
+                TempBlob.CreateOutStream(OutStr);
+                MemberInfoCapture.Image.ExportStream(OutStr);
+                TempBlob.CreateInStream(InStr);
+                Member.Image.ImportStream(InStr, Member.FieldName(Image));
                 Member.Modify();
             end;
         end;
@@ -3968,8 +3974,11 @@ codeunit 6060127 "NPR MM Membership Mgt."
     var
         CurrentMember: Record "NPR MM Member";
         CountryRegion: Record "Country/Region";
-        CountryName: Text;
         PostCode: Record "Post Code";
+        TempBlob: Codeunit "Temp Blob";
+        InStr:InStream;
+        OutStr:OutStream;
+        CountryName: Text;
         PlaceHolderLbl: Label '%1%2', Locked = true;
         PlaceHolder2Lbl: Label '%1 %2', Locked = true;
         PlaceHolder3Lbl: Label '%1 %2 %3', Locked = true;
@@ -4034,8 +4043,12 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 Member."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
         end;
 
-        if (MemberInfoCapture.Image.HasValue()) then
-            Member.Image := MemberInfoCapture.Image;
+        if (MemberInfoCapture.Image.HasValue()) then begin
+                TempBlob.CreateOutStream(OutStr);
+                MemberInfoCapture.Image.ExportStream(OutStr);
+                TempBlob.CreateInStream(InStr);
+                Member.Image.ImportStream(InStr, Member.FieldName(Image));
+        end;
 
         Member."Display Name" := StrSubstNo(PlaceHolder2Lbl, Member."First Name", Member."Last Name");
 

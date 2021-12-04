@@ -49,6 +49,7 @@ page 6151308 "NPR MM Member Picture"
                         exit;
 
                     Clear(Rec.Image);
+                    TempBlob.CreateInStream(InStr);
                     Rec.Image.ImportStream(InStr, FileName);
                     Rec.Modify(true);
                 end;
