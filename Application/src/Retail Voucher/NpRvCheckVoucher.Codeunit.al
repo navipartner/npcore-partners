@@ -60,7 +60,8 @@ codeunit 6014621 "NPR NpRvCheckVoucher"
             VoucherTypeCode := CopyStr(VoucherType, 1, MaxStrLen(VoucherTypeCode));
 
         if not NpRvVoucherMgt.FindVoucher(VoucherTypeCode, ReferenceNo, Voucher) then
-            Error(NotFoundErr, ReferenceNo, VoucherTypeCode);
+            if not NpRvVoucherMgt.FindPartnerVoucher(VoucherTypeCode, ReferenceNo, Voucher) then
+                Error(NotFoundErr, ReferenceNo, VoucherTypeCode);
 
 
         NpRvVoucherCard.Editable(false);
