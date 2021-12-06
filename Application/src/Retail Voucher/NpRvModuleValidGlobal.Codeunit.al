@@ -163,6 +163,21 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         ReserveVoucher(TempNpRvVoucherBuffer);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunFindVoucher', '', true, true)]
+    local procedure OnRunFindVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var Voucher: Record "NPR NpRv Voucher"; var Handled: Boolean)
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        if Handled then
+            exit;
+        if NpRvVoucherType.Get(VoucherTypeCode) then;
+        if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
+            exit;
+
+        if FindVoucher(ReferenceNo, NpRvVoucherType, Voucher) then
+            Handled := true;
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Sales Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSVoucher(var Rec: Record "NPR NpRv Sales Line"; RunTrigger: Boolean)
     begin
@@ -355,6 +370,124 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             ErrorXmlElement := ErrorXmlNode.AsXmlElement();
             Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
         end;
+    end;
+
+
+    procedure FindVoucher(ReferenceNo: Text; NpRvVoucherType: Record "NPR NpRv Voucher Type"; var Voucher: Record "NPR NpRv Voucher") Found: Boolean
+    var
+        NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        XmlDomManagement: codeunit "XML DOM Management";
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        RequestHeader: HttpHeaders;
+        Response: HttpResponseMessage;
+        Document: XmlDocument;
+        Node: XmlNode;
+        RequestXmlText: Text;
+        ResponseText: Text;
+        VoucherAmount: Decimal;
+    begin
+        NpRvGlobalVoucherSetup.Get(NpRvVoucherType.Code);
+        NpRvGlobalVoucherSetup.TestField("Service Url");
+
+        RequestXmlText :=
+          '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
+            '<soapenv:Body>' +
+              '<FindVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
+                '<vouchers>' +
+                  '<voucher reference_no="' + ReferenceNo + '" voucher_type="' + NpRvVoucherType.Code + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/global_voucher_service">' +
+                    '<redeem_partner_code>' + NpRvVoucherType."Partner Code" + '</redeem_partner_code>' +
+                  '</voucher>' +
+                '</vouchers>' +
+              '</FindVouchers>' +
+            '</soapenv:Body>' +
+          '</soapenv:Envelope>';
+
+        RequestContent.WriteFrom(RequestXmlText);
+        RequestContent.GetHeaders(ContentHeader);
+
+        if ContentHeader.Contains('Content-Type') then
+            ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
+        if ContentHeader.Contains('SOAPAction') then
+            ContentHeader.Remove('SOAPAction');
+        ContentHeader.Add('SOAPAction', 'FindVouchers');
+
+        RequestHeader := Client.DefaultRequestHeaders();
+        if RequestHeader.Contains('Connection') then
+            RequestHeader.Remove('Connection');
+
+        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
+        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
+
+        if not Response.IsSuccessStatusCode() then begin
+            Response.Content.ReadAs(ResponseText);
+            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
+            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
+            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
+            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
+        end;
+
+        Response.Content.ReadAs(ResponseText);
+        ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
+        XmlDocument.ReadFrom(ResponseText, Document);
+        if not NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//Body/FindVouchers_Result/vouchers/voucher', Node) then
+            Error(Text005, ReferenceNo);
+
+        if Evaluate(VoucherAmount, NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'amount', 0, false), 9) then;
+        Clear(Voucher);
+        Voucher.SetRange("Reference No.", ReferenceNo);
+        Voucher.SetRange("Voucher Type", NpRvVoucherType.Code);
+        if not Voucher.FindLast() then begin
+            Voucher.Init();
+            Voucher."No." := '';
+            Voucher."Reference No." := ReferenceNo;
+            Voucher.Validate("Voucher Type", NpRvVoucherType.Code);
+            Voucher.Insert(true);
+
+            VoucherEntry.Init();
+            VoucherEntry."Entry No." := 0;
+            VoucherEntry."Voucher No." := Voucher."No.";
+            VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Partner Issue Voucher";
+            VoucherEntry."Voucher Type" := Voucher."Voucher Type";
+            VoucherEntry.Amount := VoucherAmount;
+            VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
+            VoucherEntry.Positive := VoucherEntry.Amount > 0;
+            if Evaluate(VoucherEntry."Posting Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_date', 0, false), 9) then;
+            VoucherEntry.Open := VoucherEntry.Amount <> 0;
+#pragma warning disable AA0139
+            VoucherEntry."Register No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_register_no', MaxStrLen(VoucherEntry."Register No."), false);
+            VoucherEntry."Document No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_sales_ticket_no', MaxStrLen(VoucherEntry."Document No."), false);
+            VoucherEntry."User ID" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_user_id', MaxStrLen(VoucherEntry."User ID"), false);
+            VoucherEntry."Closed by Entry No." := 0;
+            VoucherEntry."Partner Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_partner_code', MaxStrLen(VoucherEntry."Partner Code"), false));
+            VoucherEntry.Insert();
+            Found := true;
+        end;
+
+        Voucher.Description := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'description', MaxStrLen(Voucher.Description), false);
+        if Evaluate(Voucher."Starting Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'starting_date', 0, false), 9) then;
+        if Evaluate(Voucher."Ending Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'ending_date', 0, false), 9) then;
+        Voucher."Account No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'account_no', MaxStrLen(Voucher."Account No."), false);
+        Voucher.Name := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name', MaxStrLen(Voucher.Name), false);
+        Voucher."Name 2" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name_2', MaxStrLen(Voucher."Name 2"), false);
+        Voucher.Address := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'address', MaxStrLen(Voucher.Address), false);
+        Voucher."Address 2" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'address_2', MaxStrLen(Voucher."Address 2"), false);
+        Voucher."Post Code" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'post_code', MaxStrLen(Voucher."Post Code"), false);
+        Voucher.City := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'city', MaxStrLen(Voucher.City), false);
+        Voucher.County := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'county', MaxStrLen(Voucher.County), false);
+        Voucher."Country/Region Code" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'country_code', MaxStrLen(Voucher."Country/Region Code"), false);
+        Voucher."E-mail" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'email', MaxStrLen(Voucher."E-mail"), false);
+        Voucher."Phone No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'pohone_no', MaxStrLen(Voucher."Phone No."), false);
+        Voucher."Voucher Message" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'voucher_message', MaxStrLen(Voucher."Voucher Message"), false);
+        if Evaluate(Voucher."Issue Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_date', 0, false), 9) then;
+#pragma warning restore
+        Voucher.Modify(true);
+        Commit();
     end;
 
     procedure ReserveVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)

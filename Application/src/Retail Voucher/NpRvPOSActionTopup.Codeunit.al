@@ -131,8 +131,10 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
     local procedure OnActionValidateVoucher(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         VoucherTypeFilter: Text;
         ReferenceNo: Text;
+        NotFoundErr: Label 'Reference No. %1 and Voucher Type %2 not found';
     begin
         VoucherTypeFilter := JSON.GetStringParameter('VoucherTypeFilter');
 
@@ -142,7 +144,9 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
 
         NpRvVoucher.SetFilter("Voucher Type", VoucherTypeFilter);
         NpRvVoucher.SetFilter("Reference No.", '=%1', ReferenceNo);
-        NpRvVoucher.FindFirst();
+        if not NpRvVoucher.FindFirst() then
+            if not NpRvVoucherMgt.FindPartnerVoucher(VoucherTypeFilter, ReferenceNo, NpRvVoucher) then
+                Error(NotFoundErr, ReferenceNo, VoucherTypeFilter);
         if not NpRvVoucher."Allow Top-up" then
             Error(Text006, NpRvVoucher."Reference No.");
 

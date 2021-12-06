@@ -128,6 +128,41 @@
         NpRvVoucherEntry.Insert();
     end;
 
+    procedure FindVouchers(var vouchers: XMLport "NPR NpRv Global Vouchers")
+    var
+        TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
+    begin
+        SetGlobalLanguage(UserId);
+
+        vouchers.Import();
+        vouchers.GetSourceTable(TempNpRvVoucherBuffer);
+
+        if TempNpRvVoucherBuffer.IsEmpty then
+            exit;
+
+        TempNpRvVoucherBuffer.FindSet();
+        repeat
+            FindVoucher(TempNpRvVoucherBuffer);
+        until TempNpRvVoucherBuffer.Next() = 0;
+    end;
+
+    local procedure FindVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+    begin
+        if not FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", NpRvVoucher) then
+            Error(Text000, TempNpRvVoucherBuffer."Reference No.");
+
+        Voucher2Buffer(NpRvVoucher, TempNpRvVoucherBuffer);
+        TempNpRvVoucherBuffer.Modify();
+
+        if NpRvVoucher."Starting Date" > CurrentDateTime() then
+            Error(Text004, TempNpRvVoucherBuffer."Reference No.");
+
+        if (NpRvVoucher."Ending Date" < CurrentDateTime()) and (NpRvVoucher."Ending Date" <> 0DT) then
+            Error(Text005, TempNpRvVoucherBuffer."Reference No.");
+    end;
+
     procedure ReserveVouchers(var vouchers: XMLport "NPR NpRv Global Vouchers")
     var
         TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
