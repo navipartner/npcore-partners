@@ -36,6 +36,25 @@ codeunit 6151015 "NPR NpRv Module Valid.: Def."
             Error(Text004);
     end;
 
+    procedure FindVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        if not NpRvVoucherMgt.FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then
+            Error(Text005, TempNpRvVoucherBuffer."Reference No.");
+        NpRvVoucherMgt.Voucher2Buffer(Voucher, TempNpRvVoucherBuffer);
+
+        if not Voucher.Open then
+            Error(Text002);
+
+        if Voucher."Starting Date" > CurrentDateTime() then
+            Error(Text003);
+
+        if (Voucher."Ending Date" < CurrentDateTime()) and (Voucher."Ending Date" <> 0DT) then
+            Error(Text004);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnInitVoucherModules', '', true, true)]
     local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
     begin

@@ -868,6 +868,16 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         exit(Voucher.FindFirst());
     end;
 
+    procedure FindPartnerVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var Voucher: Record "NPR NpRv Voucher") Handled: Boolean
+    var
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
+    begin
+        if VoucherTypeCode = '' then
+            exit(false);
+        NpRvModuleMgt.OnRunFindVoucher(VoucherTypeCode, ReferenceNo, Voucher, Handled);
+    end;
+
+
     procedure ValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
@@ -880,6 +890,7 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
 
         NpRvModuleValidateDefault.ValidateVoucher(TempNpRvVoucherBuffer);
     end;
+
 
     procedure Voucher2Buffer(var NpRvVoucher: Record "NPR NpRv Voucher"; var TempNpRvGlobalVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var

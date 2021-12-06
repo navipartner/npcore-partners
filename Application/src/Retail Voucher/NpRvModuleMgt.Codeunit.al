@@ -36,6 +36,11 @@ codeunit 6151011 "NPR NpRv Module Mgt."
     end;
 
     [IntegrationEvent(false, false)]
+    procedure OnRunFindVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var Voucher: Record "NPR NpRv Voucher"; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     procedure OnHasApplyPaymentSetup(VoucherType: Record "NPR NpRv Voucher Type"; var HasApplySetup: Boolean)
     begin
     end;
