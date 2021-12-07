@@ -322,6 +322,13 @@ tableextension 6014427 "NPR Item" extends Item
         {
             Caption = 'Magento Description';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
+        }
+        field(6151416; "NPR Magento Desc."; Media)
+        {
+            Caption = 'Magento Description';
+            DataClassification = CustomerContent;
         }
         field(6151420; "NPR Magento Name"; Text[250])
         {
@@ -329,6 +336,13 @@ tableextension 6014427 "NPR Item" extends Item
             DataClassification = CustomerContent;
         }
         field(6151425; "NPR Magento Short Description"; BLOB)
+        {
+            Caption = 'Magento Short Description';
+            DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
+        }
+        field(6151426; "NPR Magento Short Desc."; Media)
         {
             Caption = 'Magento Short Description';
             DataClassification = CustomerContent;

@@ -111,13 +111,20 @@ page 6059791 "NPR E-mail Template"
                         trigger OnAssistEdit()
                         var
                             MagentoFunctions: Codeunit "NPR Magento Functions";
-                            RecRef: RecordRef;
-                            FieldRef: FieldRef;
+                            TempBlob: Codeunit "Temp Blob";
+                            OutStr: OutStream;
+                            InStr: InStream;
                         begin
-                            RecRef.GetTable(Rec);
-                            FieldRef := RecRef.Field(Rec.FieldNo("HTML Template"));
-                            if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                                RecRef.SetTable(Rec);
+                            TempBlob.CreateOutStream(OutStr);
+                            Rec."HTML Template".CreateInStream(InStr);
+                            CopyStream(OutStr, InStr);
+                            if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                                if TempBlob.HasValue() then begin
+                                    TempBlob.CreateInStream(InStr);
+                                    Rec."HTML Template".CreateOutStream(OutStr);
+                                    CopyStream(OutStr, InStr);
+                                end else
+                                    Clear(Rec."HTML Template");
                                 Rec.Modify(true);
                             end;
                         end;

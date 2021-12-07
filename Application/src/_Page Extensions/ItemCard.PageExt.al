@@ -366,7 +366,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                             NPR_ValidateSEOLink();
                         end;
                     }
-                    field("NPR Magento Description"; Format(Rec."NPR Magento Description".HasValue))
+                    field("NPR Magento Description"; Format(Rec."NPR Magento Desc.".HasValue))
                     {
 
                         Caption = 'Magento Description';
@@ -376,21 +376,23 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         trigger OnAssistEdit()
                         var
                             MagentoFunctions: Codeunit "NPR Magento Functions";
-                            RecRef: RecordRef;
-                            FieldRef: FieldRef;
+                            TempBlob: Codeunit "Temp Blob";
+                            OutStr: OutStream;
+                            InStr: InStream;
                         begin
-                            RecRef.GetTable(Rec);
-
-                            FieldRef := RecRef.Field(Rec.FieldNo("NPR Magento Description"));
-
-                            if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                                RecRef.SetTable(Rec);
+                            TempBlob.CreateOutStream(OutStr);
+                            Rec."NPR Magento Desc.".ExportStream(OutStr);
+                            if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                                if TempBlob.HasValue() then begin
+                                    TempBlob.CreateInStream(InStr);
+                                    Rec."NPR Magento Desc.".ImportStream(InStr, Rec.FieldCaption("NPR Magento Desc."));
+                                end else
+                                    Clear(Rec."NPR Magento Desc.");
                                 Rec.Modify(true);
-
                             end;
                         end;
                     }
-                    field("NPR Magento Short Description"; Format(Rec."NPR Magento Short Description".HasValue))
+                    field("NPR Magento Short Description"; Format(Rec."NPR Magento Short Desc.".HasValue))
                     {
 
                         Caption = 'Magento Short Description';
@@ -400,13 +402,18 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         trigger OnAssistEdit()
                         var
                             MagentoFunctions: Codeunit "NPR Magento Functions";
-                            RecRef: RecordRef;
-                            FieldRef: FieldRef;
+                            TempBlob: Codeunit "Temp Blob";
+                            OutStr: OutStream;
+                            InStr: InStream;
                         begin
-                            RecRef.GetTable(Rec);
-                            FieldRef := RecRef.Field(Rec.FieldNo("NPR Magento Short Description"));
-                            if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                                RecRef.SetTable(Rec);
+                            TempBlob.CreateOutStream(OutStr);
+                            Rec."NPR Magento Short Desc.".ExportStream(OutStr);
+                            if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                                if TempBlob.HasValue() then begin
+                                    TempBlob.CreateInStream(InStr);
+                                    Rec."NPR Magento Short Desc.".ImportStream(InStr, Rec.FieldCaption("NPR Magento Short Desc."));
+                                end else
+                                    Clear(Rec."NPR Magento Short Desc.");
                                 Rec.Modify(true);
                             end;
                         end;

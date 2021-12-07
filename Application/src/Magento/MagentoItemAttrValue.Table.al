@@ -65,13 +65,22 @@ table 6151431 "NPR Magento Item Attr. Value"
 
             trigger OnLookup()
             var
-                RecRef: RecordRef;
-                FieldRef: FieldRef;
+                TempBlob: Codeunit "Temp Blob";
+                OutStr: OutStream;
+                InStr: InStream;
             begin
-                RecRef.GetTable(Rec);
-                FieldRef := RecRef.Field(FieldNo("Long Value"));
-                MagentoFunctions.NaviEditorEditBlob(FieldRef);
-                RecRef.Modify(true);
+                TempBlob.CreateOutStream(OutStr);
+                Rec."Long Value".CreateInStream(InStr);
+                CopyStream(OutStr, InStr);
+                if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                    if TempBlob.HasValue() then begin
+                        TempBlob.CreateInStream(InStr);
+                        Rec."Long Value".CreateOutStream(OutStr);
+                        CopyStream(OutStr, InStr);
+                    end else
+                        Clear(Rec."Long Value");
+                    Rec.Modify(true);
+                end;
             end;
         }
         field(110; Value; Text[100])
