@@ -3,7 +3,7 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
     var
         Text000: Label 'Apply Payment - Default (Full Payment)';
 
-    procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
+    procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean)
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSAction: Record "NPR POS Action";
@@ -18,8 +18,11 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
-        if Subtotal >= 0 then
+        if Subtotal >= 0 then begin
+            if EndSale then
+                DoEndSale(POSSession, VoucherType);
             exit;
+        end;
 
         ReturnVoucherType.Get(VoucherType.Code);
         ReturnVoucherType.TestField("Return Voucher Type");
@@ -41,7 +44,38 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         if not POSSession.RetrieveSessionAction(ReturnPOSActionMgt.ActionCode(), POSAction) then
             POSAction.Get(ReturnPOSActionMgt.ActionCode());
         POSAction.SetWorkflowInvocationParameter('VoucherTypeCode', ReturnVoucherType."Return Voucher Type", FrontEnd);
+        POSAction.SetWorkflowInvocationParameter('EndSale', EndSale, FrontEnd);
         FrontEnd.InvokeWorkflow(POSAction);
+    end;
+
+    local procedure DoEndSale(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"): Boolean
+    var
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSetup: Codeunit "NPR POS Setup";
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        SaleAmount: Decimal;
+        Subtotal: Decimal;
+    begin
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+
+        POSSession.GetSetup(POSSetup);
+        if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision()) then
+            exit(false);
+
+        if not POSPaymentMethod.Get(VoucherType."Payment Type") then
+            exit(false);
+        if not ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code") then
+            exit(false);
+        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) <> 0 then
+            exit(false);
+
+        POSSession.GetSale(POSSale);
+        exit(POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod));
     end;
 
     procedure ApplyPaymentSalesDoc(NpRvVoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
@@ -327,7 +361,7 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunApplyPayment', '', true, true)]
-    local procedure OnRunApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; var Handled: Boolean)
+    local procedure OnRunApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var Handled: Boolean)
     begin
         if Handled then
             exit;
@@ -336,7 +370,7 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
 
         Handled := true;
 
-        ApplyPayment(FrontEnd, POSSession, VoucherType, SaleLinePOSVoucher);
+        ApplyPayment(FrontEnd, POSSession, VoucherType, SaleLinePOSVoucher, EndSale);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunApplyPaymentSalesDoc', '', true, true)]
