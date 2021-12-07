@@ -8,7 +8,7 @@ codeunit 6014590 "NPR Service Tier User Mgt."
         exit(activeSession."Database Name")
     end;
 
-    local procedure FindMySession(activeSession: Record "Active Session")
+    local procedure FindMySession(var activeSession: Record "Active Session")
     var
         Itt: Integer;
     begin
@@ -35,10 +35,48 @@ codeunit 6014590 "NPR Service Tier User Mgt."
             exit;
         if ExpirationMessage = '' then
             exit;
-        if LowerCase(ExpirationMessage) = 'false' then
-            exit;
 
-        Message(ExpirationMessage);
+        if LowerCase(ExpirationMessage) <> 'false' then
+            Message(ExpirationMessage);
+
+        UpdateExpirationDate();
+    end;
+
+    local procedure UpdateExpirationDate()
+    var
+        User: Record User;
+    begin
+        User.Get(UserSecurityId());
+        User."Expiry Date" := GetExpirationDateTime();
+        User.Modify();
+    end;
+
+    local procedure GetExpirationDateTime(): DateTime
+    var
+        ExpirationDate: Text;
+        Day: Integer;
+        Month: Integer;
+        Year: Integer;
+        Hour: Text[2];
+        Minute: Text[2];
+        Second: Text[2];
+        ExpirationTime: Time;
+    begin
+        if not TrySendRequest('GetUserExpirationDate', ExpirationDate) then
+            exit(0DT);
+        if (ExpirationDate = '') OR (ExpirationDate = '0001-01-01T00:00:00') then
+            exit(0DT);
+
+        Evaluate(Day, CopyStr(ExpirationDate, 9, 2));
+        Evaluate(Month, CopyStr(ExpirationDate, 6, 2));
+        Evaluate(Year, CopyStr(ExpirationDate, 1, 4));
+
+        Hour := CopyStr(ExpirationDate, 12, 2);
+        Minute := CopyStr(ExpirationDate, 15, 2);
+        Second := CopyStr(ExpirationDate, 18, 2);
+        Evaluate(ExpirationTime, Hour + Minute + Second);
+
+        exit(CreateDateTime(DMY2Date(Day, Month, Year), ExpirationTime));
     end;
 
     local procedure TestUserLocked()
@@ -49,10 +87,9 @@ codeunit 6014590 "NPR Service Tier User Mgt."
             exit;
         if LockedMessage = '' then
             exit;
-        if LowerCase(LockedMessage) = 'false' then
-            exit;
 
-        Message(LockedMessage);
+        if LowerCase(LockedMessage) <> 'false' then
+            Error(LockedMessage);
     end;
 
     [TryFunction]

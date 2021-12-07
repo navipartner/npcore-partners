@@ -85,6 +85,7 @@ codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
         Element := Node.AsXmlElement();
         MethodNS := Element.NamespaceUri();
         AppendLoginInfo(ActiveSession, MethodNS, Element);
+        AppendLicenseInfo(ActiveSession, MethodNS, Element);
         AppendComputerInfo(ActiveSession, MethodNS, Element);
     end;
 
@@ -92,7 +93,6 @@ codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
     var
         User: Record User;
         IComm: Record "NPR I-Comm";
-        SystemEventWrapper: Codeunit "NPR System Event Wrapper";
         XmlElementLoginInfo: XmlElement;
         UserLoginType: Text[10];
     begin
@@ -114,9 +114,49 @@ codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
         XmlElementLoginInfo.Add(AddElement('user_security_id', ActiveSession."User SID", MethodNS));
         XmlElementLoginInfo.Add(AddElement('windows_security_id', Format(User."Windows Security ID"), MethodNS));
         XmlElementLoginInfo.Add(AddElement('user_login_type', UserLoginType, MethodNS));
-        XmlElementLoginInfo.Add(AddElement('application_version', SystemEventWrapper.ApplicationBuild(), MethodNS));
+        XmlElementLoginInfo.Add(AddElement('application_version', GetRetailVersion() + ' ' + GetBaseAppVersion(), MethodNS));
 
         Element.Add(XmlElementLoginInfo);
+    end;
+
+    local procedure GetRetailVersion(): Text
+    var
+        NPRApp: ModuleInfo;
+        RetailAppLabel: Label 'NPR: %1', Comment = '%1=Version', Locked = true;
+    begin
+        NavApp.GetCurrentModuleInfo(NPRApp);
+        exit(StrSubstNo(RetailAppLabel, (format(NPRApp.AppVersion()))));
+    end;
+
+    local procedure GetBaseAppVersion(): Text
+    var
+        BaseAppModInfo: ModuleInfo;
+        BaseAppLabel: Label 'Base: %1', Comment = '%1=Version', Locked = true;
+        BaseAppID: Guid;
+    begin
+        BaseAppID := '437dbf0e-84ff-417a-965d-ed2bb9650972';
+        NavApp.GetModuleInfo(BaseAppID, BaseAppModInfo);
+        exit(StrSubstNo(BaseAppLabel, format(BaseAppModInfo.AppVersion())));
+    end;
+
+    local procedure AppendLicenseInfo(ActiveSession: Record "Active Session"; MethodNS: Text; var Element: XmlElement)
+    var
+        User: Record User;
+        XmlElementLicenseInfo: XmlElement;
+        LicenseType: Text;
+    begin
+        LicenseType := '';
+        if User.Get(ActiveSession."User SID") then
+            LicenseType := format(User."License Type");
+
+        XmlElementLicenseInfo := XmlElement.Create('license_info', MethodNS);
+        XmlElementLicenseInfo.Add(AddElement('license_type', LicenseType, MethodNS));
+        XmlElementLicenseInfo.Add(AddElement('license_name', '', MethodNS));
+        XmlElementLicenseInfo.Add(AddElement('no_of_full_users', '', MethodNS));
+        XmlElementLicenseInfo.Add(AddElement('no_of_isv_users', '', MethodNS));
+        XmlElementLicenseInfo.Add(AddElement('no_of_limited_users', '', MethodNS));
+
+        Element.Add(XmlElementLicenseInfo);
     end;
 
     local procedure AppendComputerInfo(ActiveSession: Record "Active Session"; MethodNS: Text; var Element: XmlElement)
