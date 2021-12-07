@@ -22,6 +22,15 @@ tableextension 6014427 "NPR Item" extends Item
                             ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
             end;
         }
+        modify(GTIN)
+        {
+            trigger OnAfterValidate()
+            var
+                NPRVarietyCloneData: Codeunit "NPR Variety Clone Data";
+            begin
+                NPRVarietyCloneData.InsertItemRef(Rec."No.", '', GTIN, Enum::"Item Reference Type"::"Bar Code", '');
+            end;
+        }
 
         field(6014400; "NPR Item Group"; Code[10])
         {

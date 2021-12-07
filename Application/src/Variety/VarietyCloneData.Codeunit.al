@@ -490,6 +490,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         ItemRef.Validate("Reference Type", CrossRefType);
         ItemRef.Validate("Reference Type No.", CrossRefTypeNo);
         ItemRef."Reference No." := Barcode;
+        Item.Get(ItemNo);
         ItemRef.Description := Item.Description;
         ItemRef."Unit of Measure" := GetUnitOfMeasure(ItemNo, 1);
 
