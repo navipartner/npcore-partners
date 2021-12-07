@@ -7,7 +7,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         RequestString: Text;
         RequestURL: Text;
         Text0001: Label 'Login Details Missing';
-        ShipmondoErr: Label 'The following error occured while trying to create Shipmondo shipment:\\%1';
+
 
     local procedure SetProductAndServices(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") services: Text;
     var
@@ -142,7 +142,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             Output += STRSUBSTNO(QueryParams5Lbl);
 
 
-        Output += STRSUBSTNO(QueryParams6Lbl, BuildSender());
+        Output += STRSUBSTNO(QueryParams6Lbl, BuildSender(PakkelabelsShipment));
         Output += STRSUBSTNO(QueryParams7Lbl, BuildReceiver(PakkelabelsShipment));
 
         if PakkelabelsShipment."Delivery Location" <> '' then
@@ -156,10 +156,12 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         end else
             Output += '"print": false';
 
+        OnBeforeEndShipmentBuild(PakkelabelsShipment, Output);
+
         Output += '}';
     end;
 
-    local procedure BuildSender() Output: Text;
+    local procedure BuildSender(PakkelabelsShipment: record "NPR pacsoft shipment Document") Output: Text;
     var
         CompanyInformation: Record "Company Information";
         QueryParamsLbl: Label '"name": "%1",', Locked = true;
@@ -171,8 +173,12 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         QueryParams7Lbl: Label '"mobile": "%1",', Locked = true;
         QueryParams8Lbl: Label '"telephone": "%1",', Locked = true;
         QueryParams9Lbl: Label '"email": "%1"', Locked = true;
+        Runtrigger: Boolean;
 
     begin
+        OnBeforeAssignSender(PakkelabelsShipment, Output, Runtrigger);
+        IF Runtrigger THEN
+            EXIT;
         CompanyInformation.GET();
         Output := '{';
         Output += STRSUBSTNO(QueryParamsLbl, CompanyInformation.Name);
@@ -444,7 +450,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     var
         SalesShptHeader: Record "Sales Shipment Header";
         SalesSetup: Record "Sales & Receivables Setup";
-        ShipmondoTryCreateShipment: Codeunit "NPR Shipmondo Try Create Shpt.";
+        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
+        RecRef: RecordRef;
     begin
         if not InitPackageProvider() then
             exit;
@@ -455,9 +462,10 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
             ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then begin
             if SalesShptHeader.GET(SalesShptHdrNo) then begin
-                if not ShipmondoTryCreateShipment.Run(SalesShptHeader) then // This will incur a commit
-                    if GuiAllowed then
-                        Message(ShipmondoErr, GetLastErrorText());
+                RecRef.GetTable(SalesShptHeader);
+                AddEntry(RecRef, GuiAllowed, false, ShipmentDocument);
+                if PackageProviderSetup."Send Package Doc. Immediately" then
+                    CreateShipment(ShipmentDocument, true);
             end;
         end;
     end;
@@ -505,9 +513,10 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
 
 
                             if not PakkeShippingAgent.GET(SalesHeader."Shipping Agent Code") then
-                                exit;
-                            if SalesHeader."Shipping Agent Service Code" = '' then
-                                exit;
+                                exit
+                            else
+                                SalesHeader.TESTFIELD(SalesHeader."Shipping Agent Service Code");
+
 
                             if PakkeShippingAgent."Package Type Required" then
                                 SalesHeader.TESTFIELD("NPR Package Code");
@@ -553,7 +562,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
 
                         SalesShipmentHeader.TESTFIELD("Shipping Agent Service Code");
 
-                        PakkeShippingAgent.GET(SalesShipmentHeader."Shipping Agent Code", SalesShipmentHeader."Shipping Agent Service Code");
+                        PakkeShippingAgent.GET(SalesShipmentHeader."Shipping Agent Code");
                         if SalesHeader."Ship-to Code" <> '' then begin
                             ShiptoAddress.GET(SalesShipmentHeader."Sell-to Customer No.", SalesShipmentHeader."Ship-to Code");
                             if PakkeShippingAgent."Phone Mandatory" then
@@ -593,10 +602,9 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         exit(NOT SalesShipmentLine.IsEmpty());
     end;
 
-    procedure AddEntry(RecRef: RecordRef; ShowWindow: Boolean; Silent: Boolean);
+    procedure AddEntry(RecRef: RecordRef; ShowWindow: Boolean; Silent: Boolean; var ShipmentDocument: Record "NPR Pacsoft Shipment Document")
     var
         CompanyInfo: Record "Company Information";
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
         Customer: Record Customer;
         SalesShipmentHeader: Record "Sales Shipment Header";
         ShipToAddress: Record "Ship-to Address";
@@ -729,8 +737,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
 
         COMMIT();
 
-        if PackageProviderSetup."Send Package Doc. Immediately" then
-            CreateShipment(ShipmentDocument, Silent)
+
     end;
 
     procedure SendDocument(var PacsoftShipmentDocument: Record "NPR Pacsoft Shipment Document")
@@ -851,10 +858,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
 
     procedure PrintShipmentDocument(var SalesShipmentHeader: Record "Sales Shipment Header")
     var
-        SalesShptHeader: Record "Sales Shipment Header";
         ShipmentDocument: Record "NPR Pacsoft Shipment Document";
         RecRef: RecordRef;
-        RecRefShipment: RecordRef;
         text000: Label 'Do you Want to create a Package entry ?';
         Text001: Label 'Do you want to print the Document?';
         Jtoken: JsonToken;
@@ -872,17 +877,27 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
                     RequestString := PrintJob(ShipmentDocument);
                     if ExecuteCall('POST', Jtoken, false) then
                         Exit;
-                end
-                else begin
-                    AddEntry(RecRef, false, false);
                 end;
         end else begin
-            RecRefShipment.GETTABLE(SalesShptHeader);
-            TestFieldPakkelabels(RecRefShipment);
-            if CONFIRM(text000, true) then
-                AddEntry(RecRefShipment, false, false);
+            TestFieldPakkelabels(RecRef);
+            if CONFIRM(text000, true) then begin
+                AddEntry(RecRef, GuiAllowed, false, ShipmentDocument);
+                if PackageProviderSetup."Send Package Doc. Immediately" then
+                    CreateShipment(ShipmentDocument, true);
+            end;
         end;
     end;
 
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeAssignSender(VAR PakkelabelsShipment: Record "NPR Pacsoft Shipment Document"; VAR Output: Text; VAR RunTrigger: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeEndShipmentBuild(VAR PakkelabelsShipment: Record "NPR Pacsoft Shipment Document"; VAR Output: Text)
+    begin
+
+    end;
 }
 
