@@ -50,6 +50,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NpRv Print Object Type"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'RemoteEndpoints'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'RetailInventorySets'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Item Blob 2 Media"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Member Blob 2 Media"));
     end;
 
@@ -168,6 +169,8 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                 end;
             Codeunit::"NPR Enum Upgrade":
                 exit('NPREnumUpgrade-20211110');
+            Codeunit::"NPR UPG Item Blob 2 Media":
+                exit('NPRMagentoDescription2Media');
             Codeunit::"NPR UPG Member Blob 2 Media":
                 exit('NPMMemberBlob2Media');
         end;

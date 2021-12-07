@@ -61,13 +61,20 @@ page 6151196 "NPR NpCs Store Card"
                         trigger OnAssistEdit()
                         var
                             MagentoFunctions: Codeunit "NPR Magento Functions";
-                            RecRef: RecordRef;
-                            FieldRef: FieldRef;
+                            TempBlob: Codeunit "Temp Blob";
+                            OutStr: OutStream;
+                            InStr: InStream;
                         begin
-                            RecRef.GetTable(Rec);
-                            FieldRef := RecRef.Field(Rec.FieldNo("Magento Description"));
-                            if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                                RecRef.SetTable(Rec);
+                            TempBlob.CreateOutStream(OutStr);
+                            Rec."Magento Description".CreateInStream(InStr);
+                            CopyStream(OutStr, InStr);
+                            if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                                if TempBlob.HasValue() then begin
+                                    TempBlob.CreateInStream(InStr);
+                                    Rec."Magento Description".CreateOutStream(OutStr);
+                                    CopyStream(OutStr, InStr);
+                                end else
+                                    Clear(Rec."Magento Description");
                                 Rec.Modify(true);
                             end;
                         end;

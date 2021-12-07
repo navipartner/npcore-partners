@@ -336,13 +336,17 @@ xmlport 6151401 "NPR Magento Sales Order Import"
 
                             trigger OnBeforePassVariable()
                             var
+                                TempBlob: Codeunit "Temp Blob";
                                 InStream: InStream;
+                                OutStream: OutStream;
                                 Line: Text;
                             begin
                                 comment := '';
-                                if TempItem."NPR Magento Description".HasValue() then begin
-                                    TempItem.CalcFields("NPR Magento Description");
-                                    TempItem."NPR Magento Description".CreateInStream(InStream);
+                                if TempItem."NPR Magento Desc.".HasValue() then begin
+                                    Clear(TempBlob);
+                                    TempBlob.CreateOutStream(OutStream);
+                                    TempItem."NPR Magento Desc.".ExportStream(OutStream);
+                                    TempBlob.CreateInStream(InStream);
                                     while not InStream.EOS do begin
                                         InStream.ReadText(Line);
                                         comment += Line;
@@ -352,10 +356,12 @@ xmlport 6151401 "NPR Magento Sales Order Import"
 
                             trigger OnAfterAssignVariable()
                             var
+                                TempBlob: Codeunit "Temp Blob";
                                 OutStream: OutStream;
                             begin
-                                Clear(TempItem."NPR Magento Description");
-                                TempItem."NPR Magento Description".CreateOutStream(OutStream);
+                                Clear(TempItem."NPR Magento Desc.");
+                                TempBlob.CreateOutStream(OutStream);
+                                TempItem."NPR Magento Desc.".ExportStream(OutStream);
                                 OutStream.WriteText(comment);
                             end;
                         }
