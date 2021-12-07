@@ -461,7 +461,7 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'NPR Attribute Set ID';
                 }
 
-                field(nprMagentoDescription; Rec."NPR Magento Description")
+                field(nprMagentoDescription; Rec."NPR Magento Desc.")
                 {
                     Caption = 'Magento Description';
                 }
@@ -470,7 +470,7 @@ page 6014501 "NPR APIV1 - Items"
                 {
                     Caption = 'Magento Name';
                 }
-                field(nprMagentoShortDescription; Rec."NPR Magento Short Description")
+                field(nprMagentoShortDescription; Rec."NPR Magento Short Desc.")
                 {
                     Caption = 'Magento Short Description';
                 }

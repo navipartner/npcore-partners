@@ -294,13 +294,20 @@ page 6151439 "NPR Magento Store Item List"
                                             trigger OnAssistEdit()
                                             var
                                                 MagentoFunctions: Codeunit "NPR Magento Functions";
-                                                RecRef: RecordRef;
-                                                FieldRef: FieldRef;
+                                                TempBlob: Codeunit "Temp Blob";
+                                                OutStr: OutStream;
+                                                InStr: InStream;
                                             begin
-                                                RecRef.GetTable(Rec);
-                                                FieldRef := RecRef.Field(Rec.FieldNo("Webshop Description"));
-                                                if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                                                    RecRef.SetTable(Rec);
+                                                TempBlob.CreateOutStream(OutStr);
+                                                Rec."Webshop Description".CreateInStream(InStr);
+                                                CopyStream(OutStr, InStr);
+                                                if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                                                    if TempBlob.HasValue() then begin
+                                                        TempBlob.CreateInStream(InStr);
+                                                        Rec."Webshop Description".CreateOutStream(OutStr);
+                                                        CopyStream(OutStr, InStr);
+                                                    end else
+                                                        Clear(Rec."Webshop Description");
                                                     Rec.Modify(true);
                                                 end;
                                             end;
@@ -334,13 +341,20 @@ page 6151439 "NPR Magento Store Item List"
                                             trigger OnAssistEdit()
                                             var
                                                 MagentoFunctions: Codeunit "NPR Magento Functions";
-                                                RecRef: RecordRef;
-                                                FieldRef: FieldRef;
+                                                TempBlob: Codeunit "Temp Blob";
+                                                OutStr: OutStream;
+                                                InStr: InStream;
                                             begin
-                                                RecRef.GetTable(Rec);
-                                                FieldRef := RecRef.Field(Rec.FieldNo("Webshop Short Desc."));
-                                                if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                                                    RecRef.SetTable(Rec);
+                                                TempBlob.CreateOutStream(OutStr);
+                                                Rec."Webshop Short Desc.".CreateInStream(InStr);
+                                                CopyStream(OutStr, InStr);
+                                                if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                                                    if TempBlob.HasValue() then begin
+                                                        TempBlob.CreateInStream(InStr);
+                                                        Rec."Webshop Short Desc.".CreateOutStream(OutStr);
+                                                        CopyStream(OutStr, InStr);
+                                                    end else
+                                                        Clear(Rec."Webshop Short Desc.");
                                                     Rec.Modify(true);
                                                 end;
                                             end;

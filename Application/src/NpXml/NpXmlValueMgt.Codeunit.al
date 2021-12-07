@@ -2,6 +2,7 @@ codeunit 6151555 "NPR NpXml Value Mgt."
 {
     procedure GetXmlValue(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer) XmlValue: Text
     var
+        TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
         FieldRef: FieldRef;
         InStr: InStream;
@@ -9,6 +10,7 @@ codeunit 6151555 "NPR NpXml Value Mgt."
         IntBuffer: Integer;
         OptionString: Text;
         TextBuffer: Text;
+        MediaGuid: Text;
         Handled: Boolean;
     begin
         if NpXmlElement."Xml Value Codeunit ID" > 0 then begin
@@ -59,10 +61,21 @@ codeunit 6151555 "NPR NpXml Value Mgt."
                             XmlValue := GetEnumOption(IntBuffer, OptionString);
                         end;
                     end;
-                else
-                    if LowerCase(Format(FieldRef.Type)) = 'blob' then begin
+                'media':
+                    begin
+                        MediaGuid := FieldRef.Value;
+                        if TenantMedia.Get(MediaGuid) then begin
+                            TenantMedia.CalcFields(Content);
+                            TenantMedia.Content.CreateInStream(InStr);
+                            while not InStr.EOS do begin
+                                InStr.ReadText(TextBuffer);
+                                XmlValue += TextBuffer;
+                            end;
+                        end;
+                    end;
+                'blob':
+                    begin
                         XmlValue := '';
-
                         FieldRef.CalcField();
                         TempBlob.FromFieldRef(FieldRef);
                         TempBlob.CreateInStream(InStr);
@@ -70,8 +83,9 @@ codeunit 6151555 "NPR NpXml Value Mgt."
                             InStr.ReadText(TextBuffer);
                             XmlValue += TextBuffer;
                         end;
-                    end else
-                        XmlValue := Format(FieldRef.Value, 0, 9);
+                    end;
+                else
+                    XmlValue := Format(FieldRef.Value, 0, 9);
             end;
 
         if NpXmlElement."Lower Case" then

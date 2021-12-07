@@ -15,6 +15,7 @@ codeunit 6151404 "NPR Magento Functions"
         exit('');
     end;
 
+    [Obsolete('Replaced by new function NaviEditorEditTempBlob.')]
     procedure NaviEditorEditBlob(var FieldRef: FieldRef) NewValue: Boolean
     var
         TempBlob: Codeunit "Temp Blob";
@@ -43,6 +44,33 @@ codeunit 6151404 "NPR Magento Functions"
             end;
 
             TempBlob.ToFieldRef(FieldRef);
+            exit(true);
+        end;
+
+        exit(false);
+    end;
+
+    procedure NaviEditorEditTempBlob(var TempBlob: Codeunit "Temp Blob") NewValue: Boolean
+    var
+        TextEditorDialog: Page "NPR Text Editor Dialog";
+        InStr: InStream;
+        OutStr: OutStream;
+        HtmlText: Text;
+    begin
+        TempBlob.CreateInStream(InStr);
+        InStr.ReadText(HtmlText);
+        Clear(TextEditorDialog);
+
+        TextEditorDialog.InitTextEditorOptionKeyAndValueBuffer();
+        // An example (override the standard toolbar (the first one) to show only specific options - bold, italic):
+        // TextEditorDialog.AddTextEditorOptionKeyAndValue('toolbar1', 'bold italic');
+
+        if TextEditorDialog.EditText(HtmlText) then begin
+            Clear(TempBlob);
+            if not (HtmlText in ['<p></p>', '<p><br data-mce-bogus="1"></p>']) then begin
+                TempBlob.CreateOutStream(OutStr);
+                OutStr.WriteText(HtmlText);
+            end;
             exit(true);
         end;
 
