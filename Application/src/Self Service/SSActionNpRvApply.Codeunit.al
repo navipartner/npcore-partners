@@ -146,8 +146,7 @@
         Handled := true;
 
         ApplyVoucher(Context, POSSession, FrontEnd);
-        if not DoEndSale(Context, POSSession) then
-            POSSession.RequestRefreshData();
+        POSSession.RequestRefreshData();
     end;
 
     local procedure ApplyVoucher(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -171,43 +170,7 @@
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetPaymentLine(SaleLinePOS);
 
-        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, ReferenceNo, SaleLinePOS, SalePOS, POSSession, FrontEnd, POSPaymentLine, SaleLinePOS);
-    end;
-
-    local procedure DoEndSale(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"): Boolean
-    var
-        VoucherType: Record "NPR NpRv Voucher Type";
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSPaymentMethod: Record "NPR POS Payment Method";
-        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSetup: Codeunit "NPR POS Setup";
-        PaidAmount: Decimal;
-        ReturnAmount: Decimal;
-        SaleAmount: Decimal;
-        Subtotal: Decimal;
-    begin
-        if not Context.GetBooleanParameter('EndSale') then
-            exit(false);
-
-        POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
-
-        POSSession.GetSetup(POSSetup);
-        if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision()) then
-            exit(false);
-
-        GetVoucherType(Context);
-        VoucherType.Get(VoucherTypeCode);
-        if not POSPaymentMethod.Get(VoucherType."Payment Type") then
-            exit(false);
-        if not ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code") then
-            exit(false);
-        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) <> 0 then
-            exit(false);
-
-        POSSession.GetSale(POSSale);
-        exit(POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod));
+        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, ReferenceNo, SaleLinePOS, SalePOS, POSSession, FrontEnd, POSPaymentLine, SaleLinePOS, Context.GetBooleanParameter('EndSale'));
     end;
 
     local procedure GetVoucherType(Context: Codeunit "NPR POS JSON Management")

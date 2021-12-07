@@ -449,7 +449,7 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         NpRvSendingLog.Insert(true);
     end;
 
-    procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; NpRvSalesLine: Record "NPR NpRv Sales Line")
+    procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; NpRvSalesLine: Record "NPR NpRv Sales Line"; EndSale: Boolean)
     var
         VoucherType: Record "NPR NpRv Voucher Type";
         NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
@@ -457,11 +457,11 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         Handled: Boolean;
     begin
         VoucherType.Get(NpRvSalesLine."Voucher Type");
-        NpRvModuleMgt.OnRunApplyPayment(FrontEnd, POSSession, VoucherType, NpRvSalesLine, Handled);
+        NpRvModuleMgt.OnRunApplyPayment(FrontEnd, POSSession, VoucherType, NpRvSalesLine, EndSale, Handled);
         if Handled then
             exit;
 
-        NpRvModulePaymentDefault.ApplyPayment(FrontEnd, POSSession, VoucherType, NpRvSalesLine);
+        NpRvModulePaymentDefault.ApplyPayment(FrontEnd, POSSession, VoucherType, NpRvSalesLine, EndSale);
     end;
 
     procedure PostPayment(var NpRvSalesLine: Record "NPR NpRv Sales Line")
@@ -1140,7 +1140,7 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         NpRvSalesLine.Insert(true);
     end;
 
-    procedure ApplyVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line")
+    procedure ApplyVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; EndSale: Boolean)
     var
         TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
         VoucherType: Record "NPR NpRv Voucher Type";
@@ -1172,7 +1172,7 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         POSSession.RequestRefreshData();
         InsertNpRvSalesLine(TempNpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
 
-        ApplyPayment(FrontEnd, POSSession, NpRvSalesLine);
+        ApplyPayment(FrontEnd, POSSession, NpRvSalesLine, EndSale);
     end;
 
     procedure ApplyForeignVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; AmountToCapture: Decimal)
@@ -1211,7 +1211,7 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         PaymentNpRvSalesLine := NpRvSalesLine;
         PostIssueForeignVoucher(Voucher, AmountToCapture, NpRvSalesLine);
 
-        ApplyPayment(FrontEnd, POSSession, PaymentNpRvSalesLine);
+        ApplyPayment(FrontEnd, POSSession, PaymentNpRvSalesLine, false);
     end;
 
     local procedure UpdateTaxSetup(var Line: Record "NPR POS Sale Line"; SalePOS: Record "NPR POS Sale")

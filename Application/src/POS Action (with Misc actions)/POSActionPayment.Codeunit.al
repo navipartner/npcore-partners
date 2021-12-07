@@ -618,7 +618,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetPaymentLine(POSLine);
 
-        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, VoucherNumber, PaymentLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine);
+        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, VoucherNumber, PaymentLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine, false);
 
         AmountToCaptureLCY := POSLine."Amount Including VAT";
         AmountToCapture := AmountToCapture;
