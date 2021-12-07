@@ -144,7 +144,7 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetPaymentLine(POSLine);
 
-        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, ReferenceNo, POSLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine);
+        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, ReferenceNo, POSLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine, false);
 
         JSON.SetContext('VoucherType', VoucherType);
         FrontEnd.SetActionContext(VoucherPaymentActionCode(), JSON);
