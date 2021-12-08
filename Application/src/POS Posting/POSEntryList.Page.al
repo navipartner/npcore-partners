@@ -446,9 +446,9 @@ page 6150652 "NPR POS Entry List"
                     ToolTip = 'Tax Free Vouchers';
                     action(IssueNewTaxFreeVoucher)
                     {
-                        Caption = 'New';
-                        Image = RefreshVoucher;
-                        ToolTip = 'Executes the New action';
+                        Caption = 'Issue New Tax Free Voucher';
+                        Image = PostedPayableVoucher;
+                        ToolTip = 'Issue new tax free voucher for the selected POS entry';
                         ApplicationArea = NPRRetail;
                         Promoted = true;
                         PromotedOnly = true;
@@ -465,9 +465,9 @@ page 6150652 "NPR POS Entry List"
                     }
                     action(IssuedTaxFreeVouchers)
                     {
-                        Caption = 'Issued';
-                        Image = PostedPayableVoucher;
-                        ToolTip = 'Executes the Issued action';
+                        Caption = 'Show Tax Free Vouchers';
+                        Image = Voucher;
+                        ToolTip = 'Show existing tax free vouchers for the selected POS entry';
                         ApplicationArea = NPRRetail;
                         Promoted = true;
                         PromotedOnly = true;
