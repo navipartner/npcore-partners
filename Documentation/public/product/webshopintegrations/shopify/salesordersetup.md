@@ -50,3 +50,4 @@ The location mapping setup is taken into account only if the system can't identi
 
 ### Related links
 - [Set up inventory update sending (Location links)](./inventoryupdates.md)
+- [Set up Shopify integration](./setupshopifyintegration.md)
