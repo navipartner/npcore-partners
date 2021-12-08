@@ -13,6 +13,11 @@ codeunit 6151508 "NPR Nc Task List Processing"
         JQParamStrMgt.Parse(Rec."Parameter String");
         FindTaskProcessorCode(Rec, JQParamStrMgt, NcTaskProcessor);
 
+        if JQParamStrMgt.ContainsParam(ParamResetRetryCount()) then begin
+            NcTaskMgt.TaskResetCount(NcTaskProcessor);
+            Commit();
+        end;
+
         if JQParamStrMgt.ContainsParam(ParamUpdateTaskList()) then begin
             NcTaskMgt.UpdateTasks(NcTaskProcessor);
             Commit();
@@ -142,5 +147,10 @@ codeunit 6151508 "NPR Nc Task List Processing"
     procedure ParamProcessTaskList(): Text
     begin
         exit('process_task_list');
+    end;
+
+    procedure ParamResetRetryCount(): Text
+    begin
+        exit('reset_retry_count');
     end;
 }

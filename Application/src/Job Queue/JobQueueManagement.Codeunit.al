@@ -68,6 +68,44 @@ codeunit 6014663 "NPR Job Queue Management"
             StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
     end;
 
+    procedure ScheduleNcTaskCountResetJob(var JobQueueEntry: Record "Job Queue Entry"; TaskProcessorCode: Code[20]; JobQueueCatagoryCode: Code[10])
+    var
+        NcTaskListProcessing: Codeunit "NPR Nc Task List Processing";
+        NotBeforeDateTime: DateTime;
+        NextRunDateFormula: DateFormula;
+        JobQueueDescription: Text;
+        JobQueueDescrLbl: Label '%1 reset task retry count';
+    begin
+        if JobQueueCatagoryCode = '' then
+            JobQueueCatagoryCode := NcSetupMgt.DefaultNCJQCategoryCode(NcSetupMgt.TaskListProcessingCodeunit());
+
+        Clear(JobQueueEntry);
+
+        NotBeforeDateTime := NowWithDelayInSeconds(60);
+        Evaluate(NextRunDateFormula, '<1D>');
+
+        Clear(JQParamStrMgt);
+        JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcTaskListProcessing.ParamProcessor(), TaskProcessorCode));
+        JQParamStrMgt.AddToParamDict(NcTaskListProcessing.ParamResetRetryCount());
+
+        JobQueueDescription := StrSubstNo(JobQueueDescrLbl, TaskProcessorCode);
+        if ShowAutoCreatedClause then
+            JobQueueDescription := StrSubstNo(GetAutoRecreateNoteTxt(), JobQueueDescription);
+        if InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            NcSetupMgt.TaskListProcessingCodeunit(),
+            JQParamStrMgt.GetParamListAsCSString(),
+            JobQueueDescription,
+            NotBeforeDateTime,
+            010000T,
+            015959T,
+            NextRunDateFormula,
+            JobQueueCatagoryCode,
+            JobQueueEntry)
+        then
+            StartJobQueueEntry(JobQueueEntry);
+    end;
+
     procedure ScheduleNcImportListProcessing(ImportTypeCode: Code[20]; JobQueueCatagoryCode: Code[10])
     var
         JobQueueEntry: Record "Job Queue Entry";
@@ -401,6 +439,52 @@ codeunit 6014663 "NPR Job Queue Management"
         exit(SalesSetup."Job Queue Category Code");
     end;
 
+    local procedure EmitTelemetryDataOnError(JobQueueLogEntry: Record "Job Queue Log Entry")
+    var
+        ActiveSession: Record "Active Session";
+        ErrorMessage: Record "Error Message";
+        TypeHelper: Codeunit "Type Helper";
+        CustomDimensions: Dictionary of [Text, Text];
+        ErrorMessageText: Text;
+    begin
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+
+        JobQueueLogEntry.CalcFields("Object Caption to Run");
+        ErrorMessage.SetRange("Register ID", JobQueueLogEntry."Error Message Register Id");
+        if not ErrorMessage.FindSet() then
+            ErrorMessageText := JobQueueLogEntry."Error Message"
+        else
+            repeat
+                if ErrorMessageText <> '' then
+                    ErrorMessageText := ErrorMessageText + TypeHelper.CRLFSeparator();
+                ErrorMessageText := ErrorMessageText + ErrorMessage.Description;
+            until ErrorMessage.Next() = 0;
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', UserId);
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+
+        CustomDimensions.Add('NPR_JQ_Id', JobQueueLogEntry.ID);
+        CustomDimensions.Add('NPR_JQ_LogEntrySystemId', JobQueueLogEntry.SystemId);
+        CustomDimensions.Add('NPR_JQ_ObjectType', Format(JobQueueLogEntry."Object Type to Run"));
+        CustomDimensions.Add('NPR_JQ_ObjectId', Format(JobQueueLogEntry."Object ID to Run"));
+        CustomDimensions.Add('NPR_JQ_ObjectCaption', JobQueueLogEntry."Object Caption to Run");
+        CustomDimensions.Add('NPR_JQ_Parameters', JobQueueLogEntry."Parameter String");
+        CustomDimensions.Add('NPR_JQ_CategoryCode', JobQueueLogEntry."Job Queue Category Code");
+        CustomDimensions.Add('NPR_JQ_ErrorText', ErrorMessageText);
+        CustomDimensions.Add('NPR_JQ_CallStack', JobQueueLogEntry.GetErrorCallStack());
+        CustomDimensions.Add('NPR_JQ_ExecutionStartedAt', Format(JobQueueLogEntry."Start Date/Time", 0, 9));
+        CustomDimensions.Add('NPR_JQ_ExecutionEndedAt', Format(JobQueueLogEntry."End Date/Time", 0, 9));
+        CustomDimensions.Add('NPR_JQ_ExecutionDuration', Format(JobQueueLogEntry.Duration(), 0, 9));
+        CustomDimensions.Add('NPR_JQ_ExecutionStartedBy', JobQueueLogEntry."Processed by User ID");
+
+        Session.LogMessage('NPR_JobQueue', 'Job Queue Error', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
     local procedure SetDefaultValues(var JobQueueEntry: Record "Job Queue Entry")
     begin
@@ -408,6 +492,40 @@ codeunit 6014663 "NPR Job Queue Management"
             JobQueueEntry."Maximum No. of Attempts to Run" := 5;
         if (JobQueueEntry."Rerun Delay (sec.)" <= 0) or (JobQueueEntry."Rerun Delay (sec.)" = 60) then  //60 - default value in MS standard application
             JobQueueEntry."Rerun Delay (sec.)" := 180;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterFinalizeRun', '', true, false)]
+    local procedure RescheduleAfterError(JobQueueEntry: Record "Job Queue Entry")
+    var
+        JobQueueSendNotif: Codeunit "NPR Job Queue - Send Notif.";
+    begin
+        if JobQueueEntry.IsTemporary then
+            exit;
+        if JobQueueEntry.Status <> JobQueueEntry.Status::Error then
+            exit;
+
+        if (JobQueueEntry."NPR Notif. Profile on Error" = '') and not JobQueueEntry."NPR Auto-Resched. after Error" then
+            exit;
+
+        Commit();
+
+        if JobQueueEntry."NPR Notif. Profile on Error" <> '' then
+            JobQueueSendNotif.SendNotifications(JobQueueEntry, JobQueueSendNotif);
+
+        if JobQueueEntry."NPR Auto-Resched. after Error" then begin
+            JobQueueEntry."Earliest Start Date/Time" := NowWithDelayInSeconds(JobQueueEntry."NPR Auto-Resched. Delay (sec.)");
+            JobQueueEntry.Modify();
+            JobQueueEntry.Restart();
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnBeforeModifyLogEntry', '', true, false)]
+    local procedure EmitTelemetry(var JobQueueLogEntry: Record "Job Queue Log Entry")
+    begin
+        if JobQueueLogEntry.IsTemporary or (JobQueueLogEntry.Status <> JobQueueLogEntry.Status::Error) then
+            exit;
+
+        EmitTelemetryDataOnError(JobQueueLogEntry);
     end;
 
     [IntegrationEvent(false, false)]
