@@ -22,8 +22,8 @@ table 6060137 "NPR MM Member Notific. Setup"
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create';
-            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE;
+            OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create, Coupon';
+            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON;
         }
         field(30; "Days Before"; Integer)
         {

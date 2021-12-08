@@ -77,12 +77,53 @@ table 6060139 "NPR MM Member Notific. Entry"
         {
             Caption = 'Notification Trigger';
             DataClassification = CustomerContent;
-            OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create';
-            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE;
+            OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create,Coupon';
+            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON;
         }
         field(51; "Template Filter Value"; Code[20])
         {
             Caption = 'Template Filter Value';
+            DataClassification = CustomerContent;
+        }
+        field(60; "Coupon Reference No."; Text[50])
+        {
+            Caption = 'Coupon Reference No.';
+            DataClassification = CustomerContent;
+        }
+        field(61; "Coupon Discount Type"; Option)
+        {
+            Caption = 'Coupon Discount Type';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Discount Amount,Discount %';
+            OptionMembers = "Discount Amount","Discount %";
+        }
+        field(62; "Coupon Discount %"; Decimal)
+        {
+            Caption = 'Coupon Discount %';
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
+            MaxValue = 100;
+            MinValue = 0;
+        }
+        field(63; "Coupon Discount Amount"; Decimal)
+        {
+            AutoFormatType = 1;
+            Caption = 'Coupon Discount Amount';
+            DataClassification = CustomerContent;
+        }
+        field(64; "Coupon Starting Date"; DateTime)
+        {
+            Caption = 'Coupon Starting Date';
+            DataClassification = CustomerContent;
+        }
+        field(65; "Coupon Ending Date"; DateTime)
+        {
+            Caption = 'Coupon Ending Date';
+            DataClassification = CustomerContent;
+        }
+        field(69; "Coupon Description"; Text[30])
+        {
+            Caption = 'Coupon Description';
             DataClassification = CustomerContent;
         }
         field(80; "Target Member Role"; Option)

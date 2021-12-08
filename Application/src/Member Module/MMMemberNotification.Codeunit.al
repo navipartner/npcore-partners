@@ -49,11 +49,6 @@ codeunit 6060136 "NPR MM Member Notification"
     begin
 
         NotificationStatus := NotificationIsValid(MembershipNotification);
-
-        // Not Now
-        if (NotificationStatus = 0) then
-            exit;
-
         if (NotificationStatus = 1) then begin
             CreateRecipients(MembershipNotification);
             NotifyRecipients(MembershipNotification);
@@ -65,10 +60,12 @@ codeunit 6060136 "NPR MM Member Notification"
             MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
         end;
 
-        MembershipNotification."Notification Processed At" := CurrentDateTime;
-        MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
+        if (NotificationStatus <> 0) then begin
+            MembershipNotification."Notification Processed At" := CurrentDateTime;
+            MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
+            MembershipNotification.Modify();
+        end;
 
-        MembershipNotification.Modify();
         Commit();
     end;
 
@@ -76,6 +73,7 @@ codeunit 6060136 "NPR MM Member Notification"
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
+        Coupon: Record "NPR NpDc Coupon";
         FromDate: Date;
         UntilDate: Date;
         StartDate: Date;
@@ -144,6 +142,16 @@ codeunit 6060136 "NPR MM Member Notification"
 
                     exit(0); // Wait for the membership to become active
                 end;
+            MembershipNotification."Notification Trigger"::COUPON:
+                begin
+                    if (not Coupon.Get(MembershipNotification."Coupon No.")) then
+                        exit(0); // Coupon not created yet or not valid
+
+                    if ((Coupon."Ending Date" > CreateDateTime(0D, 0T)) and (Coupon."Ending Date" < CurrentDateTime())) then
+                        exit(-1); // Coupon has expired - cancel notification
+
+                    exit(1); // Send
+                end;
         end;
 
         exit(-1);
@@ -161,6 +169,7 @@ codeunit 6060136 "NPR MM Member Notification"
         MemberCommunity: Record "NPR MM Member Community";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
+        Coupon: Record "NPR NpDc Coupon";
         Method: Code[10];
         EMailLbl: Label '%1?email=%2', Locked = true;
     begin
@@ -268,6 +277,8 @@ codeunit 6060136 "NPR MM Member Notification"
                             MembershipManagement.GetCommunicationMethod_MemberCard(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
                         MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE:
                             MembershipManagement.GetCommunicationMethod_MemberCard(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
+                        MemberNotificationEntry."Notification Trigger"::COUPON:
+                            MembershipManagement.GetCommunicationMethod_Coupon(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
                     end;
 
                     case Method of
@@ -298,6 +309,18 @@ codeunit 6060136 "NPR MM Member Notification"
 
                     if (NotificationSetup."Generate Magento PW URL") then
                         RequestMagentoPasswordUrl(Membership."Customer No.", MembershipRole."Contact No.", Member."E-Mail Address", MemberNotificationEntry."Magento Get Password URL", MemberNotificationEntry."Failed With Message");
+
+                    if (MembershipNotification."Notification Trigger" = MembershipNotification."Notification Trigger"::COUPON) then begin
+                        if (not Coupon.Get(MembershipNotification."Coupon No.")) then
+                            Coupon.Init();
+                        MemberNotificationEntry."Coupon Reference No." := Coupon."Reference No.";
+                        MemberNotificationEntry."Coupon Description" := Coupon.Description;
+                        MemberNotificationEntry."Coupon Discount %" := Coupon."Discount %";
+                        MemberNotificationEntry."Coupon Discount Amount" := Coupon."Discount Amount";
+                        MemberNotificationEntry."Coupon Discount Type" := Coupon."Discount Type";
+                        MemberNotificationEntry."Coupon Ending Date" := Coupon."Ending Date";
+                        MemberNotificationEntry."Coupon Starting Date" := Coupon."Starting Date";
+                    end;
 
                     if (MemberNotificationEntry.Insert()) then;
                 end;
@@ -1158,13 +1181,8 @@ codeunit 6060136 "NPR MM Member Notification"
     procedure SendInlineNotifications()
     var
         MembershipNotification: Record "NPR MM Membership Notific.";
-        MemberNotification: Codeunit "NPR MM Member Notification";
-        SponsorshipTicketMgmt: Codeunit "NPR MM Sponsorship Ticket Mgt";
+        SessionId: Integer;
     begin
-
-        // inline notifications are for DEMO purpose only
-        Sleep(2000); // posting is occurring in a              other thread.
-        // I want posting to be done before sending out the notification
 
         SelectLatestVersion();
 
@@ -1174,14 +1192,12 @@ codeunit 6060136 "NPR MM Member Notification"
         MembershipNotification.SetFilter("Date To Notify", '=%1', Today);
         MembershipNotification.SetFilter(Blocked, '=%1', false);
 
-        if (MembershipNotification.FindSet()) then begin
-            repeat
-                MemberNotification.HandleMembershipNotification(MembershipNotification);
-            until (MembershipNotification.Next() = 0);
-        end;
+        if (not MembershipNotification.IsEmpty()) then
+            if (not Session.StartSession(SessionId, Codeunit::"NPR MM Process Inline Notif", CompanyName(), MembershipNotification)) then
+                Error(GetLastErrorText());
 
-        SponsorshipTicketMgmt.NotifyRecipients();
-
+        if (not Session.StartSession(SessionId, Codeunit::"NPR MM Sponsorship Ticket Mgt")) then
+            Error(GetLastErrorText());
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]

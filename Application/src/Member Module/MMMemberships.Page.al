@@ -301,7 +301,7 @@ page 6060127 "NPR MM Memberships"
 
     actions
     {
-        area(navigation)
+        area(processing)
         {
             action(OpenMembershipCard)
             {
@@ -321,6 +321,63 @@ page 6060127 "NPR MM Memberships"
                 ToolTip = 'Opens Membership Card';
                 ApplicationArea = NPRRetail;
             }
+            action("Create Membership")
+            {
+                Caption = 'Create Membership';
+                Ellipsis = true;
+                Image = NewCustomer;
+
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+
+                RunObject = Page "NPR MM Create Membership";
+
+                ToolTip = 'Executes the Create Membership action';
+                ApplicationArea = NPRRetail;
+            }
+            action("Update Customer")
+            {
+                Caption = 'Update Customer Information';
+                Image = CreateInteraction;
+
+                ToolTip = 'Executes the Update Customer Information action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                begin
+                    SyncContacts();
+                end;
+            }
+
+            action(SetNPRAttributeFilter)
+            {
+                Caption = 'Set Client Attribute Filter';
+                Image = "Filter";
+                Ellipsis = true;
+
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
+
+                ToolTip = 'Executes the Set Client Attribute Filter action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    NPRAttributeValueSet: Record "NPR Attribute Value Set";
+                begin
+                    if (not NPRAttrManagement.SetAttributeFilter(NPRAttributeValueSet)) then
+                        exit;
+
+                    Rec.SetView(NPRAttrManagement.GetAttributeFilterView(NPRAttributeValueSet, Rec));
+                end;
+            }
+        }
+        area(navigation)
+        {
             action(Notifications)
             {
                 Caption = 'Notifications';
@@ -376,6 +433,56 @@ page 6060127 "NPR MM Memberships"
 
                 ToolTip = 'Opens Coupons List';
                 ApplicationArea = NPRRetail;
+            }
+            group(History)
+            {
+                Caption = 'History';
+                Image = History;
+                action("Ledger E&ntries")
+                {
+                    Caption = 'Ledger E&ntries';
+                    Image = CustomerLedger;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "Customer Ledger Entries";
+                    RunPageLink = "Customer No." = FIELD("Customer No.");
+                    RunPageView = SORTING("Customer No.");
+                    ShortCutKey = 'Ctrl+F7';
+
+                    ToolTip = 'Executes the Ledger E&ntries action';
+                    ApplicationArea = NPRRetail;
+                }
+                action(ItemLedgerEntries)
+                {
+                    Caption = 'Item Ledger Entries';
+                    Image = ItemLedger;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "Item Ledger Entries";
+                    RunPageLink = "Source No." = FIELD("Customer No.");
+                    RunPageView = SORTING("Source Type", "Source No.", "Posting Date")
+                                  ORDER(Descending)
+                                  WHERE("Source Type" = CONST(Customer));
+
+                    ToolTip = 'Executes the Item Ledger Entries action';
+                    ApplicationArea = NPRRetail;
+                }
+                action(Statistics)
+                {
+                    Caption = 'Statistics';
+                    Image = Statistics;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "Customer Statistics";
+                    RunPageLink = "No." = FIELD("Customer No.");
+                    ShortCutKey = 'F7';
+
+                    ToolTip = 'Executes the Statistics action';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group("Raptor Integration")
             {
@@ -466,63 +573,7 @@ page 6060127 "NPR MM Memberships"
                 }
             }
         }
-        area(processing)
-        {
-            action("Create Membership")
-            {
-                Caption = 'Create Membership';
-                Ellipsis = true;
-                Image = NewCustomer;
 
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedIsBig = true;
-
-                RunObject = Page "NPR MM Create Membership";
-
-                ToolTip = 'Executes the Create Membership action';
-                ApplicationArea = NPRRetail;
-            }
-            action("Update Customer")
-            {
-                Caption = 'Update Customer Information';
-                Image = CreateInteraction;
-
-                ToolTip = 'Executes the Update Customer Information action';
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                begin
-                    SyncContacts();
-                end;
-            }
-
-            action(SetNPRAttributeFilter)
-            {
-                Caption = 'Set Client Attribute Filter';
-                Image = "Filter";
-                Ellipsis = true;
-
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
-
-                ToolTip = 'Executes the Set Client Attribute Filter action';
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    NPRAttributeValueSet: Record "NPR Attribute Value Set";
-                begin
-                    if (not NPRAttrManagement.SetAttributeFilter(NPRAttributeValueSet)) then
-                        exit;
-
-                    Rec.SetView(NPRAttrManagement.GetAttributeFilterView(NPRAttributeValueSet, Rec));
-                end;
-            }
-        }
     }
 
     trigger OnAfterGetRecord()

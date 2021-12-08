@@ -522,7 +522,6 @@ page 6060137 "NPR MM Membership Card"
 
                 trigger OnAction()
                 begin
-
                     RedeemPoints(Rec);
                 end;
             }
@@ -642,6 +641,23 @@ page 6060137 "NPR MM Membership Card"
                 ToolTip = 'Executes the Arrival Log action';
                 ApplicationArea = NPRRetail;
             }
+            action("Open Coupons")
+            {
+                Caption = 'Coupons';
+                Ellipsis = true;
+                Image = Voucher;
+
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                RunObject = Page "NPR NpDc Coupons";
+                RunPageLink = "Customer No." = FIELD("Customer No.");
+
+                ToolTip = 'Opens Coupons List';
+                ApplicationArea = NPRRetail;
+            }
             group(History)
             {
                 Caption = 'History';
@@ -744,6 +760,39 @@ page 6060137 "NPR MM Membership Card"
                             RaptorMgt.ShowRaptorData(RaptorAction, Rec."Customer No.");
 
                     end;
+                }
+            }
+        }
+        area(Reporting)
+        {
+            group(Loyalty)
+            {
+                action("Loyalty Point Summary")
+                {
+                    Caption = 'Loyalty Point Summary';
+                    Image = CreditCard;
+                    RunObject = Report "NPR MM Membersh. Points Summ.";
+
+                    ToolTip = 'Executes the Loyalty Point Summary action';
+                    ApplicationArea = NPRRetail;
+                }
+                action("Loyalty Point Value")
+                {
+                    Caption = 'Loyalty Point Value';
+                    Image = LimitedCredit;
+                    RunObject = Report "NPR MM Membership Points Value";
+
+                    ToolTip = 'Executes the Loyalty Point Value action';
+                    ApplicationArea = NPRRetail;
+                }
+                action("Loyalty Point Details")
+                {
+                    Caption = 'Loyalty Point Details';
+                    Image = CreditCardLog;
+                    RunObject = Report "NPR MM Membership Points Det.";
+
+                    ToolTip = 'Executes the Loyalty Point Details action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

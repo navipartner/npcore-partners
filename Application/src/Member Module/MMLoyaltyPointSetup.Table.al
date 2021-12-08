@@ -90,6 +90,12 @@ table 6060141 "NPR MM Loyalty Point Setup"
             Caption = 'Consume Available Points';
             DataClassification = CustomerContent;
         }
+        field(70; "Notification Code"; Code[10])
+        {
+            Caption = 'Notification Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Member Notific. Setup" Where(type = Const(COUPON));
+        }
         field(1015; "Discount Type"; Option)
         {
             CalcFormula = Lookup("NPR NpDc Coupon Type"."Discount Type" WHERE(Code = FIELD("Coupon Type Code")));

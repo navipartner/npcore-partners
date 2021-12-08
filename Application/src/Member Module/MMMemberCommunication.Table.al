@@ -24,8 +24,8 @@ table 6151188 "NPR MM Member Communication"
         {
             Caption = 'Message Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Welcome,Renew,Newsletter,Member Card,Tickets';
-            OptionMembers = WELCOME,RENEW,NEWSLETTER,MEMBERCARD,TICKETS;
+            OptionCaption = 'Welcome,Renew,Newsletter,Member Card,Tickets,Coupons';
+            OptionMembers = WELCOME,RENEW,NEWSLETTER,MEMBERCARD,TICKETS,COUPONS;
         }
         field(20; "Preferred Method"; Option)
         {
