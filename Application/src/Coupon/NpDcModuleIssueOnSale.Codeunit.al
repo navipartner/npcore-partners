@@ -159,7 +159,11 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
             NpDcSaleLinePOSNewCoupon."Line No." := 10000;
             NpDcSaleLinePOSNewCoupon."Coupon Type" := CouponType.Code;
             NpDcSaleLinePOSNewCoupon."Starting Date" := CouponType."Starting Date";
+            if ((CouponType."Starting Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Starting Date DateFormula") <> '')) then
+                NpDcSaleLinePOSNewCoupon."Starting Date" := CreateDateTime(CalcDate(CouponType."Starting Date DateFormula"), 0T);
             NpDcSaleLinePOSNewCoupon."Ending Date" := CouponType."Ending Date";
+            if ((CouponType."Ending Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Ending Date DateFormula") <> '')) then
+                NpDcSaleLinePOSNewCoupon."Ending Date" := CreateDateTime(CalcDate(CouponType."Ending Date DateFormula"), 235959T);
             NpDcSaleLinePOSNewCoupon."Discount Type" := CouponType."Discount Type";
             NpDcSaleLinePOSNewCoupon."Discount %" := CouponType."Discount %";
             NpDcSaleLinePOSNewCoupon."Max. Discount Amount" := CouponType."Max. Discount Amount";

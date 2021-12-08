@@ -181,6 +181,76 @@ page 6060144 "NPR MM Member Notific. Entry"
                     ToolTip = 'Specifies the value of the Membership Consecutive Until field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Coupon Reference No."; Rec."Coupon Reference No.")
+                {
+                    ToolTip = 'Specifies the value of the Coupon Reference No. field.';
+                    ApplicationArea = All;
+                }
+                field("Coupon Description"; Rec."Coupon Description")
+                {
+                    ToolTip = 'Specifies the value of the Coupon Description field.';
+                    ApplicationArea = All;
+                }
+                field("Coupon Discount %"; Rec."Coupon Discount %")
+                {
+                    ToolTip = 'Specifies the value of the Coupon Discount % field.';
+                    ApplicationArea = All;
+                }
+                field("Coupon Discount Amount"; Rec."Coupon Discount Amount")
+                {
+                    ToolTip = 'Specifies the value of the Coupon Discount Amount field.';
+                    ApplicationArea = All;
+                }
+                field("Coupon Discount Type"; Rec."Coupon Discount Type")
+                {
+                    ToolTip = 'Specifies the value of the Coupon Discount Type field.';
+                    ApplicationArea = All;
+                }
+                field("Coupon Ending Date"; Rec."Coupon Ending Date")
+                {
+                    ToolTip = 'Specifies the value of the Coupon Ending Date field.';
+                    ApplicationArea = All;
+                }
+                field("Coupon Starting Date"; Rec."Coupon Starting Date")
+                {
+                    ToolTip = 'Specifies the value of the Coupon Starting Date field.';
+                    ApplicationArea = All;
+                }
+                field("Contact No."; Rec."Contact No.")
+                {
+                    ToolTip = 'Specifies the value of the Contact No. field.';
+                    ApplicationArea = All;
+                }
+                field("Customer No."; Rec."Customer No.")
+                {
+                    ToolTip = 'Specifies the value of the Customer No. field.';
+                    ApplicationArea = All;
+                }
+                field("Auto-Renew"; Rec."Auto-Renew")
+                {
+                    ToolTip = 'Specifies the value of the Auto-Renew field.';
+                    ApplicationArea = All;
+                }
+                field("Auto-Renew External Data"; Rec."Auto-Renew External Data")
+                {
+                    ToolTip = 'Specifies the value of the Auto-Renew External Data field.';
+                    ApplicationArea = All;
+                }
+                field("Auto-Renew Payment Method Code"; Rec."Auto-Renew Payment Method Code")
+                {
+                    ToolTip = 'Specifies the value of the Auto-Renew Payment Method Code field.';
+                    ApplicationArea = All;
+                }
+                field("External Member Card No."; Rec."External Member Card No.")
+                {
+                    ToolTip = 'Specifies the value of the External Member Card No. field.';
+                    ApplicationArea = All;
+                }
+                field("Card Valid Until"; Rec."Card Valid Until")
+                {
+                    ToolTip = 'Specifies the value of the Card Valid Until field.';
+                    ApplicationArea = All;
+                }
                 field("Target Member Role"; Rec."Target Member Role")
                 {
 

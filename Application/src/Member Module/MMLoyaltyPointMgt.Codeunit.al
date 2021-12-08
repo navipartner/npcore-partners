@@ -636,11 +636,13 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         MembershipRole: Record "NPR MM Membership Role";
         UpgradeAlteration: Record "NPR MM Loyalty Alter Members.";
         DowngradeAlteration: Record "NPR MM Loyalty Alter Members.";
+        TempValidCouponToCreate: Record "NPR MM Loyalty Point Setup" temporary;
         MemberNotification: Codeunit "NPR MM Member Notification";
         UpgradeAvailable: Boolean;
         DowngradeAvailable: Boolean;
     begin
 
+        // Adjust membership level based on points.
         UpgradeAvailable := EligibleForMembershipAlteration(MembershipEntryNo, true, false, UpgradeAlteration);
         DowngradeAvailable := EligibleForMembershipAlteration(MembershipEntryNo, false, false, DowngradeAlteration);
 
@@ -650,6 +652,11 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         if (DowngradeAvailable and not UpgradeAvailable) then
             AlterMembership(MembershipEntryNo, DowngradeAlteration);
 
+        // Consume points and create a coupon
+        if (EligibleForCoupon(MembershipEntryNo, TempValidCouponToCreate)) then
+            CreateCouponRequest(MembershipEntryNo, TempValidCouponToCreate);
+
+        // Update wallet with new point summary and membership type
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter(Blocked, '=%1', false);
         MembershipRole.SetFilter("Wallet Pass Id", '<>%1', '');
@@ -977,28 +984,13 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                     LoyaltyPointsSetup.SetCurrentKey(Code, "Points Threshold");
                     LoyaltyPointsSetup.FindLast();
                     TmpLoyaltyPointsSetup.TransferFields(LoyaltyPointsSetup, true);
+                    TmpLoyaltyPointsSetup.SystemId := LoyaltyPointsSetup.SystemId;
 
-                    if (LoyaltyPointsSetup."Value Assignment" = LoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then begin
-                        if (PointsToSpend < TmpLoyaltyPointsSetup."Points Threshold") then // can be true when points are spent from previous period
-                            TmpLoyaltyPointsSetup."Points Threshold" := PointsToSpend;
+                    if (LoyaltyPointsSetup."Value Assignment" = LoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then
+                        SelectCouponFromCouponSetup(TmpLoyaltyPointsSetup, PointsToSpend, LoyaltyPointsSetup);
 
-                        if (LoyaltyPointsSetup."Consume Available Points") then
-                            TmpLoyaltyPointsSetup."Points Threshold" := PointsToSpend;
-
-                        if (PointsToSpend > 0) then
-                            TmpLoyaltyPointsSetup.Insert();
-                    end;
-
-                    if (LoyaltyPointsSetup."Value Assignment" = LoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) then begin
-                        TmpLoyaltyPointsSetup."Amount LCY" := SubTotal;
-                        if (PointsToSpend * TmpLoyaltyPointsSetup."Point Rate" < SubTotal) then
-                            TmpLoyaltyPointsSetup."Amount LCY" := PointsToSpend * TmpLoyaltyPointsSetup."Point Rate";
-
-                        TmpLoyaltyPointsSetup."Points Threshold" := Round(TmpLoyaltyPointsSetup."Amount LCY" / TmpLoyaltyPointsSetup."Point Rate", 1);
-
-                        if (TmpLoyaltyPointsSetup."Amount LCY" >= TmpLoyaltyPointsSetup."Minimum Coupon Amount") then
-                            TmpLoyaltyPointsSetup.Insert();
-                    end;
+                    if (LoyaltyPointsSetup."Value Assignment" = LoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) then
+                        SelectCouponFromLoyaltySetup(TmpLoyaltyPointsSetup, SubTotal, PointsToSpend);
                 end;
 
             LoyaltySetup."Voucher Creation"::SV_MP_LVC:
@@ -1006,28 +998,13 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                     LoyaltyPointsSetup.SetCurrentKey(Code, "Points Threshold");
                     LoyaltyPointsSetup.FindFirst();
                     TmpLoyaltyPointsSetup.TransferFields(LoyaltyPointsSetup, true);
+                    TmpLoyaltyPointsSetup.SystemId := LoyaltyPointsSetup.SystemId;
 
-                    if (LoyaltyPointsSetup."Value Assignment" = LoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then begin
-                        if (PointsToSpend < TmpLoyaltyPointsSetup."Points Threshold") then // can be true when points are spent from previous period
-                            TmpLoyaltyPointsSetup."Points Threshold" := PointsToSpend;
+                    if (LoyaltyPointsSetup."Value Assignment" = LoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then
+                        SelectCouponFromCouponSetup(TmpLoyaltyPointsSetup, PointsToSpend, LoyaltyPointsSetup);
 
-                        if (LoyaltyPointsSetup."Consume Available Points") then
-                            TmpLoyaltyPointsSetup."Points Threshold" := PointsToSpend;
-
-                        if (PointsToSpend > 0) then
-                            TmpLoyaltyPointsSetup.Insert();
-                    end;
-
-                    if (LoyaltyPointsSetup."Value Assignment" = LoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) then begin
-                        TmpLoyaltyPointsSetup."Amount LCY" := SubTotal;
-                        if (PointsToSpend * TmpLoyaltyPointsSetup."Point Rate" < SubTotal) then
-                            TmpLoyaltyPointsSetup."Amount LCY" := PointsToSpend * TmpLoyaltyPointsSetup."Point Rate";
-
-                        TmpLoyaltyPointsSetup."Points Threshold" := Round(TmpLoyaltyPointsSetup."Amount LCY" / TmpLoyaltyPointsSetup."Point Rate", 1);
-
-                        if (TmpLoyaltyPointsSetup."Amount LCY" >= TmpLoyaltyPointsSetup."Minimum Coupon Amount") then
-                            TmpLoyaltyPointsSetup.Insert();
-                    end;
+                    if (LoyaltyPointsSetup."Value Assignment" = LoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) then
+                        SelectCouponFromLoyaltySetup(TmpLoyaltyPointsSetup, SubTotal, PointsToSpend);
                 end;
 
             LoyaltySetup."Voucher Creation"::SV_HVC:
@@ -1036,11 +1013,13 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                     LoyaltyPointsSetup.SetFilter("Value Assignment", '=%1', LoyaltyPointsSetup."Value Assignment"::FROM_COUPON);
                     LoyaltyPointsSetup.FindLast();
                     TmpLoyaltyPointsSetup.TransferFields(LoyaltyPointsSetup, true);
+                    TmpLoyaltyPointsSetup.SystemId := LoyaltyPointsSetup.SystemId;
 
                     if (LoyaltyPointsSetup."Consume Available Points") then
                         TmpLoyaltyPointsSetup."Points Threshold" := PointsToSpend;
 
-                    TmpLoyaltyPointsSetup.Insert();
+                    if (CouponTypeIsValid(LoyaltyPointsSetup."Coupon Type Code")) then
+                        TmpLoyaltyPointsSetup.Insert();
                 end;
 
             LoyaltySetup."Voucher Creation"::MV_IVC:
@@ -1051,13 +1030,15 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                     ApplyCouponsInOrder := 1;
                     RemainingPoints := PointsToSpend;
                     repeat
-                        while (RemainingPoints > LoyaltyPointsSetup."Points Threshold") do begin
-                            TmpLoyaltyPointsSetup.TransferFields(LoyaltyPointsSetup, true);
-                            TmpLoyaltyPointsSetup."Line No." := ApplyCouponsInOrder;
-                            TmpLoyaltyPointsSetup.Insert();
-                            ApplyCouponsInOrder += 1;
-                            RemainingPoints -= LoyaltyPointsSetup."Points Threshold";
-                        end;
+                        if (CouponTypeIsValid(LoyaltyPointsSetup."Coupon Type Code")) then
+                            while (RemainingPoints >= LoyaltyPointsSetup."Points Threshold") do begin
+                                TmpLoyaltyPointsSetup.TransferFields(LoyaltyPointsSetup, true);
+                                TmpLoyaltyPointsSetup.SystemId := LoyaltyPointsSetup.SystemId;
+                                TmpLoyaltyPointsSetup."Line No." := ApplyCouponsInOrder;
+                                TmpLoyaltyPointsSetup.Insert();
+                                ApplyCouponsInOrder += 1;
+                                RemainingPoints -= LoyaltyPointsSetup."Points Threshold";
+                            end;
                     until (LoyaltyPointsSetup.Next() = 0);
                 end;
 
@@ -1068,6 +1049,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                     if (LoyaltyPointsSetup.FindSet()) then begin
                         repeat
                             TmpLoyaltyPointsSetup.TransferFields(LoyaltyPointsSetup, true);
+                            TmpLoyaltyPointsSetup.SystemId := LoyaltyPointsSetup.SystemId;
 
                             if (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then begin
                                 TmpLoyaltyPointsSetup.CalcFields("Discount Amount", "Discount %", "Discount Type", "Max. Discount Amount");
@@ -1084,18 +1066,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                                 TmpLoyaltyPointsSetup.Insert();
                             end;
 
-                            if (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) then begin
-
-                                TmpLoyaltyPointsSetup."Amount LCY" := SubTotal;
-                                if (PointsToSpend * TmpLoyaltyPointsSetup."Point Rate" < SubTotal) then
-                                    TmpLoyaltyPointsSetup."Amount LCY" := PointsToSpend * TmpLoyaltyPointsSetup."Point Rate";
-
-                                TmpLoyaltyPointsSetup."Points Threshold" := Round(TmpLoyaltyPointsSetup."Amount LCY" / TmpLoyaltyPointsSetup."Point Rate", 1);
-
-                                if (TmpLoyaltyPointsSetup."Amount LCY" >= TmpLoyaltyPointsSetup."Minimum Coupon Amount") then
-                                    TmpLoyaltyPointsSetup.Insert();
-
-                            end;
+                            if (LoyaltyPointsSetup."Value Assignment" = LoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) then
+                                SelectCouponFromLoyaltySetup(TmpLoyaltyPointsSetup, SubTotal, PointsToSpend);
 
                         until (LoyaltyPointsSetup.Next() = 0);
 
@@ -1397,6 +1369,40 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
     begin
         exit(
           EligibleForMembershipAlteration(MembershipEntryNo, Upgrade, true, LoyaltyAlterMembership));
+    end;
+
+    local procedure EligibleForCoupon(MembershipEntryNo: Integer; var TempValidCouponToCreate: Record "NPR MM Loyalty Point Setup" temporary): Boolean
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        LoyaltySetup: Record "NPR MM Loyalty Setup";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        AvailablePoints: Integer;
+        ReasonText: Text;
+    begin
+        if (not Membership.Get(MembershipEntryNo)) then
+            exit(false);
+
+        if (not MembershipSetup.Get(Membership."Membership Code")) then
+            exit(false);
+
+        if (MembershipSetup."Loyalty Code" = '') then
+            exit(false);
+
+        if (not LoyaltySetup.Get(MembershipSetup."Loyalty Code")) then
+            exit(false);
+
+        MembershipEntry.SetCurrentKey("Entry No.");
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipEntry.SetFilter(Blocked, '=%1', false);
+        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+        if (not MembershipEntry.FindLast()) then
+            exit(false);
+
+        AvailablePoints := CalculateAvailablePoints(MembershipEntryNo, Today, true);
+
+        GetEligibleCouponsToRedeemWorker(MembershipEntryNo, TempValidCouponToCreate, 0, AvailablePoints, ReasonText);
+        exit(TempValidCouponToCreate.Count() > 0);
     end;
 
     local procedure EligibleForMembershipAlteration(MembershipEntryNo: Integer; Upgrade: Boolean; GetNextTier: Boolean; var LoyaltyAlterMembership: Record "NPR MM Loyalty Alter Members."): Boolean
@@ -1775,6 +1781,94 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
             CalculatePointsValidPeriod(LoyaltySetup, ReferenceDate, PeriodStart, PeriodEnd);
         end;
+    end;
+
+    local procedure SelectCouponFromCouponSetup(var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary; PointsToSpend: Integer; var LoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup")
+    begin
+        if (PointsToSpend < TmpLoyaltyPointsSetup."Points Threshold") then // can be true when points are spent from previous period
+            TmpLoyaltyPointsSetup."Points Threshold" := PointsToSpend;
+
+        if (LoyaltyPointsSetup."Consume Available Points") then
+            TmpLoyaltyPointsSetup."Points Threshold" := PointsToSpend;
+
+        if (PointsToSpend > 0) then
+            TmpLoyaltyPointsSetup.Insert();
+    end;
+
+    local procedure SelectCouponFromLoyaltySetup(var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary; SubTotal: Decimal; PointsToSpend: Integer)
+    begin
+        TmpLoyaltyPointsSetup."Amount LCY" := SubTotal;
+        if (PointsToSpend * TmpLoyaltyPointsSetup."Point Rate" < SubTotal) then
+            TmpLoyaltyPointsSetup."Amount LCY" := PointsToSpend * TmpLoyaltyPointsSetup."Point Rate";
+
+        TmpLoyaltyPointsSetup."Points Threshold" := Round(TmpLoyaltyPointsSetup."Amount LCY" / TmpLoyaltyPointsSetup."Point Rate", 1);
+
+        if (TmpLoyaltyPointsSetup."Amount LCY" >= TmpLoyaltyPointsSetup."Minimum Coupon Amount") then
+            if (CouponTypeIsValid(TmpLoyaltyPointsSetup."Coupon Type Code")) then
+                TmpLoyaltyPointsSetup.Insert();
+    end;
+
+    local procedure CreateCouponRequest(MembershipEntryNo: Integer; var TempValidCouponToCreate: Record "NPR MM Loyalty Point Setup" temporary)
+    var
+        CouponNotification: Record "NPR MM Membership Notific.";
+        NotificationSetup: Record "NPR MM Member Notific. Setup";
+        Membership: Record "NPR MM Membership";
+        LoyaltyPointSetup: Record "NPR MM Loyalty Point Setup";
+        LoyaltyMgr: Codeunit "NPR MM Loyalty Coupon Mgr";
+    begin
+        TempValidCouponToCreate.Reset();
+        TempValidCouponToCreate.SetFilter("Notification Code", '<>%1', '');
+        if (not TempValidCouponToCreate.FindSet()) then
+            exit;
+
+        if (not Membership.Get(MembershipEntryNo)) then
+            exit;
+
+        repeat
+            if (NotificationSetup.Get(TempValidCouponToCreate."Notification Code")) then begin
+                Clear(CouponNotification);
+                CouponNotification."Membership Entry No." := MembershipEntryNo;
+                CouponNotification."External Membership No." := Membership."External Membership No.";
+                CouponNotification."Notification Trigger" := CouponNotification."Notification Trigger"::COUPON;
+                CouponNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
+                CouponNotification."Target Member Role" := NotificationSetup."Target Member Role";
+                CouponNotification."Processing Method" := NotificationSetup."Processing Method";
+                CouponNotification."Notification Method Source" := CouponNotification."Notification Method Source"::MEMBER;
+                CouponNotification."Date To Notify" := Today() + abs(NotificationSetup."Days Past");
+                CouponNotification."Include NP Pass" := NotificationSetup."Include NP Pass";
+
+                CouponNotification."Notification Code" := TempValidCouponToCreate."Notification Code";
+                CouponNotification."Loyalty Point Setup Id" := TempValidCouponToCreate.SystemId;
+
+                if (LoyaltyPointSetup.GetBySystemId(CouponNotification."Loyalty Point Setup Id")) then begin
+                    CouponNotification."Coupon No." := LoyaltyMgr.IssueOneCoupon(LoyaltyPointSetup."Coupon Type Code", CouponNotification."Membership Entry No.", '', Today(), LoyaltyPointSetup."Points Threshold", 0);
+                    CouponNotification.Insert();
+                end;
+            end;
+        until (TempValidCouponToCreate.Next() = 0);
+    end;
+
+    local procedure CouponTypeIsValid(CouponTypeCode: Code[10]): Boolean
+    var
+        CouponType: Record "NPR NpDc Coupon Type";
+    begin
+
+        if (not CouponType.Get(CouponTypeCode)) then
+            exit(false);
+
+        if (not CouponType.Enabled) then
+            exit(false);
+
+        if ((CouponType."Ending Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Ending Date DateFormula") = '')) then
+            exit(true);
+
+        if ((CouponType."Ending Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Ending Date DateFormula") <> '')) then
+            exit(CalcDate(CouponType."Ending Date DateFormula") > Today());
+
+        if (CouponType."Ending Date" < CurrentDateTime()) then
+            exit(false);
+
+        exit(true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertRmaEntry', '', true, true)]

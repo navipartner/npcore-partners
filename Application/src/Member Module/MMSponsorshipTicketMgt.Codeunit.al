@@ -3,7 +3,8 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
 
     trigger OnRun()
     begin
-
+        // Wait for other stuff to complete
+        Sleep(5000);
         NotifyRecipients();
     end;
 

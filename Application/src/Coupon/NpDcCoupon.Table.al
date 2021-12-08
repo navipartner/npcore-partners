@@ -34,6 +34,11 @@ table 6151591 "NPR NpDc Coupon"
                 "Discount Amount" := CouponType."Discount Amount";
                 "Max Use per Sale" := CouponType."Max Use per Sale";
                 "Print Template Code" := CouponType."Print Template Code";
+
+                if ((Rec."Starting Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Starting Date DateFormula") <> '')) then
+                    Rec."Starting Date" := CreateDateTime(CalcDate(CouponType."Starting Date DateFormula"), 0T);
+                if ((Rec."Ending Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Ending Date DateFormula") <> '')) then
+                    Rec."Ending Date" := CreateDateTime(CalcDate(CouponType."Ending Date DateFormula"), 235959T);
             end;
         }
         field(10; Description; Text[30])
