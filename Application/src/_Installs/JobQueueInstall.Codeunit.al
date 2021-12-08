@@ -41,6 +41,11 @@ codeunit 6014438 "NPR Job Queue Install"
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ')) then begin
+            AddNcTaskCountResetJobQueue();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -50,6 +55,14 @@ codeunit 6014438 "NPR Job Queue Install"
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
         NcSetupMgt.SetupTaskProcessingJobQueue(JobQueueEntry, true);
+    end;
+
+    local procedure AddNcTaskCountResetJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+    begin
+        NcSetupMgt.SetupTaskCountResetJobQueue(JobQueueEntry, true);
     end;
 
     local procedure AddImportListProcessingJobQueue()

@@ -1,8 +1,8 @@
-pageextension 6014413 "NPR Job Queue Entries" extends "Job Queue Entries"
+pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
 {
     layout
     {
-        addlast(Control1)
+        addlast(General)
         {
             field("NPR Notif. Profile on Error"; Rec."NPR Notif. Profile on Error")
             {
@@ -16,34 +16,9 @@ pageextension 6014413 "NPR Job Queue Entries" extends "Job Queue Entries"
             }
             field("NPR Auto-Resched. Delay (sec.)"; Rec."NPR Auto-Resched. Delay (sec.)")
             {
+                Enabled = Rec."NPR Auto-Resched. after Error";
                 ToolTip = 'Specifies how many seconds to wait before re-running this job queue entry, in cases when you want the job to be automatically rescheduled after status "Error"';
                 ApplicationArea = All;
-            }
-        }
-    }
-
-    actions
-    {
-        addlast(Action15)
-        {
-            action("NPR AddLogCleanupJob")
-            {
-                Caption = 'Add Log Cleanup Job';
-                ToolTip = 'Adds a new job, responsible for purging outdated (older than 30 days) Joq Queue Log entries';
-                Image = AddAction;
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    JobQueueEntry: Record "Job Queue Entry";
-                    CleanupJQLog: Codeunit "NPR Cleanup JQ Log Entries";
-                begin
-                    if CleanupJQLog.AddJQLogCleanupJob(JobQueueEntry, false) then begin
-                        Rec := JobQueueEntry;
-                        if Rec.Find() then
-                            Page.Run(Page::"Job Queue Entry Card", Rec);
-                    end;
-                end;
             }
         }
     }
