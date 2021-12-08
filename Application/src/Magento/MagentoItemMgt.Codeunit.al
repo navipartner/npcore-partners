@@ -45,8 +45,11 @@
         if Item."NPR Magento Name" = '' then
             Item."NPR Magento Name" := Item.Description;
 
-        if AutoUpdateSeoLink(Item) then
-            Item."NPR Seo Link" := CopyStr(MagentoFunctions.SeoFormat(Item."NPR Magento Name"), 1, MaxStrLen(Item."NPR Seo Link"));
+        if AutoUpdateSeoLink(Item) then begin
+            Item."NPR Seo Link" := Item."NPR Magento Name";
+            UpdateItemSeoLink(Item);
+        end;
+
         if not Item."NPR Magento Item" then
             exit;
 
@@ -241,6 +244,26 @@
 
         DeleteMagentoData(Rec);
         ReplicateSpecialPrice2SalesPrice(Rec, true);
+    end;
+
+    /// <summary>
+    /// Updates the seo link on the given item record. The base value used is the value of the field "NPR Seo Link",
+    /// but this can be overwritten in the `OnBeforeItemSeoLinkFormat()` integration event.
+    /// </summary>
+    /// <param name="Item">Item to be modified</param>
+    procedure UpdateItemSeoLink(var Item: Record Item)
+    var
+        PrevRec: Text;
+        SeoLinkText: Text;
+    begin
+        PrevRec := Format(Item);
+
+        SeoLinkText := Item."NPR Seo Link";
+        OnBeforeItemSeoLinkFormat(Item, SeoLinkText);
+        Item."NPR Seo Link" := CopyStr(MagentoFunctions.SeoFormat(SeoLinkText), 1, MaxStrLen(Item."NPR Seo Link"));
+
+        if PrevRec <> Format(Item) then
+            Item.Modify(false);
     end;
 
     procedure GetStockQty(ItemNo: Code[20]; VariantFilter: Text) StockQty: Decimal
@@ -778,6 +801,7 @@
         PriceListHeader.Modify(true);
     end;
 
+    #region Aux
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR Magento Item Mgt.");
@@ -787,7 +811,9 @@
     begin
         exit('TriggerStockUpdate');
     end;
+    #endregion
 
+    #region Integration Events
     [IntegrationEvent(false, false)]
     local procedure OnCalcStockQty(MagentoSetup: Record "NPR Magento Setup"; ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text; var StockQty: Decimal; var Handled: Boolean)
     begin
@@ -802,4 +828,10 @@
     local procedure OnTrigger2Item(MagentoSetup: Record "NPR Magento Setup"; RecRef: RecordRef; var TempItem: Record Item temporary; var Handled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeItemSeoLinkFormat(Item: Record Item; var SeoLinkText: Text)
+    begin
+    end;
+    #endregion
 }
