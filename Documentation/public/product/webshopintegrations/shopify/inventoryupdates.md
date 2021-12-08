@@ -12,4 +12,5 @@ Each location in Business Central for which you want to send available inventory
    If you've already set up the connection parameters on the **Shopify Integration Setup** page, you will see a list of available Shopify locations to choose from.   
 
 ### Related links
--   [Sales Order integration area setup](./salesordersetup.md)
+- [Sales Order integration area setup](./salesordersetup.md)
+- [Set up Shopify integration](./setupshopifyintegration.md)
