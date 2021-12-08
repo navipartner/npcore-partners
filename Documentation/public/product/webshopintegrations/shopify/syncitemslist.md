@@ -54,16 +54,20 @@ The following data is synchronized between Business Central and Shopify for Shop
    
 After the data is sent and a response of successful completion has been received from Shopify, the following fields are updated in Business Central:
 
-In the **Item Card**:
+### In the **Item Card**:
 
-**Shopify Product ID**, **Shopify Variant ID**, **Shopify Inventory Item ID**, and **Shopify Name** along with **Shopify Description** if the **Set Shopify Name/Description** is disabled in the **Shopify Integration Setup**.
+- **Shopify Product ID**, **Shopify Variant ID**, **Shopify Inventory Item ID**, and **Shopify Name** along with **Shopify Description** if the **Set Shopify Name/Description** is disabled in the **Shopify Integration Setup**.
 
-On the **Item Variant**:
+### On the **Item Variant**:
 
-**Shopify Variant ID** and **Shopify Inventory Item ID**.
+- **Shopify Variant ID** and **Shopify Inventory Item ID**.
 
 >[!Note]
 >The item list synchronization is a one-way process. All changes made in Business Central are synchronized to Shopify, but changes made in Shopify will not be synchronized back to Business Central, unless there is also a change in Business Central which triggered the synchronization process.
+
+### Next steps
+- [Get orders from Shopify](./getting_orders.md)
+- [Send data back to Shopify](./senddataback.md)
 
 ### Related links:
 - [Shopify SKU](./shopifysku.md)
