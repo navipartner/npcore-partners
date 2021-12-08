@@ -269,6 +269,21 @@
         JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, NcTaskProcessor.Code, true, '');
     end;
 
+    procedure SetupTaskCountResetJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Autocreated: Boolean)
+    var
+        NcTaskProcessor: Record "NPR Nc Task Processor";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+    begin
+        NcTaskProcessor.Code := NaviConnectDefaultTaskProcessorCode();
+        if not NcTaskProcessor.Find() then begin
+            NcSyncMgt.UpdateTaskProcessor(NcTaskProcessor);
+            Commit();
+        end;
+        JobQueueMgt.SetShowAutoCreatedClause(Autocreated);
+        JobQueueMgt.ScheduleNcTaskCountResetJob(JobQueueEntry, NcTaskProcessor.Code, '');
+    end;
+
     procedure SetupDefaultNcImportListProcessingJobQueue(Autocreated: Boolean)
     var
         JobQueueMgt: Codeunit "NPR Job Queue Management";
@@ -285,6 +300,7 @@
         if not TaskScheduler.CanCreateTask() then
             exit;
         SetupTaskProcessingJobQueue(JobQueueEntry, true);
+        SetupTaskCountResetJobQueue(JobQueueEntry, true);
         SetupDefaultNcImportListProcessingJobQueue(true);
     end;
 
