@@ -2829,8 +2829,16 @@ codeunit 6060127 "NPR MM Membership Mgt."
     begin
 
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::TICKETS, Method, Address, Engine));
-
     end;
+
+    procedure GetCommunicationMethod_Coupon(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    var
+        MemberCommunication: Record "NPR MM Member Communication";
+    begin
+
+        exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::COUPONS, Method, Address, Engine));
+    end;
+
 
     local procedure GetCommunicationMethodWorker(MemberEntryNo: Integer; MembershipEntryNo: Integer; MessageType: Option; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var

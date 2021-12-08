@@ -166,11 +166,21 @@ page 6151590 "NPR NpDc Coupon Type Card"
                         ToolTip = 'Specifies the value of the Starting Date field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Starting Date Date Formula"; Rec."Starting Date DateFormula")
+                    {
+                        ToolTip = 'Specifies the value of the Starting Date DateFormula field.';
+                        ApplicationArea = All;
+                    }
                     field("Ending Date"; Rec."Ending Date")
                     {
 
                         ToolTip = 'Specifies the value of the Ending Date field';
                         ApplicationArea = NPRRetail;
+                    }
+                    field("Ending Date DateFormula"; Rec."Ending Date DateFormula")
+                    {
+                        ToolTip = 'Specifies the value of the Ending Date Date Formula field.';
+                        ApplicationArea = All;
                     }
                 }
             }

@@ -75,12 +75,22 @@ table 6060138 "NPR MM Membership Notific."
         {
             Caption = 'Notification Trigger';
             DataClassification = CustomerContent;
-            OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create';
-            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE;
+            OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create,Coupon';
+            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON;
         }
         field(51; "Template Filter Value"; Code[20])
         {
             Caption = 'Template Filter Value';
+            DataClassification = CustomerContent;
+        }
+        field(60; "Coupon No."; Text[50])
+        {
+            Caption = 'Coupon No.';
+            DataClassification = CustomerContent;
+        }
+        field(67; "Loyalty Point Setup Id"; Guid)
+        {
+            Caption = 'Loyalty Point Setup Id';
             DataClassification = CustomerContent;
         }
         field(80; "Target Member Role"; Option)
