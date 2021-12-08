@@ -1,65 +1,110 @@
-/**
- * This file is essentially JavaScript as the only thing it does is some good old JavaScript DOM manipulation.
- * Don't sweat it about type safety here. Just cast to any anything that's necessary.
- */
-
-// TODO: do this without jQuery!
-
-// Grabbing global jQuery reference
-const $ = window["$"];
-
 function expandControlAddIn() {
   if (window.parent) {
-    $(".content-area-box", window.parent.document).css("padding", "0");
+    const content = window.top.document.body.querySelector(".content-area-box");
+    if (content) {
+      content.style.setProperty("padding", "0");
+    }
+
     if (window.frameElement) {
-      const frame = $("#" + window.frameElement.id, window.parent.document);
-      frame.css("min-height", window.top.innerHeight + "px");
-      frame.height(window.top.innerHeight + "px");
-      $(".ms-core-overlay", window.parent.document).css("overflow", "hidden");
+      const body = window.top.document.body;
+      const frame = body.querySelector(`#${window.frameElement.id}`);
+
+      if (frame) {
+        frame.style.setProperty("min-height", `${window.top.innerHeight}px`);
+        frame.style.height = `${window.top.innerHeight}px`;
+      }
+
+      const core = body.querySelector(".ms-core-overlay");
+      if (core) {
+        core.style.setProperty("overflow", "hidden");
+      }
     }
   }
 }
 
 function hideNavNavigation() {
-  const nav = $(window.frameElement).closest("#contentBox");
-  nav.find(".ms-nav-navigation").attr("style", "display: none !important");
-  nav.find(".ms-nav-appbar").attr("style", "display: none !important");
+  const nav = window.top.document.body.querySelector(".ms-nav-navigation");
+  if (nav) {
+    nav.style.setProperty("display", "none", "important");
+  }
+
+  const appBar = window.top.document.body.querySelector(".ms-nav-appbar");
+  if (appBar) {
+    appBar.style.setProperty("display", "none", "important");
+  }
 }
 
 function hideBusinessCentralNavigation() {
   // #340613
-  $(window.top.document.body)
-    .find("div.ms-nav-content-box > .ms-nav-navigation")
-    .attr("style", "display: none !important");
+  const navContent = window.top.document.body.querySelector("div.ms-nav-content-box > .ms-nav-navigation");
+  if (navContent) {
+    navContent.style.setProperty("display", "none", "important");
+  }
 }
 
 function hideBusinessCentralGutter() {
   // #353737
-  $(window.frameElement).closest("body").find(".nav-bar-area-box").attr("style", "display: none !important");
-  $(window.frameElement).closest("body").find(".ms-nav-layout-gutter-left").attr("style", "display: none !important");
-  $(window.frameElement).closest("body").find(".ms-nav-layout-gutter-right").attr("style", "display: none !important");
-  $(window.frameElement).closest(".control-addin-container").attr("style", "padding-top: 0 !important");
+  if (window.frameElement) {
+    const closestBody = window.frameElement.closest("body");
+    const areaBox = closestBody.querySelector(".nav-bar-area-box");
+    if (areaBox) {
+      areaBox.style.setProperty("display", "none", "important");
+    }
+
+    const gutterLeft = closestBody.querySelector(".ms-nav-layout-gutter-left");
+    if (gutterLeft) {
+      gutterLeft.style.setProperty("display", "none", "important");
+    }
+
+    const gutterRight = closestBody.querySelector(".ms-nav-layout-gutter-right");
+    if (gutterRight) {
+      gutterRight.style.setProperty("display", "none", "important");
+    }
+
+    const addinContainer = window.frameElement.closest(".control-addin-container");
+    if (addinContainer) {
+      addinContainer.style.setProperty("padding-top", "0", "important");
+    }
+  }
 }
 
 function hideBusinessCentralAppBar() {
   // #376820
-  const bc = $(window.frameElement).closest(".ms-nav-content-box");
-  bc.find(".ms-nav-appbar").attr("style", "display: none !important");
-  bc.find(".ms-nav-content").attr("style", "width: width: calc(-0px + 100%)");
+  if (window.frameElement) {
+    const bc = window.frameElement.closest(".ms-nav-content-box");
+    if (bc) {
+      const appBar = bc.querySelector(".ms-nav-appbar");
+      if (appBar) {
+        appBar.style.setProperty("display", "none", "important");
+      }
+      const navContent = bc.querySelector(".ms-nav-content");
+      if (navContent) {
+        navContent.style.setProperty("width", "100%");
+      }
+    }
+  }
 }
 
 function hideBusinessCentralProductMenuBar() {
   // #414495
-  $("#product-menu-bar", window.top.document.body).attr("style", "display: none !important");
-  $("body.has-product-menu-bar .designer", window.top.document).attr(
-    "style",
-    "height: 100% !important; top: 0 !important"
-  );
+  const productMenuBar = window.top.document.body.querySelector("#product-menu-bar");
+  if (productMenuBar) {
+    productMenuBar.style.setProperty("display", "none", "important");
+  }
+
+  const bodyMenuBar = window.top.document.querySelector("body.has-product-menu-bar .designer");
+  if (bodyMenuBar) {
+    bodyMenuBar.style.setProperty("height", "100%", "important");
+    bodyMenuBar.style.setProperty("top", "0", "important");
+  }
 }
 
 function fixBC170DefualtClientBottomPadding() {
   // #436343
-  $(window.frameElement).closest("body").find("main.ms-nav-layout-body").attr("style", "padding-bottom: 0 !important");
+  const msNav = window.frameElement.closest("body").querySelector("main.ms-nav-layout-body");
+  if (msNav) {
+    msNav.style.setProperty("padding-bottom", "0", "important");
+  }
 }
 
 function fixIOSKeyboardFocusZoom() {
@@ -95,13 +140,25 @@ function preventEscInTopWindow() {
   window.top.document.addEventListener("keydown", handleEsc, true);
 }
 
-hideNavNavigation();
-hideBusinessCentralNavigation();
-hideBusinessCentralGutter();
-hideBusinessCentralAppBar();
-hideBusinessCentralProductMenuBar();
-fixBC170DefualtClientBottomPadding();
-expandControlAddIn();
-fixIOSKeyboardFocusZoom();
-preventEscInTopWindow();
-hideNotificationPanel();
+/**
+ * Hacks Business Central and Microsoft Dynamics NAV web client UI by hijacking the entire page content and
+ * hiding any BC/NAV UI elements.
+ */
+
+const ready = (callback) => {
+  if (document.readyState != "loading") callback();
+  else document.addEventListener("DOMContentLoaded", callback);
+};
+
+ready(() => {
+  hideNavNavigation();
+  hideBusinessCentralNavigation();
+  hideBusinessCentralGutter();
+  hideBusinessCentralAppBar();
+  hideBusinessCentralProductMenuBar();
+  fixBC170DefualtClientBottomPadding();
+  expandControlAddIn();
+  fixIOSKeyboardFocusZoom();
+  preventEscInTopWindow();
+  hideNotificationPanel();
+});
