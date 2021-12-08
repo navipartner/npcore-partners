@@ -1,4 +1,4 @@
-# Configure SMS Setup
+# Configure the SMS Setup
 
 This topic describes the process of configuring the SMS Setup. As soon as the necessary setup is completed, the SMS functionality can be used.
 
