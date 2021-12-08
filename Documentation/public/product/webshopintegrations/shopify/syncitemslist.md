@@ -54,11 +54,11 @@ The following data is synchronized between Business Central and Shopify for Shop
    
 After the data is sent and a response of successful completion has been received from Shopify, the following fields are updated in Business Central:
 
-### In the **Item Card**:
+#### In the **Item Card**:
 
 - **Shopify Product ID**, **Shopify Variant ID**, **Shopify Inventory Item ID**, and **Shopify Name** along with **Shopify Description** if the **Set Shopify Name/Description** is disabled in the **Shopify Integration Setup**.
 
-### On the **Item Variant**:
+#### On the **Item Variant**:
 
 - **Shopify Variant ID** and **Shopify Inventory Item ID**.
 
@@ -72,6 +72,7 @@ After the data is sent and a response of successful completion has been received
 ### Related links:
 - [Shopify SKU](./shopifysku.md)
 - [Varieties](./varieties.md)
+- [Set up Shopify integration](./setupshopifyintegration.md)
 
 
 
