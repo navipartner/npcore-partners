@@ -1,0 +1,16 @@
+# Shopify integration
+
+Shopify is an ecommerce platform that can be used for building online and offline stores. It offers online retailers services that include payments, marketing, shipping, and customer engagement tools.
+
+NaviPartner out-of-the-box Shopify integration functionality supports the following Shopify integration areas:
+
+- [Sending item information to Shopify](./syncitemslist.md) (new and updated items and variants);
+
+- [Sending available inventory to Shopify](./sending_inventory.md) (quantity available for sale);
+
+- [Getting sales orders from Shopify](./getting_orders.md).         
+We support 2 types of integration here:
+
+    -	Order processing is done on the Shopify side: we import new orders from Shopify and automatically post them once we receive updated information from Shopify about completed orders (or delete them, if the order was cancelled in Shopify);
+
+    -	Order processing is done in Business Central: in this case we import new orders from Shopify, and users will need to process them in Business Central. Once a sales order is processed and posted in the Business Central we send “fulfilment” and “payment capture” requests to Shopify.
