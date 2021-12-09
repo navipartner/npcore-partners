@@ -92,6 +92,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         IsCheckedBySubscriber: Boolean;
         IsValid: Boolean;
     begin
+        TicketRequestManager.LockResources();
 
         if (TicketRequestManager.IsReservationRequest(Token)) then begin
             TicketRequestManager.ConfirmReservationRequestWithValidate(Token);
