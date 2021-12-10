@@ -5,22 +5,12 @@
 
     procedure EditItemAttributes(ItemNo: Code[20]; VariantCode: Code[10])
     var
-        MagentoItemAttribute: Record "NPR Magento Item Attr.";
         Item: Record Item;
         MagentoItemAttributes: Page "NPR Magento Item Attr.";
     begin
         Item.Get(ItemNo);
-
-        SetupItemAttributes(Item, VariantCode);
         Commit();
-        Clear(MagentoItemAttribute);
-        MagentoItemAttribute.FilterGroup(2);
-        MagentoItemAttribute.SetRange("Item No.", Item."No.");
-        MagentoItemAttribute.SetFilter("Variant Code", '=%1', VariantCode);
-        MagentoItemAttribute.SetRange("Attribute Set ID", Item."NPR Attribute Set ID");
-        MagentoItemAttribute.FilterGroup(0);
-        Clear(MagentoItemAttributes);
-        MagentoItemAttributes.SetTableView(MagentoItemAttribute);
+        MagentoItemAttributes.SetValues(Item."No.", Item."NPR Attribute Set ID", VariantCode);
         MagentoItemAttributes.RunModal();
     end;
 
