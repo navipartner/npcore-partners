@@ -8,5 +8,7 @@
     href: howto/planetpayment.md    
 - name: Explanation  
   items:
-  - name: Tax Free Services
-    href: explanation/overall.md  
+  - name: POS tax free services
+    href: explanation/overall.md
+  - name: NAS setup
+    href: explanation/nas-setup.md 
