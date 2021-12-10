@@ -40,7 +40,7 @@ The job queue entries are created automatically once the relevant integration ar
 
 Import types are needed to process data received from external sources, like Shopify.
 
-The following import types are needed for the integration (all of them are related to the [**Sales Order Integration**](./salesordersetup.md) area)
+The following import types are needed for the integration (all of them are related to the [**Sales Order Integration**](../howto/salesordersetup.md) area)
 
 | Code                   | Description             | Import List Update Handler      | Import Codeunit ID     |  Lookup Codeunit ID       |
 | :----:                 |    :----:               |                          :----: |                 :----: |                    :----: |
@@ -53,4 +53,4 @@ The following import types are needed for the integration (all of them are relat
 > All the import types are reviewed and created automatically, when new import list entries are added.
 
 ### Related links
--- [Set up Shopify integration](./setupshopifyintegration.md)
+-- [Set up Shopify integration](../howto/setupshopifyintegration.md)

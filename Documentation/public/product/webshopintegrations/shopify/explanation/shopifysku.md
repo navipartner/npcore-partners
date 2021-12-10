@@ -8,6 +8,6 @@ If there aren't any values for the fields in Business Central, the system will i
 - Items with variants - each variant SKU needs to be equal to the Business Central item number and Business Central variant code, separated by an underscore (for example: 8000_1)
 
 ### Related links
-- [Set up inventory update sending (Location links)](./inventoryupdates.md)
+- [Set up inventory update sending (Location links)](../howto/inventoryupdates.md)
 - [Varieties](./varieties.md)
-- [Set up Shopify integration](./setupshopifyintegration.md)
+- [Set up Shopify integration](../howto/setupshopifyintegration.md)
