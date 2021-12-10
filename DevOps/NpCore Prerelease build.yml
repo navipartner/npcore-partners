@@ -14,6 +14,7 @@ resources:
   - repository: scriptsRepo
     type: git
     name:  'NpCore/NpDevOps'
+    ref: 'topic/disable-concurrent-translations-repo-update'
 
   - repository: translations
     type: git
