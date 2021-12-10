@@ -25,3 +25,4 @@ This topic contains the list of Business Central and NPRetail specific terms tha
 - **Dynamics NAV** - an easily adaptable ERP solution which helps small and medium-sized businesses to automate and connect their sales, purchasing, operations, accounting, and stock management. The latest version of Dynamics NAV is Dynamics 365 Business Central.
 - **GDPR (General Data Protection Regulation)** - A legal framework that sets guidelines for the collection and processing of personal information from individuals who live in the European Union. It mandates that the EU visitors be given a number of data disclosures.
 - **BOM (Bill of Materials)** - A centralized source of information used to manufacture a product.
+- **IIN (Issuer Identification Number)** - The first few digits of a debit or credit card number issued by a financial institution. 
