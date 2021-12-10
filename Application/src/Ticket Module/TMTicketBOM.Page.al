@@ -69,6 +69,12 @@ page 6060121 "NPR TM Ticket BOM"
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Determines a percentage of maximum admission capacity for the provided Item No.. This is a useful option when there are several types of tickets sold for the same admission.';
                 }
+                field("POS Sale May Exceed Capacity"; Rec."POS Sale May Exceed Capacity")
+                {
+                    ToolTip = 'Specifies whether the capacity may be exceed when ticket is sold in POS.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+
                 field("Max No. Of Entries"; Rec."Max No. Of Entries")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
