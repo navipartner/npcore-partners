@@ -17,3 +17,4 @@
 - name: End user communication
   href: sms/toc.yml
 - name: Webshop integrations
+  href: webshopintegrations/toc.yml

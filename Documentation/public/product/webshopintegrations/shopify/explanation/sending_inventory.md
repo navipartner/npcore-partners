@@ -17,7 +17,7 @@ The safety stock quantity can be set in the **Shopify Safety Stock Quantity** fi
 > [!Note]
 > If there's at least one stockkeeping unit for an item in Business Central, the value of the Shopify safety stock quantity specifies on the **Item Card** is disregarded.
 
-The inventory level synchronization triggering process is very similar to the process of [item list synchronization in Business Central](./syncitemslist.md) - it involves the **Item Ledger Entries** table, the **Sales Line** data log subscribers, as well as processing of the **Task List** entries.
+The inventory level synchronization triggering process is very similar to the process of [item list synchronization in Business Central](../howto/syncitemslist.md) - it involves the **Item Ledger Entries** table, the **Sales Line** data log subscribers, as well as processing of the **Task List** entries.
 
 ### Related links
-- [Set up Shopify integration](./setupshopifyintegration.md)
+- [Set up Shopify integration](../howto/setupshopifyintegration.md)
