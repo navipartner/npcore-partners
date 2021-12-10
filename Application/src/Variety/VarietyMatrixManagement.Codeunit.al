@@ -303,7 +303,8 @@
                     ItemRef.Init();
                     ItemRef."Item No." := TempVRTBuffer."Item No.";
                     ItemRef."Variant Code" := TempVRTBuffer."Variant Code";
-                    ItemRef."Unit of Measure" := '';
+                    ItemRef."Reference Type" := ItemRef."Reference Type"::"Bar Code";
+                    ItemRef."Unit of Measure" := VRTCloneData.GetUnitOfMeasure(ItemRef."Item No.", 1);
                     ItemRef."Reference No." := CopyStr(NewValue, 1, MaxStrLen(ItemRef."Reference No."));
                     ItemRef.Description := Item.Description;
                     ItemRef.Insert();

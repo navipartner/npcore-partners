@@ -949,7 +949,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         NewVariantCode := CopyStr(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true), 1, MaxStrLen(NewVariantCode));
     end;
 
-    local procedure GetUnitOfMeasure(ItemNo: Code[20]; ReturnType: Integer): Code[10]
+    procedure GetUnitOfMeasure(ItemNo: Code[20]; ReturnType: Integer): Code[10]
     var
         Item: Record Item;
     begin
