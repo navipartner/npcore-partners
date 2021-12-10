@@ -196,6 +196,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     var
         Ticket: Record "NPR TM Ticket";
         AdmissionUnitPrice: Decimal;
+        AdmissionAllowOverAllocationConfirmed: Enum "NPR TM Ternary";
     begin
 
         TicketReservationRequest.Get(TicketReservationRequest."Entry No.");
@@ -209,9 +210,10 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
             (not TicketReservationRequest."Admission Created")) then begin
 
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+            AdmissionAllowOverAllocationConfirmed := AdmissionAllowOverAllocationConfirmed::TERNARY_FALSE;
             if (Ticket.FindSet()) then begin
                 repeat
-                    _IssueOneAdmission(TicketReservationRequest, Ticket, TicketReservationRequest."Admission Code", 1, true, AdmissionUnitPrice);
+                    _IssueOneAdmission(TicketReservationRequest, Ticket, TicketReservationRequest."Admission Code", 1, true, AdmissionUnitPrice, AdmissionAllowOverAllocationConfirmed);
 
                 until (Ticket.Next() = 0);
 
@@ -235,6 +237,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         i: Integer;
         Window: Dialog;
         AdditionalAdmissionCosts: Decimal;
+        OverAllocationConfirmed: Dictionary of [Code[20], Enum "NPR TM Ternary"];
     begin
 
 
@@ -288,7 +291,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         for i := 1 to Abs(NumberOfTickets) do begin
             AdditionalAdmissionCosts := 0;
 
-            _IssueOneTicket(ItemNo, VariantCode, TicketQuantity, TicketType, ReservationRequest, AdditionalAdmissionCosts);
+            _IssueOneTicket(ItemNo, VariantCode, TicketQuantity, TicketType, ReservationRequest, AdditionalAdmissionCosts, OverAllocationConfirmed);
 
             if (GetShowProgressBar()) then
                 if (i mod 10 = 0) then
@@ -303,7 +306,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
     end;
 
-    local procedure _IssueOneTicket(ItemNo: Code[20]; VariantCode: Code[10]; QuantityPerTicket: Integer; TicketType: Record "NPR TM Ticket Type"; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var AdditionalAdmissionCosts: Decimal)
+    local procedure _IssueOneTicket(ItemNo: Code[20]; VariantCode: Code[10]; QuantityPerTicket: Integer; TicketType: Record "NPR TM Ticket Type"; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var AdditionalAdmissionCosts: Decimal; var OverAllocationConfirmed: Dictionary of [Code[20], Enum "NPR TM Ternary"])
     var
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
@@ -334,7 +337,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         TicketManagement.SetTicketProperties(Ticket, Today);
         Ticket.Insert(true);
 
-        _IssueAdmissionsAppendToTicket(Ticket, QuantityPerTicket, ReservationRequest, AdditionalAdmissionCosts);
+        _IssueAdmissionsAppendToTicket(Ticket, QuantityPerTicket, ReservationRequest, AdditionalAdmissionCosts, OverAllocationConfirmed);
 
         TicketManagement.GetTicketAccessEntryValidDateBoundary(Ticket, LowDate, HighDate);
         if (HighDate > Ticket."Valid To Date") then
@@ -342,10 +345,11 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
     end;
 
-    local procedure _IssueAdmissionsAppendToTicket(Ticket: Record "NPR TM Ticket"; QuantityPerTicket: Integer; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var AdditionalAdmissionCosts: Decimal)
+    local procedure _IssueAdmissionsAppendToTicket(Ticket: Record "NPR TM Ticket"; QuantityPerTicket: Integer; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var AdditionalAdmissionCosts: Decimal; var OverAllocationConfirmed: Dictionary of [Code[20], Enum "NPR TM Ternary"])
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";
         AdmissionUnitPrice: Decimal;
+        AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary";
     begin
 
         // Create Ticket Content
@@ -356,17 +360,28 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
             ValidateTicketBomSalesDateLimit(TicketBom, QuantityPerTicket, Today);
 
             repeat
+
+                if (not OverAllocationConfirmed.ContainsKey(TicketBom."Admission Code")) then begin
+                    OverAllocationConfirmed.Add(TicketBom."Admission Code", Enum::"NPR TM Ternary"::TERNARY_FALSE);
+                    if (TicketBom."POS Sale May Exceed Capacity") then
+                        OverAllocationConfirmed.Set(TicketBom."Admission Code", Enum::"NPR TM Ternary"::TERNARY_UNKNOWN)
+                end;
+
+                OverAllocationConfirmed.Get(TicketBom."Admission Code", AdmissionOverAllocationConfirmed);
+
                 AdmissionUnitPrice := 0;
 
-                _IssueOneAdmission(ReservationRequest, Ticket, TicketBom."Admission Code", QuantityPerTicket, true, AdmissionUnitPrice);
+                _IssueOneAdmission(ReservationRequest, Ticket, TicketBom."Admission Code", QuantityPerTicket, true, AdmissionUnitPrice, AdmissionOverAllocationConfirmed);
                 AdditionalAdmissionCosts += AdmissionUnitPrice;
+
+                OverAllocationConfirmed.Set(TicketBom."Admission Code", AdmissionOverAllocationConfirmed);
 
             until (TicketBom.Next() = 0);
         end;
 
     end;
 
-    local procedure _IssueOneAdmission(SourceRequest: Record "NPR TM Ticket Reservation Req."; Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; QuantityPerTicket: Integer; ValidateWaitinglistReference: Boolean; var AdmissionUnitPrice: Decimal)
+    local procedure _IssueOneAdmission(SourceRequest: Record "NPR TM Ticket Reservation Req."; Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; QuantityPerTicket: Integer; ValidateWaitinglistReference: Boolean; var AdmissionUnitPrice: Decimal; var AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary")
     var
         AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -435,7 +450,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         if (ValidateWaitinglistReference) then
             ValidateWaitingListReferenceCode(WaitingListReferenceCode, Ticket, Admission."Admission Code", AdmissionSchEntry);
 
-        TicketManagement.CreateAdmissionAccessEntry(Ticket, QuantityPerTicket * TicketBom.Quantity, AdmissionCode, AdmissionSchEntry);
+        TicketManagement.CreateAdmissionAccessEntry(Ticket, QuantityPerTicket * TicketBom.Quantity, AdmissionCode, AdmissionSchEntry, AdmissionOverAllocationConfirmed);
 
         AdmissionUnitPrice := TicketBom."Admission Unit Price";
         if ((TicketBom."Admission Inclusion" <> SourceRequest."Admission Inclusion") and (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::NOT_SELECTED)) then
