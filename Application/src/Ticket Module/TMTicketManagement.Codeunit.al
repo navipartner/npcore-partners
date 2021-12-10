@@ -69,6 +69,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         POSTPAID_UPDATING: Label 'Closing prepaid payments...';
         NO_DEFAULT_SCHEDULE: Label 'The ticket request did not specify a valid time-slot for admission %1 and the ticket rule is to get the default schedule. But there are currently no time-slots that matches %2 "%3".';
         WORKFLOW_DESC: Label 'Print Ticket';
+        CONFIRM_EXCEED_CAPACITY: Label 'Capacity for %1 will be exceeded. Do you want to continue?';
 
         _TicketExecutionContext: Option SALES,ADMISSION;
 
@@ -296,6 +297,8 @@ codeunit 6059784 "NPR TM Ticket Management"
         Admission: Record "NPR TM Admission";
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntryNo: Integer;
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        AllowAdmissionOverAllocation: Enum "NPR TM Ternary";
     begin
 
         if (not GetTicket(TicketIdentifierType, TicketIdentifier, Ticket)) then
@@ -307,6 +310,9 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (not (Admission.Get(AdmissionCode))) then
             RaiseError(StrSubstNo(INVALID_REFERENCE, Admission.FieldName("Admission Code"), AdmissionCode), INVALID_REFERENCE_NO);
 
+        if (not (TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code"))) then
+            RaiseError(StrSubstNo(INVALID_REFERENCE, TicketBOM.TableCaption, ''), INVALID_REFERENCE_NO);
+
         ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo);
         ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo);
 
@@ -315,7 +321,12 @@ codeunit 6059784 "NPR TM Ticket Management"
         ValidateAdmissionDependencies(TicketAccessEntryNo);
 
         ValidateTicketConstraintsExceeded(TicketAccessEntryNo);
-        ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionScheduleEntryNo, _TicketExecutionContext::ADMISSION);
+
+        AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_FALSE;
+        if (TicketBom."POS Sale May Exceed Capacity") then
+            AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_TRUE;
+
+        ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionScheduleEntryNo, _TicketExecutionContext::ADMISSION, AllowAdmissionOverAllocation);
 
     end;
 
@@ -448,7 +459,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     end;
 
-    procedure CreateAdmissionAccessEntry(Ticket: Record "NPR TM Ticket"; TicketQty: Integer; AdmissionCode: Code[20]; AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry")
+    procedure CreateAdmissionAccessEntry(Ticket: Record "NPR TM Ticket"; TicketQty: Integer; AdmissionCode: Code[20]; AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; var AllowAdmissionOverAllocation: Enum "NPR TM Ternary")
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TicketType: Record "NPR TM Ticket Type";
@@ -504,15 +515,15 @@ codeunit 6059784 "NPR TM Ticket Management"
 
         if (Admission.Type = Admission.Type::OCCASION) then begin
             RegisterReservation_Worker(Ticket, TicketAccessEntry."Entry No.", AdmissionSchEntry."Entry No.");
-            ValidateReservationCapacityExceeded(Ticket, AdmissionSchEntry);
+            ValidateReservationCapacityExceeded(Ticket, AdmissionSchEntry, AllowAdmissionOverAllocation);
         end;
 
         if (GetAdmissionCapacity(AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code", AdmissionSchEntry."Entry No.", MaxCapacity, CapacityControl)) then
             if (CapacityControl = Admission."Capacity Control"::SALES) then
-                ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionSchEntry."Entry No.", _TicketExecutionContext::SALES);
+                ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionSchEntry."Entry No.", _TicketExecutionContext::SALES, AllowAdmissionOverAllocation);
 
         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then
-            ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionSchEntry."Entry No.", _TicketExecutionContext::SALES);
+            ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionSchEntry."Entry No.", _TicketExecutionContext::SALES, AllowAdmissionOverAllocation);
 
         ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", AdmissionSchEntry."Admission Start Date");
 
@@ -528,6 +539,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         NewDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         CapacityControl: Option;
         MaxCapacity: Integer;
+        AllowAdmissionAllowOverAllocation: Enum "NPR TM Ternary";
     begin
 
         Ticket.Get(TicketNo);
@@ -572,6 +584,8 @@ codeunit 6059784 "NPR TM Ticket Management"
         OldDetTicketAccessEntry."Closed By Entry No." := NewDetTicketAccessEntry."Entry No.";
         OldDetTicketAccessEntry.Modify();
 
+
+        AllowAdmissionAllowOverAllocation := AllowAdmissionAllowOverAllocation::TERNARY_FALSE; // TODO, allow over allocation on change requests
         Admission.Get(NewAdmissionScheduleEntry."Admission Code");
         if (Admission.Type = Admission.Type::OCCASION) then begin
             OldDetTicketAccessEntry.SetFilter(Type, '=%1', OldDetTicketAccessEntry.Type::RESERVATION);
@@ -582,13 +596,13 @@ codeunit 6059784 "NPR TM Ticket Management"
             OldDetTicketAccessEntry.Open := false;
             OldDetTicketAccessEntry.Modify();
 
-            ValidateReservationCapacityExceeded(Ticket, NewAdmissionScheduleEntry);
+            ValidateReservationCapacityExceeded(Ticket, NewAdmissionScheduleEntry, AllowAdmissionAllowOverAllocation);
 
         end;
 
         if (GetAdmissionCapacity(NewAdmissionScheduleEntry."Admission Code", NewAdmissionScheduleEntry."Schedule Code", NewAdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControl)) then
             if (CapacityControl = Admission."Capacity Control"::SALES) then
-                ValidateTicketAdmissionCapacityExceeded(Ticket, NewAdmissionScheduleEntry."Entry No.", _TicketExecutionContext::SALES);
+                ValidateTicketAdmissionCapacityExceeded(Ticket, NewAdmissionScheduleEntry."Entry No.", _TicketExecutionContext::SALES, AllowAdmissionAllowOverAllocation);
 
         ValidateTicketAdmissionReservationDate(TicketAccessEntry."Entry No.", NewAdmissionScheduleEntry."Entry No.");
 
@@ -2210,7 +2224,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(true);
     end;
 
-    local procedure ValidateTicketAdmissionCapacityExceeded(Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntryNo: Integer; TicketExecutionContext: Option SALES,ADMISSION)
+    local procedure ValidateTicketAdmissionCapacityExceeded(Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntryNo: Integer; TicketExecutionContext: Option SALES,ADMISSION; var AllowAdmissionOverAllocation: Enum "NPR TM Ternary")
     var
         Admission: Record "NPR TM Admission";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
@@ -2246,15 +2260,28 @@ codeunit 6059784 "NPR TM Ticket Management"
 
         CapacityExceeded := (AdmittedCount > MaxCapacity);
 
+        if (GuiAllowed) then begin
+            if (CapacityExceeded) and (AllowAdmissionOverAllocation = AllowAdmissionOverAllocation::TERNARY_UNKNOWN) then begin
+                AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_FALSE;
+                if (Confirm(CONFIRM_EXCEED_CAPACITY, true, Admission."Admission Code")) then
+                    AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_TRUE;
+            end;
+
+            if (AllowAdmissionOverAllocation = AllowAdmissionOverAllocation::TERNARY_TRUE) then
+                CapacityExceeded := false;
+        end;
+
         if (CapacityExceeded) then
             RaiseError(StrSubstNo(CAPACITY_EXCEEDED, Admission."Admission Code"), CAPACITY_EXCEEDED_NO);
 
-        if (CalculateConcurrentCapacity(AdmissionSchedule."Admission Code", AdmissionSchedule."Schedule Code", AdmissionScheduleEntry."Admission Start Date", AdmittedCount, MaxCapacity)) then begin
-            AdmissionGroupConcurrency.Get(AdmissionSchedule."Concurrency Code");
-            CapacityExceeded := (AdmittedCount > MaxCapacity);
-            if (CapacityExceeded) then
-                RaiseError(StrSubstNo(CONCURRENT_CAPACITY_EXCEEDED, AdmissionGroupConcurrency.Code), CONCURRENT_CAPACITY_EXCEEDED_NO);
-        end;
+        if (not (AllowAdmissionOverAllocation = AllowAdmissionOverAllocation::TERNARY_TRUE)) then
+            if (CalculateConcurrentCapacity(AdmissionSchedule."Admission Code", AdmissionSchedule."Schedule Code", AdmissionScheduleEntry."Admission Start Date", AdmittedCount, MaxCapacity)) then begin
+                AdmissionGroupConcurrency.Get(AdmissionSchedule."Concurrency Code");
+                CapacityExceeded := (AdmittedCount > MaxCapacity);
+
+                if (CapacityExceeded) then
+                    RaiseError(StrSubstNo(CONCURRENT_CAPACITY_EXCEEDED, AdmissionGroupConcurrency.Code), CONCURRENT_CAPACITY_EXCEEDED_NO);
+            end;
 
         if (MaxCapacity > 0) then
             if (AdmittedCount / MaxCapacity * 100 > Schedule."Notify When Percentage Sold") then
@@ -2493,7 +2520,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", LastAccessDate);
     end;
 
-    local procedure ValidateReservationCapacityExceeded(Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry")
+    local procedure ValidateReservationCapacityExceeded(Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; var AllowAdmissionOverAllocation: Enum "NPR TM Ternary")
     var
         Admission: Record "NPR TM Admission";
         AdmissionText: Record "NPR TM Admission";
@@ -2552,6 +2579,17 @@ codeunit 6059784 "NPR TM Ticket Management"
             Error(UNEXPECTED, AdmissionScheduleEntry.TableCaption(), Admission."Admission Code", AdmittedCount, SHOULD_NOT_BE_ZERO, 0, 0);
 
         CapacityExceeded := (AdmittedCount > MaxCapacity);
+
+        if (GuiAllowed) then begin
+            if (CapacityExceeded) and (AllowAdmissionOverAllocation = AllowAdmissionOverAllocation::TERNARY_UNKNOWN) then begin
+                AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_FALSE;
+                if (Confirm(CONFIRM_EXCEED_CAPACITY, true, Admission."Admission Code")) then
+                    AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_TRUE;
+            end;
+
+            if (AllowAdmissionOverAllocation = AllowAdmissionOverAllocation::TERNARY_TRUE) then
+                CapacityExceeded := false;
+        end;
 
         if (CapacityExceeded) then
             RaiseError(StrSubstNo(RESERVATION_EXCEEDED, Admission."Admission Code",

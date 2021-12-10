@@ -233,6 +233,11 @@ table 6060121 "NPR TM Ticket Admission BOM"
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Notification Profile";
         }
+        field(150; "POS Sale May Exceed Capacity"; Boolean)
+        {
+            Caption = 'POS Sale May Exceed Capacity';
+            DataClassification = CustomerContent;
+        }
         field(166; "Sales From Date"; Date)
         {
             Caption = 'Sales From Date';
