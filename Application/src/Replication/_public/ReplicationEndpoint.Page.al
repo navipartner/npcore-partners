@@ -39,6 +39,12 @@ page 6014504 "NPR Replication Endpoint"
                     ApplicationArea = NPRRetail;
                     MultiLine = true;
                 }
+                field("Fixed Filter"; Rec."Fixed Filter")
+                {
+                    ToolTip = 'Specifies the Fixed Filter which will be added to the base URL when sending the request. Example: number gt ''10003'' and number lt ''10008''. See: https://docs.microsoft.com/en-us/dynamics-nav/using-filter-expressions-in-odata-uris ';
+                    ApplicationArea = NPRRetail;
+                    MultiLine = true;
+                }
                 field("SQL Timestamp"; Rec."Replication Counter")
                 {
                     ToolTip = 'Used to get records from related company that have changed since the last synchronization.';

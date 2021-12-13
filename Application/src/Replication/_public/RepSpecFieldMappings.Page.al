@@ -20,18 +20,21 @@ page 6014672 "NPR Rep. Spec. Field Mappings"
                     ApplicationArea = NPRRetail;
                     Editable = Not FieldsNonEditable;
                 }
+
                 field("EndPoint ID"; Rec."EndPoint ID")
                 {
                     ToolTip = 'Specifies the EndPoint ID.';
                     ApplicationArea = NPRRetail;
                     Editable = Not FieldsNonEditable;
                 }
+
                 field("Table ID"; Rec."Table ID")
                 {
                     ToolTip = 'Specifies Table ID.';
                     ApplicationArea = NPRRetail;
                     Editable = Not FieldsNonEditable;
                 }
+
                 field("Field ID"; Rec."Field ID")
                 {
                     ToolTip = 'Specifies Field ID.';

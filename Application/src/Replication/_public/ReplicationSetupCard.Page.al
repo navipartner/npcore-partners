@@ -123,7 +123,6 @@ page 6014495 "NPR Replication Setup Card"
                             ExtendedDatatype = Masked;
                             trigger OnValidate()
                             begin
-                                Rec.TestField(Enabled, false);
                                 if pw <> '' Then
                                     WebServiceAuthHelper.SetApiPassword(pw, Rec."API Password Key")
                                 Else begin

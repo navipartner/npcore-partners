@@ -116,6 +116,12 @@ table 6014589 "NPR Replication Endpoint"
             end;
         }
 
+        field(18; "Fixed Filter"; Text[100])
+        {
+            Caption = 'Fixed Filter';
+            DataClassification = CustomerContent;
+        }
+
         field(20; "Replication Counter"; BigInteger)
         {
             DataClassification = CustomerContent;

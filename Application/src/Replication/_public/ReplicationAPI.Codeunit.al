@@ -456,6 +456,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             Commit();
             Error(ImportErr)
         end else begin
+            iEndpointMeth := Endpoint."EndPoint Method";
             iEndpointMeth.ProcessImportedContent(Response, Endpoint);
             Message(ImportMsg);
         end;
@@ -471,14 +472,38 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         if NextLinkURI = '' then begin
             URI := ReplicationSetup."Service URL" + ReplicationEndPoint.Path;
             RepCounter := ReplicationEndPoint."Replication Counter";
-            //%1 = company ID, %2 = sqlTimestamp
+            //%1 = company ID, %2 = replication Counter
             URI := StrSubstNo(URI, ReplicationSetup.GetCompanyId(), Format(RepCounter));
             if not URI.Contains('$orderby=replicationCounter') then
                 URI += '&$orderby=replicationCounter';
+            AddFixedFilterToURI(URI, ReplicationEndPoint."Fixed Filter");
             ReplicationSetup.AddTenantToURL(URI);
         end else begin
             URI := NextLinkURI;
             NextLinkURI := '';
+        end;
+    end;
+
+    local procedure AddFixedFilterToURI(var URI: Text; FixedFilter: Text)
+    var
+        URITb: TextBuilder;
+        FilterStringTb: TextBuilder;
+        FilterPosition: Integer;
+    begin
+        if FixedFilter <> '' then begin
+            if not URI.Contains('$filter') then begin
+                if URI.Contains('/?') then
+                    FilterStringTb.Append('&$filter=')
+                else
+                    FilterStringTb.Append('/?$filter=')
+            end else
+                FilterStringTb.Append(' and ');
+            FilterStringTb.Append(FixedFilter);
+
+            FilterPosition := StrPos(URI, '&$orderby');
+            URITb.Append(URI);
+            URITb.Insert(FilterPosition, FilterStringTb.ToText());
+            URI := URITb.ToText();
         end;
     end;
 
