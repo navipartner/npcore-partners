@@ -61,7 +61,7 @@ page 6151255 "NPR Activities"
 
                 field("Failed imports in the import list"; Rec."Failed imports")
                 {
-                    Caption = 'Failed Imports in the Import list';
+                    Caption = 'Failed Imports in the Import List';
                     ToolTip = 'Specifies the amount of failed import entries';
                     ApplicationArea = NPRRetail;
 
