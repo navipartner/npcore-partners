@@ -112,6 +112,7 @@ page 6060072 "NPR MM NPR Endpoint Setup"
 
     trigger OnAfterGetRecord()
     begin
+        pw := '';
         if WebServiceAuthHelper.HasApiPassword(Rec."User Password Key") then
             pw := '***';
         WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);

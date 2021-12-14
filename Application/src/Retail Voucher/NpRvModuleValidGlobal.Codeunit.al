@@ -6,11 +6,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         Text001: Label 'Voucher is being used';
         Text005: Label 'Invalid Reference No. %1';
 
-        ErrorXmlDoc: XmlDocument;
-        ErrorXmlElement: XmlElement;
-        ErrorXmlNode: XmlNode;
-        XmlDOMMgt: codeunit "XML DOM Management";
-
     [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Partner", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertPartner(var Rec: Record "NPR NpRv Partner"; RunTrigger: Boolean)
     begin
@@ -45,13 +40,15 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
     var
         NpRvPartner: Record "NPR NpRv Partner";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Client: HttpClient;
-        RequestContent: HttpContent;
+        RequestMessage: HttpRequestMessage;
         ContentHeader: HttpHeaders;
-        RequestHeader: HttpHeaders;
-        Response: HttpResponseMessage;
-        RequestXmlText: Text;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
         ResponseText: Text;
+        RequestXmlText: Text;
     begin
         NpRvVoucherType.Get(NpRvGlobalVoucherSetup."Voucher Type");
         if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
@@ -69,7 +66,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                      '<name>' + NpRvPartner.Name + '</name>' +
                      '<service_url>' + NpRvPartner."Service Url" + '</service_url>' +
                      '<service_username>' + NpRvPartner."Service Username" + '</service_username>' +
-                     '<service_password>' + NpRvPartner."Service Password" + '</service_password>' +
+                     '<service_password>' + WebServiceAuthHelper.GetApiPassword(NpRvPartner."API Password Key") + '</service_password>' +
                      '<relations>' +
                        '<relation voucher_type="' + NpRvGlobalVoucherSetup."Voucher Type" + '" />' +
                      '</relations>' +
@@ -79,9 +76,14 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(RequestXmlText);
-        RequestContent.GetHeaders(ContentHeader);
 
+        RequestMessage.GetHeaders(RequestHeaders);
+        if RequestHeaders.Contains('Connection') then
+            RequestHeaders.Remove('Connection');
+        NpRvGlobalVoucherSetup.SetRequestHeadersAuthorization(RequestHeaders);
+
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
         if ContentHeader.Contains('Content-Type') then
             ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
@@ -89,20 +91,14 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             ContentHeader.Remove('SOAPAction');
         ContentHeader.Add('SOAPAction', 'UpsertPartners');
 
-        RequestHeader := Client.DefaultRequestHeaders();
-        if RequestHeader.Contains('Connection') then
-            RequestHeader.Remove('Connection');
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvGlobalVoucherSetup."Service Url");
 
-        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
+        Client.Send(RequestMessage, ResponseMessage);
 
-        if not Response.IsSuccessStatusCode() then begin
-            Response.Content.ReadAs(ResponseText);
-            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
-            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
-            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
-            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
+        if not ResponseMessage.IsSuccessStatusCode() then begin
+            ResponseMessage.Content.ReadAs(ResponseText);
+            ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
         end;
     end;
 
@@ -193,10 +189,11 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         Client: HttpClient;
-        RequestContent: HttpContent;
+        RequestMessage: HttpRequestMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
         ContentHeader: HttpHeaders;
-        RequestHeader: HttpHeaders;
-        Response: HttpResponseMessage;
+        ResponseMessage: HttpResponseMessage;
         RequestXmlText: Text;
         ResponseText: Text;
     begin
@@ -225,9 +222,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(RequestXmlText);
-        RequestContent.GetHeaders(ContentHeader);
+        RequestMessage.GetHeaders(RequestHeaders);
+        if RequestHeaders.Contains('Connection') then
+            RequestHeaders.Remove('Connection');
+        NpRvGlobalVoucherSetup.SetRequestHeadersAuthorization(RequestHeaders);
 
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
         if ContentHeader.Contains('Content-Type') then
             ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
@@ -235,20 +236,14 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             ContentHeader.Remove('SOAPAction');
         ContentHeader.Add('SOAPAction', 'CancelReserveVouchers');
 
-        RequestHeader := Client.DefaultRequestHeaders();
-        if RequestHeader.Contains('Connection') then
-            RequestHeader.Remove('Connection');
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvGlobalVoucherSetup."Service Url");
 
-        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
+        Client.Send(RequestMessage, ResponseMessage);
 
-        if not Response.IsSuccessStatusCode() then begin
-            Response.Content.ReadAs(ResponseText);
-            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
-            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
-            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
-            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
+        if not ResponseMessage.IsSuccessStatusCode() then begin
+            ResponseMessage.Content.ReadAs(ResponseText);
+            ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
         end;
     end;
 
@@ -297,10 +292,11 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         Client: HttpClient;
-        RequestContent: HttpContent;
+        RequestMessage: HttpRequestMessage;
         ContentHeader: HttpHeaders;
-        RequestHeader: HttpHeaders;
-        Response: HttpResponseMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
         RequestXmlText: Text;
         ResponseText: Text;
     begin
@@ -345,9 +341,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(RequestXmlText);
-        RequestContent.GetHeaders(ContentHeader);
+        RequestMessage.GetHeaders(RequestHeaders);
+        if RequestHeaders.Contains('Connection') then
+            RequestHeaders.Remove('Connection');
+        NpRvGlobalVoucherSetup.SetRequestHeadersAuthorization(RequestHeaders);
 
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
         if ContentHeader.Contains('Content-Type') then
             ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
@@ -355,23 +355,15 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             ContentHeader.Remove('SOAPAction');
         ContentHeader.Add('SOAPAction', 'CreateVouchers');
 
-        RequestHeader := Client.DefaultRequestHeaders();
-        if RequestHeader.Contains('Connection') then
-            RequestHeader.Remove('Connection');
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvGlobalVoucherSetup."Service Url");
 
-        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
-
-        if not Response.IsSuccessStatusCode() then begin
-            Response.Content.ReadAs(ResponseText);
-            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
-            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
-            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
-            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
+        Client.Send(RequestMessage, ResponseMessage);
+        if not ResponseMessage.IsSuccessStatusCode() then begin
+            ResponseMessage.Content.ReadAs(ResponseText);
+            ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
         end;
     end;
-
 
     procedure FindVoucher(ReferenceNo: Text; NpRvVoucherType: Record "NPR NpRv Voucher Type"; var Voucher: Record "NPR NpRv Voucher") Found: Boolean
     var
@@ -380,10 +372,11 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlDomManagement: codeunit "XML DOM Management";
         Client: HttpClient;
-        RequestContent: HttpContent;
+        RequestMessage: HttpRequestMessage;
         ContentHeader: HttpHeaders;
-        RequestHeader: HttpHeaders;
-        Response: HttpResponseMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
         Document: XmlDocument;
         Node: XmlNode;
         RequestXmlText: Text;
@@ -406,9 +399,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(RequestXmlText);
-        RequestContent.GetHeaders(ContentHeader);
+        RequestMessage.GetHeaders(RequestHeaders);
+        if RequestHeaders.Contains('Connection') then
+            RequestHeaders.Remove('Connection');
+        NpRvGlobalVoucherSetup.SetRequestHeadersAuthorization(RequestHeaders);
 
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
         if ContentHeader.Contains('Content-Type') then
             ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
@@ -416,23 +413,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             ContentHeader.Remove('SOAPAction');
         ContentHeader.Add('SOAPAction', 'FindVouchers');
 
-        RequestHeader := Client.DefaultRequestHeaders();
-        if RequestHeader.Contains('Connection') then
-            RequestHeader.Remove('Connection');
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvGlobalVoucherSetup."Service Url");
+        Client.Send(RequestMessage, ResponseMessage);
+        ResponseMessage.Content.ReadAs(ResponseText);
+        if not ResponseMessage.IsSuccessStatusCode() then
+            ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
 
-        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
-
-        if not Response.IsSuccessStatusCode() then begin
-            Response.Content.ReadAs(ResponseText);
-            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
-            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
-            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
-            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
-        end;
-
-        Response.Content.ReadAs(ResponseText);
         ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
         XmlDocument.ReadFrom(ResponseText, Document);
         if not NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//Body/FindVouchers_Result/vouchers/voucher', Node) then
@@ -500,10 +487,11 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlDomManagement: codeunit "XML DOM Management";
         Client: HttpClient;
-        RequestContent: HttpContent;
+        RequestMessage: HttpRequestMessage;
         ContentHeader: HttpHeaders;
-        RequestHeader: HttpHeaders;
-        Response: HttpResponseMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
         Document: XmlDocument;
         Node: XmlNode;
         RequestXmlText: Text;
@@ -542,9 +530,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(RequestXmlText);
-        RequestContent.GetHeaders(ContentHeader);
+        RequestMessage.GetHeaders(RequestHeaders);
+        if RequestHeaders.Contains('Connection') then
+            RequestHeaders.Remove('Connection');
+        NpRvGlobalVoucherSetup.SetRequestHeadersAuthorization(RequestHeaders);
 
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
         if ContentHeader.Contains('Content-Type') then
             ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
@@ -552,23 +544,14 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             ContentHeader.Remove('SOAPAction');
         ContentHeader.Add('SOAPAction', 'ReserveVouchers');
 
-        RequestHeader := Client.DefaultRequestHeaders();
-        if RequestHeader.Contains('Connection') then
-            RequestHeader.Remove('Connection');
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvGlobalVoucherSetup."Service Url");
 
-        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
+        Client.Send(RequestMessage, ResponseMessage);
+        ResponseMessage.Content.ReadAs(ResponseText);
+        if not ResponseMessage.IsSuccessStatusCode() then
+            ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
 
-        if not Response.IsSuccessStatusCode() then begin
-            Response.Content.ReadAs(ResponseText);
-            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
-            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
-            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
-            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
-        end;
-
-        Response.Content.ReadAs(ResponseText);
         ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
         XmlDocument.ReadFrom(ResponseText, Document);
         if not NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//Body/ReserveVouchers_Result/vouchers/voucher', Node) then
@@ -635,10 +618,11 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         Voucher: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
         Client: HttpClient;
-        RequestContent: HttpContent;
+        RequestMessage: HttpRequestMessage;
         ContentHeader: HttpHeaders;
-        RequestHeader: HttpHeaders;
-        Response: HttpResponseMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
         RequestXmlText: Text;
         ResponseText: Text;
     begin
@@ -670,9 +654,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(RequestXmlText);
-        RequestContent.GetHeaders(ContentHeader);
+        RequestMessage.GetHeaders(RequestHeaders);
+        if RequestHeaders.Contains('Connection') then
+            RequestHeaders.Remove('Connection');
+        NpRvGlobalVoucherSetup.SetRequestHeadersAuthorization(RequestHeaders);
 
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
         if ContentHeader.Contains('Content-Type') then
             ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
@@ -680,20 +668,14 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             ContentHeader.Remove('SOAPAction');
         ContentHeader.Add('SOAPAction', 'RedeemVouchers');
 
-        RequestHeader := Client.DefaultRequestHeaders();
-        if RequestHeader.Contains('Connection') then
-            RequestHeader.Remove('Connection');
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvGlobalVoucherSetup."Service Url");
 
-        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
+        Client.Send(RequestMessage, ResponseMessage);
 
-        if not Response.IsSuccessStatusCode() then begin
-            Response.Content.ReadAs(ResponseText);
-            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
-            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
-            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
-            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
+        if not ResponseMessage.IsSuccessStatusCode() then begin
+            ResponseMessage.Content.ReadAs(ResponseText);
+            ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
         end;
     end;
 
@@ -706,10 +688,11 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
         Client: HttpClient;
-        RequestContent: HttpContent;
+        RequestMessage: HttpRequestMessage;
         ContentHeader: HttpHeaders;
-        RequestHeader: HttpHeaders;
-        Response: HttpResponseMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
         RequestXmlText: Text;
         ResponseText: Text;
     begin
@@ -750,8 +733,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(RequestXmlText);
-        RequestContent.GetHeaders(ContentHeader);
+        RequestMessage.GetHeaders(RequestHeaders);
+        if RequestHeaders.Contains('Connection') then
+            RequestHeaders.Remove('Connection');
+        NpRvPartner.SetRequestHeadersAuthorization(RequestHeaders);
+
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
 
         if ContentHeader.Contains('Content-Type') then
             ContentHeader.Remove('Content-Type');
@@ -760,23 +748,16 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             ContentHeader.Remove('SOAPAction');
         ContentHeader.Add('SOAPAction', 'RedeemPartnerVouchers');
 
-        RequestHeader := Client.DefaultRequestHeaders();
-        if RequestHeader.Contains('Connection') then
-            RequestHeader.Remove('Connection');
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvPartner."Service Url");
 
-        Client.UseWindowsAuthentication(NpRvPartner."Service Username", NpRvPartner."Service Password");
-        Client.Post(NpRvPartner."Service Url", RequestContent, Response);
+        Client.Send(RequestMessage, ResponseMessage);
 
-        if not Response.IsSuccessStatusCode() then begin
-            Response.Content.ReadAs(ResponseText);
-            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
-            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
-            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
-            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
+        if not ResponseMessage.IsSuccessStatusCode() then begin
+            ResponseMessage.Content.ReadAs(ResponseText);
+            ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
         end;
     end;
-
 
     procedure TopUpVoucher(VoucherEntry: Record "NPR NpRv Voucher Entry")
     var
@@ -784,10 +765,11 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         Voucher: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
         Client: HttpClient;
-        RequestContent: HttpContent;
+        RequestMessage: HttpRequestMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
         ContentHeader: HttpHeaders;
-        RequestHeader: HttpHeaders;
-        Response: HttpResponseMessage;
         RequestXmlText: Text;
         ResponseText: Text;
     begin
@@ -818,9 +800,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(RequestXmlText);
-        RequestContent.GetHeaders(ContentHeader);
+        RequestMessage.GetHeaders(RequestHeaders);
+        if RequestHeaders.Contains('Connection') then
+            RequestHeaders.Remove('Connection');
+        NpRvGlobalVoucherSetup.SetRequestHeadersAuthorization(RequestHeaders);
 
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
         if ContentHeader.Contains('Content-Type') then
             ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
@@ -828,21 +814,12 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             ContentHeader.Remove('SOAPAction');
         ContentHeader.Add('SOAPAction', 'TopUpVouchers');
 
-        RequestHeader := Client.DefaultRequestHeaders();
-        if RequestHeader.Contains('Connection') then
-            RequestHeader.Remove('Connection');
-
-        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
-
-        if not Response.IsSuccessStatusCode() then begin
-            Response.Content.ReadAs(ResponseText);
-            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
-            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
-            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
-            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
-        end;
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvGlobalVoucherSetup."Service Url");
+        Client.Send(RequestMessage, ResponseMessage);
+        ResponseMessage.Content.ReadAs(ResponseText);
+        if not ResponseMessage.IsSuccessStatusCode() then
+            ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -907,6 +884,23 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry."Partner Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_partner_code', MaxStrLen(NpRvVoucherEntry."Partner Code"), false));
         NpRvVoucherEntry.Insert();
+    end;
+
+    internal procedure ThrowGlobalVoucherWSError(ResponseReasonPhrase: Text; ResponseText: Text)
+    var
+        ErrorXmlDoc: XmlDocument;
+        ErrorXmlElement: XmlElement;
+        ErrorXmlNode: XmlNode;
+        XmlDOMMgt: codeunit "XML DOM Management";
+    begin
+        if ResponseText <> '' then begin
+            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
+            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
+            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
+            Error('%1\\%2', ResponseReasonPhrase, ErrorXmlElement.InnerText);
+        end else
+            Error(ResponseReasonPhrase);
     end;
 }
 

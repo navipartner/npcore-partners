@@ -39,6 +39,12 @@ table 6151020 "NPR NpRv Global Vouch. Setup"
             Caption = 'Service Url';
             DataClassification = CustomerContent;
         }
+
+        field(6; AuthType; Enum "NPR API Auth. Type")
+        {
+            Caption = 'Auth. Type';
+            DataClassification = CustomerContent;
+        }
         field(10; "Service Username"; Text[30])
         {
             Caption = 'Service Username';
@@ -48,6 +54,19 @@ table 6151020 "NPR NpRv Global Vouch. Setup"
         {
             Caption = 'Service Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Isolated Storage';
+        }
+        field(16; "API Password Key"; GUID)
+        {
+            Caption = 'User Password Key';
+            DataClassification = EndUserPseudonymousIdentifiers;
+        }
+        field(17; "OAuth2 Setup Code"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            TableRelation = "NPR OAuth Setup";
+            Caption = 'OAuth2.0 Setup Code';
         }
     }
 
@@ -57,5 +76,30 @@ table 6151020 "NPR NpRv Global Vouch. Setup"
         {
         }
     }
+
+    trigger OnDelete()
+    var
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+    begin
+        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+            WebServiceAuthHelper.RemoveApiPassword("API Password Key");
+    end;
+
+    procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
+    var
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        iAuth: Interface "NPR API IAuthorization";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+    begin
+        iAuth := Rec.AuthType;
+        case Rec.AuthType of
+            Rec.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec."Service Username", Rec."API Password Key", AuthParamsBuff);
+            Rec.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
+        end;
+        iAuth.CheckMandatoryValues(AuthParamsBuff);
+        iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
+    end;
 }
 

@@ -26,13 +26,14 @@ codeunit 6014500 "NPR Upgrade Magento Passwords"
     local procedure UpgradePasswordsInventoryCompanies()
     var
         InventoryCompanies: Record "NPR Magento Inv. Company";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
         if not InventoryCompanies.FindSet() then
             exit;
 
         repeat
             if InventoryCompanies."Api Password" <> '' then begin
-                InventoryCompanies.SetApiPassword(InventoryCompanies."Api Password");
+                WebServiceAuthHelper.SetApiPassword(InventoryCompanies."Api Password", InventoryCompanies."Api Password Key");
                 InventoryCompanies."Api Password" := '';
                 InventoryCompanies.Modify();
             end;
@@ -65,12 +66,6 @@ codeunit 6014500 "NPR Upgrade Magento Passwords"
         if MagentoSetup."Api Password" <> '' then begin
             MagentoSetup.SetApiPassword(MagentoSetup."Api Password");
             MagentoSetup."Api Password" := '';
-            MagentoSetup.Modify();
-        end;
-
-        if MagentoSetup."Managed Nav Api Password" <> '' then begin
-            MagentoSetup.SetNavApiPassword(MagentoSetup."Managed Nav Api Password");
-            MagentoSetup."Managed Nav Api Password" := '';
             MagentoSetup.Modify();
         end;
     end;

@@ -36,7 +36,10 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
         Client: HttpClient;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
-        Response: HttpResponseMessage;
+        RequestMessage: HttpRequestMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
         ExceptionMessage: Text;
         ReqBody: Text;
         ResponseText: Text;
@@ -52,6 +55,15 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
         ReqBody := InitReqBody(NpCsDocument);
 
         NpCsStore.Get(NpCsDocument."To Store Code");
+
+        RequestMessage.GetHeaders(RequestHeaders);
+        RequestHeaders.Remove('Connection');
+
+        NpCsStore.SetRequestHeadersAuthorization(RequestHeaders);
+
+        RequestMessage.Method('POST');
+        RequestMessage.SetRequestUri(NpCsStore."Service Url");
+
         RequestContent.WriteFrom(ReqBody);
         RequestContent.GetHeaders(ContentHeader);
 
@@ -61,11 +73,11 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
         ContentHeader.Add('SOAPAction', 'GetCollectDocuments');
         ContentHeader := Client.DefaultRequestHeaders();
 
-        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
-        Client.Post(NpCsStore."Service Url", RequestContent, Response);
+        RequestMessage.Content(RequestContent);
+        Client.Send(RequestMessage, ResponseMessage);
 
-        if not Response.IsSuccessStatusCode then begin
-            ExceptionMessage := Response.ReasonPhrase;
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            ExceptionMessage := ResponseMessage.ReasonPhrase;
             if XmlDocument.ReadFrom(ExceptionMessage, Document) then begin
                 if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
                     ExceptionMessage := Node.AsXmlElement().InnerText();
@@ -75,7 +87,7 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
             Error(CopyStr(ExceptionMessage, 1, 1020));
         end;
 
-        Response.Content.ReadAs(ResponseText);
+        ResponseMessage.Content.ReadAs(ResponseText);
         ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
         if not XmlDocument.ReadFrom(ResponseText, Document) then begin
             LogMessage := Text001;

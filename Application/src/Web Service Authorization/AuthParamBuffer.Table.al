@@ -18,7 +18,7 @@ table 6014607 "NPR Auth. Param. Buffer"
             DataClassification = SystemMetadata;
         }
 
-        field(5; "Basic UserName"; Code[50])
+        field(5; "Basic UserName"; Code[100])
         {
             Caption = 'Basic UserName';
             DataClassification = CustomerContent;
@@ -33,6 +33,12 @@ table 6014607 "NPR Auth. Param. Buffer"
         field(15; "OAuth Setup Code"; Code[20])
         {
             Caption = 'OAuth Setup Code';
+            DataClassification = CustomerContent;
+        }
+
+        field(20; "Custom Auth."; Text[250])
+        {
+            Caption = 'Custom Authorization';
             DataClassification = CustomerContent;
         }
     }

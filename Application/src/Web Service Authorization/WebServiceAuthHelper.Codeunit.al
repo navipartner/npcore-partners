@@ -2,13 +2,27 @@ codeunit 6014462 "NPR Web Service Auth. Helper"
 {
 
     #region FieldsVisibility
-    procedure SetAuthenticationFieldsVisibility(AuthType: Enum "NPR API Auth. Type"; var IsBasicAuthVisible: Boolean; var IsOAuth2Visible: Boolean)
+    procedure SetAuthenticationFieldsVisibility(AuthType: Enum "NPR API Auth. Type"; var IsBasicAuthVisible: Boolean)
     begin
         IsBasicAuthVisible := false;
-        IsOAuth2Visible := false;
         BasicAuthVisible(AuthType, IsBasicAuthVisible);
+    end;
+
+    procedure SetAuthenticationFieldsVisibility(AuthType: Enum "NPR API Auth. Type"; var IsBasicAuthVisible: Boolean; var IsOAuth2Visible: Boolean)
+    begin
+        IsOAuth2Visible := false;
+        SetAuthenticationFieldsVisibility(AuthType, IsBasicAuthVisible);
         if not IsBasicAuthVisible then
             OAuth2Visible(AuthType, IsOAuth2Visible);
+    end;
+
+    procedure SetAuthenticationFieldsVisibility(AuthType: Enum "NPR API Auth. Type"; var IsBasicAuthVisible: Boolean; var IsOAuth2Visible: Boolean; var IsCustomAuthVisible: Boolean)
+    var
+    begin
+        IsCustomAuthVisible := false;
+        SetAuthenticationFieldsVisibility(AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        If (not IsBasicAuthVisible) And (not IsOAuth2Visible) then
+            CustomAuthVisible(AuthType, IsCustomAuthVisible);
     end;
 
     procedure BasicAuthVisible(AuthType: Enum "NPR API Auth. Type"; var IsBasicAuthVisible: Boolean): Boolean
@@ -25,6 +39,14 @@ codeunit 6014462 "NPR Web Service Auth. Helper"
     begin
         iAuth := AuthType;
         IsOAuth2Visible := iAuth.IsEnabled(Format(AuthType), Format(AuthType::OAuth2));
+    end;
+
+    procedure CustomAuthVisible(AuthType: Enum "NPR API Auth. Type"; var IsCustomAuthVisible: Boolean): Boolean
+    var
+        iAuth: Interface "NPR API IAuthorization";
+    begin
+        iAuth := AuthType;
+        IsCustomAuthVisible := iAuth.IsEnabled(Format(AuthType), Format(AuthType::Custom));
     end;
     #endregion
 
@@ -61,7 +83,7 @@ codeunit 6014462 "NPR Web Service Auth. Helper"
     #endregion
 
     #region Authorization Parameters Buffer
-    procedure GetBasicAuthorizationParamsBuff(BasicUsername: Code[50]; BasicPasswordKey: Guid; var AuthorizationParamsBuffer: Record "NPR Auth. Param. Buffer")
+    procedure GetBasicAuthorizationParamsBuff(BasicUsername: Code[100]; BasicPasswordKey: Guid; var AuthorizationParamsBuffer: Record "NPR Auth. Param. Buffer")
     begin
         AuthorizationParamsBuffer.Init();
         AuthorizationParamsBuffer."Auth. Type" := AuthorizationParamsBuffer."Auth. Type"::Basic;
@@ -75,5 +97,13 @@ codeunit 6014462 "NPR Web Service Auth. Helper"
         AuthorizationParamsBuffer."Auth. Type" := AuthorizationParamsBuffer."Auth. Type"::OAuth2;
         AuthorizationParamsBuffer."OAuth Setup Code" := OAuthSetupCode;
     end;
+
+    procedure GetCustomAuthorizationParamsBuff(CustomAuthValue: Text[250]; var AuthorizationParamsBuffer: Record "NPR Auth. Param. Buffer")
+    begin
+        AuthorizationParamsBuffer.Init();
+        AuthorizationParamsBuffer."Auth. Type" := AuthorizationParamsBuffer."Auth. Type"::Custom;
+        AuthorizationParamsBuffer."Custom Auth." := CustomAuthValue;
+    end;
+
     #endregion
 }

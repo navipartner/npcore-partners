@@ -41,6 +41,12 @@ table 6151410 "NPR Magento Inv. Company"
             Caption = 'Api Url';
             DataClassification = CustomerContent;
         }
+
+        field(14; AuthType; Enum "NPR API Auth. Type")
+        {
+            Caption = 'Auth. Type';
+            DataClassification = CustomerContent;
+        }
         field(15; "Api Username"; Text[100])
         {
             Caption = 'Api Username';
@@ -48,7 +54,7 @@ table 6151410 "NPR Magento Inv. Company"
         }
         field(20; "Api Password"; Text[100])
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'IsolatedStorage is in use.';
             Caption = 'Api Password';
             DataClassification = CustomerContent;
@@ -59,10 +65,18 @@ table 6151410 "NPR Magento Inv. Company"
             Editable = false;
             DataClassification = CustomerContent;
         }
+        field(22; "OAuth2 Setup Code"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            TableRelation = "NPR OAuth Setup";
+            Caption = 'OAuth2.0 Setup Code';
+        }
         field(25; "Api Domain"; Text[100])
         {
             Caption = 'Api Domain';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
     }
 
@@ -83,6 +97,14 @@ table 6151410 "NPR Magento Inv. Company"
         SetApiUrl();
     end;
 
+    trigger OnDelete()
+    var
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+    begin
+        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+            WebServiceAuthHelper.RemoveApiPassword("API Password Key");
+    end;
+
     procedure SetApiUrl()
     var
         Position: Integer;
@@ -96,33 +118,20 @@ table 6151410 "NPR Magento Inv. Company"
         end;
     end;
 
-    [NonDebuggable]
-    procedure SetApiPassword(NewPassword: Text)
+    procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
+    var
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        iAuth: Interface "NPR API IAuthorization";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
-        if IsNullGuid("Api Password Key") then
-            "Api Password Key" := CreateGuid();
-
-        if not EncryptionEnabled() then
-            IsolatedStorage.Set("Api Password Key", NewPassword, DataScope::Company)
-        else
-            IsolatedStorage.SetEncrypted("Api Password Key", NewPassword, DataScope::Company);
-    end;
-
-    [NonDebuggable]
-    procedure GetApiPassword() PasswordValue: Text
-    begin
-        IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue);
-    end;
-
-    [NonDebuggable]
-    procedure HasApiPassword(): Boolean
-    begin
-        exit(GetApiPassword() <> '');
-    end;
-
-    procedure RemoveApiPassword()
-    begin
-        IsolatedStorage.Delete("Api Password Key", DataScope::Company);
-        Clear("Api Password Key");
+        iAuth := Rec.AuthType;
+        case Rec.AuthType of
+            Rec.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Copystr(Rec."Api Username", 1, 50), Rec."API Password Key", AuthParamsBuff);
+            Rec.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
+        end;
+        iAuth.CheckMandatoryValues(AuthParamsBuff);
+        iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
     end;
 }
