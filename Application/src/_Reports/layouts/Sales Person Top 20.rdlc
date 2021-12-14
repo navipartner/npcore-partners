@@ -1197,7 +1197,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(SUM(Fields!Salesperson_Purchaser_Discount_Amount.Value)/(SUM(Fields!Salesperson_Purchaser_Sales_LCY_.Value)+SUM(Fields!Salesperson_Purchaser_Discount_Amount.Value)))*100</Value>
+                                  <Value>=Fields!DiscountPctTotal.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <Format>=Fields!DiscountPctTotalFormat.Value</Format>
@@ -1420,7 +1420,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(SUM(Fields!db.Value)/SUM(Fields!Salesperson_Purchaser_Sales_LCY_.Value))*100</Value>
+                                  <Value>=Fields!dgTotal.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <Format>=Fields!dgTotalFormat.Value</Format>
