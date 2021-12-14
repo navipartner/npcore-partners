@@ -32,7 +32,10 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         ShipmentID: Code[20];
         ShipmentNumber: Code[50];
         Response: JsonToken;
+        NPRShippingAgent: Record "NPR Package Shipping Agent";
     begin
+        if not NPRShippingAgent.GET(PakkelabelsShipment."Shipping Agent Code") then
+            exit;
         RequestURL := 'https://app.pakkelabels.dk/api/public/v3/shipments/';
         RequestString := BuildShipmentRequest(PakkelabelsShipment);
         if not ExecuteCall('POST', response, silent) then
@@ -463,7 +466,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then begin
             if SalesShptHeader.GET(SalesShptHdrNo) then begin
                 RecRef.GetTable(SalesShptHeader);
-                AddEntry(RecRef, GuiAllowed, false, ShipmentDocument);
+                if not AddEntry(RecRef, GuiAllowed, false, ShipmentDocument) then
+                    Exit;
                 if PackageProviderSetup."Send Package Doc. Immediately" then
                     CreateShipment(ShipmentDocument, true);
             end;
@@ -602,7 +606,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         exit(NOT SalesShipmentLine.IsEmpty());
     end;
 
-    procedure AddEntry(RecRef: RecordRef; ShowWindow: Boolean; Silent: Boolean; var ShipmentDocument: Record "NPR Pacsoft Shipment Document")
+    procedure AddEntry(RecRef: RecordRef; ShowWindow: Boolean; Silent: Boolean; var ShipmentDocument: Record "NPR Pacsoft Shipment Document"): Boolean
     var
         CompanyInfo: Record "Company Information";
         Customer: Record Customer;
@@ -736,7 +740,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         ShipmentDocument.MODIFY(true);
 
         COMMIT();
-
+        exit(true);
 
     end;
 
@@ -881,7 +885,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         end else begin
             TestFieldPakkelabels(RecRef);
             if CONFIRM(text000, true) then begin
-                AddEntry(RecRef, GuiAllowed, false, ShipmentDocument);
+                if not AddEntry(RecRef, GuiAllowed, false, ShipmentDocument) then
+                    exit;
                 if PackageProviderSetup."Send Package Doc. Immediately" then
                     CreateShipment(ShipmentDocument, true);
             end;
