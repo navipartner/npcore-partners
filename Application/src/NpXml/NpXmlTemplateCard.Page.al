@@ -418,7 +418,6 @@ page 6151551 "NPR NpXml Template Card"
                                 ToolTip = 'Specifies the value of the User Password field';
                                 ApplicationArea = NPRRetail;
                                 Caption = 'API Password';
-                                ExtendedDatatype = Masked;
                                 trigger OnValidate()
                                 begin
                                     if pw <> '' then
