@@ -48,41 +48,70 @@ page 6151401 "NPR Magento Setup"
                         ToolTip = 'Specifies the value of the Api Url field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Api Username Type"; Rec."Api Username Type")
-                    {
 
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the Api Username Type field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Api Username"; Rec."Api Username")
+                    field(AuthType; Rec.AuthType)
                     {
-
-                        Enabled = Rec."Api Username Type" = Rec."Api Username Type"::Custom;
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the Api Username field';
                         ApplicationArea = NPRRetail;
-                    }
-                    field(Password; Password)
-                    {
-
-                        Caption = 'Api Password';
-                        Importance = Additional;
-                        ExtendedDatatype = Masked;
-                        ToolTip = 'Specifies the value of the Api Password field';
-                        ApplicationArea = NPRRetail;
+                        Tooltip = 'Specifies the Authorization Type.';
 
                         trigger OnValidate()
                         begin
-                            Rec.SetApiPassword(Password);
-                            Commit();
+                            CurrPage.Update();
                         end;
                     }
-                    field("Api Authorization"; Rec."Api Authorization")
-                    {
 
-                        ToolTip = 'Specifies the value of the Api Authorization field';
-                        ApplicationArea = NPRRetail;
+                    group(BasicAuth)
+                    {
+                        ShowCaption = false;
+                        Visible = IsBasicAuthVisible;
+                        field("Api Username"; Rec."Api Username")
+                        {
+                            Enabled = false;
+                            Importance = Additional;
+                            ToolTip = 'Specifies the value of the Api Username field';
+                            ApplicationArea = NPRRetail;
+                        }
+                        field(Password; Password)
+                        {
+                            Caption = 'Api Password';
+                            Importance = Additional;
+                            ExtendedDatatype = Masked;
+                            ToolTip = 'Specifies the value of the Api Password field';
+                            ApplicationArea = NPRRetail;
+
+                            trigger OnValidate()
+                            begin
+                                if Password <> '' then
+                                    WebServiceAuthHelper.SetApiPassword(Password, Rec."Api Password Key")
+                                else begin
+                                    if WebServiceAuthHelper.HasApiPassword(Rec."Api Password Key") then
+                                        WebServiceAuthHelper.RemoveApiPassword(Rec."Api Password Key");
+                                end;
+
+                                Commit();
+                            end;
+                        }
+                    }
+                    group(OAuth2)
+                    {
+                        ShowCaption = false;
+                        Visible = IsOAuth2Visible;
+                        field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the OAuth2.0 Setup Code.';
+                        }
+                    }
+
+                    group(Custom)
+                    {
+                        ShowCaption = false;
+                        Visible = IsCustomAuthVisible;
+                        field("Api Authorization"; Rec."Api Authorization")
+                        {
+                            ToolTip = 'Specifies the value of the Api Authorization field';
+                            ApplicationArea = NPRRetail;
+                        }
                     }
                 }
             }
@@ -1034,6 +1063,8 @@ page 6151401 "NPR Magento Setup"
 
         VariantSystem := Rec."Variant System".AsInteger() = 2;
         PictureVarietyType := Rec."Picture Variety Type".AsInteger() = 0;
+
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible);
     end;
 
     trigger OnOpenPage()
@@ -1044,9 +1075,16 @@ page 6151401 "NPR Magento Setup"
         CurrPage.NpCsStoreCardWorkflows.PAGE.SetStoreCodeVisible(true);
 
         Rec.UpdateXmlEnabledFields();
+
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible);
     end;
 
     var
+
+        [InDataSet]
+        IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible : Boolean;
+
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text002: Label 'Resync of %1 added in the Task List';
         Text00201: Label 'Items';
         HasSetupCategories: Boolean;

@@ -12,4 +12,10 @@ enum 6014473 "NPR API Auth. Type" implements "NPR API IAuthorization"
         Implementation = "NPR API IAuthorization" = "NPR API OAuth2";
     }
 
+    value(2; Custom)
+    {
+        Caption = 'Custom';
+        Implementation = "NPR API IAuthorization" = "NPR API Custom Auth";
+    }
+
 }

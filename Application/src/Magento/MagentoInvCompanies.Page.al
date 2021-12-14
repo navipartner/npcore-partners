@@ -24,37 +24,53 @@ page 6151402 "NPR Magento Inv. Companies"
                     ToolTip = 'Specifies the value of the Location Filter field';
                     ApplicationArea = NPRRetail;
                 }
+
+                field(AuthType; Rec.AuthType)
+                {
+                    ApplicationArea = NPRRetail;
+                    Tooltip = 'Specifies the Authorization Type.';
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update();
+                    end;
+                }
                 field("Api Username"; Rec."Api Username")
                 {
 
                     ToolTip = 'Specifies the value of the Api Username field';
                     ApplicationArea = NPRRetail;
+                    Visible = IsBasicAuthVisible;
                 }
-                field(Password; Password)
+                field("API Password"; pw)
                 {
 
-                    Caption = 'Api Password';
-                    ExtendedDatatype = Masked;
-                    ToolTip = 'Specifies the value of the Api Password field';
+                    ToolTip = 'Specifies the value of the User Password field';
                     ApplicationArea = NPRRetail;
-
+                    Caption = 'API Password';
+                    ExtendedDatatype = Masked;
+                    Visible = IsBasicAuthVisible;
                     trigger OnValidate()
                     begin
-                        Rec.SetApiPassword(Password);
-                        Commit();
+                        if pw <> '' then
+                            WebServiceAuthHelper.SetApiPassword(pw, Rec."API Password Key")
+                        else begin
+                            if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+                                WebServiceAuthHelper.RemoveApiPassword(Rec."API Password Key");
+                        end;
                     end;
+                }
+
+                field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the OAuth2.0 Setup Code.';
+                    Visible = IsOAuth2Visible;
                 }
                 field("Api Url"; Rec."Api Url")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Api Url field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Api Domain"; Rec."Api Domain")
-                {
-
-                    ToolTip = 'Specifies the value of the Api Domain field';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -85,15 +101,26 @@ page 6151402 "NPR Magento Inv. Companies"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+    end;
+
     trigger OnAfterGetRecord()
     begin
-        Password := '';
-        if not IsNullGuid(Rec."Api Password Key") then
-            Password := '***';
+        pw := '';
+        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+            pw := '***';
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
     end;
 
     var
-        Password: Text[250];
+        [InDataSet]
+        pw: Text[200];
+
+        [InDataSet]
+        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text000: Label 'Api Url OK';
 
     procedure TestApi()

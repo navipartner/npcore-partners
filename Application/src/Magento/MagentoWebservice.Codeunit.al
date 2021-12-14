@@ -358,7 +358,7 @@ codeunit 6151403 "NPR Magento Webservice"
         if (MagentoSetup."Magento Url" <> '') and (MagentoSetup."Magento Url" <> MagentoUrl) then
             Error(Error002, MagentoSetup."Magento Url");
 
-        MagentoSetup."Api Username Type" := MagentoSetup."Api Username Type"::Automatic;
+        MagentoSetup.AuthType := MagentoSetup.AuthType::Basic;
 
         MagentoSetup.Validate("Magento Url", MagentoUrl);
         MagentoSetup."Magento Enabled" := true;

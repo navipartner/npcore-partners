@@ -12,6 +12,7 @@ codeunit 6151197 "NPR NpCs Send Order"
         Client: HttpClient;
         Content: HttpContent;
         ContentHeaders: HttpHeaders;
+        [NonDebuggable]
         RequestHeaders: HttpHeaders;
         ContentText: Text;
         ResponseMessage: HttpResponseMessage;
@@ -42,7 +43,8 @@ codeunit 6151197 "NPR NpCs Send Order"
         RequestMessage.GetHeaders(RequestHeaders);
         RequestHeaders.Add('SOAPAction', 'ImportSalesDocuments');
 
-        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
+        NpCsStore.SetRequestHeadersAuthorization(RequestHeaders);
+
         Client.Send(RequestMessage, ResponseMessage);
 
         if not ResponseMessage.IsSuccessStatusCode() then begin
@@ -64,6 +66,7 @@ codeunit 6151197 "NPR NpCs Send Order"
         NpCsWorkflow: Record "NPR NpCs Workflow";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         ServiceName: Text;
         CustNo: Text;
     begin
@@ -95,7 +98,7 @@ codeunit 6151197 "NPR NpCs Send Order"
                       '<name>' + Escape(NpCsStoreLocal.Name) + '</name>' +
                       '<service_url>' + Escape(NpCsStoreLocal."Service Url") + '</service_url>' +
                       '<service_username>' + Escape(NpCsStoreLocal."Service Username") + '</service_username>' +
-                      '<service_password>' + Escape(NpCsStoreLocal."Service Password") + '</service_password>' +
+                      '<service_password>' + Escape(WebServiceAuthHelper.GetApiPassword(NpCsStoreLocal."API Password Key")) + '</service_password>' +
                       '<email>' + Escape(NpCsStoreLocal."E-mail") + '</email>' +
                       '<mobile_phone_no>' + Escape(NpCsStoreLocal."Mobile Phone No.") + '</mobile_phone_no>' +
                       '<callback encoding="base64">' + InitCallback(NpCsDocument) + '</callback>' +

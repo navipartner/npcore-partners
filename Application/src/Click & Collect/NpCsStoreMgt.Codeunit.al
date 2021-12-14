@@ -1,5 +1,8 @@
 ﻿codeunit 6151204 "NPR NpCs Store Mgt."
 {
+    var
+        APIReqErrorTxtG: Label 'Something went wrong:\\Error Status Code: %1;\\Description: %2';
+
     procedure InitLocalStore(var NpCsStore: Record "NPR NpCs Store")
     begin
         if NpCsStore."Company Name" = '' then
@@ -34,6 +37,7 @@
         Client: HttpClient;
         Content: HttpContent;
         ContentHeaders: HttpHeaders;
+        [NonDebuggable]
         RequestHeaders: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
@@ -70,18 +74,15 @@
         RequestHeaders.Add('SOAPAction', 'GetCollectStores');
         RequestHeaders.Remove('Connection');
 
+        NpCsStore.SetRequestHeadersAuthorization(RequestHeaders);
+
         RequestMessage.Method('POST');
         RequestMessage.SetRequestUri(NpCsStore."Service Url");
 
-        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
         Client.Send(RequestMessage, ResponseMessage);
 
-        if not ResponseMessage.IsSuccessStatusCode() then begin
-            ErrorMessage := ResponseMessage.ReasonPhrase();
-            if XmlDocument.ReadFrom(ErrorMessage, Document) then begin
-                if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
-                    ErrorMessage := Node.AsXmlElement().InnerText();
-            end;
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            ErrorMessage := StrSubstNo(APIReqErrorTxtG, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
             Error(ErrorMessage);
         end;
 
@@ -124,27 +125,28 @@
     [TryFunction]
     procedure TryGetCollectService(NpCsStore: Record "NPR NpCs Store")
     var
-        XmlDomManagement: codeunit "XML DOM Management";
         Client: HttpClient;
-        Response: HttpResponseMessage;
-        Document: XmlDocument;
-        Node: XmlNode;
-        ErrorMessage: Text;
+        RequestMessage: HttpRequestMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
+        ErrorTxt: Text;
     begin
         NpCsStore.TestField("Service Url");
 
-        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
-        if Client.Get(NpCsStore."Service Url", Response) then
-            exit;
+        RequestMessage.GetHeaders(RequestHeaders);
+        RequestHeaders.Remove('Connection');
 
-        if not Response.IsSuccessStatusCode then begin
-            ErrorMessage := Response.ReasonPhrase;
-            ErrorMessage := XmlDomManagement.RemoveNamespaces(ErrorMessage);
-            if XmlDocument.ReadFrom(ErrorMessage, Document) then
-                if Document.SelectSingleNode('//faultstring', Node) then
-                    Error(Node.AsXmlElement().InnerText());
+        NpCsStore.SetRequestHeadersAuthorization(RequestHeaders);
 
-            Error(ErrorMessage);
+        RequestMessage.Method('GET');
+        RequestMessage.SetRequestUri(NpCsStore."Service Url");
+
+        Client.Send(RequestMessage, ResponseMessage);
+
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            ErrorTxt := StrSubstNo(APIReqErrorTxtG, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
+            Error(ErrorTxt);
         end;
     end;
 
@@ -267,6 +269,7 @@
         Client: HttpClient;
         Content: HttpContent;
         ContentHeaders: HttpHeaders;
+        [NonDebuggable]
         RequestHeaders: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
@@ -317,7 +320,8 @@
         RequestHeaders.Add('SOAPAction', 'GetLocalInventory');
         RequestHeaders.Remove('Connection');
 
-        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
+        NpCsStore.SetRequestHeadersAuthorization(RequestHeaders);
+
         Client.Send(RequestMessage, ResponseMessage);
 
         if not ResponseMessage.IsSuccessStatusCode() then

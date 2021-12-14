@@ -139,7 +139,7 @@ codeunit 85021 "NPR NpXml Tests"
         MagentoSetup."Magento Enabled" := true;
         MagentoSetup."Magento Url" := 'http://new.ottosuenson.dk/';
         MagentoSetup."Api Url" := 'http://new.ottosuenson.dk/rest/all/V1/naviconnect/';
-        MagentoSetup."Api Username Type" := MagentoSetup."Api Username Type"::Automatic;
+        MagentoSetup.AuthType := MagentoSetup.AuthType::Basic;
         MagentoSetup."Api Authorization" := 'bearer tfqlwf5mtq3ny5s2ugtcjydosqrb32k1';
         MagentoSetup.Modify();
     end;
@@ -241,7 +241,7 @@ codeunit 85021 "NPR NpXml Tests"
         NpXmlTemplate."API Type" := NpXmlTemplate."API Type"::"REST (Json)";
         NpXmlTemplate."API Url" := 'http://new.ottosuenson.dk/rest/all/V1/naviconnect/products';
         NpXmlTemplate."API Method" := NpXmlTemplate."API Method"::POST;
-        NpXmlTemplate."API Username Type" := NpXmlTemplate."API Username Type"::Custom;
+        NpXmlTemplate.AuthType := NpXmlTemplate.AuthType::Custom;
         NpXmlTemplate."API Content-Type" := 'naviconnect/json';
         NpXmlTemplate."API Authorization" := 'bearer tfqlwf5mtq3ny5s2ugtcjydosqrb32k1';
         NpXmlTemplate."API Accept" := 'naviconnect/xml';

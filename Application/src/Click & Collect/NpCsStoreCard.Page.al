@@ -103,18 +103,60 @@ page 6151196 "NPR NpCs Store Card"
                         ToolTip = 'Specifies the value of the Service Url field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Service Username"; Rec."Service Username")
+                    group(Authorization)
                     {
+                        Caption = 'Authorization';
 
-                        ToolTip = 'Specifies the value of the Service Username field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Service Password"; Rec."Service Password")
-                    {
+                        field(AuthType; Rec.AuthType)
+                        {
+                            ApplicationArea = NPRRetail;
+                            Tooltip = 'Specifies the Authorization Type.';
 
-                        ToolTip = 'Specifies the value of the Service Password field';
-                        ApplicationArea = NPRRetail;
+                            trigger OnValidate()
+                            begin
+                                CurrPage.Update();
+                            end;
+                        }
+
+                        group(BasicAuth)
+                        {
+                            ShowCaption = false;
+                            Visible = IsBasicAuthVisible;
+                            field("Service Username"; Rec."Service Username")
+                            {
+
+                                ToolTip = 'Specifies the value of the Service Username field';
+                                ApplicationArea = NPRRetail;
+                            }
+                            field("API Password"; pw)
+                            {
+                                ToolTip = 'Specifies the value of the User Password field';
+                                ApplicationArea = NPRRetail;
+                                Caption = 'API Password';
+                                ExtendedDatatype = Masked;
+                                trigger OnValidate()
+                                begin
+                                    if pw <> '' then
+                                        WebServiceAuthHelper.SetApiPassword(pw, Rec."API Password Key")
+                                    else begin
+                                        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+                                            WebServiceAuthHelper.RemoveApiPassword(Rec."API Password Key");
+                                    end;
+                                end;
+                            }
+                        }
+                        group(OAuth2)
+                        {
+                            ShowCaption = false;
+                            Visible = IsOAuth2Visible;
+                            field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
+                            {
+                                ApplicationArea = NPRRetail;
+                                ToolTip = 'Specifies the OAuth2.0 Setup Code.';
+                            }
+                        }
                     }
+
                     field("Geolocation Latitude"; Rec."Geolocation Latitude")
                     {
 
@@ -384,6 +426,19 @@ page 6151196 "NPR NpCs Store Card"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        pw := '';
+        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+            pw := '***';
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+    end;
+
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
         NpCsStoreMgt: Codeunit "NPR NpCs Store Mgt.";
@@ -393,6 +448,12 @@ page 6151196 "NPR NpCs Store Card"
     end;
 
     var
+        [InDataSet]
+        pw: Text[200];
+
+        [InDataSet]
+        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text000: Label 'Error in Store Setup\\Close anway?';
         Text001: Label 'Store Setup validated successfully';
 }

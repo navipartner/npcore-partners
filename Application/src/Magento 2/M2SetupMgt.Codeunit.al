@@ -212,7 +212,7 @@
         Authentication := NpXmlDomMgt.GetXmlText(XmlElement.AsXmlElement(), '//authentication_type', 0, true) + ' ' + NpXmlDomMgt.GetXmlText(XmlElement.AsXmlElement(), '//access_token', 0, true);
 
         PrevRec := Format(MagentoSetup);
-        MagentoSetup."Api Username Type" := MagentoSetup."Api Username Type"::Custom;
+        MagentoSetup.AuthType := MagentoSetup.AuthType::Custom;
         MagentoSetup."Api Username" := '';
         MagentoSetup.RemoveApiPassword();
         MagentoSetup."Api Authorization" := Authentication;

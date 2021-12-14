@@ -33,16 +33,9 @@ page 6151026 "NPR NpRv Partners"
                     ToolTip = 'Specifies the value of the Service Url field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Service Username"; Rec."Service Username")
+                field(AuthType; Rec.AuthType)
                 {
-
-                    ToolTip = 'Specifies the value of the Service Username field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Service Password"; Rec."Service Password")
-                {
-
-                    ToolTip = 'Specifies the value of the Service Password field';
+                    ToolTip = 'Specifies the Authorization Type';
                     ApplicationArea = NPRRetail;
                 }
             }

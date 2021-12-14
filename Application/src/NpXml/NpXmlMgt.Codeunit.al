@@ -20,11 +20,13 @@
         ResponseOutStr: OutStream;
         Window: Dialog;
         PrimaryKeyValue: Text;
-        Text002: Label 'Exporting %1 to XML\Exporting:           #2###################\Estimated Time Left: #3###################\Record:       #4###########################';
+        Text002: Label 'Exporting %1 to XML\';
+        Text003: Label 'Exporting:           #2###################\Estimated Time Left: #3###################\Record:       #4###########################';
         HideDialog: Boolean;
         Initialized: Boolean;
         OutputInitialized: Boolean;
-        Text200: Label 'Finding first record in %1 within the filters: #2##############################\Estimated Time Left:                           #3##############################\Record:  #4####################################################################';
+        Text200: Label 'Finding first record in %1 within the filters: ';
+        Text300: Label '#2##############################\Estimated Time Left:                           #3##############################\Record:  #4####################################################################';
 
     procedure CreateXml()
     var
@@ -43,7 +45,7 @@
         StartTime := Time;
         Counter := 0;
         Total := RecRef.Count();
-        OpenDialog(StrSubstNo(Text002, NpXmlTemplate2.Code, Total, 'Counting', 0));
+        OpenDialog(StrSubstNo(Text002, NpXmlTemplate2.Code) + Text003);
 
         if NpXmlTemplate2."Max Records per File" <= 0 then
             NpXmlTemplate2."Max Records per File" := 10000000;
@@ -414,6 +416,7 @@
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         RequestMessage: HttpRequestMessage;
+        [NonDebuggable]
         RequestHeader: HttpHeaders;
         RequestText: Text;
         ResponseMessage: HttpResponseMessage;
@@ -428,7 +431,6 @@
         NodeFromXmlDoc2: XmlNode;
         NodeList: XmlNodeList;
         Node: XmlNode;
-        APIUsername: Text;
         ElementName: Text;
         ExceptionMessage: Text;
         JsonRequest: Text;
@@ -518,22 +520,13 @@
                 end;
         end;
 
-        APIUsername := NpXmlTemplate.GetApiUsername();
-        if NpXmlTemplate."API Password" = '' then
-            Client.UseDefaultNetworkWindowsAuthentication()
-        else begin
-            if NpXmlTemplate."API Username Type" = NpXmlTemplate."API Username Type"::Automatic then
-                RequestHeader.Add('Authorization', 'Basic ' + GetBasicAuthInfo(APIUsername, NpXmlTemplate."API Password"))
-            else
-                Client.UseWindowsAuthentication(APIUsername, NpXmlTemplate."API Password");
-        end;
+        NpXmlTemplate.SetRequestHeadersAuthorization(RequestHeader);
 
         if NpXmlTemplate."API Content-Type" <> '' then begin
             ContentHeader.Remove('Content-Type');
             ContentHeader.Add('Content-Type', NpXmlTemplate."API Content-Type");
         end;
-        if NpXmlTemplate."API Authorization" <> '' then
-            RequestHeader.Add('Authorization', NpXmlTemplate."API Authorization");
+
         if NpXmlTemplate."API Accept" <> '' then
             RequestHeader.Add('Accept', NpXmlTemplate."API Accept");
         NpXmlApiHeader.SetRange("Xml Template Code", NpXmlTemplate.Code);
@@ -868,13 +861,14 @@
     local procedure UpdateDialog(Counter: Integer; Total: Integer; StartTime: Time; RecordPosition: Text[1024])
     var
         Runtime: Decimal;
+        ProgressIndicatorLbl: Label '%1 out of %2';
     begin
         if not UseDialog() then
             exit;
 
         if Total = 0 then
             Total := 1;
-        Window.Update(2, Round((Counter / Total) * 10000, 1));
+        Window.Update(2, StrSubstNo(ProgressIndicatorLbl, Counter, Total));
         if Counter mod 100 = 0 then begin
             Runtime := (Time - StartTime) / 1000;
             Window.Update(3, Round((Runtime * Total / Counter - Runtime) / 60, 0.01));
@@ -1066,7 +1060,7 @@
         Success := false;
 
         StartTime := Time;
-        OpenDialog(Text200);
+        OpenDialog(StrSubstNo(Text200, RecRef.Caption) + Text300);
         while not Success do begin
             Counter += 1;
             UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition());

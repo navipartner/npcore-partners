@@ -51,6 +51,11 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NpRv Print Object Type"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'RemoteEndpoints'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'RetailInventorySets'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'POSHCEndpointSetup'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'NpXmlTemplate'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'NpCsStore'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'NpRvPartner'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'NpRvGlobalVoucher'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Item Blob 2 Media"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Member Blob 2 Media"));
     end;
@@ -169,6 +174,16 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                         exit('RemoteEndpointsPasswordUpg-20211029');
                     'RetailInventorySets':
                         exit('RetailInventorySetsPasswordUpg-20211029');
+                    'POSHCEndpointSetup':
+                        exit('POSHCEndpointSetupPasswordUpg-20211029');
+                    'NpXmlTemplate':
+                        exit('NpXmlTemplatePasswordUpg-20211029');
+                    'NpCsStore':
+                        exit('NpCsStorePasswordUpg-20211029');
+                    'NpRvPartner':
+                        exit('NpRvPartnerPasswordUpg-20211029');
+                    'NpRvGlobalVoucher':
+                        exit('NpRvGlobalVoucherPasswordUpg-20211029');
                 end;
             Codeunit::"NPR Enum Upgrade":
                 exit('NPREnumUpgrade-20211110');

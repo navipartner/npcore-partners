@@ -28,7 +28,7 @@ xmlport 6151013 "NPR NpRv Partners"
                 fieldelement(service_username; TempNpRvPartner."Service Username")
                 {
                 }
-                fieldelement(service_password; TempNpRvPartner."Service Password")
+                textelement(service_password)
                 {
                 }
                 textelement(relations)
@@ -56,10 +56,11 @@ xmlport 6151013 "NPR NpRv Partners"
         }
     }
 
-    procedure GetSourceTables(var TempNpRvPartner2: Record "NPR NpRv Partner" temporary; var TempNpRvPartnerRelation2: Record "NPR NpRv Partner Relation" temporary)
+    procedure GetSourceTables(var TempNpRvPartner2: Record "NPR NpRv Partner" temporary; var TempNpRvPartnerRelation2: Record "NPR NpRv Partner Relation" temporary; var ServicePassword: Text)
     begin
         TempNpRvPartner2.Copy(TempNpRvPartner, true);
         TempNpRvPartnerRelation2.Copy(TempNpRvPartnerRelation, true);
+        ServicePassword := service_password;
     end;
 }
 

@@ -89,6 +89,7 @@
     local procedure UpsertFromStore(Element: XmlElement; var NpCsStore: Record "NPR NpCs Store")
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         StoreCode: Code[20];
         PrevRec: Text;
     begin
@@ -106,7 +107,7 @@
         NpCsStore.Name := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/name', MaxStrLen(NpCsStore.Name), true), 1, MaxStrLen(NpCsStore.Name));
         NpCsStore."Service Url" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/service_url', MaxStrLen(NpCsStore."Service Url"), true), 1, MaxStrLen(NpCsStore."Service Url"));
         NpCsStore."Service Username" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/service_username', MaxStrLen(NpCsStore."Service Username"), true), 1, MaxStrLen(NpCsStore."Service Username"));
-        NpCsStore."Service Password" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/service_password', MaxStrLen(NpCsStore."Service Password"), true), 1, MaxStrLen(NpCsStore."Service Password"));
+        WebServiceAuthHelper.SetApiPassword(NpXmlDomMgt.GetElementText(Element, 'from_store/service_password', 250, true), NpCsStore."API Password Key");
         NpCsStore."E-mail" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/email', MaxStrLen(NpCsStore."E-mail"), true), 1, MaxStrLen(NpCsStore."E-mail"));
         NpCsStore."Mobile Phone No." := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/mobile_phone_no', MaxStrLen(NpCsStore."Mobile Phone No."), true), 1, MaxStrLen(NpCsStore."Mobile Phone No."));
 
