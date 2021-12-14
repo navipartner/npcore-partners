@@ -86,8 +86,6 @@ codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnBeforePrintMatrix', '', false, false)]
     local procedure OnBeforeMatrixPrint(var RecRef: RecordRef; TemplateHeader: Record "NPR RP Template Header"; var Skip: Boolean)
-    var
-        RFIDPrintLog: Record "NPR RFID Print Log";
     begin
         if TemplateHeader."Pre Processing Codeunit" <> CODEUNIT::"NPR RFID PrePrint Gen. Buffer" then
             exit;
@@ -96,10 +94,6 @@ codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
 
         ConvertToBuffer(RecRef);
         Commit();
-        //-NPR5.55 [407265]
-        RFIDPrintLog.SetRange("Batch ID", GlobalPrintBatchID);
-        PAGE.Run(PAGE::"NPR RFID Print Log", RFIDPrintLog);
-        //+NPR5.55 [407265]
     end;
 }
 
