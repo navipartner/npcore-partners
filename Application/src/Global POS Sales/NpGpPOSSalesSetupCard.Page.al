@@ -45,24 +45,62 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                         ToolTip = 'Specifies the value of the Service Url field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Service Username"; Rec."Service Username")
+
+                    group(Authorization)
                     {
+                        Caption = 'Authorization';
 
-                        ToolTip = 'Specifies the value of the Service Username field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field(Password; Password)
-                    {
+                        field(AuthType; Rec.AuthType)
+                        {
+                            ApplicationArea = NPRRetail;
+                            Tooltip = 'Specifies the Authorization Type.';
 
-                        Caption = 'Service Password';
-                        ExtendedDatatype = Masked;
-                        ToolTip = 'Specifies the value of the Service Password field';
-                        ApplicationArea = NPRRetail;
+                            trigger OnValidate()
+                            begin
+                                CurrPage.Update();
+                            end;
+                        }
 
-                        trigger OnValidate()
-                        begin
-                            Rec.HandlePassword(Password);
-                        end;
+                        group(BasicAuth)
+                        {
+                            ShowCaption = false;
+                            Visible = IsBasicAuthVisible;
+                            field("Service Username"; Rec."Service Username")
+                            {
+
+                                ToolTip = 'Specifies the value of the Service Username field';
+                                ApplicationArea = NPRRetail;
+                            }
+                            field(Password; Password)
+                            {
+
+                                Caption = 'Service Password';
+                                ExtendedDatatype = Masked;
+                                ToolTip = 'Specifies the value of the Service Password field';
+                                ApplicationArea = NPRRetail;
+
+                                trigger OnValidate()
+                                begin
+                                    if Password <> '' then
+                                        WebServiceAuthHelper.SetApiPassword(Password, Rec."Service Password")
+                                    else begin
+                                        if WebServiceAuthHelper.HasApiPassword(Rec."Service Password") then
+                                            WebServiceAuthHelper.RemoveApiPassword(Rec."Service Password");
+                                    end;
+                                end;
+                            }
+                        }
+
+                        group(OAuth2)
+                        {
+                            ShowCaption = false;
+                            Visible = IsOAuth2Visible;
+                            field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
+                            {
+                                ApplicationArea = NPRRetail;
+                                ToolTip = 'Specifies the OAuth2.0 Setup Code.';
+                            }
+                        }
                     }
 
                 }
@@ -99,10 +137,17 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+    end;
+
     trigger OnAfterGetRecord()
     begin
-        if not IsNullGuid(Rec."Service Password") then
-            Password := '*';
+        Password := '';
+        if WebServiceAuthHelper.HasApiPassword(Rec."Service Password") then
+            Password := '***';
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -114,6 +159,10 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
     end;
 
     var
+
+        [InDataSet]
+        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text000: Label 'Error in Global POS Sales Setup\\Close anway?';
         Text001: Label 'Global POS Sales Setup validated successfully';
         Password: Text[200];

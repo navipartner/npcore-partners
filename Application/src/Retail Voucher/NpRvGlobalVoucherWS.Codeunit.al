@@ -1,6 +1,8 @@
 ﻿codeunit 6151020 "NPR NpRv Global Voucher WS"
 {
     var
+        [NonDebuggable]
+        ServicePassword: Text;
         Text000: Label 'Invalid Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
         Text002: Label 'Insufficient Remaining Voucher Amount %1';
@@ -14,26 +16,30 @@
         TempNpRvPartnerRelation: Record "NPR NpRv Partner Relation" temporary;
     begin
         retail_voucher_partners.Import();
-        retail_voucher_partners.GetSourceTables(TempNpRvPartner, TempNpRvPartnerRelation);
+        retail_voucher_partners.GetSourceTables(TempNpRvPartner, TempNpRvPartnerRelation, ServicePassword);
 
         if not TempNpRvPartner.FindSet() then
             exit;
 
         repeat
-            UpsertPartner(TempNpRvPartner, TempNpRvPartnerRelation);
+            UpsertPartner(TempNpRvPartner, TempNpRvPartnerRelation, ServicePassword);
         until TempNpRvPartner.Next() = 0;
     end;
 
-    local procedure UpsertPartner(var TempNpRvPartner: Record "NPR NpRv Partner" temporary; var TempNpRvPartnerRelation: Record "NPR NpRv Partner Relation" temporary)
+    [NonDebuggable]
+    local procedure UpsertPartner(var TempNpRvPartner: Record "NPR NpRv Partner" temporary; var TempNpRvPartnerRelation: Record "NPR NpRv Partner Relation" temporary; ServicePassword: Text)
     var
         NpRvPartner: Record "NPR NpRv Partner";
         NpRvPartnerRelation: Record "NPR NpRv Partner Relation";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         PrevRec: Text;
     begin
         if not NpRvPartner.Get(TempNpRvPartner.Code) then begin
             NpRvPartner.Init();
             NpRvPartner := TempNpRvPartner;
             NpRvPartner.Insert(true);
+            WebServiceAuthHelper.SetApiPassword(ServicePassword, NpRvPartner."API Password Key");
+            NpRvPartner.Modify();
         end;
 
         PrevRec := Format(NpRvPartner);
@@ -444,17 +450,16 @@
 
     procedure InvokeRedeemPartnerVouchers(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
         NpRvPartner: Record "NPR NpRv Partner";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Client: HttpClient;
-        RequestContent: HttpContent;
+        RequestMessage: HttpRequestMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
         ContentHeader: HttpHeaders;
-        RequesHeader: HttpHeaders;
-        Response: HttpResponseMessage;
-        Document: XmlDocument;
-        Node: XmlNode;
+        ResponseMessage: HttpResponseMessage;
         RequestXmlText: Text;
-        ErrorMessage: Text;
+        ResponseText: Text;
     begin
         if NpRvVoucherBuffer."Issue Partner Code" = NpRvVoucherBuffer."Redeem Partner Code" then
             exit;
@@ -482,30 +487,25 @@
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(RequestXmlText);
-        RequestContent.GetHeaders(ContentHeader);
+        RequestMessage.GetHeaders(RequestHeaders);
+        RequestHeaders.Remove('Connection');
 
+        NpRvPartner.SetRequestHeadersAuthorization(RequestHeaders);
+
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
         ContentHeader.Clear();
         ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
         ContentHeader.Add('SOAPAction', 'RedeemPartnerVouchers');
 
-        RequesHeader := Client.DefaultRequestHeaders();
-        if RequesHeader.Contains('Connection') then
-            ContentHeader.Remove('Connection');
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvPartner."Service Url");
 
-        ContentHeader := Client.DefaultRequestHeaders();
-
-        Client.UseWindowsAuthentication(NpRvPartner."Service Username", NpRvPartner."Service Password");
-        Client.Post(NpRvPartner."Service Url", RequestContent, Response);
-
-        if not Response.IsSuccessStatusCode then begin
-            Response.Content.ReadAs(ErrorMessage);
-            if XmlDocument.ReadFrom(ErrorMessage, Document) then begin
-                if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
-                    ErrorMessage := Node.AsXmlElement().InnerText();
-            end;
-            Error(CopyStr(ErrorMessage, 1, 1000));
+        Client.Send(RequestMessage, ResponseMessage);
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            ResponseMessage.Content.ReadAs(ResponseText);
+            NpRvModuleValidGlobal.ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
         end;
     end;
 

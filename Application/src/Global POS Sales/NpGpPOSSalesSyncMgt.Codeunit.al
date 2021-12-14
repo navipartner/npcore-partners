@@ -12,21 +12,17 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         end;
     end;
 
-    var
-        ServicePasswordErr: Label 'Please check there is a password set up in %1', Comment = '%1=POSSalesSetupCard.Caption()';
-
     procedure ExportPOSEntry(var NcTask: Record "NPR Nc Task")
     var
         POSEntry: Record "NPR POS Entry";
         NpGpGlobalSalesSetup: Record "NPR NpGp POS Sales Setup";
         POSUnit: Record "NPR POS Unit";
-        ServicePassword: Text;
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        NpGpPOSSalesSetupCard: Page "NPR NpGp POS Sales Setup Card";
-        WebRequest: HttpRequestMessage;
-        WebResponse: HttpResponseMessage;
-        WebClient: HttpClient;
-        Headers: HttpHeaders;
+        RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
+        Client: HttpClient;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
         ContentHeaders: HttpHeaders;
         XmlDoc: XmlDocument;
         OutStr: OutStream;
@@ -61,32 +57,30 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
 
         Commit();
 
-        if not IsolatedStorage.Get(NpGpGlobalSalesSetup."Service Password", DataScope::Company, ServicePassword) then
-            Error(ServicePasswordErr, NpGpPOSSalesSetupCard.Caption());
-
-        WebRequest.SetRequestUri(NpGpGlobalSalesSetup."Service Url");
-        WebRequest.Method := 'POST';
-
         XmlDoc.WriteTo(XmlText);
-        WebRequest.Content.WriteFrom(XmlText);
+        RequestMessage.Content.WriteFrom(XmlText);
 
-        WebRequest.GetHeaders(Headers);
-        WebRequest.Content.GetHeaders(ContentHeaders);
+        RequestMessage.GetHeaders(RequestHeaders);
+        RequestMessage.Content.GetHeaders(ContentHeaders);
 
         if ContentHeaders.Contains('Content-Type') then
             ContentHeaders.Remove('Content-Type');
         ContentHeaders.Add('Content-Type', 'text/xml; charset=utf-8');
 
-        if Headers.Contains('SOAPAction') then
-            Headers.Remove('SOAPAction');
-        Headers.Add('SOAPAction', 'InsertPosSalesEntries');
-        WebClient.UseWindowsAuthentication(NpGpGlobalSalesSetup."Service Username", ServicePassword);
+        if RequestHeaders.Contains('SOAPAction') then
+            RequestHeaders.Remove('SOAPAction');
+        RequestHeaders.Add('SOAPAction', 'InsertPosSalesEntries');
 
-        WebClient.Send(WebRequest, WebResponse);
-        if not WebResponse.IsSuccessStatusCode then
-            Error(WebResponse.ReasonPhrase);
+        NpGpGlobalSalesSetup.SetRequestHeadersAuthorization(RequestHeaders);
 
-        WebResponse.Content.ReadAs(Response);
+        RequestMessage.SetRequestUri(NpGpGlobalSalesSetup."Service Url");
+        RequestMessage.Method := 'POST';
+
+        Client.Send(RequestMessage, ResponseMessage);
+        if not ResponseMessage.IsSuccessStatusCode then
+            Error(ResponseMessage.ReasonPhrase);
+
+        ResponseMessage.Content.ReadAs(Response);
 
         NcTask.Response.CreateOutStream(OutStr, TEXTENCODING::UTF8);
         OutStr.WriteText(NpXmlDomMgt.PrettyPrintXml(Response));
@@ -237,24 +231,25 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
     [TryFunction]
     procedure TryGetGlobalPosSalesService(NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
     var
-        ServicePassword: Text;
-        WebRequest: HttpRequestMessage;
-        WebResponse: HttpResponseMessage;
-        WebClient: HttpClient;
+        RequestMessage: HttpRequestMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
+        Client: HttpClient;
     begin
         NpGpPOSSalesSetup.TestField("Service Url");
 
-        IsolatedStorage.Get(NpGpPOSSalesSetup."Service Password", DataScope::Company, ServicePassword);
+        RequestMessage.GetHeaders(RequestHeaders);
+        RequestHeaders.Remove('Connection');
 
-        WebRequest.SetRequestUri(NpGpPOSSalesSetup."Service Url");
-        WebRequest.Method := 'GET';
-        WebClient.UseWindowsAuthentication(NpGpPOSSalesSetup."Service Username", ServicePassword);
+        NpGpPOSSalesSetup.SetRequestHeadersAuthorization(RequestHeaders);
 
-        WebClient.Send(WebRequest, WebResponse);
-        if WebResponse.IsSuccessStatusCode then
-            exit
-        else
-            Error(WebResponse.ReasonPhrase);
+        RequestMessage.Method := 'GET';
+        RequestMessage.SetRequestUri(NpGpPOSSalesSetup."Service Url");
+
+        Client.Send(RequestMessage, ResponseMessage);
+        if not ResponseMessage.IsSuccessStatusCode then
+            Error(ResponseMessage.ReasonPhrase);
     end;
 
     local procedure XmlEscape(Input: Text) Output: Text

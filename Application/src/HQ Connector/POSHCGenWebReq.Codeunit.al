@@ -117,8 +117,6 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
     procedure WebServiceApi(EndpointSetup: Record "NPR POS HC Endpoint Setup"; SoapAction: Text; XmlDocInText: Text; var XmlElementOut: XmlElement; var ResponseXmlText: Text): Boolean
     var
         XMLDomManagement: Codeunit "XML DOM Management";
-        Base64Convert: codeunit "Base64 Convert";
-        B64Credential: Text;
         XmlDocOut: XmlDocument;
         Client: HttpClient;
         RequestContent: HttpContent;
@@ -126,22 +124,13 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
         Request: HttpRequestMessage;
         RequestHeaders: HttpHeaders;
         Response: HttpResponseMessage;
-        BasicAuthLbl: Label 'Basic %1', Locked = true;
-        Base64ConvertCredentialsLbl: Label '%1:%2', Locked = true;
         SoapActionLbl: Label '"%1"', Locked = true;
         ResponseLbl: Label '<responseStatus><responseCode>%1</responseCode><responseDescription>%2 - %3</responseDescription></responseStatus>', Locked = true;
     begin
         Request.GetHeaders(RequestHeaders);
         RequestHeaders.Remove('Connection');
 
-        case EndpointSetup."Credentials Type" of
-            EndpointSetup."Credentials Type"::NAMED:
-                begin
-                    B64Credential := Base64Convert.ToBase64(StrSubstNo(Base64ConvertCredentialsLbl, EndpointSetup."User Account", EndpointSetup."User Password"));
-                    RequestHeaders.Add('Authorization', StrSubstNo(BasicAuthLbl, B64Credential));
-                end;
-            else
-        end;
+        EndpointSetup.SetRequestHeadersAuthorization(RequestHeaders);
 
         Request.Method('POST');
         Request.SetRequestUri(EndpointSetup."Endpoint URI");

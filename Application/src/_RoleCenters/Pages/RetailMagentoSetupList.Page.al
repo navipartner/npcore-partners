@@ -73,17 +73,22 @@ page 6151242 "NPR Retail Magento Setup List"
                     ToolTip = 'Specifies the value of the Api Url field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Api Username Type"; Rec."Api Username Type")
+                field(AuthType; Rec.AuthType)
                 {
-
-                    ToolTip = 'Specifies the value of the Api Username Type field';
                     ApplicationArea = NPRRetail;
+                    Tooltip = 'Specifies the Authorization Type.';
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update();
+                    end;
                 }
                 field("Api Username"; Rec."Api Username")
                 {
 
                     ToolTip = 'Specifies the value of the Api Username field';
                     ApplicationArea = NPRRetail;
+                    Visible = IsBasicAuthVisible;
                 }
                 field(Password; Password)
                 {
@@ -92,32 +97,33 @@ page 6151242 "NPR Retail Magento Setup List"
                     ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Api Password field';
                     ApplicationArea = NPRRetail;
+                    Visible = IsBasicAuthVisible;
 
                     trigger OnValidate()
                     begin
-                        Rec.SetApiPassword(Password);
+                        if Password <> '' then
+                            WebServiceAuthHelper.SetApiPassword(Password, Rec."Api Password Key")
+                        else begin
+                            if WebServiceAuthHelper.HasApiPassword(Rec."Api Password Key") then
+                                WebServiceAuthHelper.RemoveApiPassword(Rec."Api Password Key");
+                        end;
+
                         Commit();
                     end;
                 }
+
+                field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the OAuth2.0 Setup Code.';
+                    Visible = IsOAuth2Visible;
+                }
+
                 field("Api Authorization"; Rec."Api Authorization")
                 {
-
                     ToolTip = 'Specifies the value of the Api Authorization field';
                     ApplicationArea = NPRRetail;
-                }
-                field(NavPassword; NavPassword)
-                {
-
-                    Caption = 'Managed Nav Api Password';
-                    ExtendedDatatype = Masked;
-                    ToolTip = 'Specifies the value of the Managed Nav Api Password field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-                        Rec.SetNavApiPassword(NavPassword);
-                        Commit();
-                    end;
+                    Visible = IsCustomAuthVisible;
                 }
                 field("Brands Enabled"; Rec."Brands Enabled")
                 {
@@ -291,17 +297,23 @@ page 6151242 "NPR Retail Magento Setup List"
             }
         }
     }
+
+    trigger OnOpenPage()
+    begin
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible);
+    end;
+
     trigger OnAfterGetRecord()
     begin
         Password := '';
-        NavPassword := '';
-        if not IsNullGuid(Rec."Api Password Key") then
+        if WebServiceAuthHelper.HasApiPassword(Rec."Api Password Key") then
             Password := '***';
-        if not IsNullGuid(Rec."Managed Nav Api Password Key") then
-            NavPassword := '***';
+
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible);
     end;
 
     var
         Password: Text[200];
-        NavPassword: Text;
+        IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible : Boolean;
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
 }

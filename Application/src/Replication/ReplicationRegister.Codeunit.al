@@ -254,10 +254,15 @@ codeunit 6014608 "NPR Replication Register"
     local procedure RegisterServiceWithEndPoints(sender: Record "NPR Replication Service Setup")
     var
         ReplicationAPI: Codeunit "NPR Replication API";
+        BaseURLAPI: Text[100];
+        Tenant: Text[50];
     begin
+        BaseURLAPI := GetAPIServiceURL();
+        Tenant := GetTenant();
+
         // ITEM
         sender.RegisterService(ItemsServiceCodeLbl,
-            GetAPIServiceURL(), ItemsServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
+            BaseURLAPI, ItemsServiceNameLbl, false, "NPR API Auth. Type"::Basic, Tenant);
         RegisterItemServiceEndPoints();
         if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -266,7 +271,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // CUSTOMER
         sender.RegisterService(CustServiceCodeLbl,
-            GetAPIServiceURL(), CustServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
+            BaseURLAPI, CustServiceNameLbl, false, "NPR API Auth. Type"::Basic, Tenant);
         RegisterCustServiceEndPoints();
         if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -275,7 +280,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // VENDOR
         sender.RegisterService(VendServiceCodeLbl,
-            GetAPIServiceURL(), VendServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
+            BaseURLAPI, VendServiceNameLbl, false, "NPR API Auth. Type"::Basic, Tenant);
         RegisterVendServiceEndPoints();
         if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -284,7 +289,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // NP RETAIL
         sender.RegisterService(NPRetailServiceCodeLbl,
-            GetAPIServiceURL(), NPRetailServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
+            BaseURLAPI, NPRetailServiceNameLbl, false, "NPR API Auth. Type"::Basic, Tenant);
         RegisterNPRetailServiceEndPoints();
         if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -293,7 +298,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // DIMENSIONS
         sender.RegisterService(DimensionsServiceCodeLbl,
-            GetAPIServiceURL(), DimensionsServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
+            BaseURLAPI, DimensionsServiceNameLbl, false, "NPR API Auth. Type"::Basic, Tenant);
         RegisterDimensionsServiceEndPoints();
         if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -302,7 +307,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // MISC
         sender.RegisterService(MiscServiceCodeLbl,
-            GetAPIServiceURL(), MiscServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
+            BaseURLAPI, MiscServiceNameLbl, false, "NPR API Auth. Type"::Basic, Tenant);
         RegisterMiscellaneousServiceEndPoints();
         if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -1327,9 +1332,23 @@ codeunit 6014608 "NPR Replication Register"
 
     #endregion
 
-    local procedure GetAPIServiceURL(): Text
+    local procedure GetAPIServiceURL() BaseURL: Text
     begin
-        Exit(GetUrl(ClientType::Api).TrimEnd('/'));
+        BaseURL := GetUrl(ClientType::Api).TrimEnd('/');
+        IF BaseURL.ToLower().Contains('?tenant=') then
+            BaseUrl := BaseURL.Remove(BaseURL.ToLower().IndexOf('?tenant='), StrLen(BaseURL) - BaseURL.ToLower().IndexOf('?tenant=') + 1).TrimEnd('/'); // remove tenant
     end;
+
+    local procedure GetTenant() Tenant: Text
+    var
+        BaseURL: Text;
+    begin
+        BaseURL := GetUrl(ClientType::Api);
+        IF BaseURL.ToLower().Contains('?tenant=') then
+            Tenant := BaseURL.Substring(BaseURL.ToLower().IndexOf('?tenant='), StrLen(BaseURL) - BaseURL.ToLower().IndexOf('?tenant=') + 1).Replace('?tenant=', '')
+        Else
+            tenant := 'DEFAULT'
+    end;
+
 }
 

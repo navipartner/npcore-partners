@@ -203,7 +203,9 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
         Content: HttpContent;
-        Headers: HttpHeaders;
+        ContentHeaders: HttpHeaders;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
         Response: HttpResponseMessage;
         InStr: InStream;
         ExceptionMessage: Text;
@@ -251,21 +253,25 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
         Method := NpXmlDomMgt.GetElementText(Element, '//method', 0, true);
 
         Content.WriteFrom(ReqBody);
-        Content.GetHeaders(Headers);
-        Headers.Remove('Content-Type');
-        Headers.Add('Content-Type', ContentType);
+        Content.GetHeaders(ContentHeaders);
+        ContentHeaders.Remove('Content-Type');
+        ContentHeaders.Add('Content-Type', ContentType);
 
         Document.SelectNodes('//headers/header', NodeList);
         foreach Node in NodeList do begin
             AttributeCollection := Node.AsXmlElement().Attributes();
             AttributeCollection.Get('name', Attribute);
-            Headers.Add(Attribute.Value, Node.AsXmlElement().InnerText);
+            ContentHeaders.Add(Attribute.Value, Node.AsXmlElement().InnerText);
         end;
+
+        RequestMessage.GetHeaders(RequestHeaders);
+        RequestHeaders.Remove('Connection');
+
+        NpCsStore.SetRequestHeadersAuthorization(RequestHeaders);
 
         RequestMessage.Content(Content);
         RequestMessage.Method(Method);
         RequestMessage.SetRequestUri(NpCsStore."Service Url");
-        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
         Client.Send(RequestMessage, Response);
 
         if not Response.IsSuccessStatusCode then begin

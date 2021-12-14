@@ -151,6 +151,7 @@
         NpXmlDomMgt.AddAttribute(XmlElementTable, 'table_name', Format(RecRef.Name, 0, 9));
 
         Field.SetRange(TableNo, RecRef.Number);
+        Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
         if Field.FindSet() then
             repeat
                 FieldRef := RecRef.Field(Field."No.");
@@ -224,7 +225,6 @@
             exit(false);
 
         if not NpXmlTemplate.Get(TemplateCode) then begin
-            Client.UseDefaultNetworkWindowsAuthentication();
             Client.Get(TemplateUrl + LowerCase(TemplateCode) + '.xml', Response);
 
             if Response.IsSuccessStatusCode then begin
@@ -292,7 +292,8 @@
             foreach Node in NodeList do begin
                 XmlElementField := Node.AsXmlElement();
                 NpXmlDomMgt.GetAttributeFromElement(XmlElementField, 'field_no', Attribute, true);
-                if Evaluate(FieldID, Attribute.Value, 9) and Field.Get(TableID, FieldID) then begin
+                if Evaluate(FieldID, Attribute.Value, 9) and Field.Get(TableID, FieldID) and
+                 not (Field.ObsoleteState = Field.ObsoleteState::Removed) then begin
                     FieldReference := RecRef.Field(FieldID);
                     //-=Temporary disabled as we haven't updated yet our xml templates with new table names=-
                     //if XmlElementField.GetAttribute('field_name') = Format(FieldRef.Name, 0, 9) then

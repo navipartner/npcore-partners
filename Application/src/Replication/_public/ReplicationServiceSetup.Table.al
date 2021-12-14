@@ -239,7 +239,6 @@ table 6014588 "NPR Replication Service Setup"
     }
 
     var
-        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         RenameNotAllowedErr: Label 'Rename not allowed. Instead, delete and recreate record.';
         ExternalURLErr: Label 'Service Base URL must refer to an external database.', Locked = true;
         InternalURLErr: Label 'Service Base URL must refer to internal database.', Locked = true;
@@ -249,6 +248,7 @@ table 6014588 "NPR Replication Service Setup"
     var
         ServiceEndPoint: Record "NPR Replication Endpoint";
         ReplicationAPI: Codeunit "NPR Replication API";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
         ServiceEndPoint.Setrange("Service Code", Rec."API Version");
         if not ServiceEndPoint.IsEmpty() then
@@ -315,6 +315,7 @@ table 6014588 "NPR Replication Service Setup"
                         ReplicationEndpoint2.Init();
                         ReplicationEndpoint2 := ReplicationEndpoint;
                         ReplicationEndpoint2."Service Code" := Rec."API Version";
+                        ReplicationEndpoint2."Replication Counter" := 0;
                         ReplicationEndpoint2.Insert(true);
                         SpecialFieldMapping.CopyFromEndpointToEndpoint(ReplicationEndpoint, ReplicationEndpoint2);
                     end;
@@ -324,21 +325,10 @@ table 6014588 "NPR Replication Service Setup"
 
     procedure FillExternalCompany()
     var
-        iAuth: Interface "NPR API IAuthorization";
         TempCompany: Record Company temporary;
-        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
     begin
         Rec.TestField(Enabled, false);
         Rec.TestField("Service URL");
-        iAuth := Rec.AuthType;
-        case Rec.AuthType of
-            Rec.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec.UserName, Rec."API Password Key", AuthParamsBuff);
-            Rec.AuthType::OAuth2:
-                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
-        end;
-
-        iAuth.CheckMandatoryValues(AuthParamsBuff);
         if GetExternalCompany(TempCompany) then begin
             Rec.Validate("From Company Name - External", TempCompany.Name);
             Rec.Validate("From Company ID - External", TempCompany.Id);
@@ -360,7 +350,6 @@ table 6014588 "NPR Replication Service Setup"
 
     procedure GetExternalCompany(var TempCompany: Record Company temporary): Boolean
     var
-        iAuth: Interface "NPR API IAuthorization";
         ReplicationAPI: Codeunit "NPR Replication API";
         Client: HttpClient;
         [NonDebuggable]
@@ -374,13 +363,11 @@ table 6014588 "NPR Replication Service Setup"
         JToken: JsonToken;
         JArray: JsonArray;
         i: Integer;
-        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
     begin
         TempCompany.Reset();
         if not TempCompany.IsEmpty then
             TempCompany.DeleteAll();
 
-        iAuth := Rec.AuthType;
         RequestMessage.Method := 'GET';
         URI := Rec."Service URL" + '/v2.0/companies';
         AddTenantToURL(URI);
@@ -388,13 +375,8 @@ table 6014588 "NPR Replication Service Setup"
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
 
-        case Rec.AuthType of
-            Rec.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec.UserName, Rec."API Password Key", AuthParamsBuff);
-            Rec.AuthType::OAuth2:
-                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
-        end;
-        iAuth.SetAuthorizationValue(Headers, AuthParamsBuff);
+        Rec.SetRequestHeadersAuthorization(Headers);
+
         if not ReplicationAPI.IsSuccessfulRequest(Client.Send(RequestMessage, ResponseMessage), ResponseMessage, ErrorTxt, StatusCode) then
             Error(ErrorTxt);
 
@@ -430,7 +412,6 @@ table 6014588 "NPR Replication Service Setup"
 
     procedure TestConnection()
     var
-        iAuth: Interface "NPR API IAuthorization";
         ReplicationAPI: Codeunit "NPR Replication API";
         Client: HttpClient;
         [NonDebuggable]
@@ -443,18 +424,9 @@ table 6014588 "NPR Replication Service Setup"
         ResponseText: Text;
         Response: Codeunit "Temp Blob";
         OutStr: OutStream;
-        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
     begin
         Rec."Service URL" := COPYSTR(ReplicationAPI.VerifyServiceURL(Rec."Service URL"), 1, MaxStrLen(Rec."Service URL"));
         CheckFromCompany();
-        iAuth := Rec.AuthType;
-        case Rec.AuthType of
-            Rec.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec.UserName, Rec."API Password Key", AuthParamsBuff);
-            Rec.AuthType::OAuth2:
-                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
-        end;
-        iAuth.CheckMandatoryValues(AuthParamsBuff);
 
         RequestMessage.Method := 'GET';
         URI := Rec."Service URL" + '/v2.0/companies';
@@ -462,8 +434,9 @@ table 6014588 "NPR Replication Service Setup"
 
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
-        iAuth := Rec.AuthType;
-        iAuth.SetAuthorizationValue(Headers, AuthParamsBuff);
+
+        Rec.SetRequestHeadersAuthorization(Headers);
+
         if not ReplicationAPI.IsSuccessfulRequest(Client.Send(RequestMessage, ResponseMessage), ResponseMessage, ErrorTxt, StatusCode) then
             Error(ErrorTxt);
 
@@ -495,6 +468,23 @@ table 6014588 "NPR Replication Service Setup"
             else
                 URI += '/?tenant=' + "From Company Tenant";
         end;
+    end;
+
+    procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
+    var
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        iAuth: Interface "NPR API IAuthorization";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+    begin
+        iAuth := Rec.AuthType;
+        case Rec.AuthType of
+            Rec.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec.UserName, Rec."API Password Key", AuthParamsBuff);
+            Rec.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
+        end;
+        iAuth.CheckMandatoryValues(AuthParamsBuff);
+        iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
     end;
 
     [IntegrationEvent(true, false)]

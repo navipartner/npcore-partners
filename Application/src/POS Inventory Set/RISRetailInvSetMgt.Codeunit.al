@@ -145,9 +145,6 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
         Response: Text;
         WsNamespace: Text;
         XmlString: Text;
-        iAuth: Interface "NPR API IAuthorization";
-        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
-        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
     begin
         TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
 
@@ -193,15 +190,8 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
         Headers.Add('SOAPAction', 'GetItemInventory');
 
         HttpWebRequest.GetHeaders(HeadersReq);
-        iAuth := RetailInventorySetEntry.AuthType;
-        case RetailInventorySetEntry.AuthType of
-            RetailInventorySetEntry.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(RetailInventorySetEntry."Api Username", RetailInventorySetEntry."API Password Key", AuthParamsBuff);
-            RetailInventorySetEntry.AuthType::OAuth2:
-                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(RetailInventorySetEntry."OAuth2 Setup Code", AuthParamsBuff);
-        end;
-        iAuth.CheckMandatoryValues(AuthParamsBuff);
-        iAuth.SetAuthorizationValue(HeadersReq, AuthParamsBuff);
+
+        RetailInventorySetEntry.SetRequestHeadersAuthorization(HeadersReq);
 
         HttpWebRequest.Content(Content);
         HttpWebRequest.SetRequestUri(RetailInventorySetEntry."Api Url");
@@ -257,10 +247,7 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
 
     local procedure RequestInventoryOData(RetailInventorySetEntry: Record "NPR RIS Retail Inv. Set Entry"; var RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer")
     var
-        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
         TempBlob: Codeunit "Temp Blob";
-        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
-        iAuth: Interface "NPR API IAuthorization";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Client: HttpClient;
@@ -295,15 +282,8 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
         OnPrepareRequestFilter(UrlBuilder, RetailInventoryBuffer, RetailInventorySetEntry);
 
         HttpWebRequest.GetHeaders(Headers);
-        iAuth := RetailInventorySetEntry.AuthType;
-        case RetailInventorySetEntry.AuthType of
-            RetailInventorySetEntry.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(RetailInventorySetEntry."Api Username", RetailInventorySetEntry."API Password Key", AuthParamsBuff);
-            RetailInventorySetEntry.AuthType::OAuth2:
-                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(RetailInventorySetEntry."OAuth2 Setup Code", AuthParamsBuff);
-        end;
-        iAuth.CheckMandatoryValues(AuthParamsBuff);
-        iAuth.SetAuthorizationValue(Headers, AuthParamsBuff);
+
+        RetailInventorySetEntry.SetRequestHeadersAuthorization(Headers);
 
         Url := UrlBuilder.ToText();
         HttpWebRequest.SetRequestUri(Url);

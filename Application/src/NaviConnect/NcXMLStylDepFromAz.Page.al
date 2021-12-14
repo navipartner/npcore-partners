@@ -89,7 +89,6 @@ page 6151511 "NPR Nc XML Styl. Dep. From Az."
             if not Confirm(Text001) then
                 exit;
 
-        Client.UseDefaultNetworkWindowsAuthentication();
         Client.Get(TemplateUrl + XmlStylesheet, Response);
 
         if Response.IsSuccessStatusCode then begin

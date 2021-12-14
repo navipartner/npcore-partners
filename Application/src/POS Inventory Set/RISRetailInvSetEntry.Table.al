@@ -217,4 +217,21 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
         if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
             WebServiceAuthHelper.RemoveApiPassword("API Password Key");
     end;
+
+    procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
+    var
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        iAuth: Interface "NPR API IAuthorization";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+    begin
+        iAuth := Rec.AuthType;
+        case Rec.AuthType of
+            Rec.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(copystr(Rec."Api Username", 1, 50), Rec."API Password Key", AuthParamsBuff);
+            Rec.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
+        end;
+        iAuth.CheckMandatoryValues(AuthParamsBuff);
+        iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
+    end;
 }

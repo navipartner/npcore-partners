@@ -390,37 +390,74 @@ page 6151551 "NPR NpXml Template Card"
                             ApplicationArea = NPRRetail;
                         }
                     }
-                    field("API Username Type"; Rec."API Username Type")
+                    group(Authorization)
                     {
+                        Caption = 'Authorization';
+                        field(AuthType; Rec.AuthType)
+                        {
+                            ApplicationArea = NPRRetail;
+                            Tooltip = 'Specifies the Authorization Type.';
 
-                        ToolTip = 'Specifies the value of the API Username Type field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("API Username"; Rec."API Username")
-                    {
+                            trigger OnValidate()
+                            begin
+                                CurrPage.Update();
+                            end;
+                        }
+                        group(BasicAuth)
+                        {
+                            ShowCaption = false;
+                            Visible = IsBasicAuthVisible;
+                            field("API Username"; Rec."API Username")
+                            {
+                                Enabled = false;
+                                ToolTip = 'Specifies the value of the API Username field';
+                                ApplicationArea = NPRRetail;
+                            }
+                            field("API Password"; pw)
+                            {
+                                ToolTip = 'Specifies the value of the User Password field';
+                                ApplicationArea = NPRRetail;
+                                Caption = 'API Password';
+                                ExtendedDatatype = Masked;
+                                trigger OnValidate()
+                                begin
+                                    if pw <> '' then
+                                        WebServiceAuthHelper.SetApiPassword(pw, Rec."API Password Key")
+                                    else begin
+                                        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+                                            WebServiceAuthHelper.RemoveApiPassword(Rec."API Password Key");
+                                    end;
+                                end;
+                            }
+                        }
+                        group(OAuth2)
+                        {
+                            ShowCaption = false;
+                            Visible = IsOAuth2Visible;
+                            field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
+                            {
+                                ApplicationArea = NPRRetail;
+                                ToolTip = 'Specifies the OAuth2.0 Setup Code.';
+                            }
+                        }
 
-                        Enabled = Rec."API Username Type" = Rec."API Username Type"::Custom;
-                        ToolTip = 'Specifies the value of the API Username field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("API Password"; Rec."API Password")
-                    {
+                        group(CustomAuth)
+                        {
+                            ShowCaption = false;
+                            Visible = IsCustomAuthVisible;
+                            field("API Authorization"; Rec."API Authorization")
+                            {
+                                ToolTip = 'Specifies the value of the API Authorization field';
+                                ApplicationArea = NPRRetail;
+                            }
+                        }
 
-                        ToolTip = 'Specifies the value of the API Password field';
-                        ApplicationArea = NPRRetail;
                     }
                     field("API Content-Type"; Rec."API Content-Type")
                     {
 
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the API Content-Type field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("API Authorization"; Rec."API Authorization")
-                    {
-
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the API Authorization field';
                         ApplicationArea = NPRRetail;
                     }
                     field("API Accept"; Rec."API Accept")
@@ -671,6 +708,19 @@ page 6151551 "NPR NpXml Template Card"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible);
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        pw := '';
+        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+            pw := '***';
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible);
+    end;
+
     trigger OnAfterGetCurrRecord()
     begin
         CurrPage.NpXmlBatchFilters.PAGE.SetParentTableNo(Rec."Table No.");
@@ -679,6 +729,12 @@ page 6151551 "NPR NpXml Template Card"
     end;
 
     var
+        [InDataSet]
+        pw: Text[200];
+
+        [InDataSet]
+        IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible : Boolean;
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
         NpXmlTemplateTriggersVisible: Boolean;
         NpXmlBatchFiltersVisible: Boolean;

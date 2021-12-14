@@ -109,6 +109,7 @@ page 6151087 "NPR RIS Retail Inv. Set Sub."
 
     trigger OnAfterGetRecord()
     begin
+        pw := '';
         if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
             pw := '***';
         WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);

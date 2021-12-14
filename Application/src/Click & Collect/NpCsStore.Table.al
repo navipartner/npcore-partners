@@ -91,6 +91,13 @@ table 6151195 "NPR NpCs Store"
             Caption = 'Service Url';
             DataClassification = CustomerContent;
         }
+
+        field(106; AuthType; Enum "NPR API Auth. Type")
+        {
+            Caption = 'Auth. Type';
+            DataClassification = CustomerContent;
+        }
+
         field(110; "Service Username"; Text[250])
         {
             Caption = 'Service Username';
@@ -100,6 +107,21 @@ table 6151195 "NPR NpCs Store"
         {
             Caption = 'Service Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Isolated Storage';
+        }
+
+        field(116; "API Password Key"; GUID)
+        {
+            Caption = 'API Password Key';
+            DataClassification = EndUserPseudonymousIdentifiers;
+        }
+
+        field(117; "OAuth2 Setup Code"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            TableRelation = "NPR OAuth Setup";
+            Caption = 'OAuth2.0 Setup Code';
         }
         field(120; "Geolocation Latitude"; Code[50])
         {
@@ -307,6 +329,7 @@ table 6151195 "NPR NpCs Store"
     var
         NpCsStorePOSRelation: Record "NPR NpCs Store POS Relation";
         NpCsStoreWorkflowRelation: Record "NPR NpCs Store Workflow Rel.";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
         NpCsStoreWorkflowRelation.SetRange("Store Code", Code);
         if NpCsStoreWorkflowRelation.FindFirst() then
@@ -315,6 +338,9 @@ table 6151195 "NPR NpCs Store"
         NpCsStorePOSRelation.SetRange("Store Code", Code);
         if NpCsStorePOSRelation.FindFirst() then
             NpCsStorePOSRelation.DeleteAll();
+
+        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+            WebServiceAuthHelper.RemoveApiPassword("API Password Key");
     end;
 
     procedure GetServiceName() ServiceName: Text
@@ -335,5 +361,22 @@ table 6151195 "NPR NpCs Store"
             ServiceName := DelStr(ServiceName, Position);
 
         exit(ServiceName);
+    end;
+
+    procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
+    var
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        iAuth: Interface "NPR API IAuthorization";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+    begin
+        iAuth := Rec.AuthType;
+        case Rec.AuthType of
+            Rec.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(COPYSTR(Rec."Service Username", 1, 50), Rec."API Password Key", AuthParamsBuff);
+            Rec.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
+        end;
+        iAuth.CheckMandatoryValues(AuthParamsBuff);
+        iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
     end;
 }

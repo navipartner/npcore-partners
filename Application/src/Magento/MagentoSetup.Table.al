@@ -127,7 +127,21 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Api Username Type';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not supported anymore. Replaced with Basic or OAuth2.0';
         }
+
+        field(66; AuthType; Enum "NPR API Auth. Type")
+        {
+            Caption = 'Auth. Type';
+            InitValue = Custom;
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                Rec."Api Username" := GetApiUsername();
+            end;
+        }
+
         field(70; "Api Username"; Text[250])
         {
             Caption = 'Api Username';
@@ -150,6 +164,13 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Api Authorization';
             DataClassification = CustomerContent;
+        }
+
+        field(78; "OAuth2 Setup Code"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            TableRelation = "NPR OAuth Setup";
+            Caption = 'OAuth2.0 Setup Code';
         }
         field(80; "Managed Nav Modules Enabled"; Boolean)
         {
@@ -184,6 +205,8 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Managed Nav Api Password Key';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(98; "Version No."; Text[50])
         {
@@ -859,46 +882,17 @@ table 6151401 "NPR Magento Setup"
         Clear("Api Password Key");
     end;
 
-    [NonDebuggable]
-    procedure SetNavApiPassword(NewPassword: Text)
-    begin
-        if IsNullGuid("Managed Nav Api Password Key") then
-            "Managed Nav Api Password Key" := CreateGuid();
-        if not EncryptionEnabled() then
-            IsolatedStorage.Set("Managed Nav Api Password Key", NewPassword, DataScope::Company)
-        else
-            IsolatedStorage.SetEncrypted("Managed Nav Api Password Key", NewPassword, DataScope::Company);
-    end;
-
-    [NonDebuggable]
-    procedure GetNavApiPassword() PasswordValue: Text
-    begin
-        IsolatedStorage.Get("Managed Nav Api Password Key", DataScope::Company, PasswordValue);
-    end;
-
-    [NonDebuggable]
-    procedure HasNavApiPassword(): Boolean
-    begin
-        exit(GetNavApiPassword() <> '');
-    end;
-
-    procedure RemoveNavApiPassword()
-    begin
-        IsolatedStorage.Delete("Managed Nav Api Password Key", DataScope::Company);
-        Clear("Managed Nav Api Password Key");
-    end;
-
     procedure GetApiUsername(): Text[250]
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
     begin
-        case "Api Username Type" of
-            "Api Username Type"::Automatic:
+        case Rec.AuthType of
+            Rec.AuthType::Basic:
                 begin
                     exit(CopyStr(NpXmlMgt.GetAutomaticUsername(), 1, 250));
                 end;
             else
-                exit("Api Username");
+                exit('');
         end;
     end;
 

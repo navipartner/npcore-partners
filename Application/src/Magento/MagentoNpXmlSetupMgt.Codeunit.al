@@ -8,6 +8,7 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoSetup: Record "NPR Magento Setup";
         NcSetup: Record "NPR Nc Setup";
         NpXmlTemplate: Record "NPR NpXml Template";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
         if (TemplateCode = '') or (not MagentoSetup.Get()) then
             exit;
@@ -20,15 +21,11 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         NpXmlTemplate."API Transfer" := true;
         NpXmlTemplate."API Url" := CopyStr(MagentoSetup."Api Url" + NpXmlTemplate."Xml Root Name", 1, MaxStrLen(NpXmlTemplate."API Url"));
         NpXmlTemplate."API Url" := CopyStr(NpXmlTemplate."API Url".Replace('stock_updates', 'stock'), 1, MaxStrLen(NpXmlTemplate."API Url"));
-        case MagentoSetup."Api Username Type" of
-            MagentoSetup."Api Username Type"::Automatic:
-                NpXmlTemplate."API Username Type" := NpXmlTemplate."API Username Type"::Automatic;
-            MagentoSetup."Api Username Type"::Custom:
-                NpXmlTemplate."API Username Type" := NpXmlTemplate."API Username Type"::Custom;
-        end;
+        NpXmlTemplate.AuthType := MagentoSetup.AuthType;
         NpXmlTemplate."API Username" := MagentoSetup."Api Username";
-        NpXmlTemplate."API Password" := CopyStr(MagentoSetup.GetApiPassword(), 1, MaxStrLen(NpXmlTemplate."API Password"));
+        WebServiceAuthHelper.SetApiPassword(MagentoSetup.GetApiPassword(), NpXmlTemplate."API Password Key");
         NpXmlTemplate."API Authorization" := MagentoSetup."Api Authorization";
+        NpXmlTemplate."OAuth2 Setup Code" := MagentoSetup."OAuth2 Setup Code";
         NpXmlTemplate."API Content-Type" := 'naviconnect/xml';
         NpXmlTemplate."API Accept" := 'naviconnect/xml';
         NpXmlTemplate."API Response Path" := '';

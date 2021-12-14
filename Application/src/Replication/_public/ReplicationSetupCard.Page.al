@@ -315,6 +315,7 @@ page 6014495 "NPR Replication Setup Card"
 
     trigger OnAfterGetRecord()
     begin
+        pw := '';
         if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
             pw := '***';
         WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);

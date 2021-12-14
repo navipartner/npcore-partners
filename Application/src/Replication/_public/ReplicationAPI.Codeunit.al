@@ -530,13 +530,9 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         ResponseMessage: HttpResponseMessage;
         OutStr: OutStream;
         ResponseStream: InStream;
-        iAuth: Interface "NPR API IAuthorization";
         ErrorTxt: Text;
         JTokenMainObject: JsonToken;
-        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
-        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
-        iAuth := ReplicationSetup.AuthType;
         Method := 'GET';
 
         RequestMessage.Method := Method;
@@ -544,14 +540,8 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
 
-        case ReplicationSetup.AuthType of
-            ReplicationSetup.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(ReplicationSetup.UserName, ReplicationSetup."API Password Key", AuthParamsBuff);
-            ReplicationSetup.AuthType::OAuth2:
-                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(ReplicationSetup."OAuth2 Setup Code", AuthParamsBuff);
-        end;
+        ReplicationSetup.SetRequestHeadersAuthorization(Headers);
 
-        iAuth.SetAuthorizationValue(Headers, AuthParamsBuff);
         if not ImportImageRequest then
             Headers.Add('Prefer', 'odata.maxpagesize=' + Format(GetODataMaxPageSize(ReplicationEndPoint)));
 

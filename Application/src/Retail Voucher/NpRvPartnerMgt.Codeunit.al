@@ -34,16 +34,15 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
     [TryFunction]
     procedure TryValidateGlobalVoucherService(NpRvPartner: Record "NPR NpRv Partner")
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlDomManagement: Codeunit "XML DOM Management";
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
         Client: HttpClient;
-        RequestContent: HttpContent;
+        RequestMessage: HttpRequestMessage;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
         ContentHeader: HttpHeaders;
-        Response: HttpResponseMessage;
-        Document: XmlDocument;
-        Node: XmlNode;
+        ResponseMessage: HttpResponseMessage;
         RequestXmlText: Text;
-        ErrorMessage: Text;
+        ResponseText: Text;
     begin
         NpRvPartner.TestField("Service Url");
 
@@ -56,26 +55,25 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(RequestXmlText);
-        RequestContent.GetHeaders(ContentHeader);
+        RequestMessage.GetHeaders(RequestHeaders);
 
+        NpRvPartner.SetRequestHeadersAuthorization(RequestHeaders);
+
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
         ContentHeader.Clear();
         ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
         ContentHeader.Add('SOAPAction', 'UpsertPartners');
-        ContentHeader := Client.DefaultRequestHeaders();
 
-        Client.UseWindowsAuthentication(NpRvPartner."Service Username", NpRvPartner."Service Password");
-        Client.Post(NpRvPartner."Service Url", RequestContent, Response);
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvPartner."Service Url");
 
-        if Response.IsSuccessStatusCode then
-            exit;
-
-        ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
-        if XmlDocument.ReadFrom(ErrorMessage, Document) then
-            if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
-                ErrorMessage := Node.AsXmlElement().InnerText();
-        Error(CopyStr(ErrorMessage, 1, 1000));
+        Client.Send(RequestMessage, ResponseMessage);
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            ResponseMessage.Content.ReadAs(ResponseText);
+            NpRvModuleValidGlobal.ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
+        end;
     end;
 
     procedure GetGlobalVoucherWSUrl(ServiceCompanyName: Text) Url: Text

@@ -326,11 +326,8 @@ table 6151551 "NPR NpXml Template"
             Description = 'NC1.09';
             OptionCaption = 'Custom,Automatic';
             OptionMembers = Custom,Automatic;
-
-            trigger OnValidate()
-            begin
-                UpdateApiUsername();
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not supported anymore. Replaced with Auth Type';
         }
         field(5220; "API Username"; Text[250])
         {
@@ -341,7 +338,34 @@ table 6151551 "NPR NpXml Template"
         {
             Caption = 'API Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced with Isolated Storage Password Key';
         }
+
+        field(5235; AuthType; Enum "NPR API Auth. Type")
+        {
+            Caption = 'Auth. Type';
+            InitValue = Custom;
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                UpdateApiUsername();
+            end;
+        }
+
+        field(5236; "API Password Key"; GUID)
+        {
+            Caption = 'User Password Key';
+            DataClassification = EndUserPseudonymousIdentifiers;
+        }
+
+        field(5237; "OAuth2 Setup Code"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            TableRelation = "NPR OAuth Setup";
+            Caption = 'OAuth2.0 Setup Code';
+        }
+
         field(5250; "API Response Path"; Text[250])
         {
             Caption = 'API Response Path';
@@ -590,11 +614,11 @@ table 6151551 "NPR NpXml Template"
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
     begin
-        case "API Username Type" of
-            "API Username Type"::Automatic:
+        case Rec.AuthType of
+            Rec.AuthType::Basic:
                 exit(NpXmlMgt.GetAutomaticUsername());
             else
-                exit("API Username");
+                exit('');
         end;
     end;
 
@@ -637,7 +661,7 @@ table 6151551 "NPR NpXml Template"
 
     local procedure UpdateApiUsername()
     begin
-        if "API Username Type" <> "API Username Type"::Automatic then
+        if Rec.AuthType <> Rec.AuthType::Basic then
             exit;
 
         "API Username" := GetApiUsername();
@@ -722,6 +746,25 @@ table 6151551 "NPR NpXml Template"
         NpXmlTemplateArchive.SetRange(Code, Code);
         NpXmlTemplateArchive.SetRange("Template Version No.", "Template Version");
         exit(NpXmlTemplateArchive.FindFirst());
+    end;
+
+    procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
+    var
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        iAuth: Interface "NPR API IAuthorization";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+    begin
+        iAuth := Rec.AuthType;
+        case Rec.AuthType of
+            Rec.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(copystr(Rec.GetApiUsername(), 1, 100), Rec."API Password Key", AuthParamsBuff);
+            Rec.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
+            Rec.AuthType::Custom:
+                WebServiceAuthHelper.GetCustomAuthorizationParamsBuff(Rec."API Authorization", AuthParamsBuff);
+        end;
+        iAuth.CheckMandatoryValues(AuthParamsBuff);
+        iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
     end;
 }
 

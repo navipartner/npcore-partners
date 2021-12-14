@@ -60,7 +60,6 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
     var
         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
         TempBlob: Codeunit "Temp Blob";
-        Base64Convert: Codeunit "Base64 Convert";
         OutStream: OutStream;
         InStr: InStream;
         HttpWebRequest: HttpRequestMessage;
@@ -68,6 +67,7 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
         Client: HttpClient;
         Content: HttpContent;
         Headers: HttpHeaders;
+        [NonDebuggable]
         HeadersReq: HttpHeaders;
         XmlDoc: XmlDocument;
         Node: XmlNode;
@@ -75,11 +75,8 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
         ItemAttribute: XmlAttribute;
         VariantAttribute: XmlAttribute;
         Response: Text;
-        AuthText: Text;
         XmlTxt: Text;
         i: Integer;
-        AuthLbl: Label '%1:%2', Locked = true;
-        BasicLbl: Label 'Basic %1', Locked = true;
     begin
         if MagentoInventoryCompany."Company Name" = CompanyName then begin
             Inventory := MagentoItemMgt.GetStockQty3(ItemNo, VariantCode, MagentoInventoryCompany);
@@ -117,11 +114,9 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
         Headers.Add('Content-Type', 'text/xml; charset=utf-8');
         Headers.Add('SOAPAction', 'GetItemInventory');
 
-        if MagentoInventoryCompany."Api Username" <> '' then begin
-            HttpWebRequest.GetHeaders(HeadersReq);
-            AuthText := StrSubstNo(AuthLbl, MagentoInventoryCompany."Api Username", MagentoInventoryCompany.GetApiPassword());
-            HeadersReq.Add('Authorization', StrSubstNo(BasicLbl, Base64Convert.ToBase64(AuthText)));
-        end;
+        HttpWebRequest.GetHeaders(HeadersReq);
+
+        MagentoInventoryCompany.SetRequestHeadersAuthorization(HeadersReq);
 
         HttpWebRequest.Content(Content);
         HttpWebRequest.SetRequestUri(MagentoInventoryCompany."Api Url");

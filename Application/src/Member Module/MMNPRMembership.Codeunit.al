@@ -479,9 +479,6 @@ codeunit 6060147 "NPR MM NPR Membership"
         [NonDebuggable]
         Headers: HttpHeaders;
         RequestText: Text;
-        iAuth: Interface "NPR API IAuthorization";
-        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
-        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
     begin
         ReasonText := '';
 
@@ -494,15 +491,8 @@ codeunit 6060147 "NPR MM NPR Membership"
         WebRequest.Content(RequestContent);
         WebRequest.GetHeaders(Headers);
 
-        iAuth := NPRRemoteEndpointSetup.AuthType;
-        case NPRRemoteEndpointSetup.AuthType of
-            NPRRemoteEndpointSetup.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password Key", AuthParamsBuff);
-            NPRRemoteEndpointSetup.AuthType::OAuth2:
-                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(NPRRemoteEndpointSetup."OAuth2 Setup Code", AuthParamsBuff);
-        end;
-        iAuth.CheckMandatoryValues(AuthParamsBuff);
-        iAuth.SetAuthorizationValue(Headers, AuthParamsBuff);
+        SetRequestHeadersAuthorization(NPRRemoteEndpointSetup, Headers);
+
         WebRequest.Method := 'POST';
         WebRequest.SetRequestUri(NPRRemoteEndpointSetup."Endpoint URI");
         if (NPRRemoteEndpointSetup."Connection Timeout (ms)" < 100) then
@@ -1110,6 +1100,23 @@ codeunit 6060147 "NPR MM NPR Membership"
     procedure XmlSafe(InText: Text): Text
     begin
         exit(DelChr(InText, '<=>', '<>&/'));
+    end;
+
+    local procedure SetRequestHeadersAuthorization(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var RequestHeaders: HttpHeaders)
+    var
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        iAuth: Interface "NPR API IAuthorization";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+    begin
+        iAuth := NPRRemoteEndpointSetup.AuthType;
+        case NPRRemoteEndpointSetup.AuthType of
+            NPRRemoteEndpointSetup.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password Key", AuthParamsBuff);
+            NPRRemoteEndpointSetup.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(NPRRemoteEndpointSetup."OAuth2 Setup Code", AuthParamsBuff);
+        end;
+        iAuth.CheckMandatoryValues(AuthParamsBuff);
+        iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
     end;
 }
 #pragma warning restore
