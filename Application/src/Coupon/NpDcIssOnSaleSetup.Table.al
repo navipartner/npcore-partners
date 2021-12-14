@@ -28,6 +28,9 @@ table 6151601 "NPR NpDc Iss.OnSale Setup"
             Caption = 'Item Sales Qty.';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
+            InitValue = 1;
+            MinValue = 1;
+
         }
         field(50; "Max. Allowed Issues per Sale"; Decimal)
         {
