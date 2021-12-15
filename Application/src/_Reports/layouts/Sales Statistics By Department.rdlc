@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>ea15efcf-924b-4f54-9a2e-bd1a709d87ec</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -2913,7 +2914,7 @@
               </Paragraphs>
               <Top>0.11823cm</Top>
               <Left>15.46007cm</Left>
-              <Height>0.423cm</Height>
+              <Height>0.80338cm</Height>
               <Width>2.80232cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
@@ -2940,9 +2941,9 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>0.60325cm</Top>
+              <Top>1.02744cm</Top>
               <Left>15.46007cm</Left>
-              <Height>0.423cm</Height>
+              <Height>0.49356cm</Height>
               <Width>2.80232cm</Width>
               <ZIndex>2</ZIndex>
               <Style>
@@ -3016,7 +3017,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=First(Fields!FilterList.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!FilterList.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
                       </Style>
@@ -3051,7 +3052,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">="Side "&amp; Globals!PageNumber</Value>
+                      <Value>="Side "&amp; Globals!PageNumber</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -3077,7 +3078,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Parameters!Footer_Caption.Value</Value>
+                      <Value>=Parameters!Footer_Caption.Value</Value>
                       <Style>
                         <FontSize>6pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -3318,6 +3319,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>95b155e3-1df3-40a9-a320-63a8b520f2c5</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
