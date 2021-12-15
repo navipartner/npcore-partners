@@ -474,23 +474,6 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Executes the POS Info List action';
                     ApplicationArea = NPRRetail;
                 }
-                action("POS Web Fonts")
-                {
-                    Caption = 'POS Web Fonts';
-                    RunObject = Page "NPR POS Web Fonts";
-
-                    ToolTip = 'Executes the POS Web Fonts action';
-                    ApplicationArea = NPRRetail;
-                }
-
-                action("POS Stargate Packages")
-                {
-                    Caption = 'POS Stargate Packages';
-                    RunObject = Page "NPR POS Stargate Packages";
-
-                    ToolTip = 'Executes the POS Stargate Packages action';
-                    ApplicationArea = NPRRetail;
-                }
                 action("Item Worksheet Templates")
                 {
                     Caption = 'Item Worksheet Templates';
@@ -531,13 +514,7 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Open the SMS setup page';
                     ApplicationArea = NPRRetail;
                 }
-                action("Config. Template Lines Fix")
-                {
-                    Caption = 'Config. Template Lines Fix';
-                    RunObject = report "NPR Config. Template Line Fix";
-                    ToolTip = 'Runs Config. Template Line Fix report';
-                    ApplicationArea = NPRRetail;
-                }
+
             }
 
 
