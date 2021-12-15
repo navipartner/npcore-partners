@@ -412,29 +412,25 @@ report 6014535 "NPR Sales Statistics By Dept."
                     ShowCaption = false;
                     field("antal niveauer"; antalniveauer)
                     {
-                        Caption = 'Show no. of levels';
-
+                        Caption = 'Levels to show';
                         ToolTip = 'Specifies the value of the Show no. of levels field';
                         ApplicationArea = NPRRetail;
                     }
                     field("kunmed salg"; kunmedsalg)
                     {
-                        Caption = 'Only with sales';
-
+                        Caption = 'With sales only';
                         ToolTip = 'Specifies the value of the Only with sales field';
                         ApplicationArea = NPRRetail;
                     }
                     field("vis varer"; visvarer)
                     {
-                        Caption = 'Print items';
-
+                        Caption = 'Show items';
                         ToolTip = 'Specifies the value of the Print items field';
                         ApplicationArea = NPRRetail;
                     }
                     field("last Year"; lastYear)
                     {
-                        Caption = 'Print last years numbers';
-
+                        Caption = 'Show last year';
                         ToolTip = 'Specifies the value of the Print last years numbers field';
                         ApplicationArea = NPRRetail;
                     }
