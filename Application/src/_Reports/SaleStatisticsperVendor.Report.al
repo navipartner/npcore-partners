@@ -112,6 +112,9 @@ report 6014416 "NPR Sale Statistics per Vendor"
                 column(dg; dg)
                 {
                 }
+                column(dgTotal; DgTotal)
+                {
+                }
                 column(PurchasesLCY_Item; Item."Purchases (LCY)")
                 {
                 }
@@ -174,6 +177,11 @@ report 6014416 "NPR Sale Statistics per Vendor"
                         dg := 0;
 
                     SalesDb := ("Sales (LCY)" - "COGS (LCY)");
+
+                    if ("Unit Price" <> 0) and (ActualSales <> 0) then
+                        DgTotal := (Db / "ActualSales") * 100
+                    else
+                        DgTotal := 0;
 
                     if "Sales (LCY)" <> 0 then
                         SalesDg := 100 * (SalesDb / "Sales (LCY)")
@@ -340,9 +348,9 @@ report 6014416 "NPR Sale Statistics per Vendor"
                     }
                     field(Avoid0Sales; AvoidZeroSales)
                     {
-                        Caption = 'Avoid 0 Sales';
+                        Caption = 'Exclude 0 Sales';
 
-                        ToolTip = 'Specifies the value of the Avoid 0 Sales field';
+                        ToolTip = 'Specifies the value without 0 Sales';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -397,6 +405,7 @@ report 6014416 "NPR Sale Statistics per Vendor"
         db: Decimal;
         dbVendor: Decimal;
         dg: Decimal;
+        DgTotal: Decimal;
         DgVendor: Decimal;
         EndDateInventory: Decimal;
         InventoryValuation: Decimal;
