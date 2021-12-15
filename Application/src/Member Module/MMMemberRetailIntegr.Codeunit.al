@@ -5,6 +5,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MEMBER_NOT_RECOGNIZED: Label 'Can''t identify member.';
         ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
         MEMBERSHIP_NOT_VALID: Label 'The membership %1 is not valid for today.';
+        MEMBERSHIP_NOT_VALID_2: Label 'Membership %1 is not valid for today. Membership validity runs from %2 until %3.';
         BLOCKED_NOT_FOUND: Label 'Member %1 is either blocked or not found.';
         CARD_BLOCKED_NOT_FOUND: Label 'Member Card %1 is either blocked or not found.';
         NO_PRINTOUT: Label 'Membership %1 is not setup for printing.';
@@ -15,11 +16,11 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MEMBER_NAME: Label 'Member - %1';
         TICKET_NOT_FOUND: Label 'Ticket not found.';
         UI: Codeunit "NPR MM Member POS UI";
-        MEMBERCARD_EXPIRED: Label 'The membercard %1 has expired.';
+        MEMBER_CARD_EXPIRED: Label 'The member card %1 has expired.';
         gLastMessage: Text;
         Text000: Label 'Print Membership';
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s)?';
-        CONFIRM_CARD_BLOCKED: Label 'This membercard is blocked, do you want to continue anyway?';
+        CONFIRM_CARD_BLOCKED: Label 'This member card is blocked, do you want to continue anyway?';
 
     trigger OnRun()
     var
@@ -62,6 +63,8 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         FormattedCardNumber: Text[100];
         FormattedForeignCardNumber: Text[100];
         ShowMemberDialog: Boolean;
+        ValidFrom: Date;
+        ValidUntil: Date;
     begin
 
         case InputMode of
@@ -121,11 +124,11 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             if (FailWithError) then begin
 
                 if (AllowVerboseMode) then begin
-                    if (not (Confirm(MEMBERCARD_EXPIRED, true, ExternalMemberCardNo))) then begin
-                        Error(MEMBERCARD_EXPIRED, ExternalMemberCardNo);
+                    if (not (Confirm(MEMBER_CARD_EXPIRED, true, ExternalMemberCardNo))) then begin
+                        Error(MEMBER_CARD_EXPIRED, ExternalMemberCardNo);
                     end;
                 end else begin
-                    Error(MEMBERCARD_EXPIRED, ExternalMemberCardNo);
+                    Error(MEMBER_CARD_EXPIRED, ExternalMemberCardNo);
                 end;
 
             end else begin
@@ -141,18 +144,19 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
         if (not MemberManagement.IsMembershipActive(MembershipEntryNo, Today, false)) then begin
             MustActivate := MemberManagement.MembershipNeedsActivation(MembershipEntryNo);
+            MemberManagement.GetMembershipValidDate(MembershipEntryNo, Today, ValidFrom, ValidUntil);
 
             if (ActivateMembership) then
                 if (not MustActivate) then begin
                     if (FailWithError) then
-                        Error(MEMBERSHIP_NOT_VALID, ExternalMemberCardNo);
+                        Error(MEMBERSHIP_NOT_VALID_2, ExternalMemberCardNo, ValidFrom, ValidUntil);
                     exit(false);
                 end;
 
             if (MustActivate) then
                 if (not ActivateMembership) then begin
                     if (FailWithError) then
-                        Error(MEMBERSHIP_NOT_VALID, ExternalMemberCardNo);
+                        Error(MEMBERSHIP_NOT_VALID_2, ExternalMemberCardNo, ValidFrom, ValidUntil);
                     exit(false);
                 end;
         end;
