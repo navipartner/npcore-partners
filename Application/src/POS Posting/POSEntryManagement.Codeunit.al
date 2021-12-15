@@ -180,7 +180,7 @@ codeunit 6150629 "NPR POS Entry Management"
             exit;
         BankAccount.Get(BankAccountCode);
         POSPaymentMethod.Get(POSPaymentMethodCode);
-        if (BankAccount."Currency Code" <> POSPaymentMethod."Currency Code") then
+        if (BankAccount."Currency Code" <> POSPaymentMethod."Currency Code") and (BankAccount."Currency Code" <> '') then
             Error(TextInconsistent, BankAccount.FieldCaption("Currency Code"), BankAccount."Currency Code", BankAccount.TableCaption, POSPaymentMethod."Currency Code", POSPaymentMethod.TableCaption, POSPostingSetup.TableCaption);
     end;
 
