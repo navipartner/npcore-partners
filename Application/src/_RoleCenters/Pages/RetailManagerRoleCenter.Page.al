@@ -246,7 +246,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Sales code/Item Category top")
                         {
-                            Caption = 'Sales Code/Item category top';
+                            Caption = 'Sales Code/Item Category Top';
                             Image = Report2;
                             RunObject = Report "NPR Salesp./Item Cat Top 20";
 
