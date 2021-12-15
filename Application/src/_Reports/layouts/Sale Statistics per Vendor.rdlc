@@ -1993,7 +1993,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=iif(Sum(Fields!ActualSales.Value)&lt;&gt;0,(Sum(Fields!db.Value)/Sum(Fields!ActualSales.Value))*100,0)</Value>
+                                                    <Value>=Fields!dgTotal.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
                                                       <FontWeight>Normal</FontWeight>
@@ -3653,6 +3653,12 @@ End Function
         </Field>
         <Field Name="dgFormat">
           <DataField>dgFormat</DataField>
+        </Field>
+        <Field Name="dgTotal">
+          <DataField>dgTotal</DataField>
+        </Field>
+        <Field Name="dgTotalFormat">
+          <DataField>dgTotalFormat</DataField>
         </Field>
         <Field Name="PurchasesLCY_Item">
           <DataField>PurchasesLCY_Item</DataField>
