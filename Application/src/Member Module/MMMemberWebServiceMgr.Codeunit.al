@@ -47,14 +47,14 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 'ChangeMembership':
                     ImportChangeMemberships(XmlDoc, Rec."Document ID");
                 'GetMembershipChangeItemsList':
-                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID");
+                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID", 'getchangemembershiplist/request');
                 'RegretMembership':
                     ImportRegretMemberships(XmlDoc, Rec."Document ID");
 
                 'GetMembershipAutoRenewProduct':
-                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID"); // Same impl as for GetMembershipChangeItemsList
+                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID", 'getautorenewproduct/request'); // Same filter implementation as for GetMembershipChangeItemsList
                 'ConfirmAutoRenewPayment':
-                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID"); // Same impl as for GetMembershipChangeItemsList
+                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID", 'confirmautorenewpayment/request'); // Same filter implementation as for GetMembershipChangeItemsList
 
                 'SetGDPRApproval':
                     ImportGdprApproval(XmlDoc, Rec."Document ID");
@@ -82,11 +82,11 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         INVALID_MEMBERSHIP_NO: Label 'Membership number %1 is not valid.';
         INVALID_MEMBER_NO: Label 'Member number %1 is not valid.';
-        INVALID_MEMBERCARD_NO: Label 'Membercard number %1 is not valid.';
+        INVALID_MEMBER_CARD_NO: Label 'Member card number %1 is not valid.';
         NOT_FOUND: Label 'Not found.';
         NOT_ACTIVE: Label 'Membership %1 is not active.';
         MISSING_CASE: Label 'No handler for %1 [%2].';
-        ILLEGAL_CHANGETYPE: Label 'No such change type %1.';
+        ILLEGAL_CHANGE_TYPE: Label 'No such change type %1.';
         TEXT6060000: Label 'The %1 %2 is already in use.';
         NOT_LAST_TIMEFRAME: Label 'Document ID %1 does not specify the last non-blocked timeframe for membership.';
 
@@ -686,7 +686,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         if (MemberInfoCapture."External Card No." <> '') then begin
             MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtCardNo(MemberInfoCapture."External Card No.", Today, NotFoundReasonText);
             if (MemberInfoCapture."Membership Entry No." = 0) then
-                Error(INVALID_MEMBERCARD_NO, MemberInfoCapture."External Card No.");
+                Error(INVALID_MEMBER_CARD_NO, MemberInfoCapture."External Card No.");
         end;
 
         if (MemberInfoCapture."External Membership No." <> '') then begin
@@ -742,7 +742,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportGetChangeMembershipList(XmlDoc: XmlDocument; DocumentID: Text[100])
+    local procedure ImportGetChangeMembershipList(XmlDoc: XmlDocument; DocumentID: Text[100]; NodePath: Text)
     var
         Request: XmlElement;
         NodeList: XmlNodeList;
@@ -751,7 +751,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         XmlDoc.GetRoot(Request);
 
-        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'getchangemembershiplist/request', NodeList)) then
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), NodePath, NodeList)) then
             exit;
 
         foreach Node in NodeList do
@@ -952,7 +952,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberCard.SetFilter("Membership Entry No.", '=%1', MemberInfoCapture."Membership Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', MemberInfoCapture."Member Entry No");
         if (not MemberCard.FindFirst()) then
-            Error(INVALID_MEMBERCARD_NO, MemberInfoCapture."External Card No.");
+            Error(INVALID_MEMBER_CARD_NO, MemberInfoCapture."External Card No.");
 
         MemberInfoCapture."Card Entry No." := MemberCard."Entry No.";
         MemberInfoCapture.Modify();
@@ -1169,7 +1169,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             'LIST', '5', Format(MemberInfoCapture."Information Context"::LIST, 0, 9):
                 MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::LIST;
             else
-                Error(ILLEGAL_CHANGETYPE, ChangeType);
+                Error(ILLEGAL_CHANGE_TYPE, ChangeType);
         end;
     end;
 
