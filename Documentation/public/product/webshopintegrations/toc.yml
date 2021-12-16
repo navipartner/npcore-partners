@@ -2,6 +2,8 @@
   href: intro.md
 - name: Shopify
   items:
+  - name: Introduction
+    href: shopify/shopifyintegration.md
   - name: Explanation
     items:
     - name: Automatically-generated setups
@@ -24,5 +26,3 @@
       href: shopify/howto/inventoryupdates.md
     - name: Sales Order integration area setup
       href: shopify/howto/salesordersetup.md
-  - name: Shopify integration
-    href: shopify/shopifyintegration.md

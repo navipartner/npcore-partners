@@ -53,4 +53,4 @@ The following import types are needed for the integration (all of them are relat
 > All the import types are reviewed and created automatically, when new import list entries are added.
 
 ### Related links
--- [Set up Shopify integration](../howto/setupshopifyintegration.md)
+- [Set up Shopify integration](../howto/setupshopifyintegration.md)
