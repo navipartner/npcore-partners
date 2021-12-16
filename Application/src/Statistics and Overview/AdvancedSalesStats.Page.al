@@ -61,6 +61,10 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Period';
                     ToolTip = 'Specifies the value of the Period field';
                     ApplicationArea = NPRRetail;
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
                 }
                 field(DateFilterLastYear; DateFilterLastYear)
                 {
@@ -68,6 +72,10 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Period (Last Year)';
                     ToolTip = 'Specifies the value of the Period (Last Year) field';
                     ApplicationArea = NPRRetail;
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
                 }
                 field(HideItemGroup; HideItemGroup)
                 {
@@ -76,7 +84,6 @@ page 6014585 "NPR Advanced Sales Stats"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Hide Empty Lines field';
                     ApplicationArea = NPRRetail;
-
                     trigger OnValidate()
                     begin
                         CurrPage.Update(false);
@@ -89,6 +96,10 @@ page 6014585 "NPR Advanced Sales Stats"
                     TableRelation = Item."No.";
                     ToolTip = 'Specifies the value of the Item No. Filter field';
                     ApplicationArea = NPRRetail;
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
 
                 }
                 field(ItemCategoryCodeFilter; ItemCategoryCodeFilter)
@@ -98,6 +109,10 @@ page 6014585 "NPR Advanced Sales Stats"
                     TableRelation = "Item Category";
                     ToolTip = 'Specifies the value of the Item Category Code field';
                     ApplicationArea = NPRRetail;
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
                 }
             }
             group(Control6150631)
@@ -142,6 +157,7 @@ page 6014585 "NPR Advanced Sales Stats"
                         PLYSale := ShowLastYear;
                         PLYProfit := ShowLastYear;
                         "PLYProfit%" := ShowLastYear;
+                        CurrPage.Update(false);
                     end;
                 }
                 field(ShowSameWeekday; ShowSameWeekday)
@@ -154,6 +170,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     trigger OnValidate()
                     begin
                         Calc();
+                        CurrPage.Update(false);
                     end;
                 }
             }
