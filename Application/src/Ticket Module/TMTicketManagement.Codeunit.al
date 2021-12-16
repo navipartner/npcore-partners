@@ -2136,7 +2136,9 @@ codeunit 6059784 "NPR TM Ticket Management"
                     DurationFormula := TicketBOM."Duration Formula";
                     ActivateOnSales := (TicketBOM."Activation Method" = TicketBOM."Activation Method"::POS);
                     if (TicketBOM."Activation Method" = TicketBOM."Activation Method"::NA) then
-                        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE; // delegate to Ticket Type setup
+                        // if activate method on BOM is undefined, delegate back to Ticket Type setup
+                        ActivateOnSales := ((TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) or
+                                           ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBOM.Default));
                 end;
 
                 if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
