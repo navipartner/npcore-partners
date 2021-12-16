@@ -268,18 +268,32 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     local procedure OnAfterInsertCrossRefCheckCrossRef(var Rec: Record "Item Cross Reference"; RunTrigger: Boolean)
     begin
         CheckCrossRef(Rec);
+        if RunTrigger then
+            UpdateItemReferencesFromCrossRef(Rec, Rec, 1);
     end;
 
     [EventSubscriber(ObjectType::Table, 5717, 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifyCrossRefCheckCrossRef(var Rec: Record "Item Cross Reference"; var xRec: Record "Item Cross Reference"; RunTrigger: Boolean)
     begin
         CheckCrossRef(Rec);
+        if RunTrigger then
+            UpdateItemReferencesFromCrossRef(Rec, xRec, 1);
     end;
 
     [EventSubscriber(ObjectType::Table, 5717, 'OnAfterRenameEvent', '', false, false)]
     local procedure OnAfterRenameCrossRefCheckCrossRef(var Rec: Record "Item Cross Reference"; var xRec: Record "Item Cross Reference"; RunTrigger: Boolean)
     begin
         CheckCrossRef(Rec);
+        if RunTrigger then
+            UpdateItemReferencesFromCrossRef(Rec, xRec, 2);
+    end;
+
+    [EventSubscriber(ObjectType::Table, 5717, 'OnAfterDeleteEvent', '', false, false)]
+    local procedure OnAfterDeleteCrossRefHandler(var Rec: Record "Item Cross Reference"; RunTrigger: Boolean)
+    begin
+        CheckCrossRef(Rec);
+        if RunTrigger then
+            UpdateItemReferencesFromCrossRef(Rec, Rec, 3);
     end;
 
     local procedure CheckCrossRefFromItem(ItemNumber: Code[20])
@@ -508,6 +522,8 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     local procedure UpdateVendorItemCrossRef(var Item: Record Item; xItem: Record Item)
     var
         ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
+        ItemReferenceManagement: Codeunit "Item Reference Management";
     begin
         if Item.IsTemporary then
             exit;
@@ -521,6 +537,16 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
         ItemCrossReference.SetRange("Cross-Reference Type No.", xItem."Vendor No.");
         ItemCrossReference.SetRange("Cross-Reference No.", xItem."Vendor Item No.");
         ItemCrossReference.DeleteAll(true);
+
+        //temporary until norgal update to newer app start
+        ItemReference.SetRange("Item No.", Item."No.");
+        ItemReference.SetRange("Variant Code", '');
+        ItemReference.SetRange("Unit of Measure", xItem."Base Unit of Measure");
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Vendor);
+        ItemReference.SetRange("Reference Type No.", xItem."Vendor No.");
+        ItemReference.SetRange("Reference No.", xItem."Vendor Item No.");
+        ItemReference.DeleteAll(true);
+        //temporary until norgal update to newer app end
 
         if (Item."Vendor No." = '') or (Item."Vendor Item No." = '') then
             exit;
@@ -536,5 +562,166 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
             ItemCrossReference.Description := '';
             ItemCrossReference.Insert(true);
         end;
+
+        //temporary until norgal update to newer app start
+        if ItemReferenceManagement.IsEnabled() then
+            if not ItemReference.Get(Item."No.", '', Item."Base Unit of Measure", ItemReference."Reference Type"::Vendor, Item."Vendor No.", Item."Vendor Item No.") then begin
+                ItemReference.Init;
+                ItemReference."Item No." := Item."No.";
+                ItemReference."Variant Code" := '';
+                ItemReference."Unit of Measure" := Item."Base Unit of Measure";
+                ItemReference."Reference Type" := ItemReference."Reference Type"::Vendor;
+                ItemReference."Reference Type No." := Item."Vendor No.";
+                ItemReference."Reference No." := Item."Vendor Item No.";
+                ItemReference.Description := '';
+                ItemReference.Insert(true);
+            end;
+        //temporary until norgal update to newer app end
+    end;
+
+    local procedure UpdateItemReferencesFromCrossRef(ItemCrossReference: Record "Item Cross Reference"; ItemCrossReferenceOld: Record "Item Cross Reference"; ActivityType: Integer)
+    var
+        ItemReference: Record "Item Reference";
+        ItemRefExist: Boolean;
+    begin
+        ItemRefExist := ItemReference.Get(
+            ItemCrossReferenceOld."Item No.",
+            ItemCrossReferenceOld."Variant Code",
+            ItemCrossReferenceOld."Unit of Measure",
+            Enum::"Item Reference Type".FromInteger(ItemCrossReferenceOld."Cross-Reference Type"),
+            ItemCrossReferenceOld."Cross-Reference Type No.",
+            ItemCrossReferenceOld."Cross-Reference No.");
+
+        case ActivityType of
+            3: //delete
+                begin
+                    if ItemRefExist then
+                        ItemReference.Delete();
+                end;
+
+            2: //rename
+                begin
+                    if ItemRefExist then
+                        ItemReference.Delete();
+                    InsertNewItemRefFromCrossRef(ItemCrossReference);
+                end;
+            1: //modify
+                begin
+                    if not ItemRefExist then
+                        InsertNewItemRefFromCrossRef(ItemCrossReference)
+                    else begin
+                        ItemReference.Description := ItemCrossReference.Description;
+                        ItemReference."Description 2" := ItemCrossReference."Description 2";
+                        ItemReference."Discontinue Bar Code" := ItemCrossReference."Discontinue Bar Code";
+                        if ItemReference.Modify() then;
+                    end;
+                end;
+        end
+    end;
+
+    local procedure InsertNewItemRefFromCrossRef(ItemCrossReference: Record "Item Cross Reference")
+    var
+        ItemReference: Record "Item Reference";
+        ItemReferenceManagement: Codeunit "Item Reference Management";
+    begin
+        if not ItemReferenceManagement.IsEnabled() then
+            exit;
+        ItemReference.Init();
+        ItemReference."Item No." := ItemCrossReference."Item No.";
+        ItemReference."Variant Code" := ItemCrossReference."Variant Code";
+        ItemReference."Unit of Measure" := ItemCrossReference."Unit of Measure";
+        ItemReference."Reference Type" := Enum::"Item Reference Type".FromInteger(ItemCrossReference."Cross-Reference Type");
+        ItemReference."Reference Type No." := ItemCrossReference."Cross-Reference Type No.";
+        ItemReference."Reference No." := ItemCrossReference."Cross-Reference No.";
+        ItemReference.Description := ItemCrossReference.Description;
+        ItemReference."Description 2" := ItemCrossReference."Description 2";
+        ItemReference."Discontinue Bar Code" := ItemCrossReference."Discontinue Bar Code";
+        if ItemReference.Insert() then;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Reference", 'OnAfterInsertEvent', '', true, true)]
+    local procedure HandleOnAfterInsertItemReference(var Rec: Record "Item Reference"; RunTrigger: Boolean)
+    begin
+        if RunTrigger then
+            UpdateItemCrossReferencesFromItemRef(Rec, Rec, 1);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Reference", 'OnAfterModifyEvent', '', true, true)]
+    local procedure HandleOnAfterModifyItemReference(var Rec: Record "Item Reference"; var xRec: Record "Item Reference"; RunTrigger: Boolean)
+    begin
+        if RunTrigger then
+            UpdateItemCrossReferencesFromItemRef(Rec, xRec, 1);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Reference", 'OnAfterRenameEvent', '', true, true)]
+    local procedure HandleOnAfterRenameItemReference(var Rec: Record "Item Reference"; var xRec: Record "Item Reference"; RunTrigger: Boolean)
+    begin
+        if RunTrigger then
+            UpdateItemCrossReferencesFromItemRef(Rec, xRec, 2);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Reference", 'OnAfterDeleteEvent', '', true, true)]
+    local procedure HandleOnAfterDeleteItemReference(var Rec: Record "Item Reference"; RunTrigger: Boolean)
+    begin
+        if RunTrigger then
+            UpdateItemCrossReferencesFromItemRef(Rec, Rec, 3);
+    end;
+
+    local procedure UpdateItemCrossReferencesFromItemRef(ItemReference: Record "Item Reference"; ItemReferenceOld: Record "Item Reference"; ActivityType: Integer)
+    var
+        ItemCrossReference: Record "Item Cross Reference";
+        ItemCrossRefExist: Boolean;
+    begin
+        ItemCrossRefExist := ItemCrossReference.Get(
+            ItemReferenceOld."Item No.",
+            ItemReferenceOld."Variant Code",
+            ItemReferenceOld."Unit of Measure",
+            ItemReferenceOld."Reference Type".AsInteger(),
+            ItemReferenceOld."Reference Type No.",
+            ItemReferenceOld."Reference No.");
+
+        case ActivityType of
+            3: //delete
+                begin
+                    if ItemCrossRefExist then
+                        ItemCrossReference.Delete();
+                end;
+
+            2: //rename
+                begin
+                    if ItemCrossRefExist then
+                        ItemCrossReference.Delete();
+
+                    InsertNewItemCrossRefFromItemRef(ItemReference);
+                end;
+            1: //modify, insert
+                begin
+                    if not ItemCrossRefExist then
+                        InsertNewItemCrossRefFromItemRef(ItemReference)
+                    else begin
+                        ItemCrossReference.Description := ItemReference.Description;
+                        ItemCrossReference."Description 2" := ItemReference."Description 2";
+                        ItemCrossReference."Discontinue Bar Code" := ItemReference."Discontinue Bar Code";
+                        if ItemCrossReference.Modify() then;
+                    end;
+                end;
+        end
+    end;
+
+    local procedure InsertNewItemCrossRefFromItemRef(ItemReference: Record "Item Reference")
+    var
+        ItemCrossReference: Record "Item Cross Reference";
+    begin
+        ItemCrossReference.Init();
+        ItemCrossReference."Item No." := ItemReference."Item No.";
+        ItemCrossReference."Variant Code" := ItemReference."Variant Code";
+        ItemCrossReference."Unit of Measure" := ItemReference."Unit of Measure";
+        ItemCrossReference."Cross-Reference Type" := ItemReference."Reference Type".AsInteger();
+        ItemCrossReference."Cross-Reference Type No." := ItemReference."Reference Type No.";
+        ItemCrossReference."Cross-Reference No." := ItemReference."Reference No.";
+        ItemCrossReference.Description := ItemReference.Description;
+        ItemCrossReference."Description 2" := ItemReference."Description 2";
+        ItemCrossReference."Discontinue Bar Code" := ItemReference."Discontinue Bar Code";
+        if ItemCrossReference.Insert() then;
     end;
 }

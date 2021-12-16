@@ -606,6 +606,8 @@ codeunit 6059972 "NPR Variety Clone Data"
     var
         Item: Record Item;
         ItemCrossRef: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
+        ItemReferenceManagement: Codeunit "Item Reference Management";
         ItemVar: Record "Item Variant";
         DescriptionControl: Codeunit "NPR Description Control";
     begin
@@ -649,6 +651,25 @@ codeunit 6059972 "NPR Variety Clone Data"
         ItemCrossRef."Unit of Measure" := GetUnitOfMeasure(ItemNo, 1);
         //+NPR5.53 [345108]
         ItemCrossRef.Insert;
+
+        //temporary until norgal update to newer app start
+        if ItemReferenceManagement.IsEnabled() then begin
+            ItemReference.SetCurrentKey("Reference No.");
+            ItemReference.SetRange("Reference No.", Barcode);
+            if ItemReference.FindFirst then
+                Error(Text003, ItemReference.TableCaption, Barcode, ItemReference."Item No.");
+
+            ItemReference.Init;
+            ItemReference."Item No." := ItemNo;
+            ItemReference."Variant Code" := VariantCode;
+            ItemReference.Validate("Reference Type", CrossRefType);
+            ItemReference.Validate("Reference Type No.", CrossRefTypeNo);
+            ItemReference."Reference No." := Barcode;
+            ItemReference.Description := DescriptionControl.GetItemCrossRefDescription(ItemNo, VariantCode);
+            ItemReference."Unit of Measure" := GetUnitOfMeasure(ItemNo, 1);
+            ItemReference.Insert;
+        end;
+        //temporary until norgal update to newer app end
     end;
 
     procedure CreateBarcodeEAN13(RefNo: Code[20]) Barcode: Code[13]
