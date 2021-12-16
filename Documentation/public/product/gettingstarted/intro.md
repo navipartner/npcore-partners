@@ -15,3 +15,5 @@ Our product documentation consists of three distinct groups of articles - explan
 - [Replication module](../../product/replication/intro.md)
 - [Ticket module](../../product/ticket/intro.md)
 - [Electronic Funds Transfer](../../product/eft/intro.md)
+- [Webshop integrations](../../product/webshopintegrations/intro.md) 
+- [POS Tax Free](../../product/postaxfree/intro.md)

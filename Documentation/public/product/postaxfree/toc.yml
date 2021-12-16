@@ -2,9 +2,9 @@
   href: intro.md
 - name: How-To  
   items:
-  - name: Setup Global Blue I2
+  - name: Set up Global Blue I2
     href: howto/globalblue.md
-  - name: Setup Planet Payment
+  - name: Set up Planet Payment
     href: howto/planetpayment.md    
 - name: Explanation  
   items:
