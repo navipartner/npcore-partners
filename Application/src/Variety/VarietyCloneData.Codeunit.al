@@ -20,6 +20,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         Text009: Label 'Warning: This will update the Fields Description and Description 2 on all %1.\This is not revertable, and will lock the database while its beeing executed.\Do you wish to continue?';
         Text010: Label 'Updating #1########\ @2@@@@@@@';
         ItemVariantDontExisit: Label 'This Variety Combination is not enabled.';
+        BarcodeUsedOnVariantErr: Label 'The %1 %2 is already used for %3 %4. It must be deleted before it can be reused';
 
     procedure SetupNewLine(var MRecref: RecordRef; Item: Record Item; var TMPVRTBuffer: Record "NPR Variety Buffer"; NewValue: Text[250])
     var
@@ -476,13 +477,25 @@ codeunit 6059972 "NPR Variety Clone Data"
         Item: Record Item;
         ItemRef: Record "Item Reference";
     begin
+        if Barcode = '' then
+            exit;
         if Item.Get(Barcode) then
             Error(Text002);
 
         ItemRef.SetCurrentKey("Reference No.");
         ItemRef.SetRange("Reference No.", Barcode);
+        ItemRef.SetFilter("Item No.", '<>%1', ItemNo);
+        ItemRef.SetRange("Reference Type", CrossRefType);
         if ItemRef.FindFirst() then
             Error(Text003, ItemRef.TableCaption, Barcode, ItemRef."Item No.");
+
+        ItemRef.SetCurrentKey("Reference No.");
+        ItemRef.SetRange("Reference No.", Barcode);
+        ItemRef.SetRange("Item No.", ItemNo);
+        ItemRef.SetFilter("Variant Code", '<>%1', VariantCode);
+        ItemRef.SetRange("Reference Type", CrossRefType);
+        if ItemRef.FindFirst() then
+            Error(BarcodeUsedOnVariantErr, ItemRef.TableCaption, Barcode, ItemRef.FieldCaption("Variant Code"), ItemRef."Variant Code");
 
         ItemRef.Init();
         ItemRef."Item No." := ItemNo;
@@ -493,8 +506,8 @@ codeunit 6059972 "NPR Variety Clone Data"
         Item.Get(ItemNo);
         ItemRef.Description := Item.Description;
         ItemRef."Unit of Measure" := GetUnitOfMeasure(ItemNo, 1);
-
-        ItemRef.Insert();
+        if not ItemRef.Get(ItemRef."Item No.", ItemRef."Variant Code", ItemRef."Unit of Measure", ItemRef."Reference Type", ItemRef."Reference Type No.", ItemRef."Reference No.") then
+            ItemRef.Insert(true);
     end;
 
     procedure CreateBarcodeEAN13(RefNo: Code[20]) Barcode: Code[13]
