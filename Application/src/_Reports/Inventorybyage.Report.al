@@ -717,9 +717,9 @@ report 6014400 "NPR Inventory by age"
                         ToolTip = 'Specifies the value of the Show Items field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Show Zero Lines"; ShowZeroLines)
+                    field("Show Blank Lines"; ShowZeroLines)
                     {
-                        Caption = 'Show Zero Item Lines';
+                        Caption = 'Show Blank Lines';
                         Editable = ShowItem;
 
                         ToolTip = 'Specifies the value of the Show Zero Item Lines field';
