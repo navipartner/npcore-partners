@@ -37,15 +37,15 @@ page 6014468 "NPR Sales Ticket Statistics"
                 field(totalCount; totalCount)
                 {
 
-                    Caption = 'Number of Exp.';
-                    ToolTip = 'Specifies the value of the Number of Exp. field';
+                    Caption = 'Number of Transactions';
+                    ToolTip = 'Specifies the value of the Number of Transactions field';
                     ApplicationArea = NPRRetail;
                 }
                 field(CalculatedAverage; CalcAverage())
                 {
 
-                    Caption = 'Stay Expedition';
-                    ToolTip = 'Specifies the value of the Stay Expedition field';
+                    Caption = 'Average of Transactions';
+                    ToolTip = 'Specifies the value of the Average of Transactions field';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -215,4 +215,3 @@ page 6014468 "NPR Sales Ticket Statistics"
             POSEntry.SetRange("Shortcut Dimension 2 Code");
     end;
 }
-
