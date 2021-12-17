@@ -327,10 +327,10 @@ report 6014405 "NPR Salesp./Item Cat Top 20"
                     }
                     field("Show Qty"; ShowQty)
                     {
-                        Caption = 'Show Amounts';
+                        Caption = 'Show Quantity for Item Category';
                         Visible = ShowQtyVisible;
 
-                        ToolTip = 'Specifies the value of the Show Amounts field';
+                        ToolTip = 'Specifies the value of the Show Quantity for Item Category field';
                         ApplicationArea = NPRRetail;
                     }
                 }
