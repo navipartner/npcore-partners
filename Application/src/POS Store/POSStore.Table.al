@@ -340,6 +340,8 @@ table 6150614 "NPR POS Store"
 
     fieldgroups
     {
+        fieldgroup(DropDown; Code, Name, City) { }
+        fieldgroup(Brick; Code, Name, City) { }
     }
 
     trigger OnDelete()
