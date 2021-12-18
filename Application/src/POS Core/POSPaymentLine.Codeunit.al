@@ -13,7 +13,7 @@ codeunit 6150707 "NPR POS Payment Line"
         ErrVATCalcNotSupportInPOS: Label '%1 %2 not supported in POS';
         MaxAmountLimit: Label 'Maximum payment amount for %1 is %2.';
         MinAmountLimit: Label 'Minimum payment amount for %1 is %2.';
-        InvalidAmount: Label 'Amount %1 is not valid for payment type %2';
+        InvalidAmount: Label 'The payment amount %1 cannot be accepted because it does not meet the rounding precision requirements ("%2") set for payment type %3.', Comment = '%1 - payment amount, %2 - rounding precision, %3 - payment type description';
 
     procedure Init(RegisterNoIn: Code[20]; SalesTicketNoIn: Code[20]; SaleIn: Codeunit "NPR POS Sale"; SetupIn: Codeunit "NPR POS Setup"; FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
@@ -350,6 +350,9 @@ codeunit 6150707 "NPR POS Payment Line"
 
     procedure ValidateAmountBeforePayment(POSPaymentMethod: Record "NPR POS Payment Method"; AmountToCapture: Decimal)
     begin
+        if POSPaymentMethod.Description = '' then
+            POSPaymentMethod.Description := POSPaymentMethod."Code";
+
         if (POSPaymentMethod."Maximum Amount" <> 0) then
             if (AmountToCapture > POSPaymentMethod."Maximum Amount") then
                 Error(MaxAmountLimit, POSPaymentMethod.Description, POSPaymentMethod."Maximum Amount");
@@ -360,7 +363,7 @@ codeunit 6150707 "NPR POS Payment Line"
 
         if (POSPaymentMethod."Rounding Precision" <> 0) then
             if (AmountToCapture mod POSPaymentMethod."Rounding Precision") <> 0 then
-                Error(InvalidAmount, AmountToCapture, POSPaymentMethod.Description);
+                Error(InvalidAmount, AmountToCapture, POSPaymentMethod."Rounding Precision", POSPaymentMethod.Description);
 
         if AmountToCapture < 0 then
             POSPaymentMethod.TestField("Allow Refund");
