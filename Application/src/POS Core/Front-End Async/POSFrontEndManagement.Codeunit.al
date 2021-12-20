@@ -256,17 +256,11 @@
 
     procedure SetView(ViewType: Option; Setup: Codeunit "NPR POS Setup")
     var
-        POSView: Record "NPR POS View";
         DefaultView: Record "NPR POS Default View";
-        DataMgt: Codeunit "NPR POS Data Management";
         POSViewChangeWorkflowMgt: Codeunit "NPR POS View Change WF Mgt.";
         Request: Codeunit "NPR Front-End: SetView";
-        DataSource: Codeunit "NPR Data Source";
         CurrView: Codeunit "NPR POS View";
-        RequestView: Codeunit "NPR POS View";
-        DataSourceNames: List of [Text];
-        Markup: Text;
-        SourceId: Text;
+        CHANGE_VIEW_ERROR: Label 'There was a problem changing view and adding data drivers: %1';
     begin
         MakeSureFrameworkIsAvailable(true);
         case ViewType of
@@ -300,12 +294,9 @@
                     Request.InitializeAsRestaurant();
                     DefaultView.Type := DefaultView.Type::Restaurant;
                 end;
+            else
+                ReportBugAndThrowError(StrSubstNo(Text003, ViewType));
         end;
-
-        Request.GetView(RequestView);
-
-        if RequestView.Type() = RequestView.Type() ::Uninitialized then
-            ReportBugAndThrowError(StrSubstNo(Text003, ViewType));
 
         POSSession.GetCurrentView(CurrView);
         case ViewType of
@@ -325,6 +316,26 @@
             DefaultView.Type::Restaurant:
                 OnBeforeChangeToRestaurantView(POSSession);
         end;
+
+        Commit();
+        ClearLastError();
+        if (not ChangeViewInitializeDataSources(Setup, DefaultView, Request)) then
+            ReportBugAndThrowError(StrSubstNo(CHANGE_VIEW_ERROR, GetLastErrorCode()));
+    end;
+
+    [TryFunction]
+    local procedure ChangeViewInitializeDataSources(var Setup: Codeunit "NPR POS Setup"; var DefaultView: Record "NPR POS Default View"; var Request: Codeunit "NPR Front-End: SetView")
+    var
+        POSView: Record "NPR POS View";
+        RequestView: Codeunit "NPR POS View";
+        DataMgt: Codeunit "NPR POS Data Management";
+        DataSource: Codeunit "NPR Data Source";
+        DataSourceNames: List of [Text];
+        Markup: Text;
+        SourceId: Text;
+    begin
+
+        Request.GetView(RequestView);
 
         if POSView.FindViewByType(
           DefaultView.Type,
@@ -349,9 +360,8 @@
 
         InvokeFrontEndAsync(Request);
 
-        POSSession.SetView(RequestView);
+        POSSession.InitializeViewDataSources(RequestView);
     end;
-
     #endregion
 
 
