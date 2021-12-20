@@ -249,7 +249,6 @@ report 6014417 "NPR Inventory per Date"
         TotalProfit_Caption = 'Total Profit';
         RecentSale_Caption = 'Recent Sale';
         Total_Caption = 'Total';
-        PerDate_Caption = 'Per Date';
         Footer_Caption = 'ˆNAVIPARTNER K¢benhavn 2002';
         LastPurchaseDate_Caption = 'Last Purchase Date';
         LastCostPrice_Caption = 'Last Cost Price';
