@@ -41,7 +41,10 @@ page 6151255 "NPR Activities"
                         CurrPage.Update(false);
                     end;
                 }
-
+            }
+            cuegroup(FailedTasks)
+            {
+                Caption = 'Failed Tasks';
                 field("Failed tasks"; Rec."Failed Webshop Payments")
                 {
                     Caption = 'Failed Capturing of Payments';
@@ -54,10 +57,6 @@ page 6151255 "NPR Activities"
                         CurrPage.Update(false);
                     end;
                 }
-
-
-
-
 
                 field("Failed imports in the import list"; Rec."Failed imports")
                 {
@@ -76,11 +75,10 @@ page 6151255 "NPR Activities"
                     end;
                 }
 
-
             }
             cuegroup(Control6150624)
             {
-                Caption = 'SALES';
+                Caption = 'Sales';
                 ShowCaption = true;
                 field(TodaysSalesOrders; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Daily Sales Orders"))))
                 {
