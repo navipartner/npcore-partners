@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>6fd553dc-e5df-411d-b275-d7956cbe4b31</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -1218,7 +1219,7 @@
             </Filters>
             <Top>0.35243in</Top>
             <Height>0.625in</Height>
-            <Width>7.09568in</Width>
+            <Width>7.09565in</Width>
             <ZIndex>2</ZIndex>
             <Style>
               <Border>
@@ -1574,7 +1575,7 @@
             </Filters>
             <Top>2.52501cm</Top>
             <Height>0.47625cm</Height>
-            <Width>15.75084cm</Width>
+            <Width>15.75085cm</Width>
             <ZIndex>7</ZIndex>
             <Style>
               <Border>
@@ -1600,7 +1601,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=First(Fields!Title.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!Report_Caption.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>16pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1917,7 +1918,6 @@
         <PageHeight>29.7cm</PageHeight>
         <PageWidth>21cm</PageWidth>
         <LeftMargin>1.5cm</LeftMargin>
-        <RightMargin>0cm</RightMargin>
         <TopMargin>1cm</TopMargin>
         <BottomMargin>1cm</BottomMargin>
         <ColumnSpacing>1.27cm</ColumnSpacing>
@@ -2071,14 +2071,15 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>316c9de2-e42b-4e79-b248-a0b8889e3a30</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
         <Field Name="COMPANYNAME">
           <DataField>COMPANYNAME</DataField>
         </Field>
-        <Field Name="Title">
-          <DataField>Title</DataField>
+        <Field Name="Report_Caption">
+          <DataField>Report_Caption</DataField>
         </Field>
         <Field Name="text3">
           <DataField>text3</DataField>
