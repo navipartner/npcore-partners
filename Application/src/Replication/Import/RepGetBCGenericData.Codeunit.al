@@ -51,6 +51,8 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         ReplicationAPI.UpdateReplicationCounter(JTokenEntity, ReplicationEndPoint);
 
         UnBindEventSubscribersForReplication();
+
+        exit(true);
     end;
 
     local procedure HandleArrayElementEntity(JToken: JsonToken; ReplicationEndPoint: Record "NPR Replication Endpoint")
@@ -177,8 +179,11 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
                 if GetSourceTxt(FieldRec, JToken, SourceText, TempSpecialFieldMapping, TempFoundAPIField) then
                     if Not TempFoundAPIField.Skip then
                         case FieldRec.Type of
-                            FieldRec.Type::Media, FieldRec.Type::MediaSet:
-                                if CheckImage(JToken, RecRef, ReplicationEndPoint, TempFoundAPIField, Client) then
+                            FieldRec.Type::Media:
+                                if CheckMedia(JToken, RecRef, FieldRec."No.", SourceText, TempFoundAPIField, ReplicationEndPoint, Client) then
+                                    FieldsChanged := true;
+                            FieldRec.Type::MediaSet:
+                                if CheckMediaSet(JToken, RecRef, FieldRec."No.", SourceText, TempFoundAPIField, ReplicationEndPoint, Client) then
                                     FieldsChanged := true;
                             FieldRec.Type::BLOB:
                                 if CheckBLOB(RecRef, FieldRec."No.", SourceText, TempFoundAPIField, ReplicationEndPoint, Client) then
@@ -220,12 +225,8 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
 
     local procedure CheckBLOB(var RecRef: RecordRef; FieldNo: integer; BlobURL: Text; var TempFoundAPIField: Record "NPR Rep. Special Field Mapping"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient): Boolean
     var
-        ServiceSetup: Record "NPR Replication Service Setup";
         RecRef2: RecordRef;
-        ErrLog: Record "NPR Replication Error Log";
-        ReplicationAPI: Codeunit "NPR Replication API";
         Response: Codeunit "Temp Blob";
-        StatusCode: Integer;
         SourceFRef: FieldRef;
         DestinationFRef: FieldRef;
         WebRequestHelper: Codeunit "Web Request Helper";
@@ -233,16 +234,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         if not WebRequestHelper.IsValidUri(BlobURL) then
             exit(false);
 
-        ServiceSetup.Get(ReplicationEndPoint."Service Code");
-        ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, BlobURL);
-
-        if ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then
-            if (StatusCode <> 500) then begin //if BLOB is empty, server return status code 500 --> Description: Internal Server Error
-                ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', BlobURL, Response);
-                Commit();
-                Error(BLOBCouldNotBeReadErr, TempFoundAPIField."API Field Name", RecRef.RecordId, ErrLog."Entry No.");
-            end else
-                Clear(Response);
+        GetBLOBResponse(RecRef, BlobURL, TempFoundAPIField, ReplicationEndPoint, Client, Response);
 
         RecRef2 := RecRef.Duplicate();
         SourceFRef := RecRef2.Field(FieldNo);
@@ -258,12 +250,116 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         Exit(false);
     end;
 
-    local procedure CheckImage(JToken: JsonToken; var RecRef: RecordRef; ReplicationEndPoint: Record "NPR Replication Endpoint"; var TempFoundAPIField: Record "NPR Rep. Special Field Mapping"; var Client: HttpClient): Boolean
+    local procedure GetBLOBResponse(var RecRef: RecordRef; BlobURL: Text; var TempFoundAPIField: Record "NPR Rep. Special Field Mapping"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob")
+    var
+        ServiceSetup: Record "NPR Replication Service Setup";
+        ErrLog: Record "NPR Replication Error Log";
+        ReplicationAPI: Codeunit "NPR Replication API";
+        StatusCode: Integer;
+    begin
+        ServiceSetup.Get(ReplicationEndPoint."Service Code");
+        ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, BlobURL);
+
+        if ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then
+            if (StatusCode <> 500) then begin //if BLOB is empty, server return status code 500 --> Description: Internal Server Error
+                ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', BlobURL, Response, ServiceSetup."Error Notify Email Address");
+                Commit();
+                Error(BLOBCouldNotBeReadErr, TempFoundAPIField."API Field Name", RecRef.RecordId, ErrLog."Entry No.");
+            end else
+                Clear(Response);
+    end;
+
+    local procedure CheckMedia(JToken: JsonToken; var RecRef: RecordRef; FieldNo: integer; BlobURL: Text; var TempFoundAPIField: Record "NPR Rep. Special Field Mapping"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient): Boolean
+    var
+        Media: Record "Tenant Media";
+        TempConfigMediaBuffer: Record "Config. Media Buffer" temporary;
+        Response: Codeunit "Temp Blob";
+        DestinationFRef: FieldRef;
+        WebRequestHelper: Codeunit "Web Request Helper";
+        ExistingMediaTempBlob: Codeunit "Temp Blob";
+        ReplicationAPI: Codeunit "NPR Replication API";
+        EmptyGuid: Guid;
+        OStr: OutStream;
+        IStr: InStream;
+    begin
+        if CheckMasterPictureImportIsSupported(RecRef, FieldNo) then
+            exit(CheckMasterPicture(JToken, RecRef, FieldNo, TempFoundAPIField, ReplicationEndPoint, Client))
+        else begin
+            if not WebRequestHelper.IsValidUri(BlobURL) then
+                exit(false);
+            GetBLOBResponse(RecRef, BlobURL, TempFoundAPIField, ReplicationEndPoint, Client, Response);
+            DestinationFRef := RecRef.Field(FieldNo);
+            if Format(DestinationFRef.Value) <> format(EmptyGuid) then
+                Media.Get(Format(DestinationFRef.Value));
+            Media.CalcFields(Content);
+            Media.Content.CreateInStream(IStr);
+            ExistingMediaTempBlob.CreateOutStream(OStr);
+            CopyStream(OStr, IStr);
+            if ReplicationAPI.GetImageHash(Response) <> ReplicationAPI.GetImageHash(ExistingMediaTempBlob) then begin
+                TempConfigMediaBuffer.Init();
+                if Response.HasValue() then begin
+                    Response.CreateInStream(IStr);
+                    TempConfigMediaBuffer.Media.ImportStream(IStr, '');
+                    TempConfigMediaBuffer.Insert();
+                end;
+                DestinationFRef.Value := Format(TempConfigMediaBuffer.Media);
+                exit(true);
+            end;
+        end;
+        exit(false);
+    end;
+
+    local procedure CheckMediaSet(JToken: JsonToken; var RecRef: RecordRef; FieldNo: integer; BlobURL: Text; var TempFoundAPIField: Record "NPR Rep. Special Field Mapping"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient): Boolean
+    var
+        MediaSet: Record "Tenant Media Set";
+        Media: Record "Tenant Media";
+        TempConfigMediaBuffer: Record "Config. Media Buffer" temporary;
+        Response: Codeunit "Temp Blob";
+        DestinationFRef: FieldRef;
+        WebRequestHelper: Codeunit "Web Request Helper";
+        ExistingMediaTempBlob: Codeunit "Temp Blob";
+        ReplicationAPI: Codeunit "NPR Replication API";
+        EmptyGuid: Guid;
+        OStr: OutStream;
+        IStr: InStream;
+    begin
+        if CheckMasterPictureImportIsSupported(RecRef, FieldNo) then
+            exit(CheckMasterPicture(JToken, RecRef, FieldNo, TempFoundAPIField, ReplicationEndPoint, Client))
+        else begin
+            if not WebRequestHelper.IsValidUri(BlobURL) then
+                exit(false);
+            GetBLOBResponse(RecRef, BlobURL, TempFoundAPIField, ReplicationEndPoint, Client, Response);
+            DestinationFRef := RecRef.Field(FieldNo);
+            if Format(DestinationFRef.Value) <> format(EmptyGuid) then begin
+                MediaSet.SetRange(ID, Format(DestinationFRef.Value));
+                if MediaSet.FindFirst() and (Format(MediaSet."Media ID") <> format(EmptyGuid)) then
+                    Media.Get(Format(MediaSet."Media ID"));
+            end;
+            Media.CalcFields(Content);
+            Media.Content.CreateInStream(IStr);
+            ExistingMediaTempBlob.CreateOutStream(OStr);
+            CopyStream(OStr, IStr);
+            if ReplicationAPI.GetImageHash(Response) <> ReplicationAPI.GetImageHash(ExistingMediaTempBlob) then begin
+                TempConfigMediaBuffer.Init();
+                if Response.HasValue() then begin
+                    Response.CreateInStream(IStr);
+                    TempConfigMediaBuffer."Media Set".ImportStream(IStr, '');
+                    TempConfigMediaBuffer.Insert();
+                end;
+                DestinationFRef.Value := Format(TempConfigMediaBuffer."Media Set");
+                exit(true);
+            end;
+        end;
+        exit(false);
+    end;
+
+    local procedure CheckMasterPicture(JToken: JsonToken; var RecRef: RecordRef; FieldNo: Integer; var TempFoundAPIField: Record "NPR Rep. Special Field Mapping"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient): Boolean
     var
         ServiceSetup: Record "NPR Replication Service Setup";
         ErrLog: Record "NPR Replication Error Log";
         ReplicationAPI: Codeunit "NPR Replication API";
         Response: Codeunit "Temp Blob";
+        FRef: FieldRef;
         StatusCode: Integer;
         NewImageIStr: InStream;
         TempBlobNewImage: Codeunit "Temp Blob";
@@ -274,9 +370,6 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         ImageHeight: Integer;
         PictureJToken: JsonToken;
     begin
-        if not CheckPictureImportIsSupported(RecRef) then
-            exit(false);
-
         if not JToken.SelectToken('$.' + TempFoundAPIField."API Field Name", PictureJToken) then
             exit(false);
 
@@ -287,30 +380,30 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         if EValuate(ImageWidth, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.width')) then;
         if Evaluate(ImageHeight, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.height')) then;
         MimeType := COPYSTR(ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.contentType'), 1, 100);
+        FRef := RecRef.Field(FieldNo);
 
         if (ImageWidth > 0) AND (ImageHeight > 0) and (MimeType <> '') then begin
             ServiceSetup.Get(ReplicationEndPoint."Service Code");
             ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, NewImageURL);
 
             if ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then begin
-                ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', NewImageURL, Response);
+                ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', NewImageURL, Response, ServiceSetup."Error Notify Email Address");
                 Commit();
                 Error(ImageCouldNotBeReadErr, RecRef.RecordId, ErrLog."Entry No.");
             end;
 
             ReadNewImage(Response, TempBlobNewImage, MimeType); // if use directly the InStream data(without read from temptable) sometimes the hash of 2 same png images is different.
-            ReadExistingImage(RecRef, TempBlobExistingImage);
+            ReadExistingImage(FRef, TempBlobExistingImage);
 
             if ReplicationAPI.GetImageHash(TempBlobNewImage) <> ReplicationAPI.GetImageHash(TempBlobExistingImage) then begin
                 Response.CreateInStream(NewImageIStr);
-                UpdateImage(RecRef, NewImageIStr, MimeType);
+                UpdateImage(FRef, NewImageIStr, MimeType);
                 Exit(true);
             end;
         end else begin // no image
-            if ClearImage(RecRef) then
+            if ClearImage(FRef) then
                 Exit(true);
         end;
-
         exit(false);
     end;
 
@@ -328,14 +421,25 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         end;
     end;
 
-    local procedure ReadExistingImage(var RecRef: RecordRef; var TempBlob: Codeunit "Temp Blob")
+    local procedure ReadExistingImage(FRef: FieldRef; var TempBlob: Codeunit "Temp Blob")
     var
         Media: Record "Tenant Media";
+        MediaSet: Record "Tenant Media Set";
         OStr: OutStream;
         IStr: InStream;
         MediaId: Guid;
+        MediaSetId: Guid;
     begin
-        MediaId := GetExistingImageMediaId(RecRef);
+        if FRef.Type = FRef.Type::MediaSet then begin
+            MediaSetId := FRef.Value;
+            if not IsNullGuid(MediaSetId) then begin
+                MediaSet.SetRange(ID, MediaSetId);
+                if MediaSet.FindFirst() then
+                    MediaId := Format(MediaSet."Media ID");
+            end;
+        end else
+            MediaId := FRef.Value;
+
         if not IsNullGuid(MediaId) then begin
             Media.Get(MediaId);
             if (Media.Content.HasValue()) then begin
@@ -347,105 +451,57 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         end;
     end;
 
-    local procedure GetExistingImageMediaId(RecRef: RecordRef) MediaId: Guid
+    local procedure UpdateImage(var FRef: FieldRef; IStr: InStream; MimeType: Text)
     var
-        Item: Record Item;
-        Customer: Record Customer;
-        Vendor: Record Vendor;
+        TempConfigMediaBuffer: Record "Config. Media Buffer" temporary;
     begin
-        Case RecRef.Number of
-            Database::Customer:
+        TempConfigMediaBuffer.Init();
+        Case FRef.Type of
+            FRef.Type::Media:
                 begin
-                    RecRef.SetTable(Customer);
-                    MediaId := Customer.Image.MediaId();
+                    TempConfigMediaBuffer.Media.ImportStream(IStr, '', MimeType);
+                    TempConfigMediaBuffer.Insert();
+                    FRef.Value := Format(TempConfigMediaBuffer.Media);
                 end;
-            Database::Item:
+            FRef.Type::MediaSet:
                 begin
-                    RecRef.SetTable(Item);
-                    if Item.Picture.Count > 0 then
-                        MediaId := Item.Picture.Item(1);
-                End;
-            Database::Vendor:
-                begin
-                    RecRef.SetTable(Vendor);
-                    MediaId := Vendor.Image.MediaId();
+                    TempConfigMediaBuffer."Media Set".ImportStream(IStr, '', MimeType);
+                    TempConfigMediaBuffer.Insert();
+                    FRef.Value := Format(TempConfigMediaBuffer."Media Set");
                 end;
-        end;
+        End;
     end;
 
-    local procedure UpdateImage(var RecRef: RecordRef; IStr: InStream; MimeType: Text)
+    local procedure ClearImage(var FRef: FieldRef): Boolean
     var
-        Item: Record Item;
-        Customer: Record Customer;
-        Vendor: Record Vendor;
+        EmptyGUID: Guid;
     begin
-        case RecRef.Number of
-            Database::Customer:
-                begin
-                    RecRef.SetTable(Customer);
-                    Clear(Customer.Image);
-                    Customer.Image.ImportStream(IStr, Customer.Name, MimeType);
-                    RecRef.GetTable(Customer);
-                end;
-            Database::Item:
-                begin
-                    RecRef.SetTable(Item);
-                    Clear(Item.Picture);
-                    Item.Picture.ImportStream(IStr, Item.Description, MimeType);
-                    RecRef.GetTable(Item);
-                end;
-            Database::Vendor:
-                begin
-                    RecRef.SetTable(Vendor);
-                    Clear(Vendor.Image);
-                    Vendor.Image.ImportStream(IStr, Vendor.Name, MimeType);
-                    RecRef.GetTable(Vendor);
-                end;
-        end;
-    end;
-
-    local procedure ClearImage(var RecRef: RecordRef): Boolean
-    var
-        Item: Record Item;
-        Customer: Record Customer;
-        Vendor: Record Vendor;
-    begin
-        case RecRef.Number of
-            Database::Customer:
-                begin
-                    RecRef.SetTable(Customer);
-                    if Customer.Image.HasValue then begin
-                        Clear(Customer.Image);
-                        RecRef.GetTable(Customer);
-                        exit(true);
-                    end;
-                end;
-            Database::Item:
-                begin
-                    RecRef.SetTable(Item);
-                    if Item.Picture.Count > 0 then begin
-                        Clear(Item.Picture);
-                        RecRef.GetTable(Item);
-                        exit(true);
-                    end;
-                end;
-            Database::Vendor:
-                begin
-                    RecRef.SetTable(Vendor);
-                    if Vendor.Image.HasValue then begin
-                        Clear(Vendor.Image);
-                        RecRef.GetTable(Vendor);
-                        exit(true);
-                    end;
-                end;
+        if not IsNullGuid(Format(FRef.Value)) then begin
+            FRef.Value := EmptyGUID;
+            exit(true);
         end;
         Exit(false);
     end;
 
-    local procedure CheckPictureImportIsSupported(RecRef: RecordRef): Boolean
+    local procedure CheckMasterPictureImportIsSupported(RecRef: RecordRef; FieldNo: Integer): Boolean
     var
+        Cust: Record Customer;
+        Item: Record Item;
+        Vendor: Record Vendor;
+        Employee: Record Employee;
     begin
-        Exit(RecRef.Number in [Database::Customer, Database::Item, Database::Vendor]);
+        Case RecRef.Number of
+            Database::Customer:
+                exit(FieldNo = Cust.FieldNo(Image));
+            Database::Item:
+                exit(FieldNo = Item.FieldNo(Picture));
+            Database::Vendor:
+                exit(FieldNo = Vendor.FieldNo(Image));
+            Database::Employee:
+                exit(FieldNo = Employee.FieldNo(Image));
+        end;
+
+        exit(false);
     end;
 
     local procedure GetJPathFieldFromSpecialFieldMapping(var TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping") JPathField: Text

@@ -461,7 +461,7 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'NPR Attribute Set ID';
                 }
 
-                field(nprMagentoDescription; Rec."NPR Magento Desc.")
+                field(nprMagentoDescription; TempNPRBlob."Buffer 1")
                 {
                     Caption = 'Magento Description';
                 }
@@ -470,10 +470,11 @@ page 6014501 "NPR APIV1 - Items"
                 {
                     Caption = 'Magento Name';
                 }
-                field(nprMagentoShortDescription; Rec."NPR Magento Short Desc.")
+                field(nprMagentoShortDescription; TempNPRBlob."Buffer 2")
                 {
                     Caption = 'Magento Short Description';
                 }
+
                 field(nprMagentoBrand; Rec."NPR Magento Brand")
                 {
                     Caption = 'Magento Brand';
@@ -636,8 +637,32 @@ page 6014501 "NPR APIV1 - Items"
     end;
 
     trigger OnAfterGetRecord()
+    var
+        OStr: OutStream;
     begin
         SetCalculatedFields();
+
+        // get Media fields
+        TempNPRBlob.Init();
+        if Rec."NPR Magento Desc.".HasValue() then begin
+            TempNPRBlob."Buffer 1".CreateOutStream(OStr);
+            GetTenantMedia(Rec."NPR Magento Desc.".MediaId, OStr);
+        end;
+        if Rec."NPR Magento Short Desc.".HasValue() then begin
+            TempNPRBlob."Buffer 2".CreateOutStream(OStr);
+            GetTenantMedia(Rec."NPR Magento Short Desc.".MediaId, OStr);
+        end;
+    end;
+
+    local procedure GetTenantMedia(MediaId: Guid; var OStr: OutStream)
+    var
+        TenantMedia: Record "Tenant Media";
+        IStr: InStream;
+    begin
+        TenantMedia.Get(MediaId);
+        TenantMedia.CalcFields(Content);
+        TenantMedia.Content.CreateInStream(IStr);
+        CopyStream(OStr, IStr);
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
@@ -691,6 +716,7 @@ page 6014501 "NPR APIV1 - Items"
         GraphCollectionMgtItem: Codeunit "Graph Collection Mgt - Item";
         InventoryValue: Decimal;
         BlankGUID: Guid;
+        TempNPRBlob: Record "NPR BLOB buffer" temporary;
         TaxGroupValuesDontMatchErr: Label 'The tax group values do not match to a specific Tax Group.';
         TaxGroupIdDoesNotMatchATaxGroupErr: Label 'The "taxGroupId" does not match to a Tax Group.', Comment = 'taxGroupId is a field name and should not be translated.';
         TaxGroupCodeDoesNotMatchATaxGroupErr: Label 'The "taxGroupCode" does not match to a Tax Group.', Comment = 'taxGroupCode is a field name and should not be translated.';

@@ -5,6 +5,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
 
     var
         APIIntegrationLbl: Label 'Replication API Integration - %1', Comment = '%1=API Version';
+
         ImportTypeDescriptionLbl: Label 'Replication integration. Run all enabled services';
 
         ReplicationSetupErr: Label 'Replication Setup is missing or it is disabled';
@@ -16,9 +17,12 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         ReplicationJobQueueCategoryCode: Label 'REP', locked = true;
 
         ReplicationCounterEvaluateErr: Label 'Cannot evaluate Replication Counter value %1 into a BigInteger.';
+
         ReplicationCounterCannotBeEmptyErr: Label 'Replication Counter cannot be empty.';
 
         MissingFieldInJsonErr: Label 'Field %1 is missing. Please contact support.';
+
+        ImportListErr: Label 'There are one or more Import List entries with Processing Runtime Error for this Replication Endpoint.';
 
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     begin
@@ -78,7 +82,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     begin
         ServiceSetup."API Version" := ImportType.Code;
         if (not ServiceSetup.Find()) or (not ServiceSetup.Enabled) then begin
-            ErrLog.InsertLog(ServiceSetup."API Version", ServiceSetup."Service URL", ReplicationSetupErr);
+            ErrLog.InsertLog(ServiceSetup."API Version", ServiceSetup."Service URL", ReplicationSetupErr, ServiceSetup."Error Notify Email Address");
             exit;
         end;
 
@@ -88,16 +92,16 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         if EndPointIDFilter <> '' then
             ServiceEndPoint.SetFilter("EndPoint ID", EndPointIDFilter);
         if ServiceEndPoint.IsEmpty() then begin
-            ErrLog.InsertLog(ServiceSetup."API Version", ServiceSetup."Service URL", ServiceEndPointErr);
+            ErrLog.InsertLog(ServiceSetup."API Version", ServiceSetup."Service URL", ServiceEndPointErr, ServiceSetup."Error Notify Email Address");
             exit;
         end;
         if ServiceEndPoint.FindSet() then
             repeat
-                CreateImportEntry(ServiceSetup, ServiceEndPoint, Client, ImportType, '');
+                CreateImportEntries(ServiceSetup, ServiceEndPoint, Client, ImportType, '');
             until ServiceEndPoint.Next() = 0;
     end;
 
-    local procedure CreateImportEntry(ServiceSetup: Record "NPR Replication Service Setup"; ServiceEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; ImportType: Record "NPR Nc Import Type"; NextLinkURI: Text)
+    local procedure CreateImportEntries(ServiceSetup: Record "NPR Replication Service Setup"; ServiceEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; ImportType: Record "NPR Nc Import Type"; NextLinkURI: Text)
     var
         ImportEntry: Record "NPR Nc Import Entry";
         ErrLog: Record "NPR Replication Error Log";
@@ -108,22 +112,25 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         BatchId: GUID;
         IsHandledSendWebRequest: Boolean;
     begin
-        BatchId := CreateGuid();
-        repeat
-            OnBeforeSendWebRequest(Response, NextLinkURI, IsHandledSendWebRequest);
-            if not IsHandledSendWebRequest then
-                SendWebRequest(ServiceSetup, ServiceEndPoint, Client, Response, StatusCode, Method, URI, NextLinkURI);
+        if CheckImportListErrors(ServiceEndPoint) then begin
+            BatchId := CreateGuid();
+            repeat
+                OnBeforeSendWebRequest(Response, NextLinkURI, IsHandledSendWebRequest);
+                if not IsHandledSendWebRequest then
+                    SendWebRequest(ServiceSetup, ServiceEndPoint, Client, Response, StatusCode, Method, URI, NextLinkURI);
 
-            if FoundErrorInResponse(Response, StatusCode) then begin
-                ErrLog.InsertLog(ServiceEndPoint."Service Code", ServiceEndPoint."EndPoint ID", Method, URI, Response);
-                Exit;
-            end else begin
-                if not SkipImportEntryCreationForNoDataResponse(ServiceEndPoint, Response) then begin
-                    InsertImportEntry(ImportEntry, ImportType.Code, BatchId, Response, ServiceEndPoint);
-                    Commit();
+                if FoundErrorInResponse(Response, StatusCode) then begin
+                    ErrLog.InsertLog(ServiceEndPoint."Service Code", ServiceEndPoint."EndPoint ID", Method, URI, Response, ServiceSetup."Error Notify Email Address");
+                    Exit;
+                end else begin
+                    if not SkipImportEntryCreationForNoDataResponse(ServiceEndPoint, Response) then begin
+                        InsertImportEntry(ImportEntry, ImportType.Code, BatchId, Response, ServiceEndPoint);
+                        Commit();
+                    end;
                 end;
-            end;
-        until NextLinkURI = ''; // for handling pagination
+            until NextLinkURI = ''; // for handling pagination
+        end else
+            ErrLog.InsertLog(ServiceSetup."API Version", ServiceEndPoint."EndPoint ID", ServiceSetup."Service URL" + ServiceEndPoint.Path, ImportListErr, ServiceSetup."Error Notify Email Address");
     end;
 
     procedure SendWebRequest(ServiceSetup: Record "NPR Replication Service Setup"; ServiceEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: integer; var Method: Code[10]; var URI: text; var NextLinkURI: Text)
@@ -224,7 +231,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             Codeunit::"NPR Nc Import List Processing",
             JQParamStrMgt.GetParamListAsCSString(),
             CopyStr(Strsubstno(APIIntegrationLbl, ServiceSetup."API Version"), 1, MaxStrLen(JobQueueEntry.Description)),
-            CurrentDateTime(),
+            CurrentDateTime() + 50000,
             JobQueueEntry."Starting Time",
             JobQueueEntry."Ending Time",
             JobQueueEntry."No. of Minutes between Runs",
@@ -452,7 +459,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         Endpoint.TestField(Enabled);
         SendWebRequest(Setup, EndPoint, Client, Response, StatusCode, Method, URI, NextLinkURI);
         if FoundErrorInResponse(Response, StatusCode) then begin
-            ErrLog.InsertLog(EndPoint."Service Code", EndPoint."EndPoint ID", Method, URI, Response);
+            ErrLog.InsertLog(EndPoint."Service Code", EndPoint."EndPoint ID", Method, URI, Response, Setup."Error Notify Email Address");
             Commit();
             Error(ImportErr)
         end else begin
@@ -664,7 +671,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
                 end;
             'enum', 'option':
                 begin
-                    if format(FRef) <> lowercase(SourceTxt) then
+                    if lowercase(format(FRef)) <> lowercase(SourceTxt) then
                         if Evaluate(FRef, SourceTxt) then
                             ValueChanged := true;
                 end;
@@ -707,6 +714,15 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     begin
         if Evaluate(ReplicationCounterOfEntity, SelectJsonToken(JToken.AsObject(), '$.replicationCounter')) then;
         Exit(NOT (ReplicationCounterOfEntity < ReplicationEndPoint."Replication Counter")); // means that we try to manually process an older version of the record which would overwrite latest changes.
+    end;
+
+    local procedure CheckImportListErrors(ServiceEndpoint: Record "NPR Replication Endpoint"): Boolean
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+    begin
+        ImportEntry.SetRange("Document ID", Format(ServiceEndpoint.RecordId));
+        ImportEntry.SetRange("Runtime Error", true);
+        exit(ImportEntry.IsEmpty());
     end;
 
     [IntegrationEvent(false, false)]

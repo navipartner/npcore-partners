@@ -204,6 +204,7 @@ codeunit 6151511 "NPR Nc Import Processor"
                     NcImportEntry2.Modify(true);
                 until NcImportEntry2.Next() = 0;
         end;
+        OAfterMarkUnimportedEntriesWithSameBatchIdAsError(NcImportEntry);
     end;
 
     local procedure CheckBatchImportEntriesOrder(pImportEntry: Record "NPR Nc Import Entry")
@@ -218,6 +219,11 @@ codeunit 6151511 "NPR Nc Import Processor"
             IF NOT ImportEntry.IsEmpty then
                 Error(BatchEntriesMustBeImportedInOrderErr, pImportEntry."Entry No.", pImportEntry."Batch Id");
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OAfterMarkUnimportedEntriesWithSameBatchIdAsError(NcImportEntry: Record "NPR Nc Import Entry")
+    begin
     end;
 }
 
