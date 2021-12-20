@@ -17,7 +17,7 @@ report 6014456 "NPR Sales per week year/Last"
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(Title; Title)
+            column(Report_Caption; Report_Caption_Lbl)
             {
             }
             column(text3; text3)
@@ -326,5 +326,6 @@ report 6014456 "NPR Sales per week year/Last"
         text6: Label 'Week %1';
         LastWeekText: Text[50];
         Title: Text[50];
+        Report_Caption_Lbl: Label 'Sales Per Week Year/Last Year';
 }
 
