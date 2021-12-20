@@ -1,0 +1,38 @@
+- name: Warehouse Management System Introduction
+  href: intro.md
+- name: Explanation
+  items:
+  - name: Capture service logging
+    href: explanation/cs-logging.md
+  - name: Capture service posting profile
+    href: explanation/cs-posting-profile.md
+  - name: Capture service printing
+    href: explanation/cs-printing.md
+  - name: Capture service setup.md
+    href: explanation/cs-setup.md
+  - name: Capture service UIs
+    href: explanation/cs-uis.md
+  - name: Capture service users
+    href: explanation/cs-users.md
+  - name: Main header setup
+    href: explanation/main-header-setup.md
+  - name: Role center (landing page)
+    href: explanation/role-center.md
+- name: How-to
+  items: 
+  - name: Create QR codes
+    href: howto/create-qr-codes.md
+  - name: Fetch setup data
+    href: howto/fetch-setup-data.md
+  - name: Install mobile apps
+    href: howto/install-mobile-apps.md
+  - name: Set up Business Central licensing
+    href: howto/set-up-bc-licensing.md
+  - name: Set up capture service users
+    href: howto/set-up-cs-users.md
+  - name: Set up RFID
+    href: howto/set-up-rfid.md
+  - name: Set up warehouse users
+    href: howto/set-up-warehouse-users.md
+  - name: Set up warehousing in Business Central
+    href: howto/set-up-warehousing-bc.md

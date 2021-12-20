@@ -95,10 +95,6 @@
   <div class="headertext">
     <p>NaviPartner Documentation</p>      
   </div>    
-  <div class="buttons">
-    <a href="product/gettingstarted/intro.md" class="button-65" role="button">Product Documentation</a>
-    <a href="api/gettingstarted/intro.md" class="button-65" role="button">API Documentation</a>
-  </div>
   <div class="descriptiontext">        
     <section>                   
       <p>NP Retail is an extension for Microsoft Business Central that adds Point of Sale capabilities to the ERP system along with auxiliary features such as RFID warehousing, Member & Ticket management, Replenishment, Receipt/Label printing, Webshop integration and much more.</p>

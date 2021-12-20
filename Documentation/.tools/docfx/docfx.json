@@ -4,9 +4,15 @@
       {
         "files": [
           "api/**.md",
-          "api/**/toc.yml",                    
-          "product/**.md",
-          "product/**/toc.yml",                    
+          "api/**/toc.yml",
+          "ecommerce/**.md",
+          "ecommerce/**/toc.yml",                    
+          "entertainment/**.md",
+          "entertainment/**/toc.yml",
+          "retail/**.md",
+          "retail/**/toc.yml",    
+          "wms/**.md",
+          "wms/**/toc.yml",   
           "toc.yml",
           "*.md"          
         ],
