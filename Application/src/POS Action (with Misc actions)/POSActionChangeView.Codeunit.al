@@ -74,10 +74,8 @@ codeunit 6150724 "NPR POS Action - Change View"
                         if (POSSaleLine.RefreshCurrent()) then
                             Error(RemainingLines)
                     end;
-
-                    Commit();
-
                     POSSession.StartPOSSession();
+
                 end;
             ViewType::Sale:
                 POSSession.ChangeViewSale();

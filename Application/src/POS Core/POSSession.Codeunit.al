@@ -484,7 +484,7 @@ codeunit 6150700 "NPR POS Session"
         InAction := InActionNew;
     end;
 
-    procedure SetView(View: Codeunit "NPR POS View")
+    procedure InitializeViewDataSources(View: Codeunit "NPR POS View")
     begin
         CurrentView := View;
         InitializeDataSources();
