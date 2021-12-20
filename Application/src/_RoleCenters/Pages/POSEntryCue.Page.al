@@ -11,7 +11,7 @@ page 6151260 "NPR POS Entry Cue"
         {
             cuegroup("POS Entry Unposted Posting")
             {
-                Caption = 'Unposted postings';
+                Caption = 'Unposted Postings';
                 field(UnpostedItemTrans; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Unposted Item Trans."))))
                 {
                     Caption = 'Unposted Item Transactions';
@@ -47,7 +47,7 @@ page 6151260 "NPR POS Entry Cue"
             }
             cuegroup("POS Entry Failed Posting")
             {
-                Caption = 'Failed postings';
+                Caption = 'Failed Postings';
                 field(FailedItemTrans; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed Item Transaction."))))
                 {
                     Caption = 'Failed Item Transactions';

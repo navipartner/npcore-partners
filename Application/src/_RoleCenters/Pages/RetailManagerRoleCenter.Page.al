@@ -7,6 +7,11 @@ page 6151241 "NPR Retail Manager Role Center"
     {
         area(rolecenter)
         {
+            part(Headline; "NPR generic retail Headline")
+            {
+                ApplicationArea = NPRRetail;
+
+            }
             part(Control6150616; "NPR Activities")
             {
                 ApplicationArea = NPRRetail;
