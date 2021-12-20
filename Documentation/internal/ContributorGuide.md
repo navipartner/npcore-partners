@@ -4,7 +4,7 @@ Technical documentation helps an intended audience use your product, understand 
 
 This document guides you through the process of standardizing and delivering external documentation that complies with our users' needs.
 
-It's recommended that you read through the whole guide as a part of the onboarding process for delivering documentation, but its main purpose is that of a reference which you can turn to whenever you're not sure how to structure your topics. If you have dilemmas about the technical side of the documentation process, refer to the Technical Guide.
+It's recommended that you read through the whole guide as a part of the onboarding process for delivering documentation, but its main purpose is that of a reference which you can turn to whenever you're not sure how to structure your topics. If you have dilemmas about the technical side of the documentation process, refer to the [Technical Guide](./TechnicalGuide.md).
 
 ## Which documentation is external?
 External documentation describes or contains instructions for something customers ask consultants to help them with on a regular or a semi-regular basis. 
@@ -94,13 +94,13 @@ Explanations are understanding-oriented. They contain descriptions, explanations
 
  Follow this structure:
 
-![Explanation structure](images/explanation_structure_plan.png)
+![Explanation structure](images/explanation_picture.png)
 
   - Provide context.
   - Provide only the information users may be interested in; don't explain too much.
   - Write sentences that provide useful information. Sentences like "The login field is used for logging in." are unnecessary.
   - Don't instruct or provide technical reference.
-  - When listing something, use bulleted lists, not numbered lists.
+  - Avoid using numbered lists when there's no chronological order or listed items. 
 
 ## Creating screenshots
 Although it's highly recommended to replace screenshots with text in documentation due to future GUI changes, it's also important to have a unified procedure and tools for taking and formatting screenshots.
@@ -109,18 +109,20 @@ A good screenshot should be focused on the point you're trying to illustrate to 
 It shouldn't be too big - don't distract users with unnecessary information. Screenshots should serve as a quick illustration of the preceding sentence or paragraph, they shouldn't introduce new information. For example, if I want to indicate to users where they can find the option for changing the user language in YouTube, I would use the following screenshot:  
 
 
-
-  ![Good screenshot example](images/Screenshot_How_To_Youtube_Example.PNG)  
+  ![Good screenshot example](images/screenshot_example.png)  
 
 The screenshot clearly indicates which part of the screen is of interest and which button needs to be clicked to achieve the desired outcome.
 
 It also helps to frame the screenshot with a subtle dark-grey frame and put a smaller, red frame around the button that users need to find.
 
-
-I recommend the [Greenshot](https://getgreenshot.org/downloads/) screenshot-capturing tool, since it's easy to use and has many useful options.
-
 > [!NOTE]
 > Avoid adding multiple screenshots one after the other. Wherever possible, try to add some text between them.
+
+I use the following tools for capturing and editing screenshots:
+
+- [Sniptool](https://www.reasyze.com/sniptool/) for capturing screenshots. Sniptool also has a really friendly editor.
+- [Paint.net](https://www.getpaint.net/) for cropping screenshots and framing important segments.
+
 
 ## Defining tooltips
 
@@ -164,11 +166,3 @@ To ensure that the documentation style is unified, the following recommendations
    You shouldn't write about things that users can already clearly see in the app.
    - **Repetitive content**  
    There's no need to state the same thing more than once per a topic.
-
-
-
-
-
-
-
-

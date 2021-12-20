@@ -15,9 +15,7 @@ The total value of written or received checks which haven't yet come out or been
 
 # Set up the initial cash float on a POS unit
 
-A cash float is (usually) a small amount of cash reserved for customers if they don't have the exact amount ready to make a payment.
-
-The following procedure explains how to insert the initial cash float on a new POS unit for the first time. 
+The following procedure explains how to insert the initial cash float on a new POS unit for the first time. It doesn't generate any accounting entries as it covers different situations. 
 
 In certain scenarios, it doesn't generate any accounting entries:
 - If an external retail client is converted into the NP Retail solution - the cash float is already accounted for in the accounts associated with the original register. Therefore, a new transaction doesn't need to be generated for it (the entry will simply be duplicated).
@@ -30,9 +28,9 @@ In certain scenarios, it doesn't generate any accounting entries:
 - Create a cash register.
 - Use the cash register ID to create a POS unit.
 - Create a POS payment bin which is used for that POS unit.
-- Insert the initial cash float in the POS payment bin.
 
-
+> [!Note]
+> Links should be added to all of the listed items. 
 
 # Create a new POS store
 
@@ -51,14 +49,11 @@ Various information about POS stores are contained within the POS store cards. T
    The values you've entered are automatically saved.
 
 
-
 # Create a new cash register
 
 Cash registers are used for logging transactions that occur in a POS store. They create a record of the money that comes in and goes out.
 
 The minimal requirement for creating a functional cash register is indicated in the following screenshots:
-
-
 
 
 # Create a new POS unit

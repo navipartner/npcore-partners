@@ -1,0 +1,1 @@
+# Set up warehousing in Business Central
