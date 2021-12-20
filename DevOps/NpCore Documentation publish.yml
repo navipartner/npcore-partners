@@ -22,7 +22,7 @@ steps:
   inputs:
     targetType: 'filePath'
     filePath: '$(System.DefaultWorkingDirectory)\Documentation\.tools\deploy.ps1'
-    arguments: '-workspaceFolder $(System.DefaultWorkingDirectory) -docfxUrl $(docfxUrl) -AzureBlobStorageUrl $(azureBlobStorageUrl) -AzureBlobStorageSAS $env:BLOB_SAS_TOKEN -AzureCopyUrl $(azureCopyUrl)'
+    arguments: '-workspaceFolder "$(System.DefaultWorkingDirectory)" -docfxUrl $(docfxUrl) -AzureBlobStorageUrl $(azureBlobStorageUrl) -AzureBlobStorageSAS $env:BLOB_SAS_TOKEN -AzureCopyUrl $(azureCopyUrl)'
   displayName: 'Publish documentation'
   env:
     BLOB_SAS_TOKEN: $(BlobSASToken)
