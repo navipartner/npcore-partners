@@ -1,5 +1,11 @@
-- name: Product Documentation
-  href: product/
+- name: NP Retail
+  href: retail/
+- name: NP Entertainment
+  href: entertainment/
+- name: NP WMS
+  href: wms/
+- name: NP E-commerce
+  href: ecommerce/
 - name: API Documentation
   href: api/ 
 - name: Old Documentation
