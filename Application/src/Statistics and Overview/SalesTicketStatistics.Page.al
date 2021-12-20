@@ -1,12 +1,5 @@
 page 6014468 "NPR Sales Ticket Statistics"
 {
-    // NPR700.000    2201.13   TS : Added to replace Period Button which were previously on the forms.
-    // NPR4.10/MMV/20150611 CASE 215921 Added code from latest 6.2 release
-    // NPR4.12/MMV/20150618 CASE 215921 Added filters now that they aren't hardcoded in the table function
-    //                                  Fixed bug on field Debitsale OnDrillDown
-    // NPR4.16/JDH/20151019 CASE 225415 Recompiled to refresh field links to Register (fields have been rearranged)
-    // NPR5.31/JLK /20170326  CASE 269893 Correct filters for calculation of No. of Exp field
-
     Caption = 'Sales Ticket Statistics';
     PageType = List;
     SourceTable = Date;
@@ -18,37 +11,6 @@ page 6014468 "NPR Sales Ticket Statistics"
     {
         area(content)
         {
-            repeater(Control6150613)
-            {
-                ShowCaption = false;
-                field("Period Start"; Rec."Period Start")
-                {
-
-                    ToolTip = 'Specifies the value of the Period Start field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Period Name"; Rec."Period Name")
-                {
-
-                    ToolTip = 'Specifies the value of the Period Name field';
-                    ApplicationArea = NPRRetail;
-                }
-
-                field(totalCount; totalCount)
-                {
-
-                    Caption = 'Number of Transactions';
-                    ToolTip = 'Specifies the value of the Number of Transactions field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(CalculatedAverage; CalcAverage())
-                {
-
-                    Caption = 'Average of Transactions';
-                    ToolTip = 'Specifies the value of the Average of Transactions field';
-                    ApplicationArea = NPRRetail;
-                }
-            }
             group(Control6150623)
             {
                 ShowCaption = false;
@@ -60,6 +22,10 @@ page 6014468 "NPR Sales Ticket Statistics"
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
                     ToolTip = 'Specifies the value of the Dept. Code field';
                     ApplicationArea = NPRRetail;
+                    Trigger OnValidate()
+                    begin
+                        CurrPage.Update();
+                    end;
                 }
                 field(Dim2Filter; Dim2Filter)
                 {
@@ -69,6 +35,10 @@ page 6014468 "NPR Sales Ticket Statistics"
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
                     ToolTip = 'Specifies the value of the Project Code field';
                     ApplicationArea = NPRRetail;
+                    Trigger OnValidate()
+                    begin
+                        CurrPage.Update();
+                    end;
                 }
                 field(PeriodType; PeriodType)
                 {
@@ -114,6 +84,37 @@ page 6014468 "NPR Sales Ticket Statistics"
                         end;
                         //-TS
                     end;
+                }
+            }
+            repeater(Control6150613)
+            {
+                ShowCaption = false;
+                field("Period Start"; Rec."Period Start")
+                {
+
+                    ToolTip = 'Specifies the value of the Period Start field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Period Name"; Rec."Period Name")
+                {
+
+                    ToolTip = 'Specifies the value of the Period Name field';
+                    ApplicationArea = NPRRetail;
+                }
+
+                field(totalCount; totalCount)
+                {
+
+                    Caption = 'Number of Transactions';
+                    ToolTip = 'Specifies the value of the Number of Transactions field';
+                    ApplicationArea = NPRRetail;
+                }
+                field(CalculatedAverage; CalcAverage())
+                {
+
+                    Caption = 'Average of Transactions';
+                    ToolTip = 'Specifies the value of the Average of Transactions field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
