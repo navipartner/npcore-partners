@@ -93,6 +93,11 @@ page 6014495 "NPR Replication Setup Card"
                     }
                 }
 
+                field("Error Notify Email Address"; Rec."Error Notify Email Address")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Error Notification Email Address';
+                }
                 group(Authorization)
                 {
                     Caption = 'Authorization';

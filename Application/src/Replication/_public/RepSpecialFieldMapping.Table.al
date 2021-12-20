@@ -73,7 +73,7 @@ table 6014602 "NPR Rep. Special Field Mapping"
         }
     }
 
-    procedure RegisterSpecialFieldMapping(pServiceCode: Code[20]; pEndPointID: Text[50]; pTableID: integer; pFieldId: integer; pAPIFieldName: Text[30]; pPriority: Integer; pValidate: Boolean; pSkip: Boolean)
+    procedure RegisterSpecialFieldMapping(pServiceCode: Code[20]; pEndPointID: Text[50]; pTableID: integer; pFieldId: integer; pAPIFieldName: Text[100]; pPriority: Integer; pValidate: Boolean; pSkip: Boolean)
     begin
         Rec."Service Code" := pServiceCode;
         Rec."EndPoint ID" := pEndPointID;

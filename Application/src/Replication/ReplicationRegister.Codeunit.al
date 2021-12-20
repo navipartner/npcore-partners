@@ -3,6 +3,7 @@ codeunit 6014608 "NPR Replication Register"
     Access = Internal;
 
     var
+        ReplicationErrLogEmailTemplateCode: Label 'REPLICATION_ERR_LOG', Locked = true;
         ItemsServiceCodeLbl: Label 'Item_NPAPI V1', Locked = true;
         ItemsServiceNameLbl: Label 'Item - NP Replication API V1.0';
         CustServiceCodeLbl: Label 'Cust_NPAPI V1', Locked = true;
@@ -537,6 +538,12 @@ codeunit 6014608 "NPR Replication Register"
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
             Rec.FieldNo("NPR Attribute Set ID"), 'nprAttributeSetID', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo("NPR Magento Desc."), 'nprMagentoDescription@odata.mediaReadLink', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo("NPR Magento Short Desc."), 'nprMagentoShortDescription@odata.mediaReadLink', 0, false, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
@@ -1331,6 +1338,68 @@ codeunit 6014608 "NPR Replication Register"
     end;
 
     #endregion
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Service Setup", 'OnAfterValidateEvent', 'Error Notify Email Address', true, true)]
+    local procedure CreateDefaultEmailTemplate()
+    var
+        EmailTemplate: Record "NPR E-mail Template Header";
+        EmailTemplateLine: Record "NPR E-mail Templ. Line";
+        Lines: List of [Text];
+        i: Integer;
+        ErrorLogUrlTxt: Text;
+    begin
+        EmailTemplate.SetRange("Table No.", Database::"NPR Replication Error Log");
+        if not EmailTemplate.IsEmpty() then
+            exit;
+
+        EmailTemplate.Init();
+        EmailTemplate.Code := ReplicationErrLogEmailTemplateCode;
+        EmailTemplate.Description := 'Send Replication Error Log';
+        EmailTemplate.Subject := 'Data Replication Error';
+        EmailTemplate."Table No." := Database::"NPR Replication Error Log";
+        EmailTemplate."Fieldnumber Start Tag" := '$(';
+        EmailTemplate."Fieldnumber End Tag" := '$)';
+        EmailTemplate.Insert();
+
+        Lines.Add('There was an error in the Replication Process.');
+        Lines.Add('');
+        Lines.Add('Company Name: ' + CompanyName());
+        Lines.Add('Error Log Entry No.: $(1$)');
+        Lines.Add('API Version: $(10$)');
+        Lines.Add('Endpoint Id: $(15$)');
+        ErrorLogUrlTxt := 'Error Log URL: ' + System.GetUrl(ClientType::Web, CompanyName(), ObjectType::Page, Page::"NPR Replication Error Log");
+        if StrLen(ErrorLogUrlTxt) <= MaxStrLen(EmailTemplateLine."Mail Body Line") then
+            Lines.Add(ErrorLogUrlTxt);
+        Lines.Add('');
+        Lines.Add('Error Message:');
+        Lines.Add('$(31$)');
+
+        for i := 1 to Lines.Count() do begin
+            EmailTemplateLine.Init();
+            EmailTemplateLine."E-mail Template Code" := EmailTemplate.Code;
+            EmailTemplateLine."Line No." := i * 10000;
+            EmailTemplateLine."Mail Body Line" := Lines.Get(i);
+            EmailTemplateLine.Insert();
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR E-mail Template Header", 'OnAfterDeleteEvent', '', true, true)]
+    local procedure DeleteRepSetupNotificationEmailAddressOnEmailTemplateDelete(var Rec: Record "NPR E-mail Template Header"; RunTrigger: Boolean)
+    var
+        ReplicationSetup: Record "NPR Replication Service Setup";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if Rec.Code <> ReplicationErrLogEmailTemplateCode then
+            exit;
+
+        if ReplicationSetup.Findset(true, false) then
+            repeat
+                ReplicationSetup."Error Notify Email Address" := '';
+                ReplicationSetup.Modify();
+            until ReplicationSetup.Next() = 0;
+    end;
 
     local procedure GetAPIServiceURL() BaseURL: Text
     begin

@@ -229,6 +229,12 @@ table 6014588 "NPR Replication Service Setup"
                 Rec.TestField(Enabled, false);
             end;
         }
+
+        field(60; "Error Notify Email Address"; Text[100])
+        {
+            Caption = 'Error Notification Email Address';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

@@ -20,12 +20,14 @@ codeunit 6014622 "NPR Replication Import Entry"
         Content: Codeunit "Temp Blob";
         EndPoint: Interface "NPR Replication IEndpoint Meth";
     begin
-        GetServiceEndpoint(ImportEntry, ServiceEndPoint);
+        if not GetServiceEndpoint(ImportEntry, ServiceEndPoint) then
+            Error(GetLastErrorText());
         Content.FromRecord(ImportEntry, ImportEntry.FieldNo("Document Source"));
         EndPoint := ServiceEndPoint."EndPoint Method";
         EndPoint.ProcessImportedContent(Content, ServiceEndPoint);
     end;
 
+    [TryFunction]
     local procedure GetServiceEndpoint(ImportEntry: Record "NPR Nc Import Entry"; var ServiceEndPoint: Record "NPR Replication Endpoint")
     var
         DataTypeMgt: Codeunit "Data Type Management";
@@ -41,5 +43,19 @@ codeunit 6014622 "NPR Replication Import Entry"
         if RecRef.Name() <> ServiceEndPoint.TableName() then
             Error(UnexpectedRecordLbl, ServiceEndpoint.TableName(), ImportEntry.FieldName("Document ID"), ImportEntry.TableCaption(), ImportEntry."Entry No.");
         RecRef.SetTable(ServiceEndPoint);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Import Processor", 'OAfterMarkUnimportedEntriesWithSameBatchIdAsError', '', true, true)]
+    local procedure SendProcessErrorEmailNotification(NcImportEntry: Record "NPR Nc Import Entry")
+    var
+        ServiceSetup: Record "NPR Replication Service Setup";
+        ServiceEndPoint: Record "NPR Replication Endpoint";
+        ErrLog: Record "NPR Replication Error Log";
+    begin
+        if NcImportEntry."Runtime Error" and (NOT IsNullGuid(NcImportEntry."Batch Id")) then
+            if GetServiceEndpoint(NcImportEntry, ServiceEndPoint) then begin
+                ServiceSetup.Get(ServiceEndPoint."Service Code");
+                ErrLog.InsertLog(ServiceSetup."API Version", ServiceEndPoint."EndPoint ID", ServiceSetup."Service URL" + ServiceEndPoint.Path, NcImportEntry."Error Message", ServiceSetup."Error Notify Email Address");
+            end;
     end;
 }

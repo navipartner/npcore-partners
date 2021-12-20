@@ -51,6 +51,11 @@ page 6014487 "NPR Replication Error Log"
                     ToolTip = 'Specifies the User ID who created the entry.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Email Notification Sent"; Rec."Email Notification Sent")
+                {
+                    ToolTip = 'Specifies if a notification was sent by E-mail about the error.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

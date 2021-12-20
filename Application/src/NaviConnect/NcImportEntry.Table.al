@@ -149,7 +149,7 @@ table 6151504 "NPR Nc Import Entry"
         key(Key1; "Entry No.")
         {
         }
-        key(Key2; "Document ID", "Sequence No.")
+        key(Key2; "Document ID", "Sequence No.", "Runtime Error")
         {
         }
         key(Key3; "Import Type", Date, Imported)
@@ -184,7 +184,7 @@ table 6151504 "NPR Nc Import Entry"
             IF DeleteConfirmed then begin
                 ImportEntry.SetRange("Import Type", Rec."Import Type");
                 ImportEntry.SetRange("Batch Id", Rec."Batch Id");
-                If NOT ImportEntry.IsEmpty then
+                If NOT ImportEntry.IsEmpty() then
                     ImportEntry.DeleteAll();
             end else
                 Error('');

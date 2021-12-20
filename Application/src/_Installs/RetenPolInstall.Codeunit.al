@@ -27,7 +27,8 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         tabledata "NPR POS Posting Log" = rd,
         tabledata "NPR EFT Transaction Request" = rd,
         tabledata "NPR Aux. Value Entry" = rd,
-        tabledata "NPR Aux. Item Ledger Entry" = rd;
+        tabledata "NPR Aux. Item Ledger Entry" = rd,
+        tabledata "NPR Replication Error Log" = rd;
 
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
@@ -79,6 +80,8 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         AddAllowedTable(Database::"NPR POS Entry Sales Line", RtnPeriodEnum::"5 Years");
         AddAllowedTable(Database::"NPR POS Entry Payment Line", RtnPeriodEnum::"5 Years");
         AddAllowedTable(Database::"NPR POS Balancing Line", RtnPeriodEnum::"5 Years");
+
+        AddAllowedTable(Database::"NPR Replication Error Log", RtnPeriodEnum::"1 Month");
 
         // do not forget to add table to DeleteRecordsWithIndirectPermissionsOnApplyRetentionPolicyIndirectPermissionRequired below
         // and to CDU permissions
@@ -188,7 +191,8 @@ codeunit 6014496 "NPR Reten. Pol. Install"
             Database::"NPR POS Posting Log",
             Database::"NPR EFT Transaction Request",
             Database::"NPR Aux. Value Entry",
-            Database::"NPR Aux. Item Ledger Entry"])
+            Database::"NPR Aux. Item Ledger Entry",
+            Database::"NPR Replication Error Log"])
         then
             exit;
 
