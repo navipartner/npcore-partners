@@ -27,7 +27,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Variety Group", 'OnBeforeModifyEvent', '', false, false)]
@@ -43,7 +42,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Variety Group", 'OnBeforeRenameEvent', '', false, false)]
@@ -74,7 +72,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Variety", 'OnBeforeModifyEvent', '', false, false)]
@@ -90,7 +87,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Variety", 'OnBeforeRenameEvent', '', false, false)]
@@ -121,7 +117,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Variety Table", 'OnBeforeModifyEvent', '', false, false)]
@@ -137,7 +132,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Variety Table", 'OnBeforeRenameEvent', '', false, false)]
@@ -168,7 +162,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Variety Value", 'OnBeforeModifyEvent', '', false, false)]
@@ -184,7 +177,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Variety Value", 'OnBeforeRenameEvent', '', false, false)]
@@ -215,7 +207,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Attribute", 'OnBeforeModifyEvent', '', false, false)]
@@ -231,7 +222,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Attribute", 'OnBeforeRenameEvent', '', false, false)]
@@ -263,7 +253,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Attribute ID", 'OnBeforeModifyEvent', '', false, false)]
@@ -310,7 +299,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Period Discount", 'OnBeforeModifyEvent', '', false, false)]
@@ -342,7 +330,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Period Discount Line", 'OnBeforeInsertEvent', '', false, false)]
@@ -358,7 +345,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Period Discount Line", 'OnBeforeModifyEvent', '', false, false)]
@@ -390,7 +376,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Aux. Item Ledger Entry", 'OnBeforeInsertEvent', '', false, false)]
@@ -406,7 +391,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Aux. Item Ledger Entry", 'OnBeforeModifyEvent', '', false, false)]
@@ -422,7 +406,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Aux. Item Ledger Entry", 'OnBeforeRenameEvent', '', false, false)]
@@ -438,7 +421,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Aux. G/L Entry", 'OnBeforeInsertEvent', '', false, false)]
@@ -499,7 +481,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Disc. Time Interv.", 'OnBeforeModifyEvent', '', false, false)]
@@ -515,7 +496,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Disc. Time Interv.", 'OnBeforeRenameEvent', '', false, false)]
@@ -531,7 +511,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount Level", 'OnBeforeInsertEvent', '', false, false)]
@@ -547,7 +526,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount Level", 'OnBeforeModifyEvent', '', false, false)]
@@ -563,7 +541,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount Level", 'OnBeforeRenameEvent', '', false, false)]
@@ -579,7 +556,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount Line", 'OnBeforeInsertEvent', '', false, false)]
@@ -595,7 +571,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount Line", 'OnBeforeModifyEvent', '', false, false)]
@@ -611,7 +586,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount Line", 'OnBeforeRenameEvent', '', false, false)]
@@ -627,7 +601,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount", 'OnBeforeInsertEvent', '', false, false)]
@@ -643,7 +616,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount", 'OnBeforeModifyEvent', '', false, false)]
@@ -659,7 +631,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount", 'OnBeforeRenameEvent', '', false, false)]
@@ -675,7 +646,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NpDc Coupon Type", 'OnBeforeInsertEvent', '', false, false)]
@@ -691,7 +661,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NpDc Coupon Type", 'OnBeforeModifyEvent', '', false, false)]
@@ -707,7 +676,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NpDc Coupon Type", 'OnBeforeRenameEvent', '', false, false)]
@@ -723,7 +691,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     #endregion
@@ -742,7 +709,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnBeforeModifyEvent', '', false, false)]
@@ -788,7 +754,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Customer Bank Account", 'OnBeforeModifyEvent', '', false, false)]
@@ -834,7 +799,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item", 'OnBeforeModifyEvent', '', false, false)]
@@ -880,7 +844,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item Category", 'OnBeforeModifyEvent', '', false, false)]
@@ -926,7 +889,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnBeforeModifyEvent', '', false, false)]
@@ -972,7 +934,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Default Dimension", 'OnBeforeModifyEvent', '', false, false)]
@@ -1018,7 +979,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Dimension", 'OnBeforeModifyEvent', '', false, false)]
@@ -1064,7 +1024,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Dimension Value", 'OnBeforeModifyEvent', '', false, false)]
@@ -1110,7 +1069,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item Reference", 'OnBeforeModifyEvent', '', false, false)]
@@ -1156,7 +1114,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item Unit Of Measure", 'OnBeforeModifyEvent', '', false, false)]
@@ -1202,7 +1159,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Unit Of Measure", 'OnBeforeModifyEvent', '', false, false)]
@@ -1248,7 +1204,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Price List Header", 'OnBeforeModifyEvent', '', false, false)]
@@ -1294,7 +1249,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeModifyEvent', '', false, false)]
@@ -1745,7 +1699,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Vendor", 'OnBeforeModifyEvent', '', false, false)]
@@ -1791,7 +1744,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Vendor Bank Account", 'OnBeforeModifyEvent', '', false, false)]
@@ -1837,7 +1789,6 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Vendor Posting Group", 'OnBeforeModifyEvent', '', false, false)]
