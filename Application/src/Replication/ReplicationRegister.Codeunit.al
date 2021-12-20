@@ -1,6 +1,12 @@
 codeunit 6014608 "NPR Replication Register"
 {
     Access = Internal;
+    Permissions =
+        tabledata "NPR Replication Service Setup" = rim,
+        tabledata "NPR Replication Endpoint" = rim,
+        tabledata "NPR Rep. Special Field Mapping" = rim,
+        tabledata "NPR E-mail Template Header" = rim,
+        tabledata "NPR E-mail Templ. Line" = rim;
 
     var
         ReplicationErrLogEmailTemplateCode: Label 'REPLICATION_ERR_LOG', Locked = true;
