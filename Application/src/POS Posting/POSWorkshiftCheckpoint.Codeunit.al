@@ -491,6 +491,8 @@
             DimMgt.UpdateGlobalDimFromDimSetID(SalePOS."Dimension Set ID", SalePOS."Shortcut Dimension 1 Code", SalePOS."Shortcut Dimension 2 Code");
 
             EntryNo := POSCreateEntry.CreateBalancingEntryAndLines(SalePOS, (Mode <> EodWorkshiftMode::ZREPORT), CheckPointEntryNo);
+            if (EntryNo = 0) then
+                exit(0);
 
             StoreCountedDenominations(UnitNo, CheckPointEntryNo);
 
