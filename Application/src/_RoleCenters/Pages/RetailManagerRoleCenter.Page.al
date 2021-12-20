@@ -634,14 +634,6 @@ page 6151241 "NPR Retail Manager Role Center"
                     ToolTip = 'Executes the Item Categories action';
                     ApplicationArea = NPRRetail;
                 }
-                action("Stockkeeping Unit List")
-                {
-                    Caption = 'Stockkeeping Unit List';
-                    RunObject = Page "Stockkeeping Unit List";
-
-                    ToolTip = 'Executes the Stockkeeping Unit List action';
-                    ApplicationArea = NPRRetail;
-                }
             }
             group(Journals)
             {
