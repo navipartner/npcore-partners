@@ -49,9 +49,9 @@ page 6014597 "NPR Prod. Group Code Stats"
                 field("-LastYear Sale Quantity"; -"LastYear Sale Quantity")
                 {
 
-                    Caption = 'No.';
+                    Caption = 'Last Year Sale Quantity';
                     Visible = LSQTY;
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the value of the Last Year Sale Quantity field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sale Amount"; "Sale Amount")
@@ -75,16 +75,16 @@ page 6014597 "NPR Prod. Group Code Stats"
                 field(SalesAmt; SalesAmt)
                 {
 
-                    Caption = 'SalesAmtILE';
-                    ToolTip = 'Specifies the value of the SalesAmtILE field';
+                    Caption = 'Sales Amount';
+                    ToolTip = 'Specifies the value of the Sales Amount field';
                     ApplicationArea = NPRRetail;
                 }
                 field("LastYear Sale Amount"; "LastYear Sale Amount")
                 {
 
-                    Caption = 'No.';
+                    Caption = 'Last Year Sale Amount';
                     Visible = LSAmount;
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the value of the Last Year Sale Amount field';
                     ApplicationArea = NPRRetail;
                 }
                 field("-CostAmt"; -CostAmt)
