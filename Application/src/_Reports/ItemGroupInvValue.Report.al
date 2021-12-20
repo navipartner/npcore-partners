@@ -7,6 +7,8 @@ report 6014448 "NPR Item Group Inv. Value"
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
 
+
+
     dataset
     {
         dataitem("Item Category"; "Item Category")
@@ -104,6 +106,12 @@ report 6014448 "NPR Item Group Inv. Value"
                     Clear(Dg);
             end;
         }
+    }
+
+    requestpage
+    {
+        SaveValues = true;
+
     }
 
     labels
