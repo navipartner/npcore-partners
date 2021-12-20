@@ -112,9 +112,7 @@ NOTE: BC17.5 compilation still happens with BC17 flag so when the examples below
 
 2. Code should compile into anything higher than BC17 (feature was added in later versions): 
 ```
-#if BC17
-// Do nothing
-#else
+#if not BC17
 // AL Code using a feature that was added in BC18 and forward.
 #endif
 ```
