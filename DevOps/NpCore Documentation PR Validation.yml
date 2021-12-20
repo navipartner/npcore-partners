@@ -11,5 +11,5 @@ steps:
   inputs:
     targetType: 'filePath'
     filePath: '$(System.DefaultWorkingDirectory)\Documentation\.tools\validate.ps1'
-    arguments: "-workspaceFolder $(System.DefaultWorkingDirectory) -docfxUrl $(docfxUrl)"
+    arguments: '-workspaceFolder "$(System.DefaultWorkingDirectory)" -docfxUrl $(docfxUrl)'
   displayName: 'Validate Documentation'
