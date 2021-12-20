@@ -667,20 +667,20 @@ page 6151241 "NPR Retail Manager Role Center"
                     ToolTip = 'Executes the Physical Inventory Journals action';
                     ApplicationArea = NPRRetail;
                 }
-                action("Retail Journal List")
-                {
-                    Caption = 'Retail Journal List';
-                    RunObject = page "NPR Retail Journal List";
-
-                    ToolTip = 'Executes the Retail Journal List action';
-                    ApplicationArea = NPRRetail;
-                }
                 action(ItemWorksheets)
                 {
 
                     Caption = 'Item Worksheets';
                     RunObject = page "NPR Item Worksheets";
                     ToolTip = 'Executes the Item Worksheets action';
+                    ApplicationArea = NPRRetail;
+                }
+                action("Retail Journal List")
+                {
+                    Caption = 'Retail Journal List';
+                    RunObject = page "NPR Retail Journal List";
+
+                    ToolTip = 'Executes the Retail Journal List action';
                     ApplicationArea = NPRRetail;
                 }
 
