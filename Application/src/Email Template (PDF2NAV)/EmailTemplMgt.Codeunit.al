@@ -44,6 +44,9 @@
     var
         "Field": Record "Field";
         FRef: FieldRef;
+        TempBlob: Codeunit "Temp Blob";
+        IStr: InStream;
+        Line: Text;
     begin
         Field.Get(RecRef.Number, FieldNo);
         FRef := RecRef.Field(FieldNo);
@@ -51,7 +54,17 @@
         if Field.Class = Field.Class::FlowField then
             FRef.CalcField();
 
-        FieldValue := Format(FRef.Value);
+        if Field.Type = Field.Type::BLOB then begin
+            TempBlob.FromFieldRef(FRef);
+            if TempBlob.HasValue() then begin
+                TempBlob.CreateInStream(IStr);
+                while not IStr.EOS do begin
+                    IStr.ReadText(Line);
+                    FieldValue += Line;
+                end;
+            end;
+        end else
+            FieldValue := Format(FRef.Value);
     end;
     #endregion
     #region Page Actions

@@ -47,6 +47,13 @@ table 6014584 "NPR Replication Error Log"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
         }
+
+        field(50; "Email Notification Sent"; Boolean)
+        {
+            Caption = 'Email Notification Sent';
+            DataClassification = EndUserIdentifiableInformation;
+        }
+
     }
     keys
     {
@@ -56,27 +63,27 @@ table 6014584 "NPR Replication Error Log"
         }
     }
 
-    procedure InsertLog(pAPIVersion: Code[20]; pEndpointID: Text[50]; pMethod: Code[10]; pURL: Text; pResponseTxt: text)
+    procedure InsertLog(pAPIVersion: Code[20]; pURL: Text; pResponseTxt: text; RecipientEmail: Text[100])
     begin
-        InsertLog(pAPIVersion, pEndpointID, pMethod, pURL, '', pResponseTxt);
+        InsertLog(pAPIVersion, '', '', pURL, '', pResponseTxt, RecipientEmail);
     end;
 
-    procedure InsertLog(pAPIVersion: Code[20]; pURL: Text; pResponseTxt: text)
+    procedure InsertLog(pAPIVersion: Code[20]; pEndpointID: Text[50]; pURL: Text; pResponseTxt: text; RecipientEmail: Text[100])
     begin
-        InsertLog(pAPIVersion, '', '', pURL, '', pResponseTxt);
+        InsertLog(pAPIVersion, pEndpointID, '', pURL, '', pResponseTxt, RecipientEmail);
     end;
 
-    procedure InsertLog(pAPIVersion: Code[20]; pEndpointID: Text[50]; pMethod: Code[10]; pURL: Text; pResponse: Codeunit "Temp Blob")
+    procedure InsertLog(pAPIVersion: Code[20]; pEndpointID: Text[50]; pMethod: Code[10]; pURL: Text; pResponse: Codeunit "Temp Blob"; RecipientEmail: Text[100])
     var
         InStr: instream;
         ResponseTxt: Text;
     begin
         pResponse.CreateInStream(InStr);
         InStr.Read(ResponseTxt, MaxStrLen(ResponseTxt));
-        InsertLog(pAPIVersion, pEndpointID, pMethod, pURL, '', ResponseTxt);
+        InsertLog(pAPIVersion, pEndpointID, pMethod, pURL, '', ResponseTxt, RecipientEmail);
     end;
 
-    procedure InsertLog(pAPIVersion: Code[20]; pEndpointID: Text[50]; pMethod: Code[10]; pURL: Text; pRequest: Text; pResponse: text)
+    procedure InsertLog(pAPIVersion: Code[20]; pEndpointID: Text[50]; pMethod: Code[10]; pURL: Text; pRequest: Text; pResponse: text; RecipientEmail: Text[100])
     var
         LastErrorLog: Record "NPR Replication Error Log";
         oStr: OutStream;
@@ -95,7 +102,23 @@ table 6014584 "NPR Replication Error Log"
         oStr.WriteText(pRequest);
         Rec.Response.CreateOutStream(Ostr);
         oStr.WriteText(pResponse);
+
+        if SendErrorViaEmail(RecipientEmail) then
+            Rec."Email Notification Sent" := true;
+
         Rec.Modify();
+    end;
+
+    local procedure SendErrorViaEmail(RecipientEmail: Text[100]): Boolean
+    var
+        EMailMgt: Codeunit "NPR E-mail Management";
+        RecRef: RecordRef;
+    begin
+        if RecipientEmail <> '' then begin
+            RecRef.GetTable(Rec);
+            exit(EMailMgt.SendEmail(RecRef, RecipientEmail, true) = '');
+        end;
+        exit(false);
     end;
 
     procedure ReadTextFromBlob(FieldNo: Integer): Text
