@@ -126,12 +126,6 @@ page 6014588 "NPR Item Statistics Subpage"
                     ToolTip = 'Specifies the value of the -> Last year field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Vendor No."; Rec."Vendor No.")
-                {
-
-                    ToolTip = 'Specifies the value of the Vendor No. field';
-                    ApplicationArea = NPRRetail;
-                }
             }
         }
     }
