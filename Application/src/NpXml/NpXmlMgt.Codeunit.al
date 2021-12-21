@@ -675,9 +675,11 @@
     var
         "Field": Record "Field";
         FTPClient: Codeunit "NPR AF FTP Client";
+        FTPTempBlob: Codeunit "Temp Blob";
         FTPResponse: JsonObject;
         JToken: JsonToken;
         InStr: InStream;
+        OutStr: OutStream;
         StatusCode: Text;
         ErrorDescription: Text;
         OriginalFileName: Text;
@@ -696,7 +698,10 @@
         end;
 
         AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || Ftp Transfer: ' + NPXmlTemplate."FTP Server", NPXmlTemplate."Do Not Add Comment Line");
-        OutputTempBlob.CreateInStream(InStr);
+
+        FTPTempBlob.CreateOutStream(OutStr, TEXTENCODING::UTF8);
+        XmlDoc.WriteTo(OutStr);
+        FTPTempBlob.CreateInStream(InStr);
 
         FTPClient.Construct(NPXmlTemplate."FTP Server", NPXmlTemplate."FTP Username", NPXmlTemplate."FTP Password", NPXmlTemplate."FTP Port", 10000, NPXmlTemplate."FTP Passive");
         FTPResponse := FTPClient.UploadFile(InStr, NPXmlTemplate."FTP Directory" + '/' + Filename);
@@ -806,6 +811,7 @@
         end;
         if (Comment <> '') and not DoNotAddComment then
             OutputOutStr.WriteText('<!--' + Comment + '-->' + GetChar(13) + GetChar(10));
+
         XmlDoc.WriteTo(OutputOutStr);
     end;
 
