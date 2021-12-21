@@ -527,7 +527,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
                     Xml2RecRef(ReferenceNode.AsXmlElement(), TempNpRvSalesLineReferenceFieldBuffer, RecRef);
                     RecRef.SetTable(NpRvSalesLineReference);
                     NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
-                    NpRvSalesLineReference.Id := NpRvSalesLine."Register No.";
+                    NpRvSalesLineReference.Id := CreateGuid();
                     NpRvSalesLineReference.Insert(true);
                 end;
             end;
