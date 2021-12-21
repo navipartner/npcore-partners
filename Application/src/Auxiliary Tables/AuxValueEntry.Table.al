@@ -196,7 +196,7 @@ table 6014489 "NPR Aux. Value Entry"
         }
         field(6014413; "POS Unit No."; Code[20])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(6014414; "Salespers./Purch. Code"; Code[20])
