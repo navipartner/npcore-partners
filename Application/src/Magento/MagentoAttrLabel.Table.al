@@ -40,13 +40,22 @@ table 6151427 "NPR Magento Attr. Label"
 
             trigger OnLookup()
             var
-                RecRef: RecordRef;
-                FieldRef: FieldRef;
+                TempBlob: Codeunit "Temp Blob";
+                OutStr: OutStream;
+                InStr: InStream;
             begin
-                RecRef.GetTable(Rec);
-                FieldRef := RecRef.Field(FieldNo("Text Field"));
-                NaviConnectFunctions.NaviEditorEditBlob(FieldRef);
-                RecRef.Modify(true);
+                TempBlob.CreateOutStream(OutStr);
+                Rec."Text Field".CreateInStream(InStr);
+                CopyStream(OutStr, InStr);
+                if NaviConnectFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                    if TempBlob.HasValue() then begin
+                        TempBlob.CreateInStream(InStr);
+                        Rec."Text Field".CreateOutStream(OutStr);
+                        CopyStream(OutStr, InStr);
+                    end else
+                        Clear(Rec."Text Field");
+                    Rec.Modify(true);
+                end;
             end;
         }
     }

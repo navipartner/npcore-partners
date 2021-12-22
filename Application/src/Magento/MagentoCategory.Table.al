@@ -97,13 +97,22 @@ table 6151414 "NPR Magento Category"
 
             trigger OnLookup()
             var
-                RecRef: RecordRef;
-                FieldRef: FieldRef;
+                TempBlob: Codeunit "Temp Blob";
+                OutStr: OutStream;
+                InStr: InStream;
             begin
-                RecRef.GetTable(Rec);
-                FieldRef := RecRef.Field(FieldNo("Short Description"));
-                NaviConnectFunctions.NaviEditorEditBlob(FieldRef);
-                RecRef.Modify(true);
+                TempBlob.CreateOutStream(OutStr);
+                Rec."Short Description".CreateInStream(InStr);
+                CopyStream(OutStr, InStr);
+                if NaviConnectFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                    if TempBlob.HasValue() then begin
+                        TempBlob.CreateInStream(InStr);
+                        Rec."Short Description".CreateOutStream(OutStr);
+                        CopyStream(OutStr, InStr);
+                    end else
+                        Clear(Rec."Short Description");
+                    Rec.Modify(true);
+                end;
             end;
         }
         field(1000; "Item Count"; Integer)
@@ -139,13 +148,22 @@ table 6151414 "NPR Magento Category"
 
             trigger OnLookup()
             var
-                RecRef: RecordRef;
-                FieldRef: FieldRef;
+                TempBlob: Codeunit "Temp Blob";
+                OutStr: OutStream;
+                InStr: InStream;
             begin
-                RecRef.GetTable(Rec);
-                FieldRef := RecRef.Field(FieldNo(Description));
-                NaviConnectFunctions.NaviEditorEditBlob(FieldRef);
-                RecRef.Modify(true);
+                TempBlob.CreateOutStream(OutStr);
+                Rec."Description".CreateInStream(InStr);
+                CopyStream(OutStr, InStr);
+                if NaviConnectFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                    if TempBlob.HasValue() then begin
+                        TempBlob.CreateInStream(InStr);
+                        Rec."Description".CreateOutStream(OutStr);
+                        CopyStream(OutStr, InStr);
+                    end else
+                        Clear(Rec."Description");
+                    Rec.Modify(true);
+                end;
             end;
         }
         field(6059825; "Seo Link"; Text[250])

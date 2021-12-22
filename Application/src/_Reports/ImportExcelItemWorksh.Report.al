@@ -110,10 +110,15 @@ report 6060042 "NPR Import Excel Item Worksh."
 
         trigger OnQueryClosePage(CloseAction: Action): Boolean
         var
-            FileMgt: Codeunit "File Management";
+            UploadResult: Boolean;
+            InStream: InStream;
+            ImportFileLbl: Label 'Import Excel File';
+            ExcelFileExtensionTok: Label 'Excel File (.xlsx)|*.xlsx', Locked = true;
         begin
             if CloseAction = ACTION::OK then begin
-                ServerFileName := FileMgt.UploadFile(ImportFileLbl, ExcelFileExtensionTok);
+                UploadResult := UploadIntoStream(ImportFileLbl, '', ExcelFileExtensionTok, ServerFileName, InStream);
+                if not UploadResult then
+                    exit(false);
                 if ServerFileName = '' then
                     exit(false);
 
@@ -156,9 +161,7 @@ report 6060042 "NPR Import Excel Item Worksh."
         LineNo: Integer;
         RecNo: Integer;
         TotalRecNo: Integer;
-        ExcelFileExtensionTok: Label '.xlsx', Locked = true;
         AnalyzingDataLbl: Label 'Analyzing Data...\\';
-        ImportFileLbl: Label 'Import Excel File';
         ImportErr: Label 'Please start this import from the Item Worksheet Page.';
         SkipWarningMsg: Label 'Warning: %1 of the imported Variety lines are set to Skip. Please change the Action on the Variety line to process the changes.';
         ImportOption: Option "Replace lines","Add lines";

@@ -66,15 +66,15 @@ table 6014580 "NPR Object Output Selection"
 
             trigger OnLookup()
             var
-                Printer: Record Printer;
+                Printer: Record "Printer Selection";
                 PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
                 ID: Text;
             begin
                 case "Output Type" of
                     "Output Type"::"Printer Name":
                         begin
-                            if PAGE.RunModal(PAGE::Printers, Printer) = ACTION::LookupOK then
-                                "Output Path" := Printer.ID;
+                            if PAGE.RunModal(PAGE::"Printer Selections", Printer) = ACTION::LookupOK then
+                                "Output Path" := Printer."Printer Name";
                         end;
                     "Output Type"::"PrintNode PDF",
                     "Output Type"::"PrintNode Raw":
