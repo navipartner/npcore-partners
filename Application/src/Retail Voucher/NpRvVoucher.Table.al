@@ -354,8 +354,8 @@ table 6151013 "NPR NpRv Voucher"
             Caption = 'Barcode';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            // ObsoleteState = Removed;
-            // ObsoleteReason = 'Use Media instead of Blob type.';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(306; "Barcode Image"; Media)
         {
@@ -557,13 +557,13 @@ table 6151013 "NPR NpRv Voucher"
         exit("In-use Quantity");
     end;
 
-    // procedure GetImageContent(var TenantMedia: Record "Tenant Media")
-    // begin
-    //     TenantMedia.Init();
-    //     if not Rec."Barcode Image".HasValue() then
-    //         exit;
-    //     if TenantMedia.Get(Rec."Barcode Image".MediaId()) then
-    //         TenantMedia.CalcFields(Content);
-    // end;
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Rec."Barcode Image".HasValue() then
+            exit;
+        if TenantMedia.Get(Rec."Barcode Image".MediaId()) then
+            TenantMedia.CalcFields(Content);
+    end;
 }
 
