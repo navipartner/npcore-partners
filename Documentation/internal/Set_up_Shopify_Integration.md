@@ -10,9 +10,7 @@ NaviPartner out-of-the-box Shopify integration functionality supports the follow
     -	Order processing is done on the Shopify side: we import new orders from Shopify and automatically post them once we receive updated information from Shopify about completed orders (or delete them, if the order was cancelled in Shopify);
     -	Order processing is done in Business Central: in this case we import new orders from Shopify, and users will need to process them in Business Central. Once a sales order is processed and posted in the Business Central we send “fulfilment” and “payment capture” requests to Shopify.
 
-> [!Note]
-> This is a note.
-
+    
 ## Prerequisites
 
 - Install the NP Retail application. The application's version needs to be 1700.9.50.10000 and higher.   
