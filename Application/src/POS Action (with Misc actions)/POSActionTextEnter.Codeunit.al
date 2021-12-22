@@ -38,12 +38,17 @@ codeunit 6150722 "NPR POS Action: Text Enter"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        ControlId := JSON.GetStringOrFail('id', StrSubstNo(ReadingErr, ActionCode()));
+        ControlId := JSON.GetString('id');
+        if (ControlId = '') then
+            ControlId := '<blank>';
+
         Value := JSON.GetStringOrFail('value', StrSubstNo(ReadingErr, ActionCode()));
 
         case ControlId of
             'EanBox':
                 EanBoxEventHandler.InvokeEanBox(Value, Context, POSSession, FrontEnd);
+            'PaymentBox':
+                ;
             else
                 FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, ControlId, ActionCode()));
         end;

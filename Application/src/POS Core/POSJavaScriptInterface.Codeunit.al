@@ -126,9 +126,13 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         VerbosityLevel := Verbosity::Normal;
         if ((not Success) or (not Handled)) then begin
             TempText := GetLastErrorText();
+            VerbosityLevel := Verbosity::Error;
+
+            if ((not Success) and (TempText = '')) then // This is probably a "rollback event" or a framework error.
+                VerbosityLevel := Verbosity::Warning;
+
             if (not Handled) and (OnRunPOSAction.Code = '') then
                 TempText := StrSubstNo(Text001, '<blank>');
-            VerbosityLevel := Verbosity::Error;
 
             CustomDimensions.Add('NPR_ErrorText', TempText);
             CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
