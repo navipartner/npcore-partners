@@ -202,8 +202,7 @@ page 6014638 "NPR RP Template Card"
             {
                 Caption = 'Media';
                 Editable = NOT Rec.Archived;
-                // field("Media Roll Picture"; tmpMediaInfo.Image)
-                field("Media Roll Picture"; tmpMediaInfo.Picture)
+                field("Media Roll Picture"; tmpMediaInfo.Image)
                 {
 
                     Caption = 'Media Roll Picture';
@@ -213,10 +212,15 @@ page 6014638 "NPR RP Template Card"
                     trigger OnValidate()
                     var
                         MediaInfo: Record "NPR RP Template Media Info";
+                        TempBlob: Codeunit "Temp Blob";
+                        InStr: InStream;
+                        OutStr: OutStream;
                     begin
                         GetMediaInfoRecord(MediaInfo, true);
-                        // MediaInfo.Image := tmpMediaInfo.Image;
-                        MediaInfo.Picture := tmpMediaInfo.Picture;
+                        TempBlob.CreateOutStream(OutStr);
+                        tmpMediaInfo.Image.ExportStream(OutStr);
+                        TempBlob.CreateInStream(InStr);
+                        MediaInfo.Image.ImportStream(InStr, MediaInfo.FieldName(Image));
                         MediaInfo.Modify(true);
                         CurrPage.Update(true);
                     end;
@@ -390,7 +394,6 @@ page 6014638 "NPR RP Template Card"
 
     local procedure GetMediaInfoRecord(var MediaInfo: Record "NPR RP Template Media Info"; WithInsert: Boolean) Return: Boolean
     begin
-        MediaInfo.SetAutoCalcFields(Picture);
         Return := MediaInfo.Get(Rec.Code);
         if not Return then
             if WithInsert then begin

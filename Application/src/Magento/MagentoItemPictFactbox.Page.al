@@ -14,8 +14,7 @@ page 6151447 "NPR Magento Item Pict. Factbox"
                 ShowCaption = false;
                 Visible = HasPicture;
             }
-            // field("Magento Picture"; TempMagentoPicture.Image)
-            field("Magento Picture"; TempMagentoPicture.Picture)
+            field("Magento Picture"; TempMagentoPicture.Image)
             {
 
                 ShowCaption = false;
@@ -40,8 +39,8 @@ page 6151447 "NPR Magento Item Pict. Factbox"
     var
         MagentoPicture: Record "NPR Magento Picture";
         MagentoPictureLink: Record "NPR Magento Picture Link";
-    // TempBlob: Codeunit "Temp Blob";
-    // OutStr: OutStream;
+        TempBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
     begin
         HasPicture := false;
         Initialize();
@@ -49,8 +48,7 @@ page 6151447 "NPR Magento Item Pict. Factbox"
             exit;
         if not (MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"]) then
             exit;
-        // Clear(TempMagentoPicture.Image);
-        Clear(TempMagentoPicture.Picture);
+        Clear(TempMagentoPicture.Image);
         MagentoPictureLink.SetRange("Item No.", Rec."No.");
         MagentoPictureLink.SetRange("Base Image", true);
         if not MagentoPictureLink.FindFirst() then
@@ -69,10 +67,9 @@ page 6151447 "NPR Magento Item Pict. Factbox"
         end;
 
         TempMagentoPicture.DownloadPicture(TempMagentoPicture);
-        // TempBlob.CreateOutStream(OutStr);
-        // TempMagentoPicture.Image.ExportStream(OutStr);
-        // HasPicture := TempBlob.HasValue();
-        HasPicture := TempMagentoPicture.Picture.HasValue();
+        TempBlob.CreateOutStream(OutStr);
+        TempMagentoPicture.Image.ExportStream(OutStr);
+        HasPicture := TempBlob.HasValue();
     end;
 
     local procedure Initialize()

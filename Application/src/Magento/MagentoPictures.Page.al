@@ -122,10 +122,12 @@ page 6151411 "NPR Magento Pictures"
     trigger OnAfterGetRecord()
     var
         TempMagentoPicture2: Record "NPR Magento Picture" temporary;
+        TempBlob: Codeunit "Temp Blob";
+        InStr: InStream;
+        OutStr: OutStream;
     begin
         CountRelations();
         if TempMagentoPicture.Get(Rec.Type, Rec.Name) then begin
-            TempMagentoPicture.CalcFields(Picture);
             exit;
         end;
         Clear(TempMagentoPicture2);
@@ -134,8 +136,10 @@ page 6151411 "NPR Magento Pictures"
 
         TempMagentoPicture.Init();
         TempMagentoPicture := Rec;
-        // TempMagentoPicture.Image := TempMagentoPicture2.Image;
-        TempMagentoPicture.Picture := TempMagentoPicture2.Picture;
+        TempBlob.CreateOutStream(OutStr);
+        TempMagentoPicture2.Image.ExportStream(OutStr);
+        TempBlob.CreateInStream(InStr);
+        TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
         TempMagentoPicture.Insert();
     end;
 

@@ -18,8 +18,8 @@ table 6014566 "NPR RP Template Media Info"
             Caption = 'Picture';
             SubType = Bitmap;
             DataClassification = CustomerContent;
-            // ObsoleteState = Removed;
-            // ObsoleteReason = 'Use Media instead of Blob type.';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(11; URL; Text[250])
         {
@@ -79,13 +79,13 @@ table 6014566 "NPR RP Template Media Info"
             RPTemplateHeader.Modify(true);
     end;
 
-    // procedure GetImageContent(var TenantMedia: Record "Tenant Media")
-    // begin
-    //     TenantMedia.Init();
-    //     if not Rec.Image.HasValue() then
-    //         exit;
-    //     if TenantMedia.Get(Rec.Image.MediaId()) then
-    //         TenantMedia.CalcFields(Content);
-    // end;
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Rec.Image.HasValue() then
+            exit;
+        if TenantMedia.Get(Rec.Image.MediaId()) then
+            TenantMedia.CalcFields(Content);
+    end;
 }
 

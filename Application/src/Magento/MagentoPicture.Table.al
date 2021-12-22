@@ -24,8 +24,8 @@ table 6151411 "NPR Magento Picture"
             Caption = 'Picture';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            // ObsoleteState = Removed;
-            // ObsoleteReason = 'Use Media instead of Blob type.';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(101; "Size (kb)"; Decimal)
         {
@@ -129,22 +129,16 @@ table 6151411 "NPR Magento Picture"
     var
         Stream: InStream;
         PictureUrl: Text;
-        OuStr: OutStream;
     begin
-        // Clear(TempMagentoPicture.Image);
-        Clear(TempMagentoPicture.Picture);
+        Clear(TempMagentoPicture.Image);
         PictureUrl := GetMagentoUrl();
         if PictureUrl = '' then
             exit;
         if not TryDownloadPicture(PictureUrl, Stream) then
             exit;
 
-        // TempMagentoPicture.Image.ImportStream(Stream, Rec.FieldName(Image));
-        // exit(TempMagentoPicture.Image.HasValue());
-        TempMagentoPicture.Picture.CreateOutStream(OuStr);
-        CopyStream(OuStr, Stream);
-
-        exit(TempMagentoPicture.Picture.HasValue);
+        TempMagentoPicture.Image.ImportStream(Stream, Rec.FieldName(Image));
+        exit(TempMagentoPicture.Image.HasValue());
     end;
 
     [TryFunction]
@@ -178,21 +172,17 @@ table 6151411 "NPR Magento Picture"
 
     procedure GetBase64() Base64: Text
     var
-        // TempBlob: Codeunit "Temp Blob";
+        TempBlob: Codeunit "Temp Blob";
         Base64Convert: Codeunit "Base64 Convert";
         InStr: InStream;
-    // OutStr: OutStream;
+        OutStr: OutStream;
     begin
-        // if not Image.HasValue() then
-        if not Picture.HasValue() then
+        if not Image.HasValue() then
             exit;
 
-        // TempBlob.CreateOutStream(OutStr);
-        // Rec.Image.ExportStream(OutStr);
-        // TempBlob.CreateInStream(InStr);
-        // Base64 := Base64Convert.ToBase64(InStr);
-        CalcFields(Picture);
-        Picture.CreateInStream(InStr);
+        TempBlob.CreateOutStream(OutStr);
+        Rec.Image.ExportStream(OutStr);
+        TempBlob.CreateInStream(InStr);
         Base64 := Base64Convert.ToBase64(InStr);
     end;
 
@@ -247,12 +237,12 @@ table 6151411 "NPR Magento Picture"
     begin
     end;
 
-    // procedure GetImageContent(var TenantMedia: Record "Tenant Media")
-    // begin
-    //     TenantMedia.Init();
-    //     if not Rec.Image.HasValue() then
-    //         exit;
-    //     if TenantMedia.Get(Rec.Image.MediaId()) then
-    //         TenantMedia.CalcFields(Content);
-    // end;    
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Rec.Image.HasValue() then
+            exit;
+        if TenantMedia.Get(Rec.Image.MediaId()) then
+            TenantMedia.CalcFields(Content);
+    end;
 }

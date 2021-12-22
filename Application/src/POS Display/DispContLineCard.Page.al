@@ -19,8 +19,7 @@ page 6059999 "NPR Disp. Cont. Line Card"
                     ToolTip = 'Specifies the value of the Url field';
                     ApplicationArea = NPRRetail;
                 }
-                // field(Image; Rec.Picture)
-                field(Image; Rec.Image)
+                field(Image; Rec.Picture)
                 {
 
                     Visible = ImageIsVisible;

@@ -11,7 +11,7 @@ page 6151306 "NPR AF Test Service Picture"
     {
         area(content)
         {
-            field(Picture; Rec.Image)
+            field(Picture; Rec.Picture)
             {
 
                 ShowCaption = false;
@@ -38,11 +38,9 @@ page 6151306 "NPR AF Test Service Picture"
                     FileManagement: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
-                    OuStr: OutStream;
                     FileName: Text;
                 begin
-                    // if Rec.Picture.HasValue() then
-                    if Rec.Image.HasValue() then
+                    if Rec.Picture.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -50,38 +48,35 @@ page 6151306 "NPR AF Test Service Picture"
                     if FileName = '' then
                         exit;
 
-                    // Clear(Rec.Picture);
-                    Clear(Rec.Image);
+                    Clear(Rec.Picture);
                     TempBlob.CreateInStream(InStr);
-                    // Rec.Picture.ImportStream(InStr, FileName);
-                    Rec.Image.CreateOutStream(OuStr);
-                    CopyStream(OuStr, InStr);
+                    Rec.Picture.ImportStream(InStr, FileName);
                     Rec.Modify(true);
                 end;
             }
-            // action(ExportPicture)
-            // {
-            //     ApplicationArea = NPRRetail;
-            //     Caption = 'Export';
-            //     Enabled = DeleteExportEnabled;
-            //     Image = Export;
-            //     ToolTip = 'Export the picture to a file.';
+            action(ExportPicture)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Export';
+                Enabled = DeleteExportEnabled;
+                Image = Export;
+                ToolTip = 'Export the picture to a file.';
 
-            //     trigger OnAction()
-            //     var
-            //         TenantMedia: Record "Tenant Media";
-            //         FileManagement: Codeunit "File Management";
-            //         TempBlob: Codeunit "Temp Blob";
-            //         OutStr: OutStream;
-            //         ToFile: Text;
-            //     begin
-            //         Rec.GetImageContent(TenantMedia);
-            //         ToFile := TenantMedia."File Name";
-            //         TempBlob.CreateOutStream(OutStr);
-            //         Rec.Picture.ExportStream(OutStr);
-            //         FileManagement.BLOBExport(TempBlob, ToFile, true);
-            //     end;
-            // }
+                trigger OnAction()
+                var
+                    TenantMedia: Record "Tenant Media";
+                    FileManagement: Codeunit "File Management";
+                    TempBlob: Codeunit "Temp Blob";
+                    OutStr: OutStream;
+                    ToFile: Text;
+                begin
+                    Rec.GetImageContent(TenantMedia);
+                    ToFile := TenantMedia."File Name";
+                    TempBlob.CreateOutStream(OutStr);
+                    Rec.Picture.ExportStream(OutStr);
+                    FileManagement.BLOBExport(TempBlob, ToFile, true);
+                end;
+            }
             action(DeletePicture)
             {
 
@@ -96,8 +91,7 @@ page 6151306 "NPR AF Test Service Picture"
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    // Clear(Rec.Picture);
-                    Clear(Rec.Image);
+                    Clear(Rec.Picture);
                     Rec.Modify(true);
                 end;
             }
@@ -116,8 +110,7 @@ page 6151306 "NPR AF Test Service Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        // DeleteExportEnabled := Rec.Picture.HasValue();
-        DeleteExportEnabled := Rec.Image.HasValue();
+        DeleteExportEnabled := Rec.Picture.HasValue();
     end;
 }
 

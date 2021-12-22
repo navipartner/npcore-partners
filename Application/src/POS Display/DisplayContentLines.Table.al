@@ -28,8 +28,8 @@ table 6059952 "NPR Display Content Lines"
             Caption = 'Image';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            // ObsoleteState = Removed;
-            // ObsoleteReason = 'Use Media instead of Blob type.';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(13; Picture; Media)
         {
@@ -49,13 +49,13 @@ table 6059952 "NPR Display Content Lines"
     {
     }
 
-    // procedure GetImageContent(var TenantMedia: Record "Tenant Media")
-    // begin
-    //     TenantMedia.Init();
-    //     if not Rec.Picture.HasValue() then
-    //         exit;
-    //     if TenantMedia.Get(Rec.Picture.MediaId()) then
-    //         TenantMedia.CalcFields(Content);
-    // end;
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Rec.Picture.HasValue() then
+            exit;
+        if TenantMedia.Get(Rec.Picture.MediaId()) then
+            TenantMedia.CalcFields(Content);
+    end;
 }
 
