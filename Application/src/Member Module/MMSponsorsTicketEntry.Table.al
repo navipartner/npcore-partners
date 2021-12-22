@@ -11,7 +11,6 @@ table 6151186 "NPR MM Sponsors. Ticket Entry"
             AutoIncrement = true;
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR MM Membership Setup";
         }
         field(2; Status; Option)
         {
@@ -126,8 +125,6 @@ table 6151186 "NPR MM Sponsors. Ticket Entry"
             Caption = 'ZIP Code';
             DataClassification = CustomerContent;
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(132; City; Text[50])
