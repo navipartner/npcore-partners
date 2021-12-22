@@ -43,13 +43,20 @@ page 6151419 "NPR Magento Brand Card"
 
                     trigger OnAssistEdit()
                     var
-                        RecRef: RecordRef;
-                        FieldRef: FieldRef;
+                        TempBlob: Codeunit "Temp Blob";
+                        OutStr: OutStream;
+                        InStr: InStream;
                     begin
-                        RecRef.GetTable(Rec);
-                        FieldRef := RecRef.Field(Rec.FieldNo(Description));
-                        if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                            RecRef.SetTable(Rec);
+                        TempBlob.CreateOutStream(OutStr);
+                        Rec."Description".CreateInStream(InStr);
+                        CopyStream(OutStr, InStr);
+                        if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                            if TempBlob.HasValue() then begin
+                                TempBlob.CreateInStream(InStr);
+                                Rec."Description".CreateOutStream(OutStr);
+                                CopyStream(OutStr, InStr);
+                            end else
+                                Clear(Rec."Description");
                             Rec.Modify(true);
                         end;
                     end;
@@ -64,13 +71,20 @@ page 6151419 "NPR Magento Brand Card"
 
                     trigger OnAssistEdit()
                     var
-                        RecRef: RecordRef;
-                        FieldRef: FieldRef;
+                        TempBlob: Codeunit "Temp Blob";
+                        OutStr: OutStream;
+                        InStr: InStream;
                     begin
-                        RecRef.GetTable(Rec);
-                        FieldRef := RecRef.Field(Rec.FieldNo("Short Description"));
-                        if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                            RecRef.SetTable(Rec);
+                        TempBlob.CreateOutStream(OutStr);
+                        Rec."Short Description".CreateInStream(InStr);
+                        CopyStream(OutStr, InStr);
+                        if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
+                            if TempBlob.HasValue() then begin
+                                TempBlob.CreateInStream(InStr);
+                                Rec."Short Description".CreateOutStream(OutStr);
+                                CopyStream(OutStr, InStr);
+                            end else
+                                Clear(Rec."Short Description");
                             Rec.Modify(true);
                         end;
                     end;
