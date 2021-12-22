@@ -52,6 +52,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         OnRunPOSSession := POSSessionIn;
         OnRunFrontEnd := FrontEndIn;
         OnRunType := OnRunType::InvokeAction;
+        ClearLastError();
 
         Success := Self.Run();
         Handled := OnRunHandled;
@@ -103,6 +104,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         VerbosityLevel: Verbosity;
         TempText: Text;
         MessageText: Text;
+        TempActionCode: Code[20];
     begin
 
         if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
@@ -117,19 +119,34 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
         CustomDimensions.Add('NPR_RunType', Format(OnRunType, 0, 9));
 
+        TempActionCode := OnRunPOSAction.Code;
+        if (TempActionCode = '') then
+            TempActionCode := '<BLANK>';
+
+        VerbosityLevel := Verbosity::Normal;
+        if ((not Success) or (not Handled)) then begin
+            TempText := GetLastErrorText();
+            if (not Handled) and (OnRunPOSAction.Code = '') then
+                TempText := StrSubstNo(Text001, '<blank>');
+            VerbosityLevel := Verbosity::Error;
+
+            CustomDimensions.Add('NPR_ErrorText', TempText);
+            CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
+        end;
+
         if (OnRunType = OnRunType::BeforeWorkflow) then begin
-            CustomDimensions.Add('NPR_Action', OnRunPOSAction.Code);
+            CustomDimensions.Add('NPR_Action', TempActionCode);
             OnRunParameters.WriteTo(TempText);
             CustomDimensions.Add('NPR_Parameters', TempText); // Could contain sensitive data
-            MessageText := StrSubstNo('OnBeforeWorkflow => %1', OnRunPOSAction.Code);
+            MessageText := StrSubstNo('OnBeforeWorkflow => %1', TempActionCode);
         end;
 
         if (OnRunType = OnRunType::InvokeAction) then begin
-            CustomDimensions.Add('NPR_Action', OnRunPOSAction.Code);
+            CustomDimensions.Add('NPR_Action', TempActionCode);
             CustomDimensions.Add('NPR_WorkflowStep', OnRunWorkflowStep);
             OnRunContext.WriteTo(TempText);
             CustomDimensions.Add('NPR_Context', TempText); // Could contain sensitive data
-            MessageText := StrSubstNo('InvokeAction => %1, %2', OnRunPOSAction.Code, OnRunWorkflowStep);
+            MessageText := StrSubstNo('InvokeAction => %1, %2', TempActionCode, OnRunWorkflowStep);
         end;
 
         if (OnRunType = OnRunType::MethodInvocation) then begin
@@ -137,13 +154,6 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             CustomDimensions.Add('NPR_Context', TempText); // Could contain sensitive data
             CustomDimensions.Add('NPR_Method', OnRunMethod);
             MessageText := StrSubstNo('InvokeMethod => %1 (%2)', GetValueAsText(OnRunContext, 'name'), OnRunMethod);
-        end;
-
-        VerbosityLevel := Verbosity::Normal;
-        if ((not Success) or (not Handled)) then begin
-            VerbosityLevel := Verbosity::Error;
-            CustomDimensions.Add('NPR_ErrorText', GetLastErrorText());
-            CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
         end;
 
         Session.LogMessage('NPR_PosAction', MessageText, VerbosityLevel, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
