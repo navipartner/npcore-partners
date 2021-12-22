@@ -86,7 +86,7 @@ page 6014536 "NPR APIV1 - Pictures"
                     Error(ParentNotSpecifiedErr)
             end;
             Evaluate(PictureEntityParentType, ParentTypeFilter);
-            Rec.LoadDataWithParentType(ParentIdFilter, PictureEntityParentType);
+            Rec.NPRLoadDataWithParentType(ParentIdFilter, PictureEntityParentType);
             Rec.Insert(true);
         end;
 
