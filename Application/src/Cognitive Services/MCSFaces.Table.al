@@ -87,8 +87,8 @@ table 6059959 "NPR MCS Faces"
             Caption = 'Picture';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            // ObsoleteState = Removed;
-            // ObsoleteReason = 'Use Media instead of Blob type.';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(25; "Action"; Enum "NPR MCS Faces Action")
         {
@@ -109,13 +109,13 @@ table 6059959 "NPR MCS Faces"
         }
     }
 
-    // procedure GetImageContent(var TenantMedia: Record "Tenant Media")
-    // begin
-    //     TenantMedia.Init();
-    //     if not Rec.Image.HasValue() then
-    //         exit;
-    //     if TenantMedia.Get(Rec.Image.MediaId()) then
-    //         TenantMedia.CalcFields(Content);
-    // end;
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Rec.Image.HasValue() then
+            exit;
+        if TenantMedia.Get(Rec.Image.MediaId()) then
+            TenantMedia.CalcFields(Content);
+    end;
 }
 

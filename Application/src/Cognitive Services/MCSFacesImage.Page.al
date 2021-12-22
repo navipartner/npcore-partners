@@ -11,8 +11,7 @@ page 6151307 "NPR MCS Faces Image"
     {
         area(content)
         {
-            // field(Picture; Rec.Image)
-            field(Picture; Rec.Picture)
+            field(Picture; Rec.Image)
             {
 
                 ShowCaption = false;
@@ -39,11 +38,9 @@ page 6151307 "NPR MCS Faces Image"
                     FileManagement: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
-                    OuStr: OutStream;
                     FileName: Text;
                 begin
-                    // if Rec.Image.HasValue() then
-                    if Rec.Picture.HasValue() then
+                    if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -51,38 +48,35 @@ page 6151307 "NPR MCS Faces Image"
                     if FileName = '' then
                         exit;
 
-                    // Clear(Rec.Image);
-                    Clear(Rec.Picture);
+                    Clear(Rec.Image);
                     TempBlob.CreateInStream(InStr);
-                    // Rec.Image.ImportStream(InStr, FileName);
-                    Rec.Picture.CreateOutStream(OuStr);
-                    CopyStream(OuStr, InStr);
+                    Rec.Image.ImportStream(InStr, FileName);
                     Rec.Modify(true);
                 end;
             }
-            // action(ExportPicture)
-            // {
-            //     ApplicationArea = NPRRetail;
-            //     Caption = 'Export';
-            //     Enabled = DeleteExportEnabled;
-            //     Image = Export;
-            //     ToolTip = 'Export the image to a file.';
+            action(ExportPicture)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Export';
+                Enabled = DeleteExportEnabled;
+                Image = Export;
+                ToolTip = 'Export the image to a file.';
 
-            //     trigger OnAction()
-            //     var
-            //         TenantMedia: Record "Tenant Media";
-            //         FileManagement: Codeunit "File Management";
-            //         TempBlob: Codeunit "Temp Blob";
-            //         OutStr: OutStream;
-            //         ToFile: Text;
-            //     begin
-            //         Rec.GetImageContent(TenantMedia);
-            //         ToFile := TenantMedia."File Name";
-            //         TempBlob.CreateOutStream(OutStr);
-            //         Rec.Image.ExportStream(OutStr);
-            //         FileManagement.BLOBExport(TempBlob, ToFile, true);
-            //     end;
-            // }
+                trigger OnAction()
+                var
+                    TenantMedia: Record "Tenant Media";
+                    FileManagement: Codeunit "File Management";
+                    TempBlob: Codeunit "Temp Blob";
+                    OutStr: OutStream;
+                    ToFile: Text;
+                begin
+                    Rec.GetImageContent(TenantMedia);
+                    ToFile := TenantMedia."File Name";
+                    TempBlob.CreateOutStream(OutStr);
+                    Rec.Image.ExportStream(OutStr);
+                    FileManagement.BLOBExport(TempBlob, ToFile, true);
+                end;
+            }
             action(DeletePicture)
             {
 
@@ -97,8 +91,7 @@ page 6151307 "NPR MCS Faces Image"
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    // Clear(Rec.Image);
-                    Clear(Rec.Picture);
+                    Clear(Rec.Image);
                     Rec.Modify(true);
                 end;
             }
@@ -117,8 +110,7 @@ page 6151307 "NPR MCS Faces Image"
 
     local procedure SetEditableOnPictureActions()
     begin
-        // DeleteExportEnabled := Rec.Image.HasValue();
-        DeleteExportEnabled := Rec.Picture.HasValue();
+        DeleteExportEnabled := Rec.Image.HasValue();
     end;
 }
 

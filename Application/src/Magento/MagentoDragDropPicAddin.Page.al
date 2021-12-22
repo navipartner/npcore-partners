@@ -156,15 +156,13 @@ page 6151451 "NPR Magento DragDropPic. Addin"
     begin
         if MagentoPicture.Get(PictureType, TempMagentoPicture2.Name) then begin
             MagentoPicture."Size (kb)" := TempMagentoPicture."Size (kb)";
-            // Clear(MagentoPicture.Image);
-            Clear(MagentoPicture.Picture);
+            Clear(MagentoPicture.Image);
             MagentoPicture.Modify(true);
         end else begin
             MagentoPicture.Init();
             MagentoPicture := TempMagentoPicture2;
             MagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
-            // Clear(MagentoPicture.Image);
-            Clear(MagentoPicture.Picture);
+            Clear(MagentoPicture.Image);
             MagentoPicture.Insert(true);
         end;
         MagentoPictureMgt.DragDropPicture(MagentoPicture.Name, MagentoPicture.GetMagentoType(), TempMagentoPicture2.GetBase64());
@@ -253,8 +251,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
             exit;
         end;
 
-        // if Rec.Image.HasValue() then begin
-        if Rec.Picture.HasValue() then begin
+        if Rec.Image.HasValue() then begin
             CurrPage.DragDropAddin.DisplayData(GetDataUri());
             exit;
         end;
@@ -266,19 +263,16 @@ page 6151451 "NPR Magento DragDropPic. Addin"
     var
         Convert: Codeunit "Base64 Convert";
         ImageHelpers: Codeunit "Image Helpers";
-        // TempBlob: Codeunit "Temp Blob";
+        TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
-    // OutStr: OutStream;
+        OutStr: OutStream;
     begin
-        // if not Rec.Image.HasValue() then
-        if not Rec.Picture.HasValue() then
+        if not Rec.Image.HasValue() then
             exit;
 
-        // TempBlob.CreateOutStream(OutStr);
-        // Rec.Image.ExportStream(OutStr);
-        // TempBlob.CreateInStream(InStr);
-        Rec.CalcFields(Picture);
-        Rec.Picture.CreateInStream(InStr);
+        TempBlob.CreateOutStream(OutStr);
+        Rec.Image.ExportStream(OutStr);
+        TempBlob.CreateInStream(InStr);
 
         DataUri := 'data:image/' + ImageHelpers.GetImageType(InStr);
         DataUri += ';base64,' + Convert.ToBase64(InStr);
