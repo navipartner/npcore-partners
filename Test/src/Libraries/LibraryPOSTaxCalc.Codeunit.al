@@ -97,6 +97,15 @@ codeunit 85028 "NPR POS Lib. - Tax Calc."
         TaxDetail.Modify();
     end;
 
+    procedure UpdateTaxJurisdictionSalesAccounts()
+    var
+        TaxJurisdiction: Record "Tax Jurisdiction";
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        TaxJurisdiction.ModifyAll("Tax Account (Sales)", LibraryERM.CreateGLAccountNo());
+        TaxJurisdiction.ModifyAll("Unreal. Tax Acc. (Sales)", LibraryERM.CreateGLAccountNo());
+    end;
+
     procedure IsUSLocalizationEnabled(): Boolean
     var
         DataTypeMgt: Codeunit "Data Type Management";

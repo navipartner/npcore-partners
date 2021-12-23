@@ -2610,6 +2610,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
@@ -2663,7 +2664,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         UpdatePOSSalesRoundingAcc();
 
         // [GIVEN] Update Tax account (sales)
-        UpdateTaxJurisdictionSalesAccounts(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -2715,15 +2716,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Assert.AreEqual(POSSaleLine."Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT", 'POSSaleLine."Amount Including VAT" <> POSEntrySalesLine."Amount Incl. VAT"');
         Assert.IsFalse(TaxJurisdiction.IsEmpty(), 'Tax Jurisdiction not found');
 
-        //Verify G/L Entry
-        GLEntry.SetRange("Document No.", POSEntry."Document No.");
-        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
-        TaxJurisdiction.FindSet();
-        repeat
-            GLEntry.SetRange("G/L Account No.", TaxJurisdiction."Tax Account (Sales)");
-            Assert.IsTrue(GLEntry.FindFirst(), 'G/L Entry not created for Sales Account');
-            Assert.AreEqual(LineAmtInclTax, -(GLEntry.Amount + GLEntry."VAT Amount"), '(Qty * Item."Unit Price") <> (GLEntry.Amount + GLEntry."VAT Amount")');
-        until TaxJurisdiction.next() = 0;
+        VerifyVATforGLEntry(POSEntry, TaxArea);
+
+        POSStore.GetProfile(POSPostingProfile);
+        VerifySalesforGLEntry(POSEntry, Item, POSPostingProfile."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -2740,6 +2736,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
@@ -2793,7 +2790,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         UpdatePOSSalesRoundingAcc();
 
         // [GIVEN] Update Tax account (sales)
-        UpdateTaxJurisdictionSalesAccounts(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -2845,15 +2842,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Assert.AreEqual(POSSaleLine."Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT", 'POSSaleLine."Amount Including VAT" <> POSEntrySalesLine."Amount Incl. VAT"');
         Assert.IsFalse(TaxJurisdiction.IsEmpty(), 'Tax Jurisdiction not found');
 
-        //Verify G/L Entry
-        GLEntry.SetRange("Document No.", POSEntry."Document No.");
-        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
-        TaxJurisdiction.FindSet();
-        repeat
-            GLEntry.SetRange("G/L Account No.", TaxJurisdiction."Tax Account (Sales)");
-            Assert.IsTrue(GLEntry.FindFirst(), 'G/L Entry not created for Sales Account');
-            Assert.AreEqual(LineAmtInclTax, -(GLEntry.Amount + GLEntry."VAT Amount"), '(Qty * Item."Unit Price") <> (GLEntry.Amount + GLEntry."VAT Amount")');
-        until TaxJurisdiction.next() = 0;
+        VerifyVATforGLEntry(POSEntry, TaxArea);
+
+        POSStore.GetProfile(POSPostingProfile);
+        VerifySalesforGLEntry(POSEntry, Item, POSPostingProfile."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -2926,7 +2918,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         UpdatePOSSalesRoundingAcc();
 
         // [GIVEN] Update Tax account (sales)
-        UpdateTaxJurisdictionSalesAccounts(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -2981,15 +2973,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Assert.AreEqual(POSSaleLine."Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT", 'POSSaleLine."Amount Including VAT" <> POSEntrySalesLine."Amount Incl. VAT"');
         Assert.IsFalse(TaxJurisdiction.IsEmpty(), 'Tax Jurisdiction not found');
 
-        //Verify G/L Entry
-        GLEntry.SetRange("Document No.", POSEntry."Document No.");
-        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
-        TaxJurisdiction.FindSet();
-        repeat
-            GLEntry.SetRange("G/L Account No.", TaxJurisdiction."Tax Account (Sales)");
-            Assert.IsTrue(GLEntry.FindFirst(), 'G/L Entry not created for Sales Account');
-            Assert.AreEqual(LineAmtInclTax, -(GLEntry.Amount + GLEntry."VAT Amount"), 'UnitPriceTaxable * Qty <> (GLEntry.Amount + GLEntry."VAT Amount")');
-        until TaxJurisdiction.next() = 0;
+        VerifyVATforGLEntry(POSEntry, TaxArea);
+
+        VerifySalesforGLEntry(POSEntry, Item, Customer."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -3062,7 +3048,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         UpdatePOSSalesRoundingAcc();
 
         // [GIVEN] Update Tax account (sales)
-        UpdateTaxJurisdictionSalesAccounts(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -3117,15 +3103,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Assert.AreEqual(POSSaleLine."Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT", 'POSSaleLine."Amount Including VAT" <> POSEntrySalesLine."Amount Incl. VAT"');
         Assert.IsFalse(TaxJurisdiction.IsEmpty(), 'Tax Jurisdiction not found');
 
-        //Verify G/L Entry
-        GLEntry.SetRange("Document No.", POSEntry."Document No.");
-        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
-        TaxJurisdiction.FindSet();
-        repeat
-            GLEntry.SetRange("G/L Account No.", TaxJurisdiction."Tax Account (Sales)");
-            Assert.IsTrue(GLEntry.FindFirst(), 'G/L Entry not created for Sales Account');
-            Assert.AreEqual(LineAmtInclTax, -(GLEntry.Amount + GLEntry."VAT Amount"), 'UnitPriceTaxable * Qty <> (GLEntry.Amount + GLEntry."VAT Amount")');
-        until TaxJurisdiction.next() = 0;
+        VerifyVATforGLEntry(POSEntry, TaxArea);
+
+        VerifySalesforGLEntry(POSEntry, Item, Customer."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -4528,6 +4508,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
@@ -4577,7 +4558,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         UpdatePOSSalesRoundingAcc();
 
         // [GIVEN] Update Tax account (sales)
-        UpdateTaxJurisdictionSalesAccounts(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -4635,15 +4616,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Assert.AreEqual(POSSaleLine."Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT", 'POSSaleLine."Amount Including VAT" <> POSEntrySalesLine."Amount Incl. VAT"');
         Assert.IsFalse(TaxJurisdiction.IsEmpty(), 'Tax Jurisdiction not found');
 
-        //Verify G/L Entry
-        GLEntry.SetRange("Document No.", POSEntry."Document No.");
-        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
-        TaxJurisdiction.FindSet();
-        repeat
-            GLEntry.SetRange("G/L Account No.", TaxJurisdiction."Tax Account (Sales)");
-            Assert.IsTrue(GLEntry.FindFirst(), 'G/L Entry not created for Sales Account');
-            Assert.AreEqual(LineAmtInclTax, -(GLEntry.Amount + GLEntry."VAT Amount"), 'UnitPriceTaxable * Qty + TotalTax <> (GLEntry.Amount + GLEntry."VAT Amount")');
-        until TaxJurisdiction.next() = 0;
+        VerifyVATforGLEntry(POSEntry, TaxArea);
+
+        POSStore.GetProfile(POSPostingProfile);
+        VerifySalesforGLEntry(POSEntry, Item, POSPostingProfile."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -4716,7 +4692,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         UpdatePOSSalesRoundingAcc();
 
         // [GIVEN] Update Tax account (sales)
-        UpdateTaxJurisdictionSalesAccounts(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -4777,15 +4753,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Assert.AreEqual(POSSaleLine."Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT", 'POSSaleLine."Amount Including VAT" <> POSEntrySalesLine."Amount Incl. VAT"');
         Assert.IsFalse(TaxJurisdiction.IsEmpty(), 'Tax Jurisdiction not found');
 
-        //Verify G/L Entry
-        GLEntry.SetRange("Document No.", POSEntry."Document No.");
-        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
-        TaxJurisdiction.FindSet();
-        repeat
-            GLEntry.SetRange("G/L Account No.", TaxJurisdiction."Tax Account (Sales)");
-            Assert.IsTrue(GLEntry.FindFirst(), 'G/L Entry not created for Sales Account');
-            Assert.AreEqual(LineAmtInclTax, -(GLEntry.Amount + GLEntry."VAT Amount"), 'UnitPriceTaxable * Qty <> (GLEntry.Amount + GLEntry."VAT Amount")');
-        until TaxJurisdiction.next() = 0;
+        VerifyVATforGLEntry(POSEntry, TaxArea);
+        VerifySalesforGLEntry(POSEntry, Item, Customer."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -5416,6 +5385,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
+        SalesSetup: Record "Sales & Receivables Setup";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibraryERM: Codeunit "Library - ERM";
     begin
@@ -5426,6 +5396,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         end;
 
         if not Initialized then begin
+            SalesSetup.Get();
+            SalesSetup."Discount Posting" := SalesSetup."Discount Posting"::"Line Discounts";
+            SalesSetup.Modify();
             LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
             LibraryPOSMasterData.CreatePOSSetup(POSSetup);
             LibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
@@ -5438,13 +5411,13 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
             LibraryTaxCalc.CreateTaxSetup();
             LibraryTaxCalc.CreateTaxGroup(TaxGroup);
 
+            CreateEmptyTaxPostingSetup();
+
             DeletePOSPostedEntries();
             DeleteDiscounts();
 
             Initialized := true;
         end;
-
-
 
         Commit();
     end;
@@ -5606,30 +5579,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         GLAcc.Modify();
     end;
 
-    local procedure UpdateTaxJurisdictionSalesAccounts(VATPostingSetup: Record "VAT Posting Setup")
-    var
-        GLAcc: Record "G/L Account";
-        TaxJurisdiction: Record "Tax Jurisdiction";
-    begin
-        TaxJurisdiction.SetFilter("Tax Account (Sales)", '<>%1', '');
-        if TaxJurisdiction.FindSet() then
-            repeat
-                GLAcc.Get(TaxJurisdiction."Tax Account (Sales)");
-                GLAcc."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
-                GLAcc."VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
-                GLAcc.Modify();
-            until TaxJurisdiction.Next() = 0;
-        TaxJurisdiction.Reset();
-        TaxJurisdiction.SetFilter("Unreal. Tax Acc. (Sales)", '<>%1', '');
-        if TaxJurisdiction.FindSet() then
-            repeat
-                GLAcc.Get(TaxJurisdiction."Unreal. Tax Acc. (Sales)");
-                GLAcc."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
-                GLAcc."VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
-                GLAcc.Modify();
-            until TaxJurisdiction.Next() = 0;
-    end;
-
     local procedure EnableDiscount()
     var
         DiscountPriority: Record "NPR Discount Priority";
@@ -5698,5 +5647,79 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         MixedDiscountLine."Starting date" := MixedDiscount."Starting date";
         MixedDiscountLine."Ending Date" := MixedDiscount."Ending date";
         MixedDiscountLine.Insert();
+    end;
+
+    local procedure VerifyVATforGLEntry(POSEntry: Record "NPR POS Entry"; TaxArea: Record "Tax Area")
+    var
+        GLEntry: Record "G/L Entry";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+        TaxJurisdiction: Record "Tax Jurisdiction";
+        TaxAreaLine: Record "Tax Area Line";
+        GLSetup: Record "General Ledger Setup";
+        POSSalesTax: Codeunit "NPR POS Sales Tax";
+    begin
+        TaxAreaLine.SetRange("Tax Area", TaxArea.Code);
+        TaxAreaLine.FindFirst();
+        TaxJurisdiction.Get(TaxAreaLine."Tax Jurisdiction Code");
+        GLEntry.SetRange("Document No.", POSEntry."Document No.");
+        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
+        GLEntry.SetRange("G/L Account No.", TaxJurisdiction.GetSalesAccount(false));
+        GLENtry.CalcSums(Amount);
+        GLSetup.get();
+        if POSSalesTax.NALocalizationEnabled() then begin
+            if GLSetup."Summarize G/L Entries" then
+                Assert.AreEqual(4, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created')
+            else
+                Assert.AreEqual(3, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created');
+        end else begin
+            Assert.AreEqual(4, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created');
+        end;
+        POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryTaxLine.CalcSums("Tax Amount");
+        Assert.AreEqual(3, POSEntryTaxLine.Count(), 'More then 3 POS Entry Tax Line has been posted');
+        Assert.IsTrue(ABS(GLEntry.Amount + POSEntryTaxLine."Tax Amount") <= 0.01, 'GLEntry.Amount <> POSEntryTaxLine."Tax Amount"');
+    end;
+
+    local procedure VerifySalesforGLEntry(POSEntry: Record "NPR POS Entry"; Item: Record Item; GenBusPostingGroup: Code[20])
+    var
+        GLEntry: Record "G/L Entry";
+        GeneralPostingSetup: Record "General Posting Setup";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        GLEntry.SetRange("Document No.", POSEntry."Document No.");
+        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.FindSet();
+        repeat
+            GeneralPostingSetup.Get(GenBusPostingGroup, POSEntrySalesLine."Gen. Prod. Posting Group");
+            GLEntry.SetRange("G/L Account No.", GeneralPostingSetup."Sales Account");
+            Assert.IsTrue(GLEntry.FindFirst(), 'G/L Entry for Sales account has not been created');
+            Assert.AreEqual(POSEntrySalesLine."Amount Excl. VAT (LCY)" + POSEntrySalesLine."Line Discount Amount Excl. VAT", Abs(GLEntry.Amount), '(POSEntrySalesLine."Amount Excl. VAT (LCY)" + POSEntrySalesLine."Line Discount Amount Excl. VAT") <> GLEntry.Amount');
+            Assert.AreEqual(0, Abs(GLEntry."VAT Amount"), '0 <> GLEntry."VAT Amount"');
+
+            GLEntry.SetRange("G/L Account No.", GeneralPostingSetup."Sales Line Disc. Account");
+            Assert.IsTrue(GLEntry.FindFirst(), 'G/L Entry for Sales account has not been created');
+            Assert.AreEqual(POSEntrySalesLine."Line Discount Amount Excl. VAT", Abs(GLEntry.Amount), 'POSEntrySalesLine."Line Discount Amount Excl. VAT" <> GLEntry.Amount');
+            Assert.AreEqual(0, Abs(GLEntry."VAT Amount"), '0 <> GLEntry."VAT Amount"');
+        until POSEntrySalesLine.Next() = 0;
+    end;
+
+    local procedure CreateEmptyTaxPostingSetup()
+    var
+        TaxPostingSetup: Record "VAT Posting Setup";
+    begin
+        //we need this to be able to post sale to G/L Entry for Automatic VAT Entry
+        //with unknown VAT Amount. VAT Amount later will be posted from POS Entry Tax Lines
+        if not TaxPostingSetup.get('', '') then begin
+            TaxPostingSetup."VAT Bus. Posting Group" := '';
+            TaxPostingSetup."VAT Prod. Posting Group" := '';
+            TaxPostingSetup.Init();
+            TaxPostingSetup.Insert();
+        end;
+        TaxPostingSetup."VAT Calculation Type" := TaxPostingSetup."VAT Calculation Type"::"Sales Tax";
+        TaxPostingSetup."Tax Category" := 'E';
+        TaxPostingSetup.Modify();
     end;
 }
