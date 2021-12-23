@@ -153,11 +153,7 @@ page 6014585 "NPR Advanced Sales Stats"
 
                     trigger OnValidate()
                     begin
-                        PLYSaleQty := ShowLastYear;
-                        PLYSale := ShowLastYear;
-                        PLYProfit := ShowLastYear;
-                        "PLYProfit%" := ShowLastYear;
-                        CurrPage.Update(false);
+                        SetShowLastYear();
                     end;
                 }
                 field(ShowSameWeekday; ShowSameWeekday)
@@ -170,7 +166,8 @@ page 6014585 "NPR Advanced Sales Stats"
                     trigger OnValidate()
                     begin
                         Calc();
-                        CurrPage.Update(false);
+                        ShowLastYear := true;
+                        SetShowLastYear();
                     end;
                 }
             }
@@ -510,11 +507,7 @@ page 6014585 "NPR Advanced Sales Stats"
     trigger OnOpenPage()
     begin
         ShowLastYear := false;
-        PLYSaleQty := ShowLastYear;
-        PLYSale := ShowLastYear;
-        PLYProfit := ShowLastYear;
-        "PLYProfit%" := ShowLastYear;
-
+        SetShowLastYear();
         HideItem := true;
         HideItemGroup := false;
         HideCustomer := true;
@@ -758,5 +751,13 @@ page 6014585 "NPR Advanced Sales Stats"
         end;
     end;
 #endif
+    local procedure SetShowLastYear()
+    begin
+        PLYSaleQty := ShowLastYear;
+        PLYSale := ShowLastYear;
+        PLYProfit := ShowLastYear;
+        "PLYProfit%" := ShowLastYear;
+        CurrPage.Update(false);
+    end;
 }
 
