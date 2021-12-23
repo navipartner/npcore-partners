@@ -104,7 +104,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
             Codeunit::"NPR UPG Credit Voucher":
                 exit('NPRCreditVoucher-58afcbe8-d720-4770-8e65-28e0bc15e4a8');
             Codeunit::"NPR UPG Bitmap 2 Media":
-                exit(CompanyName() + 'Bitmap2Media' + Format(Today(), 0, 9));
+                exit('NPRBitmap2Media');
             Codeunit::"NPR UPG Azure Functions Data":
                 exit('NPR_UPG_Azure_Functions_Data');
             Codeunit::"NPR Salesperson Upgrade":
