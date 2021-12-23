@@ -114,6 +114,11 @@ report 6014450 "NPR Items Received&Not Invoic."
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
+
 
     var
         Items_Received_and_not_yet_InvoicedCaptionLbl: Label 'Items Received and not yet Invoiced';

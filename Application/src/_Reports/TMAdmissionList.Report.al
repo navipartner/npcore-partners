@@ -122,6 +122,7 @@ report 6060126 "NPR TM Admission List"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

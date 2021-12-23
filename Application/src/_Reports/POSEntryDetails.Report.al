@@ -116,7 +116,7 @@ report 6014458 "NPR POS Entry Details"
     }
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
         }

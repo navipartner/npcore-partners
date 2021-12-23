@@ -241,6 +241,7 @@ report 6059900 "NPR Analyse Task Queue Usg."
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

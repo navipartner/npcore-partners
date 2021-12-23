@@ -94,6 +94,10 @@ report 6060134 "NPR MM Member Info"
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
     labels
     {
         TxtCount = 'Membership Change Count';

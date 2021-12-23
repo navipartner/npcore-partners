@@ -6,6 +6,7 @@ report 6014411 "NPR Crt. Purc. Order From Item"
     UsageCategory = None;
     requestpage
     {
+        SaveValues = true;
         layout
         {
             area(Content)

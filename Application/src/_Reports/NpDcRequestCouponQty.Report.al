@@ -6,6 +6,7 @@ report 6151590 "NPR NpDc Request Coupon Qty."
     ApplicationArea = NPRRetail;
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

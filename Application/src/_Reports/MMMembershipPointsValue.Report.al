@@ -239,6 +239,7 @@ report 6060130 "NPR MM Membership Points Value"
 
     requestpage
     {
+        SaveValues = true;
 
         trigger OnOpenPage()
         begin

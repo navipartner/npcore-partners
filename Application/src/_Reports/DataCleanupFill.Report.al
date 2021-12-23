@@ -210,6 +210,7 @@ report 6060100 "NPR Data Cleanup Fill"
     requestpage
     {
 
+        SaveValues = true;
         layout
         {
             area(content)

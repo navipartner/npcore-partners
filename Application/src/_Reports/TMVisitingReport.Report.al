@@ -111,6 +111,10 @@ report 6060125 "NPR TM Visiting Report"
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     labels
     {

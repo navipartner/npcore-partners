@@ -134,6 +134,7 @@ report 6014597 "NPR Sales Per Contact"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

@@ -150,7 +150,7 @@ report 6014428 "NPR Shelf Labels"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

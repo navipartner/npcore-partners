@@ -81,7 +81,7 @@ report 6014421 "NPR POS Menu Buttons/Actions"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

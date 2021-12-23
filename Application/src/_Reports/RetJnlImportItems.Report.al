@@ -92,7 +92,7 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

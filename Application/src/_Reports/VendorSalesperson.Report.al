@@ -205,6 +205,10 @@ report 6014529 "NPR Vendor/Salesperson"
             end;
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     trigger OnInitReport()
     begin

@@ -142,6 +142,11 @@ report 6060133 "NPR MM Visiting Report"
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
+
 
     labels
     {

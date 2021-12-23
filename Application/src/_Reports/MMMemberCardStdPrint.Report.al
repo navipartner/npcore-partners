@@ -115,6 +115,10 @@ report 6060123 "NPR MM Member Card Std Print"
             end;
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     var
         CompanyInformation: Record "Company Information";

@@ -442,7 +442,7 @@ report 6014435 "NPR Vendor/Item Group"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

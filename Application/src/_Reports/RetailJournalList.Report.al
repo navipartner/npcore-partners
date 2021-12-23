@@ -62,6 +62,10 @@ report 6014514 "NPR Retail Journal List"
             end;
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     labels
     {

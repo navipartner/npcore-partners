@@ -196,6 +196,10 @@ report 6014427 "NPR Turnover Rate"
             end;
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     labels
     {

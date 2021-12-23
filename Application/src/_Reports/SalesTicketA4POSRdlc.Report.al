@@ -496,7 +496,10 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
             end;
         }
     }
-
+    requestpage
+    {
+        SaveValues = true;
+    }
     labels
     {
         LineDiscountPercentageLabel = 'Disc. %';

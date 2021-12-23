@@ -123,6 +123,10 @@ report 6014495 "NPR Whse. - Shipment"
             end;
         }
     }
+     requestpage
+    {
+        SaveValues = true;
+    }
 
     var
         Location: Record Location;
