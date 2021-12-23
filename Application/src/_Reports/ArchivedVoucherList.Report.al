@@ -93,6 +93,7 @@ report 6014403 "NPR Archived Voucher List"
     }
     requestpage
     {
+        SaveValues = true;
         layout
         {
             area(content)

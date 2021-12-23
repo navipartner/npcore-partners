@@ -29,6 +29,12 @@ report 6014601 "NPR Update Barcodes"
 
     }
 
+    requestpage
+    {
+        SaveValues = true;
+    }
+
+
     trigger OnPostReport()
     var
         NoOfBarCodesCreatedMsg: Label '%1 new barcodes created.', Comment = '%1 - Number of new barcodes';

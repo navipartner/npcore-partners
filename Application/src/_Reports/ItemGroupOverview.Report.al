@@ -70,6 +70,10 @@ report 6014408 "NPR Item Group Overview"
             end;
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     labels
     {

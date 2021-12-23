@@ -6,6 +6,7 @@ report 6151597 "NPR NpDc Request Priority"
     ApplicationArea = NPRRetail;
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

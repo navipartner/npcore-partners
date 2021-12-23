@@ -20,6 +20,10 @@ report 6060128 "NPR MM Sync. Community Cust."
 
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
     var
         MembershipCodeLbl: Label 'Membership Code: #1################## @2@@@@@@@@@@@@@@@@@@';
 

@@ -167,7 +167,7 @@ report 6014543 "NPR Item - Loss - Top 10"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

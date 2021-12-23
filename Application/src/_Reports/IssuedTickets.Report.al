@@ -52,6 +52,11 @@ report 6014413 "NPR Issued Tickets"
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
+
 
     labels
     {

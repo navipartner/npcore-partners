@@ -107,7 +107,7 @@ report 6060111 "NPR Check Duplicate Cust."
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

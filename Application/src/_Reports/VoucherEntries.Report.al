@@ -101,6 +101,10 @@ report 6014407 "NPR Voucher Entries"
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     var
         TitleLbl: Label 'VOUCHER ENTRIES';

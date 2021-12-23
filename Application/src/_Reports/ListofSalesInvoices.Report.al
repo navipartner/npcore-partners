@@ -6,5 +6,10 @@ report 6060051 "NPR List of Sales Invoices"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
+    requestpage
+    {
+        SaveValues = true;
+    }
+
 }
 

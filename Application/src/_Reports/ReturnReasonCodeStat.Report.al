@@ -151,6 +151,10 @@ report 6014404 "NPR Return Reason Code Stat."
         }
 
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
 
     trigger OnPreReport()

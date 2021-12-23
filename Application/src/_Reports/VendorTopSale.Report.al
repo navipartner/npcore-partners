@@ -340,7 +340,7 @@ report 6014426 "NPR Vendor Top/Sale"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

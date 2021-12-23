@@ -81,7 +81,7 @@ report 6060052 "NPR Item Wise Sales Figures"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

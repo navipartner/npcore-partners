@@ -99,6 +99,7 @@ report 6060137 "NPR MM Membership Batch Renew"
 
     requestpage
     {
+        SaveValues = true;
         Caption = 'Membership Mass Renew';
         DeleteAllowed = false;
         InsertAllowed = false;

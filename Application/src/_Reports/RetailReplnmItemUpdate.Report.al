@@ -10,6 +10,10 @@ report 6151051 "NPR Retail Replnm. Item Update"
         {
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
 }
 

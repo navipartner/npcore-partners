@@ -174,6 +174,10 @@ report 6014499 "NPR Inventory Campaign Stat."
         }
 
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     labels
     {

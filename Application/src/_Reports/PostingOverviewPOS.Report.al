@@ -299,7 +299,7 @@ report 6150614 "NPR Posting Overview POS"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

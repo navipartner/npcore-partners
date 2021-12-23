@@ -173,6 +173,10 @@ report 6151014 "NPR NpRv Voucher 2"
             end;
         }
     }
+     requestpage
+    {
+        SaveValues = true;
+    }
 
     var
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";

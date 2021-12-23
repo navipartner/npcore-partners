@@ -70,6 +70,7 @@ report 6060040 "NPR Suggest Item Worksh. Lines"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

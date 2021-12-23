@@ -6,5 +6,9 @@ report 6014613 "NPR Report Selection Overview"
     ApplicationArea = NPRRetail;
     Caption = 'Report Selection Overview';
     DataAccessIntent = ReadOnly;
+    requestpage
+    {
+        SaveValues = true;
+    }
 }
 

@@ -461,7 +461,7 @@ report 6014432 "NPR Customer Analysis"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

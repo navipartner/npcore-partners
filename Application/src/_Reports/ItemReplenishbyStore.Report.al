@@ -252,6 +252,7 @@ report 6014475 "NPR Item Replenish. by Store"
     requestpage
     {
 
+        SaveValues = true;
         layout
         {
             area(content)

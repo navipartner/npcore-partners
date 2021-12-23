@@ -47,6 +47,10 @@ report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
 }
 

@@ -73,6 +73,10 @@ report 6014616 "NPR Retail Campaign Items"
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
 }
 

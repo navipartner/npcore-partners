@@ -106,6 +106,7 @@ report 6014401 "NPR Voucher List"
     }
     requestpage
     {
+        SaveValues = true;
         layout
         {
             area(content)

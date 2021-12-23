@@ -48,6 +48,10 @@ report 6060135 "NPR MM Member Card Owner"
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
 }
 

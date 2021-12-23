@@ -214,7 +214,7 @@ report 6014441 "NPR POS Item Sales with Dim."
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

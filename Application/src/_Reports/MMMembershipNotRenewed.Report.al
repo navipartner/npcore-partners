@@ -214,6 +214,7 @@ report 6060136 "NPR MM Membership Not Renewed"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

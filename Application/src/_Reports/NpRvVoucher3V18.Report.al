@@ -172,7 +172,10 @@ report 6151015 "NPR NpRv Voucher 3"
             end;
         }
     }
-
+ requestpage
+    {
+        SaveValues = true;
+    }
     var
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
         BarcodeSimbiology: Enum "Barcode Symbology";

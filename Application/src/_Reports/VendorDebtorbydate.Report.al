@@ -116,6 +116,7 @@ report 6014434 "NPR Vendor/Debtor by date"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

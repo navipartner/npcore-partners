@@ -212,7 +212,7 @@ report 6060132 "NPR MM Membership Status"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)
