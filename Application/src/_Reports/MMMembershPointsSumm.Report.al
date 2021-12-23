@@ -75,6 +75,7 @@ report 6060129 "NPR MM Membersh. Points Summ."
 
     requestpage
     {
+        SaveValues = true;
         trigger OnOpenPage()
         begin
             "MM Membership".SetFilter("Date Filter", '..%2', ToDate);

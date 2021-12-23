@@ -44,6 +44,10 @@ report 6014481 "NPR Ret. Jnl. Imp. Per. Disc."
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     var
         Item: Record Item;

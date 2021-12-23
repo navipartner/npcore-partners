@@ -13,6 +13,10 @@ report 6014618 "NPR Skip Sales Shipment Print"
         {
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     trigger OnInitReport()
     begin

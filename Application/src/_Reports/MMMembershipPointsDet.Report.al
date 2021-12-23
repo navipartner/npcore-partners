@@ -133,7 +133,10 @@ report 6060131 "NPR MM Membership Points Det."
             end;
         }
     }
-
+    requestpage
+    {
+        SaveValues = true;
+    }
     labels
     {
         ReportLbl = 'Membership Points Detail';

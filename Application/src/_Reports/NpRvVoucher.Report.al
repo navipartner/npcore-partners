@@ -169,6 +169,10 @@ report 6151013 "NPR NpRv Voucher"
             end;
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     var
         EndingDate: Text;

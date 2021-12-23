@@ -304,6 +304,10 @@ report 6060150 "NPR Event Customer Template"
             end;
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     var
         CommentLine: Record "Comment Line";

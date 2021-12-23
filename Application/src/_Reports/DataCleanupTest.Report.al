@@ -74,7 +74,7 @@ report 6060101 "NPR Data Cleanup Test"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

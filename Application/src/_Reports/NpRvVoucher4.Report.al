@@ -169,6 +169,10 @@ report 6151016 "NPR NpRv Voucher 4"
             end;
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     var
         EndingDate: Text;

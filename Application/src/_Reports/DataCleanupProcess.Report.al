@@ -110,6 +110,7 @@ report 6060102 "NPR Data Cleanup Process"
     requestpage
     {
 
+        SaveValues = true;
         layout
         {
             area(content)

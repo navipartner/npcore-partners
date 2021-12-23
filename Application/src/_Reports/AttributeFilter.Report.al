@@ -14,5 +14,9 @@ report 6014555 "NPR Attribute Filter"
             RequestFilterFields = "Attribute Code", "Text Value";
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 }
 

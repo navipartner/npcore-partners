@@ -67,6 +67,10 @@ report 6060124 "NPR TM Ticket Batch Resp."
             }
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     labels
     {

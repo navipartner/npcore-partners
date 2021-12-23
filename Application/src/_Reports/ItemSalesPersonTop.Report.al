@@ -148,7 +148,7 @@ report 6014474 "NPR Item/Sales Person Top"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)

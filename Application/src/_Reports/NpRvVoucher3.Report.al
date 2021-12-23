@@ -169,7 +169,10 @@ report 6151015 "NPR NpRv Voucher 3"
             end;
         }
     }
-
+    requestpage
+    {
+        SaveValues = true;
+    }
     var
         EndingDate: Text;
         IssuedDate: Text;

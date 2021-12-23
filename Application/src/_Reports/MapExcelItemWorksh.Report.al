@@ -35,7 +35,6 @@ report 6060044 "NPR Map Excel Item Worksh."
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

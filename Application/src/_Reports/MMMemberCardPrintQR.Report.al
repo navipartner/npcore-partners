@@ -77,6 +77,10 @@ report 6060127 "NPR MM Member Card Print QR"
             end;
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     labels
     {

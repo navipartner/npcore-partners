@@ -74,6 +74,10 @@ report 6014412 "NPR Sold Items by Sales Person"
             end;
         }
     }
+    requestpage
+    {
+        SaveValues = true;
+    }
 
     labels
     {

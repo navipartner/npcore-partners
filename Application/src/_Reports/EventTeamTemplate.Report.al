@@ -448,6 +448,7 @@ report 6060151 "NPR Event Team Template"
                 }
             }
 
+
             trigger OnAfterGetRecord()
             begin
                 if not Customer.Get("Bill-to Customer No.") then
@@ -464,8 +465,13 @@ report 6060151 "NPR Event Team Template"
                     EventAttributeTempName2 := EventAttribute."Template Name";
             end;
         }
+
     }
 
+    requestpage
+    {
+        SaveValues = true;
+    }
     var
         Customer: Record Customer;
         ItemLineTotal: Record "Job Planning Line";
