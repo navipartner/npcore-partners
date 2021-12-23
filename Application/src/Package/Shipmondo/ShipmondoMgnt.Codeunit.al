@@ -36,7 +36,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     begin
         if not NPRShippingAgent.GET(PakkelabelsShipment."Shipping Agent Code") then
             exit;
-        RequestURL := 'https://app.pakkelabels.dk/api/public/v3/shipments/';
+        RequestURL := BaseURL() + 'shipments/';
         RequestString := BuildShipmentRequest(PakkelabelsShipment);
         if not ExecuteCall('POST', response, silent) then
             Exit;
@@ -63,7 +63,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         Jtoken: Jsontoken;
         QueryParamsLbl: Label 'page=%1&per_page=%2', Locked = true;
     begin
-        RequestURL := 'https://app.pakkelabels.dk/api/public/v3/printers';
+        RequestURL := BaseURL() + 'printers';
         QueryParams := '';
 
         if QueryParams <> '' then
@@ -842,7 +842,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             exit;
 
         if ShipmentDocument."Response Shipment ID" <> '' then begin
-            RequestURL := 'https://app.shipmondo.com/api/public/v3/print_jobs/';
+            RequestURL := BaseURL() + 'print_jobs/';
             RequestString := PrintJob(ShipmentDocument);
             if ExecuteCall('POST', JToken, false) then;
         end;
@@ -854,7 +854,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     begin
         if not InitPackageProvider() then
             exit;
-        RequestURL := 'https://app.shipmondo.com/api/public/v3/account/balance';
+        RequestURL := BaseURL() + 'account/balance';
         if not ExecuteCall('GET', Jtoken, False) then
             exit;
         Message(GetJsonText(JToken, 'amount', 0));
@@ -877,7 +877,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         if ShipmentDocument.FINDLAST() then begin
             if CONFIRM(Text001, true) then
                 if ShipmentDocument."Response Shipment ID" <> '' then begin
-                    RequestURL := 'https://app.shipmondo.com/api/public/v3/print_jobs/';
+                    RequestURL := BaseURL() + 'print_jobs/';
                     RequestString := PrintJob(ShipmentDocument);
                     if ExecuteCall('POST', Jtoken, false) then
                         Exit;
@@ -891,6 +891,11 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
                     CreateShipment(ShipmentDocument, true);
             end;
         end;
+    end;
+
+    local procedure BaseURL(): text[250]
+    begin
+        exit('https://app.shipmondo.com/api/public/v3/')
     end;
 
 
