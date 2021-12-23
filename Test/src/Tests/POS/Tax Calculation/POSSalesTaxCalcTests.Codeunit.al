@@ -600,7 +600,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         Assert.IsTrue(POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId), 'POS Active Tax Calculation not created');
 
-        VerifySingleTaxLineCalculation(POSActiveTaxAmountLine, POSActiveTaxAmount);
+        VerifyMultieTaxLineCalculationUnliable(POSActiveTaxAmountLine, POSActiveTaxAmount);
         POSActiveTaxAmountLine.FindFirst();
         Assert.IsFalse(POSActiveTaxAmountLine."Tax Liable", 'Tax Liable');
 
@@ -686,7 +686,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         Assert.IsTrue(POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId), 'POS Active Tax Calculation not created');
 
-        VerifySingleTaxLineCalculation(POSActiveTaxAmountLine, POSActiveTaxAmount);
+        VerifyMultieTaxLineCalculationUnliable(POSActiveTaxAmountLine, POSActiveTaxAmount);
         POSActiveTaxAmountLine.FindFirst();
         Assert.IsFalse(POSActiveTaxAmountLine."Tax Liable", 'Tax Liable');
         VerifyTaxLineCalc(TempPOSActiveTaxAmountLine, POSActiveTaxAmountLine);
@@ -1366,13 +1366,14 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Item: array[2] of Record Item;
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
+        TaxJurisdiction: Record "Tax Jurisdiction";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: array[2] of Record "NPR POS Sale Tax Line";
-        TempPOSPostedTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
         POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line";
         SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -1386,6 +1387,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [Scenario] POS active sale tax calculation is created when maximum amount is unknown on tax detail
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+
+        TaxJurisdiction.DeleteAll();
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
@@ -1408,7 +1411,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         UpdatePOSSalesRoundingAcc();
 
         // [GIVEN] Update Tax account (sales)
-        UpdateTaxJurisdictionSalesAccounts(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -1451,9 +1454,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
         VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
 
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
-
         //Second Direct Sale
         SaleLinePOS.SetRange("No.", Item[2]."No.");
         SaleLinePOS.FindFirst();
@@ -1461,9 +1461,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
         VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
-
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay[1] + AmountToPay[2], '');
@@ -1473,10 +1470,13 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
 
-        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry);
-        VerifyActiveTaxCalcCopied2PostedTaxCalc(TempPOSPostedTaxAmountLine, POSPostedTaxAmountLine);
+        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, true, TaxDetail."Effective Date");
         VerifyPostedTaxCalcCopied2POSEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyPostedTaxCalcCopied2VATEntries(POSPostedTaxAmountLine, POSEntry);
+        VerifyVATforGLEntry(POSEntry, TaxArea);
+
+        POSStore.GetProfile(POSPostingProfile);
+        VerifySalesforGLEntry(POSEntry, Item, POSPostingProfile."Gen. Bus. Posting Group");
 
         //Revert
         AssignPOSViewProfileToPOSUnit('');
@@ -1496,10 +1496,10 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: array[2] of Record "NPR POS Sale Tax Line";
-        TempPOSPostedTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
         POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line";
         POSEntry: Record "NPR POS Entry";
         SalePOS: Record "NPR POS Sale";
+        TaxJurisdiction: Record "Tax Jurisdiction";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -1515,6 +1515,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
 
+        TaxJurisdiction.DeleteAll();
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
         LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
@@ -1540,7 +1541,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSPostingProfile.Modify();
 
         // [GIVEN] Update Tax account (sales)
-        UpdateTaxJurisdictionSalesAccounts(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -1586,9 +1587,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
         VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
 
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
-
         //Second Debit Sale
         SaleLinePOS.SetRange("No.", Item[2]."No.");
         SaleLinePOS.FindFirst();
@@ -1596,9 +1594,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
         VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
-
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay[1] + AmountToPay[2], '');
@@ -1608,10 +1603,11 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
 
-        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry);
-        VerifyActiveTaxCalcCopied2PostedTaxCalc(TempPOSPostedTaxAmountLine, POSPostedTaxAmountLine);
+        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, true, TaxDetail."Effective Date");
         VerifyPostedTaxCalcCopied2POSEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyPostedTaxCalcCopied2VATEntries(POSPostedTaxAmountLine, POSEntry);
+        VerifyVATforGLEntry(POSEntry, TaxArea);
+        VerifySalesforGLEntry(POSEntry, Item, Customer."Gen. Bus. Posting Group");
 
         //Revert
         AssignVATBusPostGroupToPOSPostingProfile('');
@@ -1628,10 +1624,11 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: array[2] of Record "NPR POS Sale Tax Line";
-        TempPOSPostedTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
         POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line";
         SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        TaxJurisdiction: Record "Tax Jurisdiction";
         SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -1646,6 +1643,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
 
+        TaxJurisdiction.DeleteAll();
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
         LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
@@ -1669,7 +1667,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         UpdatePOSSalesRoundingAcc();
 
         // [GIVEN] Update Tax account (sales)
-        //UpdateTaxJurisdictionSalesAccountsTaxUnliable(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -1710,10 +1708,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifySingleTaxLineCalculation(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
-
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
+        VerifyMultieTaxLineCalculationUnliable(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
 
         //Second Direct Sale
         SaleLinePOS.SetRange("No.", Item[2]."No.");
@@ -1721,10 +1716,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         AmountToPay[2] := GetAmountToPay(SaleLinePOS);
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifySingleTaxLineCalculation(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
-
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
+        VerifyMultieTaxLineCalculationUnliable(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay[1] + AmountToPay[2], '');
@@ -1734,10 +1726,13 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
 
-        VerifySingleTaxLineCalculation(POSPostedTaxAmountLine, POSEntry);
-        VerifyActiveTaxCalcCopied2PostedTaxCalc(TempPOSPostedTaxAmountLine, POSPostedTaxAmountLine);
+        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, false, TaxDetail."Effective Date");
         VerifyPostedTaxCalcCopied2POSEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyPostedTaxCalcNotCopied2VATEntries(POSEntry);
+        VerifyVATforGLEntryUnliable(POSEntry, TaxArea);
+
+        POSStore.GetProfile(POSPostingProfile);
+        VerifySalesforGLEntry(POSEntry, Item, POSPostingProfile."Gen. Bus. Posting Group");
 
         //Revert
         AssignPOSViewProfileToPOSUnit('');
@@ -1757,10 +1752,10 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: array[2] of Record "NPR POS Sale Tax Line";
-        TempPOSPostedTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
         POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line";
         POSEntry: Record "NPR POS Entry";
         SalePOS: Record "NPR POS Sale";
+        TaxJurisdiction: Record "Tax Jurisdiction";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -1775,6 +1770,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [Scenario] POS active sale tax calculation is created and posted for tax unliable with single tax amount line caclulation
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+
+        TaxJurisdiction.DeleteAll();
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
@@ -1796,12 +1793,12 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [GIVEN] Update rounding amount account
         UpdatePOSSalesRoundingAcc();
 
+        // [GIVEN] Update Tax account (sales)
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
+
         POSStore.GetProfile(POSPostingProfile);
         POSPostingProfile."Default POS Posting Setup" := POSPostingProfile."Default POS Posting Setup"::Customer;
         POSPostingProfile.Modify();
-
-        // [GIVEN] Update Tax account (sales)
-        //UpdateTaxJurisdictionSalesAccountsTaxUnliable(VATPostingSetup);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -1845,10 +1842,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifySingleTaxLineCalculation(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
-
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
+        VerifyMultieTaxLineCalculationUnliable(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
 
         //Second Debit Sale
         SaleLinePOS.SetRange("No.", Item[2]."No.");
@@ -1856,10 +1850,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         AmountToPay[2] := GetAmountToPay(SaleLinePOS);
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifySingleTaxLineCalculation(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
-
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
+        VerifyMultieTaxLineCalculationUnliable(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay[1] + AmountToPay[2], '');
@@ -1869,10 +1860,11 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
 
-        VerifySingleTaxLineCalculation(POSPostedTaxAmountLine, POSEntry);
-        VerifyActiveTaxCalcCopied2PostedTaxCalc(TempPOSPostedTaxAmountLine, POSPostedTaxAmountLine);
+        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, false, TaxDetail."Effective Date");
         VerifyPostedTaxCalcCopied2POSEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyPostedTaxCalcNotCopied2VATEntries(POSEntry);
+        VerifyVATforGLEntryUnliable(POSEntry, TaxArea);
+        VerifySalesforGLEntry(POSEntry, Item, Customer."Gen. Bus. Posting Group");
 
         //Revert
         AssignVATBusPostGroupToPOSPostingProfile('');
@@ -1881,6 +1873,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     [Test]
     procedure CalcTaxAmountForSalesTaxTypeUnitPriceHigherThenMaxAmtDirectSalePosted()
     var
+        POSPostingProfile: Record "NPR POS Posting Profile";
         VATPostingSetup: Record "VAT Posting Setup";
         POSViewProfile: Record "NPR POS View Profile";
         Item: array[2] of Record Item;
@@ -1889,10 +1882,10 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: array[2] of Record "NPR POS Sale Tax Line";
-        TempPOSPostedTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
         POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line";
         SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
+        TaxJurisdiction: Record "Tax Jurisdiction";
         SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -1906,6 +1899,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [Scenario] POS active sale tax calculation is created and posted when unit price is above tax detail maximum amount 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+
+        TaxJurisdiction.DeleteAll();
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
@@ -1924,7 +1919,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         UpdatePOSSalesRoundingAcc();
 
         // [GIVEN] Update Tax account (sales)
-        UpdateTaxJurisdictionSalesAccounts(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -1969,21 +1964,11 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
-
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
 
         //Second Direct Sale
         SaleLinePOS.SetRange("No.", Item[2]."No.");
         SaleLinePOS.FindFirst();
         AmountToPay[2] := GetAmountToPay(SaleLinePOS);
-
-        POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
-
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay[1] + AmountToPay[2], '');
@@ -1993,10 +1978,12 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
 
-        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry);
-        VerifyActiveTaxCalcCopied2PostedTaxCalc(TempPOSPostedTaxAmountLine, POSPostedTaxAmountLine);
+        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, true, TaxDetail."Effective Date");
         VerifyPostedTaxCalcCopied2POSEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyPostedTaxCalcCopied2VATEntries(POSPostedTaxAmountLine, POSEntry);
+        VerifyVATforGLEntry(POSEntry, TaxArea);
+        POSStore.GetProfile(POSPostingProfile);
+        VerifySalesforGLEntry(POSEntry, Item, POSPostingProfile."Gen. Bus. Posting Group");
 
         //Revert
         AssignPOSViewProfileToPOSUnit('');
@@ -2016,10 +2003,10 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: array[2] of Record "NPR POS Sale Tax Line";
-        TempPOSPostedTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
         POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line";
         POSEntry: Record "NPR POS Entry";
         SalePOS: Record "NPR POS Sale";
+        TaxJurisdiction: Record "Tax Jurisdiction";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -2035,6 +2022,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
 
+        TaxJurisdiction.DeleteAll();
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
         LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
@@ -2056,7 +2044,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSPostingProfile.Modify();
 
         // [GIVEN] Update Tax account (sales)
-        UpdateTaxJurisdictionSalesAccounts(VATPostingSetup);
+        LibraryTaxCalc.UpdateTaxJurisdictionSalesAccounts();
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -2104,21 +2092,11 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
-
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
 
         //Second Debit Sale
         SaleLinePOS.SetRange("No.", Item[2]."No.");
         SaleLinePOS.FindFirst();
         AmountToPay[2] := GetAmountToPay(SaleLinePOS);
-
-        POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
-
-        //Store POS Active Tax Amount to check against posted values
-        StorePOSActiveTaxAmounts(TempPOSPostedTaxAmountLine, POSActiveTaxAmount);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay[1] + AmountToPay[2], '');
@@ -2128,10 +2106,11 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
 
-        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry);
-        VerifyActiveTaxCalcCopied2PostedTaxCalc(TempPOSPostedTaxAmountLine, POSPostedTaxAmountLine);
+        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, true, TaxDetail."Effective Date");
         VerifyPostedTaxCalcCopied2POSEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyPostedTaxCalcCopied2VATEntries(POSPostedTaxAmountLine, POSEntry);
+        VerifyVATforGLEntry(POSEntry, TaxArea);
+        VerifySalesforGLEntry(POSEntry, Item, Customer."Gen. Bus. Posting Group");
 
         //Revert
         AssignVATBusPostGroupToPOSPostingProfile('');
@@ -2162,6 +2141,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
             LibraryTaxCalc.CreateTaxSetup();
             LibraryTaxCalc.CreateTaxGroup(TaxGroup);
+
+            CreateEmptyTaxPostingSetup();
 
             Initialized := true;
         end;
@@ -2277,27 +2258,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Assert.IsTrue(POSActiveTaxAmountLine.IsEmpty(), 'POS Active Tax Amount Lines created');
     end;
 
-    local procedure VerifySingleTaxLineCalculation(var POSActiveTaxAmountLine: Record "NPR POS Sale Tax Line"; POSActiveTaxAmount: Record "NPR POS Sale Tax")
-    var
-        POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
-    begin
-        POSActiveTaxCalc.FilterLines(POSActiveTaxAmount, POSActiveTaxAmountLine);
-        Assert.IsFalse(POSActiveTaxAmountLine.IsEmpty(), 'POS Active Tax Amount Lines not created');
-        Assert.AreEqual(1, POSActiveTaxAmountLine.Count(), 'More then one tax amount line is created');
-    end;
-
-    local procedure VerifySingleTaxLineCalculation(var POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line"; POSEntry: Record "NPR POS Entry")
-    var
-        POSPostedTaxCalc: codeunit "NPR POS Entry Tax Calc.";
-    begin
-        POSPostedTaxCalc.FilterLines(POSEntry."Entry No.", POSPostedTaxAmountLine);
-        Assert.IsFalse(POSPostedTaxAmountLine.IsEmpty(), 'POS Tax Amount Lines not posted');
-        Assert.AreEqual(1, POSPostedTaxAmountLine.Count(), 'More then one tax amount line is posted');
-        POSPostedTaxAmountLine.FindFirst();
-        Assert.AreEqual(POSPostedTaxAmountLine."Tax Base Amount", POSPostedTaxAmountLine."Amount Including Tax", 'POSPostedTaxAmountLine."Tax Base Amount" <> POSPostedTaxAmountLine."Amount Including Tax"');
-        Assert.AreEqual(0, POSPostedTaxAmountLine."Tax Amount", 'Tax amount not euqal to zero for tax unliable');
-    end;
-
     local procedure VerifyMultieTaxLineCalculation(var POSActiveTaxAmountLine: Record "NPR POS Sale Tax Line"; POSActiveTaxAmount: Record "NPR POS Sale Tax")
     var
         POSActiveTaxAmountLine2: Record "NPR POS Sale Tax Line";
@@ -2315,13 +2275,34 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         until POSActiveTaxAmountLine2.Next() = 0;
     end;
 
-    local procedure VerifyMultieTaxLineCalculation(var POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line"; POSEntry: Record "NPR POS Entry")
+    local procedure VerifyMultieTaxLineCalculationUnliable(var POSActiveTaxAmountLine: Record "NPR POS Sale Tax Line"; POSActiveTaxAmount: Record "NPR POS Sale Tax")
+    var
+        POSActiveTaxAmountLine2: Record "NPR POS Sale Tax Line";
+        POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+    begin
+        POSActiveTaxCalc.FilterLines(POSActiveTaxAmount, POSActiveTaxAmountLine);
+        Assert.IsFalse(POSActiveTaxAmountLine.IsEmpty(), 'POS Active Tax Amount Lines not created');
+        Assert.AreNotEqual(1, POSActiveTaxAmountLine.Count(), 'One tax amount line is created');
+        POSActiveTaxAmountLine2.COpy(POSActiveTaxAmountLine);
+        POSActiveTaxAmountLine2.FindSet();
+        repeat
+            Assert.IsFalse(POSActiveTaxAmountLine2."Tax Area Code" = '', 'Tax Area Code empty');
+            Assert.IsFalse(POSActiveTaxAmountLine2."Tax Group Code" = '', 'Tax Group Code empty');
+            Assert.IsTrue(not POSActiveTaxAmountLine2."Tax Liable", 'Tax liable');
+        until POSActiveTaxAmountLine2.Next() = 0;
+    end;
+
+    local procedure VerifyMultieTaxLineCalculation(var POSEntryTaxLine: Record "NPR POS Entry Tax Line"; POSEntry: Record "NPR POS Entry"; TaxAreaCode: code[20]; TaxGroupCode: Code[20]; TaxLiable: Boolean; EffectiveDate: Date)
     var
         POSPostedTaxCalc: codeunit "NPR POS Entry Tax Calc.";
     begin
-        POSPostedTaxCalc.FilterLines(POSEntry."Entry No.", POSPostedTaxAmountLine);
-        Assert.IsFalse(POSPostedTaxAmountLine.IsEmpty(), 'POS Tax Amount Lines not posted');
-        Assert.AreNotEqual(1, POSPostedTaxAmountLine.Count(), 'One tax amount line is posted');
+        POSPostedTaxCalc.FilterLines(POSEntry."Entry No.", POSEntryTaxLine);
+        POSEntryTaxLine.SetRange("Tax Area Code", TaxAreaCode);
+        POSEntryTaxLine.SetRange("Tax Group Code", TaxGroupCode);
+        POSEntryTaxLine.SetRange("Entry Date", EffectiveDate);
+        POSEntryTaxLine.SetRange("Tax Liable", TaxLiable);
+        Assert.IsFalse(POSEntryTaxLine.IsEmpty(), 'POS Tax Amount not posted');
+        Assert.IsTrue(3 = POSEntryTaxLine.Count(), 'More or less then three POS entry tax lines are created');
     end;
 
     local procedure SetRandomValues(var TempPOSActiveTaxAmountLine: Record "NPR POS Sale Tax Line"; Item: Record Item; Qty: Decimal; TaxPct: Decimal; LineDisc: Decimal; LineDiscPct: Decimal)
@@ -2359,6 +2340,18 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         TempPOSPostedTaxAmountLine."Tax Amount" += POSActiveTaxAmount."Calculated Tax Amount";
         TempPOSPostedTaxAmountLine."Calculated Tax Amount" += POSActiveTaxAmount."Calculated Tax Amount";
         TempPOSPostedTaxAmountLine."Amount Including Tax" += POSActiveTaxAmount."Calculated Amount Incl. Tax";
+    end;
+
+    local procedure StorePOSActiveTaxAmounts(var TempPOSPostedTaxAmountLine: Record "NPR POS Entry Tax Line"; var POSSaleTaxLine: Record "NPR POS Sale Tax Line")
+    begin
+        POSSaleTaxLine.CalcSums(Quantity, "Amount Excl. Tax", "Line Amount", "Tax Amount", "Amount Incl. Tax");
+        TempPOSPostedTaxAmountLine.Quantity += POSSaleTaxLine.Quantity;
+        TempPOSPostedTaxAmountLine."Tax Base Amount" += POSSaleTaxLine."Amount Excl. Tax";
+        TempPOSPostedTaxAmountLine."Tax Base Amount FCY" += POSSaleTaxLine."Amount Excl. Tax";
+        TempPOSPostedTaxAmountLine."Line Amount" += POSSaleTaxLine."Line Amount";
+        TempPOSPostedTaxAmountLine."Tax Amount" += POSSaleTaxLine."Tax Amount";
+        TempPOSPostedTaxAmountLine."Calculated Tax Amount" += POSSaleTaxLine."Tax Amount";
+        TempPOSPostedTaxAmountLine."Amount Including Tax" += POSSaleTaxLine."Amount Incl. Tax";
     end;
 
     local procedure VerifyTaxLineCalc(var TempPOSActiveTaxAmountLine: Record "NPR POS Sale Tax Line"; var POSActiveTaxAmountLine: Record "NPR POS Sale Tax Line")
@@ -2480,46 +2473,9 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         GLAcc.Modify();
     end;
 
-    local procedure VerifyActiveTaxCalcCopied2PostedTaxCalc(var TempPOSActiveTaxAmountLine: Record "NPR POS Entry Tax Line"; var POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line")
-    begin
-        POSPostedTaxAmountLine.CalcSums(Quantity, "Tax Base Amount", "Tax Base Amount FCY", "Line Amount", "Amount Including Tax", "Tax Amount", "Calculated Tax Amount");
-
-        Assert.AreEqual(
-                    TempPOSActiveTaxAmountLine.Quantity,
-                    POSPostedTaxAmountLine.Quantity, 'Quantity not posted from active to posted tax line');
-
-        Assert.AreEqual(
-                    TempPOSActiveTaxAmountLine."Tax Base Amount",
-                    POSPostedTaxAmountLine."Tax Base Amount", 'Tax Base Amount not posted from active Amount Excl. Tax calculation');
-
-        Assert.AreEqual(
-                    TempPOSActiveTaxAmountLine."Tax Base Amount FCY",
-                    POSPostedTaxAmountLine."Tax Base Amount FCY", 'Tax Base Amount FCY not posted from active Amount Excl. Tax calculation');
-
-        Assert.AreEqual(
-                    TempPOSActiveTaxAmountLine."Line Amount",
-                    POSPostedTaxAmountLine."Line Amount", 'Line Amount not posted from active tax line amount');
-
-        Assert.AreEqual(
-                    TempPOSActiveTaxAmountLine."Calculated Tax Amount",
-                    POSPostedTaxAmountLine."Calculated Tax Amount", 'Calculated tax amount not posted from active Tax Amount calculation');
-
-        Assert.AreEqual(
-                    TempPOSActiveTaxAmountLine."Tax Amount",
-                    POSPostedTaxAmountLine."Tax Amount", 'Tax amount not posted from active Tax Amount calculation');
-
-        Assert.AreEqual(
-                    TempPOSActiveTaxAmountLine."Amount Including Tax",
-                    POSPostedTaxAmountLine."Amount Including Tax", 'Amount Including Tax not posted from active Amount Incl. Tax calculation');
-    end;
-
     local procedure VerifyPostedTaxCalcCopied2POSEntries(var POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line"; POSEntry: Record "NPR POS Entry")
     begin
-        POSPostedTaxAmountLine.CalcSums(Quantity, "Tax Base Amount", "Tax Amount", "Calculated Tax Amount", "Amount Including Tax");
-
-        Assert.AreEqual(POSPostedTaxAmountLine.Quantity, POSEntry."Sales Quantity", 'POSPostedTaxAmountLine."Tax Base Amount" <> POSEntry."Amount Excl. Tax"');
-        Assert.AreEqual(POSPostedTaxAmountLine."Tax Base Amount", POSEntry."Amount Excl. Tax", 'POSPostedTaxAmountLine."Tax Base Amount" <> POSEntry."Amount Excl. Tax"');
-        Assert.AreEqual(POSPostedTaxAmountLine."Amount Including Tax", POSEntry."Amount Incl. Tax", 'POSPostedTaxAmountLine."Amount Including Tax" <> POSEntry."Amount Excl. Tax"');
+        POSPostedTaxAmountLine.CalcSums("Calculated Tax Amount", "Tax Amount");
         Assert.AreEqual(POSPostedTaxAmountLine."Tax Amount", POSEntry."Tax Amount", 'POSPostedTaxAmountLine."Tax Amount" <> POSEntry."Tax Amount"');
         Assert.AreEqual(POSPostedTaxAmountLine."Calculated Tax Amount", POSEntry."Tax Amount", 'POSPostedTaxAmountLine."Calculated Tax Amount" <> POSEntry."Tax Amount"');
     end;
@@ -2539,37 +2495,132 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Assert.AreEqual(-POSPostedTaxAmountLine."Calculated Tax Amount", VAtEntry.Amount, 'POSPostedTaxAmountLine."Calculated Tax Amount" <> VAtEntry.Amount');
     end;
 
+    local procedure VerifyVATforGLEntry(POSEntry: Record "NPR POS Entry"; TaxArea: Record "Tax Area")
+    var
+        GLEntry: Record "G/L Entry";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+        TaxJurisdiction: Record "Tax Jurisdiction";
+        TaxAreaLine: Record "Tax Area Line";
+        GLSetup: Record "General Ledger Setup";
+        POSSalesTax: Codeunit "NPR POS Sales Tax";
+    begin
+        TaxAreaLine.SetRange("Tax Area", TaxArea.Code);
+        TaxAreaLine.FindFirst();
+        TaxJurisdiction.Get(TaxAreaLine."Tax Jurisdiction Code");
+        GLEntry.SetRange("Document No.", POSEntry."Document No.");
+        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
+        GLEntry.SetRange("G/L Account No.", TaxJurisdiction.GetSalesAccount(false));
+        GLENtry.CalcSums(Amount);
+        GLSetup.get();
+        if POSSalesTax.NALocalizationEnabled() then begin
+            if GLSetup."Summarize G/L Entries" then
+                Assert.AreEqual(4, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created')
+            else
+                Assert.AreEqual(3, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created');
+        end else begin
+            Assert.AreEqual(4, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created');
+        end;
+        POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryTaxLine.CalcSums("Tax Amount");
+        Assert.AreEqual(3, POSEntryTaxLine.Count(), 'More then 3 POS Entry Tax Line has been posted');
+        Assert.IsTrue(ABS(GLEntry.Amount + POSEntryTaxLine."Tax Amount") <= 0.01, 'GLEntry.Amount <> POSEntryTaxLine."Tax Amount"');
+    end;
+
+    local procedure VerifyVATforGLEntryUnliable(POSEntry: Record "NPR POS Entry"; TaxArea: Record "Tax Area")
+    var
+        GLEntry: Record "G/L Entry";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+        TaxJurisdiction: Record "Tax Jurisdiction";
+        TaxAreaLine: Record "Tax Area Line";
+        GLSetup: Record "General Ledger Setup";
+        POSSalesTax: Codeunit "NPR POS Sales Tax";
+    begin
+        TaxAreaLine.SetRange("Tax Area", TaxArea.Code);
+        TaxAreaLine.FindFirst();
+        TaxJurisdiction.Get(TaxAreaLine."Tax Jurisdiction Code");
+        GLEntry.SetRange("Document No.", POSEntry."Document No.");
+        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
+        GLEntry.SetRange("G/L Account No.", TaxJurisdiction.GetSalesAccount(false));
+        GLENtry.CalcSums(Amount);
+        GLSetup.get();
+        if POSSalesTax.NALocalizationEnabled() then begin
+            if GLSetup."Summarize G/L Entries" then
+                Assert.AreEqual(1, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created')
+            else
+                Assert.AreEqual(0, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created');
+        end else begin
+            Assert.AreEqual(1, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created');
+        end;
+        POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryTaxLine.CalcSums("Tax Amount");
+        Assert.AreEqual(3, POSEntryTaxLine.Count(), 'More then 3 POS Entry Tax Line has been posted');
+        Assert.AreEqual(0, POSEntryTaxLine."Tax Amount", 'Tax Amount created');
+    end;
+
+    local procedure VerifySalesforGLEntry(POSEntry: Record "NPR POS Entry"; Item: array[2] of Record Item; GenBusPostingGroup: Code[20])
+    var
+        GLEntry: Record "G/L Entry";
+        GeneralPostingSetup: Record "General Posting Setup";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        i: Integer;
+    begin
+        GLEntry.SetRange("Document No.", POSEntry."Document No.");
+        GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
+        if Item[1]."Gen. Prod. Posting Group" = Item[2]."Gen. Prod. Posting Group" then begin
+            GeneralPostingSetup.Get(GenBusPostingGroup, Item[1]."Gen. Prod. Posting Group");
+            GLEntry.SetRange("G/L Account No.", GeneralPostingSetup."Sales Account");
+            Assert.IsTrue(GLEntry.FindFirst(), 'G/L Entry for Sales account has not been created');
+            Assert.AreEqual(POSEntry."Amount Excl. Tax", Abs(GLEntry.Amount), 'POSEntry."Amount Excl. Tax" <> GLEntry.Amount');
+            Assert.AreEqual(0, Abs(GLEntry."VAT Amount"), '0 <> GLEntry."VAT Amount"');
+        end else begin
+            POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+            POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+            POSEntrySalesLine.FindSet();
+            repeat
+                GeneralPostingSetup.Get(GenBusPostingGroup, POSEntrySalesLine."Gen. Prod. Posting Group");
+                GLEntry.SetRange("G/L Account No.", GeneralPostingSetup."Sales Account");
+                Assert.IsTrue(GLEntry.FindFirst(), 'G/L Entry for Sales account has not been created');
+                Assert.AreEqual(POSEntrySalesLine."Amount Excl. VAT (LCY)", Abs(GLEntry.Amount), 'POSEntrySalesLine."Amount Excl. VAT (LCY)" <> GLEntry.Amount');
+                Assert.AreEqual(0, Abs(GLEntry."VAT Amount"), '0 <> GLEntry."VAT Amount"');
+            until POSEntrySalesLine.Next() = 0;
+        end;
+    end;
+
     local procedure VerifyPostedTaxCalcNotCopied2VATEntries(POSEntry: Record "NPR POS Entry")
     var
         VAtEntry: Record "VAT Entry";
     begin
         VAtEntry.SetRange("Document No.", POSEntry."Document No.");
         VAtEntry.SetRange("Posting Date", POSEntry."Posting Date");
-        Assert.IsTrue(VAtEntry.IsEmpty(), 'VAT Entry created');
+        Assert.IsFalse(VAtEntry.IsEmpty(), 'VAT Entry not created');
+        VAtEntry.CalcSums(Amount);
+        Assert.AreEqual(0, VAtEntry.Amount, 'VAT Entries posted with vat amount');
     end;
 
-    local procedure UpdateTaxJurisdictionSalesAccounts(VATPostingSetup: Record "VAT Posting Setup")
+    local procedure UpdateTaxJurisdictionSalesTaxAccounts()
     var
         GLAcc: Record "G/L Account";
         TaxJurisdiction: Record "Tax Jurisdiction";
     begin
-        TaxJurisdiction.SetFilter("Tax Account (Sales)", '<>%1', '');
-        if TaxJurisdiction.FindSet() then
-            repeat
-                GLAcc.Get(TaxJurisdiction."Tax Account (Sales)");
-                GLAcc."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
-                GLAcc."VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
-                GLAcc.Modify();
-            until TaxJurisdiction.Next() = 0;
-        TaxJurisdiction.Reset();
-        TaxJurisdiction.SetFilter("Unreal. Tax Acc. (Sales)", '<>%1', '');
-        if TaxJurisdiction.FindSet() then
-            repeat
-                GLAcc.Get(TaxJurisdiction."Unreal. Tax Acc. (Sales)");
-                GLAcc."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
-                GLAcc."VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
-                GLAcc.Modify();
-            until TaxJurisdiction.Next() = 0;
+        TaxJurisdiction.ModifyAll("Tax Account (Sales)", '');
+        TaxJurisdiction.ModifyAll("Unreal. Tax Acc. (Sales)", '');
     end;
 
+    local procedure CreateEmptyTaxPostingSetup()
+    var
+        TaxPostingSetup: Record "VAT Posting Setup";
+    begin
+        //we need this to be able to post sale to G/L Entry for Automatic VAT Entry
+        //with unknown VAT Amount. VAT Amount later will be posted from POS Entry Tax Lines
+        if not TaxPostingSetup.get('', '') then begin
+            TaxPostingSetup."VAT Bus. Posting Group" := '';
+            TaxPostingSetup."VAT Prod. Posting Group" := '';
+            TaxPostingSetup.Init();
+            TaxPostingSetup.Insert();
+        end;
+        TaxPostingSetup."VAT Calculation Type" := TaxPostingSetup."VAT Calculation Type"::"Sales Tax";
+        TaxPostingSetup."Tax Category" := 'E';
+        TaxPostingSetup.Modify();
+    end;
 }

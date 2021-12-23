@@ -139,6 +139,11 @@ table 6150629 "NPR POS Entry Tax Line"
             DataClassification = CustomerContent;
             Editable = false;
         }
+        field(36; "Calc. for Maximum Amount/Qty."; Boolean)
+        {
+            Caption = 'Calculation for Maximum Amount/Qty.';
+            DataClassification = CustomerContent;
+        }
         field(600; "Entry Date"; Date)
         {
             CalcFormula = Lookup("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));

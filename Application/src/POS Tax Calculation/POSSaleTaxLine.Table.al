@@ -106,6 +106,11 @@ table 6014571 "NPR POS Sale Tax Line"
             Caption = 'Tax Calculation Type';
             DataClassification = CustomerContent;
         }
+        field(33; "Calc. for Maximum Amount/Qty."; Boolean)
+        {
+            Caption = 'Calculation for Maximum Amount/Qty.';
+            DataClassification = CustomerContent;
+        }
         field(34; "Tax %"; Decimal)
         {
             Caption = 'Tax %';
@@ -254,6 +259,7 @@ table 6014571 "NPR POS Sale Tax Line"
             TaxDetail."Tax Type"::"Excise Tax":
                 Rec."Tax Type" := Rec."Tax Type"::"Excise Tax";
         end;
+        Rec."Tax Group Code" := POSSaleTax."Source Tax Group Code";
         Rec.Positive := POSSaleTax."Source Is Positive Amount";
         Rec."Tax Identifier" := POSSaleTax."Source Tax Identifier";
         Rec."Use Tax" := false;

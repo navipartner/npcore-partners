@@ -2,6 +2,7 @@ table 6150634 "NPR POS Posting Buffer"
 {
     Caption = 'POS Posting Buffer';
     DataClassification = CustomerContent;
+    TableType = Temporary;
 
     fields
     {
@@ -255,13 +256,11 @@ table 6150634 "NPR POS Posting Buffer"
         {
             Caption = 'Applies-to Doc. No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.38';
         }
         field(92; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.38';
         }
     }
 
@@ -270,10 +269,6 @@ table 6150634 "NPR POS Posting Buffer"
         key(Key1; "Posting Date", "POS Entry No.", "Line Type", "Document No.", "Line No.", Type, "No.", "Gen. Bus. Posting Group", "Gen. Prod. Posting Group", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Currency Code", "POS Payment Bin Code", "Dimension Set ID", "Tax Area Code", "Applies-to Doc. No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

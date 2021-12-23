@@ -21,7 +21,6 @@ page 6014533 "NPR POS Sale Tax Lines"
                 }
                 field("Tax Type"; Rec."Tax Type")
                 {
-
                     ToolTip = 'Specifies value of the field Tax Type.';
                     Editable = false;
                     ApplicationArea = NPRRetail;

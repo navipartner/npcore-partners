@@ -4,7 +4,6 @@ page 6150722 "NPR POS Tax Line Subpage"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-
     SourceTable = "NPR POS Entry Tax Line";
     ApplicationArea = NPRRetail;
 
@@ -52,40 +51,58 @@ page 6150722 "NPR POS Tax Line Subpage"
                 }
                 field("Tax Jurisdiction Code"; Rec."Tax Jurisdiction Code")
                 {
-
+                    Visible = NALocalizationEnabled;
                     ToolTip = 'Specifies the value of the Tax Jurisdiction Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Tax Area Code"; Rec."Tax Area Code")
                 {
-
+                    Visible = NALocalizationEnabled;
                     ToolTip = 'Specifies the value of the Tax Area Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Tax Group Code"; Rec."Tax Group Code")
                 {
-
+                    Visible = NALocalizationEnabled;
                     ToolTip = 'Specifies the value of the Tax Group Code field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Calc. for Maximum Amount/Qty."; Rec."Calc. for Maximum Amount/Qty.")
+                {
+                    Visible = NALocalizationEnabled;
+                    ToolTip = 'Specifies wheter calculation of tax is performed including Maximum Amount (or Quantity) from Tax Details or not.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-
                     ToolTip = 'Specifies the value of the Quantity field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Use Tax"; Rec."Use Tax")
                 {
-
                     ToolTip = 'Specifies the value of the Use Tax field';
                     ApplicationArea = NPRRetail;
+                }
+                field("Print Description"; Rec."Print Description")
+                {
+                    ToolTip = 'Specifies the value of the Print Description field. Value can be transferred from Tax Area > Description or Tax Jurisdiction > Print Description.';
+                    ApplicationArea = NPRRetail;
+                    Visible = NALocalizationEnabled;
                 }
             }
         }
     }
+    var
+        NALocalizationEnabled: Boolean;
 
-    actions
-    {
-    }
+    trigger OnOpenPage()
+    begin
+        OnNALocalizationEnabled(NALocalizationEnabled);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnNALocalizationEnabled(var _NALocalizationEnabled: Boolean)
+    begin
+    end;
 }
 
