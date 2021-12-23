@@ -47,14 +47,6 @@ page 6151244 "NPR Retail Web Manager RC"
             group("Magento Content")
             {
                 Caption = 'Magento Content';
-                action(Items)
-                {
-                    Caption = 'Items';
-                    RunObject = Page "Item List";
-
-                    ToolTip = 'Executes the Item List action';
-                    ApplicationArea = NPRRetail;
-                }
                 action(Attributes)
                 {
                     Caption = 'Attributes';
@@ -202,6 +194,85 @@ page 6151244 "NPR Retail Web Manager RC"
                 }
 
             }
+        }
+        area(Creation)
+        {
+            action(Items)
+            {
+                Caption = 'Items';
+                RunObject = Page "Item List";
+
+                ToolTip = 'Executes the Item List action';
+                ApplicationArea = NPRRetail;
+            }
+
+            action("Sales &Order")
+            {
+                Caption = 'Sales &Order';
+                Image = Document;
+                Promoted = false;
+                RunObject = Page "Sales Order";
+                RunPageMode = Create;
+
+                ToolTip = 'Executes the Sales &Order action';
+                ApplicationArea = NPRRetail;
+            }
+            action("Import List")
+            {
+                Caption = 'Import List';
+                RunObject = Page "NPR Nc Import List";
+
+                ToolTip = 'Executes the Import List action';
+                ApplicationArea = NPRRetail;
+            }
+        }
+        area(processing)
+        {
+            group(Tasks)
+            {
+                Caption = 'Tasks';
+                action("Service Tas&ks")
+                {
+                    ApplicationArea = Service;
+                    Caption = 'Service Tas&ks';
+                    Image = ServiceTasks;
+                    RunObject = Page "Service Tasks";
+                    ToolTip = 'View or edit service task information, such as service order number, service item description, repair status, and service item. You can print a list of the service tasks that have been entered.';
+                }
+                action("C&reate Contract Service Orders")
+                {
+                    ApplicationArea = Service;
+                    Caption = 'C&reate Contract Service Orders';
+                    Image = "Report";
+                    RunObject = Report "Create Contract Service Orders";
+                    ToolTip = 'Copy information from an existing production order record to a new one. This can be done regardless of the status type of the production order. You can, for example, copy from a released production order to a new planned production order. Note that before you start to copy, you have to create the new record.';
+                }
+                action("Create Contract In&voices")
+                {
+                    ApplicationArea = Service;
+                    Caption = 'Create Contract In&voices';
+                    Image = "Report";
+                    RunObject = Report "Create Contract Invoices";
+                    ToolTip = 'Create service invoices for service contracts that are due for invoicing. ';
+                }
+                action("Post &Prepaid Contract Entries")
+                {
+                    ApplicationArea = Service;
+                    Caption = 'Post &Prepaid Contract Entries';
+                    Image = "Report";
+                    RunObject = Report "Post Prepaid Contract Entries";
+                    ToolTip = 'Transfers prepaid service contract ledger entries amounts from prepaid accounts to income accounts.';
+                }
+                action("Order Pla&nning")
+                {
+                    ApplicationArea = Planning;
+                    Caption = 'Order Pla&nning';
+                    Image = Planning;
+                    RunObject = Page "Order Planning";
+                    ToolTip = 'Plan supply orders order by order to fulfill new demand.';
+                }
+            }
+
         }
     }
 }
