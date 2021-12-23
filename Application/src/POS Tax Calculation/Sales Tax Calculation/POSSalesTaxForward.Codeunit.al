@@ -21,29 +21,18 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
     local procedure CalculateTaxLines(var POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency; ExchangeFactor: Decimal)
     begin
         if Rec."Tax Liable" then
-            CalculateTaxLinesTaxLiable(POSSaleTax, Currency, ExchangeFactor)
+            CalculateTaxLinesTaxLiable(POSSaleTax, Currency, ExchangeFactor, Rec)
         else
-            CalculateTaxLinesTaxUnliable(POSSaleTax, Currency, ExchangeFactor);
+            CalculateTaxLinesTaxUnliable(POSSaleTax, Currency, ExchangeFactor, Rec);
     end;
 
-    local procedure CalculateTaxLinesTaxUnliable(var POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency; ExchangeFactor: Decimal)
-    var
-        POSSaleTaxLine: record "NPR POS Sale Tax Line";
-        TaxAreaLine: Record "Tax Area Line";
-        TaxDetail: Record "Tax Detail";
-        CalculatedUnit: Decimal;
-    begin
-        Upsert(POSSaleTaxLine, POSSaleTax, TaxAreaLine, TaxDetail, CalculatedUnit, ExchangeFactor, Currency);
-    end;
-
-    local procedure CalculateTaxLinesTaxLiable(var POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency; ExchangeFactor: Decimal)
+    local procedure CalculateTaxLinesTaxUnliable(var POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency; ExchangeFactor: Decimal; var POSSaleLine: Record "NPR POS Sale Line")
     var
         POSSaleTaxLine: record "NPR POS Sale Tax Line";
         xPOSSaleTaxLine: record "NPR POS Sale Tax Line";
         TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
-        CalculatedUnit: Decimal;
         LastCalculationOrder: Integer;
         CalculationOrderViolation: Boolean;
     begin
@@ -55,21 +44,55 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
             CalculationOrderViolation := false;
             repeat
                 SetLastCalculationOrder(LastCalculationOrder, CalculationOrderViolation, TaxAreaLine);
-                if FindLastSalesTaxDetails(TaxDetail, TaxAreaLine, POSSaleTax."Source Posting Date") then begin
+                if FindLastSalesTaxDetails(TaxDetail, TaxAreaLine, POSSaleLine."Tax Group Code", POSSaleTax."Source Posting Date") then begin
                     if TaxDetail."Calculate Tax on Tax" and CalculationOrderViolation then
                         Error(
                             CalcOrderViolationTaxOnTaxErr,
                             TaxAreaLine.FieldCaption("Calculation Order"), TaxArea.TableCaption(), TaxAreaLine."Tax Area",
                             TaxDetail.FieldCaption("Calculate Tax on Tax"), CalculationOrderViolation);
 
-                    CalcUnitForSalesTaxDetails(TaxDetail, POSSaleTax, xPOSSaleTaxLine, CalculatedUnit);
-                    Upsert(POSSaleTaxLine, POSSaleTax, TaxAreaLine, TaxDetail, CalculatedUnit, ExchangeFactor, Currency);
+                    CalcUnitForSalesTaxDetailsUnliable(TaxDetail, POSSaleTax, xPOSSaleTaxLine, POSSaleTaxLine, TaxAreaLine, Currency, ExchangeFactor);
 
                     xPOSSaleTaxLine := POSSaleTaxLine;
                 end;
                 if FindLastExciseTaxDetails(TaxDetail, TaxAreaLine, POSSaleTax."Source Posting Date") then begin
-                    CalcUnitForExciseTaxDetails(TaxDetail, POSSaleTax, CalculatedUnit);
-                    Upsert(POSSaleTaxLine, POSSaleTax, TaxAreaLine, TaxDetail, CalculatedUnit, ExchangeFactor, Currency);
+                    CalcUnitForSalesTaxDetailsUnliable(TaxDetail, POSSaleTax, xPOSSaleTaxLine, POSSaleTaxLine, TaxAreaLine, Currency, ExchangeFactor);
+                end;
+            until TaxAreaLine.Next(-1) = 0;
+        end;
+    end;
+
+    local procedure CalculateTaxLinesTaxLiable(var POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency; ExchangeFactor: Decimal; var POSSaleLine: Record "NPR POS Sale Line")
+    var
+        POSSaleTaxLine: record "NPR POS Sale Tax Line";
+        xPOSSaleTaxLine: record "NPR POS Sale Tax Line";
+        TaxAreaLine: Record "Tax Area Line";
+        TaxDetail: Record "Tax Detail";
+        TaxArea: Record "Tax Area";
+        LastCalculationOrder: Integer;
+        CalculationOrderViolation: Boolean;
+    begin
+        FilterTaxAreaLine(TaxAreaLine, POSSaleTax);
+
+        if TaxAreaLine.Find('+') then begin
+            LastCalculationOrder := TaxAreaLine."Calculation Order" + 1;
+
+            CalculationOrderViolation := false;
+            repeat
+                SetLastCalculationOrder(LastCalculationOrder, CalculationOrderViolation, TaxAreaLine);
+                if FindLastSalesTaxDetails(TaxDetail, TaxAreaLine, POSSaleLine."Tax Group Code", POSSaleTax."Source Posting Date") then begin
+                    if TaxDetail."Calculate Tax on Tax" and CalculationOrderViolation then
+                        Error(
+                            CalcOrderViolationTaxOnTaxErr,
+                            TaxAreaLine.FieldCaption("Calculation Order"), TaxArea.TableCaption(), TaxAreaLine."Tax Area",
+                            TaxDetail.FieldCaption("Calculate Tax on Tax"), CalculationOrderViolation);
+
+                    CalcUnitForSalesTaxDetails(TaxDetail, POSSaleTax, xPOSSaleTaxLine, POSSaleTaxLine, TaxAreaLine, Currency, ExchangeFactor);
+
+                    xPOSSaleTaxLine := POSSaleTaxLine;
+                end;
+                if FindLastExciseTaxDetails(TaxDetail, TaxAreaLine, POSSaleTax."Source Posting Date") then begin
+                    CalcUnitForExciseTaxDetails(TaxDetail, POSSaleTax, POSSaleTaxLine, TaxAreaLine, Currency, ExchangeFactor);
                 end;
             until TaxAreaLine.Next(-1) = 0;
         end;
@@ -84,7 +107,7 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
         OnFilterTaxAreaLine(POSSaleTax, TaxAreaLine);
     end;
 
-    local procedure Upsert(var POSSaleTaxLine: record "NPR POS Sale Tax Line"; POSSaleTax: Record "NPR POS Sale Tax"; TaxAreaLine: Record "Tax Area Line"; TaxDetail: Record "Tax Detail"; CalculatedUnit: Decimal; ExchangeFactor: Decimal; Currency: Record Currency)
+    local procedure Insert(var POSSaleTaxLine: record "NPR POS Sale Tax Line"; POSSaleTax: Record "NPR POS Sale Tax"; TaxAreaLine: Record "Tax Area Line"; TaxDetail: Record "Tax Detail"; CalculatedUnit: Decimal; ExchangeFactor: Decimal; Currency: Record Currency)
     begin
         if not POSSaleTaxLine.FindLine(POSSaleTax, TaxAreaLine, TaxDetail) then begin
             POSSaleTaxLine.Init();
@@ -121,6 +144,55 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
         end;
     end;
 
+    local procedure InsertForMaximumAmountQty(var POSSaleTaxLine: record "NPR POS Sale Tax Line"; POSSaleTax: Record "NPR POS Sale Tax"; TaxAreaLine: Record "Tax Area Line"; TaxDetail: Record "Tax Detail"; CalculatedUnit: Decimal; ExchangeFactor: Decimal; Currency: Record Currency)
+    var
+        POSSaleTaxLine2: record "NPR POS Sale Tax Line";
+    begin
+        if not POSSaleTaxLine.FindLine(POSSaleTax, TaxAreaLine, TaxDetail) then begin
+            POSSaleTaxLine.Init();
+            POSSaleTaxLine.CopyFromHeader(POSSaleTax);
+            CopyFromTaxArea(POSSaleTaxLine);
+
+            OnBeforeCalculateActiveTaxAmountLine(POSSaleTaxLine, POSSaleTax, Currency);
+
+            POSSaleTaxLine."Calculation Order" := TaxAreaLine."Calculation Order";
+            POSSaleTaxLine."Calculate Tax on Tax" := TaxDetail."Calculate Tax on Tax";
+
+            POSSaleTaxLine."Applied Line Discount" := (POSSaleTaxLine."Discount Amount" > 0) or (POSSaleTaxLine."Discount %" > 0);
+            POSSaleTaxLine."Applied Invoice Discount" := POSSaleTaxLine."Invoice Disc. Amount" > 0;
+
+            POSSaleTaxLine2.Reset();
+            POSSaleTaxLine2.SetRange("Tax Area Code for Key", POSSaleTaxLine."Tax Area Code for Key");
+            POSSaleTaxLine2.SetRange("Tax Jurisdiction Code", POSSaleTaxLine."Tax Jurisdiction Code");
+            POSSaleTaxLine2.SetRange("Tax Type", POSSaleTaxLine."Tax Type");
+            POSSaleTaxLine2.SetRange("Tax Group Code", POSSaleTaxLine."Tax Group Code");
+            POSSaleTaxLine2.SetRange(Positive, POSSaleTaxLine.Positive);
+            POSSaleTaxLine2.SetRange("Tax Identifier", POSSaleTaxLine."Tax Identifier");
+            POSSaleTaxLine2.SetRange("Use Tax", POSSaleTaxLine."Use Tax");
+            if POSSaleTaxLine2.IsEmpty() then begin
+                POSSaleTaxLine."Unit Tax" := CalculatedUnit / ExchangeFactor;
+                POSSaleTaxLine."Unit Price Incl. Tax" := POSSaleTaxLine."Unit Price Excl. Tax" + POSSaleTaxLine."Unit Tax";
+                POSSaleTaxLine."Tax %" := 100 * (POSSaleTaxLine."Unit Price Incl. Tax" - POSSaleTaxLine."Unit Price Excl. Tax") / POSSaleTaxLine."Unit Price Excl. Tax";
+
+                POSSaleTaxLine."Amount Excl. Tax" := POSSaleTaxLine."Unit Price Excl. Tax" * POSSaleTaxLine.Quantity - POSSaleTaxLine."Discount Amount";
+                POSSaleTaxLine."Line Amount" := POSSaleTaxLine."Unit Price Excl. Tax" * POSSaleTaxLine.Quantity - POSSaleTaxLine."Discount Amount";
+                POSSaleTaxLine."Tax Amount" := POSSaleTaxLine."Unit Tax" * POSSaleTaxLine.Quantity;
+                POSSaleTaxLine."Amount Incl. Tax" := POSSaleTaxLine."Amount Excl. Tax" + POSSaleTaxLine."Tax Amount";
+
+                OnBeforeRoundActiveTaxAmountLine(POSSaleTaxLine, POSSaleTax, Currency);
+
+                POSSaleTaxLine."Amount Excl. Tax" := Round(POSSaleTaxLine."Amount Excl. Tax", Currency."Amount Rounding Precision");
+                POSSaleTaxLine."Line Amount" := Round(POSSaleTaxLine."Line Amount", Currency."Amount Rounding Precision");
+                POSSaleTaxLine."Amount Incl. Tax" := Round(POSSaleTaxLine."Amount Incl. Tax", Currency."Amount Rounding Precision");
+                POSSaleTaxLine."Tax Amount" := Round(POSSaleTaxLine."Tax Amount", Currency."Amount Rounding Precision");
+
+                OnAfterRoundActiveTaxAmountLine(POSSaleTaxLine, POSSaleTax, Currency);
+            end;
+
+            POSSaleTaxLine.Insert();
+        end;
+    end;
+
     local procedure SetLastCalculationOrder(var LastCalculationOrder: Integer; var CalculationOrderViolation: Boolean; TaxAreaLine: Record "Tax Area Line")
     begin
         if TaxAreaLine."Calculation Order" >= LastCalculationOrder then
@@ -129,16 +201,20 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
             LastCalculationOrder := TaxAreaLine."Calculation Order";
     end;
 
-    local procedure FindLastSalesTaxDetails(var TaxDetail: Record "Tax Detail"; TaxAreaLine: Record "Tax Area Line"; PostingDate: Date): Boolean
+    local procedure FindLastSalesTaxDetails(var TaxDetail: Record "Tax Detail"; TaxAreaLine: Record "Tax Area Line"; TaxGroupCode: Code[20]; PostingDate: Date): Boolean
     begin
-        FilterSalesTaxDetails(TaxDetail, TaxAreaLine, PostingDate);
+        FilterSalesTaxDetails(TaxDetail, TaxAreaLine, TaxGroupCode, PostingDate);
         exit(TaxDetail.FindLast());
     end;
 
-    local procedure FilterSalesTaxDetails(var TaxDetail: Record "Tax Detail"; TaxAreaLine: Record "Tax Area Line"; PostingDate: Date): Boolean
+    local procedure FilterSalesTaxDetails(var TaxDetail: Record "Tax Detail"; TaxAreaLine: Record "Tax Area Line"; TaxGroupCode: Code[20]; PostingDate: Date): Boolean
     begin
         TaxDetail.Reset();
         TaxDetail.SetRange("Tax Jurisdiction Code", TaxAreaLine."Tax Jurisdiction Code");
+        if TaxGroupCode = '' then
+            TaxDetail.SetFilter("Tax Group Code", '%1', TaxGroupCode)
+        else
+            TaxDetail.SetFilter("Tax Group Code", '%1|%2', '', TaxGroupCode);
         if PostingDate = 0D then
             TaxDetail.SetFilter("Effective Date", '<=%1', WorkDate())
         else
@@ -148,32 +224,55 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
         OnFilterSetSalesTaxDetails(TaxDetail, TaxAreaLine);
     end;
 
-    procedure FilterSalesTaxDetails(var TaxDetail: Record "Tax Detail"; TaxAreaLine: Record "Tax Area Line"; TaxJurisdictionFilter: Text; EffectiveDate: Date): Boolean
+    procedure FilterSalesTaxDetails(var TaxDetail: Record "Tax Detail"; TaxAreaLine: Record "Tax Area Line"; TaxJurisdictionFilter: Text; TaxGroupCode: Code[20]; EffectiveDate: Date): Boolean
     begin
         TaxDetail.Reset();
         TaxDetail.SetFilter("Tax Jurisdiction Code", TaxJurisdictionFilter);
+        TaxDetail.SetRange("Tax Group Code", TaxGroupCode);
         TaxDetail.SetFilter("Effective Date", '<=%1', EffectiveDate);
         TaxDetail.SetRange("Tax Type", 0); //"Sales Tax" for W1; "Sales and Use Tax" for US
 
         OnFilterSetSalesTaxDetails(TaxDetail, TaxAreaLine);
     end;
 
-    local procedure CalcUnitForSalesTaxDetails(TaxDetail: Record "Tax Detail"; POSSaleTax: Record "NPR POS Sale Tax"; var xPOSSaleTaxLineTaxOnTax: Record "NPR POS Sale Tax Line"; var CalculatedUnit: Decimal)
+    local procedure CalcUnitForSalesTaxDetails(TaxDetail: Record "Tax Detail"; POSSaleTax: Record "NPR POS Sale Tax"; var xPOSSaleTaxLineTaxOnTax: Record "NPR POS Sale Tax Line"; var POSSaleTaxLine: record "NPR POS Sale Tax Line"; TaxAreaLine: Record "Tax Area Line"; Currency: Record Currency; ExchangeFactor: Decimal)
     var
-        TaxBaseUnitPrice: Decimal;
-        MaxUnitPrice: Decimal;
+        TaxBaseUnitPrice, MaxUnitPrice, CalculatedUnit : Decimal;
     begin
-        CalculatedUnit := 0;
-
         if TaxDetail."Calculate Tax on Tax" then
             TaxBaseUnitPrice := POSSaleTax."Source Line Amount" / POSSaleTax."Source Quantity" + xPOSSaleTaxLineTaxOnTax."Unit Price Incl. Tax"
         else
             TaxBaseUnitPrice := POSSaleTax."Source Line Amount" / POSSaleTax."Source Quantity";
         if (Abs(TaxBaseUnitPrice) <= (TaxDetail."Maximum Amount/Qty." / POSSaleTax."Source Quantity")) or (TaxDetail."Maximum Amount/Qty." = 0) then begin
-            CalculatedUnit := TaxBaseUnitPrice * TaxDetail."Tax Below Maximum" / 100
+            CalculatedUnit := TaxBaseUnitPrice * TaxDetail."Tax Below Maximum" / 100;
+            Insert(POSSaleTaxLine, POSSaleTax, TaxAreaLine, TaxDetail, CalculatedUnit, ExchangeFactor, Currency);
         end else begin
             MaxUnitPrice := TaxBaseUnitPrice / Abs(TaxBaseUnitPrice) * (TaxDetail."Maximum Amount/Qty." / POSSaleTax."Source Quantity");
             CalculatedUnit := ((MaxUnitPrice * TaxDetail."Tax Below Maximum") + ((TaxBaseUnitPrice - MaxUnitPrice) * TaxDetail."Tax Above Maximum")) / 100;
+            InsertForMaximumAmountQty(POSSaleTaxLine, POSSaleTax, TaxAreaLine, TaxDetail, CalculatedUnit, ExchangeFactor, Currency);
+            POSSaleTaxLine."Calc. for Maximum Amount/Qty." := true;
+            POSSaleTaxLine.Modify();
+        end;
+
+        OnAfterCalcUnitForSalesTaxDetails(TaxDetail, POSSaleTax, xPOSSaleTaxLineTaxOnTax, CalculatedUnit);
+    end;
+
+    local procedure CalcUnitForSalesTaxDetailsUnliable(TaxDetail: Record "Tax Detail"; POSSaleTax: Record "NPR POS Sale Tax"; var xPOSSaleTaxLineTaxOnTax: Record "NPR POS Sale Tax Line"; var POSSaleTaxLine: record "NPR POS Sale Tax Line"; TaxAreaLine: Record "Tax Area Line"; Currency: Record Currency; ExchangeFactor: Decimal)
+    var
+        TaxBaseUnitPrice, CalculatedUnit : Decimal;
+    begin
+        if TaxDetail."Calculate Tax on Tax" then
+            TaxBaseUnitPrice := POSSaleTax."Source Line Amount" / POSSaleTax."Source Quantity" + xPOSSaleTaxLineTaxOnTax."Unit Price Incl. Tax"
+        else
+            TaxBaseUnitPrice := POSSaleTax."Source Line Amount" / POSSaleTax."Source Quantity";
+        if (Abs(TaxBaseUnitPrice) <= (TaxDetail."Maximum Amount/Qty." / POSSaleTax."Source Quantity")) or (TaxDetail."Maximum Amount/Qty." = 0) then begin
+            CalculatedUnit := 0;
+            Insert(POSSaleTaxLine, POSSaleTax, TaxAreaLine, TaxDetail, CalculatedUnit, ExchangeFactor, Currency);
+        end else begin
+            CalculatedUnit := 0;
+            InsertForMaximumAmountQty(POSSaleTaxLine, POSSaleTax, TaxAreaLine, TaxDetail, CalculatedUnit, ExchangeFactor, Currency);
+            POSSaleTaxLine."Calc. for Maximum Amount/Qty." := true;
+            POSSaleTaxLine.Modify();
         end;
 
         OnAfterCalcUnitForSalesTaxDetails(TaxDetail, POSSaleTax, xPOSSaleTaxLineTaxOnTax, CalculatedUnit);
@@ -208,20 +307,22 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
         OnFilterSetExciseTaxDetails(TaxDetail, TaxAreaLine);
     end;
 
-    local procedure CalcUnitForExciseTaxDetails(TaxDetail: Record "Tax Detail"; POSSaleTax: Record "NPR POS Sale Tax"; var CalculatedUnit: Decimal)
+    local procedure CalcUnitForExciseTaxDetails(TaxDetail: Record "Tax Detail"; POSSaleTax: Record "NPR POS Sale Tax"; var POSSaleTaxLine: record "NPR POS Sale Tax Line"; TaxAreaLine: Record "Tax Area Line"; Currency: Record Currency; ExchangeFactor: Decimal)
     var
-        MaxUnitPrice: Decimal;
+        MaxUnitPrice, CalculatedUnit : Decimal;
     begin
-        CalculatedUnit := 0;
         if (Abs(POSSaleTax."Source Quantity") <= TaxDetail."Maximum Amount/Qty.") or (TaxDetail."Maximum Amount/Qty." = 0) then begin
-            CalculatedUnit := TaxDetail."Tax Below Maximum"
+            CalculatedUnit := TaxDetail."Tax Below Maximum";
+            Insert(POSSaleTaxLine, POSSaleTax, TaxAreaLine, TaxDetail, CalculatedUnit, ExchangeFactor, Currency);
         end else begin
             MaxUnitPrice := POSSaleTax."Source Quantity" / Abs(POSSaleTax."Source Quantity") * TaxDetail."Maximum Amount/Qty.";
             CalculatedUnit := (MaxUnitPrice * TaxDetail."Tax Below Maximum") + ((POSSaleTax."Source Quantity" - MaxUnitPrice) / POSSaleTax."Source Quantity" * TaxDetail."Tax Above Maximum");
+            InsertForMaximumAmountQty(POSSaleTaxLine, POSSaleTax, TaxAreaLine, TaxDetail, CalculatedUnit, ExchangeFactor, Currency);
+            POSSaleTaxLine."Calc. for Maximum Amount/Qty." := true;
+            POSSaleTaxLine.Modify();
         end;
 
         OnAfterCalcUnitForExciseTaxDetails(TaxDetail, POSSaleTax, CalculatedUnit);
-
     end;
 
     local procedure CopyFromTaxArea(var POSSaleTaxLine: record "NPR POS Sale Tax Line")
@@ -262,7 +363,7 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
         end;
     end;
 
-    local procedure SetHeaderValues(var POSSaleTax: Record "NPR POS Sale Tax")
+    local procedure SetHeaderValues(var POSSaleTax: Record "NPR POS Sale Tax"): Boolean
     var
         POSSaleTaxLine: record "NPR POS Sale Tax Line";
     begin
@@ -283,6 +384,7 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
         POSSaleTax."Calc. Applied Line Discount" := POSSaleTaxLine."Applied Line Discount";
         POSSaleTax."Calculated Discount %" := POSSaleTaxLine."Discount %";
         POSSaleTax."Calculated Discount Amount" := POSSaleTaxLine."Discount Amount";
+        exit(true);
     end;
 
     local procedure FindLines(POSSaleTax: Record "NPR POS Sale Tax"; var POSSaleTaxLine: record "NPR POS Sale Tax Line")
