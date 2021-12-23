@@ -1,3 +1,3 @@
 # Warehouse Management System
 
-What is NP WMS? How can it be used to suit our customers' business needs?
+NP WMS connects your inventory management in Business Central with your POS solution and your online store, and makes every item visible across the supply chain, distribution centers, and sales channels.
