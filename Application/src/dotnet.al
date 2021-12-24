@@ -302,11 +302,7 @@ dotnet
 
     assembly("Newtonsoft.Json")
     {
-#if BC17
-        Version = '10.0.0.0';
-#else
-        Version = '11.0.0.0';
-#endif
+
         Culture = 'neutral';
         PublicKeyToken = '30ad4fe6b2a6aeed';
 

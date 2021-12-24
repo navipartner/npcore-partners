@@ -1488,7 +1488,8 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
-            <Top>0.05556in</Top>
+            <Top>0.02431in</Top>
+            <Left>0.05292cm</Left>
             <Height>0.64583in</Height>
             <Width>6.51737in</Width>
             <Style>
@@ -1498,13 +1499,13 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>2.77673cm</Height>
+        <Height>5.18444cm</Height>
         <Style />
       </Body>
       <Width>16.66382cm</Width>
       <Page>
         <PageHeader>
-          <Height>3.58069cm</Height>
+          <Height>4.82423cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -1707,7 +1708,7 @@
               </Style>
             </Line>
             <Line Name="Line2">
-              <Top>1.39583in</Top>
+              <Top>1.86458in</Top>
               <Height>0in</Height>
               <Width>6.5in</Width>
               <ZIndex>8</ZIndex>
@@ -1740,6 +1741,85 @@
               <Height>0.423cm</Height>
               <Width>3.40009cm</Width>
               <ZIndex>9</ZIndex>
+              <Style>
+                <VerticalAlign>Middle</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CurrReportPageNoCaption4">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=First(Fields!OrderBy_SortOrderFilter.Value, "DataSet_Result")</Value>
+                      <Style>
+                        <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>3.28034cm</Top>
+              <Height>0.423cm</Height>
+              <Width>13.51981cm</Width>
+              <ZIndex>10</ZIndex>
+              <Style>
+                <VerticalAlign>Middle</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CurrReportPageNoCaption5">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=First(Fields!OrderBy_ShowQtyFilter.Value, "DataSet_Result")</Value>
+                      <Style>
+                        <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>3.70334cm</Top>
+              <Height>0.423cm</Height>
+              <Width>13.51981cm</Width>
+              <ZIndex>11</ZIndex>
+              <Style>
+                <VerticalAlign>Middle</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CurrReportPageNoCaption6">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Fields!OrderBy_OnlySalesFilter.Value</Value>
+                      <Style>
+                        <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>4.24248cm</Top>
+              <Left>0.00078cm</Left>
+              <Height>0.423cm</Height>
+              <Width>13.51981cm</Width>
+              <ZIndex>12</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1875,8 +1955,14 @@ End Function
         <Field Name="OrderBy_ShowTypeFilter">
           <DataField>OrderBy_ShowTypeFilter</DataField>
         </Field>
-        <Field Name="ShowQty">
-          <DataField>ShowQty</DataField>
+        <Field Name="OrderBy_SortOrderFilter">
+          <DataField>OrderBy_SortOrderFilter</DataField>
+        </Field>
+        <Field Name="OrderBy_ShowQtyFilter">
+          <DataField>OrderBy_ShowQtyFilter</DataField>
+        </Field>
+        <Field Name="OrderBy_OnlySalesFilter">
+          <DataField>OrderBy_OnlySalesFilter</DataField>
         </Field>
         <Field Name="Salesperson_Purchaser_Name">
           <DataField>Salesperson_Purchaser_Name</DataField>
