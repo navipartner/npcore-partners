@@ -99,10 +99,16 @@ report 6014406 "NPR Sales Person Top 20"
             column(SalespersonFilter; SalespersonFilter)
             {
             }
-            column(OrderBy_ShowTypeFilter; StrSubstNo(Text001, SelectStr(ShowType + 1, TextSort)))
+            column(OrderBy_ShowTypeFilter; StrSubstNo(Text001, SelectStr(ShowType + 1, TextSort1)))
             {
             }
-            column(ShowQty; ShowQty)
+            column(OrderBy_SortOrderFilter; StrSubstNo(Text001, Format(SortOrder)))
+            {
+            }
+            column(OrderBy_ShowQtyFilter; StrSubstNo(Text002, ShowQty))
+            {
+            }
+            column(OrderBy_OnlySalesFilter; StrSubstNo(Text003, OnlySales))
             {
             }
             column(Salesperson_Purchaser_Name; "Salesperson/Purchaser".Name)
@@ -257,13 +263,15 @@ report 6014406 "NPR Sales Person Top 20"
         TurnoverPctCaptionLbl: Label '% of Turnover';
         DiscountPctCaptionLbl: Label 'Discount Amount %';
         ExclVatCaption_Lbl: Label 'excl. VAT';
-        Text001: Label 'Order By : %1';
+        Text001: Label 'Order By: %1';
+        Text002: Label 'Order Qty: %1';
+        Text003: Label 'Order Only Sales: %1';
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         ProfitPctCaptionLbl: Label 'Profit %';
         ProfitCaptionLbl: Label 'Profit (LCY)';
         Report_Caption_Lbl: Label 'Sales Person Top 20';
         TurnoverCaptionLbl: Label 'Turnover (LCY)';
-        TextSort: Label 'Turnover,Discount,Contribution Margin,Contribution Ratio';
+        TextSort1: Label 'Turnover,Discount,Contribution Margin,Contribution Ratio';
         SortOrder: Option Largest,Smallest;
         ShowType: Option Turnover,Discount,"Contribution Margin","Contribution Ratio";
         J: Text[30];
