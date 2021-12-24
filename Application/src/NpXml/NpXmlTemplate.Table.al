@@ -661,10 +661,11 @@ table 6151551 "NPR NpXml Template"
 
     local procedure UpdateApiUsername()
     begin
-        if Rec.AuthType <> Rec.AuthType::Basic then
-            exit;
+        if Rec.AuthType = Rec.AuthType::Basic then
+            Rec."API Username" := GetApiUsername();
 
-        "API Username" := GetApiUsername();
+        if Rec.AuthType <> Rec.AuthType::Custom then
+            Rec."API Authorization" := '';
     end;
 
     procedure UpdateNaviConnectSetup()

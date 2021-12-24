@@ -138,7 +138,10 @@ table 6151401 "NPR Magento Setup"
             DataClassification = CustomerContent;
             trigger OnValidate()
             begin
-                Rec."Api Username" := GetApiUsername();
+                if Rec.AuthType = Rec.AuthType::Basic then
+                    Rec."Api Username" := GetApiUsername();
+                if Rec.AuthType <> Rec.AuthType::Custom then
+                    Rec."Api Authorization" := '';
             end;
         }
 
