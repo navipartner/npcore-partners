@@ -36,7 +36,9 @@ function hideNavNavigation() {
 
 function hideBusinessCentralNavigation() {
   // #340613
-  const navContent = window.top.document.body.querySelector("div.ms-nav-content-box > .ms-nav-navigation");
+  const navContent = window.top.document.body.querySelector(
+    "div.ms-nav-content-box > .ms-nav-navigation"
+  );
   if (navContent) {
     navContent.style.setProperty("display", "none", "important");
   }
@@ -56,12 +58,16 @@ function hideBusinessCentralGutter() {
       gutterLeft.style.setProperty("display", "none", "important");
     }
 
-    const gutterRight = closestBody.querySelector(".ms-nav-layout-gutter-right");
+    const gutterRight = closestBody.querySelector(
+      ".ms-nav-layout-gutter-right"
+    );
     if (gutterRight) {
       gutterRight.style.setProperty("display", "none", "important");
     }
 
-    const addinContainer = window.frameElement.closest(".control-addin-container");
+    const addinContainer = window.frameElement.closest(
+      ".control-addin-container"
+    );
     if (addinContainer) {
       addinContainer.style.setProperty("padding-top", "0", "important");
     }
@@ -87,12 +93,15 @@ function hideBusinessCentralAppBar() {
 
 function hideBusinessCentralProductMenuBar() {
   // #414495
-  const productMenuBar = window.top.document.body.querySelector("#product-menu-bar");
+  const productMenuBar =
+    window.top.document.body.querySelector("#product-menu-bar");
   if (productMenuBar) {
     productMenuBar.style.setProperty("display", "none", "important");
   }
 
-  const bodyMenuBar = window.top.document.querySelector("body.has-product-menu-bar .designer");
+  const bodyMenuBar = window.top.document.querySelector(
+    "body.has-product-menu-bar .designer"
+  );
   if (bodyMenuBar) {
     bodyMenuBar.style.setProperty("height", "100%", "important");
     bodyMenuBar.style.setProperty("top", "0", "important");
@@ -101,7 +110,16 @@ function hideBusinessCentralProductMenuBar() {
 
 function fixBC170DefualtClientBottomPadding() {
   // #436343
-  const msNav = window.frameElement.closest("body").querySelector("main.ms-nav-layout-body");
+  const frameElement = window.frameElement;
+
+  if (!frameElement) {
+    return;
+  }
+
+  const msNav = frameElement
+    .closest("body")
+    .querySelector("main.ms-nav-layout-body");
+
   if (msNav) {
     msNav.style.setProperty("padding-bottom", "0", "important");
   }
@@ -112,7 +130,8 @@ function fixIOSKeyboardFocusZoom() {
   const metaAll = window.top.document.head.querySelectorAll("meta");
   for (let node of metaAll) {
     if (node.name === "viewport") {
-      node.content = "width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0";
+      node.content =
+        "width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0";
     }
   }
 }
@@ -125,7 +144,8 @@ function hideNotificationPanel() {
   }
   const doc = frame.ownerDocument;
   const style = doc.createElement("style");
-  style.innerText = "div.notification-panel { display: none; } div.notification-area { display: none; }";
+  style.innerText =
+    "div.notification-panel { display: none; } div.notification-area { display: none; }";
   doc.head.appendChild(style);
 }
 
