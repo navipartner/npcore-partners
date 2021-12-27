@@ -103,7 +103,7 @@
       <p>NP Entertainment is all-in-one ticketing and membership management system that streamlines sales and validation of tickets and memberships.</p>
       <p>NP WMS connects your inventory management in Business Central with your POS solution and your online store, and makes every item visible across the supply chain, distribution centers, and sales channels.</p>
       <p>The API documentation comprises technical webservice references and a sandbox for testing purposes.</p>
-      <p>The <a href="https://support.navipartner.com/">Old_Documentation</a> section contains articles that have not yet been migrated to this format. As soon as all articles are rewritten and migrated here, the old documentation portal will be obsoleted</p>                           
+      <p>The <a href="https://support.navipartner.com/">Old Documentation</a> section contains articles that have not yet been migrated to this format. As soon as all articles are rewritten and migrated here, the old documentation portal will be obsoleted</p>                           
     </section>
   </div>
 </div>
