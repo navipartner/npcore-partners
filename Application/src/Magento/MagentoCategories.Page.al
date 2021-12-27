@@ -76,9 +76,11 @@ page 6151416 "NPR Magento Categories"
                 trigger OnAction()
                 var
                     MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
+                    Window: Dialog;
                 begin
-                    MagentoSetupMgt.TriggerSetupCategories();
-                    Message(Text000);
+                    Window.Open(Text000);
+                    MagentoSetupMgt.TriggerSetupCategories(true);
+                    Window.Close();
                 end;
             }
         }
@@ -132,7 +134,7 @@ page 6151416 "NPR Magento Categories"
     var
         DisplayConfigVisible: Boolean;
         HasSetupCategories: Boolean;
-        Text000: Label 'Category update initiated';
+        Text000: Label 'Downloading...';
 
     local procedure SetDisplayConfigVisible()
     var
