@@ -64,7 +64,6 @@ codeunit 6150705 "NPR POS Sale"
             WorkDate := Today();
         end;
 
-        Rec."User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
         Rec.Insert(true);
 
         Rec.Validate("Customer No.", '');
@@ -636,6 +635,8 @@ codeunit 6150705 "NPR POS Sale"
     begin
         Rec := SalePOS_ToResume;
         Rec."User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
+        Rec."Server Instance ID" := Database.ServiceInstanceId();
+        Rec."User Session ID" := Database.SessionId();
 
         Rec."Salesperson Code" := Setup.Salesperson();
         if Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then
