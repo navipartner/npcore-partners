@@ -1,8 +1,9 @@
 # Capture service logging 
 
-Capture service logging is used for...
+To be able to login in CS the following is required
 
-new paragraph
-
-
+- Setup CS Service
+- Create CS Users
+- Install the Standard CS UIs
+- Install the Apps on a mobile phone
 ### Related links
