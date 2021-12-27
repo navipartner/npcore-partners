@@ -61,7 +61,7 @@ codeunit 6150738 "NPR POS Try Resume&CancelSale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Resume Sale Mgt.", 'OnBeforePromptResumeSale', '', false, false)]
-    local procedure SetCancelOrPark(var SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; var SkipDialog: Boolean; var ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote; var ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError; var Handled: Boolean)
+    local procedure SetCancelOrPark(var SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; var SkipDialog: Boolean; var ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote,SkipAndNew; var ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError; var Handled: Boolean)
     begin
         /*
         SkipDialog := TRUE;
