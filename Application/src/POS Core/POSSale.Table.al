@@ -626,6 +626,16 @@ table 6014405 "NPR POS Sale"
             DataClassification = EndUserIdentifiableInformation;
             Description = 'NPR5.54';
         }
+        field(220; "Server Instance ID"; Integer)
+        {
+            Caption = 'Server Instance ID';
+            DataClassification = SystemMetadata;
+        }
+        field(230; "User Session ID"; Integer)
+        {
+            Caption = 'User Session ID';
+            DataClassification = SystemMetadata;
+        }
         field(300; Amount; Decimal)
         {
             AutoFormatType = 1;
@@ -757,6 +767,10 @@ table 6014405 "NPR POS Sale"
         "Location Code" := POSStore."Location Code";
         "Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
         "Event No." := POSUnit.FindActiveEventFromCurrPOSUnit();
+
+        "User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
+        "Server Instance ID" := Database.ServiceInstanceId();
+        "User Session ID" := Database.SessionId();
 
         AvoidGUIDCollision();
     end;

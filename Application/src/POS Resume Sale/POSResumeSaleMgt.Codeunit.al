@@ -41,24 +41,39 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         SalePOS.SetRange("Register No.", Setup.GetPOSUnitNo());
         SalePOS.SetRange("User ID", UserId);
         SalePOS.FilterGroup(0);
+        if SalePOS.IsEmpty then
+            exit(false);
+
+        SalePOS.FindSet();
+        repeat
+            SalePOS.Mark(true);
+        until SalePOS.Next() = 0;
+        SalePOS.MarkedOnly(true);
         exit(SaleToResumeIsSelected(SalePOS, POSUnit, POSSession, POSQuoteEntryNo));
     end;
 
     local procedure SaleToResumeIsSelected(var SalePOS: Record "NPR POS Sale"; POSUnit: Record "NPR POS Unit"; POSSession: Codeunit "NPR POS Session"; var POSQuoteEntryNo: Integer): Boolean
     var
         ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError;
-        ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote;
+        ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote,SkipAndNew;
         CancelFailed: Boolean;
+        Confirmed: Boolean;
         ForceSaveAsQuote: Boolean;
         Handled: Boolean;
         SkipDialog: Boolean;
+        ConfirmActionCnf: Label 'You have chosen to %1 an existing unfinished sale. The sale was created in another session, which at the moment is still active. Are you sure you want to go on with your selected action? If you do NOT confirm, system will leave the sale intact.';
+        ActionOptionLabels: Label 'resume,cancel,save as quote (park)';
     begin
         if SalePOS.IsEmpty then
             exit(false);
 
         SalePOS.FindFirst();
-        if not SalePOS.SalesLinesExist() then
-            ActionOption := ActionOption::CancelAndNew;  //Silently cancel any unfinished sale with no lines
+        if not SalePOS.SalesLinesExist() then begin
+            if IsAnotherActiveSessionSale(SalePOS) then
+                ActionOption := ActionOption::SkipAndNew  //Leave this empty unfinished sale untouched, because it may have been just started in another active session
+            else
+                ActionOption := ActionOption::CancelAndNew;  //Silently cancel any unfinished sale with no lines
+        end;
         ActionOnCancelError := ActionOnCancelError::SaveAsQuote;
 
         OnBeforePromptResumeSale(SalePOS, POSSession, SkipDialog, ActionOption, ActionOnCancelError, Handled);
@@ -66,14 +81,27 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
             exit(ActionOption = ActionOption::Resume);
 
         if not SkipDialog and (ActionOption = ActionOption::" ") then
-            case PAGE.RunModal(PAGE::"NPR Unfinished POS Sale", SalePOS) of
-                ACTION::Yes:
+            case Page.RunModal(Page::"NPR Unfinished POS Sale", SalePOS) of
+                Action::Yes:
                     ActionOption := ActionOption::Resume;
-                ACTION::No:
+                Action::No:
                     ActionOption := ActionOption::CancelAndNew;
                 else
                     Error('');
             end;
+
+        if ActionOption in [ActionOption::Resume, ActionOption::CancelAndNew, ActionOption::SaveAsQuote] then
+            if IsAnotherActiveSessionSale(SalePOS) then begin
+                Confirmed := SkipDialog;
+                if not Confirmed then
+                    Confirmed := Confirm(ConfirmActionCnf, false, SelectStr(ActionOption, ActionOptionLabels));
+                if not Confirmed then
+                    ActionOption := ActionOption::SkipAndNew;
+            end;
+        if ActionOption = ActionOption::SkipAndNew then begin
+            SalePOS.Mark(false);
+            ActionOption := ActionOption::" ";
+        end;
 
         CancelErrorText := '';
         CancelFailed := false;
@@ -99,7 +127,7 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         //Cannot resume a sale started on other POS Unit or on another date.
         //So it is to be saved as a POS Saved Sale and retrieved from the quote once the new sale start routine is finished
         ForceSaveAsQuote :=
-          (ActionOption = ActionOption::Resume) and ((SalePOS.Date <> Today) or (SalePOS."Register No." <> POSUnit."No."));
+            (ActionOption = ActionOption::Resume) and ((SalePOS.Date <> Today) or (SalePOS."Register No." <> POSUnit."No."));
 
         if (ActionOption = ActionOption::SaveAsQuote) or ForceSaveAsQuote then begin
             POSQuoteEntryNo := DoSaveAsPOSQuote(POSSession, SalePOS, ForceSaveAsQuote or SkipDialog, CancelFailed);
@@ -113,6 +141,17 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
             exit(SaleToResumeIsSelected(SalePOS, POSUnit, POSSession, POSQuoteEntryNo));
 
         exit(ActionOption = ActionOption::Resume);
+    end;
+
+    local procedure IsAnotherActiveSessionSale(SalePOS: Record "NPR POS Sale"): Boolean
+    var
+        ActiveSession: Record "Active Session";
+    begin
+        if (SalePOS."Server Instance ID" = 0) or (SalePOS."User Session ID" = 0) then
+            exit(false);
+        if not ActiveSession.Get(SalePOS."Server Instance ID", SalePOS."User Session ID") then
+            exit(false);
+        exit(not ((SalePOS."Server Instance ID" = Database.ServiceInstanceId()) and (SalePOS."User Session ID" = Database.SessionId())));
     end;
 
     procedure DoSaveAsPOSQuote(POSSession: Codeunit "NPR POS Session"; SalePOS: Record "NPR POS Sale"; SkipDialog: Boolean; CancelFailed: Boolean): Integer

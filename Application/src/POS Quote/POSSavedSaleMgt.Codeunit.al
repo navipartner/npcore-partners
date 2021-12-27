@@ -422,6 +422,10 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         FindFields(RecRef, true, TempSalePOSFieldBuffer, true);
         if TempSalePOSFieldBuffer.Get(RecRef.Number, SalePOS.FieldNo("User ID")) then
             TempSalePOSFieldBuffer.Delete();
+        if TempSalePOSFieldBuffer.Get(RecRef.Number, SalePOS.FieldNo("Server Instance ID")) then
+            TempSalePOSFieldBuffer.Delete();
+        if TempSalePOSFieldBuffer.Get(RecRef.Number, SalePOS.FieldNo("User Session ID")) then
+            TempSalePOSFieldBuffer.Delete();
 
         RecRef.GetTable(SaleLinePOS);
         FindFields(RecRef, false, TempSaleLinePOSFieldBuffer, true);
