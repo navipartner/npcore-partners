@@ -388,14 +388,14 @@ codeunit 6151403 "NPR Magento Webservice"
     var
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
     begin
-        MagentoSetupMgt.TriggerSetupCategories();
+        MagentoSetupMgt.TriggerSetupCategories(false);
     end;
 
     procedure UpdateBrands()
     var
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
     begin
-        MagentoSetupMgt.TriggerSetupBrands();
+        MagentoSetupMgt.TriggerSetupBrands(false);
     end;
 
     local procedure ReportToBase64(ReportID: Integer; RecRef: RecordRef): Text

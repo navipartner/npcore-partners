@@ -64,9 +64,11 @@ page 6151420 "NPR Magento Brands"
                 trigger OnAction()
                 var
                     MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
+                    Window: Dialog;
                 begin
-                    MagentoSetupMgt.TriggerSetupBrands();
-                    Message(Text000);
+                    Window.Open(Text000);
+                    MagentoSetupMgt.TriggerSetupBrands(true);
+                    Window.Close();
                 end;
             }
         }
@@ -116,7 +118,7 @@ page 6151420 "NPR Magento Brands"
     var
         DisplayConfigVisible: Boolean;
         HasSetupBrands: Boolean;
-        Text000: Label 'Brand update initiated';
+        Text000: Label 'Downloading...';
 
     procedure GetSelectionFilter(): Text
     var

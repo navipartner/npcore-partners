@@ -8,8 +8,10 @@ page 6059791 "NPR E-mail Template"
     {
         area(content)
         {
-            group(Generelt)
+            group(General)
             {
+                Caption = 'General';
+
                 field("Code"; Rec.Code)
                 {
 

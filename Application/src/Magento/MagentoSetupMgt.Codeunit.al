@@ -522,20 +522,20 @@
         SetupShipmentMethodMapping();
     end;
 
-    procedure TriggerSetupCategories()
+    procedure TriggerSetupCategories(InActiveSession: Boolean)
     var
         Handled: Boolean;
     begin
-        OnSetupCategories(Handled);
+        OnSetupCategories(Handled, InActiveSession);
         if Handled then
             exit;
     end;
 
-    procedure TriggerSetupBrands()
+    procedure TriggerSetupBrands(InActiveSession: Boolean)
     var
         Handled: Boolean;
     begin
-        OnSetupBrands(Handled);
+        OnSetupBrands(Handled, InActiveSession);
         if Handled then
             exit;
     end;
@@ -576,12 +576,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSetupCategories(var Handled: Boolean)
+    local procedure OnSetupCategories(var Handled: Boolean; InActiveSession: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSetupBrands(var Handled: Boolean)
+    local procedure OnSetupBrands(var Handled: Boolean; InActiveSession: Boolean)
     begin
     end;
 

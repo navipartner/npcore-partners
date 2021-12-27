@@ -68,11 +68,14 @@
         DataLogMgt.DisableDataLog(false);
     end;
 
-    local procedure ScheduleUpdateCategories()
+    local procedure ScheduleUpdateCategories(InActiveSession: Boolean)
     var
         SessionId: Integer;
     begin
-        SESSION.StartSession(SessionId, CurrCodeunitId(), CompanyName);
+        if InActiveSession then
+            Codeunit.Run(CurrCodeunitId())
+        else
+            SESSION.StartSession(SessionId, CurrCodeunitId(), CompanyName);
     end;
 
     local procedure RemoveCategory(var MagentoCategory: Record "NPR Magento Category")
@@ -93,7 +96,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Setup Mgt.", 'OnSetupCategories', '', true, true)]
-    local procedure SetupM2Categories(var Handled: Boolean)
+    local procedure SetupM2Categories(var Handled: Boolean; InActiveSession: Boolean)
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
@@ -102,7 +105,7 @@
             exit;
 
         Handled := true;
-        ScheduleUpdateCategories();
+        ScheduleUpdateCategories(InActiveSession);
     end;
 
     local procedure CurrCodeunitId(): Integer

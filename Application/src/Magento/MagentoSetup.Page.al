@@ -12,8 +12,10 @@ page 6151401 "NPR Magento Setup"
     {
         area(content)
         {
-            group(Generelt)
+            group(General)
             {
+                Caption = 'General';
+
                 field("Magento Enabled"; Rec."Magento Enabled")
                 {
 
@@ -751,10 +753,14 @@ page 6151401 "NPR Magento Setup"
                     }
                 }
             }
-            part(Control6151459; "NPR Magento Setup PostOnImport")
+            group("Post on Import Setup")
             {
-                ApplicationArea = NPRRetail;
+                Caption = 'Post on Import Setup';
 
+                part(Control6151459; "NPR Magento Setup PostOnImport")
+                {
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
@@ -836,7 +842,7 @@ page 6151401 "NPR Magento Setup"
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
-                            MagentoSetupMgt.TriggerSetupCategories();
+                            MagentoSetupMgt.TriggerSetupCategories(false);
                             Message(Text003);
                         end;
                     }
@@ -857,7 +863,7 @@ page 6151401 "NPR Magento Setup"
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
-                            MagentoSetupMgt.TriggerSetupBrands();
+                            MagentoSetupMgt.TriggerSetupBrands(false);
                             Message(Text004);
                         end;
                     }
