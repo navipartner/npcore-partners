@@ -60,11 +60,14 @@
         DataLogMgt.DisableDataLog(false);
     end;
 
-    local procedure ScheduleUpdateBrands()
+    local procedure ScheduleUpdateBrands(InActiveSession: Boolean)
     var
         SessionId: Integer;
     begin
-        SESSION.StartSession(SessionId, CurrCodeunitId(), CompanyName);
+        if InActiveSession then
+            Codeunit.Run(CurrCodeunitId())
+        else
+            SESSION.StartSession(SessionId, CurrCodeunitId(), CompanyName);
     end;
 
     local procedure RemoveBrand(var MagentoBrand: Record "NPR Magento Brand")
@@ -87,7 +90,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Setup Mgt.", 'OnSetupBrands', '', true, true)]
-    local procedure SetupM2Brands(var Handled: Boolean)
+    local procedure SetupM2Brands(var Handled: Boolean; InActiveSession: Boolean)
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
@@ -96,7 +99,7 @@
             exit;
 
         Handled := true;
-        ScheduleUpdateBrands();
+        ScheduleUpdateBrands(InActiveSession);
     end;
 
     local procedure CurrCodeunitId(): Integer

@@ -12,8 +12,10 @@ page 6151550 "NPR NpXml Setup"
     {
         area(content)
         {
-            group(Generelt)
+            group(General)
             {
+                Caption = 'General';
+
                 field("NpXml Enabled"; Rec."NpXml Enabled")
                 {
 

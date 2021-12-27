@@ -62,9 +62,11 @@ page 6151415 "NPR Magento Category List"
                 trigger OnAction()
                 var
                     MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
+                    Window: Dialog;
                 begin
-                    MagentoSetupMgt.TriggerSetupCategories();
-                    Message(Text000);
+                    Window.Open(Text000);
+                    MagentoSetupMgt.TriggerSetupCategories(true);
+                    Window.Close();
                 end;
             }
         }
@@ -78,7 +80,7 @@ page 6151415 "NPR Magento Category List"
     end;
 
     var
-        Text000: Label 'Category update initiated';
+        Text000: Label 'Downloading...';
         HasSetupCategories: Boolean;
 
     procedure GetSelectionFilter(): Text
