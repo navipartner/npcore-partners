@@ -991,6 +991,9 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Season';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won"t be used anymore';
+            ObsoleteTag = 'Refactoring 2/2/2021';
         }
         field(6014410; "Label Barcode"; Code[20])
         {

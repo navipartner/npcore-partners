@@ -673,7 +673,6 @@
         RegisteredWorksheetLine."Custom Price 4" := ItemWkshLine."Custom Price 4";
         RegisteredWorksheetLine."Custom Price 5" := ItemWkshLine."Custom Price 5";
         RegisteredWorksheetLine."Group sale" := ItemWkshLine."Group sale";
-        RegisteredWorksheetLine.Season := ItemWkshLine.Season;
         RegisteredWorksheetLine."Label Barcode" := ItemWkshLine."Label Barcode";
         RegisteredWorksheetLine."Explode BOM auto" := ItemWkshLine."Explode BOM auto";
         RegisteredWorksheetLine."Guarantee voucher" := ItemWkshLine."Guarantee voucher";
