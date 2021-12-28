@@ -501,17 +501,16 @@ report 6014460 "NPR Balancing Report A4"
                     field("Print TurnOver"; PrintTurnOver)
                     {
                         Caption = 'Print TurnOver';
-
                         ToolTip = 'Specifies the value of the Print TurnOver field';
                         ApplicationArea = NPRRetail;
                     }
-                    field(CompareDay_; CompareDay)
+                    field("CompareDay_"; CompareDay)
                     {
                         Caption = 'Compare To Day';
                         ToolTip = 'Specifies the value of the Compare To Day field';
                         ApplicationArea = NPRRetail;
                     }
-                    field(compareNearestDate_; CompareNearestDate)
+                    field("compareNearestDate_"; CompareNearestDate)
                     {
                         Caption = 'Compare Nearest Date';
                         ToolTip = 'Specifies the value of the Compare Nearest Date field';
@@ -520,64 +519,55 @@ report 6014460 "NPR Balancing Report A4"
                     field("Print Discount"; PrintDiscount)
                     {
                         Caption = 'Print Discount';
-
                         ToolTip = 'Specifies the value of the Print Discount field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print VAT"; PrintVAT)
                     {
                         Caption = 'Print VAT';
-
                         ToolTip = 'Specifies the value of the Print VAT field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print EFT"; PrintEFT)
                     {
                         Caption = 'Print EFT';
-
                         ToolTip = 'Specifies the value of the Print EFT field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Vouchers"; PrintVouchers)
                     {
                         Caption = 'Print Vouchers';
-
                         ToolTip = 'Specifies the value of the Print Vouchers field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Counting"; PrintCounting)
                     {
                         Caption = 'Print Counting';
-
                         ToolTip = 'Specifies the value of the Print Counting field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Counted Amt Incl Float"; PrintCountedAmtInclFloat)
                     {
                         Caption = 'Print Counted Amt Incl Float';
-
                         ToolTip = 'Specifies the value of the Print Counted Amt Incl Float field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Closing"; PrintClosing)
                     {
                         Caption = 'Print Closing';
-
                         ToolTip = 'Specifies the value of the Print Closing field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Attached Bins"; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
-
                         ToolTip = 'Specifies the value of the Print Attached Bins field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Empty Lines"; PrintEmptyLines)
                     {
-                        Caption = 'Print Lines where Value is Zero.';
-
-                        ToolTip = 'Specifies the value of the Print Lines where Value is Zero. field';
+                        Caption = 'Print Lines where Value is Zero';
+                        ToolTip = 'Specifies the value of the Print Lines where Value is Zero field';
                         ApplicationArea = NPRRetail;
                     }
                 }

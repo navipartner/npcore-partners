@@ -144,7 +144,6 @@ report 6014455 "NPR Item Barcode Status Sheet"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

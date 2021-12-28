@@ -78,7 +78,6 @@ report 6014412 "NPR Sold Items by Sales Person"
     {
         SaveValues = true;
     }
-
     labels
     {
         Report_Caption = 'Sold Items by Sales Person';

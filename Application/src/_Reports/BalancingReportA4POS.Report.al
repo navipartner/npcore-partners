@@ -704,28 +704,24 @@ report 6014459 "NPR Balancing Report A4 POS"
                     field("Print Receipts"; PrintReceipts)
                     {
                         Caption = 'Print Receipts';
-
                         ToolTip = 'Specifies the value of the Print Receipts field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Terminals"; PrintTerminals)
                     {
                         Caption = 'Print Terminals';
-
                         ToolTip = 'Specifies the value of the Print Terminals field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Vouchers"; PrintVouchers)
                     {
                         Caption = 'Print Vouchers';
-
                         ToolTip = 'Specifies the value of the Print Vouchers field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Turn Over"; PrintTurnOver)
                     {
                         Caption = 'Print TurnOver';
-
                         ToolTip = 'Specifies the value of the Print TurnOver field';
                         ApplicationArea = NPRRetail;
                     }
@@ -735,14 +731,12 @@ report 6014459 "NPR Balancing Report A4 POS"
                         field("Print Discount Amt"; PrintDiscountAmt)
                         {
                             Caption = '        Print Discount Amount';
-
                             ToolTip = 'Specifies the value of the         Print Discount Amount field';
                             ApplicationArea = NPRRetail;
                         }
                         field("Print Discount Perc"; PrintDiscountPerc)
                         {
                             Caption = '        Print Discount %';
-
                             ToolTip = 'Specifies the value of the         Print Discount % field';
                             ApplicationArea = NPRRetail;
 
@@ -750,7 +744,6 @@ report 6014459 "NPR Balancing Report A4 POS"
                         field("Print Discount Total"; PrintDiscountTotal)
                         {
                             Caption = '        Print Discount Total';
-
                             ToolTip = 'Specifies the value of the         Print Discount Total field';
                             ApplicationArea = NPRRetail;
 
@@ -759,36 +752,31 @@ report 6014459 "NPR Balancing Report A4 POS"
                     field("Print Counting"; PrintCounting)
                     {
                         Caption = 'Print Counting';
-
                         ToolTip = 'Specifies the value of the Print Counting field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Closing"; PrintClosing)
                     {
                         Caption = 'Print Closing';
-
                         ToolTip = 'Specifies the value of the Print Closing field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print VAT"; PrintVAT)
                     {
                         Caption = 'Print VAT';
-
                         ToolTip = 'Specifies the value of the Print VAT field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Attached Bins"; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
-
                         ToolTip = 'Specifies the value of the Print Attached Bins field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Empty Lines"; PrintEmptyLines)
                     {
-                        Caption = 'Print Lines where Value is Zero.';
-
-                        ToolTip = 'Specifies the value of the Print Lines where Value is Zero. field';
+                        Caption = 'Print Lines where Value is Zero';
+                        ToolTip = 'Specifies the value of the Print Lines where Value is Zero field';
                         ApplicationArea = NPRRetail;
                     }
                 }

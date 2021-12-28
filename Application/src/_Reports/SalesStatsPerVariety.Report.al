@@ -185,7 +185,6 @@ report 6014615 "NPR Sales Stats Per Variety"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)
@@ -193,14 +192,12 @@ report 6014615 "NPR Sales Stats Per Variety"
                 field("Print Also Without Sale"; PrintAlsoWithoutSale)
                 {
                     Caption = 'Include Items Not Sold';
-
                     ToolTip = 'Specifies the value of the Include Items Not Sold field';
                     ApplicationArea = NPRRetail;
                 }
                 field(PrintTotals; PrintTotal)
                 {
                     Caption = 'Print Totals';
-
                     ToolTip = 'Specifies the value of the Print Totals field';
                     ApplicationArea = NPRRetail;
                 }

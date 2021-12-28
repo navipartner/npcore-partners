@@ -135,14 +135,12 @@ report 6014425 "NPR Event Overview"
                     field("Period Start"; PeriodStart)
                     {
                         Caption = 'Period starts at';
-
                         ToolTip = 'Specifies the value of the Period starts at field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Period End"; PeriodEnd)
                     {
                         Caption = 'Period ends at';
-
                         ToolTip = 'Specifies the value of the Period ends at field';
                         ApplicationArea = NPRRetail;
                     }
@@ -152,28 +150,24 @@ report 6014425 "NPR Event Overview"
                         field("Job Planning Type Resource"; JobPlanningTypeResource)
                         {
                             Caption = 'Resource';
-
                             ToolTip = 'Specifies the value of the Resource field';
                             ApplicationArea = NPRRetail;
                         }
                         field("Job Planning Type Item"; JobPlanningTypeItem)
                         {
                             Caption = 'Item';
-
                             ToolTip = 'Specifies the value of the Item field';
                             ApplicationArea = NPRRetail;
                         }
                         field("Job Planning Type GL Account"; JobPlanningTypeGLAccount)
                         {
                             Caption = 'G/L Account';
-
                             ToolTip = 'Specifies the value of the G/L Account field';
                             ApplicationArea = NPRRetail;
                         }
                         field("Job Planning Type Text"; JobPlanningTypeText)
                         {
                             Caption = 'Text';
-
                             ToolTip = 'Specifies the value of the Text field';
                             ApplicationArea = NPRRetail;
                         }

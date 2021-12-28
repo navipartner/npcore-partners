@@ -163,16 +163,15 @@ report 6014417 "NPR Inventory per Date"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)
             {
                 field("End Date"; EndDate)
                 {
-                    Caption = 'Date';
+                    Caption = 'End Date';
 
-                    ToolTip = 'Specifies the value of the Date field';
+                    ToolTip = 'Specifies the value of the End Date field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Include Item Stock"; IncludeItemStock)
@@ -198,9 +197,9 @@ report 6014417 "NPR Inventory per Date"
                 }
                 field("Negativ Volume Show"; NegativVolumeShow)
                 {
-                    Caption = 'Show only items with negativ volume';
+                    Caption = 'Show only items with negative volume';
 
-                    ToolTip = 'Specifies the value of the Show only items with negativ volume field';
+                    ToolTip = 'Specifies the value of the Show only items with negative volume field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show No Inventory"; ShowNoInventory)

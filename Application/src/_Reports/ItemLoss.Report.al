@@ -96,7 +96,6 @@ report 6014542 "NPR Item - Loss"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

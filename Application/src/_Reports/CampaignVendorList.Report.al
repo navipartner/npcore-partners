@@ -169,26 +169,25 @@ report 6014497 "NPR Campaign Vendor List"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)
             {
                 field("Location Filter"; LocationFilter)
                 {
-                    Caption = 'LocationFilter';
+                    Caption = 'Location Filter';
                     TableRelation = Location.Code;
 
-                    ToolTip = 'Specifies the value of the LocationFilter field';
+                    ToolTip = 'Specifies the value of the Location Filter field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Dimension 1 Filter"; Dimension1Filter)
                 {
                     CaptionClass = '1,3,1';
-                    Caption = 'DimensionFilter';
+                    Caption = 'Dimension Filter';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
 
-                    ToolTip = 'Specifies the value of the DimensionFilter field';
+                    ToolTip = 'Specifies the value of the Dimension Filter field';
                     ApplicationArea = NPRRetail;
                 }
             }

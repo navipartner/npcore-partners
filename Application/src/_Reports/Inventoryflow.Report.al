@@ -301,7 +301,6 @@ report 6014533 "NPR Inventory - flow"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

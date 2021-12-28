@@ -760,7 +760,6 @@ report 6014510 "NPR Purch Return Order"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

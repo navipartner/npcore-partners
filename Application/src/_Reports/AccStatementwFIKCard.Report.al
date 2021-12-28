@@ -675,7 +675,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     field("Print Entries Due"; PrintEntriesDue)
                     {
                         Caption = 'Show Overdue Entries';
-
                         ToolTip = 'Specifies the value of the Show Overdue Entries field';
                         ApplicationArea = NPRRetail;
                     }
@@ -683,7 +682,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Include All Customers with Ledger Entries';
                         MultiLine = true;
-
                         ToolTip = 'Specifies the value of the Include All Customers with Ledger Entries field';
                         ApplicationArea = NPRRetail;
 
@@ -697,7 +695,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Include All Customers with a Balance';
                         MultiLine = true;
-
                         ToolTip = 'Specifies the value of the Include All Customers with a Balance field';
                         ApplicationArea = NPRRetail;
 
@@ -710,28 +707,24 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     field("Print Reversed Entries"; PrintReversedEntries)
                     {
                         Caption = 'Include Reversed Entries';
-
                         ToolTip = 'Specifies the value of the Include Reversed Entries field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Unapplied Entries"; PrintUnappliedEntries)
                     {
                         Caption = 'Include Unapplied Entries';
-
                         ToolTip = 'Specifies the value of the Include Unapplied Entries field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Include Aging Band"; IncludeAgingBand)
                     {
                         Caption = 'Include Aging Band';
-
                         ToolTip = 'Specifies the value of the Include Aging Band field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Period Length"; PeriodLength)
                     {
                         Caption = 'Aging Band Period Length';
-
                         ToolTip = 'Specifies the value of the Aging Band Period Length field';
                         ApplicationArea = NPRRetail;
                     }
@@ -739,7 +732,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Aging Band by';
                         OptionCaption = 'Due Date,Posting Date';
-
                         ToolTip = 'Specifies the value of the Aging Band by field';
                         ApplicationArea = NPRRetail;
                     }
@@ -747,14 +739,12 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
-
                         ToolTip = 'Specifies the value of the Log Interaction field';
                         ApplicationArea = NPRRetail;
                     }
                     field("FIK No"; FIKNo)
                     {
                         Caption = 'FIK No.';
-
                         ToolTip = 'Specifies the value of the FIK No. field';
                         ApplicationArea = NPRRetail;
                     }
@@ -766,7 +756,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Report Output';
                         OptionCaption = 'Print,Preview,PDF,Email,Excel,XML';
-
                         ToolTip = 'Specifies the value of the Report Output field';
                         ApplicationArea = NPRRetail;
 
@@ -796,7 +785,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Chosen Output';
                         Visible = false;
-
                         ToolTip = 'Specifies the value of the Chosen Output field';
                         ApplicationArea = NPRRetail;
                     }
@@ -807,7 +795,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                         field(PrintMissingAddresses; PrintRemaining)
                         {
                             Caption = 'Print remaining statements';
-
                             ToolTip = 'Specifies the value of the Print remaining statements field';
                             ApplicationArea = NPRRetail;
                         }

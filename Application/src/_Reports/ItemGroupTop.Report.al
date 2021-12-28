@@ -236,7 +236,6 @@ report 6014420 "NPR Item Group Top"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

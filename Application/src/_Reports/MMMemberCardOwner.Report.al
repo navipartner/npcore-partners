@@ -52,6 +52,5 @@ report 6060135 "NPR MM Member Card Owner"
     {
         SaveValues = true;
     }
-
 }
 

@@ -164,7 +164,6 @@ report 6014663 "NPR Retail Calc. Inv."
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

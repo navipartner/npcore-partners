@@ -71,7 +71,6 @@ report 6060124 "NPR TM Ticket Batch Resp."
     {
         SaveValues = true;
     }
-
     labels
     {
         YourRef = 'Your Reference:';

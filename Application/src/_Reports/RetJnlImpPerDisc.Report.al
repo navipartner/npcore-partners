@@ -48,7 +48,6 @@ report 6014481 "NPR Ret. Jnl. Imp. Per. Disc."
     {
         SaveValues = true;
     }
-
     var
         Item: Record Item;
         RetailJournalLine: Record "NPR Retail Journal Line";

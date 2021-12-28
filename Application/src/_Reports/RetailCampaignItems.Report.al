@@ -77,6 +77,5 @@ report 6014616 "NPR Retail Campaign Items"
     {
         SaveValues = true;
     }
-
 }
 

@@ -156,7 +156,6 @@ report 6014404 "NPR Return Reason Code Stat."
         SaveValues = true;
     }
 
-
     trigger OnPreReport()
     begin
         if "Return Reason".GetFilters <> '' then

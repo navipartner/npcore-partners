@@ -200,7 +200,6 @@ report 6014427 "NPR Turnover Rate"
     {
         SaveValues = true;
     }
-
     labels
     {
         Report_Caption = 'Turnover rate';

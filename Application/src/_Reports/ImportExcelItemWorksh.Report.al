@@ -72,7 +72,6 @@ report 6060042 "NPR Import Excel Item Worksh."
                 field("Set Items To Skip"; SetItemsToSkip)
                 {
                     Caption = 'Set all items to SKIP';
-
                     ToolTip = 'Specifies the value of the Set all items to SKIP field';
                     ApplicationArea = NPRRetail;
                 }

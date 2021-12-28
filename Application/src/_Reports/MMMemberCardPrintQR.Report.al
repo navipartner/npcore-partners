@@ -81,7 +81,6 @@ report 6060127 "NPR MM Member Card Print QR"
     {
         SaveValues = true;
     }
-
     labels
     {
         ExpiryDate = 'Expiry date:';

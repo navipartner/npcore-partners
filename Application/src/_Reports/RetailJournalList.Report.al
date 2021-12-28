@@ -66,7 +66,6 @@ report 6014514 "NPR Retail Journal List"
     {
         SaveValues = true;
     }
-
     labels
     {
         LabelPrintingLine = 'Label Printing Line';

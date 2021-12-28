@@ -317,7 +317,6 @@ report 6014416 "NPR Sale Statistics per Vendor"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

@@ -172,7 +172,6 @@ report 6151014 "NPR NpRv Voucher 2"
     {
         SaveValues = true;
     }
-
     var
         EndingDate: Text;
         IssuedDate: Text;
