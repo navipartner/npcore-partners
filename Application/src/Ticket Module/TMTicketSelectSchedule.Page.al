@@ -105,7 +105,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
         DateTimeLbl: Label '%1 %2', Locked = true;
         RemainingLbl: Label '%1', Locked = true;
         Remaining2Lbl: Label '%1 (%2)', Locked = true;
-        ReasonCode: Enum "NPR TM Schedule Blocked Sales Reason";
+        ReasonCode: Enum "NPR TM Sch. Block Sales Reason";
     begin
 
         LocalDateTimeText := StrSubstNo(DateTimeLbl, Format(Today()), Format(Time()));
@@ -179,7 +179,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
 
     local procedure AddToTempRecord(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketItemNo: Code[20]; TicketVariantCode: Code[10])
     var
-        ReasonCode: Enum "NPR TM Schedule Blocked Sales Reason";
+        ReasonCode: Enum "NPR TM Sch. Block Sales Reason";
     begin
 
         if (TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry, TicketItemNo, TicketVariantCode, Today, Time, ReasonCode, Remaining)) then begin

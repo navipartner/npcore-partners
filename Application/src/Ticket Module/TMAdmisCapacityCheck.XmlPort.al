@@ -181,7 +181,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         TicketManagement: Codeunit "NPR TM Ticket Management";
                         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
                         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
-                        ReasonCode: Enum "NPR TM Schedule Blocked Sales Reason";
+                        ReasonCode: Enum "NPR TM Sch. Block Sales Reason";
                         ItemNumber: Code[20];
                         VariantCode: Code[10];
                         ResolvingTable: Integer;
