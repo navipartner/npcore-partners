@@ -21,6 +21,8 @@ codeunit 6014528 "NPR Barcode Image Library"
         MemoryStream: DotNet NPRNetMemoryStream;
         OutStream: OutStream;
     begin
+        if BarCode = '' then
+            exit;
         Initialize(BarCode);
         BarCodeGenerator := BarCodeGenerator.BarCodeGenerator(BarCodeSettings);
         BarCodeSettings.ApplyKey('3YOZI-9N0S5-RD239-JN9R0-WCGL8');
