@@ -71,21 +71,20 @@ report 6060040 "NPR Suggest Item Worksh. Lines"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)
             {
                 field(Variants; OptVariants)
                 {
-
+                    Caption = 'OptVariants';
                     OptionCaption = 'None,Variants,Varieties Without Variants,All';
                     ToolTip = 'Specifies the value of the OptVariants field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Defaults; OptDefaultAction)
                 {
-
+                    Caption = 'OptDefaultAction';
                     OptionCaption = 'Skip,Create New,Update Only,Update and Create Variants';
                     ToolTip = 'Specifies the value of the OptDefaultAction field';
                     ApplicationArea = NPRRetail;

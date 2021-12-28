@@ -687,7 +687,6 @@ report 6014400 "NPR Inventory by age"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)
@@ -719,17 +718,17 @@ report 6014400 "NPR Inventory by age"
                     }
                     field("Show Blank Lines"; ShowZeroLines)
                     {
-                        Caption = 'Show Blank Lines';
+                        Caption = 'Show Blank Item Lines';
                         Editable = ShowItem;
 
-                        ToolTip = 'Specifies the value of the Show Zero Item Lines field';
+                        ToolTip = 'Specifies the value of the Show Blank Item Lines field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Item Grp Level"; ItemGrpLevel)
                     {
-                        Caption = 'Level';
+                        Caption = 'Item Group Level';
 
-                        ToolTip = 'Specifies the value of the Level field';
+                        ToolTip = 'Specifies the value of the Item Group Level field';
                         ApplicationArea = NPRRetail;
                     }
                 }

@@ -23,8 +23,6 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
 
     requestpage
     {
-        SaveValues = true;
-
         layout
         {
             area(content)

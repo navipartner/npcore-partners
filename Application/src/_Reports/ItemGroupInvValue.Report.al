@@ -111,9 +111,7 @@ report 6014448 "NPR Item Group Inv. Value"
     requestpage
     {
         SaveValues = true;
-
     }
-
     labels
     {
         ReportCap = 'Item Group Inventory Value';

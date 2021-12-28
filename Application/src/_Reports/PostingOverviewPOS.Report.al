@@ -310,7 +310,6 @@ report 6150614 "NPR Posting Overview POS"
                     field("Include Credit Card Transaction"; IncludeCreditCardTransaction)
                     {
                         Caption = 'Include Credit Card Transaction';
-
                         ToolTip = 'Specifies the value of the Include Credit Card Transaction field';
                         ApplicationArea = NPRRetail;
                     }

@@ -177,14 +177,12 @@ report 6014543 "NPR Item - Loss - Top 10"
                     ShowCaption = false;
                     field("Source Code Filter"; SourceCodeFilter)
                     {
-
                         Caption = 'Source Code Filter';
                         ToolTip = 'Specifies the value of the Source Code Filter field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Sorting"; SortOrder)
                     {
-
                         Caption = 'Quantity';
                         OptionCaption = 'Quantity,CostAmount,Shrinkage';
                         ToolTip = 'Specifies the value of the Quantity field';
@@ -192,7 +190,6 @@ report 6014543 "NPR Item - Loss - Top 10"
                     }
                     field("No Of Records To Print"; NoOfRecordsToPrint)
                     {
-
                         Caption = 'Print Lines';
                         ToolTip = 'Specifies the value of the Print Lines field';
                         ApplicationArea = NPRRetail;

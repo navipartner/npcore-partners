@@ -402,7 +402,6 @@ report 6014535 "NPR Sales Statistics By Dept."
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

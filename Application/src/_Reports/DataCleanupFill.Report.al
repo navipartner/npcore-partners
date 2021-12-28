@@ -217,14 +217,12 @@ report 6060100 "NPR Data Cleanup Fill"
             {
                 field("Fill Table"; FillTable)
                 {
-
                     Caption = 'Insert Data In Table';
                     ToolTip = 'Specifies the value of the Insert Data In Table field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Cleanup Action"; CleanupAction)
                 {
-
                     Caption = 'Cleanup Action';
                     OptionCaption = 'Delete,Rename';
                     ToolTip = 'Specifies the value of the Cleanup Action field';
@@ -232,7 +230,6 @@ report 6060100 "NPR Data Cleanup Fill"
                 }
                 field("Table Option"; TableOption)
                 {
-
                     Caption = 'Table Option';
                     CaptionClass = 'Customer,Vendor,Item,GLAccount';
                     ToolTip = 'Specifies the value of the Table Option field';
@@ -240,7 +237,6 @@ report 6060100 "NPR Data Cleanup Fill"
                 }
                 field("Item Rename Option"; ItemRenameOption)
                 {
-
                     Caption = 'Rename Option for Item';
                     OptionCaption = ' ,Vendor Item No.,Vendor + Vendor Item No.';
                     ToolTip = 'Specifies the value of the Rename Option for Item field';

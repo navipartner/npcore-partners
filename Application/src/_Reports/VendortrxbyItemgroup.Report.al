@@ -219,7 +219,6 @@ report 6014449 "NPR Vendor trx by Item group"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

@@ -173,7 +173,6 @@ report 6151016 "NPR NpRv Voucher 4"
     {
         SaveValues = true;
     }
-
     var
         EndingDate: Text;
         IssuedDate: Text;

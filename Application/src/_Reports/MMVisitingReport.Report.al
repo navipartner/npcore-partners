@@ -146,8 +146,6 @@ report 6060133 "NPR MM Visiting Report"
     {
         SaveValues = true;
     }
-
-
     labels
     {
         ReportName = 'Member Visting Report';

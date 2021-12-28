@@ -142,7 +142,6 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

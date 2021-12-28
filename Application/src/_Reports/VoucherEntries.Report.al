@@ -105,7 +105,6 @@ report 6014407 "NPR Voucher Entries"
     {
         SaveValues = true;
     }
-
     var
         TitleLbl: Label 'VOUCHER ENTRIES';
         TotalLbl: Label 'Total';

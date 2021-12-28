@@ -215,7 +215,6 @@ report 6014402 "NPR Discount Statistics"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)
@@ -226,7 +225,6 @@ report 6014402 "NPR Discount Statistics"
                     field("Show Item Ledger"; ShowItemLedger)
                     {
                         Caption = 'Show Value Entries';
-
                         ToolTip = 'Specifies the value of the Show Value Entries field';
                         ApplicationArea = NPRRetail;
                     }
