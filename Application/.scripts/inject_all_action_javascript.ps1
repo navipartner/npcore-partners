@@ -1,11 +1,9 @@
-$ErrorActionPreference = “Stop”
-
-Add-Type -Path ".\.scripts\NUglify.dll" # https://github.com/trullock/NUglify
+$ErrorActionPreference = "Stop"
 
 $fileList = Get-ChildItem -Path .\src\ -Filter *.al -Recurse
 foreach ($file in $fileList)
 {
-    $find = $file | Select-String -Pattern '\/\/###NP_FILE_REPLACE:(\w+\.js)###'
+    $find = $file | Select-String -Pattern '\/\/###NPR_INJECT_FROM_FILE:([\w-. ]*\.js)###'
     if ($find)
     {                      
         $jsfilePath = Join-Path $file.Directory ('/'+$find.Matches.Groups[1].Value)        
@@ -13,7 +11,7 @@ foreach ($file in $fileList)
         if ($jsfileFound) 
         {
             $jsfileContent = Get-Content -Path $jsfilePath -Raw      
-            $minifiedJs = [NUglify.Uglify]::Js($jsfileContent).Code   
+            $minifiedJs = $jsfileContent | .\.scripts\esbuild.exe --minify
 
             $alfileContent = Get-Content -Path $file.FullName            
             $alfileContent[$find.LineNumber] = "'" + $minifiedJs.Replace("'","''") + "'";
