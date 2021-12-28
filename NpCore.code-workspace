@@ -39,7 +39,20 @@
 		"CRS.ObjectNamePrefix": "NPR ",
 		"CRS.RemovePrefixFromFilename": true,
 		"CRS.DisableCRSSnippets": true,
-		"CRS.OnSaveAlFileAction": "Rename"
+		"CRS.OnSaveAlFileAction": "Rename",
+		"runOnSave.statusMessageTimeout": 3000,
+		"runOnSave.commands": [
+			{
+				"match": "POSAction.*\\.js$",
+				"command": "${workspaceFolder}/.scripts/inject_javascript.ps1 -BaseFolder ${fileDirname} -JsFileName ${fileBasename}",
+				"runIn": "terminal"
+			},
+			{
+				"match": "POSAction.*\\.al$",
+				"command": "${workspaceFolder}/.scripts/inject_action_javascript.ps1 -AlFileName ${file}",
+				"runIn": "terminal"
+			}
+		]
 	},
 	"extensions": {
 		"recommendations": [
@@ -50,9 +63,10 @@
 			"andrzejzwierzchowski.al-code-outline", //Code actions, icon browser
 			"davidfeldhoff.al-codeactions", //Code actions
 			"wbrakowski.al-navigator", //Code actions
-			"waldo.crs-al-language-extension", //Auto file naming with proper prefix,
+			"waldo.crs-al-language-extension", //Auto file naming with proper prefix
 			"ban.spellright", //Spell checking in comments and markdown documentation
 			"docsmsft.docs-preview", //Better preview of markdown for documentation
+			"pucelle.run-on-save" //Auto update POS Action javascript when files are save
 		]
 	},
 	"tasks": {
@@ -60,47 +74,33 @@
 		"tasks": [
 			{
 				"label": "Inject all action javascript files",
-				"detail": "Searches .al files for custom token //###NP_FILE_REPLACE:action.js### and replaces the line underneath with minified javascript if action.js file is found in same folder.",
-				"type": "shell",				
-				"command": "powershell",
-				"args": [   
-					"-ExecutionPolicy",
-					"Unrestricted",
-					"-NoProfile",
-					"-File",
-					"${cwd}\\.scripts\\inject_all_action_javascript.ps1"       
-				],
+				"detail": "Searches .al files for custom token //###NPR_INJECT_FROM_FILE:action.js### and replaces the line underneath with minified javascript if action.js file is found in same folder.",
+				"type": "shell",
+				"command": "${workspaceFolder}/.scripts//inject_all_action_javascript.ps1",
 				"presentation": {
 					"echo": true,
 					"reveal": "always",
 					"panel": "shared",
 					"showReuseMessage": true,
 					"clear": true,
-					"revealProblems": "always",							
-				},				
-				"problemMatcher": "$func-powershell-watch"
+					"revealProblems": "always"
+				},
+				"problemMatcher": []
 			},
 			{
 				"label": "Download Dependencies",
 				"detail": "Downloads .NET dependencies, necessary for compilation",
-				"type": "shell",				
-				"command": "powershell",
-				"args": [   
-					"-ExecutionPolicy",
-					"Unrestricted",
-					"-NoProfile",
-					"-File",
-					"${cwd}\\.scripts\\download_compile_dependencies.ps1"       
-				],
+				"type": "shell",
+				"command": "${workspaceFolder}/.scripts/download_compile_dependencies.ps1",
 				"presentation": {
 					"echo": true,
 					"reveal": "always",
 					"panel": "shared",
 					"showReuseMessage": true,
 					"clear": true,
-					"revealProblems": "always",							
-				},				
-				"problemMatcher": "$func-powershell-watch"
+					"revealProblems": "always"
+				},
+				"problemMatcher": []
 			}
 		]
 	}
