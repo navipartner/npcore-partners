@@ -112,7 +112,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
                     {
                         AutoFormatType = 1;
                     }
-                    column(db; Db)
+                    column(db; GrossCoverage)
                     {
                         AutoFormatType = 1;
                     }
@@ -136,17 +136,17 @@ report 6014430 "NPR Item Sales Stats/Provider"
                     {
                         AutoFormatType = 1;
                     }
-                    column(forpct; Forpct)
+                    column(forpct; ProfitPriceCoveragePct)
                     {
                         AutoFormatType = 1;
                     }
                     column(ItemFooterDesc; ItemFooterDesc)
                     {
                     }
-                    column(GnsBeholdningKpris; GnsBeholdningKpris)
+                    column(GnsBeholdningKpris; AvgInvPrice)
                     {
                     }
-                    column(antalmdr; Antalmdr)
+                    column(antalmdr; MonthsCount)
                     {
                     }
                     column(SalesCost; SalesCost)
@@ -164,7 +164,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
                         Clear(PeriodSales);
                         Clear(TurnoverRate);
                         Clear(ItemInventory);
-                        Clear(GnsBeholdningKpris);
+                        Clear(AvgInvPrice);
 
                         //Lagerbeholdning Ultimo
                         Item2.Get("No.");
@@ -186,27 +186,27 @@ report 6014430 "NPR Item Sales Stats/Provider"
                         StockValue := PurchPrice + Hjemtagelsesomk;
                         PeriodSales := "Sales (LCY)";
 
-                        //Beregn db
-                        Db := "Sales (LCY)" - "COGS (LCY)";
+                        //Calculate  Gross Coverage
+                        GrossCoverage := "Sales (LCY)" - "COGS (LCY)";
 
                         if "Sales (LCY)" <> 0 then
-                            Dg := (Db / "Sales (LCY)") * 100
+                            Dg := (GrossCoverage / "Sales (LCY)") * 100
                         else
                             Dg := 0;
 
-                        //Omsaetningshastighed
-                        for x := 0 to Antalmdr do
-                            ItemInventory += Beregn(0D, CalcDate('<-' + Format(x) + Text10600003 + '>', EndDate));
+                        //Turnover rate
+                        for x := 0 to MonthsCount do
+                            ItemInventory += Calculate(0D, CalcDate('<-' + Format(x) + Text10600003 + '>', EndDate));
 
-                        GnsBeholdningKpris := (ItemInventory / (Antalmdr + 1));
+                        AvgInvPrice := (ItemInventory / (MonthsCount + 1));
 
-                        if GnsBeholdningKpris <> 0 then begin
-                            TurnoverRate := (SalesCost / GnsBeholdningKpris) * (12 / (Antalmdr + 1));
-                            Forpct := (Db * 100 / GnsBeholdningKpris) * (12 / (Antalmdr + 1));
+                        if AvgInvPrice <> 0 then begin
+                            TurnoverRate := (SalesCost / AvgInvPrice) * (12 / (MonthsCount + 1));
+                            ProfitPriceCoveragePct := (GrossCoverage * 100 / AvgInvPrice) * (12 / (MonthsCount + 1));
                         end
                         else begin
                             TurnoverRate := 0;
-                            Forpct := 0;
+                            ProfitPriceCoveragePct := 0;
                         end;
                     end;
 
@@ -215,7 +215,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
                         SetRange("Vendor No.", Vendor."No.");
                         StartDate := GetRangeMin("Date Filter");
                         EndDate := GetRangeMax("Date Filter");
-                        Antalmdr := (Date2DMY(EndDate, 3) - Date2DMY(StartDate, 3)) * 12 + (Date2DMY(EndDate, 2) - Date2DMY(StartDate, 2));
+                        MonthsCount := (Date2DMY(EndDate, 3) - Date2DMY(StartDate, 3)) * 12 + (Date2DMY(EndDate, 2) - Date2DMY(StartDate, 2));
                     end;
                 }
 
@@ -277,7 +277,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
                     {
 
                         Caption = 'Inventory Value Is Based On:';
-                        OptionCaption = 'sidste koebspris,kostpris (gns.)';
+                        OptionCaption = 'Last Purchase Price,Cost Price (avg.)';
                         ToolTip = 'Specifies the value of the Inventory Value Is Based On: field';
                         ApplicationArea = NPRRetail;
                     }
@@ -304,7 +304,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
         lagerv_Cap = 'Value in inventory';
         Qty_cap = 'Anticipated acces';
         Oms_Cap = 'Turnover rate';
-        for_Cap = 'Forr. %';
+        for_Cap = 'Profit/Price coverrage %';
         Page_Caption = 'Page';
     }
 
@@ -328,10 +328,10 @@ report 6014430 "NPR Item Sales Stats/Provider"
         EndDate: Date;
         StartDate: Date;
         ValueDate: Date;
-        Db: Decimal;
+        GrossCoverage: Decimal;
         Dg: Decimal;
-        Forpct: Decimal;
-        GnsBeholdningKpris: Decimal;
+        ProfitPriceCoveragePct: Decimal;
+        AvgInvPrice: Decimal;
         GNSCostPrice: Decimal;
         Hjemtagelsesomk: Decimal;
         ItemInventory: Decimal;
@@ -340,7 +340,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
         SalesCost: Decimal;
         StockValue: Decimal;
         TurnoverRate: Decimal;
-        Antalmdr: Integer;
+        MonthsCount: Integer;
         x: Integer;
         Text10600001: Label 'Chosen Vendors';
         Text10600007: Label 'Department';
@@ -358,12 +358,12 @@ report 6014430 "NPR Item Sales Stats/Provider"
         ItemGroupDesc: Text[200];
         ItemGroupFooterDesc: Text[200];
 
-    procedure Beregn(DateFrom: Date; DateTo: Date) vaerdibeh: Decimal
+    procedure Calculate(DateFrom: Date; DateTo: Date): Decimal
     begin
         Item1.SetRange("Date Filter", DateFrom, DateTo);
         Item1.Get(Item."No.");
         Item1.CalcFields("Purchases (LCY)", "COGS (LCY)");
-        vaerdibeh := Item1."Purchases (LCY)" - (Item1."COGS (LCY)");
+        Exit(Item1."Purchases (LCY)" - (Item1."COGS (LCY)"));
     end;
 }
 
