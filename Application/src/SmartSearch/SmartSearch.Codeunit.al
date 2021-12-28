@@ -50,6 +50,8 @@ codeunit 6014623 "NPR Smart Search"
 
         Customer.SetFilter("Name", '%1', '@' + ConvertSpaceToWildcard(SearchTerm));
         Customer.SetFilter("Contact", '%1', '@' + ConvertSpaceToWildcard(SearchTerm));
+
+        OnAfterApplyCustomerFilter(SearchTerm, Customer);
     end;
 
     local procedure ApplyItemFilter(SearchTerm: Text; var Item: Record Item)
@@ -64,6 +66,8 @@ codeunit 6014623 "NPR Smart Search"
             Item.SetFilter("Search Description", '%1', ConvertSpaceToWildcard(UpperCase(SearchTerm)));
 
         Item.SetFilter(Description, '%1', '@' + ConvertSpaceToWildcard(SearchTerm));
+
+        OnAfterApplyItemFilter(SearchTerm, Item);
     end;
 
     local procedure CheckLength(SearchTerm: Text; MaxLength: Integer): Boolean
@@ -86,5 +90,15 @@ codeunit 6014623 "NPR Smart Search"
     var
     begin
         exit(ConvertStr(SearchTerm, ' ', '*') + '*');
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterApplyItemFilter(SearchTerm: Text; var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterApplyCustomerFilter(SearchTerm: Text; var Customer: Record Customer)
+    begin
     end;
 }
