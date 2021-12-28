@@ -1,4 +1,4 @@
-enum 6014484 "NPR TM Schedule Blocked Sales Reason"
+enum 6014484 "NPR TM Sch. Block Sales Reason"
 {
     Extensible = false;
 

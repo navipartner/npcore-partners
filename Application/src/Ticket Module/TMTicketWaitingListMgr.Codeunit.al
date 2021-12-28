@@ -272,7 +272,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         TicketWaitingList: Record "NPR TM Ticket Wait. List";
         TempTicketWaitingList: Record "NPR TM Ticket Wait. List" temporary;
         TicketManagement: Codeunit "NPR TM Ticket Management";
-        ReasonCode: Enum "NPR TM Schedule Blocked Sales Reason";
+        ReasonCode: Enum "NPR TM Sch. Block Sales Reason";
         ReferenceDateTime: DateTime;
         RemainingQty: Integer;
         SelectCounter: Integer;
