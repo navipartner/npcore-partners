@@ -367,6 +367,7 @@ table 6150615 "NPR POS Unit"
         POSUnit: Record "NPR POS Unit";
     begin
         UserSetup.Get(UserId);
+        UserSetup.TestField("NPR POS Unit No.");
         POSUnit.Get(UserSetup."NPR POS Unit No.");
         exit(POSUnit."No.");
     end;
