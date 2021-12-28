@@ -487,10 +487,6 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
                     {
                         MinOccurs = Zero;
                     }
-                    fieldelement(Season; "Item Worksheet Line".Season)
-                    {
-                        MinOccurs = Zero;
-                    }
                     textelement(Assortment)
                     {
                         MinOccurs = Zero;

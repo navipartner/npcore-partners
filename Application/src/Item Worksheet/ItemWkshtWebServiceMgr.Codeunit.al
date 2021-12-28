@@ -507,9 +507,6 @@
                     ItemWorksheetLine.Validate("Group sale", 1)
                 else
                     ItemWorksheetLine.Validate("Group sale", 0);
-        TempText := GetXmlText(Element, 'Season', 0, false);
-        if TempText <> '' then
-            ItemWorksheetLine.Validate(Season, TempText);
         TempText := GetXmlText(Element, 'LabelBarcode', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Label Barcode", TempText);
