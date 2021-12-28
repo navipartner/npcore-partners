@@ -372,7 +372,6 @@ report 6014612 "NPR Inventory per Variant/date"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

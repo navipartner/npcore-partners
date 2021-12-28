@@ -175,7 +175,6 @@ report 6014611 "NPR Sales Stats w/ Variants"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)
@@ -185,7 +184,6 @@ report 6014611 "NPR Sales Stats w/ Variants"
                     field(PrintPrintAlsoWithoutSale; PrintAlsoWithoutSale)
                     {
                         Caption = 'Print Also Without Sale';
-
                         ToolTip = 'Specifies the value of the Print Also Without Sale field';
                         ApplicationArea = NPRRetail;
                     }

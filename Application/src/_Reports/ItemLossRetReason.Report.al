@@ -196,7 +196,6 @@ report 6014544 "NPR Item Loss - Ret. Reason"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

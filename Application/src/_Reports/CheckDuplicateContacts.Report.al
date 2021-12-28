@@ -105,7 +105,6 @@ report 6060112 "NPR Check Duplicate Contacts"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

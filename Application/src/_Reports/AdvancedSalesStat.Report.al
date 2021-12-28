@@ -197,7 +197,6 @@ report 6014490 "NPR Advanced Sales Stat."
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

@@ -213,7 +213,6 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

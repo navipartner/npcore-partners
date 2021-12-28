@@ -74,7 +74,6 @@ report 6014408 "NPR Item Group Overview"
     {
         SaveValues = true;
     }
-
     labels
     {
         BelongInMainItemGrp_Caption = 'Belongs in Main Item Group';

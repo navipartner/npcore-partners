@@ -33,7 +33,10 @@ report 6151050 "NPR Add Hierachy Item"
             end;
         }
     }
-
+    requestpage
+    {
+        SaveValues = true;
+    }
     var
         LineNo: Integer;
         SplitLineErr: Label 'Splitline is not possible - Line can not be inserted!';

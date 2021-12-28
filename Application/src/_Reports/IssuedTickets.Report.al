@@ -56,8 +56,6 @@ report 6014413 "NPR Issued Tickets"
     {
         SaveValues = true;
     }
-
-
     labels
     {
         PageLbl = 'Page';

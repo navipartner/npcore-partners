@@ -81,7 +81,6 @@ report 6060101 "NPR Data Cleanup Test"
             {
                 field("Cleanup Action"; CleanupAction)
                 {
-
                     Caption = 'Cleanup Action';
                     OptionCaption = 'Delete,Rename,Both';
                     ToolTip = 'Specifies the value of the Cleanup Action field';
@@ -89,7 +88,6 @@ report 6060101 "NPR Data Cleanup Test"
                 }
                 field("Table Option"; TableOption)
                 {
-
                     Caption = 'Table Option';
                     OptionCaption = 'Option All,Customer,Vendor,Item,GLAccount';
                     ToolTip = 'Specifies the value of the Table Option field';
@@ -97,7 +95,6 @@ report 6060101 "NPR Data Cleanup Test"
                 }
                 field("No Filter"; NoFilter)
                 {
-
                     Caption = 'No. Filter';
                     ToolTip = 'Specifies the value of the No. Filter field';
                     ApplicationArea = NPRRetail;

@@ -138,7 +138,6 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)

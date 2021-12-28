@@ -178,7 +178,6 @@ report 6014499 "NPR Inventory Campaign Stat."
     {
         SaveValues = true;
     }
-
     labels
     {
         Report_Lbl = 'Campaign sales statistics';

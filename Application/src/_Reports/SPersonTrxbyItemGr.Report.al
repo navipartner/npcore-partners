@@ -216,8 +216,6 @@ report 6014431 "NPR S.Person Trx by Item Gr."
     requestpage
     {
         SaveValues = true;
-
-
         layout
         {
             area(content)
@@ -243,6 +241,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                     {
 
                         Enabled = sortSalesPerson;
+                        Caption = 'Sort By';
                         OptionCaption = 'Quantity,Turnover,DB';
                         ToolTip = 'Specifies the value of the SortBy field';
                         ApplicationArea = NPRRetail;
@@ -251,6 +250,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                     {
 
                         Editable = sortSalesPerson;
+                        Caption = 'Sort';
                         OptionCaption = 'Highest,Lowest';
                         ToolTip = 'Specifies the value of the Sort field';
                         ApplicationArea = NPRRetail;

@@ -116,7 +116,6 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)
