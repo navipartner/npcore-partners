@@ -1,8 +1,6 @@
-# Role centre (landing page)
+# NP WMS Role center
 
-
-This is the WMS Role Centre.
-From here have the following links
+From the WMS Role Center, you can access the following links:
 
 - Download Live Template
 - Download test data
