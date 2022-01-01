@@ -1007,7 +1007,8 @@ report 6014617 "NPR Purchase Order"
 
             trigger OnAfterGetRecord()
             begin
-                CurrReport.Language := Language.GetLanguageID("Language Code");
+                if "Language Code" <> '' then
+                    CurrReport.Language := Language.GetLanguageID("Language Code");
 
                 CompanyInfo.Get();
                 CompanyInfo.CalcFields(Picture);

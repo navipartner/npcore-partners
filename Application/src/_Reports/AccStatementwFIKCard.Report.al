@@ -592,7 +592,8 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
             trigger OnAfterGetRecord()
             begin
                 TempAgingBandBuf.DeleteAll();
-                CurrReport.Language := Language.GetLanguageID("Language Code");
+                if "Language Code" <> '' then
+                    CurrReport.Language := Language.GetLanguageID("Language Code");
                 PrintLine := false;
                 Cust2 := Customer;
                 CopyFilter("Currency Filter", TempCurrency2.Code);
