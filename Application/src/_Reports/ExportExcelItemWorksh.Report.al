@@ -2,8 +2,7 @@
 {
     Caption = 'Export Excel Item Worksheet';
     ProcessingOnly = true;
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
     UseRequestPage = false;
 
     dataset
