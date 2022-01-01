@@ -307,7 +307,8 @@ report 6014426 "NPR Vendor Top/Sale"
                 AuxValueEntry2.SetFilter("Vendor No.", Vendor."No.");
 
                 AuxValueEntry2.CalcSums("Cost per Unit");
-                StockQty := AuxValueEntry2."Cost Amount (Actual)" / AuxValueEntry2."Cost per Unit";
+                if AuxValueEntry2."Cost per Unit" <> 0 then
+                    StockQty := AuxValueEntry2."Cost Amount (Actual)" / AuxValueEntry2."Cost per Unit";
             end;
 
             trigger OnPreDataItem()
