@@ -22,6 +22,7 @@ codeunit 85021 "NPR NpXml Tests"
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         Assert: Codeunit Assert;
         NpXmlTests: Codeunit "NPR NpXml Tests";
+        NpXmlMockHandler: Codeunit "NPR NpXml Mock Handler";
         Successed: Boolean;
     begin
         // [Scenario] Check that Process Manualy action is handled correctly using UPD_Item XML template
@@ -45,8 +46,8 @@ codeunit 85021 "NPR NpXml Tests"
         Item.Modify();
         UnbindSubscription(NpXmlTests);
 
-        //[GIVEN] Download XML Template from Azure Blob Storage
-        DownloadXmlTemplateFromAzureBlobStorage('Latest/upd_item.xml', NpXmlTemplate);
+        //[GIVEN] Download XML Template
+        MockDownloadXmlTemplate('upd_item', NpXmlTemplate);
 
         //[GIVEN] Configure XML Template
         ConfigureXmlTemplateForAPI(NpXmlTemplate);
@@ -57,63 +58,15 @@ codeunit 85021 "NPR NpXml Tests"
         //[WHEN] TaskList item is processed
         NcTask.SetRange("Table No.", Database::Item);
         NcTask.SetRange("Record Value", Item."No.");
-        if NcTask.FindFirst() then
+        if NcTask.FindFirst() then begin
+            BindSubscription(NpXmlMockHandler);
+            NpXmlMockHandler.SetItemNo(Item."No.");
             Successed := NcSyncMgt.ProcessTask(NcTask);
+            UnbindSubscription(NpXmlMockHandler);
+        end;
 
         //[THEN] Check if Resposne was Successfull
-        Assert.IsTrue(Successed, 'API synchronization failed for XML template: UPD_Item');
-    end;
-
-    [Test]
-    procedure ProcessTaskWithUpdItemXmlTemplateUsingFTP()
-    var
-        Item: Record Item;
-        NcTask: Record "NPR Nc Task";
-        NpXmlTemplate: Record "NPR NpXml Template";
-        LibraryInventory: Codeunit "NPR Library - Inventory";
-        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        Assert: Codeunit Assert;
-        NpXmlTests: Codeunit "NPR NpXml Tests";
-        Successed: Boolean;
-    begin
-        // [Scenario] Check that Process Manualy action is handled correctly using UPD_Item XML template
-
-        //[GIVEN] Initialize
-        Initialize();
-
-        //[GIVEN] Enable Data Log for table
-        EnableDataLog(Database::Item);
-
-        //[GIVEN] Enable Data Log Subscriber
-        EnableDataLogSubscriber(Database::Item);
-
-        //[GIVEN] Create Item
-        LibraryInventory.CreateItem(Item);
-
-        //[GIVEN] Enable Magento Item 
-        Item."NPR Magento Item" := true;
-        Item.Description := format(Random(10000));
-        BindSubscription(NpXmlTests);
-        Item.Modify();
-        UnbindSubscription(NpXmlTests);
-
-        //[GIVEN] Download XML Template from Azure Blob Storage
-        DownloadXmlTemplateFromAzureBlobStorage('Latest/upd_item.xml', NpXmlTemplate);
-
-        //[GIVEN] Configure XML Template
-        ConfigureXmlTemplateForFTP(NpXmlTemplate);
-
-        //[GIVEN] Import TaskList Item
-        ImportTaskList();
-
-        //[WHEN] TaskList item is processed
-        NcTask.SetRange("Table No.", Database::Item);
-        NcTask.SetRange("Record Value", Item."No.");
-        if NcTask.FindFirst() then
-            Successed := NcSyncMgt.ProcessTask(NcTask);
-
-        //[THEN] Check if Resposne was Successfull
-        Assert.IsTrue(Successed, 'API synchronization failed for XML template: UPD_Item');
+        Assert.IsTrue(Successed, GetLastErrorText());
     end;
 
     local procedure Initialize()
@@ -121,6 +74,7 @@ codeunit 85021 "NPR NpXml Tests"
         if not Initialized then begin
             SetupMagento();
             SetupNaviConnect();
+            SetupTaskSetup();
             SetupNpXml();
             SetupNcTaskProcessLine();
             Initialized := true;
@@ -137,10 +91,6 @@ codeunit 85021 "NPR NpXml Tests"
         end;
 
         MagentoSetup."Magento Enabled" := true;
-        MagentoSetup."Magento Url" := 'http://new.ottosuenson.dk/';
-        MagentoSetup."Api Url" := 'http://new.ottosuenson.dk/rest/all/V1/naviconnect/';
-        MagentoSetup.AuthType := MagentoSetup.AuthType::Basic;
-        MagentoSetup."Api Authorization" := 'bearer tfqlwf5mtq3ny5s2ugtcjydosqrb32k1';
         MagentoSetup.Modify();
     end;
 
@@ -156,6 +106,24 @@ codeunit 85021 "NPR NpXml Tests"
         NcSetup."Task Queue Enabled" := true;
         NcSetup."Task Worker Group" := 'NC';
         NcSetup.Modify(true);
+    end;
+
+    local procedure SetupTaskSetup()
+    var
+        TaskSetup: Record "NPR Nc Task Setup";
+    begin
+        TaskSetup.SetRange("Task Processor Code", 'NC');
+        TaskSetup.SetRange("Table No.", 27);
+        if not TaskSetup.FindFirst() then begin
+            TaskSetup.Init();
+            TaskSetup."Task Processor Code" := 'NC';
+            TaskSetup."Table No." := 27;
+            TaskSetup."Codeunit ID" := 6151550;
+            TaskSetup.Insert();
+        end else begin
+            TaskSetup."Codeunit ID" := 6151550;
+            TaskSetup.Modify();
+        end;
     end;
 
     local procedure SetupNpXml()
@@ -216,20 +184,16 @@ codeunit 85021 "NPR NpXml Tests"
         end;
     end;
 
-    local procedure DownloadXmlTemplateFromAzureBlobStorage(XmlTemplateFileName: Text; var NPRNpXmlTemplate: Record "NPR NpXml Template")
+    local procedure MockDownloadXmlTemplate(XmlTemplateCode: Code[20]; var NPRNpXmlTemplate: Record "NPR NpXml Template")
     var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
-        TemplateCodeText: Text;
-        TemplateCode: Code[20];
-        BaseURL: Text;
+        NpXmlMockHandler: Codeunit "NPR NpXml Mock Handler";
     begin
-        BaseURL := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl') + '/npxml/' + XmlTemplateFileName.Substring(1, XmlTemplateFileName.LastIndexOf('/'));
-        TemplateCodeText := XmlTemplateFileName.Substring(XmlTemplateFileName.LastIndexOf('/') + 1);
-        TemplateCodeText := TemplateCodeText.Substring(1, TemplateCodeText.IndexOf('.xml') - 1);
-        TemplateCode := CopyStr(TemplateCodeText, 1, MaxStrLen(TemplateCode));
-        if NpXmlTemplateMgt.ImportNpXmlTemplateUrl(TemplateCode, BaseURL) then
-            NPRNpXmlTemplate.Get(TemplateCodeText);
+        BindSubscription(NpXmlMockHandler);
+        if NpXmlTemplateMgt.ImportNpXmlTemplateUrl(UpperCase(XmlTemplateCode), 'DummyUrl') then
+            NPRNpXmlTemplate.Get(XmlTemplateCode);
+
+        UnbindSubscription(NpXmlMockHandler);
     end;
 
     local procedure ConfigureXmlTemplateForAPI(var NpXmlTemplate: Record "NPR NpXml Template")
@@ -239,31 +203,12 @@ codeunit 85021 "NPR NpXml Tests"
         NpXmlTemplate."FTP Transfer" := false;
         NpXmlTemplate."API Transfer" := true;
         NpXmlTemplate."API Type" := NpXmlTemplate."API Type"::"REST (Json)";
-        NpXmlTemplate."API Url" := 'http://new.ottosuenson.dk/rest/all/V1/naviconnect/products';
-        NpXmlTemplate."API Method" := NpXmlTemplate."API Method"::POST;
-        NpXmlTemplate.AuthType := NpXmlTemplate.AuthType::Custom;
-        NpXmlTemplate."API Content-Type" := 'naviconnect/json';
-        NpXmlTemplate."API Authorization" := 'bearer tfqlwf5mtq3ny5s2ugtcjydosqrb32k1';
-        NpXmlTemplate."API Accept" := 'naviconnect/xml';
         NpXmlTemplate.Modify();
 
         NpXmlElement.SetRange("Xml Template Code", NpXmlTemplate.Code);
         NpXmlElement.SetFilter("Element Name", '%1|%2', 'ticket_setup*', 'ticket_type*');
         if NpXmlElement.FindSet() then
             NpXmlElement.ModifyAll(Active, false);
-    end;
-
-    local procedure ConfigureXmlTemplateForFTP(var NpXmlTemplate: Record "NPR NpXml Template")
-    begin
-        NpXmlTemplate."FTP Transfer" := true;
-        NpXmlTemplate."API Transfer" := false;
-        NpXmlTemplate."FTP Server" := 'ftp://ftp01.dynamics-retail.com';
-        NpXmlTemplate."FTP Username" := 'Case-325323';
-        NpXmlTemplate."FTP Password" := 'tNDs2Bags42B+1';
-        NpXmlTemplate."FTP Port" := 21;
-        NpXmlTemplate."FTP Passive" := true;
-        NpXmlTemplate."FTP Directory" := 'BC/Export';
-        NpXmlTemplate.Modify();
     end;
 
     local procedure ImportTaskList()

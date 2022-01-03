@@ -436,6 +436,7 @@
         JsonRequest: Text;
         Response: Text;
         IsJson: Boolean;
+        RequestProcessingHandled: Boolean;
         NetConvHelper: Variant;
     begin
         if not NpXmlTemplate."API Transfer" then
@@ -495,6 +496,11 @@
             AddTextToOutputTempBlob(RequestText);
             RequestContent.WriteFrom(RequestText);
         end;
+
+        OnAfterCreateRequestContent(JsonRequest, RequestText, RequestProcessingHandled);
+
+        if RequestProcessingHandled then
+            exit;
 
         RequestContent.GetHeaders(ContentHeader);
         ContentHeader.Clear();
@@ -1127,6 +1133,11 @@
         TempBlob.CreateInStream(InStr);
 
         DownloadFromStream(InStr, 'Download and preview XML file', '', 'XML Files (*.xml)|*.xml|All Files (*.*)|*.*', FileName);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateRequestContent(JsonRequest: Text; RequestText: Text; var RequestProcessingHandled: Boolean);
+    begin
     end;
 }
 
