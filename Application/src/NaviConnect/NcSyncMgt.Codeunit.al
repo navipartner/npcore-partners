@@ -268,6 +268,7 @@
     var
         OutStream: OutStream;
         ErrorText: Text;
+        SkipErrorClearing: Boolean;
     begin
         NaviConnectTask.LockTable();
         if not NaviConnectTask.Get(NaviConnectTask."Entry No.") then
@@ -281,7 +282,9 @@
         if ErrorText <> '' then begin
             NaviConnectTask.Response.CreateOutStream(OutStream);
             OutStream.Write(ErrorText);
-            ClearLastError();
+            OnBeforeClearLastErrorInTaskError(SkipErrorClearing);
+            if not SkipErrorClearing then
+                ClearLastError();
         end;
 
         NaviConnectTask.Modify(true);
@@ -701,6 +704,11 @@
     #region events
     [IntegrationEvent(false, false)]
     local procedure OnBeforeProcessTask(var Task: Record "NPR Nc Task")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeClearLastErrorInTaskError(var SkipErrorClearing: Boolean)
     begin
     end;
     #endregion events
