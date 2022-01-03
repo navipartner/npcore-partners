@@ -7,16 +7,26 @@ codeunit 6151015 "NPR NpRv Module Valid.: Def."
         Text003: Label 'Voucher is not valid yet';
         Text004: Label 'Voucher is not valid anymore';
         Text005: Label 'Invalid Reference No. %1';
+        VourcherRedeemedErr: Label 'The voucher with Reference No. %1 has already been redeemed in another transaction on %2.', Comment = '%1 - voucher reference number, 2% - date';
 
     procedure ValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+        ArchvoucherEntry: record "NPR NpRv Arch. Voucher Entry";
         Voucher: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         Timestamp: DateTime;
     begin
-        if not NpRvVoucherMgt.FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then
-            Error(Text005, TempNpRvVoucherBuffer."Reference No.");
+        if not NpRvVoucherMgt.FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then begin
+            if NpRvVoucherMgt.FindArchivedVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", ArchVoucher) then begin
+                ArchvoucherEntry.SetCurrentKey("Arch. Voucher No.");
+                ArchvoucherEntry.SetRange("Arch. Voucher No.", ArchVoucher."No.");
+                if ArchvoucherEntry.FindLast() then;
+                Error(VourcherRedeemedErr, TempNpRvVoucherBuffer."Reference No.", ArchvoucherEntry."Posting Date");
+            end else
+                Error(Text005, TempNpRvVoucherBuffer."Reference No.");
+        end;
         NpRvVoucherMgt.Voucher2Buffer(Voucher, TempNpRvVoucherBuffer);
         VoucherType.Get(TempNpRvVoucherBuffer."Voucher Type");
         VoucherType.TestField("Payment Type");
