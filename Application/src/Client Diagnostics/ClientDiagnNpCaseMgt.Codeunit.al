@@ -143,14 +143,13 @@ codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
     var
         User: Record User;
         XmlElementLicenseInfo: XmlElement;
-        LicenseType: Text;
+        LicenseType: Integer;
     begin
-        LicenseType := '';
         if User.Get(ActiveSession."User SID") then
-            LicenseType := format(User."License Type");
+            LicenseType := User."License Type" + 1; //The case system field for license type has ordinal one higher than baseapp.
 
         XmlElementLicenseInfo := XmlElement.Create('license_info', MethodNS);
-        XmlElementLicenseInfo.Add(AddElement('license_type', LicenseType, MethodNS));
+        XmlElementLicenseInfo.Add(AddElement('license_type', Format(LicenseType), MethodNS));
         XmlElementLicenseInfo.Add(AddElement('license_name', '', MethodNS));
         XmlElementLicenseInfo.Add(AddElement('no_of_full_users', '', MethodNS));
         XmlElementLicenseInfo.Add(AddElement('no_of_isv_users', '', MethodNS));
