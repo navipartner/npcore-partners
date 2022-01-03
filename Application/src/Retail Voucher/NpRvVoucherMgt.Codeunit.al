@@ -878,6 +878,14 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         exit(Voucher.FindFirst());
     end;
 
+    procedure FindArchivedVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var ArchVoucher: Record "NPR NpRv Arch. Voucher"): Boolean
+    begin
+        if VoucherTypeCode <> '' then
+            ArchVoucher.SetFilter("Voucher Type", VoucherTypeCode);
+        ArchVoucher.SetRange("Reference No.", ReferenceNo);
+        exit(ArchVoucher.FindFirst());
+    end;
+
     procedure FindPartnerVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var Voucher: Record "NPR NpRv Voucher") Handled: Boolean
     var
         NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
