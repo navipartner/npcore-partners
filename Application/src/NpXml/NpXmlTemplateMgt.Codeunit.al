@@ -210,6 +210,7 @@
     procedure ImportNpXmlTemplateUrl(TemplateCode: Code[20]; TemplateUrl: Text): Boolean
     var
         NpXmlTemplate: Record "NPR NpXml Template";
+        TempBlob: Codeunit "Temp Blob";
         Client: HttpClient;
         Response: HttpResponseMessage;
         InStr: InStream;
@@ -220,15 +221,26 @@
         Node: XmlNode;
         Attribute: XmlAttribute;
         MagentoNpXmlSetupMgt: Codeunit "NPR Magento NpXml Setup Mgt";
+        SkipDownload: Boolean;
+        DownloadHandled: Boolean;
     begin
         if (TemplateCode = '') or (TemplateUrl = '') then
             exit(false);
 
         if not NpXmlTemplate.Get(TemplateCode) then begin
-            Client.Get(TemplateUrl + LowerCase(TemplateCode) + '.xml', Response);
+            OnBeforeGetTemplate(SkipDownload, DownloadHandled, TempBlob);
+            if not SkipDownload then begin
+                Client.Get(TemplateUrl + LowerCase(TemplateCode) + '.xml', Response);
+                if Response.IsSuccessStatusCode then begin
+                    Response.Content.ReadAs(InStr);
+                    DownloadHandled := true;
+                end;
+            end;
 
-            if Response.IsSuccessStatusCode then begin
-                Response.Content.ReadAs(InStr);
+            if DownloadHandled then begin
+                if TempBlob.HasValue() then
+                    TempBlob.CreateInStream(InStr);
+
                 XmlDocument.ReadFrom(InStr, Document);
                 Document.GetRoot(Element);
 
@@ -1130,6 +1142,11 @@
 
         TempNpXmlTemplateTriggerLink.DeleteAll();
         TempNpXmlTemplateTrigger.DeleteAll();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetTemplate(var SkipDownload: Boolean; var DownloadHandled: Boolean; var TempBlob: Codeunit "Temp Blob")
+    begin
     end;
 }
 

@@ -287,7 +287,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetFrontEnd(FrontEnd, true);
 
 
-        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, VoucherReferenceNo, POSLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine);
+        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, VoucherReferenceNo, POSLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine, false);
     end;
 
     procedure VoucherTopUp(POSSession: Codeunit "NPR POS Session"; VoucherNo: Text; VoucherAmount: Decimal; DiscountType: Text; DiscountAmount: Decimal)
