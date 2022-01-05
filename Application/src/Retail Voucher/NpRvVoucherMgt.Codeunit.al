@@ -726,10 +726,12 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         ArchVoucher."Send via Print" := Voucher."Send via Print";
         ArchVoucher."Send via E-mail" := Voucher."Send via E-mail";
         ArchVoucher."Send via SMS" := Voucher."Send via SMS";
-        TempBlob.CreateOutStream(OutStr);
-        Voucher."Barcode Image".ExportStream(OutStr);
-        TempBlob.CreateInStream(InStr);
-        ArchVoucher."Barcode Image".ImportStream(InStr, ArchVoucher.FieldName("Barcode Image"));
+        if Voucher."Barcode Image".HasValue() then begin
+            TempBlob.CreateOutStream(OutStr);
+            Voucher."Barcode Image".ExportStream(OutStr);
+            TempBlob.CreateInStream(InStr);
+            ArchVoucher."Barcode Image".ImportStream(InStr, ArchVoucher.FieldName("Barcode Image"));
+        end;
         ArchVoucher.Insert();
     end;
 
