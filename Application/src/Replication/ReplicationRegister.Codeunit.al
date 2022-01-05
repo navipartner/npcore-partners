@@ -802,7 +802,7 @@ codeunit 6014608 "NPR Replication Register"
 
 #if BC17
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
-           Rec.FieldNo(Image), 'picture', 0, false, true);
+           89, 'picture', 0, false, true);
 #ENDIF
     end;
 
