@@ -91,6 +91,10 @@ table 6150617 "NPR POS Payment Bin"
 
     fieldgroups
     {
+        fieldgroup(Brick; "No.", Description, "Eject Method")
+        {
+
+        }
     }
 
     trigger OnDelete()
