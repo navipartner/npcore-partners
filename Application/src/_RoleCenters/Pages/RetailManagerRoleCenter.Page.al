@@ -41,21 +41,6 @@ page 6151241 "NPR Retail Manager Role Center"
                 Visible = false;
                 ApplicationArea = NPRRetail;
             }
-            part(HelpAndChartWrapper; "Help And Chart Wrapper")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = '';
-            }
-            part(FavoriteAccounts; "My Accounts")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Favorite Accounts';
-            }
-            part(TrialBalance; "Trial Balance")
-            {
-                AccessByPermission = TableData "G/L Entry" = R;
-                ApplicationArea = Basic, Suite;
-            }
             part(PowerBI; "Power BI Report Spinner Part")
             {
                 AccessByPermission = TableData "Power BI User Configuration" = I;
