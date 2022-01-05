@@ -198,6 +198,7 @@ There are a couple of tools you will need to install locally.
 
 Git is used for version control, to track file changes:  
 https://git-scm.com/download/win
+Note: There are a lot of prompts when installing git - default settings are all fine, and there are no hidden toolbar prompts :)
 
 
 Visual Studio Code is used as the editor for making changes:  
@@ -249,7 +250,7 @@ These will also be recommended automatically by visual studio code when you clon
 The following gif shows all the steps involved in creating a new article with images and table of content update, with the full local setup from scratch:
 
 1. Setup git name and e-mail (Only needed once on fresh installations)
-2. Clone NpCore project to a folder on the local machine using vscode (Only needed once on fresh installations)
+2. Clone NpCore project to a folder on the local machine using vscode. Folder location is completely up to you. (Only needed once on fresh installations)
 3. Open the project workspace by waiting for vscode to prompt automatically about it when cloning is done.
 4. Perform "Git Pull" on the master branch (!) using vscode. This is needed at the start of every new change, just before you create a new topic branch to make sure all files are up-to-date locally on the master branch and the upcoming topic branch.
 5. Perform Git branch from the master branch into a new topic branch dedicated for the documentation changes we want to make.
