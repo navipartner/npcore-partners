@@ -760,6 +760,10 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             PromotedOnly = true;
             PromotedCategory = Process;
         }
+        modify("Cross Re&ferences")
+        {
+            Visible = not ItemReferenceVisible;
+        }
         addafter("Va&riants")
         {
             action("NPR NPR_VarietyMatrix")
