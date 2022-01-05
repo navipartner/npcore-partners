@@ -472,17 +472,6 @@ page 6151241 "NPR Retail Manager Role Center"
                             ToolTip = 'Executes the NPR Return Reason Code Statistics action';
                             ApplicationArea = NPRRetail;
                         }
-
-                        action("NPR Adjust Cost - Item Entries")
-                        {
-                            Caption = 'Adjust Cost - Item Entries';
-                            Image = Report;
-                            RunObject = report "NPR Adjust Cost: ItemEntriesTQ";
-
-                            ToolTip = 'Executes the NPR Adjust Cost - Item Entries action';
-                            ApplicationArea = NPRRetail;
-                        }
-
                         action("NPR Item Sales Statistics")
                         {
                             Caption = 'Item Sales Statistics';
