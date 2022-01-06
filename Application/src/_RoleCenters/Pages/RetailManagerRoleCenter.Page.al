@@ -490,13 +490,13 @@ page 6151241 "NPR Retail Manager Role Center"
                             ToolTip = 'Executes the NPR Item Group Overview action';
                             ApplicationArea = NPRRetail;
                         }
-                        action("NPR Vendor sales per line")
+                        action("NPR Vendor Sales per Line")
                         {
-                            Caption = 'Vendor sales per line';
+                            Caption = 'Vendor Sales per Line';
                             Image = Report;
                             RunObject = report "NPR Vendor trx by Item group";
 
-                            ToolTip = 'Executes the NPR Vendor sales per line action';
+                            ToolTip = 'Executes the NPR Vendor Sales per Line action';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales Person Trn. by Item Gr.")
