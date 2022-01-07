@@ -315,13 +315,13 @@ page 6151241 "NPR Retail Manager Role Center"
                         {
                             Caption = 'Reports and Analysis';
                             Image = AnalysisView;
-                            action("NPR Sales per week year/Last year")
+                            action("NPR Sales per Week Year/Last Year")
                             {
-                                Caption = 'Sales per week year/Last year';
+                                Caption = 'Sales per Week Year/Last Year';
                                 Image = Report2;
                                 RunObject = Report "NPR Sales per week year/Last";
 
-                                ToolTip = 'Executes the NPR Sales per week year/Last year action';
+                                ToolTip = 'Executes the NPR Sales per Week Year/Last Year action';
                                 ApplicationArea = NPRRetail;
                             }
                             action("NPR Discount Statistics")
@@ -345,13 +345,13 @@ page 6151241 "NPR Retail Manager Role Center"
                         Caption = 'Goods';
                         Image = Item;
 
-                        action("NPR Inventory by age")
+                        action("NPR Inventory by Age")
                         {
-                            Caption = 'Inventory by age';
+                            Caption = 'Inventory by Age';
                             Image = Report;
                             RunObject = report "NPR Inventory by age";
 
-                            ToolTip = 'Executes the NPR Inventory by age action';
+                            ToolTip = 'Executes the NPR Inventory by Age action';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Inv. Sales Statistics")
@@ -430,13 +430,13 @@ page 6151241 "NPR Retail Manager Role Center"
                             ToolTip = 'Executes the NPR Sales Statistics Variant action';
                             ApplicationArea = NPRRetail;
                         }
-                        action("NPR Inventory per Variant at date")
+                        action("NPR Inventory per Variant at Date")
                         {
-                            Caption = 'Inventory per Variant at date';
+                            Caption = 'Inventory per Variant at Date';
                             Image = Report;
                             RunObject = report "NPR Inventory per Variant/date";
 
-                            ToolTip = 'Executes the NPR Inventory per Variant at date action';
+                            ToolTip = 'Executes the NPR Inventory per Variant at Date action';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Item Barcode Sheet")
