@@ -97,6 +97,12 @@ table 6151522 "NPR Nc Endpoint FTP"
             Caption = 'FTP Passive';
             DataClassification = CustomerContent;
         }
+        field(161; EncMode; Enum "NPR Nc FTP Encryption mode")
+        {
+            Caption = 'FTP Encryption mode';
+            InitValue = "None";
+            DataClassification = CustomerContent;
+        }
         field(170; "File Encoding"; Option)
         {
             Caption = 'File Encoding';

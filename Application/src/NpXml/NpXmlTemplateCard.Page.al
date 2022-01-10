@@ -324,6 +324,11 @@ page 6151551 "NPR NpXml Template Card"
                         ToolTip = 'Specifies the value of the FTP Passive field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("FTP Encryption mode"; Rec."Ftp EncMode")
+                    {
+                        ToolTip = 'Specifies which mode of encryption is used between client and server';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("FTP Directory"; Rec."FTP Directory")
                     {
 

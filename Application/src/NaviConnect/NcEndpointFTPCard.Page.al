@@ -73,6 +73,11 @@ page 6151523 "NPR Nc Endpoint FTP Card"
                     ToolTip = 'Specifies the value of the FTP Passive field';
                     ApplicationArea = NPRNaviConnect;
                 }
+                field("Encryption mode"; Rec.EncMode)
+                {
+                    ToolTip = 'Specifies which mode of encryption is used between client and server';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Directory; Rec.Directory)
                 {
 

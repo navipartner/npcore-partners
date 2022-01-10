@@ -70,7 +70,7 @@
 
         //Check for Binary property (probably not needed anymore): if ImportType."Ftp Binary" then FtpWebRequest.UseBinary := true;
 
-        FTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive");
+        FTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive", ImportType."Ftp EncMode");
         FTPResponse := FTPClient.DownloadFile(SourceUri + Filename);
 
         FTPResponse.Get('StatusCode', JToken);
@@ -341,63 +341,7 @@
 
     #region "Ftp List"
     [TryFunction]
-    procedure DownloadFtpListDirectory(ImportType: Record "NPR Nc Import Type"; var DirectoryList: List of [Text])
-    var
-        FtpPort: Integer;
-        FTPResponse: JsonObject;
-        FileObject: JsonObject;
-        JToken: JsonToken;
-        JArray: JsonArray;
-        i: Integer;
-        ResponseCodeText: Text;
-    begin
-        Clear(DirectoryList);
-
-        if not ImportType."Ftp Enabled" then
-            exit;
-
-        FtpPort := ImportType."Ftp Port";
-        IF FtpPort = 0 then
-            FtpPort := 21;
-
-        //Check for Binary property (probably not needed anymore): if ImportType."Ftp Binary" then FtpWebRequest.UseBinary := true;
-
-        FTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive");
-        FTPResponse := FTPClient.ListDirectory(ManagePathSlashes(ImportType."Ftp Path"));
-
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
-
-        FTPClient.Destruct();
-
-        case ResponseCodeText of
-            '200':
-                begin
-                    FTPResponse.Get('Files', JToken);
-                    JArray := JToken.AsArray();
-
-                    for i := 0 to JArray.Count - 1 do begin
-                        JArray.Get(i, JToken);
-                        FileObject := JToken.AsObject();
-
-                        FileObject.Get('IsDirectory', JToken);
-                        if Jtoken.AsValue().AsBoolean() then begin
-                            FileObject.Get('Name', JToken);
-                            DirectoryList.Add(JToken.AsValue().AsText());
-                        end;
-                    end;
-                end;
-            '401':
-                Error(AuthorizationFailedErrorText);
-            else begin
-                    FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue().AsText());
-                end;
-        end;
-    end;
-
-    [TryFunction]
-    procedure DownloadFtpListDirectoryDetails(ImportType: Record "NPR Nc Import Type"; var ListDirectoryDetails: List of [Text])
+    local procedure DownloadFtpListDirectoryDetails(ImportType: Record "NPR Nc Import Type"; var ListDirectoryDetails: List of [Text])
     var
         FtpPort: Integer;
         FTPResponse: JsonObject;
@@ -416,7 +360,7 @@
         IF FtpPort = 0 then
             FtpPort := 21;
 
-        FTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive");
+        FTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive", ImportType."Ftp EncMode");
         FTPResponse := FTPClient.ListDirectory(ManagePathSlashes(ImportType."Ftp Path"));
 
         FTPResponse.Get('StatusCode', JToken);
