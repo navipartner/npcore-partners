@@ -6,6 +6,7 @@ page 6014495 "NPR Replication Setup Card"
     PageType = Card;
     SourceTable = "NPR Replication Service Setup";
     UsageCategory = None;
+    ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
 
     layout
     {
