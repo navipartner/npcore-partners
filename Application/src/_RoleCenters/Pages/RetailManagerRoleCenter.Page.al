@@ -46,13 +46,13 @@ page 6151241 "NPR Retail Manager Role Center"
                 AccessByPermission = TableData "Power BI User Configuration" = I;
                 ApplicationArea = Basic, Suite;
             }
-            part("MyReports"; "NPR My Reports")
-            {
-                ApplicationArea = NPRRetail;
-            }
             part(MyJobQueue; "My Job Queue")
             {
                 Caption = 'Job Queue';
+                ApplicationArea = NPRRetail;
+            }
+            part("MyReports"; "NPR My Reports")
+            {
                 ApplicationArea = NPRRetail;
             }
             part(Control21; "Report Inbox Part")
