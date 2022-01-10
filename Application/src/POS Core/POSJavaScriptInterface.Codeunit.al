@@ -14,6 +14,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         ReadingParametersFailedErr: Label 'accessing parameters for workflow %1';
         ReadingWorkflowIdErr: Label 'reading workflow ID';
         ReadingActionNameErr: Label 'reading action name';
+        ActionBlockedErr: Label 'Action %1 is blocked and cannot be invoked. Please contact system manager if you think this should be changed.';
 
         OnRunType: Option InvokeAction,BeforeWorkflow,MethodInvocation;
         OnRunInitialized: Boolean;
@@ -30,6 +31,9 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     begin
         if not OnRunInitialized then
             Error(TextErrorMustNotRunThisCodeunit);
+
+        if (OnRunType in [OnRunType::InvokeAction, OnRunType::BeforeWorkflow]) and OnRunPOSAction.Blocked then
+            Error(ActionBlockedErr, OnRunPOSAction.Code);
 
         case OnRunType of
             OnRunType::InvokeAction:

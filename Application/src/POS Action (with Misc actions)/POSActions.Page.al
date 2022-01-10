@@ -103,6 +103,26 @@ page 6150703 "NPR POS Actions"
                     RefreshActions();
                 end;
             }
+            action(ToggleBlocked)
+            {
+                Caption = 'Toggle Blocked';
+                ToolTip = 'Toggles Blocked state for the POS action. If a POS action is blocked, it will not appear on the POS.';
+                ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                Image = DefaultFault;
+
+                trigger OnAction()
+                var
+                    POSAction: Record "NPR POS Action";
+                begin
+                    CurrPage.SaveRecord();
+                    CurrPage.SetSelectionFilter(POSAction);
+                    Codeunit.Run(Codeunit::"NPR Block/Unblock POS Action", POSAction);
+                    CurrPage.Update(false);
+                end;
+            }
         }
         area(navigation)
         {

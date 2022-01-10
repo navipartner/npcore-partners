@@ -2,6 +2,7 @@ codeunit 6150702 "NPR POS UI Management"
 {
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
+        MenuButtonLbl: Label '%1 [%2, %3]', Locked = true;
 
     procedure Initialize(FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
@@ -74,8 +75,7 @@ codeunit 6150702 "NPR POS UI Management"
         MenuObj: Codeunit "NPR POS Menu";
         Menus: JsonArray;
     begin
-        if not POSViewProfile.Get(POSUnit."POS View Profile") then
-            Clear(POSViewProfile);
+        POSUnit.GetProfile(POSViewProfile);
 
         PreloadParameters(TempPOSParameterValue);
 
@@ -134,17 +134,18 @@ codeunit 6150702 "NPR POS UI Management"
     begin
         if SubMenuButton.FindSet() then
             repeat
-                InitializeMenuButtonObject(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
-                ISubMenu.AddMenuButton(MenuButtonObj);
-                if SubMenuButton."Action Type" = SubMenuButton."Action Type"::Submenu then
-                    InitializeSubmenu(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
+                if InitializeMenuButtonObject(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue) then begin
+                    ISubMenu.AddMenuButton(MenuButtonObj);
+                    if SubMenuButton."Action Type" = SubMenuButton."Action Type"::Submenu then
+                        InitializeSubmenu(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
+                end;
             until SubMenuButton.Next() = 0;
     end;
 
-    local procedure InitializeMenuButtonObject(MenuButton: Record "NPR POS Menu Button"; var MenuButtonObj: Codeunit "NPR POS Menu Button"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
+    local procedure InitializeMenuButtonObject(MenuButton: Record "NPR POS Menu Button"; var MenuButtonObj: Codeunit "NPR POS Menu Button"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary): Boolean
     var
         ActionObj: Interface "NPR IAction";
-        MenuButtonLbl: Label '%1 [%2, %3]', Locked = true;
+        ConfigErrorSeverity: Integer;
     begin
         Clear(MenuButtonObj);
         MenuButtonObj.SetCaption(MenuButton.GetLocalizedCaption(MenuButton.FieldNo(Caption)));
@@ -161,10 +162,11 @@ codeunit 6150702 "NPR POS UI Management"
 
         InitializeMenuButtonObjectFilters(MenuButton, MenuButtonObj);
 
-        if MenuButton.GetAction(ActionObj, POSSession, StrSubstNo(MenuButtonLbl, MenuButton.TableCaption, MenuButton."Menu Code", MenuButton.Caption), tmpPOSParameterValue) then
+        if MenuButton.GetAction(ActionObj, POSSession, StrSubstNo(MenuButtonLbl, MenuButton.TableCaption, MenuButton."Menu Code", MenuButton.Caption), ConfigErrorSeverity, tmpPOSParameterValue) then
             MenuButtonObj.SetAction(ActionObj);
 
         MenuButton.StoreButtonConfiguration(MenuButtonObj);
+        exit(ConfigErrorSeverity < 100);
     end;
 
     local procedure InitializeMenuButtonObjectFilters(MenuButton: Record "NPR POS Menu Button"; MenuButtonObj: Codeunit "NPR POS Menu Button")
