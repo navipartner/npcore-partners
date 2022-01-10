@@ -97,7 +97,6 @@ report 6014456 "NPR Sales per week year/Last"
                     until SalesPersonPurchaser.Next() = 0;
                 end;
 
-                SalesAllPersons := SalesAllPersons * Multiplier;
                 WeekTotal := WeekTotal + SalesAllPersons;
                 MonthTotal := MonthTotal + SalesAllPersons;
 
@@ -115,7 +114,6 @@ report 6014456 "NPR Sales per week year/Last"
                         SalesAllPersonsLastYear := SalesAllPersonsLastYear + SalesPersonPurchaser."NPR Sales (LCY)";
                     until SalesPersonPurchaser.Next() = 0;
                 end;
-                SalesAllPersonsLastYear := SalesAllPersonsLastYear * Multiplier;
 
                 WeekTotalLastYear := WeekTotalLastYear + SalesAllPersonsLastYear;
                 MonthTotalLastYear := MonthTotalLastYear + SalesAllPersonsLastYear;
@@ -229,13 +227,6 @@ report 6014456 "NPR Sales per week year/Last"
                                 DateComparison := false;
                         end;
                     }
-                    field(Multiply; Multiplier)
-                    {
-                        Caption = 'Multiply With';
-
-                        ToolTip = 'Specifies the value of the Multiply With field';
-                        ApplicationArea = NPRRetail;
-                    }
                 }
             }
         }
@@ -259,7 +250,6 @@ report 6014456 "NPR Sales per week year/Last"
         FirstRun := true;
         MonthTotal := 0;
         DateComparison := true;
-        Multiplier := 1.25;
     end;
 
     trigger OnPreReport()
@@ -308,7 +298,6 @@ report 6014456 "NPR Sales per week year/Last"
         Index: Decimal;
         MonthTotal: Decimal;
         MonthTotalLastYear: Decimal;
-        Multiplier: Decimal;
         SalesAllPersons: Decimal;
         SalesAllPersonsLastYear: Decimal;
         TotalOutput: Decimal;
