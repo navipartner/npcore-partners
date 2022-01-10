@@ -529,12 +529,12 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Executes the Sales Price Maintenance Setup action';
                     ApplicationArea = NPRRetail;
                 }
-                action("RIS Retail Inventory Sets")
+                action("Retail Inventory Sets")
                 {
-                    Caption = 'RIS Retail Inventory Sets';
+                    Caption = 'Retail Inventory Sets';
                     RunObject = Page "NPR RIS Retail Inv. Sets";
 
-                    ToolTip = 'Executes the RIS Retail Inventory Sets action';
+                    ToolTip = 'Executes the Retail Inventory Sets action';
                     ApplicationArea = NPRRetail;
                 }
                 action("Store Groups")
