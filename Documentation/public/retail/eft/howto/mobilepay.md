@@ -9,7 +9,7 @@ From the customer’s side, the payment flow when purchasing from an online stor
 
 However, to enable MobilePay, the following procedure needs to be performed in NP Retail first:
 
-1. From the Role Center search for **EFT Setup** and open it.   
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **EFT Setup** and choose the related link.         
    The **EFT Setup** window is displayed.
 2. Open the **Payment Type POS** dropdown and link the selected POS unit with EFT configurations for MobilePay.    
 3. Select the appropriate **POS Unit No.** and the **EFT Integration Type**.     

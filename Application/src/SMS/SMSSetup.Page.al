@@ -6,7 +6,7 @@ page 6014404 "NPR SMS Setup"
     PromotedActionCategories = 'New,Tasks,Reports,Display';
     RefreshOnActivate = true;
     UsageCategory = Administration;
-    ContextSensitiveHelpPage = 'product/sms/howto/smshowto.html';
+    ContextSensitiveHelpPage = 'retail/sms/howto/smshowto.html';
     DeleteAllowed = false;
     InsertAllowed = false;
     ApplicationArea = NPRRetail;

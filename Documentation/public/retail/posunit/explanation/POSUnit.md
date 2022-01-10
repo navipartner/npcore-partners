@@ -9,7 +9,7 @@ In brief, the POS units help streamline retail operations by automating the tran
 As POS units in the NP Retail solution are highly customizable, it's possible to configure each of their many aspects. To find out more, refer to one of the following links.
 
 ### Related links
- - [Create a new POS (from scratch)](../../../../public/404.md)
+ - [Create a new POS (from scratch)](../../../../public/404.md) 
  - [Create a new POS (using an old one as a reference)](../howto/createnew.md)
  - [Configure a payment terminal for a POS unit](../../../../public/404.md)
  - [Configure an opening mechanism for a POS unit cash drawer](../../../../public/404.md)
