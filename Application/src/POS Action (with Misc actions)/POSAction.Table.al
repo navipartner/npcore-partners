@@ -178,6 +178,8 @@ table 6150703 "NPR POS Action"
     end;
 
     procedure DiscoverAction("Code": Code[20]; Description: Text[250]; Version: Text[30]; Type: Integer; AllowedInstances: Option): Boolean
+    var
+        xPOSAction: Record "NPR POS Action";
     begin
         if (ActionInRefresh <> '') and (ActionInRefresh <> Code) then
             exit(false);
@@ -194,12 +196,16 @@ table 6150703 "NPR POS Action"
         if ActionUpdateRequired then
             DeleteParameters(Code);
 
+        if not xPOSAction.Get(Code) then
+            xPOSAction.Init();
+
         Init();
         Rec.Code := Code;
         Rec.Description := Description;
         Rec.Version := Version;
         Rec.Type := Type;
         Rec."Blocking UI" := true;
+        Rec.Blocked := xPOSAction.Blocked;
 
         if ActionUpdateRequired then
             OnActionDiscovered(Rec);
@@ -223,6 +229,8 @@ table 6150703 "NPR POS Action"
     end;
 
     procedure DiscoverAction20("Code": Code[20]; Description: Text[250]; Version: Text[30]): Boolean
+    var
+        xPOSAction: Record "NPR POS Action";
     begin
         if (ActionInRefresh <> '') and (ActionInRefresh <> Code) then
             exit(false);
@@ -238,12 +246,16 @@ table 6150703 "NPR POS Action"
         if ActionUpdateRequired then
             DeleteParameters(Code);
 
+        if not xPOSAction.Get(Code) then
+            xPOSAction.Init();
+
         Init();
         Rec.Code := Code;
         Rec.Description := Description;
         Rec.Version := Version;
         Rec."Workflow Engine Version" := '2.0';
         Rec."Blocking UI" := true;
+        Rec.Blocked := xPOSAction.Blocked;
 
         if ActionUpdateRequired then
             OnActionDiscovered(Rec);

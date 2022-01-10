@@ -22,9 +22,8 @@ codeunit 6150719 "NPR POS Action Management"
         end;
     end;
 
-    procedure IsValidActionConfiguration(POSSession: Codeunit "NPR POS Session"; ActionObject: Interface "NPR IAction"; Source: Text; var ErrorText: Text; RaiseEvent: Boolean) Result: Boolean
+    procedure IsValidActionConfiguration(POSSession: Codeunit "NPR POS Session"; ActionObject: Interface "NPR IAction"; Source: Text; var ErrorText: Text; var Severity: Integer; RaiseEvent: Boolean) Result: Boolean
     var
-        Severity: Integer;
         ActionMoniker: Text;
     begin
         Result := ActionObject.CheckConfiguration(POSSession, Source, ActionMoniker, ErrorText, Severity);
@@ -72,9 +71,11 @@ codeunit 6150719 "NPR POS Action Management"
         InitializeDiscoveryState(TempNewDiscoveryState);
         if TempNewDiscoveryState.FindSet() then
             repeat
-                if TempDiscoveryState.Get(TempNewDiscoveryState."Subscriber Codeunit ID", TempNewDiscoveryState."Subscriber Function")
-                  and (TempDiscoveryState."Number of Calls" <> TempNewDiscoveryState."Number of Calls") then begin
+                if TempDiscoveryState.Get(TempNewDiscoveryState."Subscriber Codeunit ID", TempNewDiscoveryState."Subscriber Function") and
+                   (TempDiscoveryState."Number of Calls" <> TempNewDiscoveryState."Number of Calls")
+                then begin
                     TempDiscoveryState."Number of Calls" := TempNewDiscoveryState."Number of Calls";
+                    TempDiscoveryState.Modify();
                     Rec."Codeunit ID" := TempNewDiscoveryState."Subscriber Codeunit ID";
                 end;
             until TempNewDiscoveryState.Next() = 0;

@@ -5,6 +5,7 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
         _state: JsonObject;
         _base: Codeunit "NPR Base Action";
         TextActionDoesNotExist: Label 'Action %1 does not exist.';
+        TextActionIsBlocked: Label 'Action %1 is blocked.', Comment = '%1 - action code';
         TextUndefinedParameter: Label '%2 specifies a value for a parameter %3, that is not defined for action %1.';
         TextParameterNotDefined: Label 'Action %1 defines parameter %3, but the value for this parameter is not specified in %2.';
         TextParameterValueInvalid: Label '%2 specifies value [%5] for parameter %3, which is not a valid %4 as required by action %1.';
@@ -40,6 +41,7 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
     procedure CheckConfiguration(POSSession: Codeunit "NPR POS Session"; Source: Text; var ActionMoniker: Text; var ErrorText: Text; var Severity: Integer): Boolean;
     var
         Parameter: Record "NPR POS Action Parameter";
+        POSAction: Record "NPR POS Action";
         Param: Text;
         Token: JsonToken;
         Value: Text;
@@ -47,22 +49,29 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
         ActionMoniker := _workflow.Name();
 
         // Action does not exist
-        if not POSSession.IsSessionAction(CopyStr(_workflow.Name(), 1, 20)) then begin
+        if not POSSession.RetrieveSessionAction(CopyStr(_workflow.Name(), 1, MaxStrLen(POSAction.Code)), POSAction) then begin
             Severity := 100;
             ErrorText := StrSubstNo(TextActionDoesNotExist, _workflow.Name());
             exit(false);
         end;
 
+        // Action is blocked
+        if POSAction.Blocked then begin
+            Severity := 100;
+            ErrorText := StrSubstNo(TextActionIsBlocked, POSAction."Code");
+            exit(false);
+        end;
+
         // Specifies an undefined parameter
         foreach Param in _base.Parameters().Keys() do begin
-            if not Parameter.Get(_workflow.Name(), Param) and not (CopyStr(Param, 1, 8) = '_option_') then begin
+            if not Parameter.Get(POSAction.Code, Param) and not (CopyStr(Param, 1, 8) = '_option_') then begin
                 Severity := 10;
                 ErrorText := StrSubstNo(TextUndefinedParameter, _workflow.Name(), Source, Param);
                 exit(false);
             end;
         end;
 
-        Parameter.SetRange("POS Action Code", _workflow.Name());
+        Parameter.SetRange("POS Action Code", POSAction.Code);
         if Parameter.FindSet() then
             repeat
                 // Parameter not specified

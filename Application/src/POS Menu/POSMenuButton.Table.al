@@ -508,12 +508,13 @@ table 6150701 "NPR POS Menu Button"
             exit(ParamMgt.RefreshParametersRequired(RecordId, "Menu Code", ID, "Action Code"));
     end;
 
-    procedure GetAction(var ActionOut: Interface "NPR IAction"; POSSession: Codeunit "NPR POS Session"; Source: Text; var POSParameterValue: Record "NPR POS Parameter Value"): Boolean
+    procedure GetAction(var ActionOut: Interface "NPR IAction"; POSSession: Codeunit "NPR POS Session"; Source: Text; var ConfigErrorSeverity: Integer; var POSParameterValue: Record "NPR POS Parameter Value"): Boolean
     var
         ActionMgt: Codeunit "NPR POS Action Management";
         ErrorText: Text;
         ActionInterface: interface "NPR IAction";
     begin
+        ConfigErrorSeverity := 0;
         if ("Action Type" = "Action Type"::SubMenu) or (not "Action Type".Ordinals().Contains("Action Type".AsInteger())) then
             exit(false);
 
@@ -525,7 +526,7 @@ table 6150701 "NPR POS Menu Button"
         StoreButtonParameters(ActionOut, POSParameterValue);
         StoreDataSource(ActionOut);
         StoreActionOtherConfiguration(ActionOut, POSSession);
-        ActionMgt.IsValidActionConfiguration(POSSession, ActionOut, Source, ErrorText, true);
+        ActionMgt.IsValidActionConfiguration(POSSession, ActionOut, Source, ErrorText, ConfigErrorSeverity, true);
 
         exit(true);
     end;
