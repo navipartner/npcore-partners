@@ -92,6 +92,12 @@ table 6151505 "NPR Nc Import Type"
             Caption = 'Ftp Passive';
             DataClassification = CustomerContent;
         }
+        field(226; "Ftp EncMode"; Enum "NPR Nc FTP Encryption mode")
+        {
+            Caption = 'Ftp Encryption mode';
+            DataClassification = CustomerContent;
+            InitValue = "None";
+        }
         field(230; "Ftp Path"; Text[250])
         {
             Caption = 'Ftp Path';

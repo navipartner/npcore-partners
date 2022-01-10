@@ -183,7 +183,7 @@
         If FtpPort = 0 then
             FtpPort := 21;
 
-        InitializeFTP(Servername, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive);
+        InitializeFTP(Servername, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive, NcEndpointFTP.EncMode);
         FTPResponse := FTPClient.UploadFile(InStr, ConnectionString);
 
         FTPResponse.Get('StatusCode', JToken);
@@ -306,7 +306,7 @@
         If FtpPort = 0 then
             FtpPort := 21;
 
-        InitializeFTP(ServerName, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive);
+        InitializeFTP(ServerName, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive, NcEndpointFTP.EncMode);
         FTPClient.UploadFile(InStr, FilePath);
     end;
 
@@ -338,7 +338,7 @@
         If FtpPort = 0 then
             FtpPort := 21;
 
-        InitializeFTP(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive);
+        InitializeFTP(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive, NcEndpointFTP.EncMode);
         TryListFtpDirectory(DirectoryList);
 
         if NcEndpointFTP.Directory = '' then
@@ -561,9 +561,9 @@
         SendFtpOutput(NcTaskOutput, NcEndpointFTP);
     end;
 
-    local procedure InitializeFTP(ServerName: Text; Username: Text; Password: Text; FtpPort: Integer; Passive: Boolean)
+    local procedure InitializeFTP(ServerName: Text; Username: Text; Password: Text; FtpPort: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode")
     begin
-        FTPClient.Construct(ServerName, Username, Password, FtpPort, 10000, Passive);
+        FTPClient.Construct(ServerName, Username, Password, FtpPort, 10000, Passive, EncMode);
     end;
 
     local procedure InitializeSFTP(ServerName: Text; Username: Text; Password: Text; FtpPort: Integer)

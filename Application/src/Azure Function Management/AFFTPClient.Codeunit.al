@@ -6,21 +6,31 @@ codeunit 6151611 "NPR AF FTP Client"
         gConvert: Codeunit "Base64 Convert";
         gAzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
         //CodeUnit Constants
-        gHttpUrlConst, gHttpUsernameConst, gHttpPasswordConst, gHttpPortConst, gHttpFilePathConst, gHttpPasiveConst : Text;
+        gHttpUrlConst, gHttpUsernameConst, gHttpPasswordConst, gHttpPortConst, gHttpFilePathConst, gHttpPasiveConst, gHttpEncmodeConst : Text;
         gHttpPathConst, gHttpFileContentConst, gHttpTimeoutMsConst, gHttpHostKey : Text;
         gErrorConst, gErrMsg_Post_Fail, gErrMsg_Parse_Fail : Text;
         gResponseMsg_StatusCode, gResponseMsg_ServerJson : Text;
         //ftpParameters
-        gHost, gUsername, gPassword : Text;
+        gHost, gUsername, gPassword, gEncmode : Text;
         gPort, gTimeoutMs : Integer;
         gPassive: Boolean;
 
-    procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean)
+    procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode")
+    var
+        EncModeText: Text;
     begin
-        CommonConstruct(Host, Username, Password, Port, TimeoutMs, Passive);
+        case EncMode of
+            EncMode::Implicit:
+                EncModeText := 'implicit';
+            EncMode::Explicit:
+                EncModeText := 'explicit';
+            else
+                EncModeText := 'none';
+        end;
+        CommonConstruct(Host, Username, Password, Port, TimeoutMs, Passive, EncModeText);
     end;
 
-    local procedure CommonConstruct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean)
+    local procedure CommonConstruct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Text)
     var
         baseurl: Text;
     begin
@@ -30,6 +40,7 @@ codeunit 6151611 "NPR AF FTP Client"
         gPort := Port;
         gTimeoutMs := TimeoutMs;
         gPassive := Passive;
+        gEncmode := EncMode;
         baseurl := gAzureKeyVault.GetSecret('FtpAzureFunctionUrl');
         FtpClient.SetBaseAddress(baseurl);
         gHttpUrlConst := 'url';
@@ -37,6 +48,7 @@ codeunit 6151611 "NPR AF FTP Client"
         gHttpPasswordConst := 'password';
         gHttpPortConst := 'port';
         gHttpPathConst := 'path';
+        gHttpEncmodeConst := 'encmode';
         gHttpFilePathConst := 'filepath';
         gHttpFileContentConst := 'filecontent';
         gHttpTimeoutMsConst := 'timeoutms';
@@ -382,7 +394,8 @@ codeunit 6151611 "NPR AF FTP Client"
             reqContent.Add(gHttpUsernameConst, gUsername) and
             reqContent.Add(gHttpPasswordConst, gPassword) and
             reqContent.Add(gHttpPortConst, gPort) and
-            reqContent.Add(gHttpPasiveConst, gPassive)
+            reqContent.Add(gHttpPasiveConst, gPassive) and
+            reqContent.Add(gHttpEncmodeConst, gEncmode)
         );
         if (gTimeoutMs <> -1)
         then begin
