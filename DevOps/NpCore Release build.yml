@@ -25,7 +25,7 @@ stages:
       containerDefinitions:
         - Auto
         - BC1804
-        - BC1900      
+        - BC1902
       analyzers: 'AppSourceCop,UICop,CodeCop'
       keyVaultCert:
         certPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
