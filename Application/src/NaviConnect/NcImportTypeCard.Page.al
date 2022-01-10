@@ -158,6 +158,11 @@ page 6151509 "NPR Nc Import Type Card"
                         ToolTip = 'Specifies the value of the Ftp Passive field';
                         ApplicationArea = NPRNaviConnect;
                     }
+                    field("FTP Encryption mode"; Rec."Ftp EncMode")
+                    {
+                        ToolTip = 'Specifies which mode of encryption is used between client and server';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("Ftp Path"; Rec."Ftp Path")
                     {
 

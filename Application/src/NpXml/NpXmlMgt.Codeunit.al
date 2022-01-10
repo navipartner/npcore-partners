@@ -709,7 +709,7 @@
         XmlDoc.WriteTo(OutStr);
         FTPTempBlob.CreateInStream(InStr);
 
-        FTPClient.Construct(NPXmlTemplate."FTP Server", NPXmlTemplate."FTP Username", NPXmlTemplate."FTP Password", NPXmlTemplate."FTP Port", 10000, NPXmlTemplate."FTP Passive");
+        FTPClient.Construct(NPXmlTemplate."FTP Server", NPXmlTemplate."FTP Username", NPXmlTemplate."FTP Password", NPXmlTemplate."FTP Port", 10000, NPXmlTemplate."FTP Passive", NPXmlTemplate."Ftp EncMode");
         FTPResponse := FTPClient.UploadFile(InStr, NPXmlTemplate."FTP Directory" + '/' + Filename);
 
         FTPResponse.Get('StatusCode', JToken);

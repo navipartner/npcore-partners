@@ -303,6 +303,12 @@ table 6151551 "NPR NpXml Template"
             Caption = 'FTP Passive';
             DataClassification = CustomerContent;
         }
+        field(5161; "Ftp EncMode"; Enum "NPR Nc FTP Encryption mode")
+        {
+            Caption = 'FTP Encryption mode';
+            DataClassification = CustomerContent;
+            InitValue = "None";
+        }
         field(5190; "Do Not Add Comment Line"; Boolean)
         {
             Caption = 'Do Not Add Comment Line';
