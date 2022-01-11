@@ -1197,7 +1197,8 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!DiscountPctTotal.Value</Value>
+                                  <Value>=IF(SUM(Fields!Salesperson_Purchaser_Sales_LCY_.Value)+SUM(Fields!Salesperson_Purchaser_Discount_Amount.Value)&lt;&gt;0,
+(SUM(Fields!Salesperson_Purchaser_Discount_Amount.Value)/(SUM(Fields!Salesperson_Purchaser_Sales_LCY_.Value)+SUM(Fields!Salesperson_Purchaser_Discount_Amount.Value)))*100,00)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <Format>=Fields!DiscountPctTotalFormat.Value</Format>
@@ -1225,6 +1226,7 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -1420,7 +1422,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!dgTotal.Value</Value>
+                                  <Value>=IF(SUM(Fields!Salesperson_Purchaser_Sales_LCY_.Value)&lt;&gt;0,(SUM(Fields!db.Value)/SUM(Fields!Salesperson_Purchaser_Sales_LCY_.Value))*100,00)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <Format>=Fields!dgTotalFormat.Value</Format>
@@ -1438,9 +1440,7 @@
                               <Style>None</Style>
                             </Border>
                             <TopBorder>
-                              <Color>Black</Color>
                               <Style>Solid</Style>
-                              <Width>1pt</Width>
                             </TopBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1499,7 +1499,7 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>5.18444cm</Height>
+        <Height>1.90361cm</Height>
         <Style />
       </Body>
       <Width>16.66382cm</Width>
