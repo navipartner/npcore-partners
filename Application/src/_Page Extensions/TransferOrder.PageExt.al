@@ -28,26 +28,6 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 end;
 
             }
-            action("NPR PriceLabel")
-            {
-                Caption = 'Price Label';
-                Image = BinContent;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
-                ToolTip = 'Executes the Price Label action';
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    LabelLibrary: Codeunit "NPR Label Library";
-                    ReportSelectionRetail: Record "NPR Report Selection Retail";
-                begin
-                    LabelLibrary.PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
-                end;
-            }
         }
         addfirst("F&unctions")
         {

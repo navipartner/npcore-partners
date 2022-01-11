@@ -67,26 +67,6 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                         LabelLibrary.ChooseLabel(Rec);
                     end;
                 }
-                action("NPR PriceLabel")
-                {
-                    Caption = 'Price Label';
-                    Image = BinContent;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-
-                    ToolTip = 'Executes the Price Label action';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnAction()
-                    var
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
-                        LabelLibrary: Codeunit "NPR Label Library";
-                    begin
-                        LabelLibrary.PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
-                    end;
-                }
             }
         }
     }
