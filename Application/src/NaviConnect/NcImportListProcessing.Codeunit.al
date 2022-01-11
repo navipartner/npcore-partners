@@ -47,11 +47,11 @@ codeunit 6151509 "NPR Nc Import List Processing"
         NcImportEntry.SetFilter("Earliest Import Datetime", '<=%1', CurrentDateTime);
         if NcImportEntry.IsEmpty then
             exit;
-        NcImportEntry.FindSet(true);
-        repeat
-            NcImportEntry2 := NcImportEntry;
-            NcSyncMgt.ProcessImportEntry(NcImportEntry2);
-        until NcImportEntry.Next() = 0;
+        if NcImportEntry.FindSet(true) then
+            repeat
+                NcImportEntry2 := NcImportEntry;
+                NcSyncMgt.ProcessImportEntry(NcImportEntry2);
+            until NcImportEntry.Next() = 0;
     end;
 
     procedure FilterImportType(ImportTypeParamValue: Text; var NcImportType: Record "NPR Nc Import Type"): Boolean
