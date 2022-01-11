@@ -43,6 +43,12 @@ pageextension 6014401 "NPR User Setup" extends "User Setup"
                 ToolTip = 'Specifies the value of the NPR Block Role Center field';
                 ApplicationArea = NPRRetail;
             }
+            field("NPR MM Allow MS Entry Edit"; Rec."NPR MM Allow MS Entry Edit")
+            {
+                ToolTip = 'Specifies the value of the Allow Membership Entry Edit field.';
+                ApplicationArea = NPRRetail;
+            }
+
         }
     }
 }

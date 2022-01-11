@@ -742,7 +742,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportGetChangeMembershipList(XmlDoc: XmlDocument; DocumentID: Text[100]; NodePath: Text)
+    local procedure ImportGetChangeMembershipList(XmlDoc: XmlDocument; DocumentID: Text[100]; NodePath: Text[250])
     var
         Request: XmlElement;
         NodeList: XmlNodeList;
