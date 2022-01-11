@@ -115,6 +115,20 @@ page 6060129 "NPR MM Members. Ledger Entries"
 
     actions
     {
+        area(Processing)
+        {
+            action(Entries)
+            {
+                Caption = 'Membership Ledger Entries';
+                ToolTip = 'Opens a list for the entries.';
+                ApplicationArea = NPRRetail;
+                Image = EditLines;
+                RunObject = Page "NPR MM Edit Membership Entries";
+                RunPageMode = Edit;
+                RunPageLink = "Membership Entry No." = field("Membership Entry No.");
+                RunPageView = sorting("Membership Entry No.") order(ascending);
+            }
+        }
     }
 
     trigger OnAfterGetRecord()

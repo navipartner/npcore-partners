@@ -25,6 +25,11 @@ tableextension 6014454 "NPR User Setup" extends "User Setup"
             TableRelation = "NPR POS Unit";
             ValidateTableRelation = false;
         }
+        field(6060150; "NPR MM Allow MS Entry Edit"; Boolean)
+        {
+            Caption = 'Allow Membership Entry Edit';
+            DataClassification = CustomerContent;
+        }
         field(6014410; "NPR Register Switch Filter"; Text[100])
         {
             Caption = 'POS Unit Switch Filter';
