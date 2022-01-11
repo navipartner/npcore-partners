@@ -119,29 +119,6 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                     LabelLibrary.ChooseLabel(Rec);
                 end;
             }
-
-            action("NPR PriceLabel")
-            {
-                Caption = 'Price Label';
-                Image = BinContent;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                ShortCutKey = 'Shift+Ctrl+L';
-
-                ToolTip = 'Executes the Price Label action';
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    ReportSelectionRetail: Record "NPR Report Selection Retail";
-                    LabelLibrary: Codeunit "NPR Label Library";
-                begin
-
-                    LabelLibrary.PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
-                end;
-            }
         }
     }
 }
