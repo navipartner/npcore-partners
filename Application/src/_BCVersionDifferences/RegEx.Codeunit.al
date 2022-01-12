@@ -182,11 +182,12 @@ codeunit 6014569 "NPR RegEx"
                     Regex.Groups(TempMatches, TempGroups);
                     TempGroups.SetRange(TempGroups.Name, 'RandomQty');
                     if TempGroups.FindFirst() then begin
-                        if Evaluate(RandomQty, TempGroups.ReadValue()) then begin
-                            for i := 1 to RandomQty do
-                                ReplaceString += Format(GenerateRandomChar());
-                            Input := Regex.Replace(Input, Pattern, ReplaceString, 1);
-                        end;
+                        RandomQty := 1;
+                        ReplaceString := '';
+                        if Evaluate(RandomQty, TempGroups.ReadValue()) then;
+                        for i := 1 to RandomQty do
+                            ReplaceString += Format(Random(9));
+                        Input := Regex.Replace(Input, Pattern, ReplaceString, 1);
                     end;
                 end;
             until TempMatches.Next() = 0;
