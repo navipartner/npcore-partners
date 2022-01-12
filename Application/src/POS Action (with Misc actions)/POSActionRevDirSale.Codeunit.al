@@ -14,7 +14,6 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         COPIED_RECEIPT: Label 'This sales is copied from %1 and new return items can''t be added to the return sales.';
         QTY_ADJUSTED: Label 'Quantity was adjusted due to previous return sales.';
         POSEntryMgt: Codeunit "NPR POS Entry Management";
-        Text00001: Label 'There already exists lines in the sales. Please delete the lines to fetch and customize the return sale.';
         ReadingErr: Label 'reading in %1';
         SettingScopeErr: Label 'setting scope in %1';
 
@@ -191,16 +190,10 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     procedure ReverseSalesTicket(var SalePOS: Record "NPR POS Sale"; SalesTicketNo: Code[20]; ReturnReasonCode: Code[20])
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        SaleLinePOS2: Record "NPR POS Sale Line";
         POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSSalesLine.SetRange("Document No.", SalesTicketNo);
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
-
-        SaleLinePOS2.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS2.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS2.FindFirst() then
-            Error(Text00001);
 
         if POSSalesLine.FindSet(false, false) then
             repeat
