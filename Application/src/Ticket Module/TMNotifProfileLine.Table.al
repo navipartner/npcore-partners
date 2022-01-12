@@ -43,8 +43,8 @@ table 6014590 "NPR TM Notif. Profile Line"
         {
             Caption = 'Notification Trigger';
             DataClassification = CustomerContent;
-            OptionMembers = RESERVATION,FIRST_ADMISSION,REVOKE;
-            OptionCaption = 'Reservation Reminder,First Admission,Revoke';
+            OptionMembers = RESERVATION,FIRST_ADMISSION,REVOKE,WELCOME;
+            OptionCaption = 'Reservation Reminder,First Admission,Revoke,Welcome';
         }
         field(32; "Detention Time Seconds"; Integer)
         {
