@@ -219,13 +219,16 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 Caption = 'Apply Payment';
                 field("Apply Payment Module"; Rec."Apply Payment Module")
                 {
-
                     ToolTip = 'Specifies the value of the Apply Payment Module field';
                     ApplicationArea = NPRRetail;
+                    trigger OnValidate()
+                    begin
+                        if Rec."Apply Payment Module" <> xRec."Apply Payment Module" then
+                            CurrPage.Update();
+                    end;
                 }
                 field("Payment Type"; Rec."Payment Type")
                 {
-
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Payment Type field';
                     ApplicationArea = NPRRetail;
