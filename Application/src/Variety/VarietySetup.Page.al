@@ -49,6 +49,11 @@ page 6059970 "NPR Variety Setup"
                     ToolTip = 'If variant is selected on sales and purchase line item description is copied into description on sales and purchase line, and variant description is copied into description 2 on sales and purchase line.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Pop up Variety Matrix"; Rec."Pop up Variety Matrix")
+                {
+                    ToolTip = 'If item with variants is selected on sales and purchase documents variety matrix will pop up.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Variant No. Series"; Rec."Variant No. Series")
                 {
 
