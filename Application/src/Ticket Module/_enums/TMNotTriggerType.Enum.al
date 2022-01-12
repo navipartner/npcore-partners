@@ -42,5 +42,9 @@ enum 6014475 "NPR TM Not. Trigger Type"
     {
         Caption = 'Capacity to Waiting List';
     }
+    value(10; WELCOME)
+    {
+        Caption = 'Welcome';
+    }
 
 }

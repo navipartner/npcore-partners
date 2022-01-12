@@ -742,6 +742,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                     TicketAccessEntry.Modify();
                 end;
 
+                NotifyParticipant.CreateAdmissionWelcomeReminder(TicketAccessEntry, Ticket."External Member Card No.");
                 NotifyParticipant.CreateAdmissionReservationReminder(TicketAccessEntry, Ticket."External Member Card No.");
 
             end;

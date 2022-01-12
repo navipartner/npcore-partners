@@ -648,6 +648,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         if (TicketAccessEntry.FindSet()) then begin
             repeat
+                CreateAdmissionWelcomeReminder(TicketAccessEntry, Ticket."External Member Card No.");
                 CreateAdmissionReservationReminder(TicketAccessEntry, Ticket."External Member Card No.");
             until (TicketAccessEntry.Next() = 0);
         end;
@@ -692,6 +693,57 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         NotificationEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         NotificationEntry.SetFilter("Admission Code", '=%1', TicketAccessEntry."Admission Code");
         NotificationEntry.SetFilter("Notification Trigger", '=%1', NotificationEntry."Notification Trigger"::REMINDER);
+        NotificationEntry.SetFilter("Ticket Trigger Type", '=%1', NotificationEntry."Ticket Trigger Type"::RESERVE);
+        NotificationEntry.SetFilter("Notification Send Status", '=%1', NotificationEntry."Notification Send Status"::PENDING);
+        NotificationEntry.ModifyAll("Notification Send Status", NotificationEntry."Notification Send Status"::CANCELED);
+
+        GetMember(MemberNumber, Member);
+
+        repeat
+            NotificationEntryNo := CreateReminderNotification(DetTicketAccessEntry, ProfileLine, Member);
+        until (ProfileLine.Next() = 0);
+    end;
+
+    procedure CreateAdmissionWelcomeReminder(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; MemberNumber: Code[20]) NotificationEntryNo: Integer
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        NotificationProfile: Record "NPR TM Notification Profile";
+        ProfileLine: Record "NPR TM Notif. Profile Line";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+        Member: Record "NPR MM Member";
+    begin
+        if (not Ticket.Get(TicketAccessEntry."Ticket No.")) then
+            exit(0);
+
+        if (not TicketBOM.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code")) then
+            exit(0);
+
+        if (TicketBOM."Notification Profile Code" = '') then
+            exit(0);
+
+        if (not NotificationProfile.Get(TicketBOM."Notification Profile Code")) then
+            exit(0);
+
+        if (NotificationProfile.Blocked) then
+            exit(0);
+
+        ProfileLine.SetFilter("Profile Code", '=%1', TicketBOM."Notification Profile Code");
+        ProfileLine.SetFilter("Notification Trigger", '=%1', ProfileLine."Notification Trigger"::WELCOME);
+        ProfileLine.SetFilter(Blocked, '=%1', false);
+        if (not ProfileLine.FindSet()) then
+            exit(0);
+
+        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+        if (not DetTicketAccessEntry.FindFirst()) then
+            exit(0);
+
+        NotificationEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        NotificationEntry.SetFilter("Admission Code", '=%1', TicketAccessEntry."Admission Code");
+        NotificationEntry.SetFilter("Notification Trigger", '=%1', NotificationEntry."Notification Trigger"::REMINDER);
+        NotificationEntry.SetFilter("Ticket Trigger Type", '=%1', NotificationEntry."Ticket Trigger Type"::WELCOME);
         NotificationEntry.SetFilter("Notification Send Status", '=%1', NotificationEntry."Notification Send Status"::PENDING);
         NotificationEntry.ModifyAll("Notification Send Status", NotificationEntry."Notification Send Status"::CANCELED);
 
@@ -821,6 +873,22 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         if (NotificationEntry."Notification Address" = '') then
             exit(0);
 
+        if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::WELCOME) then begin
+            NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::WELCOME;
+            // Schedule based on today
+            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::DAYS) then begin
+                NotificationEntry."Date To Notify" := CalcDate(StrSubstNo('<%1D>', ABS(TicketNotProfileLine.Units)));
+                NotificationEntry."Time To Notify" := Time();
+            end;
+
+            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::HOURS) then begin
+                CalcReminderTime := CurrentDateTime();
+                CalcReminderTime += ABS(TicketNotProfileLine.Units) * 3600 * 1000;
+                NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
+                NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
+            end;
+        end;
+
         if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::RESERVATION) then begin
             NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::RESERVE;
             // Schedule ahead of admission start
@@ -883,14 +951,19 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
         NotificationEntry."Ticket Type Code" := Ticket."Ticket Type Code";
         NotificationEntry."Ticket No." := Ticket."No.";
+        NotificationEntry."Ticket Item No." := Ticket."Item No.";
+        NotificationEntry."Ticket Variant Code" := Ticket."Variant Code";
         NotificationEntry."External Ticket No." := Ticket."External Ticket No.";
         NotificationEntry."Ticket No. for Printing" := Ticket."External Ticket No.";
         NotificationEntry."Admission Code" := Admission."Admission Code";
         NotificationEntry."Adm. Event Description" := Admission.Description;
-        NotificationEntry."Quantity To Admit" := TicketReservationRequest.Quantity;
+        NotificationEntry."Adm. Location Description" := Admission.Description;
 
+        NotificationEntry."Quantity To Admit" := TicketReservationRequest.Quantity;
         NotificationEntry."Ticket Holder E-Mail" := TicketReservationRequest."Notification Address";
         NotificationEntry."External Order No." := TicketReservationRequest."External Order No.";
+        NotificationEntry."Ticket Token" := TicketReservationRequest."Session Token ID";
+        NotificationEntry."Authorization Code" := TicketReservationRequest."Authorization Code";
 
         NotificationEntry."Relevant Date" := AdmSchEntry."Admission Start Date";
         NotificationEntry."Relevant Time" := AdmSchEntry."Admission Start Time";
