@@ -102,13 +102,13 @@ codeunit 6059974 "NPR Variety Check"
         VRTSetup: Record "NPR Variety Setup";
         ItemVar: Record "Item Variant";
     begin
+        if ItemJnlLine."Phys. Inventory" or
+           ItemJnlLine.Adjustment or
+           (ItemJnlLine."Item Charge No." <> '')
+        then
+            exit;
+
         if not VRTSetup.Get() then
-            exit;
-
-        if ItemJnlLine."Phys. Inventory" then
-            exit;
-
-        if ItemJnlLine."Item Charge No." <> '' then
             exit;
 
         case VRTSetup."Item Journal Blocking" of
