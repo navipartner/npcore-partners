@@ -180,6 +180,11 @@ table 6059970 "NPR Variety Setup"
             Caption = 'Custom Descriptions';
             DataClassification = CustomerContent;
         }
+        field(90; "Pop up Variety Matrix"; Boolean)
+        {
+            Caption = 'Pop up Variety Matrix';
+            DataClassification = CustomerContent;
+        }
         field(750; "Variant No. Series"; Code[20])
         {
             Caption = 'Variant Std. No. Serie';
