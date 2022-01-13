@@ -578,6 +578,9 @@ table 6151198 "NPR NpCs Document"
         key(Key5; "Delivery expires at")
         {
         }
+        key(Key6; "Delivery Document Type", "Delivery Document No.")
+        {
+        }
     }
 
     trigger OnDelete()
