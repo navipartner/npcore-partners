@@ -784,7 +784,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
     end;
 
-    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var AdmittedCount: Integer; var ReasonCode: Integer; var ReasonText: Text): Boolean
+    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var AdmittedCount: Integer; var ReasonCode: Integer; var ReasonText: Text) MemberArrivalOk: Boolean
     var
         MemberCard: Record "NPR MM Member Card";
         AttemptArrival: Codeunit "NPR MM Attempt Member Arrival";
@@ -813,14 +813,14 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         // Batch register arrival creating tickets.
         Commit();
         AttemptArrival.AttemptMemberArrival(MemberInfoCapture, '', '<auto>');
-        if (not AttemptArrival.Run()) then begin
-            ReasonCode := AttemptArrival.GetAttemptMemberArrivalResponse(ReasonText);
-            MemberLimitationMgr.UpdateLogEntry(LogEntryNo, ReasonCode, ReasonText); // TODO: Add LogEntryNo to InfoCapture and update all entries ... 
-            exit(false);
-        end;
+        MemberArrivalOk := AttemptArrival.Run();
+
+        // Log arrival message. 
+        ReasonCode := AttemptArrival.GetAttemptMemberArrivalResponse(ReasonText);
+        MemberLimitationMgr.UpdateLogEntry(LogEntryNo, ReasonCode, ReasonText); // TODO: Add LogEntryNo to InfoCapture and update all entries ... 
 
         AdmittedCount += MemberInfoCapture.Count();
-        exit(true);
+        exit(MemberArrivalOk);
 
     end;
 

@@ -33,6 +33,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         TICKET_CALENDAR: Label 'Ticket calendar defined for %1 %2 %3 states that ticket is not valid for %4.';
         RESERVATION_NOT_FOR_NOW: Label 'The ticket reservation for %4 allows admission from %1 until %2 on %3.\\Current time is: %5';
         RESCHEDULE_NOT_ALLOWED: Label 'The ticket reschedule policy for %1 and %2, prevents changes at this time.';
+        INVALID_ADMISSION_CODE: Label 'Ticket %1 does not contain entry for admission code %2.';
         NO_DEFAULT_ADMISSION_SELECTED: Label 'When ticket is scanned and no admission code is specified, system attempts to find a default admission. With current setup, a default admission could not be found for item %1.';
         INVALID_REFERENCE_NO: Label '-1001';
         RESERVATION_NOT_FOUND_NO: Label '-1002';
@@ -57,6 +58,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         RESERVATION_NOT_FOR_NOW_NO: Label '-1028';
         CONCURRENT_CAPACITY_EXCEEDED_NO: Label '-1030';
         RESCHEDULE_NOT_ALLOWED_NO: Label '-1031';
+        INVALID_ADMISSION_CODE_NO: Label '-1032';
         INVOICE_TEXT2: Label 'Admission on %1 {%2,...}';
         POSTPAID_RESULT: Label 'Number of postpaid tickets: %1\\Number of invoices: %2\\Invoices created: %3';
         gAccessEntryPaymentType: Option PAYMENT,PREPAID,POSTPAID;
@@ -311,7 +313,7 @@ codeunit 6059784 "NPR TM Ticket Management"
             RaiseError(StrSubstNo(INVALID_REFERENCE, Admission.FieldName("Admission Code"), AdmissionCode), INVALID_REFERENCE_NO);
 
         if (not (TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code"))) then
-            RaiseError(StrSubstNo(INVALID_REFERENCE, TicketBOM.TableCaption, ''), INVALID_REFERENCE_NO);
+            RaiseError(StrSubstNo(INVALID_ADMISSION_CODE, Ticket."External Ticket No.", AdmissionCode), INVALID_ADMISSION_CODE_NO);
 
         ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo);
         ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo);
