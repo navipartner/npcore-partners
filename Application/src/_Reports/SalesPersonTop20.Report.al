@@ -49,6 +49,10 @@ report 6014406 "NPR Sales Person Top 20"
                         end;
                     ShowType::"Contribution Margin":
                         TempSalesPerson."Amount (LCY)" := Multipl * Db;
+
+                    ShowType::"Contribution Ratio":
+                        TempSalesPerson."Amount (LCY)" := Multipl * Dg;
+
                 end;
 
                 TempSalesPerson.Insert();
@@ -66,12 +70,10 @@ report 6014406 "NPR Sales Person Top 20"
                     SalesPct := (("Salesperson/Purchaser"."NPR Sales (LCY)") / SalesTotal) * 100;
 
                 if "Salesperson/Purchaser"."NPR Sales (LCY)" <> 0 then
-                    DgTotal := (Db / "Salesperson/Purchaser"."NPR Sales (LCY)") * 100;
+                    DgTotal += (Db / "Salesperson/Purchaser"."NPR Sales (LCY)") * 100;
 
                 if "Salesperson/Purchaser"."NPR Discount Amount" <> 0 then
-                    DiscountPctTotal := "Salesperson/Purchaser"."NPR Discount Amount" / ("Salesperson/Purchaser"."NPR Sales (LCY)" + "Salesperson/Purchaser"."NPR Discount Amount") * 100
-                else
-                    DiscountPctTotal := 0;
+                    DiscountPctTotal += "Salesperson/Purchaser"."NPR Discount Amount" / ("Salesperson/Purchaser"."NPR Sales (LCY)" + "Salesperson/Purchaser"."NPR Discount Amount") * 100;
             end;
 
             trigger OnPreDataItem()
