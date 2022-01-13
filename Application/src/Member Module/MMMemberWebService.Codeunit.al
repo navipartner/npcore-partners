@@ -1216,8 +1216,8 @@ codeunit 6060128 "NPR MM Member WebService"
             exit(0);
 
         AttemptArrival.AttemptMemberArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, ScannerStationId, Member, MembershipEntryNo);
-        if AttemptArrival.run() then
-            ResponseCode := AttemptArrival.GetAttemptMemberArrivalResponse(ResponseMessage);
+        if (AttemptArrival.Run()) then;
+        ResponseCode := AttemptArrival.GetAttemptMemberArrivalResponse(ResponseMessage);
 
         MemberLimitationMgr.UpdateLogEntry(LimitLogEntry, ResponseCode, ResponseMessage);
 
