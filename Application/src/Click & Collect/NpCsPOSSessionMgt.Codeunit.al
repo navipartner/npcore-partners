@@ -76,6 +76,7 @@ codeunit 6151205 "NPR NpCs POSSession Mgt."
         if POSSalesWorkflowStep."Subscriber Function" <> 'DeliverCollectDocument' then
             exit;
 
+        NpCsDocument.SetCurrentKey("Delivery Document Type", "Delivery Document No.");
         NpCsDocument.SetRange("Delivery Document Type", NpCsDocument."Delivery Document Type"::"POS Entry");
         NpCsDocument.SetRange("Delivery Document No.", SalePOS."Sales Ticket No.");
         if NpCsDocument.IsEmpty then
