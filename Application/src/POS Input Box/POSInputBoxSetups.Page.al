@@ -17,19 +17,19 @@ page 6060096 "NPR POS Input Box Setups"
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the Box Sales Setup unique Code';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the Box Sales Setup Description';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS View"; Rec."POS View")
                 {
 
-                    ToolTip = 'Specifies the value of the POS View field';
+                    ToolTip = 'Specifies the Box Sales Setup POS View Type';
                     ApplicationArea = NPRRetail;
                 }
             }
