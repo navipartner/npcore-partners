@@ -84,8 +84,8 @@ page 6151413 "NPR Magento Item Pict. List"
         case MagentoSetup."Picture Variety Type" of
             MagentoSetup."Picture Variety Type"::Fixed:
                 begin
-                    CurrPage.MagentoPictureLinkSubform2.PAGE.SetVariantValueCode(Rec."Item No.");
-                    CurrPage.MagentoPictureDragDropAddin2.PAGE.SetVariantValueCode(Rec."Item No.");
+                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVariantValueCode(Rec."Item No.");
+                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVariantValueCode(Rec."Item No.");
                 end;
             MagentoSetup."Picture Variety Type"::"Select on Item":
                 begin
