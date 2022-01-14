@@ -78,12 +78,13 @@ codeunit 6014569 "NPR RegEx"
                     TempGroups.DeleteAll();
                     Regex.Groups(TempMatches, TempGroups);
                     TempGroups.SetRange(TempGroups.Name, 'RandomQty');
+                    ReplaceString := '';
+                    RandomQty := 1;
                     if TempGroups.FindFirst() then begin
-                        if Evaluate(RandomQty, TempGroups.ReadValue()) then begin
-                            for i := 1 to RandomQty do
-                                ReplaceString += Format(GenerateRandomChar());
-                            Input := Regex.Replace(Input, Pattern, ReplaceString, 1);
-                        end;
+                        if Evaluate(RandomQty, TempGroups.ReadValue()) then;
+                        for i := 1 to RandomQty do
+                            ReplaceString += Format(GenerateRandomChar());
+                        Input := Regex.Replace(Input, Pattern, ReplaceString, 1);
                     end;
                 end;
             until TempMatches.Next() = 0;
