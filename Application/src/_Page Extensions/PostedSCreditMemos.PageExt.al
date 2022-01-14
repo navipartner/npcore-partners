@@ -14,31 +14,4 @@ pageextension 6014417 "NPR Posted S.Credit Memos" extends "Posted Sales Credit M
             }
         }
     }
-
-    actions
-    {
-        addafter("&Credit Memo")
-        {
-            group("NPR Doc. Exch. Framework")
-            {
-                Caption = 'Doc. Exch. Framework';
-                action("NPR Export")
-                {
-                    Caption = 'Export';
-                    Image = ExportFile;
-
-                    ToolTip = 'Executes the Export action';
-                    ApplicationArea = NPRRetail;
-                }
-                action("NPR UpdateStatus")
-                {
-                    Caption = 'Update Status';
-                    Image = ChangeStatus;
-
-                    ToolTip = 'Executes the Update Status action';
-                    ApplicationArea = NPRRetail;
-                }
-            }
-        }
-    }
 }
