@@ -1,37 +1,25 @@
 codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
 {
     var
-        HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
-        ResponseTempBlob: Codeunit "Temp Blob";
-        BodyJObject: JsonObject;
-        ResponseInStream: InStream;
-        InvalidNpXmlDataErr: Label '%1 %2 must return a list of %3, %4 sets.', Comment = '%1 = Xml Template Table Caption, %2 = Xml Template Code, %3 = name, %4 = content';
-        GeneratePreviewTxt: Label 'Generate Preview';
         ConnectionSuccessMsg: Label 'The connection test was successful. The settings are valid.';
+        GeneratePreviewTxt: Label 'Generate Preview';
+        InvalidNpXmlDataErr: Label '%1 %2 must return a list of %3, %4 sets.', Comment = '%1 = Xml Template Table Caption, %2 = Xml Template Code, %3 = name, %4 = content';
 
     procedure TestConnection()
     begin
-        Initialize(GetFullURL('/users/ping2.json'), 'POST');
-
-        if not ExecuteWebServiceRequest() then
-            Error(GetLastErrorText);
-
+        ExecuteWebServiceRequest('/users/ping2.json');
         Message(ConnectionSuccessMsg);
     end;
 
     procedure GetSmartEmailList(var TransactionalJSONResult: Record "NPR Trx JSON Result" temporary)
     var
-        JArray: JsonArray;
         JObject: JsonObject;
+        JArray: JsonArray;
         JToken: JsonToken;
         i: Integer;
     begin
-        Initialize(GetFullURL('/templates/list.json'), 'POST');
-        if not ExecuteWebServiceRequest() then
-            Error(GetLastErrorText);
-
         i := 0;
-        JToken.ReadFrom(GetWebResonseText());
+        JToken.ReadFrom(ExecuteWebServiceRequest('/templates/list.json'));
         JArray := JToken.AsArray();
         foreach JToken in JArray do begin
             JObject := JToken.AsObject();
@@ -52,18 +40,16 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
     var
         SmartEmailVariable: Record "NPR Smart Email Variable";
         TempVariable: Record "NPR Smart Email Variable" temporary;
-        JObject: JsonObject;
-        I: Integer;
-        CodeString: Text;
         NpRegex: Codeunit "NPR RegEx";
+        Body: JsonObject;
+        JObject: JsonObject;
+        NewLineNo: Integer;
+        CodeString: Text;
     begin
-        Initialize(GetFullURL('/templates/info.json'), 'POST');
-        BodyJObject.Add('name', SmartEmail."Smart Email ID");
+        Body := InitializeBody();
+        Body.Add('name', SmartEmail."Smart Email ID");
 
-        if not ExecuteWebServiceRequest() then
-            Error(GetLastErrorText);
-
-        JObject.ReadFrom(GetWebResonseText());
+        JObject.ReadFrom(ExecuteWebServiceRequest('/templates/info.json', Body));
 
         SmartEmail."Smart Email Name" := CopyStr(GetString(JObject, 'name'), 1, MaxStrLen(SmartEmail."Smart Email Name"));
         SmartEmail.From := CopyStr(GetString(JObject, 'from_name'), 1, MaxStrLen(SmartEmail.From));
@@ -84,14 +70,14 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
                 else
                     SmartEmailVariable.Delete();
             until SmartEmailVariable.Next() = 0;
-        I := SmartEmailVariable."Line No." + 10000;
+        NewLineNo := SmartEmailVariable."Line No." + 10000;
         TempVariable.Reset();
         if TempVariable.FindSet() then
             repeat
                 SmartEmailVariable := TempVariable;
                 SmartEmailVariable."Transactional Email Code" := SmartEmail.Code;
-                SmartEmailVariable."Line No." := I;
-                I += 10000;
+                SmartEmailVariable."Line No." := NewLineNo;
+                NewLineNo += 10000;
                 SmartEmailVariable."Merge Table ID" := SmartEmail."Merge Table ID";
                 SmartEmailVariable.Insert();
             until TempVariable.Next() = 0;
@@ -103,24 +89,21 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         JObject: JsonObject;
     begin
         ClearLastError();
-        if TryGetMessageDetails(EmailLog, JObject) then begin
+        if DownloadMessageDetails(EmailLog, JObject) then begin
             SaveMessageDetails(EmailLog, JObject);
             Commit();
         end;
     end;
 
-    [TryFunction]
-    local procedure TryGetMessageDetails(EmailLog: Record "NPR Trx Email Log"; var JObject: JsonObject)
+    local procedure DownloadMessageDetails(EmailLog: Record "NPR Trx Email Log"; var JObject: JsonObject): Boolean
     var
+        Body: JsonObject;
         MessageId: Text;
     begin
-        Initialize(GetFullURL('/messages/info.json'), 'POST');
+        Body := InitializeBody();
         MessageId := DelChr(EmailLog."Message ID", '<=>', '{-}');
-        BodyJObject.Add('id', MessageId);
-        if not ExecuteWebServiceRequest() then
-            Error(GetLastErrorText);
-
-        JObject.ReadFrom(GetWebResonseText());
+        Body.Add('id', MessageId);
+        exit(JObject.ReadFrom(ExecuteWebServiceRequest('/messages/info.json', Body)));
     end;
 
     local procedure SaveMessageDetails(EmailLog: Record "NPR Trx Email Log"; var JObject: JsonObject)
@@ -146,15 +129,17 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
     procedure SendSmartEmailWAttachment(SmartEmail: Record "NPR Smart Email"; Recipient: Text; Cc: Text; Bcc: Text; RecRef: RecordRef; var Attachment: Record "NPR E-mail Attachment"; Silent: Boolean) ErrorMessage: Text
     var
         EmailLog: Record "NPR Trx Email Log";
-        JArray: JsonArray;
+        Body: JsonObject;
         JObject: JsonObject;
         MessageJObject: JsonObject;
+        JArray: JsonArray;
         JToken: JsonToken;
     begin
         SmartEmail.TestField("Smart Email ID");
-        Initialize(GetFullURL('/messages/send-template.json'), 'POST');
-        BodyJObject.Add('template_name', SmartEmail."Smart Email ID");
-        BodyJObject.Add('template_content', '');
+        Body := InitializeBody();
+
+        Body.Add('template_name', SmartEmail."Smart Email ID");
+        Body.Add('template_content', '');
 
         AddRecepient(JArray, Recipient, 'to');
         AddRecepient(JArray, Cc, 'cc');
@@ -165,19 +150,13 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
             MessageJObject.Add('merge_language', Format(SmartEmail."Merge Language (Mailchimp)"));
         MessageJObject.Add('track_opens', true);
         MessageJObject.Add('track_clicks', true);
+        MessageJObject.Add('global_merge_vars', GetVariablesAsArray(SmartEmail, RecRef));
+        MessageJObject.Add('attachments', GetAttachmentsAsArray(Attachment));
 
-        AddVariablesToJArray(JArray, SmartEmail, RecRef);
-        MessageJObject.Add('global_merge_vars', JArray);
+        Body.Add('message', MessageJObject);
 
-        AddAttachmentsToJArray(JArray, Attachment);
-        MessageJObject.Add('attachments', JArray);
+        JToken.ReadFrom(ExecuteWebServiceRequest('/messages/send-template.json', Body));
 
-        BodyJObject.Add('message', MessageJObject);
-
-        if not ExecuteWebServiceRequest() then
-            Error(GetLastErrorText);
-
-        JToken.ReadFrom(GetWebResonseText());
         JArray := JToken.AsArray();
         foreach JToken in JArray do begin
             JObject := JToken.AsObject();
@@ -198,12 +177,14 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
     procedure SendClassicMail(Recipient: Text; Cc: Text; Bcc: Text; Subject: Text; BodyHtml: Text; BodyText: Text; FromEmail: Text; FromName: Text; ReplyTo: Text; TrackOpen: Boolean; TrackClick: Boolean; Tags: Text; AddRecipientsToListID: Text; var Attachment: Record "NPR E-mail Attachment"; Silent: Boolean): Text
     var
         EmailLog: Record "NPR Trx Email Log";
-        JArray: JsonArray;
+        Body: JsonObject;
         JObject: JsonObject;
         MessageJObject: JsonObject;
+        JArray: JsonArray;
         JToken: JsonToken;
     begin
-        Initialize(GetFullURL('/messages/send.json'), 'POST');
+        Body := InitializeBody();
+
         MessageJObject.Add('from_email', FromEmail);
         MessageJObject.Add('from_name', FromName);
         MessageJObject.Add('subject', Subject);
@@ -225,14 +206,12 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         MessageJObject.Add('track_opens', TrackOpen);
         MessageJObject.Add('track_clicks', TrackClick);
 
-        AddAttachmentsToJArray(JArray, Attachment);
+        JArray := GetAttachmentsAsArray(Attachment);
         MessageJObject.Add('attachments', JArray);
 
-        BodyJObject.Add('message', MessageJObject);
-        if not ExecuteWebServiceRequest() then
-            Error(GetLastErrorText);
+        Body.Add('message', MessageJObject);
 
-        JToken.ReadFrom(GetWebResonseText());
+        JToken.ReadFrom(ExecuteWebServiceRequest('/messages/send.json', Body));
         JArray := JToken.AsArray();
         foreach JToken in JArray do begin
             JObject := JToken.AsObject();
@@ -254,70 +233,78 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
-        RecRef: RecordRef;
-        JArray: JsonArray;
+        Body: JsonObject;
         JObject: JsonObject;
+        JArray: JsonArray;
+        RecRef: RecordRef;
         OutStr: OutStream;
     begin
-        Initialize(GetFullURL('/templates/render.json'), 'POST');
-        BodyJObject.Add('template_name', SmartEmail."Smart Email ID");
-        BodyJObject.Add('template_content', '');
+        Body := InitializeBody();
+        Body.Add('template_name', SmartEmail."Smart Email ID");
+        Body.Add('template_content', '');
 
         if SmartEmail."Merge Language (Mailchimp)" <> 0 then
-            BodyJObject.Add('merge_language', Format(SmartEmail."Merge Language (Mailchimp)"));
-
+            Body.Add('merge_language', Format(SmartEmail."Merge Language (Mailchimp)"));
         if SmartEmail."Merge Table ID" <> 0 then begin
             RecRef.Open(SmartEmail."Merge Table ID");
             RecRef.FindFirst();
         end;
 
-        AddVariablesToJArray(JArray, SmartEmail, RecRef);
-        BodyJObject.Add('merge_vars', JArray);
+        JArray := GetVariablesAsArray(SmartEmail, RecRef);
+        Body.Add('merge_vars', JArray);
 
-        if not ExecuteWebServiceRequest() then
-            Error(GetLastErrorText);
+        JObject.ReadFrom(ExecuteWebServiceRequest('/templates/render.json', Body));
 
-        JObject.ReadFrom(GetWebResonseText());
         TempBlob.CreateOutStream(OutStr);
         OutStr.WriteText(GetString(JObject, 'html'));
         FileManagement.BLOBExport(TempBlob, SmartEmail."Smart Email Name" + '.html', true);
     end;
 
-    local procedure Initialize(URL: Text; Method: Text[6])
+    local procedure InitializeContent(var Content: HttpContent)
+    var
+        Headers: HttpHeaders;
+    begin
+        Content.GetHeaders(Headers);
+
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', 'application/json');
+    end;
+
+    local procedure InitializeBody(): JsonObject
     var
         TransactionalEmailSetup: Record "NPR Trx Email Setup";
+        Body: JsonObject;
     begin
         TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::Mailchimp);
         TransactionalEmailSetup.TestField("API Key");
-
-        Clear(HttpWebRequestMgt);
-        HttpWebRequestMgt.Initialize(URL);
-        HttpWebRequestMgt.SetMethod(Method);
-        HttpWebRequestMgt.SetContentType('application/json');
-        HttpWebRequestMgt.SetReturnType('application/json');
-        BodyJObject.Add('key', TransactionalEmailSetup."API Key");
+        Body.Add('key', TransactionalEmailSetup."API Key");
+        exit(Body);
     end;
 
-    [TryFunction]
-    local procedure ExecuteWebServiceRequest()
-    var
-        TempBlob: Codeunit "Temp Blob";
-        OStream: OutStream;
+    local procedure ExecuteWebServiceRequest(Path: Text) ResponseText: Text
     begin
-        If BodyJObject.Keys.Count() <> 0 then begin
-            TempBlob.CreateOutStream(OStream);
-            BodyJObject.WriteTo(OStream);
-            HttpWebRequestMgt.AddBodyBlob(TempBlob);
-        end;
+        ResponseText := ExecuteWebServiceRequest(Path, InitializeBody());
+    end;
 
-        Clear(ResponseTempBlob);
-        ResponseTempBlob.CreateInStream(ResponseInStream);
+    local procedure ExecuteWebServiceRequest(Path: Text; Body: JsonObject) ResponseText: Text
+    var
+        Client: HttpClient;
+        Content: HttpContent;
+        ResponseMessage: HttpResponseMessage;
+        ContentText: Text;
+    begin
+        InitializeContent(Content);
+        Body.WriteTo(ContentText);
+        Content.WriteFrom(ContentText);
 
-        if not GuiAllowed then
-            HttpWebRequestMgt.DisableUI();
+        if not Client.Post(GetFullURL(Path), Content, ResponseMessage) then
+            Error(GetLastErrorText());
+        ResponseMessage.Content().ReadAs(ResponseText);
+        if not ResponseMessage.IsSuccessStatusCode() then
+            Error(ResponseText);
 
-        if not HttpWebRequestMgt.GetResponseStream(ResponseInStream) then
-            HttpWebRequestMgt.ProcessFaultXMLResponse('', '', '', '');
+        exit(ResponseText);
     end;
 
     local procedure GetFullURL(PartialURL: Text): Text
@@ -329,18 +316,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         exit(TransactionalEmailSetup."API URL" + PartialURL);
     end;
 
-    local procedure GetWebResonseText() ResponseText: Text
-    var
-        PartText: Text;
-    begin
-        ResponseText := '';
-        while not ResponseInStream.EOS do begin
-            ResponseInStream.ReadText(PartText);
-            ResponseText += PartText;
-        end;
-    end;
-
-    local procedure AddVariablesToJArray(var JArray: JsonArray; SmartEmail: Record "NPR Smart Email"; RecRef: RecordRef)
+    local procedure GetVariablesAsArray(SmartEmail: Record "NPR Smart Email"; RecRef: RecordRef): JsonArray
     var
         NpXmlTemplate: Record "NPR NpXml Template";
         SmartEmailVariable: Record "NPR Smart Email Variable";
@@ -348,14 +324,15 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
         NpXmlValueMgt: Codeunit "NPR NpXml Value Mgt.";
         JObject: JsonObject;
+        JArray: JsonArray;
         JToken: JsonToken;
-        XmlDoc: XmlDocument;
         Element: XmlElement;
-        XmlDocNode: XmlNode;
+        XmlDoc: XmlDocument;
+        ArrayName: Text;
         FirstChildNode: XmlNode;
         LastChildNode: XmlNode;
         NodeList: XmlNodeList;
-        ArrayName: Text;
+        XmlDocNode: XmlNode;
     begin
         if (SmartEmail."NpXml Template Code" <> '') and NpXmlTemplate.Get(SmartEmail."NpXml Template Code") then begin
             RecRef.SetRecFilter();
@@ -371,9 +348,9 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
             NodeList.Get(1, FirstChildNode);
             ArrayName := FirstChildNode.AsXmlElement().Name;
             //get last child
-            NodeList.Get(NodeList.Count, LastChildNode);
+            NodeList.Get(NodeList.Count(), LastChildNode);
             if ArrayName <> LastChildNode.AsXmlElement().Name then
-                Error(InvalidNpXmlDataErr, NpXmlTemplate.TableCaption, NpXmlTemplate.Code, 'name', 'content');
+                Error(InvalidNpXmlDataErr, NpXmlTemplate.TableCaption(), NpXmlTemplate.Code, 'name', 'content');
             JObject.SelectToken(ArrayName, JToken);
             if JToken.IsArray then
                 JArray := JToken.AsArray()
@@ -381,14 +358,16 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
                 JArray.Add(JToken);
         end else begin
             SmartEmailVariable.SetRange("Transactional Email Code", SmartEmail.Code);
-            WriteVariables(JArray, SmartEmailVariable, RecRef);
+            JArray := WriteVariables(SmartEmailVariable, RecRef);
         end;
+        exit(JArray);
     end;
 
-    local procedure WriteVariables(var JArray: JsonArray; var SmartEmailVariable: Record "NPR Smart Email Variable"; RecRef: RecordRef)
+    local procedure WriteVariables(var SmartEmailVariable: Record "NPR Smart Email Variable"; RecRef: RecordRef): JsonArray
     var
-        FldRef: FieldRef;
         JObject: JsonObject;
+        JArray: JsonArray;
+        FldRef: FieldRef;
     begin
         if SmartEmailVariable.FindSet() then
             repeat
@@ -399,7 +378,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
                 end else begin
                     JObject.Add('name', SmartEmailVariable."Variable Name");
                     if (RecRef.Number <> 0) and (SmartEmailVariable."Field No." <> 0) then begin
-                        FldRef := RecRef.Field(SmartEmailVariable."Field No.");
+                        FldRef := RecRef.field(SmartEmailVariable."Field No.");
                         if Format(FldRef.Class) = 'FlowField' then
                             FldRef.CalcField();
                         JObject.Add('content', Format(FldRef.Value));
@@ -408,6 +387,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
                 end;
                 JArray.Add(JObject.Clone());
             until SmartEmailVariable.Next() = 0;
+        exit(JArray);
     end;
 
     local procedure AddRecepient(var JArray: JsonArray; Recipients: Text; Type: Text)
@@ -461,10 +441,11 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         MessageJObject.Add('tags', JArray);
     end;
 
-    local procedure AddAttachmentsToJArray(var JArray: JsonArray; var Attachment: Record "NPR E-mail Attachment")
+    local procedure GetAttachmentsAsArray(var Attachment: Record "NPR E-mail Attachment"): JsonArray;
     var
         Convert: Codeunit "Base64 Convert";
         JObject: JsonObject;
+        JArray: JsonArray;
         IStream: InStream;
     begin
         if Attachment.IsEmpty() then
@@ -480,25 +461,28 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
                     JArray.Add(JObject.Clone());
                 end;
             until Attachment.Next() = 0;
+        exit(JArray);
     end;
 
     local procedure GetString(JObject: JsonObject; Property: Text): Text
     var
         JToken: JsonToken;
-        JValue: JsonValue;
     begin
-        if GetJToken(JObject, Property, JToken) then begin
-            JValue := JToken.AsValue();
-            exit(JValue.AsText());
-        end;
+        if JObject.SelectToken(Property, JToken) then
+            if JToken.IsValue then
+                if not JToken.AsValue().IsNull then
+                    exit(JToken.AsValue().AsText());
+
     end;
 
     local procedure GetInt(JObject: JsonObject; Property: Text): Integer
     var
-        Number: Integer;
+        JToken: JsonToken;
     begin
-        if Evaluate(Number, GetString(JObject, Property)) then
-            exit(Number);
+        if JObject.SelectToken(Property, JToken) then
+            if JToken.IsValue then
+                if not JToken.AsValue().IsNull then
+                    exit(JToken.AsValue().AsInteger());
     end;
 
     local procedure GetDate(JObject: JsonObject; Property: Text): Date
@@ -509,21 +493,12 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
             exit(DT2Date(DTVar));
     end;
 
-    local procedure GetJToken(JObject: JsonObject; Property: Text; var JToken: JsonToken): Boolean
-    var
-        JText: Text;
-    begin
-        JObject.SelectToken(Property, JToken);
-        JToken.WriteTo(JText);
-        exit(JText <> '');
-    end;
-
     local procedure GetAttachmentType(FileName: Text) mimeType: Text
     var
         fileMgt: Codeunit "File Management";
         FileFormatErr: Label 'File format isn''t supported.';
     begin
-        case lowercase(fileMgt.GetExtension(FileName)) of
+        case LowerCase(fileMgt.GetExtension(FileName)) of
             'pdf':
                 mimeType := 'data:application/pdf';
             'txt':
