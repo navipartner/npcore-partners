@@ -172,6 +172,21 @@ page 6150616 "NPR POS Unit List"
                     ToolTip = 'Executes the Workshifts action';
                     ApplicationArea = NPRRetail;
                 }
+                action("MPOS QR Code")
+                {
+                    Caption = 'MPOS QR Code';
+                    Ellipsis = true;
+                    Image = Sales;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    RunObject = Page "NPR MPOS QR Code List";
+                    RunPageLink = "POS Unit No." = FIELD("No.");
+
+                    ToolTip = 'Displays a page showing list of related MPOS QR Code setups';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

@@ -79,19 +79,26 @@ table 6059964 "NPR MPOS QR Code"
         {
             Caption = 'Cash Register Id';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Unit"."No.";
-            ValidateTableRelation = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Renamed to "POS Unit No."';
         }
         field(22; "QR Image"; Media)
         {
             Caption = 'QR code';
             DataClassification = CustomerContent;
         }
+        field(23; "POS Unit No."; Code[10])
+        {
+            Caption = 'POS Unit No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Unit"."No.";
+            ValidateTableRelation = false;
+        }
     }
 
     keys
     {
-        key(Key1; "User ID", Company, "Cash Register Id")
+        key(PK; "User ID", Company, "POS Unit No.")
         {
         }
     }
@@ -186,7 +193,7 @@ table 6059964 "NPR MPOS QR Code"
                       '","F":"' + MPOSQRCode.Company +
                       '","G":"' + PaymentType +
                       '","H":"' + MPOSQRCode."Webservice Url" +
-                      '","I":"' + MPOSQRCode."Cash Register Id" +
+                      '","I":"' + MPOSQRCode."POS Unit No." +
                       '"}';
 
         GenerateBarcode(JsonString, TmpQR);
@@ -242,7 +249,7 @@ table 6059964 "NPR MPOS QR Code"
         JObject.Add('F', MPOSQRCode.Company);
         JObject.Add('G', PaymentType);
         JObject.Add('H', MPOSQRCode."Webservice Url");
-        JObject.Add('I', MPOSQRCode."Cash Register Id");
+        JObject.Add('I', MPOSQRCode."POS Unit No.");
         JObject.WriteTo(JsonString);
 
         GenerateBarcode(JsonString, TmpQR);
