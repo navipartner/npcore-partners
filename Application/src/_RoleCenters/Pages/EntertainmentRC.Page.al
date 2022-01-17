@@ -273,6 +273,26 @@ page 6151249 "NPR Entertainment RC"
                     ApplicationArea = NPRRetail;
                 }
             }
+            group(POS)
+            {
+                action("POS Menus")
+                {
+                    Caption = 'POS Menus';
+                    Image = PaymentJournal;
+                    RunObject = Page "NPR POS Menus";
+
+                    ToolTip = 'Executes the POS Menus action';
+                    ApplicationArea = NPRRetail;
+                }
+                action(POSDragonglass)
+                {
+
+                    Caption = 'Open POS';
+                    RunObject = Codeunit "NPR Open POS Page";
+                    ToolTip = 'Executes the Open POS action';
+                    ApplicationArea = NPRRetail;
+                }
+            }
         }
         area(processing)
         {
@@ -294,6 +314,15 @@ page 6151249 "NPR Entertainment RC"
                     RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
 
                     ToolTip = 'Executes the Ticket Access Statistics Matrix action';
+                    Image = ShowMatrix;
+                    ApplicationArea = NPRRetail;
+                }
+                action("Admission Forecast Matrix")
+                {
+                    Caption = 'Admission Forecast Matrix';
+                    RunObject = Page "NPR TM Admis. Forecast Matrix";
+
+                    ToolTip = 'Executes the Admission Forecast Matrix action';
                     Image = ShowMatrix;
                     ApplicationArea = NPRRetail;
                 }
@@ -325,6 +354,15 @@ page 6151249 "NPR Entertainment RC"
                     RunObject = Page "NPR MM Recur. Payment Setup";
                     ToolTip = 'Executes the Recurring Payment Setup action';
                     Image = SetupPayment;
+                    ApplicationArea = NPRRetail;
+                }
+                action("Membership Alteration Journal")
+                {
+
+                    Caption = 'Membership Alteration Journal';
+                    RunObject = Page "NPR MM Members. Alteration Jnl";
+                    ToolTip = 'Executes the Membership Alteration Journal action';
+                    Image = Journal;
                     ApplicationArea = NPRRetail;
                 }
             }
