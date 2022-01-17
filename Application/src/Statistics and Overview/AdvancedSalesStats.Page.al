@@ -147,8 +147,8 @@ page 6014585 "NPR Advanced Sales Stats"
                 field(ShowLastYear; ShowLastYear)
                 {
 
-                    Caption = 'Show last year';
-                    ToolTip = 'Specifies the value of the Show last year field';
+                    Caption = 'Show Previous Year';
+                    ToolTip = '"Display Sales Statistics from the Previous Year';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -159,8 +159,8 @@ page 6014585 "NPR Advanced Sales Stats"
                 field(ShowSameWeekday; ShowSameWeekday)
                 {
 
-                    Caption = 'Show same weekday last year';
-                    ToolTip = 'Specifies the value of the Show same weekday last year field';
+                    Caption = 'Show the Same Weekday from the Previous Year';
+                    ToolTip = 'Display Sales Statistics from the Same Weekday of the Previous Year.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
