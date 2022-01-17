@@ -188,10 +188,10 @@ report 6014474 "NPR Item/Sales Person Top"
                     }
                     field("Show Qty"; ShowQty)
                     {
-                        Caption = 'Show Qty.';
+                        Caption = 'Show Quantity';
                         Enabled = ShowSort;
 
-                        ToolTip = 'Specifies the value of the Show Qty. field';
+                        ToolTip = 'Specifies the value of the Show Quantity field';
                         ApplicationArea = NPRRetail;
                     }
                 }

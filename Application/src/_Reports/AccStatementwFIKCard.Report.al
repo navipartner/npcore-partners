@@ -731,9 +731,9 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     }
                     field("Date Choice"; DateChoice)
                     {
-                        Caption = 'Aging Band by';
+                        Caption = 'Aging Band By';
                         OptionCaption = 'Due Date,Posting Date';
-                        ToolTip = 'Specifies the value of the Aging Band by field';
+                        ToolTip = 'Specifies the value of the Aging Band By field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Log Interaction"; LogInteraction)

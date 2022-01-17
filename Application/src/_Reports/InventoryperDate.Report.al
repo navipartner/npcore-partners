@@ -176,44 +176,44 @@ report 6014417 "NPR Inventory per Date"
                 }
                 field("Include Item Stock"; IncludeItemStock)
                 {
-                    Caption = 'Show only products with inventory';
+                    Caption = 'Show Only Products With Inventory';
 
-                    ToolTip = 'Specifies the value of the Show only products with inventory field';
+                    ToolTip = 'Specifies the value of the Show Only Products With Inventory field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Not Unit Price"; NotUnitPrice)
                 {
-                    Caption = 'Do not display prices';
+                    Caption = 'Do Not Display Prices';
 
-                    ToolTip = 'Specifies the value of the Do not display prices field';
+                    ToolTip = 'Specifies the value of the Do Not Display Prices field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show Item Negative Inventory"; ShowItemNegativeInventory)
                 {
-                    Caption = 'Do not display items with negative inventory';
+                    Caption = 'Do Not Display Items With Negative Inventory';
 
-                    ToolTip = 'Specifies the value of the Do not display items with negative inventory field';
+                    ToolTip = 'Specifies the value of the Do Not Display Items With Negative Inventory field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Negativ Volume Show"; NegativVolumeShow)
                 {
-                    Caption = 'Show only items with negative volume';
+                    Caption = 'Show Only Items With Negative Volume';
 
-                    ToolTip = 'Specifies the value of the Show only items with negative volume field';
+                    ToolTip = 'Specifies the value of the Show Only Items With Negative Volume field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show No Inventory"; ShowNoInventory)
                 {
-                    Caption = 'Do not show inventory';
+                    Caption = 'Do Not Show Inventory';
 
-                    ToolTip = 'Specifies the value of the Do not show inventory field';
+                    ToolTip = 'Specifies the value of the Do Not Show Inventory field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show Zero Inventory"; ShowZeroInventory)
                 {
-                    Caption = 'Show only 0 quantity inventory';
+                    Caption = 'Show Only 0 Quantity Inventory';
 
-                    ToolTip = 'Specifies the value of the Show only 0 quantity inventory field';
+                    ToolTip = 'Specifies the value of the Show Only 0 Quantity Inventory field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Choose Calc. Method"; SelectCalcMethod)
@@ -226,9 +226,9 @@ report 6014417 "NPR Inventory per Date"
                 }
                 field("Group By Item Group"; GroupByItemGroup)
                 {
-                    Caption = 'Sort items by item group';
+                    Caption = 'Sort Items by Item Group';
 
-                    ToolTip = 'Specifies the value of the Sort items by item group field';
+                    ToolTip = 'Specifies the value of the Sort Items by Item Group field';
                     ApplicationArea = NPRRetail;
                 }
             }

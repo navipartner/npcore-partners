@@ -134,14 +134,14 @@ report 6014425 "NPR Event Overview"
                     Caption = 'Options';
                     field("Period Start"; PeriodStart)
                     {
-                        Caption = 'Period starts at';
-                        ToolTip = 'Specifies the value of the Period starts at field';
+                        Caption = 'Period Starts At';
+                        ToolTip = 'Specifies the value of the Period Starts At field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Period End"; PeriodEnd)
                     {
-                        Caption = 'Period ends at';
-                        ToolTip = 'Specifies the value of the Period ends at field';
+                        Caption = 'Period Ends At';
+                        ToolTip = 'Specifies the value of the Period Ends At field';
                         ApplicationArea = NPRRetail;
                     }
                     group(JobPlanningType)

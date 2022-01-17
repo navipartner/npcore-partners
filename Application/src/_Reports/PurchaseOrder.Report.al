@@ -1101,9 +1101,9 @@ report 6014617 "NPR Purchase Order"
                     Caption = 'Options';
                     field("No of Copies"; NoOfCopies)
                     {
-                        Caption = 'No. of Copies';
+                        Caption = 'No. Of Copies';
 
-                        ToolTip = 'Specifies the value of the No. of Copies field';
+                        ToolTip = 'Specifies the value of the No. Of Copies field';
                         ApplicationArea = NPRRetail;
                     }
                     field(ShowInternalInformation; ShowInternalInfo)
