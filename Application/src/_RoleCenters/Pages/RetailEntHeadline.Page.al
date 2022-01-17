@@ -9,22 +9,6 @@ page 6151332 "NPR Retail Ent Headline"
     {
         area(content)
         {
-
-            group(Control9)
-            {
-                ShowCaption = false;
-                Visible = UserGreetingVisible;
-
-                field(GreetingText; GreetingText)
-                {
-
-                    Caption = 'Greeting headline';
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Greeting headline field';
-                    ApplicationArea = NPRRetail;
-
-                }
-            }
             group(Control5)
             {
                 ShowCaption = false;
@@ -106,7 +90,6 @@ page 6151332 "NPR Retail Ent Headline"
         DocumentationTxt: Label 'Want to learn more about %1?', Comment = '%1 is the NAV short product name.';
         GreetingText: Text[250];
         DocumentationText: Text[250];
-        UserGreetingVisible: Boolean;
         IssuedTicketText: Text[250];
         TicketAdmission: Text[250];
         MembersCreated: Text[250];
@@ -117,7 +100,6 @@ page 6151332 "NPR Retail Ent Headline"
         ExtensionHeadlinesVisible: Boolean;
     begin
         OnIsAnyExtensionHeadlineVisible(ExtensionHeadlinesVisible);
-        UserGreetingVisible := HeadlineManagement.ShouldUserGreetingBeVisible();
     end;
 
     [IntegrationEvent(false, false)]
