@@ -211,7 +211,7 @@ report 6014490 "NPR Advanced Sales Stat."
                 field("Sort By"; SortBy)
                 {
 
-                    Caption = 'Sort by';
+                    Caption = 'Sort By';
                     OptionCaption = 'No.,Description,Period Start,Sales qty.,Sales qty. last year,Sales LCY,Sales LCY last year,Profit LCY,Profit LCY last year,Profit %,Profit % last year';
                     ToolTip = 'Specifies the value of the Sort by field';
                     ApplicationArea = NPRRetail;
