@@ -411,34 +411,34 @@ report 6014535 "NPR Sales Statistics By Dept."
                     ShowCaption = false;
                     field("antal niveauer"; antalniveauer)
                     {
-                        Caption = 'Levels to show';
-                        ToolTip = 'Specifies the value of the Show no. of levels field';
+                        Caption = 'Levels To Show';
+                        ToolTip = 'Specifies the value of the Show No. Of Levels field';
                         ApplicationArea = NPRRetail;
                     }
                     field("kunmed salg"; kunmedsalg)
                     {
-                        Caption = 'With sales only';
-                        ToolTip = 'Specifies the value of the Only with sales field';
+                        Caption = 'With Sales Only';
+                        ToolTip = 'Specifies the value of the Only with Sales field';
                         ApplicationArea = NPRRetail;
                     }
                     field("vis varer"; visvarer)
                     {
-                        Caption = 'Show items';
-                        ToolTip = 'Specifies the value of the Print items field';
+                        Caption = 'Show Items';
+                        ToolTip = 'Specifies the value of the Print Items field';
                         ApplicationArea = NPRRetail;
                     }
                     field("last Year"; lastYear)
                     {
-                        Caption = 'Show last year';
-                        ToolTip = 'Specifies the value of the Print last years numbers field';
+                        Caption = 'Show Last Year';
+                        ToolTip = 'Specifies the value of the Print Last Years Numbers field';
                         ApplicationArea = NPRRetail;
                     }
                     field("is Grouped By Location"; isGroupedByLocation)
                     {
                         CaptionClass = txtLabeldim1;
-                        Caption = 'Group by';
+                        Caption = 'Group By';
 
-                        ToolTip = 'Specifies the value of the Group by field';
+                        ToolTip = 'Specifies the value of the Group By field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Sales Person"; SalesPerson)

@@ -566,8 +566,8 @@ report 6014460 "NPR Balancing Report A4"
                     }
                     field("Print Empty Lines"; PrintEmptyLines)
                     {
-                        Caption = 'Print Lines where Value is Zero';
-                        ToolTip = 'Specifies the value of the Print Lines where Value is Zero field';
+                        Caption = 'Print Lines Where Value Is Zero';
+                        ToolTip = 'Specifies the value of the Print Lines Where Value Is Zero field';
                         ApplicationArea = NPRRetail;
                     }
                 }

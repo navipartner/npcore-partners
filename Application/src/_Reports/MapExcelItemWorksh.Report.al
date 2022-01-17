@@ -49,7 +49,7 @@ report 6060044 "NPR Map Excel Item Worksh."
                 field("Try to match fields automatically"; BoolTryMatch)
                 {
 
-                    Caption = 'Try to match fields automatically';
+                    Caption = 'Try to Match Fields Automatically';
                     ToolTip = 'Specifies the value of the BoolTryMatch field';
                     ApplicationArea = NPRRetail;
                 }

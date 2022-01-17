@@ -125,10 +125,10 @@ report 6014550 "NPR Statement E-Mail"
                     }
                     field(IncludeAllCustomerswithLE; PrintAllHavingEntry)
                     {
-                        Caption = 'Include All Customers with Ledger Entries';
+                        Caption = 'Include All Customers With Ledger Entries';
                         MultiLine = true;
 
-                        ToolTip = 'Specifies the value of the Include All Customers with Ledger Entries field';
+                        ToolTip = 'Specifies the value of the Include All Customers With Ledger Entries field';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -139,10 +139,10 @@ report 6014550 "NPR Statement E-Mail"
                     }
                     field(IncludeAllCustomerswithBalance; PrintAllHavingBal)
                     {
-                        Caption = 'Include All Customers with a Balance';
+                        Caption = 'Include All Customers With a Balance';
                         MultiLine = true;
 
-                        ToolTip = 'Specifies the value of the Include All Customers with a Balance field';
+                        ToolTip = 'Specifies the value of the Include All Customers With a Balance field';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()

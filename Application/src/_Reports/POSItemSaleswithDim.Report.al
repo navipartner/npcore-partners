@@ -2,7 +2,7 @@ report 6014441 "NPR POS Item Sales with Dim."
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/POS Item Sales with Dimensions.rdlc';
-    Caption = 'POS Item Sales with Dimensions';
+    Caption = 'POS Item Sales With Dimensions';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;

@@ -64,31 +64,31 @@ report 6060042 "NPR Import Excel Item Worksh."
                 field("Import Option"; ImportOption)
                 {
                     Caption = 'Option';
-                    OptionCaption = 'Replace lines,Add lines';
+                    OptionCaption = 'Replace Lines,Add Lines';
 
                     ToolTip = 'Specifies the value of the Option field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Set Items To Skip"; SetItemsToSkip)
                 {
-                    Caption = 'Set all items to SKIP';
-                    ToolTip = 'Specifies the value of the Set all items to SKIP field';
+                    Caption = 'Set All Items To SKIP';
+                    ToolTip = 'Specifies the value of the Set All Items To SKIP field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Action If Variant Unknown"; ActionIfVariantUnknown)
                 {
-                    Caption = 'If the Variant does not exist, but the Variety does';
+                    Caption = 'If the Variant Does Not Exist, but the Variety Does';
                     OptionCaption = 'Set Variety Worksheet Line to <Skip>,Set Variety Worksheet Line to <Create>';
 
-                    ToolTip = 'Specifies the value of the If the Variant does not exist, but the Variety does field';
+                    ToolTip = 'Specifies the value of the If the Variant Does Not Exist, but the Variety Does field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Action If Variety Unknown"; ActionIfVarietyUnknown)
                 {
-                    Caption = 'If the Variant and Variety do not exist';
+                    Caption = 'If the Variant and Variety Do Not Exist';
                     OptionCaption = 'Set Variety Worksheet Line to <Skip>,Set Variety Worksheet Line to <Create>';
 
-                    ToolTip = 'Specifies the value of the If the Variant and Variety do not exist field';
+                    ToolTip = 'Specifies the value of the If the Variant and Variety Do Not Exist field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Combine Varieties"; CombineVarieties)
