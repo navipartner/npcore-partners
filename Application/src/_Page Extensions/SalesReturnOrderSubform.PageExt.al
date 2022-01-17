@@ -22,12 +22,4 @@
             end;
         }
     }
-
-    actions
-    {
-        // Add changes to page actions here
-    }
-
-    var
-
 }
