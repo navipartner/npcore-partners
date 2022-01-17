@@ -1,0 +1,10 @@
+- name: Introduction
+  href: intro.md
+- name: How-To  
+  items:
+  - name: Set up the Click & Collect module in NP Retail
+    href: howto/clickandcollect_setup.md
+- name: Explanations
+  items:
+  - name: POS actions for the Click & Collect module
+    href: explanation/clickandcollect-pos.md

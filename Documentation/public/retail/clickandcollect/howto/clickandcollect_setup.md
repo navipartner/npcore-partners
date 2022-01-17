@@ -58,3 +58,7 @@ The collect workflows define the behavior/functionality of collect orders which 
 4. Use the options in the **Send Order** section to determine whether the store will receive email notifications about the order, define what the email template looks like, how the customers are mapped during the order import in the collecting store, and so on. 
 5. Define the options in the **Order Status** section if you wish to notify the customer about each step of the order delivery process, and to define templates for each one of those notifications. 
 6. Use the options in the **IC Clearing** section to determine how the intercompany reconciliation is performed across multiple companies when orders/items are transferred, sold, and shipped.
+
+### Related links
+- [Click & Collect introduction](../intro.md)
+- [POS actions for the Click & Collect module](../explanation/clickandcollect-pos.md)
