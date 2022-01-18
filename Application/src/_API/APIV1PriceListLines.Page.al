@@ -54,7 +54,11 @@ page 6014545 "NPR API V1 - Price List Lines"
                 }
                 field(sourceID; Rec."Source ID")
                 {
-                    Caption = 'Applies-to ID';
+                    Caption = 'Source ID';
+                }
+                field(parentSourceNo; Rec."Parent Source No.")
+                {
+                    Caption = 'Parent Source No.';
                 }
                 field(assetType; Rec."Asset Type")
                 {
@@ -64,7 +68,7 @@ page 6014545 "NPR API V1 - Price List Lines"
                 {
                     Caption = 'Product No.';
                 }
-                field(assetID; Rec."Asset ID")
+                field(assetId; Rec."Asset ID")
                 {
                     Caption = 'Asset ID';
                 }

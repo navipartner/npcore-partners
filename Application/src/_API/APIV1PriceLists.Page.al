@@ -49,7 +49,7 @@ page 6014544 "NPR API V1 - Price Lists"
                 }
                 field(sourceID; Rec."Source ID")
                 {
-                    Caption = 'Applies-to ID';
+                    Caption = 'Source ID';
                 }
                 field(currencyCode; Rec."Currency Code")
                 {
@@ -67,7 +67,7 @@ page 6014544 "NPR API V1 - Price Lists"
                 {
                     Caption = 'VAT Bus. Posting Gr. (Price)';
                 }
-                field(priceIncludesVAT; Rec."Price Includes VAT")
+                field(priceIncludesVat; Rec."Price Includes VAT")
                 {
                     Caption = 'Price Includes VAT';
                 }
@@ -89,7 +89,17 @@ page 6014544 "NPR API V1 - Price Lists"
                 }
                 field(parentSourceNo; Rec."Parent Source No.")
                 {
-                    Caption = 'Applies-to Parent No.';
+                    Caption = 'Parent Source No.';
+                }
+
+                field(filterSourceNo; Rec."Filter Source No.")
+                {
+                    Caption = 'Filter Source No.';
+                }
+
+                field(noSeries; Rec."No. Series")
+                {
+                    Caption = 'No. Series';
                 }
                 field(systemModifiedAt; Rec.SystemModifiedAt)
                 {

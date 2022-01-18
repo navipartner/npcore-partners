@@ -51,7 +51,7 @@ page 6014530 "NPR APIV1 Variety Table"
                 {
                     Caption = 'pretagInVariantDescription', Locked = true;
                 }
-                field(useDescriptionfield; Rec."Use Description field")
+                field(useDescriptionField; Rec."Use Description field")
                 {
                     Caption = 'useDescriptionfield', Locked = true;
                 }

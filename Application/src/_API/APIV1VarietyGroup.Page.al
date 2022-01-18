@@ -31,6 +31,10 @@ page 6014526 "NPR APIV1 - Variety Group"
                 {
                     Caption = 'description', Locked = true;
                 }
+                field(noSeries; Rec."No. Series")
+                {
+                    Caption = 'No. Series', Locked = true;
+                }
                 field(crossVarietyNo; Rec."Cross Variety No.")
                 {
                     Caption = 'crossVarietyNo', Locked = true;
