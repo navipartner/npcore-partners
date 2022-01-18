@@ -12,6 +12,8 @@
   href: replication/toc.yml
 - name: End user communication
   href: sms/toc.yml
+- name: GDPR in NP Retail
+  href: gdpr/toc.yml
 - name: Click & Collect module
   href: clickandcollect/toc.yml
 - name: Webshop integrations
