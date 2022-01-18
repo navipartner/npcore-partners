@@ -50,7 +50,7 @@ codeunit 6014505 "NPR MobilePayV10 Get Refund"
         mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
         mobilePayUnitSetup.TestField("MobilePay POS ID");
 
-        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper);
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, eftTrxRequest);
 
         reqMessage.Method := 'GET';
         reqMessage.SetRequestUri(mobilePayProtocol.GetURL(eftSetup) + GetEndpoint() + eftTrxRequest."Reference Number Output");

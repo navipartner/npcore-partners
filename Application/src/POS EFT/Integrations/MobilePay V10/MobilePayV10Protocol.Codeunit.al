@@ -605,11 +605,22 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
     internal procedure SetGenericHeaders(EftSetup: Record "NPR EFT Setup"; var ReqMessage: HttpRequestMessage; HttpRequestHelper: Codeunit "NPR HttpRequest Helper")
     var
         headers: HttpHeaders;
+        eftTrxRequest: Record "NPR EFT Transaction Request";
     begin
-        SetGenericHeaders(EftSetup, ReqMessage, HttpRequestHelper, headers);
+        Clear(eftTrxRequest);
+        SetGenericHeaders(EftSetup, ReqMessage, HttpRequestHelper, headers, EftTrxRequest);
     end;
 
-    internal procedure SetGenericHeaders(EftSetup: Record "NPR EFT Setup"; var ReqMessage: HttpRequestMessage; HttpRequestHelper: Codeunit "NPR HttpRequest Helper"; var Headers: HttpHeaders)
+    internal procedure SetGenericHeaders(EftSetup: Record "NPR EFT Setup"; var ReqMessage: HttpRequestMessage; HttpRequestHelper: Codeunit "NPR HttpRequest Helper";
+        var EftTrxRequest: Record "NPR EFT Transaction Request")
+    var
+        headers: HttpHeaders;
+    begin
+        SetGenericHeaders(EftSetup, ReqMessage, HttpRequestHelper, headers, EftTrxRequest);
+    end;
+
+    internal procedure SetGenericHeaders(EftSetup: Record "NPR EFT Setup"; var ReqMessage: HttpRequestMessage; HttpRequestHelper: Codeunit "NPR HttpRequest Helper"; var Headers: HttpHeaders;
+        var EftTrxRequest: Record "NPR EFT Transaction Request")
     var
         mobilePayCorrelation: Codeunit "NPR MobilePayV10 Correlat. ID";
     begin
@@ -620,6 +631,11 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         HttpRequestHelper.SetHeader('x-ibm-client-id', GetClientId(eftSetup));
         HttpRequestHelper.SetHeader('CorrelationId', mobilePayCorrelation.GetCurrentID());
         HttpRequestHelper.SetHeader('x-mobilepay-client-system-version', GetClientVersion());
+
+        if (EftTrxRequest."Entry No." <> 0) then begin
+            EftTrxRequest.TestField(Token);
+            HttpRequestHelper.SetHeader('x-mobilepay-idempotency-key', DelChr(Format(EftTrxRequest.Token), '=', '{}'));
+        end;
     end;
 
     internal procedure SendAndPreHandleTheRequest(var HttpClient: HttpClient; var ReqMessage: HttpRequestMessage; var RespMessage: HttpResponseMessage;

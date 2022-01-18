@@ -43,8 +43,7 @@ codeunit 6014478 "NPR MobilePayV10 CreatePOS"
         posUnit.Get(eftSetup."POS Unit No.");
 
         reqMessage.GetHeaders(headers);
-        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, headers);
-        httpRequestHelper.SetHeader('x-mobilepay-idempotency-key', Format(eftTrxRequest."Entry No."));
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, headers, eftTrxRequest);
 
         jsonRequest.Add('merchantPosId', mobilepayUnitSetup."Merchant PoS ID");
         jsonRequest.Add('storeId', mobilePayUnitSetup."Store ID");

@@ -34,12 +34,13 @@ codeunit 6014529 "NPR MobilePayV10 Delete POS"
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
     begin
+        eftTrxRequest.TestField(Token);
+
         eftSetup.FindSetup(eftTrxRequest."Register No.", eftTrxRequest."Original POS Payment Type Code");
         mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
         mobilePayUnitSetup.TestField("MobilePay POS ID");
 
-        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, headers);
-        httpRequestHelper.SetHeader('x-mobilepay-idempotency-key', Format(eftTrxRequest."Entry No."));
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, headers, eftTrxRequest);
 
         reqMessage.Method := 'DELETE';
         reqMessage.SetRequestUri(mobilePayProtocol.GetURL(eftSetup) + '/pos/v10/pointofsales/' + mobilePayUnitSetup."MobilePay POS ID");

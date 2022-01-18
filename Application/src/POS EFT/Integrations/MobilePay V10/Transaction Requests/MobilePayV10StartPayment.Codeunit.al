@@ -46,12 +46,13 @@ codeunit 6014521 "NPR MobilePayV10 Start Payment"
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
         merchantPaymentLbl: Label '%1 - %2', Locked = true;
     begin
+        eftTrxRequest.TestField(Token);
+
         eftSetup.FindSetup(eftTrxRequest."Register No.", eftTrxRequest."Original POS Payment Type Code");
         mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
         mobilePayUnitSetup.TestField("MobilePay POS ID");
 
-        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, headers);
-        httpRequestHelper.SetHeader('x-mobilepay-idempotency-key', Format(eftTrxRequest."Entry No."));
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, headers, eftTrxRequest);
 
         jsonRequest.Add('posId', mobilePayUnitSetup."MobilePay POS ID");
         jsonRequest.Add('orderId', eftTrxRequest."Reference Number Input");

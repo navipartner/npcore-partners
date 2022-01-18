@@ -54,7 +54,7 @@ codeunit 6014514 "NPR MobilePayV10 Find Payment"
         mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
         mobilePayUnitSetup.TestField("MobilePay POS ID");
 
-        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper);
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, eftTrxRequest);
 
         reqMessage.Method := 'GET';
         requestUrl := mobilePayProtocol.GetURL(eftSetup) + '/pos/v10/payments';
