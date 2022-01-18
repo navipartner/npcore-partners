@@ -59,9 +59,9 @@ codeunit 6014557 "NPR MobilePayV10 Start Refund"
             // TODO: ??? Report a problem => We need their payment ID, without it we can't do anything here.
             // 
         end;
+        eftTrxRequest.TestField(Token);
 
-        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, headers);
-        httpRequestHelper.SetHeader('x-mobilepay-idempotency-key', Format(eftTrxRequest."Entry No."));
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, headers, eftTrxRequest);
 
         jsonRequest.Add('paymentId', procEftTrxRequest."Reference Number Output");
         jsonRequest.Add('refundOrderId', eftTrxRequest."Reference Number Input");

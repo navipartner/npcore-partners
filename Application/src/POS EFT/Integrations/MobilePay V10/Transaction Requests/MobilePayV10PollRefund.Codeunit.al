@@ -40,7 +40,7 @@ codeunit 6014556 "NPR MobilePayV10 Poll Refund"
         mobilePayUnitSetup.TestField("MobilePay POS ID");
         eftTrxRequest.TestField("Reference Number Output");
 
-        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper);
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, eftTrxRequest);
 
         reqMessage.Method := 'GET';
         reqMessage.SetRequestUri(mobilePayProtocol.GetURL(eftSetup) + GetEndpoint() + eftTrxRequest."Reference Number Output");
