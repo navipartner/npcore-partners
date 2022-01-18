@@ -37,13 +37,49 @@ page 6014410 "NPR APIV1 - Vendors"
                         RegisterFieldSet(Rec.FieldNo(Name));
                     end;
                 }
-
                 field(displayName2; Rec."Name 2")
                 {
                     Caption = 'Display Name 2';
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Name 2"));
+                    end;
+                }
+                field(searchName; Rec."Search Name")
+                {
+                    Caption = 'Search Name';
+                }
+                field(contact; Rec.Contact)
+                {
+                    Caption = 'Contact';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo(Contact));
+                    end;
+                }
+                field(telexNo; Rec."Telex No.")
+                {
+                    Caption = 'Telex No.';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Telex No."));
+                    end;
+                }
+                field(ourAccountNo; Rec."Our Account No.")
+                {
+                    Caption = 'Our Account No.';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Our Account No."));
+                    end;
+                }
+
+                field(budgetedAmount; Rec."Budgeted Amount")
+                {
+                    Caption = 'Budgeted Amount';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Budgeted Amount"));
                     end;
                 }
                 field(addressLine1; Rec.Address)
@@ -58,7 +94,6 @@ page 6014410 "NPR APIV1 - Vendors"
                 field(addressLine2; Rec."Address 2")
                 {
                     Caption = 'Address Line 2';
-
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Address 2"));
@@ -67,7 +102,6 @@ page 6014410 "NPR APIV1 - Vendors"
                 field(city; Rec.City)
                 {
                     Caption = 'City';
-
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("City"));
@@ -76,7 +110,6 @@ page 6014410 "NPR APIV1 - Vendors"
                 field(state; Rec.County)
                 {
                     Caption = 'State';
-
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("County"));
@@ -85,7 +118,6 @@ page 6014410 "NPR APIV1 - Vendors"
                 field(country; Rec."Country/Region Code")
                 {
                     Caption = 'Country/Region Code';
-
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Country/Region Code"));
@@ -94,7 +126,6 @@ page 6014410 "NPR APIV1 - Vendors"
                 field(postalCode; Rec."Post Code")
                 {
                     Caption = 'Post Code';
-
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Post Code"));
@@ -103,7 +134,6 @@ page 6014410 "NPR APIV1 - Vendors"
                 field(phoneNumber; Rec."Phone No.")
                 {
                     Caption = 'Phone No.';
-
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Phone No."));
@@ -112,7 +142,6 @@ page 6014410 "NPR APIV1 - Vendors"
                 field(email; Rec."E-Mail")
                 {
                     Caption = 'Email';
-
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("E-Mail"));
@@ -121,10 +150,44 @@ page 6014410 "NPR APIV1 - Vendors"
                 field(website; Rec."Home Page")
                 {
                     Caption = 'Website';
-
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Home Page"));
+                    end;
+                }
+
+                field(faxNo; Rec."Fax No.")
+                {
+                    Caption = 'Fax No.';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Fax No."));
+                    end;
+                }
+                field(telexAnswerBack; Rec."Telex Answer Back")
+                {
+                    Caption = 'Telex Answer Back';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Telex Answer Back"));
+                    end;
+                }
+
+                field(noSeries; Rec."No. Series")
+                {
+                    Caption = 'No. Series';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("No. Series"));
+                    end;
+                }
+
+                field(disableSearchByName; Rec."Disable Search by Name")
+                {
+                    Caption = 'Disable Search by Name';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Disable Search by Name"));
                     end;
                 }
                 field(taxAreaCode; Rec."Tax Area Code")
@@ -329,7 +392,7 @@ page 6014410 "NPR APIV1 - Vendors"
                         RegisterFieldSet(Rec.FieldNo("Partner Type"));
                     end;
                 }
-                field(pricesIncludingVAT; Rec."Prices Including VAT")
+                field(pricesIncludingVat; Rec."Prices Including VAT")
                 {
                     Caption = 'Prices Including VAT';
                     trigger OnValidate()
@@ -552,6 +615,32 @@ page 6014410 "NPR APIV1 - Vendors"
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Fin. Charge Terms Code"));
+                    end;
+                }
+
+                field(statisticsGroup; Rec."Statistics Group")
+                {
+                    Caption = 'Statistics Group';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Statistics Group"));
+                    end;
+                }
+                field(priority; Rec.Priority)
+                {
+                    Caption = 'Priority';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Priority"));
+                    end;
+                }
+
+                field(lastDateModified; Rec."Last Date Modified")
+                {
+                    Caption = 'Last Date Modified';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Last Date Modified"));
                     end;
                 }
 

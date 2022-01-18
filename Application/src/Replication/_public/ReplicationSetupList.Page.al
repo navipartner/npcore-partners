@@ -35,9 +35,55 @@ page 6014499 "NPR Replication Setup List"
         }
     }
 
+    actions
+    {
+        area(Processing)
+        {
+            action("Update Custom Endpoints")
+            {
+                ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+                ToolTip = 'Runs code that subscribes to this action with the purpose of modifying standard NP Retail Enpoints path with Custom Paths.';
+                Image = UpdateDescription;
+                trigger OnAction()
+                var
+                    ReplicationRegister: Codeunit "NPR Replication Register";
+                    Handled: Boolean;
+                begin
+                    ReplicationRegister.OnUpdateCustomEndpoints(Handled);
+                    if Handled then
+                        Message(UpdatedCustomEnpointsMsg)
+                    else
+                        Message(NotUpdatedCustomEnpointsMsg);
+                end;
+            }
+        }
+        area(Reporting)
+        {
+            action("Check Missing Fields")
+            {
+                ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                PromotedCategory = Report;
+                ToolTip = 'Check if there are missing fields from other extensions that are not handled by the replication.';
+                Image = CheckList;
+                RunObject = report "NPR Rep. Check Missing Fields";
+            }
+        }
+    }
+
     trigger OnOpenPage()
     begin
         Rec.OnRegisterService();
     end;
+
+    var
+        UpdatedCustomEnpointsMsg: Label 'Custom Endpoints updated.';
+        NotUpdatedCustomEnpointsMsg: Label 'There is no code defined to update Custom Endpoints.';
 
 }

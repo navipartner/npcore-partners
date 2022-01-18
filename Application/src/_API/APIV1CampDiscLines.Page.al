@@ -156,6 +156,10 @@ page 6014476 "NPR APIV1 - Camp. Disc. Lines"
                 {
                     Caption = 'vendorNo', Locked = true;
                 }
+                field(lastDateModified; Rec."Last Date Modified")
+                {
+                    Caption = 'Last Date Modified', Locked = true;
+                }
                 field(systemModifiedAt; Rec.SystemModifiedAt)
                 {
                     Caption = 'systemModifiedAt', Locked = true;

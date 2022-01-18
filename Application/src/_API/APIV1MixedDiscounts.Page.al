@@ -58,19 +58,19 @@ page 6014477 "NPR APIV1 - Mixed Discounts"
                 {
                     Caption = 'discountType', Locked = true;
                 }
-                field(startingdate; Rec."Starting date")
+                field(startingDate; Rec."Starting date")
                 {
                     Caption = 'startingdate', Locked = true;
                 }
-                field(startingtime; Rec."Starting time")
+                field(startingTime; Rec."Starting time")
                 {
                     Caption = 'startingtime', Locked = true;
                 }
-                field(endingdate; Rec."Ending date")
+                field(endingDate; Rec."Ending date")
                 {
                     Caption = 'endingdate', Locked = true;
                 }
-                field(endingtime; Rec."Ending time")
+                field(endingTime; Rec."Ending time")
                 {
                     Caption = 'endingtime', Locked = true;
                 }
@@ -137,6 +137,10 @@ page 6014477 "NPR APIV1 - Mixed Discounts"
                 field(turnover; Rec.Turnover)
                 {
                     Caption = 'turnover', Locked = true;
+                }
+                field(lastDateModified; Rec."Last Date Modified")
+                {
+                    Caption = 'Last Date Modified', Locked = true;
                 }
                 field(systemModifiedAt; Rec.SystemModifiedAt)
                 {

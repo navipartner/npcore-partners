@@ -1,6 +1,5 @@
 codeunit 6014608 "NPR Replication Register"
 {
-    Access = Internal;
     Permissions =
         tabledata "NPR Replication Service Setup" = rim,
         tabledata "NPR Replication Endpoint" = rim,
@@ -14,7 +13,6 @@ codeunit 6014608 "NPR Replication Register"
         ItemsServiceNameLbl: Label 'Item - NP Replication API V1.0';
         CustServiceCodeLbl: Label 'Cust_NPAPI V1', Locked = true;
         CustServiceNameLbl: Label 'Customer - NP Replication API V1.0';
-
         VendServiceCodeLbl: Label 'Vend_NPAPI V1', Locked = true;
         VendServiceNameLbl: Label 'Vendor - NP Replication API V1.0';
         NPRetailServiceCodeLbl: Label 'Retail_NPAPI V1', Locked = true;
@@ -26,228 +24,154 @@ codeunit 6014608 "NPR Replication Register"
 
         #region Item related endpoints data
         ItemsEndPointIDLbl: Label 'GetItems', Locked = true;
-
         ItemsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/items/?$expand=picture&$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
         ItemsEndPointDescriptionLbl: Label 'Gets Items from related company. ', Locked = true;
+
         ItemCategoriesEndPointIDLbl: Label 'GetItemCategories', Locked = true;
         ItemCategoriesEndPointDescriptionLbl: Label 'Gets Item Categories from related company. ', Locked = true;
         ItemCategoriesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemCategories/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         VarGroupsEndPointIDLbl: Label 'GetVarietyGroups', Locked = true;
-
         VarGroupsEndPointDescriptionLbl: Label 'Gets Variety Groups from related company. ', Locked = true;
-
         VarGroupsPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varietyGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         VarietiesEndPointIDLbl: Label 'GetVarieties', Locked = true;
-
         VarietiesEndPointDescriptionLbl: Label 'Gets Varieties from related company. ', Locked = true;
-
         VarietiesPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varieties/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         VarietyTablesEndPointIDLbl: Label 'GetVarietyTables', Locked = true;
-
         VarietyTablesEndPointDescriptionLbl: Label 'Gets Variety Tables from related company. ', Locked = true;
-
         VarietyTablesPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varietyTables/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         VarietyValuesEndPointIDLbl: Label 'GetVarietyValues', Locked = true;
-
         VarietyValuesEndPointDescriptionLbl: Label 'Gets Variety Values from related company. ', Locked = true;
-
         VarietyValuesPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varietyValues/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         ItemVariantsEndPointIDLbl: Label 'GetItemVariants', Locked = true;
-
         ItemVariantsEndPointDescriptionLbl: Label 'Gets Item Variants from related company. ', Locked = true;
-
         ItemVariantsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemVariants/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         ItemReferencesEndPointIDLbl: Label 'GetItemReferences', Locked = true;
-
         ItemReferencesEndPointDescriptionLbl: Label 'Gets Item References from related company. ', Locked = true;
-
         ItemReferencesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemReferences/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         UOMEndPointIDLbl: Label 'GetUnitsOfMeasure', Locked = true;
-
         UOMEndPointDescriptionLbl: Label 'Gets Units Of Measure from related company. ', Locked = true;
-
         UOMPathLbl: Label '/navipartner/core/v1.0/companies(%1)/unitsOfMeasure/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         ItemsUOMEndPointIDLbl: Label 'GetItemsUOM', Locked = true;
-
         ItemsUOMEndPointDescriptionLbl: Label 'Gets Items Units Of Measure from related company. ', Locked = true;
-
         ItemsUOMPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemUnitsOfMeasure/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
         #endregion
 
         #region Customer endpoints data
         CustomersEndPointIDLbl: Label 'GetCustomers', Locked = true;
-
         CustomersEndPointDescriptionLbl: Label 'Gets Customers from related company.', Locked = true;
-
         CustomersPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customers/?$expand=picture&$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         SalePriceListsEndPointIDLbl: Label 'GetSalePriceListHeaders', Locked = true;
-
         SalePriceListsEndPointDescriptionLbl: Label 'Gets Sales Price List Headers from related company.', Locked = true;
-
         SalePriceListsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/priceLists/?$filter=(priceType eq Microsoft.NAV.priceType''Sale'') and (replicationCounter gt %2)&$orderby=replicationCounter&$schemaVersion=2.0', Locked = true;
 
         SalePriceListLinesEndPointIDLbl: Label 'GetSalePriceListLines', Locked = true;
-
         SalePriceListLinesEndPointDescriptionLbl: Label 'Gets Sales Price List Lines from related company.', Locked = true;
-
         SalePriceListLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/priceListLines/?$filter=(priceType eq Microsoft.NAV.priceType''Sale'') and (replicationCounter gt %2)&$orderby=replicationCounter&$schemaVersion=2.0', Locked = true;
 
         SalespersonsPurchasersEndPointIDLbl: Label 'GetSalespersons/Purchasers', Locked = true;
-
         SalespersonsPurchasersEndPointDescriptionLbl: Label 'Gets Salespersons/Purchasers from related company.', Locked = true;
-
         SalespersonsPurchasersPathLbl: Label '/navipartner/core/v1.0/companies(%1)/salespersonsPurchasers/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         CustPriceGroupsEndPointIDLbl: Label 'GetCustPriceGroups', Locked = true;
-
         CustPriceGroupsEndPointDescriptionLbl: Label 'Gets Customer Price Groups from related company.', Locked = true;
-
         CustPriceGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerPriceGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         CustDiscGroupsEndPointIDLbl: Label 'GetCustDiscountGroups', Locked = true;
-
         CustDiscGroupsEndPointDescriptionLbl: Label 'Gets Customer Discount Groups from related company.', Locked = true;
-
         CustDiscGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerDiscountGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         CustPostingGroupsEndPointIDLbl: Label 'GetCustPostingGroups', Locked = true;
-
         CustPostingGroupsEndPointDescriptionLbl: Label 'Gets Customer Posting Groups from related company.', Locked = true;
-
         CustPostingGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerPostGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         CustBankAccountsEndPointIDLbl: Label 'GetCustBankAccounts', Locked = true;
-
         CustBankAccountsEndPointDescriptionLbl: Label 'Gets Customer Bank Accounts from related company.', Locked = true;
-
         CustBankAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerBankAccounts/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
         #endregion
 
         #region Vendor Endpoints data
         VendorsEndPointIDLbl: Label 'GetVendors', Locked = true;
-
         VendorsEndPointDescriptionLbl: Label 'Gets Vendors from related company.', Locked = true;
-
         VendorsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendors/?$expand=picture&$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         VendorBankAccEndPointIDLbl: Label 'GetVendorBankAccounts', Locked = true;
-
         VendorBankAccEndPointDescriptionLbl: Label 'Gets Vendor Bank Accounts from related company.', Locked = true;
-
         VendorBankAccPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendorBankAccounts/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         VendorPostGrEndPointIDLbl: Label 'GetVendorPostingGroups', Locked = true;
-
         VendorPostGrEndPointDescriptionLbl: Label 'Gets Vendor Posting Groups from related company.', Locked = true;
-
         VendorPostGrPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendorPostGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
         #endregion
 
         #region NP RETAIL endpoints data
         PeriodDiscountsEndPointIDLbl: Label 'GetPeriodicDiscountHeaders', Locked = true;
-
         PeriodDiscountsEndPointDescriptionLbl: Label 'Gets Periodic Discount Headers from related company.', Locked = true;
-
         PeriodDiscountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/periodDiscounts/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         PeriodDiscountLinesEndPointIDLbl: Label 'GetPeriodicDiscountLines', Locked = true;
-
         PeriodDiscountLinesEndPointDescriptionLbl: Label 'Gets Periodic Discount Lines from related company.', Locked = true;
-
         PeriodDiscountLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/periodDiscountLines/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         MixedDiscountsEndPointIDLbl: Label 'GetMixedDiscounts', Locked = true;
-
         MixedDiscountsEndPointDescriptionLbl: Label 'Gets Mixed Discounts Headers from related company.', Locked = true;
-
         MixedDiscountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscounts/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         MixedDiscountsTIEndPointIDLbl: Label 'GetMixedDisTimeIntervals', Locked = true;
-
         MixedDiscountsTIEndPointDescriptionLbl: Label 'Gets Mixed Discounts Time Intervals from related company.', Locked = true;
-
         MixedDiscountsTIPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountTimeIntervals/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         MixedDiscountsLevelsEndPointIDLbl: Label 'GetMixedDisLevels', Locked = true;
-
         MixedDiscountsLevelsEndPointDescriptionLbl: Label 'Gets Mixed Discounts Levels from related company.', Locked = true;
-
         MixedDiscountsLevelsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountLevels/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         MixedDiscountsLinesEndPointIDLbl: Label 'GetMixedDiscLines', Locked = true;
-
         MixedDiscountsLinesEndPointDescriptionLbl: Label 'Gets Mixed Discounts Lines from related company.', Locked = true;
-
         MixedDiscountsLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountLines/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
         #endregion
 
         #region DIMENSIONS endpoints data
         DimensionsEndPointIDLbl: Label 'GetDimensions', Locked = true;
-
         DimensionsEndPointDescriptionLbl: Label 'Gets Dimensions from related company.', Locked = true;
-
         DimensionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/dimensions/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         DimensionValuesEndPointIDLbl: Label 'GetDimensionValues', Locked = true;
-
         DimensionValuesEndPointDescriptionLbl: Label 'Gets Dimension Values from related company.', Locked = true;
-
         DimensionValuesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/dimensionValues/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         DefaultDimensionsEndPointIDLbl: Label 'GetDefaultDimensions', Locked = true;
-
         DefaultDimensionsEndPointDescriptionLbl: Label 'Gets Default Dimensions from related company.', Locked = true;
-
         DefaultDimensionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/defaultDimensions/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         #endregion
 
         #region MISC endpoints data
         LocationsEndPointIDLbl: Label 'GetLocations', Locked = true;
-
         LocationsEndPointDescriptionLbl: Label 'Gets Locations from related company.', Locked = true;
-
         LocationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/locations/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         ShipmentMethodsEndPointIDLbl: Label 'GetShipmentMethods', Locked = true;
-
-
         ShipmentMethodsEndPointDescriptionLbl: Label 'Gets Shipment Methods from related company.', Locked = true;
-
-
         ShipmentMethodsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/shipmentMethods/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         PaymentTermsEndPointIDLbl: Label 'GetPaymentTerms', Locked = true;
-
-
         PaymentTermsEndPointDescriptionLbl: Label 'Gets Payment Terms from related company.', Locked = true;
-
-
         PaymentTermsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/paymentTerms/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         PaymentMethodsEndPointIDLbl: Label 'GetPaymentMethods', Locked = true;
-
-
         PaymentMethodsEndPointDescriptionLbl: Label 'Gets Payment Methods from related company.', Locked = true;
-
-
         PaymentMethodsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/paymentMethods/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         CurrenciesEndPointIDLbl: Label 'GetCurrencies', Locked = true;
-
-
         CurrenciesEndPointDescriptionLbl: Label 'Gets Currencies from related company.', Locked = true;
-
-
         CurrenciesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/currencies/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
     #endregion
 
@@ -330,12 +254,6 @@ codeunit 6014608 "NPR Replication Register"
     end;
     #endregion
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterRegisterServiceEndPoint(sender: Record "NPR Replication Endpoint")
-    begin
-    end;
-
-
     #region Register Service EndPoints
     local procedure RegisterItemServiceEndPoints()
     var
@@ -385,11 +303,9 @@ codeunit 6014608 "NPR Replication Register"
         ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemReferencesEndPointIDLbl, ItemReferencesPathLbl,
                     ItemReferencesEndPointDescriptionLbl, true, 600, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
                     10000, Database::"Item Reference", false, false);
-
-        OnAfterRegisterServiceEndPoint(ServiceEndPoint);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterItemCatSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -405,7 +321,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo(Description), 'displayName', 0, true, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterUOMSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -421,7 +337,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo(Description), 'displayName', 0, true, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterVarietySpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -440,7 +356,7 @@ codeunit 6014608 "NPR Replication Register"
            Rec.FieldNo("Pre tag In Variant Description"), 'pretagInVariantDescription', 0, true, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterVarietyTableSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -465,7 +381,7 @@ codeunit 6014608 "NPR Replication Register"
           Rec.FieldNo("Use in Variant Description"), 'useinVariantDescription', 0, true, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterVarietyValueSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -478,7 +394,7 @@ codeunit 6014608 "NPR Replication Register"
            Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterVarietyGroupSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -503,7 +419,7 @@ codeunit 6014608 "NPR Replication Register"
            Rec.FieldNo("Create Copy of Variety 4 Table"), 'createCopyofVariety4Table', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterItemSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -543,6 +459,9 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo("Default Deferral Template Code"), 'defaultDeferralTemplate', 0, false, false);
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+         Rec.FieldNo("Scrap %"), 'scrapPct', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
             Rec.FieldNo("NPR Attribute Set ID"), 'nprAttributeSetID', 0, false, false);
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -552,7 +471,7 @@ codeunit 6014608 "NPR Replication Register"
            Rec.FieldNo("NPR Magento Short Desc."), 'nprMagentoShortDescription@odata.mediaReadLink', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterItemUOMSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -571,7 +490,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo("Qty. per Unit of Measure"), 'qtyperUnitofMeasure', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterItemVariantSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -629,7 +548,7 @@ codeunit 6014608 "NPR Replication Register"
            Rec.FieldNo("NPR Blocked"), 'blocked', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterItemReferenceSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -676,7 +595,7 @@ codeunit 6014608 "NPR Replication Register"
 
         ServiceEndPoint.RegisterServiceEndPoint(CustServiceCodeLbl, SalePriceListLinesEndPointIDLbl, SalePriceListLinesPathLbl,
                             SalePriceListLinesEndPointDescriptionLbl, true, 610, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
-                            10000, Database::"Price List Line", false, false);
+                            10000, Database::"Price List Line", true, true);
 
         ServiceEndPoint.RegisterServiceEndPoint(CustServiceCodeLbl, SalespersonsPurchasersEndPointIDLbl, SalespersonsPurchasersPathLbl,
                             SalespersonsPurchasersEndPointDescriptionLbl, true, 700, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
@@ -686,10 +605,9 @@ codeunit 6014608 "NPR Replication Register"
                             CustBankAccountsEndPointDescriptionLbl, true, 800, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
                             10000, Database::"Customer Bank Account", false, false);
 
-        OnAfterRegisterServiceEndPoint(ServiceEndPoint);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterCustPriceGroupSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -702,7 +620,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterCustDiscGroupSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -715,7 +633,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterCustPostingGroupSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -728,7 +646,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterCustSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -806,7 +724,7 @@ codeunit 6014608 "NPR Replication Register"
 #ENDIF
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterPriceListHeaderSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -817,10 +735,13 @@ codeunit 6014608 "NPR Replication Register"
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
             Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo("Source ID"), 'sourceID', 0, false, false);
     end;
 
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterPriceListLineSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -842,7 +763,7 @@ codeunit 6014608 "NPR Replication Register"
            Rec.FieldNo("Price Includes VAT"), 'priceIncludesVAT', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterSalespersonPurchSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -859,9 +780,12 @@ codeunit 6014608 "NPR Replication Register"
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
             Rec.FieldNo("Commission %"), 'commission', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(Image), 'image@odata.mediaReadLink', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterCustBankAccountSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -896,7 +820,7 @@ codeunit 6014608 "NPR Replication Register"
                     1000, Database::"Vendor Bank Account", false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterVendorSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -945,9 +869,6 @@ codeunit 6014608 "NPR Replication Register"
           Rec.FieldNo("VAT Registration No."), 'taxRegistrationNumber', 0, false, false);
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
-          Rec.FieldNo("Prices Including VAT"), 'pricesIncludingVAT', 0, false, false);
-
-        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
           Rec.FieldNo("Prepayment %"), 'prepaymentPct', 0, false, false);
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -962,7 +883,7 @@ codeunit 6014608 "NPR Replication Register"
 #ENDIF
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterVendorBankAccSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -975,7 +896,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterVendorPostGrSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1021,10 +942,9 @@ codeunit 6014608 "NPR Replication Register"
                             MixedDiscountsLinesEndPointDescriptionLbl, true, 630, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
                             1000, Database::"NPR Mixed Discount Line", false, false);
 
-        OnAfterRegisterServiceEndPoint(ServiceEndPoint);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterPeriodDiscSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1037,7 +957,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterPeriodDiscLineSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1053,7 +973,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo("Discount %"), 'discount', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterMixDiscSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1099,7 +1019,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo("Total Discount %"), 'totalDiscount', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterMixDiscTimeIntervalsLineSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1112,7 +1032,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterMixDiscLevelsLineSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1128,7 +1048,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo("Discount %"), 'discount', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterMixDiscLinesLineSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1173,7 +1093,7 @@ codeunit 6014608 "NPR Replication Register"
 
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterDimSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1192,7 +1112,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo("Map-to IC Dimension Code"), 'mapToICDimensionCode', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterDimValueSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1214,7 +1134,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo("Map-to IC Dimension Value Code"), 'mapToICDimensionValueCode', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterDefaultDimSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1228,6 +1148,18 @@ codeunit 6014608 "NPR Replication Register"
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
            Rec.FieldNo("Table ID"), 'tableID', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo("Value Posting"), 'postingValidation', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(ParentId), 'parentId', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(DimensionId), 'dimensionId', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(DimensionValueId), 'dimensionValueId', 0, false, false);
     end;
 
     local procedure RegisterMiscellaneousServiceEndPoints()
@@ -1260,7 +1192,7 @@ codeunit 6014608 "NPR Replication Register"
                             1000, Database::Currency, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterLocationSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1282,7 +1214,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo("Use ADCS"), 'useADCS', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterShipMethodSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1295,7 +1227,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterPaymentTermsSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1311,7 +1243,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo("Discount %"), 'discount', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterPaymentMethodSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1324,7 +1256,7 @@ codeunit 6014608 "NPR Replication Register"
             Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPointOnAfterInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterCurrencySpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
@@ -1425,5 +1357,12 @@ codeunit 6014608 "NPR Replication Register"
             tenant := 'DEFAULT'
     end;
 
-}
+    [BusinessEvent(false)]
+#pragma warning disable AA0150
+    procedure OnUpdateCustomEndpoints(var Handled: Boolean)
+#pragma warning restore
+    begin
+        // code from customer app subscribes to this event to update endpoints Path: for custom fields we need to have custom api page in customer extension and use that api instead of the standard one.
+    end;
 
+}

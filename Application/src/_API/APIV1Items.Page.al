@@ -29,6 +29,11 @@ page 6014501 "NPR APIV1 - Items"
                 {
                     Caption = 'No.';
                 }
+
+                field(no2; Rec."No. 2")
+                {
+                    Caption = 'No. 2';
+                }
                 field(displayName; Rec.Description)
                 {
                     Caption = 'DisplayName';
@@ -38,7 +43,6 @@ page 6014501 "NPR APIV1 - Items"
                         RegisterFieldSet(Rec.FieldNo(Description));
                     end;
                 }
-
                 field(displayName2; Rec."Description 2")
                 {
                     Caption = 'DisplayName2';
@@ -48,6 +52,12 @@ page 6014501 "NPR APIV1 - Items"
                         RegisterFieldSet(Rec.FieldNo("Description 2"));
                     end;
                 }
+
+                field(searchDescription; Rec."Search Description")
+                {
+                    Caption = 'Search Description';
+                }
+
                 field(type; Rec.Type)
                 {
                     Caption = 'Type';
@@ -56,6 +66,91 @@ page 6014501 "NPR APIV1 - Items"
                     begin
                         RegisterFieldSet(Rec.FieldNo(Type));
                     end;
+                }
+
+                field(priceUnitConversion; Rec."Price Unit Conversion")
+                {
+                    Caption = 'Price Unit Conversion';
+                }
+
+                field(statisticsGroup; Rec."Statistics Group")
+                {
+                    Caption = 'Statistics Group';
+                }
+
+                field(commissionGroup; Rec."Commission Group")
+                {
+                    Caption = 'Commission Group';
+                }
+
+                field(reorderPoint; Rec."Reorder Point")
+                {
+                    Caption = 'Reorder Point';
+                }
+
+                field(maximumInventory; Rec."Maximum Inventory")
+                {
+                    Caption = 'Maximum Inventory';
+                }
+
+                field(reorderQuantity; Rec."Reorder Quantity")
+                {
+                    Caption = 'Reorder Quantity';
+                }
+
+                field(alternativeItemNo; Rec."Alternative Item No.")
+                {
+                    Caption = 'Alternative Item No.';
+                }
+
+                field(grossWeight; Rec."Gross Weight")
+                {
+                    Caption = 'Gross Weight';
+                }
+
+                field(netWeight; Rec."Net Weight")
+                {
+                    Caption = 'Net Weight';
+                }
+
+                field(unitsPerParcel; Rec."Units per Parcel")
+                {
+                    Caption = 'Units per Parcel';
+                }
+
+                field(unitVolume; Rec."Unit Volume")
+                {
+                    Caption = 'Unit Volume';
+                }
+
+                field(freightType; Rec."Freight Type")
+                {
+                    Caption = 'Freight Type';
+                }
+
+                field(countryRegionPurchasedCode; Rec."Country/Region Purchased Code")
+                {
+                    Caption = 'Country/Region Purchased Code';
+                }
+
+                field(budgetQuantity; Rec."Budget Quantity")
+                {
+                    Caption = 'Budget Quantity';
+                }
+
+                field(budgetedAmount; Rec."Budgeted Amount")
+                {
+                    Caption = 'Budgeted Amount';
+                }
+
+                field(budgetProfit; Rec."Budget Profit")
+                {
+                    Caption = 'Budget Profit';
+                }
+
+                field(durability; Rec.Durability)
+                {
+                    Caption = 'Durability';
                 }
 
                 field(allowInvoiceDisc; Rec."Allow Invoice Disc.")
@@ -147,6 +242,42 @@ page 6014501 "NPR APIV1 - Items"
                         RegisterFieldSet(Rec.FieldNo(Blocked));
                     end;
                 }
+
+                field(blockReason; Rec."Block Reason")
+                {
+                    Caption = 'Block Reason';
+                }
+
+                field(countryRegionOfOriginCode; Rec."Country/Region of Origin Code")
+                {
+                    Caption = 'Country/Region of Origin Code';
+                }
+
+                field(automaticExtTexts; Rec."Automatic Ext. Texts")
+                {
+                    Caption = 'Automatic Ext. Texts';
+                }
+
+                field(noSeries; Rec."No. Series")
+                {
+                    Caption = 'No. Series';
+                }
+
+                field(stockoutWarning; Rec."Stockout Warning")
+                {
+                    Caption = 'Stockout Warning';
+                }
+
+                field(preventNegativeInventory; Rec."Prevent Negative Inventory")
+                {
+                    Caption = 'Prevent Negative Inventory';
+                }
+
+                field(roundingPrecision; Rec."Rounding Precision")
+                {
+                    Caption = 'Rounding Precision';
+                }
+
                 field(gtin; Rec.GTIN)
                 {
                     Caption = 'GTIN';
@@ -416,9 +547,261 @@ page 6014501 "NPR APIV1 - Items"
                         RegisterFieldSet(Rec.FieldNo("Item Disc. Group"));
                     end;
                 }
+
+                field(assemblyPolicy; Rec."Assembly Policy")
+                {
+                    Caption = 'Assembly Policy';
+                }
+
+                field(lowLevelCode; Rec."Low-Level Code")
+                {
+                    Caption = 'Low-Level Code';
+                }
+
+                field(lotSize; Rec."Lot Size")
+                {
+                    Caption = 'Lot Size';
+                }
+
+                field(scrapPct; Rec."Scrap %")
+                {
+                    Caption = 'Scrap %';
+                }
+
+                field(dampenerQuantity; Rec."Dampener Quantity")
+                {
+                    Caption = 'Dampener Quantity';
+                }
+
+                field(serialNos; Rec."Serial Nos.")
+                {
+                    Caption = 'Serial Nos.';
+                }
+
+                field(inventoryValueZero; Rec."Inventory Value Zero")
+                {
+                    Caption = 'Inventory Value Zero';
+                }
+
+                field(discreteOrderQuantity; Rec."Discrete Order Quantity")
+                {
+                    Caption = 'Discrete Order Quantity';
+                }
+
+                field(minimumOrderQuantity; Rec."Minimum Order Quantity")
+                {
+                    Caption = 'Minimum Order Quantity';
+                }
+
+                field(maximumOrderQuantity; Rec."Maximum Order Quantity")
+                {
+                    Caption = 'Maximum Order Quantity';
+                }
+
+                field(safetyStockQuantity; Rec."Safety Stock Quantity")
+                {
+                    Caption = 'Safety Stock Quantity';
+                }
+
+                field(orderMultiple; Rec."Order Multiple")
+                {
+                    Caption = 'Order Multiple';
+                }
+
+                field(safetyLeadTime; Rec."Safety Lead Time")
+                {
+                    Caption = 'Safety Lead Time';
+                }
+
+                field(flushingMethod; Rec."Flushing Method")
+                {
+                    Caption = 'Flushing Method';
+                }
+
+                field(replenishmentSystem; Rec."Replenishment System")
+                {
+                    Caption = 'Replenishment System';
+                }
+
+                field(timeBucket; Rec."Time Bucket")
+                {
+                    Caption = 'Time Bucket';
+                }
+
+                field(reorderingPolicy; Rec."Reordering Policy")
+                {
+                    Caption = 'Reordering Policy';
+                }
+
+                field(includeInventory; Rec."Include Inventory")
+                {
+                    Caption = 'Include Inventory';
+                }
+
+                field(leadTimeCalculation; Rec."Lead Time Calculation")
+                {
+                    Caption = 'Lead Time Calculation';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Lead Time Calculation"));
+                    end;
+                }
+
+                field(manufacturingPolicy; Rec."Manufacturing Policy")
+                {
+                    Caption = 'Manufacturing Policy';
+                }
+
+                field(reschedulingPeriod; Rec."Rescheduling Period")
+                {
+                    Caption = 'Rescheduling Period';
+                }
+
+                field(lotAccumulationPeriod; Rec."Lot Accumulation Period")
+                {
+                    Caption = 'Lot Accumulation Period';
+                }
+                field(dampenerPeriod; Rec."Dampener Period")
+                {
+                    Caption = 'Dampener Period';
+                }
+
+                field(overflowLevel; Rec."Overflow Level")
+                {
+                    Caption = 'Overflow Level';
+                }
+
+                field(createdFromNonstockItem; Rec."Created From Nonstock Item")
+                {
+                    Caption = 'Created From Nonstock Item';
+                }
+
+                field(purchasingCode; Rec."Purchasing Code")
+                {
+                    Caption = 'Purchasing Code';
+                }
+                field(serviceItemGroup; Rec."Service Item Group")
+                {
+                    Caption = 'Service Item Group';
+                }
+
+                field(itemTrackingCode; Rec."Item Tracking Code")
+                {
+                    Caption = 'Item Tracking Code';
+                }
+
+                field(lotNos; Rec."Lot Nos.")
+                {
+                    Caption = 'Lot Nos.';
+                }
+
+                field(expirationCalculation; Rec."Expiration Calculation")
+                {
+                    Caption = 'Expiration Calculation';
+                }
+
+                field(warehouseClassCode; Rec."Warehouse Class Code")
+                {
+                    Caption = 'Warehouse Class Code';
+                }
+
+                field(specialEquipmentCode; Rec."Special Equipment Code")
+                {
+                    Caption = 'Special Equipment Code';
+                }
+
+                field(putAwayTemplateCode; Rec."Put-away Template Code")
+                {
+                    Caption = 'Put-away Template Code';
+                }
+
+                field(putAwayUnitOfMeasureCode; Rec."Put-away Unit of Measure Code")
+                {
+                    Caption = 'Put-away Unit of Measure Code';
+                }
+
+                field(physInvtCountingPeriodCode; Rec."Phys Invt Counting Period Code")
+                {
+                    Caption = 'Phys Invt Counting Period Code';
+                }
+
+                field(useCrossDocking; Rec."Use Cross-Docking")
+                {
+                    Caption = 'Use Cross-Docking';
+                }
+
+                field(purchasingBlocked; Rec."Purchasing Blocked")
+                {
+                    Caption = 'Purchasing Blocked';
+                }
+
+                field(overReceiptCode; Rec."Over-Receipt Code")
+                {
+                    Caption = 'Over-Receipt Code';
+                }
+
+                field(salesBlocked; Rec."Sales Blocked")
+                {
+                    Caption = 'Sales Blocked';
+                }
+
+                field(routingNo; Rec."Routing No.")
+                {
+                    Caption = 'Routing No.';
+                }
+
+                field(productionBomNo; Rec."Production BOM No.")
+                {
+                    Caption = 'Production BOM No.';
+                }
+
+                field(singleLevelMaterialCost; Rec."Single-Level Material Cost")
+                {
+                    Caption = 'Single-Level Material Cost';
+                }
+
+                field(singleLevelCapacityCost; Rec."Single-Level Capacity Cost")
+                {
+                    Caption = 'Single-Level Capacity Cost';
+                }
+
+                field(singleLevelSubcontrdCost; Rec."Single-Level Subcontrd. Cost")
+                {
+                    Caption = 'Single-Level Subcontrd. Cost';
+                }
+
+                field(singleLevelCapOvhdCost; Rec."Single-Level Cap. Ovhd Cost")
+                {
+                    Caption = 'Single-Level Cap. Ovhd Cost';
+                }
+
+                field(singleLevelMfgOvhdCost; Rec."Single-Level Mfg. Ovhd Cost")
+                {
+                    Caption = 'Single-Level Mfg. Ovhd Cost';
+                }
+
+                field(overheadRate; Rec."Overhead Rate")
+                {
+                    Caption = 'Overhead Rate';
+                }
+
+                field(orderTrackingPolicy; Rec."Order Tracking Policy")
+                {
+                    Caption = 'Order Tracking Policy';
+                }
                 field(nprGroupSale; Rec."NPR Group sale")
                 {
                     Caption = 'Group sale';
+                }
+
+                field(critical; Rec.Critical)
+                {
+                    Caption = 'Critical';
+                }
+
+                field(commonItemNo; Rec."Common Item No.")
+                {
+                    Caption = 'Common Item No.';
                 }
 
                 field(nprExplodeBomAuto; Rec."NPR Explode BOM auto")
@@ -441,7 +824,7 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'Ticket Type';
                 }
 
-                field(nprItemAddOnNo; Rec."NPR Item AddOn No.")
+                field(nprItemAddonNo; Rec."NPR Item AddOn No.")
                 {
                     Caption = 'Item AddOn No.';
                 }
@@ -571,6 +954,46 @@ page 6014501 "NPR APIV1 - Items"
                 field(nprVariety4Table; Rec."NPR Variety 4 Table")
                 {
                     Caption = 'Variety  4 Table';
+                }
+
+                field(nprNoPrintOnReciept; Rec."NPR No Print on Reciept")
+                {
+                    Caption = 'No Print on Reciept';
+                }
+
+                field(nprPrintTags; Rec."NPR Print Tags")
+                {
+                    Caption = 'Print Tags';
+                }
+
+                field(nprNpreItemRoutingProfile; Rec."NPR NPRE Item Routing Profile")
+                {
+                    Caption = 'NPRE Item Routing Profile';
+                }
+
+                field(nprCustomDiscountBlocked; Rec."NPR Custom Discount Blocked")
+                {
+                    Caption = 'Custom Discount Blocked';
+                }
+
+                field(nprCrossVarietyNo; Rec."NPR Cross Variety No.")
+                {
+                    Caption = 'Cross Variety No.';
+                }
+
+                field(nprItemStatus; Rec."NPR Item Status")
+                {
+                    Caption = 'Item Status';
+                }
+
+                field(nprMagentoPictVarietyType; Rec."NPR Magento Pict. Variety Type")
+                {
+                    Caption = 'Magento Pict. Variety Type';
+                }
+
+                field(nprDisplayOnlyText; Rec."NPR Display only Text")
+                {
+                    Caption = 'Display only Text';
                 }
 
                 part(baseUnitOfMeasure; "NPR APIV1 - Units of Measure")

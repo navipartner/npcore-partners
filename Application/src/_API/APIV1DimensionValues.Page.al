@@ -52,6 +52,11 @@ page 6014464 "NPR APIV1 - Dimension Values"
                     Caption = 'Dimension Value Type';
                 }
 
+                field(dimensionValueId; Rec."Dimension Value ID")
+                {
+                    Caption = 'Dimension Value Type';
+                }
+
                 field(totaling; Rec.Totaling)
                 {
                     Caption = 'Totaling';

@@ -155,7 +155,7 @@ page 6014668 "NPR APIV1 Locations"
                 {
                     Caption = 'Phone No. 2';
                 }
-                field(pickAccordingToFEFO; Rec."Pick According to FEFO")
+                field(pickAccordingToFefo; Rec."Pick According to FEFO")
                 {
                     Caption = 'Pick According to FEFO';
                 }
