@@ -40,7 +40,7 @@ codeunit 6014530 "NPR MobilePayV10 Can.Payment"
         eftSetup.FindSetup(eftTrxRequest."Register No.", eftTrxRequest."Original POS Payment Type Code");
         mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
 
-        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper);
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, eftTrxRequest);
 
         reqMessage.Method := 'POST';
         reqMessage.SetRequestUri(mobilePayProtocol.GetURL(eftSetup) + '/pos/v10/payments/' + eftTrxRequest."Reference Number Output" + '/cancel');

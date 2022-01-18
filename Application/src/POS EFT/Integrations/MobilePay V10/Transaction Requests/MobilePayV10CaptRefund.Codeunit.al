@@ -40,7 +40,7 @@ codeunit 6014552 "NPR MobilePayV10 Capt. Refund"
         mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
         posUnit.Get(eftSetup."POS Unit No.");
 
-        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper);
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, eftTrxRequest);
 
         jsonRequest.Add('amount', eftTrxRequest."Amount Input");
         jsonRequest.WriteTo(_request);

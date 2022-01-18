@@ -38,7 +38,7 @@ codeunit 6014523 "NPR MobilePayV10 FindActi.Ref."
         mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
         mobilePayUnitSetup.TestField("MobilePay POS ID");
 
-        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper);
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper, eftTrxRequest);
 
         reqMessage.Method := 'GET';
         reqMessage.SetRequestUri(mobilePayProtocol.GetURL(eftSetup) + '/pos/v10/refunds?posId=' + mobilePayUnitSetup."MobilePay POS ID");
