@@ -67,6 +67,11 @@ page 6014636 "NPR APIV1 - Salespersons/Purch"
                     Caption = 'Search Email', Locked = true;
                 }
 
+                field(image; TempNPRBlob."Buffer 1")
+                {
+                    Caption = 'Image';
+                }
+
                 field(nprRegisterPassword; Rec."NPR Register Password")
                 {
                     Caption = 'Register Password', Locked = true;
@@ -82,9 +87,14 @@ page 6014636 "NPR APIV1 - Salespersons/Purch"
                     Caption = 'Maximum Cash Returnsale', Locked = true;
                 }
 
-                field(nprSupervisorPOS; Rec."NPR Supervisor POS")
+                field(nprSupervisorPos; Rec."NPR Supervisor POS")
                 {
                     Caption = 'Supervisor POS', Locked = true;
+                }
+
+                field(nprHideRegisterImbalance; Rec."NPR Hide Register Imbalance")
+                {
+                    Caption = 'Hide Register Imbalance', Locked = true;
                 }
 
                 field(lastModifiedAt; Rec.SystemModifiedAt)
@@ -100,4 +110,29 @@ page 6014636 "NPR APIV1 - Salespersons/Purch"
         }
     }
 
+    trigger OnAfterGetRecord()
+    var
+        OStr: OutStream;
+    begin
+        // get Media field
+        TempNPRBlob.Init();
+        if Rec.Image.HasValue() then begin
+            TempNPRBlob."Buffer 1".CreateOutStream(OStr);
+            GetTenantMedia(Rec.Image.MediaId, OStr);
+        end;
+    end;
+
+    local procedure GetTenantMedia(MediaId: Guid; var OStr: OutStream)
+    var
+        TenantMedia: Record "Tenant Media";
+        IStr: InStream;
+    begin
+        TenantMedia.Get(MediaId);
+        TenantMedia.CalcFields(Content);
+        TenantMedia.Content.CreateInStream(IStr);
+        CopyStream(OStr, IStr);
+    end;
+
+    var
+        TempNPRBlob: Record "NPR BLOB buffer" temporary;
 }

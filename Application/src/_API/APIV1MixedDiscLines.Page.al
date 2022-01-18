@@ -99,6 +99,10 @@ page 6014483 "NPR API V1 - Mixed Disc. Lines"
                 {
                     Caption = 'vendorNo', Locked = true;
                 }
+                field(lastDateModified; Rec."Last Date Modified")
+                {
+                    Caption = 'Last Date Modified', Locked = true;
+                }
                 field(systemModifiedAt; Rec.SystemModifiedAt)
                 {
                     Caption = 'systemModifiedAt', Locked = true;

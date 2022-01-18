@@ -161,27 +161,25 @@ table 6014589 "NPR Replication Endpoint"
     begin
         Rec."Service Code" := pServiceCode;
         Rec."EndPoint ID" := pEndPointID;
-        if rec.Find() then
-            exit;
+        if not rec.Find() then begin
+            Rec.Init();
+            Rec.Path := pPath;
+            Rec.Description := pDescription;
+            Rec.Enabled := pEnabled;
+            Rec."Sequence Order" := pSeqOrder;
+            Rec."Endpoint Method" := pEndPointMethod;
+            Rec."odata.maxpagesize" := pOdataMaxPageSize;
+            Rec."Replication Counter" := pReplicationCounter;
+            Rec."Skip Import Entry No Data Resp" := true;
+            Rec."Table ID" := pTableId;
+            Rec."Run OnInsert Trigger" := pRunInsert;
+            Rec."Run OnModify Trigger" := pRunModify;
 
-        Rec.Init();
-        Rec.Path := pPath;
-        Rec.Description := pDescription;
-        Rec.Enabled := pEnabled;
-        Rec."Sequence Order" := pSeqOrder;
-        Rec."Endpoint Method" := pEndPointMethod;
-        Rec."odata.maxpagesize" := pOdataMaxPageSize;
-        Rec."Replication Counter" := pReplicationCounter;
-        Rec."Skip Import Entry No Data Resp" := true;
-        Rec."Table ID" := pTableId;
-        Rec."Run OnInsert Trigger" := pRunInsert;
-        Rec."Run OnModify Trigger" := pRunModify;
-
-        OnRegisterServiceEndPointOnBeforeInsert();
-
-        Rec.Insert();
-
-        OnRegisterServiceEndPointOnAfterInsert();
+            OnRegisterServiceEndPointOnBeforeInsert();
+            Rec.Insert();
+            OnRegisterServiceEndPointOnAfterInsert();
+        end;
+        OnRegisterServiceEndPoint();
     end;
 
     procedure CheckMappingExistForEndpoint(var Mapping: Record "NPR Rep. Special Field Mapping"): Boolean
@@ -216,6 +214,11 @@ table 6014589 "NPR Replication Endpoint"
 
     [IntegrationEvent(true, false)]
     local procedure OnRegisterServiceEndPointOnAfterInsert()
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnRegisterServiceEndPoint()
     begin
     end;
 }

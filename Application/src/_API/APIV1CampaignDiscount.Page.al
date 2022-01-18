@@ -124,6 +124,10 @@ page 6014470 "NPR APIV1 - Campaign Discount"
                 {
                     Caption = 'status', Locked = true;
                 }
+                field(lastDateModified; Rec."Last Date Modified")
+                {
+                    Caption = 'Last Date Modified', Locked = true;
+                }
                 field(systemModifiedAt; Rec.SystemModifiedAt)
                 {
                     Caption = 'systemModifiedAt', Locked = true;

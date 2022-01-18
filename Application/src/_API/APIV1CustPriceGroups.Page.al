@@ -42,7 +42,7 @@ page 6014641 "NPR APIV1 Cust. Price Groups"
                 {
                     Caption = 'Price Calculation Method';
                 }
-                field(priceIncludesVAT; Rec."Price Includes VAT")
+                field(priceIncludesVat; Rec."Price Includes VAT")
                 {
                     Caption = 'Price Includes VAT';
                 }

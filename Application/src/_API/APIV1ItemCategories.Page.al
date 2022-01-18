@@ -62,6 +62,16 @@ page 6014537 "NPR APIV1 - Item Categories"
                     end;
                 }
 
+                field(hasChildren; Rec."Has Children")
+                {
+                    Caption = 'Has Children';
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Has Children"));
+                    end;
+                }
+
                 field(indentation; Rec.Indentation)
                 {
                     Caption = 'Indentation';

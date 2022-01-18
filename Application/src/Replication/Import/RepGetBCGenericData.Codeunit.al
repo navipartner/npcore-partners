@@ -532,7 +532,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         Exit(JArrayValues.Count > 0);
     end;
 
-    local procedure InitializeTempSpecialFieldMapping(var TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping" temporary; ReplicationEndpoint: Record "NPR Replication Endpoint")
+    internal procedure InitializeTempSpecialFieldMapping(var TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping" temporary; ReplicationEndpoint: Record "NPR Replication Endpoint")
     var
         SpecialFieldMapping: Record "NPR Rep. Special Field Mapping";
     begin

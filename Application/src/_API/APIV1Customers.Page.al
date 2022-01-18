@@ -54,6 +54,12 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(Rec.FieldNo("Contact Type"));
                     end;
                 }
+
+                field(searchName; Rec."Search Name")
+                {
+                    Caption = 'Search Name';
+                }
+
                 field(addressLine1; Rec.Address)
                 {
                     Caption = 'Address Line 1';
@@ -144,6 +150,90 @@ page 6014507 "NPR APIV1 - Customers"
                     begin
                         RegisterFieldSet(Rec.FieldNo("Home Page"));
                     end;
+                }
+
+                field(contact; Rec.Contact)
+                {
+                    Caption = 'Contact';
+                }
+
+                field(telexNo; Rec."Telex No.")
+                {
+                    Caption = 'Telex No.';
+                }
+
+                field(shipToCode; Rec."Ship-to Code")
+                {
+                    Caption = 'Ship-to Code';
+                }
+
+                field(ourAccountNo; Rec."Our Account No.")
+                {
+                    Caption = 'Our Account No.';
+                }
+
+                field(territoryCode; Rec."Territory Code")
+                {
+                    Caption = 'Territory Code';
+                }
+
+                field(chainName; Rec."Chain Name")
+                {
+                    Caption = 'Chain Name';
+                }
+
+                field(budgetedAmount; Rec."Budgeted Amount")
+                {
+                    Caption = 'Budgeted Amount';
+                }
+
+                field(statisticsGroup; Rec."Statistics Group")
+                {
+                    Caption = 'Statistics Group';
+                }
+
+                field(shippingAgentCode; Rec."Shipping Agent Code")
+                {
+                    Caption = 'Shipping Agent Code';
+                }
+
+                field(placeOfExport; Rec."Place of Export")
+                {
+                    Caption = 'Place of Export';
+                }
+
+                field(collectionMethod; Rec."Collection Method")
+                {
+                    Caption = 'Collection Method';
+                }
+                field(amount; Rec.Amount)
+                {
+                    Caption = 'Amount';
+                }
+
+                field(lastStatementNo; Rec."Last Statement No.")
+                {
+                    Caption = 'Last Statement No.';
+                }
+
+                field(printStatements; Rec."Print Statements")
+                {
+                    Caption = 'Print Statements';
+                }
+
+                field(priority; Rec.Priority)
+                {
+                    Caption = 'Priority';
+                }
+
+                field(lastDateModified; Rec."Last Date Modified")
+                {
+                    Caption = 'Last Date Modified';
+                }
+
+                field(pricesIncludingVat; Rec."Prices Including VAT")
+                {
+                    Caption = 'Prices Including VAT';
                 }
                 field(taxLiable; Rec."Tax Liable")
                 {
@@ -423,11 +513,6 @@ page 6014507 "NPR APIV1 - Customers"
                     Caption = 'Invoice Disc. Code';
                 }
 
-                field(pricesIncludingVAT; Rec."Prices Including VAT")
-                {
-                    Caption = 'Prices Including VAT';
-                }
-
                 field(customerDiscGroup; Rec."Customer Disc. Group")
                 {
                     Caption = 'Customer Disc. Group';
@@ -491,6 +576,87 @@ page 6014507 "NPR APIV1 - Customers"
                 {
                     Caption = 'Bill-to Customer No.';
                 }
+
+                field(faxNo; Rec."Fax No.")
+                {
+                    Caption = 'Fax No.';
+                }
+
+                field(telexAnswerBack; Rec."Telex Answer Back")
+                {
+                    Caption = 'Telex Answer Back';
+                }
+
+                field(useGlnInElectronicDocument; Rec."Use GLN in Electronic Document")
+                {
+                    Caption = 'Use GLN in Electronic Document';
+                }
+
+                field(noSeries; Rec."No. Series")
+                {
+                    Caption = 'No. Series';
+                }
+
+                field(reserve; Rec.Reserve)
+                {
+                    Caption = 'Reserve';
+                }
+
+                field(disableSearchByName; Rec."Disable Search by Name")
+                {
+                    Caption = 'Disable Search by Name';
+                }
+
+                field(preferredBankAccountCode; Rec."Preferred Bank Account Code")
+                {
+                    Caption = 'Preferred Bank Account Code';
+                }
+
+                field(cashFlowPaymentTermsCode; Rec."Cash Flow Payment Terms Code")
+                {
+                    Caption = 'Cash Flow Payment Terms Code';
+                }
+
+                field(primaryContactNo; Rec."Primary Contact No.")
+                {
+                    Caption = 'Primary Contact No.';
+                }
+
+                field(shippingAdvice; Rec."Shipping Advice")
+                {
+                    Caption = 'Shipping Advice';
+                }
+
+                field(shippingTime; Rec."Shipping Time")
+                {
+                    Caption = 'Shipping Time';
+                }
+
+                field(shippingAgentServiceCode; Rec."Shipping Agent Service Code")
+                {
+                    Caption = 'Shipping Agent Service Code';
+                }
+
+                field(serviceZoneCode; Rec."Service Zone Code")
+                {
+                    Caption = 'Service Zone Code';
+                }
+
+                field(copySellToAddrToQteFrom; Rec."Copy Sell-to Addr. to Qte From")
+                {
+                    Caption = 'Copy Sell-to Addr. to Qte From';
+                }
+
+                field(contactId; Rec."Contact ID")
+                {
+                    Caption = 'Contact ID';
+                }
+
+                field(contactGraphId; Rec."Contact Graph Id")
+                {
+                    Caption = 'Contact Graph Id';
+                }
+
                 field(nprAnonymized; Rec."NPR Anonymized")
                 {
                     Caption = 'NPR Anonymized';

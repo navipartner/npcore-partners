@@ -63,6 +63,10 @@ page 6014525 "NPR API V1 - Item Reference"
                 }
 #pragma warning disable AL0432
 #ENDIF
+                field(nprLabelBarcode; Rec."NPR Label Barcode")
+                {
+                    Caption = 'NPR Label Barcode', Locked = true;
+                }
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'lastModifiedDateTime', Locked = true;

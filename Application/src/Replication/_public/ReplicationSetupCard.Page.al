@@ -126,7 +126,6 @@ page 6014495 "NPR Replication Setup Card"
                             ApplicationArea = NPRRetail;
                             Caption = 'Password';
                             Tooltip = 'Specifies the Password for Basic Authentication.';
-                            ExtendedDatatype = Masked;
                             trigger OnValidate()
                             begin
                                 if pw <> '' Then
