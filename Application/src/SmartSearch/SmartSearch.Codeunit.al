@@ -5,9 +5,10 @@ codeunit 6014623 "NPR Smart Search"
         CustomerSearchWorker(SearchTerm, Customer);
     end;
 
-    internal procedure SearchItem(SearchTerm: Text[100]; var Item: Record Item)
+    internal procedure SearchItemAndItemReference(SearchTerm: Text[100]; var Item: Record Item)
     begin
         ItemSearchWorker(SearchTerm, Item);
+        ItemReferenceSearchWorker(SearchTerm, Item);
     end;
 
     local procedure CustomerSearchWorker(SearchTerm: Text[100]; var Customer: Record Customer)
@@ -16,11 +17,11 @@ codeunit 6014623 "NPR Smart Search"
         ApplyCustomerFilter(SearchTerm, Customer);
         Customer.SetLoadFields("No.");
 
-        if (Customer.GetFilters() <> '') then begin
+        if Customer.GetFilters() <> '' then begin
             if Customer.FindSet() then
                 repeat
                     Customer.Mark(true);
-                until (Customer.Next() = 0);
+                until Customer.Next() = 0;
         end;
         Customer.FilterGroup := 0;
     end;
@@ -31,13 +32,34 @@ codeunit 6014623 "NPR Smart Search"
         ApplyItemFilter(SearchTerm, Item);
         Item.SetLoadFields("No.");
 
-        if (Item.GetFilters() <> '') then begin
+        if Item.GetFilters() <> '' then begin
             if Item.FindSet() then
                 repeat
                     Item.Mark(true);
-                until (Item.Next() = 0);
+                until Item.Next() = 0;
         end;
         Item.FilterGroup := 0;
+    end;
+
+    local procedure ItemReferenceSearchWorker(SearchTerm: Text[100]; var Item: Record Item)
+    var
+        ItemReference: Record "Item Reference";
+    begin
+        if StrLen(SearchTerm) > MaxStrLen(ItemReference."Reference No.") then
+            exit;
+
+        //to avoid performance issues '*' character is not allowed in front of the search term when searching the Item References
+        if StrPos(SearchTerm, '*') = 1 then
+            exit;
+
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetFilter("Reference No.", '%1', UpperCase(SearchTerm));
+        ItemReference.SetLoadFields("Item No.");
+        if ItemReference.FindSet() then
+            repeat
+                if Item.Get(ItemReference."Item No.") then
+                    Item.Mark(true);
+            until ItemReference.Next() = 0;
     end;
 
     local procedure ApplyCustomerFilter(SearchTerm: Text; var Customer: Record Customer)

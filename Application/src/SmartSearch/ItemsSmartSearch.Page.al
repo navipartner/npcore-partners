@@ -34,7 +34,7 @@ page 6059771 "NPR Items Smart Search"
                         exit;
                     end;
 
-                    SmartSearch.SearchItem(_SearchTerm, Item);
+                    SmartSearch.SearchItemAndItemReference(_SearchTerm, Item);
 #if BC17
                     Rec.Copy(Item);
                     Rec.SetLoadFields();
