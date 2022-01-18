@@ -66,12 +66,6 @@ page 6151590 "NPR NpDc Coupon Type Card"
                             ApplicationArea = NPRRetail;
                         }
                     }
-                    field(Enabled; Rec.Enabled)
-                    {
-
-                        ToolTip = 'Specifies the value of the Enabled field';
-                        ApplicationArea = NPRRetail;
-                    }
                 }
                 group(Control6014443)
                 {
@@ -86,6 +80,12 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     {
 
                         ToolTip = 'Specifies the value of the Arch. Coupon Qty. field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field(Enabled; Rec.Enabled)
+                    {
+
+                        ToolTip = 'Specifies the value of the Enabled field';
                         ApplicationArea = NPRRetail;
                     }
                 }
