@@ -16,8 +16,6 @@ page 6014602 "NPR Item Variants"
                 ShowCaption = false;
                 field("Item No."; Rec."Item No.")
                 {
-
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Item No. field';
                     ApplicationArea = NPRRetail;
                 }
@@ -38,6 +36,22 @@ page 6014602 "NPR Item Variants"
 
                     Visible = true;
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Inventory; Inventory)
+                {
+
+                    Caption = 'Inventory';
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Inventory field';
+                    ApplicationArea = NPRRetail;
+                }
+                field(NetChange; NetChange)
+                {
+
+                    Caption = 'Net Change';
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Net Change field';
                     ApplicationArea = NPRRetail;
                 }
 
@@ -67,5 +81,29 @@ page 6014602 "NPR Item Variants"
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    var
+        Item: Record Item;
+    begin
+        Item.Get(Rec."Item No.");
+        Item.SetRange("Variant Filter", Rec.Code);
+        Item.SetFilter("Date Filter", '..%1', Today);
+        if (LocationCodeFilter <> '') then
+            Item.SetRange("Location Filter", LocationCodeFilter);
+        Item.CalcFields(Inventory, "Net Change");
+        Inventory := Item.Inventory;
+        NetChange := Item."Net Change";
+    end;
+
+    procedure SetLocationCodeFilter(LocationCode: Code[10])
+    begin
+        LocationCodeFilter := LocationCode;
+    end;
+
+    var
+        Inventory: Decimal;
+        NetChange: Decimal;
+        LocationCodeFilter: Code[10];
 }
 
