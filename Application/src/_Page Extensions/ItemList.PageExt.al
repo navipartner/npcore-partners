@@ -24,7 +24,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                         exit;
                     end;
 
-                    SmartSearch.SearchItem(_SearchTerm, Item);
+                    SmartSearch.SearchItemAndItemReference(_SearchTerm, Item);
 #if BC17
                     Rec.Copy(Item);
                     Rec.SetLoadFields();
