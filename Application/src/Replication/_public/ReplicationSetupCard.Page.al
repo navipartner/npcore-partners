@@ -2,11 +2,11 @@ page 6014495 "NPR Replication Setup Card"
 {
 
     Caption = 'Replication API Setup Card';
+    ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
     Extensible = true;
     PageType = Card;
     SourceTable = "NPR Replication Service Setup";
     UsageCategory = None;
-    ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
 
     layout
     {
