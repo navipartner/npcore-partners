@@ -115,6 +115,7 @@ report 6014415 "NPR Rep. Check Missing Fields"
     local procedure UpdateMetadata(MetadataURI: Text; ServiceSetup: Record "NPR Replication Service Setup")
     var
         Client: HttpClient;
+        StatusCode: Integer;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
         [NonDebuggable]
@@ -126,6 +127,7 @@ report 6014415 "NPR Rep. Check Missing Fields"
         Properties: XmlNodeList;
         Property: XmlNode;
         XmlDomManagement: Codeunit "XML DOM Management";
+        ReplicationAPI: Codeunit "NPR Replication API";
         Attribute: XmlAttribute;
         EntityType: Text;
         EntitySet: Text;
@@ -136,8 +138,8 @@ report 6014415 "NPR Rep. Check Missing Fields"
             RequestMessage.SetRequestUri(MetadataURI);
             RequestMessage.GetHeaders(Headers);
             ServiceSetup.SetRequestHeadersAuthorization(Headers);
-            if not Client.Send(RequestMessage, ResponseMessage) then
-                Error(WebAPIErrorTxtG, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
+            if not ReplicationAPI.IsSuccessfulRequest(Client.Send(RequestMessage, ResponseMessage), ResponseMessage, ResponseXMLText, StatusCode) then
+                Error(ResponseXMLText);
 
             ResponseMessage.Content.ReadAs(ResponseXMLText);
             ResponseXMLText := XmlDomManagement.RemoveNamespaces(ResponseXMLText);
@@ -200,6 +202,8 @@ report 6014415 "NPR Rep. Check Missing Fields"
         TempSpecialFieldMapping.SetRange("Field ID", FieldRec."No.");
         if TempSpecialFieldMapping.FindSet() then
             repeat
+                if TempSpecialFieldMapping.Skip then
+                    exit(true);
                 if FieldRec.Type in [FieldRec.Type::BLOB, FieldRec.Type::Media, FieldRec.Type::MediaSet] then
                     TempSpecialFieldMapping."API Field Name" := TempSpecialFieldMapping."API Field Name".Replace('@odata.mediaReadLink', '');
                 if FindFieldInMetadata(MetadataURI, EntitySet, TempSpecialFieldMapping."API Field Name") then
@@ -232,7 +236,16 @@ report 6014415 "NPR Rep. Check Missing Fields"
 
     local procedure SkipMasterPictureField(FieldRec: Record Field): Boolean
     begin
-        exit((FieldRec.Type in [FieldRec.Type::Media, FieldRec.Type::MediaSet]) and (FieldRec.TableNo in [18, 23, 27]))
+        if (FieldRec.Type in [FieldRec.Type::Media, FieldRec.Type::MediaSet]) and
+         (FieldRec.TableNo in [Database::Customer, Database::Vendor, Database::Item]) then begin
+            case FieldRec.TableNo of
+                Database::Customer, Database::Vendor:
+                    exit(FieldRec.FieldName = 'Image');
+                Database::Item:
+                    exit(FieldRec.FieldName = 'Picture');
+            end;
+        end;
+        exit(false);
     end;
 
     var
@@ -241,5 +254,4 @@ report 6014415 "NPR Rep. Check Missing Fields"
         LastMetadataEntryNo: Integer;
         ImportedMetadatas: List Of [Text];
         ExceptedFields: List of [Text];
-        WebAPIErrorTxtG: Label 'Something went wrong:\\Error Status Code: %1;\\Description: %2';
 }
