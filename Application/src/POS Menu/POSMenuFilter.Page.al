@@ -198,6 +198,11 @@ page 6150718 "NPR POS Menu Filter"
 
                 ToolTip = 'Executes the Generic Filter action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                begin
+                    Rec.TableFilter();
+                end;
             }
             action(DisplayFilter)
             {
@@ -206,6 +211,21 @@ page 6150718 "NPR POS Menu Filter"
 
                 ToolTip = 'Executes the Display Filter action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    FilterStringText: Text;
+                    INS: InStream;
+                    NoFilterText: Label 'No filters set.';
+                begin
+                    FilterStringText := NoFilterText;
+                    Rec.CalcFields("Table Filter");
+                    if Rec."Table Filter".HasValue then begin
+                        Rec."Table Filter".CreateInStream(INS);
+                        INS.Read(FilterStringText);
+                    end;
+                    Message(FilterStringText);
+                end;
             }
         }
     }
