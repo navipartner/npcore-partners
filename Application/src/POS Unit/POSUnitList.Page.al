@@ -182,7 +182,7 @@ page 6150616 "NPR POS Unit List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR MPOS QR Code List";
-                    RunPageLink = "POS Unit No." = FIELD("No.");
+                    RunPageLink = "Cash Register Id" = FIELD("No.");
 
                     ToolTip = 'Displays a page showing list of related MPOS QR Code setups';
                     ApplicationArea = NPRRetail;
