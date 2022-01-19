@@ -3,6 +3,7 @@ page 6014487 "NPR Replication Error Log"
 
     ApplicationArea = NPRRetail;
     Caption = 'Replication Error Log';
+    ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
     PageType = List;
     SourceTable = "NPR Replication Error Log";
     UsageCategory = Lists;
