@@ -191,8 +191,6 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                 exit('NPRMagentoDescription2Media');
             Codeunit::"NPR UPG Member Blob 2 Media":
                 exit('NPMMemberBlob2Media');
-            Codeunit::"NPR Upgrade POS Unit No":
-                exit('NPRUpgradePOSUnitNo-20220114')
         end;
     end;
 }

@@ -51,7 +51,7 @@ page 6059964 "NPR MPOS QR Code List"
                     ToolTip = 'Specifies the value of the Payment Gateway field';
                     ApplicationArea = NPRRetail;
                 }
-                field("POS Unit No."; Rec."POS Unit No.")
+                field("POS Unit No."; Rec."Cash Register Id")
                 {
 
                     ToolTip = 'Specifies assigned POS Unit';
@@ -77,7 +77,7 @@ page 6059964 "NPR MPOS QR Code List"
             {
                 SubPageLink = "User ID" = FIELD("User ID"),
                               Company = FIELD(Company),
-                              "POS Unit No." = FIELD("POS Unit No.");
+                              "Cash Register Id" = FIELD("Cash Register Id");
                 ApplicationArea = NPRRetail;
 
             }
