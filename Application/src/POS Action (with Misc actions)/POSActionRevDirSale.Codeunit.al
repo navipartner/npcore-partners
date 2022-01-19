@@ -191,9 +191,16 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSalesLine: Record "NPR POS Entry Sales Line";
+        SaleLinePOS2: Record "NPR POS Sale Line";
+        SaleLinePOSLineNo: Integer;
     begin
         POSSalesLine.SetRange("Document No.", SalesTicketNo);
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+
+        SaleLinePOS2.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS2.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        if SaleLinePOS2.FindLast() then
+            SaleLinePOSLineNo := SaleLinePOS2."Line No." + 10000;
 
         if POSSalesLine.FindSet(false, false) then
             repeat
@@ -203,9 +210,12 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
                 SaleLinePOS.Date := SalePOS.Date;
                 SaleLinePOS.Type := SaleLinePOS.Type::Item;
                 SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
-                SaleLinePOS."Line No." := POSSalesLine."Line No.";
+                SaleLinePOS."Line No." := SaleLinePOSLineNo;
                 SaleLinePOS.Insert(true);
+                SaleLinePOSLineNo := SaleLinePOSLineNo + 10000;
+
                 ReverseAuditInfoToSalesLine(SaleLinePOS, POSSalesLine);
+
                 if ReturnReasonCode <> '' then
                     SaleLinePOS.Validate("Return Reason Code", ReturnReasonCode);
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
