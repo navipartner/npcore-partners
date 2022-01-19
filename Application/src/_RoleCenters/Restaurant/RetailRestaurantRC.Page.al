@@ -135,10 +135,10 @@ page 6151334 "NPR Retail Restaurant RC"
                 action(POSEntries)
                 {
 
-                    Caption = 'POS Entries';
+                    Caption = 'POS Entry List';
                     Image = Entries;
                     RunObject = Page "NPR POS Entry List";
-                    ToolTip = 'Open the list of registered POS entries.';
+                    ToolTip = 'Open the list of registered POS entry list';
                     ApplicationArea = NPRRetail;
                 }
                 action("Posted Sales Invoices")
