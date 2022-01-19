@@ -294,11 +294,12 @@ codeunit 6059970 "NPR Variety Wrapper"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Check Line", 'OnAfterCheckItemJnlLine', '', false, false)]
-    local procedure C21OnAfterCheckItemJnlLine(var ItemJnlLine: Record "Item Journal Line")
+    local procedure C21OnAfterCheckItemJnlLine(var ItemJnlLine: Record "Item Journal Line"; CalledFromAdjustment: Boolean)
     var
         VRTCheck: Codeunit "NPR Variety Check";
     begin
-        VRTCheck.PostingCheck(ItemJnlLine);
+        if not CalledFromAdjustment then
+            VRTCheck.PostingCheck(ItemJnlLine);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'NPR Variety Group', true, false)]
