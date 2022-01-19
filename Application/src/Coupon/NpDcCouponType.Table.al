@@ -57,7 +57,7 @@ table 6151590 "NPR NpDc Coupon Type"
         }
         field(31; "Starting Date DateFormula"; DateFormula)
         {
-            Caption = 'Starting Date DateFormula';
+            Caption = 'Starting Date Formula';
             DataClassification = CustomerContent;
         }
         field(35; "Ending Date"; DateTime)
@@ -67,7 +67,7 @@ table 6151590 "NPR NpDc Coupon Type"
         }
         field(36; "Ending Date DateFormula"; DateFormula)
         {
-            Caption = 'Ending Date Date Formula';
+            Caption = 'Ending Date  Formula';
             DataClassification = CustomerContent;
         }
         field(45; "Date Filter"; Date)
