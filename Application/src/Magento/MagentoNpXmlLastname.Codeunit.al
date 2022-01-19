@@ -37,6 +37,10 @@ codeunit 6151456 "NPR Magento NpXml Lastname"
         FieldRef := RecRef.Field(FieldNo);
         Lastname := Format(FieldRef.Value, 0, 9);
 
+        while Lastname[StrLen(Lastname)] = ' ' do begin
+            Lastname := DelStr(Lastname, StrLen(Lastname));
+        end;
+
         Position := StrPos(Lastname, ' ');
         if Position = 0 then
             exit('');
