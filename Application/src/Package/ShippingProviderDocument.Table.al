@@ -1,8 +1,8 @@
-table 6014452 "NPR Pacsoft Shipment Document"
+table 6014452 "NPR Shipping Provider Document"
 {
-    Caption = 'Pacsoft Shipment Document';
-    DrillDownPageID = "NPR Pacsoft Shipment Documents";
-    LookupPageID = "NPR Pacsoft Shipment Documents";
+    Caption = 'Shipping Provider  Document';
+    DrillDownPageID = "NPR Shipping Provider Docs";
+    LookupPageID = "NPR Shipping Provider Docs";
     PasteIsValid = false;
     DataClassification = CustomerContent;
 
@@ -15,7 +15,7 @@ table 6014452 "NPR Pacsoft Shipment Document"
 
             trigger OnValidate()
             var
-                ShipmentDocument: Record "NPR Pacsoft Shipment Document";
+                ShipmentDocument: Record "NPR Shipping Provider Document";
             begin
                 if "Entry No." = 0 then begin
                     Clear(ShipmentDocument);
@@ -462,8 +462,8 @@ table 6014452 "NPR Pacsoft Shipment Document"
     procedure AddEntry(RecRef: RecordRef; ShowWindow: Boolean)
     var
         CompanyInfo: Record "Company Information";
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
-        ShipmentDocument2: Record "NPR Pacsoft Shipment Document";
+        ShipmentDocument: Record "NPR Shipping Provider Document";
+        ShipmentDocument2: Record "NPR Shipping Provider Document";
         ShipmentDocServices: Record "NPR Pacsoft Shipm. Doc. Serv.";
         CustomsItemRows: Record "NPR Pacsoft Customs Item Rows";
         Customer: Record Customer;
@@ -472,8 +472,8 @@ table 6014452 "NPR Pacsoft Shipment Document"
         ShippingAgentServices: Record "Shipping Agent Services";
         PacsoftMgt: Codeunit "NPR Pacsoft Management";
         TextNotActivated: Label 'The Pacsoft integration is not activated.';
-        PacsoftSetup: Record "NPR Pacsoft Setup";
-        CreateShipmentDocument: Page "NPR Pacsoft Shipment Document";
+        PacsoftSetup: Record "NPR Shipping Provider Setup";
+        CreateShipmentDocument: Page "NPR Shipping Provider Document";
         ShippingAgentServicesCode: Code[10];
     begin
         if not PacsoftSetup.Get() then exit;
@@ -633,7 +633,7 @@ table 6014452 "NPR Pacsoft Shipment Document"
                 PacsoftMgt.SendDocument(ShipmentDocument, false);
     end;
 
-    procedure DeleteShippingAgentServices(pShipmentDocument: Record "NPR Pacsoft Shipment Document"; WithDialog: Boolean)
+    procedure DeleteShippingAgentServices(pShipmentDocument: Record "NPR Shipping Provider Document"; WithDialog: Boolean)
     var
         ShipmentDocServices: Record "NPR Pacsoft Shipm. Doc. Serv.";
         TextConfirm: Label 'The chosen Shipping Agent Services will be deleted. Continue ?';
@@ -656,11 +656,11 @@ table 6014452 "NPR Pacsoft Shipment Document"
         ShipmentDocServices.DeleteAll(true);
     end;
 
-    procedure ShowTrackAndTrace(pShipmentDocument: Record "NPR Pacsoft Shipment Document")
+    procedure ShowTrackAndTrace(pShipmentDocument: Record "NPR Shipping Provider Document")
     var
         ShippingAgent: Record "Shipping Agent";
         TrackingInternetAddr: Text[250];
-        PacsoftSetup: Record "NPR Pacsoft Setup";
+        PacsoftSetup: Record "NPR Shipping Provider Setup";
     begin
 
         if pShipmentDocument."Entry No." = 0 then exit;

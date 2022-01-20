@@ -6,13 +6,13 @@ codeunit 6014484 "NPR Pacsoft Management"
     end;
 
     var
-        PacsoftSetup: Record "NPR Pacsoft Setup";
+        PacsoftSetup: Record "NPR Shipping Provider Setup";
         GotIComm: Boolean;
         SendShipmentAgainQst: Label 'The shipment was already sent to Pacsoft, do you wish to send it again?';
 
     procedure SendDocuments()
     var
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
+        ShipmentDocument: Record "NPR Shipping Provider Document";
     begin
         Clear(ShipmentDocument);
         ShipmentDocument.SetCurrentKey("Export Time");
@@ -23,7 +23,7 @@ codeunit 6014484 "NPR Pacsoft Management"
             until ShipmentDocument.Next() = 0;
     end;
 
-    procedure SendDocument(var ShipmentDocument: Record "NPR Pacsoft Shipment Document"; WithDialog: Boolean)
+    procedure SendDocument(var ShipmentDocument: Record "NPR Shipping Provider Document"; WithDialog: Boolean)
     var
         OutStr: OutStream;
         DocumentSentMsg: Label 'Document sent.';
@@ -63,7 +63,7 @@ codeunit 6014484 "NPR Pacsoft Management"
             Message(DocumentSentMsg);
     end;
 
-    local procedure SendXML(var ShipmentDocument: Record "NPR Pacsoft Shipment Document")
+    local procedure SendXML(var ShipmentDocument: Record "NPR Shipping Provider Document")
     var
         Client: HttpClient;
         Content: HttpContent;
@@ -119,7 +119,7 @@ codeunit 6014484 "NPR Pacsoft Management"
         ShipmentDocument.Modify();
     end;
 
-    local procedure StoreResponseOfSentPacsoftShipmentDocument(var ShipmentDocument: Record "NPR Pacsoft Shipment Document"; ResponseMessage: HttpResponseMessage)
+    local procedure StoreResponseOfSentPacsoftShipmentDocument(var ShipmentDocument: Record "NPR Shipping Provider Document"; ResponseMessage: HttpResponseMessage)
     var
         Document: XmlDocument;
         OutStr: OutStream;
@@ -131,7 +131,7 @@ codeunit 6014484 "NPR Pacsoft Management"
         Document.WriteTo(OutStr);
     end;
 
-    procedure CheckDocument(ShipmentDocument: Record "NPR Pacsoft Shipment Document") OK: Boolean
+    procedure CheckDocument(ShipmentDocument: Record "NPR Shipping Provider Document") OK: Boolean
     var
         ShippingAgent: Record "Shipping Agent";
         ShippingAgentService: Record "Shipping Agent Services";
@@ -220,7 +220,7 @@ codeunit 6014484 "NPR Pacsoft Management"
         exit(OK);
     end;
 
-    procedure PrepareXml(var ShipmentDocument: Record "NPR Pacsoft Shipment Document")
+    procedure PrepareXml(var ShipmentDocument: Record "NPR Shipping Provider Document")
     var
         Document: XmlDocument;
         Element: XmlElement;

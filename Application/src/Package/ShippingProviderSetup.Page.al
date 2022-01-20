@@ -1,8 +1,8 @@
-page 6014574 "NPR Pacsoft Setup"
+page 6014574 "NPR Shipping Provider Setup"
 {
-    Caption = 'Pacsoft Setup';
+    Caption = 'Shipping Provider Setup';
     PageType = Card;
-    SourceTable = "NPR Pacsoft Setup";
+    SourceTable = "NPR Shipping Provider Setup";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 

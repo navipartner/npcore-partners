@@ -1,10 +1,10 @@
-page 6014440 "NPR Pacsoft Shipment Documents"
+page 6014440 "NPR Shipping Provider Docs"
 {
-    Caption = 'Pacsoft Shipment Documents';
-    CardPageID = "NPR Pacsoft Shipment Document";
+    Caption = 'Shipping Provider Documents';
+    CardPageID = "NPR Shipping Provider Document";
     Editable = false;
     PageType = List;
-    SourceTable = "NPR Pacsoft Shipment Document";
+    SourceTable = "NPR Shipping Provider Document";
     SourceTableView = SORTING("Export Time");
     UsageCategory = Documents;
     ApplicationArea = NPRRetail;
@@ -156,7 +156,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
 
                 trigger OnAction()
                 var
-                    ShipmentDocumentForm: Page "NPR Pacsoft Shipment Document";
+                    ShipmentDocumentForm: Page "NPR Shipping Provider Document";
                 begin
                     Clear(ShipmentDocumentForm);
                     ShipmentDocumentForm.SetRecord(Rec);
@@ -190,7 +190,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 trigger OnAction()
                 var
                     PacsoftMgt: Codeunit "NPR Pacsoft Management";
-                    PacsoftSetup: Record "NPR Pacsoft Setup";
+                    PacsoftSetup: Record "NPR Shipping Provider Setup";
                     ShipmondoMgnt: Codeunit "NPR Shipmondo Mgnt.";
                 begin
                     if Confirm(StrSubstNo(TextConfirm, Rec.FieldCaption("Entry No."), Rec."Entry No."), true) then begin
@@ -212,7 +212,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
             {
                 Caption = 'Setup';
                 Image = Setup;
-                RunObject = Page "NPR Pacsoft Setup";
+                RunObject = Page "NPR Shipping Provider Setup";
 
                 ToolTip = 'Executes the Setup action';
                 ApplicationArea = NPRRetail;

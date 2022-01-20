@@ -2,8 +2,8 @@ table 6014587 "NPR Package Code"
 {
 
     Caption = 'NPR Package Codes';
-    DrillDownPageID = "NPR Pacsoft Package Codes";
-    LookupPageID = "NPR Pacsoft Package Codes";
+    DrillDownPageID = "NPR Package Codes";
+    LookupPageID = "NPR Package Codes";
     DataClassification = CustomerContent;
 
     fields
