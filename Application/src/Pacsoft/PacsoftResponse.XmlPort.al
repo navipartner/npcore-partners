@@ -1,15 +1,12 @@
 xmlport 6014485 "NPR Pacsoft Response"
 {
-    // PS1.00/BHR/20140714  Updated Version List.
-    // PS1.01/RA/20160809  CASE 228449 Changed Encoding to UTF-8
-
     Caption = 'Pacsoft Response';
     Direction = Import;
     Encoding = UTF8;
 
     schema
     {
-        tableelement(tempshipmentdocument; "NPR Pacsoft Shipment Document")
+        tableelement(tempshipmentdocument; "NPR Shipping Provider Document")
         {
             XmlName = 'response';
             SourceTableView = SORTING("Entry No.");
@@ -56,14 +53,14 @@ xmlport 6014485 "NPR Pacsoft Response"
     end;
 
     var
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
+        ShipmentDocument: Record "NPR Shipping Provider Document";
 
-    procedure SetShipmentDocument(pShipmentDocument: Record "NPR Pacsoft Shipment Document")
+    procedure SetShipmentDocument(pShipmentDocument: Record "NPR Shipping Provider Document")
     begin
         ShipmentDocument := pShipmentDocument;
     end;
 
-    procedure GetShipmentDocument(var pShipmentDocument: Record "NPR Pacsoft Shipment Document")
+    procedure GetShipmentDocument(var pShipmentDocument: Record "NPR Shipping Provider Document")
     begin
         pShipmentDocument := ShipmentDocument;
     end;

@@ -1,6 +1,6 @@
 codeunit 6014404 "NPR Event Subscriber"
 {
-    SingleInstance = true; //For performance, not state sharing.
+    SingleInstance = true;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforeInsertTransferEntry', '', true, false)]
     local procedure ItemJnlPostLineOnBeforeInsertTransferEntry(var NewItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line")
@@ -37,8 +37,8 @@ codeunit 6014404 "NPR Event Subscriber"
         ConsignorEntry: Record "NPR Consignor Entry";
         SalesShptHeader: Record "Sales Shipment Header";
         SalesSetup: Record "Sales & Receivables Setup";
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
-        PacsoftSetup: Record "NPR Pacsoft Setup";
+        ShipmentDocument: Record "NPR Shipping Provider Document";
+        PacsoftSetup: Record "NPR Shipping Provider Setup";
         RecRefShipment: RecordRef;
     begin
         SalesSetup.Get();

@@ -1,6 +1,6 @@
-table 6014574 "NPR Pacsoft Setup"
+table 6014574 "NPR Shipping Provider Setup"
 {
-    Caption = 'Pacsoft Setup';
+    Caption = 'Shipping Provider Setup';
     DataClassification = CustomerContent;
 
     fields

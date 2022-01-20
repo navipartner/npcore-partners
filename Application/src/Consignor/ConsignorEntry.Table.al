@@ -162,7 +162,7 @@ table 6184601 "NPR Consignor Entry"
 
     local procedure InsertHeader(InCode: Code[20])
     var
-        PacsoftSetup: Record "NPR Pacsoft Setup";
+        PacsoftSetup: Record "NPR Shipping Provider Setup";
     begin
         if not PacsoftSetup.Get() then
             exit;
@@ -171,7 +171,6 @@ table 6184601 "NPR Consignor Entry"
             exit;
 
         Code := InCode;
-        //Actor;
         Ready := true;
         Insert(true);
     end;

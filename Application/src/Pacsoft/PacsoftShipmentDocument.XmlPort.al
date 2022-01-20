@@ -5,7 +5,7 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
     Encoding = UTF8;
     schema
     {
-        tableelement(shipmentdocument; "NPR Pacsoft Shipment Document")
+        tableelement(shipmentdocument; "NPR Shipping Provider Document")
         {
             XmlName = 'data';
             textelement(sender)
@@ -1461,7 +1461,7 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
 
     var
         CompanyInfo: Record "Company Information";
-        PacsoftSetup: Record "NPR Pacsoft Setup";
+        PacsoftSetup: Record "NPR Shipping Provider Setup";
         PacsoftMgt: Codeunit "NPR Pacsoft Management";
 }
 
