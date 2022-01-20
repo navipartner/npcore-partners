@@ -44,8 +44,8 @@ page 6060073 "NPR MM Members. Alteration Jnl"
 
                     trigger OnValidate()
                     begin
-
-                        SetExternalMembershipNo(Rec."External Membership No.", Rec);
+                        if (not SelectMembershipUsingMemberCard(Rec."External Membership No.", Rec)) then
+                            SetExternalMembershipNo(Rec."External Membership No.", Rec);
                     end;
                 }
                 field("Membership Code"; Rec."Membership Code")
