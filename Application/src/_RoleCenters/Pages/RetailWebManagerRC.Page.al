@@ -13,6 +13,11 @@ page 6151244 "NPR Retail Web Manager RC"
                 ApplicationArea = NPRRetail;
 
             }
+            part(MyJobQueue; "My Job Queue")
+            {
+                Caption = 'Job Queue';
+                ApplicationArea = NPRRetail;
+            }
             part(Control21; "Report Inbox Part")
             {
                 AccessByPermission = TableData "Report Inbox" = R;
