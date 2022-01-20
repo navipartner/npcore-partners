@@ -46,9 +46,23 @@ These are the elements outlined in John Gruber’s original design document. All
 
 ---
 
-### Link
+### External Link
 
 [Markdown Guide](https://www.markdownguide.org)
+
+### Internal Link
+
+For internal links (links to other NaviPartner documentation pages, i.e. related links) follow these steps:
+
+1. Use the "relative path" to the page omitting the protocol and domain name (right-click on the page you wish to link to and select the **Copy Relative Path** option).   
+   For example use "/public/retail/eft/howto/mobilepay" instead of https://docs.navipartner.com/retail/eft/howto/mobilepay.html.
+2. For the link address use the path of the page in the site regardless of the location of the file in the repository.       
+   Do not use the .md suffix.
+3. Don't forget to start the path with a forward slash: /.
+
+Putting this all together an internal link looks like this:
+
+[An Internal Link](/public/retail/eft/howto/mobilepay)
 
 ### Image
 
@@ -64,6 +78,8 @@ These elements extend the basic syntax by adding additional features. Not all Ma
 | ----------- | ----------- |
 | Header | Title |
 | Paragraph | Text |
+
+If you're feeling lazy, you can generate a table on [this website](https://www.tablesgenerator.com/markdown_tables).
 
 ### Fenced Code Block
 

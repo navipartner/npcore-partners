@@ -6,7 +6,7 @@
     href: explanation/POSUnit.md
 - name: How-To  
   items:
-  - name: Create new POS Unit
+  - name: Create a new POS Unit
     href: howto/createnew.md
   - name: Configure a receipt printout for a POS unit
     href: howto/receipt-printout.md

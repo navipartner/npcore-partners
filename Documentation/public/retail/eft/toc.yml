@@ -6,5 +6,5 @@
     href: howto/mobilepay.md
 - name: Explanations
   items:
-  - name: Transaction Lookup
+  - name: Transaction lookup
     href: explanation/lookup.md

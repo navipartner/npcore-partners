@@ -43,7 +43,7 @@ Internal documentation deals with back-end information that would be more suitab
 - **Features should be written with first letters of each word capitalized**   
   Feature names shouldn't be bold or indicated by quotation marks.
 - **Add screenshots ONLY when they add value to the article/topic**   
-  If you can explain something with text, don't add screenshots at all. If we have too many screenshots and the GUI is changed, 
+  If you can explain something with text, don't add screenshots at all. If we have too many screenshots and the GUI is changed, we will have to replace all screenshots manually, which is highly inconvenient.
 
 ## Documentation sections and structure
 There are two topic structures that you can choose from, depending on the subject, knowledge levels, and the goal of the reader.
@@ -139,24 +139,24 @@ When constructing tooltips, we're going to strive for the model defined by the B
 
 ## General recommendations:
 
-To ensure that the documentation style is unified, the following recommendations should be follow, regardless of the type of topic that you're writing. Your docs may still be valid if some of these guidelines aren't met, but it would be best to apply them to maximize the docs' usability.
+To ensure that the documentation style is standardized, the following recommendations should be considered, regardless of the type of topic that you're writing. Your docs may still be valid if some of these guidelines aren't met, but it would be best to apply them to maximize the docs' usability.
 
 
-- **If you can, use the present tense and active voice**  
+- **If you can, use the present tense and active voice.**  
   They are easier to read and understand. They also improve searchability.
 - **Don't use abbreviations.**   
   Instead of "e.g.", use "for example", "such as", or "like". The same goes for all other abbreviations ("etc." -> "and so on"; "i.e." -> "that is").
-- **Use the sentence-style capitalization in headings**  
+- **Use the sentence-style capitalization in headings.**  
   (For example, write "Point of sale", not "Point of Sale")
-- **Write brief and meaningful text**  
+- **Write brief and meaningful text.**  
   Technical documentation should cater to the users' immediate needs. Organize your content into short but meaningful sentences wherever possible.
-- **Prioritize**  
+- **Prioritize.**  
   Lead with the information that matters the most, so that readers know immediately where to focus their attention.
-- **Don't be abstract**  
+- **Don't be abstract.**  
   Basically, if you're intimately acquainted with the subject, your writing should automatically become more straight-to-the-point.
-- **Avoid gender-specific language**  
+- **Avoid gender-specific language.**  
   Don't use he/she.
-- **Avoid unnecessary information**  
+- **Avoid unnecessary information.**  
   Put yourself in the users' shoes and separate information that you personally think is interesting, and information that users need.
 
 
