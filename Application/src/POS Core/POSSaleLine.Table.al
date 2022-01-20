@@ -2126,6 +2126,9 @@ table 6014406 "NPR POS Sale Line"
     end;
 
     local procedure InitFromItem()
+    var
+        ItemVariant: Record "Item Variant";
+        NPRVarietySetup: Record "NPR Variety Setup";
     begin
         if "No." = '' then
             exit;
@@ -2145,6 +2148,15 @@ table 6014406 "NPR POS Sale Line"
         Description := Item.Description;
         "Description 2" := Item."Description 2";
         "Magento Brand" := Item."NPR Magento Brand";
+
+        if NPRVarietySetup.Get() then
+            if not NPRVarietySetup."Custom Descriptions" then
+                exit;
+
+        if "Variant Code" <> '' then begin
+            ItemVariant.Get(Item."No.", "Variant Code");
+            "Description 2" := ItemVariant.Description;
+        end;
     end;
 
     local procedure InitFromItemCategory()
