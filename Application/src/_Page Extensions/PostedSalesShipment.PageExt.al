@@ -83,7 +83,7 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
 
                     trigger OnAction()
                     var
-                        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
+                        ShipmentDocument: Record "NPR shipping Provider Document";
                         RecRef: RecordRef;
                     begin
                         RecRef.GetTable(Rec);

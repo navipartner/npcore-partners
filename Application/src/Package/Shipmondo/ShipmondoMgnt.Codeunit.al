@@ -1,7 +1,7 @@
 codeunit 6014578 "NPR Shipmondo Mgnt."
 {
     var
-        PackageProviderSetup: Record "NPR Pacsoft Setup";
+        PackageProviderSetup: Record "NPR Shipping Provider Setup";
         ApiUser: Text;
         ApiKey: Text;
         RequestString: Text;
@@ -9,7 +9,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         Text0001: Label 'Login Details Missing';
 
 
-    local procedure SetProductAndServices(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") services: Text;
+    local procedure SetProductAndServices(var PakkelabelsShipment: Record "NPR Shipping Provider Document") services: Text;
     var
         ServicesCombination: Record "NPR Services Combination";
         Counter: Integer;
@@ -27,7 +27,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             until ServicesCombination.NEXT() = 0;
     end;
 
-    local procedure CreateShipment(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document"; Silent: Boolean);
+    local procedure CreateShipment(var PakkelabelsShipment: Record "NPR Shipping Provider Document"; Silent: Boolean);
     var
         ShipmentID: Code[20];
         ShipmentNumber: Code[50];
@@ -98,7 +98,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         end;
     end;
 
-    local procedure BuildShipmentRequest(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") Output: Text;
+    local procedure BuildShipmentRequest(var PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;
     var
         ShippingAgent: Record "NPR Package Shipping Agent";
         own_agreement: Text;
@@ -164,7 +164,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         Output += '}';
     end;
 
-    local procedure BuildSender(PakkelabelsShipment: record "NPR pacsoft shipment Document") Output: Text;
+    local procedure BuildSender(PakkelabelsShipment: record "NPR Shipping Provider Document") Output: Text;
     var
         CompanyInformation: Record "Company Information";
         QueryParamsLbl: Label '"name": "%1",', Locked = true;
@@ -197,7 +197,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         Output += '}';
     end;
 
-    local procedure BuildReceiver(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") Output: Text;
+    local procedure BuildReceiver(var PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;
     var
         QueryParamsLbl: Label '"name": "%1",', Locked = true;
         QueryParams2Lbl: Label '"attention": "%1",', Locked = true;
@@ -232,7 +232,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         Output += '}';
     end;
 
-    local procedure BuildServicePoint(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") Output: Text;
+    local procedure BuildServicePoint(var PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;
     var
         QueryParamsLbl: Label '"id": "%1"', Locked = true;
     begin
@@ -241,7 +241,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         Output += '}';
     end;
 
-    local procedure BuildParcels(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") Output: Text;
+    local procedure BuildParcels(var PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;
     var
         PakkeShippingAgent: Record "NPR Package Shipping Agent";
         QueryParamsLbl: Label '"weight":"%1"', Locked = true;
@@ -260,7 +260,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
 
     end;
 
-    local procedure PrintAllowed(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document"): Boolean;
+    local procedure PrintAllowed(var PakkelabelsShipment: Record "NPR Shipping Provider Document"): Boolean;
     var
         PakkelabelsPrinter: Record "NPR Package Printers";
     begin
@@ -274,7 +274,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             exit(false);
     end;
 
-    local procedure BuildPrintAt(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") Output: Text;
+    local procedure BuildPrintAt(var PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;
     var
         PakkelabelsPrinter: Record "NPR Package Printers";
         QueryParamsLbl: Label '"host_name": "%1",', Locked = true;
@@ -291,7 +291,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         end;
     end;
 
-    local procedure PrintJob(ShipmentDocument: Record "NPR Pacsoft Shipment Document") output: Text;
+    local procedure PrintJob(ShipmentDocument: Record "NPR Shipping Provider Document") output: Text;
     var
         PakkelabelsPrinter: Record "NPR Package Printers";
         QueryParamsLbl: Label '"document_id":%1', Locked = true;
@@ -421,8 +421,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     end;
 
 
-    [EventSubscriber(ObjectType::Page, Page::"NPR Pacsoft Setup", 'GetPackageProvider', '', true, true)]
-    local procedure IdentifyMe_GetPackageProvider(var Sender: Page "NPR Pacsoft Setup"; var tmpAllObjWithCaption: Record AllObjWithCaption temporary);
+    [EventSubscriber(ObjectType::Page, Page::"NPR Shipping Provider Setup", 'GetPackageProvider', '', true, true)]
+    local procedure IdentifyMe_GetPackageProvider(var Sender: Page "NPR Shipping Provider Setup"; var tmpAllObjWithCaption: Record AllObjWithCaption temporary);
     var
         AllObjWithCaption: Record AllObjWithCaption;
     begin
@@ -453,7 +453,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     var
         SalesShptHeader: Record "Sales Shipment Header";
         SalesSetup: Record "Sales & Receivables Setup";
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
+        ShipmentDocument: Record "NPR Shipping Provider Document";
         RecRef: RecordRef;
     begin
         if not InitPackageProvider() then
@@ -606,7 +606,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         exit(NOT SalesShipmentLine.IsEmpty());
     end;
 
-    procedure AddEntry(RecRef: RecordRef; ShowWindow: Boolean; Silent: Boolean; var ShipmentDocument: Record "NPR Pacsoft Shipment Document"): Boolean
+    procedure AddEntry(RecRef: RecordRef; ShowWindow: Boolean; Silent: Boolean; var ShipmentDocument: Record "NPR Shipping Provider Document"): Boolean
     var
         CompanyInfo: Record "Company Information";
         Customer: Record Customer;
@@ -744,7 +744,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
 
     end;
 
-    procedure SendDocument(var PacsoftShipmentDocument: Record "NPR Pacsoft Shipment Document")
+    procedure SendDocument(var PacsoftShipmentDocument: Record "NPR Shipping Provider Document")
     begin
         if not InitPackageProvider() then
             exit;
@@ -834,7 +834,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             error(ResponseText);
     end;
 
-    procedure PrintDocument(var ShipmentDocument: Record "NPR Pacsoft Shipment Document")
+    procedure PrintDocument(var ShipmentDocument: Record "NPR Shipping Provider Document")
     var
         JToken: JsonToken;
     begin
@@ -862,7 +862,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
 
     procedure PrintShipmentDocument(var SalesShipmentHeader: Record "Sales Shipment Header")
     var
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
+        ShipmentDocument: Record "NPR Shipping Provider Document";
         RecRef: RecordRef;
         text000: Label 'Do you Want to create a Package entry ?';
         Text001: Label 'Do you want to print the Document?';
@@ -900,12 +900,12 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
 
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeAssignSender(VAR PakkelabelsShipment: Record "NPR Pacsoft Shipment Document"; VAR Output: Text; VAR RunTrigger: Boolean)
+    local procedure OnBeforeAssignSender(VAR PakkelabelsShipment: Record "NPR Shipping Provider Document"; VAR Output: Text; VAR RunTrigger: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeEndShipmentBuild(VAR PakkelabelsShipment: Record "NPR Pacsoft Shipment Document"; VAR Output: Text)
+    local procedure OnBeforeEndShipmentBuild(VAR PakkelabelsShipment: Record "NPR Shipping Provider Document"; VAR Output: Text)
     begin
 
     end;

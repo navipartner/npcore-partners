@@ -1,13 +1,13 @@
-page 6014486 "NPR Pacsoft Shipment Document"
+page 6014486 "NPR Shipping Provider Document"
 {
-    Caption = 'Pacsoft Shipment Document';
+    Caption = 'Shipping Provider Document';
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = true;
     PageType = Card;
     UsageCategory = Administration;
 
-    SourceTable = "NPR Pacsoft Shipment Document";
+    SourceTable = "NPR Shipping Provider Document";
     ApplicationArea = NPRRetail;
 
     layout
