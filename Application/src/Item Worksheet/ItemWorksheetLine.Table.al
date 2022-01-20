@@ -1744,7 +1744,7 @@ table 6060042 "NPR Item Worksheet Line"
             OptionCaption = 'No,Yes,Undefined';
             OptionMembers = No,Yes,Undefined;
         }
-        field(99000750; "Routing No."; Code[20])
+        field(6014680; "Routing No."; Code[20])
         {
             Caption = 'Routing No.';
             DataClassification = CustomerContent;
@@ -1752,7 +1752,7 @@ table 6060042 "NPR Item Worksheet Line"
             TableRelation = "Routing Header";
             ValidateTableRelation = false;
         }
-        field(99000751; "Production BOM No."; Code[20])
+        field(6014681; "Production BOM No."; Code[20])
         {
             Caption = 'Production BOM No.';
             DataClassification = CustomerContent;
@@ -1760,7 +1760,7 @@ table 6060042 "NPR Item Worksheet Line"
             TableRelation = "Production BOM Header";
             ValidateTableRelation = false;
         }
-        field(99000757; "Overhead Rate"; Decimal)
+        field(6014682; "Overhead Rate"; Decimal)
         {
             AccessByPermission = TableData "Production Order" = R;
             AutoFormatType = 2;
@@ -1768,7 +1768,7 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
         }
-        field(99000773; "Order Tracking Policy"; Option)
+        field(6014683; "Order Tracking Policy"; Option)
         {
             Caption = 'Order Tracking Policy';
             DataClassification = CustomerContent;
@@ -1777,7 +1777,7 @@ table 6060042 "NPR Item Worksheet Line"
             OptionCaption = 'None,Tracking Only,Tracking & Action Msg.,,,,,,,Undefined';
             OptionMembers = "None","Tracking Only","Tracking & Action Msg.",,,,,,,Undefined;
         }
-        field(99000875; Critical; Option)
+        field(6014684; Critical; Option)
         {
             Caption = 'Critical';
             DataClassification = CustomerContent;
@@ -1786,7 +1786,7 @@ table 6060042 "NPR Item Worksheet Line"
             OptionCaption = 'No,Yes,Undefined';
             OptionMembers = No,Yes,Undefined;
         }
-        field(99008500; "Common Item No."; Code[20])
+        field(6014685; "Common Item No."; Code[20])
         {
             Caption = 'Common Item No.';
             DataClassification = CustomerContent;
