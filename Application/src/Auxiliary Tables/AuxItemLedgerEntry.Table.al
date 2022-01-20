@@ -179,7 +179,7 @@ table 6014488 "NPR Aux. Item Ledger Entry"
             Caption = 'Document Date and Time';
             DataClassification = CustomerContent;
         }
-        field(6185470; "New Entry No."; Integer) // Used for transfering data from to new entry (for lack of suitable event in codeunit 22)
+        field(6014699; "New Entry No."; Integer) // Used for transfering data from to new entry (for lack of suitable event in codeunit 22)
         {
             Caption = 'New Entry No.';
             DataClassification = CustomerContent;

@@ -443,7 +443,7 @@ table 6151552 "NPR NpXml Element"
             Caption = 'Replace Inherited Filters';
             DataClassification = CustomerContent;
         }
-        field(100000; "Has Filter"; Boolean)
+        field(40000; "Has Filter"; Boolean)
         {
             CalcFormula = Exist("NPR NpXml Filter" WHERE("Xml Template Code" = FIELD("Xml Template Code"),
                                                       "Xml Element Line No." = FIELD("Line No.")));
@@ -451,7 +451,7 @@ table 6151552 "NPR NpXml Element"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(100010; "Has Attribute"; Boolean)
+        field(40010; "Has Attribute"; Boolean)
         {
             CalcFormula = Exist("NPR NpXml Attribute" WHERE("Xml Template Code" = FIELD("Xml Template Code"),
                                                          "Xml Element Line No." = FIELD("Line No.")));

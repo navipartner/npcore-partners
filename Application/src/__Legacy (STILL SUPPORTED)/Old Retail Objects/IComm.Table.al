@@ -207,7 +207,7 @@ table 6014510 "NPR I-Comm"
             OptionMembers = " ",NaviPartner,,,,,,,,,Custom;
             DataClassification = CustomerContent;
         }
-        field(1000000; "Key"; Code[10])
+        field(40000; "Key"; Code[10])
         {
             Caption = 'Key';
             DataClassification = CustomerContent;
