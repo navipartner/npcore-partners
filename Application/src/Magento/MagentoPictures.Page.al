@@ -36,6 +36,7 @@ page 6151411 "NPR Magento Pictures"
                         Caption = 'Count';
                         ToolTip = 'Specifies the value of the Count field';
                         ApplicationArea = NPRRetail;
+                        Editable = false;
 
                         trigger OnDrillDown()
                         begin
@@ -120,27 +121,8 @@ page 6151411 "NPR Magento Pictures"
     }
 
     trigger OnAfterGetRecord()
-    var
-        TempMagentoPicture2: Record "NPR Magento Picture" temporary;
-        TempBlob: Codeunit "Temp Blob";
-        InStr: InStream;
-        OutStr: OutStream;
     begin
         CountRelations();
-        if TempMagentoPicture.Get(Rec.Type, Rec.Name) then begin
-            exit;
-        end;
-        Clear(TempMagentoPicture2);
-        if MiniatureLinePicture then
-            Rec.DownloadPicture(TempMagentoPicture2);
-
-        TempMagentoPicture.Init();
-        TempMagentoPicture := Rec;
-        TempBlob.CreateOutStream(OutStr);
-        TempMagentoPicture2.Image.ExportStream(OutStr);
-        TempBlob.CreateInStream(InStr);
-        TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
-        TempMagentoPicture.Insert();
     end;
 
     trigger OnInit()
@@ -151,9 +133,7 @@ page 6151411 "NPR Magento Pictures"
 
     var
         MagentoSetup: Record "NPR Magento Setup";
-        TempMagentoPicture: Record "NPR Magento Picture" temporary;
         Counter: Integer;
-        MiniatureLinePicture: Boolean;
         MiniatureSinglePicture: Boolean;
         Text000: Label 'Checking Pictures: @1@@@@@@@@@@@@@@@';
 
@@ -240,6 +220,5 @@ page 6151411 "NPR Magento Pictures"
         if not MagentoSetup.Get() then
             exit;
         MiniatureSinglePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
-        MiniatureLinePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::LinePicture, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
     end;
 }
