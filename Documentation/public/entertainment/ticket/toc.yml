@@ -2,7 +2,7 @@
   href: intro.md
 - name: Tutorial
   items:
-  - name: Setting up tickets using the ticket wizard
+  - name: Set up tickets with the Ticket Wizard
     href: tutorial/ticket_tutorial.md  
 - name: How-To
   items:
