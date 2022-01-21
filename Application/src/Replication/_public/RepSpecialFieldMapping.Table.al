@@ -34,7 +34,7 @@ table 6014602 "NPR Rep. Special Field Mapping"
 
         field(21; "Field Name"; Text[30])
         {
-            Caption = 'Field ID';
+            Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
             CalcFormula = lookup(Field.FieldName WHERE(TableNo = Field("Table ID"), "No." = field("Field ID")));
