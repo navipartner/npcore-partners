@@ -2,8 +2,8 @@ table 6014622 "NPR EFT Recon. Provider"
 {
     Caption = 'EFT Recon. Provider';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR NpCs Store Stock Setup";
-    LookupPageID = "NPR NpCs Store Stock Setup";
+    DrillDownPageID = "NPR EFT Recon. Provider List";
+    LookupPageID = "NPR EFT Recon. Provider List";
 
     fields
     {
