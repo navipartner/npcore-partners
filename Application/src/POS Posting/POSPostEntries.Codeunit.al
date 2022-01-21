@@ -606,12 +606,15 @@
     local procedure PostGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"): Boolean
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
+        TempPOSPostingProfile: Record "NPR POS Posting Profile" temporary;
         DifferenceAmount: Decimal;
     begin
         DifferenceAmount := CalculateDifferenceAmount(GenJournalLine);
 
         if (Abs(DifferenceAmount) > 0) then begin
             GetPOSPostingProfile(POSEntry, POSPostingProfile);
+            TempPOSPostingProfile.Copy(POSPostingProfile);
+            TempPOSPostingProfile."VAT Customer No." := '';
             MakeGenJournalLine(
               Enum::"Gen. Journal Account Type"::"G/L Account",
               POSPostingProfile."POS Posting Diff. Account",
@@ -637,8 +640,7 @@
               GenJournalLine."Use Tax",
               0,
               0,
-              '',
-              POSPostingProfile."Source Code",
+              TempPOSPostingProfile,
               "Tax Calculation Type"::"Normal VAT",
               GenJournalLine);
         end;
@@ -1182,8 +1184,7 @@
           POSPostingBuffer."Use Tax",
           VATAmountIn,
           VATAmountInLCY,
-          POSPostingProfile."VAT Customer No.",
-          POSPostingProfile."Source Code",
+          POSPostingProfile,
           POSPostingBuffer."VAT Calculation Type",
           GenJournalLine);
 
@@ -1195,9 +1196,12 @@
         POSEntry: Record "NPR POS Entry";
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
+        TempPosPostingProfile: Record "NPR POS Posting Profile" temporary;
     begin
         POSEntry.Get(POSBalancingLine."POS Entry No.");
         POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
+        TempPosPostingProfile.Copy(POSPostingProfile);
+        TempPosPostingProfile."VAT Customer No." := '';
 
         MakeGenJournalLine(
           AccountType,
@@ -1224,19 +1228,18 @@
           false,
           0,
           0,
-          '',
-          POSPostingProfile."Source Code",
+          TempPosPostingProfile,
           "Tax Calculation Type"::"Normal VAT",
           GenJournalLine);
 
         OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine, GenJournalLine, false);
     end;
 
-    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[20]; GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[20]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; VATCustomerNo: Code[20]; SourceCode: Code[10]; TaxCalcType: Enum "Tax Calculation Type"; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[20]; GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[20]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; POSPostingProfile: Record "NPR POS Posting Profile"; TaxCalcType: Enum "Tax Calculation Type"; var GenJournalLine: Record "Gen. Journal Line")
     begin
         LineNumber := LineNumber + 10000;
         GenJournalLine.Init();
-        GenJournalLine."Journal Template Name" := '';
+        GenJournalLine."Journal Template Name" := POSPostingProfile."Journal Template Name";
         GenJournalLine."Journal Batch Name" := '';
         GenJournalLine."Line No." := LineNumber;
         GenJournalLine."System-Created Entry" := true;
@@ -1279,7 +1282,7 @@
                 GenJournalLine."VAT Amount (LCY)" := VATAmountLCY;
 
                 if GenPostingType = GenJournalLine."Gen. Posting Type"::Sale then
-                    GenJournalLine."Bill-to/Pay-to No." := VATCustomerNo;
+                    GenJournalLine."Bill-to/Pay-to No." := POSPostingProfile."VAT Customer No.";
 
                 GenJournalLine."VAT Posting" := GenJournalLine."VAT Posting"::"Manual VAT Entry";
                 GenJournalLine."VAT Bus. Posting Group" := VATBusPostingGroup;
@@ -1296,7 +1299,7 @@
         GenJournalLine."Dimension Set ID" := DimSetID;
         GenJournalLine."Salespers./Purch. Code" := SalespersonCode;
         GenJournalLine."Reason Code" := ReasonCode;
-        GenJournalLine."Source Code" := SourceCode;
+        GenJournalLine."Source Code" := POSPostingProfile."Source Code";
         GenJournalLine.Insert();
     end;
 

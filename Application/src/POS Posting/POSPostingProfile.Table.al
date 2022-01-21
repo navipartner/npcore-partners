@@ -25,6 +25,22 @@ table 6150653 "NPR POS Posting Profile"
             ObsoleteState = Removed;
             ObsoleteReason = 'It''s not used anywhere';
         }
+        field(21; "Journal Template Name"; Code[10])
+        {
+            Caption = 'Journal Template Name';
+            TableRelation = "Gen. Journal Template";
+            Description = 'Initially created for BE localization';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                GenJournalTemplate: Record "Gen. Journal Template";
+            begin
+                if not GenJournalTemplate.Get("Journal Template Name") then
+                    GenJournalTemplate.Init();
+                Rec."Source Code" := GenJournalTemplate."Source Code";
+            end;
+        }
         field(30; "Max. POS Posting Diff. (LCY)"; Decimal)
         {
             Caption = 'Max. POS Posting Diff. (LCY)';

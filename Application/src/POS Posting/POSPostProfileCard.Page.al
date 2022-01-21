@@ -84,6 +84,12 @@ page 6150639 "NPR POS Post. Profile Card"
                     ToolTip = 'Specifies the value of the Auto Process Ext. POS Sales field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Journal Template Name"; Rec."Journal Template Name")
+                {
+                    ToolTip = 'Specifies the value of the Journal Template Name which will be assigned to General Journal Lines in the POS Posting activity.';
+                    ApplicationArea = NPRRetail;
+                    Description = 'Initially created for BE localization';
+                }
                 group("Posting Difference")
                 {
                     Caption = 'Posting Difference';
