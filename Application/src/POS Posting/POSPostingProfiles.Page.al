@@ -5,7 +5,6 @@ page 6150638 "NPR POS Posting Profiles"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-
     SourceTable = "NPR POS Posting Profile";
     ApplicationArea = NPRRetail;
 
@@ -58,6 +57,12 @@ page 6150638 "NPR POS Posting Profiles"
 
                     ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
                     ApplicationArea = NPRRetail;
+                }
+                field("Journal Template Name"; Rec."Journal Template Name")
+                {
+                    ToolTip = 'Specifies the value of the Journal Template Name which will be assigned to General Journal Lines in the POS Posting activity.';
+                    ApplicationArea = NPRRetail;
+                    Description = 'Initially created for BE localization';
                 }
             }
         }
