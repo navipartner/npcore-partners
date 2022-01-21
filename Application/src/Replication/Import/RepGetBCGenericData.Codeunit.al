@@ -261,7 +261,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, BlobURL);
 
         if ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then
-            if (StatusCode <> 500) then begin //if BLOB is empty, server return status code 500 --> Description: Internal Server Error
+            if not (StatusCode in [204, 500]) then begin //if BLOB is empty, server return status code 500 --> Description: Internal Server Error or 204 --> No Content
                 ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', BlobURL, Response, ServiceSetup."Error Notify Email Address");
                 Commit();
                 Error(BLOBCouldNotBeReadErr, TempFoundAPIField."API Field Name", RecRef.RecordId, ErrLog."Entry No.");

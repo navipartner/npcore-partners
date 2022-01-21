@@ -144,6 +144,8 @@ table 6014589 "NPR Replication Endpoint"
         RenameNotAllowedErr: Label 'Rename not allowed. Instead, delete and recreate record.';
         SpecialFieldMappingExistErr: Label 'One or more special Field Mappings exist for this endpoint.';
 
+        ConfirmUpdateReplicationCounter: Label 'Are you sure you want to Update the Replication Counter for Endpoint ''%1''? This will set the Replication Counter to the value from Source Company of the highest Replication Counter of table ''%2''.';
+
     trigger OnRename()
     begin
         Error(RenameNotAllowedErr);
@@ -205,6 +207,19 @@ table 6014589 "NPR Replication Endpoint"
         SpecFieldMappingsPage.SetFieldsNonEditable();
         SpecFieldMappingsPage.SetReplicationEndpoint(Rec);
         SpecFieldMappingsPage.RunModal();
+    end;
+
+    procedure UpdateLastReplicationCounterToLastCurrent()
+    var
+        RepWSFunctionsInterface: Interface "NPR Rep. WS IFunctions";
+        ServiceSetup: Record "NPR Replication Service Setup";
+    begin
+        if Confirm(StrSubstNo(ConfirmUpdateReplicationCounter, Rec."EndPoint ID", Rec."Table ID"), false) then begin
+            ServiceSetup.Get(Rec."Service Code");
+            RepWSFunctionsInterface := Rec."Endpoint Method";
+            Rec."Replication Counter" := RepWSFunctionsInterface.GetLastReplicationCounter(Rec."Table ID", ServiceSetup, Rec);
+            Rec.Modify();
+        end;
     end;
 
     [IntegrationEvent(true, false)]
