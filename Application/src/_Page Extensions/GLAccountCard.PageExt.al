@@ -13,9 +13,12 @@ pageextension 6014422 "NPR G/L Account Card" extends "G/L Account Card"
 
                 trigger OnValidate()
                 begin
+                    Rec.TestField("No.");
+                    CurrPage.SaveRecord();
                     NPRAuxGLAccount.Validate("Retail Payment");
                     Rec.NPRSetGLAccAdditionalFields(NPRAuxGLAccount);
                     Rec.NPRSaveGLAccAdditionalFields();
+                    CurrPage.Update(false);
                 end;
             }
         }
