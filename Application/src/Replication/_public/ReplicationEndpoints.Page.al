@@ -92,7 +92,18 @@ page 6014500 "NPR Replication Endpoints"
     {
         area(Processing)
         {
-
+            action(OpenCard)
+            {
+                Caption = 'Open Card';
+                ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                Image = Card;
+                RunObject = Page "NPR Replication Endpoint";
+                RunPageLink = "EndPoint ID" = field("EndPoint ID");
+                ToolTip = 'Open Card Page';
+            }
             action(SpecialFieldMappings)
             {
                 Caption = 'Special Field Mappings';
@@ -107,17 +118,20 @@ page 6014500 "NPR Replication Endpoints"
                     Rec.OpenSpecialFieldMappings();
                 end;
             }
-            action(OpenCard)
+
+            action(GetLastReplicationCounter)
             {
-                Caption = 'Open Card';
+                Caption = 'Get Last Replication Counter';
                 ApplicationArea = NPRRetail;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                Image = Card;
-                RunObject = Page "NPR Replication Endpoint";
-                RunPageLink = "EndPoint ID" = field("EndPoint ID");
-                ToolTip = 'Open Card Page';
+                Image = GetSourceDoc;
+                ToolTip = 'Updates the Replication Counter on the Endpoint to the Last Replication Counter from the Source database table. This should be used if the starting point of the Replication needs to be changed.';
+                trigger OnAction()
+                begin
+                    Rec.UpdateLastReplicationCounterToLastCurrent();
+                end;
             }
 
             action(Errors)

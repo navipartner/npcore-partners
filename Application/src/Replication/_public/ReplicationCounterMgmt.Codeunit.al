@@ -6,7 +6,7 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         FRefReplicationCounter: FieldRef;
     begin
         if not NumberSequence.Exists('NPRReplicationModule_' + Format(RecRef.Number), true) then
-            NumberSequence.Insert('NPRReplicationModule_' + Format(RecRef.Number), 0, 1, true);
+            NumberSequence.Insert('NPRReplicationModule_' + Format(RecRef.Number), 1, 1, true);
 
         FRefReplicationCounter := RecRef.Field(ReplicationCounterFieldNo);
         FRefReplicationCounter.Value := NumberSequence.Next('NPRReplicationModule_' + Format(RecRef.Number), true);
