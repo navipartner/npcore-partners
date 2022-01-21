@@ -5,7 +5,9 @@ page 6014468 "NPR Sales Ticket Statistics"
     SourceTable = Date;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-
+    InsertAllowed = false;
+    ModifyAllowed = false;
+    DeleteAllowed = false;
 
     layout
     {
@@ -89,6 +91,7 @@ page 6014468 "NPR Sales Ticket Statistics"
             repeater(Control6150613)
             {
                 ShowCaption = false;
+                Editable = false;
                 field("Period Start"; Rec."Period Start")
                 {
 
