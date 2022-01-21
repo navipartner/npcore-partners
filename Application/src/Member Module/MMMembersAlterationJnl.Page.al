@@ -44,6 +44,10 @@ page 6060073 "NPR MM Members. Alteration Jnl"
 
                     trigger OnValidate()
                     begin
+                        Rec."Membership Code" := '';
+                        Rec."Item No." := '';
+                        Rec."Response Message" := '';
+                        Rec."Response Status" := Rec."Response Status"::REGISTERED;
                         if (not SelectMembershipUsingMemberCard(Rec."External Membership No.", Rec)) then
                             SetExternalMembershipNo(Rec."External Membership No.", Rec);
                     end;
@@ -393,12 +397,13 @@ page 6060073 "NPR MM Members. Alteration Jnl"
     begin
 
         MemberInfoCapture."Item No." := ItemNo;
-        MemberInfoCapture.Description := MembershipAlterationSetup.Description;
-        if (ItemNo = '') then
-            exit;
+        MemberInfoCapture.Description := '';
 
-        MembershipAlterationSetup.Get(GetAlterationType(AlterationOption), MemberInfoCapture."Membership Code", ItemNo);
-        MemberInfoCapture."Item No." := ItemNo;
+        if (not MembershipAlterationSetup.Get(GetAlterationType(AlterationOption), MemberInfoCapture."Membership Code", ItemNo)) then begin
+            MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::FAILED;
+            MemberInfoCapture."Response Message" := 'Invalid alteration item.';
+        end;
+
         MemberInfoCapture.Description := MembershipAlterationSetup.Description;
     end;
 
@@ -562,6 +567,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         MemberInfoCapture.Init();
         MemberInfoCapture."Source Type" := MemberInfoCapture."Source Type"::ALTERATION_JNL;
         MemberInfoCapture."Document No." := CopyStr(UserId, 1, MaxStrLen(MemberInfoCapture."Document No."));
+        MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::REGISTERED;
 
         case LowerCase(FldAlterationType) of
             'renew':
@@ -579,11 +585,11 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         end;
         SetInformationContext(AlterationOption, MemberInfoCapture);
 
+        MemberInfoCapture."External Membership No." := FldExternalNumber;
         if (not SelectMembershipUsingMemberCard(CopyStr(FldExternalNumber, 1, 100), MemberInfoCapture)) then
             SetExternalMembershipNo(CopyStr(FldExternalNumber, 1, 20), MemberInfoCapture);
 
-        if (MemberInfoCapture."Item No." = '') then
-            validateTextField(FldAlterationItemNo, MaxStrLen(Rec."Item No."), REQUIRED, Rec.FieldCaption("Item No."));
+        validateTextField(FldAlterationItemNo, MaxStrLen(Rec."Item No."), REQUIRED, Rec.FieldCaption("Item No."));
 
         if (FldAlterationItemNo <> '') then
             SetItemNo(CopyStr(FldAlterationItemNo, 1, 20), MemberInfoCapture);
@@ -592,9 +598,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         if (FldAlterationDate <> '') then
             MemberInfoCapture."Document Date" := validateDateField(FldAlterationDate, GDateMask, REQUIRED, Rec.FieldCaption("Document Date"));
 
-        MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::REGISTERED;
         MemberInfoCapture."Originates From File Import" := true;
-
         MemberInfoCapture.Insert();
 
     end;
