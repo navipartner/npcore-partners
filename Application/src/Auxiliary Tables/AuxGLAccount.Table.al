@@ -15,6 +15,17 @@ table 6014528 "NPR Aux. G/L Account"
         {
             DataClassification = CustomerContent;
             Caption = 'Retail Payment';
+
+            trigger OnValidate()
+            var
+                GLAccount: Record "G/L Account";
+            begin
+                if "Retail Payment" then begin
+                    TestField("No.");
+                    GLAccount.Get("No.");
+                    GLAccount.TestField("Account Type", GLAccount."Account Type"::Posting);
+                end;
+            end;
         }
     }
 
