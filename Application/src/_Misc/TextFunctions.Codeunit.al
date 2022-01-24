@@ -58,5 +58,19 @@ codeunit 6014604 "NPR Text Functions"
         exit(TB.ToText());
     end;
 #ENDIF
-
+    procedure AddressArrayToMultilineString(InputArray: Array[8] of Text) Result: Text
+    var
+        Counter: Integer;
+        CRLF: Text[2];
+    begin
+        CRLF[1] := 13;
+        CRLF[2] := 10;
+        for Counter := 1 to ArrayLen(InputArray) do begin
+            If InputArray[Counter] <> '' then begin
+                If Result <> '' then
+                    Result += CRLF;
+                Result += InputArray[Counter];
+            end;
+        end;
+    end;
 }
