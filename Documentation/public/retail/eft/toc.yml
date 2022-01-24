@@ -4,6 +4,8 @@
   items:
   - name: Set up MobilePay
     href: howto/mobilepay.md
+  - name: Import EFT reconciliation file, match and post it
+    href: howto/reconciliation.md
 - name: Explanations
   items:
   - name: Transaction lookup
