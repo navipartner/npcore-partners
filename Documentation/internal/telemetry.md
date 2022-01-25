@@ -27,6 +27,7 @@ There will be a significant amount of noise for levels Error, Warning, and Norma
 - **ALNPR_ImportList** - Import List;
 - **ALNPR_PosAction** - POS Actions;
 - **ALNPR_ReportBugAndThrowError** - Frontend Error Messages;
+- **ALNPR_TaskList** - Task List;
 
 #### ALNPR_Import List
 
@@ -38,6 +39,10 @@ This log captures interactions made by a user from the POS. The log includes cus
 #### ALNPR_ReportBugAndThrowError
 
 This log captures error message from the POS workflow engine. For example, the messages in the displayed in the orange "toaster" bottom right. The log includes custom dimension **NPR_SessionUniqId** which should allow us back-track the sequence of events leading up to an error using the **POS Action** event log.
+
+#### ALNPR_Task List
+
+This data is close to a mirror of the **Task List** data in BC and shows the outbound message from our BC to, for example, Magento. Basically all data except the actual message body is emitted to this log. The custom dimension **NPR_TL_Type** will give us insight on the specific message types and frequency.
 
 ## Related Links
 - [Creating Custom Telemetry Traces for Application Insights Monitoring](https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-instrument-application-for-telemetry-app-insights)

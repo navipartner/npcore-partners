@@ -32,8 +32,45 @@
             Clear(NcTask.Response);
             NcTask.Response.CreateOutStream(OutStr, TEXTENCODING::UTF8);
             OutStr.Write(LastErrorText);
+            EmitTelemetryDataOnError(NcTask, LastErrorText)
         end;
         NcTask.Modify();
+    end;
+
+    procedure EmitTelemetryDataOnError(NcTask: Record "NPR Nc Task"; ErrorMessageText: Text)
+    var
+        ActiveSession: Record "Active Session";
+        CustomDimensions: Dictionary of [Text, Text];
+    begin
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', UserId());
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+
+        CustomDimensions.Add('NPR_TL_EntryNo', Format(NcTask."Entry No."));
+        CustomDimensions.Add('NPR_TL_TaskProcessorCode', NcTask."Task Processor Code");
+        CustomDimensions.Add('NPR_TL_Type', Format(NcTask.Type));
+        CustomDimensions.Add('NPR_TL_TableNo', Format(NcTask."Table No."));
+        NcTask.CalcFields("Table Name");
+        CustomDimensions.Add('NPR_TL_TableName', NcTask."Table Name");
+        CustomDimensions.Add('NPR_TL_RecordPosition', NcTask."Record Position");
+        CustomDimensions.Add('NPR_TL_RecordID', Format(NcTask."Record ID"));
+        CustomDimensions.Add('NPR_TL_RecordValue', NcTask."Record Value");
+        CustomDimensions.Add('NPR_TL_LogDate', Format(NcTask."Log Date", 0, 9));
+        CustomDimensions.Add('NPR_TL_LastProcessingStartedAt', Format(NcTask."Last Processing Started at", 0, 9));
+        CustomDimensions.Add('NPR_TL_LastProcessingCompletedAt', Format(NcTask."Last Processing Completed at", 0, 9));
+        CustomDimensions.Add('NPR_TL_LastProcessingDuration', Format(NcTask."Last Processing Duration", 0, 9));
+        CustomDimensions.Add('NPR_TL_CompanyName', NcTask."Company Name");
+        CustomDimensions.Add('NPR_TL_Processed', Format(NcTask.Processed));
+        CustomDimensions.Add('NPR_TL_ProcessError', Format(NcTask."Process Error"));
+        CustomDimensions.Add('NPR_TL_Response', ErrorMessageText);
+
+        Session.LogMessage('NPR_TaskList', 'TaskList Error', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     procedure UpdateTasks(TaskProcessor: Record "NPR Nc Task Processor")

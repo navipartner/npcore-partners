@@ -266,6 +266,7 @@
 
     local procedure TaskError(var NaviConnectTask: Record "NPR Nc Task")
     var
+        NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         OutStream: OutStream;
         ErrorText: Text;
         SkipErrorClearing: Boolean;
@@ -285,6 +286,8 @@
             OnBeforeClearLastErrorInTaskError(SkipErrorClearing);
             if not SkipErrorClearing then
                 ClearLastError();
+
+            NcTaskMgt.EmitTelemetryDataOnError(NaviConnectTask, ErrorText);
         end;
 
         NaviConnectTask.Modify(true);
