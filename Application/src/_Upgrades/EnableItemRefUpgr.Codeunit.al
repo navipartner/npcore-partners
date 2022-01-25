@@ -42,7 +42,10 @@ codeunit 6014502 "NPR Enable Item Ref. Upgr."
             until ItemReference.Next() = 0;
         ItemReference.DeleteAll();
 
-        FeatureKey.Get(ItemReferenceMgt.GetFeatureKey());
+        if not FeatureKey.Get(ItemReferenceMgt.GetFeatureKey()) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
 
         FeatureKey.Validate(Enabled, FeatureKey.Enabled::"All Users");
         FeatureKey.Modify();
