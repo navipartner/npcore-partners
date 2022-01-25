@@ -301,6 +301,12 @@ table 6150705 "NPR POS Parameter Value"
                         TempRetailList.Insert();
                     end;
                 end;
+            "Data Type"::Text:
+                begin
+                    if Name = 'MenuFilterCode' then
+                        Value := GetPOSMenuFilter();
+                    exit;
+                end;
             else
                 exit;
         end;
@@ -443,5 +449,16 @@ table 6150705 "NPR POS Parameter Value"
     local procedure TrySelectStr(Ordinal: Integer; OptionString: Text; var OptionOut: Text)
     begin
         OptionOut := SelectStr(Ordinal + 1, OptionString);
+    end;
+
+    local procedure GetPOSMenuFilter(): Text[250]
+    var
+        NPRPOSMenuFilterList: Page "NPR POS Menu Filter List";
+        NPRPOSMenuFilter: Record "NPR POS Menu Filter";
+    begin
+        NPRPOSMenuFilterList.LookupMode(true);
+        if NPRPOSMenuFilterList.RunModal() = Action::LookupOK then
+            NPRPOSMenuFilterList.GetRecord(NPRPOSMenuFilter);
+        exit(NPRPOSMenuFilter."Filter Code");
     end;
 }
