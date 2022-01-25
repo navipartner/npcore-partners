@@ -195,36 +195,26 @@ page 6150718 "NPR POS Menu Filter"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Generic Filter action';
                 ApplicationArea = NPRRetail;
-
                 trigger OnAction()
+                var
+                    GenericFilterPageMgt: Codeunit "NPR Generic Filter Page Mgt.";
                 begin
-                    Rec.TableFilter();
+                    GenericFilterPageMgt.GenericFilter(Rec);
                 end;
             }
             action(DisplayFilter)
             {
                 Caption = 'Display Filter';
                 Image = "Filter";
-
                 ToolTip = 'Executes the Display Filter action';
                 ApplicationArea = NPRRetail;
-
                 trigger OnAction()
                 var
-                    FilterStringText: Text;
-                    INS: InStream;
-                    NoFilterText: Label 'No filters set.';
+                    GenericFilterPageMgt: Codeunit "NPR Generic Filter Page Mgt.";
                 begin
-                    FilterStringText := NoFilterText;
-                    Rec.CalcFields("Table Filter");
-                    if Rec."Table Filter".HasValue then begin
-                        Rec."Table Filter".CreateInStream(INS);
-                        INS.Read(FilterStringText);
-                    end;
-                    Message(FilterStringText);
+                    GenericFilterPageMgt.DisplayFilter(Rec);
                 end;
             }
         }
