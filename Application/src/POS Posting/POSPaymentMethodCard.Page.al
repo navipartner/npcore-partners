@@ -34,7 +34,7 @@ page 6150619 "NPR POS Payment Method Card"
                 field("Return Payment Method Code"; Rec."Return Payment Method Code")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Return Payment Method Code field. Return Payment Method will be used for return of overpaid amount. For Foreign Currency, we need to set it to the POS Payment Method used for local currency as we return the overpaid amount in local currency.';
+                    ToolTip = 'Specifies which return payment method will be used for the return of the overpaid amount. For foreign currency, it''s necessary to set it to the POS Payment Method used for the local currency, as we return the overpaid amount in the local currency.';
                     ShowMandatory = true;
                 }
                 field("Block POS Payment"; Rec."Block POS Payment")
@@ -100,7 +100,7 @@ page 6150619 "NPR POS Payment Method Card"
                 field("Auto End Sale"; Rec."Auto End Sale")
                 {
 
-                    ToolTip = 'Specifies if POS Transaction automatically ends when POS Payment method is selected.';
+                    ToolTip = 'Specifies if the POS transaction automatically ends when the POS Payment Method is selected if all other conditions are met.';
                     ApplicationArea = NPRRetail;
                 }
 
@@ -117,13 +117,13 @@ page 6150619 "NPR POS Payment Method Card"
                 field("Rounding Precision"; Rec."Rounding Precision")
                 {
 
-                    ToolTip = 'Specifies the value of the Rounding Precision field. Field should represent lowest denomination used for selected POS Payment Method.';
+                    ToolTip = 'Specifies how precise the rounding is. The field should represent lowest denomination used for the selected POS Payment Method.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Rounding Type"; Rec."Rounding Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Rounding Type field. Possible roudings are Nearest, Up or Down';
+                    ToolTip = 'Specifies which rounding type will be applied to the amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Rounding Gains Account"; Rec."Rounding Gains Account")
@@ -145,13 +145,13 @@ page 6150619 "NPR POS Payment Method Card"
                 field("Minimum Amount"; Rec."Minimum Amount")
                 {
 
-                    ToolTip = 'Specifies Minimum Amout that can be paid using selected POS Payment Method.';
+                    ToolTip = 'Specifies the minimum amount that can be paid using the selected POS Payment Method.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Maximum Amount"; Rec."Maximum Amount")
                 {
 
-                    ToolTip = 'Specifies Maximum Amout that can be paid using selected POS Payment Method.';
+                    ToolTip = 'Specifies the maximum amount that can be paid using the selected POS Payment Method.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Allow Refund"; Rec."Allow Refund")
