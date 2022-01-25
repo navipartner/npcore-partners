@@ -243,7 +243,9 @@
         case SaleLinePOS."Sale Type" of
             SaleLinePOS."Sale Type"::Deposit:
                 if SaleLinePOS.Type = SaleLinePOS.Type::Customer then
-                    POSSalesLine.Type := POSSalesLine.Type::Customer;
+                    POSSalesLine.Type := POSSalesLine.Type::Customer
+                else
+                    POSSalesLine.Type := POSSalesLine.Type::Voucher;    
 
             SaleLinePOS."Sale Type"::"Out payment":
                 //This is currently the only way to see the difference between a Rounding and a Payout line!
