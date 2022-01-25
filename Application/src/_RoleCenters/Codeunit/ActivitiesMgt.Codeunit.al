@@ -3,7 +3,6 @@
 
     trigger OnRun()
     begin
-        RefreshActivitiesCueData();
     end;
 
     var
@@ -166,21 +165,6 @@
         GLAccount.SetRange("Account Type", GLAccount."Account Type"::Posting);
         GLAccount.SetRange("Account Subcategory Entry No.", 3);
         PAGE.Run(PAGE::"Chart of Accounts", GLAccount);
-    end;
-
-    local procedure RefreshActivitiesCueData()
-    var
-        ActivitiesCue: Record "Activities Cue";
-    begin
-        ActivitiesCue.LockTable();
-
-        ActivitiesCue.Get();
-        ActivitiesCue."NPR Sales This Month Last Year" := NPCalcSalesThisMonthAmountLastYear(false);
-        ActivitiesCue."NPR Sales This Month ILE" := NPCalcSalesThisMonthAmount(false);
-
-        ActivitiesCue."Last Date/Time Modified" := CurrentDateTime;
-        ActivitiesCue.Modify();
-        Commit();
     end;
 
     procedure IsCueDataStale(): Boolean
