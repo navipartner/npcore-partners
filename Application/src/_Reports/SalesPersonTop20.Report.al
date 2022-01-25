@@ -226,8 +226,8 @@ report 6014406 "NPR Sales Person Top 20"
                     }
                     field("Only Sales"; OnlySales)
                     {
-                        Caption = 'Only Salespersons With Sale';
-                        ToolTip = 'Specifies the value of the Only Salespersons With Sale field';
+                        Caption = 'Show Salespersons with Sales Only';
+                        ToolTip = 'View only salespersons who have performed sales for the indicated period';
                         ApplicationArea = NPRRetail;
                     }
                 }
