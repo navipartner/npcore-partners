@@ -17,38 +17,38 @@ page 6150616 "NPR POS Unit List"
                 field("No."; Rec."No.")
                 {
 
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the unique number for each POS Unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the Name of the POS Unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
 
-                    ToolTip = 'Specifies the value of the Status field';
+                    ToolTip = 'Displays Status for each POS Unit which includes: Open,Closed,End of Day. ';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Store Code field';
+                    ToolTip = 'Specifies an unique Code for each POS Store.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ToolTip = 'Specifies the default Global Dimension 1 Code for the POS Unit.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ToolTip = 'Specifies the default Global Dimension 2 Code for the POS Unit.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
@@ -56,20 +56,20 @@ page 6150616 "NPR POS Unit List"
                 field("POS Sales Workflow Set"; Rec."POS Sales Workflow Set")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Sales Workflow Set field';
+                    ToolTip = 'Specifies the value of the POS Sales Workflow Set field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Type"; Rec."POS Type")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Type field';
+                    ToolTip = 'Displays Status for the POS Type field which includes: Attended or Unattended.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Bin"; Rec."Default POS Payment Bin")
                 {
 
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the POS Payment Bin field';
+                    ToolTip = 'Specifies the default value of the POS Payment Bin.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -96,7 +96,7 @@ page 6150616 "NPR POS Unit List"
                                       "No." = FIELD("No.");
                         ShortCutKey = 'Shift+Ctrl+D';
 
-                        ToolTip = 'Executes the Dimensions-Single action';
+                        ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                         ApplicationArea = NPRRetail;
                     }
                     action("Dimensions-&Multiple")
@@ -105,7 +105,7 @@ page 6150616 "NPR POS Unit List"
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
 
-                        ToolTip = 'Executes the Dimensions-&Multiple action';
+                        ToolTip = 'View or edit dimensions for a group of records. You can assign dimension codes to transactions to distribute costs and analyze historical information.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnAction()
