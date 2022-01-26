@@ -198,7 +198,9 @@ page 6059771 "NPR Items Smart Search"
                 {
                     ApplicationArea = Suite;
                     Caption = 'Item References';
+                    #if BC17 or BC18
                     Visible = ItemReferenceVisible;
+                    #endif
                     Image = Change;
                     Promoted = true;
                     PromotedCategory = Category4;
@@ -1391,11 +1393,15 @@ page 6059771 "NPR Items Smart Search"
 
     trigger OnOpenPage()
     var
+    #if BC17 or BC18
         ItemReferenceMgt: Codeunit "Item Reference Management";
+        #endif
 
     begin
         IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled();
+        #if BC17 or BC18
         ItemReferenceVisible := ItemReferenceMgt.IsEnabled();
+        #endif
         ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
     end;
 
@@ -1406,7 +1412,9 @@ page 6059771 "NPR Items Smart Search"
 
     var
         IsFoundationEnabled: Boolean;
+        #if BC17 or BC18
         ItemReferenceVisible: Boolean;
+        #endif
         ExtendedPriceEnabled: Boolean;
         [InDataSet]
         IsNonInventoriable: Boolean;

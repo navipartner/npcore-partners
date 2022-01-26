@@ -183,12 +183,14 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
     actions
     {
+        #if BC17 or BC18
 #pragma warning disable AL0432
         modify("Cross Re&ferences")
         {
             Visible = not ItemReferenceVisible;
         }
 #pragma warning restore
+#endif
         addafter("&Warehouse Entries")
         {
             action("NPR POS Sales Entries")

@@ -382,7 +382,11 @@ page 6151577 "NPR Event Copy"
             CopyJob.SetCopyOptions(CopyJobPrices, CopyQuantity, CopyDimensions, Source, PlanningLineType, LedgerEntryType);
             CopyJob.SetJobTaskRange(FromJobTaskNo, ToJobTaskNo);
             CopyJob.SetJobTaskDateRange(FromDate, ToDate);
+#if BC20
+            CopyJob.CopyJob(SourceJob, TargetJobNo, TargetJobDescription, '', TargetBillToCustomerNo);
+#else
             CopyJob.CopyJob(SourceJob, TargetJobNo, TargetJobDescription, TargetBillToCustomerNo);
+#endif
             TargetJob.Get(TargetJobNo);
             TargetJob."Starting Date" := 0D;
             TargetJob."Ending Date" := 0D;
