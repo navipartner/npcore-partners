@@ -3048,7 +3048,7 @@ codeunit 6059784 "NPR TM Ticket Management"
             if (not TicketReservationReq.SetCurrentKey("External Order No.")) then;
             if (SalesInvHeader.Get(DocNoFilter)) then begin
                 TicketReservationReq.SetFilter("External Order No.", SalesInvHeader."External Document No.");
-                if (not TicketReservationReq.IsEmpty()) then
+                if (TicketReservationReq.IsEmpty()) then
                     exit;
                 Page.Run(Page::"NPR TM Ticket Request", TicketReservationReq);
             end;
