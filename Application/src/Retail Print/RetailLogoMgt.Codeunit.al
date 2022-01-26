@@ -39,15 +39,17 @@ codeunit 6014531 "NPR Retail Logo Mgt."
         TempBlob: Codeunit "Temp Blob";
         Base64Converter: Codeunit "Base64 Convert";
         InStr: InStream;
-        Base64: Text;
-        ImgExtension: Text;
         ImageHelper: Codeunit "Image Helpers";
+        OutStr: OutStream;
+#if BC20
+        Image: Codeunit Image;
+#else
         DotNetImage: Codeunit DotNet_Image;
         DotNetImageFormat: Codeunit DotNet_ImageFormat;
-        OutStr: OutStream;
         Width: Integer;
         Height: Integer;
         ImageHandler: Codeunit "Image Handler Management";
+#endif
     begin
         if not CtrlAddInInitialized then
             Error(NotInitializedErr);
@@ -57,19 +59,20 @@ codeunit 6014531 "NPR Retail Logo Mgt."
 
         if not ImportLogo(TempBlob) then
             exit;
-
+#if BC20
+        Image.FromStream(InStr);
+        Image.SetFormat(Enum::"Image Format"::Bmp);
+        Image.Save(OutStr);
+#else
         ImageHandler.GetImageSize(InStr, Width, Height);
-
         Clear(DotNetImage);
         DotNetImage.FromStream(InStr);
         DotNetImage.FromBitmap(Width, Height);
         DotNetImageFormat.Bmp();
         DotNetImage.Save(OutStr, DotNetImageFormat);
+#endif
 
-        ImgExtension := ImageHelper.GetImageType(InStr);
-        Base64 := Base64Converter.ToBase64(InStr);
-
-        ResizeImage.ResizeImage(Base64, ImgExtension);
+        ResizeImage.ResizeImage(Base64Converter.ToBase64(InStr), ImageHelper.GetImageType(InStr));
     end;
 
     #region AUX

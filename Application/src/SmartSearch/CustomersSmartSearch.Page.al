@@ -226,7 +226,9 @@ page 6014697 "NPR Customers Smart Search"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item Refe&rences';
+#if BC17 or BC18
                     Visible = ItemReferenceVisible;
+#endif
                     Image = Change;
                     Promoted = true;
                     PromotedCategory = Category7;
@@ -872,9 +874,13 @@ page 6014697 "NPR Customers Smart Search"
 
     trigger OnOpenPage()
     var
+#if BC17 or BC18
         ItemReferenceMgt: Codeunit "Item Reference Management";
+#endif
     begin
+#if BC17 or BC18
         ItemReferenceVisible := ItemReferenceMgt.IsEnabled();
+#endif
     end;
 
     local procedure CreateCustomerFromTemplate()
@@ -891,6 +897,8 @@ page 6014697 "NPR Customers Smart Search"
 
     var
         _SearchTerm: Text[100];
+#if BC17 or BC18
         ItemReferenceVisible: Boolean;
+#endif
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
 }

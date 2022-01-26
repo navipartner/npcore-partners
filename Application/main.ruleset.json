@@ -546,6 +546,11 @@
             "id": "AS0049",
             "action":"Warning",
             "justification": "Error was trown for new codeunits with Internal access"
+        },
+        {
+            "id": "AL0697",
+            "action": "Hidden",
+            "justification": "Skip 'Argument {0}: The argument should be a valid Field type.' because there is no good solution"
         }
     ]
 }

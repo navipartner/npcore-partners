@@ -450,7 +450,11 @@
                 begin
                     RecRef.SetTable(WarehouseActivityLine);
                     if WarehouseActivityLine.FindFirst() then;
+                    #if BC20
+                    RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type".AsInteger(), WarehouseActivityLine."No.", TmpRetailJnlCode);
+#else
                     RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.", TmpRetailJnlCode);
+                    #endif
                 end;
             //+NPR5.55 [414268]
             else

@@ -200,8 +200,11 @@ codeunit 6060153 "NPR Event Email Management"
 #IF NOT BC17
         EmailMessage.Create(Recipients, EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateHeader.Subject), BodyText, true, CcRecipients, BCCRecipients);
         AddAttachment(MailFor, Job, EmailMessage);
-
+#if BC20
+        Email.AddRelation(EmailMessage, Database::Job, Job.SystemId, EmailRelationType::"Primary Source", Enum::"Email Relation Origin"::"Compose Context");
+#else
         Email.AddRelation(EmailMessage, Database::Job, Job.SystemId, EmailRelationType::"Primary Source");
+#endif
 
         if EventExchIntTemplate."Open E-mail dialog" then
             Email.OpenInEditorModally(EmailMessage, EmailAccount)
