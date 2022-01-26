@@ -56,7 +56,11 @@
         TargetJobNo := NoSeriesManagement.GetNextNo(JobsSetup."Job Nos.", 0D, true);
         TargetJobDescription := SourceJob.Description;
         CopyJob.SetCopyOptions(CopyJobPrices, CopyQuantity, CopyDimensions, Source, PlanningLineType, LedgerEntryType);
+#if BC20
+        CopyJob.CopyJob(SourceJob, TargetJobNo, TargetJobDescription, '', BillToCustomerNo);
+#else
         CopyJob.CopyJob(SourceJob, TargetJobNo, TargetJobDescription, BillToCustomerNo);
+#endif
         TargetJob.Get(TargetJobNo);
         TargetJob."Starting Date" := 0D;
         TargetJob."Ending Date" := 0D;
