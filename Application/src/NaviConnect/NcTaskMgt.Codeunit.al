@@ -611,8 +611,11 @@
     end;
 
     procedure Initialize()
+    var
+        NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
         if not Initialized then begin
+            NaviConnectSetupMgt.InitNaviConnectSetup();
             NaviConnectSetup.Get();
             Initialized := true;
         end;

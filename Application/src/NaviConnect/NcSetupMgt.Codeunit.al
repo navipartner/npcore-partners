@@ -5,14 +5,13 @@
 
     procedure InitNaviConnectSetup()
     begin
-        if not NaviConnectSetup.Get() then begin
-            NaviConnectSetup.Init();
-            NaviConnectSetup.Insert();
-        end;
+        if NaviConnectSetup.Get() then
+            exit;
 
+        NaviConnectSetup.Init();
         NaviConnectSetup."Keep Tasks for" := CreateDateTime(Today, 000000T) - CreateDateTime(CalcDate('<-7D>', Today), 000000T);
         NaviConnectSetup."Task Worker Group" := NaviConnectDefaultTaskProcessorCode();
-        NaviConnectSetup.Modify(true);
+        NaviConnectSetup.Insert();
     end;
 
     procedure SetupTaskQueue()
