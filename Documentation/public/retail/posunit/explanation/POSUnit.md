@@ -2,7 +2,7 @@
 
 Each business has multiple operation categories, regardless of its size (payment processing, logistics, appointment management, procuring materials, and so on). It's much more efficient to automatize these operations and eliminate mistakes if you're using POS units and POS systems.
 
-POS units are also capable or tracking the real-time status of the shop's inventory and recording transactions on paper or spreadsheets, helping strategize marketing efforts and boost sales.
+POS units are also capable of tracking the real-time status of the shop's inventory and recording transactions on paper or spreadsheets, helping strategize marketing efforts and boost sales.
 
 In brief, the POS units help streamline retail operations by automating the transaction process and tracking important sales data. 
 
