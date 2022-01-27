@@ -1,5 +1,6 @@
-page 6150637 "NPR POS End of Day Profiles"
+﻿page 6150637 "NPR POS End of Day Profiles"
 {
+    Extensible = False;
     Caption = 'POS End of Day Profile';
     PageType = List;
     UsageCategory = Administration;

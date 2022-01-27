@@ -1,5 +1,6 @@
-table 6059941 "NPR SMS Template Line"
+﻿table 6059941 "NPR SMS Template Line"
 {
+    Access = Internal;
     Caption = 'SMS Template Line';
     DataClassification = CustomerContent;
 

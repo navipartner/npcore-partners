@@ -1,5 +1,6 @@
-table 6060050 "NPR Missing Setup Record"
+﻿table 6060050 "NPR Missing Setup Record"
 {
+    Access = Internal;
     Caption = 'Missing Setup Record';
     DataClassification = CustomerContent;
 

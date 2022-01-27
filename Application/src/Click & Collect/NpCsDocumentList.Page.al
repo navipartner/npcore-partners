@@ -1,5 +1,6 @@
-page 6151200 "NPR NpCs Document List"
+﻿page 6151200 "NPR NpCs Document List"
 {
+    Extensible = False;
     Caption = 'Collect Document List';
     InsertAllowed = false;
     PageType = List;

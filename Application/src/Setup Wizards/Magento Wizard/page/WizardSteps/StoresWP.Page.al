@@ -1,5 +1,6 @@
-page 6014522 "NPR Stores WP"
+﻿page 6014522 "NPR Stores WP"
 {
+    Extensible = False;
     Caption = 'Stores';
     PageType = ListPart;
     UsageCategory = Administration;

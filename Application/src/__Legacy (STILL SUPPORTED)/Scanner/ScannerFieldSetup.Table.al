@@ -1,5 +1,6 @@
-table 6014448 "NPR Scanner: Field Setup"
+﻿table 6014448 "NPR Scanner: Field Setup"
 {
+    Access = Internal;
     Caption = 'Scanner - Field Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

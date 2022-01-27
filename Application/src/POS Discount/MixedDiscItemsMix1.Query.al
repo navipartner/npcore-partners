@@ -1,5 +1,6 @@
-query 6014618 "NPR Mixed Disc. Items Mix 1"
+﻿query 6014618 "NPR Mixed Disc. Items Mix 1"
 {
+    Access = Internal;
     Caption = 'Mixed Disc. Items Mix 1';
     elements
     {

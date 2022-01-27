@@ -1,5 +1,6 @@
-page 6151207 "NPR NpCs Coll. StoreOrderLines"
+﻿page 6151207 "NPR NpCs Coll. StoreOrderLines"
 {
+    Extensible = False;
     Caption = 'Lines';
     Editable = false;
     PageType = ListPart;

@@ -1,5 +1,6 @@
-table 6060145 "NPR MM Member Arr. Log Entry"
+﻿table 6060145 "NPR MM Member Arr. Log Entry"
 {
+    Access = Internal;
 
     Caption = 'MM Member Arrival Log Entry';
     DataClassification = CustomerContent;

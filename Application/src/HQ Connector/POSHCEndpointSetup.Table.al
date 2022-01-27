@@ -1,5 +1,6 @@
-table 6150907 "NPR POS HC Endpoint Setup"
+﻿table 6150907 "NPR POS HC Endpoint Setup"
 {
+    Access = Internal;
     Caption = 'Endpoint Setup';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,6 @@
-codeunit 6014436 "NPR UPG Document Send. Prof."
+﻿codeunit 6014436 "NPR UPG Document Send. Prof."
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     var

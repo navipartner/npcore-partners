@@ -1,5 +1,6 @@
-table 6151136 "NPR TM Concurrent Admis. Setup"
+﻿table 6151136 "NPR TM Concurrent Admis. Setup"
 {
+    Access = Internal;
     // TM1.45/TSA /20200116 CASE 385922 Initial Version
 
     Caption = 'Concurrent Admission Setup';

@@ -1,5 +1,6 @@
-page 6059987 "NPR Discount Activities"
+﻿page 6059987 "NPR Discount Activities"
 {
+    Extensible = False;
     Caption = 'Discount Activities';
     PageType = CardPart;
     UsageCategory = Administration;

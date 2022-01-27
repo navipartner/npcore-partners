@@ -1,5 +1,6 @@
-codeunit 6014689 "NPR UPG NpRv Print Object Type"
+﻿codeunit 6014689 "NPR UPG NpRv Print Object Type"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

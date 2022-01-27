@@ -1,5 +1,6 @@
-page 6150702 "NPR POS Menu Buttons"
+﻿page 6150702 "NPR POS Menu Buttons"
 {
+    Extensible = False;
     Caption = 'POS Menu Buttons';
     PageType = List;
     UsageCategory = Administration;

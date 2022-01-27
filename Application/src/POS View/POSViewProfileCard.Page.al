@@ -1,5 +1,6 @@
-page 6150636 "NPR POS View Profile Card"
+﻿page 6150636 "NPR POS View Profile Card"
 {
+    Extensible = False;
     Caption = 'POS View Profile Card';
     PageType = Card;
     SourceTable = "NPR POS View Profile";

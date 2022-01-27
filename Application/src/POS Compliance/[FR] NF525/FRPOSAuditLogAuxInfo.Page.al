@@ -1,5 +1,6 @@
-page 6184852 "NPR FR POS Audit Log Aux. Info"
+﻿page 6184852 "NPR FR POS Audit Log Aux. Info"
 {
+    Extensible = False;
     Caption = 'FR POS Audit Log Aux. Info';
     DeleteAllowed = false;
     Editable = false;

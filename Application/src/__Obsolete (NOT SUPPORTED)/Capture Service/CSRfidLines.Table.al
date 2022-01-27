@@ -1,5 +1,6 @@
-table 6151369 "NPR CS Rfid Lines"
+﻿table 6151369 "NPR CS Rfid Lines"
 {
+    Access = Internal;
 
     Caption = 'CS Rfid Lines';
     DataClassification = CustomerContent;

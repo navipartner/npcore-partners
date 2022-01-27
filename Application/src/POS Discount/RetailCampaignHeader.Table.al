@@ -1,5 +1,6 @@
-table 6014610 "NPR Retail Campaign Header"
+﻿table 6014610 "NPR Retail Campaign Header"
 {
+    Access = Internal;
     // NPR5.38.01/MHA /20171220  CASE 299436 Object created - Retail Campaign
     // NPR5.38.01/JKL /20180129  CASE 289017 Added Fields Distribution Group, Campaign No.
     // MAG2.26/MHA /20200507  CASE 401235 Added field 6151414 "Magento Category Id"

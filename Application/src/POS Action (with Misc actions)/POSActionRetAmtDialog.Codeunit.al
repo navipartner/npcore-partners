@@ -1,5 +1,6 @@
-codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog"
+﻿codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Show the return amount (change) after sale ends for mPOS.';
         ConfirmEndOfSaleTitle: Label '(MPOS) End of Sale';

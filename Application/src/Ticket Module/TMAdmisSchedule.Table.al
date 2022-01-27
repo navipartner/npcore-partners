@@ -1,5 +1,6 @@
-table 6060118 "NPR TM Admis. Schedule"
+﻿table 6060118 "NPR TM Admis. Schedule"
 {
+    Access = Internal;
 
     Caption = 'Admission Schedule';
     DataClassification = CustomerContent;

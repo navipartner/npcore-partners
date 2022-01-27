@@ -1,5 +1,6 @@
-codeunit 6150681 "NPR NPRE RVA: Set R-View"
+﻿codeunit 6150681 "NPR NPRE RVA: Set R-View"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('RV_SET_R-VIEW');

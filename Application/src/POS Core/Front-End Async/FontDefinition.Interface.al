@@ -1,5 +1,8 @@
-interface "NPR Font Definition"
+﻿interface "NPR Font Definition"
 {
+    #IF NOT BC17 
+    Access = Internal;      
+    #ENDIF
     procedure Code(): Text;
     procedure Name(): Text;
     procedure FontFace(): Text;

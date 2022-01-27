@@ -1,5 +1,6 @@
-page 6014436 "NPR MobilePayV10 POS"
+﻿page 6014436 "NPR MobilePayV10 POS"
 {
+    Extensible = False;
     PageType = List;
     SourceTable = "NPR MobilePayV10 POS";
     SourceTableTemporary = true;

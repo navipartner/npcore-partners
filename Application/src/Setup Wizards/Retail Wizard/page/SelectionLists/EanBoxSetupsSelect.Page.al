@@ -1,5 +1,6 @@
-page 6014699 "NPR Ean Box Setups Select"
+﻿page 6014699 "NPR Ean Box Setups Select"
 {
+    Extensible = False;
     Caption = 'Ean Box Setups';
     PageType = List;
     SourceTable = "NPR Ean Box Setup";

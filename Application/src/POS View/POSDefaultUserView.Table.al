@@ -1,5 +1,6 @@
-table 6150712 "NPR POS Default User View"
+﻿table 6150712 "NPR POS Default User View"
 {
+    Access = Internal;
     Caption = 'POS Default User View';
     DataClassification = CustomerContent;
 

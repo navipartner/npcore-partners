@@ -1,5 +1,6 @@
-page 6060131 "NPR MM Member Cards ListPart"
+﻿page 6060131 "NPR MM Member Cards ListPart"
 {
+    Extensible = False;
 
     Caption = 'Member Cards';
     CardPageID = "NPR MM Member Card Card";

@@ -1,5 +1,6 @@
-codeunit 6150619 "NPR POS Audit Log Mgt."
+﻿codeunit 6150619 "NPR POS Audit Log Mgt."
 {
+    Access = Internal;
     var
         ERROR_NO_LOG_VALIDATION: Label 'No log validation routine found';
 

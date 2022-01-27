@@ -1,5 +1,6 @@
-query 6014555 "NPR Attribute Keys"
+﻿query 6014555 "NPR Attribute Keys"
 {
+    Access = Internal;
     // NPR5.37/MHA /20171026  Object created - NPR Attribute Filter
     // NPR5.48/JDH /20181109 CASE 334163 Missing Object Caption Added
 

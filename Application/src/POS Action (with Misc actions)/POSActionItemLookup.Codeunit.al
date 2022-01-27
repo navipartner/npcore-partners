@@ -1,5 +1,6 @@
-codeunit 6150813 "NPR POS Action: Item Lookup"
+﻿codeunit 6150813 "NPR POS Action: Item Lookup"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built in function for handling lookup';
         LookupType: Option Item,Customer,SKU;

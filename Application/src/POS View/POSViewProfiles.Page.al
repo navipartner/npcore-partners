@@ -1,5 +1,6 @@
-page 6150635 "NPR POS View Profiles"
+﻿page 6150635 "NPR POS View Profiles"
 {
+    Extensible = False;
     Caption = 'POS View Profiles';
     CardPageID = "NPR POS View Profile Card";
     PageType = List;

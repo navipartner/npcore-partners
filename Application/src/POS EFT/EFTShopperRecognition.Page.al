@@ -1,5 +1,6 @@
-page 6184505 "NPR EFT Shopper Recognition"
+﻿page 6184505 "NPR EFT Shopper Recognition"
 {
+    Extensible = False;
     // NPR5.49/MMV /20190410 CASE 347476 Created object
 
     Caption = 'EFT Shopper Recognition';

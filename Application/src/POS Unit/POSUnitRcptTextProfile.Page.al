@@ -1,5 +1,6 @@
-page 6151265 "NPR POS Unit Rcpt.Text Profile"
+﻿page 6151265 "NPR POS Unit Rcpt.Text Profile"
 {
+    Extensible = False;
     Caption = 'POS Unit Receipt Text Profile';
     PageType = Card;
     UsageCategory = None;

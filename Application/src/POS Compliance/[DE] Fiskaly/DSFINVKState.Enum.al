@@ -1,5 +1,8 @@
-enum 6014472 "NPR DSFINVK State"
+﻿enum 6014472 "NPR DSFINVK State"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     value(0; " ") { Caption = ' '; }
     value(1; PENDING) { Caption = 'PENDING'; }
     value(2; WORKING) { Caption = 'WORKING'; }

@@ -1,5 +1,6 @@
 ﻿codeunit 6151590 "NPR NpDc Coupon Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

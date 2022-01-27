@@ -1,5 +1,6 @@
-codeunit 6150829 "NPR POS Action: POS Info"
+﻿codeunit 6150829 "NPR POS Action: POS Info"
 {
+    Access = Internal;
     var
         ReadingErr: Label 'reading in %1';
 

@@ -1,5 +1,6 @@
-table 6151127 "NPR NpIa SaleLinePOS AddOn"
+﻿table 6151127 "NPR NpIa SaleLinePOS AddOn"
 {
+    Access = Internal;
     Caption = 'Sale Line POS AddOn';
     DataClassification = CustomerContent;
 

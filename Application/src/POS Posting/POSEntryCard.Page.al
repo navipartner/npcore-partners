@@ -1,5 +1,6 @@
-page 6150675 "NPR POS Entry Card"
+﻿page 6150675 "NPR POS Entry Card"
 {
+    Extensible = False;
     Caption = 'POS Entry Card';
     DeleteAllowed = false;
     Editable = false;

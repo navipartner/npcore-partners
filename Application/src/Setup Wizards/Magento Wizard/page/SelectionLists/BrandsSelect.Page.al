@@ -1,5 +1,6 @@
-page 6014625 "NPR Brands Select"
+﻿page 6014625 "NPR Brands Select"
 {
+    Extensible = False;
     Caption = 'Brands';
     PageType = List;
     UsageCategory = Administration;

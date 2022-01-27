@@ -1,5 +1,6 @@
-table 6184507 "NPR EFT Shopper Recognition"
+﻿table 6184507 "NPR EFT Shopper Recognition"
 {
+    Access = Internal;
     // NPR5.49/MMV /20190401 CASE 345188 Created object
 
     Caption = 'EFT Shopper Recognition';

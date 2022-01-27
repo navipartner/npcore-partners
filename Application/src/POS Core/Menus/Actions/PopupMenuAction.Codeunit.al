@@ -1,5 +1,6 @@
-codeunit 6150887 "NPR Popup Menu Action" implements "NPR IAction", "NPR IJsonSerializable"
+﻿codeunit 6150887 "NPR Popup Menu Action" implements "NPR IAction", "NPR IJsonSerializable"
 {
+    Access = Internal;
     var
         _menuId: Text;
         _openAsPopup: Boolean;

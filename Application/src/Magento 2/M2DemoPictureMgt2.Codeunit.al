@@ -1,5 +1,6 @@
-codeunit 6014446 "NPR M2 Demo Picture Mgt2"
+﻿codeunit 6014446 "NPR M2 Demo Picture Mgt2"
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture", 'OnGetMagentoUrl', '', true, true)]
     local procedure GetM2DemoPictureUrl(var Sender: Record "NPR Magento Picture"; var MagentoUrl: Text; var Handled: Boolean)
     var

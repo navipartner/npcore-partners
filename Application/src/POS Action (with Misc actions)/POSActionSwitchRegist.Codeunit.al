@@ -1,5 +1,6 @@
-codeunit 6150804 "NPR POS Action: Switch Regist."
+﻿codeunit 6150804 "NPR POS Action: Switch Regist."
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Switch to a different register';
         Prompt_EnterRegister: Label 'Enter Register';

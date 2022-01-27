@@ -1,5 +1,6 @@
-codeunit 6059771 "NPR Order Cue Backgrd Task"
+﻿codeunit 6059771 "NPR Order Cue Backgrd Task"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         Calculate();

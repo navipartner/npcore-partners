@@ -1,5 +1,6 @@
 ﻿codeunit 6151060 "NPR NP GDPR Management"
 {
+    Access = Internal;
     Permissions = TableData "Sales Shipment Header" = rm,
                   TableData "Sales Invoice Header" = rm,
                   TableData "Sales Cr.Memo Header" = rm,

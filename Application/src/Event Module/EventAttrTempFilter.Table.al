@@ -1,5 +1,6 @@
-table 6060163 "NPR Event Attr. Temp. Filter"
+﻿table 6060163 "NPR Event Attr. Temp. Filter"
 {
+    Access = Internal;
     Caption = 'Event Attribute Temp. Filter';
     DataClassification = CustomerContent;
 

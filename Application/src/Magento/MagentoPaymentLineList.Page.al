@@ -1,5 +1,6 @@
-page 6151454 "NPR Magento Payment Line List"
+﻿page 6151454 "NPR Magento Payment Line List"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Payment Line List';
     PageType = List;

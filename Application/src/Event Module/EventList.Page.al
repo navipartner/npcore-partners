@@ -1,5 +1,6 @@
-page 6060152 "NPR Event List"
+﻿page 6060152 "NPR Event List"
 {
+    Extensible = False;
     Caption = 'Event List';
     CardPageID = "NPR Event Card";
     PageType = List;

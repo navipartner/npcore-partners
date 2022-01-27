@@ -1,5 +1,6 @@
 ﻿codeunit 6184487 "NPR Pepper Library TSD"
 {
+    Access = Internal;
     var
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";

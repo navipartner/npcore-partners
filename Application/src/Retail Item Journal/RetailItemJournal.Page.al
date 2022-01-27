@@ -1,5 +1,6 @@
-page 6014402 "NPR Retail Item Journal"
+﻿page 6014402 "NPR Retail Item Journal"
 {
+    Extensible = False;
 
     AutoSplitKey = true;
     Caption = 'Retail Item Journal';

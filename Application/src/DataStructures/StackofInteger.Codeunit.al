@@ -1,5 +1,6 @@
-codeunit 6150898 "NPR Stack of [Integer]"
+﻿codeunit 6150898 "NPR Stack of [Integer]"
 {
+    Access = Internal;
     var
         CannotPeekErr: Label 'Cannot peek into an empty stack.';
         CannotPopErr: Label 'Cannot pop a value from an empty stack.';

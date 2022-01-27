@@ -1,5 +1,6 @@
-page 6151006 "NPR POS Entry Rel. Sales Doc."
+﻿page 6151006 "NPR POS Entry Rel. Sales Doc."
 {
+    Extensible = False;
     Caption = 'POS Entry Related Sales Documents';
     DelayedInsert = false;
     DeleteAllowed = false;

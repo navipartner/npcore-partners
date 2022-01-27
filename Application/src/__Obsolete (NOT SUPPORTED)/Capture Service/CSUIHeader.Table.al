@@ -1,5 +1,6 @@
-table 6151373 "NPR CS UI Header"
+﻿table 6151373 "NPR CS UI Header"
 {
+    Access = Internal;
 
     Caption = 'CS UI Header';
     DataClassification = CustomerContent;

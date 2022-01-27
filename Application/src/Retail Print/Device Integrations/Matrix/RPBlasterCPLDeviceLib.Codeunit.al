@@ -1,5 +1,6 @@
-codeunit 6014545 "NPR RP Blaster CPL Device Lib."
+﻿codeunit 6014545 "NPR RP Blaster CPL Device Lib."
 {
+    Access = Internal;
     // Blaster CPL Command Library.
     //  Work started by Nicolai Esbensen.
     //  Contributions providing function interfaces for valid

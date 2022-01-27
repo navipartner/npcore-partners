@@ -1,5 +1,6 @@
-table 6059767 "NPR NaviDocs Setup"
+﻿table 6059767 "NPR NaviDocs Setup"
 {
+    Access = Internal;
     Caption = 'NaviDocs Setup';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,6 @@
-page 6059979 "NPR Variety Fields Lookup"
+﻿page 6059979 "NPR Variety Fields Lookup"
 {
+    Extensible = False;
     // VRT1.11/JDH /20160602 CASE 242940 Created
     // NPR5.32/JDH /20170509 CASE 274170 Making sure setup is updated
     // NPR5.47/JDH /20181012 CASE 324997 Added filter to hide disabled fileds and changed key

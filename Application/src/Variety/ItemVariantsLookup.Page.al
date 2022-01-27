@@ -1,5 +1,6 @@
-page 6059805 "NPR Item Variants Lookup"
+﻿page 6059805 "NPR Item Variants Lookup"
 {
+    Extensible = False;
     Caption = 'Item Variants Lookup';
     PageType = List;
     SourceTable = "NPR Item Variant Buffer";

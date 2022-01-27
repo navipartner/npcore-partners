@@ -1,5 +1,8 @@
-enum 6151500 "NPR Nc IL Update Handler" implements "NPR Nc Import List IUpdate"
+﻿enum 6151500 "NPR Nc IL Update Handler" implements "NPR Nc Import List IUpdate"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     DefaultImplementation = "NPR Nc Import List IUpdate" = "NPR Nc IL Update Default";
 

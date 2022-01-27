@@ -1,5 +1,6 @@
-page 6014481 "NPR Retail Report Select. List"
+﻿page 6014481 "NPR Retail Report Select. List"
 {
+    Extensible = False;
 
     Caption = 'Report Type List - Retail';
     PageType = List;

@@ -1,5 +1,6 @@
-codeunit 6014428 "NPR POS After Sale Execution"
+﻿codeunit 6014428 "NPR POS After Sale Execution"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         case OnRunType of

@@ -1,5 +1,6 @@
-table 6151571 "NPR AF Test Objects"
+﻿table 6151571 "NPR AF Test Objects"
 {
+    Access = Internal;
     Caption = 'AF Test Objects';
     DataClassification = CustomerContent;
 

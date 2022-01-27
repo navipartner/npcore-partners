@@ -1,5 +1,6 @@
-page 6151133 "NPR TM Ticket Wizard"
+﻿page 6151133 "NPR TM Ticket Wizard"
 {
+    Extensible = False;
     Caption = 'Ticket Setup Wizard';
     DataCaptionExpression = Rec.Description;
     DataCaptionFields = Description;

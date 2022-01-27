@@ -1,5 +1,6 @@
 ﻿codeunit 6184506 "NPR EFT Trx Bgd. Session Mgt"
 {
+    Access = Internal;
     // NPR5.53/MMV /20191120 CASE 377533 Created object
     // NPR5.54/MMV /20200226 CASE 364340 Added method IsRequestOutdated & ResponseExists()
 

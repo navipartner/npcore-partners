@@ -1,5 +1,8 @@
-enum 6014409 "NPR BTF Content Type" implements "NPR BTF IFormatResponse"
+﻿enum 6014409 "NPR BTF Content Type" implements "NPR BTF IFormatResponse"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "application/json")

@@ -1,5 +1,6 @@
-codeunit 6151175 "NPR POS Action: Change LineAm."
+﻿codeunit 6151175 "NPR POS Action: Change LineAm."
 {
+    Access = Internal;
     var
         ActionDescriptionCaption: Label 'This action is used to change line amount VIA EAN Box events';
         NoSaleLineErr: Label 'A sale line must exist in order to change the amount';

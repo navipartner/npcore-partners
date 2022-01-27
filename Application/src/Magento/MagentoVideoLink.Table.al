@@ -1,5 +1,6 @@
-table 6151439 "NPR Magento Video Link"
+﻿table 6151439 "NPR Magento Video Link"
 {
+    Access = Internal;
     Caption = 'Magento Video Link';
     DataClassification = CustomerContent;
 

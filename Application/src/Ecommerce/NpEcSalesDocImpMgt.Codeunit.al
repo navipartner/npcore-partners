@@ -1,5 +1,6 @@
-codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
+﻿codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
 {
+    Access = Internal;
     var
         XmlAttributeIsMissingInElementErr: Label 'Xml attribute %1 is missing in <%2>', Comment = '%1=Xml attribute name;%2=Xml element name';
         InvalidLineTypeErr: Label 'Invalid Line Type: %1', Comment = '%1=xml attribute type';

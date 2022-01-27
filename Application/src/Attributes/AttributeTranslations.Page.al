@@ -1,5 +1,6 @@
-page 6014606 "NPR Attribute Translations"
+﻿page 6014606 "NPR Attribute Translations"
 {
+    Extensible = False;
     // NPR4.11/TSA/20150422 CASE209946 - Entity and Shortcut Attributes
 
     Caption = 'Client Attribute Translations';

@@ -1,5 +1,6 @@
-codeunit 6014421 "NPR Retail Item Jnl. Mgt."
+﻿codeunit 6014421 "NPR Retail Item Jnl. Mgt."
 {
+    Access = Internal;
     // NPR5.30/TJ  /20170227 CASE 267424 Added new function GetItem
     // NPR5.30/NPKNAV/20170310  CASE 266258 Transport NPR5.30 - 26 January 2017
 

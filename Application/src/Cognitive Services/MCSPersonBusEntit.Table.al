@@ -1,5 +1,6 @@
-table 6059961 "NPR MCS Person Bus. Entit."
+﻿table 6059961 "NPR MCS Person Bus. Entit."
 {
+    Access = Internal;
 
     Caption = 'MCS Person Business Entities';
     DataClassification = CustomerContent;

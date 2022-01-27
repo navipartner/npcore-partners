@@ -1,5 +1,6 @@
 ﻿codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
 {
+    Access = Internal;
     var
         GlobalKitchenOrder: Record "NPR NPRE Kitchen Order";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";

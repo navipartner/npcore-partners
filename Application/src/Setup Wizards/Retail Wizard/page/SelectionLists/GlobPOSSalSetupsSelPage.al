@@ -1,5 +1,6 @@
-page 6059778 "NPR Glob. POS Sal. Setups Sel."
+﻿page 6059778 "NPR Glob. POS Sal. Setups Sel."
 {
+    Extensible = False;
     Caption = 'Global POS Sales Setups';
     PageType = List;
     SourceTable = "NPR NpGp POS Sales Setup";

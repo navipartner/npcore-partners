@@ -1,5 +1,6 @@
-table 6151247 "NPR POS Entry Cue."
+﻿table 6151247 "NPR POS Entry Cue."
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'POS Entry Cue.';
     fields

@@ -1,5 +1,6 @@
-codeunit 6014524 "NPR MobilePayV10 GetPOSList"
+﻿codeunit 6014524 "NPR MobilePayV10 GetPOSList"
 {
+    Access = Internal;
     // GET  /v10/pointofsales
     TableNo = "NPR EFT Setup";
 

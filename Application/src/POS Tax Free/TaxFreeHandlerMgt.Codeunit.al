@@ -1,5 +1,6 @@
 ﻿codeunit 6014610 "NPR Tax Free Handler Mgt."
 {
+    Access = Internal;
     // All tax free handlers implement the publishers in this codeunit.
     // 
     // Handlers can either use the generic parameter pattern (stored as blob on the specific tax free unit record) or maintain their own parameters elsewhere if too complex.

@@ -1,5 +1,6 @@
-codeunit 6150871 "NPR POS Action: LayawayShow"
+﻿codeunit 6150871 "NPR POS Action: LayawayShow"
 {
+    Access = Internal;
 
     var
         ActionDescription: Label 'Show layaway orders and all associated prepayment invoices';

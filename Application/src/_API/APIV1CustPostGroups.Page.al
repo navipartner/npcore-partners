@@ -1,5 +1,6 @@
-page 6014664 "NPR APIV1 - Cust. Post. Groups"
+﻿page 6014664 "NPR APIV1 - Cust. Post. Groups"
 {
+    Extensible = False;
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';

@@ -1,5 +1,6 @@
-page 6014567 "NPR Retail Logo Factbox"
+﻿page 6014567 "NPR Retail Logo Factbox"
 {
+    Extensible = False;
     Caption = 'Retail Logo Factbox';
     DeleteAllowed = false;
     Editable = false;

@@ -1,5 +1,6 @@
-table 6151092 "NPR Nc RapidConn. Endpoint"
+﻿table 6151092 "NPR Nc RapidConn. Endpoint"
 {
+    Access = Internal;
     Caption = 'Nc RapidConnect Endpoint';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

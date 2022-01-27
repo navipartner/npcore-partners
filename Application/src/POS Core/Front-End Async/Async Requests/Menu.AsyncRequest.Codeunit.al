@@ -1,5 +1,6 @@
-codeunit 6150778 "NPR Front-End: Menu" implements "NPR Front-End Async Request"
+﻿codeunit 6150778 "NPR Front-End: Menu" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _menus: JsonArray;

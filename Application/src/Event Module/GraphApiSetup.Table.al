@@ -1,5 +1,6 @@
-table 6014597 "NPR GraphApi Setup"
+﻿table 6014597 "NPR GraphApi Setup"
 {
+    Access = Internal;
     Caption = 'GraphApi Setup';
     DataClassification = CustomerContent;
 

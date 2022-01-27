@@ -1,5 +1,6 @@
-page 6151030 "NPR NpRv Arch. Sending Log"
+﻿page 6151030 "NPR NpRv Arch. Sending Log"
 {
+    Extensible = False;
     Caption = 'Archived Retail Voucher Sending Log';
     Editable = false;
     PageType = List;

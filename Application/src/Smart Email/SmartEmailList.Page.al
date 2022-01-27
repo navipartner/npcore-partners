@@ -1,5 +1,6 @@
-page 6059821 "NPR Smart Email List"
+﻿page 6059821 "NPR Smart Email List"
 {
+    Extensible = False;
     Caption = 'Smart Email List';
     CardPageID = "NPR Smart Email Card";
     Editable = false;

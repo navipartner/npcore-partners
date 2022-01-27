@@ -1,5 +1,6 @@
-codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
+﻿codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

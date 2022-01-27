@@ -1,5 +1,8 @@
-report 6151590 "NPR NpDc Request Coupon Qty."
+﻿report 6151590 "NPR NpDc Request Coupon Qty."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Request Coupon Qty.';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

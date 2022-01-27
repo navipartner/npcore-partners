@@ -1,5 +1,6 @@
-page 6150648 "NPR POS Pricing Profiles"
+﻿page 6150648 "NPR POS Pricing Profiles"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = Administration;
 

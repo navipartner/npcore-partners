@@ -1,5 +1,6 @@
-table 6014627 "NPR Lookup Template Line"
+﻿table 6014627 "NPR Lookup Template Line"
 {
+    Access = Internal;
     Caption = 'Lookup Template Line';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

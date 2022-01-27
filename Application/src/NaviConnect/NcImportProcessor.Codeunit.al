@@ -1,5 +1,6 @@
-codeunit 6151511 "NPR Nc Import Processor"
+﻿codeunit 6151511 "NPR Nc Import Processor"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     var

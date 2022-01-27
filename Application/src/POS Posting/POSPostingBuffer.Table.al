@@ -1,5 +1,6 @@
-table 6150634 "NPR POS Posting Buffer"
+﻿table 6150634 "NPR POS Posting Buffer"
 {
+    Access = Internal;
     Caption = 'POS Posting Buffer';
     DataClassification = CustomerContent;
     TableType = Temporary;

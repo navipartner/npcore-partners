@@ -1,5 +1,6 @@
-table 6151060 "NPR Customer GDPR SetUp"
+﻿table 6151060 "NPR Customer GDPR SetUp"
 {
+    Access = Internal;
     Caption = 'Customer GDPR SetUp';
     DataClassification = CustomerContent;
 

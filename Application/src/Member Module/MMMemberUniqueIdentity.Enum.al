@@ -1,5 +1,8 @@
-enum 6014482 "NPR MM Member Unique Identity"
+﻿enum 6014482 "NPR MM Member Unique Identity"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = false;
 
     value(0; NONE)

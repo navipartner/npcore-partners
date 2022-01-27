@@ -1,5 +1,6 @@
-page 6151174 "NPR NpGp User Sale Return"
+﻿page 6151174 "NPR NpGp User Sale Return"
 {
+    Extensible = False;
     Caption = 'Choose return quantities';
     DeleteAllowed = false;
     InsertAllowed = false;

@@ -1,5 +1,6 @@
 ﻿codeunit 6151504 "NPR Nc Import Mgt."
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

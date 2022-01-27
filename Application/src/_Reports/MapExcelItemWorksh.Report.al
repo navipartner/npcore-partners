@@ -1,5 +1,8 @@
-report 6060044 "NPR Map Excel Item Worksh."
+﻿report 6060044 "NPR Map Excel Item Worksh."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Map Excel Item Worksheet';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

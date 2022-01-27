@@ -1,5 +1,6 @@
 ﻿codeunit 6014498 "NPR Exchange Label Mgt."
 {
+    Access = Internal;
     var
         Text00001: Label 'The item was not found. Use manual procedure in order to return the item.';
 

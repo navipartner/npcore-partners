@@ -1,5 +1,6 @@
-page 6014612 "NPR Retail Campaign Subform"
+﻿page 6014612 "NPR Retail Campaign Subform"
 {
+    Extensible = False;
     // NPR5.38.01/MHA /20171220  CASE 299436 Object created - Retail Campaign
 
     AutoSplitKey = true;

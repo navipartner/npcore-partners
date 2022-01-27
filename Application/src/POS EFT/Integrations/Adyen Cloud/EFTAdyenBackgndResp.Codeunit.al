@@ -1,5 +1,6 @@
-codeunit 6184522 "NPR EFT Adyen Backgnd. Resp."
+﻿codeunit 6184522 "NPR EFT Adyen Backgnd. Resp."
 {
+    Access = Internal;
     // NPR5.49/MMV /20190409 CASE 351678 Created object
     // NPR5.53/MMV /20191211 CASE 377533 Renamed
     // NPR5.54/MMV /20200226 CASE 364340 Split into 2 steps.

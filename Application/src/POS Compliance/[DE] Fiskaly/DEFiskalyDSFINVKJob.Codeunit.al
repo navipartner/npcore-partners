@@ -1,5 +1,6 @@
-codeunit 6014487 "NPR DE Fiskaly DSFINVK Job"
+﻿codeunit 6014487 "NPR DE Fiskaly DSFINVK Job"
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

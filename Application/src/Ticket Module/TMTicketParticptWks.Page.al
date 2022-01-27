@@ -1,5 +1,6 @@
-page 6060109 "NPR TM Ticket Particpt. Wks."
+﻿page 6060109 "NPR TM Ticket Particpt. Wks."
 {
+    Extensible = False;
 
     Caption = 'Ticket Participant Wks.';
     DataCaptionFields = "Admission Code", "Notification Type", "Notification Address";

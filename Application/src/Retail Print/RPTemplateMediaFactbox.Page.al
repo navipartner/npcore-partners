@@ -1,5 +1,6 @@
-page 6014629 "NPR RP Template Media Factbox"
+﻿page 6014629 "NPR RP Template Media Factbox"
 {
+    Extensible = False;
     Caption = 'Template Media Factbox';
     Editable = false;
     InsertAllowed = false;

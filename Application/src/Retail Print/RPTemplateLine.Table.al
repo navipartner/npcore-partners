@@ -1,5 +1,6 @@
-table 6014445 "NPR RP Template Line"
+﻿table 6014445 "NPR RP Template Line"
 {
+    Access = Internal;
     // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
     // NPR5.44/MMV /20180706 CASE 315362 Added field 60, renamed field 44
     // NPR5.46/MMV /20180911 CASE 314067 Added field 52

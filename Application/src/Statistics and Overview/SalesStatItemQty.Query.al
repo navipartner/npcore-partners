@@ -1,5 +1,6 @@
-query 6014411 "NPR Sales Stat - Item Qty"
+﻿query 6014411 "NPR Sales Stat - Item Qty"
 {
+    Access = Internal;
     // NPR5.52/ZESO/20191010  Object created
     // NPR5.53/ZESO/20191211  CASE 371446 Added Vendor No filter
     // NPR5.55/ZESO/20200708  CASE 378805 Added Location Code filter

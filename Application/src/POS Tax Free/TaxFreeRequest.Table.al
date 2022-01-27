@@ -1,5 +1,6 @@
-table 6014640 "NPR Tax Free Request"
+﻿table 6014640 "NPR Tax Free Request"
 {
+    Access = Internal;
     Caption = 'Tax Free Request';
     DataClassification = CustomerContent;
 

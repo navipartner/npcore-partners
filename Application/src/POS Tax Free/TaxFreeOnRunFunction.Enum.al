@@ -1,5 +1,8 @@
-enum 6014446 "NPR Tax Free OnRunFunction"
+﻿enum 6014446 "NPR Tax Free OnRunFunction"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = false;
 
     value(0; FunctionNotSet) { }

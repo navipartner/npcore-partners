@@ -1,5 +1,6 @@
-page 6151405 "NPR Magento Website Links"
+﻿page 6151405 "NPR Magento Website Links"
 {
+    Extensible = False;
     Caption = 'Website Links';
     DelayedInsert = true;
     Editable = true;

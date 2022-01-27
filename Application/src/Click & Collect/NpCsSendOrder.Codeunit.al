@@ -1,5 +1,6 @@
-codeunit 6151197 "NPR NpCs Send Order"
+﻿codeunit 6151197 "NPR NpCs Send Order"
 {
+    Access = Internal;
     var
         CreateCollectOrderLbl: Label 'Create Collect Sales Order in Store';
         OrderSentToStoreLbl: Label 'Order %1 sent to Store %2', Comment = '%1=NpCsDocument."Document No.";%2=NpCsDocument."To Store Code"';

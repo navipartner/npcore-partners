@@ -1,5 +1,6 @@
-table 6150674 "NPR NPRE Assigned Flow Status"
+﻿table 6150674 "NPR NPRE Assigned Flow Status"
 {
+    Access = Internal;
     Caption = 'Assigned Flow Status';
     DataClassification = CustomerContent;
 

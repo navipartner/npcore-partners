@@ -1,5 +1,6 @@
-page 6060094 "NPR TM Ticket Res. Req. Page"
+﻿page 6060094 "NPR TM Ticket Res. Req. Page"
 {
+    Extensible = False;
     Caption = 'Ticket Res. Request Page';
     PageType = Card;
     SourceTable = "NPR TM Ticket Reservation Req.";

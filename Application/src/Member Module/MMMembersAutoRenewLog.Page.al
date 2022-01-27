@@ -1,5 +1,6 @@
-page 6060075 "NPR MM Members. Auto-Renew Log"
+﻿page 6060075 "NPR MM Members. Auto-Renew Log"
 {
+    Extensible = False;
 
     Caption = 'Membership Auto-Renew Log';
     InsertAllowed = false;

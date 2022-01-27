@@ -1,5 +1,6 @@
 page 6014440 "NPR Shipping Provider Docs"
 {
+    Extensible = False;
     Caption = 'Shipping Provider Documents';
     CardPageID = "NPR Shipping Provider Document";
     Editable = false;

@@ -1,5 +1,6 @@
-table 6014577 "NPR Package Shipping Agent"
+﻿table 6014577 "NPR Package Shipping Agent"
 {
+    Access = Internal;
     DataCaptionFields = "Code", Name;
     DrillDownPageID = "Shipping Agents";
     LookupPageID = "Shipping Agents";

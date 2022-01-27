@@ -1,5 +1,6 @@
-page 6060045 "NPR Item Search Page"
+﻿page 6060045 "NPR Item Search Page"
 {
+    Extensible = False;
     Caption = 'Item Search Page';
     UsageCategory = Documents;
     ApplicationArea = NPRRetail;

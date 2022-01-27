@@ -1,5 +1,6 @@
-codeunit 6184498 "NPR Pepper Term. Captions TSD"
+﻿codeunit 6184498 "NPR Pepper Term. Captions TSD"
 {
+    Access = Internal;
     // NPR5.26/TSA/20160809 CASE 248452 Assembly Version Up - JBAXI Support, General Improvements
     // NPR5.38/MHA /20180105  CASE 301053 Renamed Parameter Labels to ProcssLabels in GetLabels as labels is a reserved word in V2
 

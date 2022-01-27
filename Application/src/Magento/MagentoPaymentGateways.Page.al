@@ -1,5 +1,6 @@
-page 6151453 "NPR Magento Payment Gateways"
+﻿page 6151453 "NPR Magento Payment Gateways"
 {
+    Extensible = False;
     Caption = 'Payment Gateways';
     PageType = List;
     SourceTable = "NPR Magento Payment Gateway";

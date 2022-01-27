@@ -1,5 +1,6 @@
-table 6014441 "NPR Company All"
+﻿table 6014441 "NPR Company All"
 {
+    Access = Internal;
     Caption = 'Company All';
     DataPerCompany = false;
     DataClassification = CustomerContent;

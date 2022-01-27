@@ -1,5 +1,6 @@
 ﻿codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
 {
+    Access = Internal;
     var
         TempNpCsOpenHourCalendarEntry: Record "NPR NpCs Open. Hour Cal. Entry" temporary;
         Initialized: Boolean;

@@ -1,5 +1,6 @@
-page 6060113 "NPR TM Ticket Make Reserv."
+﻿page 6060113 "NPR TM Ticket Make Reserv."
 {
+    Extensible = False;
     Caption = 'Make your reservation';
     DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;

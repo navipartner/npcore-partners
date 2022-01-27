@@ -1,5 +1,6 @@
-table 6060121 "NPR TM Ticket Admission BOM"
+﻿table 6060121 "NPR TM Ticket Admission BOM"
 {
+    Access = Internal;
 
     Caption = 'Ticket Admission BOM';
     DataClassification = CustomerContent;

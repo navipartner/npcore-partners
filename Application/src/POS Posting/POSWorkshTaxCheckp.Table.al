@@ -1,5 +1,6 @@
-table 6150630 "NPR POS Worksh. Tax Checkp."
+﻿table 6150630 "NPR POS Worksh. Tax Checkp."
 {
+    Access = Internal;
     Caption = 'POS Workshift Tax Checkpoint';
     DataClassification = CustomerContent;
 

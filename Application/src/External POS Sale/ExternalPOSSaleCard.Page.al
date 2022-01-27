@@ -1,5 +1,6 @@
-page 6059801 "NPR External POS Sale Card"
+﻿page 6059801 "NPR External POS Sale Card"
 {
+    Extensible = False;
     ApplicationArea = NPRRetail;
     Caption = 'External POS Sale';
     PageType = Document;

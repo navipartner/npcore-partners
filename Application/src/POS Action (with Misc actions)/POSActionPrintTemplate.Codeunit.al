@@ -1,5 +1,6 @@
-codeunit 6150834 "NPR POS Action: Print Template"
+﻿codeunit 6150834 "NPR POS Action: Print Template"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for running a report';
         ReadingErr: Label 'reading in %1';

@@ -1,5 +1,6 @@
-codeunit 6150748 "NPR POS Run Workflow"
+﻿codeunit 6150748 "NPR POS Run Workflow"
 {
+    Access = Internal;
     var
         ReadingErr: Label 'reading in %1';
 

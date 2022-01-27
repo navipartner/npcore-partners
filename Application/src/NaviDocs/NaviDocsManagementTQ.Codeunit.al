@@ -1,5 +1,6 @@
-codeunit 6059768 "NPR NaviDocs Management TQ"
+﻿codeunit 6059768 "NPR NaviDocs Management TQ"
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-page 6150688 "NPR NPRE Kitchen Order List"
+﻿page 6150688 "NPR NPRE Kitchen Order List"
 {
+    Extensible = False;
     Caption = 'Kitchen Order List';
     CardPageID = "NPR NPRE Kitchen Order Card";
     Editable = false;

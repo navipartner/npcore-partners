@@ -1,5 +1,6 @@
-page 6014488 "NPR POS Count. Denomin. List"
+﻿page 6014488 "NPR POS Count. Denomin. List"
 {
+    Extensible = False;
     UsageCategory = Lists;
 
     Caption = 'Credit Card Prefix';

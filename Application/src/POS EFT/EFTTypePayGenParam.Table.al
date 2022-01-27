@@ -1,5 +1,6 @@
-table 6184483 "NPR EFT Type Pay. Gen. Param."
+﻿table 6184483 "NPR EFT Type Pay. Gen. Param."
 {
+    Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
 
     Caption = 'EFT Type Payment Gen. Param.';

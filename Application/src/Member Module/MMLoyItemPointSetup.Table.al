@@ -1,5 +1,6 @@
-table 6060142 "NPR MM Loy. Item Point Setup"
+﻿table 6060142 "NPR MM Loy. Item Point Setup"
 {
+    Access = Internal;
 
     Caption = 'Loyalty Item Point Setup';
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-table 6151205 "NPR NpCs Store Inv. Buffer"
+﻿table 6151205 "NPR NpCs Store Inv. Buffer"
 {
+    Access = Internal;
     Caption = 'Collect Store Inventory Buffer';
     DataClassification = CustomerContent;
 

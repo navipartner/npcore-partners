@@ -1,5 +1,6 @@
-codeunit 6014646 "NPR BTF XML Response" implements "NPR BTF IFormatResponse"
+﻿codeunit 6014646 "NPR BTF XML Response" implements "NPR BTF IFormatResponse"
 {
+    Access = Internal;
     var
         NoBodyReturnedLbl: Label 'No body returned';
 

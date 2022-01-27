@@ -1,5 +1,6 @@
-page 6151573 "NPR AF Notification Hub List"
+﻿page 6151573 "NPR AF Notification Hub List"
 {
+    Extensible = False;
 
     Caption = 'AF Notification Hub List';
     CardPageID = "NPR AF Notification Hub Card";

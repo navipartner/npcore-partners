@@ -1,5 +1,6 @@
-page 6151582 "NPR Event Events by Attributes"
+﻿page 6151582 "NPR Event Events by Attributes"
 {
+    Extensible = False;
     Caption = 'Events by Attributes';
     CardPageID = "NPR Event Card";
     Editable = false;

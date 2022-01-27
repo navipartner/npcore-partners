@@ -1,5 +1,6 @@
-table 6014591 "NPR TM Notification Profile"
+﻿table 6014591 "NPR TM Notification Profile"
 {
+    Access = Internal;
     Caption = 'Ticket Notification Profile';
     DataClassification = CustomerContent;
     LookupPageId = "NPR TM Notif. Profile List";

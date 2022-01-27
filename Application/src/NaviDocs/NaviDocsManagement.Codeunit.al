@@ -1,5 +1,6 @@
-codeunit 6059767 "NPR NaviDocs Management"
+﻿codeunit 6059767 "NPR NaviDocs Management"
 {
+    Access = Internal;
     TableNo = "NPR NaviDocs Entry";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-table 6014601 "NPR POS Security Profile"
+﻿table 6014601 "NPR POS Security Profile"
 {
+    Access = Internal;
     Caption = 'NPR POS Security Profile';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Security Profiles";

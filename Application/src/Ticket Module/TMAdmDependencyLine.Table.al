@@ -1,5 +1,6 @@
-table 6014436 "NPR TM Adm. Dependency Line"
+﻿table 6014436 "NPR TM Adm. Dependency Line"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'Admission Dependency Line';
 

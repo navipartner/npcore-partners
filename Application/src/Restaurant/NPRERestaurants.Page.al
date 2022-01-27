@@ -1,5 +1,6 @@
-page 6150683 "NPR NPRE Restaurants"
+﻿page 6150683 "NPR NPRE Restaurants"
 {
+    Extensible = False;
     Caption = 'Restaurants';
     CardPageID = "NPR NPRE Restaurant Card";
     Editable = false;

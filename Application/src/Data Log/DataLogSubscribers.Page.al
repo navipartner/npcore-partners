@@ -1,5 +1,6 @@
-page 6059896 "NPR Data Log Subscribers"
+﻿page 6059896 "NPR Data Log Subscribers"
 {
+    Extensible = False;
     // DL1.01/MH/20140820  NP-AddOn: Data Log
     //   - This Form contains information of Data Log consumers. Update of Subscribers is not mandatory and should be maintained manually.
     //     Direct Data Processing defines whether the Data Processing Codeunit should be executed on Runtime.

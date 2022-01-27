@@ -1,5 +1,6 @@
 ﻿page 6151134 "NPR TM Ticket Schedule Wizard"
 {
+    Extensible = False;
     Caption = 'Schedule';
     DelayedInsert = true;
     PageType = ListPart;

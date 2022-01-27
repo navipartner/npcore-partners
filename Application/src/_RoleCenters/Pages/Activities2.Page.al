@@ -1,5 +1,6 @@
-page 6151253 "NPR Activities 2"
+﻿page 6151253 "NPR Activities 2"
 {
+    Extensible = False;
 
     Caption = 'Retail Activities';
     PageType = CardPart;

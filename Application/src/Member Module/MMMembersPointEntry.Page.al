@@ -1,5 +1,6 @@
-page 6060104 "NPR MM Members. Point Entry"
+﻿page 6060104 "NPR MM Members. Point Entry"
 {
+    Extensible = False;
 
     Caption = 'Membership Point Entry';
     Editable = false;

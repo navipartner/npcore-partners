@@ -1,5 +1,6 @@
-codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
+﻿codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
 {
+    Access = Internal;
     var
         ActionDescriptionCaption: Label 'This action is used to print an exchange label after a sale has been posted, either last sale or selectively.';
         ChooseDocumentCaption: Label 'Please choose sale';

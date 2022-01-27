@@ -1,5 +1,6 @@
-codeunit 6014546 "NPR RP Matrix Printer Interf."
+﻿codeunit 6014546 "NPR RP Matrix Printer Interf."
 {
+    Access = Internal;
     // Matrix Printer Interface.
     // 
     // This library is purely an interface between the

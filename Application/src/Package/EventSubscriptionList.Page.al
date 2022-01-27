@@ -1,5 +1,6 @@
-page 6059787 "NPR Event Subscription List"
+﻿page 6059787 "NPR Event Subscription List"
 {
+    Extensible = False;
     PageType = List;
 
     UsageCategory = Administration;

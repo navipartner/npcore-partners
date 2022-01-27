@@ -1,5 +1,6 @@
 ﻿codeunit 6060157 "NPR Event Link Usg."
 {
+    Access = Internal;
     //New object copied from standard codeunit 1026
     Permissions = TableData "Job Usage Link" = rimd;
 

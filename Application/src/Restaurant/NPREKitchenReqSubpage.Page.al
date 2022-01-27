@@ -1,5 +1,6 @@
-page 6150690 "NPR NPRE Kitchen Req. Subpage"
+﻿page 6150690 "NPR NPRE Kitchen Req. Subpage"
 {
+    Extensible = False;
     Caption = 'Kitchen Request Stations';
     Editable = false;
     PageType = ListPart;

@@ -1,5 +1,6 @@
-table 6150639 "NPR POS RMA Line"
+﻿table 6150639 "NPR POS RMA Line"
 {
+    Access = Internal;
     // NPR5.49/TSA /20190319 CASE 342090 Initial Version
 
     Caption = 'POS RMA Line';

@@ -1,5 +1,6 @@
-codeunit 6150786 "NPR POS Action - Play Sound"
+﻿codeunit 6150786 "NPR POS Action - Play Sound"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('PLAY_SOUND');

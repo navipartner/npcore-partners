@@ -1,5 +1,6 @@
-codeunit 6151448 "NPR Magento NpXml Gen.ChildMgt"
+﻿codeunit 6151448 "NPR Magento NpXml Gen.ChildMgt"
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Mgt.", 'OnSetupGenericChildTable', '', true, true)]
     local procedure SetupVariantTranslation(NpXmlElement: Record "NPR NpXml Element"; ParentRecRef: RecordRef; var ChildRecRef: RecordRef; var Handled: Boolean)
     var

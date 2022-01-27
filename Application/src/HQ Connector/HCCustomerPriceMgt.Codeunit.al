@@ -1,5 +1,6 @@
-codeunit 6150908 "NPR HC Customer Price Mgt."
+﻿codeunit 6150908 "NPR HC Customer Price Mgt."
 {
+    Access = Internal;
     [TryFunction]
     procedure TryProcessRequest(var TmpSalesHeader: Record "Sales Header"; var TmpSalesLine: Record "Sales Line")
     var

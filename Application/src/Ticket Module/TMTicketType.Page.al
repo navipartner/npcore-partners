@@ -1,5 +1,6 @@
-page 6059784 "NPR TM Ticket Type"
+﻿page 6059784 "NPR TM Ticket Type"
 {
+    Extensible = False;
 
     Caption = 'Ticket Type';
     PageType = List;

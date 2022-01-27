@@ -1,5 +1,6 @@
-table 6014538 "NPR Audit Roll Backup"
+﻿table 6014538 "NPR Audit Roll Backup"
 {
+    Access = Internal;
     Caption = 'Audit Roll Backup';
     PasteIsValid = false;
     DataClassification = CustomerContent;

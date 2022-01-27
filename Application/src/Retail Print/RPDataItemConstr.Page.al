@@ -1,5 +1,6 @@
-page 6014642 "NPR RP Data Item Constr."
+﻿page 6014642 "NPR RP Data Item Constr."
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Data Item Constraints';
     PageType = List;

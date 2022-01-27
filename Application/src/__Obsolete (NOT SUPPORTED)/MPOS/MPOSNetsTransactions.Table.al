@@ -1,5 +1,6 @@
-table 6059968 "NPR MPOS Nets Transactions"
+﻿table 6059968 "NPR MPOS Nets Transactions"
 {
+    Access = Internal;
     Caption = 'MPOS Nets Transactions';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

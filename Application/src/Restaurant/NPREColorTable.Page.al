@@ -1,5 +1,6 @@
-page 6150693 "NPR NPRE Color Table"
+﻿page 6150693 "NPR NPRE Color Table"
 {
+    Extensible = False;
     Caption = 'Color Table';
     PageType = List;
 

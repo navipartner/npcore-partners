@@ -1,5 +1,6 @@
-page 6014626 "NPR Displ Groups Select"
+﻿page 6014626 "NPR Displ Groups Select"
 {
+    Extensible = False;
     Caption = 'Display Groups';
     PageType = List;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-codeunit 6059942 "NPR VAN Doc. Endpoint Deliv."
+﻿codeunit 6059942 "NPR VAN Doc. Endpoint Deliv."
 {
+    Access = Internal;
     TableNo = "Record Export Buffer";
 
     trigger OnRun()

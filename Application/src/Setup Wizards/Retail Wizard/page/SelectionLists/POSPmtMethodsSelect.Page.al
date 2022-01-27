@@ -1,5 +1,6 @@
-page 6059782 "NPR POS Pmt Methods Select"
+﻿page 6059782 "NPR POS Pmt Methods Select"
 {
+    Extensible = False;
     Caption = 'POS Payment Method List';
     PageType = List;
     SourceTable = "NPR POS Payment Method";

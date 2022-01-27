@@ -1,5 +1,6 @@
-table 6151372 "NPR CS Comm. Log"
+﻿table 6151372 "NPR CS Comm. Log"
 {
+    Access = Internal;
 
 
     Caption = 'CS Communication Log';

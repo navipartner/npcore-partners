@@ -1,5 +1,6 @@
-codeunit 6059820 "NPR Transactional Email Mgt."
+﻿codeunit 6059820 "NPR Transactional Email Mgt."
 {
+    Access = Internal;
     procedure CheckConnection(TransactionalEmailSetup: Record "NPR Trx Email Setup")
     var
         CampaignMonitorMgt: Codeunit "NPR CampaignMonitor Mgt.";

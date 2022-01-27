@@ -1,5 +1,6 @@
-table 6150668 "NPR NPRE Item Routing Profile"
+﻿table 6150668 "NPR NPRE Item Routing Profile"
 {
+    Access = Internal;
     Caption = 'Rest. Item Routing Profile';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Item Routing Profiles";

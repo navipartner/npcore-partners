@@ -1,5 +1,6 @@
-codeunit 6150897 "NPR Stopwatch"
+﻿codeunit 6150897 "NPR Stopwatch"
 {
+    Access = Internal;
     var
         _start: Dictionary of [Text, DateTime];
         _elapsed: Dictionary of [Text, Duration];

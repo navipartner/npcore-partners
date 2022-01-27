@@ -1,6 +1,7 @@
-#pragma warning disable AA0139, AA0217
+﻿#pragma warning disable AA0139, AA0217
 codeunit 6060147 "NPR MM NPR Membership"
 {
+    Access = Internal;
     var
         InvalidXml: Label 'An invalid XML was returned:\%1';
         MemberCardValidation: Label 'Service %1 at %2 could not validate membercard %3.';

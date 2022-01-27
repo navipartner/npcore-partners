@@ -1,5 +1,6 @@
-table 6014661 "NPR POS Cross Ref. Setup"
+﻿table 6014661 "NPR POS Cross Ref. Setup"
 {
+    Access = Internal;
     Caption = 'POS Cross Reference Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Cross Ref. Setup";

@@ -1,5 +1,6 @@
-codeunit 6014411 "NPR Event Dimension Mgt"
+﻿codeunit 6014411 "NPR Event Dimension Mgt"
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::DimensionManagement, 'OnAfterSetupObjectNoList', '', true, false)]
     local procedure DimensionMgtOnLoadDimensions(var TempAllObjWithCaption: Record AllObjWithCaption temporary)
     begin

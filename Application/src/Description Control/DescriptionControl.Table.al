@@ -1,5 +1,6 @@
-table 6059969 "NPR Description Control"
+﻿table 6059969 "NPR Description Control"
 {
+    Access = Internal;
     // NPR5.29/JDH /20170105 CASE 260472 Description Control is now possible on different types of documents
 
     Caption = 'Description Control';

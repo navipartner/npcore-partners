@@ -1,5 +1,6 @@
-page 6059920 "NPR BTF Service Setup"
+﻿page 6059920 "NPR BTF Service Setup"
 {
+    Extensible = False;
     AdditionalSearchTerms = 'btwentyfour omnichannel,b24';
     PageType = List;
 

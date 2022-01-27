@@ -1,5 +1,6 @@
-codeunit 6014676 "NPR NpXml Value Endp. Batch"
+﻿codeunit 6014676 "NPR NpXml Value Endp. Batch"
 {
+    Access = Internal;
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()

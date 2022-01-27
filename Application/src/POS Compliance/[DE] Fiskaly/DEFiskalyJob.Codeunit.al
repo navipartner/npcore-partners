@@ -1,5 +1,6 @@
-codeunit 6014449 "NPR DE Fiskaly Job"
+﻿codeunit 6014449 "NPR DE Fiskaly Job"
 {
+    Access = Internal;
     trigger OnRun()
     var
         POSEntry: Record "NPR POS Entry";

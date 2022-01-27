@@ -1,5 +1,6 @@
-page 6150694 "NPR NPRE Service Flow Profiles"
+﻿page 6150694 "NPR NPRE Service Flow Profiles"
 {
+    Extensible = False;
     Caption = 'Rest. Service Flow Profiles';
     CardPageID = "NPR NPRE Serv. Flow Prof. Card";
     Editable = false;

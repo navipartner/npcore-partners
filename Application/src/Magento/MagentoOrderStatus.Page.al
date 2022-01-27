@@ -1,5 +1,6 @@
-page 6151452 "NPR Magento Order Status"
+﻿page 6151452 "NPR Magento Order Status"
 {
+    Extensible = False;
     Caption = 'Order Status';
     Editable = false;
     PageType = List;

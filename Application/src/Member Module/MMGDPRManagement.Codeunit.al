@@ -1,5 +1,6 @@
-codeunit 6151121 "NPR MM GDPR Management"
+﻿codeunit 6151121 "NPR MM GDPR Management"
 {
+    Access = Internal;
 
     trigger OnRun()
     var

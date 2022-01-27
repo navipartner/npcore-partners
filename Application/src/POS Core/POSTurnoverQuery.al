@@ -1,5 +1,6 @@
-query 6014400 "NPR POS Turnover"
+﻿query 6014400 "NPR POS Turnover"
 {
+    Access = Internal;
     QueryType = Normal;
     Caption = 'POS Turnover';
 

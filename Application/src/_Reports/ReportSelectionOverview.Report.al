@@ -1,5 +1,8 @@
-report 6014613 "NPR Report Selection Overview"
+﻿report 6014613 "NPR Report Selection Overview"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Report Selection Overview.rdlc';
     UsageCategory = ReportsAndAnalysis;

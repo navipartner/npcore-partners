@@ -1,5 +1,6 @@
 codeunit 6014678 "NPR UPG Member Blob 2 Media"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

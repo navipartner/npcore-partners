@@ -1,5 +1,6 @@
-codeunit 6150682 "NPR NPRE RVA: New WPad"
+﻿codeunit 6150682 "NPR NPRE RVA: New WPad"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('RV_NEW_WAITER_PAD');

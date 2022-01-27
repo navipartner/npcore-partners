@@ -1,5 +1,6 @@
-page 6014427 "NPR DE POS Unit Aux. Info List"
+﻿page 6014427 "NPR DE POS Unit Aux. Info List"
 {
+    Extensible = False;
     Caption = 'NPR DE POS Unit Aux. Info List';
     PageType = List;
     SourceTable = "NPR DE POS Unit Aux. Info";

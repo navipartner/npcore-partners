@@ -1,9 +1,10 @@
-// TODO: Case 430713
+﻿// TODO: Case 430713
 //       UI in this Codeunit can be replaced with Workflows 2.0 signatureValidation dialog.
 //       https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object?anchor=code-example%3A-%60signaturevalidation%60-dialog
 
 codeunit 6184520 "NPR EFT Adyen Cloud Sign Dia."
 {
+    Access = Internal;
     SingleInstance = true;
 
     var

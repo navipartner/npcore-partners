@@ -1,5 +1,6 @@
-table 6014415 "NPR Quantity Discount Line"
+﻿table 6014415 "NPR Quantity Discount Line"
 {
+    Access = Internal;
     // NPR5.31/MHA /20170110  CASE 262904 Renamed Variables and functions to English and deleted unused in OnInsert()
 
     Caption = 'Multiple Unit Price';

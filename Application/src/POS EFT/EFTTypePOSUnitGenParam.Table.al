@@ -1,5 +1,6 @@
-table 6184484 "NPR EFTType POSUnit Gen.Param."
+﻿table 6184484 "NPR EFTType POSUnit Gen.Param."
 {
+    Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
 
     Caption = 'EFT Type POS Unit Gen. Param.';

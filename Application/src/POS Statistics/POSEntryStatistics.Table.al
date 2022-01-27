@@ -1,5 +1,6 @@
-table 6014620 "NPR POS Entry Statistics"
+﻿table 6014620 "NPR POS Entry Statistics"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     TableType = Temporary;
     Caption = 'POS Entry Statistics';

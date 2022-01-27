@@ -1,5 +1,8 @@
-report 6014408 "NPR Item Group Overview"
+﻿report 6014408 "NPR Item Group Overview"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Group Overview.rdlc';
     Caption = 'Item Group Overview';

@@ -1,5 +1,6 @@
-codeunit 6150795 "NPR POS Action - Insert Comm."
+﻿codeunit 6150795 "NPR POS Action - Insert Comm."
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Insert a sales line comment. ';
         Prompt_EnterComment: Label 'Enter Comment';

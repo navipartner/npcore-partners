@@ -1,5 +1,6 @@
-table 6151573 "NPR AF Arguments - Notific.Hub"
+﻿table 6151573 "NPR AF Arguments - Notific.Hub"
 {
+    Access = Internal;
 
     Caption = 'AF Arguments - NotificationHub';
     DataClassification = CustomerContent;

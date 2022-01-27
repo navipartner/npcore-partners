@@ -1,5 +1,6 @@
-page 6150733 "NPR POS Scenarios Set Card"
+﻿page 6150733 "NPR POS Scenarios Set Card"
 {
+    Extensible = False;
 
     Caption = 'POS Scenarios Set Card';
     PageType = Card;

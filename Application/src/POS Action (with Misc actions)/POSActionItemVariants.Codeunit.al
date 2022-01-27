@@ -1,5 +1,6 @@
 codeunit 6059773 "NPR POS Action: Item Variants"
 {
+    Access = Internal;
     local procedure ActionCode(): Text[20]
     begin
         exit('ITEM_VARIANTS');

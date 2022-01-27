@@ -1,5 +1,6 @@
-page 6151220 "NPR PrintNode Setup"
+﻿page 6151220 "NPR PrintNode Setup"
 {
+    Extensible = False;
     Caption = 'PrintNode Setup';
     PageType = Card;
     UsageCategory = Administration;

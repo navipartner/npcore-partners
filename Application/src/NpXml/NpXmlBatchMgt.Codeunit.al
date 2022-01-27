@@ -1,5 +1,6 @@
-codeunit 6151552 "NPR NpXml Batch Mgt."
+﻿codeunit 6151552 "NPR NpXml Batch Mgt."
 {
+    Access = Internal;
     SingleInstance = true;
 
     trigger OnRun()

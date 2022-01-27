@@ -1,5 +1,6 @@
-page 6014493 "NPR POS Apply Cust. Entries"
+﻿page 6014493 "NPR POS Apply Cust. Entries"
 {
+    Extensible = False;
     Caption = 'Apply Customer Entries';
     DataCaptionFields = "Customer No.";
     DeleteAllowed = false;

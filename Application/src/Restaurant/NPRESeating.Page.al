@@ -1,5 +1,6 @@
-page 6150665 "NPR NPRE Seating"
+﻿page 6150665 "NPR NPRE Seating"
 {
+    Extensible = False;
     Caption = 'Seating';
     PageType = Card;
     SourceTable = "NPR NPRE Seating";

@@ -1,5 +1,6 @@
-page 6184514 "NPR EFT BIN Ranges"
+﻿page 6184514 "NPR EFT BIN Ranges"
 {
+    Extensible = False;
     Caption = 'EFT BIN Ranges';
     PageType = List;
     UsageCategory = Administration;

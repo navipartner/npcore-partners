@@ -1,5 +1,6 @@
-codeunit 6014429 "NPR POS Sales Doc. Output Mgt."
+﻿codeunit 6014429 "NPR POS Sales Doc. Output Mgt."
 {
+    Access = Internal;
     // NPR5.52/MMV /20190911 CASE 352473 Created object
     // NPR5.53/MMV /20200102 CASE 377510 Added OnRun trigger for better error handling
 

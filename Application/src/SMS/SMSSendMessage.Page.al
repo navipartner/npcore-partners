@@ -1,5 +1,6 @@
-page 6059944 "NPR SMS Send Message"
+﻿page 6059944 "NPR SMS Send Message"
 {
+    Extensible = False;
     Caption = 'Send SMS';
     DeleteAllowed = false;
     InsertAllowed = false;

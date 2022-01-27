@@ -1,5 +1,6 @@
-codeunit 6150867 "NPR POS Action: Doc. Show"
+﻿codeunit 6150867 "NPR POS Action: Doc. Show"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Open sales document via list or from selected POS line.';
         CaptionSelectCustomer: Label 'Select Customer';

@@ -1,5 +1,6 @@
-page 6150746 "NPR Unfinished POS Sale"
+﻿page 6150746 "NPR Unfinished POS Sale"
 {
+    Extensible = False;
     Caption = 'Unfinished POS Sale';
     Editable = false;
     InstructionalText = 'There is an unfinished sale, do you want to resume it?';

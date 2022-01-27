@@ -1,5 +1,6 @@
-codeunit 6151186 "NPR MM NpXml Members. Trigger"
+﻿codeunit 6151186 "NPR MM NpXml Members. Trigger"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

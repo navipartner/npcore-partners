@@ -1,5 +1,6 @@
 ﻿codeunit 6060056 "NPR Item Wksht. Doc. Exch."
 {
+    Access = Internal;
     procedure InsertItemWorksheetLine(ItemWorksheet: Record "NPR Item Worksheet"; var ItemWorksheetLine: Record "NPR Item Worksheet Line"; VendorNo: Code[20]; VendorItemNo: Text; VendorItemDescription: Text; ItemGroupText: Text; DirectUnitCost: Decimal)
     var
         ItemCategory: Record "Item Category";

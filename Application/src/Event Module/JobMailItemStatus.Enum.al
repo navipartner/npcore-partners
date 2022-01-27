@@ -1,5 +1,8 @@
-enum 6014450 "NPR Job Mail Item Status"
+﻿enum 6014450 "NPR Job Mail Item Status"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; " ") { Caption = ''; }

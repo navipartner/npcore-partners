@@ -1,5 +1,6 @@
-table 6151370 "NPR CS User"
+﻿table 6151370 "NPR CS User"
 {
+    Access = Internal;
     Caption = 'CS User';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

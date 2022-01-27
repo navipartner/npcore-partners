@@ -1,5 +1,6 @@
-page 6184506 "NPR EFT Verifone Paym. Param."
+﻿page 6184506 "NPR EFT Verifone Paym. Param."
 {
+    Extensible = False;
     // NPR5.53/MMV /20191204 CASE 349520 Added object
 
     Caption = 'EFT Verifone Payment Parameter';

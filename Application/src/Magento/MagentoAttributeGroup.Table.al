@@ -1,5 +1,6 @@
-table 6151440 "NPR Magento Attribute Group"
+﻿table 6151440 "NPR Magento Attribute Group"
 {
+    Access = Internal;
     Caption = 'Magento Attribute Group';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Attr. Group List";

@@ -1,5 +1,6 @@
 ﻿codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt."
 {
+    Access = Internal;
     var
         Text000: Label 'Quickpay error:\%1 - %2  \%3';
 

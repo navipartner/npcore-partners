@@ -1,5 +1,6 @@
-codeunit 6060116 "NPR TM Ticket WebService Mgr"
+﻿codeunit 6060116 "NPR TM Ticket WebService Mgr"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

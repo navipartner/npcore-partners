@@ -1,6 +1,5 @@
-page 6014672 "NPR Rep. Spec. Field Mappings"
+﻿page 6014672 "NPR Rep. Spec. Field Mappings"
 {
-
     Caption = 'Replication Special Field Mappings';
     ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
     Editable = true;

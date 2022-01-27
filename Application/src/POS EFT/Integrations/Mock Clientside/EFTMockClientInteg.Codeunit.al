@@ -1,5 +1,6 @@
-codeunit 6184511 "NPR EFT Mock Client Integ."
+﻿codeunit 6184511 "NPR EFT Mock Client Integ."
 {
+    Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
     // NPR5.51/MMV /20190626 CASE 359385 Added gift card load support.

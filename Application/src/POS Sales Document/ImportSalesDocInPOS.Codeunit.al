@@ -1,5 +1,6 @@
-codeunit 6014562 "NPR Import Sales Doc. In POS"
+﻿codeunit 6014562 "NPR Import Sales Doc. In POS"
 {
+    Access = Internal;
     TableNo = "NPR POS Sale";
 
     trigger OnRun()

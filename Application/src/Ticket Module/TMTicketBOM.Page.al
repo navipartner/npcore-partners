@@ -1,5 +1,6 @@
-page 6060121 "NPR TM Ticket BOM"
+﻿page 6060121 "NPR TM Ticket BOM"
 {
+    Extensible = False;
     Caption = 'Ticket BOM';
     PageType = List;
     SourceTable = "NPR TM Ticket Admission BOM";

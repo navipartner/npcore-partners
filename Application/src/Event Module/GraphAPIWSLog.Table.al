@@ -1,5 +1,6 @@
-table 6014596 "NPR GraphAPI WS Log"
+﻿table 6014596 "NPR GraphAPI WS Log"
 {
+    Access = Internal;
     Caption = 'GraphAPI WS Log';
     DataClassification = CustomerContent;
 

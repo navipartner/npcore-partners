@@ -1,5 +1,6 @@
-table 6014437 "NPR Payment Type - Detailed"
+﻿table 6014437 "NPR Payment Type - Detailed"
 {
+    Access = Internal;
     Caption = 'Payment Type - Detailed';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

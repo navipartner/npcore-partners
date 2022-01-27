@@ -1,5 +1,6 @@
-codeunit 6150740 "NPR POS Method - Wysiwyg"
+﻿codeunit 6150740 "NPR POS Method - Wysiwyg"
 {
+    Access = Internal;
     var
         ReadingErr: Label 'executing WYSIWYG editor';
         SettingScopeErr: Label 'setting scope in WYSIWYG editor';

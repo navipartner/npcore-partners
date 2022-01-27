@@ -1,5 +1,6 @@
 ﻿codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
 {
+    Access = Internal;
     var
         ERRNoPadForSeating: Label 'No active waiter pad exists for seating %1.';
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";

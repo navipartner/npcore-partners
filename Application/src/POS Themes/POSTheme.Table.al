@@ -1,5 +1,6 @@
-table 6150721 "NPR POS Theme"
+﻿table 6150721 "NPR POS Theme"
 {
+    Access = Internal;
     // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
 
     Caption = 'POS Theme';

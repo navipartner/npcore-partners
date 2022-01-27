@@ -1,5 +1,6 @@
-table 6059963 "NPR MPOS EOD Recipts"
+﻿table 6059963 "NPR MPOS EOD Recipts"
 {
+    Access = Internal;
     Caption = 'MPOS EOD Recipts';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,6 @@
-codeunit 6014663 "NPR Job Queue Management"
+﻿codeunit 6014663 "NPR Job Queue Management"
 {
+    Access = Internal;
     Permissions =
         tabledata "Error Message" = rimd,
         tabledata "Error Message Register" = rimd,

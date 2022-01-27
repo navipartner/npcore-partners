@@ -1,5 +1,8 @@
-report 6014540 "NPR Items With Low Sales"
+﻿report 6014540 "NPR Items With Low Sales"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Items With Low Sales.rdlc';
     Caption = 'Items With Low Sales';

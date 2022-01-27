@@ -1,5 +1,6 @@
-page 6060048 "NPR Reg. ItemWsht Var.Subpage"
+﻿page 6060048 "NPR Reg. ItemWsht Var.Subpage"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Reg. Item Wsht Variety Subpage';
     Editable = false;

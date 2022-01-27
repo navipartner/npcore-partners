@@ -1,5 +1,6 @@
-page 6014444 "NPR Quantity Discount Line"
+﻿page 6014444 "NPR Quantity Discount Line"
 {
+    Extensible = False;
     Caption = 'Multiple Unit Price';
     PageType = CardPart;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-codeunit 6014520 "NPR MobilePayV10 Token"
+﻿codeunit 6014520 "NPR MobilePayV10 Token"
 {
+    Access = Internal;
     SingleInstance = true;
 
     var

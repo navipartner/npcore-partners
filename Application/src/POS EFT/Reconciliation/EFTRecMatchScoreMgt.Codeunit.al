@@ -1,5 +1,6 @@
-codeunit 6014668 "NPR EFT Rec. Match/Score Mgt."
+﻿codeunit 6014668 "NPR EFT Rec. Match/Score Mgt."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

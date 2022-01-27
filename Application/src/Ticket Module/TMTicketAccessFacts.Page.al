@@ -1,5 +1,6 @@
-page 6060114 "NPR TM Ticket Access Facts"
+﻿page 6060114 "NPR TM Ticket Access Facts"
 {
+    Extensible = False;
     Caption = 'Ticket Access Facts';
     PageType = List;
     SourceTable = "NPR TM Ticket Access Fact";

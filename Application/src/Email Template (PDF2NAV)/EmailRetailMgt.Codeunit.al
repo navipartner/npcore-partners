@@ -1,5 +1,6 @@
-codeunit 6014474 "NPR E-mail Retail Mgt."
+﻿codeunit 6014474 "NPR E-mail Retail Mgt."
 {
+    Access = Internal;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR E-mail Management", 'GetEmailAddressEvent', '', false, false)]
     local procedure OnGetEmailAddressEvent(var RecRef: RecordRef; var EmailAddress: Text; var Handled: Boolean)

@@ -1,5 +1,6 @@
-page 6150903 "NPR HC Register List"
+﻿page 6150903 "NPR HC Register List"
 {
+    Extensible = False;
     Caption = 'HC Register List';
     PageType = List;
     SourceTable = "NPR HC Register";

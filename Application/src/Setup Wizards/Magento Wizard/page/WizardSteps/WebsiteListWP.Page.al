@@ -1,5 +1,6 @@
-page 6014520 "NPR Website List WP"
+﻿page 6014520 "NPR Website List WP"
 {
+    Extensible = False;
     Caption = 'Websites';
     PageType = ListPart;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-page 6014497 "NPR Retail Journal List"
+﻿page 6014497 "NPR Retail Journal List"
 {
+    Extensible = False;
     Caption = 'Retail Journal List';
     CardPageID = "NPR Retail Journal Header";
     Editable = false;

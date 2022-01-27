@@ -1,5 +1,6 @@
 ﻿codeunit 6060046 "NPR Item Wsht.Register Line"
 {
+    Access = Internal;
     Permissions = TableData "NPR Registered Item Works." = imd,
                   TableData "NPR Regist. Item Worksh Line" = imd,
                   TableData "NPR Reg. Item Wsht Var. Line" = imd;

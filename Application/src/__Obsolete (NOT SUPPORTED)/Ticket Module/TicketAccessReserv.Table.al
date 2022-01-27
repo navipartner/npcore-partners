@@ -1,5 +1,6 @@
-table 6059788 "NPR Ticket Access Reserv."
+﻿table 6059788 "NPR Ticket Access Reserv."
 {
+    Access = Internal;
     Caption = 'Ticket Access Reservation';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

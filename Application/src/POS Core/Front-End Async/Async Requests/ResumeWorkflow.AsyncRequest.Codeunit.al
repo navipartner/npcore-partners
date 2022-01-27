@@ -1,5 +1,6 @@
-codeunit 6150775 "NPR Front-End: ResumeWorkflow" implements "NPR Front-End Async Request"
+﻿codeunit 6150775 "NPR Front-End: ResumeWorkflow" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _workflowId: Integer;

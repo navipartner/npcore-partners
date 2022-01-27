@@ -1,5 +1,6 @@
-page 6151448 "NPR Magento Payment Mapping"
+﻿page 6151448 "NPR Magento Payment Mapping"
 {
+    Extensible = False;
     Caption = 'Payment Method Mapping';
     PageType = List;
     SourceTable = "NPR Magento Payment Mapping";

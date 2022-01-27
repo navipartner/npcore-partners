@@ -1,5 +1,6 @@
-page 6014456 "NPR POS Info: Request Text"
+﻿page 6014456 "NPR POS Info: Request Text"
 {
+    Extensible = False;
     PageType = StandardDialog;
     UsageCategory = None;
     SourceTable = "NPR POS Info";

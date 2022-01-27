@@ -1,5 +1,6 @@
-page 6014622 "NPR POS Web Fonts"
+﻿page 6014622 "NPR POS Web Fonts"
 {
+    Extensible = False;
     Caption = 'POS Web Fonts';
     PageType = List;
     SourceTable = "NPR POS Web Font";

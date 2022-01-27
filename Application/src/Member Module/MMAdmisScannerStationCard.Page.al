@@ -1,5 +1,6 @@
-page 6060080 "NPR Admis. Scanner Stat. Card"
+﻿page 6060080 "NPR Admis. Scanner Stat. Card"
 {
+    Extensible = False;
 
     Caption = 'NPR MM Admis. Scanner Station Card';
     PageType = Card;

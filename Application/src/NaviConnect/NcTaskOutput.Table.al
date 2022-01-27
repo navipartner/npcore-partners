@@ -1,5 +1,6 @@
-table 6151508 "NPR Nc Task Output"
+﻿table 6151508 "NPR Nc Task Output"
 {
+    Access = Internal;
     Caption = 'Nc Task Output';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Task Output List";

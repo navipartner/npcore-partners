@@ -1,5 +1,6 @@
 table 6014632 "NPR Job Queue Notif. Profile"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'Job Queue Notification Profile';
 

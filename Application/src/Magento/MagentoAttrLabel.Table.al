@@ -1,5 +1,6 @@
-table 6151427 "NPR Magento Attr. Label"
+﻿table 6151427 "NPR Magento Attr. Label"
 {
+    Access = Internal;
     Caption = 'Magento Attribute Label';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Attr. Labels";

@@ -1,5 +1,6 @@
-codeunit 6059904 "NPR Task Queue NAS Login"
+﻿codeunit 6059904 "NPR Task Queue NAS Login"
 {
+    Access = Internal;
     // TQ1.18/MH  /20141110 CASE 198170 Max No. Of Active Task Workers is managed by each Group instead of only the Master Group.
     // TQ1.24/JDH /20150317 CASE 209090 added function CheckHeartBeatForSessions
     // TQ1.25/MH  /20150410 CASE 210797 Changed sequence of Task Queue:

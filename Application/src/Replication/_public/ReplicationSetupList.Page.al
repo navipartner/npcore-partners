@@ -1,6 +1,5 @@
-page 6014499 "NPR Replication Setup List"
+﻿page 6014499 "NPR Replication Setup List"
 {
-
     ApplicationArea = NPRRetail;
     Caption = 'Replication API Setup List';
     CardPageId = "NPR Replication Setup Card";

@@ -1,5 +1,6 @@
-codeunit 6150769 "NPR Front-End: ProvideContext" implements "NPR Front-End Async Request"
+﻿codeunit 6150769 "NPR Front-End: ProvideContext" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _context: JsonObject;

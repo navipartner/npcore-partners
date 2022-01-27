@@ -1,5 +1,8 @@
-report 6014434 "NPR Vendor/Debtor by date"
+﻿report 6014434 "NPR Vendor/Debtor by date"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/VendorDebtor by date.rdlc';
     UsageCategory = ReportsAndAnalysis;

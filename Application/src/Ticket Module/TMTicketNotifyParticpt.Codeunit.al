@@ -1,5 +1,6 @@
-codeunit 6060120 "NPR TM Ticket Notify Particpt."
+﻿codeunit 6060120 "NPR TM Ticket Notify Particpt."
 {
+    Access = Internal;
     trigger OnRun()
     var
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";

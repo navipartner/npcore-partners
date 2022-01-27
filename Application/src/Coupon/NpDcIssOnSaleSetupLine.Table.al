@@ -1,5 +1,6 @@
-table 6151602 "NPR NpDc Iss.OnSale Setup Line"
+﻿table 6151602 "NPR NpDc Iss.OnSale Setup Line"
 {
+    Access = Internal;
     Caption = 'Issue On-Sale Setup Line';
     DataClassification = CustomerContent;
 

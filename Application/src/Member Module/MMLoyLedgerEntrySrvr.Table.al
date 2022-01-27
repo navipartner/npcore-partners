@@ -1,5 +1,6 @@
-table 6151162 "NPR MM Loy. LedgerEntry (Srvr)"
+﻿table 6151162 "NPR MM Loy. LedgerEntry (Srvr)"
 {
+    Access = Internal;
 
     Caption = 'Loyalty Server Store Ledger';
     DataClassification = CustomerContent;

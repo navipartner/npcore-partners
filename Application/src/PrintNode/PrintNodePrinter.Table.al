@@ -1,5 +1,6 @@
-table 6151221 "NPR PrintNode Printer"
+﻿table 6151221 "NPR PrintNode Printer"
 {
+    Access = Internal;
     Caption = 'PrintNode Printer';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR PrintNode Printer List";

@@ -1,5 +1,6 @@
-table 6150619 "NPR POS Unit to Bin Relation"
+﻿table 6150619 "NPR POS Unit to Bin Relation"
 {
+    Access = Internal;
     // NPR5.36/TSA /20170707 CASE 282251 First Version
     // NPR5.40/TSA /20180302 CASE 282251 Changed primary key to include bin number
 

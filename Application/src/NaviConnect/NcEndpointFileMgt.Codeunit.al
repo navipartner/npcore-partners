@@ -1,5 +1,6 @@
-codeunit 6151526 "NPR Nc Endpoint File Mgt."
+﻿codeunit 6151526 "NPR Nc Endpoint File Mgt."
 {
+    Access = Internal;
     var
         TextFileDownloadedLbl: Label 'The file was downloaded.';
         TextFileExportedLbl: Label 'The file was exported.';

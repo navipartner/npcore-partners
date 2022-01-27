@@ -1,5 +1,8 @@
-report 6014417 "NPR Inventory per Date"
+﻿report 6014417 "NPR Inventory per Date"
 {
+#IF NOT BC17
+    Extensible = False; 
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory per Date.rdlc';
     Caption = 'Inventory per Date';

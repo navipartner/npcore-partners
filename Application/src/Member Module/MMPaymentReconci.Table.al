@@ -1,5 +1,6 @@
-table 6060094 "NPR MM Payment Reconci."
+﻿table 6060094 "NPR MM Payment Reconci."
 {
+    Access = Internal;
 
     Caption = 'Payment Reconciliation';
     DataClassification = CustomerContent;

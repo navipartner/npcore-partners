@@ -1,5 +1,6 @@
-table 6014528 "NPR Aux. G/L Account"
+﻿table 6014528 "NPR Aux. G/L Account"
 {
+    Access = Internal;
     Caption = 'Aux. G/L Account';
     DataClassification = CustomerContent;
 

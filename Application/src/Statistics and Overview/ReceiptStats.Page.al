@@ -1,5 +1,6 @@
-page 6014491 "NPR Receipt Stats"
+﻿page 6014491 "NPR Receipt Stats"
 {
+    Extensible = False;
     Caption = 'Receipt statistics';
     PageType = List;
     UsageCategory = Administration;

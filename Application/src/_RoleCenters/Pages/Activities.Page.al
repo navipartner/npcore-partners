@@ -1,6 +1,7 @@
-page 6151255 "NPR Activities"
+﻿page 6151255 "NPR Activities"
 
 {
+    Extensible = False;
     Caption = 'Sales Activities';
     PageType = CardPart;
     SourceTable = "NPR Retail Sales Cue";

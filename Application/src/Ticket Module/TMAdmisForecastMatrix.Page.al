@@ -1,5 +1,6 @@
-page 6151135 "NPR TM Admis. Forecast Matrix"
+﻿page 6151135 "NPR TM Admis. Forecast Matrix"
 {
+    Extensible = False;
     // TM1.48/TSA /20200625 CASE 409741 Initial Version
 
     Caption = 'Admission Forecast Matrix';

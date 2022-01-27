@@ -1,5 +1,6 @@
 ﻿codeunit 6150731 "NPR POS Action: Transf. Order"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for handling Transfer Orders';
         CreateNewRecordCaption: Label 'Create new record with "%1" and "%2"';

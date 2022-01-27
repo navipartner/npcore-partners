@@ -1,5 +1,6 @@
-page 6059958 "NPR MCS Person"
+﻿page 6059958 "NPR MCS Person"
 {
+    Extensible = False;
 
     Caption = 'MCS Person';
     PageType = List;

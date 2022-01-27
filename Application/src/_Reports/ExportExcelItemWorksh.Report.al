@@ -1,5 +1,8 @@
 ﻿report 6060043 "NPR Export Excel Item Worksh."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Export Excel Item Worksheet';
     ProcessingOnly = true;
     UsageCategory = None;

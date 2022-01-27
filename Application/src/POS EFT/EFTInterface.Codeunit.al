@@ -1,5 +1,6 @@
-codeunit 6184479 "NPR EFT Interface"
+﻿codeunit 6184479 "NPR EFT Interface"
 {
+    Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.48/MMV /20190123 CASE 341237 Added new events for skipping pause/unpause of front end.
     // NPR5.51/MMV /20190626 CASE 359385 Added gift card event

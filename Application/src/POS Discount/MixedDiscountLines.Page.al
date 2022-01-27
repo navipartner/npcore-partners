@@ -1,5 +1,6 @@
-page 6014451 "NPR Mixed Discount Lines"
+﻿page 6014451 "NPR Mixed Discount Lines"
 {
+    Extensible = False;
     Caption = 'Mix Discount Lines';
     DelayedInsert = true;
     PageType = ListPart;

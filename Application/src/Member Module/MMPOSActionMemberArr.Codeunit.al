@@ -1,5 +1,6 @@
-codeunit 6060140 "NPR MM POS Action: Member Arr."
+﻿codeunit 6060140 "NPR MM POS Action: Member Arr."
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This action handles member arrival functions.';
         MemberCardPrompt: Label 'Enter Member Card Number';

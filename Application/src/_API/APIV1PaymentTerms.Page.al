@@ -1,5 +1,6 @@
-page 6014661 "NPR APIV1 - Payment Terms"
+﻿page 6014661 "NPR APIV1 - Payment Terms"
 {
+    Extensible = False;
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';

@@ -1,5 +1,6 @@
-page 6060110 "NPR TM Acquire Participant"
+﻿page 6060110 "NPR TM Acquire Participant"
 {
+    Extensible = False;
     Caption = 'Acquire Participant';
     DataCaptionExpression = Rec."Admission Description";
     DataCaptionFields = "Admission Description";

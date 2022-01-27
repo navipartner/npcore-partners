@@ -1,5 +1,6 @@
-page 6014652 "NPR Comp. Inf. Step"
+﻿page 6014652 "NPR Comp. Inf. Step"
 {
+    Extensible = False;
     Caption = 'Company Information';
     DeleteAllowed = false;
     PageType = CardPart;

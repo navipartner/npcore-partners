@@ -1,5 +1,6 @@
-codeunit 6150722 "NPR POS Action: Text Enter"
+﻿codeunit 6150722 "NPR POS Action: Text Enter"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for completing the TextEnter request passed from the front end (when user presses enter in a supported text box)';
         Text001: Label 'Control %1 has just sent an %2 event, but it appears that events for this control are not handled.';

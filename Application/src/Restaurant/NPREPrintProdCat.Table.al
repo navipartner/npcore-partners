@@ -1,5 +1,6 @@
-table 6150663 "NPR NPRE Print/Prod. Cat."
+﻿table 6150663 "NPR NPRE Print/Prod. Cat."
 {
+    Access = Internal;
     Caption = 'Print/Production Category';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Slct Prnt Cat.";

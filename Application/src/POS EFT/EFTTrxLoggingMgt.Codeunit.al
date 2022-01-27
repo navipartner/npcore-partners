@@ -1,5 +1,6 @@
-codeunit 6184505 "NPR EFT Trx Logging Mgt."
+﻿codeunit 6184505 "NPR EFT Trx Logging Mgt."
 {
+    Access = Internal;
     // NPR5.53/MMV /20191120 CASE 377533 Created object
 
 

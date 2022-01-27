@@ -1,5 +1,6 @@
-codeunit 6014654 "NPR External POS Tax Calc"
+﻿codeunit 6014654 "NPR External POS Tax Calc"
 {
+    Access = Internal;
     procedure PostExternalPOSSalesLineTaxAmount(var POSEntryTaxLine: Record "NPR POS Entry Tax Line"; ExtPOSSaleLine: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry")
     var
     begin

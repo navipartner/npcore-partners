@@ -1,5 +1,6 @@
-page 6184498 "NPR EFT Transaction Requests"
+﻿page 6184498 "NPR EFT Transaction Requests"
 {
+    Extensible = False;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
     // NPR5.22\BR\20160330  CASE 231481 Fixed misspelling Successful
     // NPR5.22\BR\20160407  CASE 231481 Added Result Display Text

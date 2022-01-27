@@ -1,5 +1,6 @@
-query 6150661 "NPR NPRE Seating - W/Pad Link"
+﻿query 6150661 "NPR NPRE Seating - W/Pad Link"
 {
+    Access = Internal;
     QueryType = Normal;
     Caption = 'NPRE Seating - W/Pad Link';
 

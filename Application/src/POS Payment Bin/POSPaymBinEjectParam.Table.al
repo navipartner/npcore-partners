@@ -1,5 +1,6 @@
-table 6150633 "NPR POS Paym. Bin Eject Param."
+﻿table 6150633 "NPR POS Paym. Bin Eject Param."
 {
+    Access = Internal;
     Caption = 'POS Payment Bin Eject Param.';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Paym. Bin Eject Params";

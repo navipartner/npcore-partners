@@ -1,5 +1,6 @@
-page 6150743 "NPR POS Restaur. Profile Card"
+﻿page 6150743 "NPR POS Restaur. Profile Card"
 {
+    Extensible = False;
     Caption = 'POS Restaur. Profile';
     PageType = Card;
     UsageCategory = None;

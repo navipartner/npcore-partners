@@ -1,5 +1,6 @@
-page 6184851 "NPR FR Audit No. Series"
+﻿page 6184851 "NPR FR Audit No. Series"
 {
+    Extensible = False;
     Caption = 'FR Audit No. Series';
     DelayedInsert = true;
     PageType = List;

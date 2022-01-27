@@ -1,5 +1,6 @@
-codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
+﻿codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

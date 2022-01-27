@@ -1,5 +1,6 @@
-codeunit 6150629 "NPR POS Entry Management"
+﻿codeunit 6150629 "NPR POS Entry Management"
 {
+    Access = Internal;
     TableNo = "NPR POS Entry";
 
     trigger OnRun()

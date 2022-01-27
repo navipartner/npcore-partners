@@ -1,5 +1,6 @@
-table 6151554 "NPR NpXml Attribute"
+﻿table 6151554 "NPR NpXml Attribute"
 {
+    Access = Internal;
     Caption = 'NpXml Attribute';
     DataClassification = CustomerContent;
 

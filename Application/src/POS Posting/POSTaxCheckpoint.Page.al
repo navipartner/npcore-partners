@@ -1,5 +1,6 @@
-page 6150630 "NPR POS Tax Checkpoint"
+﻿page 6150630 "NPR POS Tax Checkpoint"
 {
+    Extensible = False;
     Caption = 'POS Tax Checkpoint';
     Editable = false;
     PageType = List;

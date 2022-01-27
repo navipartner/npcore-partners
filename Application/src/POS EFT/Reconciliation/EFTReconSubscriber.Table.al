@@ -1,5 +1,6 @@
-table 6014629 "NPR EFT Recon. Subscriber"
+﻿table 6014629 "NPR EFT Recon. Subscriber"
 {
+    Access = Internal;
     Caption = 'EFT Recon. Subscriber';
     DataClassification = CustomerContent;
 

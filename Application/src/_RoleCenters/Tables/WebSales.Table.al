@@ -1,5 +1,6 @@
-table 6151246 "NPR Web Sales"
+﻿table 6151246 "NPR Web Sales"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'Web Sales';
 

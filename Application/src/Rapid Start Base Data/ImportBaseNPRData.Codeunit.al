@@ -1,5 +1,6 @@
-codeunit 6014602 "NPR Import Base NPR Data"
+﻿codeunit 6014602 "NPR Import Base NPR Data"
 {
+    Access = Internal;
     trigger OnRun()
     var
         AllObj: Record AllObj;

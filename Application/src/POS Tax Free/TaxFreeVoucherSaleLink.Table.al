@@ -1,5 +1,6 @@
-table 6014644 "NPR Tax Free Voucher Sale Link"
+﻿table 6014644 "NPR Tax Free Voucher Sale Link"
 {
+    Access = Internal;
 
     Caption = 'Tax Free Voucher Sale Link';
     LookupPageID = "NPR Tax Free Vouch. Sale Links";

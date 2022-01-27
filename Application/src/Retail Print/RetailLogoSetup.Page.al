@@ -1,5 +1,6 @@
-page 6014566 "NPR Retail Logo Setup"
+﻿page 6014566 "NPR Retail Logo Setup"
 {
+    Extensible = False;
 
     Caption = 'Retail Logo Setup';
     InsertAllowed = false;

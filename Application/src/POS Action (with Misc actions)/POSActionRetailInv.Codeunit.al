@@ -1,5 +1,6 @@
-codeunit 6151086 "NPR POS Action - Retail Inv."
+﻿codeunit 6151086 "NPR POS Action - Retail Inv."
 {
+    Access = Internal;
     var
         Text000: Label 'This is a built-in action for Inventory Lookup using Retail Inventory Set';
 

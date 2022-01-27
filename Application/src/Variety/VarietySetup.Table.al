@@ -1,5 +1,6 @@
-table 6059970 "NPR Variety Setup"
+﻿table 6059970 "NPR Variety Setup"
 {
+    Access = Internal;
     Caption = 'Variety Setup';
     DataClassification = CustomerContent;
 

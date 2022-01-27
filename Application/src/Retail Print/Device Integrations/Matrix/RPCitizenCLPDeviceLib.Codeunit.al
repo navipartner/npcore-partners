@@ -1,5 +1,6 @@
-codeunit 6014544 "NPR RP Citizen CLP Device Lib."
+﻿codeunit 6014544 "NPR RP Citizen CLP Device Lib."
 {
+    Access = Internal;
     // Citizen CLP Command Library.
     //  Work started by Michael Thulin.
     //  Contributions providing function interfaces for valid

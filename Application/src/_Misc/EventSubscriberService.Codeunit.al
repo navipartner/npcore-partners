@@ -1,5 +1,6 @@
-codeunit 6014457 "NPR Event Subscriber (Service)"
+﻿codeunit 6014457 "NPR Event Subscriber (Service)"
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Table, Database::"Service Connection", 'OnRegisterServiceConnection', '', false, false)]
     local procedure T1400OnRegisterServiceConnection(var ServiceConnection: Record "Service Connection")
     begin

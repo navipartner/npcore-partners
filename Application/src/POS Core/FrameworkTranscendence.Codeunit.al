@@ -1,5 +1,6 @@
-codeunit 6150750 "NPR Framework: Transcendence" implements "NPR Framework Interface"
+﻿codeunit 6150750 "NPR Framework: Transcendence" implements "NPR Framework Interface"
 {
+    Access = Internal;
     var
         Framework: controladdin "NPR Transcendence";
         Initialized: boolean;

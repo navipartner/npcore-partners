@@ -1,5 +1,6 @@
-codeunit 6151106 "NPR NpRi Task Queue Mgt."
+﻿codeunit 6151106 "NPR NpRi Task Queue Mgt."
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

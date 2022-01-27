@@ -1,5 +1,6 @@
-codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
+﻿codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
 {
+    Access = Internal;
 
     procedure IsRetailInventoryEnabled(): Boolean
     var

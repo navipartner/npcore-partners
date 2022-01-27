@@ -1,5 +1,6 @@
-table 6151606 "NPR NpDc Ext. Coupon Buffer"
+﻿table 6151606 "NPR NpDc Ext. Coupon Buffer"
 {
+    Access = Internal;
     Caption = 'NpDc Ext. Coupon Buffer';
     DataClassification = CustomerContent;
 

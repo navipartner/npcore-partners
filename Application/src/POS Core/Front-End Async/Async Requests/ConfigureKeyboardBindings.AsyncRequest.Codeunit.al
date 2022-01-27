@@ -1,5 +1,6 @@
-codeunit 6150760 "NPR Front-End: ConfigKeyBind." implements "NPR Front-End Async Request"
+﻿codeunit 6150760 "NPR Front-End: ConfigKeyBind." implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _bindings: JsonArray;

@@ -1,5 +1,6 @@
-page 6151185 "NPR MM Sponsors. Ticket Setup"
+﻿page 6151185 "NPR MM Sponsors. Ticket Setup"
 {
+    Extensible = False;
 
     Caption = 'Sponsorship Ticket Setup';
     DelayedInsert = true;

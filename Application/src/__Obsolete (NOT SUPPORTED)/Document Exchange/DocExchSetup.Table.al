@@ -1,5 +1,6 @@
-table 6059931 "NPR Doc. Exch. Setup"
+﻿table 6059931 "NPR Doc. Exch. Setup"
 {
+    Access = Internal;
     Caption = 'Doc. Exch. Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

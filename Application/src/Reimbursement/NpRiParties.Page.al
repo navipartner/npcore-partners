@@ -1,5 +1,6 @@
-page 6151105 "NPR NpRi Parties"
+﻿page 6151105 "NPR NpRi Parties"
 {
+    Extensible = False;
 
     Caption = 'Reimbursement Parties';
     DelayedInsert = true;

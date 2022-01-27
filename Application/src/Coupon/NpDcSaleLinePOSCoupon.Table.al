@@ -1,5 +1,6 @@
-table 6151593 "NPR NpDc SaleLinePOS Coupon"
+﻿table 6151593 "NPR NpDc SaleLinePOS Coupon"
 {
+    Access = Internal;
     Caption = 'Sale Line POS Coupon';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpDc SaleLinePOS Coupons";

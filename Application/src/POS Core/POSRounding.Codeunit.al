@@ -1,5 +1,6 @@
-codeunit 6150636 "NPR POS Rounding"
+﻿codeunit 6150636 "NPR POS Rounding"
 {
+    Access = Internal;
     procedure InsertRounding(SalePOS: Record "NPR POS Sale"; RoundAmount: Decimal) InsertedRounding: Decimal
     var
         GLAccount: Record "G/L Account";

@@ -1,5 +1,6 @@
-page 6059983 "NPR Store Manager Activ."
+﻿page 6059983 "NPR Store Manager Activ."
 {
+    Extensible = False;
 
     Caption = 'Order Processing';
     PageType = ListPart;

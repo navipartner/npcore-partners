@@ -1,5 +1,6 @@
-table 6014553 "NPR Attribute Translation"
+﻿table 6014553 "NPR Attribute Translation"
 {
+    Access = Internal;
     // NPRx.xx/TSA/22-04-15 CASE209946 - Entity and Shortcut Attributes
 
     Caption = 'Attribute Translation';

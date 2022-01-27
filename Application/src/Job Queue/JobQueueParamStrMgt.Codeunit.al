@@ -1,5 +1,6 @@
-codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
+﻿codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
 {
+    Access = Internal;
     var
         ParamString: Text;
         ParamDict: Dictionary of [Text, Text];

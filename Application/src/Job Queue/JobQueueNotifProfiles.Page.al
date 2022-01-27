@@ -1,5 +1,6 @@
 page 6059842 "NPR Job Queue Notif. Profiles"
 {
+    Extensible = false;
     ApplicationArea = All;
     Caption = 'Job Queue Notif. Profiles';
     PageType = List;

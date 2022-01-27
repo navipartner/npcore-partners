@@ -1,5 +1,6 @@
-codeunit 6151557 "NPR NpXml Process Single Batch"
+﻿codeunit 6151557 "NPR NpXml Process Single Batch"
 {
+    Access = Internal;
     TableNo = "NPR NpXml Template";
 
     trigger OnRun()

@@ -1,6 +1,7 @@
 ﻿
 codeunit 6151019 "NPR NpRv Module Valid.: Global"
 {
+    Access = Internal;
     var
         Text000: Label 'Validate Global Voucher';
         Text001: Label 'Voucher is being used';

@@ -1,5 +1,6 @@
-codeunit 6150842 "NPR POS Action - Set Sale VAT"
+﻿codeunit 6150842 "NPR POS Action - Set Sale VAT"
 {
+    Access = Internal;
 
     var
         ActionDescription: Label 'Action for changing VAT Business Posting Group of active sale.';

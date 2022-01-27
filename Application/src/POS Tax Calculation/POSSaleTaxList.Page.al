@@ -1,5 +1,6 @@
-page 6014541 "NPR POS Sale Tax List"
+﻿page 6014541 "NPR POS Sale Tax List"
 {
+    Extensible = False;
     PageType = List;
 
     UsageCategory = Lists;

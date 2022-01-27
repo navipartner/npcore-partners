@@ -1,5 +1,6 @@
-page 6150706 "NPR POS Action Workflow"
+﻿page 6150706 "NPR POS Action Workflow"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'POS Action Workflow';
     PageType = List;

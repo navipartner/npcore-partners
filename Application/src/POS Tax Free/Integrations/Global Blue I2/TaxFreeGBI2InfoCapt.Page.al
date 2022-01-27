@@ -1,5 +1,6 @@
-page 6014573 "NPR Tax Free GB I2 Info Capt."
+﻿page 6014573 "NPR Tax Free GB I2 Info Capt."
 {
+    Extensible = False;
 
     UsageCategory = None;
     Caption = 'Tax Free GB I2 Info Capture';

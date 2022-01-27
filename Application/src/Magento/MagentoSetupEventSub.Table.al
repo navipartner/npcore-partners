@@ -1,5 +1,6 @@
-table 6151418 "NPR Magento Setup Event Sub."
+﻿table 6151418 "NPR Magento Setup Event Sub."
 {
+    Access = Internal;
     Caption = 'Magento Setup Event Subscription';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Setup Event Subs.";

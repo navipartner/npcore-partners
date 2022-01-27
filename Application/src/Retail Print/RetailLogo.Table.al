@@ -1,5 +1,6 @@
-table 6014478 "NPR Retail Logo"
+﻿table 6014478 "NPR Retail Logo"
 {
+    Access = Internal;
     Caption = 'Retail Logo';
     DataClassification = CustomerContent;
 

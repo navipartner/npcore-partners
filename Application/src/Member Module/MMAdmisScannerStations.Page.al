@@ -1,5 +1,6 @@
-page 6060069 "NPR MM Admis. Scanner Stations"
+﻿page 6060069 "NPR MM Admis. Scanner Stations"
 {
+    Extensible = False;
 
     Caption = 'MM Admission Scanner Stations';
     PageType = ListPart;

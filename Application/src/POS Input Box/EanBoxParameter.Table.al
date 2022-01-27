@@ -1,5 +1,6 @@
-table 6060108 "NPR Ean Box Parameter"
+﻿table 6060108 "NPR Ean Box Parameter"
 {
+    Access = Internal;
 
     Caption = 'Ean Box Parameter';
     DataClassification = CustomerContent;

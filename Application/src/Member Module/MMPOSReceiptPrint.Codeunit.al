@@ -1,5 +1,6 @@
-codeunit 6060134 "NPR MM POS Receipt Print"
+﻿codeunit 6060134 "NPR MM POS Receipt Print"
 {
+    Access = Internal;
 
     TableNo = "NPR MM Membership";
 

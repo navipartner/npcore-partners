@@ -1,5 +1,6 @@
-codeunit 6014623 "NPR Smart Search"
+﻿codeunit 6014623 "NPR Smart Search"
 {
+    Access = Internal;
     internal procedure SearchCustomer(SearchTerm: Text[100]; var Customer: Record Customer)
     begin
         CustomerSearchWorker(SearchTerm, Customer);

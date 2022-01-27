@@ -1,5 +1,6 @@
-query 6151240 "NPR Trailing Purch Order"
+﻿query 6151240 "NPR Trailing Purch Order"
 {
+    Access = Internal;
     Caption = 'Trailing Purchase Order Qry';
 
     elements

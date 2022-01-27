@@ -1,5 +1,6 @@
 ﻿codeunit 6014439 "NPR MM Member Create Demo Data"
 {
+    Access = Internal;
     procedure CreateDemoData(DeleteCurrentSetup: Boolean)
     var
         Customer: Record Customer;

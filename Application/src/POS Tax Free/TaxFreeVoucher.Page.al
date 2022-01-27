@@ -1,5 +1,6 @@
-page 6014565 "NPR Tax Free Voucher"
+﻿page 6014565 "NPR Tax Free Voucher"
 {
+    Extensible = False;
     Caption = 'Tax Free Voucher';
     DeleteAllowed = false;
     Editable = false;

@@ -1,5 +1,6 @@
-codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
+﻿codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
 {
+    Access = Internal;
     // TODO: Delete the following explanation section when everything is done with this codeunit
     /*
         The purpose of this codeunit is to feed state to the front-end balancing view. The state is a JSON object that

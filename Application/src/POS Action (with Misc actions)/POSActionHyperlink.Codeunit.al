@@ -1,5 +1,6 @@
-codeunit 6150727 "NPR POS Action - Hyperlink"
+﻿codeunit 6150727 "NPR POS Action - Hyperlink"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This action opens a hyperlink or loads a page in a frame';
 

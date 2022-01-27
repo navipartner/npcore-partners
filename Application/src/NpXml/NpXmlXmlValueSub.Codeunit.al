@@ -1,5 +1,6 @@
-codeunit 6151562 "NPR NpXml Xml Value Sub."
+﻿codeunit 6151562 "NPR NpXml Xml Value Sub."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Value Mgt.", 'OnGetXmlValue', '', true, true)]
     local procedure GetBase64(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var

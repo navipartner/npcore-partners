@@ -1,5 +1,6 @@
-page 6151241 "NPR Retail Manager Role Center"
+﻿page 6151241 "NPR Retail Manager Role Center"
 {
+    Extensible = False;
     Caption = 'NP Retail Manager';
     PageType = RoleCenter;
     UsageCategory = None;
@@ -321,15 +322,6 @@ page 6151241 "NPR Retail Manager Role Center"
                                 Image = Report2;
                                 RunObject = Report "NPR Sales per week year/Last";
                                 ToolTip = 'Executes the Sales per week year/Last year action';
-                                ApplicationArea = NPRRetail;
-                            }
-                            action("NPR Discount Statistics")
-                            {
-                                Caption = 'Discount Statistics';
-                                Image = Report2;
-                                RunObject = Report "NPR Discount Statistics";
-
-                                ToolTip = 'Executes the Discount Statistics action';
                                 ApplicationArea = NPRRetail;
                             }
                         }

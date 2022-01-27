@@ -1,5 +1,6 @@
-codeunit 6151303 "NPR NpEc S.Order Import Create"
+﻿codeunit 6151303 "NPR NpEc S.Order Import Create"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-codeunit 6151550 "NPR NpXml Task Mgt."
+﻿codeunit 6151550 "NPR NpXml Task Mgt."
 {
+    Access = Internal;
     TableNo = "NPR Nc Task";
 
     trigger OnRun()

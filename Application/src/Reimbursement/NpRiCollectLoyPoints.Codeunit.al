@@ -1,5 +1,6 @@
 ﻿codeunit 6151108 "NPR NpRi Collect Loy. Points"
 {
+    Access = Internal;
 
     var
         Text000: Label 'Membership Point Entries';

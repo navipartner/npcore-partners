@@ -1,5 +1,6 @@
-page 6150671 "NPR POS Entry Factbox"
+﻿page 6150671 "NPR POS Entry Factbox"
 {
+    Extensible = False;
     Caption = 'POS Entry Factbox';
     PageType = CardPart;
     UsageCategory = Administration;

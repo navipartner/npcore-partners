@@ -1,5 +1,6 @@
-table 6151382 "NPR CS Price Check Handl."
+﻿table 6151382 "NPR CS Price Check Handl."
 {
+    Access = Internal;
 
     Caption = 'CS Price Check Handling';
     DataClassification = CustomerContent;

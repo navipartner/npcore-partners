@@ -1,5 +1,6 @@
-table 6151197 "NPR NpCs Workflow Module"
+﻿table 6151197 "NPR NpCs Workflow Module"
 {
+    Access = Internal;
     Caption = 'Collect Workflow Module';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Workflow Modules";

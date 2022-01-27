@@ -1,5 +1,6 @@
-page 6150906 "NPR POS HC Endpoint Setup"
+﻿page 6150906 "NPR POS HC Endpoint Setup"
 {
+    Extensible = False;
     Caption = 'Endpoint Setup';
     PageType = Card;
     UsageCategory = None;

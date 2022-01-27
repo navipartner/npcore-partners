@@ -1,5 +1,6 @@
-table 6014664 "NPR Stock-Take Worksheet Line"
+﻿table 6014664 "NPR Stock-Take Worksheet Line"
 {
+    Access = Internal;
     Caption = 'Statement Line';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

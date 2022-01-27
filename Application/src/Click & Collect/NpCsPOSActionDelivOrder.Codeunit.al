@@ -1,5 +1,6 @@
 ﻿codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
 {
+    Access = Internal;
     var
         DeliverCollectInStoreLbl: Label 'Deliver Collect in Store Documents';
         CollectInStoreLbl: Label 'Collect in Store';

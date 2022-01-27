@@ -1,5 +1,8 @@
-report 6014611 "NPR Sales Stats w/ Variants"
+﻿report 6014611 "NPR Sales Stats w/ Variants"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Statistics w Variants.rdlc';
     UsageCategory = ReportsAndAnalysis;

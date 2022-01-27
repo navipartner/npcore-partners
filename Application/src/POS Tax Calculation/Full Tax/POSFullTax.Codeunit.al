@@ -1,5 +1,6 @@
-codeunit 6014635 "NPR POS Full Tax" implements "NPR POS ITaxCalc"
+﻿codeunit 6014635 "NPR POS Full Tax" implements "NPR POS ITaxCalc"
 {
+    Access = Internal;
     var
         TaxCalcTypeNotSupportedInPOS: Label '%1 %2 not supported in POS';
 

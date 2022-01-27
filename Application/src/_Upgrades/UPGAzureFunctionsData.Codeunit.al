@@ -1,5 +1,6 @@
-codeunit 6014418 "NPR UPG Azure Functions Data"
+﻿codeunit 6014418 "NPR UPG Azure Functions Data"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

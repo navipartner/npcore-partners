@@ -1,5 +1,8 @@
-report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
+﻿report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Create Invt. Put-away/Pick/Movement';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

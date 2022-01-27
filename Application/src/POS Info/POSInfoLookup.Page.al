@@ -1,5 +1,6 @@
-page 6150646 "NPR POS Info Lookup"
+﻿page 6150646 "NPR POS Info Lookup"
 {
+    Extensible = False;
     Caption = 'POS Info Lookup';
     PageType = List;
     UsageCategory = None;

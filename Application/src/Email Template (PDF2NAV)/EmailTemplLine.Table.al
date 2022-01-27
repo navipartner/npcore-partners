@@ -1,5 +1,6 @@
-table 6014463 "NPR E-mail Templ. Line"
+﻿table 6014463 "NPR E-mail Templ. Line"
 {
+    Access = Internal;
     Caption = 'E-mail Template Line';
     DataClassification = CustomerContent;
 

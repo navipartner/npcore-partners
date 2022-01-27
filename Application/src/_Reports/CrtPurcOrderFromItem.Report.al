@@ -1,5 +1,8 @@
 report 6014411 "NPR Crt. Purc. Order From Item"
 {
+#IF NOT BC17
+    Extensible = False; 
+#ENDIF
     Caption = 'Add to Purchase Order';
     ProcessingOnly = true;
     UseRequestPage = true;

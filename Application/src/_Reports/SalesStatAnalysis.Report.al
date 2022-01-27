@@ -1,5 +1,8 @@
-report 6014457 "NPR Sales Stat/Analysis"
+﻿report 6014457 "NPR Sales Stat/Analysis"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales StatAnalysis.rdlc';
     Caption = 'Sales Stat/Analysis';

@@ -1,5 +1,6 @@
-codeunit 6014538 "NPR RP Epson Web Print Service"
+﻿codeunit 6014538 "NPR RP Epson Web Print Service"
 {
+    Access = Internal;
     // NPR4.15/MMV/20151001 CASE 223893 Created CU for use with web service printing
     // NPR4.15/MMV/20151016 CASE 223893 Changed print job deletion filter.
     // NPR5.20/MMV/20151020 CASE 223893 Added method GetInnerXML which builds a printjob that is processed faster on the printer than GetSinglePrintJob().

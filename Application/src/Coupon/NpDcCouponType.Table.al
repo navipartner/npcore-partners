@@ -1,5 +1,6 @@
-table 6151590 "NPR NpDc Coupon Type"
+﻿table 6151590 "NPR NpDc Coupon Type"
 {
+    Access = Internal;
     Caption = 'Coupon Type';
     DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;

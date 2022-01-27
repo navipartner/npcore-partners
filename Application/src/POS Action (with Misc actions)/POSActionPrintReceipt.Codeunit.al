@@ -1,5 +1,6 @@
 ﻿codeunit 6150787 "NPR POS Action: Print Receipt"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for printing a receipt for the current or selected transaction.';
         CurrentRegisterNo: Code[10];

@@ -1,6 +1,7 @@
 codeunit 6059775 "NPR Generic Filter Page Mgt."
 {
-    procedure AdvancedFilter(RecRef: RecordRef;var FilterStringText: Text) FilterPageOK: Boolean
+    Access = Internal;
+    procedure AdvancedFilter(RecRef: RecordRef; var FilterStringText: Text) FilterPageOK: Boolean
     var
         GenericFilterPage: Page "NPR Generic Filter Page";
     begin
@@ -9,7 +10,7 @@ codeunit 6059775 "NPR Generic Filter Page Mgt."
         GenericFilterPage.LookupMode := true;
         FilterPageOK := GenericFilterPage.RunModal() = Action::LookupOK;
         if FilterPageOK then
-          FilterStringText := GenericFilterPage.ReturnRawFilter();
+            FilterStringText := GenericFilterPage.ReturnRawFilter();
 
     end;
 
@@ -25,14 +26,14 @@ codeunit 6059775 "NPR Generic Filter Page Mgt."
 
         POSMenuFilter.CalcFields("Table Filter");
         if POSMenuFilter."Table Filter".HasValue() then begin
-          POSMenuFilter."Table Filter".CreateInStream(INS);
-          INS.Read(FilterStringText);
+            POSMenuFilter."Table Filter".CreateInStream(INS);
+            INS.Read(FilterStringText);
         end;
 
-        if AdvancedFilter(RecRef,FilterStringText) then begin
-          POSMenuFilter."Table Filter".CreateOutStream(OUTS);
-          OUTS.Write(FilterStringText);
-          POSMenuFilter.Modify();
+        if AdvancedFilter(RecRef, FilterStringText) then begin
+            POSMenuFilter."Table Filter".CreateOutStream(OUTS);
+            OUTS.Write(FilterStringText);
+            POSMenuFilter.Modify();
         end;
 
         RecRef.Close();
@@ -47,13 +48,13 @@ codeunit 6059775 "NPR Generic Filter Page Mgt."
         FilterStringText := NoFilterText;
         POSMenuFilter.CalcFields("Table Filter");
         if POSMenuFilter."Table Filter".HasValue() then begin
-          POSMenuFilter."Table Filter".CreateInStream(INS);
-          INS.Read(FilterStringText);
+            POSMenuFilter."Table Filter".CreateInStream(INS);
+            INS.Read(FilterStringText);
         end;
         Message(FilterStringText);
     end;
 
-    procedure ReadKeyString(RecRef: RecordRef;KeyIndex: Integer) SortingKey: Text
+    procedure ReadKeyString(RecRef: RecordRef; KeyIndex: Integer) SortingKey: Text
     var
         KeyRef: KeyRef;
         FldRef: FieldRef;
@@ -61,11 +62,11 @@ codeunit 6059775 "NPR Generic Filter Page Mgt."
     begin
         KeyRef := RecRef.KeyIndex(KeyIndex);
         for i := 1 to KeyRef.FieldCount do begin
-          FldRef := KeyRef.FieldIndex(i);
-          if SortingKey <> '' then
-            SortingKey := SortingKey + ',' + FldRef.Name
-          else
-            SortingKey := FldRef.Name;
+            FldRef := KeyRef.FieldIndex(i);
+            if SortingKey <> '' then
+                SortingKey := SortingKey + ',' + FldRef.Name
+            else
+                SortingKey := FldRef.Name;
         end;
         exit(SortingKey);
     end;

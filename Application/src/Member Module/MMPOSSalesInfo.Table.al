@@ -1,5 +1,6 @@
-table 6060147 "NPR MM POS Sales Info"
+﻿table 6060147 "NPR MM POS Sales Info"
 {
+    Access = Internal;
 
     Caption = 'MM POS Sales Info';
     DataClassification = CustomerContent;

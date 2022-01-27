@@ -1,5 +1,6 @@
-page 6150738 "NPR POS Named Actions Profiles"
+﻿page 6150738 "NPR POS Named Actions Profiles"
 {
+    Extensible = False;
     Caption = 'POS Actions Profiles';
     CardPageID = "NPR POS Named Actions Profile";
     ApplicationArea = NPRRetail;

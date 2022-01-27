@@ -1,5 +1,6 @@
-page 6150679 "NPR NPRE Flow Statuses"
+﻿page 6150679 "NPR NPRE Flow Statuses"
 {
+    Extensible = False;
     Caption = 'Flow Statuses';
     DataCaptionExpression = GetDataCaptionExpr();
     DelayedInsert = true;

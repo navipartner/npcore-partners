@@ -1,5 +1,6 @@
-page 6014637 "NPR RP Templ. Matrix Designer"
+﻿page 6014637 "NPR RP Templ. Matrix Designer"
 {
+    Extensible = False;
     // NPR4.02/MMV/20150223 CASE 204483 Made "Field Text Start" visible and changed the Caption.
     // NPR4.10/MMV/20150506 CASE 167059 Added field "Print With Next".
     // NPR4.10/MMV720150513 CASE 207985 Added field Attribute

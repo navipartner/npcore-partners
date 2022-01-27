@@ -1,5 +1,6 @@
-table 6184516 "NPR EFT Trx Async Req."
+﻿table 6184516 "NPR EFT Trx Async Req."
 {
+    Access = Internal;
     // NPR5.53/MMV /20191120 CASE 377533 Created object
     // NPR5.54/MMV /20200219 CASE 364340 Added fields 40, 50
 

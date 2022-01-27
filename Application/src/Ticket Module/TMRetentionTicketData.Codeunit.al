@@ -1,5 +1,6 @@
-codeunit 6014688 "NPR TM Retention Ticket Data"
+﻿codeunit 6014688 "NPR TM Retention Ticket Data"
 {
+    Access = Internal;
     var
         _Window: Dialog;
         _EndDateTime: DateTime;

@@ -1,5 +1,6 @@
-codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
+﻿codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
 {
+    Access = Internal;
     var
         ActionDescriptionCaption: Label 'This action is used to merge similar item lines of the sale to a single one';
         NoLinesErr: Label 'No adequate sale lines are available in the current sale';

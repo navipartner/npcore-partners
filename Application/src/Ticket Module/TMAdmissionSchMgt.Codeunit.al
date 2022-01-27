@@ -1,5 +1,6 @@
 ﻿codeunit 6060118 "NPR TM Admission Sch. Mgt."
 {
+    Access = Internal;
 
     trigger OnRun()
     var

@@ -1,5 +1,6 @@
-codeunit 6151223 "NPR NpCs Store Stock Sync Mgt."
+﻿codeunit 6151223 "NPR NpCs Store Stock Sync Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     var
         NpCsStoreStockDataMgt: Codeunit "NPR NpCs Store Stock Data Mgt.";

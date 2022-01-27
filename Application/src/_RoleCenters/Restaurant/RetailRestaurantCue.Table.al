@@ -1,5 +1,6 @@
-table 6151251 "NPR Restaurant Cue"
+﻿table 6151251 "NPR Restaurant Cue"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'Restaurant Cue';
 

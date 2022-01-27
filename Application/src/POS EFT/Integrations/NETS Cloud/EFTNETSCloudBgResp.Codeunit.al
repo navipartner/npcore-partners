@@ -1,5 +1,6 @@
-codeunit 6184537 "NPR EFT NETSCloud Bg. Resp."
+﻿codeunit 6184537 "NPR EFT NETSCloud Bg. Resp."
 {
+    Access = Internal;
     // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
 
     TableNo = "NPR EFT Transaction Request";

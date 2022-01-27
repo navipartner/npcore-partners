@@ -1,5 +1,6 @@
-codeunit 6014508 "NPR MobilePayV10 SelfCertify"
+﻿codeunit 6014508 "NPR MobilePayV10 SelfCertify"
 {
+    Access = Internal;
     Subtype = Test;
     EventSubscriberInstance = Manual;
 

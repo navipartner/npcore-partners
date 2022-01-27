@@ -1,5 +1,6 @@
-page 6059822 "NPR Smart Email Card"
+﻿page 6059822 "NPR Smart Email Card"
 {
+    Extensible = False;
     Caption = 'Smart Email Card';
     PageType = Card;
     SourceTable = "NPR Smart Email";

@@ -1,5 +1,6 @@
-codeunit 6060053 "NPR Item Wksht. Wf Events"
+﻿codeunit 6060053 "NPR Item Wksht. Wf Events"
 {
+    Access = Internal;
     local procedure ItemStatusChanged(): Code[128]
     begin
         exit('ItemStatusChanged');

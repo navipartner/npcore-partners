@@ -1,5 +1,6 @@
-page 6151004 "NPR POS Saved Sale Subp."
+﻿page 6151004 "NPR POS Saved Sale Subp."
 {
+    Extensible = False;
     Caption = 'POS Saved Sale Subpage';
     DelayedInsert = true;
     PageType = ListPart;

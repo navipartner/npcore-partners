@@ -1,5 +1,6 @@
-codeunit 6150828 "NPR POS Action: ItemInv Overv."
+﻿codeunit 6150828 "NPR POS Action: ItemInv Overv."
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built in function opens a page displaying the item inventory per location and variant.';
         Title: Label 'Item Card';

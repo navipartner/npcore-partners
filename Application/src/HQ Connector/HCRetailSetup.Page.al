@@ -1,5 +1,6 @@
-page 6150902 "NPR HC Retail Setup"
+﻿page 6150902 "NPR HC Retail Setup"
 {
+    Extensible = False;
     Caption = 'HC Retail Setup';
     DeleteAllowed = false;
     InsertAllowed = false;

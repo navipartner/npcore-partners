@@ -1,5 +1,6 @@
-query 6151483 "NPR Top 10 Salespersons"
+﻿query 6151483 "NPR Top 10 Salespersons"
 {
+    Access = Internal;
 
     Caption = 'Top 10 Salespersons';
     OrderBy = Descending(Sales_Qty);

@@ -1,5 +1,6 @@
-table 6014551 "NPR Package Label Numbers"
+﻿table 6014551 "NPR Package Label Numbers"
 {
+    Access = Internal;
     // NPR4.000.000, 21-04-09, MH - Created in order to implement multi kolli.
     //                                Package Label numbers is stored in this table.
     // NPR4.000.001, 23-07-09, MH - Added field, Type, inorder to be able to print labels from sales orders.

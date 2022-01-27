@@ -1,5 +1,8 @@
-enum 6150754 "NPR Data Type"
+﻿enum 6150754 "NPR Data Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = false;
 
     value(0; Undefined) { }

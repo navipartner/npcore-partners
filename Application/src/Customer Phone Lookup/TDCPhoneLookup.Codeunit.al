@@ -1,5 +1,6 @@
-codeunit 6184550 "NPR TDC Phone Lookup"
+﻿codeunit 6184550 "NPR TDC Phone Lookup"
 {
+    Access = Internal;
     TableNo = "NPR Phone Lookup Buffer";
 
     trigger OnRun()

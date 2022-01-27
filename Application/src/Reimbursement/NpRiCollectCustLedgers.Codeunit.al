@@ -1,5 +1,6 @@
 ﻿codeunit 6151104 "NPR NpRi Collect Cust. Ledgers"
 {
+    Access = Internal;
     var
         Text000: Label 'Customer Ledger Entries (Invoice and Credit Memo)';
         Text001: Label 'Collecting Customer Ledger Entries: @1@@@@@@@@@@@@@@@@@@';

@@ -1,5 +1,6 @@
-codeunit 6014483 "NPR Service Process"
+﻿codeunit 6014483 "NPR Service Process"
 {
+    Access = Internal;
 
     TableNo = "NPR Retail List";
 

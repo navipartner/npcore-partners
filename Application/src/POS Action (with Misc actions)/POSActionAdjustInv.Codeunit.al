@@ -1,5 +1,6 @@
-codeunit 6150848 "NPR POS Action: Adjust Inv."
+﻿codeunit 6150848 "NPR POS Action: Adjust Inv."
 {
+    Access = Internal;
     var
         Text000: Label 'Post Inventory Adjustment directly from POS';
         Text001: Label 'Adjust Inventory Quantity';

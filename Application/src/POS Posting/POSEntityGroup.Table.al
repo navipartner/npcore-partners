@@ -1,5 +1,6 @@
-table 6150649 "NPR POS Entity Group"
+﻿table 6150649 "NPR POS Entity Group"
 {
+    Access = Internal;
     Caption = 'POS Entity Group';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Entity Groups";

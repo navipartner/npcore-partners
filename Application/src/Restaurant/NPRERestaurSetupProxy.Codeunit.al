@@ -1,5 +1,6 @@
-codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
+﻿codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
 {
+    Access = Internal;
     // The purpose of this codeunit is to abstract retrieval of setup.
     var
         NPRESetup: Record "NPR NPRE Restaurant Setup";

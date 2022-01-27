@@ -1,5 +1,6 @@
-page 6151111 "NPR NpRi S. Inv. SetupSubpage"
+﻿page 6151111 "NPR NpRi S. Inv. SetupSubpage"
 {
+    Extensible = False;
     UsageCategory = None;
     AutoSplitKey = true;
     Caption = 'Lines';

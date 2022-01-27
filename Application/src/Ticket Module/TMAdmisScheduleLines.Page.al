@@ -1,5 +1,6 @@
-page 6060119 "NPR TM Admis. Schedule Lines"
+﻿page 6060119 "NPR TM Admis. Schedule Lines"
 {
+    Extensible = False;
     Caption = 'Admission Schedule Lines';
     PageType = List;
     SourceTable = "NPR TM Admis. Schedule Lines";

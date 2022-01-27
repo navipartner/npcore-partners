@@ -1,5 +1,6 @@
-page 6059794 "NPR E-mail Templ. Filters"
+﻿page 6059794 "NPR E-mail Templ. Filters"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'E-mail Template Filters';
     PageType = List;

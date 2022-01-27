@@ -1,5 +1,6 @@
-page 6014471 "NPR TM Adm. Dependency"
+﻿page 6014471 "NPR TM Adm. Dependency"
 {
+    Extensible = False;
     PageType = List;
     ApplicationArea = NPRTicketAdvanced;
     UsageCategory = Administration;

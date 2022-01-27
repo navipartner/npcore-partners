@@ -1,5 +1,6 @@
-codeunit 6014539 "NPR UPG Pos Menus"
+﻿codeunit 6014539 "NPR UPG Pos Menus"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

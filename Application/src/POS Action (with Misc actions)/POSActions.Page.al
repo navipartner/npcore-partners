@@ -1,5 +1,6 @@
-page 6150703 "NPR POS Actions"
+﻿page 6150703 "NPR POS Actions"
 {
+    Extensible = False;
     Caption = 'POS Actions';
     InsertAllowed = false;
     ModifyAllowed = false;

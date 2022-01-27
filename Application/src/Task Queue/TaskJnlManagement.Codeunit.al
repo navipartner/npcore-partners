@@ -1,5 +1,6 @@
 ﻿codeunit 6059900 "NPR Task Jnl. Management"
 {
+    Access = Internal;
     Permissions = TableData "Job Journal Template" = imd,
                   TableData "Job Journal Batch" = imd;
 

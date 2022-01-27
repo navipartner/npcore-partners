@@ -1,5 +1,6 @@
-page 6014449 "NPR Input Dialog"
+﻿page 6014449 "NPR Input Dialog"
 {
+    Extensible = False;
     Caption = 'Input Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;

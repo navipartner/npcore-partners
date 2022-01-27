@@ -1,5 +1,6 @@
-page 6014559 "NPR MM Select Alteration"
+﻿page 6014559 "NPR MM Select Alteration"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = None;
     SourceTable = "NPR MM Membership Entry";

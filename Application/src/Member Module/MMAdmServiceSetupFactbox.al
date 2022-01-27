@@ -1,5 +1,6 @@
-page 6060082 "NPR Adm. Service Setup Factbox"
+﻿page 6060082 "NPR Adm. Service Setup Factbox"
 {
+    Extensible = False;
 
     Caption = 'NPR MM Admis. Service Setup Factbox';
     InsertAllowed = false;

@@ -1,5 +1,6 @@
-page 6151574 "NPR AF Notification Hub Card"
+﻿page 6151574 "NPR AF Notification Hub Card"
 {
+    Extensible = False;
 
     Caption = 'AF Notification Hub Card';
     DelayedInsert = true;

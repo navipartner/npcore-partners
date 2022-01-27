@@ -1,5 +1,6 @@
-table 6060151 "NPR Event Word Layout"
+﻿table 6060151 "NPR Event Word Layout"
 {
+    Access = Internal;
     Caption = 'Event Word Layout';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

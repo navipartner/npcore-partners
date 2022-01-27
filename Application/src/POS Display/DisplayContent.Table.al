@@ -1,5 +1,6 @@
-table 6059951 "NPR Display Content"
+﻿table 6059951 "NPR Display Content"
 {
+    Access = Internal;
     // NPR5.29/CLVA/20170118 CASE 256153 Changed field "Content Lines" to FlowField
 
     Caption = 'Display Content';

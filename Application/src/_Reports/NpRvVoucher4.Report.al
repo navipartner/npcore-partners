@@ -1,6 +1,9 @@
-#if BC17
+﻿#if BC17
 report 6151016 "NPR NpRv Voucher 4"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher 4.rdlc';
     WordLayout = './src/_Reports/layouts/NpRv Voucher 4.docx';
     UsageCategory = ReportsAndAnalysis;

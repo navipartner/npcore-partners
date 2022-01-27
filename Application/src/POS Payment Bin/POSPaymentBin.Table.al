@@ -1,5 +1,6 @@
-table 6150617 "NPR POS Payment Bin"
+﻿table 6150617 "NPR POS Payment Bin"
 {
+    Access = Internal;
     // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
     // NPR5.30/AP/20170209 CASE 261728 Renamed field "Store Code" -> "POS Store Code"
     // NPR5.36/NPKNAV/20171003  CASE 282251 Transport NPR5.36 - 3 October 2017

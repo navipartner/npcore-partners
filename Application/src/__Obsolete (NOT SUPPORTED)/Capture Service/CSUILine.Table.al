@@ -1,5 +1,6 @@
-table 6151374 "NPR CS UI Line"
+﻿table 6151374 "NPR CS UI Line"
 {
+    Access = Internal;
 
     Caption = 'CS UI Line';
     DataClassification = CustomerContent;

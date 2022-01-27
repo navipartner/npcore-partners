@@ -1,5 +1,6 @@
-codeunit 6150917 "NPR HC Dimension Mgt."
+﻿codeunit 6150917 "NPR HC Dimension Mgt."
 {
+    Access = Internal;
     var
         DimensionMgt: Codeunit DimensionManagement;
 

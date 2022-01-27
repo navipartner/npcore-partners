@@ -1,5 +1,6 @@
-page 6014467 "NPR Quantity Discount List"
+﻿page 6014467 "NPR Quantity Discount List"
 {
+    Extensible = False;
     // NPR5.29/TJ  /20170123 CASE 263787 Commented out code under action Dimensions-Multiple and set Visible property to FALSE
     // NPR5.30/BHR /20170223 CASE 265244 Add field Item No.
     // NPR5.55/TJ  /20200421 CASE 400524 Removed Name from action Dimension-Single to default to page name

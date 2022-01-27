@@ -1,5 +1,6 @@
-codeunit 6014488 "NPR Membership Attempt Create"
+﻿codeunit 6014488 "NPR Membership Attempt Create"
 {
+    Access = Internal;
     TableNo = "NPR MM Member Info Capture";
 
     var

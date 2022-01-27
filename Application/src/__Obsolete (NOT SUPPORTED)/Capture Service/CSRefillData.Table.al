@@ -1,5 +1,6 @@
-table 6151388 "NPR CS Refill Data"
+﻿table 6151388 "NPR CS Refill Data"
 {
+    Access = Internal;
     Caption = 'CS Refill Data';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

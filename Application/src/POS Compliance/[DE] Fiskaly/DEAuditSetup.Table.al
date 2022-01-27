@@ -1,5 +1,6 @@
-table 6014529 "NPR DE Audit Setup"
+﻿table 6014529 "NPR DE Audit Setup"
 {
+    Access = Internal;
     Caption = 'DE Audit Setup';
     DataClassification = CustomerContent;
 

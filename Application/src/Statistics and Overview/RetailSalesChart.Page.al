@@ -1,5 +1,6 @@
-page 6059813 "NPR Retail Sales Chart"
+﻿page 6059813 "NPR Retail Sales Chart"
 {
+    Extensible = False;
     Caption = 'Margin/Turnover by Period';
     PageType = CardPart;
     UsageCategory = None;

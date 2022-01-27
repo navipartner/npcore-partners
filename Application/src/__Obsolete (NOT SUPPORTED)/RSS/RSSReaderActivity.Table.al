@@ -1,5 +1,6 @@
-table 6059995 "NPR RSS Reader Activity"
+﻿table 6059995 "NPR RSS Reader Activity"
 {
+    Access = Internal;
     ObsoleteState = Removed;
     ObsoleteReason = 'We dont use RSS Feed any more.';
     Caption = 'RSS Reader Activity';

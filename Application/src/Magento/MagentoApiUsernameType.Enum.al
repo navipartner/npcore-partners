@@ -1,5 +1,8 @@
-enum 6014433 "NPR Magento Api Username Type"
+﻿enum 6014433 "NPR Magento Api Username Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; Automatic)

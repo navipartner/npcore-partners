@@ -1,5 +1,6 @@
-codeunit 6150782 "NPR Front-End: SetView" implements "NPR Front-End Async Request"
+﻿codeunit 6150782 "NPR Front-End: SetView" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _view: Codeunit "NPR POS View";
         _content: JsonObject;

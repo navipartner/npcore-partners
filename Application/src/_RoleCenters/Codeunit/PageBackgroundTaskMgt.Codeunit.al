@@ -1,5 +1,6 @@
-codeunit 6014698 "NPR Page Background Task Mgt."
+﻿codeunit 6014698 "NPR Page Background Task Mgt."
 {
+    Access = Internal;
     procedure FailedTaskError(CalledFromPageCaption: Text; ErrorCode: Text; ErrorText: Text)
     var
         BackgroundTaskErrorLbl: Label 'Page %1: background task ended with an error.\Error code: %2.\Error: %3', Comment = '%1 = called from page caption, %2 = error code, %3 = error text';

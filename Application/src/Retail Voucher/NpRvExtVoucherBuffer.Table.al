@@ -1,5 +1,6 @@
-table 6151023 "NPR NpRv Ext. Voucher Buffer"
+﻿table 6151023 "NPR NpRv Ext. Voucher Buffer"
 {
+    Access = Internal;
     Caption = 'Global Voucher Buffer';
     DataClassification = CustomerContent;
 

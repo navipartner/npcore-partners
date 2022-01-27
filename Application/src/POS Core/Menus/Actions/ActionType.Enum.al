@@ -1,5 +1,8 @@
-enum 6150750 "NPR Action Type" implements "NPR IAction"
+﻿enum 6150750 "NPR Action Type" implements "NPR IAction"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; SubMenu)

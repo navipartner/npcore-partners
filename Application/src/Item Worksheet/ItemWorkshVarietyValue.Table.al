@@ -1,5 +1,6 @@
-table 6060044 "NPR Item Worksh. Variety Value"
+﻿table 6060044 "NPR Item Worksh. Variety Value"
 {
+    Access = Internal;
     Caption = 'Item Worksheet Variety Value';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Item Worksh.Vrty. Values";

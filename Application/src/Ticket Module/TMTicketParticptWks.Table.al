@@ -1,5 +1,6 @@
-table 6060113 "NPR TM Ticket Particpt. Wks."
+﻿table 6060113 "NPR TM Ticket Particpt. Wks."
 {
+    Access = Internal;
     // TM1.16/TSA/20160816  CASE 245004 Transport TM1.16 - 19 July 2016
     // TM1.17/TSA20160916  CASE 251883 Added SMS Option
     // TM1.17/TSA /20161025  CASE 256152 Conform to OMA Guidelines

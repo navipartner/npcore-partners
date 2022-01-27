@@ -1,5 +1,6 @@
-table 6150654 "NPR POS Unit Rcpt.Txt Profile"
+﻿table 6150654 "NPR POS Unit Rcpt.Txt Profile"
 {
+    Access = Internal;
     Caption = 'POS Unit Receipt Text Profile';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Unit Rcpt.Txt Profiles";

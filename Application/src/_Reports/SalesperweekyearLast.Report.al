@@ -1,5 +1,8 @@
-report 6014456 "NPR Sales per week year/Last"
+﻿report 6014456 "NPR Sales per week year/Last"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales per week yearLast year.rdlc';
     Caption = 'Sales Per Week Year/Last Year';

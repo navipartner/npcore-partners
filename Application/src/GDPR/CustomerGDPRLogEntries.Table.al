@@ -1,5 +1,6 @@
-table 6151070 "NPR Customer GDPR Log Entries"
+﻿table 6151070 "NPR Customer GDPR Log Entries"
 {
+    Access = Internal;
     // NPR5.52/ZESO/20190925 CASE 358656 Object Created
     // NPR5.55/ZESO/20200427 CASE 401981 Added field 10 Open Journal Entries/Statement
 

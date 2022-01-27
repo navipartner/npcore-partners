@@ -1,5 +1,6 @@
-table 6151600 "NPR NpDc Valid Time Interval"
+﻿table 6151600 "NPR NpDc Valid Time Interval"
 {
+    Access = Internal;
     Caption = 'Extra Coupon Item';
     DataClassification = CustomerContent;
 

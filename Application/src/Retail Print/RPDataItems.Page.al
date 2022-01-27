@@ -1,5 +1,6 @@
-page 6014561 "NPR RP Data Items"
+﻿page 6014561 "NPR RP Data Items"
 {
+    Extensible = False;
     // NPR5.34/MMV /20170724 CASE 284505 Indent multiple.
     // NPR5.40/MMV /20180208 CASE 304639 Added new fields 30,31
     // NPR5.50/MMV /20190502 CASE 353588 Added support for distinct iteration.

@@ -1,5 +1,6 @@
-page 6151556 "NPR NpXml Filters"
+﻿page 6151556 "NPR NpXml Filters"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Xml Filters';
     DelayedInsert = true;

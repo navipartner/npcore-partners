@@ -1,5 +1,6 @@
-codeunit 6151241 "NPR Purchase Ord Mgt"
+﻿codeunit 6151241 "NPR Purchase Ord Mgt"
 {
+    Access = Internal;
     var
         TrailingPurchOrdersSetup: Record "NPR Trail. Purch. Orders Setup";
         PurchHeader: Record "Purchase Header";

@@ -1,5 +1,6 @@
-codeunit 6014685 "NPR UPG Sales Pr. Maint. Setup"
+﻿codeunit 6014685 "NPR UPG Sales Pr. Maint. Setup"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

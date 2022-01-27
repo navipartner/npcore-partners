@@ -1,5 +1,6 @@
-table 6151161 "NPR MM Loyalty Store Setup"
+﻿table 6151161 "NPR MM Loyalty Store Setup"
 {
+    Access = Internal;
 
     Caption = 'Loyalty Store Setup';
     DataClassification = CustomerContent;

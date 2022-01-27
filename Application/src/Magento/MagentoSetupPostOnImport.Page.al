@@ -1,5 +1,6 @@
-page 6151462 "NPR Magento Setup PostOnImport"
+﻿page 6151462 "NPR Magento Setup PostOnImport"
 {
+    Extensible = False;
     Caption = 'Post on Import Setup';
     DelayedInsert = true;
     PageType = ListPart;

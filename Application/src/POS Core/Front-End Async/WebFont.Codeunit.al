@@ -1,5 +1,6 @@
-codeunit 6150759 "NPR Web Font" implements "NPR Font Definition"
+﻿codeunit 6150759 "NPR Web Font" implements "NPR Font Definition"
 {
+    Access = Internal;
     var
         _code: Text;
         _name: Text;

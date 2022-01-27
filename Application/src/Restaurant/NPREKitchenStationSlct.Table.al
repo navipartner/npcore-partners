@@ -1,5 +1,6 @@
-table 6150683 "NPR NPRE Kitchen Station Slct."
+﻿table 6150683 "NPR NPRE Kitchen Station Slct."
 {
+    Access = Internal;
     Caption = 'Kitchen Station Selection';
     DataClassification = CustomerContent;
 

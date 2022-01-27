@@ -1,5 +1,6 @@
-page 6060068 "NPR TM Ticket Rapid Packages"
+﻿page 6060068 "NPR TM Ticket Rapid Packages"
 {
+    Extensible = False;
     PageType = NavigatePage;
 
     UsageCategory = Administration;

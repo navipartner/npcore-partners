@@ -1,5 +1,6 @@
-page 6150749 "NPR POS Ticket Rcpt. Text"
+﻿page 6150749 "NPR POS Ticket Rcpt. Text"
 {
+    Extensible = False;
     PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR POS Ticket Rcpt. Text";

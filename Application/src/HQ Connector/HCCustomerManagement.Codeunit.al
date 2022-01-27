@@ -1,5 +1,6 @@
-codeunit 6150907 "NPR HC Customer Management"
+﻿codeunit 6150907 "NPR HC Customer Management"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

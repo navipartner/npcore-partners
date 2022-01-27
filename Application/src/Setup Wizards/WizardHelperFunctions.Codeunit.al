@@ -1,5 +1,6 @@
-codeunit 6014458 "NPR Wizard Helper Functions"
+﻿codeunit 6014458 "NPR Wizard Helper Functions"
 {
+    Access = Internal;
     procedure FormatCode(var NoToFormat: Code[10]; returnNewValue: Boolean)
     var
         FormattedStartingNo: Text;

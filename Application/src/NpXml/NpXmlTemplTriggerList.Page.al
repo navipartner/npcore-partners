@@ -1,5 +1,6 @@
-page 6151559 "NPR NpXml Templ. Trigger List"
+﻿page 6151559 "NPR NpXml Templ. Trigger List"
 {
+    Extensible = False;
     Caption = 'Xml Template Triggers';
     Editable = false;
     PageType = ListPart;

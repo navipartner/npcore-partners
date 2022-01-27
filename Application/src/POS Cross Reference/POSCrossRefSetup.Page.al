@@ -1,5 +1,6 @@
-page 6059810 "NPR POS Cross Ref. Setup"
+﻿page 6059810 "NPR POS Cross Ref. Setup"
 {
+    Extensible = False;
     Caption = 'POS Cross Reference Setup';
     DelayedInsert = true;
     PageType = List;

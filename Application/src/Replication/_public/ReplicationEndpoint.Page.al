@@ -1,6 +1,5 @@
-page 6014504 "NPR Replication Endpoint"
+﻿page 6014504 "NPR Replication Endpoint"
 {
-
     Caption = 'Replication Endpoint';
     ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
     Extensible = true;

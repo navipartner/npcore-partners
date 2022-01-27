@@ -1,5 +1,6 @@
-codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
+﻿codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('RV_RUN_W/PAD_ACTION');

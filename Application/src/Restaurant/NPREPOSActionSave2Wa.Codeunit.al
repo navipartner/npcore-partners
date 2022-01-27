@@ -1,5 +1,6 @@
-codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
+﻿codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
 {
+    Access = Internal;
     var
         Text000: Label 'Save POS Sale to Waiter Pad';
         Text001: Label 'No Water Pad exists on %1\Create new Water Pad?';

@@ -1,5 +1,6 @@
-codeunit 6151591 "NPR NpDc Coupon Module Mgt."
+﻿codeunit 6151591 "NPR NpDc Coupon Module Mgt."
 {
+    Access = Internal;
     [IntegrationEvent(false, false)]
     procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
     begin

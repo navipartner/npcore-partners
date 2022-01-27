@@ -1,5 +1,8 @@
-report 6014420 "NPR Item Group Top"
+﻿report 6014420 "NPR Item Group Top"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     RDLCLayout = './src/_Reports/layouts/Item Group Top.rdlc';
     Caption = 'Item Group Top';
     UsageCategory = ReportsAndAnalysis;

@@ -1,5 +1,6 @@
-table 6014403 "NPR EFT Receipt"
+﻿table 6014403 "NPR EFT Receipt"
 {
+    Access = Internal;
     Caption = 'EFT Receipt';
     DataClassification = CustomerContent;
 

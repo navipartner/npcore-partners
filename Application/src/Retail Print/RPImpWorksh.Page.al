@@ -1,5 +1,6 @@
-page 6014632 "NPR RP Imp. Worksh."
+﻿page 6014632 "NPR RP Imp. Worksh."
 {
+    Extensible = False;
     // NPR5.38/MMV /20171212 CASE 294095 Created object.
 
     Caption = 'Import Worksheet';

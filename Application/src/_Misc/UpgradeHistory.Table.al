@@ -1,5 +1,6 @@
-table 6151000 "NPR Upgrade History"
+﻿table 6151000 "NPR Upgrade History"
 {
+    Access = Internal;
     Caption = 'NPR Upgrade History';
     DataClassification = CustomerContent;
     DataPerCompany = false;

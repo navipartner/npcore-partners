@@ -1,5 +1,6 @@
-table 6059996 "NPR Scanner Service Setup"
+﻿table 6059996 "NPR Scanner Service Setup"
 {
+    Access = Internal;
     Caption = 'Scanner Service Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

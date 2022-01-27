@@ -1,5 +1,6 @@
-page 6150667 "NPR NPRE Seating Location"
+﻿page 6150667 "NPR NPRE Seating Location"
 {
+    Extensible = False;
     Caption = 'Seating Locations';
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,Layout';

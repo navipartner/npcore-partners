@@ -1,5 +1,6 @@
-page 6060087 "NPR MM Membership Lim. Setup"
+﻿page 6060087 "NPR MM Membership Lim. Setup"
 {
+    Extensible = False;
 
     Caption = 'Membership Limitation Setup';
     PageType = List;

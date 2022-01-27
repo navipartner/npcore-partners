@@ -1,5 +1,6 @@
-page 6151411 "NPR Magento Pictures"
+﻿page 6151411 "NPR Magento Pictures"
 {
+    Extensible = False;
     Caption = 'Magento Pictures';
     InsertAllowed = false;
     ModifyAllowed = false;

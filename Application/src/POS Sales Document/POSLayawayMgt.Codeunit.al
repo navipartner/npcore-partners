@@ -1,5 +1,6 @@
 ﻿codeunit 6014425 "NPR POS Layaway Mgt."
 {
+    Access = Internal;
     TableNo = "Sales Header";
 
     trigger OnRun()

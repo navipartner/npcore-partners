@@ -1,5 +1,6 @@
-codeunit 6014479 "NPR POS Action Member Mgt WF2"
+﻿codeunit 6014479 "NPR POS Action Member Mgt WF2"
 {
+    Access = Internal;
     var
         MemberSelectionMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
 

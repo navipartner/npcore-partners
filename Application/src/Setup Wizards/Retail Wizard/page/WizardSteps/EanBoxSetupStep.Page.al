@@ -1,5 +1,6 @@
-page 6014673 "NPR Ean Box Setup Step"
+﻿page 6014673 "NPR Ean Box Setup Step"
 {
+    Extensible = False;
     Caption = 'Ean Box Setup';
     PageType = ListPart;
     SourceTable = "NPR Ean Box Setup";

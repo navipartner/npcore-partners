@@ -1,5 +1,6 @@
-codeunit 6014442 "NPR DE Fiskaly DSFINVK"
+﻿codeunit 6014442 "NPR DE Fiskaly DSFINVK"
 {
+    Access = Internal;
     [TryFunction]
     procedure CreateDSFINVKDocument(var DSFINVKJson: JsonObject; DSFINVKClosing: Record "NPR DSFINVK Closing")
     begin

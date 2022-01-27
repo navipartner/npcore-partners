@@ -1,5 +1,6 @@
-table 6151434 "NPR Magento Contact Shpt.Meth."
+﻿table 6151434 "NPR Magento Contact Shpt.Meth."
 {
+    Access = Internal;
     Caption = 'Magento Contact Shipment Method';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Cont.Shpt.Methods";

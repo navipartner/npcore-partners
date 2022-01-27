@@ -1,5 +1,8 @@
-report 6014403 "NPR Archived Voucher List"
+﻿report 6014403 "NPR Archived Voucher List"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Archived Voucher List';
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Archived Voucher List.rdlc';

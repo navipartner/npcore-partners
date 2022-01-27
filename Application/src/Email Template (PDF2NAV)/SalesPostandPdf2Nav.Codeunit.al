@@ -1,5 +1,6 @@
 ﻿codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
 {
+    Access = Internal;
     TableNo = "Sales Header";
 
     trigger OnRun()

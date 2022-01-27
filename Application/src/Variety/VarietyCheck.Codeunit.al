@@ -1,5 +1,6 @@
-codeunit 6059974 "NPR Variety Check"
+﻿codeunit 6059974 "NPR Variety Check"
 {
+    Access = Internal;
     var
         Text001: Label 'There is open %1 for %2 %3.\These entries must be closed before you can change the Variations';
         Text002: Label 'There is %1 for %2 %3.\These entries must be deleted before you can change the Variations';

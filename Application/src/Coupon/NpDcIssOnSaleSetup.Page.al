@@ -1,5 +1,6 @@
-page 6151604 "NPR NpDc Iss.OnSale Setup"
+﻿page 6151604 "NPR NpDc Iss.OnSale Setup"
 {
+    Extensible = False;
     Caption = 'Issue On-Sale Setup';
     PageType = Card;
     UsageCategory = Administration;

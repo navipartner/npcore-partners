@@ -1,5 +1,6 @@
-page 6150656 "NPR POS Entry Pmt. Line List"
+﻿page 6150656 "NPR POS Entry Pmt. Line List"
 {
+    Extensible = False;
     Caption = 'POS Entry Payment Line List';
     Editable = false;
     PageType = List;

@@ -1,5 +1,6 @@
-codeunit 6150725 "NPR POS Action: Payment"
+﻿codeunit 6150725 "NPR POS Action: Payment"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for inserting a payment line into the current transaction';
         Setup: Codeunit "NPR POS Setup";

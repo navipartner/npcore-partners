@@ -1,5 +1,6 @@
-page 6151418 "NPR Magento Category Links"
+﻿page 6151418 "NPR Magento Category Links"
 {
+    Extensible = False;
     Caption = 'Magento Category Links';
     DelayedInsert = true;
     LinksAllowed = false;

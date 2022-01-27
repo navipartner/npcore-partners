@@ -1,5 +1,6 @@
-page 6151172 "NPR NpGp POS Sales Setup Card"
+﻿page 6151172 "NPR NpGp POS Sales Setup Card"
 {
+    Extensible = False;
     Caption = 'Global POS Sales Setup Card';
     PageType = Card;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-page 6014679 "NPR Endpoint Query List"
+﻿page 6014679 "NPR Endpoint Query List"
 {
+    Extensible = False;
     // NPR5.25\BR\20160801  CASE 234602 Object created
     // NPR5.48/JDH /20181109 CASE 334163 Added Action Captions and object caption
 

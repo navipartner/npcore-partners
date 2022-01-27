@@ -1,5 +1,6 @@
-page 6151121 "NPR GDPR Agreement List"
+﻿page 6151121 "NPR GDPR Agreement List"
 {
+    Extensible = False;
     // MM1.29/TSA /20180509 CASE 313795 Initial Version
 
     Caption = 'GDPR Agreement List';

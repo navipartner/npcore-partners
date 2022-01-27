@@ -1,5 +1,6 @@
-table 6151199 "NPR NpCs Document Log Entry"
+﻿table 6151199 "NPR NpCs Document Log Entry"
 {
+    Access = Internal;
     Caption = 'Collect Document Log Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Document Log Entries";

@@ -1,5 +1,6 @@
-page 6150632 "NPR POS Audit Profiles"
+﻿page 6150632 "NPR POS Audit Profiles"
 {
+    Extensible = False;
     Caption = 'POS Audit Profiles';
     CardPageID = "NPR POS Audit Profile";
     Editable = false;

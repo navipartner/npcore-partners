@@ -1,5 +1,6 @@
-codeunit 6150833 "NPR POS Action: Notif. List"
+﻿codeunit 6150833 "NPR POS Action: Notif. List"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built in function opens the notification list page';
         Title: Label 'Notification List';

@@ -1,5 +1,6 @@
-page 6060047 "NPR Regist. Item Worksh. Page"
+﻿page 6060047 "NPR Regist. Item Worksh. Page"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Registered Item Worksheet Page';
     DeleteAllowed = false;

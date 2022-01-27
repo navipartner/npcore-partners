@@ -1,5 +1,6 @@
-page 6014553 "NPR Mixed Discount Levels"
+﻿page 6014553 "NPR Mixed Discount Levels"
 {
+    Extensible = False;
     // NPR5.55/ALPO/20200714 CASE 412946 Mixed Discount enhancement: support for multiple discount amount levels
 
     Caption = 'Mix Discount Levels';

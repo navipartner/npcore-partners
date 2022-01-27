@@ -1,5 +1,6 @@
-page 6151521 "NPR Nc Trigger Setup"
+﻿page 6151521 "NPR Nc Trigger Setup"
 {
+    Extensible = False;
     Caption = 'Nc Trigger Setup';
     PageType = Card;
     SourceTable = "NPR Nc Trigger Setup";

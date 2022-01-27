@@ -1,5 +1,6 @@
-page 6014687 "NPR POS Pmt. Method List Step"
+﻿page 6014687 "NPR POS Pmt. Method List Step"
 {
+    Extensible = False;
     Caption = 'POS Payment Methods';
     PageType = ListPart;
     SourceTable = "NPR POS Payment Method";

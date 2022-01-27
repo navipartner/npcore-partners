@@ -1,5 +1,6 @@
-table 6014586 "NPR Sales Stats Time Period"
+﻿table 6014586 "NPR Sales Stats Time Period"
 {
+    Access = Internal;
     // NPR5.52/ZESO/20191010  Object created
 
     Caption = 'Sales Statistics Time Period';

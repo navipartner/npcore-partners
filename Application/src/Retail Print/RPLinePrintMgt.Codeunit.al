@@ -1,5 +1,6 @@
-codeunit 6014549 "NPR RP Line Print Mgt."
+﻿codeunit 6014549 "NPR RP Line Print Mgt."
 {
+    Access = Internal;
     // 
     // Line Print Buffer Mgt.
     //  Work started by Nicolai Esbensen.

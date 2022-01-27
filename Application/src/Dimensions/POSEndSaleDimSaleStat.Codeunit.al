@@ -1,5 +1,6 @@
-codeunit 6014598 "NPR POS End Sale: Dim.SaleStat"
+﻿codeunit 6014598 "NPR POS End Sale: Dim.SaleStat"
 {
+    Access = Internal;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Front End Management", 'OnBeforeChangeToPaymentView', '', true, true)]
     local procedure CU_CodeunitPOSFrontEndManagement_OnBeforeChangeToPaymentView(var Sender: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")

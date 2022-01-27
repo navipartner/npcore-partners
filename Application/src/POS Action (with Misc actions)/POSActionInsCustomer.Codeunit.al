@@ -1,5 +1,6 @@
 ﻿codeunit 6150726 "NPR POSAction: Ins. Customer"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for setting a customer on the current transaction';
         Text000: Label 'Required Customer select after Login';

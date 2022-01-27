@@ -1,5 +1,6 @@
-table 6151186 "NPR MM Sponsors. Ticket Entry"
+﻿table 6151186 "NPR MM Sponsors. Ticket Entry"
 {
+    Access = Internal;
 
     Caption = 'Sponsorship Ticket Entry';
     DataClassification = CustomerContent;

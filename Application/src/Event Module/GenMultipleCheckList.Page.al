@@ -1,5 +1,6 @@
-page 6014650 "NPR Gen. Multiple Check List"
+﻿page 6014650 "NPR Gen. Multiple Check List"
 {
+    Extensible = False;
     Caption = 'Select options';
     LinksAllowed = false;
     ShowFilter = false;

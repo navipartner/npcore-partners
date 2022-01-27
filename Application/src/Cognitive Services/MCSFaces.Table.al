@@ -1,5 +1,6 @@
-table 6059959 "NPR MCS Faces"
+﻿table 6059959 "NPR MCS Faces"
 {
+    Access = Internal;
     Caption = 'MCS Faces';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR MCS Faces";

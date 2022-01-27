@@ -1,5 +1,8 @@
-report 6060125 "NPR TM Visiting Report"
+﻿report 6060125 "NPR TM Visiting Report"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Visiting Report.rdlc';
     Caption = 'TM Visiting Report';

@@ -1,5 +1,6 @@
-table 6059955 "NPR MCS API Setup"
+﻿table 6059955 "NPR MCS API Setup"
 {
+    Access = Internal;
     Caption = 'MCS API Setup';
     DataClassification = CustomerContent;
 

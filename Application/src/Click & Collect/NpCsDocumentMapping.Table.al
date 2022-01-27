@@ -1,5 +1,6 @@
-table 6151201 "NPR NpCs Document Mapping"
+﻿table 6151201 "NPR NpCs Document Mapping"
 {
+    Access = Internal;
     Caption = 'Collect Document Mapping';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Document Mapping";

@@ -1,5 +1,6 @@
 ﻿codeunit 6151242 "NPR Activities Mgt."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

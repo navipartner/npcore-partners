@@ -1,5 +1,6 @@
-page 6151305 "NPR NpEc Customer Mapping"
+﻿page 6151305 "NPR NpEc Customer Mapping"
 {
+    Extensible = False;
     Caption = 'Np E-commerce Customer Mapping';
     DelayedInsert = true;
     PageType = List;

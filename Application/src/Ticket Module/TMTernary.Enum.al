@@ -1,5 +1,8 @@
 enum 6014485 "NPR TM Ternary"
 {
+#IF NOT BC17
+    Access = Internal;       
+#ENDIF
     Extensible = false;
 
     value(0; TERNARY_UNKNOWN)

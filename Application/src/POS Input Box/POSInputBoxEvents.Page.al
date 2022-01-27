@@ -1,5 +1,6 @@
-page 6060097 "NPR POS Input Box Events"
+﻿page 6060097 "NPR POS Input Box Events"
 {
+    Extensible = False;
 
     Caption = 'POS Input Box Events';
     InsertAllowed = false;

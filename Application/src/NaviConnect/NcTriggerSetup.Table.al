@@ -1,5 +1,6 @@
-table 6151521 "NPR Nc Trigger Setup"
+﻿table 6151521 "NPR Nc Trigger Setup"
 {
+    Access = Internal;
     Caption = 'Nc Trigger Setup';
     DataClassification = CustomerContent;
 

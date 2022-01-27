@@ -1,5 +1,6 @@
-table 6151529 "NPR Nc Collector Request"
+﻿table 6151529 "NPR Nc Collector Request"
 {
+    Access = Internal;
     Caption = 'Nc Collector Request';
     DataClassification = CustomerContent;
 

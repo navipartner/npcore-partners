@@ -1,5 +1,6 @@
-codeunit 6184507 "NPR EFT Shopper Recognition"
+﻿codeunit 6184507 "NPR EFT Shopper Recognition"
 {
+    Access = Internal;
     // NPR5.53/TSA /20191126 CASE 378812 Initial Version
 
 

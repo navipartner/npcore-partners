@@ -1,5 +1,6 @@
-codeunit 6150687 "NPR NPRE RVA: Select Table"
+﻿codeunit 6150687 "NPR NPRE RVA: Select Table"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('RV_SELECT_TABLE');

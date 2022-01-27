@@ -1,5 +1,6 @@
-table 6150906 "NPR HC Paym.Type Post.Setup"
+﻿table 6150906 "NPR HC Paym.Type Post.Setup"
 {
+    Access = Internal;
     Caption = 'HC Payment Type Posting Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR HC Paym.Types Post. Setup";

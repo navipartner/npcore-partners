@@ -1,5 +1,6 @@
-codeunit 6150715 "NPR POS Data Driver: ExchRate"
+﻿codeunit 6150715 "NPR POS Data Driver: ExchRate"
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

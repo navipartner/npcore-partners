@@ -1,5 +1,8 @@
-enum 6014428 "NPR Mag. Setup Event Sub. Type"
+﻿enum 6014428 "NPR Mag. Setup Event Sub. Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "DragDrop Picture")

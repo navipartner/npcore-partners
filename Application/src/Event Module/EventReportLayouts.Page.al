@@ -1,5 +1,6 @@
-page 6014671 "NPR Event Report Layouts"
+﻿page 6014671 "NPR Event Report Layouts"
 {
+    Extensible = False;
 
     Caption = 'Event Report Layouts';
     PageType = List;

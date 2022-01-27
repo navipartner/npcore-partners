@@ -1,5 +1,6 @@
-table 6014475 "NPR Retail Price Log Setup"
+﻿table 6014475 "NPR Retail Price Log Setup"
 {
+    Access = Internal;
     // NPR5.40/MHA /20180316  CASE 304031 Object created
     // NPR5.48/MHA /20181102  CASE 334573 Replaced 90 Days InitValue on field 15 "Delete Price Log Entries after" with function InitDeletePriceLogEntriesAfter()
 

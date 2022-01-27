@@ -1,5 +1,6 @@
-page 6151309 "NPR MM Member Info Picture"
+﻿page 6151309 "NPR MM Member Info Picture"
 {
+    Extensible = False;
     Caption = 'MM Member Info Capture Picture';
     DeleteAllowed = false;
     InsertAllowed = false;

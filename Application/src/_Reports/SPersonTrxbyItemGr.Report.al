@@ -1,5 +1,8 @@
-report 6014431 "NPR S.Person Trx by Item Gr."
+﻿report 6014431 "NPR S.Person Trx by Item Gr."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Person Trn. by Item Gr..rdlc';
     Caption = 'Sales Person Trn. By Item Gr.';

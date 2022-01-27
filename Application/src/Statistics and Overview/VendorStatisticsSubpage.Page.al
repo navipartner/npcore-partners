@@ -1,5 +1,6 @@
-page 6014590 "NPR Vendor Statistics Subpage"
+﻿page 6014590 "NPR Vendor Statistics Subpage"
 {
+    Extensible = False;
     Caption = 'Vendor Statistics Subform';
     Editable = false;
     PageType = List;

@@ -1,5 +1,6 @@
-query 6151480 "NPR Top 10 Items by Quantity"
+﻿query 6151480 "NPR Top 10 Items by Quantity"
 {
+    Access = Internal;
     Caption = 'Top 10 Items by Quantity';
     OrderBy = Ascending(Sum_Invoiced_Quantity);
     TopNumberOfRows = 10;

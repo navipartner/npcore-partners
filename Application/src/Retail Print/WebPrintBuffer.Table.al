@@ -1,5 +1,6 @@
-table 6014581 "NPR Web Print Buffer"
+﻿table 6014581 "NPR Web Print Buffer"
 {
+    Access = Internal;
     // NPR4.15/MMV/20151001 CASE 223893 Created table for use with web service printing
 
     Caption = 'Web Print Buffer';

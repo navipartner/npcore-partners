@@ -1,5 +1,6 @@
-codeunit 6151502 "NPR Nc Dependency Factory"
+﻿codeunit 6151502 "NPR Nc Dependency Factory"
 {
+    Access = Internal;
     #region Factory Methods
     procedure CreateNcImportListUpdater(var Updater: Interface "NPR Nc Import List IUpdate"; ImportType: Record "NPR Nc Import Type"): Boolean
     var

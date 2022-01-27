@@ -1,5 +1,6 @@
-page 6151122 "NPR GDPR Agreement Versions"
+﻿page 6151122 "NPR GDPR Agreement Versions"
 {
+    Extensible = False;
     // MM1.29/NPKNAV/20180524  CASE 313795 Transport MM1.29 - 24 May 2018
 
     Caption = 'GDPR Agreement Versions';

@@ -1,5 +1,8 @@
-report 6014402 "NPR Discount Statistics"
+﻿report 6014402 "NPR Discount Statistics"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Discount Statistics.rdlc';
     Caption = 'Discount Statistics';

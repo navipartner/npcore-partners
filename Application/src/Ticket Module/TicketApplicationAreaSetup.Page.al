@@ -1,5 +1,6 @@
-page 6151194 "NPR Ticket App. Area Setup"
+﻿page 6151194 "NPR Ticket App. Area Setup"
 {
+    Extensible = False;
     Caption = 'Ticket Application Area Setup';
     PageType = List;
     SourceTable = "Application Area Setup";

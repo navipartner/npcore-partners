@@ -1,5 +1,6 @@
-table 6059937 "NPR RSS Feed Channel Sub."
+﻿table 6059937 "NPR RSS Feed Channel Sub."
 {
+    Access = Internal;
     ObsoleteState = Removed;
     ObsoleteReason = 'We dont use RSS Feed any more.';
     Caption = 'RSS Feed Channel Subscription';

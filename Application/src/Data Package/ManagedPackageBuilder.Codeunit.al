@@ -1,5 +1,6 @@
-codeunit 6014629 "NPR Managed Package Builder"
+﻿codeunit 6014629 "NPR Managed Package Builder"
 {
+    Access = Internal;
     // This object is made for building a generic manifest containing data from one or more tables.
     // Call AddRecord() however many times you wish, with filters on Record if you only want to add a subset, followed by either ExportToFile() or ExportToBlob() depending on your use case.
     // 

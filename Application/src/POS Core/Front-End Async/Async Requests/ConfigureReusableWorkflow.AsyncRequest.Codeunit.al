@@ -1,5 +1,6 @@
-codeunit 6150777 "NPR Front-End: CfgReusableWkf." implements "NPR Front-End Async Request"
+﻿codeunit 6150777 "NPR Front-End: CfgReusableWkf." implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _action: Codeunit "NPR Workflow Action";

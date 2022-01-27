@@ -1,5 +1,6 @@
-page 6150621 "NPR POS Unit to Bin Relation"
+﻿page 6150621 "NPR POS Unit to Bin Relation"
 {
+    Extensible = False;
     // NPR5.36/NPKNAV/20171003  CASE 282251 Transport NPR5.36 - 3 October 2017
     // NPR5.51/YAHA/20190717 CASE 360536 Field "POS Unit No.","POS Payment Bin No." set to Mandatory(TRUE)
 

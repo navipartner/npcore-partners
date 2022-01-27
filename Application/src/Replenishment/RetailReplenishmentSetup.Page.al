@@ -1,5 +1,6 @@
-page 6151073 "NPR Retail Replenishment Setup"
+﻿page 6151073 "NPR Retail Replenishment Setup"
 {
+    Extensible = False;
     Caption = 'Retail Replenisment Setup';
     PageType = Card;
     SourceTable = "NPR Retail Replenishment Setup";

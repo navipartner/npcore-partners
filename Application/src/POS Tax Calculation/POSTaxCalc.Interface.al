@@ -1,5 +1,8 @@
-interface "NPR POS ITaxCalc"
+﻿interface "NPR POS ITaxCalc"
 {
+    #IF NOT BC17 
+    Access = Internal;      
+    #ENDIF
     procedure CalculateTax(var POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency; ExchangeRate: Decimal);
     procedure Show(SourceRecSysId: Guid);
     procedure UpdateTaxSetup(var Rec: Record "NPR POS Sale Line"; VATPostingSetup: Record "VAT Posting Setup");

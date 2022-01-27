@@ -1,5 +1,8 @@
-report 6060135 "NPR MM Member Card Owner"
+﻿report 6060135 "NPR MM Member Card Owner"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Owner.rdlc';
     Caption = 'Member Card Owner';

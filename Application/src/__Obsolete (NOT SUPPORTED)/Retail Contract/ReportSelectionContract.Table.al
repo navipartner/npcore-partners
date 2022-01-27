@@ -1,5 +1,6 @@
-table 6014520 "NPR Report Selection: Contract"
+﻿table 6014520 "NPR Report Selection: Contract"
 {
+    Access = Internal;
     Caption = 'Report Selection - Contract';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

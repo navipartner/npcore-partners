@@ -1,5 +1,6 @@
-table 6059779 "NPR Part. Sync Fields Prof."
+﻿table 6059779 "NPR Part. Sync Fields Prof."
 {
+    Access = Internal;
     Caption = 'Partiel Synk. Felt Profiler';
     DataPerCompany = false;
     DataClassification = CustomerContent;

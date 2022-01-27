@@ -1,5 +1,6 @@
-query 6059804 "NPR Retail Sales by Dim. 1"
+﻿query 6059804 "NPR Retail Sales by Dim. 1"
 {
+    Access = Internal;
     Caption = 'Retail Sales by Dimension 1';
 
     elements

@@ -1,5 +1,6 @@
-page 6151301 "NPR NpEc Store Card"
+﻿page 6151301 "NPR NpEc Store Card"
 {
+    Extensible = False;
     Caption = 'E-commerce Store Card';
     PageType = Card;
     SourceTable = "NPR NpEc Store";

@@ -1,5 +1,6 @@
-page 6060100 "NPR POS Input Box Setup"
+﻿page 6060100 "NPR POS Input Box Setup"
 {
+    Extensible = False;
 
     UsageCategory = None;
     Caption = 'POS Input Box Setup';

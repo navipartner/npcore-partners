@@ -1,5 +1,6 @@
-page 6150629 "NPR POS Workshift Checkpoints"
+﻿page 6150629 "NPR POS Workshift Checkpoints"
 {
+    Extensible = False;
     Caption = 'Workshift Summary';
     DeleteAllowed = false;
     Editable = false;

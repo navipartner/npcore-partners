@@ -1,5 +1,6 @@
-page 6059984 "NPR Web Manager Activ."
+﻿page 6059984 "NPR Web Manager Activ."
 {
+    Extensible = False;
     Caption = 'Web Order Activities';
     PageType = CardPart;
     SourceTable = "NPR Retail Order Cue";

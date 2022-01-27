@@ -1,5 +1,6 @@
-page 6014425 "NPR Magento Store Items Card"
+﻿page 6014425 "NPR Magento Store Items Card"
 {
+    Extensible = False;
     Caption = 'Magento Store Items Card';
     PageType = Card;
 

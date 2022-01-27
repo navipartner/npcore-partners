@@ -1,5 +1,6 @@
-table 6014456 "NPR Salesperson Buffer"
+﻿table 6014456 "NPR Salesperson Buffer"
 {
+    Access = Internal;
     Caption = 'Salesperson Buffer';
 
     fields

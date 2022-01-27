@@ -1,5 +1,6 @@
 codeunit 6059776 "NPR Fix POS Entry SystemId"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

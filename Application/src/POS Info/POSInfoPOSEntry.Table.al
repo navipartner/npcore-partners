@@ -1,5 +1,6 @@
-table 6150647 "NPR POS Info POS Entry"
+﻿table 6150647 "NPR POS Info POS Entry"
 {
+    Access = Internal;
 
     Caption = 'POS Info POS Entry';
     DataClassification = CustomerContent;

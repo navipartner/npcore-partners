@@ -1,5 +1,6 @@
-table 6060122 "NPR TM Admis. Schedule Entry"
+﻿table 6060122 "NPR TM Admis. Schedule Entry"
 {
+    Access = Internal;
     // NPR4.16/TSA/20150803 CASE219658 Ticket Initial Version
     // TM1.00/TSA/20151217  CASE 224225 NaviPartner Ticket Management
     // TM1.04/TSA/20160115  CASE 231834 Changed flowfields to sum quantity rather than count lines

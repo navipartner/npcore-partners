@@ -1,5 +1,6 @@
-page 6151160 "NPR MM Loy. Store Setup Server"
+﻿page 6151160 "NPR MM Loy. Store Setup Server"
 {
+    Extensible = False;
 
     Caption = 'Loyalty Store Setup (Server)';
     PageType = List;

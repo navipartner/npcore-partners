@@ -1,5 +1,6 @@
-codeunit 6014682 "NPR MM Smart Search"
+﻿codeunit 6014682 "NPR MM Smart Search"
 {
+    Access = Internal;
     internal procedure SearchMember(SearchTerm: Text[100]; var Member: Record "NPR MM Member")
     begin
         MemberSearchWorker(SearchTerm, Member);

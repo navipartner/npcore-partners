@@ -1,5 +1,6 @@
-codeunit 6014405 "NPR UPG Aux. Tables"
+﻿codeunit 6014405 "NPR UPG Aux. Tables"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

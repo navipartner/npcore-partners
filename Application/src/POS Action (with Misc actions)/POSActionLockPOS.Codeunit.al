@@ -1,5 +1,6 @@
-codeunit 6150835 "NPR POS Action: Lock POS"
+﻿codeunit 6150835 "NPR POS Action: Lock POS"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built in function locks the POS';
 

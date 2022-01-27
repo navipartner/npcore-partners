@@ -1,5 +1,8 @@
-enum 6014480 "NPR TM Attendee Status"
+﻿enum 6014480 "NPR TM Attendee Status"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = false;
 
     value(0; OPEN)

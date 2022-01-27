@@ -1,5 +1,6 @@
 ﻿codeunit 6151240 "NPR NP Retail Headline Mgt."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

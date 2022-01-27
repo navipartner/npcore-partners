@@ -1,5 +1,6 @@
-codeunit 6014438 "NPR Job Queue Install"
+﻿codeunit 6014438 "NPR Job Queue Install"
 {
+    Access = Internal;
     Subtype = Install;
 
     var

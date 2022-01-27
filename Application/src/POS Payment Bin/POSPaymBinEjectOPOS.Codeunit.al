@@ -1,5 +1,6 @@
-codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
+﻿codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
 {
+    Access = Internal;
     // NPR5.40/MMV /20180228 CASE 300660 Created object
     // NPR5.41/MMV /20180425 CASE 312990 Renamed object
 

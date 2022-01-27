@@ -1,5 +1,8 @@
-report 6014404 "NPR Return Reason Code Stat."
+﻿report 6014404 "NPR Return Reason Code Stat."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Return Reason Code Statistics.rdlc';
     Caption = 'Return Reason Code Statistics';

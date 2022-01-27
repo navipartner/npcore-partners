@@ -1,5 +1,6 @@
-table 6151417 "NPR Magento Product Relation"
+﻿table 6151417 "NPR Magento Product Relation"
 {
+    Access = Internal;
 
     Caption = 'Magento Product Relation';
     DataClassification = CustomerContent;

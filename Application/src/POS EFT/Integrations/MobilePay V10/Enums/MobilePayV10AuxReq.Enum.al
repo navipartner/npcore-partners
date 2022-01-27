@@ -1,5 +1,8 @@
-enum 6014466 "NPR MobilePayV10 Aux. Req."
+﻿enum 6014466 "NPR MobilePayV10 Aux. Req."
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = false;
 
     value(1; AuthTokenRequest) { }

@@ -1,5 +1,6 @@
-page 6151535 "NPR Nc Coll. Create Outg. Req."
+﻿page 6151535 "NPR Nc Coll. Create Outg. Req."
 {
+    Extensible = False;
     Caption = 'Create Outgoing Collector Req.';
     DataCaptionExpression = TextCreateNewLbl;
     PageType = Document;

@@ -1,5 +1,6 @@
-codeunit 6014633 "NPR POS Sales Tax Backward"
+﻿codeunit 6014633 "NPR POS Sales Tax Backward"
 {
+    Access = Internal;
     var
         SalesTaxBackwardNotSupportedErr: Label 'Reverse sales tax calculation is not supported. Turn off Prices Including VAT on POS Pricing Profile for direct sale and for debit sale on the Customer card';
 

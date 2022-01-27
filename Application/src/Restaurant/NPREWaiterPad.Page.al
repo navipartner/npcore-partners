@@ -1,5 +1,6 @@
-page 6150660 "NPR NPRE Waiter Pad"
+﻿page 6150660 "NPR NPRE Waiter Pad"
 {
+    Extensible = False;
     Caption = 'Waiter Pad';
     InsertAllowed = false;
     PageType = Document;

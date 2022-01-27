@@ -1,5 +1,6 @@
-codeunit 6014533 "NPR HttpRequest Helper"
+﻿codeunit 6014533 "NPR HttpRequest Helper"
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

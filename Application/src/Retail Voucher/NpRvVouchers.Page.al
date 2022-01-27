@@ -1,5 +1,6 @@
-page 6151015 "NPR NpRv Vouchers"
+﻿page 6151015 "NPR NpRv Vouchers"
 {
+    Extensible = False;
     Caption = 'Retail Vouchers';
     CardPageID = "NPR NpRv Voucher Card";
     Editable = false;

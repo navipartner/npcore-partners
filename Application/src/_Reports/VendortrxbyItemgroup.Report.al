@@ -1,5 +1,8 @@
-report 6014449 "NPR Vendor trx by Item group"
+﻿report 6014449 "NPR Vendor trx by Item group"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Vendor trn. by Item group.rdlc';
     Caption = 'Vendor Trn. By Item Group';

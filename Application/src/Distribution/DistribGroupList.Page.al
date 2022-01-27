@@ -1,5 +1,6 @@
-page 6151055 "NPR Distrib. Group List"
+﻿page 6151055 "NPR Distrib. Group List"
 {
+    Extensible = False;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
 
     Caption = 'Distribution Groups';

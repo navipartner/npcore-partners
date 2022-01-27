@@ -1,5 +1,6 @@
-page 6059777 "NPR POS Sal. Workfl. Set. Sel."
+﻿page 6059777 "NPR POS Sal. Workfl. Set. Sel."
 {
+    Extensible = False;
     Caption = 'POS Sales Workflow Sets';
     PageType = List;
     SourceTable = "NPR POS Sales Workflow Set";

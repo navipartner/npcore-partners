@@ -1,5 +1,6 @@
-codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
+﻿codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
 {
+    Access = Internal;
 
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CancelPaymentEvent', '', false, false)]

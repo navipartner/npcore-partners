@@ -1,5 +1,6 @@
-codeunit 6060094 "NPR MM Alteration Jnl Mgmt"
+﻿codeunit 6060094 "NPR MM Alteration Jnl Mgmt"
 {
+    Access = Internal;
 
     TableNo = "NPR MM Member Info Capture";
 

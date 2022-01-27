@@ -1,5 +1,6 @@
-table 6151603 "NPR NpDc SaleLinePOS NewCoupon"
+﻿table 6151603 "NPR NpDc SaleLinePOS NewCoupon"
 {
+    Access = Internal;
     Caption = 'NpDc Sale Line POS New Coupon';
     DataClassification = CustomerContent;
 

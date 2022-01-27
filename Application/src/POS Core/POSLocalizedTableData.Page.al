@@ -1,5 +1,6 @@
-page 6150724 "NPR POS Localized Table Data"
+﻿page 6150724 "NPR POS Localized Table Data"
 {
+    Extensible = False;
     Caption = 'Localized Table Data';
     DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;

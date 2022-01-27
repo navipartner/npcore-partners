@@ -1,5 +1,6 @@
-page 6014615 "NPR RapidStart Base Data Imp."
+﻿page 6014615 "NPR RapidStart Base Data Imp."
 {
+    Extensible = False;
     PageType = NavigatePage;
 
     UsageCategory = Administration;

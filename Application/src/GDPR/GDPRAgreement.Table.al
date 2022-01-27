@@ -1,5 +1,6 @@
-table 6151121 "NPR GDPR Agreement"
+﻿table 6151121 "NPR GDPR Agreement"
 {
+    Access = Internal;
     // MM1.29/TSA /20180509 CASE 313795 Initial Version
 
     Caption = 'GDPR Agreement';

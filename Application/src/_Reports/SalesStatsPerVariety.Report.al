@@ -1,5 +1,8 @@
-report 6014615 "NPR Sales Stats Per Variety"
+﻿report 6014615 "NPR Sales Stats Per Variety"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Statistics Per Variety.rdlc';
     Caption = 'Sales Statistics Variant';

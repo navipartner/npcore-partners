@@ -1,5 +1,6 @@
-page 6184489 "NPR Pepper EFT Result Codes"
+﻿page 6184489 "NPR Pepper EFT Result Codes"
 {
+    Extensible = False;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
     // NPR5.28/BR/20161128  CASE 259563 Added field for "Open Terminal and Retry"
     // NPR5.30/BR  /20170113  CASE 263458 Renamed Object from Pepper to EFT, added Fields Integration Type and Transaction Subtype

@@ -1,5 +1,8 @@
-enum 6014478 "NPR TM Not. Process Method"
+﻿enum 6014478 "NPR TM Not. Process Method"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; MANUAL)

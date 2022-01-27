@@ -1,5 +1,6 @@
-table 6014442 "NPR Touch Screen - Layout"
+﻿table 6014442 "NPR Touch Screen - Layout"
 {
+    Access = Internal;
     Caption = 'Touch Screen - Layout';
     ObsoleteState = Removed;
     ObsoleteReason = 'Not used';

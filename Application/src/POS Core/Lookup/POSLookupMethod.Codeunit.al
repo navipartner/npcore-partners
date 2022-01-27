@@ -1,10 +1,11 @@
-/// <summary>
+﻿/// <summary>
 /// Responds to LookupFromPOS custom method.
 /// Retrieves lookup data from specified table, and does paging if necessary. The lookup data is, for example, when during
 /// balancing, a user wants to look up a bank deposit bin code. It replaces typical TableRelation situations, only in POS.
 /// </summary>
 codeunit 6014570 "NPR POS Lookup Method"
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
     local procedure OnPreSearch(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
     var

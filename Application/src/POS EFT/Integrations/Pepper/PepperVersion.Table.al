@@ -1,5 +1,6 @@
-table 6184494 "NPR Pepper Version"
+﻿table 6184494 "NPR Pepper Version"
 {
+    Access = Internal;
     // NPR5.22\BR\20160316  CASE 231481 Object Created
     // NPR5.22\BR\20160415  CASE 231481 Added Install Zip File BLOB field, dll version
     // NPR5.22\BR\20160422  CASE 231481 Added the Installation Codeunit fields

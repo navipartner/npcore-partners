@@ -1,5 +1,6 @@
-page 6151592 "NPR NpDc Coupon Card"
+﻿page 6151592 "NPR NpDc Coupon Card"
 {
+    Extensible = False;
     Caption = 'Coupon Card';
     DeleteAllowed = false;
     InsertAllowed = false;

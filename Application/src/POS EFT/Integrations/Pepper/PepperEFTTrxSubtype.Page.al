@@ -1,5 +1,6 @@
-page 6184482 "NPR Pepper EFT Trx Subtype"
+﻿page 6184482 "NPR Pepper EFT Trx Subtype"
 {
+    Extensible = False;
     // NPR5.30/BR  /20170113  CASE 263458 Object Created
     // NPR5.46/MMV /20181006 CASE 290734 EFT Framework refactored
 

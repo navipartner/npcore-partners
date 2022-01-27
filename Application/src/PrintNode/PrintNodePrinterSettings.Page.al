@@ -1,5 +1,6 @@
-page 6151222 "NPR PrintNode Printer Settings"
+﻿page 6151222 "NPR PrintNode Printer Settings"
 {
+    Extensible = False;
     UsageCategory = None;
     PageType = Card;
     Editable = false;

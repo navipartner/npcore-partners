@@ -1,5 +1,6 @@
-codeunit 6060054 "NPR Item Wksht. Wf Responses"
+﻿codeunit 6060054 "NPR Item Wksht. Wf Responses"
 {
+    Access = Internal;
     EventSubscriberInstance = StaticAutomatic;
 
     local procedure SetItemField(WorkflowStepInstance: Record "Workflow Step Instance")

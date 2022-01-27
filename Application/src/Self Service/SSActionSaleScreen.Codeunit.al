@@ -1,5 +1,6 @@
-codeunit 6151288 "NPR SS Action - Sale Screen"
+﻿codeunit 6151288 "NPR SS Action - Sale Screen"
 {
+    Access = Internal;
 
     var
         ActionDescription: Label 'This built in function changes to sale view';

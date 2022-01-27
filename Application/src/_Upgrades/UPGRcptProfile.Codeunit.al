@@ -1,5 +1,6 @@
-codeunit 6150935 "NPR UPG Rcpt. Profile"
+﻿codeunit 6150935 "NPR UPG Rcpt. Profile"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

@@ -1,5 +1,6 @@
-page 6151011 "NPR NpRv Voucher Modules"
+﻿page 6151011 "NPR NpRv Voucher Modules"
 {
+    Extensible = False;
     Caption = 'Retail Voucher Modules';
     PageType = List;
     SourceTable = "NPR NpRv Voucher Module";

@@ -1,5 +1,6 @@
 ﻿table 6060120 "NPR TM Admission"
 {
+    Access = Internal;
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM1.04/TSA/20160104  CASE 230600 Caption Change Occation -> Event
     // TM1.08/TSA/20160262  CASE 232262 Dependant admission objects

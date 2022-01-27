@@ -1,5 +1,6 @@
-table 6059950 "NPR Display Setup"
+﻿table 6059950 "NPR Display Setup"
 {
+    Access = Internal;
     Caption = 'POS Display Profile';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Display Profiles";

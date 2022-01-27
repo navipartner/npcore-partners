@@ -1,5 +1,8 @@
-report 6060132 "NPR MM Membership Status"
+﻿report 6060132 "NPR MM Membership Status"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Status.rdlc';
     Caption = 'Membership Status';

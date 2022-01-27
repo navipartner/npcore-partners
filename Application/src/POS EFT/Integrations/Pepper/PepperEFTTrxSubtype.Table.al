@@ -1,5 +1,6 @@
-table 6184487 "NPR Pepper EFT Trx Subtype"
+﻿table 6184487 "NPR Pepper EFT Trx Subtype"
 {
+    Access = Internal;
     // NPR5.46/MMV /20180714 CASE 290734 Renamed
 
     Caption = 'Pepper EFT Transaction Subtype';

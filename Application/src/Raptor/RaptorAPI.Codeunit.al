@@ -1,5 +1,6 @@
-codeunit 6151493 "NPR Raptor API"
+﻿codeunit 6151493 "NPR Raptor API"
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

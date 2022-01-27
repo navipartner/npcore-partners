@@ -1,5 +1,8 @@
-enum 6150757 "NPR POS Tax Type"
+﻿enum 6150757 "NPR POS Tax Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "Sales Tax")

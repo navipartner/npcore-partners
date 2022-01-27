@@ -1,5 +1,6 @@
-table 6060144 "NPR MM Membership Lim. Setup"
+﻿table 6060144 "NPR MM Membership Lim. Setup"
 {
+    Access = Internal;
 
     Caption = 'Membership Limitation Setup';
     DataClassification = CustomerContent;

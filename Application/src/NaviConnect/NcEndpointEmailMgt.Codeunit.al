@@ -1,5 +1,6 @@
-codeunit 6151525 "NPR Nc Endpoint Email Mgt."
+﻿codeunit 6151525 "NPR Nc Endpoint Email Mgt."
 {
+    Access = Internal;
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text; Subject: Text; Body: Text)
     var
         NcEndpoint: Record "NPR Nc Endpoint";

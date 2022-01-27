@@ -1,5 +1,6 @@
-page 6151593 "NPR NpDc Coupons"
+﻿page 6151593 "NPR NpDc Coupons"
 {
+    Extensible = False;
     Caption = 'Coupons';
     CardPageID = "NPR NpDc Coupon Card";
     Editable = false;

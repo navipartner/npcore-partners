@@ -1,5 +1,6 @@
-page 6014465 "NPR NP Attributes FactBox"
+﻿page 6014465 "NPR NP Attributes FactBox"
 {
+    Extensible = False;
     // NPR4.15/TS/20151013 CASE 224751 Created NpAttribute Factbox
     // NPR4.21/TS/20160225  CASE 224751 Open Retail Item Card Instead of Item Card
     // NPR5.29/LS  /20161108 CASE 257874 Changed length from 100 to 250 for Global Var "NPRAttrTextArray"

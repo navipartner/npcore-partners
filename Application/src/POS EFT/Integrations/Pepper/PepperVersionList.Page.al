@@ -1,5 +1,6 @@
-page 6184496 "NPR Pepper Version List"
+﻿page 6184496 "NPR Pepper Version List"
 {
+    Extensible = False;
     Caption = 'Pepper Version List';
     CardPageID = "NPR Pepper Version Card";
     Editable = false;

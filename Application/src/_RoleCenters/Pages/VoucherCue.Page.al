@@ -1,5 +1,6 @@
-page 6151330 "NPR Voucher Cue"
+﻿page 6151330 "NPR Voucher Cue"
 {
+    Extensible = False;
     Caption = 'Retail Voucher Cue';
     PageType = CardPart;
     SourceTable = "NPR Retail Sales Cue";

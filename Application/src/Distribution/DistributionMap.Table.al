@@ -1,5 +1,6 @@
-table 6014526 "NPR Distribution Map"
+﻿table 6014526 "NPR Distribution Map"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'Distribution Map';
 

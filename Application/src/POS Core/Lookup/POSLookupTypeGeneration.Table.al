@@ -1,4 +1,4 @@
-/// <summary>
+﻿/// <summary>
 /// Table keeps information about data generation per lookup type. Generations represent stable
 /// states of back-end data. Same generation means no data changed. Any time anything about data
 /// changes (new row, modified row, deleted row), generation of that data must update. That way,
@@ -26,6 +26,7 @@
 /// </summary>
 table 6014549 "NPR POS Lookup Type Generation"
 {
+    Access = Internal;
     Caption = 'POS Lookup Type Generation';
     DataClassification = CustomerContent;
 

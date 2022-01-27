@@ -1,5 +1,6 @@
-page 6059971 "NPR Variety"
+﻿page 6059971 "NPR Variety"
 {
+    Extensible = False;
     // VRT1.11/TR/20150428  CASE 210960 - Caption on action changed from "Variety Value" to "Variety Table".
     // NPR5.41/TS  /20180105 CASE 300893 ActionContainers cannot have captions
 

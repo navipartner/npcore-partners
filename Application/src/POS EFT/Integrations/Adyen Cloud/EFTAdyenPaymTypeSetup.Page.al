@@ -1,5 +1,6 @@
-page 6184504 "NPR EFT Adyen Paym. Type Setup"
+﻿page 6184504 "NPR EFT Adyen Paym. Type Setup"
 {
+    Extensible = False;
     Caption = 'EFT Adyen Payment Type Setup';
     DelayedInsert = false;
     DeleteAllowed = false;

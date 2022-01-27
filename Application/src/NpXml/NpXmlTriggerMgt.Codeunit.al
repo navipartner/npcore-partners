@@ -1,5 +1,6 @@
 ﻿codeunit 6151553 "NPR NpXml Trigger Mgt."
 {
+    Access = Internal;
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
         NpXmlValueMgt: Codeunit "NPR NpXml Value Mgt.";

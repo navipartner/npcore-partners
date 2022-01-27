@@ -1,5 +1,6 @@
-codeunit 6014423 "NPR Open POS Page"
+﻿codeunit 6014423 "NPR Open POS Page"
 {
+    Access = Internal;
     trigger OnRun();
     var
         Url: Text;

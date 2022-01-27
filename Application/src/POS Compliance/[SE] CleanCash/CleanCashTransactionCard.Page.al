@@ -1,5 +1,6 @@
-page 6014543 "NPR CleanCash Transaction Card"
+﻿page 6014543 "NPR CleanCash Transaction Card"
 {
+    Extensible = False;
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR CleanCash Trans. Request";

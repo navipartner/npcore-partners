@@ -1,5 +1,6 @@
-page 6184508 "NPR EFT NETS Cloud Paym. Setup"
+﻿page 6184508 "NPR EFT NETS Cloud Paym. Setup"
 {
+    Extensible = False;
     Caption = 'EFT NETS Cloud Payment Setup';
     PageType = Card;
     UsageCategory = None;

@@ -1,5 +1,6 @@
-page 6014424 "NPR Getting Started"
+﻿page 6014424 "NPR Getting Started"
 {
+    Extensible = False;
     Caption = 'Hi!';
     PageType = NavigatePage;
     UsageCategory = None;

@@ -1,5 +1,6 @@
-page 6014694 "NPR GraphApi Setup Wizard"
+﻿page 6014694 "NPR GraphApi Setup Wizard"
 {
+    Extensible = False;
     Caption = 'GraphApi Setup';
     PageType = NavigatePage;
     SourceTable = "NPR GraphApi Setup";

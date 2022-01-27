@@ -1,5 +1,6 @@
-codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
+﻿codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
 {
+    Access = Internal;
     var
         Text000: Label 'Load POS Sale from POS saved Sale';
         CannotLoad: Label 'The POS Saved Sale is missing essential data and cannot be loaded.';

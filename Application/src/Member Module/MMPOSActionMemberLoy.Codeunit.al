@@ -1,5 +1,6 @@
-codeunit 6060146 "NPR MM POS Action: Member Loy."
+﻿codeunit 6060146 "NPR MM POS Action: Member Loy."
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This action is capable of redeeming member points and applying them as a coupon.';
         LoyaltyWindowTitle: Label '%1 - Membership Loyalty.';

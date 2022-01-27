@@ -1,5 +1,6 @@
-page 6151218 "NPR NpCs Open. Hour Calendar"
+﻿page 6151218 "NPR NpCs Open. Hour Calendar"
 {
+    Extensible = False;
     Caption = 'Collect Store Opening Hour Calendar';
     PageType = List;
     UsageCategory = Administration;

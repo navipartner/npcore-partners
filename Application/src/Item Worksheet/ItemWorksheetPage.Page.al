@@ -1,5 +1,6 @@
-page 6060042 "NPR Item Worksheet Page"
+﻿page 6060042 "NPR Item Worksheet Page"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Item Worksheet Page';
     DelayedInsert = false;

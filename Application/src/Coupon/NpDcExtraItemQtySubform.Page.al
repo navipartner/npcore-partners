@@ -1,5 +1,6 @@
-page 6151607 "NPR NpDc ExtraItemQty. Subform"
+﻿page 6151607 "NPR NpDc ExtraItemQty. Subform"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Coupon List Items';
     DelayedInsert = true;

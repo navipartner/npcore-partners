@@ -1,5 +1,6 @@
-table 6014616 "NPR EFT Reconciliation"
+﻿table 6014616 "NPR EFT Reconciliation"
 {
+    Access = Internal;
     Caption = 'EFT Reconciliation';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR EFT Reconciliation List";

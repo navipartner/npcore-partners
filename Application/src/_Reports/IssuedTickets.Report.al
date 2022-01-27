@@ -1,5 +1,8 @@
-report 6014413 "NPR Issued Tickets"
+﻿report 6014413 "NPR Issued Tickets"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Issued Tickets.rdlc';
     UsageCategory = ReportsAndAnalysis;

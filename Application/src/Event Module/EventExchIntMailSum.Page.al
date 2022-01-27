@@ -1,5 +1,6 @@
-page 6151584 "NPR Event Exch. Int. Mail Sum."
+﻿page 6151584 "NPR Event Exch. Int. Mail Sum."
 {
+    Extensible = False;
     Caption = 'Event Exch. Int. Email Summary';
     Editable = false;
     PageType = Worksheet;

@@ -1,5 +1,6 @@
-codeunit 6150797 "NPR POSAction: Cancel Sale"
+﻿codeunit 6150797 "NPR POSAction: Cancel Sale"
 {
+    Access = Internal;
     var
         ActionDescriptionLbl: Label 'Cancel Sale';
         TitleLbl: Label 'Cancel Sale';

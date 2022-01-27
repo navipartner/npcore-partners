@@ -1,5 +1,6 @@
-codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
+﻿codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
 {
+    Access = Internal;
     var
         GLSetup: Record "General Ledger Setup";
         Item: Record Item;

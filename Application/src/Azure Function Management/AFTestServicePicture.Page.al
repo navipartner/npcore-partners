@@ -1,5 +1,6 @@
-page 6151306 "NPR AF Test Service Picture"
+﻿page 6151306 "NPR AF Test Service Picture"
 {
+    Extensible = False;
     Caption = 'AF Test Service Picture';
     DeleteAllowed = false;
     InsertAllowed = false;

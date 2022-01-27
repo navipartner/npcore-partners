@@ -1,5 +1,6 @@
-page 6059903 "NPR TQ Task Card"
+﻿page 6059903 "NPR TQ Task Card"
 {
+    Extensible = False;
     // TQ1.17/JDH/20141008 CASE 179044 If task is executed manually, the record filter was applied +
     //                                 call other function in order to log the execution of the task
     // TQ1.18.01/JDH/20141124 CASE 198851 Task Line not set correctly when running task manually (printer not found correct)

@@ -1,5 +1,6 @@
-page 6151447 "NPR Magento Item Pict. Factbox"
+﻿page 6151447 "NPR Magento Item Pict. Factbox"
 {
+    Extensible = False;
     Caption = 'Picture';
     PageType = CardPart;
     UsageCategory = None;

@@ -1,5 +1,6 @@
-table 6151443 "NPR M2 Value Buffer"
+﻿table 6151443 "NPR M2 Value Buffer"
 {
+    Access = Internal;
     Caption = 'M2 Value Buffer';
     DataClassification = CustomerContent;
 

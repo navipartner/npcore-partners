@@ -1,5 +1,6 @@
 ﻿codeunit 6150627 "NPR POS Workshift Checkpoint"
 {
+    Access = Internal;
     var
         MissingBin: Label 'No payment bin relation found for POS Unit %1.';
 

@@ -1,5 +1,6 @@
-page 6151551 "NPR NpXml Template Card"
+﻿page 6151551 "NPR NpXml Template Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Xml Template';
     DelayedInsert = true;

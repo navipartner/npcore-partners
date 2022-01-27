@@ -1,5 +1,6 @@
-codeunit 6014510 "NPR MobilePayV10 CancelDead"
+﻿codeunit 6014510 "NPR MobilePayV10 CancelDead"
 {
+    Access = Internal;
     var
         TempDefaultMobilePayEftIntType: Record "NPR EFT Integration Type" temporary;
 

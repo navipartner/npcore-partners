@@ -1,5 +1,6 @@
-page 6060054 "NPR Item Worksh. Field Setup"
+﻿page 6060054 "NPR Item Worksh. Field Setup"
 {
+    Extensible = False;
     Caption = 'Item Worksheet Field Setup';
     PageType = List;
     SourceTable = "NPR Item Worksh. Field Setup";

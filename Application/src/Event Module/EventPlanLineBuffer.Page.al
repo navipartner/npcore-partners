@@ -1,5 +1,6 @@
-page 6059832 "NPR Event Plan. Line Buffer"
+﻿page 6059832 "NPR Event Plan. Line Buffer"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Event Planning Line Buffer';
     PageType = List;

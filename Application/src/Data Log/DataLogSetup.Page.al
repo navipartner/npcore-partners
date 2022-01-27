@@ -1,5 +1,6 @@
-page 6059897 "NPR Data Log Setup"
+﻿page 6059897 "NPR Data Log Setup"
 {
+    Extensible = False;
     Caption = 'Data Log Setup';
     DelayedInsert = true;
     PageType = List;

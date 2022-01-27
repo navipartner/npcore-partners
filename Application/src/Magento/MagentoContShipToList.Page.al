@@ -1,5 +1,6 @@
-page 6151459 "NPR Magento Cont. ShipTo List"
+﻿page 6151459 "NPR Magento Cont. ShipTo List"
 {
+    Extensible = False;
     Caption = 'Magento Contact Ship-to List';
     DelayedInsert = true;
     InsertAllowed = false;

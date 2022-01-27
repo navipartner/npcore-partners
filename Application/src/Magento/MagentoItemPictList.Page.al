@@ -1,5 +1,6 @@
-page 6151413 "NPR Magento Item Pict. List"
+﻿page 6151413 "NPR Magento Item Pict. List"
 {
+    Extensible = False;
     Caption = 'Item Pictures';
     DeleteAllowed = false;
     InsertAllowed = false;

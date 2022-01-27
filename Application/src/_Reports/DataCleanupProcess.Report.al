@@ -1,5 +1,8 @@
-report 6060102 "NPR Data Cleanup Process"
+﻿report 6060102 "NPR Data Cleanup Process"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Data Cleanup Process.rdlc';
     UsageCategory = ReportsAndAnalysis;

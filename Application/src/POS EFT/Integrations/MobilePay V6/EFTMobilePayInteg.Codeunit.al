@@ -1,5 +1,6 @@
-codeunit 6184513 "NPR EFT MobilePay Integ."
+﻿codeunit 6184513 "NPR EFT MobilePay Integ."
 {
+    Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.46.01/MMV /20181025 CASE 333953 Fixed incorrect mobile pay environment optionstring
     // NPR5.47/MMV /20181030 CASE 334510 Added string length check

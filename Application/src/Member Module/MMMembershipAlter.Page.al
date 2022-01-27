@@ -1,5 +1,6 @@
-page 6060141 "NPR MM Membership Alter."
+﻿page 6060141 "NPR MM Membership Alter."
 {
+    Extensible = False;
 
     Caption = 'Membership Alteration';
     PageType = List;

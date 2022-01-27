@@ -1,5 +1,6 @@
-codeunit 6150796 "NPR POSAction: Delete POS Line"
+﻿codeunit 6150796 "NPR POSAction: Delete POS Line"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('DELETE_POS_LINE');

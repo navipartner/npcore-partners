@@ -1,5 +1,6 @@
-page 6151163 "NPR MM Loyalty Alter Members."
+﻿page 6151163 "NPR MM Loyalty Alter Members."
 {
+    Extensible = False;
 
     Caption = 'Loyalty Alter Membership';
     PageType = List;

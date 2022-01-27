@@ -1,5 +1,6 @@
-page 6014421 "NPR DE Audit Setup"
+﻿page 6014421 "NPR DE Audit Setup"
 {
+    Extensible = False;
     Caption = 'DE Audit Setup';
     DeleteAllowed = false;
     InsertAllowed = false;

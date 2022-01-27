@@ -1,5 +1,6 @@
-page 6014462 "NPR Input Item"
+﻿page 6014462 "NPR Input Item"
 {
+    Extensible = False;
 
     Caption = 'Input Item';
     PageType = StandardDialog;

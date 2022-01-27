@@ -1,5 +1,6 @@
-codeunit 6014599 "NPR New Prices Install"
+﻿codeunit 6014599 "NPR New Prices Install"
 {
+    Access = Internal;
     Subtype = Install;
 
 

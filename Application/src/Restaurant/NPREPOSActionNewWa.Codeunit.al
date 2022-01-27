@@ -1,5 +1,6 @@
-codeunit 6150665 "NPR NPRE POSAction: New Wa."
+﻿codeunit 6150665 "NPR NPRE POSAction: New Wa."
 {
+    Access = Internal;
     var
         Text000: Label 'Create new Waiter Pad on Seating';
         Text001: Label 'There are already active waiter pad(s) on seating %1.\Press Yes to add new waiterpad.\Press No to abort.';

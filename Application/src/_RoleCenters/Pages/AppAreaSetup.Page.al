@@ -1,5 +1,6 @@
-page 6151231 "NPR App. Area Setup"
+﻿page 6151231 "NPR App. Area Setup"
 {
+    Extensible = False;
     Caption = 'NPR Application Area Setup';
     PageType = List;
     SourceTable = "Application Area Setup";

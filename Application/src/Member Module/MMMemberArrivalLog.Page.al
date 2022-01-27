@@ -1,5 +1,6 @@
-page 6060088 "NPR MM Member Arrival Log"
+﻿page 6060088 "NPR MM Member Arrival Log"
 {
+    Extensible = False;
 
     Caption = 'Member Arrival Log';
     DeleteAllowed = false;

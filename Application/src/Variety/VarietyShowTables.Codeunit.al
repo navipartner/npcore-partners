@@ -1,5 +1,6 @@
-codeunit 6059975 "NPR Variety ShowTables"
+﻿codeunit 6059975 "NPR Variety ShowTables"
 {
+    Access = Internal;
     // VRT1.11/MHA/20160420  CASE 236840 Changed parameter Item to VAR in function ShowVarietyMatrix in order to parse filters
     // VRT1.11/JDH /20160602 CASE 242940 Added function ShowBooleanMatrix to support the new Matrix
     // NPR5.32/JDH /20170510 CASE 274170 Added Subscriber to Matrix Drilldown Event

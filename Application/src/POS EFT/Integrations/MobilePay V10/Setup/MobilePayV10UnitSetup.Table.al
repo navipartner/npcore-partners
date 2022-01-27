@@ -1,5 +1,6 @@
-table 6014544 "NPR MobilePayV10 Unit Setup"
+﻿table 6014544 "NPR MobilePayV10 Unit Setup"
 {
+    Access = Internal;
     Caption = 'MobilePayV10 Unit Setup';
     fields
     {

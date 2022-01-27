@@ -1,5 +1,6 @@
-page 6151212 "NPR NpCs Arch.Doc.Log Entries"
+﻿page 6151212 "NPR NpCs Arch.Doc.Log Entries"
 {
+    Extensible = False;
     Caption = 'Archived Collect Document Log Entries';
     Editable = false;
     PageType = List;

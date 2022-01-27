@@ -1,5 +1,6 @@
 ﻿codeunit 6060158 "NPR Event Web Service"
 {
+    Access = Internal;
     procedure CopyEventFromTemplate(BundledItemNo: Code[20]; TemplateEventNo: Code[20]; BillToCustomerNo: Code[20]; BundledItemQuantity: Decimal; BundledItemPrice: Decimal; StartDateTime: DateTime; EndDateTime: DateTime; AdditionalItems: XMLport "NPR Event Import Opt. Items"; var ReturnMessage: Text): Boolean
     var
         EventSalesSetup: Record "NPR Event Web Sales Setup";

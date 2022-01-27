@@ -1,5 +1,6 @@
-codeunit 6014495 "NPR Text Encoding Mapper"
+﻿codeunit 6014495 "NPR Text Encoding Mapper"
 {
+    Access = Internal;
     procedure EncodingNameToCodePageNumber(EncodingName: Text): Integer;
     begin
         case LowerCase(EncodingName) of

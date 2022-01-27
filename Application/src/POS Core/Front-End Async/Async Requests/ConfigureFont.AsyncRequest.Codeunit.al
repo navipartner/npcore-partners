@@ -1,5 +1,6 @@
-codeunit 6150758 "NPR Front-End: ConfigFont." implements "NPR Front-End Async Request"
+﻿codeunit 6150758 "NPR Front-End: ConfigFont." implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _font: Interface "NPR Font Definition";

@@ -1,5 +1,6 @@
-page 6014408 "NPR Aux. Item Ledger Entries"
+﻿page 6014408 "NPR Aux. Item Ledger Entries"
 {
+    Extensible = False;
     Caption = 'Item Ledger Entries';
     PageType = List;
     UsageCategory = None;

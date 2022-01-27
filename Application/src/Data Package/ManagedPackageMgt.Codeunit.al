@@ -1,5 +1,6 @@
-codeunit 6014628 "NPR Managed Package Mgt."
+﻿codeunit 6014628 "NPR Managed Package Mgt."
 {
+    Access = Internal;
     // This codeunit allows for import of data packages either manually from a manifest file/blob or straight from ground control.
     // 
     // If you wish to add custom import logic to your specific package, subscribe to event:

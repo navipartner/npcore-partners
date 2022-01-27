@@ -1,5 +1,6 @@
-page 6060147 "NPR RC Members. Burndown Setup"
+﻿page 6060147 "NPR RC Members. Burndown Setup"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Membership Burndown Setup';
     SourceTable = "NPR RC Members. Burndown Setup";

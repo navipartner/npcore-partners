@@ -1,5 +1,6 @@
-page 6151435 "NPR Magento Attr. Set Values"
+﻿page 6151435 "NPR Magento Attr. Set Values"
 {
+    Extensible = False;
     Caption = 'Attribute Set Values';
     DelayedInsert = true;
     PageType = ListPart;

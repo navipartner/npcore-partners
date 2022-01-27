@@ -1,5 +1,6 @@
-page 6014683 "NPR POS Unit List Step"
+﻿page 6014683 "NPR POS Unit List Step"
 {
+    Extensible = False;
     Caption = 'POS Units';
     PageType = ListPart;
     SourceTable = "NPR POS Unit";

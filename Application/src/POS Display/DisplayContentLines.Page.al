@@ -1,5 +1,6 @@
-page 6059952 "NPR Display Content Lines"
+﻿page 6059952 "NPR Display Content Lines"
 {
+    Extensible = False;
     Caption = 'Display Content Lines';
     LinksAllowed = false;
     PageType = List;

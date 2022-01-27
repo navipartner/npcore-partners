@@ -1,5 +1,6 @@
-codeunit 6014541 "NPR RP BixolonDisp Device Lib."
+﻿codeunit 6014541 "NPR RP BixolonDisp Device Lib."
 {
+    Access = Internal;
     // Bixolon Disp. Command Library Library.
     //  Work started by Nicolai Esbensen.
     //  Contributions providing function interfaces for valid

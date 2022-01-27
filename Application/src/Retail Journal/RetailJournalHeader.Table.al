@@ -1,5 +1,6 @@
-table 6014451 "NPR Retail Journal Header"
+﻿table 6014451 "NPR Retail Journal Header"
 {
+    Access = Internal;
     Caption = 'Label Printing Header';
     LookupPageID = "NPR Retail Journal List";
     DataClassification = CustomerContent;

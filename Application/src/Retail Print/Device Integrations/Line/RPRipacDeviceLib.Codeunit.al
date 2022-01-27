@@ -1,5 +1,6 @@
-codeunit 6014559 "NPR RP Ripac Device Lib."
+﻿codeunit 6014559 "NPR RP Ripac Device Lib."
 {
+    Access = Internal;
     // This library is almost identical to Epsons as the printer also uses ESC/POS.
     // Differences are in characters per line, alignment and encoding.
 

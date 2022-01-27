@@ -1,5 +1,6 @@
-page 6014688 "NPR POS Posting Setup Step"
+﻿page 6014688 "NPR POS Posting Setup Step"
 {
+    Extensible = False;
     Caption = 'POS Posting Setup';
     PageType = ListPart;
     SourceTable = "NPR POS Posting Setup";

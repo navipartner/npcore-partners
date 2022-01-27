@@ -1,5 +1,6 @@
-table 6014566 "NPR RP Template Media Info"
+﻿table 6014566 "NPR RP Template Media Info"
 {
+    Access = Internal;
     // Keep media information seperate from templates so they are not backed up in archived versions and to prevent the BLOB from impacting print SQL performance.
 
     Caption = 'Template Media Info';

@@ -1,5 +1,6 @@
-codeunit 6014417 "NPR POS Doc. Export Try Pay"
+﻿codeunit 6014417 "NPR POS Doc. Export Try Pay"
 {
+    Access = Internal;
     var
         HandleType: Option Undefined,Prepayment,Post;
         FullPosting: Boolean;

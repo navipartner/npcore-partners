@@ -1,5 +1,6 @@
-page 6150707 "NPR POS Named Actions Profile"
+﻿page 6150707 "NPR POS Named Actions Profile"
 {
+    Extensible = False;
     Caption = 'POS Named Actions Profile';
     PageType = Card;
     SourceTable = "NPR POS Setup";

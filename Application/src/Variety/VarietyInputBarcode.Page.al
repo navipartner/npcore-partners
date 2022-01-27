@@ -1,5 +1,6 @@
-page 6014584 "NPR Variety Input Barcode"
+﻿page 6014584 "NPR Variety Input Barcode"
 {
+    Extensible = False;
     Caption = 'Input Barcode';
     PageType = StandardDialog;
     UsageCategory = None;

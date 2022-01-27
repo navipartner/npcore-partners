@@ -1,5 +1,6 @@
-table 6151368 "NPR CS Rfid Header"
+﻿table 6151368 "NPR CS Rfid Header"
 {
+    Access = Internal;
 
     Caption = 'CS Rfid Data By Document';
     DataClassification = CustomerContent;

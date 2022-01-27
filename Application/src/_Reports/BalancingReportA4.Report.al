@@ -1,5 +1,8 @@
-report 6014460 "NPR Balancing Report A4"
+﻿report 6014460 "NPR Balancing Report A4"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - NEW.rdlc';
     UsageCategory = ReportsAndAnalysis;

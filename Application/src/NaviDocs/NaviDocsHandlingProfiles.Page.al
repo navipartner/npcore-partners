@@ -1,5 +1,6 @@
-page 6059768 "NPR NaviDocs Handling Profiles"
+﻿page 6059768 "NPR NaviDocs Handling Profiles"
 {
+    Extensible = False;
     Caption = 'NaviDocs Posting List';
     PageType = List;
     SourceTable = "NPR NaviDocs Handling Profile";

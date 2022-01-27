@@ -1,5 +1,6 @@
-codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
+﻿codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
 {
+    Access = Internal;
     var
         ConnectionSuccessMsg: Label 'The connection test was successful. The settings are valid.';
         GeneratePreviewTxt: Label 'Generate Preview';

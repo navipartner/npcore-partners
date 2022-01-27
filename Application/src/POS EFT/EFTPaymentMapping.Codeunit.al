@@ -1,5 +1,6 @@
-codeunit 6184510 "NPR EFT Payment Mapping"
+﻿codeunit 6184510 "NPR EFT Payment Mapping"
 {
+    Access = Internal;
 
     procedure FindPaymentType(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var

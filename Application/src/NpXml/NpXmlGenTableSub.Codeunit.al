@@ -1,5 +1,6 @@
-codeunit 6151561 "NPR NpXml Gen. Table Sub."
+﻿codeunit 6151561 "NPR NpXml Gen. Table Sub."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Mgt.", 'OnSetupGenericChildTable', '', true, true)]
     local procedure SetupStockkeepingUnit(NpXmlElement: Record "NPR NpXml Element"; ParentRecRef: RecordRef; var ChildRecRef: RecordRef; var Handled: Boolean)
     var

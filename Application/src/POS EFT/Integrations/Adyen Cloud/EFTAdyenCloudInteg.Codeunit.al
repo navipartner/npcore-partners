@@ -1,5 +1,6 @@
-codeunit 6184517 "NPR EFT Adyen Cloud Integ."
+﻿codeunit 6184517 "NPR EFT Adyen Cloud Integ."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

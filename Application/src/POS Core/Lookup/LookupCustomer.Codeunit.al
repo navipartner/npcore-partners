@@ -1,5 +1,6 @@
-codeunit 6014666 "NPR Lookup: Customer" implements "NPR IPOSLookupType"
+﻿codeunit 6014666 "NPR Lookup: Customer" implements "NPR IPOSLookupType"
 {
+    Access = Internal;
     #region NPR IPOSLookup implementation
     procedure InitializeDataRead(var RecRef: RecordRef);
     var

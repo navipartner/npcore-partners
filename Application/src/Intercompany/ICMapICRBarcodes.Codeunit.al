@@ -1,5 +1,6 @@
-codeunit 6014486 "NPR IC - Map ICR Barcodes"
+﻿codeunit 6014486 "NPR IC - Map ICR Barcodes"
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::ICInboxOutboxMgt, 'OnInsertICOutboxSalesDocTransaction', '', false, false)]
     local procedure OnICOutboxTransactionCreated(var ICOutboxTransaction: Record "IC Outbox Transaction")
     begin

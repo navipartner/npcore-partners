@@ -1,5 +1,6 @@
-page 6151131 "NPR TM Seating Template"
+﻿page 6151131 "NPR TM Seating Template"
 {
+    Extensible = False;
     Caption = 'Seating Template';
     DeleteAllowed = false;
     InsertAllowed = false;

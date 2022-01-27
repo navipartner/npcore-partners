@@ -1,5 +1,6 @@
-codeunit 6151415 "NPR Magento Nc Task Card Mgt."
+﻿codeunit 6151415 "NPR Magento Nc Task Card Mgt."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'RunSourceCardEvent', '', true, true)]
     local procedure RunSourceCardEvent(var RecRef: RecordRef; var RunCardExecuted: Boolean)
     var

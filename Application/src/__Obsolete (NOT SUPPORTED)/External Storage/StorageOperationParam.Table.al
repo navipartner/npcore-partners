@@ -1,5 +1,6 @@
-table 6184893 "NPR Storage Operation Param."
+﻿table 6184893 "NPR Storage Operation Param."
 {
+    Access = Internal;
     Caption = 'Storage Operation Parameters';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

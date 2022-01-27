@@ -1,5 +1,6 @@
-page 6151400 "NPR Magento Gen. Setup Buffer"
+﻿page 6151400 "NPR Magento Gen. Setup Buffer"
 {
+    Extensible = False;
     Caption = 'Generic Setup';
     DataCaptionFields = "Root Element";
     DeleteAllowed = false;

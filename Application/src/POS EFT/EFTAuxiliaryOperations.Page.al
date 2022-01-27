@@ -1,5 +1,6 @@
-page 6184474 "NPR EFT Auxiliary Operations"
+﻿page 6184474 "NPR EFT Auxiliary Operations"
 {
+    Extensible = False;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
 
     Caption = 'EFT Auxiliary Operations';

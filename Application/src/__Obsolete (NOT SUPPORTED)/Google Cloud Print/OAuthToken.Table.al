@@ -1,5 +1,6 @@
-table 6014582 "NPR OAuth Token"
+﻿table 6014582 "NPR OAuth Token"
 {
+    Access = Internal;
 
     Caption = 'OAuth Token';
     DataClassification = CustomerContent;

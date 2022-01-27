@@ -1,5 +1,6 @@
-table 6059825 "NPR Trx Email Log"
+﻿table 6059825 "NPR Trx Email Log"
 {
+    Access = Internal;
     Caption = 'Transactional Email Log';
     DataClassification = CustomerContent;
 

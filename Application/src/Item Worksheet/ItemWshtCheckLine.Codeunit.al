@@ -1,5 +1,6 @@
 ﻿codeunit 6060045 "NPR Item Wsht.-Check Line"
 {
+    Access = Internal;
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";

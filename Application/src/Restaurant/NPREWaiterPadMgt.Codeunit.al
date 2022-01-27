@@ -1,5 +1,6 @@
 ﻿codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
 {
+    Access = Internal;
     var
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         InQuotes: Label '''%1''', Locked = true;

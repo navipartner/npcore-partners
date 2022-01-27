@@ -1,5 +1,6 @@
-codeunit 6151597 "NPR NpDc Module Valid. Item L."
+﻿codeunit 6151597 "NPR NpDc Module Valid. Item L."
 {
+    Access = Internal;
     var
         Text003: Label 'Coupon Items have not been defined on Coupon %1 (%2)';
         Text004: Label 'None of the Coupon Items have been added to the Sale';

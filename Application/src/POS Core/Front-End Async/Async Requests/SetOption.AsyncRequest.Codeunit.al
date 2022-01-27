@@ -1,5 +1,6 @@
-codeunit 6150763 "NPR Front-End: SetOption" implements "NPR Front-End Async Request"
+﻿codeunit 6150763 "NPR Front-End: SetOption" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _option: Text;

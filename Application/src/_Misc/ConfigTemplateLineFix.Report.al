@@ -1,5 +1,8 @@
-report 6014410 "NPR Config. Template Line Fix"
+﻿report 6014410 "NPR Config. Template Line Fix"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     ApplicationArea = All;
     Caption = 'Config. Template Line Fix';
     UsageCategory = Administration;

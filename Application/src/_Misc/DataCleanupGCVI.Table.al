@@ -1,5 +1,6 @@
-table 6060101 "NPR Data Cleanup GCVI"
+﻿table 6060101 "NPR Data Cleanup GCVI"
 {
+    Access = Internal;
     Caption = 'Data Cleanup GCVI';
     DataClassification = CustomerContent;
 

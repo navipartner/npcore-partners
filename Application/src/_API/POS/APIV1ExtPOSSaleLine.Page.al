@@ -1,5 +1,6 @@
-page 6059788 "NPR APIV1 - Ext. POS Sale Line"
+﻿page 6059788 "NPR APIV1 - Ext. POS Sale Line"
 {
+    Extensible = False;
 
     APIGroup = 'pos';
     APIPublisher = 'navipartner';

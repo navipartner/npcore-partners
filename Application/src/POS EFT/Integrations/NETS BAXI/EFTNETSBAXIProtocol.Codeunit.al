@@ -1,5 +1,6 @@
-codeunit 6184541 "NPR EFT NETS BAXI Protocol"
+﻿codeunit 6184541 "NPR EFT NETS BAXI Protocol"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

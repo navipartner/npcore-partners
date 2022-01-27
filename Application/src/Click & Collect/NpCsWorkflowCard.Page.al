@@ -1,5 +1,6 @@
-page 6151198 "NPR NpCs Workflow Card"
+﻿page 6151198 "NPR NpCs Workflow Card"
 {
+    Extensible = False;
     Caption = 'Collect Workflow Card';
     PageType = Card;
     UsageCategory = None;

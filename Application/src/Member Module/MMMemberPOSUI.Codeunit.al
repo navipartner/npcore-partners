@@ -1,5 +1,6 @@
-codeunit 6060135 "NPR MM Member POS UI"
+﻿codeunit 6060135 "NPR MM Member POS UI"
 {
+    Access = Internal;
     procedure MemberSearchWithFacialRecognition(var MemberEntryNo: Integer) MemberFound: Boolean
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";

@@ -1,5 +1,6 @@
-table 6060082 "NPR MCS Rec. Bus. Rule"
+﻿table 6060082 "NPR MCS Rec. Bus. Rule"
 {
+    Access = Internal;
     ObsoleteState = Pending;
     ObsoleteReason = 'On February 15, 2018, “Recommendations API is no longer under active development”';
     Caption = 'MCS Rec. Business Rule';

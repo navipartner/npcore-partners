@@ -1,5 +1,6 @@
-codeunit 6150779 "NPR POS Action: PepperTerminal"
+﻿codeunit 6150779 "NPR POS Action: PepperTerminal"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This command sends different commands to the Pin Pad. Specify command using the Parameters.';
         EFTIntegration: Codeunit "NPR EFT Framework Mgt.";
