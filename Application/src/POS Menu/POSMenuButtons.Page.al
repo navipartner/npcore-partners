@@ -104,22 +104,6 @@
                     ToolTip = 'Specifies what the custom class attribute is';
                     ApplicationArea = NPRRetail;
                 }
-                field(Bold; Rec.Bold)
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Field Is not needed anymore. Case 498936';
-                    Visible = false;
-                    ToolTip = 'Specifies whether or not the caption should be in bold lettering';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Font Size"; Rec."Font Size")
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Field Is not needed anymore. Case 498936';
-                    Visible = false;
-                    ToolTip = 'Specifies the font size';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Position X"; Rec."Position X")
                 {
 

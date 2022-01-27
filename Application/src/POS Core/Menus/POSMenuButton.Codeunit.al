@@ -10,8 +10,6 @@
         _color: Text;
         _iconClass: Text;
         _class: Text;
-        _bold: Boolean;
-        _fontSize: Enum "NPR Button Font Size";
         _row: Integer;
         _column: Integer;
         _enabledState: Enum "NPR Button Enabled State";
@@ -87,30 +85,6 @@
     procedure SetClass(NewClass: Text);
     begin
         _class := NewClass;
-    end;
-
-    [Obsolete('Procedure is not needed anymore. Case 498936')]
-    procedure Bold(): Boolean;
-    begin
-        exit(_bold);
-    end;
-
-    [Obsolete('Procedure is not needed anymore. Case 498936')]
-    procedure SetBold(NewBold: Boolean);
-    begin
-        _bold := NewBold;
-    end;
-
-    [Obsolete('Procedure is not needed anymore. Case 498936')]
-    procedure FontSize(): Enum "NPR Button Font Size";
-    begin
-        exit(_fontSize);
-    end;
-
-    [Obsolete('Procedure is not needed anymore. Case 498936')]
-    procedure SetFontSize(NewFontSize: Enum "NPR Button Font Size");
-    begin
-        _fontSize := NewFontSize;
     end;
 
     procedure Row(): Integer;
