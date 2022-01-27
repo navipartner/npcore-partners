@@ -141,14 +141,14 @@
         }
         field(25; Bold; Boolean)
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Field Is not needed anymore. Case 498936';
             Caption = 'Bold';
             DataClassification = CustomerContent;
         }
-        field(26; "Font Size"; Enum "NPR Button Font Size")
+        field(26; "Font Size"; Integer)
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Field Is not needed anymore. Case 498936';
             Caption = 'Font Size';
             DataClassification = CustomerContent;
