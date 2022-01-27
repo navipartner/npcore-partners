@@ -1,5 +1,6 @@
-codeunit 6014422 "NPR NP Retail Setup Upgrade"
+﻿codeunit 6014422 "NPR NP Retail Setup Upgrade"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

@@ -1,5 +1,6 @@
-page 6059840 "NPR EFT Recon. Bank Amounts"
+﻿page 6059840 "NPR EFT Recon. Bank Amounts"
 {
+    Extensible = False;
     Caption = 'EFT Recon. Bank Amounts';
     PageType = ListPart;
     SourceTable = "NPR EFT Recon. Bank Amount";

@@ -1,5 +1,6 @@
-page 6014666 "NPR GraphAPI Setup"
+﻿page 6014666 "NPR GraphAPI Setup"
 {
+    Extensible = False;
 
     Caption = 'GraphAPI Setup';
     PageType = Card;

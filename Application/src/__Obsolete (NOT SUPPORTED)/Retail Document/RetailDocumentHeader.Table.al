@@ -1,5 +1,6 @@
-table 6014425 "NPR Retail Document Header"
+﻿table 6014425 "NPR Retail Document Header"
 {
+    Access = Internal;
     Caption = 'Retail Document Header';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

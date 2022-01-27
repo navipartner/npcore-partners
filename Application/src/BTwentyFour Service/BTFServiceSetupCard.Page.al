@@ -1,5 +1,6 @@
-page 6059922 "NPR BTF Service Setup Card"
+﻿page 6059922 "NPR BTF Service Setup Card"
 {
+    Extensible = False;
     UsageCategory = None;
     PageType = Card;
     SourceTable = "NPR BTF Service Setup";

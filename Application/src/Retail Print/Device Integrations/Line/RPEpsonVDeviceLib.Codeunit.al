@@ -1,5 +1,6 @@
-codeunit 6014543 "NPR RP Epson V Device Lib."
+﻿codeunit 6014543 "NPR RP Epson V Device Lib."
 {
+    Access = Internal;
     // Epson V Command Library.
     //  Work started by Nicolai Esbensen.
     //  Contributions providing function interfaces for valid

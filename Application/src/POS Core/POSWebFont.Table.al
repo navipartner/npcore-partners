@@ -1,5 +1,6 @@
-table 6014621 "NPR POS Web Font"
+﻿table 6014621 "NPR POS Web Font"
 {
+    Access = Internal;
     Caption = 'POS Web Font';
     DataCaptionFields = "Code", Name;
     DataPerCompany = false;

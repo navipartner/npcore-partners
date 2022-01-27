@@ -1,5 +1,6 @@
-codeunit 6150667 "NPR NPRE POSAction: Get Wa."
+﻿codeunit 6150667 "NPR NPRE POSAction: Get Wa."
 {
+    Access = Internal;
     var
         Text000: Label 'Transfer Waiter Pad to POS Sale';
         ConfirmTableCaption: Label 'Are you sure you want to retrieve from %1?';

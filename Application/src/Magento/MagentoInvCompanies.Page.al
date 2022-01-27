@@ -1,5 +1,6 @@
-page 6151402 "NPR Magento Inv. Companies"
+﻿page 6151402 "NPR Magento Inv. Companies"
 {
+    Extensible = False;
     Caption = 'Inventory Companies';
     DelayedInsert = true;
     PageType = ListPart;

@@ -1,5 +1,6 @@
-page 6184490 "NPR Pepper Config. Card"
+﻿page 6184490 "NPR Pepper Config. Card"
 {
+    Extensible = False;
     // NPR5.22\BR\20160316  CASE 231481 Object Created
     // NPR5.22\BR\20160412  CASE 231481 Added Export Buttons
     // NPR5.22\BR\20160412  CASE 231481 Added fields "End of Day on Close", "Unload Library on Close", "End of Day Receipt Mandatory"

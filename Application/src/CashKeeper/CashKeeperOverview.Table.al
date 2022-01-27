@@ -1,5 +1,6 @@
-table 6059947 "NPR CashKeeper Overview"
+﻿table 6059947 "NPR CashKeeper Overview"
 {
+    Access = Internal;
     Caption = 'CashKeeper Overview';
     DataClassification = CustomerContent;
 

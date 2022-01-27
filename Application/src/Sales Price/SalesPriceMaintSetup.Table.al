@@ -1,5 +1,6 @@
-table 6059781 "NPR Sales Price Maint. Setup"
+﻿table 6059781 "NPR Sales Price Maint. Setup"
 {
+    Access = Internal;
     Caption = 'Sales Price Maintenance Setup';
     DrillDownPageID = "NPR Sales Price Maint. Setup";
     LookupPageID = "NPR Sales Price Maint. Setup";

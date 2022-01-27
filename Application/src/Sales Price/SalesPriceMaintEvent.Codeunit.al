@@ -1,5 +1,6 @@
-codeunit 6014481 "NPR Sales Price Maint. Event"
+﻿codeunit 6014481 "NPR Sales Price Maint. Event"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         EventTest();

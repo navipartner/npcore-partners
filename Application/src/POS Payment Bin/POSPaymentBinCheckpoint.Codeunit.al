@@ -1,5 +1,6 @@
-codeunit 6150628 "NPR POS Payment Bin Checkpoint"
+﻿codeunit 6150628 "NPR POS Payment Bin Checkpoint"
 {
+    Access = Internal;
     var
         UNCONFIRMED_CP: Label 'Not Counted.';
         ACCOUNT_DIFFERENCE: Label 'WARNING!\\As a result of the close workshift, there needs to be a transfer of %1 to the amount of %5 from bin %2 to bin %3. These bins are configured with different G/L Accounts, and the posting needs to be handled.\\You can either:\\A) configure the bins to use the same account\\B) perform a BIN TRANSFER prior to close workshift on unit %4\\C) manually post the difference in a journal.\\If you continue, you will have to manually post the difference in a journal. Do you want to continue?';

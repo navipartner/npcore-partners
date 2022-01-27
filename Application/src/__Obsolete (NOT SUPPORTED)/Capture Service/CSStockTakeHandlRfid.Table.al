@@ -1,5 +1,6 @@
-table 6151390 "NPR CS Stock-Take Handl. Rfid"
+﻿table 6151390 "NPR CS Stock-Take Handl. Rfid"
 {
+    Access = Internal;
 
     Caption = 'CS Stock-Take Handling Rfid';
     DataClassification = CustomerContent;

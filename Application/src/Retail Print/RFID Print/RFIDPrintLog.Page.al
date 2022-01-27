@@ -1,5 +1,6 @@
-page 6014550 "NPR RFID Print Log"
+﻿page 6014550 "NPR RFID Print Log"
 {
+    Extensible = False;
     // NPR5.55/MMV /20200713 CASE 407265 Created object
 
     Caption = 'RFID Print Log';

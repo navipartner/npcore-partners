@@ -1,5 +1,6 @@
-codeunit 6184518 "NPR EFT Adyen Cloud Prot."
+﻿codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 {
+    Access = Internal;
     // NPR5.48/MMV /20190124 CASE 341237 Created object
     // 
     // https://docs.adyen.com/developers/point-of-sale/build-your-integration/terminal-api-integration-overview

@@ -1,5 +1,8 @@
-report 6060151 "NPR Event Team Template"
+﻿report 6060151 "NPR Event Team Template"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Team Template.rdlc';
     UsageCategory = ReportsAndAnalysis;

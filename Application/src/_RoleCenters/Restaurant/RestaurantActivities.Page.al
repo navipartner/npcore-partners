@@ -1,5 +1,6 @@
-page 6151335 "NPR Restaurant Activities"
+﻿page 6151335 "NPR Restaurant Activities"
 {
+    Extensible = False;
     Caption = 'Activities';
     PageType = CardPart;
     RefreshOnActivate = true;

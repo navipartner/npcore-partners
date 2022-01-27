@@ -1,5 +1,6 @@
-page 6060118 "NPR TM Ticket Schedules"
+﻿page 6060118 "NPR TM Ticket Schedules"
 {
+    Extensible = False;
     Caption = 'Ticket Schedules';
     PageType = List;
     SourceTable = "NPR TM Admis. Schedule";

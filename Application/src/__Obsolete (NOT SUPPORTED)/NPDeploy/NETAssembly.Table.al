@@ -1,5 +1,6 @@
-table 6014623 "NPR .NET Assembly"
+﻿table 6014623 "NPR .NET Assembly"
 {
+    Access = Internal;
     Caption = '.NET Assembly';
     DataPerCompany = false;
     ObsoleteState = Removed;

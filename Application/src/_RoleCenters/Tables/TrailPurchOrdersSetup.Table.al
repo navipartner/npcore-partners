@@ -1,5 +1,6 @@
-table 6151249 "NPR Trail. Purch. Orders Setup"
+﻿table 6151249 "NPR Trail. Purch. Orders Setup"
 {
+    Access = Internal;
     Caption = 'Trailing Purchase Orders Setup';
     DataClassification = CustomerContent;
 

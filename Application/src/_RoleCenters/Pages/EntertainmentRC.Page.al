@@ -1,5 +1,6 @@
-page 6151249 "NPR Entertainment RC"
+﻿page 6151249 "NPR Entertainment RC"
 {
+    Extensible = False;
     Caption = 'Entertainment RC', Comment = '{Dependency=Match,"ProfileDescription_PRESIDENT-SMALLBUSINESS"}';
     PageType = RoleCenter;
     UsageCategory = None;

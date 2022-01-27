@@ -1,5 +1,6 @@
-table 6014580 "NPR Object Output Selection"
+﻿table 6014580 "NPR Object Output Selection"
 {
+    Access = Internal;
     Caption = 'Object Output Selection';
     DataClassification = CustomerContent;
 

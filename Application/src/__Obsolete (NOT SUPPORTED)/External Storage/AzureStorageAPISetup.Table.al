@@ -1,5 +1,6 @@
-table 6184860 "NPR Azure Storage API Setup"
+﻿table 6184860 "NPR Azure Storage API Setup"
 {
+    Access = Internal;
     Caption = 'Azure Storage API Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

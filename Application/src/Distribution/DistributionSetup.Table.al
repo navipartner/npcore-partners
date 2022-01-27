@@ -1,5 +1,6 @@
-table 6151059 "NPR Distribution Setup"
+﻿table 6151059 "NPR Distribution Setup"
 {
+    Access = Internal;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
 
     Caption = 'Distribution Setup';

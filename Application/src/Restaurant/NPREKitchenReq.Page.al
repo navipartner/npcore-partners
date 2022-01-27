@@ -1,5 +1,6 @@
-page 6150689 "NPR NPRE Kitchen Req."
+﻿page 6150689 "NPR NPRE Kitchen Req."
 {
+    Extensible = False;
     Caption = 'Kitchen Request List';
     DataCaptionExpression = GetPageCaption();
     Editable = false;

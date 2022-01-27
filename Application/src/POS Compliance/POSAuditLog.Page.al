@@ -1,5 +1,6 @@
-page 6150673 "NPR POS Audit Log"
+﻿page 6150673 "NPR POS Audit Log"
 {
+    Extensible = False;
     Caption = 'POS Audit Log';
     DeleteAllowed = false;
     Editable = false;

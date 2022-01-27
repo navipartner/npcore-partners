@@ -1,6 +1,9 @@
-#if not BC17
+﻿#if not BC17
 report 6060123 "NPR MM Member Card Std Print"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Std PrintV18.rdl';
     PreviewMode = PrintLayout;

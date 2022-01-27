@@ -1,5 +1,8 @@
-report 6014421 "NPR POS Menu Buttons/Actions"
+﻿report 6014421 "NPR POS Menu Buttons/Actions"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/POS Menu ButtonsActions.rdlc';
     Caption = 'NPR POS Menu Buttons/Actions';

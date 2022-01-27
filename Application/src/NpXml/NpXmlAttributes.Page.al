@@ -1,5 +1,6 @@
-page 6151555 "NPR NpXml Attributes"
+﻿page 6151555 "NPR NpXml Attributes"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Xml Attributes';
     DelayedInsert = true;

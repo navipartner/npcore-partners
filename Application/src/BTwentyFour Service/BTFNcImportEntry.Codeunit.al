@@ -1,5 +1,6 @@
-codeunit 6014649 "NPR BTF Nc Import Entry"
+﻿codeunit 6014649 "NPR BTF Nc Import Entry"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

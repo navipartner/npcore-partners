@@ -1,5 +1,6 @@
-page 6151408 "NPR Magento Store Subform"
+﻿page 6151408 "NPR Magento Store Subform"
 {
+    Extensible = False;
     Caption = 'Magento Store Subform';
     InsertAllowed = false;
     PageType = ListPart;

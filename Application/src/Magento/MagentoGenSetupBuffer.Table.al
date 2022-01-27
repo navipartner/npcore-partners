@@ -1,5 +1,6 @@
-table 6151400 "NPR Magento Gen. Setup Buffer"
+﻿table 6151400 "NPR Magento Gen. Setup Buffer"
 {
+    Access = Internal;
 
     Caption = 'Magento Generic Setup Buffer';
     DataClassification = CustomerContent;

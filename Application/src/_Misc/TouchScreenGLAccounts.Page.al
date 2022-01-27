@@ -1,5 +1,6 @@
-page 6014527 "NPR TouchScreen: G/L Accounts"
+﻿page 6014527 "NPR TouchScreen: G/L Accounts"
 {
+    Extensible = False;
     Caption = 'Touch Screen - Lookup G/L Account';
     Editable = false;
     PageType = List;

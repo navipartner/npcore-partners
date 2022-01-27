@@ -1,5 +1,6 @@
-table 6151220 "NPR PrintNode Setup"
+﻿table 6151220 "NPR PrintNode Setup"
 {
+    Access = Internal;
     // NPR5.53/THRO/20200106 CASE 383562 Object Created
 
     Caption = 'PrintNode Setup';

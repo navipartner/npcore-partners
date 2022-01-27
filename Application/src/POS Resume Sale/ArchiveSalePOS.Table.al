@@ -1,5 +1,6 @@
-table 6014418 "NPR Archive Sale POS"
+﻿table 6014418 "NPR Archive Sale POS"
 {
+    Access = Internal;
     // The purpose of this table:
     //   All existing unfinished sale transactions have been moved here for possible future reference (6014418 - header, 6014419 - lines).
     //   The table may be deleted later, when it is no longer relevant.

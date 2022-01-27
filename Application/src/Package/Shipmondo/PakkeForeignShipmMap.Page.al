@@ -1,5 +1,6 @@
-page 6014416 "NPR Pakke Foreign Shipm. Map."
+﻿page 6014416 "NPR Pakke Foreign Shipm. Map."
 {
+    Extensible = False;
 
     Caption = 'Pakke Foreign Shipment Mapping';
     PageType = List;

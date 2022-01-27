@@ -1,5 +1,6 @@
-table 6184500 "NPR CleanCash Setup"
+﻿table 6184500 "NPR CleanCash Setup"
 {
+    Access = Internal;
 
     Caption = 'CleanCash Setup';
     DataClassification = CustomerContent;

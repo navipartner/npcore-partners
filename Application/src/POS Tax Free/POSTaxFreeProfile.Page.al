@@ -1,5 +1,6 @@
-page 6059966 "NPR POS Tax Free Profile"
+﻿page 6059966 "NPR POS Tax Free Profile"
 {
+    Extensible = False;
     Caption = 'POS Tax Free Profile';
     PageType = Card;
     UsageCategory = None;

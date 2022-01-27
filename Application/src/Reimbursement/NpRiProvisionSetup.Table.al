@@ -1,5 +1,6 @@
-table 6151106 "NPR NpRi Provision Setup"
+﻿table 6151106 "NPR NpRi Provision Setup"
 {
+    Access = Internal;
     Caption = 'Provision Reimbursement Setup';
     DataClassification = CustomerContent;
     fields

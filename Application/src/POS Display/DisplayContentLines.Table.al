@@ -1,5 +1,6 @@
-table 6059952 "NPR Display Content Lines"
+﻿table 6059952 "NPR Display Content Lines"
 {
+    Access = Internal;
     Caption = 'Display Content Lines';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Display Content Lines";

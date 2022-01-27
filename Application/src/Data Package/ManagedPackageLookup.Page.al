@@ -1,5 +1,6 @@
-page 6014598 "NPR Managed Package Lookup"
+﻿page 6014598 "NPR Managed Package Lookup"
 {
+    Extensible = False;
     // NPR5.48/JDH /20181109 CASE 334163 Added Object Caption
 
     Caption = 'Managed Package Lookup';

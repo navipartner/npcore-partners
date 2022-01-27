@@ -1,5 +1,6 @@
-table 6014431 "NPR Record Field Setup"
+﻿table 6014431 "NPR Record Field Setup"
 {
+    Access = Internal;
     Caption = 'Record Field Setup';
     DataClassification = CustomerContent;
 

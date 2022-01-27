@@ -1,5 +1,6 @@
 ﻿codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
 {
+    Access = Internal;
 
     Permissions = TableData "Vendor Ledger Entry" = rm;
 

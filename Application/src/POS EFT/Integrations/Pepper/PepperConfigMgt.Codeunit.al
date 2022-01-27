@@ -1,5 +1,6 @@
-codeunit 6184490 "NPR Pepper Config. Mgt."
+﻿codeunit 6184490 "NPR Pepper Config. Mgt."
 {
+    Access = Internal;
     procedure GetConfigurationText(PepperConfiguration: Record "NPR Pepper Config."; TextType: Option License,Configuration,AdditionalParameters): Text
     var
         PepperVersion: Record "NPR Pepper Version";

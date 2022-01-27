@@ -1,5 +1,6 @@
-codeunit 6184516 "NPR EFT Flexiiterm Prot."
+﻿codeunit 6184516 "NPR EFT Flexiiterm Prot."
 {
+    Access = Internal;
     SingleInstance = true;
 
     trigger OnRun()

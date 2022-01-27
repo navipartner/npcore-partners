@@ -1,5 +1,6 @@
-page 6059964 "NPR MPOS QR Code List"
+﻿page 6059964 "NPR MPOS QR Code List"
 {
+    Extensible = False;
     Caption = 'MPOS QR Code List';
     PageType = List;
     UsageCategory = Administration;

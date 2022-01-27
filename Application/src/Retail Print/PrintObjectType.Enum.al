@@ -1,5 +1,8 @@
-enum 6014481 "NPR Print Object Type"
+﻿enum 6014481 "NPR Print Object Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     value(0; No_Print)
     {
         Caption = 'No Print';

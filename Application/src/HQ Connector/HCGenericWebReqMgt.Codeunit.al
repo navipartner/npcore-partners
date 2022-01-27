@@ -1,5 +1,6 @@
-codeunit 6150911 "NPR HC Generic Web Req. Mgt."
+﻿codeunit 6150911 "NPR HC Generic Web Req. Mgt."
 {
+    Access = Internal;
     var
         ResponseStringTooLong: Label 'Response string too long.';
 

@@ -1,5 +1,6 @@
-table 6151381 "NPR CS Transf. Order Handl."
+﻿table 6151381 "NPR CS Transf. Order Handl."
 {
+    Access = Internal;
 
     Caption = 'CS Transfer Order Handling';
     DataClassification = CustomerContent;

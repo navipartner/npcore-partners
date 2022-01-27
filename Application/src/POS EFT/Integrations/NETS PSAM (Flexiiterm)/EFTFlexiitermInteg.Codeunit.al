@@ -1,5 +1,6 @@
-codeunit 6184515 "NPR EFT Flexiiterm Integ."
+﻿codeunit 6184515 "NPR EFT Flexiiterm Integ."
 {
+    Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.48/MMV /20190125 CASE 341237 Renamed desc
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object

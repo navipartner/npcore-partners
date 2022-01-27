@@ -1,5 +1,8 @@
-report 6014618 "NPR Skip Sales Shipment Print"
+﻿report 6014618 "NPR Skip Sales Shipment Print"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Skip Sales Shipment Print';
     ProcessingOnly = true;
     UsageCategory = None;

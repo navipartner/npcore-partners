@@ -1,5 +1,6 @@
-codeunit 6060057 "NPR Item Works. Purch. Integr."
+﻿codeunit 6060057 "NPR Item Works. Purch. Integr."
 {
+    Access = Internal;
     var
         RegisteredButNotFoundErr: Label 'And Item Worksheet Line was registered but not found in Registered Item Lines.';
         OneLineFoundQst: Label 'One Item Worksheet Line found. Would you like to created the item with description %1?', Comment = '%1 = Description';

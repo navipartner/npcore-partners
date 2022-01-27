@@ -1,5 +1,6 @@
-page 6150708 "NPR POS Data Sources"
+﻿page 6150708 "NPR POS Data Sources"
 {
+    Extensible = False;
     Caption = 'POS Data Sources';
     Editable = false;
     PageType = List;

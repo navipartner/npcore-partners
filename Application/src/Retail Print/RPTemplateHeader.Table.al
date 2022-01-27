@@ -1,5 +1,6 @@
-table 6014446 "NPR RP Template Header"
+﻿table 6014446 "NPR RP Template Header"
 {
+    Access = Internal;
     Caption = 'RP Template Header';
     DrillDownPageID = "NPR RP Template List";
     LookupPageID = "NPR RP Template List";

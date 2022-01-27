@@ -1,5 +1,6 @@
 ﻿codeunit 6150664 "NPR NPRE Restaurant Print"
 {
+    Access = Internal;
     var
         PrintKitchOderConfMsg: Label 'Do you want to send the order to the kitchen now?';
         NoMoreMealGroupsLbl: Label 'No more meal groups left to be sent to the kitchen.';

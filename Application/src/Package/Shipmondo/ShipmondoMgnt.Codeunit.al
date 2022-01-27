@@ -1,5 +1,6 @@
-codeunit 6014578 "NPR Shipmondo Mgnt."
+﻿codeunit 6014578 "NPR Shipmondo Mgnt."
 {
+    Access = Internal;
     var
         PackageProviderSetup: Record "NPR Shipping Provider Setup";
         ApiUser: Text;

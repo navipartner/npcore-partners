@@ -1,5 +1,6 @@
-table 6151105 "NPR NpRi Party"
+﻿table 6151105 "NPR NpRi Party"
 {
+    Access = Internal;
 
     Caption = 'Reimbursement Party';
     DataClassification = CustomerContent;

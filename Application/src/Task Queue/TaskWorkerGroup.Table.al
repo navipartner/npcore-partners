@@ -1,5 +1,6 @@
-table 6059906 "NPR Task Worker Group"
+﻿table 6059906 "NPR Task Worker Group"
 {
+    Access = Internal;
     // TQ1.18/MH/20141110  CASE 198170 Renamed field 50 from "Max. Cuncurrent Threads" to Max. Concurrent Threads.
     //                                 Data Per Company set to NO - Group is now common to all companies
     // TQ1.21/JDH/20141212 CASE 198170 Keep Alive time set to 10 min default

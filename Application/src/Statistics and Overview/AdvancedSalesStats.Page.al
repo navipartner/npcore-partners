@@ -1,5 +1,6 @@
-page 6014585 "NPR Advanced Sales Stats"
+﻿page 6014585 "NPR Advanced Sales Stats"
 {
+    Extensible = False;
     Caption = 'Advanced Sales Statistics Page';
     DeleteAllowed = false;
     InsertAllowed = false;

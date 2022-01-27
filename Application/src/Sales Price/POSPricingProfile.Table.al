@@ -1,5 +1,6 @@
-table 6150656 "NPR POS Pricing Profile"
+﻿table 6150656 "NPR POS Pricing Profile"
 {
+    Access = Internal;
     Caption = 'POS Pricing Profile';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Pricing Profiles";

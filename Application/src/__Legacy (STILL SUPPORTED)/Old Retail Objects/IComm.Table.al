@@ -1,5 +1,6 @@
-table 6014510 "NPR I-Comm"
+﻿table 6014510 "NPR I-Comm"
 {
+    Access = Internal;
     Caption = 'I-Comm';
     DataClassification = CustomerContent;
 

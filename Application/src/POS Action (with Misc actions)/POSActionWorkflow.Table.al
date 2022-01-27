@@ -1,5 +1,6 @@
-table 6150706 "NPR POS Action Workflow"
+﻿table 6150706 "NPR POS Action Workflow"
 {
+    Access = Internal;
     Caption = 'POS Action Workflow';
     DataClassification = CustomerContent;
 

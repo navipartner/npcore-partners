@@ -1,5 +1,6 @@
-page 6059800 "NPR Salespers/PurchSelect"
+﻿page 6059800 "NPR Salespers/PurchSelect"
 {
+    Extensible = False;
     Caption = 'Salespeople';
     PageType = List;
     SourceTable = "Salesperson/Purchaser";

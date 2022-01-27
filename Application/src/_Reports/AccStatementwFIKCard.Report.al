@@ -1,5 +1,8 @@
-report 6014545 "NPR Acc. Statement w FIK-Card"
+﻿report 6014545 "NPR Acc. Statement w FIK-Card"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Acc. Statement w FIK-Card.rdlc';
     UsageCategory = ReportsAndAnalysis;

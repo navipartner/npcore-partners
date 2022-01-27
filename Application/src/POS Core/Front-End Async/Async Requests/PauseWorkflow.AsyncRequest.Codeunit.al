@@ -1,5 +1,6 @@
-codeunit 6150774 "NPR Front-End: PauseWorkflow" implements "NPR Front-End Async Request"
+﻿codeunit 6150774 "NPR Front-End: PauseWorkflow" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _workflowId: Integer;

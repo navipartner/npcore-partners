@@ -1,5 +1,6 @@
-page 6060074 "NPR MM Membership Print Jnl"
+﻿page 6060074 "NPR MM Membership Print Jnl"
 {
+    Extensible = False;
 
     Caption = 'Membership Offline Print Journal';
     InsertAllowed = false;

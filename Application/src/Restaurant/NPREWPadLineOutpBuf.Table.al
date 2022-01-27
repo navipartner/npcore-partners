@@ -1,5 +1,6 @@
-table 6150672 "NPR NPRE W.Pad.Line Outp.Buf."
+﻿table 6150672 "NPR NPRE W.Pad.Line Outp.Buf."
 {
+    Access = Internal;
     Caption = 'Waiter Pad Line Output Buffer';
     DataClassification = CustomerContent;
 

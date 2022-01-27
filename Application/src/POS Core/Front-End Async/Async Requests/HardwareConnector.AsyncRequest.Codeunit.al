@@ -1,4 +1,4 @@
-/// <summary>
+﻿/// <summary>
 /// Represents a Hardware Connector request. Sending this request to `FrontEnd.InvokeFrontEndAsync` method routes this
 /// request to the Hardware Connector application. Invoking this method doesn't depend on workflows and may be invoked
 /// from within a call stack of both v1 and v2 workflows, as well as outside of any workflow as long as the POS page
@@ -35,6 +35,7 @@
 /// </summary>
 codeunit 6014573 "NPR Front-End: HWC" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _request: JsonObject;

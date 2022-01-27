@@ -1,5 +1,6 @@
-table 6059896 "NPR Data Log Subscriber"
+﻿table 6059896 "NPR Data Log Subscriber"
 {
+    Access = Internal;
     // DL1.00/MH/20140801  NP-AddOn: Data Log
     //   - This Table contains information of Data Log consumers. Update of Subscribers is not mandatory and should be maintained manually.
     // DL1.01/MH/20140820 Added Field 100 "Direct Data Processing" - defines whether the Data Processing Codeunit should be executed on Runtime.

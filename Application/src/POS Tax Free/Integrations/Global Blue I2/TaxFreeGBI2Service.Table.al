@@ -1,5 +1,6 @@
-table 6014653 "NPR Tax Free GB I2 Service"
+﻿table 6014653 "NPR Tax Free GB I2 Service"
 {
+    Access = Internal;
 
     Caption = 'Tax Free GB I2 Service';
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-codeunit 6150891 "NPR Data Store"
+﻿codeunit 6150891 "NPR Data Store"
 {
+    Access = Internal;
     var
         _dataSets: JsonObject;
         _dataSources: JsonArray;

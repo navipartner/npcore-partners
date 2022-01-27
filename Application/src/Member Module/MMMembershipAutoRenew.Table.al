@@ -1,5 +1,6 @@
-table 6060148 "NPR MM Membership Auto Renew"
+﻿table 6060148 "NPR MM Membership Auto Renew"
 {
+    Access = Internal;
 
     Caption = 'Membership Auto Renew';
     DataClassification = CustomerContent;

@@ -1,5 +1,8 @@
-report 6014601 "NPR Update Barcodes"
+﻿report 6014601 "NPR Update Barcodes"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;

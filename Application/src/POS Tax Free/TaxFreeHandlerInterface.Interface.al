@@ -1,5 +1,8 @@
-interface "NPR Tax Free Handler Interface"
+﻿interface "NPR Tax Free Handler Interface"
 {
+    #IF NOT BC17 
+    Access = Internal;      
+    #ENDIF
 
     procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean);
     procedure OnUnitTestConnection(var TaxFreeRequest: Record "NPR Tax Free Request");

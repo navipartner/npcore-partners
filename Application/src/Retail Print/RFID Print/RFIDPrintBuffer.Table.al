@@ -1,5 +1,6 @@
-table 6014542 "NPR RFID Print Buffer"
+﻿table 6014542 "NPR RFID Print Buffer"
 {
+    Access = Internal;
     // NPR5.48/MMV /20181206 CASE 327107 Object created
 
     Caption = 'RFID Print Buffer';

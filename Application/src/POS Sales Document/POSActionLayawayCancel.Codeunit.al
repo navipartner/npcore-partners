@@ -1,5 +1,6 @@
-codeunit 6150870 "NPR POS Action: Layaway Cancel"
+﻿codeunit 6150870 "NPR POS Action: Layaway Cancel"
 {
+    Access = Internal;
 
     var
         ActionDescription: Label 'Cancel a layaway. Fees can be posted and paid prepayment invoices will be refunded.';

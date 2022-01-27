@@ -1,5 +1,6 @@
-query 6150660 "NPR NPRE Kitchen Req. w Source"
+﻿query 6150660 "NPR NPRE Kitchen Req. w Source"
 {
+    Access = Internal;
     Caption = 'NPRE Kitchen Req. w Source';
     elements
     {

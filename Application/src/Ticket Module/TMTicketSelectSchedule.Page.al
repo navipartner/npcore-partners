@@ -1,5 +1,6 @@
-page 6060112 "NPR TM Ticket Select Schedule"
+﻿page 6060112 "NPR TM Ticket Select Schedule"
 {
+    Extensible = False;
     Caption = 'Ticket Select Schedule';
     DataCaptionFields = "Admission Code";
     DeleteAllowed = false;

@@ -1,5 +1,6 @@
-page 6151230 "NPR Nc App. Area Setup"
+﻿page 6151230 "NPR Nc App. Area Setup"
 {
+    Extensible = False;
     Caption = 'NaviConnect Application Area Setup';
     PageType = List;
     SourceTable = "Application Area Setup";

@@ -1,5 +1,6 @@
-page 6151138 "NPR TM Ticket Waiting List"
+﻿page 6151138 "NPR TM Ticket Waiting List"
 {
+    Extensible = False;
     Caption = 'Ticket Waiting List';
     InsertAllowed = false;
     PageType = List;

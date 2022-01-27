@@ -1,5 +1,6 @@
-page 6059769 "NPR NaviDocs Document List"
+﻿page 6059769 "NPR NaviDocs Document List"
 {
+    Extensible = False;
     Caption = 'NaviDocs Document List';
     DeleteAllowed = false;
     InsertAllowed = false;

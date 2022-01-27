@@ -1,5 +1,6 @@
-page 6014518 "NPR Sales Order Pick"
+﻿page 6014518 "NPR Sales Order Pick"
 {
+    Extensible = False;
     Caption = 'Sales Order';
     PageType = Card;
     UsageCategory = Administration;

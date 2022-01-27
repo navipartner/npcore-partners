@@ -1,5 +1,6 @@
-page 6150696 "NPR NPRE Kitchen Order Card"
+﻿page 6150696 "NPR NPRE Kitchen Order Card"
 {
+    Extensible = False;
     Caption = 'Kitchen Order Card';
     DeleteAllowed = false;
     InsertAllowed = false;

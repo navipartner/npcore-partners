@@ -1,5 +1,6 @@
-page 6184497 "NPR Pepper Version Card"
+﻿page 6184497 "NPR Pepper Version Card"
 {
+    Extensible = False;
     Caption = 'Pepper Version Card';
     PageType = Card;
     UsageCategory = Administration;

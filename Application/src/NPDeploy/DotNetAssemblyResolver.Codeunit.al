@@ -1,5 +1,6 @@
-codeunit 6014658 "NPR DotNet Assembly Resolver"
+﻿codeunit 6014658 "NPR DotNet Assembly Resolver"
 {
+    Access = Internal;
     SingleInstance = true;
 
     var

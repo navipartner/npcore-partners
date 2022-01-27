@@ -1,5 +1,6 @@
-table 6151206 "NPR NpCs Store POS Relation"
+﻿table 6151206 "NPR NpCs Store POS Relation"
 {
+    Access = Internal;
     Caption = 'Collect Store POS Relation';
     DataClassification = CustomerContent;
 

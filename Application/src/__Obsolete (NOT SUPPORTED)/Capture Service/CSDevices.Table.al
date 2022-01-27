@@ -1,5 +1,6 @@
-table 6151387 "NPR CS Devices"
+﻿table 6151387 "NPR CS Devices"
 {
+    Access = Internal;
 
     Caption = 'CS Devices';
     DataClassification = CustomerContent;

@@ -1,6 +1,5 @@
-codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
+﻿codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
 {
-
     Access = Public;
 
     var

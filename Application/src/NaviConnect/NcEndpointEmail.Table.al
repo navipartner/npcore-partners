@@ -1,5 +1,6 @@
-table 6151523 "NPR Nc Endpoint E-mail"
+﻿table 6151523 "NPR Nc Endpoint E-mail"
 {
+    Access = Internal;
     Caption = 'Nc Endpoint E-mail';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Endpoint E-mail List";

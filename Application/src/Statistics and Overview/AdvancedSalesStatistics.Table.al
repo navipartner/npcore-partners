@@ -1,5 +1,6 @@
-table 6014585 "NPR Advanced Sales Statistics"
+﻿table 6014585 "NPR Advanced Sales Statistics"
 {
+    Access = Internal;
     Caption = 'Advanced Sales Statistics';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,8 @@
-report 6014450 "NPR Items Received&Not Invoic."
+﻿report 6014450 "NPR Items Received&Not Invoic."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Items Received&Not Invoiced NP.rdlc';
     Caption = 'Items Received & Not Invoiced';

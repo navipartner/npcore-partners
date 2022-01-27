@@ -1,5 +1,8 @@
-interface "NPR CleanCash XCCSP Interface"
+﻿interface "NPR CleanCash XCCSP Interface"
 {
+    #IF NOT BC17 
+    Access = Internal;      
+    #ENDIF
     procedure CreateRequest(PosEntry: Record "NPR POS Entry"; RequestType: Enum "NPR CleanCash Request Type"; var EntryNo: Integer): Boolean
 
     procedure CreateRequest(PosUnitNo: Code[10]; var EntryNo: Integer): Boolean

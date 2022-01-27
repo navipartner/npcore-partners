@@ -1,5 +1,6 @@
-table 6150652 "NPR POS End of Day Profile"
+﻿table 6150652 "NPR POS End of Day Profile"
 {
+    Access = Internal;
     Caption = 'POS End of Day Profile';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS End of Day Profiles";

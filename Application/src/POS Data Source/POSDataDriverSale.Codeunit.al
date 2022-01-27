@@ -1,5 +1,6 @@
-codeunit 6150711 "NPR POS Data Driver - Sale"
+﻿codeunit 6150711 "NPR POS Data Driver - Sale"
 {
+    Access = Internal;
     var
         Caption_CompanyName: Label 'Company Name';
         Caption_RegisterName: Label 'Register Name';

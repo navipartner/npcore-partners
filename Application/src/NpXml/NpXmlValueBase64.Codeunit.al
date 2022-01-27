@@ -1,5 +1,6 @@
-codeunit 6151560 "NPR NpXml Value Base64"
+﻿codeunit 6151560 "NPR NpXml Value Base64"
 {
+    Access = Internal;
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()

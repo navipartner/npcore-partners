@@ -1,5 +1,6 @@
-codeunit 6014467 "NPR Retail Journal Code"
+﻿codeunit 6014467 "NPR Retail Journal Code"
 {
+    Access = Internal;
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
 

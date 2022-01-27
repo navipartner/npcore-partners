@@ -1,5 +1,6 @@
-page 6060091 "NPR MM Admis. Service Entries"
+﻿page 6060091 "NPR MM Admis. Service Entries"
 {
+    Extensible = False;
 
     Caption = 'MM Admission Service Entries';
     Editable = false;

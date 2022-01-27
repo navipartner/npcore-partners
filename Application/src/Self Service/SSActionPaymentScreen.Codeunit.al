@@ -1,5 +1,6 @@
-codeunit 6151284 "NPR SS Action: Payment Screen"
+﻿codeunit 6151284 "NPR SS Action: Payment Screen"
 {
+    Access = Internal;
 
     var
         ActionDescription: Label 'This built in function changes to payment view';

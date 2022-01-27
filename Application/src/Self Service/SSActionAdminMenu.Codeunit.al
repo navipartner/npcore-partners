@@ -1,5 +1,6 @@
-codeunit 6151290 "NPR SS Action: Admin Menu"
+﻿codeunit 6151290 "NPR SS Action: Admin Menu"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built- in action displays the self-service admin menu.';
 

@@ -1,5 +1,6 @@
-page 6150674 "NPR POS Prepaym. Invoices"
+﻿page 6150674 "NPR POS Prepaym. Invoices"
 {
+    Extensible = False;
     // NPR5.50/MMV /20190417 CASE 300557 Created object
 
     Caption = 'POS Prepayment Invoices';

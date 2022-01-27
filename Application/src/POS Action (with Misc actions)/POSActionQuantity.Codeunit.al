@@ -1,5 +1,6 @@
-codeunit 6150808 "NPR POS Action: Quantity"
+﻿codeunit 6150808 "NPR POS Action: Quantity"
 {
+    Access = Internal;
     var
         MustBePositiveErr: Label 'Quantity must be positive.';
         MustBeNegativeErr: Label 'Quantity must be negative.';

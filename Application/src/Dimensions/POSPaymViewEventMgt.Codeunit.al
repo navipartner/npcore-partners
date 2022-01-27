@@ -1,5 +1,6 @@
-codeunit 6151053 "NPR POS Paym. View Event Mgt."
+﻿codeunit 6151053 "NPR POS Paym. View Event Mgt."
 {
+    Access = Internal;
     var
         Text000: Label 'Enter Dimension on POS Sale';
 

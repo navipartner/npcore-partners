@@ -1,5 +1,6 @@
-codeunit 6059905 "NPR Mail Task Status"
+﻿codeunit 6059905 "NPR Mail Task Status"
 {
+    Access = Internal;
     TableNo = "NPR Task Line";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-table 6059916 "NPR Facial Recogn. Setup"
+﻿table 6059916 "NPR Facial Recogn. Setup"
 {
+    Access = Internal;
     ObsoleteState = Pending;
     ObsoleteReason = 'Refractored to old code MCS Face Recognition';
     DataClassification = CustomerContent;

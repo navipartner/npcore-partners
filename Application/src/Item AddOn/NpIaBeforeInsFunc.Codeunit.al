@@ -1,5 +1,6 @@
-codeunit 6151129 "NPR NpIa Before Ins. Func."
+﻿codeunit 6151129 "NPR NpIa Before Ins. Func."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpIa Item AddOn Mgt.", 'BeforeInsertPOSAddOnLine', '', true, true)]
     local procedure UnitPriceFromMaster(SalePOS: Record "NPR POS Sale"; AppliesToLineNo: Integer; var NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line")
     var

@@ -1,5 +1,6 @@
-table 6150664 "NPR NPRE Flow Status"
+﻿table 6150664 "NPR NPRE Flow Status"
 {
+    Access = Internal;
     Caption = 'Status';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Select Flow Status";

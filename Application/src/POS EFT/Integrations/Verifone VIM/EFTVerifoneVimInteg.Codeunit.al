@@ -1,5 +1,6 @@
-codeunit 6184526 "NPR EFT Verifone Vim Integ."
+﻿codeunit 6184526 "NPR EFT Verifone Vim Integ."
 {
+    Access = Internal;
     // NPR5.53/MMV /20191203 CASE 349520 Created object
     // NPR5.54/MMV /20200414 CASE 364340 Added card data for voids
 

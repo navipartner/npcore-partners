@@ -1,5 +1,6 @@
-table 6014450 "NPR Imp. Exp. Media Buffer"
+﻿table 6014450 "NPR Imp. Exp. Media Buffer"
 {
+    Access = Internal;
     Caption = 'Import Export Media Buffer';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

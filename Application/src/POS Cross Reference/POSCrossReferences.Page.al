@@ -1,5 +1,6 @@
-page 6059811 "NPR POS Cross References"
+﻿page 6059811 "NPR POS Cross References"
 {
+    Extensible = False;
     Caption = 'POS Cross References';
     PageType = List;
     SourceTable = "NPR POS Cross Reference";

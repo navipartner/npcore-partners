@@ -1,5 +1,6 @@
-page 6014441 "NPR Nc Show Html"
+﻿page 6014441 "NPR Nc Show Html"
 {
+    Extensible = False;
     PageType = Card;
     UsageCategory = Administration;
     Editable = false;

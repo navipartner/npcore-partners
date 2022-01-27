@@ -1,5 +1,8 @@
-report 6014490 "NPR Advanced Sales Stat."
+﻿report 6014490 "NPR Advanced Sales Stat."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Advanced Sales Statistics.rdlc';
     UsageCategory = ReportsAndAnalysis;

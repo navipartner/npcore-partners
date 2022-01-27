@@ -1,5 +1,6 @@
-table 6184512 "NPR EFT BIN Group Paym. Link"
+﻿table 6184512 "NPR EFT BIN Group Paym. Link"
 {
+    Access = Internal;
     Caption = 'EFT Mapping Group Payment Link';
     DataClassification = CustomerContent;
 

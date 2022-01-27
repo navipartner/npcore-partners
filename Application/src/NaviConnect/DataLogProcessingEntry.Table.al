@@ -1,5 +1,6 @@
-table 6059894 "NPR Data Log Processing Entry"
+﻿table 6059894 "NPR Data Log Processing Entry"
 {
+    Access = Internal;
     DrillDownPageID = "NPR Data Log Process. Entries";
     LookupPageID = "NPR Data Log Process. Entries";
     Caption = 'Data Log Processing Entry';

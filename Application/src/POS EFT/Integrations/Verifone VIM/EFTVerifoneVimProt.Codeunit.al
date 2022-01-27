@@ -1,5 +1,6 @@
-codeunit 6184527 "NPR EFT Verifone Vim Prot."
+﻿codeunit 6184527 "NPR EFT Verifone Vim Prot."
 {
+    Access = Internal;
     // NPR5.53/MMV /20191204 CASE 349520 Added object
     // NPR5.54/MMV /20200414 CASE 364340 Handle lookups correctly for refund and voids
 

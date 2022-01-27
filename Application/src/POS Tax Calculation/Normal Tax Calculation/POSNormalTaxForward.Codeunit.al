@@ -1,5 +1,6 @@
-codeunit 6014639 "NPR POS Normal Tax Forward"
+﻿codeunit 6014639 "NPR POS Normal Tax Forward"
 {
+    Access = Internal;
     procedure UpdateSourceBeforeCalculateTax(var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
     begin
         Rec.Amount := Round(Rec.Amount, Currency."Amount Rounding Precision");

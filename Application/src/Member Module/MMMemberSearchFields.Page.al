@@ -1,5 +1,6 @@
-page 6014524 "NPR MM Member Search Fields"
+﻿page 6014524 "NPR MM Member Search Fields"
 {
+    Extensible = False;
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR MM Member";

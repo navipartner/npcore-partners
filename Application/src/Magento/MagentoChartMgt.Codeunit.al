@@ -1,5 +1,6 @@
-codeunit 6151480 "NPR Magento Chart Mgt."
+﻿codeunit 6151480 "NPR Magento Chart Mgt."
 {
+    Access = Internal;
     var
         MarginLbl: Label 'Margin';
         TurnoverLbl: Label 'Turnover';

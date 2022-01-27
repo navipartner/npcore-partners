@@ -1,5 +1,6 @@
-page 6151432 "NPR Magento Attr. Labels"
+﻿page 6151432 "NPR Magento Attr. Labels"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Attribute Labels';
     DelayedInsert = true;

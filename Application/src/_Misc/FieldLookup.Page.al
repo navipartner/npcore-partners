@@ -1,5 +1,6 @@
-page 6014547 "NPR Field Lookup"
+﻿page 6014547 "NPR Field Lookup"
 {
+    Extensible = False;
     Caption = 'Field Lookup';
     Editable = false;
     PageType = List;

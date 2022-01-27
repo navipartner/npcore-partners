@@ -1,5 +1,6 @@
-table 6150699 "NPR Data Model Upg. Log Entry"
+﻿table 6150699 "NPR Data Model Upg. Log Entry"
 {
+    Access = Internal;
     Caption = 'Data Model Upgrade Log Entry';
     DataClassification = CustomerContent;
     fields

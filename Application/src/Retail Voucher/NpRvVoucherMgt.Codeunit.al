@@ -1,5 +1,6 @@
-codeunit 6151010 "NPR NpRv Voucher Mgt."
+﻿codeunit 6151010 "NPR NpRv Voucher Mgt."
 {
+    Access = Internal;
     TableNo = "NPR NpRv Voucher";
 
     trigger OnRun()

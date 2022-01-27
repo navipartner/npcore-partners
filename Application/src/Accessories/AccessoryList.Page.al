@@ -1,5 +1,6 @@
-page 6014510 "NPR Accessory List"
+﻿page 6014510 "NPR Accessory List"
 {
+    Extensible = False;
     // NPR5.40/MHA /20180214  CASE 288039 Added field 85 "Unfold in Worksheet"
 
     Caption = 'Accessories List';

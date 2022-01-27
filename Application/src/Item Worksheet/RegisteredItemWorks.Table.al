@@ -1,5 +1,6 @@
-table 6060045 "NPR Registered Item Works."
+﻿table 6060045 "NPR Registered Item Works."
 {
+    Access = Internal;
     Caption = 'Item Worksheet Batch';
     DataClassification = CustomerContent;
     DataCaptionFields = "No.", "Worksheet Name", Description;

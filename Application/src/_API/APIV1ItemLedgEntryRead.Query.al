@@ -1,5 +1,6 @@
-query 6014402 "NPR APIV1 Item Ledg Entry Read"
+﻿query 6014402 "NPR APIV1 Item Ledg Entry Read"
 {
+    Access = Internal;
     APIGroup = 'core';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';

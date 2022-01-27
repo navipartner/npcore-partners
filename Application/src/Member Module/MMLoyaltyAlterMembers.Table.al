@@ -1,5 +1,6 @@
-table 6151163 "NPR MM Loyalty Alter Members."
+﻿table 6151163 "NPR MM Loyalty Alter Members."
 {
+    Access = Internal;
 
     Caption = 'Loyalty Alter Membership';
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-table 6151053 "NPR POS Paym. View Log Entry"
+﻿table 6151053 "NPR POS Paym. View Log Entry"
 {
+    Access = Internal;
     Caption = 'POS Payment View Log Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Paym. View Log Entries";

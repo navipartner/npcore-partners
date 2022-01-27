@@ -1,5 +1,6 @@
-table 6150702 "NPR POS Localized Caption"
+﻿table 6150702 "NPR POS Localized Caption"
 {
+    Access = Internal;
     Caption = 'Localized Caption';
     DataClassification = CustomerContent;
 

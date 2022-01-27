@@ -1,5 +1,6 @@
-table 6014613 "NPR APIV1 Store Opening Buffer"
+﻿table 6014613 "NPR APIV1 Store Opening Buffer"
 {
+    Access = Internal;
     Caption = 'Collect Store Opening Hour Date';
     DataClassification = CustomerContent;
     TableType = Temporary;

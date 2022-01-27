@@ -1,5 +1,6 @@
-page 6059955 "NPR MCS API Setup"
+﻿page 6059955 "NPR MCS API Setup"
 {
+    Extensible = False;
 
     Caption = 'MCS API Setup';
     PageType = List;

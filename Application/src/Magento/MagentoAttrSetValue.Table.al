@@ -1,5 +1,6 @@
-table 6151429 "NPR Magento Attr. Set Value"
+﻿table 6151429 "NPR Magento Attr. Set Value"
 {
+    Access = Internal;
     Caption = 'Magento Attribute Set Value';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Magento Attr. Set Values";

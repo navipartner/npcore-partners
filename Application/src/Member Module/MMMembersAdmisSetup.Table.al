@@ -1,5 +1,6 @@
-table 6060135 "NPR MM Members. Admis. Setup"
+﻿table 6060135 "NPR MM Members. Admis. Setup"
 {
+    Access = Internal;
     Caption = 'Membership Admission Setup';
     DataClassification = CustomerContent;
 

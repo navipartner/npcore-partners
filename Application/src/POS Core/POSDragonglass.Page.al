@@ -1,5 +1,6 @@
-page 6150750 "NPR POS (Dragonglass)"
+﻿page 6150750 "NPR POS (Dragonglass)"
 {
+    Extensible = False;
     Caption = 'POS';
     PageType = List;
     UsageCategory = Administration;

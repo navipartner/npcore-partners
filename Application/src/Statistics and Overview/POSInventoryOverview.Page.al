@@ -1,5 +1,6 @@
-page 6060059 "NPR POS Inventory Overview"
+﻿page 6060059 "NPR POS Inventory Overview"
 {
+    Extensible = False;
     // NPR5.34/BR  /20170726   CASE 282748 Object Created
     // NPR5.52/ALPO/20191002 CASE 370333 New options to show inventory for current location only
     //                                   - Function SetParameters: new call parameter: OnlyCurentLocIn [boolean]

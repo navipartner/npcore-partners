@@ -1,5 +1,6 @@
-page 6150618 "NPR POS Payment Method List"
+﻿page 6150618 "NPR POS Payment Method List"
 {
+    Extensible = False;
     Caption = 'POS Payment Method List';
     CardPageID = "NPR POS Payment Method Card";
     Editable = false;

@@ -1,5 +1,6 @@
 ﻿codeunit 6151110 "NPR NpRi Reim. Sales Inv."
 {
+    Access = Internal;
     TableNo = "NPR NpRi Reimbursement Entry";
 
     trigger OnRun()

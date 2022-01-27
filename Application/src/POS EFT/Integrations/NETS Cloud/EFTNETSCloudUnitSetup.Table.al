@@ -1,5 +1,6 @@
-table 6184519 "NPR EFT NETSCloud Unit Setup"
+﻿table 6184519 "NPR EFT NETSCloud Unit Setup"
 {
+    Access = Internal;
     // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
 
     Caption = 'EFT NETS Cloud POS Unit Setup';

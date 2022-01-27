@@ -1,5 +1,6 @@
-page 6014406 "NPR POS View Picture"
+﻿page 6014406 "NPR POS View Picture"
 {
+    Extensible = False;
     Caption = 'POS View Picture';
     DeleteAllowed = false;
     InsertAllowed = false;

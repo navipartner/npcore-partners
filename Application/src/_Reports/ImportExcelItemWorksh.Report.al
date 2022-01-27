@@ -1,5 +1,8 @@
-report 6060042 "NPR Import Excel Item Worksh."
+﻿report 6060042 "NPR Import Excel Item Worksh."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Import Excel Item Worksheet';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

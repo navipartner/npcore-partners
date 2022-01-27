@@ -1,5 +1,6 @@
-page 6151262 "NPR SO Processor Act Ext"
+﻿page 6151262 "NPR SO Processor Act Ext"
 {
+    Extensible = False;
     Caption = 'Activities';
     PageType = CardPart;
     RefreshOnActivate = true;

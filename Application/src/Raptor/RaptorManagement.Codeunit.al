@@ -1,5 +1,6 @@
 ﻿codeunit 6151491 "NPR Raptor Management"
 {
+    Access = Internal;
     var
         RaptorSetup: Record "NPR Raptor Setup";
         ActionDescrLbl_GetUserIDHistory: Label 'Browsing History Entries';

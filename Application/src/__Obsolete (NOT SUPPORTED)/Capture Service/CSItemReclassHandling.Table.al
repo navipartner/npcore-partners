@@ -1,5 +1,6 @@
-table 6151394 "NPR CS Item Reclass. Handling"
+﻿table 6151394 "NPR CS Item Reclass. Handling"
 {
+    Access = Internal;
 
     Caption = 'CS Warehouse Shipment Handling';
     DataClassification = CustomerContent;

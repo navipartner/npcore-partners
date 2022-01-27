@@ -1,5 +1,6 @@
-table 6184502 "NPR CleanCash Audit Roll"
+﻿table 6184502 "NPR CleanCash Audit Roll"
 {
+    Access = Internal;
     Caption = 'CleanCash Audit Roll';
     DataClassification = CustomerContent;
 

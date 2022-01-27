@@ -1,5 +1,6 @@
-page 6151102 "NPR NpRi Reimbursements"
+﻿page 6151102 "NPR NpRi Reimbursements"
 {
+    Extensible = False;
     Caption = 'Reimbursements';
     DelayedInsert = true;
     PageType = List;

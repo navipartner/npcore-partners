@@ -1,5 +1,8 @@
-enum 6150620 "NPR POS Sales Document Type"
+﻿enum 6150620 "NPR POS Sales Document Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     AssignmentCompatibility = true;
 

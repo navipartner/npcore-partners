@@ -1,5 +1,6 @@
-codeunit 6151599 "NPR NpDc Module Validate: Time"
+﻿codeunit 6151599 "NPR NpDc Module Validate: Time"
 {
+    Access = Internal;
     var
         Text000: Label 'Validate Coupon - Time Interval';
         Text001: Label 'Coupon is invalid during this Time';

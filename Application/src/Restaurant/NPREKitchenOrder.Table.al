@@ -1,5 +1,6 @@
-table 6150677 "NPR NPRE Kitchen Order"
+﻿table 6150677 "NPR NPRE Kitchen Order"
 {
+    Access = Internal;
     Caption = 'Kitchen Order';
     DataClassification = CustomerContent;
 

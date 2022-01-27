@@ -1,5 +1,6 @@
-codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
+﻿codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Create a payment line to balance an open sales order and post the order upon POS sale end.';
         CaptionPrintDocument: Label 'Print Document';

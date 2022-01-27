@@ -1,5 +1,6 @@
-codeunit 6184499 "NPR EFT Framework Mgt."
+﻿codeunit 6184499 "NPR EFT Framework Mgt."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

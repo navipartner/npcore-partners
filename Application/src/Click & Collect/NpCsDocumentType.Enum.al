@@ -1,5 +1,8 @@
-enum 6151198 "NPR NpCs Document Type"
+﻿enum 6151198 "NPR NpCs Document Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     AssignmentCompatibility = true;
 

@@ -1,5 +1,6 @@
-table 6151506 "NPR Nc Task Proces. Line"
+﻿table 6151506 "NPR Nc Task Proces. Line"
 {
+    Access = Internal;
     Caption = 'Nc Task Proces. Line';
     DataClassification = CustomerContent;
 

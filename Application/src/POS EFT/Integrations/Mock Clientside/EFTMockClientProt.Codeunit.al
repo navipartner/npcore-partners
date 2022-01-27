@@ -1,5 +1,6 @@
-codeunit 6184512 "NPR EFT Mock Client Prot."
+﻿codeunit 6184512 "NPR EFT Mock Client Prot."
 {
+    Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.48/MMV /20181220 CASE 339930 Moved receipt write outside tryfunction for 2017+ support
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object

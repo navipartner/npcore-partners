@@ -1,5 +1,6 @@
-table 6014521 "NPR Mail Text Line"
+﻿table 6014521 "NPR Mail Text Line"
 {
+    Access = Internal;
     Caption = 'Mail Text Line';
     DataClassification = CustomerContent;
 

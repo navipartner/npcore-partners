@@ -1,5 +1,6 @@
-page 6014620 "NPR Websites Select"
+﻿page 6014620 "NPR Websites Select"
 {
+    Extensible = False;
     Caption = 'Websites';
     PageType = List;
     UsageCategory = Administration;

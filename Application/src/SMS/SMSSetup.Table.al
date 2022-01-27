@@ -1,5 +1,6 @@
-table 6014465 "NPR SMS Setup"
+﻿table 6014465 "NPR SMS Setup"
 {
+    Access = Internal;
     Caption = 'SMS Setup';
     DataClassification = CustomerContent;
     LookupPageId = "NPR SMS Setup";

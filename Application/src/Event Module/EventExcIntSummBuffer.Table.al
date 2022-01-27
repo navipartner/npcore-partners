@@ -1,5 +1,6 @@
-table 6060165 "NPR Event Exc.Int.Summ. Buffer"
+﻿table 6060165 "NPR Event Exc.Int.Summ. Buffer"
 {
+    Access = Internal;
     Caption = 'Event Exc. Int. Summary Buffer';
     DataClassification = CustomerContent;
 

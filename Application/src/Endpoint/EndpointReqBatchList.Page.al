@@ -1,5 +1,6 @@
-page 6014677 "NPR Endpoint Req. Batch List"
+﻿page 6014677 "NPR Endpoint Req. Batch List"
 {
+    Extensible = False;
     // NPR5.23\BR\20160518  CASE 237658 Object created
 
     Caption = 'Endpoint Request Batch List';

@@ -1,5 +1,6 @@
-table 6014562 "NPR RP Data Item Links"
+﻿table 6014562 "NPR RP Data Item Links"
 {
+    Access = Internal;
     Caption = 'Data Item Links';
     DataClassification = CustomerContent;
 

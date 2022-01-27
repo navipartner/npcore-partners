@@ -1,5 +1,6 @@
-page 6151000 "NPR Upgrade History"
+﻿page 6151000 "NPR Upgrade History"
 {
+    Extensible = False;
     Caption = 'NPR Upgrade History';
     Editable = false;
     PageType = List;

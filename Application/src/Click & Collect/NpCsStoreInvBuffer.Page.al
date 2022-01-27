@@ -1,5 +1,6 @@
-page 6151210 "NPR NpCs Store Inv. Buffer"
+﻿page 6151210 "NPR NpCs Store Inv. Buffer"
 {
+    Extensible = False;
     Caption = 'Collect Store Inventory List';
     Editable = false;
     PageType = ListPart;

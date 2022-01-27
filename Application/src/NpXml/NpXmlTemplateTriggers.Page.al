@@ -1,5 +1,6 @@
-page 6151558 "NPR NpXml Template Triggers"
+﻿page 6151558 "NPR NpXml Template Triggers"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Xml Template Triggers';
     DelayedInsert = true;

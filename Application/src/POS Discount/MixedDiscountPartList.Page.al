@@ -1,5 +1,6 @@
-page 6014447 "NPR Mixed Discount Part List"
+﻿page 6014447 "NPR Mixed Discount Part List"
 {
+    Extensible = False;
     // NPR5.31/MHA /20170110  CASE 262904 Object created
 
     Caption = 'Mixed Discount Combination Parts';

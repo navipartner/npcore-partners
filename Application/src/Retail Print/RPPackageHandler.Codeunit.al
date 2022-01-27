@@ -1,5 +1,6 @@
-codeunit 6014585 "NPR RP Package Handler"
+﻿codeunit 6014585 "NPR RP Package Handler"
 {
+    Access = Internal;
     var
         ImportedMessage: Label 'Templates imported:\Created: %1\Replaced: %2';
 

@@ -1,5 +1,6 @@
-table 6059982 "NPR Item Repair"
+﻿table 6059982 "NPR Item Repair"
 {
+    Access = Internal;
     // VRT1.20/JDH /20170106 CASE 251896 TestTool to analyse and fix Variants
     // NPR5.48/JDH /20181109 CASE 334163 Added option captions
     // NPR5.49/BHR /20190218 CASE 341465 Increase size of Variety Tables from code 20 to code 40

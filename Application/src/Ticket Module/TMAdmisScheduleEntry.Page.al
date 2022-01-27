@@ -1,5 +1,6 @@
-page 6060122 "NPR TM Admis. Schedule Entry"
+﻿page 6060122 "NPR TM Admis. Schedule Entry"
 {
+    Extensible = False;
     Caption = 'Admission Schedule Entry';
     InsertAllowed = false;
     PageType = List;

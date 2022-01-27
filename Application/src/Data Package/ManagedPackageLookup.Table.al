@@ -1,5 +1,6 @@
-table 6014598 "NPR Managed Package Lookup"
+﻿table 6014598 "NPR Managed Package Lookup"
 {
+    Access = Internal;
     // NPR5.26/MMV /20160915 Created table for temp use.
     // NPR5.48/JDH /20181109 CASE 334163 Added Captions
 

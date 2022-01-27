@@ -1,5 +1,6 @@
-codeunit 6014695 "NPR Upgrade Retail Journal"
+﻿codeunit 6014695 "NPR Upgrade Retail Journal"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     var

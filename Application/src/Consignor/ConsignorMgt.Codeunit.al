@@ -1,5 +1,6 @@
-codeunit 6184601 "NPR Consignor Mgt."
+﻿codeunit 6184601 "NPR Consignor Mgt."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Table, Database::"NPR Consignor Entry", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnAfterInsertConsignorEntry(var Rec: Record "NPR Consignor Entry"; RunTrigger: Boolean)
     begin

@@ -1,5 +1,6 @@
-codeunit 6014591 "NPR UPG POS Pass"
+﻿codeunit 6014591 "NPR UPG POS Pass"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
 

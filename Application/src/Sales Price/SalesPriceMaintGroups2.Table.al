@@ -1,5 +1,6 @@
-table 6014490 "NPR Sales Price Maint. Groups2"
+﻿table 6014490 "NPR Sales Price Maint. Groups2"
 {
+    Access = Internal;
     Caption = 'Sales Price Maintenance Groups';
     DrillDownPageID = "NPR Sales Price Maint. Groups";
     LookupPageID = "NPR Sales Price Maint. Groups";

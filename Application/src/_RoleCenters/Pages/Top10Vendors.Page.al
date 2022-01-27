@@ -1,5 +1,6 @@
-page 6151258 "NPR Top 10 Vendors"
+﻿page 6151258 "NPR Top 10 Vendors"
 {
+    Extensible = False;
     Caption = 'Top 10 Vendors';
     CardPageID = "Vendor Card";
     Editable = true;

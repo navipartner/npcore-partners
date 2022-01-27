@@ -1,5 +1,6 @@
-codeunit 6150921 "NPR UPG Credit Voucher"
+﻿codeunit 6150921 "NPR UPG Credit Voucher"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

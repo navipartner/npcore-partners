@@ -1,5 +1,6 @@
-page 6150904 "NPR HC Payment Types"
+﻿page 6150904 "NPR HC Payment Types"
 {
+    Extensible = False;
     Caption = 'HC Payment Types';
     PageType = List;
     SourceTable = "NPR HC Payment Type POS";

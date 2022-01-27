@@ -1,5 +1,8 @@
-enum 6014421 "NPR Magento Order Status"
+﻿enum 6014421 "NPR Magento Order Status"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; Processing)

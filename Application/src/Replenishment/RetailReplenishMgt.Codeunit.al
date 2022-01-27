@@ -1,5 +1,6 @@
 ﻿codeunit 6151052 "NPR Retail Replenish. Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

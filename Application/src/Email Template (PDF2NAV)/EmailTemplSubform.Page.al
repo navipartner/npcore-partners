@@ -1,5 +1,6 @@
-page 6059793 "NPR E-mail Templ. Subform"
+﻿page 6059793 "NPR E-mail Templ. Subform"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'E-mail Template Subform';
     PageType = ListPart;

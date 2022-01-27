@@ -1,5 +1,6 @@
-table 6151222 "NPR NpCs Store Stock Setup"
+﻿table 6151222 "NPR NpCs Store Stock Setup"
 {
+    Access = Internal;
     // #416503/MHA /20200818  CASE 416503 Object created
 
     Caption = 'Collect Store Stock Setup';

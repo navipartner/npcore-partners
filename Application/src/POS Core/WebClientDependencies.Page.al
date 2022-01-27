@@ -1,5 +1,6 @@
-page 6014659 "NPR Web Client Dependencies"
+﻿page 6014659 "NPR Web Client Dependencies"
 {
+    Extensible = False;
     Caption = 'Web Client Dependencies';
     PageType = List;
     SourceTable = "NPR Web Client Dependency";

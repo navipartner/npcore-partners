@@ -1,5 +1,6 @@
-page 6060156 "NPR Event Copy Attr./Templ."
+﻿page 6060156 "NPR Event Copy Attr./Templ."
 {
+    Extensible = False;
     Caption = 'Event Copy Attr./Templ.';
     DataCaptionExpression = PageCaption;
     PageType = StandardDialog;

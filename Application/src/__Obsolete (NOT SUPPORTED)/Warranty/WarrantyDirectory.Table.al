@@ -1,5 +1,6 @@
-table 6014509 "NPR Warranty Directory"
+﻿table 6014509 "NPR Warranty Directory"
 {
+    Access = Internal;
     Caption = 'Warranty Directory';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

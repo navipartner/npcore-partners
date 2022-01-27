@@ -1,5 +1,6 @@
-codeunit 6059897 "NPR Data Log Proces. Err. Mgt."
+﻿codeunit 6059897 "NPR Data Log Proces. Err. Mgt."
 {
+    Access = Internal;
     TableNo = "NPR Data Log Processing Entry";
 
     trigger OnRun()

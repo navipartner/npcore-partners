@@ -1,5 +1,6 @@
-page 6014519 "NPR Sales Order Pick Subform"
+﻿page 6014519 "NPR Sales Order Pick Subform"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Lines';
     DelayedInsert = true;

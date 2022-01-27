@@ -1,5 +1,6 @@
-table 6151570 "NPR AF Setup"
+﻿table 6151570 "NPR AF Setup"
 {
+    Access = Internal;
     Caption = 'AF Setup';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,6 @@
-page 6150631 "NPR POS Paym. Checkp. Subpage"
+﻿page 6150631 "NPR POS Paym. Checkp. Subpage"
 {
+    Extensible = False;
     Caption = 'POS Payment Bin Checkpoint';
     Editable = false;
     PageType = ListPart;

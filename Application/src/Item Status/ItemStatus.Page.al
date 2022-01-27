@@ -1,5 +1,6 @@
-page 6060056 "NPR Item Status"
+﻿page 6060056 "NPR Item Status"
 {
+    Extensible = False;
     // NPR5.25\BR  \20160720  CASE 246088 Object Created
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Object
 

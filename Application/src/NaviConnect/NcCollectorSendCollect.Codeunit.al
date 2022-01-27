@@ -1,5 +1,6 @@
 ﻿codeunit 6151529 "NPR Nc Collector Send Collect."
 {
+    Access = Internal;
     trigger OnRun()
     begin
         CheckMaxLines();

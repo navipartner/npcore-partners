@@ -1,5 +1,6 @@
-page 6150723 "NPR POS Entry Comments"
+﻿page 6150723 "NPR POS Entry Comments"
 {
+    Extensible = False;
     Caption = 'POS Entry Comments';
     DeleteAllowed = false;
     Editable = false;

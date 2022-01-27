@@ -1,5 +1,6 @@
-page 6150695 "NPR NPRE Serv. Flow Prof. Card"
+﻿page 6150695 "NPR NPRE Serv. Flow Prof. Card"
 {
+    Extensible = False;
     Caption = 'Rest. Service Flow Profile Card';
     PageType = Card;
     SourceTable = "NPR NPRE Serv.Flow Profile";

@@ -1,5 +1,6 @@
-codeunit 6151508 "NPR Nc Task List Processing"
+﻿codeunit 6151508 "NPR Nc Task List Processing"
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

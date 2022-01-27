@@ -1,5 +1,6 @@
-page 6059820 "NPR Trx Email Setup"
+﻿page 6059820 "NPR Trx Email Setup"
 {
+    Extensible = False;
     Caption = 'Transactional Email Setup';
     CardPageID = "NPR Trx Email Setup Card";
     Editable = false;

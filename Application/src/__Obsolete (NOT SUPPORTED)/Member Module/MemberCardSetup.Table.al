@@ -1,5 +1,6 @@
-table 6059772 "NPR Member Card Setup"
+﻿table 6059772 "NPR Member Card Setup"
 {
+    Access = Internal;
 
     Caption = 'Point Card Properties';
     DataClassification = CustomerContent;

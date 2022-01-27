@@ -1,5 +1,6 @@
-table 6014573 "NPR DSFINVK Closing"
+﻿table 6014573 "NPR DSFINVK Closing"
 {
+    Access = Internal;
     Caption = 'DSFINVK Closing';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,6 @@
-page 6151168 "NPR NpGp POSSalesEntry Subpage"
+﻿page 6151168 "NPR NpGp POSSalesEntry Subpage"
 {
+    Extensible = False;
     Caption = 'Sales Lines';
     Editable = false;
     PageType = ListPart;

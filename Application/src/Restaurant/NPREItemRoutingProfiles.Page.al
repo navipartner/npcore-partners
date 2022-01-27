@@ -1,5 +1,6 @@
-page 6150681 "NPR NPRE Item Routing Profiles"
+﻿page 6150681 "NPR NPRE Item Routing Profiles"
 {
+    Extensible = False;
     //TODO: Show assigned print/prod categories and serving steps
 
     Caption = 'Rest. Item Routing Profiles';

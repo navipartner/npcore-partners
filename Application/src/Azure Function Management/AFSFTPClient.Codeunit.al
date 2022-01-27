@@ -1,5 +1,6 @@
-codeunit 6151612 "NPR AF SFTP Client"
+﻿codeunit 6151612 "NPR AF SFTP Client"
 {
+    Access = Internal;
     var
         //CodeUnit variables
         SftpClient: HttpClient;

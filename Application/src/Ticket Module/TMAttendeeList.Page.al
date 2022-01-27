@@ -1,5 +1,6 @@
-page 6014517 "NPR TM Attendee List"
+﻿page 6014517 "NPR TM Attendee List"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = None;
     SourceTable = "NPR TM Attendees Buffer";

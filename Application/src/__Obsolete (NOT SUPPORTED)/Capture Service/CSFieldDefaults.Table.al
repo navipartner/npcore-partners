@@ -1,5 +1,6 @@
-table 6151378 "NPR CS Field Defaults"
+﻿table 6151378 "NPR CS Field Defaults"
 {
+    Access = Internal;
 
     Caption = 'CS Field Defaults';
     DataClassification = CustomerContent;

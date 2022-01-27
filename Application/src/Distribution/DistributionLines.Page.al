@@ -1,5 +1,6 @@
-page 6151059 "NPR Distribution Lines"
+﻿page 6151059 "NPR Distribution Lines"
 {
+    Extensible = False;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
 
     AutoSplitKey = true;

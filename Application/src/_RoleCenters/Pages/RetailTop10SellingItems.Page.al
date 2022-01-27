@@ -1,5 +1,6 @@
-page 6151256 "NPR Retail Top10 Selling Items"
+﻿page 6151256 "NPR Retail Top10 Selling Items"
 {
+    Extensible = False;
 
     Caption = 'Top 10 Items by Quantity';
     CardPageID = "Item Card";

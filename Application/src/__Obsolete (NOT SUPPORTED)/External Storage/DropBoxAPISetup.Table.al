@@ -1,5 +1,6 @@
-table 6184870 "NPR DropBox API Setup"
+﻿table 6184870 "NPR DropBox API Setup"
 {
+    Access = Internal;
     Caption = 'DropBox API Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

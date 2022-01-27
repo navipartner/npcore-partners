@@ -1,5 +1,6 @@
 ﻿codeunit 6060042 "NPR Item Number Mgt."
 {
+    Access = Internal;
     var
         ExternalBarcodeErr: Label '%1 is not an External Barcode because it starts with 2.', Comment = '%1 = Barcode';
         InternalBarcodeErr: Label '%1 is not an Internal Barcode because it does not start with 2.', Comment = '%1 = Barcode';

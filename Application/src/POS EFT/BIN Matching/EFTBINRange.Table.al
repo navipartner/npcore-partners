@@ -1,5 +1,6 @@
-table 6184510 "NPR EFT BIN Range"
+﻿table 6184510 "NPR EFT BIN Range"
 {
+    Access = Internal;
     Caption = 'EFT BIN Range';
     DataClassification = CustomerContent;
 

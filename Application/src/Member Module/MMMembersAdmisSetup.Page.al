@@ -1,5 +1,6 @@
-page 6060135 "NPR MM Members. Admis. Setup"
+﻿page 6060135 "NPR MM Members. Admis. Setup"
 {
+    Extensible = False;
 
     Caption = 'Membership Admission Setup';
     PageType = List;

@@ -1,5 +1,8 @@
-enum 6014479 "NPR TM Not. Method"
+﻿enum 6014479 "NPR TM Not. Method"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; NA)

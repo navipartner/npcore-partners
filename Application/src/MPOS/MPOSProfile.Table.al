@@ -1,5 +1,6 @@
-table 6150657 "NPR MPOS Profile"
+﻿table 6150657 "NPR MPOS Profile"
 {
+    Access = Internal;
     Caption = 'MPOS Profile';
     DataClassification = CustomerContent;
     LookupPageID = "NPR MPOS Profiles";

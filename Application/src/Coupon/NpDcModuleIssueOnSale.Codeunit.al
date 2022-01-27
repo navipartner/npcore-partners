@@ -1,5 +1,6 @@
-codeunit 6151600 "NPR NpDc Module Issue: OnSale"
+﻿codeunit 6151600 "NPR NpDc Module Issue: OnSale"
 {
+    Access = Internal;
     var
         Text000: Label 'Issue Coupon - Default';
         Text001: Label 'On-Sale Coupons can only be issued through POS Sale';

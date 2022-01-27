@@ -1,5 +1,6 @@
-page 6059963 "NPR MPOS QR Code FactBox"
+﻿page 6059963 "NPR MPOS QR Code FactBox"
 {
+    Extensible = False;
     Caption = 'MPOS QR Code FactBox';
     PageType = CardPart;
     UsageCategory = Administration;

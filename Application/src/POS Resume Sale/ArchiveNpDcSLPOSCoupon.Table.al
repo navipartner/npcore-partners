@@ -1,5 +1,6 @@
-table 6014496 "NPR Archive NpDc SL POS Coupon"
+﻿table 6014496 "NPR Archive NpDc SL POS Coupon"
 {
+    Access = Internal;
     // The purpose of this table:
     //   All existing unfinished sale transactions have been moved to archive tables
     //   The table may be deleted later, when it is no longer relevant.

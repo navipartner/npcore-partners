@@ -1,5 +1,6 @@
-page 6184507 "NPR EFT Verifone Unit Param."
+﻿page 6184507 "NPR EFT Verifone Unit Param."
 {
+    Extensible = False;
     // NPR5.53/MMV /20191204 CASE 349520 Added object
 
     Caption = 'EFT Verifone Unit Parameters';

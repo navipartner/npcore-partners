@@ -1,5 +1,6 @@
-table 6184501 "NPR CleanCash Error List"
+﻿table 6184501 "NPR CleanCash Error List"
 {
+    Access = Internal;
     Caption = 'CleanCash Error List';
     DataClassification = CustomerContent;
     ObsoleteReason = 'This table is not used anymore';

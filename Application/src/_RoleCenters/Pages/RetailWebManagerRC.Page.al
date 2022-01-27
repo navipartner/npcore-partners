@@ -1,5 +1,6 @@
-page 6151244 "NPR Retail Web Manager RC"
+﻿page 6151244 "NPR Retail Web Manager RC"
 {
+    Extensible = False;
     Caption = 'NP Retail Web Manag. Role Center';
     PageType = RoleCenter;
     UsageCategory = None;

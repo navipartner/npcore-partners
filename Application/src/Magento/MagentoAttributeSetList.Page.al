@@ -1,5 +1,6 @@
-page 6151433 "NPR Magento Attribute Set List"
+﻿page 6151433 "NPR Magento Attribute Set List"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Attribute Sets';
     CardPageID = "NPR Magento Attribute Sets";

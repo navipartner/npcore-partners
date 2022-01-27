@@ -1,5 +1,6 @@
-page 6151505 "NPR Nc Import Types"
+﻿page 6151505 "NPR Nc Import Types"
 {
+    Extensible = False;
     Caption = 'NaviConnect Import Types';
     CardPageID = "NPR Nc Import Type Card";
     Editable = false;

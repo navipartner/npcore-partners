@@ -1,5 +1,6 @@
-table 6151561 "NPR NpXml Namespace"
+﻿table 6151561 "NPR NpXml Namespace"
 {
+    Access = Internal;
     Caption = 'NpXml Namespace';
     DataClassification = CustomerContent;
 

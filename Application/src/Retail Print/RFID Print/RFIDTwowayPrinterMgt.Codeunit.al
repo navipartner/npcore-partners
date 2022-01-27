@@ -1,5 +1,6 @@
-codeunit 6059830 "NPR RFID Two-way Printer Mgt."
+﻿codeunit 6059830 "NPR RFID Two-way Printer Mgt."
 {
+    Access = Internal;
     EventSubscriberInstance = Manual;
 
     var

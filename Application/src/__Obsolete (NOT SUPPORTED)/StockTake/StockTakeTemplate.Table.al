@@ -1,5 +1,6 @@
-table 6014666 "NPR Stock-Take Template"
+﻿table 6014666 "NPR Stock-Take Template"
 {
+    Access = Internal;
     Caption = 'Stock-Take Template';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

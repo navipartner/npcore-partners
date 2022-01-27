@@ -1,5 +1,6 @@
-page 6151525 "NPR Nc Endpoint E-mail Card"
+﻿page 6151525 "NPR Nc Endpoint E-mail Card"
 {
+    Extensible = False;
     Caption = 'Nc Endpoint E-mail Card';
     DeleteAllowed = false;
     InsertAllowed = false;

@@ -1,5 +1,6 @@
-codeunit 6014440 "NPR Aux. Tables Mgt."
+﻿codeunit 6014440 "NPR Aux. Tables Mgt."
 {
+    Access = Internal;
     procedure CopyValueEntryToAux(ValueEntry: Record "Value Entry"; ItemJournalLine: Record "Item Journal Line")
     var
         AuxValueEntry: Record "NPR Aux. Value Entry";

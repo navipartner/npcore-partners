@@ -1,5 +1,6 @@
 ﻿codeunit 6014558 "NPR RP Data Join Buffer Mgt."
 {
+    Access = Internal;
     var
         TempBuffer: Record "NPR RP Data Join Buffer" temporary;
         TempRecIDBuffer: Record "NPR RP DataJoin Rec.ID Buffer" temporary;

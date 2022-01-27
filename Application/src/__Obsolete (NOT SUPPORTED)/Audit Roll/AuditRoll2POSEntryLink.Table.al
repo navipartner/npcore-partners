@@ -1,5 +1,6 @@
-table 6150698 "NPR Audit Roll 2 POSEntry Link"
+﻿table 6150698 "NPR Audit Roll 2 POSEntry Link"
 {
+    Access = Internal;
     Caption = 'Audit Roll to POS Entry Link';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

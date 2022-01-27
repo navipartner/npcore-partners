@@ -1,5 +1,6 @@
-codeunit 6151462 "NPR M2 Picture Mgt."
+﻿codeunit 6151462 "NPR M2 Picture Mgt."
 {
+    Access = Internal;
     procedure DragDropPicture(PictureName: Text; PictureType: Text; PictureDataUri: Text)
     var
         Handled: Boolean;

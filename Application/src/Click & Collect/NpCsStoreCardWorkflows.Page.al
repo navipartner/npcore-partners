@@ -1,5 +1,6 @@
-page 6151202 "NPR NpCs Store Card Workflows"
+﻿page 6151202 "NPR NpCs Store Card Workflows"
 {
+    Extensible = False;
     Caption = 'Store Workflow Relations';
     DelayedInsert = true;
     PageType = ListPart;

@@ -1,5 +1,6 @@
-page 6059797 "NPR E-mail Attachments"
+﻿page 6059797 "NPR E-mail Attachments"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'E-mail Attachments';
     PageType = List;

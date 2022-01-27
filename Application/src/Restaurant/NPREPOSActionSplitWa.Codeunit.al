@@ -1,5 +1,6 @@
-codeunit 6150668 "NPR NPRE POSAction: Split Wa."
+﻿codeunit 6150668 "NPR NPRE POSAction: Split Wa."
 {
+    Access = Internal;
     var
         Text000: Label 'Partially load Waiter Pad to POS Sale';
         ReadingErr: Label 'reading in %1';

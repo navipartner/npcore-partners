@@ -1,5 +1,6 @@
-page 6151605 "NPR NpDc Iss.OnSale Subform"
+﻿page 6151605 "NPR NpDc Iss.OnSale Subform"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Issue On-Sale Subform';
     DelayedInsert = true;

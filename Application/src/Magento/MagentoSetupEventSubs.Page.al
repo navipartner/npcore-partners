@@ -1,5 +1,6 @@
-page 6151422 "NPR Magento Setup Event Subs."
+﻿page 6151422 "NPR Magento Setup Event Subs."
 {
+    Extensible = False;
     Caption = 'Magento Setup Event Subscriptions';
     DelayedInsert = true;
     PageType = List;

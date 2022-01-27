@@ -1,5 +1,6 @@
-codeunit 6060096 "NPR UPG App. Area User Exp."
+﻿codeunit 6060096 "NPR UPG App. Area User Exp."
 {
+    Access = Internal;
     Subtype = Upgrade;
 
 

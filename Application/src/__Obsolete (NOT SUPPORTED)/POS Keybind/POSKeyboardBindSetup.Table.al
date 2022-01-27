@@ -1,5 +1,6 @@
-table 6150719 "NPR POS Keyboard Bind. Setup"
+﻿table 6150719 "NPR POS Keyboard Bind. Setup"
 {
+    Access = Internal;
     Caption = 'POS Keyboard Binding Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

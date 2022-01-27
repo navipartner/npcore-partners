@@ -1,5 +1,6 @@
-page 6014428 "NPR Salesperson Card"
+﻿page 6014428 "NPR Salesperson Card"
 {
+    Extensible = False;
     Caption = 'Salesperson/Purchaser Card';
     SourceTable = "Salesperson/Purchaser";
     UsageCategory = Documents;

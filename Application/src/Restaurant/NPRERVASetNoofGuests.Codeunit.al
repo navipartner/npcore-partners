@@ -1,5 +1,6 @@
-codeunit 6150686 "NPR NPRE RVA: Set No.of Guests"
+﻿codeunit 6150686 "NPR NPRE RVA: Set No.of Guests"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('RV_SET_PARTYSIZE');

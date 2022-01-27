@@ -1,5 +1,6 @@
-page 6060101 "NPR TM Ticket Req. Mini"
+﻿page 6060101 "NPR TM Ticket Req. Mini"
 {
+    Extensible = False;
     Caption = 'Ticket Request Mini';
     InsertAllowed = false;
     InstructionalText = 'Set quantity to the number of guest for each line';

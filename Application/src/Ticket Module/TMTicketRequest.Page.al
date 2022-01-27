@@ -1,5 +1,6 @@
-page 6060103 "NPR TM Ticket Request"
+﻿page 6060103 "NPR TM Ticket Request"
 {
+    Extensible = False;
     Caption = 'Ticket Request';
     CardPageID = "NPR TM Ticket Res. Req. Page";
     Editable = false;

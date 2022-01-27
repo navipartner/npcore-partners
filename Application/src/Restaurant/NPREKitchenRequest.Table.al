@@ -1,5 +1,6 @@
-table 6150678 "NPR NPRE Kitchen Request"
+﻿table 6150678 "NPR NPRE Kitchen Request"
 {
+    Access = Internal;
     Caption = 'Kitchen Request';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Kitchen Req. List";

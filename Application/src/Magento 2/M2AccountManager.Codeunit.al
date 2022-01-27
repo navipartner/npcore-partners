@@ -1,5 +1,6 @@
-codeunit 6151151 "NPR M2 Account Manager"
+﻿codeunit 6151151 "NPR M2 Account Manager"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         case SelectedAccountFunction of

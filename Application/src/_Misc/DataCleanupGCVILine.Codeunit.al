@@ -1,5 +1,6 @@
-codeunit 6060100 "NPR Data Cleanup GCVI Line"
+﻿codeunit 6060100 "NPR Data Cleanup GCVI Line"
 {
+    Access = Internal;
     TableNo = "NPR Data Cleanup GCVI";
 
     trigger OnRun()

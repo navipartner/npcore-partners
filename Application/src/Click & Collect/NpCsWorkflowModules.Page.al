@@ -1,5 +1,6 @@
-page 6151199 "NPR NpCs Workflow Modules"
+﻿page 6151199 "NPR NpCs Workflow Modules"
 {
+    Extensible = False;
     Caption = 'Collect Workflow Modules';
     InsertAllowed = false;
     PageType = List;

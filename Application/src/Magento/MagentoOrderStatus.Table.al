@@ -1,5 +1,6 @@
-table 6151407 "NPR Magento Order Status"
+﻿table 6151407 "NPR Magento Order Status"
 {
+    Access = Internal;
     Caption = 'Magento Order Status';
     DataClassification = CustomerContent;
 

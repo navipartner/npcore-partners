@@ -1,4 +1,4 @@
-codeunit 6014626 "NPR Replication Counter Mgmt."
+﻿codeunit 6014626 "NPR Replication Counter Mgmt."
 {
     #region General
     procedure UpdateReplicationCounter(RecRef: RecordRef; ReplicationCounterFieldNo: Integer)

@@ -1,5 +1,6 @@
-page 6014578 "NPR Tax Free GB Countries"
+﻿page 6014578 "NPR Tax Free GB Countries"
 {
+    Extensible = False;
 
     Caption = 'Tax Free GB Countries';
     DeleteAllowed = false;

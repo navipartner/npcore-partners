@@ -1,5 +1,6 @@
-table 6014607 "NPR Auth. Param. Buffer"
+﻿table 6014607 "NPR Auth. Param. Buffer"
 {
+    Access = Internal;
     Caption = 'Authorization Parameters Buffer';
     DataClassification = SystemMetadata;
     TableType = Temporary;

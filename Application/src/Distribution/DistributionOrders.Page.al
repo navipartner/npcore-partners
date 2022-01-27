@@ -1,5 +1,6 @@
-page 6151067 "NPR Distribution Orders"
+﻿page 6151067 "NPR Distribution Orders"
 {
+    Extensible = False;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
 
     Caption = 'Distribution Orders';

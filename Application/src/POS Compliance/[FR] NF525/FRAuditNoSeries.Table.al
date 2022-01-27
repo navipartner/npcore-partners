@@ -1,5 +1,6 @@
-table 6184851 "NPR FR Audit No. Series"
+﻿table 6184851 "NPR FR Audit No. Series"
 {
+    Access = Internal;
     Caption = 'FR Audit No. Series';
     DataClassification = CustomerContent;
 

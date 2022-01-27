@@ -1,5 +1,6 @@
-page 6151443 "NPR Magento Display Config"
+﻿page 6151443 "NPR Magento Display Config"
 {
+    Extensible = False;
     Caption = 'Display Config';
     DelayedInsert = true;
     PageType = List;

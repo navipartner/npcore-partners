@@ -1,5 +1,6 @@
-codeunit 6014603 "NPR RP Templ. Output Log Mgt."
+﻿codeunit 6014603 "NPR RP Templ. Output Log Mgt."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnSendPrintJob', '', false, false)]
     local procedure OnSendMatrixPrintJob(TemplateCode: Text; CodeunitId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer);
     var

@@ -1,5 +1,6 @@
-table 6184505 "NPR EFT Aux Operation"
+﻿table 6184505 "NPR EFT Aux Operation"
 {
+    Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
 
     Caption = 'EFT Aux Operation';

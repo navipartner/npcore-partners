@@ -1,5 +1,6 @@
-codeunit 6150729 "NPR POS Sales Print Mgt."
+﻿codeunit 6150729 "NPR POS Sales Print Mgt."
 {
+    Access = Internal;
 
     var
         PRINT_RECEIPT: Label 'Print Sales Receipt';

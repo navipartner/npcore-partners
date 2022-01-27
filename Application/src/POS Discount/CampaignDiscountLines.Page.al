@@ -1,5 +1,6 @@
-page 6014454 "NPR Campaign Discount Lines"
+﻿page 6014454 "NPR Campaign Discount Lines"
 {
+    Extensible = False;
     Caption = 'Period Discount Lines';
     DelayedInsert = true;
     PageType = ListPart;

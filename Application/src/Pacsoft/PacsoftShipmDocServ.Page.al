@@ -1,5 +1,6 @@
-page 6014414 "NPR Pacsoft Shipm. Doc. Serv."
+﻿page 6014414 "NPR Pacsoft Shipm. Doc. Serv."
 {
+    Extensible = False;
     // PS1.00/LS/20141021  CASE  188056 : PacSoft Module Integration Created Page
 
     Caption = 'Pacsoft Shipment Document Services';

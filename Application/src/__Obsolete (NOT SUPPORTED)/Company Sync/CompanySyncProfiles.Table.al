@@ -1,5 +1,6 @@
-table 6059777 "NPR Company Sync Profiles"
+﻿table 6059777 "NPR Company Sync Profiles"
 {
+    Access = Internal;
     Caption = 'Company Sync Profiles';
     DataPerCompany = false;
     DataClassification = CustomerContent;

@@ -1,5 +1,8 @@
-report 6060041 "NPR Delete Reg. Item Works."
+﻿report 6060041 "NPR Delete Reg. Item Works."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Delete Reg. Item Worksheets';
     ProcessingOnly = true;
     UsageCategory = Tasks;

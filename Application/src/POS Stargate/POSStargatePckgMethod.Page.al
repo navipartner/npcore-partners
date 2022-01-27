@@ -1,5 +1,6 @@
-page 6150714 "NPR POS Stargate Pckg Method"
+﻿page 6150714 "NPR POS Stargate Pckg Method"
 {
+    Extensible = False;
     Caption = 'POS Stargate Package Method';
     Editable = false;
     PageType = List;

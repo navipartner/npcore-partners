@@ -1,5 +1,6 @@
-codeunit 6014468 "NPR UPG Item Group"
+﻿codeunit 6014468 "NPR UPG Item Group"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

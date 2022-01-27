@@ -1,5 +1,8 @@
-enum 6014431 "NPR Magento Pic. Variety Type"
+﻿enum 6014431 "NPR Magento Pic. Variety Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "Fixed")

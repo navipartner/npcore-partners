@@ -1,5 +1,6 @@
-page 6014400 "NPR Magento Wizard"
+﻿page 6014400 "NPR Magento Wizard"
 {
+    Extensible = False;
     Caption = 'NP Magento Wizard';
     PageType = NavigatePage;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-codeunit 6014402 "NPR License Information"
+﻿codeunit 6014402 "NPR License Information"
 {
+    Access = Internal;
 
     TableNo = AllObj;
 

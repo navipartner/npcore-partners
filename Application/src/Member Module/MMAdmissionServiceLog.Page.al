@@ -1,5 +1,6 @@
-page 6060092 "NPR MM Admission Service Log"
+﻿page 6060092 "NPR MM Admission Service Log"
 {
+    Extensible = False;
 
     Caption = 'MM Admission Service Log';
     Editable = false;

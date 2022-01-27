@@ -1,5 +1,6 @@
-table 6151160 "NPR MM Reg. Sales Buffer"
+﻿table 6151160 "NPR MM Reg. Sales Buffer"
 {
+    Access = Internal;
 
     Caption = 'Register Sales Buffer';
     DataClassification = CustomerContent;

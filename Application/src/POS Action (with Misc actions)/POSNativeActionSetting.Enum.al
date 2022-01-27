@@ -1,5 +1,8 @@
-enum 6150825 "NPR POS Native Action Setting"
+﻿enum 6150825 "NPR POS Native Action Setting"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     Caption = 'POS Native Action Type';
 

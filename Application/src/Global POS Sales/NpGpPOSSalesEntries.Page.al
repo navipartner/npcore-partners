@@ -1,5 +1,6 @@
-page 6151167 "NPR NpGp POS Sales Entries"
+﻿page 6151167 "NPR NpGp POS Sales Entries"
 {
+    Extensible = False;
     Caption = 'Global POS Sales Entries';
     Editable = false;
     PageType = List;

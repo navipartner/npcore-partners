@@ -1,5 +1,6 @@
-table 6151153 "NPR Authentication Log"
+﻿table 6151153 "NPR Authentication Log"
 {
+    Access = Internal;
     Caption = 'Authentication Log';
     DataClassification = CustomerContent;
 

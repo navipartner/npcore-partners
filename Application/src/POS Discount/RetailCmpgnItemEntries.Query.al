@@ -1,5 +1,6 @@
-query 6014611 "NPR Retail Cmpgn. Item Entries"
+﻿query 6014611 "NPR Retail Cmpgn. Item Entries"
 {
+    Access = Internal;
     Caption = 'Retail Campaign Item Entries';
 
     elements

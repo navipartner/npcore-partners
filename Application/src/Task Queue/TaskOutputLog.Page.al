@@ -1,5 +1,6 @@
-page 6059911 "NPR Task Output Log"
+﻿page 6059911 "NPR Task Output Log"
 {
+    Extensible = False;
 
     Caption = 'Task Output Log';
     PageType = List;

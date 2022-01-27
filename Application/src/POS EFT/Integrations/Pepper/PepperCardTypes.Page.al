@@ -1,5 +1,6 @@
-page 6184485 "NPR Pepper Card Types"
+﻿page 6184485 "NPR Pepper Card Types"
 {
+    Extensible = False;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
 
     Caption = 'Pepper Card Types';

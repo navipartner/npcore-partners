@@ -1,5 +1,6 @@
-codeunit 6151521 "NPR Nc Trigger Scheduler"
+﻿codeunit 6151521 "NPR Nc Trigger Scheduler"
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Table, Database::"NPR Nc Trigger", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertNcTriggerInsertTaskLine(var Rec: Record "NPR Nc Trigger"; RunTrigger: Boolean)
     begin

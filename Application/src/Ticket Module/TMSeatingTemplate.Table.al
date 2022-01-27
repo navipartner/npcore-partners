@@ -1,5 +1,6 @@
-table 6151131 "NPR TM Seating Template"
+﻿table 6151131 "NPR TM Seating Template"
 {
+    Access = Internal;
     // //-TM1.45 [322432] Initial Version
 
     Caption = 'Seating Template';

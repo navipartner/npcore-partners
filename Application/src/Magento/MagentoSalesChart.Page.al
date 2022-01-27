@@ -1,5 +1,6 @@
-page 6151482 "NPR Magento Sales Chart"
+﻿page 6151482 "NPR Magento Sales Chart"
 {
+    Extensible = False;
     Caption = 'Margin/Turnover by Period';
     PageType = CardPart;
     UsageCategory = None;

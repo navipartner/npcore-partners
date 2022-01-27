@@ -1,5 +1,6 @@
-table 6151562 "NPR NpXml Api Header"
+﻿table 6151562 "NPR NpXml Api Header"
 {
+    Access = Internal;
     Caption = 'NpXml Api Header';
     DataClassification = CustomerContent;
 

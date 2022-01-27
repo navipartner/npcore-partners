@@ -1,5 +1,6 @@
-page 6150686 "NPR NPRE Kitchen Station Card"
+﻿page 6150686 "NPR NPRE Kitchen Station Card"
 {
+    Extensible = False;
     Caption = 'Restaurant Kitchen Station Card';
     PageType = Card;
     SourceTable = "NPR NPRE Kitchen Station";

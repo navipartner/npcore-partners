@@ -1,5 +1,8 @@
-report 6014663 "NPR Retail Calc. Inv."
+﻿report 6014663 "NPR Retail Calc. Inv."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Retail Calculate Inventory';
     ProcessingOnly = true;
     UsageCategory = None;

@@ -1,5 +1,6 @@
-table 6014546 "NPR Payment Method Denom"
+﻿table 6014546 "NPR Payment Method Denom"
 {
+    Access = Internal;
 
     Caption = 'POS Payment Method Denomination';
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-table 6151151 "NPR M2 One Time Password"
+﻿table 6151151 "NPR M2 One Time Password"
 {
+    Access = Internal;
     Caption = 'One Time Password';
     DataClassification = CustomerContent;
 

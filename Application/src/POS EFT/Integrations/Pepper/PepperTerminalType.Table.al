@@ -1,5 +1,6 @@
-table 6184493 "NPR Pepper Terminal Type"
+﻿table 6184493 "NPR Pepper Terminal Type"
 {
+    Access = Internal;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
     // NPR5.25/BR/20160509  CASE 231481 Added field Force Fixed Currency Check.
 

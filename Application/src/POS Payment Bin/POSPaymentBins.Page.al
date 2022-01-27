@@ -1,5 +1,6 @@
-page 6150620 "NPR POS Payment Bins"
+﻿page 6150620 "NPR POS Payment Bins"
 {
+    Extensible = False;
     // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
     // NPR5.36/BR/20170810 CASE 277096 Added Action to navigate to POS Posting Setup
     // NPR5.40/MMV /20180302 CASE 300660 Added field opening method and action for setting parameters

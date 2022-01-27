@@ -1,5 +1,6 @@
-table 6151014 "NPR NpRv Voucher Entry"
+﻿table 6151014 "NPR NpRv Voucher Entry"
 {
+    Access = Internal;
     Caption = 'Retail Voucher Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Voucher Entries";

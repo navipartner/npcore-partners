@@ -1,5 +1,6 @@
-codeunit 6151453 "NPR Magento NpXml FIK"
+﻿codeunit 6151453 "NPR Magento NpXml FIK"
 {
+    Access = Internal;
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()

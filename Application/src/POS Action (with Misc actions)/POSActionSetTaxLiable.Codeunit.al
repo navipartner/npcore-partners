@@ -1,5 +1,6 @@
-codeunit 6150823 "NPR POSAction: Set Tax Liable"
+﻿codeunit 6150823 "NPR POSAction: Set Tax Liable"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Set Tax Liable';
         Title: Label 'Tax Liable property';

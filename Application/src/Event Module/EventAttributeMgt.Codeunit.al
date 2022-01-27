@@ -1,5 +1,6 @@
 ﻿codeunit 6060155 "NPR Event Attribute Mgt."
 {
+    Access = Internal;
     var
         EventAttributeFound: Label 'You can''t change %1 as it is already part of template (or is a template) which has assigned values. If you wish to change it, create new template and do changes on it.';
         EventAttributeTemplateOnReport: Record "NPR Event Attribute Template";

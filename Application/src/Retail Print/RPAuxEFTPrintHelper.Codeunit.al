@@ -1,5 +1,6 @@
-codeunit 6014536 "NPR RP Aux: EFT Print Helper"
+﻿codeunit 6014536 "NPR RP Aux: EFT Print Helper"
 {
+    Access = Internal;
     // NPR5.36/MMV /20170913 CASE 287022 Created codeunit
     // 
     // Codeunit only exists because the table "Credit Card Transaction" on which EFT receipts are currently based requires some overarching logic in order to recognize seperate prints bundled together.

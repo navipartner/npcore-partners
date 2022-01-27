@@ -1,5 +1,6 @@
-table 6150685 "NPR NPRE Location Layout"
+﻿table 6150685 "NPR NPRE Location Layout"
 {
+    Access = Internal;
     Caption = 'NPRE Location Layout';
     DataClassification = CustomerContent;
 

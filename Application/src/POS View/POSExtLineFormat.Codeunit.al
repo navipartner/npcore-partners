@@ -1,5 +1,6 @@
-codeunit 6150853 "NPR POS Ext.: Line Format."
+﻿codeunit 6150853 "NPR POS Ext.: Line Format."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscover(DataSourceName: Text; Extensions: List of [Text])
     begin

@@ -1,5 +1,6 @@
-page 6151576 "NPR Event Resource Overview"
+﻿page 6151576 "NPR Event Resource Overview"
 {
+    Extensible = False;
     Caption = 'Event Resource Overview';
     Editable = false;
     PageType = ListPart;

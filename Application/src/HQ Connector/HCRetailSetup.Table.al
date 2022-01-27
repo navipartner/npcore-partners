@@ -1,5 +1,6 @@
-table 6150904 "NPR HC Retail Setup"
+﻿table 6150904 "NPR HC Retail Setup"
 {
+    Access = Internal;
     Caption = 'HC Retail Setup';
     DataClassification = CustomerContent;
 

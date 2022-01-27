@@ -1,5 +1,6 @@
-table 6014434 "NPR TM Adm. Dependency"
+﻿table 6014434 "NPR TM Adm. Dependency"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'Admission Dependency';
     LookupPageId = "NPR TM Adm. Dependency";

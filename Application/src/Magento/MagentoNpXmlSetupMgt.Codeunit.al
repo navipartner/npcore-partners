@@ -1,5 +1,6 @@
-codeunit 6151450 "NPR Magento NpXml Setup Mgt"
+﻿codeunit 6151450 "NPR Magento NpXml Setup Mgt"
 {
+    Access = Internal;
     var
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
 

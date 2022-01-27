@@ -1,5 +1,6 @@
-page 6151563 "NPR NpXml Templ. Chng. History"
+﻿page 6151563 "NPR NpXml Templ. Chng. History"
 {
+    Extensible = False;
     Caption = 'NpXml Template Change History';
     Editable = false;
     PageType = List;

@@ -1,5 +1,6 @@
-table 6014590 "NPR TM Notif. Profile Line"
+﻿table 6014590 "NPR TM Notif. Profile Line"
 {
+    Access = Internal;
     Caption = 'Ticket Notification Profile Line';
     DataClassification = CustomerContent;
 

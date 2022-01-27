@@ -1,5 +1,6 @@
-page 6060133 "NPR MM Member Card Card"
+﻿page 6060133 "NPR MM Member Card Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Member Card Card';
     DataCaptionExpression = Rec."External Card No.";

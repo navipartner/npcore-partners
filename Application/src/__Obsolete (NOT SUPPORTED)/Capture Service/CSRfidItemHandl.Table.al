@@ -1,5 +1,6 @@
-table 6151384 "NPR CS Rfid Item Handl."
+﻿table 6151384 "NPR CS Rfid Item Handl."
 {
+    Access = Internal;
 
     Caption = 'CS Rfid Item Handling';
     DataClassification = CustomerContent;

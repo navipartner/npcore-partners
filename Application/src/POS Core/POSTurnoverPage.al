@@ -1,5 +1,6 @@
-page 6014409 "NPR POS Turnover"
+﻿page 6014409 "NPR POS Turnover"
 {
+    Extensible = False;
     PageType = Worksheet;
 
     UsageCategory = ReportsAndAnalysis;

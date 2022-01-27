@@ -1,5 +1,6 @@
-table 6014615 "NPR EFT Recon. Bank Amount"
+﻿table 6014615 "NPR EFT Recon. Bank Amount"
 {
+    Access = Internal;
     Caption = 'EFT Recon. Bank Amount';
     DataClassification = CustomerContent;
 

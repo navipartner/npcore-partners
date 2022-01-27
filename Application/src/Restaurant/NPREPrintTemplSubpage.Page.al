@@ -1,5 +1,6 @@
-page 6150634 "NPR NPRE Print Templ. Subpage"
+﻿page 6150634 "NPR NPRE Print Templ. Subpage"
 {
+    Extensible = False;
     Caption = 'NPRE Print Templates Subpage';
     PageType = ListPart;
     SourceTable = "NPR NPRE Print Templ.";

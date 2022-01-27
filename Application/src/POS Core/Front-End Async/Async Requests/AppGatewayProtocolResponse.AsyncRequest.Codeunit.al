@@ -1,5 +1,6 @@
-codeunit 6150768 "NPR Front-End: AppGWResp." implements "NPR Front-End Async Request"
+﻿codeunit 6150768 "NPR Front-End: AppGWResp." implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _event: Text;

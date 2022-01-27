@@ -1,5 +1,6 @@
-codeunit 6014619 "NPR TaxFree LastVouch.Print"
+﻿codeunit 6014619 "NPR TaxFree LastVouch.Print"
 {
+    Access = Internal;
     // Single instance codeunit for allowing reprint of the last tax free voucher issued by a user session, for integrations that don't allow reprint further back.
     // 
     // PrintType:

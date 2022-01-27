@@ -1,5 +1,6 @@
-table 6014498 "NPR Exchange Label"
+﻿table 6014498 "NPR Exchange Label"
 {
+    Access = Internal;
     Caption = 'Exchange Label';
     DataClassification = CustomerContent;
 

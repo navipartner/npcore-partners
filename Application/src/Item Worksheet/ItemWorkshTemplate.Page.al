@@ -1,5 +1,6 @@
-page 6060058 "NPR Item Worksh. Template"
+﻿page 6060058 "NPR Item Worksh. Template"
 {
+    Extensible = False;
     Caption = 'Item Worksheet Template';
     PageType = Card;
     SourceTable = "NPR Item Worksh. Template";

@@ -1,5 +1,6 @@
-page 6151254 "NPR Acc. Payables Act"
+﻿page 6151254 "NPR Acc. Payables Act"
 {
+    Extensible = False;
     Caption = 'Activities';
     PageType = CardPart;
     RefreshOnActivate = true;

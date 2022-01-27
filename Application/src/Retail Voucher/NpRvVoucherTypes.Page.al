@@ -1,5 +1,6 @@
-page 6151013 "NPR NpRv Voucher Types"
+﻿page 6151013 "NPR NpRv Voucher Types"
 {
+    Extensible = False;
     Caption = 'Retail Voucher Types';
     CardPageID = "NPR NpRv Voucher Type Card";
     Editable = false;

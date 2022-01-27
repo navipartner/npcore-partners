@@ -1,5 +1,6 @@
-page 6059773 "NPR OAuth Setup Card"
+﻿page 6059773 "NPR OAuth Setup Card"
 {
+    Extensible = False;
 
     Caption = 'OAuth Setup';
     PageType = Card;

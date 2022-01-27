@@ -1,5 +1,6 @@
-codeunit 6151202 "NPR NpCs POSAction Proc. Order"
+﻿codeunit 6151202 "NPR NpCs POSAction Proc. Order"
 {
+    Access = Internal;
     var
         Text000: Label 'Process Collect in Store Orders';
 

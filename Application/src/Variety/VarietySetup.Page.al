@@ -1,5 +1,6 @@
-page 6059970 "NPR Variety Setup"
+﻿page 6059970 "NPR Variety Setup"
 {
+    Extensible = False;
     Caption = 'Variety Setup';
     PageType = Card;
     PromotedActionCategories = 'New,Process,Report,View,Update';

@@ -1,5 +1,6 @@
-page 6014463 "NPR Item ListPart"
+﻿page 6014463 "NPR Item ListPart"
 {
+    Extensible = False;
     Caption = 'Items';
     CardPageID = "Item Card";
     Editable = false;

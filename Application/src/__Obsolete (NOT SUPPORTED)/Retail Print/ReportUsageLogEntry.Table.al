@@ -1,5 +1,6 @@
-table 6014482 "NPR Report Usage Log Entry"
+﻿table 6014482 "NPR Report Usage Log Entry"
 {
+    Access = Internal;
     // NPR5.48/TJ  /20181108 CASE 324444 New object
 
     Caption = 'Report Usage Log Entry';

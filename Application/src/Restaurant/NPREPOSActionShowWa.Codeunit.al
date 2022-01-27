@@ -1,5 +1,6 @@
-codeunit 6150669 "NPR NPRE POSAction: Show Wa."
+﻿codeunit 6150669 "NPR NPRE POSAction: Show Wa."
 {
+    Access = Internal;
     var
         ReadingErr: Label 'reading in %1';
 

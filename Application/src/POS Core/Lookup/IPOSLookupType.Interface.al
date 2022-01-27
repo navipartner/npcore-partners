@@ -1,8 +1,11 @@
-/// <summary>
+﻿/// <summary>
 /// Represents a lookup type.
 /// </summary>
 interface "NPR IPOSLookupType"
 {
+    #IF NOT BC17 
+    Access = Internal;      
+    #ENDIF
     /// <summary>
     /// Initializes the data read operation for the lookup. It should open a RecordRef over the source table, and it should
     /// set any necessary filters so that the lookup infrastructure can iterate over the correct data.

@@ -1,5 +1,6 @@
-codeunit 6059903 "NPR Task Queue Execute"
+﻿codeunit 6059903 "NPR Task Queue Execute"
 {
+    Access = Internal;
     TableNo = "NPR Task Line";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-codeunit 6014507 "NPR MobilePayV10 Can. Refund"
+﻿codeunit 6014507 "NPR MobilePayV10 Can. Refund"
 {
+    Access = Internal;
     // POST  /v10/refunds/{refundid}/cancel
 
     // This is only a request to cancel in MobilePays backend, the polling continues 

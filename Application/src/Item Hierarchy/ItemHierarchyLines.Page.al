@@ -1,5 +1,6 @@
-page 6151053 "NPR Item Hierarchy Lines"
+﻿page 6151053 "NPR Item Hierarchy Lines"
 {
+    Extensible = False;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
 
     Caption = 'Item Hiearachy Lines';

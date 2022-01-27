@@ -1,5 +1,6 @@
-table 6060092 "NPR MM Admis. Service Log"
+﻿table 6060092 "NPR MM Admis. Service Log"
 {
+    Access = Internal;
 
     Caption = 'MM Admission Service Log';
     DataClassification = CustomerContent;

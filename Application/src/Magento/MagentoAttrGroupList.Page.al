@@ -1,5 +1,6 @@
-page 6151458 "NPR Magento Attr. Group List"
+﻿page 6151458 "NPR Magento Attr. Group List"
 {
+    Extensible = False;
     Caption = 'Attribute Groups';
     Editable = true;
     PageType = List;

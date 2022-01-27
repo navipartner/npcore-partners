@@ -1,5 +1,6 @@
-table 6150726 "NPR POS Action Sequence"
+﻿table 6150726 "NPR POS Action Sequence"
 {
+    Access = Internal;
     Caption = 'POS Action Sequence';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,6 @@
-page 6151137 "NPR TM Waiting List Setup"
+﻿page 6151137 "NPR TM Waiting List Setup"
 {
+    Extensible = False;
     // TM1.45/TSA/20200122  CASE 380754 Transport TM1.45 - 22 January 2020
 
     Caption = 'Waiting List Setup';

@@ -1,5 +1,6 @@
-table 6060106 "NPR Ean Box Event"
+﻿table 6060106 "NPR Ean Box Event"
 {
+    Access = Internal;
 
     Caption = 'Ean Box Event';
     DataClassification = CustomerContent;

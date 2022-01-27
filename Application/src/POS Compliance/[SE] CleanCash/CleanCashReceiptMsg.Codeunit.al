@@ -1,5 +1,6 @@
-codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP Interface"
+﻿codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP Interface"
 {
+    Access = Internal;
 
     // This method is not implement for receipt message type
 #pragma warning disable AA0150

@@ -1,5 +1,6 @@
-codeunit 6151051 "NPR Distribution Mgmt"
+﻿codeunit 6151051 "NPR Distribution Mgmt"
 {
+    Access = Internal;
     var
         NoLocationText: Label 'No Distribution Group Members exist in group %1';
         BlockedForDistribution: Label 'Distribution Blocked for %1';

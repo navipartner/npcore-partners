@@ -1,5 +1,6 @@
-page 6150722 "NPR POS Tax Line Subpage"
+﻿page 6150722 "NPR POS Tax Line Subpage"
 {
+    Extensible = False;
     Caption = 'POS Tax Line Subpage';
     Editable = false;
     PageType = ListPart;

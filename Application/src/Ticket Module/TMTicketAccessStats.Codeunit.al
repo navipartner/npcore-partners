@@ -1,5 +1,6 @@
 ﻿codeunit 6060114 "NPR TM Ticket Access Stats"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         BuildCompressedStatistics(Today);

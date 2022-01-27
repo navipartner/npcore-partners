@@ -1,5 +1,6 @@
 ﻿codeunit 6151463 "NPR M2 Account Lookup Mgt."
 {
+    Access = Internal;
     var
         Text000: Label '%1 %2 does not exist ';
 

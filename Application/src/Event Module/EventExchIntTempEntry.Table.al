@@ -1,5 +1,6 @@
-table 6060161 "NPR Event Exch.Int.Temp.Entry"
+﻿table 6060161 "NPR Event Exch.Int.Temp.Entry"
 {
+    Access = Internal;
     Caption = 'Event Exch. Int. Temp. Entry';
     DataClassification = CustomerContent;
 

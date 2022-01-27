@@ -1,5 +1,6 @@
-codeunit 6014561 "NPR Image Format"
+﻿codeunit 6014561 "NPR Image Format"
 {
+    Access = Internal;
     procedure ByteToHex(ByteValue: Byte): Text;
     var
         a: byte;

@@ -1,5 +1,6 @@
-page 6014459 "NPR DSFINVK Closing List"
+﻿page 6014459 "NPR DSFINVK Closing List"
 {
+    Extensible = False;
     ApplicationArea = NPRRetail;
     Caption = 'DSFINVK Closing List';
     PageType = List;

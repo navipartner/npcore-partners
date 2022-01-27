@@ -1,5 +1,6 @@
-page 6059901 "NPR Task Batch"
+﻿page 6059901 "NPR Task Batch"
 {
+    Extensible = False;
     // TQ1.28/MHA/20151216  CASE 229609 Task Queue
     // TQ1.29/JDH /20161101 CASE 242044 Added setupnewbatch call + removed unused fields
 

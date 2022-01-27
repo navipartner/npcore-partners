@@ -1,5 +1,6 @@
-table 6059985 "NPR Retail Document Cue"
+﻿table 6059985 "NPR Retail Document Cue"
 {
+    Access = Internal;
     Caption = 'Retail Document Cue';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

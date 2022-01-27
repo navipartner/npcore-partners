@@ -1,5 +1,6 @@
-codeunit 6150755 "NPR Front-End: ApplAdminTempl." implements "NPR Front-End Async Request"
+﻿codeunit 6150755 "NPR Front-End: ApplAdminTempl." implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _templates: JsonArray;

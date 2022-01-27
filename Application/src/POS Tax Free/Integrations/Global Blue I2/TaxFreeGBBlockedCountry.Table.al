@@ -1,5 +1,6 @@
-table 6014657 "NPR TaxFree GB BlockedCountry"
+﻿table 6014657 "NPR TaxFree GB BlockedCountry"
 {
+    Access = Internal;
 
     Caption = 'Tax Free GB Blocked Country';
     DataClassification = CustomerContent;

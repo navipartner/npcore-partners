@@ -1,5 +1,6 @@
-codeunit 6014634 "NPR POS Entry Tax Calc."
+﻿codeunit 6014634 "NPR POS Entry Tax Calc."
 {
+    Access = Internal;
 
     procedure DeleteAllLines(EntryNo: Integer)
     var

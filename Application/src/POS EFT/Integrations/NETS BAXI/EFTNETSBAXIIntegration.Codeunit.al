@@ -1,5 +1,6 @@
-codeunit 6184540 "NPR EFT NETS BAXI Integration"
+﻿codeunit 6184540 "NPR EFT NETS BAXI Integration"
 {
+    Access = Internal;
     // NPR5.54/MMV /20200129 CASE 364340 Created object
 
 

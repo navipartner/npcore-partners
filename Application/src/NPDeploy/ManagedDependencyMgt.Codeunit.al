@@ -1,5 +1,6 @@
-codeunit 6014627 "NPR Managed Dependency Mgt."
+﻿codeunit 6014627 "NPR Managed Dependency Mgt."
 {
+    Access = Internal;
     Permissions = TableData "NPR Web Client Dependency" = rimd,
                   TableData "NPR POS Stargate Package" = rimd;
 

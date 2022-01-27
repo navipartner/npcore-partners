@@ -1,5 +1,6 @@
-page 6151062 "NPR Distribution Setup"
+﻿page 6151062 "NPR Distribution Setup"
 {
+    Extensible = False;
     Caption = 'Distribution Setup';
     PageType = ListPart;
     UsageCategory = Administration;

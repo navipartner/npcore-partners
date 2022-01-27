@@ -1,5 +1,6 @@
-codeunit 6151596 "NPR NpDc Module Apply ItemList"
+﻿codeunit 6151596 "NPR NpDc Module Apply ItemList"
 {
+    Access = Internal;
     var
         Text000: Label 'Apply Discount - Item List';
 

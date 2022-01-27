@@ -1,5 +1,6 @@
-table 6184515 "NPR EFT Verifone Unit Param."
+﻿table 6184515 "NPR EFT Verifone Unit Param."
 {
+    Access = Internal;
     // NPR5.53/MMV /20191204 CASE 349520 Added object
 
     Caption = 'EFT Verifone Unit Parameter';

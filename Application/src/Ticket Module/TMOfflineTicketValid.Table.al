@@ -1,5 +1,6 @@
-table 6060109 "NPR TM Offline Ticket Valid."
+﻿table 6060109 "NPR TM Offline Ticket Valid."
 {
+    Access = Internal;
     Caption = 'Offline Ticket Validation';
     DataClassification = CustomerContent;
 

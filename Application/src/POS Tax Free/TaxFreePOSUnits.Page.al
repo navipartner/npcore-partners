@@ -1,5 +1,6 @@
-page 6014644 "NPR POS Tax Free Profiles"
+﻿page 6014644 "NPR POS Tax Free Profiles"
 {
+    Extensible = False;
     Caption = 'POS Tax Free Profiles';
     PageType = List;
     SourceTable = "NPR Tax Free POS Unit";

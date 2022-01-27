@@ -1,5 +1,6 @@
-table 6014604 "NPR OAuth Setup"
+﻿table 6014604 "NPR OAuth Setup"
 {
+    Access = Internal;
     Caption = 'OAuth Setup';
     DataClassification = CustomerContent;
 

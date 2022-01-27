@@ -1,5 +1,6 @@
-page 6151601 "NPR NpDc Arch.Coupon Entries"
+﻿page 6151601 "NPR NpDc Arch.Coupon Entries"
 {
+    Extensible = False;
     Caption = 'Archived Coupon Entries';
     Editable = false;
     PageType = List;

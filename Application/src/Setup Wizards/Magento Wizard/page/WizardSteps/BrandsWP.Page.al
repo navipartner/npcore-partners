@@ -1,5 +1,6 @@
-page 6014552 "NPR Brands WP"
+﻿page 6014552 "NPR Brands WP"
 {
+    Extensible = False;
     Caption = 'Brands';
     PageType = ListPart;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-table 6150732 "NPR POS Sales WF Set Entry"
+﻿table 6150732 "NPR POS Sales WF Set Entry"
 {
+    Access = Internal;
     // NPR5.45/MHA /20180820  CASE 321266 Object created
 
     Caption = 'POS Sales Workflow Set Entry';

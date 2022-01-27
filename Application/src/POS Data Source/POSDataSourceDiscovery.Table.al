@@ -1,5 +1,6 @@
-table 6150708 "NPR POS Data Source Discovery"
+﻿table 6150708 "NPR POS Data Source Discovery"
 {
+    Access = Internal;
     Caption = 'POS Data Source';
     DataClassification = CustomerContent;
 

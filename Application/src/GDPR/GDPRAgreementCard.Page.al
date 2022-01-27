@@ -1,5 +1,6 @@
-page 6151123 "NPR GDPR Agreement Card"
+﻿page 6151123 "NPR GDPR Agreement Card"
 {
+    Extensible = False;
     // MM1.29/NPKNAV/20180524  CASE 313795 Transport MM1.29 - 24 May 2018
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Action
 

@@ -1,5 +1,6 @@
 ﻿codeunit 6151102 "NPR NpRi Reimbursement Mgt."
 {
+    Access = Internal;
 
     TableNo = "NPR NpRi Reimbursement";
 

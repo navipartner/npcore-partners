@@ -1,5 +1,6 @@
 ﻿codeunit 6059955 "NPR MCS Face Service API"
 {
+    Access = Internal;
     var
         PersonGroupURI: label '/persongroups/', Locked = true;
         PersonURI: label '/persons/', Locked = true;

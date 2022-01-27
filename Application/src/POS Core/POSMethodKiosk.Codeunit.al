@@ -1,5 +1,6 @@
-codeunit 6150741 "NPR POS Method - Kiosk"
+﻿codeunit 6150741 "NPR POS Method - Kiosk"
 {
+    Access = Internal;
     var
         ReadingErr: Label 'reading in %1';
 

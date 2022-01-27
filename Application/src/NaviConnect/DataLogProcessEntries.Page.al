@@ -1,5 +1,6 @@
-page 6059894 "NPR Data Log Process. Entries"
+﻿page 6059894 "NPR Data Log Process. Entries"
 {
+    Extensible = False;
     Editable = false;
     PageType = List;
     SourceTable = "NPR Data Log Processing Entry";

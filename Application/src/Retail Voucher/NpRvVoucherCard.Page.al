@@ -1,5 +1,6 @@
-page 6151014 "NPR NpRv Voucher Card"
+﻿page 6151014 "NPR NpRv Voucher Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Retail Voucher Card';
     SourceTable = "NPR NpRv Voucher";

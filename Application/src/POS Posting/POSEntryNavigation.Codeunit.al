@@ -1,5 +1,6 @@
-codeunit 6150635 "NPR POS Entry Navigation"
+﻿codeunit 6150635 "NPR POS Entry Navigation"
 {
+    Access = Internal;
     procedure OpenPOSSalesLineListFromItem(Item: Record Item)
     var
         POSSalesLine: Record "NPR POS Entry Sales Line";

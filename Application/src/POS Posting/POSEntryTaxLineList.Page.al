@@ -1,5 +1,6 @@
-page 6150676 "NPR POS Entry Tax Line List"
+﻿page 6150676 "NPR POS Entry Tax Line List"
 {
+    Extensible = False;
     Caption = 'POS Entry Tax Line List';
     Editable = false;
     PageType = List;

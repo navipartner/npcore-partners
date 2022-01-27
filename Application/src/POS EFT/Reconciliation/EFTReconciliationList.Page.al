@@ -1,5 +1,6 @@
-page 6059818 "NPR EFT Reconciliation List"
+﻿page 6059818 "NPR EFT Reconciliation List"
 {
+    Extensible = False;
     Caption = 'EFT Reconciliation List';
     CardPageID = "NPR EFT Reconciliation";
     Editable = false;

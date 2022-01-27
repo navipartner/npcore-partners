@@ -1,5 +1,6 @@
-table 6059980 "NPR Item Repair Log"
+﻿table 6059980 "NPR Item Repair Log"
 {
+    Access = Internal;
     // VRT1.20/JDH /20170106 CASE 251896 TestTool to analyse and fix Variants
 
     Caption = 'Item Repair Log';

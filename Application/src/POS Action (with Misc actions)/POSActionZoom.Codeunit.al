@@ -1,5 +1,6 @@
-codeunit 6150803 "NPR POSAction: Zoom"
+﻿codeunit 6150803 "NPR POSAction: Zoom"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Zoom a sales line.';
 

@@ -1,5 +1,6 @@
-codeunit 6150852 "NPR POS Action - Item Price"
+﻿codeunit 6150852 "NPR POS Action - Item Price"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This action prompts for a numeric item number, and shows the price';
         Title: Label 'We need more information.';

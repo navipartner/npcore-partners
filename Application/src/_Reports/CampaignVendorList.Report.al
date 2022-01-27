@@ -1,5 +1,8 @@
-report 6014497 "NPR Campaign Vendor List"
+﻿report 6014497 "NPR Campaign Vendor List"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Campaign Vendor List.rdlc';
     UsageCategory = ReportsAndAnalysis;

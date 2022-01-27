@@ -1,6 +1,7 @@
 codeunit 6059867 "NPR ReportSelectionMgt"
-
 {
+    Access = Internal;
+
     [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnPrintDocumentsOnAfterSelectTempReportSelectionsToPrint', '', true, true)]
 
     local procedure OnPrintDocumentsOnAfterSelectTempReportSelectionsToPrint(RecordVariant: Variant; var TempReportSelections: Record "Report Selections" temporary; var TempNameValueBuffer: Record "Name/Value Buffer" temporary; WithCheck: Boolean; ReportUsage: Integer; TableNo: Integer)

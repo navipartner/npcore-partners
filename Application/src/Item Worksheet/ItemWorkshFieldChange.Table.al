@@ -1,5 +1,6 @@
-table 6060053 "NPR Item Worksh. Field Change"
+﻿table 6060053 "NPR Item Worksh. Field Change"
 {
+    Access = Internal;
     Caption = 'Item Worksheet Field Change';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Item Worksh. Field Changes";

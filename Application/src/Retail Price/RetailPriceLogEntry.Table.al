@@ -1,5 +1,6 @@
-table 6014476 "NPR Retail Price Log Entry"
+﻿table 6014476 "NPR Retail Price Log Entry"
 {
+    Access = Internal;
     // NPR5.40/MHA /20180316  CASE 304031 Object created
 
     Caption = 'Retail Price Log Entry';

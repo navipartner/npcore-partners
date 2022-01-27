@@ -1,5 +1,6 @@
-page 6014538 "NPR Insurance Companies"
+﻿page 6014538 "NPR Insurance Companies"
 {
+    Extensible = False;
     Caption = 'Insurance - Companies';
     PageType = List;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-codeunit 6014430 "NPR Apply Salesperson to Doc."
+﻿codeunit 6014430 "NPR Apply Salesperson to Doc."
 {
+    Access = Internal;
     // Manually bound event
     // 
     // NPR5.53/MMV /20200102 CASE Created object

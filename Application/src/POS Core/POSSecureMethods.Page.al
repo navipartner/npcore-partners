@@ -1,5 +1,6 @@
-page 6150731 "NPR POS Secure Methods"
+﻿page 6150731 "NPR POS Secure Methods"
 {
+    Extensible = False;
     // NPR5.43/VB  /20180611  CASE 314603 Implemented secure method behavior functionality.
 
     Caption = 'POS Secure Methods';

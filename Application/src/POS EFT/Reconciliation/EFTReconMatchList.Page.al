@@ -1,5 +1,6 @@
-page 6059835 "NPR EFT Recon. Match List"
+﻿page 6059835 "NPR EFT Recon. Match List"
 {
+    Extensible = False;
     Caption = 'EFT Recon. Match List';
     CardPageID = "NPR EFT Recon. Match Card";
     Editable = false;

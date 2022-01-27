@@ -1,5 +1,6 @@
-page 6060148 "NPR RC Members. Burndown Chart"
+﻿page 6060148 "NPR RC Members. Burndown Chart"
 {
+    Extensible = False;
 
     Caption = 'Membership Burndown Chart';
     PageType = CardPart;

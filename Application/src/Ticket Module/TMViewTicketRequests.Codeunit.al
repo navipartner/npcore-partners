@@ -1,5 +1,6 @@
-codeunit 6060125 "NPR TM View Ticket Requests"
+﻿codeunit 6060125 "NPR TM View Ticket Requests"
 {
+    Access = Internal;
     // #280133/BHR/20170609 CASE 280133 View Ticket from Import list (document function)
 
     TableNo = "NPR Nc Import Entry";

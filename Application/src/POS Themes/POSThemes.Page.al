@@ -1,5 +1,6 @@
-page 6150735 "NPR POS Themes"
+﻿page 6150735 "NPR POS Themes"
 {
+    Extensible = False;
     // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
 
     Caption = 'POS Themes';

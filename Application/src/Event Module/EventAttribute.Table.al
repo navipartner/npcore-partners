@@ -1,5 +1,6 @@
-table 6060162 "NPR Event Attribute"
+﻿table 6060162 "NPR Event Attribute"
 {
+    Access = Internal;
     Caption = 'Event Attribute';
     DataClassification = CustomerContent;
 

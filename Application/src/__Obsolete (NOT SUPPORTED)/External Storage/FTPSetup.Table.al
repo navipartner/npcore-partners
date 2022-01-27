@@ -1,5 +1,6 @@
-table 6184880 "NPR FTP Setup"
+﻿table 6184880 "NPR FTP Setup"
 {
+    Access = Internal;
     Caption = 'FTP Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

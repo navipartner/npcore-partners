@@ -1,5 +1,6 @@
-codeunit 6014669 "NPR POS Data Driver: Discount"
+﻿codeunit 6014669 "NPR POS Data Driver: Discount"
 {
+    Access = Internal;
     local procedure ThisDataSource(): Text
     begin
         exit('BUILTIN_SALELINE');

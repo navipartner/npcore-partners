@@ -1,5 +1,6 @@
-query 6060136 "NPR MM Member Card Notific."
+﻿query 6060136 "NPR MM Member Card Notific."
 {
+    Access = Internal;
 
     Caption = 'MM Member Card Notification';
 

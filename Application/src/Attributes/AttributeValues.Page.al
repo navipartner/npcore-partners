@@ -1,5 +1,6 @@
-page 6014608 "NPR Attribute Values"
+﻿page 6014608 "NPR Attribute Values"
 {
+    Extensible = False;
     // NPR4.11/TSA/20150422 CASE209946 - Entity and Shortcut Attributes
 
     Caption = 'Client Attribute Values';

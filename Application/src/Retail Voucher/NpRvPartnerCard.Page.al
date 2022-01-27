@@ -1,5 +1,6 @@
-page 6151027 "NPR NpRv Partner Card"
+﻿page 6151027 "NPR NpRv Partner Card"
 {
+    Extensible = False;
     Caption = 'Retail Voucher Partner';
     PageType = Card;
     UsageCategory = Administration;

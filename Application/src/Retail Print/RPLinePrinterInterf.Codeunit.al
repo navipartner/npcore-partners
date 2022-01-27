@@ -1,5 +1,6 @@
-codeunit 6014548 "NPR RP Line Printer Interf."
+﻿codeunit 6014548 "NPR RP Line Printer Interf."
 {
+    Access = Internal;
     // Line Printer Interface.
     // 
     // This library is purely an interface between the

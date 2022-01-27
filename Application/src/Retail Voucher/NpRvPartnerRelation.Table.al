@@ -1,5 +1,6 @@
-table 6151025 "NPR NpRv Partner Relation"
+﻿table 6151025 "NPR NpRv Partner Relation"
 {
+    Access = Internal;
     Caption = 'Retail Voucher Partner Relation';
     DataClassification = CustomerContent;
 

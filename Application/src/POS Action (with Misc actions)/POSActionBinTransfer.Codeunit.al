@@ -1,5 +1,6 @@
-codeunit 6150851 "NPR POS Action: Bin Transfer"
+﻿codeunit 6150851 "NPR POS Action: Bin Transfer"
 {
+    Access = Internal;
     var
         ActionDescriptionLbl: Label 'This action transfer funds from one bin to a different bin using the thPOS';
 

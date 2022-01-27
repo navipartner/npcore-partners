@@ -1,5 +1,6 @@
-page 6059790 "NPR Pdf2Nav Posting Setup"
+﻿page 6059790 "NPR Pdf2Nav Posting Setup"
 {
+    Extensible = False;
     Caption = 'Pdf2Nav Posting Setup';
     PageType = Card;
     SourceTable = "NPR SalesPost Pdf2Nav Setup";

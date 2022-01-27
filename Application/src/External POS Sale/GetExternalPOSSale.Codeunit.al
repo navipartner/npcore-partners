@@ -1,5 +1,6 @@
-codeunit 6014648 "NPR Get External POS Sale" implements "NPR Nc Import List IUpdate"
+﻿codeunit 6014648 "NPR Get External POS Sale" implements "NPR Nc Import List IUpdate"
 {
+    Access = Internal;
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
 
     begin

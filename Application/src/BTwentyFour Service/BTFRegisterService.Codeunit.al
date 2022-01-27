@@ -1,5 +1,6 @@
-codeunit 6014640 "NPR BTF Register Service"
+﻿codeunit 6014640 "NPR BTF Register Service"
 {
+    Access = Internal;
     var
         ServiceCodeLbl: Label 'V1', Locked = true;
         ServiceNameLbl: Label 'BTwentyFour Omni Channel V1.0';

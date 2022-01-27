@@ -1,5 +1,6 @@
-codeunit 6150771 "NPR Front-End: StargatePkg." implements "NPR Front-End Async Request"
+﻿codeunit 6150771 "NPR Front-End: StargatePkg." implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _packages: JsonArray;

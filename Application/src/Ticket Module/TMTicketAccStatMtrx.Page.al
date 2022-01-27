@@ -1,5 +1,6 @@
-page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
+﻿page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
 {
+    Extensible = False;
     Caption = 'Ticket Access Statistics Matrix';
     PageType = ListPlus;
     UsageCategory = ReportsAndAnalysis;

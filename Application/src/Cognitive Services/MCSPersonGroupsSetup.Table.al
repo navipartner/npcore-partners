@@ -1,5 +1,6 @@
-table 6059956 "NPR MCS Person Groups Setup"
+﻿table 6059956 "NPR MCS Person Groups Setup"
 {
+    Access = Internal;
 
     Caption = 'MCS Person Groups Setup';
     DataClassification = CustomerContent;

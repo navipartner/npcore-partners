@@ -1,5 +1,6 @@
-query 6014614 "NPR Retail Cmpgn. Items Mix 1"
+﻿query 6014614 "NPR Retail Cmpgn. Items Mix 1"
 {
+    Access = Internal;
     Caption = 'Retail Cmpgn. Items Mix 1';
     elements
     {

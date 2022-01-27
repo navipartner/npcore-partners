@@ -1,5 +1,6 @@
-page 6014619 "NPR Tax Free CC Param."
+﻿page 6014619 "NPR Tax Free CC Param."
 {
+    Extensible = False;
 
     Caption = 'Custom Cash Parameters';
     PageType = Card;

@@ -1,4 +1,4 @@
-/*
+﻿/*
    All MobilePay transactions pass through a reserved -> polling -> capture/cancel flow. We do not log polling, capture or cancel as separate transaction request.
    These are logged in the context of the original transaction, which switches status. 
    Depending on the log level, these separate request/responses are visible in the logging factbox for the original trx.
@@ -7,6 +7,7 @@
 
 codeunit 6014518 "NPR MobilePayV10 Integration"
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

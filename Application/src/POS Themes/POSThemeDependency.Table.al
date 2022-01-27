@@ -1,5 +1,6 @@
-table 6150722 "NPR POS Theme Dependency"
+﻿table 6150722 "NPR POS Theme Dependency"
 {
+    Access = Internal;
     // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
 
     Caption = 'POS Theme Dependency';

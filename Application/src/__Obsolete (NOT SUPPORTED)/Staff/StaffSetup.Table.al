@@ -1,5 +1,6 @@
-table 6014485 "NPR Staff Setup"
+﻿table 6014485 "NPR Staff Setup"
 {
+    Access = Internal;
     Caption = 'Staff Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

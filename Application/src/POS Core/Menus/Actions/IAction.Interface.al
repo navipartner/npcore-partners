@@ -1,5 +1,8 @@
-interface "NPR IAction"
+﻿interface "NPR IAction"
 {
+    #IF NOT BC17 
+    Access = Internal;      
+    #ENDIF
     procedure Content(): JsonObject;
     procedure Parameters(): JsonObject;
     procedure Type(): Enum "NPR Action Type";

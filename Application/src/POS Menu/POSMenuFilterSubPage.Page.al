@@ -1,5 +1,6 @@
-page 6150717 "NPR POS Menu Filter SubPage"
+﻿page 6150717 "NPR POS Menu Filter SubPage"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Filter Line';
     PageType = ListPart;

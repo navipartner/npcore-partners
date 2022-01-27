@@ -1,5 +1,8 @@
-report 6060137 "NPR MM Membership Batch Renew"
+﻿report 6060137 "NPR MM Membership Batch Renew"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Membership Batch Renew';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

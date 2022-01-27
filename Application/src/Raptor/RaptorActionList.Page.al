@@ -1,5 +1,6 @@
-page 6151494 "NPR Raptor Action List"
+﻿page 6151494 "NPR Raptor Action List"
 {
+    Extensible = False;
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
 
     Caption = 'Raptor Action List';

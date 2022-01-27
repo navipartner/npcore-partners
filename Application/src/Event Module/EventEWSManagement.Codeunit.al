@@ -1,5 +1,6 @@
-codeunit 6060151 "NPR Event EWS Management"
+﻿codeunit 6060151 "NPR Event EWS Management"
 {
+    Access = Internal;
     var
 
         ExchItemType: Option "E-Mail",Appointment,"Meeting Request";

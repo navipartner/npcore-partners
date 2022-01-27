@@ -1,5 +1,6 @@
-page 6151436 "NPR Magento Item Attr."
+﻿page 6151436 "NPR Magento Item Attr."
 {
+    Extensible = False;
     UsageCategory = None;
     AutoSplitKey = true;
     Caption = 'Item Attributes';

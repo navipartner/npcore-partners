@@ -1,5 +1,6 @@
-codeunit 6014447 "NPR Document Send. Profile Sub"
+﻿codeunit 6014447 "NPR Document Send. Profile Sub"
 {
+    Access = Internal;
     SingleInstance = true; //For performance, not state sharing.
     [EventSubscriber(ObjectType::Table, Database::"Document Sending Profile", 'OnBeforeSendCustomerRecords', '', true, true)]
     local procedure NPRDocumentSendingProfileOnBeforeSendCustomerRecords(ReportUsage: Integer; RecordVariant: Variant; DocName: Text[150]; CustomerNo: Code[20]; DocumentNo: Code[20]; CustomerFieldNo: Integer; DocumentFieldNo: Integer; var Handled: Boolean)

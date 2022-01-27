@@ -1,5 +1,6 @@
-codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
+﻿codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
 {
+    Access = Internal;
     // NPR5.32/MMV /20170410 CASE 241995 Retail Print 2.0
     // NPR5.34/MMV /20170707 CASE 269396 Support for aligning while rotating.
     // NPR5.48/MMV /20181126 CASE 327107 Added QR support

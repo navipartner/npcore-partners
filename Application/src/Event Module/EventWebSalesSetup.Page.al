@@ -1,5 +1,6 @@
-page 6060158 "NPR Event Web Sales Setup"
+﻿page 6060158 "NPR Event Web Sales Setup"
 {
+    Extensible = False;
     Caption = 'Event Web Sales Setup';
     PageType = List;
     SourceTable = "NPR Event Web Sales Setup";

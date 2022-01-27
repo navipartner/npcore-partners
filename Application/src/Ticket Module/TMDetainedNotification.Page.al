@@ -1,5 +1,6 @@
-page 6059841 "NPR TM Detained Notification"
+﻿page 6059841 "NPR TM Detained Notification"
 {
+    Extensible = False;
     PageType = List;
     ApplicationArea = NPRTicketAdvanced;
     UsageCategory = Lists;

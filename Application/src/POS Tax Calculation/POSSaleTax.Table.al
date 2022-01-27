@@ -1,5 +1,6 @@
-table 6014570 "NPR POS Sale Tax"
+﻿table 6014570 "NPR POS Sale Tax"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'POS Sale Tax';
     LookupPageId = "NPR POS Sale Tax List";

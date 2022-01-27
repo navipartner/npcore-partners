@@ -1,5 +1,6 @@
-page 6150726 "NPR POS Action Sequences"
+﻿page 6150726 "NPR POS Action Sequences"
 {
+    Extensible = False;
     Caption = 'POS Action Sequences';
     PageType = List;
     SourceTable = "NPR POS Action Sequence";

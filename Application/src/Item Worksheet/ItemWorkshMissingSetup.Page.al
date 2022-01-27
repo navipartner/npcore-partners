@@ -1,5 +1,6 @@
-page 6060049 "NPR Item Worksh. Missing Setup"
+﻿page 6060049 "NPR Item Worksh. Missing Setup"
 {
+    Extensible = False;
     Caption = 'Item Worksheet Missing Setup';
     PageType = List;
     SourceTable = "NPR Missing Setup Table";

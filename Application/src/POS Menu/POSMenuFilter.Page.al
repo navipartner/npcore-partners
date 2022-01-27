@@ -1,5 +1,6 @@
-page 6150718 "NPR POS Menu Filter"
+﻿page 6150718 "NPR POS Menu Filter"
 {
+    Extensible = False;
     Caption = 'POS Menu Filter';
     DelayedInsert = true;
     PageType = Card;

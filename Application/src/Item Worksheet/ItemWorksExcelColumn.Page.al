@@ -1,5 +1,6 @@
-page 6060053 "NPR Item Works. Excel Column"
+﻿page 6060053 "NPR Item Works. Excel Column"
 {
+    Extensible = False;
     Caption = 'Item Worksheet Excel Column';
     PageType = List;
     SourceTable = "NPR Item Worksh. Excel Column";

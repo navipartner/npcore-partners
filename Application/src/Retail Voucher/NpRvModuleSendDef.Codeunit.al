@@ -1,5 +1,6 @@
-codeunit 6151013 "NPR NpRv Module Send: Def."
+﻿codeunit 6151013 "NPR NpRv Module Send: Def."
 {
+    Access = Internal;
     TableNo = "NPR NpRv Voucher";
 
     trigger OnRun()

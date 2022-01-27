@@ -1,5 +1,6 @@
-page 6151572 "NPR AF Test Services"
+﻿page 6151572 "NPR AF Test Services"
 {
+    Extensible = False;
     Caption = 'AF Test Services';
     PageType = Card;
     UsageCategory = Administration;

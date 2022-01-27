@@ -1,5 +1,6 @@
-page 6151533 "NPR Nc Collector Req. Lines"
+﻿page 6151533 "NPR Nc Collector Req. Lines"
 {
+    Extensible = False;
     Caption = 'Nc Collector Request Lines';
     PageType = List;
     SourceTable = "NPR Nc Collector Request";

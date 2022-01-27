@@ -1,5 +1,8 @@
-enum 6014430 "NPR Magento Variant System"
+﻿enum 6014430 "NPR Magento Variant System"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "None")

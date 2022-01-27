@@ -1,5 +1,6 @@
-table 6014454 "NPR CleanCash Trans. VAT"
+﻿table 6014454 "NPR CleanCash Trans. VAT"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'CleanCash Trans. VAT';
 

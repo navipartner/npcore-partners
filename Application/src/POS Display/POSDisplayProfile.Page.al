@@ -1,5 +1,6 @@
-page 6059995 "NPR POS Display Profile"
+﻿page 6059995 "NPR POS Display Profile"
 {
+    Extensible = False;
     Caption = 'POS Display Profile';
     PageType = Card;
     UsageCategory = None;

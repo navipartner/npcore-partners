@@ -1,5 +1,8 @@
-report 6151598 "NPR Open/Archive Coupon Stat."
+﻿report 6151598 "NPR Open/Archive Coupon Stat."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/OpenArchive Coupon Statistics.rdlc';
     Caption = 'Open/Archived Coupon Statistics';

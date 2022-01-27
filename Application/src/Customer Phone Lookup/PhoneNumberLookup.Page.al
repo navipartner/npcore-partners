@@ -1,5 +1,6 @@
-page 6014413 "NPR Phone Number Lookup"
+﻿page 6014413 "NPR Phone Number Lookup"
 {
+    Extensible = False;
     Caption = 'Online service Name and Numbers search';
     Editable = false;
     PageType = List;

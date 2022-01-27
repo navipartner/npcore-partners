@@ -1,5 +1,6 @@
 table 6014452 "NPR Shipping Provider Document"
 {
+    Access = Internal;
     Caption = 'Shipping Provider  Document';
     DrillDownPageID = "NPR Shipping Provider Docs";
     LookupPageID = "NPR Shipping Provider Docs";

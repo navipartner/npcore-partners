@@ -1,5 +1,6 @@
-page 6059947 "NPR Sales Price Maint. Groups"
+﻿page 6059947 "NPR Sales Price Maint. Groups"
 {
+    Extensible = False;
     Caption = 'Sales Price Maintenance Groups';
     PageType = List;
     UsageCategory = Administration;

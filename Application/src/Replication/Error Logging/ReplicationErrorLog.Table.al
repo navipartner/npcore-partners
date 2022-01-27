@@ -1,5 +1,6 @@
-table 6014584 "NPR Replication Error Log"
+﻿table 6014584 "NPR Replication Error Log"
 {
+    Access = Internal;
     Caption = 'Replication Error Log';
     DataClassification = CustomerContent;
     Extensible = false;

@@ -1,5 +1,6 @@
-table 6150637 "NPR POS Audit Log"
+﻿table 6150637 "NPR POS Audit Log"
 {
+    Access = Internal;
     Caption = 'POS Audit Log';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Audit Log";

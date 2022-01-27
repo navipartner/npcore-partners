@@ -1,5 +1,6 @@
-table 6151493 "NPR Raptor Action"
+﻿table 6151493 "NPR Raptor Action"
 {
+    Access = Internal;
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
     // NPR5.54/ALPO/20200302 CASE 355871 Possibility to specify user identifier parameter name
 

@@ -1,5 +1,6 @@
-page 6151524 "NPR Nc Endpoint E-mail List"
+﻿page 6151524 "NPR Nc Endpoint E-mail List"
 {
+    Extensible = False;
     Caption = 'Nc Endpoint E-mail List';
     CardPageID = "NPR Nc Endpoint E-mail Card";
     DeleteAllowed = false;

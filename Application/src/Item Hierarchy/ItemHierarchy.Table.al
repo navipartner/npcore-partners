@@ -1,5 +1,6 @@
-table 6151050 "NPR Item Hierarchy"
+﻿table 6151050 "NPR Item Hierarchy"
 {
+    Access = Internal;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
 
     Caption = 'Item Hierarchy';

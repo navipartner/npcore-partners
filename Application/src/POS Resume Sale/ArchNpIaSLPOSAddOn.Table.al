@@ -1,5 +1,6 @@
-table 6014494 "NPR Arch. NpIa SL POS AddOn"
+﻿table 6014494 "NPR Arch. NpIa SL POS AddOn"
 {
+    Access = Internal;
     // The purpose of this table:
     //   All existing unfinished sale transactions have been moved to archive tables
     //   The table may be deleted later, when it is no longer relevant.

@@ -1,5 +1,6 @@
-table 6014435 "NPR Touch Screen: Meta Func."
+﻿table 6014435 "NPR Touch Screen: Meta Func."
 {
+    Access = Internal;
     // NPR/RMT/20150210 Case 198862 - Assigned a valid lookuppage to the table
     // NPR5.20/MHA/20150315 CASE 235325 Added Action Type NavEvent for invoking Publisher function HandleMetaTriggerEvent()
 

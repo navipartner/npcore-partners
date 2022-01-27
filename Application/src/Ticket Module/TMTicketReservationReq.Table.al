@@ -1,5 +1,6 @@
-table 6060116 "NPR TM Ticket Reservation Req."
+﻿table 6060116 "NPR TM Ticket Reservation Req."
 {
+    Access = Internal;
     Caption = 'Ticket Reservation Request';
     DataClassification = CustomerContent;
 

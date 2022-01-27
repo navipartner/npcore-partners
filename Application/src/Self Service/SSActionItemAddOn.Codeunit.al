@@ -1,5 +1,6 @@
 ﻿codeunit 6151285 "NPR SS Action - Item AddOn"
 {
+    Access = Internal;
 
     var
         ActionDescription: Label 'This built in function sets the item addon values';

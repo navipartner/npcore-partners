@@ -1,5 +1,6 @@
-table 6059778 "NPR Sync Profile Setup"
+﻿table 6059778 "NPR Sync Profile Setup"
 {
+    Access = Internal;
     Caption = 'Sync Profile Setup';
     DataPerCompany = false;
     DataClassification = CustomerContent;

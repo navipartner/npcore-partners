@@ -1,5 +1,6 @@
-codeunit 6060063 "NPR Catalog Nonstock Mgt."
+﻿codeunit 6060063 "NPR Catalog Nonstock Mgt."
 {
+    Access = Internal;
     local procedure CopyNonstockAttributesToItem(var NonstockItem: Record "Nonstock Item")
     var
         NPRAttributeKey: Record "NPR Attribute Key";

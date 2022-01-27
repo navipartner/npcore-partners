@@ -1,5 +1,6 @@
-table 6151574 "NPR AF Notification Hub"
+﻿table 6151574 "NPR AF Notification Hub"
 {
+    Access = Internal;
     Caption = 'AF Notification Hub';
     DataClassification = CustomerContent;
     DataCaptionFields = Id, Title;

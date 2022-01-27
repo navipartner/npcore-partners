@@ -1,6 +1,8 @@
-#if BC17
+﻿#if BC17
 codeunit 6014528 "NPR Barcode Image Library"
 {
+    Access = Internal;
+
     var
         BarCodeType: DotNet NPRNetBarCodeType;
         BarCodeSettings: DotNet NPRNetBarcodeSettings;

@@ -1,5 +1,6 @@
-codeunit 6151130 "NPR TM Seating Mgt."
+﻿codeunit 6151130 "NPR TM Seating Mgt."
 {
+    Access = Internal;
     procedure AddRoot(AdmissionCode: Code[20]; pDescription: Text[80]) EntryNo: Integer
     var
         SeatingTemplate: Record "NPR TM Seating Template";

@@ -1,5 +1,6 @@
-codeunit 6151327 "NPR NpEc P.Invoice Imp. Create"
+﻿codeunit 6151327 "NPR NpEc P.Invoice Imp. Create"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

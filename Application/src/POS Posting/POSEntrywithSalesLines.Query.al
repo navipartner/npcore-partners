@@ -1,5 +1,6 @@
-query 6014417 "NPR POS Entry with Sales Lines"
+﻿query 6014417 "NPR POS Entry with Sales Lines"
 {
+    Access = Internal;
     Caption = 'POS Entry with Sales Lines';
 
     elements

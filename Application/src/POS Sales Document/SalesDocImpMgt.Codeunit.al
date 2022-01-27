@@ -1,5 +1,6 @@
 ﻿codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
 {
+    Access = Internal;
     var
         ERR_DUPLICATE_DOCUMENT: Label 'Only one sales document can be processed per sale.';
         DOCUMENT_IMPORTED_DELETED: Label '%1 %2 was imported in POS. The document has been deleted.';

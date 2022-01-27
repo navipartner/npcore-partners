@@ -1,5 +1,6 @@
-codeunit 6150857 "NPR POS Action: Item UnitPrice"
+﻿codeunit 6150857 "NPR POS Action: Item UnitPrice"
 {
+    Access = Internal;
 
     var
         Text000: Label 'Insert Item and set Unit Price from Barcode';

@@ -1,5 +1,6 @@
-page 6014516 "NPR I-Comm"
+﻿page 6014516 "NPR I-Comm"
 {
+    Extensible = False;
     // //-NPR4.001.000,Offline - NPE
     //   Added field default dialog path to tab smtp
     // 

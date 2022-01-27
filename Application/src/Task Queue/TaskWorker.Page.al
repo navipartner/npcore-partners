@@ -1,5 +1,6 @@
-page 6059907 "NPR Task Worker"
+﻿page 6059907 "NPR Task Worker"
 {
+    Extensible = False;
     Caption = 'Task Worker';
     PageType = List;
     SourceTable = "NPR Task Worker";

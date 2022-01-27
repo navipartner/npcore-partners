@@ -1,5 +1,6 @@
-table 6150679 "NPR NPRE Kitchen Req. Station"
+﻿table 6150679 "NPR NPRE Kitchen Req. Station"
 {
+    Access = Internal;
     Caption = 'Kitchen Order Line Station';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Kitchen Req. Stations";

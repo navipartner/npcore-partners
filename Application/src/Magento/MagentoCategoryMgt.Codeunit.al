@@ -1,5 +1,6 @@
-codeunit 6151406 "NPR Magento Category Mgt."
+﻿codeunit 6151406 "NPR Magento Category Mgt."
 {
+    Access = Internal;
     procedure ItemCountDrillDown(MagentoCategory: Record "NPR Magento Category")
     var
         Item: Record Item;

@@ -1,5 +1,6 @@
-page 6014577 "NPR Tax Free GB I2 Serv. List"
+﻿page 6014577 "NPR Tax Free GB I2 Serv. List"
 {
+    Extensible = False;
 
     Caption = 'Tax Free GB I2 Service List';
     DeleteAllowed = false;

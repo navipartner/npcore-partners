@@ -1,5 +1,6 @@
-table 6151595 "NPR NpDc Extra Coupon Item"
+﻿table 6151595 "NPR NpDc Extra Coupon Item"
 {
+    Access = Internal;
     Caption = 'Extra Coupon Item';
     DataClassification = CustomerContent;
 

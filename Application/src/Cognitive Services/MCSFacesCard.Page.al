@@ -1,5 +1,6 @@
-page 6059954 "NPR MCS Faces Card"
+﻿page 6059954 "NPR MCS Faces Card"
 {
+    Extensible = False;
     Caption = 'MCS Faces Card';
     InsertAllowed = false;
     ModifyAllowed = false;

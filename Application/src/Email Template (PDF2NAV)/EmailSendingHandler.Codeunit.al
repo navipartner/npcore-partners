@@ -1,5 +1,6 @@
-codeunit 6014553 "NPR Email Sending Handler"
+﻿codeunit 6014553 "NPR Email Sending Handler"
 {
+    Access = Internal;
     TableNo = "Email Item";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-codeunit 6151022 "NPR NpRv Partner Mgt."
+﻿codeunit 6151022 "NPR NpRv Partner Mgt."
 {
+    Access = Internal;
     procedure InitLocalPartner(var NpRvPartner: Record "NPR NpRv Partner")
     var
         ServiceUrl: Text;

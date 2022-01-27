@@ -1,5 +1,6 @@
-codeunit 6150753 "NPR Front-End: ReportBug" implements "NPR Front-End Async Request"
+﻿codeunit 6150753 "NPR Front-End: ReportBug" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _errorText: Text;

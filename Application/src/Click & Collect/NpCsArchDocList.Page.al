@@ -1,5 +1,6 @@
-page 6151211 "NPR NpCs Arch. Doc. List"
+﻿page 6151211 "NPR NpCs Arch. Doc. List"
 {
+    Extensible = False;
     Caption = 'Archived Collect Document List';
     InsertAllowed = false;
     PageType = List;

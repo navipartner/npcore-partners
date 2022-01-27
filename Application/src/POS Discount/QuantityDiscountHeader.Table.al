@@ -1,5 +1,6 @@
-table 6014439 "NPR Quantity Discount Header"
+﻿table 6014439 "NPR Quantity Discount Header"
 {
+    Access = Internal;
     Caption = 'Multiple Price Header';
     LookupPageID = "NPR Quantity Discount List";
     DataClassification = CustomerContent;

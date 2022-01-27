@@ -1,5 +1,6 @@
-table 6151393 "NPR CS Warehouse Shipm. Handl."
+﻿table 6151393 "NPR CS Warehouse Shipm. Handl."
 {
+    Access = Internal;
 
     Caption = 'CS Warehouse Shipment Handling';
     DataClassification = CustomerContent;

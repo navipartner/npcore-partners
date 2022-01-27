@@ -1,5 +1,8 @@
-report 6014597 "NPR Sales Per Contact"
+﻿report 6014597 "NPR Sales Per Contact"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Per Contact.rdlc';
     UsageCategory = ReportsAndAnalysis;

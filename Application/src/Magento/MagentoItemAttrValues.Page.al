@@ -1,5 +1,6 @@
-page 6151437 "NPR Magento Item Attr. Values"
+﻿page 6151437 "NPR Magento Item Attr. Values"
 {
+    Extensible = False;
     Caption = 'Item Attribute Values';
     DeleteAllowed = false;
     InsertAllowed = false;

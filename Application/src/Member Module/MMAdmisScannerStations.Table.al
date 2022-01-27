@@ -1,5 +1,6 @@
-table 6060095 "NPR MM Admis. Scanner Stations"
+﻿table 6060095 "NPR MM Admis. Scanner Stations"
 {
+    Access = Internal;
 
     Caption = 'MM Admission Scanner Stations';
     DataClassification = CustomerContent;

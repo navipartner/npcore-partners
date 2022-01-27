@@ -1,5 +1,6 @@
-table 6060143 "NPR MM Foreign Members. Setup"
+﻿table 6060143 "NPR MM Foreign Members. Setup"
 {
+    Access = Internal;
 
     Caption = 'External Validation';
     DataClassification = CustomerContent;

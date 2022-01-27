@@ -1,5 +1,6 @@
-table 6151051 "NPR Item Hierarchy Level"
+﻿table 6151051 "NPR Item Hierarchy Level"
 {
+    Access = Internal;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
 

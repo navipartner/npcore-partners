@@ -1,5 +1,6 @@
-table 6014576 "NPR Services Combination"
+﻿table 6014576 "NPR Services Combination"
 {
+    Access = Internal;
     Caption = 'Services Combination';
 
     fields

@@ -1,5 +1,6 @@
-table 6060052 "NPR Item Worksh. Field Setup"
+﻿table 6060052 "NPR Item Worksh. Field Setup"
 {
+    Access = Internal;
     Caption = 'Item Worksheet Field Setup';
     DataClassification = CustomerContent;
     fields

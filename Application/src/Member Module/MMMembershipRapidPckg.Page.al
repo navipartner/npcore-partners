@@ -1,5 +1,6 @@
-page 6060063 "NPR MM Membership Rapid Pckg."
+﻿page 6060063 "NPR MM Membership Rapid Pckg."
 {
+    Extensible = False;
     PageType = NavigatePage;
 
     UsageCategory = Administration;

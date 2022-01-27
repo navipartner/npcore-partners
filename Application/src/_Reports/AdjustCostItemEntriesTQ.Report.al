@@ -1,5 +1,8 @@
-report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
+﻿report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Adjust Cost - Item Entries';
     Permissions = TableData "Item Ledger Entry" = rimd,
                   TableData "Item Application Entry" = r,

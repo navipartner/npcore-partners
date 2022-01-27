@@ -1,5 +1,6 @@
-page 6150700 "NPR POS (Transcendence)"
+﻿page 6150700 "NPR POS (Transcendence)"
 {
+    Extensible = False;
     Caption = 'POS';
     PageType = List;
     UsageCategory = Administration;

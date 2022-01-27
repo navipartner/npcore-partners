@@ -1,5 +1,6 @@
-codeunit 6150880 "NPR Workflow" implements "NPR IJsonSerializable"
+﻿codeunit 6150880 "NPR Workflow" implements "NPR IJsonSerializable"
 {
+    Access = Internal;
     var
         _name: Text;
         _requestContext: Boolean;

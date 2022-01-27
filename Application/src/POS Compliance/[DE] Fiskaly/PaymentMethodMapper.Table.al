@@ -1,5 +1,6 @@
-table 6014533 "NPR Payment Method Mapper"
+﻿table 6014533 "NPR Payment Method Mapper"
 {
+    Access = Internal;
     Caption = 'Payment Method Mapper';
     DataClassification = CustomerContent;
 

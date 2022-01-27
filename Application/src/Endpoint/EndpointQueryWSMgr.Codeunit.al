@@ -1,5 +1,6 @@
-codeunit 6014673 "NPR Endpoint Query WS Mgr"
+﻿codeunit 6014673 "NPR Endpoint Query WS Mgr"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

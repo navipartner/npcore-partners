@@ -1,5 +1,6 @@
-codeunit 6184534 "NPR EFT NETSCloud Protocol"
+﻿codeunit 6184534 "NPR EFT NETSCloud Protocol"
 {
+    Access = Internal;
     // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
     // NPR5.55/MMV /20200525 CASE 405984 Fixed undocumented breaking change in NETS backend update.
 

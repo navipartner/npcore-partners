@@ -1,5 +1,6 @@
-table 6151134 "NPR TM Seating Reserv. Entry"
+﻿table 6151134 "NPR TM Seating Reserv. Entry"
 {
+    Access = Internal;
     // TM1.43/TSA /20190903 CASE 357359 Initial Version
     // TM1.45/TSA /20191112 CASE 322432 Added index
 

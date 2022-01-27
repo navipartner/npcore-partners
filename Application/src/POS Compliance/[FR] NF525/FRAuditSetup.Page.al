@@ -1,5 +1,6 @@
-page 6184850 "NPR FR Audit Setup"
+﻿page 6184850 "NPR FR Audit Setup"
 {
+    Extensible = False;
     Caption = 'FR Audit Setup';
     DeleteAllowed = false;
     InsertAllowed = false;

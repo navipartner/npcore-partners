@@ -1,5 +1,6 @@
 ﻿codeunit 6060070 "NPR Premap Incom. Item Lines"
 {
+    Access = Internal;
     TableNo = "Data Exch.";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
 ﻿codeunit 6014491 "NPR Ticket Attempt Create"
 {
+    Access = Internal;
     SingleInstance = true;
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-codeunit 6014451 "NPR POS Setup Safety Check"
+﻿codeunit 6014451 "NPR POS Setup Safety Check"
 {
+    Access = Internal;
     // The purpose of this codeunit is to validate configuration of standard BC
     // setup tables that could cause the POS to run sub-optimally with a clear indication
     // of the cause. Instead we hard error on POS launch, to prevent misunderstandings again.    

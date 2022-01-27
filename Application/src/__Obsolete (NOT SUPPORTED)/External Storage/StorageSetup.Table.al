@@ -1,5 +1,6 @@
-table 6184892 "NPR Storage Setup"
+﻿table 6184892 "NPR Storage Setup"
 {
+    Access = Internal;
     Caption = 'External Storage Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

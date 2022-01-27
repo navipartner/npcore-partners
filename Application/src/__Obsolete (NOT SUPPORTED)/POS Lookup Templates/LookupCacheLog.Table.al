@@ -1,5 +1,6 @@
-table 6014628 "NPR Lookup Cache Log"
+﻿table 6014628 "NPR Lookup Cache Log"
 {
+    Access = Internal;
     Caption = 'Lookup Cache Log';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

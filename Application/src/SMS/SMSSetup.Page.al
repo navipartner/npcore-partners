@@ -1,5 +1,6 @@
-page 6014404 "NPR SMS Setup"
+﻿page 6014404 "NPR SMS Setup"
 {
+    Extensible = False;
     Caption = 'SMS Setup';
     PageType = Card;
     SourceTable = "NPR SMS Setup";

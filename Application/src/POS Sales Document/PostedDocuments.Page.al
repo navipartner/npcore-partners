@@ -1,5 +1,6 @@
-page 6014438 "NPR Posted Documents"
+﻿page 6014438 "NPR Posted Documents"
 {
+    Extensible = False;
     // NPR5.53/ALPO/20191010 CASE 360297 Prepayment/layaway functionality additions
 
     Caption = 'Posted Documents';

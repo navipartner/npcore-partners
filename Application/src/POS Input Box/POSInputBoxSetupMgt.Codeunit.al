@@ -1,5 +1,6 @@
-codeunit 6060105 "NPR POS Input Box Setup Mgt."
+﻿codeunit 6060105 "NPR POS Input Box Setup Mgt."
 {
+    Access = Internal;
 
 
     trigger OnRun()

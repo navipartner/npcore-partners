@@ -1,5 +1,6 @@
-codeunit 6150922 "NPR UPG Customer Templates"
+﻿codeunit 6150922 "NPR UPG Customer Templates"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

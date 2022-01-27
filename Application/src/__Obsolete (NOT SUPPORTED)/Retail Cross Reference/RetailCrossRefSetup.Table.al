@@ -1,5 +1,6 @@
-table 6151181 "NPR Retail Cross Ref. Setup"
+﻿table 6151181 "NPR Retail Cross Ref. Setup"
 {
+    Access = Internal;
     // NPR5.50/MHA /20190422  CASE 337539 Object created
 
     Caption = 'Retail Cross Reference Setup';

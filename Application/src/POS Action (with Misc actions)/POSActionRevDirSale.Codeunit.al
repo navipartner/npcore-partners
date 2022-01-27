@@ -1,5 +1,6 @@
-codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
+﻿codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
 {
+    Access = Internal;
     Description = 'POS Action: Reverse Direct Sale';
 
     var

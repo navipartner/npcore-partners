@@ -1,5 +1,6 @@
-table 6014432 "NPR Phone Lookup Buffer"
+﻿table 6014432 "NPR Phone Lookup Buffer"
 {
+    Access = Internal;
 
     Caption = 'TDC Names & Numbers Buffer';
     DataClassification = CustomerContent;

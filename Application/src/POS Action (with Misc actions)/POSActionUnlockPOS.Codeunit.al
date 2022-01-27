@@ -1,5 +1,6 @@
-codeunit 6150836 "NPR POS Action: UnlockPOS"
+﻿codeunit 6150836 "NPR POS Action: UnlockPOS"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built in function unlocks the POS';
         IllegalPassword: Label 'Illegal password.';

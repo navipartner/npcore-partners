@@ -1,5 +1,8 @@
-report 6014425 "NPR Event Overview"
+﻿report 6014425 "NPR Event Overview"
 {
+#IF NOT BC17
+    Extensible = False; 
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Overview.rdl';
     UsageCategory = ReportsAndAnalysis;

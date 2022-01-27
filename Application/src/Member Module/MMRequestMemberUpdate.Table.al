@@ -1,5 +1,6 @@
-table 6014608 "NPR MM Request Member Update"
+﻿table 6014608 "NPR MM Request Member Update"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
 
     fields

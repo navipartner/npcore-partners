@@ -1,5 +1,6 @@
 ﻿codeunit 6014655 "NPR UPG Web Service Pass"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

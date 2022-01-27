@@ -1,5 +1,6 @@
-page 6060140 "NPR MM POS Member Card"
+﻿page 6060140 "NPR MM POS Member Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Member Details';
     DataCaptionExpression = Rec."External Member No." + ' - ' + Rec."Display Name";

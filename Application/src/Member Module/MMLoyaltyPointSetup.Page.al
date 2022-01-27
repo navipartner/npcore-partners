@@ -1,5 +1,6 @@
-page 6060106 "NPR MM Loyalty Point Setup"
+﻿page 6060106 "NPR MM Loyalty Point Setup"
 {
+    Extensible = False;
 
     AutoSplitKey = true;
     Caption = 'Loyalty Points Setup';

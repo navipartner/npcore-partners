@@ -1,5 +1,6 @@
-page 6184512 "NPR EFT BIN Group Paym. Links"
+﻿page 6184512 "NPR EFT BIN Group Paym. Links"
 {
+    Extensible = False;
     Caption = 'EFT Mapping Group Payment Links';
     PageType = ListPart;
     UsageCategory = Administration;

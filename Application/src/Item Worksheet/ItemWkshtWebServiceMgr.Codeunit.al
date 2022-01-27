@@ -1,5 +1,6 @@
 ﻿codeunit 6060049 "NPR Item Wksht. WebService Mgr"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

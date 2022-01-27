@@ -1,5 +1,6 @@
-page 6060161 "NPR Event Planning Line List"
+﻿page 6060161 "NPR Event Planning Line List"
 {
+    Extensible = False;
     Caption = 'Event Planning Line List';
     Editable = false;
     PageType = List;

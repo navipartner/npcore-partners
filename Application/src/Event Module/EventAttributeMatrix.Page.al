@@ -1,5 +1,6 @@
-page 6060155 "NPR Event Attribute Matrix"
+﻿page 6060155 "NPR Event Attribute Matrix"
 {
+    Extensible = False;
     Caption = 'Event Attribute Matrix';
     DeleteAllowed = false;
     InsertAllowed = false;

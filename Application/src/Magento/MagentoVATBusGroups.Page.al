@@ -1,5 +1,6 @@
-page 6151409 "NPR Magento VAT Bus. Groups"
+﻿page 6151409 "NPR Magento VAT Bus. Groups"
 {
+    Extensible = False;
     Caption = 'VAT Business Posting Groups';
     InsertAllowed = false;
     PageType = List;

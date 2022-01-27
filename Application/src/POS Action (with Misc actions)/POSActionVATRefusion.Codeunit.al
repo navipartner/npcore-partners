@@ -1,5 +1,6 @@
 ﻿codeunit 6150816 "NPR POSAction: VAT Refusion"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built in function for handling VAT refussion';
         Setup: Codeunit "NPR POS Setup";

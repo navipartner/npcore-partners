@@ -1,5 +1,6 @@
-table 6014474 "NPR Item Repl. by Store"
+﻿table 6014474 "NPR Item Repl. by Store"
 {
+    Access = Internal;
     Caption = 'Item Replenishment by Store';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,8 @@
-report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
+﻿report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Rdlc.rdlc';
     Caption = 'Sales Ticket A4 - POS Rdlc';
     UsageCategory = ReportsAndAnalysis;

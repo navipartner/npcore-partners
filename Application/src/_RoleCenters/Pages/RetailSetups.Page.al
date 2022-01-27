@@ -1,5 +1,6 @@
-page 6151247 "NPR Retail - Setups"
+﻿page 6151247 "NPR Retail - Setups"
 {
+    Extensible = False;
     Caption = 'Videos';
     PageType = CardPart;
     RefreshOnActivate = true;

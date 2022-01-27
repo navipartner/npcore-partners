@@ -1,5 +1,6 @@
-page 6151250 "NPR Retail Enter. Act - Ticket"
+﻿page 6151250 "NPR Retail Enter. Act - Ticket"
 {
+    Extensible = False;
     Caption = 'Activities';
     PageType = CardPart;
     RefreshOnActivate = true;

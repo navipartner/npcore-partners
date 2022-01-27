@@ -1,5 +1,6 @@
-codeunit 6150788 "NPR POS Action: PrintExchLabel"
+﻿codeunit 6150788 "NPR POS Action: PrintExchLabel"
 {
+    Access = Internal;
     var
         ReadingErr: Label 'reading in %1 of %2';
 

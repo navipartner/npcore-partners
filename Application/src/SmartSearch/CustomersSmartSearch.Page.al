@@ -1,5 +1,6 @@
-page 6014697 "NPR Customers Smart Search"
+﻿page 6014697 "NPR Customers Smart Search"
 {
+    Extensible = False;
     Caption = 'Customers';
     CardPageID = "Customer Card";
     DeleteAllowed = false;

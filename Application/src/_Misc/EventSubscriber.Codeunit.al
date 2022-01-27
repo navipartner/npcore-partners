@@ -1,6 +1,7 @@
-codeunit 6014404 "NPR Event Subscriber"
+﻿codeunit 6014404 "NPR Event Subscriber"
 {
-    SingleInstance = true;
+    Access = Internal;
+    SingleInstance = true; //For performance, not state sharing.
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforeInsertTransferEntry', '', true, false)]
     local procedure ItemJnlPostLineOnBeforeInsertTransferEntry(var NewItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line")

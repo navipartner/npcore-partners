@@ -1,5 +1,8 @@
-report 6059904 "NPR Adjust Item Cost/Price TQ"
+﻿report 6059904 "NPR Adjust Item Cost/Price TQ"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Adjust Item Costs/Prices';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

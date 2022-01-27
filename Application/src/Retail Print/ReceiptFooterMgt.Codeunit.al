@@ -1,5 +1,6 @@
-codeunit 6014424 "NPR Receipt Footer Mgt."
+﻿codeunit 6014424 "NPR Receipt Footer Mgt."
 {
+    Access = Internal;
     procedure SetDefaultBreakLineNumberOfCharacters(var POSUnitReceiptTextProfile: Record "NPR POS Unit Rcpt.Txt Profile")
     begin
         if POSUnitReceiptTextProfile."Break Line" <> 0 then

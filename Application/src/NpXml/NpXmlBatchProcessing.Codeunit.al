@@ -1,5 +1,6 @@
-codeunit 6151512 "NPR NpXml Batch Processing"
+﻿codeunit 6151512 "NPR NpXml Batch Processing"
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

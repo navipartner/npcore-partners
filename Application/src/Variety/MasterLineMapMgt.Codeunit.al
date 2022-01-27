@@ -1,5 +1,6 @@
-codeunit 6014472 "NPR Master Line Map Mgt."
+﻿codeunit 6014472 "NPR Master Line Map Mgt."
 {
+    Access = Internal;
     procedure FilterRecRefOnMasterId(var RR: RecordRef; var SrcRR: RecordRef; WithoutMaster: Boolean)
     var
         MasterLineMap: Record "NPR Master Line Map";

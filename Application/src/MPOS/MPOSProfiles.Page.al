@@ -1,5 +1,6 @@
-page 6150677 "NPR MPOS Profiles"
+﻿page 6150677 "NPR MPOS Profiles"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = Administration;
 

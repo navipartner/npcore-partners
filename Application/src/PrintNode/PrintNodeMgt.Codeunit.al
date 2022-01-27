@@ -1,5 +1,6 @@
-codeunit 6151221 "NPR PrintNode Mgt."
+﻿codeunit 6151221 "NPR PrintNode Mgt."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

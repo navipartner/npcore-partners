@@ -1,5 +1,6 @@
-table 6151052 "NPR Item Hierarchy Line"
+﻿table 6151052 "NPR Item Hierarchy Line"
 {
+    Access = Internal;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -fields 10,11
 

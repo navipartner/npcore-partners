@@ -1,5 +1,8 @@
-enum 6014411 "NPR Mixed Discount Type"
+﻿enum 6014411 "NPR Mixed Discount Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     AssignmentCompatibility = true;
 

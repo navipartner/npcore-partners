@@ -1,5 +1,6 @@
-page 6059977 "NPR Variety Group"
+﻿page 6059977 "NPR Variety Group"
 {
+    Extensible = False;
     // NPR5.43/NPKNAV/20180629  CASE 317108 Transport NPR5.43 - 29 June 2018
 
     Caption = 'Variety Group';

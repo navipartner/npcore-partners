@@ -1,5 +1,6 @@
-page 6151528 "NPR Nc Collector List"
+﻿page 6151528 "NPR Nc Collector List"
 {
+    Extensible = False;
     Caption = 'Nc Collector List';
     CardPageID = "NPR Nc Collector Card";
     Editable = false;

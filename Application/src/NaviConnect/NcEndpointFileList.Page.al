@@ -1,5 +1,6 @@
-page 6151526 "NPR Nc Endpoint File List"
+﻿page 6151526 "NPR Nc Endpoint File List"
 {
+    Extensible = False;
     Caption = 'Nc Endpoint File List';
     CardPageID = "NPR Nc Endpoint File Card";
     DeleteAllowed = false;

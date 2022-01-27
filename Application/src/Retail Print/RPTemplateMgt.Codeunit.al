@@ -1,5 +1,6 @@
-codeunit 6014586 "NPR RP Template Mgt."
+﻿codeunit 6014586 "NPR RP Template Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

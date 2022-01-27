@@ -1,5 +1,6 @@
-table 6150613 "NPR NP Retail Setup"
+﻿table 6150613 "NPR NP Retail Setup"
 {
+    Access = Internal;
 
     Caption = 'NP Retail Setup';
     DataClassification = CustomerContent;

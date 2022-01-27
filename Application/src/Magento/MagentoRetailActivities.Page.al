@@ -1,5 +1,6 @@
-page 6151481 "NPR Magento Retail Activities"
+﻿page 6151481 "NPR Magento Retail Activities"
 {
+    Extensible = False;
     Caption = 'NaviConnect Activities';
     PageType = CardPart;
     UsageCategory = None;

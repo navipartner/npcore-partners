@@ -1,5 +1,6 @@
-table 6184495 "NPR EFT Transaction Request"
+﻿table 6184495 "NPR EFT Transaction Request"
 {
+    Access = Internal;
     Caption = 'EFT Transaction Request';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR EFT Transaction Requests";

@@ -1,5 +1,6 @@
-table 6151397 "NPR CS Posting Buffer"
+﻿table 6151397 "NPR CS Posting Buffer"
 {
+    Access = Internal;
 
     Caption = 'CS Posting Buffer';
     DataClassification = CustomerContent;

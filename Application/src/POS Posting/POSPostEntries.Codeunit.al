@@ -1,5 +1,6 @@
 ﻿codeunit 6150615 "NPR POS Post Entries"
 {
+    Access = Internal;
     TableNo = "NPR POS Entry";
 
     trigger OnRun()

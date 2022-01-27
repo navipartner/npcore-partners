@@ -1,5 +1,6 @@
-table 6014537 "NPR MobilePayV10 POS"
+﻿table 6014537 "NPR MobilePayV10 POS"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     LookupPageId = "NPR MobilePayV10 POS";
     Caption = 'MobilePayV10 POS';

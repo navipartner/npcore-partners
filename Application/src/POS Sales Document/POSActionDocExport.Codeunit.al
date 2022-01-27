@@ -1,5 +1,6 @@
-codeunit 6150859 "NPR POS Action: Doc. Export"
+﻿codeunit 6150859 "NPR POS Action: Doc. Export"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Export current sale to a standard NAV sales document';
         ERRNOSALELINES: Label 'There are no sale lines to export';

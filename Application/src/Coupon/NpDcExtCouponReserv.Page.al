@@ -1,5 +1,6 @@
-page 6151608 "NPR NpDc Ext. Coupon Reserv."
+﻿page 6151608 "NPR NpDc Ext. Coupon Reserv."
 {
+    Extensible = False;
     Caption = 'External Coupon Reservations';
     PageType = List;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-table 6150725 "NPR POS Secure Method"
+﻿table 6150725 "NPR POS Secure Method"
 {
+    Access = Internal;
     // NPR5.43/VB  /20180611  CASE 314603 Implemented secure method behavior functionality.
     // NPR5.46/TSA /20180914 CASE 314603 Added overflow protection in DiscoverSecureMethod()
 

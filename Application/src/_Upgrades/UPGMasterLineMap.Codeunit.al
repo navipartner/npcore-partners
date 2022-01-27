@@ -1,5 +1,6 @@
-codeunit 6014471 "NPR UPG Master Line Map"
+﻿codeunit 6014471 "NPR UPG Master Line Map"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     var

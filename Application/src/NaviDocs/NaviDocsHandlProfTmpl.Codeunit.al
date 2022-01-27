@@ -1,5 +1,6 @@
-codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
+﻿codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
 {
+    Access = Internal;
     var
         NaviDocsHandlingProfileTxt: Label 'Add Description here';
         DataTypeManagement: Codeunit "Data Type Management";

@@ -1,5 +1,6 @@
-codeunit 6014660 "NPR POS Action Create Member"
+﻿codeunit 6014660 "NPR POS Action Create Member"
 {
+    Access = Internal;
     var
         ActionVersion: Label '2.0', Locked = true, MaxLength = 20;
         ActionCode: Label 'MM_CREATE_MEMBER', Locked = true, MaxLength = 20;

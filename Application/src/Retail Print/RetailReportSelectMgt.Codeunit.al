@@ -1,5 +1,6 @@
-codeunit 6014581 "NPR Retail Report Select. Mgt."
+﻿codeunit 6014581 "NPR Retail Report Select. Mgt."
 {
+    Access = Internal;
     // NPR4.18/MMV/20151216 CASE 225584 Created CU
     // 
     // This codeunit acts as a wrapper for all retail report selection needs.

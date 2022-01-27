@@ -1,5 +1,6 @@
-codeunit 6060131 "NPR MM Member Retail Integr."
+﻿codeunit 6060131 "NPR MM Member Retail Integr."
 {
+    Access = Internal;
 
     var
         MEMBER_NOT_RECOGNIZED: Label 'Can''t identify member.';

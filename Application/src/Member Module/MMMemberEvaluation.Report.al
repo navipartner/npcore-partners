@@ -1,5 +1,8 @@
-report 6014494 "NPR MM Member Evaluation"
+﻿report 6014494 "NPR MM Member Evaluation"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Member Evaluation';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;

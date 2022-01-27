@@ -1,5 +1,6 @@
-codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
+﻿codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
 {
+    Access = Internal;
     // 
     // *** TICKET SERVER setup ***
     //   http://test.ticket.navipartner.dk/import/api/rest/v1/ticket/orders

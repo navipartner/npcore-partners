@@ -1,5 +1,6 @@
-page 6059833 "NPR Event Res. Avail. Overview"
+﻿page 6059833 "NPR Event Res. Avail. Overview"
 {
+    Extensible = False;
     Caption = 'Event Resource Avail. Overview';
     DataCaptionExpression = '';
     DeleteAllowed = false;

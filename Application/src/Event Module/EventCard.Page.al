@@ -1,5 +1,6 @@
-page 6060150 "NPR Event Card"
+﻿page 6060150 "NPR Event Card"
 {
+    Extensible = False;
     Caption = 'Event Card';
     PageType = Card;
     UsageCategory = Administration;

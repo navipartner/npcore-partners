@@ -1,5 +1,6 @@
-table 6150714 "NPR POS Stargate Pckg. Method"
+﻿table 6150714 "NPR POS Stargate Pckg. Method"
 {
+    Access = Internal;
     Caption = 'POS Stargate Package Method';
     DataClassification = CustomerContent;
     DataPerCompany = false;

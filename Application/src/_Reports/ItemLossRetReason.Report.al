@@ -1,5 +1,8 @@
-report 6014544 "NPR Item Loss - Ret. Reason"
+﻿report 6014544 "NPR Item Loss - Ret. Reason"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Loss - Return Reason.rdlc';
     Caption = 'Item Loss - Return Reason';

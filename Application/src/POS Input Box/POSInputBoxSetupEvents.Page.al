@@ -1,5 +1,6 @@
-page 6060098 "NPR POS Input Box Setup Events"
+﻿page 6060098 "NPR POS Input Box Setup Events"
 {
+    Extensible = False;
 
     Caption = 'POS Input Box Setup Events';
     DelayedInsert = true;

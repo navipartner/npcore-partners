@@ -1,5 +1,6 @@
-page 6151565 "NPR NpXml Wsdl Input Dlg"
+﻿page 6151565 "NPR NpXml Wsdl Input Dlg"
 {
+    Extensible = False;
     Caption = 'WSDL Input Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;

@@ -1,5 +1,8 @@
-report 6150660 "NPR NPRE: Rest. Daily Turnover"
+﻿report 6150660 "NPR NPRE: Rest. Daily Turnover"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/NPRE - Rest. Daily Turnover.rdlc';
     Caption = 'Restaurant Daily Turnover';

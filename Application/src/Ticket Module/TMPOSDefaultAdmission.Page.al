@@ -1,5 +1,6 @@
-page 6014446 "NPR TM POS Default Admission"
+﻿page 6014446 "NPR TM POS Default Admission"
 {
+    Extensible = False;
     PageType = List;
     ApplicationArea = NPRTicketAdvanced;
     UsageCategory = Administration;

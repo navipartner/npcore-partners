@@ -1,5 +1,6 @@
-page 6150732 "NPR POS Scenarios Sets"
+﻿page 6150732 "NPR POS Scenarios Sets"
 {
+    Extensible = False;
 
     Caption = 'POS Scenarios Sets';
     CardPageID = "NPR POS Scenarios Set Card";

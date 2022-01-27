@@ -1,5 +1,6 @@
 ﻿codeunit 6151212 "NPR NpCs Run Workflow Step"
 {
+    Access = Internal;
     TableNo = "NPR NpCs Document";
 
     trigger OnRun()

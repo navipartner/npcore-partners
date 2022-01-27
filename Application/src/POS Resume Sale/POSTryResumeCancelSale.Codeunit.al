@@ -1,5 +1,6 @@
-codeunit 6150738 "NPR POS Try Resume&CancelSale"
+﻿codeunit 6150738 "NPR POS Try Resume&CancelSale"
 {
+    Access = Internal;
     TableNo = "NPR POS Sale";
 
     trigger OnRun()

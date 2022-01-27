@@ -1,5 +1,6 @@
-table 6014518 "NPR Insurance Combination"
+﻿table 6014518 "NPR Insurance Combination"
 {
+    Access = Internal;
     // NPR5.38/MHA /20180104  CASE 301054 Added ConstValue to TextConstants ErrAmount and ErrZero
 
     Caption = 'Insurance Combination';

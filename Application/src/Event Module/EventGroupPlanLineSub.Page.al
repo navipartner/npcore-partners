@@ -1,5 +1,6 @@
-page 6059830 "NPR Event Group.Plan. Line Sub"
+﻿page 6059830 "NPR Event Group.Plan. Line Sub"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Grouped Planning Lines';
     DataCaptionExpression = Rec.Caption();

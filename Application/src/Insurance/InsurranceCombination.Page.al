@@ -1,5 +1,6 @@
-page 6014540 "NPR Insurrance Combination"
+﻿page 6014540 "NPR Insurrance Combination"
 {
+    Extensible = False;
     Caption = 'Insurance - Combination';
     PageType = List;
     UsageCategory = Administration;

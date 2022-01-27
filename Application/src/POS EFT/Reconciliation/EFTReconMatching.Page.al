@@ -1,5 +1,6 @@
-page 6059827 "NPR EFT Recon. Matching"
+﻿page 6059827 "NPR EFT Recon. Matching"
 {
+    Extensible = False;
     PageType = Worksheet;
     SourceTable = "NPR EFT Recon. Line";
     UsageCategory = None;

@@ -1,5 +1,6 @@
-codeunit 6014580 "NPR Object Output Mgt."
+﻿codeunit 6014580 "NPR Object Output Mgt."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

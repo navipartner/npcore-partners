@@ -1,5 +1,6 @@
-codeunit 6150830 "NPR POS Action: ScanExchLabel"
+﻿codeunit 6150830 "NPR POS Action: ScanExchLabel"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a build in function to handle exchange labels.';
         InpTitle: Label 'Exchange Label';

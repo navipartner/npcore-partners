@@ -1,5 +1,6 @@
-page 6059796 "NPR E-mail Log"
+﻿page 6059796 "NPR E-mail Log"
 {
+    Extensible = False;
     Caption = 'Mail And Document Log List';
     Editable = false;
     PageType = List;

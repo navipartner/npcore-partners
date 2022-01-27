@@ -1,5 +1,6 @@
 ﻿codeunit 6151133 "NPR TM Ticket Wizard"
 {
+    Access = Internal;
     trigger OnRun()
     var
         ItemNumberCreated: Code[20];

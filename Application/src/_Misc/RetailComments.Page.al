@@ -1,5 +1,6 @@
-page 6014492 "NPR Retail Comments"
+﻿page 6014492 "NPR Retail Comments"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'NPR Comment Sheet';
     PageType = List;

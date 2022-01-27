@@ -1,5 +1,6 @@
 ﻿codeunit 6151494 "NPR Raptor Send Data"
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

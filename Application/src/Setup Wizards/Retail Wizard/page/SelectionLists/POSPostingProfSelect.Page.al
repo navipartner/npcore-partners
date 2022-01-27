@@ -1,5 +1,6 @@
-page 6014698 "NPR POS Posting Prof. Select"
+﻿page 6014698 "NPR POS Posting Prof. Select"
 {
+    Extensible = False;
     Caption = 'POS Posting Profiles';
     PageType = List;
     SourceTable = "NPR POS Posting Profile";

@@ -1,5 +1,6 @@
-page 6060060 "NPR Item Worksh. Vrty. Mapping"
+﻿page 6060060 "NPR Item Worksh. Vrty. Mapping"
 {
+    Extensible = False;
     Caption = 'Item Worksheet Variety Mapping';
     PageType = List;
     SourceTable = "NPR Item Worksh. Vrty Mapping";

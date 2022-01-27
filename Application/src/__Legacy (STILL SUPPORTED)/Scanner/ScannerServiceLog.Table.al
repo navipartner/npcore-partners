@@ -1,5 +1,6 @@
-table 6059997 "NPR Scanner Service Log"
+﻿table 6059997 "NPR Scanner Service Log"
 {
+    Access = Internal;
     Caption = 'Scanner Service Log';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

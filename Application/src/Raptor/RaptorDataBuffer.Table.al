@@ -1,5 +1,6 @@
-table 6151492 "NPR Raptor Data Buffer"
+﻿table 6151492 "NPR Raptor Data Buffer"
 {
+    Access = Internal;
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
 
     Caption = 'Raptor Data Buffer';

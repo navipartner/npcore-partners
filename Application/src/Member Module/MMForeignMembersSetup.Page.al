@@ -1,5 +1,6 @@
-page 6060146 "NPR MM Foreign Members. Setup"
+﻿page 6060146 "NPR MM Foreign Members. Setup"
 {
+    Extensible = False;
 
     Caption = 'Foreign Membership Setup';
     PageType = List;

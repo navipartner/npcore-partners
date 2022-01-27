@@ -1,5 +1,6 @@
-codeunit 6151280 "NPR SS Action - Qty Increase"
+﻿codeunit 6151280 "NPR SS Action - Qty Increase"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a build in function to change quantity.';
 

@@ -1,5 +1,6 @@
-table 6060104 "NPR Global Sale POS"
+﻿table 6060104 "NPR Global Sale POS"
 {
+    Access = Internal;
     Caption = 'Global Sale POS';
     DataClassification = CustomerContent;
     DataPerCompany = false;

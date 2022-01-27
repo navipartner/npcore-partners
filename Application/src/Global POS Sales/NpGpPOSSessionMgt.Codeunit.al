@@ -1,5 +1,6 @@
-codeunit 6151165 "NPR NpGp POS Session Mgt."
+﻿codeunit 6151165 "NPR NpGp POS Session Mgt."
 {
+    Access = Internal;
     TableNo = "NPR Nc Task";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-codeunit 6014569 "NPR RegEx"
+﻿codeunit 6014569 "NPR RegEx"
 {
+    Access = Internal;
     var
 #if BC17
         RegEx: Codeunit DotNet_Regex;

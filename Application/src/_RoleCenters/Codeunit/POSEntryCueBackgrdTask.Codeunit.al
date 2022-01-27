@@ -1,5 +1,6 @@
-codeunit 6014697 "NPR POS Entry Cue Backgrd Task"
+﻿codeunit 6014697 "NPR POS Entry Cue Backgrd Task"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         Calculate();

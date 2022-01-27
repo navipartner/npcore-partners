@@ -1,5 +1,6 @@
-codeunit 6150717 "NPR POS Front End Keeper"
+﻿codeunit 6150717 "NPR POS Front End Keeper"
 {
+    Access = Internal;
     EventSubscriberInstance = Manual;
 
     trigger OnRun()

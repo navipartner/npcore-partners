@@ -1,5 +1,6 @@
-codeunit 6151132 "NPR TM POS Action - Seating"
+﻿codeunit 6151132 "NPR TM POS Action - Seating"
 {
+    Access = Internal;
     // TM1.43/TSA /20190618 CASE 357359 Initial Version
     // TM1.45/TSA /20191112 CASE 322432 edit reservation
 

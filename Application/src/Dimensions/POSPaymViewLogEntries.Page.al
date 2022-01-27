@@ -1,5 +1,6 @@
-page 6151043 "NPR POS Paym. View Log Entries"
+﻿page 6151043 "NPR POS Paym. View Log Entries"
 {
+    Extensible = False;
 
     Caption = 'POS Payment View Log Entries';
     Editable = false;

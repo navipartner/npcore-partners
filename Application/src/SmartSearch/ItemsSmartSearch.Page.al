@@ -1,5 +1,6 @@
-page 6059771 "NPR Items Smart Search"
+﻿page 6059771 "NPR Items Smart Search"
 {
+    Extensible = False;
     Caption = 'Items';
     CardPageID = "Item Card";
     DeleteAllowed = false;

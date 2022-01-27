@@ -1,5 +1,6 @@
-codeunit 6060095 "NPR UPG Scanner Stations"
+﻿codeunit 6060095 "NPR UPG Scanner Stations"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     var

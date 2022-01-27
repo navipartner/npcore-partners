@@ -1,5 +1,6 @@
-page 6014542 "NPR CleanCash Response List"
+﻿page 6014542 "NPR CleanCash Response List"
 {
+    Extensible = False;
     PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR CleanCash Trans. Response";

@@ -1,5 +1,6 @@
-page 6014639 "NPR RP Template List"
+﻿page 6014639 "NPR RP Template List"
 {
+    Extensible = False;
     Caption = 'Print Template List';
     CardPageID = "NPR RP Template Card";
     Editable = false;

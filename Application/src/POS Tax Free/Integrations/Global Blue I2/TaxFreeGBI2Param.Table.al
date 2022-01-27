@@ -1,5 +1,6 @@
-table 6014654 "NPR Tax Free GB I2 Param."
+﻿table 6014654 "NPR Tax Free GB I2 Param."
 {
+    Access = Internal;
 
     Caption = 'Tax Free GB I2 Parameter';
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-codeunit 6151570 "NPR AF Management"
+﻿codeunit 6151570 "NPR AF Management"
 {
+    Access = Internal;
     procedure CallRESTWebService(var Parameters: Dictionary of [Text, Text]; HttpCont: HttpContent; var HttpResponseMsg: HttpResponseMessage): Boolean
     var
         HttpClnt: HttpClient;

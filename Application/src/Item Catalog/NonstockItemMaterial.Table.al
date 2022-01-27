@@ -1,5 +1,6 @@
-table 6060063 "NPR Nonstock Item Material"
+﻿table 6060063 "NPR Nonstock Item Material"
 {
+    Access = Internal;
     // NPR5.45/RA  /20180802  CASE 295322 Created Table.
     // NPR5.45/RA  /20180827  CASE 325023 Added field 3
 

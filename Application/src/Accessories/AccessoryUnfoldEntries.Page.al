@@ -1,5 +1,6 @@
-page 6014505 "NPR Accessory Unfold Entries"
+﻿page 6014505 "NPR Accessory Unfold Entries"
 {
+    Extensible = False;
     // NPR5.40/MHA /20180214  CASE 288039 Object created - unfold Accessory Items
 
     Caption = 'Accessory Unfold Entries';

@@ -1,5 +1,6 @@
-page 6151223 "NPR NpCs Store Stock Items"
+﻿page 6151223 "NPR NpCs Store Stock Items"
 {
+    Extensible = False;
     Caption = 'Collect Store Stock Items';
     PageType = List;
     SourceTable = "NPR NpCs Store Stock Item";

@@ -1,5 +1,6 @@
-table 6059953 "NPR Display Custom Content"
+﻿table 6059953 "NPR Display Custom Content"
 {
+    Access = Internal;
     // NPR5.50/CLVA/20190513 CASE 352390 Object created
 
     Caption = 'Display Custom Content';

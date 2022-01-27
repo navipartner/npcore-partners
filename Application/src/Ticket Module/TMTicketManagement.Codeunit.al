@@ -1,5 +1,6 @@
-codeunit 6059784 "NPR TM Ticket Management"
+﻿codeunit 6059784 "NPR TM Ticket Management"
 {
+    Access = Internal;
     var
         Text6059776: Label 'This value must be an integer between 1 and 4.';
 

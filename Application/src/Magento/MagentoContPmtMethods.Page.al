@@ -1,5 +1,6 @@
-page 6151441 "NPR Magento Cont.Pmt.Methods"
+﻿page 6151441 "NPR Magento Cont.Pmt.Methods"
 {
+    Extensible = False;
     Caption = 'Contact Payment Methods';
     DelayedInsert = true;
     PageType = List;

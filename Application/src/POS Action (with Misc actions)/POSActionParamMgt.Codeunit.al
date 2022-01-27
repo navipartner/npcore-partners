@@ -1,5 +1,6 @@
-codeunit 6150709 "NPR POS Action Param. Mgt."
+﻿codeunit 6150709 "NPR POS Action Param. Mgt."
 {
+    Access = Internal;
     var
         Text001: Label 'There are no action parameters to edit for %1, %2, and action %3 does not define any parameters to copy from.';
         Text002: Label 'There are no action parameters defined for %1, %2. Do you want to insert the default parameters and their values?';

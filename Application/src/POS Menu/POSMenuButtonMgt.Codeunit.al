@@ -1,5 +1,6 @@
-codeunit 6150644 "NPR POS Menu Button Mgt."
+﻿codeunit 6150644 "NPR POS Menu Button Mgt."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnAfterActionUpdated', '', false, false)]
     local procedure OnAfterActionUpdated("Action": Record "NPR POS Action")
     var

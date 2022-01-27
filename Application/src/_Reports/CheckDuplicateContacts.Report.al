@@ -1,5 +1,8 @@
-report 6060112 "NPR Check Duplicate Contacts"
+﻿report 6060112 "NPR Check Duplicate Contacts"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Check Duplicate Contacts.rdlc';
     UsageCategory = ReportsAndAnalysis;

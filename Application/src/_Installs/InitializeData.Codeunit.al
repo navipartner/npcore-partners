@@ -1,5 +1,6 @@
-codeunit 6014448 "NPR Initialize Data"
+﻿codeunit 6014448 "NPR Initialize Data"
 {
+    Access = Internal;
     Subtype = Install;
 
     trigger OnInstallAppPerCompany()

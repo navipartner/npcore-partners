@@ -1,5 +1,6 @@
-table 6014487 "NPR POS Turnover Calc. Buffer"
+﻿table 6014487 "NPR POS Turnover Calc. Buffer"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     TableType = Temporary;
     Caption = 'POS Turnover Calc. Buffer';

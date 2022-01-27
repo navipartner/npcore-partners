@@ -1,5 +1,6 @@
-page 6060046 "NPR Registered Item Worksh."
+﻿page 6060046 "NPR Registered Item Worksh."
 {
+    Extensible = False;
     Caption = 'Registered Item Worksheets';
     Editable = false;
     PageType = List;

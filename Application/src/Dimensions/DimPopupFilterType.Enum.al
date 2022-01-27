@@ -1,5 +1,8 @@
-enum 6014459 "NPR Dim. Popup Filter Type"
+﻿enum 6014459 "NPR Dim. Popup Filter Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; Item)

@@ -1,5 +1,6 @@
-page 6014478 "NPR RFID Setup"
+﻿page 6014478 "NPR RFID Setup"
 {
+    Extensible = False;
     // NPR5.48/JAVA/20190205  CASE 327107 Transport NPR5.48 - 5 February 2019
 
     Caption = 'RFID Setup';

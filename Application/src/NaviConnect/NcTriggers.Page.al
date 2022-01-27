@@ -1,5 +1,6 @@
-page 6151520 "NPR Nc Triggers"
+﻿page 6151520 "NPR Nc Triggers"
 {
+    Extensible = False;
     Caption = 'Nc Triggers';
     PageType = List;
     SourceTable = "NPR Nc Trigger";

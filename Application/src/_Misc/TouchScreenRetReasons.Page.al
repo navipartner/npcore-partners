@@ -1,5 +1,6 @@
-page 6014534 "NPR TouchScreen: Ret. Reasons"
+﻿page 6014534 "NPR TouchScreen: Ret. Reasons"
 {
+    Extensible = False;
     UsageCategory = Lists;
 
     Caption = 'Return reasons';

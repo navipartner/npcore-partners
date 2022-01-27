@@ -1,5 +1,8 @@
-enum 6014435 "NPR Magento Cust. Update Mode"
+﻿enum 6014435 "NPR Magento Cust. Update Mode"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "Create and Update")

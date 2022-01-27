@@ -1,5 +1,6 @@
-table 6060112 "NPR RC Ticket Cues"
+﻿table 6060112 "NPR RC Ticket Cues"
 {
+    Access = Internal;
     Caption = 'RC Ticket Cues';
     DataClassification = CustomerContent;
 

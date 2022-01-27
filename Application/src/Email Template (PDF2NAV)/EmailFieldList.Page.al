@@ -1,5 +1,6 @@
-page 6059792 "NPR E-mail Field List"
+﻿page 6059792 "NPR E-mail Field List"
 {
+    Extensible = False;
     Caption = 'E-mail Field List';
     DeleteAllowed = false;
     Editable = false;

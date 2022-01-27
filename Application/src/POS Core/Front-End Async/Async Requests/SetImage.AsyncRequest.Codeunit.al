@@ -1,5 +1,6 @@
-codeunit 6150757 "NPR Front-End: SetImage" implements "NPR Front-End Async Request"
+﻿codeunit 6150757 "NPR Front-End: SetImage" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _id: Text;

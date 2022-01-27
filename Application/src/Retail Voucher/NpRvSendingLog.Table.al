@@ -1,5 +1,6 @@
-table 6151030 "NPR NpRv Sending Log"
+﻿table 6151030 "NPR NpRv Sending Log"
 {
+    Access = Internal;
     Caption = 'Retail Voucher Sending Log';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Sending Log";

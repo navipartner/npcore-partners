@@ -1,5 +1,6 @@
-page 6151510 "NPR Nc Task Output List"
+﻿page 6151510 "NPR Nc Task Output List"
 {
+    Extensible = False;
     Caption = 'Task Output List';
     Editable = false;
     PageType = List;

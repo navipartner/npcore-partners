@@ -1,5 +1,6 @@
-page 6151581 "NPR Event Attr. Temp. Filters"
+﻿page 6151581 "NPR Event Attr. Temp. Filters"
 {
+    Extensible = False;
     Caption = 'Event Attribute Temp. Filters';
     PageType = List;
     UsageCategory = Administration;

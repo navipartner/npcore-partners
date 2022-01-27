@@ -1,5 +1,6 @@
-page 6060057 "NPR Item Worksh. Field Mapping"
+﻿page 6060057 "NPR Item Worksh. Field Mapping"
 {
+    Extensible = False;
     Caption = 'Item Worksheet Field Mapping';
     PageType = List;
     PopulateAllFields = true;

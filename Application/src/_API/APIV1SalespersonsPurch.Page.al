@@ -1,5 +1,6 @@
-page 6014636 "NPR APIV1 - Salespersons/Purch"
+﻿page 6014636 "NPR APIV1 - Salespersons/Purch"
 {
+    Extensible = False;
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';

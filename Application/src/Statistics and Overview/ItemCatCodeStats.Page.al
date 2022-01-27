@@ -1,5 +1,6 @@
-page 6014596 "NPR Item Cat. Code Stats"
+﻿page 6014596 "NPR Item Cat. Code Stats"
 {
+    Extensible = False;
     Caption = 'Item Category Stats Subpage';
     Editable = false;
     PageType = List;

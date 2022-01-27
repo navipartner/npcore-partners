@@ -1,5 +1,6 @@
-table 6151130 "NPR TM Seating Setup"
+﻿table 6151130 "NPR TM Seating Setup"
 {
+    Access = Internal;
     // TM1.36/TSA/20180830  CASE 322432 Transport TM1.36 - 30 August 2018
     // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
     // TM1.45/TSA /20191113 CASE 322432 Added Template Cache

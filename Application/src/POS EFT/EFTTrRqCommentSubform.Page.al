@@ -1,5 +1,6 @@
-page 6184499 "NPR EFT Tr.Rq.Comment Subform"
+﻿page 6184499 "NPR EFT Tr.Rq.Comment Subform"
 {
+    Extensible = False;
     Caption = 'EFT Tr. Rq. Comment Subform';
     Editable = false;
     PageType = ListPart;

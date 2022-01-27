@@ -1,5 +1,6 @@
-query 6014405 "NPR Item Variants"
+﻿query 6014405 "NPR Item Variants"
 {
+    Access = Internal;
     Caption = 'Item Variants';
     OrderBy = descending(Code);
 

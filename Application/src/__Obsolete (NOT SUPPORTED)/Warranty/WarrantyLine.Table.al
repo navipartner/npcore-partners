@@ -1,5 +1,6 @@
-table 6014519 "NPR Warranty Line"
+﻿table 6014519 "NPR Warranty Line"
 {
+    Access = Internal;
     Caption = 'Warranty Line';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

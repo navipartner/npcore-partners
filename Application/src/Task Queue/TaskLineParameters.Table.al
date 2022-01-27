@@ -1,5 +1,6 @@
-table 6059909 "NPR Task Line Parameters"
+﻿table 6059909 "NPR Task Line Parameters"
 {
+    Access = Internal;
     // TQ1.24/JDH/20150320 CASE 208247 Added Captions
     // TQ1.28/MHA/20151216  CASE 229609 Task Queue
 

@@ -1,5 +1,6 @@
-page 6151486 "NPR M2 Value Buffer List"
+﻿page 6151486 "NPR M2 Value Buffer List"
 {
+    Extensible = False;
     Caption = 'M2 Values';
     DataCaptionFields = Value;
     Editable = false;

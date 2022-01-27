@@ -1,5 +1,6 @@
-codeunit 6014583 "NPR Report Printer Interface"
+﻿codeunit 6014583 "NPR Report Printer Interface"
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

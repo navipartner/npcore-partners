@@ -1,5 +1,6 @@
-table 6151111 "NPR NpRi Sales Inv. Setup Line"
+﻿table 6151111 "NPR NpRi Sales Inv. Setup Line"
 {
+    Access = Internal;
     Caption = 'Sales Invoice Reimbursement Setup Line';
     DataClassification = CustomerContent;
 

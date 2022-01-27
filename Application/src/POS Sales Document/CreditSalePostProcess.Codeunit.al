@@ -1,5 +1,6 @@
-codeunit 6014435 "NPR Credit Sale Post-Process"
+﻿codeunit 6014435 "NPR Credit Sale Post-Process"
 {
+    Access = Internal;
     TableNo = "NPR POS Sale";
 
     trigger OnRun()

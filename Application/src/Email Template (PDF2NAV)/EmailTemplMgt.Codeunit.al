@@ -1,5 +1,6 @@
 ﻿codeunit 6014452 "NPR E-mail Templ. Mgt."
 {
+    Access = Internal;
     var
         Text000: Label 'Export failed';
         Text001: Label 'All values on %1 will be replaced with values from %2';

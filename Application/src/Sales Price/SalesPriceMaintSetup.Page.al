@@ -1,5 +1,6 @@
-page 6014685 "NPR Sales Price Maint. Setup"
+﻿page 6014685 "NPR Sales Price Maint. Setup"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Sales Price Maintenance Setup';
     PageType = List;

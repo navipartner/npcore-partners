@@ -1,5 +1,6 @@
-page 6151260 "NPR POS Entry Cue"
+﻿page 6151260 "NPR POS Entry Cue"
 {
+    Extensible = False;
     PageType = CardPart;
     SourceTable = "NPR POS Entry Cue.";
     UsageCategory = None;

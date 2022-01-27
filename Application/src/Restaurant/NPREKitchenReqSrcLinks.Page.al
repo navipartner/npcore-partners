@@ -1,5 +1,6 @@
-page 6150697 "NPR NPRE Kitchen Req.Src.Links"
+﻿page 6150697 "NPR NPRE Kitchen Req.Src.Links"
 {
+    Extensible = False;
 
     Caption = 'Kitchen Request Source Links';
     Editable = false;

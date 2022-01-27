@@ -1,5 +1,6 @@
-codeunit 6150875 "NPR POS Action: Raptor"
+﻿codeunit 6150875 "NPR POS Action: Raptor"
 {
+    Access = Internal;
 
     var
         ActionDescription: Label 'An action to run Raptor integration functions';

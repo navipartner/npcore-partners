@@ -1,5 +1,6 @@
-page 6151150 "NPR Customer GDPR Setup"
+﻿page 6151150 "NPR Customer GDPR Setup"
 {
+    Extensible = False;
     Caption = 'Customer GDPR Setup';
     DeleteAllowed = false;
     InsertAllowed = false;

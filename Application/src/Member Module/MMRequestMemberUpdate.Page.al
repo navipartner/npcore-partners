@@ -1,5 +1,6 @@
-page 6059803 "NPR MM Request Member Update"
+﻿page 6059803 "NPR MM Request Member Update"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = None;
     SourceTable = "NPR MM Request Member Update";

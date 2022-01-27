@@ -1,5 +1,6 @@
-page 6151412 "NPR Magento Pict. Link Subform"
+﻿page 6151412 "NPR Magento Pict. Link Subform"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Magento Picture Link Subform';
     DelayedInsert = true;

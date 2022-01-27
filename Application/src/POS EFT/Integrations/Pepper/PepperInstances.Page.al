@@ -1,5 +1,6 @@
-page 6184492 "NPR Pepper Instances"
+﻿page 6184492 "NPR Pepper Instances"
 {
+    Extensible = False;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
 
     Caption = 'Pepper Instances';

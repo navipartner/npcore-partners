@@ -1,5 +1,6 @@
 ﻿codeunit 6059898 "NPR Data Log Sub. Mgt."
 {
+    Access = Internal;
     // DL1.07/MH/20150515  CASE 214248 Object created
     // DL1.08/MH/20150824  CASE 221341 Error with skipped records when max records is reached corrected
     // DL1.10/MHA/20160412 CASE 239117 Added function GetNewRecordsCompany() for intercompany Subscribers

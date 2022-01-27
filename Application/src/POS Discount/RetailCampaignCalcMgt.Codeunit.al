@@ -1,5 +1,6 @@
-codeunit 6014614 "NPR Retail Campaign Calc. Mgt."
+﻿codeunit 6014614 "NPR Retail Campaign Calc. Mgt."
 {
+    Access = Internal;
     // NPR5.38.01/MHA /20171221  CASE 299436 Object create - Retail Campaign
 
 

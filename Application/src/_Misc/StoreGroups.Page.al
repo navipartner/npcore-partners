@@ -1,5 +1,6 @@
-page 6014582 "NPR Store Groups"
+﻿page 6014582 "NPR Store Groups"
 {
+    Extensible = False;
     Caption = 'Store Groups';
     PageType = List;
     SourceTable = "NPR Store Group";

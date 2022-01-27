@@ -1,5 +1,6 @@
-table 6014600 "NPR Auto Rapidstart Import Log"
+﻿table 6014600 "NPR Auto Rapidstart Import Log"
 {
+    Access = Internal;
     Caption = 'Auto Rapidstart Import Log';
     DataClassification = CustomerContent;
 

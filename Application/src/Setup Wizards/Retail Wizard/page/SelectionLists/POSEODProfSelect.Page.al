@@ -1,5 +1,6 @@
-page 6014696 "NPR POS EOD Prof. Select"
+﻿page 6014696 "NPR POS EOD Prof. Select"
 {
+    Extensible = False;
     Caption = 'POS End of Day Profile';
     PageType = List;
     SourceTable = "NPR POS End of Day Profile";

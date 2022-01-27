@@ -1,5 +1,6 @@
-table 6014471 "NPR Pacsoft Package Code"
+﻿table 6014471 "NPR Pacsoft Package Code"
 {
+    Access = Internal;
 
     Caption = 'Pacsoft Package Codes';
     DrillDownPageID = "NPR Pacsoft Package Codes";

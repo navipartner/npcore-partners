@@ -1,5 +1,8 @@
-enum 6059771 "NPR MM Sales Document Type"
+﻿enum 6059771 "NPR MM Sales Document Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     AssignmentCompatibility = true;
 

@@ -1,5 +1,6 @@
-table 6060146 "NPR MM NPR Remote Endp. Setup"
+﻿table 6060146 "NPR MM NPR Remote Endp. Setup"
 {
+    Access = Internal;
 
     Caption = 'MM NPR Remote Endpoint Setup';
     DataClassification = CustomerContent;

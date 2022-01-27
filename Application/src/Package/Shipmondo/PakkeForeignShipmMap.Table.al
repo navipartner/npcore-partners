@@ -1,5 +1,6 @@
-table 6014453 "NPR Pakke Foreign Shipm. Map."
+﻿table 6014453 "NPR Pakke Foreign Shipm. Map."
 {
+    Access = Internal;
 
     Caption = 'Pakke Foreign Shipment Mapping';
     DataClassification = CustomerContent;

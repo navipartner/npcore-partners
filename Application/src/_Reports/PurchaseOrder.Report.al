@@ -1,5 +1,8 @@
-report 6014617 "NPR Purchase Order"
+﻿report 6014617 "NPR Purchase Order"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     RDLCLayout = './src/_Reports/layouts/NP Purchase Order.rdlc';
     WordLayout = './src/_Reports/layouts/NP Purchase Order.docx';
     UsageCategory = ReportsAndAnalysis;

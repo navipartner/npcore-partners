@@ -1,5 +1,6 @@
-page 6059975 "NPR Variety Fields Setup"
+﻿page 6059975 "NPR Variety Fields Setup"
 {
+    Extensible = False;
     // VRT1.11/JDH /20160602 CASE 242940 Added Image to action
     // NPR5.28/JDH /20161128 CASE 255961 Added OnDrillDown Codeunit Id
     // NPR5.32/JDH /20170510 CASE 274170 Field Type Name Added

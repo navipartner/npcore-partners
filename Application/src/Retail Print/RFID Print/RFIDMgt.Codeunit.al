@@ -1,5 +1,6 @@
-codeunit 6059831 "NPR RFID Mgt."
+﻿codeunit 6059831 "NPR RFID Mgt."
 {
+    Access = Internal;
     var
         ERR_RFID_CLASH: Label 'RFID value already exists';
         ERR_RFID_VALUE_LENGTH: Label 'RFID value %1 is longer than limit', Comment = '%1=HexValue of RFIDSetup."RFID Value No. Series"';

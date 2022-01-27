@@ -1,5 +1,6 @@
 codeunit 6014691 "NPR Block/Unblock POS Action"
 {
+    Access = Internal;
     TableNo = "NPR POS Action";
 
     trigger OnRun()

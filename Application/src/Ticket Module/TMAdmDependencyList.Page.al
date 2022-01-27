@@ -1,5 +1,6 @@
-page 6014512 "NPR TM Adm. Dependency List"
+﻿page 6014512 "NPR TM Adm. Dependency List"
 {
+    Extensible = False;
     Caption = 'Admission Dependency Lines';
     PageType = ListPart;
     RefreshOnActivate = true;

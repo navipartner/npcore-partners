@@ -1,5 +1,6 @@
-table 6060111 "NPR TM Ticket Setup"
+﻿table 6060111 "NPR TM Ticket Setup"
 {
+    Access = Internal;
     Caption = 'Ticket Setup';
     DataClassification = CustomerContent;
 

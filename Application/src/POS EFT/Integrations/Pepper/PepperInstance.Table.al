@@ -1,5 +1,6 @@
-table 6184491 "NPR Pepper Instance"
+﻿table 6184491 "NPR Pepper Instance"
 {
+    Access = Internal;
     Caption = 'Pepper Instance';
     DataClassification = CustomerContent;
     DataCaptionFields = ID, Description;

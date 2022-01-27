@@ -1,5 +1,6 @@
-table 6014603 "NPR Event Report Layout"
+﻿table 6014603 "NPR Event Report Layout"
 {
+    Access = Internal;
     Caption = 'Event Report Layout';
     DataClassification = CustomerContent;
     fields

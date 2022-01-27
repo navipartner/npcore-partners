@@ -1,5 +1,6 @@
-page 6151186 "NPR MM Sponsor. Ticket Entry"
+﻿page 6151186 "NPR MM Sponsor. Ticket Entry"
 {
+    Extensible = False;
 
     Caption = 'Sponsorship Ticket Entry';
     InsertAllowed = false;
