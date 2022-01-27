@@ -269,7 +269,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
             until TempField.Next() = 0;
     end;
 
-    local procedure FindFields(RecRef: RecordRef; ExclKeyField: Boolean; var TempField: Record "Field" temporary; InclSystemId: Boolean)
+    procedure FindFields(RecRef: RecordRef; ExclKeyField: Boolean; var TempField: Record "Field" temporary; InclSystemId: Boolean)
     var
         "Field": Record "Field";
         TempKeyFieldBuffer: Record "Field" temporary;
@@ -578,7 +578,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         end;
     end;
 
-    local procedure Xml2RecRef(Element: XmlElement; var TempField: Record "Field" temporary; var RecRef: RecordRef)
+    procedure Xml2RecRef(Element: XmlElement; var TempField: Record "Field" temporary; var RecRef: RecordRef)
     var
         Attr: XmlAttribute;
         FieldNode: XmlNode;

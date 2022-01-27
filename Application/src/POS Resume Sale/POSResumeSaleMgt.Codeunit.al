@@ -22,7 +22,6 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         NoInfoProvidedMsg: Label 'The POS sale cancel routine did not provide any additional infromation.';
         POSActionDeleteMsg: Label 'This sales can''t be deleted.';
         ResumedWithNewTicketMsg: Label 'Instead system created a new sale ticket and copied all the information from the old sale.';
-        SaleWasParkedTxt: Label 'Sale was saved as POS Saved Sale (parked) at %1';
         SavedAsQuoteMsg: Label 'The sale was saved as POS Saved Sale No. %1. You can retrieve it from the list of parked sales.';
         SelectAction_InstructionMsg: Label 'Please select what do you want to do with the sale:\\';
         SelectAction_OptionsMsg: Label 'Resume,Park (save as a POS Saved Sale)';
@@ -56,7 +55,6 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
     var
         ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError;
         ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote,SkipAndNew;
-        CancelFailed: Boolean;
         Confirmed: Boolean;
         ForceSaveAsQuote: Boolean;
         Handled: Boolean;
@@ -104,11 +102,9 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         end;
 
         CancelErrorText := '';
-        CancelFailed := false;
         if ActionOption = ActionOption::CancelAndNew then begin
             ActionOption := ActionOption::" ";
             if not TryCancelSale(SalePOS, POSSession) then begin
-                CancelFailed := true;
                 if ActionOnCancelError = ActionOnCancelError::" " then
                     ActionOnCancelError := StrMenu(SelectAction_OptionsMsg, 1, StrSubstNo(CannotCancelMsg, CancelErrorText) + '\\' + SelectAction_InstructionMsg);
                 case ActionOnCancelError of
@@ -130,7 +126,7 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
             (ActionOption = ActionOption::Resume) and ((SalePOS.Date <> Today) or (SalePOS."Register No." <> POSUnit."No."));
 
         if (ActionOption = ActionOption::SaveAsQuote) or ForceSaveAsQuote then begin
-            POSQuoteEntryNo := DoSaveAsPOSQuote(POSSession, SalePOS, ForceSaveAsQuote or SkipDialog, CancelFailed);
+            POSQuoteEntryNo := DoSaveAsPOSQuote(POSSession, SalePOS, ForceSaveAsQuote or SkipDialog);
             if not ForceSaveAsQuote then begin
                 POSQuoteEntryNo := 0;
                 ActionOption := ActionOption::" ";
@@ -154,25 +150,21 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         exit(not ((SalePOS."Server Instance ID" = Database.ServiceInstanceId()) and (SalePOS."User Session ID" = Database.SessionId())));
     end;
 
-    procedure DoSaveAsPOSQuote(POSSession: Codeunit "NPR POS Session"; SalePOS: Record "NPR POS Sale"; SkipDialog: Boolean; CancelFailed: Boolean): Integer
+    procedure DoSaveAsPOSQuote(POSSession: Codeunit "NPR POS Session"; SalePOS: Record "NPR POS Sale"; SkipDialog: Boolean): Integer
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl";
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
     begin
         //Do not save as POS Saved Sales unfinished sales with no lines
         if not SalePOS.SalesLinesExist() then
             SkipDialog := true
-        else
+        else begin
             POSActionSavePOSQuote.CreatePOSQuote(SalePOS, POSQuoteEntry);
-
-        if not CancelFailed then begin
-            Commit();
-            AltSaleCancelDescription := StrSubstNo(SaleWasParkedTxt, CurrentDateTime);
-            CancelFailed := not TryCancelSale(SalePOS, POSSession);
-            AltSaleCancelDescription := '';
+            POSCreateEntry.InsertParkSaleEntry(SalePOS."Register No.", SalePOS."Salesperson Code");
         end;
-        if CancelFailed then
-            SalePOS.Delete(true);
+
+        SalePOS.Delete(true);
         Commit();
 
         if not SkipDialog then
@@ -219,7 +211,6 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         POSTryCancelSale: Codeunit "NPR POS Try Resume&CancelSale";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         Position: Integer;
-
     begin
         if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
             WaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS, true);

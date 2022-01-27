@@ -89,7 +89,7 @@ codeunit 6151283 "NPR SS Action: Login Screen"
         if (not SalesIsCanceled) then begin
             POSSession.GetSale(POSSale);
             POSSale.GetCurrentSale(SalePOS);
-            PosEntryNo := POSResumeSaleMgt.DoSaveAsPOSQuote(POSSession, SalePOS, true, true);
+            PosEntryNo := POSResumeSaleMgt.DoSaveAsPOSQuote(POSSession, SalePOS, true);
             POSQuoteEntry.Get(PosEntryNo);
             ResponseMessage := StrSubstNo(REQUIRES_ATTENTION, POSQuoteEntry."Sales Ticket No.");
             WorkflowResponseJson := StrSubstNo(ResponseLbl, SAVE_SALE, ResponseMessage);
