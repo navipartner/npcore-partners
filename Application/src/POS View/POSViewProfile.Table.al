@@ -11,6 +11,7 @@ table 6150651 "NPR POS View Profile"
         {
             Caption = 'Code';
             DataClassification = CustomerContent;
+            NotBlank = true;
         }
         field(2; Description; Text[50])
         {
