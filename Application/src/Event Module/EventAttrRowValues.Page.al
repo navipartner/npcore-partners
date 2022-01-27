@@ -1,5 +1,6 @@
-page 6060163 "NPR Event Attr. Row Values"
+﻿page 6060163 "NPR Event Attr. Row Values"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Attribute Row Values';
     PageType = List;

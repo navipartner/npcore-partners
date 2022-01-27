@@ -1,5 +1,6 @@
-table 6184601 "NPR Consignor Entry"
+﻿table 6184601 "NPR Consignor Entry"
 {
+    Access = Internal;
     Caption = 'Consignor Entry';
     DataClassification = CustomerContent;
 

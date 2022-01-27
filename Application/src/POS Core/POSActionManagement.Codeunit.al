@@ -1,5 +1,6 @@
-codeunit 6150719 "NPR POS Action Management"
+﻿codeunit 6150719 "NPR POS Action Management"
 {
+    Access = Internal;
     EventSubscriberInstance = Manual;
 
     var

@@ -1,5 +1,6 @@
-table 6151442 "NPR Magento Contact ShipToAdr."
+﻿table 6151442 "NPR Magento Contact ShipToAdr."
 {
+    Access = Internal;
     Caption = 'Magento Contact Ship-to Adrs.';
     DataClassification = CustomerContent;
 

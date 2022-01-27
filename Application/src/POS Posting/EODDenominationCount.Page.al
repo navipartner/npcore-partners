@@ -1,5 +1,6 @@
-page 6014443 "NPR EOD Denomination Count"
+﻿page 6014443 "NPR EOD Denomination Count"
 {
+    Extensible = False;
 
     Caption = 'NPR EOD Denomination Count';
     PageType = Worksheet;

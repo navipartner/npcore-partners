@@ -1,5 +1,6 @@
-page 6150745 "NPR Arch. POS S. Lines Subpage"
+﻿page 6150745 "NPR Arch. POS S. Lines Subpage"
 {
+    Extensible = False;
     Caption = 'Archive POS Sale Lines';
     Editable = false;
     PageType = ListPart;

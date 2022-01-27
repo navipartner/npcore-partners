@@ -1,5 +1,6 @@
-page 6014631 "NPR RP Template Archive List"
+﻿page 6014631 "NPR RP Template Archive List"
 {
+    Extensible = False;
     Caption = 'Template Archive List';
     DeleteAllowed = true;
     InsertAllowed = false;

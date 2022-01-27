@@ -1,5 +1,8 @@
-report 6014400 "NPR Inventory by age"
+﻿report 6014400 "NPR Inventory by age"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory by age.rdlc';
     Caption = 'Inventory By Age';

@@ -1,5 +1,6 @@
-table 6150635 "NPR POS Posting Log"
+﻿table 6150635 "NPR POS Posting Log"
 {
+    Access = Internal;
     Caption = 'POS Posting Log';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Posting Log";

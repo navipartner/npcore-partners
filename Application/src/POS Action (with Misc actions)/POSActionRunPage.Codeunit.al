@@ -1,5 +1,6 @@
-codeunit 6150802 "NPR POS Action: Run Page"
+﻿codeunit 6150802 "NPR POS Action: Run Page"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for running a page';
         ReadingErr: Label 'reading in %1';

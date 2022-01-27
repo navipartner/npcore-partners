@@ -1,5 +1,8 @@
-report 6014407 "NPR Voucher Entries"
+﻿report 6014407 "NPR Voucher Entries"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
 
     Caption = 'Voucher Entries';
     DefaultLayout = RDLC;

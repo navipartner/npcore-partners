@@ -1,5 +1,6 @@
-table 6060102 "NPR Periodes"
+﻿table 6060102 "NPR Periodes"
 {
+    Access = Internal;
     Caption = 'Period';
     DataClassification = CustomerContent;
     DataPerCompany = false;

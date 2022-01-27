@@ -1,5 +1,6 @@
-page 6014576 "NPR Services Combination"
+﻿page 6014576 "NPR Services Combination"
 {
+    Extensible = False;
 
 
     PageType = ListPart;

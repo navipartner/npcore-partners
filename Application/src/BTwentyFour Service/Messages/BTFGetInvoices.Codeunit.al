@@ -1,5 +1,6 @@
-codeunit 6014645 "NPR BTF GetInvoices" implements "NPR BTF IEndPoint", "NPR Nc Import List IUpdate"
+﻿codeunit 6014645 "NPR BTF GetInvoices" implements "NPR BTF IEndPoint", "NPR Nc Import List IUpdate"
 {
+    Access = Internal;
     var
         EndPointKeyNotSetLbl: Label 'Endpoint-Key is not set for endpoint %1 (%2 -> %3)', Comment = '%1=Service EndPoint ID;%2=ServiceSetup.TableCaption();%3=ServiceEndPoint.TableCaption()';
         AuthMethodIDNotSetLbl: Label 'Authorization Method ID is not set in %1 or it''s not found in related table %2', Comment = '%1=ServiceSetup.TableCaption();%2=ServiceEndPoint.TableCaption()';

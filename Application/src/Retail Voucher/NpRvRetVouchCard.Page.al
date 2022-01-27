@@ -1,5 +1,6 @@
-page 6151019 "NPR NpRv Ret. Vouch. Card"
+﻿page 6151019 "NPR NpRv Ret. Vouch. Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Return Retail Voucher Card';
     SourceTable = "NPR NpRv Ret. Vouch. Type";

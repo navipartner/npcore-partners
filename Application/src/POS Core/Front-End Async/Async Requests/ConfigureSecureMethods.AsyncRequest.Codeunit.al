@@ -1,5 +1,6 @@
-codeunit 6150772 "NPR Front-End: CfgSecureMeth." implements "NPR Front-End Async Request"
+﻿codeunit 6150772 "NPR Front-End: CfgSecureMeth." implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _methods: JsonObject;

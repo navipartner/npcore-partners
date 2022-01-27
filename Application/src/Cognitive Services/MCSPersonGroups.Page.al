@@ -1,5 +1,6 @@
-page 6059957 "NPR MCS Person Groups"
+﻿page 6059957 "NPR MCS Person Groups"
 {
+    Extensible = False;
     Caption = 'MCS Person Groups';
     PageType = List;
     SourceTable = "NPR MCS Person Groups";

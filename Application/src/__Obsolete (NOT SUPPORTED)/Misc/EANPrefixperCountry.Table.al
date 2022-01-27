@@ -1,5 +1,6 @@
-table 6060064 "NPR EAN Prefix per Country"
+﻿table 6060064 "NPR EAN Prefix per Country"
 {
+    Access = Internal;
     Caption = 'EAN Prefix per Country';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

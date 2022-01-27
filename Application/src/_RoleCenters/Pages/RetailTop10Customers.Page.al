@@ -1,5 +1,6 @@
-page 6059814 "NPR Retail Top 10 Customers"
+﻿page 6059814 "NPR Retail Top 10 Customers"
 {
+    Extensible = False;
 
     Caption = 'Top 10 Customers';
     CardPageID = "Customer Card";

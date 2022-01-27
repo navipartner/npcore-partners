@@ -1,5 +1,6 @@
-codeunit 6014693 "NPR Environment Handler"
+﻿codeunit 6014693 "NPR Environment Handler"
 {
+    Access = Internal;
     var
         IssueDetectedNotificationTxt: Label 'Something went wrong and Allow HTTP for extension ''%1'' won''t be enabled.';
         AllowHttpEnabledTxt: Label 'Allow HTTP has been successfully enabled for extension ''%1''';

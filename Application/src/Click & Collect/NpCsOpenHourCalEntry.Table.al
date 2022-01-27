@@ -1,5 +1,6 @@
-table 6151211 "NPR NpCs Open. Hour Cal. Entry"
+﻿table 6151211 "NPR NpCs Open. Hour Cal. Entry"
 {
+    Access = Internal;
     Caption = 'Collect Store Opening Hour Date';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Open. Hour Calendar";

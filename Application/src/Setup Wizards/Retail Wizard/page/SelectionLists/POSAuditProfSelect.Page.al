@@ -1,5 +1,6 @@
-page 6059779 "NPR POS Audit Prof. Select"
+﻿page 6059779 "NPR POS Audit Prof. Select"
 {
+    Extensible = False;
     Caption = 'POS Audit Profiles';
     PageType = List;
     SourceTable = "NPR POS Audit Profile";

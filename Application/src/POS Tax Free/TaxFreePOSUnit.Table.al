@@ -1,5 +1,6 @@
-table 6014641 "NPR Tax Free POS Unit"
+﻿table 6014641 "NPR Tax Free POS Unit"
 {
+    Access = Internal;
 
     Caption = 'POS Tax Free Profile';
     LookupPageID = "NPR POS Tax Free Profiles";

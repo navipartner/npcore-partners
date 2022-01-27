@@ -1,5 +1,6 @@
-page 6014588 "NPR Item Statistics Subpage"
+﻿page 6014588 "NPR Item Statistics Subpage"
 {
+    Extensible = False;
     Caption = 'Item Statistics Subform';
     Editable = false;
     PageType = List;

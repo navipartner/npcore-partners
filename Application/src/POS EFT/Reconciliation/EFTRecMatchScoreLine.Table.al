@@ -1,5 +1,6 @@
-table 6014630 "NPR EFT Rec. Match/Score Line"
+﻿table 6014630 "NPR EFT Rec. Match/Score Line"
 {
+    Access = Internal;
     Caption = 'EFT Recon. Match/Score Line';
 
     fields

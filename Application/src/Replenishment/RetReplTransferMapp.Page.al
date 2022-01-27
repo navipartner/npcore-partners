@@ -1,5 +1,6 @@
-page 6014635 "NPR Ret. Repl. Transfer Mapp."
+﻿page 6014635 "NPR Ret. Repl. Transfer Mapp."
 {
+    Extensible = False;
     ApplicationArea = All;
     Caption = 'Replenishment Transfer Mapping';
     PageType = List;

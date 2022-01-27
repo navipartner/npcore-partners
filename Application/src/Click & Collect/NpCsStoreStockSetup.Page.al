@@ -1,5 +1,6 @@
-page 6151225 "NPR NpCs Store Stock Setup"
+﻿page 6151225 "NPR NpCs Store Stock Setup"
 {
+    Extensible = False;
     Caption = 'Collect Store Stock Setup';
     InsertAllowed = false;
     PageType = Card;

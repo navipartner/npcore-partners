@@ -1,6 +1,7 @@
-#if BC17 or BC18
+﻿#if BC17 or BC18
 codeunit 6014502 "NPR Enable Item Ref. Upgr."
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

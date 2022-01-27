@@ -1,5 +1,8 @@
-report 6014481 "NPR Ret. Jnl. Imp. Per. Disc."
+﻿report 6014481 "NPR Ret. Jnl. Imp. Per. Disc."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Import Periode Discounts';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

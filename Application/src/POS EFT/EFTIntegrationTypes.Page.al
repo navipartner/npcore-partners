@@ -1,5 +1,6 @@
-page 6184483 "NPR EFT Integration Types"
+﻿page 6184483 "NPR EFT Integration Types"
 {
+    Extensible = False;
     // NPR5.30/BR  /20170113  CASE 263458 Object Created
     // NPR5.46/MMV /20180926 CASE 290734 EFT Framework refactored
 

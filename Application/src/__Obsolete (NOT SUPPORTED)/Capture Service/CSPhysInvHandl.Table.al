@@ -1,5 +1,6 @@
-table 6151396 "NPR CS Phys. Inv. Handl."
+﻿table 6151396 "NPR CS Phys. Inv. Handl."
 {
+    Access = Internal;
     Caption = 'CS Phys. Inventory Handling';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

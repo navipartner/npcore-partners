@@ -1,5 +1,6 @@
-table 6059987 "NPR Discount Cue"
+﻿table 6059987 "NPR Discount Cue"
 {
+    Access = Internal;
     Caption = 'Discount Cue';
     DataClassification = CustomerContent;
 

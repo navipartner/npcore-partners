@@ -1,5 +1,8 @@
-enum 6014462 "NPR NpDc Coupon Type"
+﻿enum 6014462 "NPR NpDc Coupon Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     AssignmentCompatibility = true;
 

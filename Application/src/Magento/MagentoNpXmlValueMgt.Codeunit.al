@@ -1,5 +1,6 @@
-codeunit 6151449 "NPR Magento NpXml Value Mgt."
+﻿codeunit 6151449 "NPR Magento NpXml Value Mgt."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Value Mgt.", 'OnGetXmlValue', '', true, true)]
     local procedure ConvertSpecialChars(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var

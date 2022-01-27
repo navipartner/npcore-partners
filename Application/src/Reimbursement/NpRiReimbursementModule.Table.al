@@ -1,5 +1,6 @@
-table 6151100 "NPR NpRi Reimbursement Module"
+﻿table 6151100 "NPR NpRi Reimbursement Module"
 {
+    Access = Internal;
     Caption = 'Reimbursement Module';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRi Reimburs. Modules";

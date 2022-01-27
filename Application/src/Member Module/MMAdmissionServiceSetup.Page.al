@@ -1,5 +1,6 @@
-page 6060090 "NPR MM Admission Service Setup"
+﻿page 6060090 "NPR MM Admission Service Setup"
 {
+    Extensible = False;
 
     Caption = 'MM Admission Service Setup';
     PageType = Card;

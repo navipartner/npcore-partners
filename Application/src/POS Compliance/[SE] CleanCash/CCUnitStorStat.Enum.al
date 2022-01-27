@@ -1,5 +1,8 @@
-enum 6014404 "NPR CC Unit Stor. Stat."
+﻿enum 6014404 "NPR CC Unit Stor. Stat."
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     value(0; OK)
     {

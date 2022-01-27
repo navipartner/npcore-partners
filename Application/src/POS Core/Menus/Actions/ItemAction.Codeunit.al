@@ -1,5 +1,6 @@
-codeunit 6150883 "NPR Item Action" implements "NPR IAction", "NPR IJsonSerializable"
+﻿codeunit 6150883 "NPR Item Action" implements "NPR IAction", "NPR IJsonSerializable"
 {
+    Access = Internal;
     var
         _code: Text;
         _base: Codeunit "NPR Base Action";

@@ -1,5 +1,6 @@
-codeunit 6014431 "NPR Event Report Layout Upg."
+﻿codeunit 6014431 "NPR Event Report Layout Upg."
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

@@ -1,5 +1,6 @@
 ﻿codeunit 6014677 "NPR Endpoint Send Req. Batch"
 {
+    Access = Internal;
     // NPR5.23\BR\20160518  CASE 237658 Object created: To be Used as Scheduled task
     // NPR5.30/ANEN/20170227 CASE 267582 Removing call to CheckMaxRequests.
     // NPR5.31/BR  /20170330 CASE 267459 Fix for errors with mutiple updates

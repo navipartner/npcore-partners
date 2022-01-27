@@ -1,5 +1,6 @@
-table 6060110 "NPR TM Ticket Notif. Entry"
+﻿table 6060110 "NPR TM Ticket Notif. Entry"
 {
+    Access = Internal;
     Caption = 'Ticket Notification Entry';
     DataClassification = CustomerContent;
     fields

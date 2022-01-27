@@ -1,5 +1,8 @@
-enum 6014456 "NPR SMS Log Status"
+﻿enum 6014456 "NPR SMS Log Status"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     value(0; Pending)
     {

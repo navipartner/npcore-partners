@@ -1,5 +1,6 @@
-table 6060117 "NPR TM Ticket Reserv. Resp."
+﻿table 6060117 "NPR TM Ticket Reserv. Resp."
 {
+    Access = Internal;
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM1.04/TSA/20160115  CASE 231834 General Issues
     // TM1.08/TSA/20160222  CASE 235208 Added new Admission Code to identify ticket specifics

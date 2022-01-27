@@ -1,5 +1,6 @@
-page 6014589 "NPR Customer Stats Subpage"
+﻿page 6014589 "NPR Customer Stats Subpage"
 {
+    Extensible = False;
     Caption = 'Customer Statistics Subform';
     Editable = false;
     PageType = List;

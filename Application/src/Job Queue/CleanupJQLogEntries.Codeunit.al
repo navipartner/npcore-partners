@@ -1,5 +1,6 @@
-codeunit 6014664 "NPR Cleanup JQ Log Entries"
+﻿codeunit 6014664 "NPR Cleanup JQ Log Entries"
 {
+    Access = Internal;
     #region execute
     TableNo = "Job Queue Entry";
 

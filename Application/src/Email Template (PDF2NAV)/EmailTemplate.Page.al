@@ -1,5 +1,6 @@
-page 6059791 "NPR E-mail Template"
+﻿page 6059791 "NPR E-mail Template"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'E-mail Template';
     SourceTable = "NPR E-mail Template Header";

@@ -1,5 +1,6 @@
-page 6151104 "NPR NpRi Party Types"
+﻿page 6151104 "NPR NpRi Party Types"
 {
+    Extensible = False;
     Caption = 'Reimbursement Party Types';
     DelayedInsert = true;
     PageType = List;

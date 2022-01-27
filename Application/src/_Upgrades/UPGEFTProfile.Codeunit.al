@@ -1,5 +1,6 @@
-codeunit 6150939 "NPR UPG EFT Profile"
+﻿codeunit 6150939 "NPR UPG EFT Profile"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

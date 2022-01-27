@@ -1,5 +1,6 @@
-page 6014564 "NPR TM Notif. Profile List"
+﻿page 6014564 "NPR TM Notif. Profile List"
 {
+    Extensible = False;
     PageType = List;
     ApplicationArea = NPRTicketAdvanced;
     UsageCategory = Administration;

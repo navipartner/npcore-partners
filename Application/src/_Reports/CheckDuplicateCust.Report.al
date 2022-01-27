@@ -1,5 +1,8 @@
-report 6060111 "NPR Check Duplicate Cust."
+﻿report 6060111 "NPR Check Duplicate Cust."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Check Duplicate Customers.rdlc';
     UsageCategory = ReportsAndAnalysis;

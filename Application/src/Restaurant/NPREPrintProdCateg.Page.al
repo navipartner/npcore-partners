@@ -1,5 +1,6 @@
-page 6150680 "NPR NPRE Print/Prod. Categ."
+﻿page 6150680 "NPR NPRE Print/Prod. Categ."
 {
+    Extensible = False;
     Caption = 'Print/Prod. Categories';
     DataCaptionExpression = '';
     DelayedInsert = true;

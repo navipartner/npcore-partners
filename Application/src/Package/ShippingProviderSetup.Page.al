@@ -1,5 +1,6 @@
 page 6014574 "NPR Shipping Provider Setup"
 {
+    Extensible = False;
     Caption = 'Shipping Provider Setup';
     PageType = Card;
     SourceTable = "NPR Shipping Provider Setup";

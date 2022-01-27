@@ -1,5 +1,6 @@
-page 6014422 "NPR Pacsoft Customs Item Rows"
+﻿page 6014422 "NPR Pacsoft Customs Item Rows"
 {
+    Extensible = False;
     // PS1.00/LS/20141021  CASE  188056 : PacSoft Module Integration Creation of Page
 
     Caption = 'Pacsoft Customs Item Rows';

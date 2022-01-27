@@ -1,5 +1,8 @@
-enum 6014410 "NPR Magento Item Custom Type"
+﻿enum 6014410 "NPR Magento Item Custom Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; TextField)

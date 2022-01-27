@@ -1,5 +1,6 @@
-table 6059773 "NPR Member Card Trx Log"
+﻿table 6059773 "NPR Member Card Trx Log"
 {
+    Access = Internal;
 
     Caption = 'Point Card - Transaction Log';
     DataClassification = CustomerContent;

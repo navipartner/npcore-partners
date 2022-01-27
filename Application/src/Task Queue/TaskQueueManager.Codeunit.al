@@ -1,5 +1,6 @@
-codeunit 6059901 "NPR Task Queue Manager"
+﻿codeunit 6059901 "NPR Task Queue Manager"
 {
+    Access = Internal;
     // This CU will be executed until there are no Jobs that will fullfull the requirements for being executed now
     // This means that when CU is runned the first time, it will try to find a task that "Needs to be executed now" (Next Execution time" has passed)
     // when this task is finished, the CU will try to see if there is a New task that "Needs to be executed now".

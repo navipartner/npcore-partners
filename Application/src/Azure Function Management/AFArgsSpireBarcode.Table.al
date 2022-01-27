@@ -1,5 +1,6 @@
-table 6151572 "NPR AF Args: Spire Barcode"
+﻿table 6151572 "NPR AF Args: Spire Barcode"
 {
+    Access = Internal;
     Caption = 'AF Arguments - Spire';
     DataClassification = CustomerContent;
 

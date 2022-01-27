@@ -1,5 +1,6 @@
-table 6060160 "NPR Event Plan. Line Buffer"
+﻿table 6060160 "NPR Event Plan. Line Buffer"
 {
+    Access = Internal;
     Caption = 'Event Planning Line Buffer';
     DataClassification = CustomerContent;
 

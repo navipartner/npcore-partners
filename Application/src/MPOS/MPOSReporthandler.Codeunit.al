@@ -1,5 +1,6 @@
-codeunit 6059976 "NPR MPOS Report handler"
+﻿codeunit 6059976 "NPR MPOS Report handler"
 {
+    Access = Internal;
     var
         CreatePDFFailedErr: Label 'Error creating PDF report';
 

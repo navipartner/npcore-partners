@@ -1,5 +1,6 @@
-page 6150640 "NPR POS Info Card"
+﻿page 6150640 "NPR POS Info Card"
 {
+    Extensible = False;
     Caption = 'POS Info Card';
     PageType = Card;
     UsageCategory = None;

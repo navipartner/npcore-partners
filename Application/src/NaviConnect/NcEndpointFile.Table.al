@@ -1,5 +1,6 @@
-table 6151524 "NPR Nc Endpoint File"
+﻿table 6151524 "NPR Nc Endpoint File"
 {
+    Access = Internal;
     Caption = 'Nc Endpoint File';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Endpoint File List";

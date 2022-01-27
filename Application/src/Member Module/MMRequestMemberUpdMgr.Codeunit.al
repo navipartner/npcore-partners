@@ -1,5 +1,6 @@
-codeunit 6014656 "NPR MM Request Member Upd Mgr"
+﻿codeunit 6014656 "NPR MM Request Member Upd Mgr"
 {
+    Access = Internal;
     procedure UpdateMemberField(EntryNo: Integer; CurrentValue: Text[200]; NewValue: Text[200]; MembershipEntryNo: Integer)
     var
         Member: Record "NPR MM Member";

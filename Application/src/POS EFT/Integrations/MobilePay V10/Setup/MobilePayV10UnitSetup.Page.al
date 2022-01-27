@@ -1,5 +1,6 @@
-page 6014405 "NPR MobilePayV10 Unit Setup"
+﻿page 6014405 "NPR MobilePayV10 Unit Setup"
 {
+    Extensible = False;
     PageType = Card;
 
     UsageCategory = Administration;

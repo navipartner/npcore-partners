@@ -1,5 +1,6 @@
 ﻿codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
 {
+    Access = Internal;
     var
         FTPClient: Codeunit "NPR AF FTP Client";
         SFTPClient: Codeunit "NPR AF SFTP Client";

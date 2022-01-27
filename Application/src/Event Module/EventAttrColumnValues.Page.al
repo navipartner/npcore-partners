@@ -1,5 +1,6 @@
-page 6060164 "NPR Event Attr. Column Values"
+﻿page 6060164 "NPR Event Attr. Column Values"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Attribute Column Values';
     PageType = List;

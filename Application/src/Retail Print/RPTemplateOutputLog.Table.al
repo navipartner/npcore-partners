@@ -1,5 +1,6 @@
-table 6014501 "NPR RP Template Output Log"
+﻿table 6014501 "NPR RP Template Output Log"
 {
+    Access = Internal;
     Caption = 'RP Template Output Log';
     fields
     {

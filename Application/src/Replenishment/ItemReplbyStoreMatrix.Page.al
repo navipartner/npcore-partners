@@ -1,5 +1,6 @@
-page 6014592 "NPR Item Repl. by Store Matrix"
+﻿page 6014592 "NPR Item Repl. by Store Matrix"
 {
+    Extensible = False;
     Caption = 'Item Replen. by Stores Matrix';
     DeleteAllowed = false;
     InsertAllowed = false;

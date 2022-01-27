@@ -1,5 +1,6 @@
-page 6151588 "NPR Event Atributes Info"
+﻿page 6151588 "NPR Event Atributes Info"
 {
+    Extensible = False;
     Caption = 'Event Atributes Info';
     InsertAllowed = false;
     PageType = ListPart;

@@ -1,5 +1,6 @@
-codeunit 6150809 "NPR POSAction: PayIn Payout"
+﻿codeunit 6150809 "NPR POSAction: PayIn Payout"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built in function handles cash deposit / withdrawls from the till';
         PayOptionType: Option PAYIN,PAYOUT;

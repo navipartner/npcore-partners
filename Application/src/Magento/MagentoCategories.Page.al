@@ -1,5 +1,6 @@
-page 6151416 "NPR Magento Categories"
+﻿page 6151416 "NPR Magento Categories"
 {
+    Extensible = False;
     Caption = 'Magento Categories';
     CardPageID = "NPR Magento Category Card";
     Editable = false;

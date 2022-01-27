@@ -1,5 +1,6 @@
-codeunit 6014567 "NPR Front-End: UpdateSearch" implements "NPR Front-End Async Request"
+﻿codeunit 6014567 "NPR Front-End: UpdateSearch" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _resultsLbl: Label 'results', Locked = true;

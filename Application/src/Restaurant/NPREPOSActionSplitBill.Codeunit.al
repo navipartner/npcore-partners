@@ -1,5 +1,6 @@
-codeunit 6150670 "NPR NPRE POS Action: SplitBill"
+﻿codeunit 6150670 "NPR NPRE POS Action: SplitBill"
 {
+    Access = Internal;
     var
         ReadingErr: Label 'reading in %1 of %2';
 

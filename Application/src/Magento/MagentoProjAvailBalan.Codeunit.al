@@ -1,5 +1,6 @@
 ﻿codeunit 6151425 "NPR Magento Proj.Avail.Balan."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Item Mgt.", 'OnCalcStockQty', '', true, true)]
     local procedure CalcProjectedAvailableInventory(MagentoSetup: Record "NPR Magento Setup"; ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text; var StockQty: Decimal; var Handled: Boolean)
     var

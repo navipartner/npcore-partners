@@ -1,5 +1,6 @@
-page 6060066 "NPR Items by Location Overview"
+﻿page 6060066 "NPR Items by Location Overview"
 {
+    Extensible = False;
     // NPR5.52/JAKUBV/20191022  CASE 370333 Transport NPR5.52 - 22 October 2019
 
     Caption = 'Items by Location Overview';

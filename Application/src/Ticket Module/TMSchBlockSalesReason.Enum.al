@@ -1,5 +1,8 @@
 enum 6014484 "NPR TM Sch. Block Sales Reason"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = false;
 
     value(0; OpenForSales)

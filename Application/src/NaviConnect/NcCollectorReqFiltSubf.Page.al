@@ -1,5 +1,6 @@
-page 6151534 "NPR Nc Collector Req.Filt.Subf"
+﻿page 6151534 "NPR Nc Collector Req.Filt.Subf"
 {
+    Extensible = False;
     Caption = 'Nc Collector Req. Filter Subf.';
     PageType = ListPart;
     UsageCategory = Administration;

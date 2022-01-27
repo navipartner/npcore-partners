@@ -1,5 +1,6 @@
-codeunit 6014667 "NPR EFT Recon. Teller / AMEX"
+﻿codeunit 6014667 "NPR EFT Recon. Teller / AMEX"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

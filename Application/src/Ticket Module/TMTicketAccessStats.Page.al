@@ -1,5 +1,6 @@
-page 6060115 "NPR TM Ticket Access Stats"
+﻿page 6060115 "NPR TM Ticket Access Stats"
 {
+    Extensible = False;
     Caption = 'Ticket Access Statistics';
     Editable = false;
     PageType = List;

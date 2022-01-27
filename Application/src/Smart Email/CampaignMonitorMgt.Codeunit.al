@@ -1,5 +1,6 @@
 ﻿codeunit 6059821 "NPR CampaignMonitor Mgt."
 {
+    Access = Internal;
     var
         ConnectionSuccessMsg: Label 'The connection test was successful. The settings are valid.';
 

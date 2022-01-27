@@ -1,5 +1,6 @@
-page 6150699 "NPR SS Profile Card"
+﻿page 6150699 "NPR SS Profile Card"
 {
+    Extensible = False;
     Caption = 'POS Self Service Profile';
     PageType = Card;
     SourceTable = "NPR SS Profile";

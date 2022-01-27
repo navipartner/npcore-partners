@@ -1,5 +1,6 @@
-page 6151026 "NPR NpRv Partners"
+﻿page 6151026 "NPR NpRv Partners"
 {
+    Extensible = False;
     Caption = 'Retail Voucher Partners';
     CardPageID = "NPR NpRv Partner Card";
     Editable = false;

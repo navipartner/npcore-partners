@@ -1,5 +1,6 @@
-page 6059783 "NPR POS Payment Bins Select"
+﻿page 6059783 "NPR POS Payment Bins Select"
 {
+    Extensible = False;
     Caption = 'POS Payment Bins';
     PageType = List;
     SourceTable = "NPR POS Payment Bin";

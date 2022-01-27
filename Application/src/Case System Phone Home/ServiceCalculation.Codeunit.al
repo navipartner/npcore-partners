@@ -1,5 +1,6 @@
 ﻿codeunit 6014482 "NPR Service Calculation"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

@@ -1,5 +1,6 @@
-page 6151577 "NPR Event Copy"
+﻿page 6151577 "NPR Event Copy"
 {
+    Extensible = False;
     Caption = 'Copy Job';
     PageType = StandardDialog;
     UsageCategory = Administration;

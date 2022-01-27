@@ -1,5 +1,8 @@
-enum 6014445 "NPR POS Pay. Met. Acc. Type"
+﻿enum 6014445 "NPR POS Pay. Met. Acc. Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
 
     value(0; "G/L Account")
     {

@@ -1,5 +1,6 @@
-page 6014689 "NPR Salesperson/Purchaser Step"
+﻿page 6014689 "NPR Salesperson/Purchaser Step"
 {
+    Extensible = False;
     Caption = 'Salespersons';
     PageType = ListPart;
     SourceTable = "NPR Salesperson Buffer";

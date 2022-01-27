@@ -1,5 +1,6 @@
-page 6150669 "NPR NPRE Restaurant Setup"
+﻿page 6150669 "NPR NPRE Restaurant Setup"
 {
+    Extensible = False;
     Caption = 'Restaurant Setup';
     PageType = Card;
     SourceTable = "NPR NPRE Restaurant Setup";

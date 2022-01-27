@@ -1,5 +1,6 @@
-page 6014605 "NPR Attributes"
+﻿page 6014605 "NPR Attributes"
 {
+    Extensible = False;
     // NPR4.11/TSA /20150422 CASE 209946 - Entity and Shortcut Attributes
     // NPR5.30/BR  /20170213 CASE 252646 Added function GetViewText
     // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer

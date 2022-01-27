@@ -1,5 +1,6 @@
-page 6014502 "NPR Accessory Unfold Worksheet"
+﻿page 6014502 "NPR Accessory Unfold Worksheet"
 {
+    Extensible = False;
     // NPR5.40/MHA /20180214  CASE 288039 Object created - unfold Accessory Items
 
     Caption = 'Accessory Unfold Worksheet';

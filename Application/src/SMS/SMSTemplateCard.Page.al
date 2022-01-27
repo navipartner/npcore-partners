@@ -1,5 +1,6 @@
-page 6059941 "NPR SMS Template Card"
+﻿page 6059941 "NPR SMS Template Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'SMS Template Card';
     PromotedActionCategories = 'New,Process,Report,Functions';

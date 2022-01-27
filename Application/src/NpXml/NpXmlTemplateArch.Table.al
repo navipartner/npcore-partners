@@ -1,5 +1,6 @@
-table 6151559 "NPR NpXml Template Arch."
+﻿table 6151559 "NPR NpXml Template Arch."
 {
+    Access = Internal;
     Caption = 'NpXml Template Archive';
     DataClassification = CustomerContent;
 

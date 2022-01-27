@@ -1,5 +1,6 @@
-page 6014458 "NPR M2 Contact List"
+﻿page 6014458 "NPR M2 Contact List"
 {
+    Extensible = False;
     Caption = 'Magento Contact List';
     PageType = List;
 

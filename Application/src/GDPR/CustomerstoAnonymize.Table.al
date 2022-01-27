@@ -1,5 +1,6 @@
-table 6151071 "NPR Customers to Anonymize"
+﻿table 6151071 "NPR Customers to Anonymize"
 {
+    Access = Internal;
     // NPR5.53/ZESO/20200115 CASE 358656 New Object Created
     // NPR5.55/ZESO/20200513 CASE 388813 Increased length of Customer Name to 100 as Length of Customer Name is 100 in BC.
 

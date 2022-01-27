@@ -1,5 +1,6 @@
 ﻿codeunit 6151109 "NPR NpRi Collect G/L Entries"
 {
+    Access = Internal;
     var
         Text000: Label 'G/L Entries';
         Text001: Label 'Collecting G/L Entries: @1@@@@@@@@@@@@@@@@@@';

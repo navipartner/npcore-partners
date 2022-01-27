@@ -1,5 +1,6 @@
-page 6059943 "NPR SMS Field List"
+﻿page 6059943 "NPR SMS Field List"
 {
+    Extensible = False;
     Caption = 'SMS Field List';
     DeleteAllowed = false;
     Editable = false;

@@ -1,9 +1,12 @@
-/// <summary>
+﻿/// <summary>
 /// POS Lookup Types map logical lookup data sets (typically tables, or filtered tables) and provide
 /// implementation of that logic through the IPOSLookupType interface.
 /// </summary>
 enum 6014470 "NPR POS Lookup Type" implements "NPR IPOSLookupType"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Caption = 'POS Lookup Type';
 
     /// <summary>

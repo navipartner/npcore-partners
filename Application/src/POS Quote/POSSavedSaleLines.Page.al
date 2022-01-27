@@ -1,5 +1,6 @@
-page 6151005 "NPR POS Saved Sale Lines"
+﻿page 6151005 "NPR POS Saved Sale Lines"
 {
+    Extensible = False;
     Caption = 'POS Saved Sale Lines';
     Editable = false;
     PageType = List;

@@ -1,5 +1,6 @@
-codeunit 6184851 "NPR FR Audit Arch. Workshifts"
+﻿codeunit 6184851 "NPR FR Audit Arch. Workshifts"
 {
+    Access = Internal;
     // Finds new P monthly workshifts, refreshes all audit entries created within the workshift and archives them.
 
     trigger OnRun()

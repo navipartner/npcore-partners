@@ -1,5 +1,6 @@
-table 6150636 "NPR POS Entry Output Log"
+﻿table 6150636 "NPR POS Entry Output Log"
 {
+    Access = Internal;
     Caption = 'POS Entry Output Log';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Entry Output Log";

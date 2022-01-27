@@ -1,5 +1,6 @@
-page 6060099 "NPR POS Input Box Parameters"
+﻿page 6060099 "NPR POS Input Box Parameters"
 {
+    Extensible = False;
 
     Caption = 'POS Input Box Parameters';
     DeleteAllowed = false;

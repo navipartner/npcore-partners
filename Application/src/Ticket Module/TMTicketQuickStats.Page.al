@@ -1,5 +1,6 @@
-page 6060111 "NPR TM Ticket Quick Stats"
+﻿page 6060111 "NPR TM Ticket Quick Stats"
 {
+    Extensible = False;
     // TM1.15/TSA/20160512  CASE 240863 POS Quick Statistics
     // TM1.19/TSA/20170202  CASE 265061 To be able to expose the page as a webservice and give the webserivce the ability to filter, GUIALLOWED was added in the OnOpenPage where default filter is set
 

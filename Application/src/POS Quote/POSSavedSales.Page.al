@@ -1,5 +1,6 @@
-page 6151002 "NPR POS Saved Sales"
+﻿page 6151002 "NPR POS Saved Sales"
 {
+    Extensible = False;
     Caption = 'POS Saved Sales';
     CardPageID = "NPR POS Saved Sale Card";
     InsertAllowed = false;

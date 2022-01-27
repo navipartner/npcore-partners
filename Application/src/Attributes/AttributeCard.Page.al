@@ -1,5 +1,6 @@
-page 6014604 "NPR Attribute Card"
+﻿page 6014604 "NPR Attribute Card"
 {
+    Extensible = False;
     // NPR4.11/TSA/20150422  CASE 209946 - Entity and Shortcut Attributes
     // NPR5.35/ANEN/20170608 CASE 276486 Support for lookup from table
     // NPR5.39/BR  /20180215 CASE 295322 Added field Import File Column No.

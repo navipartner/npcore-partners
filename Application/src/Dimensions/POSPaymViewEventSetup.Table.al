@@ -1,5 +1,6 @@
-table 6151054 "NPR POS Paym. View Event Setup"
+﻿table 6151054 "NPR POS Paym. View Event Setup"
 {
+    Access = Internal;
     Caption = 'POS Payment View Event Setup';
     DataClassification = CustomerContent;
 

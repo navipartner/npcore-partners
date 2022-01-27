@@ -1,5 +1,6 @@
-table 6059905 "NPR Task Output Log"
+﻿table 6059905 "NPR Task Output Log"
 {
+    Access = Internal;
 
     Caption = 'Task Output Log';
     DrillDownPageID = "NPR Task Output Log";

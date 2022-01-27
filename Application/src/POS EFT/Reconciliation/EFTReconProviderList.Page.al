@@ -1,5 +1,6 @@
-page 6059837 "NPR EFT Recon. Provider List"
+﻿page 6059837 "NPR EFT Recon. Provider List"
 {
+    Extensible = False;
     Caption = 'EFT Recon. Provider List';
     CardPageID = "NPR EFT Recon. Provider Card";
     Editable = false;

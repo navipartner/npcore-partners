@@ -1,5 +1,6 @@
-page 6059988 "NPR Sale Stats Activities"
+﻿page 6059988 "NPR Sale Stats Activities"
 {
+    Extensible = False;
     Caption = 'Sale Statistics';
     PageType = CardPart;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
 page 6059845 "NPR Generic Filter Page"
 {
+    Extensible = false;
     Caption = 'Generic Filter Page';
     DataCaptionExpression = PageCaptionExpr;
     DeleteAllowed = false;

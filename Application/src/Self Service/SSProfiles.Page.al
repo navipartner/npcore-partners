@@ -1,5 +1,6 @@
-page 6150678 "NPR SS Profiles"
+﻿page 6150678 "NPR SS Profiles"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = Administration;
 

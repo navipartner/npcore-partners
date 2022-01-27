@@ -1,5 +1,6 @@
-page 6014472 "NPR Retail Journal Line"
+﻿page 6014472 "NPR Retail Journal Line"
 {
+    Extensible = False;
     // //- NE 08/07-05
     //   Rettet import tilbage til at bruge forms.
     // // RR 31-07-2008

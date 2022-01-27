@@ -1,5 +1,6 @@
-codeunit 6060138 "NPR MM POS Action: MemberMgmt."
+﻿codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 {
+    Access = Internal;
     var
         QTY_CANT_CHANGE: Label 'Changing quantity for membership sales is not possible.';
         ActionDescription: Label 'This action handles member management functions.';

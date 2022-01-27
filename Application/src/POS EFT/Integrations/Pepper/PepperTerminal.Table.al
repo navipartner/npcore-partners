@@ -1,5 +1,6 @@
-table 6184492 "NPR Pepper Terminal"
+﻿table 6184492 "NPR Pepper Terminal"
 {
+    Access = Internal;
     Caption = 'Pepper Terminal';
     DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;

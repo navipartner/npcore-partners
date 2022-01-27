@@ -1,5 +1,6 @@
-page 6014583 "NPR JS Bridge"
+﻿page 6014583 "NPR JS Bridge"
 {
+    Extensible = False;
     Caption = 'JS Bridge';
     DeleteAllowed = false;
     Editable = false;

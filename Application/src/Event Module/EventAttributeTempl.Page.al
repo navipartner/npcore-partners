@@ -1,5 +1,6 @@
-page 6060160 "NPR Event Attribute Templ."
+﻿page 6060160 "NPR Event Attribute Templ."
 {
+    Extensible = False;
     Caption = 'Attribute Templates';
     PageType = List;
     SourceTable = "NPR Event Attribute Template";

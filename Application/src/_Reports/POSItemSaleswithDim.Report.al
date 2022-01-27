@@ -1,5 +1,8 @@
-report 6014441 "NPR POS Item Sales with Dim."
+﻿report 6014441 "NPR POS Item Sales with Dim."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/POS Item Sales with Dimensions.rdlc';
     Caption = 'POS Item Sales With Dimensions';

@@ -1,5 +1,6 @@
-page 6151334 "NPR Retail Restaurant RC"
+﻿page 6151334 "NPR Retail Restaurant RC"
 {
+    Extensible = False;
     Caption = 'NP Retail Restaurant', Comment = '{Dependency=Match,"ProfileDescription_NPR RESTAURANT"}';
     PageType = RoleCenter;
     UsageCategory = None;

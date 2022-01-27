@@ -1,5 +1,6 @@
-table 6184486 "NPR EFT Integration Type"
+﻿table 6184486 "NPR EFT Integration Type"
 {
+    Access = Internal;
     // NPR5.30/BR  /20170113  CASE 263458 Object Created
     // NPR5.46/MMV /20180720 CASE 290734 EFT Framework refactored
 

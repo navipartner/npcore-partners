@@ -1,5 +1,6 @@
-table 6014515 "NPR Retail Contr. Setup"
+﻿table 6014515 "NPR Retail Contr. Setup"
 {
+    Access = Internal;
     // //-NPR3.0c
     //   tilf¢jet feltet email på modtager af forsikringsoplysninger
     // NPR5.30/MHA /20170201  CASE 264918 Object renamed from Photo Setup to Retail Contract Setup and Unused fields deleted

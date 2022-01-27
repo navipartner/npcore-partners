@@ -1,5 +1,6 @@
 ﻿codeunit 6151528 "NPR Nc Collector Management"
 {
+    Access = Internal;
     procedure GetNcCollectionNo(CollectorCode: Code[20]): BigInteger
     var
         NcCollection: Record "NPR Nc Collection";

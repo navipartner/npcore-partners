@@ -1,5 +1,6 @@
-page 6151492 "NPR Raptor Data Buffer Entries"
+﻿page 6151492 "NPR Raptor Data Buffer Entries"
 {
+    Extensible = False;
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
 
     UsageCategory = None;

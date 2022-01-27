@@ -1,5 +1,6 @@
-codeunit 6150780 "NPR POS Action: TableBuzzerNo"
+﻿codeunit 6150780 "NPR POS Action: TableBuzzerNo"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Insert a table buzzer number ';
         Prompt_EnterComment: Label 'Enter Table Buzzer Number';

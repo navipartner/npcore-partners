@@ -1,5 +1,6 @@
-codeunit 6184474 "NPR POS Action: EFT Payment"
+﻿codeunit 6184474 "NPR POS Action: EFT Payment"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'EFT Request Workflow';
 

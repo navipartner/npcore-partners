@@ -1,5 +1,6 @@
-codeunit 6014596 "NPR Pckge Table Name Modifier"
+﻿codeunit 6014596 "NPR Pckge Table Name Modifier"
 {
+    Access = Internal;
     EventSubscriberInstance = Manual;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Config. XML Exchange", 'OnBeforeGetElementName', '', false, false)]

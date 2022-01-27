@@ -1,5 +1,6 @@
-codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
+﻿codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
 {
+    Access = Internal;
     TableNo = "NPR EFT Trx Async Req.";
 
     trigger OnRun()

@@ -1,5 +1,8 @@
-report 6014612 "NPR Inventory per Variant/date"
+﻿report 6014612 "NPR Inventory per Variant/date"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory per Variant at date.rdlc';
     Caption = 'Inventory Per Variant at Date';

@@ -1,5 +1,6 @@
-page 6150730 "NPR POS Scenarios Steps"
+﻿page 6150730 "NPR POS Scenarios Steps"
 {
+    Extensible = False;
 
     Caption = 'POS Scenarios Steps';
     DelayedInsert = true;

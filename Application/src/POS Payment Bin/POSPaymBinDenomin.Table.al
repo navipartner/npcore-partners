@@ -1,5 +1,6 @@
-table 6150638 "NPR POS Paym. Bin Denomin."
+﻿table 6150638 "NPR POS Paym. Bin Denomin."
 {
+    Access = Internal;
     Caption = 'POS Payment Bin Denomination';
     DataClassification = CustomerContent;
 

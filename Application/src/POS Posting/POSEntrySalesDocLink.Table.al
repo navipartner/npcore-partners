@@ -1,5 +1,6 @@
-table 6150680 "NPR POS Entry Sales Doc. Link"
+﻿table 6150680 "NPR POS Entry Sales Doc. Link"
 {
+    Access = Internal;
     Caption = 'POS Entry Sales Doc. Link';
     DataClassification = CustomerContent;
 

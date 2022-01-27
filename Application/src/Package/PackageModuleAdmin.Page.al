@@ -1,5 +1,6 @@
-page 6014648 "NPR Package Module Admin"
+﻿page 6014648 "NPR Package Module Admin"
 {
+    Extensible = False;
     // 
     // NPR-Package1.0, NPK, DL, 04-04-08, Form created
     //                      DL, 02-05-08, Added some fields

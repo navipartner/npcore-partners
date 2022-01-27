@@ -1,5 +1,6 @@
-page 6014675 "NPR Endpoint Card"
+﻿page 6014675 "NPR Endpoint Card"
 {
+    Extensible = False;
     // NPR5.23\BR\20160518  CASE 237658 Object created
     // NPR5.25\BR\20160801  CASE 234602 Added Query fields
     // NPR5.41/TS  /20180105 CASE 300893 Changed Queries to Query

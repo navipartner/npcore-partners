@@ -1,5 +1,6 @@
-page 6151248 "NPR Setup Act - POS"
+﻿page 6151248 "NPR Setup Act - POS"
 {
+    Extensible = False;
     Caption = 'NP Retail Setup - POS';
     PageType = CardPart;
     RefreshOnActivate = true;

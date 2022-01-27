@@ -1,5 +1,6 @@
-page 6014610 "NPR Retail Campaigns"
+﻿page 6014610 "NPR Retail Campaigns"
 {
+    Extensible = False;
     // NPR5.38.01/MHA /20171220  CASE 299436 Object created - Retail Campaign
     // MAG2.26/MHA /20200507  CASE 401235 Added field 6151414 "Magento Category Id"
 

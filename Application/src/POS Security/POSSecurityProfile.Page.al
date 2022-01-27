@@ -1,5 +1,6 @@
-page 6014601 "NPR POS Security Profile"
+﻿page 6014601 "NPR POS Security Profile"
 {
+    Extensible = False;
     Caption = 'NPR POS Security Profile';
     PageType = Card;
     SourceTable = "NPR POS Security Profile";

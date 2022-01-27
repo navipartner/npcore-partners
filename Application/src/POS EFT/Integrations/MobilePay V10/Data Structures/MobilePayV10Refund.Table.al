@@ -1,5 +1,6 @@
-table 6014540 "NPR MobilePayV10 Refund"
+﻿table 6014540 "NPR MobilePayV10 Refund"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'MobilePayV10 Refund Detail';
     TableType = Temporary;

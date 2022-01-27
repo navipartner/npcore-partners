@@ -1,5 +1,6 @@
-page 6060061 "NPR Catalog Suppliers"
+﻿page 6060061 "NPR Catalog Suppliers"
 {
+    Extensible = False;
     // NPR5.39/BR  /20171212 CASE 295322 Object Created
     // NPR5.42/RA/20180522  CASE 313503 Added field "Send Sales Statistics" and "Trade Number"
 

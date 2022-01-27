@@ -1,5 +1,6 @@
-page 6151209 "NPR NpCs Store Card POSRelat."
+﻿page 6151209 "NPR NpCs Store Card POSRelat."
 {
+    Extensible = False;
     Caption = 'Collect Store POS Relations';
     DelayedInsert = true;
     PageType = ListPart;

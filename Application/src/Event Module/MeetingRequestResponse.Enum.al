@@ -1,5 +1,8 @@
-enum 6014451 "NPR Meeting Request Response"
+﻿enum 6014451 "NPR Meeting Request Response"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; " ") { Caption = ' '; }

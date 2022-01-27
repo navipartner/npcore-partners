@@ -1,5 +1,6 @@
-page 6059831 "NPR Event Period Distr. Dialog"
+﻿page 6059831 "NPR Event Period Distr. Dialog"
 {
+    Extensible = False;
     Caption = 'Event Period Distr. Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;

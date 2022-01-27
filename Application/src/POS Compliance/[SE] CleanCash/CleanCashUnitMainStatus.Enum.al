@@ -1,5 +1,8 @@
-enum 6014403 "NPR CleanCash Unit Main Status"
+﻿enum 6014403 "NPR CleanCash Unit Main Status"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     value(0; OK)
     {

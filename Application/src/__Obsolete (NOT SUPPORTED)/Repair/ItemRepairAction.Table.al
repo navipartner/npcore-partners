@@ -1,5 +1,6 @@
-table 6059981 "NPR Item Repair Action"
+﻿table 6059981 "NPR Item Repair Action"
 {
+    Access = Internal;
     // VRT1.20/JDH /20170106 CASE 251896 TestTool to analyse and fix Variants
     // NPR5.48/JDH /20181109 CASE 334163 Added Option Captions
 

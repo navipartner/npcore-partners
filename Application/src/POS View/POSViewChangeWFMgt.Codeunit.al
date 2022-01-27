@@ -1,5 +1,6 @@
 ﻿codeunit 6150728 "NPR POS View Change WF Mgt."
 {
+    Access = Internal;
     TableNo = "NPR POS Sales Workflow Step";
 
     trigger OnRun()

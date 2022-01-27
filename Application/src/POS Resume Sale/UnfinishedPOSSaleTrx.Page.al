@@ -1,5 +1,6 @@
-page 6150747 "NPR Unfinished POS Sale Trx"
+﻿page 6150747 "NPR Unfinished POS Sale Trx"
 {
+    Extensible = False;
     Caption = 'Unfinished POS Sale Transactions';
     DataCaptionExpression = '';
     Editable = false;

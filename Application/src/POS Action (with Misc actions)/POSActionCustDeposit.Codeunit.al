@@ -1,5 +1,6 @@
-codeunit 6150864 "NPR POS Action: Cust. Deposit"
+﻿codeunit 6150864 "NPR POS Action: Cust. Deposit"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Collect customer deposits, optionally applied directly to entries.';
         CAPTION_INVOICENOPROMPT: Label 'Enter document no.';

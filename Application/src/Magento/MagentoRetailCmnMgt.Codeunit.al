@@ -1,5 +1,6 @@
 ﻿codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Table, Database::"NPR Retail Campaign Line", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertRetailCampaignLine(var Rec: Record "NPR Retail Campaign Line"; RunTrigger: Boolean)
     begin

@@ -1,5 +1,8 @@
-enum 6014454 "NPR Over Capacitate Resource"
+﻿enum 6014454 "NPR Over Capacitate Resource"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; " ") { Caption = ' '; }

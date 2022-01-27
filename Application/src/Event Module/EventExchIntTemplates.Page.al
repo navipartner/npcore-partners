@@ -1,5 +1,6 @@
-page 6151578 "NPR Event Exch. Int. Templates"
+﻿page 6151578 "NPR Event Exch. Int. Templates"
 {
+    Extensible = False;
     Caption = 'Event Exch. Int. Templates';
     CardPageID = "NPR Event Exch.Int.Templ. Card";
     PageType = List;

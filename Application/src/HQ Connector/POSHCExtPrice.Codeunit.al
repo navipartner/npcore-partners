@@ -1,5 +1,6 @@
-codeunit 6150910 "NPR POS HC Ext. Price"
+﻿codeunit 6150910 "NPR POS HC Ext. Price"
 {
+    Access = Internal;
     var
         InvalidXml: Label 'The response is not in valid XML format.\\%1';
 

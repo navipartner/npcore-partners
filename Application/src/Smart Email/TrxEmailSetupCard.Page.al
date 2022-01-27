@@ -1,5 +1,6 @@
-page 6059826 "NPR Trx Email Setup Card"
+﻿page 6059826 "NPR Trx Email Setup Card"
 {
+    Extensible = False;
     Caption = 'Transaction Email Setup Card';
     PageType = Card;
     SourceTable = "NPR Trx Email Setup";

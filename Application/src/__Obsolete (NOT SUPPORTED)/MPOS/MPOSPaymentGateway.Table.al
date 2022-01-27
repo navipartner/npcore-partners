@@ -1,5 +1,6 @@
-table 6059967 "NPR MPOS Payment Gateway"
+﻿table 6059967 "NPR MPOS Payment Gateway"
 {
+    Access = Internal;
     Caption = 'MPOS Payment Gateway';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

@@ -1,5 +1,6 @@
-page 6151583 "NPR Event Attributes"
+﻿page 6151583 "NPR Event Attributes"
 {
+    Extensible = False;
     Caption = 'Event Attributes';
     PageType = List;
     UsageCategory = Administration;

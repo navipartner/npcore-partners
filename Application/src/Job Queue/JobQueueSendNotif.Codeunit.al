@@ -1,5 +1,6 @@
 codeunit 6014624 "NPR Job Queue - Send Notif."
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

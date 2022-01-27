@@ -1,5 +1,6 @@
-page 6150719 "NPR POS Menu Filter List"
+﻿page 6150719 "NPR POS Menu Filter List"
 {
+    Extensible = False;
     Caption = 'POS Menu Filter List';
     CardPageID = "NPR POS Menu Filter";
     InsertAllowed = false;

@@ -1,5 +1,6 @@
-codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
+﻿codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
 {
+    Access = Internal;
     // NPR5.53/MMV /20191204 CASE 349520 Added object
     // NPR5.54/MMV /20200325 CASE 364340 Handle sign correctly whend voiding refund
 

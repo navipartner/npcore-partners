@@ -1,5 +1,6 @@
-page 6060089 "NPR TM Ticket Req. Factbox"
+﻿page 6060089 "NPR TM Ticket Req. Factbox"
 {
+    Extensible = False;
     Caption = 'NP Attributes FactBox';
     PageType = CardPart;
     SourceTable = "NPR TM Ticket Reservation Req.";

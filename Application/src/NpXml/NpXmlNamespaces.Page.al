@@ -1,5 +1,6 @@
-page 6151564 "NPR NpXml Namespaces"
+﻿page 6151564 "NPR NpXml Namespaces"
 {
+    Extensible = False;
     Caption = 'Namespaces';
     DelayedInsert = true;
     PageType = ListPart;

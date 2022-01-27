@@ -1,5 +1,6 @@
-table 6014416 "NPR Alternative No."
+﻿table 6014416 "NPR Alternative No."
 {
+    Access = Internal;
     Caption = 'Alternative No.';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

@@ -1,5 +1,6 @@
-codeunit 6059823 "NPR TransferOrder-Post + Print"
+﻿codeunit 6059823 "NPR TransferOrder-Post + Print"
 {
+    Access = Internal;
     TableNo = "Transfer Header";
 
     trigger OnRun()

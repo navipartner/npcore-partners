@@ -1,5 +1,6 @@
-table 6151305 "NPR NpEc Customer Mapping"
+﻿table 6151305 "NPR NpEc Customer Mapping"
 {
+    Access = Internal;
     Caption = 'Customer Mapping';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpEc Customer Mapping";

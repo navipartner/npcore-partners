@@ -1,5 +1,6 @@
-page 6151221 "NPR PrintNode Printer List"
+﻿page 6151221 "NPR PrintNode Printer List"
 {
+    Extensible = False;
     // NPR5.53/THRO/20200106 CASE 383562 Object Created
 
     Caption = 'PrintNode Printer List';

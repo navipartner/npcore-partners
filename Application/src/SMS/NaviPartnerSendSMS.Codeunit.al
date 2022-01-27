@@ -1,5 +1,6 @@
-codeunit 6014426 "NPR NaviPartner Send SMS" implements "NPR Send SMS"
+﻿codeunit 6014426 "NPR NaviPartner Send SMS" implements "NPR Send SMS"
 {
+    Access = Internal;
     //Test customer No 70220322
     var
         NoPhoneMessageErr: Label 'SMS Message and Phone No. must be suplied.';

@@ -1,5 +1,8 @@
-report 6060150 "NPR Event Customer Template"
+﻿report 6060150 "NPR Event Customer Template"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Customer Template.rdlc';
     UsageCategory = ReportsAndAnalysis;

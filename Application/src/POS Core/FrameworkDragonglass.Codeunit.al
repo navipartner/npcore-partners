@@ -1,5 +1,6 @@
-codeunit 6150751 "NPR Framework: Dragonglass" implements "NPR Framework Interface"
+﻿codeunit 6150751 "NPR Framework: Dragonglass" implements "NPR Framework Interface"
 {
+    Access = Internal;
     var
         Framework: controladdin "NPR Dragonglass";
         Initialized: boolean;

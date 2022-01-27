@@ -1,5 +1,6 @@
-page 6184509 "NPR EFT NETS BAXI Paym. Setup"
+﻿page 6184509 "NPR EFT NETS BAXI Paym. Setup"
 {
+    Extensible = False;
 
     Caption = 'EFT NETS BAXI Payment Setup';
     PageType = Card;

@@ -1,5 +1,6 @@
-table 6150701 "NPR POS Menu Button"
+﻿table 6150701 "NPR POS Menu Button"
 {
+    Access = Internal;
     Caption = 'POS Menu Button';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Menu Buttons";

@@ -1,5 +1,6 @@
-codeunit 6014512 "NPR MobilePayV10 Get Store"
+﻿codeunit 6014512 "NPR MobilePayV10 Get Store"
 {
+    Access = Internal;
     // GET /v10/stores/{storeid}
     TableNo = "NPR EFT Setup";
 

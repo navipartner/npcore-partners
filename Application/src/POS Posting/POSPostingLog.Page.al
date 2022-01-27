@@ -1,5 +1,6 @@
-page 6150658 "NPR POS Posting Log"
+﻿page 6150658 "NPR POS Posting Log"
 {
+    Extensible = False;
     Caption = 'POS Posting Log';
     Editable = false;
     PageType = List;

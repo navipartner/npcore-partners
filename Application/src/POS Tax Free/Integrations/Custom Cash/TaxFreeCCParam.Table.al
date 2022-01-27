@@ -1,5 +1,6 @@
-table 6014592 "NPR Tax Free CC Param."
+﻿table 6014592 "NPR Tax Free CC Param."
 {
+    Access = Internal;
     Caption = 'Tax Free Custom Cash Parameters';
     DataClassification = ToBeClassified;
     DrillDownPageId = "NPR Tax Free CC Param.";

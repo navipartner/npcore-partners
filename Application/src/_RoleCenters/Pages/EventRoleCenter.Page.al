@@ -1,5 +1,6 @@
-page 6060165 "NPR Event Role Center"
+﻿page 6060165 "NPR Event Role Center"
 {
+    Extensible = False;
     Caption = 'Event Role Center';
     PageType = RoleCenter;
     UsageCategory = None;

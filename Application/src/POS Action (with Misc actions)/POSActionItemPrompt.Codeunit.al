@@ -1,5 +1,6 @@
-codeunit 6150843 "NPR POS Action: Item Prompt"
+﻿codeunit 6150843 "NPR POS Action: Item Prompt"
 {
+    Access = Internal;
 
     var
         ActionDescription: Label 'This action prompts for a numeric item number';

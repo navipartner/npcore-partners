@@ -1,5 +1,6 @@
-table 6151129 "NPR NpIa ItemAddOn Line Setup"
+﻿table 6151129 "NPR NpIa ItemAddOn Line Setup"
 {
+    Access = Internal;
     Caption = 'Item AddOn Line Option';
     DataClassification = CustomerContent;
 

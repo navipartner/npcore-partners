@@ -1,5 +1,6 @@
-table 6059820 "NPR Trx Email Setup"
+﻿table 6059820 "NPR Trx Email Setup"
 {
+    Access = Internal;
     Caption = 'Transactional Email Setup';
     DataClassification = CustomerContent;
 

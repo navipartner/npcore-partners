@@ -1,7 +1,10 @@
-// TODO: This entire type might be unnecessary. It may have been used in .NET, but it may not be used at all in AL+Json
+﻿// TODO: This entire type might be unnecessary. It may have been used in .NET, but it may not be used at all in AL+Json
 
 enum 6150751 "NPR Button Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = false;
 
     value(0; Unspecified) { }

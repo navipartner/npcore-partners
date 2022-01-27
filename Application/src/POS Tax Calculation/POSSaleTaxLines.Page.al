@@ -1,5 +1,6 @@
-page 6014533 "NPR POS Sale Tax Lines"
+﻿page 6014533 "NPR POS Sale Tax Lines"
 {
+    Extensible = False;
     PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR POS Sale Tax Line";

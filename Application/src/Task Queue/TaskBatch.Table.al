@@ -1,5 +1,6 @@
-table 6059901 "NPR Task Batch"
+﻿table 6059901 "NPR Task Batch"
 {
+    Access = Internal;
     // TQ1.16/JDH /20140923  CASE 179044 Added SMTP mail support
     // TQ1.21/JDH /20141219  CASE 202183 Added field "Delete Log After"
     // TQ1.27/JDH /20150701  CASE 217903 Deleted unused Variables and fields

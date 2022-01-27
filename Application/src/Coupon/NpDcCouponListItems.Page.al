@@ -1,5 +1,6 @@
-page 6151597 "NPR NpDc Coupon List Items"
+﻿page 6151597 "NPR NpDc Coupon List Items"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Coupon List Items';
     DelayedInsert = true;

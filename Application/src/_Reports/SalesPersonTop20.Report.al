@@ -1,5 +1,8 @@
-report 6014406 "NPR Sales Person Top 20"
+﻿report 6014406 "NPR Sales Person Top 20"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Person Top 20.rdlc';
     Caption = 'Sales Person Top 20';

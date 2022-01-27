@@ -1,5 +1,6 @@
-codeunit 6014470 "NPR UPG Distr. And Exch. Map"
+﻿codeunit 6014470 "NPR UPG Distr. And Exch. Map"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
 

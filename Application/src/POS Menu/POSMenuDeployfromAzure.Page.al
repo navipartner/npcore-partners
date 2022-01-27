@@ -1,5 +1,6 @@
-page 6150709 "NPR POS Menu Deploy from Azure"
+﻿page 6150709 "NPR POS Menu Deploy from Azure"
 {
+    Extensible = False;
     PageType = NavigatePage;
 
     UsageCategory = Administration;

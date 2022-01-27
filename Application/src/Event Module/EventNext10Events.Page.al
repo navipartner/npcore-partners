@@ -1,5 +1,6 @@
-page 6060166 "NPR Event Next 10 Events"
+﻿page 6060166 "NPR Event Next 10 Events"
 {
+    Extensible = False;
     Caption = 'Next 10 Events';
     CardPageID = "NPR Event Card";
     Editable = false;

@@ -1,5 +1,6 @@
-page 6150651 "NPR POS Period Register List"
+﻿page 6150651 "NPR POS Period Register List"
 {
+    Extensible = False;
     Caption = 'POS Period Register List';
     Editable = false;
     PageType = List;

@@ -1,5 +1,6 @@
-page 6150701 "NPR POS Menus"
+﻿page 6150701 "NPR POS Menus"
 {
+    Extensible = False;
     Caption = 'POS Menus';
     PageType = List;
     SourceTable = "NPR POS Menu";

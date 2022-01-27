@@ -1,5 +1,6 @@
-page 6014417 "NPR Print Tags"
+﻿page 6014417 "NPR Print Tags"
 {
+    Extensible = False;
     // NPR4.18/MMV/20151229 CASE 225584 Created Page
 
     Caption = 'Print Tags';

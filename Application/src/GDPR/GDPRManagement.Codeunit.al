@@ -1,5 +1,6 @@
-codeunit 6151120 "NPR GDPR Management"
+﻿codeunit 6151120 "NPR GDPR Management"
 {
+    Access = Internal;
     // MM1.29/TSA /20180509 CASE 313795 Intial Version
 
 

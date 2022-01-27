@@ -1,5 +1,6 @@
 ﻿codeunit 6151204 "NPR NpCs Store Mgt."
 {
+    Access = Internal;
     var
         APIReqErrorTxtG: Label 'Something went wrong:\\Error Status Code: %1;\\Description: %2';
 

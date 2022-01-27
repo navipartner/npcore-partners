@@ -1,5 +1,6 @@
-page 6014571 "NPR Tax Free Consolidation"
+﻿page 6014571 "NPR Tax Free Consolidation"
 {
+    Extensible = False;
 
     Caption = 'Tax Free Consolidation';
     InsertAllowed = false;

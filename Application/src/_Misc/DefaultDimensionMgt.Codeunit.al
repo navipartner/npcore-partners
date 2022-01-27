@@ -1,5 +1,6 @@
-codeunit 6014400 "NPR Default Dimension Mgt."
+﻿codeunit 6014400 "NPR Default Dimension Mgt."
 {
+    Access = Internal;
     procedure UpdateGlobalDimCode(GlobalDimCodeNo: Integer; "Table ID": Integer; "No.": Code[20]; NewDimValue: Code[20])
     begin
         case "Table ID" of

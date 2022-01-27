@@ -1,5 +1,8 @@
-report 6014499 "NPR Inventory Campaign Stat."
+﻿report 6014499 "NPR Inventory Campaign Stat."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory Campaign Stat..rdlc';
     Caption = 'Inventory Campaign Stat.';

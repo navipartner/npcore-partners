@@ -1,5 +1,6 @@
-table 6014656 "NPR Tax Free GB Country"
+﻿table 6014656 "NPR Tax Free GB Country"
 {
+    Access = Internal;
 
     Caption = 'Tax Free GB Country';
     LookupPageID = "NPR Tax Free GB Countries";

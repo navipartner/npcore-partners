@@ -1,5 +1,6 @@
-page 6060044 "NPR Item Worksh.Vrty. Values"
+﻿page 6060044 "NPR Item Worksh.Vrty. Values"
 {
+    Extensible = False;
     Caption = 'Item Worksheet Variety Values';
     PageType = List;
     SourceTable = "NPR Item Worksh. Variety Value";

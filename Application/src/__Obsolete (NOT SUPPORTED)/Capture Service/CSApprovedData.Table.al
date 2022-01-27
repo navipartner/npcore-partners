@@ -1,5 +1,6 @@
-table 6151366 "NPR CS Approved Data"
+﻿table 6151366 "NPR CS Approved Data"
 {
+    Access = Internal;
     Caption = 'CS Approved Data';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

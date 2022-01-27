@@ -1,5 +1,6 @@
-table 6014514 "NPR Exchange Label Map"
+﻿table 6014514 "NPR Exchange Label Map"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'Exchange Label Map';
 

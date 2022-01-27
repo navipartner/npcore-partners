@@ -1,5 +1,6 @@
-page 6151566 "NPR NpXml Api Headers"
+﻿page 6151566 "NPR NpXml Api Headers"
 {
+    Extensible = False;
     Caption = 'NpXml Api Headers';
     DelayedInsert = true;
     PageType = ListPart;

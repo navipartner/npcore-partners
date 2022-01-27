@@ -1,5 +1,8 @@
-report 6014458 "NPR POS Entry Details"
+﻿report 6014458 "NPR POS Entry Details"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
 
     Caption = 'POS Entry Details';
     PreviewMode = PrintLayout;

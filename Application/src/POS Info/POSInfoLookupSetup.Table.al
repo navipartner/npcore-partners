@@ -1,5 +1,6 @@
-table 6150645 "NPR POS Info Lookup Setup"
+﻿table 6150645 "NPR POS Info Lookup Setup"
 {
+    Access = Internal;
     Caption = 'POS Info Lookup Setup';
     DataClassification = CustomerContent;
 

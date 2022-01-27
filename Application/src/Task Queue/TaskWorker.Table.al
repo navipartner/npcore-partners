@@ -1,5 +1,6 @@
-table 6059907 "NPR Task Worker"
+﻿table 6059907 "NPR Task Worker"
 {
+    Access = Internal;
     // TQ1.24/JDH/20150320 CASE 208247 Added Captions
     // TQ1.28/MHA/20151216  CASE 229609 Task Queue
     // TQ1.34/JDH /20181011 CASE 326930 New key

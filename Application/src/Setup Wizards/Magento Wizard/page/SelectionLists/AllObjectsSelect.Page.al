@@ -1,5 +1,6 @@
-page 6014621 "NPR All Objects Select"
+﻿page 6014621 "NPR All Objects Select"
 {
+    Extensible = False;
     Caption = 'All Objects';
     DataCaptionFields = "Object Type";
     Editable = false;

@@ -1,5 +1,6 @@
-codeunit 6150868 "NPR POS Action: Layaway Create"
+﻿codeunit 6150868 "NPR POS Action: Layaway Create"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Create layaway of sales order via prepayment invoices.';
         TextDownpaymentPctTitle: Label 'Down payment';

@@ -1,5 +1,6 @@
-table 6014500 "NPR Used Goods Registration"
+﻿table 6014500 "NPR Used Goods Registration"
 {
+    Access = Internal;
     Caption = 'Used Goods Registration';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

@@ -1,5 +1,6 @@
-table 6014505 "NPR Customer Repair Journal"
+﻿table 6014505 "NPR Customer Repair Journal"
 {
+    Access = Internal;
     // NPR70.00.01.00/MH/20150113  CASE 199932 Removed Web references (WEB1.00).
     // NPR70.00.01.01/BHR/20150130 CASE 204899 Added field 6 "Part Item No.",7 Quantity
     // NPR70.00.02.00/MH/20150216  CASE 204110 Removed NaviShop References (WS).

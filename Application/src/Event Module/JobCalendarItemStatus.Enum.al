@@ -1,5 +1,8 @@
-enum 6014449 "NPR Job Calendar Item Status"
+﻿enum 6014449 "NPR Job Calendar Item Status"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; " ") { Caption = ''; }

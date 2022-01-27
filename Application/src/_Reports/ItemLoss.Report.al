@@ -1,5 +1,8 @@
-report 6014542 "NPR Item - Loss"
+﻿report 6014542 "NPR Item - Loss"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item - Loss.rdlc';
     Caption = 'Item - Loss';

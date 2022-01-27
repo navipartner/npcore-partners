@@ -1,5 +1,6 @@
-table 6014643 "NPR Tax Free Consolidation"
+﻿table 6014643 "NPR Tax Free Consolidation"
 {
+    Access = Internal;
     Caption = 'Tax Free Consolidation';
     LookupPageID = "NPR Tax Free Consolidation";
     DataClassification = CustomerContent;

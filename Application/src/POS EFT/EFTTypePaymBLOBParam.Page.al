@@ -1,5 +1,6 @@
-page 6184476 "NPR EFT Type Paym. BLOB Param."
+﻿page 6184476 "NPR EFT Type Paym. BLOB Param."
 {
+    Extensible = False;
     Caption = 'EFT Type Payment BLOB Param.';
     DeleteAllowed = false;
     InsertAllowed = false;

@@ -1,5 +1,6 @@
-table 6184511 "NPR EFT BIN Group"
+﻿table 6184511 "NPR EFT BIN Group"
 {
+    Access = Internal;
     Caption = 'EFT Mapping Group';
     DataClassification = CustomerContent;
     LookupPageID = "NPR EFT BIN Group List";

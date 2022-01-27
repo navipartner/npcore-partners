@@ -1,5 +1,6 @@
-table 6059946 "NPR CashKeeper Transaction"
+﻿table 6059946 "NPR CashKeeper Transaction"
 {
+    Access = Internal;
 
     Caption = 'CashKeeper Transaction';
     DataClassification = CustomerContent;

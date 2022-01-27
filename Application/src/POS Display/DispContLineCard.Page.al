@@ -1,5 +1,6 @@
-page 6059999 "NPR Disp. Cont. Line Card"
+﻿page 6059999 "NPR Disp. Cont. Line Card"
 {
+    Extensible = False;
     Caption = 'Display Content Line Card';
     PageType = Card;
     UsageCategory = None;

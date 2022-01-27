@@ -1,5 +1,6 @@
-codeunit 6151015 "NPR NpRv Module Valid.: Def."
+﻿codeunit 6151015 "NPR NpRv Module Valid.: Def."
 {
+    Access = Internal;
     var
         Text000: Label 'Validate Voucher - Default';
         Text001: Label 'Voucher is being used';

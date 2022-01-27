@@ -1,5 +1,6 @@
-page 6014496 "NPR Exchange Label"
+﻿page 6014496 "NPR Exchange Label"
 {
+    Extensible = False;
     // NPR5.26/MMV /20160810 CASE 248262 Removed deprecated fields 25 & 26
     // NPR5.26/MMV /20160802 CASE 246998 Added field 30 - Quantity.
     //                                   Added field 32 - Unit of Measure.

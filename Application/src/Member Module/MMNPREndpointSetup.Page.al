@@ -1,5 +1,6 @@
-page 6060072 "NPR MM NPR Endpoint Setup"
+﻿page 6060072 "NPR MM NPR Endpoint Setup"
 {
+    Extensible = False;
 
     Caption = 'NPR Endpoint Setup';
     PageType = List;

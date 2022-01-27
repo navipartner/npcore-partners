@@ -1,5 +1,6 @@
-table 6060062 "NPR Item Category Mapping"
+﻿table 6060062 "NPR Item Category Mapping"
 {
+    Access = Internal;
     Caption = 'Item Category Mapping';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

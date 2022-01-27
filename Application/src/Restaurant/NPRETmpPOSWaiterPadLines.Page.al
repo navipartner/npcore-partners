@@ -1,5 +1,6 @@
-page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
+﻿page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
 {
+    Extensible = False;
     Caption = 'Add lines to ticket';
     DeleteAllowed = false;
     InsertAllowed = false;

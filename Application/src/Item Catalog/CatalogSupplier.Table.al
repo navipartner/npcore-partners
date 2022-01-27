@@ -1,5 +1,6 @@
-table 6060061 "NPR Catalog Supplier"
+﻿table 6060061 "NPR Catalog Supplier"
 {
+    Access = Internal;
     // NPR5.39/BR  /20171212 CASE 295322 Object Created
     // NPR5.42/RA/20180522  CASE 313503 Added field 30 and 40
     // NPR5.48/JDH /20181109 CASE 334163 Added caption to fields

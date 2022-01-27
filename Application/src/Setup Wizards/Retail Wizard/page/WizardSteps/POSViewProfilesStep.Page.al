@@ -1,5 +1,6 @@
-page 6014655 "NPR POS View Profiles Step"
+﻿page 6014655 "NPR POS View Profiles Step"
 {
+    Extensible = False;
     Caption = 'POS View Profiles';
     PageType = ListPart;
     SourceTable = "NPR POS View Profile";

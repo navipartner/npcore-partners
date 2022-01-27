@@ -1,5 +1,6 @@
-table 6151420 "NPR Magento Store Item"
+﻿table 6151420 "NPR Magento Store Item"
 {
+    Access = Internal;
     Caption = 'Magento Store Item';
     DataClassification = CustomerContent;
 

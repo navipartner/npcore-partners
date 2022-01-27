@@ -1,5 +1,6 @@
-page 6150727 "NPR POS Param. Values Temp."
+﻿page 6150727 "NPR POS Param. Values Temp."
 {
+    Extensible = False;
     Caption = 'POS Parameter Values';
     DelayedInsert = true;
     DeleteAllowed = false;

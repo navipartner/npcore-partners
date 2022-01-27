@@ -1,5 +1,6 @@
-table 6014424 "NPR Audit Roll Posting"
+﻿table 6014424 "NPR Audit Roll Posting"
 {
+    Access = Internal;
     Caption = 'Audit Roll Posting';
     DataClassification = CustomerContent;
     ObsoleteState = Pending;

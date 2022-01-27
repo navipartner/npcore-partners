@@ -1,5 +1,6 @@
-codeunit 6014662 "NPR Tax Free CC Print"
+﻿codeunit 6014662 "NPR Tax Free CC Print"
 {
+    Access = Internal;
     TableNo = "NPR Tax Free Request";
     trigger OnRun()
     begin

@@ -1,5 +1,6 @@
-page 6151169 "NPR NpGp POS Sales Lines"
+﻿page 6151169 "NPR NpGp POS Sales Lines"
 {
+    Extensible = False;
     Caption = 'Global POS Sales Lines';
     Editable = false;
     PageType = List;

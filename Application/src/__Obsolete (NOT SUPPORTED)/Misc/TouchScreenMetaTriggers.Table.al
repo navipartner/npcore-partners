@@ -1,5 +1,6 @@
-table 6014443 "NPR Touch Screen: MetaTriggers"
+﻿table 6014443 "NPR Touch Screen: MetaTriggers"
 {
+    Access = Internal;
 
     Caption = 'Touch Screen - MetaTriggers';
     ObsoleteState = Removed;

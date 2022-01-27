@@ -1,5 +1,8 @@
-enum 6014406 "NPR CleanCash Fault Code"
+﻿enum 6014406 "NPR CleanCash Fault Code"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(2; UnknownRequest)

@@ -1,5 +1,6 @@
-codeunit 6150923 "NPR UPG Gift Voucher"
+﻿codeunit 6150923 "NPR UPG Gift Voucher"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

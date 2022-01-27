@@ -1,5 +1,6 @@
-page 6184488 "NPR Pepper EFT Trans. Types"
+﻿page 6184488 "NPR Pepper EFT Trans. Types"
 {
+    Extensible = False;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
     // NPR5.28/BR/20161124  CASE 255137 Added field "Suppress Receipt Print"
     // NPR5.30/BR  /20170113  CASE 263458 Renamed Object from Pepper to EFT, added Field Integration Type

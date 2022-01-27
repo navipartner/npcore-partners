@@ -1,5 +1,6 @@
-page 6151539 "NPR Nc Endpoints"
+﻿page 6151539 "NPR Nc Endpoints"
 {
+    Extensible = False;
     Caption = 'Nc Endpoints';
     PageType = List;
     SourceTable = "NPR Nc Endpoint";

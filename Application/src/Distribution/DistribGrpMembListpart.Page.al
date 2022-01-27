@@ -1,5 +1,6 @@
-page 6151058 "NPR Distrib. Grp Memb Listpart"
+﻿page 6151058 "NPR Distrib. Grp Memb Listpart"
 {
+    Extensible = False;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
 
     AutoSplitKey = true;

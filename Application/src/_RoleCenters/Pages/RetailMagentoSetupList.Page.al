@@ -1,6 +1,7 @@
-page 6151242 "NPR Retail Magento Setup List"
+﻿page 6151242 "NPR Retail Magento Setup List"
 
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = Administration;
 

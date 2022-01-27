@@ -1,5 +1,6 @@
-page 6014411 "NPR Turnover Statistics"
+﻿page 6014411 "NPR Turnover Statistics"
 {
+    Extensible = False;
     Caption = 'Turnover Statistics';
     PageType = CardPart;
     UsageCategory = Administration;

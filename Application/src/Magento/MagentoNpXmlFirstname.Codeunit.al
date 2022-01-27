@@ -1,5 +1,6 @@
-codeunit 6151455 "NPR Magento NpXml Firstname"
+﻿codeunit 6151455 "NPR Magento NpXml Firstname"
 {
+    Access = Internal;
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()

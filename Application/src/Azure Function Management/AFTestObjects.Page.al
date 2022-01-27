@@ -1,5 +1,6 @@
-page 6151571 "NPR AF Test Objects"
+﻿page 6151571 "NPR AF Test Objects"
 {
+    Extensible = False;
     Caption = 'AF Test Objects';
     PageType = List;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-page 6151023 "NPR NpRv Arch. Voucher Entries"
+﻿page 6151023 "NPR NpRv Arch. Voucher Entries"
 {
+    Extensible = False;
     Caption = 'Archived Retail Voucher Entries';
     Editable = false;
     PageType = List;

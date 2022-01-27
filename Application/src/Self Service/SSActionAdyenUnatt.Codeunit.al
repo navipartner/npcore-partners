@@ -1,5 +1,6 @@
 ﻿codeunit 6184544 "NPR SS Action - Adyen Unatt."
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Adyen Cloud Unattended Transaction';
         DIALOG_CAPTION: Label 'Continue on terminal';

@@ -1,5 +1,6 @@
-codeunit 6151018 "NPR NpRv Module Pay. - Partial"
+﻿codeunit 6151018 "NPR NpRv Module Pay. - Partial"
 {
+    Access = Internal;
     var
         Text000: Label 'Apply Payment - Partial';
 

@@ -1,5 +1,6 @@
-page 6014401 "NPR Debit sale info"
+﻿page 6014401 "NPR Debit sale info"
 {
+    Extensible = False;
     // NPR5.39/TJ  /20180208 CASE 302634 Renamed functions to english
 
     UsageCategory = None;

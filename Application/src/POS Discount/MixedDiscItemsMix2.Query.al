@@ -1,5 +1,6 @@
-query 6014619 "NPR Mixed Disc. Items Mix 2"
+﻿query 6014619 "NPR Mixed Disc. Items Mix 2"
 {
+    Access = Internal;
     Caption = 'Mixed Disc. Items Mix 2';
     // MAG2.26/MHA /20200507  CASE 401235 Object created - returns Items used on Mixed Discount Line (Item Disc. Group)
 

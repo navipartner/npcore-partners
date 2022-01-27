@@ -1,5 +1,6 @@
-table 6150723 "NPR Available POS Keybind"
+﻿table 6150723 "NPR Available POS Keybind"
 {
+    Access = Internal;
     Caption = 'Available POS Keybind';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

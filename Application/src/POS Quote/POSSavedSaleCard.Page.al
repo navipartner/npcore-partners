@@ -1,5 +1,6 @@
-page 6151003 "NPR POS Saved Sale Card"
+﻿page 6151003 "NPR POS Saved Sale Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'POS Saved Sale Card';
     InsertAllowed = false;

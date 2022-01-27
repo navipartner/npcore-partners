@@ -1,5 +1,6 @@
-codeunit 6059833 "NPR RFID PostPrint Rest. Rec."
+﻿codeunit 6059833 "NPR RFID PostPrint Rest. Rec."
 {
+    Access = Internal;
     // NPR5.48/MMV /20181205 CASE 327107 Created object
     // 
     // This object can be set as "Post processing codeunit" on a template.

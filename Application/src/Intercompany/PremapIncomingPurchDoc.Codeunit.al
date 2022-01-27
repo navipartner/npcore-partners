@@ -1,5 +1,6 @@
 ﻿codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
 {
+    Access = Internal;
     TableNo = "Data Exch.";
 
     trigger OnRun()

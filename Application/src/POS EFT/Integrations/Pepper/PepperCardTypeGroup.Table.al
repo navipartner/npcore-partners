@@ -1,5 +1,6 @@
-table 6184499 "NPR Pepper Card Type Group"
+﻿table 6184499 "NPR Pepper Card Type Group"
 {
+    Access = Internal;
     // NPR5.22\BR\20160316  CASE 231481 Object Created
 
     Caption = 'Pepper Card Type Group';

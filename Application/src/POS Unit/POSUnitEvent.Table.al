@@ -1,5 +1,6 @@
-table 6150631 "NPR POS Unit Event"
+﻿table 6150631 "NPR POS Unit Event"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'POS Unit Event';
 

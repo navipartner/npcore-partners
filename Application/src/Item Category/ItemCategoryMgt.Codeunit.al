@@ -1,5 +1,6 @@
-codeunit 6014456 "NPR Item Category Mgt."
+﻿codeunit 6014456 "NPR Item Category Mgt."
 {
+    Access = Internal;
     #region Item Category creation and modification management
 
     procedure UpdateItemDiscGroupOnItems(ItemCategory: Record "Item Category"; ItemDiscGroupCode: Code[20]; xItemDiscGroupCode: Code[20])

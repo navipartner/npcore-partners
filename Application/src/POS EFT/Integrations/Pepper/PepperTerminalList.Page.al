@@ -1,5 +1,6 @@
-page 6184494 "NPR Pepper Terminal List"
+﻿page 6184494 "NPR Pepper Terminal List"
 {
+    Extensible = False;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
     // NPR5.25/BR/20160608  CASE 231481 Added fields Customer ID, License ID, License File, License Action
     // NPR5.29/BR/20161230  CASE 262269 Fix some ENU Captions, Added field License ID

@@ -1,5 +1,6 @@
-codeunit 6060109 "NPR TM Offline Ticket Valid."
+﻿codeunit 6060109 "NPR TM Offline Ticket Valid."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

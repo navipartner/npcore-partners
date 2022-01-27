@@ -1,5 +1,6 @@
-page 6151461 "NPR Magento Customer Mapping"
+﻿page 6151461 "NPR Magento Customer Mapping"
 {
+    Extensible = False;
     Caption = 'Magento Customer Mapping';
     DelayedInsert = true;
     PageType = List;

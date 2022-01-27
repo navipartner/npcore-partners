@@ -1,5 +1,8 @@
-report 6014409 "NPR Prices Upgrade"
+﻿report 6014409 "NPR Prices Upgrade"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     ApplicationArea = NPRRetail;
     Caption = 'Prices Upgrade';
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-table 6151604 "NPR NpDc Item Buffer"
+﻿table 6151604 "NPR NpDc Item Buffer"
 {
+    Access = Internal;
     Caption = 'Discount Item Buffer';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

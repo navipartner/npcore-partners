@@ -1,5 +1,6 @@
-codeunit 6014515 "NPR MobilePayV10 Auth"
+﻿codeunit 6014515 "NPR MobilePayV10 Auth"
 {
+    Access = Internal;
     // POST  /connect/token
 
     TableNo = "NPR EFT Transaction Request";

@@ -1,5 +1,6 @@
 ﻿codeunit 6151159 "NPR MM NRP Loyalty Wizard"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

@@ -1,5 +1,6 @@
-table 6060057 "NPR Item Worksh. Vrty Mapping"
+﻿table 6060057 "NPR Item Worksh. Vrty Mapping"
 {
+    Access = Internal;
     Caption = 'Item Worksheet Variety Mapping';
     DataClassification = CustomerContent;
 

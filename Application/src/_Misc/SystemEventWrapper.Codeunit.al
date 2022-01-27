@@ -1,5 +1,6 @@
-codeunit 6014427 "NPR System Event Wrapper"
+﻿codeunit 6014427 "NPR System Event Wrapper"
 {
+    Access = Internal;
     procedure MakeDateFilter(var DateFilterText: Text)
     var
         FilterTokens: Codeunit "Filter Tokens";

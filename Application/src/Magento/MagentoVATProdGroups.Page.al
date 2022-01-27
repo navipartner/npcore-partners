@@ -1,5 +1,6 @@
-page 6151410 "NPR Magento VAT Prod. Groups"
+﻿page 6151410 "NPR Magento VAT Prod. Groups"
 {
+    Extensible = False;
     Caption = 'VAT Product Posting Groups';
     InsertAllowed = false;
     PageType = List;

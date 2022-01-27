@@ -1,5 +1,6 @@
-codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
+﻿codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This action provides access to backend management function for the member module.';
 

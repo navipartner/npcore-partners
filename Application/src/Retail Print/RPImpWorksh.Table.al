@@ -1,5 +1,6 @@
-table 6014569 "NPR RP Imp. Worksh."
+﻿table 6014569 "NPR RP Imp. Worksh."
 {
+    Access = Internal;
     Caption = 'Import Worksheet';
     DataClassification = CustomerContent;
 

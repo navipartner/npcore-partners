@@ -1,5 +1,6 @@
-table 6059829 "NPR Trx JSON Result"
+﻿table 6059829 "NPR Trx JSON Result"
 {
+    Access = Internal;
     Caption = 'Transactional JSON Result';
     DrillDownPageID = "NPR Trx JSON Result";
     LookupPageID = "NPR Trx JSON Result";

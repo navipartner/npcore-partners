@@ -1,5 +1,6 @@
-page 6014638 "NPR RP Template Card"
+﻿page 6014638 "NPR RP Template Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Template Card';
     SourceTable = "NPR RP Template Header";

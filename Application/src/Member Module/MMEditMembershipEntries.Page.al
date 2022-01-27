@@ -1,5 +1,6 @@
 page 6059844 "NPR MM Edit Membership Entries"
 {
+    Extensible = false;
     PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR MM Membership Entry";

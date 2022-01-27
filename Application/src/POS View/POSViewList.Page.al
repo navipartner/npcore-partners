@@ -1,5 +1,6 @@
-page 6150710 "NPR POS View List"
+﻿page 6150710 "NPR POS View List"
 {
+    Extensible = False;
     Caption = 'POS View List';
     CardPageID = "NPR POS View Card";
     Editable = false;

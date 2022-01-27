@@ -1,5 +1,6 @@
-codeunit 6150846 "NPR POS Action: EFT Operation"
+﻿codeunit 6150846 "NPR POS Action: EFT Operation"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a template for POS Action';
         ERROR_MISSING_PARAM: Label 'Parameter %1 is missing';

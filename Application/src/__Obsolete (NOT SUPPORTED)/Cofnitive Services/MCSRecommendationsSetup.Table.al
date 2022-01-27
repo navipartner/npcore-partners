@@ -1,5 +1,6 @@
-table 6060080 "NPR MCS Recommendations Setup"
+﻿table 6060080 "NPR MCS Recommendations Setup"
 {
+    Access = Internal;
     ObsoleteState = Pending;
     ObsoleteReason = 'On February 15, 2018, “Recommendations API is no longer under active development”';
     Caption = 'MCS Recommendations Setup';

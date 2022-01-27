@@ -1,5 +1,6 @@
-page 6059767 "NPR NaviDocs Setup"
+﻿page 6059767 "NPR NaviDocs Setup"
 {
+    Extensible = False;
     Caption = 'NaviDocs Setup';
     DeleteAllowed = false;
     InsertAllowed = false;

@@ -1,5 +1,6 @@
-codeunit 6184529 "NPR EFT Adyen Resp. Parser"
+﻿codeunit 6184529 "NPR EFT Adyen Resp. Parser"
 {
+    Access = Internal;
     // NPR5.53/MMV /20191120 CASE 377533 Created object
     // NPR5.53/MMV /20200131 CASE 377533 Added support for aborting InProgress/Busy terminal automatically
     // NPR5.54/MMV /20200213 CASE 387990 Re-wrote receipt parsing to prevent locking FIND.

@@ -1,5 +1,6 @@
-page 6151589 "NPR Event Task Lines"
+﻿page 6151589 "NPR Event Task Lines"
 {
+    Extensible = False;
     Caption = 'Event Task Lines';
     DataCaptionFields = "Job No.";
     PageType = List;

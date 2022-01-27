@@ -1,5 +1,6 @@
-page 6014643 "NPR RP Data Item Constr. Links"
+﻿page 6014643 "NPR RP Data Item Constr. Links"
 {
+    Extensible = False;
     // NPR5.47/MMV /20181017 CASE 318084 Added field 12
 
     AutoSplitKey = true;

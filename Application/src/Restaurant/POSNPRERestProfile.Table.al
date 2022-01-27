@@ -1,5 +1,6 @@
-table 6150655 "NPR POS NPRE Rest. Profile"
+﻿table 6150655 "NPR POS NPRE Rest. Profile"
 {
+    Access = Internal;
     Caption = 'POS Restaurant Profile';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS NPRE Restaur. Profiles";

@@ -1,5 +1,6 @@
 ﻿codeunit 6014535 "NPR Salesperson Upgrade"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

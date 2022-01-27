@@ -1,5 +1,6 @@
-page 6014667 "NPR APIV1 - Ship. Methods"
+﻿page 6014667 "NPR APIV1 - Ship. Methods"
 {
+    Extensible = False;
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';

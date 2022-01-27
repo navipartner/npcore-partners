@@ -1,5 +1,6 @@
 ﻿table 6014507 "NPR Accessory Unfold Worksheet"
 {
+    Access = Internal;
     Caption = 'Accessory Unfold Worksheet';
     DataClassification = CustomerContent;
 

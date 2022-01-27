@@ -1,5 +1,6 @@
-table 6059904 "NPR Task Log (Task)"
+﻿table 6059904 "NPR Task Log (Task)"
 {
+    Access = Internal;
     // TQ1.17/JDH/20141015 CASE 179044 Added function to log a Message (must be used in relation to a commit, hence it locks the table)
     // TQ1.24/JDH/20150320 CASE 208247 Added Captions
     // TQ1.27/MH/20150727  CASE 219319 Added option 0 (#blank) to Option string of field 15 Status

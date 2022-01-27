@@ -1,5 +1,6 @@
-page 6014682 "NPR Glob. POS Sal. Setup Step"
+﻿page 6014682 "NPR Glob. POS Sal. Setup Step"
 {
+    Extensible = False;
     Caption = 'Global POS Sales Setup';
     PageType = ListPart;
     SourceTable = "NPR NpGp POS Sales Setup";

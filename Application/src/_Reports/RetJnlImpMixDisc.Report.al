@@ -1,5 +1,8 @@
-report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
+﻿report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Import Mixed Discounts';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

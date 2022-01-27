@@ -1,5 +1,8 @@
-report 6014555 "NPR Attribute Filter"
+﻿report 6014555 "NPR Attribute Filter"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/NPR Attribute Filter.rdlc';
     UsageCategory = ReportsAndAnalysis;

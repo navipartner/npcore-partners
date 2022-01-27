@@ -1,6 +1,5 @@
-page 6014495 "NPR Replication Setup Card"
+﻿page 6014495 "NPR Replication Setup Card"
 {
-
     Caption = 'Replication API Setup Card';
     ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
     Extensible = true;

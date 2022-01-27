@@ -1,5 +1,6 @@
-page 6151201 "NPR NpCs Document Log Entries"
+﻿page 6151201 "NPR NpCs Document Log Entries"
 {
+    Extensible = False;
     Caption = 'Collect Document Log Entries';
     Editable = false;
     PageType = List;

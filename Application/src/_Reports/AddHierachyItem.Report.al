@@ -1,5 +1,8 @@
-report 6151050 "NPR Add Hierachy Item"
+﻿report 6151050 "NPR Add Hierachy Item"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Add Hierachy Item';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

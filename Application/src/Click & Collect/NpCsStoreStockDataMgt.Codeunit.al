@@ -1,5 +1,6 @@
-codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
+﻿codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
 {
+    Access = Internal;
     TableNo = "NPR Data Log Record";
 
     trigger OnRun()

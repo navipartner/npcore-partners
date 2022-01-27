@@ -1,5 +1,6 @@
-table 6151145 "NPR M2 Price Calc. Buffer"
+﻿table 6151145 "NPR M2 Price Calc. Buffer"
 {
+    Access = Internal;
     Caption = 'Sales Price Buffer';
     DataClassification = CustomerContent;
 

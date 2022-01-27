@@ -1,5 +1,6 @@
-page 6059946 "NPR CashKeeper Transaction"
+﻿page 6059946 "NPR CashKeeper Transaction"
 {
+    Extensible = False;
     // NPR5.29\CLVA\20161108 CASE NPR5.29 Object Created
     // NPR5.40/CLVA/20180307 CASE 291921 Added field "Payment Type"
 

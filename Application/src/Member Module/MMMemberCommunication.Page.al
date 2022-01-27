@@ -1,5 +1,6 @@
-page 6151188 "NPR MM Member Communication"
+﻿page 6151188 "NPR MM Member Communication"
 {
+    Extensible = False;
 
     Caption = 'Member Communication';
     InsertAllowed = false;

@@ -1,5 +1,6 @@
-page 6151483 "NPR Magento Top 10 Customers"
+﻿page 6151483 "NPR Magento Top 10 Customers"
 {
+    Extensible = False;
     Caption = 'Top 10 Customers';
     CardPageID = "Customer Card";
     Editable = false;

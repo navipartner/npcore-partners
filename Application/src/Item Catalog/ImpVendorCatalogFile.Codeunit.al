@@ -1,5 +1,6 @@
 ﻿codeunit 6060061 "NPR Imp. Vendor Catalog File"
 {
+    Access = Internal;
     trigger OnRun()
     var
         FileManagement: Codeunit "File Management";

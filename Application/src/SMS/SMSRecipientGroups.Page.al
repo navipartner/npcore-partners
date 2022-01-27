@@ -1,5 +1,6 @@
-page 6014429 "NPR SMS Recipient Groups"
+﻿page 6014429 "NPR SMS Recipient Groups"
 {
+    Extensible = False;
 
 
     Caption = 'SMS Recipient Groups';

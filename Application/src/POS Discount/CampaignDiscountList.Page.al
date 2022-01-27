@@ -1,5 +1,6 @@
-page 6014455 "NPR Campaign Discount List"
+﻿page 6014455 "NPR Campaign Discount List"
 {
+    Extensible = False;
     // NPR4.14/TS/20150818 CASE 220971 Action Card removed from Actions
     // NPR5.29/TJ  /20170123 CASE 263787 Commented out code under action Dimensions-Multiple and set Visible property to FALSE
     // NPR5.42/MHA /20180521  CASE 315554 Added Period Fields to enable Weekly Condition

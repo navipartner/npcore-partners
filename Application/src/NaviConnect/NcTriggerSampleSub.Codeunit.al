@@ -1,5 +1,6 @@
-codeunit 6151523 "NPR Nc Trigger Sample Sub."
+﻿codeunit 6151523 "NPR Nc Trigger Sample Sub."
 {
+    Access = Internal;
     var
         CRLFString: Text[20];
 

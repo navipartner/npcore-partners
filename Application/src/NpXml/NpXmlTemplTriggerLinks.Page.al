@@ -1,5 +1,6 @@
-page 6151560 "NPR NpXml Templ. Trigger Links"
+﻿page 6151560 "NPR NpXml Templ. Trigger Links"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Xml Trigger Links';
     DelayedInsert = true;

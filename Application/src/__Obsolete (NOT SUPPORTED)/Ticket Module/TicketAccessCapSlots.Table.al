@@ -1,5 +1,6 @@
-table 6059787 "NPR Ticket Access Cap. Slots"
+﻿table 6059787 "NPR Ticket Access Cap. Slots"
 {
+    Access = Internal;
     Caption = 'Access Capacity';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

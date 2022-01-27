@@ -1,5 +1,6 @@
-codeunit 6151506 "NPR Nc IL Update Default" implements "NPR Nc Import List IUpdate"
+﻿codeunit 6151506 "NPR Nc IL Update Default" implements "NPR Nc Import List IUpdate"
 {
+    Access = Internal;
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     var
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";

@@ -1,5 +1,6 @@
-table 6150901 "NPR HC Audit Roll"
+﻿table 6150901 "NPR HC Audit Roll"
 {
+    Access = Internal;
     Caption = 'HC Audit Roll';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

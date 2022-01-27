@@ -1,5 +1,6 @@
-codeunit 6151452 "NPR Magento NpXml Stock Status"
+﻿codeunit 6151452 "NPR Magento NpXml Stock Status"
 {
+    Access = Internal;
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()

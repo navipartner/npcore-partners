@@ -1,5 +1,6 @@
-page 6014546 "NPR Dim. Select.Mul.w.Filter"
+﻿page 6014546 "NPR Dim. Select.Mul.w.Filter"
 {
+    Extensible = False;
     Caption = 'Dimension Selection';
     DeleteAllowed = false;
     InsertAllowed = false;

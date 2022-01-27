@@ -1,5 +1,6 @@
-codeunit 6014462 "NPR Web Service Auth. Helper"
+﻿codeunit 6014462 "NPR Web Service Auth. Helper"
 {
+    Access = Internal;
 
     #region FieldsVisibility
     procedure SetAuthenticationFieldsVisibility(AuthType: Enum "NPR API Auth. Type"; var IsBasicAuthVisible: Boolean)

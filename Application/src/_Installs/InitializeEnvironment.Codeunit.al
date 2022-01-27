@@ -1,5 +1,6 @@
-codeunit 6014694 "NPR Initialize Environment"
+﻿codeunit 6014694 "NPR Initialize Environment"
 {
+    Access = Internal;
     Subtype = Install;
 
     trigger OnInstallAppPerDatabase()

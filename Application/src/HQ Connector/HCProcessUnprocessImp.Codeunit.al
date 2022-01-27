@@ -1,5 +1,6 @@
-codeunit 6150905 "NPR HC Process Unprocess. Imp."
+﻿codeunit 6150905 "NPR HC Process Unprocess. Imp."
 {
+    Access = Internal;
     trigger OnRun()
     var
         ImportEntry: Record "NPR Nc Import Entry";

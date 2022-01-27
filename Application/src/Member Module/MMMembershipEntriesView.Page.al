@@ -1,5 +1,6 @@
-page 6014558 "NPR MM Membership Entries View"
+﻿page 6014558 "NPR MM Membership Entries View"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = None;
     SourceTable = "NPR MM Membership Entry";

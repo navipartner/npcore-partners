@@ -1,5 +1,6 @@
-page 6014480 "NPR Object List"
+﻿page 6014480 "NPR Object List"
 {
+    Extensible = False;
     Caption = 'Object List';
     Editable = false;
     PageType = List;

@@ -1,5 +1,6 @@
-page 6151417 "NPR Magento Child Categories"
+﻿page 6151417 "NPR Magento Child Categories"
 {
+    Extensible = False;
     Caption = 'Magento Child Categories';
     DelayedInsert = true;
     PageType = ListPart;

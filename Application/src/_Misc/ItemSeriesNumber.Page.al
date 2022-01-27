@@ -1,5 +1,6 @@
-page 6014442 "NPR Item - Series Number"
+﻿page 6014442 "NPR Item - Series Number"
 {
+    Extensible = False;
     Caption = 'Item Serial No.';
     Editable = false;
     PageType = List;

@@ -1,5 +1,6 @@
-codeunit 6150721 "NPR POS Action - Login"
+﻿codeunit 6150721 "NPR POS Action - Login"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for completing the login request passed on from the front end.';
         Text001: Label 'Unknown login type requested by JavaScript: %1.';

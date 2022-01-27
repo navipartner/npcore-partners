@@ -1,5 +1,6 @@
-table 6150717 "NPR POS Menu Filter"
+﻿table 6150717 "NPR POS Menu Filter"
 {
+    Access = Internal;
     Caption = 'POS Menu Filter';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Menu Filter List";

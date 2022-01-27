@@ -1,5 +1,6 @@
-table 6151187 "NPR MM Member Comm. Setup"
+﻿table 6151187 "NPR MM Member Comm. Setup"
 {
+    Access = Internal;
 
     Caption = 'Member Communication Setup';
     DataClassification = CustomerContent;

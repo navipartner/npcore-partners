@@ -1,5 +1,6 @@
-page 6151430 "NPR Magento Attr. List"
+﻿page 6151430 "NPR Magento Attr. List"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Attributes';
     CardPageID = "NPR Magento Attributes";

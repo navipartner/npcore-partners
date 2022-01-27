@@ -1,5 +1,6 @@
-table 6151090 "NPR Nc RapidConnect Setup"
+﻿table 6151090 "NPR Nc RapidConnect Setup"
 {
+    Access = Internal;
     Caption = 'Nc RapidConnect Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

@@ -1,5 +1,6 @@
-page 6059961 "NPR CashKeeper Overview"
+﻿page 6059961 "NPR CashKeeper Overview"
 {
+    Extensible = False;
     // NPR5.43/CLVA/20180620 CASE 319764 Object created
 
     Caption = 'CashKeeper Overview';

@@ -1,5 +1,6 @@
-table 6150658 "NPR SS Profile"
+﻿table 6150658 "NPR SS Profile"
 {
+    Access = Internal;
     Caption = 'POS Self Service Profile';
     DataClassification = CustomerContent;
     LookupPageID = "NPR SS Profiles";

@@ -1,5 +1,6 @@
-table 6014559 "NPR RP Template Archive"
+﻿table 6014559 "NPR RP Template Archive"
 {
+    Access = Internal;
     Caption = 'Template Archive';
     LookupPageID = "NPR RP Template Archive List";
     DataClassification = CustomerContent;

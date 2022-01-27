@@ -1,5 +1,6 @@
-table 6014464 "NPR E-mail Template Filter"
+﻿table 6014464 "NPR E-mail Template Filter"
 {
+    Access = Internal;
     Caption = 'E-mail Template Filter';
     DataClassification = CustomerContent;
 

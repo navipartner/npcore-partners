@@ -1,5 +1,6 @@
-page 6014569 "NPR Package Shipping Agents"
+﻿page 6014569 "NPR Package Shipping Agents"
 {
+    Extensible = False;
     UsageCategory = Administration;
 
     CardPageID = "NPR Package Shipping agent";

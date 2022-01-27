@@ -1,5 +1,6 @@
-table 6150671 "NPR NPRE W.Pad Prnt LogEntry"
+﻿table 6150671 "NPR NPRE W.Pad Prnt LogEntry"
 {
+    Access = Internal;
     Caption = 'W. Pad Line Send Log Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE W.Pad Pr.Log Entries";

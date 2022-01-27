@@ -1,5 +1,8 @@
-enum 6014475 "NPR TM Not. Trigger Type"
+﻿enum 6014475 "NPR TM Not. Trigger Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; RESERVE)

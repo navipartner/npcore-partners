@@ -1,5 +1,6 @@
-codeunit 6150735 "NPR POS Workflows 2.0: Require"
+﻿codeunit 6150735 "NPR POS Workflows 2.0: Require"
 {
+    Access = Internal;
     var
         CustomHandlerMissingErr: Label 'Custom Require method handler for require type "%1" was not found.';
         LookupTemplateMissingErr: Label 'Lookup template wiht code "%1" was not found.';

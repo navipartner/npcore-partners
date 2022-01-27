@@ -1,5 +1,6 @@
-codeunit 6060126 "NPR MM Membership Kiosk"
+﻿codeunit 6060126 "NPR MM Membership Kiosk"
 {
+    Access = Internal;
 
     SingleInstance = true;
 

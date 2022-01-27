@@ -1,5 +1,6 @@
-codeunit 6014444 "NPR DE Audit Mgt."
+﻿codeunit 6014444 "NPR DE Audit Mgt."
 {
+    Access = Internal;
     SingleInstance = true;
 
     procedure HandlerCode(): Text

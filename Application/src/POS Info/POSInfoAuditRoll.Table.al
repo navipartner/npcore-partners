@@ -1,5 +1,6 @@
-table 6150643 "NPR POS Info Audit Roll"
+﻿table 6150643 "NPR POS Info Audit Roll"
 {
+    Access = Internal;
     Caption = 'POS Info Audit Roll';
     DataClassification = CustomerContent;
 

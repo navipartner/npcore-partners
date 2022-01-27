@@ -1,5 +1,6 @@
-page 6151175 "NPR NpGp Cross Companies Setup"
+﻿page 6151175 "NPR NpGp Cross Companies Setup"
 {
+    Extensible = False;
     Caption = 'Cross Companies Setup';
     PageType = List;
     SourceTable = "NPR NpGp Cross Company Setup";

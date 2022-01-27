@@ -1,5 +1,6 @@
-codeunit 6014590 "NPR Service Tier User Mgt."
+﻿codeunit 6014590 "NPR Service Tier User Mgt."
 {
+    Access = Internal;
     local procedure GetDatabaseName(): Text
     var
         activeSession: Record "Active Session";

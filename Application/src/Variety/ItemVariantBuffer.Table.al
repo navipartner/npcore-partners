@@ -1,5 +1,6 @@
-table 6014609 "NPR Item Variant Buffer"
+﻿table 6014609 "NPR Item Variant Buffer"
 {
+    Access = Internal;
     Caption = 'Item Variant Buffer';
     DataClassification = CustomerContent;
     TableType = Temporary;

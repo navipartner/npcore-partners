@@ -1,5 +1,6 @@
-table 6014426 "NPR Retail Document Lines"
+﻿table 6014426 "NPR Retail Document Lines"
 {
+    Access = Internal;
     Caption = 'Retail Document Line';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

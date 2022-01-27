@@ -1,5 +1,6 @@
-table 6151383 "NPR CS Item Search Handl."
+﻿table 6151383 "NPR CS Item Search Handl."
 {
+    Access = Internal;
 
     Caption = 'CS Item Seach Handling';
     DataClassification = CustomerContent;

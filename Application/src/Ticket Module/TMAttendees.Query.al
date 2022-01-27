@@ -1,5 +1,6 @@
-query 6014404 "NPR TM Attendees"
+﻿query 6014404 "NPR TM Attendees"
 {
+    Access = Internal;
     QueryType = Normal;
     Caption = 'Attendees';
     OrderBy = ascending(TicketID);

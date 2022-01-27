@@ -1,5 +1,6 @@
 ﻿codeunit 6151421 "NPR Magento Lookup Ret.Order"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

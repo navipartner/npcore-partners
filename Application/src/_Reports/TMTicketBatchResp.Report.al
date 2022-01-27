@@ -1,5 +1,8 @@
-report 6060124 "NPR TM Ticket Batch Resp."
+﻿report 6060124 "NPR TM Ticket Batch Resp."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Ticket Batch Response.rdlc';
     UsageCategory = ReportsAndAnalysis;

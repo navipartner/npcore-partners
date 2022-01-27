@@ -1,5 +1,6 @@
 ﻿codeunit 6151169 "NPR POS Action: NpGp Return"
 {
+    Access = Internal;
     var
         TitleCaption: Label 'Return Item by Reference';
         RefNoPromptCaption: Label 'Cross Reference No.';

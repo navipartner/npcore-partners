@@ -1,5 +1,6 @@
-codeunit 6014437 "NPR Phone Lookup"
+﻿codeunit 6014437 "NPR Phone Lookup"
 {
+    Access = Internal;
     var
         IComm: Record "NPR I-Comm";
         Initialized: Boolean;

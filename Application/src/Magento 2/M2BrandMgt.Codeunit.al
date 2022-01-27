@@ -1,5 +1,6 @@
 ﻿codeunit 6151465 "NPR M2 Brand Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     begin
         UpdateBrands();

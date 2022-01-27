@@ -1,5 +1,6 @@
-page 6150650 "NPR POS Entries"
+﻿page 6150650 "NPR POS Entries"
 {
+    Extensible = False;
     Caption = 'POS Entries';
     Editable = false;
     PageType = List;

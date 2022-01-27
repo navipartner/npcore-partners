@@ -1,5 +1,6 @@
-table 6014587 "NPR Package Code"
+﻿table 6014587 "NPR Package Code"
 {
+    Access = Internal;
 
     Caption = 'NPR Package Codes';
     DrillDownPageID = "NPR Package Codes";

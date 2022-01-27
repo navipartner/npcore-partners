@@ -1,5 +1,6 @@
-page 6060095 "NPR TM Pick-Up Reserv. Tickets"
+﻿page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 {
+    Extensible = False;
 
     Caption = 'TM Pick-Up Reserved Tickets';
     DeleteAllowed = false;

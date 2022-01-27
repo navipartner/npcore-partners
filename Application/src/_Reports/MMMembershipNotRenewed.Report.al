@@ -1,5 +1,8 @@
-report 6060136 "NPR MM Membership Not Renewed"
+﻿report 6060136 "NPR MM Membership Not Renewed"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Not Renewed.rdlc';
     Caption = 'Membership Not Renewed';

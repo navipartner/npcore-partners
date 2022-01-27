@@ -1,5 +1,6 @@
-page 6184480 "NPR EFT POSUnit Param. Setup"
+﻿page 6184480 "NPR EFT POSUnit Param. Setup"
 {
+    Extensible = False;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.48/BHR /20181206 CASE 338656 Added Missing Picture to Action
 

@@ -1,5 +1,6 @@
-page 6151575 "NPR Event Notes"
+﻿page 6151575 "NPR Event Notes"
 {
+    Extensible = False;
     Caption = 'Event Notes';
     Editable = false;
     PageType = ListPart;

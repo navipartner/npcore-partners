@@ -1,5 +1,6 @@
-table 6184498 "NPR Pepper Card Type Fee"
+﻿table 6184498 "NPR Pepper Card Type Fee"
 {
+    Access = Internal;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
 
     Caption = 'Pepper Card Type Fee';

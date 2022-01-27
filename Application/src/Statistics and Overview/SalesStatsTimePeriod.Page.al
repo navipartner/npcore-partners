@@ -1,5 +1,6 @@
-page 6014591 "NPR Sales Stats Time Period"
+﻿page 6014591 "NPR Sales Stats Time Period"
 {
+    Extensible = False;
     Caption = 'Sales Statistics by Date Time';
     PageType = Card;
     UsageCategory = ReportsAndAnalysis;

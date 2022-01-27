@@ -1,5 +1,6 @@
-query 6059801 "NPR Retail Sales Value Entry"
+﻿query 6059801 "NPR Retail Sales Value Entry"
 {
+    Access = Internal;
     // NC1.17/BHR/20150528  CASE 212983 Navishop rolecenter layout(chart)
     // NC1.17/BHR/20150619  CASE 216856 Changed query base on "value entry" instead of "Cust ledger enntry"
     // NC1.20/BHR/20150819 CASE 220881 Changed filter on Value Entry

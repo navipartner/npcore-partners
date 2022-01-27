@@ -1,5 +1,8 @@
-report 6014412 "NPR Sold Items by Sales Person"
+﻿report 6014412 "NPR Sold Items by Sales Person"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sold Items by Sales Person.rdlc';
     UsageCategory = ReportsAndAnalysis;

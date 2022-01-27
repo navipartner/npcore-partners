@@ -1,5 +1,6 @@
-table 6151556 "NPR NpXml Templ.Trigger Link"
+﻿table 6151556 "NPR NpXml Templ.Trigger Link"
 {
+    Access = Internal;
     Caption = 'NpXml Template Trigger Link';
     DataClassification = CustomerContent;
 

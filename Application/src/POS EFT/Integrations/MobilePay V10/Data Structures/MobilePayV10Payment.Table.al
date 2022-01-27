@@ -1,5 +1,6 @@
-table 6014543 "NPR MobilePayV10 Payment"
+﻿table 6014543 "NPR MobilePayV10 Payment"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'MobilePayV10 Payment Detail';
     TableType = Temporary;

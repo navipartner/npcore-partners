@@ -1,5 +1,6 @@
-page 6014461 "NPR Invt. Pick Subform Scan"
+﻿page 6014461 "NPR Invt. Pick Subform Scan"
 {
+    Extensible = False;
     Caption = 'Lines';
     Editable = false;
     InsertAllowed = false;

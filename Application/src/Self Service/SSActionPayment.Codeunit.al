@@ -1,5 +1,6 @@
-codeunit 6151291 "NPR SS Action: Payment"
+﻿codeunit 6151291 "NPR SS Action: Payment"
 {
+    Access = Internal;
 
     var
         ActionDescription: Label 'Unattended payment';

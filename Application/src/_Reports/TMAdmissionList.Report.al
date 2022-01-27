@@ -1,5 +1,8 @@
-report 6060126 "NPR TM Admission List"
+﻿report 6060126 "NPR TM Admission List"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Admission List.rdlc';
     UsageCategory = ReportsAndAnalysis;

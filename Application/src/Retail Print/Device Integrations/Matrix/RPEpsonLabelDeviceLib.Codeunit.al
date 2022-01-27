@@ -1,5 +1,6 @@
-codeunit 6014537 "NPR RP Epson Label Device Lib."
+﻿codeunit 6014537 "NPR RP Epson Label Device Lib."
 {
+    Access = Internal;
     // Epson Label Command Library.
     //  Work started by Mikkel Vilhelmsen.
     //  Contributions providing function interfaces for valid

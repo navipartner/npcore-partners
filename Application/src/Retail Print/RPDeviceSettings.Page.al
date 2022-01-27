@@ -1,5 +1,6 @@
-page 6014628 "NPR RP Device Settings"
+﻿page 6014628 "NPR RP Device Settings"
 {
+    Extensible = False;
     Caption = 'Device Settings';
     DelayedInsert = true;
     PageType = List;

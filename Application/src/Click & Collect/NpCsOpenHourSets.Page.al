@@ -1,5 +1,6 @@
-page 6151215 "NPR NpCs Open. Hour Sets"
+﻿page 6151215 "NPR NpCs Open. Hour Sets"
 {
+    Extensible = False;
     Caption = 'Collect Store Opening Hour Sets';
     CardPageID = "NPR NpCs Open. Hour Set Card";
     Editable = false;

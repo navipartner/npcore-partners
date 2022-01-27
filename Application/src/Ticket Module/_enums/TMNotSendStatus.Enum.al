@@ -1,5 +1,8 @@
-enum 6014476 "NPR TM Not. Send Status"
+﻿enum 6014476 "NPR TM Not. Send Status"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; PENDING)

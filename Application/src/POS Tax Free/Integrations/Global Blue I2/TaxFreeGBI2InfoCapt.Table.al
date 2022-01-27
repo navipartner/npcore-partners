@@ -1,5 +1,6 @@
-table 6014655 "NPR TaxFree GB I2 Info Capt."
+﻿table 6014655 "NPR TaxFree GB I2 Info Capt."
 {
+    Access = Internal;
 
     Caption = 'Tax Free GB I2 Info Capture';
     DataClassification = CustomerContent;

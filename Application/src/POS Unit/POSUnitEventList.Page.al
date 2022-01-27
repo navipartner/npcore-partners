@@ -1,5 +1,6 @@
-page 6150739 "NPR POS Unit Event List"
+﻿page 6150739 "NPR POS Unit Event List"
 {
+    Extensible = False;
     PageType = List;
     Editable = true;
 

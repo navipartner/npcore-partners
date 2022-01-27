@@ -1,5 +1,6 @@
-table 6151527 "NPR Nc Collection"
+﻿table 6151527 "NPR Nc Collection"
 {
+    Access = Internal;
     Caption = 'Nc Collection';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Collection List";

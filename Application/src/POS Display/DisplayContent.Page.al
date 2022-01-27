@@ -1,5 +1,6 @@
-page 6059951 "NPR Display Content"
+﻿page 6059951 "NPR Display Content"
 {
+    Extensible = False;
     // NPR5.48/JDH /20181109 CASE 334163 Added object caption
 
     Caption = 'Display Content';

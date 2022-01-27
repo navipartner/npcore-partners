@@ -1,5 +1,6 @@
-page 6150633 "NPR NPRE Select Flow Status"
+﻿page 6150633 "NPR NPRE Select Flow Status"
 {
+    Extensible = False;
     Caption = 'Select Flow Status';
     DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;

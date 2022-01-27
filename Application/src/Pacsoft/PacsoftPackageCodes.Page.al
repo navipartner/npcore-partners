@@ -1,5 +1,6 @@
-page 6014415 "NPR Pacsoft Package Codes"
+﻿page 6014415 "NPR Pacsoft Package Codes"
 {
+    Extensible = False;
 
     Caption = 'Pacsoft Package Codes';
     PageType = Worksheet;

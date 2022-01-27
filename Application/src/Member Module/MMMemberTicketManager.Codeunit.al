@@ -1,5 +1,6 @@
-codeunit 6060130 "NPR MM Member Ticket Manager"
+﻿codeunit 6060130 "NPR MM Member Ticket Manager"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

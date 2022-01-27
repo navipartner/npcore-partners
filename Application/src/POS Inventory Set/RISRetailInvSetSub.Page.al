@@ -1,5 +1,6 @@
-page 6151087 "NPR RIS Retail Inv. Set Sub."
+﻿page 6151087 "NPR RIS Retail Inv. Set Sub."
 {
+    Extensible = False;
     UsageCategory = None;
     AutoSplitKey = true;
     Caption = 'Inventory Set Entries';

@@ -1,5 +1,6 @@
-codeunit 6060062 "NPR Process Catalog File"
+﻿codeunit 6060062 "NPR Process Catalog File"
 {
+    Access = Internal;
 
     TableNo = "NPR Nc Import Entry";
 

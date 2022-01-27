@@ -1,5 +1,6 @@
-page 6059789 "NPR E-mail Setup"
+﻿page 6059789 "NPR E-mail Setup"
 {
+    Extensible = False;
     Caption = 'E-mail Setup';
     DeleteAllowed = false;
     InsertAllowed = false;

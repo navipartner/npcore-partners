@@ -1,5 +1,6 @@
-codeunit 6150858 "NPR POS Action: Start POS"
+﻿codeunit 6150858 "NPR POS Action: Start POS"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This action is executed when the POS Unit is in status closed, to verify BIN contents.';
         Title: Label 'Confirm Bin Contents.';

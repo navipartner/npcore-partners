@@ -1,5 +1,6 @@
-page 6151332 "NPR Retail Ent Headline"
+﻿page 6151332 "NPR Retail Ent Headline"
 {
+    Extensible = False;
     Caption = 'Headline';
     PageType = HeadlinePart;
     RefreshOnActivate = true;

@@ -1,5 +1,6 @@
-page 6014572 "NPR Tax Free Vouch. Sale Links"
+﻿page 6014572 "NPR Tax Free Vouch. Sale Links"
 {
+    Extensible = False;
     Caption = 'Tax Free Voucher Sale Links';
     DeleteAllowed = false;
     Editable = false;

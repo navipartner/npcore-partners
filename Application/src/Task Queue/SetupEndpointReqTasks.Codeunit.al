@@ -1,5 +1,6 @@
-codeunit 6014679 "NPR Setup Endpoint Req Tasks"
+﻿codeunit 6014679 "NPR Setup Endpoint Req Tasks"
 {
+    Access = Internal;
     // NPR5.23/BR/20160609      CASE 237658 Setup Task Queue taken from Codeunit 6059800 NaviConnect Setup Mgt.
     // NPR5.23.03/MHA/20160726  CASE 242557 Magento reference updated according to NC2.00
 

@@ -1,5 +1,6 @@
-page 6151538 "NPR Nc Endpoint Trigger Links"
+﻿page 6151538 "NPR Nc Endpoint Trigger Links"
 {
+    Extensible = False;
     Caption = 'Nc Endpoint Trigger Links';
     PageType = List;
     UsageCategory = Administration;

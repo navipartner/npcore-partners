@@ -1,5 +1,6 @@
-codeunit 6014441 "NPR Get Started Notification"
+﻿codeunit 6014441 "NPR Get Started Notification"
 {
+    Access = Internal;
     local procedure SendOrRecallGetStartedNotification()
     begin
         if not IsNotificationEnabled() then

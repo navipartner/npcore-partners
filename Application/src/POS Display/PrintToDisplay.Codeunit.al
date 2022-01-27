@@ -1,5 +1,6 @@
-codeunit 6014579 "NPR Print To Display"
+﻿codeunit 6014579 "NPR Print To Display"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         PrintLines();

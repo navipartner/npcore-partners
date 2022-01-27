@@ -1,5 +1,6 @@
-table 6059964 "NPR MPOS QR Code"
+﻿table 6059964 "NPR MPOS QR Code"
 {
+    Access = Internal;
     Caption = 'MPOS QR Code';
     DataClassification = CustomerContent;
     DataPerCompany = false;

@@ -1,5 +1,6 @@
-codeunit 6014632 "NPR POS Sales Tax Forward"
+﻿codeunit 6014632 "NPR POS Sales Tax Forward"
 {
+    Access = Internal;
     var
         CalcOrderViolationTaxOnTaxErr: Label '%1 in %2 %3 must be filled in with unique values when %4 is %5.', Comment = '%1=TaxAreaLine.FieldCaption("Calculation Order");%2=TaxArea.TableCaption();%3=TaxAreaLine."Tax Area";%4=TaxDetail.FieldCaption("Calculate Tax on Tax");%5=CalculationOrderViolation';
 

@@ -1,5 +1,6 @@
-codeunit 6150716 "NPR POS Stargate Management"
+﻿codeunit 6150716 "NPR POS Stargate Management"
 {
+    Access = Internal;
     EventSubscriberInstance = Manual;
 
     trigger OnRun()

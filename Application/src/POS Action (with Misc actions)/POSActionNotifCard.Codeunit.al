@@ -1,5 +1,6 @@
-codeunit 6150831 "NPR POS Action: Notif. Card"
+﻿codeunit 6150831 "NPR POS Action: Notif. Card"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built in function opens the notification card page';
         Title: Label 'Notification Card';

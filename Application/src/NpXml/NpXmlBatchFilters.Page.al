@@ -1,5 +1,6 @@
-page 6151557 "NPR NpXml Batch Filters"
+﻿page 6151557 "NPR NpXml Batch Filters"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Xml Batch Filters';
     DelayedInsert = true;

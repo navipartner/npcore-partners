@@ -1,5 +1,6 @@
-table 6184508 "NPR EFT Adyen Paym. Type Setup"
+﻿table 6184508 "NPR EFT Adyen Paym. Type Setup"
 {
+    Access = Internal;
     // NPR5.49/MMV /20190401 CASE 345188 Created object
     // NPR5.49/MMV /20190410 CASE 347476 Added field 7
     // NPR5.50/MMV /20190430 CASE 352465 Added field 8

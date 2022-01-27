@@ -1,5 +1,6 @@
-page 6151509 "NPR Nc Import Type Card"
+﻿page 6151509 "NPR Nc Import Type Card"
 {
+    Extensible = False;
     Caption = 'Import Type Card';
     PageType = Card;
     UsageCategory = Administration;

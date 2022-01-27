@@ -1,5 +1,6 @@
-codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
+﻿codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     begin
         SendClientDiagnostics();

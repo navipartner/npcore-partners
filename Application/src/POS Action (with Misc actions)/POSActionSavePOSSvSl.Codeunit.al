@@ -1,5 +1,6 @@
-codeunit 6151004 "NPR POS Action: SavePOSSvSl"
+﻿codeunit 6151004 "NPR POS Action: SavePOSSvSl"
 {
+    Access = Internal;
     var
         Text000: Label 'Save POS Sale as POS Quote';
         Text001: Label 'POS Quote';

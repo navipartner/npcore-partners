@@ -1,5 +1,6 @@
-codeunit 6059910 "NPR Task Queue: SingleInstance"
+﻿codeunit 6059910 "NPR Task Queue: SingleInstance"
 {
+    Access = Internal;
     // TQ1.29/JDH /20161101 CASE 242044 Used to get the current log entry no for other tasks that wants to write to the log
 
     SingleInstance = true;

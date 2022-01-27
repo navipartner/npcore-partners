@@ -1,5 +1,6 @@
-table 6060056 "NPR Inv. Overview Line"
+﻿table 6060056 "NPR Inv. Overview Line"
 {
+    Access = Internal;
     Caption = 'Inventory Overview Line';
     DataClassification = CustomerContent;
 

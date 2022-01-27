@@ -1,5 +1,6 @@
-page 6150704 "NPR POS Action Param."
+﻿page 6150704 "NPR POS Action Param."
 {
+    Extensible = False;
     Caption = 'POS Action Parameters';
     DelayedInsert = true;
     PageType = List;

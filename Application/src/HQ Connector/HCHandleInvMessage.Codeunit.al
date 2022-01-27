@@ -1,5 +1,6 @@
-codeunit 6150912 "NPR HC Handle Inv. Message"
+﻿codeunit 6150912 "NPR HC Handle Inv. Message"
 {
+    Access = Internal;
     var
         TooLong: Label 'Parameter %1 has value %2, which is too long. Field %3 in table %4 can be max. %5 characters. ';
         DoesntExist: Label '%1 %2 cannot be found.';

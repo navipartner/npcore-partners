@@ -1,5 +1,8 @@
-enum 6014443 "NPR MCS Faces Action"
+﻿enum 6014443 "NPR MCS Faces Action"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
 
     value(0; CaptureImage)
     {

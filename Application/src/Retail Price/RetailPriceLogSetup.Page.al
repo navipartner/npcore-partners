@@ -1,5 +1,6 @@
-page 6014474 "NPR Retail Price Log Setup"
+﻿page 6014474 "NPR Retail Price Log Setup"
 {
+    Extensible = False;
     // NPR5.40/MHA /20180316  CASE 304031 Object created
     // NPR5.48/MHA /20181102  CASE 334573 Insert with trigger in OnOpenPage()
 

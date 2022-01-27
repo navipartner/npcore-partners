@@ -1,5 +1,6 @@
-table 6014665 "NPR Stock-Take Configuration"
+﻿table 6014665 "NPR Stock-Take Configuration"
 {
+    Access = Internal;
     Caption = 'Stock-Take Configuration';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

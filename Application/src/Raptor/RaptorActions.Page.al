@@ -1,5 +1,6 @@
-page 6151493 "NPR Raptor Actions"
+﻿page 6151493 "NPR Raptor Actions"
 {
+    Extensible = False;
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
     // NPR5.54/ALPO/20200302 CASE 355871 Possibility to specify user identifier parameter name
 

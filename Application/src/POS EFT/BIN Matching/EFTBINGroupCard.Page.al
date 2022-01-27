@@ -1,5 +1,6 @@
-page 6184513 "NPR EFT BIN Group Card"
+﻿page 6184513 "NPR EFT BIN Group Card"
 {
+    Extensible = False;
 
     Caption = 'EFT Mapping Group Card';
     PageType = Card;

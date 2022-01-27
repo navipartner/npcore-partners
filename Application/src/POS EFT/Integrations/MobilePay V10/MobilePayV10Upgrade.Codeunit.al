@@ -1,5 +1,6 @@
-codeunit 6014565 "NPR MobilePayV10 Upgrade"
+﻿codeunit 6014565 "NPR MobilePayV10 Upgrade"
 {
+    Access = Internal;
     // Subtype = Upgrade;
 
     // trigger OnUpgradePerCompany()

@@ -1,5 +1,6 @@
-table 6060137 "NPR MM Member Notific. Setup"
+﻿table 6060137 "NPR MM Member Notific. Setup"
 {
+    Access = Internal;
 
     Caption = 'MM Member Notification Setup';
     DataClassification = CustomerContent;

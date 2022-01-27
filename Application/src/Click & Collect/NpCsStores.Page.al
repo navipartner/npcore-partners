@@ -1,5 +1,6 @@
-page 6151195 "NPR NpCs Stores"
+﻿page 6151195 "NPR NpCs Stores"
 {
+    Extensible = False;
     Caption = 'Collect Stores';
     CardPageID = "NPR NpCs Store Card";
     Editable = false;

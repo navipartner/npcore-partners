@@ -1,5 +1,6 @@
-page 6150670 "NPR POS Balancing Line"
+﻿page 6150670 "NPR POS Balancing Line"
 {
+    Extensible = False;
     Caption = 'POS Balancing Line';
     Editable = false;
     PageType = List;

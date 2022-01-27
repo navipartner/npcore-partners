@@ -1,5 +1,6 @@
-page 6060159 "NPR Event Attr. Row Templ."
+﻿page 6060159 "NPR Event Attr. Row Templ."
 {
+    Extensible = False;
     Caption = 'Attribute Row Templates';
     PageType = List;
     UsageCategory = Administration;

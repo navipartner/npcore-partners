@@ -1,5 +1,6 @@
-codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
+﻿codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
 {
+    Access = Internal;
     var
         Text000: Label 'This action handles Scan Retail Vouchers (Payment).';
         Text001: Label 'Retail Voucher Payment';

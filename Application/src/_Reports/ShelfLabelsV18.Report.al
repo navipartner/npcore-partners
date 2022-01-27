@@ -1,6 +1,9 @@
-#if not BC17
+﻿#if not BC17
 report 6014428 "NPR Shelf Labels"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Shelf LabelsV18.rdl';
     UsageCategory = ReportsAndAnalysis;

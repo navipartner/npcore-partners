@@ -1,5 +1,6 @@
-codeunit 6060052 "NPR Item Wksht.Valid.Test Rnr."
+﻿codeunit 6060052 "NPR Item Wksht.Valid.Test Rnr."
 {
+    Access = Internal;
     Subtype = TestRunner;
     TestIsolation = Codeunit;
 

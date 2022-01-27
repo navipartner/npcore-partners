@@ -1,5 +1,6 @@
 ﻿codeunit 6060071 "NPR Map Incom. Item Lines"
 {
+    Access = Internal;
 
     Permissions = TableData "Data Exch." = rimd,
                   TableData "Data Exch. Field" = rimd;

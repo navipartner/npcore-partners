@@ -1,5 +1,6 @@
-page 6151165 "NPR MM Members. Points Summary"
+﻿page 6151165 "NPR MM Members. Points Summary"
 {
+    Extensible = False;
 
     Caption = 'Membership Points Summary';
     DeleteAllowed = false;

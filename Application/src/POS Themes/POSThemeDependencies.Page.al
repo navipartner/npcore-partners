@@ -1,5 +1,6 @@
-page 6150736 "NPR POS Theme Dependencies"
+﻿page 6150736 "NPR POS Theme Dependencies"
 {
+    Extensible = False;
     // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
 
     AutoSplitKey = true;

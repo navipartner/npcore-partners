@@ -1,5 +1,6 @@
-codeunit 6150845 "NPR POS Action: Quick Login"
+﻿codeunit 6150845 "NPR POS Action: Quick Login"
 {
+    Access = Internal;
     var
         Text000: Label 'Quick Login - change Salesperson on current POS Sale';
         ReadingErr: Label 'reading in %1';

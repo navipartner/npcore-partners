@@ -1,5 +1,6 @@
-table 6014614 "NPR DotNet Assembly"
+﻿table 6014614 "NPR DotNet Assembly"
 {
+    Access = Internal;
     Caption = '.NET Assembly';
     DataPerCompany = false;
 

@@ -1,5 +1,6 @@
-page 6151028 "NPR NpRv Partner Relations"
+﻿page 6151028 "NPR NpRv Partner Relations"
 {
+    Extensible = False;
     Caption = 'Retail Voucher Partner Relations';
     PageType = List;
     UsageCategory = Administration;

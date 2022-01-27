@@ -1,5 +1,6 @@
-page 6014669 "NPR POS Entry Statistics"
+﻿page 6014669 "NPR POS Entry Statistics"
 {
+    Extensible = False;
     Caption = 'POS Entry Statistics';
     Editable = false;
     PageType = Worksheet;

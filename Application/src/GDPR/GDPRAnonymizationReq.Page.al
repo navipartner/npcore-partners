@@ -1,5 +1,6 @@
-page 6151153 "NPR GDPR Anonymization Req."
+﻿page 6151153 "NPR GDPR Anonymization Req."
 {
+    Extensible = False;
     Caption = 'GDPR Anonymization Request';
     Editable = false;
     PageType = List;

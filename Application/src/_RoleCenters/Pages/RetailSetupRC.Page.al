@@ -1,5 +1,6 @@
-page 6151245 "NPR Retail Setup RC"
+﻿page 6151245 "NPR Retail Setup RC"
 {
+    Extensible = False;
     Caption = 'NP Retail Setup';
     PageType = RoleCenter;
     UsageCategory = None;

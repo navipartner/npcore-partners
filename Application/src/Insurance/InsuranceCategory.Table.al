@@ -1,5 +1,6 @@
-table 6014517 "NPR Insurance Category"
+﻿table 6014517 "NPR Insurance Category"
 {
+    Access = Internal;
     Caption = 'Insurance Category';
     LookupPageID = "NPR Insurance Category";
     DataClassification = CustomerContent;

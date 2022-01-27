@@ -1,5 +1,6 @@
-table 6151391 "NPR CS Stock-Takes"
+﻿table 6151391 "NPR CS Stock-Takes"
 {
+    Access = Internal;
 
     Caption = 'CS Stock-Takes';
     DataClassification = CustomerContent;

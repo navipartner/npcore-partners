@@ -1,5 +1,6 @@
-codeunit 6060058 "NPR Item Wksht. TaskQueue Mgt."
+﻿codeunit 6060058 "NPR Item Wksht. TaskQueue Mgt."
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

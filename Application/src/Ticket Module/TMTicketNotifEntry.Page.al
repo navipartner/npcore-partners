@@ -1,5 +1,6 @@
-page 6060065 "NPR TM Ticket Notif. Entry"
+﻿page 6060065 "NPR TM Ticket Notif. Entry"
 {
+    Extensible = False;
     Caption = 'Ticket Notification Entry';
     InsertAllowed = false;
     PageType = List;

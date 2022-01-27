@@ -1,5 +1,6 @@
-codeunit 6151458 "NPR Magento Npxml ItemCrossRef"
+﻿codeunit 6151458 "NPR Magento Npxml ItemCrossRef"
 {
+    Access = Internal;
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()

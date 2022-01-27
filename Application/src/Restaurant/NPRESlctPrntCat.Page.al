@@ -1,5 +1,6 @@
-page 6150668 "NPR NPRE Slct Prnt Cat."
+﻿page 6150668 "NPR NPRE Slct Prnt Cat."
 {
+    Extensible = False;
     Caption = 'Select Print/Prod. Categories';
     DataCaptionExpression = '';
     DeleteAllowed = false;

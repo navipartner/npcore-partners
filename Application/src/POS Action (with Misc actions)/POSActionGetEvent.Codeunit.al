@@ -1,5 +1,6 @@
-codeunit 6060160 "NPR POS Action: Get Event"
+﻿codeunit 6060160 "NPR POS Action: Get Event"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Get event from Event Management module';
         EnterEventTxt: Label 'Enter Event No.';

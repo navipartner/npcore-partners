@@ -1,5 +1,6 @@
-page 6151124 "NPR GDPR Consent Log"
+﻿page 6151124 "NPR GDPR Consent Log"
 {
+    Extensible = False;
     // MM1.29/TSA /20180509 CASE 313795 Initial Version
 
     Caption = 'GDPR Consent Log';

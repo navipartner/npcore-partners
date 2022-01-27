@@ -1,5 +1,6 @@
-codeunit 6151050 "NPR Item Hierarchy Mgmt."
+﻿codeunit 6151050 "NPR Item Hierarchy Mgmt."
 {
+    Access = Internal;
     var
         TextUpdateRetailCampHieracy: Label 'Do you want to update the Item Hierachy %1 with the items from retail Campaign %2';
         TextCancelledByUser: Label 'Cancelled by user!';

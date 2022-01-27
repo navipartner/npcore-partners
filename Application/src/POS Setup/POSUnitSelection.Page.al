@@ -1,5 +1,6 @@
-page 6014439 "NPR POS Unit Selection"
+﻿page 6014439 "NPR POS Unit Selection"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = None;
     SourceTable = "NPR POS Unit";

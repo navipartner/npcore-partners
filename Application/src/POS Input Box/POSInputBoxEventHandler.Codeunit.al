@@ -1,5 +1,6 @@
-codeunit 6060107 "NPR POS Input Box Evt Handler"
+﻿codeunit 6060107 "NPR POS Input Box Evt Handler"
 {
+    Access = Internal;
     var
         Text000: Label 'Ambigous input, please specify.';
         Text001: Label '"%1" not found.';

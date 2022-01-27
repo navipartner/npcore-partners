@@ -1,5 +1,6 @@
-page 6014531 "NPR Payment Mapping WP"
+﻿page 6014531 "NPR Payment Mapping WP"
 {
+    Extensible = False;
     Caption = 'Payment Method Mapping';
     PageType = ListPart;
     UsageCategory = Administration;

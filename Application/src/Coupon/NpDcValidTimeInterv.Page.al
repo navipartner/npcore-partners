@@ -1,5 +1,6 @@
-page 6151603 "NPR NpDc Valid Time Interv."
+﻿page 6151603 "NPR NpDc Valid Time Interv."
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Valid Time Intervals';
     DelayedInsert = true;

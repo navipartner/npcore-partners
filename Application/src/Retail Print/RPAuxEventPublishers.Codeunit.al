@@ -1,5 +1,6 @@
-codeunit 6014534 "NPR RP Aux: Event Publishers"
+﻿codeunit 6014534 "NPR RP Aux: Event Publishers"
 {
+    Access = Internal;
     // NPR5.40/MMV /20180208 CASE 304639 Changed events to use receipt no. instead of audit roll to make it independent of specific table.
     // NPR5.41/MMV /20180411 CASE 308701 Added FIND to retrieve record data.
 

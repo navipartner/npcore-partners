@@ -1,5 +1,6 @@
-page 6059960 "NPR MCS Person Bus. Entities"
+﻿page 6059960 "NPR MCS Person Bus. Entities"
 {
+    Extensible = False;
 
     Caption = 'MCS Person Business Entities';
     PageType = List;

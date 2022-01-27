@@ -1,5 +1,6 @@
-page 6151506 "NPR Nc Task Proces. Lines"
+﻿page 6151506 "NPR Nc Task Proces. Lines"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Nc Task Proces. Lines';
     DelayedInsert = true;

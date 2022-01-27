@@ -1,5 +1,6 @@
-codeunit 6150900 "NPR POS Package Handler"
+﻿codeunit 6150900 "NPR POS Package Handler"
 {
+    Access = Internal;
     procedure ExportPOSMenuPackageToFile(var POSMenu: Record "NPR POS Menu")
     var
         ManagedPackageBuilder: Codeunit "NPR Managed Package Builder";

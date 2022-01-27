@@ -1,5 +1,6 @@
-codeunit 6014684 "NPR Schedule Invt. Cost Adj."
+﻿codeunit 6014684 "NPR Schedule Invt. Cost Adj."
 {
+    Access = Internal;
     trigger OnRun()
     begin
 #if BC17

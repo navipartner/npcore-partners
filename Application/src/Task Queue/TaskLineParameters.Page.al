@@ -1,5 +1,6 @@
-page 6059909 "NPR Task Line Parameters"
+﻿page 6059909 "NPR Task Line Parameters"
 {
+    Extensible = False;
     // TQ1.17/JDH/20141027 CASE 187044 Format of Value Field Updated
     // TQ1.28/MHA/20151216  CASE 229609 Task Queue
     // TQ1.29/JDH /20161101 CASE 242044 Dont show fields that is meant for data type validation only

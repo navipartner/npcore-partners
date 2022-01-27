@@ -1,5 +1,6 @@
-codeunit 6150684 "NPR NPRE RVA: Set WPad Status"
+﻿codeunit 6150684 "NPR NPRE RVA: Set WPad Status"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('RV_SET_W/PAD_STATUS');

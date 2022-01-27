@@ -1,5 +1,8 @@
-enum 6014407 "NPR BTF EndPoint Method" implements "NPR BTF IEndPoint"
+﻿enum 6014407 "NPR BTF EndPoint Method" implements "NPR BTF IEndPoint"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "Get Token")

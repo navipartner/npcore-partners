@@ -1,5 +1,6 @@
-table 6150675 "NPR NPRE Kitchen Req.Src. Link"
+﻿table 6150675 "NPR NPRE Kitchen Req.Src. Link"
 {
+    Access = Internal;
     Caption = 'Kitchen Request Source Link';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Kitchen Req.Src.Links";

@@ -1,5 +1,6 @@
-page 6014609 "NPR Attribute Value Lookup"
+﻿page 6014609 "NPR Attribute Value Lookup"
 {
+    Extensible = False;
     // NPR4.11/TSA/20150422 CASE209946 - Entity and Shortcut Attributes
 
     Caption = 'Client Attribute Value Lookup';

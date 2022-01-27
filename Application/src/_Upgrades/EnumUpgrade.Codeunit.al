@@ -1,5 +1,6 @@
-codeunit 6014657 "NPR Enum Upgrade"
+﻿codeunit 6014657 "NPR Enum Upgrade"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

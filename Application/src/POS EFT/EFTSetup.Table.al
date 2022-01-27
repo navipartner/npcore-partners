@@ -1,5 +1,6 @@
-table 6184485 "NPR EFT Setup"
+﻿table 6184485 "NPR EFT Setup"
 {
+    Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
 
     Caption = 'EFT Setup';

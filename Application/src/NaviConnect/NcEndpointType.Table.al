@@ -1,5 +1,6 @@
-table 6151531 "NPR Nc Endpoint Type"
+﻿table 6151531 "NPR Nc Endpoint Type"
 {
+    Access = Internal;
     Caption = 'Nc Endpoint Type';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Endpoint Types";

@@ -1,5 +1,6 @@
-page 6014678 "NPR Endpoint Request List"
+﻿page 6014678 "NPR Endpoint Request List"
 {
+    Extensible = False;
     // NPR5.23\BR\20160518  CASE 237658 Object created
     // NPR5.25\BR\20160801  CASE 234602 Added Query fields
 

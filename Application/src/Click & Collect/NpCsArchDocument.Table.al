@@ -1,5 +1,6 @@
-table 6151202 "NPR NpCs Arch. Document"
+﻿table 6151202 "NPR NpCs Arch. Document"
 {
+    Access = Internal;
     Caption = 'Collect Document';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Arch. Doc. List";

@@ -1,5 +1,6 @@
-codeunit 6060153 "NPR Event Email Management"
+﻿codeunit 6060153 "NPR Event Email Management"
 {
+    Access = Internal;
     var
         EventMgt: Codeunit "NPR Event Management";
         EventEWSMgt: Codeunit "NPR Event EWS Management";

@@ -1,5 +1,6 @@
-page 6150655 "NPR POS Entry Sales Line List"
+﻿page 6150655 "NPR POS Entry Sales Line List"
 {
+    Extensible = False;
     Caption = 'POS Entry Sales Line List';
     Editable = false;
     PageType = List;

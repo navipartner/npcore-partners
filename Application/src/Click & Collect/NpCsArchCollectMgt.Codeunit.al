@@ -1,5 +1,6 @@
 ﻿codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
 {
+    Access = Internal;
     var
         Text003: Label 'Document Archived';
 

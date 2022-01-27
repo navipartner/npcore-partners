@@ -1,5 +1,6 @@
-codeunit 6014490 "NPR GE Assisted Setup Subs"
+﻿codeunit 6014490 "NPR GE Assisted Setup Subs"
 {
+    Access = Internal;
 #IF BC17
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Assisted Setup", 'OnRegister', '', false, false)]
     local procedure RegisterWizard_OnRegisterAssistedSetup()

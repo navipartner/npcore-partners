@@ -1,5 +1,6 @@
-table 6014556 "NPR Attribute Key"
+﻿table 6014556 "NPR Attribute Key"
 {
+    Access = Internal;
     // 
     // NPRx.xx/TSA/22-04-15 CASE209946 - Entity and Shortcut Attributes
     // NPR4.19/BR/20160309 CASE182391 Added support for documents and for Worksheets added Fields MDR Code 2 PK and MDR Line 2 PK

@@ -1,5 +1,6 @@
-table 6150669 "NPR NPRE Restaurant Setup"
+﻿table 6150669 "NPR NPRE Restaurant Setup"
 {
+    Access = Internal;
     Caption = 'Restaurant Setup';
     DataClassification = CustomerContent;
 

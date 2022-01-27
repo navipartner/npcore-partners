@@ -1,5 +1,6 @@
-page 6151530 "NPR Nc Collec. Filters"
+﻿page 6151530 "NPR Nc Collec. Filters"
 {
+    Extensible = False;
     Caption = 'Nc Collector Filters';
     DelayedInsert = true;
     MultipleNewLines = false;

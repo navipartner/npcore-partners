@@ -1,5 +1,6 @@
-page 6151051 "NPR Item Hierarchy Card"
+﻿page 6151051 "NPR Item Hierarchy Card"
 {
+    Extensible = False;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
 
     Caption = 'Item Hierarchy Card';

@@ -1,5 +1,6 @@
-codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
+﻿codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
 {
+    Access = Internal;
     // NPR5.53/MMV /20191120 CASE 377533 Created object
     // NPR5.53/MMV /20200126 CASE 377533 Added timeout param on lookup invoke
     // NPR5.54/MMV /20200218 CASE 387990 Added response status code buffer.

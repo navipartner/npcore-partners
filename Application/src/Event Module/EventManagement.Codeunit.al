@@ -1,5 +1,6 @@
-codeunit 6060150 "NPR Event Management"
+﻿codeunit 6060150 "NPR Event Management"
 {
+    Access = Internal;
     Permissions = TableData "Job Ledger Entry" = imd,
                   TableData "Job Register" = imd,
                   TableData "Value Entry" = rimd;

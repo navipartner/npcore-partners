@@ -1,5 +1,6 @@
-page 6059834 "NPR Event Comment Sheet"
+﻿page 6059834 "NPR Event Comment Sheet"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Comment Sheet';
     DataCaptionFields = "No.";

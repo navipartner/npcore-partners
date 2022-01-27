@@ -1,5 +1,6 @@
-page 6151522 "NPR Nc Endpoint FTP List"
+﻿page 6151522 "NPR Nc Endpoint FTP List"
 {
+    Extensible = False;
     Caption = 'Nc Endpoint FTP List';
     CardPageID = "NPR Nc Endpoint FTP Card";
     DeleteAllowed = false;

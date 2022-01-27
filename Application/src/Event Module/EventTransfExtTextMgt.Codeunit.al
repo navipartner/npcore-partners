@@ -1,5 +1,6 @@
-codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
+﻿codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
 {
+    Access = Internal;
     var
         GLAcc: Record "G/L Account";
         Item: Record Item;

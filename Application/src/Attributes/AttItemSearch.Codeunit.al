@@ -1,5 +1,6 @@
 ﻿codeunit 6014597 "NPR Att. Item Search"
 {
+    Access = Internal;
     // NPR5.34/ANEN/20170608 CASE 279662 Support for text search in attributes for item
 
 

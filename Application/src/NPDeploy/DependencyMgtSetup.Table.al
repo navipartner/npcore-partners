@@ -1,5 +1,6 @@
-table 6014625 "NPR Dependency Mgt. Setup"
+﻿table 6014625 "NPR Dependency Mgt. Setup"
 {
+    Access = Internal;
     Caption = 'Dependency Management Setup';
     DataPerCompany = false;
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-codeunit 6014433 "NPR Customer Discount Mgt."
+﻿codeunit 6014433 "NPR Customer Discount Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

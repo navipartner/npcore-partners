@@ -1,5 +1,6 @@
-page 6014686 "NPR Create Out. Endpoint Query"
+﻿page 6014686 "NPR Create Out. Endpoint Query"
 {
+    Extensible = False;
     Caption = 'Create Outgoing Endpoint Query';
     DataCaptionExpression = TextCreateNew;
     PageType = Document;

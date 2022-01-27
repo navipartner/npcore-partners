@@ -1,5 +1,6 @@
-codeunit 6150931 "NPR UPG POS View Profile"
+﻿codeunit 6150931 "NPR UPG POS View Profile"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

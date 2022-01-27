@@ -1,5 +1,6 @@
-page 6060162 "NPR Event Attr. Col. Templates"
+﻿page 6060162 "NPR Event Attr. Col. Templates"
 {
+    Extensible = False;
     Caption = 'Attribute Column Templates';
     PageType = List;
     UsageCategory = Administration;

@@ -1,5 +1,6 @@
-table 6014470 "NPR Pacsoft Shipm. Doc. Serv."
+﻿table 6014470 "NPR Pacsoft Shipm. Doc. Serv."
 {
+    Access = Internal;
 
     Caption = 'Pacsoft Shipment Document Services';
     DataClassification = CustomerContent;

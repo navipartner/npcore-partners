@@ -1,5 +1,6 @@
-table 6014455 "NPR CleanCash Trans. Response"
+﻿table 6014455 "NPR CleanCash Trans. Response"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'CleanCash Trans. Response';
 

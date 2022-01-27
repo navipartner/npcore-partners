@@ -1,5 +1,6 @@
-page 6150684 "NPR NPRE Restaurant Card"
+﻿page 6150684 "NPR NPRE Restaurant Card"
 {
+    Extensible = False;
     Caption = 'Restaurant Card';
     PageType = Card;
     UsageCategory = None;

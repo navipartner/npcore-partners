@@ -1,5 +1,6 @@
-page 6059839 "NPR EFT Recon. Trans. List"
+﻿page 6059839 "NPR EFT Recon. Trans. List"
 {
+    Extensible = False;
     Caption = 'EFT Recon. Trans. List';
     Editable = false;
     PageType = ListPart;

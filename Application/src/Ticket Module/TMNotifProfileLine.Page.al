@@ -1,5 +1,6 @@
-page 6014563 "NPR TM Notif. Profile Line"
+﻿page 6014563 "NPR TM Notif. Profile Line"
 {
+    Extensible = False;
     Caption = 'Ticket Notification Profile Line';
     PageType = ListPart;
     RefreshOnActivate = true;

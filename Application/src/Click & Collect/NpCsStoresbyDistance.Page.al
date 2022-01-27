@@ -1,5 +1,6 @@
-page 6151208 "NPR NpCs Stores by Distance"
+﻿page 6151208 "NPR NpCs Stores by Distance"
 {
+    Extensible = False;
     Caption = 'Collect Stores by Distance';
     DeleteAllowed = false;
     InsertAllowed = false;

@@ -1,5 +1,6 @@
-table 6151480 "NPR Magento Cue"
+﻿table 6151480 "NPR Magento Cue"
 {
+    Access = Internal;
 
     Caption = 'Magento Cue';
     DataClassification = CustomerContent;

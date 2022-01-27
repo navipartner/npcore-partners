@@ -1,5 +1,6 @@
-codeunit 6060132 "NPR MM Import Members"
+﻿codeunit 6060132 "NPR MM Import Members"
 {
+    Access = Internal;
 
     trigger OnRun()
     var

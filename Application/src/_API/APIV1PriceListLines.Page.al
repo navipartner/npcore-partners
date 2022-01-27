@@ -1,5 +1,6 @@
-page 6014545 "NPR API V1 - Price List Lines"
+﻿page 6014545 "NPR API V1 - Price List Lines"
 {
+    Extensible = False;
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';

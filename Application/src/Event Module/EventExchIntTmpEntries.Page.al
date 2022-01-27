@@ -1,5 +1,6 @@
-page 6151579 "NPR Event Exch.Int.Tmp.Entries"
+﻿page 6151579 "NPR Event Exch.Int.Tmp.Entries"
 {
+    Extensible = False;
     Caption = 'Event Exch. Int. Temp. Entries';
     PageType = List;
     UsageCategory = Administration;

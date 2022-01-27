@@ -1,5 +1,6 @@
-table 6150704 "NPR POS Action Parameter"
+﻿table 6150704 "NPR POS Action Parameter"
 {
+    Access = Internal;
     Caption = 'POS Action Parameter';
     DataClassification = CustomerContent;
 

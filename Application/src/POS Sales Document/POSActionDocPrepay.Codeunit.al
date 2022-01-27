@@ -1,5 +1,6 @@
-codeunit 6150863 "NPR POS Action: Doc. Prepay"
+﻿codeunit 6150863 "NPR POS Action: Doc. Prepay"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Create a prepayment line for a sales order. Prepayment invoice will be posted & applied immediately upon sale end.';
         TextPrepaymentTitle: Label 'Prepayment';

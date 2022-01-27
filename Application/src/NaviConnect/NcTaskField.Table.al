@@ -1,5 +1,6 @@
-table 6151503 "NPR Nc Task Field"
+﻿table 6151503 "NPR Nc Task Field"
 {
+    Access = Internal;
     Caption = 'Nc Task Field';
     DataClassification = CustomerContent;
 

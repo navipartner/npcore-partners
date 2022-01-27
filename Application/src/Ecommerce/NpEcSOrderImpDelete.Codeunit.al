@@ -1,5 +1,6 @@
-codeunit 6151305 "NPR NpEc S.Order Imp. Delete"
+﻿codeunit 6151305 "NPR NpEc S.Order Imp. Delete"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

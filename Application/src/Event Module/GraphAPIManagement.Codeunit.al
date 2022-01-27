@@ -1,5 +1,6 @@
-codeunit 6014606 "NPR Graph API Management"
+﻿codeunit 6014606 "NPR Graph API Management"
 {
+    Access = Internal;
     var
         GraphApiSetup: Record "NPR GraphApi Setup";
 

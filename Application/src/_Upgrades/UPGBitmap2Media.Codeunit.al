@@ -1,5 +1,6 @@
-codeunit 6014588 "NPR UPG Bitmap 2 Media"
+﻿codeunit 6014588 "NPR UPG Bitmap 2 Media"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     var

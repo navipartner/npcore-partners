@@ -1,5 +1,6 @@
-table 6060055 "NPR Item Worksh. Field Mapping"
+﻿table 6060055 "NPR Item Worksh. Field Mapping"
 {
+    Access = Internal;
     Caption = 'Item Worksheet Field Mapping';
     DataClassification = CustomerContent;
 

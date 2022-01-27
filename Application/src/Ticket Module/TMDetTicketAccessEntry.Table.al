@@ -1,5 +1,6 @@
-table 6060123 "NPR TM Det. Ticket AccessEntry"
+﻿table 6060123 "NPR TM Det. Ticket AccessEntry"
 {
+    Access = Internal;
     Caption = 'Det. Ticket Access Entry';
     DataClassification = CustomerContent;
     DrillDownPageId = "NPR TM Det. Ticket AccessEntry";

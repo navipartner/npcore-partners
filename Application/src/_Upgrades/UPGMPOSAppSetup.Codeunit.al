@@ -1,5 +1,6 @@
-codeunit 6150929 "NPR UPG MPOS App Setup"
+﻿codeunit 6150929 "NPR UPG MPOS App Setup"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

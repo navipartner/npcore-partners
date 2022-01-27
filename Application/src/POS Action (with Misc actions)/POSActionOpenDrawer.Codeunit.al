@@ -1,5 +1,6 @@
-codeunit 6150793 "NPR POS Action: Open Drawer"
+﻿codeunit 6150793 "NPR POS Action: Open Drawer"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for opening the cash drawer';
         ReadingErr: Label 'reading in %1';

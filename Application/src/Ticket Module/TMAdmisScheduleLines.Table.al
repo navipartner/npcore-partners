@@ -1,5 +1,6 @@
-table 6060119 "NPR TM Admis. Schedule Lines"
+﻿table 6060119 "NPR TM Admis. Schedule Lines"
 {
+    Access = Internal;
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM80.1.09/TSA/20160310  CASE 236689 Change field from percentage to absolute
     // TM1.11/BR/20160331  CASE 237850 Addded check to OnDelete

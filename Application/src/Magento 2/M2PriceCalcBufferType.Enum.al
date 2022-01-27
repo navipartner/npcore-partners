@@ -1,5 +1,8 @@
-enum 6014439 "NPR M2 Price Calc. Buffer Type"
+﻿enum 6014439 "NPR M2 Price Calc. Buffer Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "Unit Price")

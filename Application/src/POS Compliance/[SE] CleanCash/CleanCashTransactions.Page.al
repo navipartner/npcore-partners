@@ -1,5 +1,6 @@
-page 6014603 "NPR CleanCash Transactions"
+﻿page 6014603 "NPR CleanCash Transactions"
 {
+    Extensible = False;
     PageType = List;
 
     UsageCategory = History;

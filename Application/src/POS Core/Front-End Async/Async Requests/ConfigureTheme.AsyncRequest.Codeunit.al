@@ -1,5 +1,6 @@
-codeunit 6150761 "NPR Front-End: ConfigureTheme" implements "NPR Front-End Async Request"
+﻿codeunit 6150761 "NPR Front-End: ConfigureTheme" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _theme: JsonArray;

@@ -1,5 +1,6 @@
-table 6059933 "NPR Doc. Exchange Path"
+﻿table 6059933 "NPR Doc. Exchange Path"
 {
+    Access = Internal;
     Caption = 'Doc. Exchange Path';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

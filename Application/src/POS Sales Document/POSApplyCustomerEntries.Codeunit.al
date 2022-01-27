@@ -1,5 +1,6 @@
 ﻿codeunit 6014410 "NPR POS Apply Customer Entries"
 {
+    Access = Internal;
     Permissions = TableData "Cust. Ledger Entry" = rimd;
     TableNo = "NPR POS Sale Line";
 

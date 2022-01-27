@@ -1,5 +1,6 @@
-table 6014622 "NPR EFT Recon. Provider"
+﻿table 6014622 "NPR EFT Recon. Provider"
 {
+    Access = Internal;
     Caption = 'EFT Recon. Provider';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR EFT Recon. Provider List";

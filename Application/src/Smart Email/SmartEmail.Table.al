@@ -1,5 +1,6 @@
-table 6059822 "NPR Smart Email"
+﻿table 6059822 "NPR Smart Email"
 {
+    Access = Internal;
     Caption = 'Smart Email';
     DrillDownPageID = "NPR Smart Email List";
     LookupPageID = "NPR Smart Email List";

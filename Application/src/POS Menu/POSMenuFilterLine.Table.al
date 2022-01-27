@@ -1,5 +1,6 @@
-table 6150716 "NPR POS Menu Filter Line"
+﻿table 6150716 "NPR POS Menu Filter Line"
 {
+    Access = Internal;
     Caption = 'POS Menu Filter';
     DataClassification = CustomerContent;
 

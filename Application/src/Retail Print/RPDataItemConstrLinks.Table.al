@@ -1,5 +1,6 @@
-table 6014564 "NPR RP Data Item Constr. Links"
+﻿table 6014564 "NPR RP Data Item Constr. Links"
 {
+    Access = Internal;
     // NPR5.47/MMV /20181017 CASE 318084 Added field 12
 
     Caption = 'Data Item Constraint Links';

@@ -1,5 +1,6 @@
-codeunit 6060154 "NPR Event Ticket Mgt."
+﻿codeunit 6060154 "NPR Event Ticket Mgt."
 {
+    Access = Internal;
     var
         TicketContext: Label 'TICKET';
         EventMgt: Codeunit "NPR Event Management";

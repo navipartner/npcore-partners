@@ -1,5 +1,6 @@
 ﻿codeunit 6151101 "NPR NpRi Data Collection Mgt."
 {
+    Access = Internal;
     TableNo = "NPR NpRi Reimbursement";
 
     trigger OnRun()

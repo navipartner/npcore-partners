@@ -1,5 +1,6 @@
-page 6059772 "NPR OAuth Setup List"
+﻿page 6059772 "NPR OAuth Setup List"
 {
+    Extensible = False;
 
     ApplicationArea = NPRRetail;
     Caption = 'OAuth Setup List';

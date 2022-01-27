@@ -1,5 +1,6 @@
-codeunit 6150679 "NPR NPRE Frontend Assistant"
+﻿codeunit 6150679 "NPR NPRE Frontend Assistant"
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnConfigureReusableWorkflows', '', true, true)]
     local procedure OnConfigureReusableWorkflows(var Sender: Codeunit "NPR POS UI Management"; POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup");
     var

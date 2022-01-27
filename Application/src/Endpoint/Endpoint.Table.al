@@ -1,5 +1,6 @@
-table 6014674 "NPR Endpoint"
+﻿table 6014674 "NPR Endpoint"
 {
+    Access = Internal;
     Caption = 'Endpoint';
     DrillDownPageID = "NPR Endpoint List";
     LookupPageID = "NPR Endpoint List";

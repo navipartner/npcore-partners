@@ -1,5 +1,6 @@
-page 6151586 "NPR Event Exch. Int. E-Mails"
+﻿page 6151586 "NPR Event Exch. Int. E-Mails"
 {
+    Extensible = False;
     Caption = 'Event Exch. Int. E-Mails';
     DelayedInsert = true;
     PageType = List;

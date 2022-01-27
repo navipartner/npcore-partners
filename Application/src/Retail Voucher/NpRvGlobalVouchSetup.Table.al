@@ -1,5 +1,6 @@
-table 6151020 "NPR NpRv Global Vouch. Setup"
+﻿table 6151020 "NPR NpRv Global Vouch. Setup"
 {
+    Access = Internal;
     Caption = 'Global Voucher Setup';
     DataClassification = CustomerContent;
 

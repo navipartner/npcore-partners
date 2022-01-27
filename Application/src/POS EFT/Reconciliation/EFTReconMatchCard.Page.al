@@ -1,5 +1,6 @@
-page 6059824 "NPR EFT Recon. Match Card"
+﻿page 6059824 "NPR EFT Recon. Match Card"
 {
+    Extensible = False;
     Caption = 'EFT Recon. Match Card';
     PageType = Card;
     SourceTable = "NPR EFT Recon. Match/Score";

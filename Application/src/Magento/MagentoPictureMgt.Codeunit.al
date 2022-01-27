@@ -1,5 +1,6 @@
-codeunit 6151419 "NPR Magento Picture Mgt."
+﻿codeunit 6151419 "NPR Magento Picture Mgt."
 {
+    Access = Internal;
     var
         MagentoSetup: Record "NPR Magento Setup";
 

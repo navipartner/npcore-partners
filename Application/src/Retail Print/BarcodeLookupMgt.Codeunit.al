@@ -1,5 +1,6 @@
 ﻿codeunit 6014403 "NPR Barcode Lookup Mgt."
 {
+    Access = Internal;
     var
         ItemWithItemRefNoNotFoundErr: Label 'There are no items with reference: %1', Comment = '%1=TempItemRefNo';
         Text001: Label 'Status should not be %1.';

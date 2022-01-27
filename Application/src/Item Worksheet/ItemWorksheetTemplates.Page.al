@@ -1,5 +1,6 @@
-page 6060040 "NPR Item Worksheet Templates"
+﻿page 6060040 "NPR Item Worksheet Templates"
 {
+    Extensible = False;
     Caption = 'Item Worksheet Templates';
     CardPageID = "NPR Item Worksh. Template";
     Editable = false;

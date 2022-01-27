@@ -1,5 +1,6 @@
-page 6150644 "NPR POS Info Audit Roll"
+﻿page 6150644 "NPR POS Info Audit Roll"
 {
+    Extensible = False;
     // NPR5.26/OSFI/20160810 CASE 246167 Object Created
 
     Caption = 'POS Info Audit Roll';

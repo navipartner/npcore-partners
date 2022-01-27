@@ -1,5 +1,6 @@
-page 6151531 "NPR Nc Collection List"
+﻿page 6151531 "NPR Nc Collection List"
 {
+    Extensible = False;
     Caption = 'Nc Collection List';
     Editable = false;
     PageType = List;

@@ -1,5 +1,6 @@
-table 6014513 "NPR SMS Log"
+﻿table 6014513 "NPR SMS Log"
 {
+    Access = Internal;
     Caption = 'SMS Log';
     DataClassification = CustomerContent;
     LookupPageId = "NPR SMS Log";

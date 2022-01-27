@@ -1,5 +1,6 @@
-table 6150733 "NPR POS Admin. Template"
+﻿table 6150733 "NPR POS Admin. Template"
 {
+    Access = Internal;
     // NPR5.51/JAKUBV/20190903  CASE 352582 Transport NPR5.51 - 3 September 2019
 
     Caption = 'POS Administrative Template';

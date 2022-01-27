@@ -1,5 +1,6 @@
-page 6184500 "NPR CleanCash Setup List"
+﻿page 6184500 "NPR CleanCash Setup List"
 {
+    Extensible = False;
     Caption = 'CleanCash POS Unit Setup';
     PageType = List;
     SourceTable = "NPR CleanCash Setup";

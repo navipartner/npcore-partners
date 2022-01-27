@@ -1,5 +1,6 @@
-table 6059903 "NPR Task Queue"
+﻿table 6059903 "NPR Task Queue"
 {
+    Access = Internal;
     // TQ1.11/JDH/20140905 CASE 179044 Key changed from  "Task Worker Group","Next Run time" to
     //                                                   "Task Worker Group",Priority,"Next Run time"
     // TQ1.16/JDH /20140916 CASE 179044 Aligned code in order to upgrade to 2013

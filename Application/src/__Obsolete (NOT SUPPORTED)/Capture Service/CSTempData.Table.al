@@ -1,5 +1,6 @@
-table 6151389 "NPR CS Temp Data"
+﻿table 6151389 "NPR CS Temp Data"
 {
+    Access = Internal;
 
     Caption = 'CS Temp Data';
     DataClassification = CustomerContent;

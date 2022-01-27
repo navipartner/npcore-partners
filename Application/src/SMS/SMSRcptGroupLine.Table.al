@@ -1,5 +1,6 @@
-table 6014503 "NPR SMS Rcpt. Group Line"
+﻿table 6014503 "NPR SMS Rcpt. Group Line"
 {
+    Access = Internal;
     Caption = 'SMS Recipient Group Line';
     DataClassification = ToBeClassified;
 

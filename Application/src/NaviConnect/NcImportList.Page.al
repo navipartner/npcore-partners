@@ -1,5 +1,6 @@
-page 6151504 "NPR Nc Import List"
+﻿page 6151504 "NPR Nc Import List"
 {
+    Extensible = False;
     Caption = 'Import List';
     DelayedInsert = true;
     PageType = List;

@@ -1,5 +1,6 @@
-codeunit 6150764 "NPR Front-End: RequireResponse" implements "NPR Front-End Async Request"
+﻿codeunit 6150764 "NPR Front-End: RequireResponse" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _id: Integer;

@@ -1,5 +1,6 @@
-page 6060052 "NPR Item Worksh. Attr. FactBox"
+﻿page 6060052 "NPR Item Worksh. Attr. FactBox"
 {
+    Extensible = False;
     Caption = 'NP Attributes FactBox';
     PageType = CardPart;
     SourceTable = "NPR Item Worksheet Line";

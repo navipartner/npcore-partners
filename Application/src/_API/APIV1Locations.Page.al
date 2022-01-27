@@ -1,5 +1,6 @@
-page 6014668 "NPR APIV1 Locations"
+﻿page 6014668 "NPR APIV1 Locations"
 {
+    Extensible = False;
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';

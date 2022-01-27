@@ -1,5 +1,6 @@
-codeunit 6151405 "NPR Magento Order Status Mgt."
+﻿codeunit 6151405 "NPR Magento Order Status Mgt."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
     local procedure Cu80OnAfterPostSalesDoc(SalesInvHdrNo: Code[20])
     var

@@ -1,5 +1,6 @@
-page 6060073 "NPR MM Members. Alteration Jnl"
+﻿page 6060073 "NPR MM Members. Alteration Jnl"
 {
+    Extensible = False;
 
     Caption = 'Membership Alteration Journal';
     PageType = List;

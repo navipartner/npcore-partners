@@ -1,5 +1,6 @@
-page 6014641 "NPR APIV1 Cust. Price Groups"
+﻿page 6014641 "NPR APIV1 Cust. Price Groups"
 {
+    Extensible = False;
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';

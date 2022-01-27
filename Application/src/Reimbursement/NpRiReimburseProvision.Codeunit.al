@@ -1,5 +1,6 @@
 ﻿codeunit 6151105 "NPR NpRi Reimburse Provision"
 {
+    Access = Internal;
     var
         Text000: Label 'Post percentage of Data Collection Amount to G/L';
 

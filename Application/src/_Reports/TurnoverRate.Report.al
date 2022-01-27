@@ -1,5 +1,8 @@
-report 6014427 "NPR Turnover Rate"
+﻿report 6014427 "NPR Turnover Rate"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Turnover Rate.rdlc';
     UsageCategory = ReportsAndAnalysis;

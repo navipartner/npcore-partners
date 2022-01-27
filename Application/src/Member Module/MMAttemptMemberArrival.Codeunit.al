@@ -1,5 +1,6 @@
-codeunit 6014492 "NPR MM Attempt Member Arrival"
+﻿codeunit 6014492 "NPR MM Attempt Member Arrival"
 {
+    Access = Internal;
     trigger OnRun()
     begin
 

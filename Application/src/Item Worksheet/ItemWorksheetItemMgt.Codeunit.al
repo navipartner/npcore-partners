@@ -1,5 +1,6 @@
-codeunit 6060041 "NPR Item Worksheet Item Mgt."
+﻿codeunit 6060041 "NPR Item Worksheet Item Mgt."
 {
+    Access = Internal;
     var
         ItemNumberManagement: Codeunit "NPR Item Number Mgt.";
 

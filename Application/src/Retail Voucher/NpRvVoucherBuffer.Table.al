@@ -1,5 +1,6 @@
-table 6151021 "NPR NpRv Voucher Buffer"
+﻿table 6151021 "NPR NpRv Voucher Buffer"
 {
+    Access = Internal;
     Caption = 'Voucher Buffer';
     DataClassification = CustomerContent;
     TableType = Temporary;

@@ -1,5 +1,6 @@
-page 6014599 "NPR CleanCash Transaction VAT"
+﻿page 6014599 "NPR CleanCash Transaction VAT"
 {
+    Extensible = False;
     PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR CleanCash Trans. VAT";

@@ -1,5 +1,6 @@
-codeunit 6150872 "NPR POSAction: DocPrepayRefund"
+﻿codeunit 6150872 "NPR POSAction: DocPrepayRefund"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Create a refund line for any paid prepayments of the selected line. A credit memo for all prepayment invoices will be posted upon POS sale end.';
         DescPrintDoc: Label 'Print standard report for prepayment credit note.';

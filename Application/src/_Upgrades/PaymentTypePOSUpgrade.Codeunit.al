@@ -1,5 +1,6 @@
-codeunit 6014419 "NPR Payment Type POS Upgrade"
+﻿codeunit 6014419 "NPR Payment Type POS Upgrade"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

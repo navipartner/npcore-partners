@@ -1,5 +1,6 @@
-table 6150709 "NPR POS Ticket Rcpt. Text"
+﻿table 6150709 "NPR POS Ticket Rcpt. Text"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'POS Sales Ticket Receipt Text';
 

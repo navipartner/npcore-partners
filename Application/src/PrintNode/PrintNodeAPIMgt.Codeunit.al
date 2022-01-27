@@ -1,5 +1,6 @@
-codeunit 6151220 "NPR PrintNode API Mgt."
+﻿codeunit 6151220 "NPR PrintNode API Mgt."
 {
+    Access = Internal;
     // NPR5.53/THRO/20200106 CASE 383562 Object Created
 
 

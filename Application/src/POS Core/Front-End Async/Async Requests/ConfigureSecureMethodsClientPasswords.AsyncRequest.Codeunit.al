@@ -1,5 +1,6 @@
-codeunit 6150767 "NPR Front-End: ConfSMPasswords" implements "NPR Front-End Async Request"
+﻿codeunit 6150767 "NPR Front-End: ConfSMPasswords" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _method: Text;

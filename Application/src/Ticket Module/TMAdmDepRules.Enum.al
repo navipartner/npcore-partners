@@ -1,5 +1,8 @@
-enum 6014400 "NPR TM Adm. Dep. Rules"
+﻿enum 6014400 "NPR TM Adm. Dep. Rules"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; REQUIRED)

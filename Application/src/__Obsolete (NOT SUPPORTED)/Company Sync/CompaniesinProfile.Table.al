@@ -1,5 +1,6 @@
-table 6059780 "NPR Companies in Profile"
+﻿table 6059780 "NPR Companies in Profile"
 {
+    Access = Internal;
     Caption = 'Companies in Profile';
     DataPerCompany = false;
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-page 6151562 "NPR NpXml Templ. Arch. List"
+﻿page 6151562 "NPR NpXml Templ. Arch. List"
 {
+    Extensible = False;
     Caption = 'NpXml Template Archive';
     DeleteAllowed = false;
     InsertAllowed = false;

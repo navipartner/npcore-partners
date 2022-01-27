@@ -1,5 +1,6 @@
-table 6060107 "NPR Ean Box Setup Event"
+﻿table 6060107 "NPR Ean Box Setup Event"
 {
+    Access = Internal;
     // NPR5.32/NPKNAV/20170526  CASE 272577 Transport NPR5.32 - 26 May 2017
     // NPR5.41/TSA /20180425 CASE 307454 OptionValueInteger set -1 to get the default value
     // NPR5.45/MHA /20180814  CASE 319706 Reworked Identifier Dissociation to Ean Box Event Handler

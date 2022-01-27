@@ -1,5 +1,6 @@
-page 6060125 "NPR MM Membership Sales Setup"
+﻿page 6060125 "NPR MM Membership Sales Setup"
 {
+    Extensible = False;
 
     Caption = 'Membership Sales Setup';
     PageType = List;

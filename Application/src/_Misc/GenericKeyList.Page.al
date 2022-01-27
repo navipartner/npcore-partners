@@ -1,5 +1,6 @@
 page 6014660 "NPR Generic Key List"
 {
+    Extensible = false;
     Caption = 'Select sorting key';
     Editable = false;
     PageType = List;

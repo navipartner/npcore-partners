@@ -1,5 +1,6 @@
-table 6014675 "NPR Endpoint Filter"
+﻿table 6014675 "NPR Endpoint Filter"
 {
+    Access = Internal;
     // NPR5.23\BR\20160518  CASE 237658 Object created
 
     Caption = 'Endpoint Filter';

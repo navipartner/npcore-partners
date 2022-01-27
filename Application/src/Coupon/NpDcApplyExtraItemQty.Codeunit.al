@@ -1,5 +1,6 @@
-codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
+﻿codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
 {
+    Access = Internal;
     var
         Text000: Label 'Extra Coupon Item has not been defined for Coupon %1 (%2)';
         Text001: Label 'Extra Item per Validation Qty.';

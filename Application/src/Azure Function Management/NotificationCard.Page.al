@@ -1,5 +1,6 @@
-page 6151042 "NPR Notification Card"
+﻿page 6151042 "NPR Notification Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Notification Card';
     Editable = false;

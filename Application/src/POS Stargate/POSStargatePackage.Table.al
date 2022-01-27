@@ -1,5 +1,6 @@
-table 6150713 "NPR POS Stargate Package"
+﻿table 6150713 "NPR POS Stargate Package"
 {
+    Access = Internal;
     Caption = 'POS Stargate Package';
     DataClassification = CustomerContent;
     DataPerCompany = false;

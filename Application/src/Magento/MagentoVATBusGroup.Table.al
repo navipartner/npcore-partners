@@ -1,5 +1,6 @@
-table 6151405 "NPR Magento VAT Bus. Group"
+﻿table 6151405 "NPR Magento VAT Bus. Group"
 {
+    Access = Internal;
     Caption = 'Magento VAT Business Group';
     DataClassification = CustomerContent;
 

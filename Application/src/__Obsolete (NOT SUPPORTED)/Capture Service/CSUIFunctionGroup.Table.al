@@ -1,5 +1,6 @@
-table 6151375 "NPR CS UI Function Group"
+﻿table 6151375 "NPR CS UI Function Group"
 {
+    Access = Internal;
 
     Caption = 'CS UI Function Group';
     DataClassification = CustomerContent;

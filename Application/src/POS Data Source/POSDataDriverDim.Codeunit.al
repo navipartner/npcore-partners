@@ -1,5 +1,6 @@
-codeunit 6150732 "NPR POS Data Driver: Dim."
+﻿codeunit 6150732 "NPR POS Data Driver: Dim."
 {
+    Access = Internal;
     // NPR5.44/TSA /20180709 CASE 321303 Initial Version
     // NPR5.48/MMV /20181105 CASE 334588 Fixed mismatch in event subscriber signature
     // NPR5.52/ALPO/20190912 CASE 368673 Add dimension values to the data source even if there is no value at the moment

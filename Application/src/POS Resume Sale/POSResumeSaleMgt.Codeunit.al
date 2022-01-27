@@ -1,5 +1,6 @@
-codeunit 6150739 "NPR POS Resume Sale Mgt."
+﻿codeunit 6150739 "NPR POS Resume Sale Mgt."
 {
+    Access = Internal;
     // If you want to overrule/suppress the pop-up windows/questions, create a subscriber.
     // For example, using the following subscriber we can suppress all pop-ups
     // and get all unfinished sales silently cancelled, and, if cancel fails, get them saved as POS Saved Sales:

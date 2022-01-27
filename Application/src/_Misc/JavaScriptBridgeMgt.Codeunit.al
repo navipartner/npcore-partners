@@ -1,5 +1,6 @@
-codeunit 6150632 "NPR JavaScript Bridge Mgt."
+﻿codeunit 6150632 "NPR JavaScript Bridge Mgt."
 {
+    Access = Internal;
     var
         Initialized: Boolean;
         Bridge: ControlAddIn "NPR Bridge";

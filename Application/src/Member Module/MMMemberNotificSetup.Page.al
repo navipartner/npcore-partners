@@ -1,5 +1,6 @@
-page 6060142 "NPR MM Member Notific. Setup"
+﻿page 6060142 "NPR MM Member Notific. Setup"
 {
+    Extensible = False;
 
     Caption = 'Member Notification Setup';
     PageType = List;

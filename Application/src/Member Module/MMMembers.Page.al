@@ -1,5 +1,6 @@
-page 6060126 "NPR MM Members"
+﻿page 6060126 "NPR MM Members"
 {
+    Extensible = False;
     Caption = 'Members';
     AdditionalSearchTerms = 'Member List';
     CardPageID = "NPR MM Member Card";

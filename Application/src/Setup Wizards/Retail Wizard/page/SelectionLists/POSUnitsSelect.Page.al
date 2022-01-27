@@ -1,5 +1,6 @@
-page 6059780 "NPR POS Units Select"
+﻿page 6059780 "NPR POS Units Select"
 {
+    Extensible = False;
     Caption = 'POS Unit List';
     PageType = List;
     SourceTable = "NPR POS Unit";

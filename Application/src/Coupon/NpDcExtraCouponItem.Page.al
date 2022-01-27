@@ -1,5 +1,6 @@
-page 6151596 "NPR NpDc Extra Coupon Item"
+﻿page 6151596 "NPR NpDc Extra Coupon Item"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Extra Coupon Item';
     PageType = Card;

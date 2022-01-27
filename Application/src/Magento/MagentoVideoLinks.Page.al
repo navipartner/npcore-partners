@@ -1,5 +1,6 @@
-page 6151455 "NPR Magento Video Links"
+﻿page 6151455 "NPR Magento Video Links"
 {
+    Extensible = False;
     Caption = 'Magento Video Links';
     PageType = Worksheet;
     UsageCategory = Administration;

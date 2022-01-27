@@ -1,5 +1,6 @@
-page 6059802 "NPR MM Remote Member Update"
+﻿page 6059802 "NPR MM Remote Member Update"
 {
+    Extensible = False;
     PageType = StandardDialog;
     UsageCategory = None;
     SourceTable = "NPR MM Member";

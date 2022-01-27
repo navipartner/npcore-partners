@@ -1,5 +1,6 @@
-codeunit 6014552 "NPR MobilePayV10 Capt. Refund"
+﻿codeunit 6014552 "NPR MobilePayV10 Capt. Refund"
 {
+    Access = Internal;
     // POST  /v10/refunds/{refundid}/capture
     TableNo = "NPR EFT Transaction Request";
 

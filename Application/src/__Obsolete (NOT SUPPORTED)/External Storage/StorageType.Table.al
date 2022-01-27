@@ -1,5 +1,6 @@
-table 6184890 "NPR Storage Type"
+﻿table 6184890 "NPR Storage Type"
 {
+    Access = Internal;
     Caption = 'Storage Types';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

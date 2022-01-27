@@ -1,5 +1,6 @@
-codeunit 6150752 "NPR Front-End: Generic" implements "NPR Front-End Async Request"
+﻿codeunit 6150752 "NPR Front-End: Generic" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _method: Text;

@@ -1,5 +1,6 @@
-page 6014670 "NPR Dependency Mgt. Setup"
+﻿page 6014670 "NPR Dependency Mgt. Setup"
 {
+    Extensible = False;
     Caption = 'Dependency Management Setup';
     PageType = Card;
     SourceTable = "NPR Dependency Mgt. Setup";

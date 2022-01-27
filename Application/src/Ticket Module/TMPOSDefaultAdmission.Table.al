@@ -1,5 +1,6 @@
-table 6014548 "NPR TM POS Default Admission"
+﻿table 6014548 "NPR TM POS Default Admission"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'TM POS Default Admission';
 

@@ -1,6 +1,7 @@
-codeunit 6014621 "NPR NpRvCheckVoucher"
+﻿codeunit 6014621 "NPR NpRvCheckVoucher"
 
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('CHECK_VOUCHER');

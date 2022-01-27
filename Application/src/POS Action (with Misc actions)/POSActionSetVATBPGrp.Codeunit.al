@@ -1,5 +1,6 @@
-codeunit 6150824 "NPR POSAction: Set VAT B.P.Grp"
+﻿codeunit 6150824 "NPR POSAction: Set VAT B.P.Grp"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Set VAT Bus. Posting Group';
 

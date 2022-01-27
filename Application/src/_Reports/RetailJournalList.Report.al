@@ -1,5 +1,8 @@
-report 6014514 "NPR Retail Journal List"
+﻿report 6014514 "NPR Retail Journal List"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Journal List.rdlc';
     UsageCategory = ReportsAndAnalysis;

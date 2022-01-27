@@ -1,5 +1,6 @@
-page 6060093 "NPR TM Offline Ticket Valid."
+﻿page 6060093 "NPR TM Offline Ticket Valid."
 {
+    Extensible = False;
     // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
     // TM90.1.46/TSA /20200203 CASE 383196 Added mass modify on event date and event time
 

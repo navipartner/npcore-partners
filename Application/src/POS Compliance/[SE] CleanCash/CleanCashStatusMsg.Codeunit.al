@@ -1,5 +1,6 @@
-codeunit 6014461 "NPR CleanCash Status Msg." implements "NPR CleanCash XCCSP Interface"
+﻿codeunit 6014461 "NPR CleanCash Status Msg." implements "NPR CleanCash XCCSP Interface"
 {
+    Access = Internal;
     procedure CreateRequest(PosUnitNo: Code[10]; var EntryNo: Integer): Boolean
     var
         CleanCashTransactionRequest: Record "NPR CleanCash Trans. Request";

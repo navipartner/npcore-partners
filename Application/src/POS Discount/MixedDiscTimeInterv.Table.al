@@ -1,5 +1,6 @@
-table 6014420 "NPR Mixed Disc. Time Interv."
+﻿table 6014420 "NPR Mixed Disc. Time Interv."
 {
+    Access = Internal;
     // NPR5.45/MHA /20180820  CASE 323568 Object created
 
     Caption = 'Active Time Interval';

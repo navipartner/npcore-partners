@@ -1,5 +1,6 @@
-page 6059823 "NPR Smart Email Variables"
+﻿page 6059823 "NPR Smart Email Variables"
 {
+    Extensible = False;
     Caption = 'Smart Email Variables';
     PageType = ListPart;
     SourceTable = "NPR Smart Email Variable";

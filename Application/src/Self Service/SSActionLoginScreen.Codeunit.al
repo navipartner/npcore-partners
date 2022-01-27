@@ -1,5 +1,6 @@
-codeunit 6151283 "NPR SS Action: Login Screen"
+﻿codeunit 6151283 "NPR SS Action: Login Screen"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built in function locks the POS';
         ConfirmTitle: Label 'We need your confirmation...';

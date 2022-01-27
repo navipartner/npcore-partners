@@ -1,5 +1,6 @@
-table 6150670 "NPR NPRE Assign. Print Cat."
+﻿table 6150670 "NPR NPRE Assign. Print Cat."
 {
+    Access = Internal;
     Caption = 'Assigned Print Category';
     DataClassification = CustomerContent;
 

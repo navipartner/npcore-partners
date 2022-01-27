@@ -1,5 +1,6 @@
-table 6014652 "NPR Tax Free GB IIN Blacklist"
+﻿table 6014652 "NPR Tax Free GB IIN Blacklist"
 {
+    Access = Internal;
     Caption = 'Tax Free GB IIN Blacklist';
     DataClassification = CustomerContent;
 

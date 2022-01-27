@@ -1,5 +1,6 @@
-table 6150681 "NPR NPRE Restaurant"
+﻿table 6150681 "NPR NPRE Restaurant"
 {
+    Access = Internal;
     Caption = 'Restaurant';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Restaurants";

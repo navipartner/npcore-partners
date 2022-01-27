@@ -1,5 +1,6 @@
-table 6014495 "NPR Arch. Retail Cross Ref."
+﻿table 6014495 "NPR Arch. Retail Cross Ref."
 {
+    Access = Internal;
     // The purpose of this table:
     //   All existing unfinished sale transactions have been moved to archive tables
     //   The table may be deleted later, when it is no longer relevant.

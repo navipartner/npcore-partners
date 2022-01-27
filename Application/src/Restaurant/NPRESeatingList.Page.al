@@ -1,5 +1,6 @@
-page 6150664 "NPR NPRE Seating List"
+﻿page 6150664 "NPR NPRE Seating List"
 {
+    Extensible = False;
     Caption = 'Seating List';
     CardPageID = "NPR NPRE Seating";
     Editable = false;

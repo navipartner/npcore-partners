@@ -1,5 +1,6 @@
-page 6150623 "NPR POS Paym.Bin Set Float"
+﻿page 6150623 "NPR POS Paym.Bin Set Float"
 {
+    Extensible = False;
     // NPR5.51/TJ  /20190618 CASE 353761 New object
 
     Caption = 'POS Payment Bin Set Float';

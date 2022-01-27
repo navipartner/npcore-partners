@@ -1,5 +1,6 @@
-query 6014610 "NPR Retail Campgn. Item Totals"
+﻿query 6014610 "NPR Retail Campgn. Item Totals"
 {
+    Access = Internal;
     Caption = 'Retail Campaign Item Totals';
 
     elements

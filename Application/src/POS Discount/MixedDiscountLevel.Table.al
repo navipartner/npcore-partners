@@ -1,5 +1,6 @@
-table 6014427 "NPR Mixed Discount Level"
+﻿table 6014427 "NPR Mixed Discount Level"
 {
+    Access = Internal;
     // NPR5.55/ALPO/20200714 CASE 412946 Mixed Discount enhancement: support for multiple discount amount levels
 
     Caption = 'Mixed Discount Level';

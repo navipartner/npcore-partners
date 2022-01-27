@@ -1,5 +1,6 @@
-page 6014445 "NPR Payment Method Denom"
+﻿page 6014445 "NPR Payment Method Denom"
 {
+    Extensible = False;
     Caption = 'NPR Payment Method Denom';
     PageType = List;
     SourceTable = "NPR Payment Method Denom";

@@ -1,5 +1,6 @@
-codeunit 6014638 "NPR POS Normal Tax Backward"
+﻿codeunit 6014638 "NPR POS Normal Tax Backward"
 {
+    Access = Internal;
     procedure UpdateSourceBeforeCalculateTax(var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
     begin
         Rec."Amount Including VAT" := Round(Rec."Amount Including VAT", Currency."Amount Rounding Precision");

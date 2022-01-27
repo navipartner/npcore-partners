@@ -1,5 +1,6 @@
-table 6014524 "NPR BTF EndPoint Error Log"
+﻿table 6014524 "NPR BTF EndPoint Error Log"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'BTwentyFour Error Log';
     LookupPageId = "NPR BTF EndPoints Error Log";

@@ -1,5 +1,6 @@
-codeunit 6014601 "NPR RP Boca FGL Device Lib."
+﻿codeunit 6014601 "NPR RP Boca FGL Device Lib."
 {
+    Access = Internal;
     // Line print..
     // ----------------------------------------------------------------------------------
     // 

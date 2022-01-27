@@ -1,5 +1,6 @@
-table 6151560 "NPR NpXml Template History"
+﻿table 6151560 "NPR NpXml Template History"
 {
+    Access = Internal;
     Caption = 'NpXml Template History';
     DataClassification = CustomerContent;
 

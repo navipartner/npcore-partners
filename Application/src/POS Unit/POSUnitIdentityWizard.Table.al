@@ -1,5 +1,6 @@
-table 6150718 "NPR POS Unit Identity Wizard"
+﻿table 6150718 "NPR POS Unit Identity Wizard"
 {
+    Access = Internal;
     // #Transcendence/TSA/20170221 CASE Trancendence Login
 
     Caption = 'POS Unit Identity';

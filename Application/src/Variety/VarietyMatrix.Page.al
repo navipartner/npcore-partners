@@ -1,5 +1,6 @@
-page 6059974 "NPR Variety Matrix"
+﻿page 6059974 "NPR Variety Matrix"
 {
+    Extensible = False;
     // VRT1.10/JDH /20151202 CASE 201022 create table copy added as an action
     // VRT1.11/MHA /20160411 CASE 236840 Increased column count from 32 to 100 and added HideInactive filter and Changed parameter Item2 to VAR in function SetRecordRef() in order to parse filters
     // VRT1.11/TS  /20160509 CASE 238348  Added SETCURRENTKEY

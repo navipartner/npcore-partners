@@ -1,5 +1,8 @@
-report 6014550 "NPR Statement E-Mail"
+﻿report 6014550 "NPR Statement E-Mail"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Statement - Paper/E-Mail';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

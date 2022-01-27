@@ -1,5 +1,6 @@
 ﻿codeunit 6059977 "NPR Variety Setup Wizard"
 {
+    Access = Internal;
     // NPR5.36/JDH /20170922 CASE 288696 Wizard created
 
 

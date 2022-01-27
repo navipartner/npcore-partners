@@ -1,5 +1,6 @@
-codeunit 6014445 "NPR DE Fiskaly Communication"
+﻿codeunit 6014445 "NPR DE Fiskaly Communication"
 {
+    Access = Internal;
     [TryFunction]
     procedure SendDocument(var DeAuditAuxPar: Record "NPR DE POS Audit Log Aux. Info"; DocumentJsonObject: JsonObject; var ResponseJsonObject: JsonObject; var DEAuditSetupPar: Record "NPR DE Audit Setup")
     var

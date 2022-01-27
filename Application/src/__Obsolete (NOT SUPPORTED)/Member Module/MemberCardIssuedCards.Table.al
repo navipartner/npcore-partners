@@ -1,5 +1,6 @@
-table 6059774 "NPR Member Card Issued Cards"
+﻿table 6059774 "NPR Member Card Issued Cards"
 {
+    Access = Internal;
 
     Caption = 'Point Card - Issued Cards';
     DataClassification = CustomerContent;

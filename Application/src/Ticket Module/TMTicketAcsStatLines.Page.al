@@ -1,5 +1,6 @@
 ﻿page 6060117 "NPR TM Ticket Acs. Stat.Lines"
 {
+    Extensible = False;
     Caption = 'Ticket Access Stat. Lines';
     Editable = false;
     PageType = ListPart;

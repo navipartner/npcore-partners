@@ -1,5 +1,6 @@
-page 6151173 "NPR NpGp POS Info POS Entry"
+﻿page 6151173 "NPR NpGp POS Info POS Entry"
 {
+    Extensible = False;
     Caption = 'Global POS Info Entries';
     Editable = false;
     PageType = List;

@@ -1,5 +1,6 @@
-page 6060105 "NPR MM Loyalty Setup"
+﻿page 6060105 "NPR MM Loyalty Setup"
 {
+    Extensible = False;
 
     Caption = 'Loyalty Setup';
     PageType = List;

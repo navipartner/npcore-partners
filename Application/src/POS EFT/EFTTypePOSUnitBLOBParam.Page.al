@@ -1,5 +1,6 @@
-page 6184477 "NPR EFTType POSUnit BLOB Param"
+﻿page 6184477 "NPR EFTType POSUnit BLOB Param"
 {
+    Extensible = False;
     Caption = 'EFT Type POS Unit BLOB Param.';
     DeleteAllowed = false;
     InsertAllowed = false;

@@ -1,5 +1,6 @@
-page 6151126 "NPR NpIa Item AddOn Card"
+﻿page 6151126 "NPR NpIa Item AddOn Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Item AddOn Card';
     PageType = Card;

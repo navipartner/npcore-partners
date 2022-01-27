@@ -1,5 +1,6 @@
-table 6151058 "NPR Distribution Lines"
+﻿table 6151058 "NPR Distribution Lines"
 {
+    Access = Internal;
     Caption = 'Distribution Lines';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,8 @@
-report 6060128 "NPR MM Sync. Community Cust."
+﻿report 6060128 "NPR MM Sync. Community Cust."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Sync. Community Customers';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

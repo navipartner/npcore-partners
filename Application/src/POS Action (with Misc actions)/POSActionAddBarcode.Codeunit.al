@@ -1,5 +1,6 @@
-codeunit 6014576 "NPR POS Action Add Barcode"
+﻿codeunit 6014576 "NPR POS Action Add Barcode"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('ADD_BARCODE');

@@ -1,5 +1,6 @@
-table 6151367 "NPR CS Counting Supervisor"
+﻿table 6151367 "NPR CS Counting Supervisor"
 {
+    Access = Internal;
 
     Caption = 'CS Counting Supervisor';
     DataClassification = CustomerContent;

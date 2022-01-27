@@ -1,5 +1,6 @@
-table 6151138 "NPR TM Ticket Wait. List"
+﻿table 6151138 "NPR TM Ticket Wait. List"
 {
+    Access = Internal;
     // TM1.45/TSA /20191203 CASE 380754 Initial Version
 
     Caption = 'Ticket Waiting List';

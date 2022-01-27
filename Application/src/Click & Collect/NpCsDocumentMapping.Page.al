@@ -1,5 +1,6 @@
-page 6151203 "NPR NpCs Document Mapping"
+﻿page 6151203 "NPR NpCs Document Mapping"
 {
+    Extensible = False;
     Caption = 'Collect Document Mapping';
     DelayedInsert = true;
     PageType = List;

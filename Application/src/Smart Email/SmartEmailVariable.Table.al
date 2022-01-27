@@ -1,5 +1,6 @@
-table 6059823 "NPR Smart Email Variable"
+﻿table 6059823 "NPR Smart Email Variable"
 {
+    Access = Internal;
     Caption = 'Smart Email Variable';
     DataClassification = CustomerContent;
 

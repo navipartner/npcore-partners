@@ -1,5 +1,8 @@
-report 6014529 "NPR Vendor/Salesperson"
+﻿report 6014529 "NPR Vendor/Salesperson"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/VendorSalesperson.rdlc';
     Caption = 'Vendor/Salesperson';

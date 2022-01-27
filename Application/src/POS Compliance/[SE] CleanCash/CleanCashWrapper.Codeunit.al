@@ -1,5 +1,6 @@
-codeunit 6184500 "NPR CleanCash Wrapper"
+﻿codeunit 6184500 "NPR CleanCash Wrapper"
 {
+    Access = Internal;
     var
         Text000: Label 'Create Sales in CleanCash';
 

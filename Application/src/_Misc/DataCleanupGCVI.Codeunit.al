@@ -1,5 +1,6 @@
-codeunit 6060101 "NPR Data Cleanup GCVI"
+﻿codeunit 6060101 "NPR Data Cleanup GCVI"
 {
+    Access = Internal;
     trigger OnRun()
     var
         SuccessLbl: Label 'SUCCESS', Locked = true;

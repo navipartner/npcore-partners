@@ -1,5 +1,6 @@
-table 6151433 "NPR Magento Contact Pmt.Meth."
+﻿table 6151433 "NPR Magento Contact Pmt.Meth."
 {
+    Access = Internal;
     Caption = 'Magento Contact Payment Method';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Cont.Pmt.Methods";

@@ -1,5 +1,6 @@
-table 6014678 "NPR Endpoint Query"
+﻿table 6014678 "NPR Endpoint Query"
 {
+    Access = Internal;
     // NPR5.25/BR  /20160801  CASE 234602 Object created
     // NPR5.38/MHA /20180104  CASE 301054 Corrected Calcformula for field 220 "Table Name"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj field 220

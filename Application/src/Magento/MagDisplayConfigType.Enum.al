@@ -1,5 +1,8 @@
-enum 6014419 "NPR Mag. Display Config Type"
+﻿enum 6014419 "NPR Mag. Display Config Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; Item)

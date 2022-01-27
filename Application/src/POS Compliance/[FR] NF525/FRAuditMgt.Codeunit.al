@@ -1,6 +1,7 @@
 #if BC17
 codeunit 6184850 "NPR FR Audit Mgt."
 {
+    Access = Internal;
     SingleInstance = true;
 
     var

@@ -1,5 +1,6 @@
-page 6150685 "NPR NPRE Kitchen Stations"
+﻿page 6150685 "NPR NPRE Kitchen Stations"
 {
+    Extensible = False;
     Caption = 'Restaurant Kitchen Stations';
     CardPageID = "NPR NPRE Kitchen Station Card";
     Editable = false;

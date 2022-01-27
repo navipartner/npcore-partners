@@ -1,5 +1,6 @@
-page 6184515 "NPR EFT NETSCloud POSUnitSetup"
+﻿page 6184515 "NPR EFT NETSCloud POSUnitSetup"
 {
+    Extensible = False;
     Caption = 'EFT NETS Cloud POS Unit Setup';
     PageType = Card;
     UsageCategory = None;

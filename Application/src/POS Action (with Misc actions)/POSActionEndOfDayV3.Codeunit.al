@@ -1,5 +1,6 @@
-codeunit 6150849 "NPR POS Action: EndOfDay V3"
+﻿codeunit 6150849 "NPR POS Action: EndOfDay V3"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is the built in function to perform balancing of the register (Version 1)';
         t002: Label 'Delete all sales lines before balancing the register';

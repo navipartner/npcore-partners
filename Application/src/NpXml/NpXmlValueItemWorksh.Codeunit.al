@@ -1,5 +1,6 @@
-codeunit 6060050 "NPR NpXml Value Item Worksh."
+﻿codeunit 6060050 "NPR NpXml Value Item Worksh."
 {
+    Access = Internal;
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()

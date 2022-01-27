@@ -1,5 +1,6 @@
-codeunit 6150661 "NPR NPRE POSAction: Print Wa."
+﻿codeunit 6150661 "NPR NPRE POSAction: Print Wa."
 {
+    Access = Internal;
     var
         Text000: Label 'Print waiterpad';
         ReadingErr: Label 'reading in %1';

@@ -1,5 +1,6 @@
-table 6014457 "NPR POS Counting Denomination"
+﻿table 6014457 "NPR POS Counting Denomination"
 {
+    Access = Internal;
     Caption = 'POS Counting Denomination';
     DataClassification = CustomerContent;
 

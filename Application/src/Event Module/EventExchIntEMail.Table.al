@@ -1,5 +1,6 @@
-table 6060166 "NPR Event Exch. Int. E-Mail"
+﻿table 6060166 "NPR Event Exch. Int. E-Mail"
 {
+    Access = Internal;
     Caption = 'Event Exch. Int. E-Mail';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Event Exch. Int. E-Mails";

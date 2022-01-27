@@ -1,5 +1,6 @@
-page 6014624 "NPR Pmt. Gateways Select"
+﻿page 6014624 "NPR Pmt. Gateways Select"
 {
+    Extensible = False;
     Caption = 'Payment Gateways';
     PageType = List;
     UsageCategory = Administration;

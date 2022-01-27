@@ -1,5 +1,6 @@
-codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
+﻿codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

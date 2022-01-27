@@ -1,5 +1,8 @@
-enum 6014473 "NPR API Auth. Type" implements "NPR API IAuthorization"
+﻿enum 6014473 "NPR API Auth. Type" implements "NPR API IAuthorization"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = false;
     value(0; Basic)
     {

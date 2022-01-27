@@ -1,5 +1,6 @@
-table 6184488 "NPR Pepper EFT Trx Type"
+﻿table 6184488 "NPR Pepper EFT Trx Type"
 {
+    Access = Internal;
     Caption = 'Pepper EFT Transaction Type';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Pepper EFT Trans. Types";

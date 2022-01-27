@@ -1,5 +1,6 @@
-page 6014549 "NPR Event Planning Lines"
+﻿page 6014549 "NPR Event Planning Lines"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Event Planning Lines';
     DataCaptionExpression = Rec.Caption();

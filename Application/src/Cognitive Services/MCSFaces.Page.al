@@ -1,5 +1,6 @@
-page 6059959 "NPR MCS Faces"
+﻿page 6059959 "NPR MCS Faces"
 {
+    Extensible = False;
 
     Caption = 'MCS Faces';
     CardPageID = "NPR MCS Faces Card";

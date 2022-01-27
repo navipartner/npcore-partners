@@ -1,5 +1,6 @@
-codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
+﻿codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
 {
+    Access = Internal;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSource', '', false, false)]
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")

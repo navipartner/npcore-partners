@@ -1,5 +1,8 @@
-report 6150614 "NPR Posting Overview POS"
+﻿report 6150614 "NPR Posting Overview POS"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Posting Overview POS.rdlc';
     UsageCategory = ReportsAndAnalysis;

@@ -1,5 +1,6 @@
-codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
+﻿codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CapturePaymentEvent', '', false, false)]
     local procedure CapturePaymentSalesInvoice(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
     begin

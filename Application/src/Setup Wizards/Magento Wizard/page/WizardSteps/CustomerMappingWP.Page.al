@@ -1,5 +1,6 @@
-page 6014523 "NPR Customer Mapping WP"
+﻿page 6014523 "NPR Customer Mapping WP"
 {
+    Extensible = False;
     Caption = 'Magento Customer Mapping';
     PageType = ListPart;
     UsageCategory = Administration;

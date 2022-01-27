@@ -1,5 +1,6 @@
-codeunit 6014527 "NPR Credit Card Prot. Helper"
+﻿codeunit 6014527 "NPR Credit Card Prot. Helper"
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

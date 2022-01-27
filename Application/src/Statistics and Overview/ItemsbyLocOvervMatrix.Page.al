@@ -1,5 +1,6 @@
-page 6060067 "NPR Items by Loc.Overv. Matrix"
+﻿page 6060067 "NPR Items by Loc.Overv. Matrix"
 {
+    Extensible = False;
     // NPR5.52/JAKUBV/20191022  CASE 370333 Transport NPR5.52 - 22 October 2019
 
     Caption = 'Items by Loc. Overview Matrix';

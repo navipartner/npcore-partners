@@ -1,5 +1,6 @@
-codeunit 6150618 "NPR POS Entry Output Log Mgt."
+﻿codeunit 6150618 "NPR POS Entry Output Log Mgt."
 {
+    Access = Internal;
 
     local procedure CreatePOSEntryOutputLog(RecRef: RecordRef; ReportSelectionRetail: Record "NPR Report Selection Retail")
     var

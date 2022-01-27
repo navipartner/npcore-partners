@@ -1,5 +1,6 @@
-page 6059786 "NPR TM Ticket AccessEntry List"
+﻿page 6059786 "NPR TM Ticket AccessEntry List"
 {
+    Extensible = False;
     Caption = 'Ticket access Entry List';
     Editable = false;
     PageType = List;

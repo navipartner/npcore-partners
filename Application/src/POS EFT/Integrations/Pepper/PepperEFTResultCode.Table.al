@@ -1,5 +1,6 @@
-table 6184489 "NPR Pepper EFT Result Code"
+﻿table 6184489 "NPR Pepper EFT Result Code"
 {
+    Access = Internal;
     Caption = 'Pepper EFT Result Code';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Pepper EFT Result Codes";

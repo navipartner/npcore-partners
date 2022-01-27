@@ -1,5 +1,6 @@
-codeunit 6014540 "NPR RP Escape Code Library"
+﻿codeunit 6014540 "NPR RP Escape Code Library"
 {
+    Access = Internal;
     // Escape Code Library.
     //  Work started by Nicolai Esbensen.
     //  This Library is complete. Please do not extend,

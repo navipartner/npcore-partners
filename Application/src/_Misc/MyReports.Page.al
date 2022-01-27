@@ -1,5 +1,6 @@
-page 6014618 "NPR My Reports"
+﻿page 6014618 "NPR My Reports"
 {
+    Extensible = False;
     Caption = 'My Reports';
     PageType = ListPart;
     UsageCategory = Administration;

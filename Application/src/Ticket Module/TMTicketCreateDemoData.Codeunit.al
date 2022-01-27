@@ -1,5 +1,6 @@
-codeunit 6151134 "NPR TM Ticket Create Demo Data"
+﻿codeunit 6151134 "NPR TM Ticket Create Demo Data"
 {
+    Access = Internal;
     /***    
             ****** TICKET SERVER setup ******
             http://test.ticket.navipartner.dk/import/api/rest/v1/ticket/orders

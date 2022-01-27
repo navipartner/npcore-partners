@@ -1,5 +1,6 @@
-page 6014484 "NPR TM Adm. Dependency Card"
+﻿page 6014484 "NPR TM Adm. Dependency Card"
 {
+    Extensible = False;
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR TM Adm. Dependency";

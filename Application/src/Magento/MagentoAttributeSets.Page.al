@@ -1,5 +1,6 @@
-page 6151434 "NPR Magento Attribute Sets"
+﻿page 6151434 "NPR Magento Attribute Sets"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Attribute Sets';
     MultipleNewLines = false;

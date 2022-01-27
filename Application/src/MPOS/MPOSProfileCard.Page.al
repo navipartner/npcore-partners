@@ -1,5 +1,6 @@
-page 6150698 "NPR MPOS Profile Card"
+﻿page 6150698 "NPR MPOS Profile Card"
 {
+    Extensible = False;
     Caption = 'MPOS Profile';
     PageType = Card;
     SourceTable = "NPR MPOS Profile";

@@ -1,5 +1,6 @@
-table 6151120 "NPR GDPR Setup"
+﻿table 6151120 "NPR GDPR Setup"
 {
+    Access = Internal;
     // MM1.29/TSA /20180509 CASE 313795 Initial Version
 
     Caption = 'GDPR Setup';

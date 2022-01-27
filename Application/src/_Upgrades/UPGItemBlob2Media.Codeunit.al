@@ -1,5 +1,6 @@
 codeunit 6014686 "NPR UPG Item Blob 2 Media"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     var

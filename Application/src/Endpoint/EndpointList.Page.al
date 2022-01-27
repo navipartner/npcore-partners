@@ -1,5 +1,6 @@
-page 6014674 "NPR Endpoint List"
+﻿page 6014674 "NPR Endpoint List"
 {
+    Extensible = False;
     // NPR5.23\BR\20160518  CASE 237658 Object created
 
     Caption = 'Endpoint List';

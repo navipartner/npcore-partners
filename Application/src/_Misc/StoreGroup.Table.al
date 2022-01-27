@@ -1,5 +1,6 @@
-table 6014473 "NPR Store Group"
+﻿table 6014473 "NPR Store Group"
 {
+    Access = Internal;
     Caption = 'Store Group';
     DataClassification = CustomerContent;
 

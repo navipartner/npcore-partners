@@ -1,5 +1,6 @@
-page 6014579 "NPR Retail List"
+﻿page 6014579 "NPR Retail List"
 {
+    Extensible = False;
     Caption = 'Choose';
     DeleteAllowed = false;
     InsertAllowed = false;

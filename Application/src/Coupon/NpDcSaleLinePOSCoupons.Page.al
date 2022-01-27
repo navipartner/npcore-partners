@@ -1,5 +1,6 @@
-page 6151598 "NPR NpDc SaleLinePOS Coupons"
+﻿page 6151598 "NPR NpDc SaleLinePOS Coupons"
 {
+    Extensible = False;
     Caption = 'Sale Line POS Coupons';
     Editable = false;
     PageType = List;

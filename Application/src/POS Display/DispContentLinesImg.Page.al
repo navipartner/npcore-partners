@@ -1,5 +1,6 @@
-page 6059953 "NPR Disp. Content Lines Img"
+﻿page 6059953 "NPR Disp. Content Lines Img"
 {
+    Extensible = False;
     Caption = 'Display Content Lines Image';
     LinksAllowed = false;
     PageType = CardPart;

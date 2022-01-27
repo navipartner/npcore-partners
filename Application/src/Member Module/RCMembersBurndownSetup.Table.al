@@ -1,5 +1,6 @@
-table 6060149 "NPR RC Members. Burndown Setup"
+﻿table 6060149 "NPR RC Members. Burndown Setup"
 {
+    Access = Internal;
 
     Caption = 'Trailing Sales Orders Setup';
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-page 6014600 "NPR POS Security Profiles"
+﻿page 6014600 "NPR POS Security Profiles"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = Administration;
 

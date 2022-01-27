@@ -1,5 +1,6 @@
 ﻿codeunit 6150640 "NPR POS Info Management"
 {
+    Access = Internal;
     var
         ApplicScope: Option " ","Current Line","All Lines","New Lines",Ask;
 

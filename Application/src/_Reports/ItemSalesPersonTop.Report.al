@@ -1,5 +1,8 @@
-report 6014474 "NPR Item/Sales Person Top"
+﻿report 6014474 "NPR Item/Sales Person Top"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/ItemSales Person Top.rdlc';
     UsageCategory = ReportsAndAnalysis;

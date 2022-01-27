@@ -1,5 +1,6 @@
-page 6014556 "NPR Popup Dim. Filter"
+﻿page 6014556 "NPR Popup Dim. Filter"
 {
+    Extensible = False;
 
     Caption = 'Popup Dimension Filter';
     PageType = ListPart;

@@ -1,5 +1,6 @@
-codeunit 6151000 "NPR POS Proxy: Raw Print"
+﻿codeunit 6151000 "NPR POS Proxy: Raw Print"
 {
+    Access = Internal;
     // NPR5.43/MMV /20180528 CASE 315838 Updated assembly reference
 
 

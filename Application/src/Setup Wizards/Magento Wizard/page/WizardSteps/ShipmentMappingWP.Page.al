@@ -1,5 +1,6 @@
-page 6014551 "NPR Shipment Mapping WP"
+﻿page 6014551 "NPR Shipment Mapping WP"
 {
+    Extensible = False;
     Caption = 'Shipment Method Mapping';
     PageType = ListPart;
     UsageCategory = Administration;

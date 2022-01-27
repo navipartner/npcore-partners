@@ -1,5 +1,6 @@
-page 6060138 "NPR MM Member Members.ListPart"
+﻿page 6060138 "NPR MM Member Members.ListPart"
 {
+    Extensible = False;
 
     Caption = 'Member Memberships';
     InsertAllowed = false;

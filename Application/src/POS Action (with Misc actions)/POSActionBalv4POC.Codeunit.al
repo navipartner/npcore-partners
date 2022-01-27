@@ -1,5 +1,6 @@
-codeunit 6014600 "NPR POS Action: Bal. v4 POC"
+﻿codeunit 6014600 "NPR POS Action: Bal. v4 POC"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'TODO';
 

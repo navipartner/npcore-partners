@@ -1,5 +1,6 @@
-codeunit 6151201 "NPR NpCs Lookup Sales Document"
+﻿codeunit 6151201 "NPR NpCs Lookup Sales Document"
 {
+    Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

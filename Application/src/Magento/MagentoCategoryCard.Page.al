@@ -1,5 +1,6 @@
-page 6151414 "NPR Magento Category Card"
+﻿page 6151414 "NPR Magento Category Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Magento Category Card';
     DelayedInsert = true;

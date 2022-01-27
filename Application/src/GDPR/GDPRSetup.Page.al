@@ -1,5 +1,6 @@
-page 6151120 "NPR GDPR Setup"
+﻿page 6151120 "NPR GDPR Setup"
 {
+    Extensible = False;
     // MM1.29/TSA /20180509 CASE 313795 Intial Version
 
     Caption = 'GDPR Setup';

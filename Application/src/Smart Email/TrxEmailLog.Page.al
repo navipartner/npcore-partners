@@ -1,5 +1,6 @@
-page 6059825 "NPR Trx Email Log"
+﻿page 6059825 "NPR Trx Email Log"
 {
+    Extensible = False;
     Caption = 'Transactional Email Log';
     DeleteAllowed = false;
     Editable = false;

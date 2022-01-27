@@ -1,5 +1,6 @@
-page 6184493 "NPR Pepper Terminal Card"
+﻿page 6184493 "NPR Pepper Terminal Card"
 {
+    Extensible = False;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
     // NPR5.25/BR/20160509  CASE 231481 Added field Fixed Currency Code
     // NPR5.25/BR/20160608  CASE 231481 Added fields Customer ID, License ID, License File, License Action

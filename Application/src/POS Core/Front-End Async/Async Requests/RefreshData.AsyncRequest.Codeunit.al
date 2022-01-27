@@ -1,5 +1,6 @@
-codeunit 6150781 "NPR Front-End: RefreshData" implements "NPR Front-End Async Request"
+﻿codeunit 6150781 "NPR Front-End: RefreshData" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _dataSets: JsonObject;

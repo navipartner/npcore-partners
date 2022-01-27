@@ -1,5 +1,6 @@
-page 6151217 "NPR NpCs Open.Hour Set S.page"
+﻿page 6151217 "NPR NpCs Open.Hour Set S.page"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Opening Hours';
     DelayedInsert = true;

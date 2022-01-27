@@ -1,5 +1,6 @@
-codeunit 6060051 "NPR Item Wksht.Valid. Process"
+﻿codeunit 6060051 "NPR Item Wksht.Valid. Process"
 {
+    Access = Internal;
     Subtype = Test;
 
     trigger OnRun()

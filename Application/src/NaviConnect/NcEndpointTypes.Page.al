@@ -1,5 +1,6 @@
-page 6151537 "NPR Nc Endpoint Types"
+﻿page 6151537 "NPR Nc Endpoint Types"
 {
+    Extensible = False;
     Caption = 'Nc Endpoint Types';
     DeleteAllowed = false;
     Editable = false;

@@ -1,5 +1,6 @@
-table 6014428 "NPR Payment Type - Prefix"
+﻿table 6014428 "NPR Payment Type - Prefix"
 {
+    Access = Internal;
     Caption = 'Prefix-Payment Type';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

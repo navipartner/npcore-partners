@@ -1,5 +1,6 @@
-page 6014570 "NPR Package Codes"
+﻿page 6014570 "NPR Package Codes"
 {
+    Extensible = False;
 
     Caption = 'Package Codes';
     PageType = ListPart;

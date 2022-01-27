@@ -1,5 +1,8 @@
-enum 6014440 "NPR M2 Acc. Com. Template Type"
+﻿enum 6014440 "NPR M2 Acc. Com. Template Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; NA)

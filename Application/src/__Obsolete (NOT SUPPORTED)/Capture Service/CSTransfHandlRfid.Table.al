@@ -1,5 +1,6 @@
-table 6151364 "NPR CS Transf. Handl. Rfid"
+﻿table 6151364 "NPR CS Transf. Handl. Rfid"
 {
+    Access = Internal;
 
     Caption = 'CS Transfer Handling Rfid';
     DataClassification = CustomerContent;

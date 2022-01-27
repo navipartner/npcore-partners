@@ -1,5 +1,6 @@
-table 6151024 "NPR NpRv Partner"
+﻿table 6151024 "NPR NpRv Partner"
 {
+    Access = Internal;
     Caption = 'Retail Voucher Partner';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Partners";

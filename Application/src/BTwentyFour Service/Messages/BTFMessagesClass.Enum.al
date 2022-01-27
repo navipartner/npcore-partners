@@ -1,5 +1,8 @@
-enum 6014413 "NPR BTF Messages Class"
+﻿enum 6014413 "NPR BTF Messages Class"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(1; "pricat")

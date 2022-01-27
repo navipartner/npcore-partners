@@ -1,5 +1,8 @@
-enum 6014401 "NPR CleanCash Receipt Type"
+﻿enum 6014401 "NPR CleanCash Receipt Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; normal)

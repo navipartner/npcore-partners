@@ -1,5 +1,6 @@
 ﻿codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface"
 {
+    Access = Internal;
     // Consumes Global Blue I2 solution, GRIPS MX API v16.06
     // 
     // test credentials:

@@ -1,5 +1,6 @@
-page 6151171 "NPR NpGp Global POSSalesSetups"
+﻿page 6151171 "NPR NpGp Global POSSalesSetups"
 {
+    Extensible = False;
     Caption = 'Global POS Sales Setups';
     CardPageID = "NPR NpGp POS Sales Setup Card";
     Editable = false;

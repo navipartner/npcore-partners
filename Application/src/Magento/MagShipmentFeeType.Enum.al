@@ -1,5 +1,8 @@
-enum 6014424 "NPR Mag. Shipment Fee Type"
+﻿enum 6014424 "NPR Mag. Shipment Fee Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "G/L Account")

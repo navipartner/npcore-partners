@@ -1,5 +1,6 @@
-codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
+﻿codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
 {
+    Access = Internal;
     var
         Text000: Label 'Coupon is not Valid';
         Text001: Label 'Coupon is being used';

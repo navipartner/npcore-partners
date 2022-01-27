@@ -1,5 +1,6 @@
-codeunit 6150736 "NPR POS Secure Method Svrside"
+﻿codeunit 6150736 "NPR POS Secure Method Svrside"
 {
+    Access = Internal;
     var
         Text001: Label 'No handler responded to server-side password validation event for %1.';
         FrontEndCached: Codeunit "NPR POS Front End Management";

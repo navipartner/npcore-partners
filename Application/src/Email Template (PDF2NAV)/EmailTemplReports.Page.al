@@ -1,5 +1,6 @@
-page 6059798 "NPR E-mail Templ. Reports"
+﻿page 6059798 "NPR E-mail Templ. Reports"
 {
+    Extensible = False;
     Caption = 'Additional E-mail Template Reports';
     DelayedInsert = true;
     PageType = List;

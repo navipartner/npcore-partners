@@ -1,5 +1,6 @@
-codeunit 6150762 "NPR Front-End: StartTrans." implements "NPR Front-End Async Request"
+﻿codeunit 6150762 "NPR Front-End: StartTrans." implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _transactionNo: Text;

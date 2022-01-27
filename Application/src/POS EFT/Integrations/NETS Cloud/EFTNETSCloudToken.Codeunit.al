@@ -1,5 +1,6 @@
-codeunit 6184533 "NPR EFT NETSCloud Token"
+﻿codeunit 6184533 "NPR EFT NETSCloud Token"
 {
+    Access = Internal;
     // NPR5.54/MMV /20200129 CASE 364340 Created object
     // NPR5.55/MMV /20200420 CASE 386254 Added WF2 methods, unattended lookup skip & fixed sale completion check.
 

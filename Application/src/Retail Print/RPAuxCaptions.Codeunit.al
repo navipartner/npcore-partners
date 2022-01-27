@@ -1,5 +1,6 @@
-codeunit 6014551 "NPR RP Aux: Captions"
+﻿codeunit 6014551 "NPR RP Aux: Captions"
 {
+    Access = Internal;
     var
         Caption_Total: Label 'Total';
         Caption_Vat: Label 'VAT';

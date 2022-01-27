@@ -1,5 +1,6 @@
-table 6014444 "Touch Screen - Meta F. Trans"
+﻿table 6014444 "Touch Screen - Meta F. Trans"
 {
+    Access = Internal;
     Caption = 'Touch Screen - Meta F. Trans';
     DataCaptionFields = "Language Code", Description;
     ObsoleteState = Removed;

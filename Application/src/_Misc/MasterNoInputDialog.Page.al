@@ -1,5 +1,6 @@
-page 6014420 "NPR Master No. Input Dialog"
+﻿page 6014420 "NPR Master No. Input Dialog"
 {
+    Extensible = False;
     Caption = 'Master No. Input Dialog';
     PageType = StandardDialog;
 

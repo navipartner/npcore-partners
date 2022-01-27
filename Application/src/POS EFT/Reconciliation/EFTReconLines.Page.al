@@ -1,5 +1,6 @@
-page 6059819 "NPR EFT Recon. Lines"
+﻿page 6059819 "NPR EFT Recon. Lines"
 {
+    Extensible = False;
     Caption = 'Reconciliation Lines';
     InsertAllowed = false;
     PageType = ListPart;

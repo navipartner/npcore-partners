@@ -1,5 +1,6 @@
-table 6184852 "NPR FR POS Audit Log Aux. Info"
+﻿table 6184852 "NPR FR POS Audit Log Aux. Info"
 {
+    Access = Internal;
     Caption = 'FR POS Audit Log Aux. Info';
     DataClassification = CustomerContent;
 

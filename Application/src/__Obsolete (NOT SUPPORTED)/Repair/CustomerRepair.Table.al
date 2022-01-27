@@ -1,5 +1,6 @@
-table 6014504 "NPR Customer Repair"
+﻿table 6014504 "NPR Customer Repair"
 {
+    Access = Internal;
     Caption = 'Customer Repair';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

@@ -1,5 +1,6 @@
-codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
+﻿codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('RUN_W/PAD_ACTION');

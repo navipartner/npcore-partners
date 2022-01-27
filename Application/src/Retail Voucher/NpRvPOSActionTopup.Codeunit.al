@@ -1,5 +1,6 @@
-codeunit 6151023 "NPR NpRv POS Action Top-up"
+﻿codeunit 6151023 "NPR NpRv POS Action Top-up"
 {
+    Access = Internal;
     var
         Text000: Label 'Apply Top-up (refill) on existing Retail Voucher.';
         Text001: Label 'Top-up Retail Voucher';

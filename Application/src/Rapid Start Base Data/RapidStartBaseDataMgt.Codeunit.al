@@ -1,5 +1,6 @@
-codeunit 6014594 "NPR RapidStart Base Data Mgt."
+﻿codeunit 6014594 "NPR RapidStart Base Data Mgt."
 {
+    Access = Internal;
     EventSubscriberInstance = Manual;
     [EventSubscriber(ObjectType::Table, Database::"Config. Package Table", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertConfigPackageTable(RunTrigger: Boolean; var Rec: Record "Config. Package Table")

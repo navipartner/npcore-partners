@@ -1,5 +1,6 @@
-page 6151100 "NPR NpRi Reimburs. Modules"
+﻿page 6151100 "NPR NpRi Reimburs. Modules"
 {
+    Extensible = False;
     Caption = 'Reimbursement Modules';
     InsertAllowed = false;
     PageType = List;

@@ -1,5 +1,6 @@
-codeunit 6059902 "NPR Task Queue Processor"
+﻿codeunit 6059902 "NPR Task Queue Processor"
 {
+    Access = Internal;
     // TQ1.16/JDH /20140916 CASE 179044 Alignment of code for 2013 upgrade
     // TQ1.17/JDH /20141015 CASE 179044 New function to execute a task manually - used to log which user that has executed it
     // TQ1.19/JDH /20141201 CASE 199884 Bugfix in the calculation of a task beeing valid, if it crosses midnight

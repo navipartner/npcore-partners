@@ -1,5 +1,6 @@
 ﻿codeunit 6151007 "NPR POS Entry S.Doc. Link Mgt."
 {
+    Access = Internal;
     procedure InsertPOSEntrySalesDocReference(POSEntry: Record "NPR POS Entry"; SalesDocType: Enum "NPR POS Sales Document Type"; SalesDocNo: Code[20])
     var
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";

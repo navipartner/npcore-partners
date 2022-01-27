@@ -1,5 +1,6 @@
-codeunit 6150937 "NPR UPG Tax Calc."
+﻿codeunit 6150937 "NPR UPG Tax Calc."
 {
+    Access = Internal;
     Subtype = Upgrade;
 
 

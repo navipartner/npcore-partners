@@ -1,5 +1,6 @@
-codeunit 6060152 "NPR Event Calendar Mgt."
+﻿codeunit 6060152 "NPR Event Calendar Mgt."
 {
+    Access = Internal;
     var
         JobsSetup: Record "Jobs Setup";
         EventMgt: Codeunit "NPR Event Management";

@@ -1,5 +1,6 @@
-table 6151172 "NPR NpGp Cross Company Setup"
+﻿table 6151172 "NPR NpGp Cross Company Setup"
 {
+    Access = Internal;
     Caption = 'Cross Company Setup';
     DataClassification = CustomerContent;
 

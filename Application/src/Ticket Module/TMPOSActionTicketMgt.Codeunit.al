@@ -1,5 +1,6 @@
-codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
+﻿codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
 {
+    Access = Internal;
     var
         ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
         TICKET_NUMBER: Label 'Ticket Number';

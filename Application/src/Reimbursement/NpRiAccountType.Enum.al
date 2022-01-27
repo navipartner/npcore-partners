@@ -1,5 +1,8 @@
-enum 6151100 "NPR NpRi Account Type"
+﻿enum 6151100 "NPR NpRi Account Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     AssignmentCompatibility = true;
 

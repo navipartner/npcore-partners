@@ -1,5 +1,8 @@
-enum 6014452 "NPR Ticket Status"
+﻿enum 6014452 "NPR Ticket Status"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; " ") { Caption = ' '; }

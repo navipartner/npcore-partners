@@ -1,5 +1,6 @@
-page 6014647 "NPR Tax Free GB I2 Param."
+﻿page 6014647 "NPR Tax Free GB I2 Param."
 {
+    Extensible = False;
     Caption = 'Tax Free GB I2 Parameters';
     PageType = Card;
     SourceTable = "NPR Tax Free GB I2 Param.";

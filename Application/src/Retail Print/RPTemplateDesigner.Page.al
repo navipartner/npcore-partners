@@ -1,5 +1,6 @@
-page 6014560 "NPR RP Template Designer"
+﻿page 6014560 "NPR RP Template Designer"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Template Designer';
     DeleteAllowed = false;

@@ -1,5 +1,6 @@
-page 6151594 "NPR NpDc Coupon Entries"
+﻿page 6151594 "NPR NpDc Coupon Entries"
 {
+    Extensible = False;
     Caption = 'Coupon Entries';
     Editable = false;
     PageType = List;

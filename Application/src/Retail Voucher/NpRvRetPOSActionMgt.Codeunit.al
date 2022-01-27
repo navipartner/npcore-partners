@@ -1,5 +1,6 @@
-codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
+﻿codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
 {
+    Access = Internal;
     var
         Text000: Label 'This action Issues Return Retail Vouchers.';
         Text001: Label 'Select Voucher Type';

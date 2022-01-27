@@ -1,5 +1,6 @@
-table 6014619 "NPR EFT Recon. Match/Score"
+﻿table 6014619 "NPR EFT Recon. Match/Score"
 {
+    Access = Internal;
     Caption = 'EFT Recon. Match/Score';
     DataClassification = CustomerContent;
 

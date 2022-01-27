@@ -1,5 +1,6 @@
-codeunit 6151017 "NPR NpRv Module Pay.: Default"
+﻿codeunit 6151017 "NPR NpRv Module Pay.: Default"
 {
+    Access = Internal;
     var
         Text000: Label 'Apply Payment - Default (Full Payment)';
 

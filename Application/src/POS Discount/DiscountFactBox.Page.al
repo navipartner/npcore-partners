@@ -1,5 +1,6 @@
-page 6014614 "NPR Discount FactBox"
+﻿page 6014614 "NPR Discount FactBox"
 {
+    Extensible = False;
 
     Caption = 'Discount FactBox';
     InsertAllowed = false;

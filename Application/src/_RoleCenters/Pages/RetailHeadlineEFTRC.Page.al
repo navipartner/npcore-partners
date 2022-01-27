@@ -1,5 +1,6 @@
-page 6151257 "NPR Retail Headline EFT RC"
+﻿page 6151257 "NPR Retail Headline EFT RC"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Headline';
     RefreshOnActivate = true;

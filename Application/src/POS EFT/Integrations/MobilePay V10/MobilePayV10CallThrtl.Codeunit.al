@@ -1,5 +1,6 @@
-codeunit 6014504 "NPR MobilePayV10 Call Thrtl."
+﻿codeunit 6014504 "NPR MobilePayV10 Call Thrtl."
 {
+    Access = Internal;
     // https://mobilepaydev.github.io/MobilePay-PoS-v10/api_principles#call_throttling
 
     SingleInstance = true;

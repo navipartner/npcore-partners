@@ -1,5 +1,6 @@
-codeunit 6014420 "NPR Endpoint Send SMS" implements "NPR Send SMS"
+﻿codeunit 6014420 "NPR Endpoint Send SMS" implements "NPR Send SMS"
 {
+    Access = Internal;
     procedure SendSMS(PhoneNo: Text; SenderNo: Text; Message: Text)
     var
         NcEndpoint: Record "NPR Nc Endpoint";

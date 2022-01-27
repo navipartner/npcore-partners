@@ -1,5 +1,6 @@
-table 6059932 "NPR Doc. Exch. Cue"
+﻿table 6059932 "NPR Doc. Exch. Cue"
 {
+    Access = Internal;
     Caption = 'Doc. Exch. Cue';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

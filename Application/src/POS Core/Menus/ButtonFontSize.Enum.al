@@ -1,5 +1,8 @@
-enum 6150753 "NPR Button Font Size"
+﻿enum 6150753 "NPR Button Font Size"
 {
+#IF NOT BC17
+    Access = Internal;       
+#ENDIF
     ObsoleteState = Pending;
     ObsoleteReason = 'Enum Is not needed anymore. Case 498936';
     Extensible = false;

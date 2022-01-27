@@ -1,5 +1,6 @@
-codeunit 6014696 "NPR Activities Backgrd Task"
+﻿codeunit 6014696 "NPR Activities Backgrd Task"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         Calculate();

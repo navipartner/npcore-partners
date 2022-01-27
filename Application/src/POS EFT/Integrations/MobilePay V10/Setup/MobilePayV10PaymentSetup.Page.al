@@ -1,5 +1,6 @@
-page 6014437 "NPR MobilePayV10 Payment Setup"
+﻿page 6014437 "NPR MobilePayV10 Payment Setup"
 {
+    Extensible = False;
     PageType = Card;
 
     UsageCategory = Administration;

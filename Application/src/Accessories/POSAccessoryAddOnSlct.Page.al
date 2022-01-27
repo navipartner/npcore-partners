@@ -1,5 +1,6 @@
-page 6014548 "NPR POS Accessory AddOn Slct."
+﻿page 6014548 "NPR POS Accessory AddOn Slct."
 {
+    Extensible = False;
     // NPR5.44/MHA /20180309  CASE 286547 Object created - Accessory AddOn
 
     Caption = 'Item AddOns';

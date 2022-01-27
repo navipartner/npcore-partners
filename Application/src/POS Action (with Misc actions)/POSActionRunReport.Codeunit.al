@@ -1,5 +1,6 @@
-codeunit 6150810 "NPR POSAction: Run Report"
+﻿codeunit 6150810 "NPR POSAction: Run Report"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for running a report';
         ReadingErr: Label 'reading in %1';

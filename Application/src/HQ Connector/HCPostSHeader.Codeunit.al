@@ -1,5 +1,6 @@
-codeunit 6150916 "NPR HC Post S.Header"
+﻿codeunit 6150916 "NPR HC Post S.Header"
 {
+    Access = Internal;
     TableNo = "Sales Header";
 
     trigger OnRun()

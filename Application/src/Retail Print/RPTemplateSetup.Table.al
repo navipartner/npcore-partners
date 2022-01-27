@@ -1,5 +1,6 @@
-table 6014565 "NPR RP Template Setup"
+﻿table 6014565 "NPR RP Template Setup"
 {
+    Access = Internal;
     Caption = 'Template Setup';
     DataClassification = CustomerContent;
 

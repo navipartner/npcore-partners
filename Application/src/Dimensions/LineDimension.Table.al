@@ -1,5 +1,6 @@
-table 6014430 "NPR Line Dimension"
+﻿table 6014430 "NPR Line Dimension"
 {
+    Access = Internal;
     Caption = 'NPR Line Dimension';
     DataClassification = CustomerContent;
 

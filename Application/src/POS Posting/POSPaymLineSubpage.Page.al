@@ -1,5 +1,6 @@
-page 6150654 "NPR POS Paym. Line Subpage"
+﻿page 6150654 "NPR POS Paym. Line Subpage"
 {
+    Extensible = False;
     Caption = 'POS Payment Line Subpage';
     Editable = false;
     PageType = ListPart;

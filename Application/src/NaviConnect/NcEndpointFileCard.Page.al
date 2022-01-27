@@ -1,5 +1,6 @@
-page 6151527 "NPR Nc Endpoint File Card"
+﻿page 6151527 "NPR Nc Endpoint File Card"
 {
+    Extensible = False;
     Caption = 'Nc Endpoint File Card';
     DeleteAllowed = false;
     InsertAllowed = false;

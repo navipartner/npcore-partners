@@ -1,5 +1,6 @@
-page 6014665 "NPR GraphAPI WS Log"
+﻿page 6014665 "NPR GraphAPI WS Log"
 {
+    Extensible = False;
 
     ApplicationArea = NPRRetail;
     Caption = 'GraphAPI WS Log';

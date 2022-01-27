@@ -1,5 +1,6 @@
-codeunit 6014496 "NPR Reten. Pol. Install"
+﻿codeunit 6014496 "NPR Reten. Pol. Install"
 {
+    Access = Internal;
     // based on codeunit 3999 "Reten. Pol. Install - BaseApp" from Base App
 
     Subtype = Install;

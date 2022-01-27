@@ -1,5 +1,6 @@
-table 6014617 "NPR EFT Recon. Line"
+﻿table 6014617 "NPR EFT Recon. Line"
 {
+    Access = Internal;
     Caption = 'EFT Reconciliation Line';
     DataClassification = CustomerContent;
 

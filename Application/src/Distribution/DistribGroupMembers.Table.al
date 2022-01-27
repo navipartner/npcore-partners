@@ -1,5 +1,6 @@
-table 6151056 "NPR Distrib. Group Members"
+﻿table 6151056 "NPR Distrib. Group Members"
 {
+    Access = Internal;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
 
     Caption = 'Distribution Group Members';

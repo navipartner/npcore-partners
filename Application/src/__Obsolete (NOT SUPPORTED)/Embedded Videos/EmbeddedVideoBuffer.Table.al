@@ -1,5 +1,6 @@
-table 6014697 "NPR Embedded Video Buffer"
+﻿table 6014697 "NPR Embedded Video Buffer"
 {
+    Access = Internal;
     Caption = 'Embedded Video Buffer';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

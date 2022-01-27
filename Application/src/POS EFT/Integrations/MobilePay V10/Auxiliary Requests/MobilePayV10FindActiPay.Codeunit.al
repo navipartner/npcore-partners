@@ -1,5 +1,6 @@
-codeunit 6014522 "NPR MobilePayV10 FindActi.Pay."
+﻿codeunit 6014522 "NPR MobilePayV10 FindActi.Pay."
 {
+    Access = Internal;
     // GET /v10/payments
     TableNo = "NPR EFT Transaction Request";
 

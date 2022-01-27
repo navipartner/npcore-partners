@@ -1,5 +1,6 @@
-codeunit 6150893 "NPR Data Set" implements "NPR IJsonSerializable"
+﻿codeunit 6150893 "NPR Data Set" implements "NPR IJsonSerializable"
 {
+    Access = Internal;
     var
         _constructed: Boolean;
         _json: JsonObject;

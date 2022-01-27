@@ -1,5 +1,6 @@
-codeunit 6014637 "NPR Ext. POS Sale Converter"
+﻿codeunit 6014637 "NPR Ext. POS Sale Converter"
 {
+    Access = Internal;
     TableNo = "NPR External POS Sale";
     trigger OnRun()
     var

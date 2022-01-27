@@ -1,5 +1,6 @@
-codeunit 6184532 "NPR EFT NETSCloud Integrat."
+﻿codeunit 6184532 "NPR EFT NETSCloud Integrat."
 {
+    Access = Internal;
     // NPR5.54/MMV /20200129 CASE 364340 Created object
     // NPR5.55/MMV /20200525 CASE 405984 Fixed frontend resume behaviour after lookup prompt.
 

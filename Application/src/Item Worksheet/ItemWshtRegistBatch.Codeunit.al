@@ -1,5 +1,6 @@
-codeunit 6060044 "NPR Item Wsht.-Regist. Batch"
+﻿codeunit 6060044 "NPR Item Wsht.-Regist. Batch"
 {
+    Access = Internal;
     TableNo = "NPR Item Worksheet Line";
 
     trigger OnRun()

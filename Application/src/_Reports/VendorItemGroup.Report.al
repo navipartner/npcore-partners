@@ -1,5 +1,8 @@
-report 6014435 "NPR Vendor/Item Group"
+﻿report 6014435 "NPR Vendor/Item Group"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/VendorItem Group.rdlc';
     Caption = 'Vendor/Item Group';

@@ -1,5 +1,6 @@
-query 6014613 "NPR Retail Cmpgn.Items Mix 0"
+﻿query 6014613 "NPR Retail Cmpgn.Items Mix 0"
 {
+    Access = Internal;
     Caption = 'Retail Cmpgn.Items Mix 0';
     // MAG2.26/MHA /20200507  CASE 401235 Object created - returns Items used on Mixed Discount Line (Item) related to Retail Campaign
 

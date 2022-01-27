@@ -1,5 +1,6 @@
-page 6014640 "NPR RP Template Setup"
+﻿page 6014640 "NPR RP Template Setup"
 {
+    Extensible = False;
     Caption = 'Template Setup';
     SourceTable = "NPR RP Template Setup";
     UsageCategory = Administration;

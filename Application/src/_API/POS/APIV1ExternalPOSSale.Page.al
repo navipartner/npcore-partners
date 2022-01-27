@@ -1,5 +1,6 @@
-page 6059775 "NPR APIV1 - External POS Sale"
+﻿page 6059775 "NPR APIV1 - External POS Sale"
 {
+    Extensible = False;
 
     APIGroup = 'pos';
     APIPublisher = 'navipartner';

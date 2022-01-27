@@ -1,5 +1,6 @@
-codeunit 6060117 "NPR TM Ticket Retail Mgt."
+﻿codeunit 6060117 "NPR TM Ticket Retail Mgt."
 {
+    Access = Internal;
     var
         ABORTED: Label 'Aborted.';
         SCHEDULE_ERROR: Label 'There was an error changing the reservation \\%1\\Do you want to try again?';

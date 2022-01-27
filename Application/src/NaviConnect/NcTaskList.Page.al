@@ -1,5 +1,6 @@
-page 6151502 "NPR Nc Task List"
+﻿page 6151502 "NPR Nc Task List"
 {
+    Extensible = False;
     Caption = 'Task List';
     InsertAllowed = false;
     PageType = List;

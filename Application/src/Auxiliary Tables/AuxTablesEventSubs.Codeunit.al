@@ -1,5 +1,6 @@
-codeunit 6014460 "NPR Aux. Tables Event Subs."
+﻿codeunit 6014460 "NPR Aux. Tables Event Subs."
 {
+    Access = Internal;
 
     #region Aux. Value Entry
 

@@ -1,5 +1,6 @@
-page 6060144 "NPR MM Member Notific. Entry"
+﻿page 6060144 "NPR MM Member Notific. Entry"
 {
+    Extensible = False;
 
     Caption = 'Member Notification Entry';
     InsertAllowed = false;

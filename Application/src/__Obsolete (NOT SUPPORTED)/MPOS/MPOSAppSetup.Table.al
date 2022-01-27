@@ -1,5 +1,6 @@
-table 6059966 "NPR MPOS App Setup"
+﻿table 6059966 "NPR MPOS App Setup"
 {
+    Access = Internal;
     Caption = 'MPOS App Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

@@ -1,5 +1,6 @@
-table 6151592 "NPR NpDc Coupon Entry"
+﻿table 6151592 "NPR NpDc Coupon Entry"
 {
+    Access = Internal;
     Caption = 'Coupon Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpDc Coupon Entries";

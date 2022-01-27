@@ -1,5 +1,6 @@
-page 6014432 "NPR SMS Log"
+﻿page 6014432 "NPR SMS Log"
 {
+    Extensible = False;
 
 
     Caption = 'SMS Log';

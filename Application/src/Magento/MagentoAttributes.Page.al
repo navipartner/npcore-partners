@@ -1,5 +1,6 @@
-page 6151431 "NPR Magento Attributes"
+﻿page 6151431 "NPR Magento Attributes"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Attributes';
     DelayedInsert = true;

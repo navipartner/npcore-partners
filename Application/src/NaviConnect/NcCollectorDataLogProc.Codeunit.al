@@ -1,5 +1,6 @@
 ﻿codeunit 6151527 "NPR Nc Collector DataLog Proc."
 {
+    Access = Internal;
     TableNo = "NPR Data Log Record";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-codeunit 6059812 "NPR Retail Chart Mgt by Shop"
+﻿codeunit 6059812 "NPR Retail Chart Mgt by Shop"
 {
+    Access = Internal;
     var
         MarginLbl: Label 'Margin';
         TurnoverLbl: Label 'Turnover';

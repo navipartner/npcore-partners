@@ -1,5 +1,6 @@
-table 6014440 "NPR Period Line"
+﻿table 6014440 "NPR Period Line"
 {
+    Access = Internal;
     Caption = 'Period Line';
     DataClassification = CustomerContent;
 

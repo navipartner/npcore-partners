@@ -1,5 +1,6 @@
 page 6059843 "NPR POS HC Endpoint Setup List"
 {
+    Extensible = false;
     Caption = 'Endpoint Setup List';
     CardPageId = "NPR POS HC Endpoint Setup";
     Editable = false;

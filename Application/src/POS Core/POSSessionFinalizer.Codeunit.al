@@ -1,5 +1,6 @@
-codeunit 6150745 "NPR POS Session Finalizer"
+﻿codeunit 6150745 "NPR POS Session Finalizer"
 {
+    Access = Internal;
     // NPR5.53/MMV /20200113 CASE 377284 Created object
     // 
     // Some modules act differently when a POSSession is currently active, since it can be used to invoke hardware directly via the POS page add-in without opening a new modal page.

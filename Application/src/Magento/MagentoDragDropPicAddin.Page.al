@@ -1,5 +1,6 @@
-page 6151451 "NPR Magento DragDropPic. Addin"
+﻿page 6151451 "NPR Magento DragDropPic. Addin"
 {
+    Extensible = False;
     Caption = ' ';
     InsertAllowed = false;
     ModifyAllowed = false;

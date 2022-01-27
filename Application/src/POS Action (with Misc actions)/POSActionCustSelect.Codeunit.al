@@ -1,5 +1,6 @@
-codeunit 6150865 "NPR POS Action: Cust. Select"
+﻿codeunit 6150865 "NPR POS Action: Cust. Select"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Attach or remove customer from POS sale.';
         CAPTION_OPERATION: Label 'Operation';

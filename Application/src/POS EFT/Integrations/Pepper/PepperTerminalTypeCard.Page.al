@@ -1,5 +1,6 @@
-page 6184484 "NPR Pepper Terminal Type Card"
+﻿page 6184484 "NPR Pepper Terminal Type Card"
 {
+    Extensible = False;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
     // NPR5.25/BR/20160509  CASE 231481 Added field Force Fixed Currency Check.
 

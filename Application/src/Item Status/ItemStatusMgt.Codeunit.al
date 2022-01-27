@@ -1,5 +1,6 @@
-codeunit 6060055 "NPR Item Status Mgt."
+﻿codeunit 6060055 "NPR Item Status Mgt."
 {
+    Access = Internal;
     // NPR5.25\BR  \20160720  CASE 246088 Object Created
 
 

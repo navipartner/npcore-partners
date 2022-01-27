@@ -1,5 +1,6 @@
-page 6014554 "NPR TouchScreen: SalesLineZoom"
+﻿page 6014554 "NPR TouchScreen: SalesLineZoom"
 {
+    Extensible = False;
     Caption = 'Touch Screen - Sales Lines';
     DeleteAllowed = false;
     InsertAllowed = false;

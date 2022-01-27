@@ -1,5 +1,6 @@
-codeunit 6150826 "NPR POS Action: Sale Dimension"
+﻿codeunit 6150826 "NPR POS Action: Sale Dimension"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This Action updates the POS Sale Dimension with either a fixed value or provides a list of valid value';
         ValueSelection: Option LIST,"FIXED",PROMPT_N,PROMPT_A;

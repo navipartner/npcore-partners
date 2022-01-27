@@ -1,5 +1,6 @@
-table 6151445 "NPR Magento Customer Mapping"
+﻿table 6151445 "NPR Magento Customer Mapping"
 {
+    Access = Internal;
     Caption = 'Magento Customer Mapping';
     DataClassification = CustomerContent;
 

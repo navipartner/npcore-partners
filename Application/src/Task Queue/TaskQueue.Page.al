@@ -1,5 +1,6 @@
-page 6059905 "NPR Task Queue"
+﻿page 6059905 "NPR Task Queue"
 {
+    Extensible = False;
     // TQ1.28/TS/20150909 CASE 222526 Prevent Modify if not in Current Company
     // NPR5.37/BR/20171023 CASE 293886 Disabled Drilldown and Lookup from "Assigned To User" field for security reasons
 

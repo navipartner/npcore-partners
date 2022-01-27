@@ -1,5 +1,6 @@
-page 6151511 "NPR Nc XML Styl. Dep. From Az."
+﻿page 6151511 "NPR Nc XML Styl. Dep. From Az."
 {
+    Extensible = False;
     PageType = NavigatePage;
     ApplicationArea = NPRNaviConnect;
     UsageCategory = Administration;

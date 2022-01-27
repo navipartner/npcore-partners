@@ -1,5 +1,6 @@
-table 6014642 "NPR Tax Free Handler Param."
+﻿table 6014642 "NPR Tax Free Handler Param."
 {
+    Access = Internal;
 
     Caption = 'Tax Free Handler Parameters';
     DataClassification = CustomerContent;

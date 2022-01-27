@@ -1,5 +1,6 @@
-page 6060123 "NPR TM Det. Ticket AccessEntry"
+﻿page 6060123 "NPR TM Det. Ticket AccessEntry"
 {
+    Extensible = False;
     Caption = 'Detailed Ticket Access Entry';
     DeleteAllowed = false;
     Editable = false;

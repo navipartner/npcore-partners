@@ -1,5 +1,6 @@
-table 6059895 "NPR Data Log Setup (Field)"
+﻿table 6059895 "NPR Data Log Setup (Field)"
 {
+    Access = Internal;
     Caption = 'Data Log Setup (Ignored Field)';
     DataClassification = CustomerContent;
 

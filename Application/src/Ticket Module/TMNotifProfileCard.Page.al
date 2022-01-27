@@ -1,5 +1,6 @@
-page 6014555 "NPR TM Notif. Profile Card"
+﻿page 6014555 "NPR TM Notif. Profile Card"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = None;
     SourceTable = "NPR TM Notification Profile";

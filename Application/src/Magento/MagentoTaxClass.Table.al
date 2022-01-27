@@ -1,5 +1,6 @@
-table 6151408 "NPR Magento Tax Class"
+﻿table 6151408 "NPR Magento Tax Class"
 {
+    Access = Internal;
     Caption = 'Magento Tax Class';
     DataClassification = CustomerContent;
 

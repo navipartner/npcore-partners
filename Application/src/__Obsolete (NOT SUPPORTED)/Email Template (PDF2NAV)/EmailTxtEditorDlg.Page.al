@@ -1,5 +1,6 @@
-page 6059804 "NPR E-mail Txt Editor Dlg"
+﻿page 6059804 "NPR E-mail Txt Editor Dlg"
 {
+    Extensible = False;
     Caption = 'NaviConnect Text Editor Dialog';
     PageType = StandardDialog;
     UsageCategory = None;

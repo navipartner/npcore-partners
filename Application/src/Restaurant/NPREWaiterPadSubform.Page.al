@@ -1,5 +1,6 @@
-page 6150661 "NPR NPRE Waiter Pad Subform"
+﻿page 6150661 "NPR NPRE Waiter Pad Subform"
 {
+    Extensible = False;
     Caption = 'Lines';
     InsertAllowed = false;
     PageType = ListPart;

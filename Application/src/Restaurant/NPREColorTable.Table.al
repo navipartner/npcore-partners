@@ -1,5 +1,6 @@
-table 6150684 "NPR NPRE Color Table"
+﻿table 6150684 "NPR NPRE Color Table"
 {
+    Access = Internal;
     Caption = 'Color Table';
     DataClassification = CustomerContent;
     LookupPageId = "NPR NPRE Color Table";

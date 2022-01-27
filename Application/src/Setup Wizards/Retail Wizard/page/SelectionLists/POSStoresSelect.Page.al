@@ -1,5 +1,6 @@
-page 6059781 "NPR POS Stores Select"
+﻿page 6059781 "NPR POS Stores Select"
 {
+    Extensible = False;
     Caption = 'Pos Store List';
     PageType = List;
     SourceTable = "NPR POS Store";

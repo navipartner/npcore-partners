@@ -1,5 +1,6 @@
-page 6151017 "NPR NpRv Sales Lines"
+﻿page 6151017 "NPR NpRv Sales Lines"
 {
+    Extensible = False;
     Caption = 'Retail Voucher Sales Lines';
     CardPageID = "NPR NpRv Sales Line Card";
     Editable = false;

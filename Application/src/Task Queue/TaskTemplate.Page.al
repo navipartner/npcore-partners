@@ -1,5 +1,6 @@
-page 6059900 "NPR Task Template"
+﻿page 6059900 "NPR Task Template"
 {
+    Extensible = False;
     // TQ1.28/MHA/20151216  CASE 229609 Task Queue
     // TQ1.29/JDH /20161101 CASE 242044 Added Action Templates. Removed unussed field
 

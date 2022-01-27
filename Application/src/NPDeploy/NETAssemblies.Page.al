@@ -1,5 +1,6 @@
-page 6059808 "NPR .NET Assemblies"
+﻿page 6059808 "NPR .NET Assemblies"
 {
+    Extensible = False;
     Caption = '.NET Assemblies';
     PageType = List;
     SourceTable = "NPR DotNet Assembly";

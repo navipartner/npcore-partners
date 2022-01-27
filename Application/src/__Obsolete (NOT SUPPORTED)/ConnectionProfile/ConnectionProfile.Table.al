@@ -1,5 +1,6 @@
-table 6014599 "NPR Connection Profile"
+﻿table 6014599 "NPR Connection Profile"
 {
+    Access = Internal;
     Caption = 'Connection Profile';
     ObsoleteState = Removed;
     ObsoleteReason = 'Table has not been used since NAV2015';

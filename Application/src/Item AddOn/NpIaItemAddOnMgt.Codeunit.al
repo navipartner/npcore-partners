@@ -1,5 +1,6 @@
-codeunit 6151125 "NPR NpIa Item AddOn Mgt."
+﻿codeunit 6151125 "NPR NpIa Item AddOn Mgt."
 {
+    Access = Internal;
     var
         IsAutoSplitKeyRecord: Boolean;
 

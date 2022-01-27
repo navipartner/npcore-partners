@@ -1,5 +1,6 @@
-page 6014562 "NPR RP Data Item Links"
+﻿page 6014562 "NPR RP Data Item Links"
 {
+    Extensible = False;
     // NPR5.47/MMV /20181017 CASE 318084 Added field 19
 
     Caption = 'Data Item Links';

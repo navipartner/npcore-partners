@@ -1,5 +1,6 @@
-codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
+﻿codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

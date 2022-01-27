@@ -1,5 +1,6 @@
-table 6059908 "NPR Session Log"
+﻿table 6059908 "NPR Session Log"
 {
+    Access = Internal;
     // TQ1.28/MHA/20151216  CASE 219795 Task Queue
     // TQ1.29/JDH /20161101 CASE 242044 Used to log start of threads + Master thread
     // TQ1.31/BR /20171109 CASE 295987 Added option ErrorStartingTread to Field Log Type, and field Error Message

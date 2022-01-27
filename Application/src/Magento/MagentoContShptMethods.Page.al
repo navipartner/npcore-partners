@@ -1,5 +1,6 @@
-page 6151442 "NPR Magento Cont.Shpt.Methods"
+﻿page 6151442 "NPR Magento Cont.Shpt.Methods"
 {
+    Extensible = False;
     Caption = 'Contact Shipment Methods';
     PageType = List;
     UsageCategory = Administration;

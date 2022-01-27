@@ -1,5 +1,6 @@
-page 6059908 "NPR Session Log"
+﻿page 6059908 "NPR Session Log"
 {
+    Extensible = False;
     // TQ1.29/JDH /20161101 CASE 242044 Shows Session logins, and the master thread logout as well
     // TQ1.31/BR /20171109 CASE 295987 Added field Error Message
 

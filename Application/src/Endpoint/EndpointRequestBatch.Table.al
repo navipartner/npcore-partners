@@ -1,5 +1,6 @@
-table 6014676 "NPR Endpoint Request Batch"
+﻿table 6014676 "NPR Endpoint Request Batch"
 {
+    Access = Internal;
     // NPR5.23\BR\20160518  CASE 237658 Object created
 
     Caption = 'Endpoint Request Batch';

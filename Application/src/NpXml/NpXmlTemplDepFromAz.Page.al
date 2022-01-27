@@ -1,5 +1,6 @@
-page 6151554 "NPR NpXml Templ. Dep. From Az."
+﻿page 6151554 "NPR NpXml Templ. Dep. From Az."
 {
+    Extensible = False;
     PageType = NavigatePage;
 
     UsageCategory = Administration;

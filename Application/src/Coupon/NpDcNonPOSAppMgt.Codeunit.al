@@ -1,5 +1,6 @@
 ﻿codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     var
         NotInitialized: Label 'Codeunit 6151603 wasn''t initialized properly. This is a programming bug, not a user error. Please contact system vendor.';

@@ -1,5 +1,6 @@
-codeunit 6059973 "NPR Variety Lookup Functions"
+﻿codeunit 6059973 "NPR Variety Lookup Functions"
 {
+    Access = Internal;
     TableNo = "NPR Variety Field Setup";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-page 6150614 "NPR POS Store List"
+﻿page 6150614 "NPR POS Store List"
 {
+    Extensible = False;
 
     Caption = 'POS Store List';
     CardPageID = "NPR POS Store Card";

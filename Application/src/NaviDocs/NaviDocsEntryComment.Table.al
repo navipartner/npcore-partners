@@ -1,5 +1,6 @@
-table 6059769 "NPR NaviDocs Entry Comment"
+﻿table 6059769 "NPR NaviDocs Entry Comment"
 {
+    Access = Internal;
     Caption = 'Document Handling Comment';
     DataClassification = CustomerContent;
 

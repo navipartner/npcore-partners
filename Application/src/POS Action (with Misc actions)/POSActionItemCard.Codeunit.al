@@ -1,5 +1,6 @@
-codeunit 6150827 "NPR POS Action: Item Card"
+﻿codeunit 6150827 "NPR POS Action: Item Card"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built in function opens the item card page for a selected sales line in the POS';
 

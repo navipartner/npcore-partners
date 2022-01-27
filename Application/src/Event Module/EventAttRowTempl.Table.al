@@ -1,5 +1,6 @@
-table 6060154 "NPR Event Att. Row Templ."
+﻿table 6060154 "NPR Event Att. Row Templ."
 {
+    Access = Internal;
     Caption = 'Event Attribute Row Template';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Event Attr. Row Templ.";

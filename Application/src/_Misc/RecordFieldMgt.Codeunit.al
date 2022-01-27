@@ -1,5 +1,6 @@
-codeunit 6060133 "NPR Record Field Mgt."
+﻿codeunit 6060133 "NPR Record Field Mgt."
 {
+    Access = Internal;
     var
         TableRelationErr: Label 'No table relation has been setup';
 

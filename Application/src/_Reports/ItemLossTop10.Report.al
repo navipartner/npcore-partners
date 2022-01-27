@@ -1,5 +1,8 @@
-report 6014543 "NPR Item - Loss - Top 10"
+﻿report 6014543 "NPR Item - Loss - Top 10"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item - Loss - Top 10.rdlc';
     Caption = 'Item Shrinkage - Top 10';

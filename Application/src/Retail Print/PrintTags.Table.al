@@ -1,5 +1,6 @@
-table 6014499 "NPR Print Tags"
+﻿table 6014499 "NPR Print Tags"
 {
+    Access = Internal;
     // NPR4.18/MMV /20151222 CASE 225584 Created table
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
     //                                   - "Print Tag" field set to be not blank

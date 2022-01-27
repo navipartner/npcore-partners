@@ -1,5 +1,6 @@
-table 6059770 "NPR NaviDocs Handling Profile"
+﻿table 6059770 "NPR NaviDocs Handling Profile"
 {
+    Access = Internal;
     Caption = 'NaviDocs Entry Report Filters';
     DrillDownPageID = "NPR NaviDocs Handling Profiles";
     LookupPageID = "NPR NaviDocs Handling Profiles";

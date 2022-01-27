@@ -1,5 +1,6 @@
-page 6150751 "NPR POS Default User Views"
+﻿page 6150751 "NPR POS Default User Views"
 {
+    Extensible = False;
     Caption = 'POS Default User Views';
     PageType = List;
     SourceTable = "NPR POS Default User View";

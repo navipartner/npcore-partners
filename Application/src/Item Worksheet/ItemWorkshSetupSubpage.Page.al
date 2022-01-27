@@ -1,5 +1,6 @@
-page 6060050 "NPR Item Worksh. Setup Subpage"
+﻿page 6060050 "NPR Item Worksh. Setup Subpage"
 {
+    Extensible = False;
     Caption = 'Item Worksheet Setup Subpage';
     PageType = ListPart;
     SourceTable = "NPR Missing Setup Record";

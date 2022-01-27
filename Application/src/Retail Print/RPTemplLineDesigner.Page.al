@@ -1,5 +1,6 @@
-page 6014630 "NPR RP Templ. Line Designer"
+﻿page 6014630 "NPR RP Templ. Line Designer"
 {
+    Extensible = False;
     // NPR5.32/MMV /20170424 CASE 241995 Retail Print 2.0
     // NPR5.34/MMV /20170724 CASE 284505 Indent multiple lines at once.
     // NPR5.51/MMV /20190712 CASE 360972 Added field 70

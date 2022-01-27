@@ -1,5 +1,6 @@
-page 6059809 "NPR EFT Reconciliation"
+﻿page 6059809 "NPR EFT Reconciliation"
 {
+    Extensible = False;
     Caption = 'EFT Reconciliation';
     PageType = Card;
     SourceTable = "NPR EFT Reconciliation";

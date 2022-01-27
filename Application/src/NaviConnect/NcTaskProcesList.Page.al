@@ -1,5 +1,6 @@
-page 6151508 "NPR Nc Task Proces. List"
+﻿page 6151508 "NPR Nc Task Proces. List"
 {
+    Extensible = False;
     Caption = 'NaviConnect Task Processors';
     CardPageID = "NPR Nc Task Proces. Card";
     Editable = false;

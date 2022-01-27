@@ -1,5 +1,6 @@
-page 6059774 "NPR External POS Sale Subform"
+﻿page 6059774 "NPR External POS Sale Subform"
 {
+    Extensible = False;
 
     Caption = 'External POS Sale Subform';
     PageType = ListPart;

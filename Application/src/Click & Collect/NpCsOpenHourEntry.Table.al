@@ -1,5 +1,6 @@
-table 6151210 "NPR NpCs Open. Hour Entry"
+﻿table 6151210 "NPR NpCs Open. Hour Entry"
 {
+    Access = Internal;
     Caption = 'Collect Store Opening Hour Entry';
     DataClassification = CustomerContent;
 

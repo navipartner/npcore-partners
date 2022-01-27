@@ -1,5 +1,6 @@
-table 6014557 "NPR Attribute Lookup Value"
+﻿table 6014557 "NPR Attribute Lookup Value"
 {
+    Access = Internal;
     // NPRx.xx/TSA/22-04-15 CASE209946 - Entity and Shortcut Attributes
 
     Caption = 'Attribute Code Lookup Value';

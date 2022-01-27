@@ -1,5 +1,6 @@
-page 6014511 "NPR generic retail Headline"
+﻿page 6014511 "NPR generic retail Headline"
 {
+    Extensible = False;
     Caption = 'Generic retail Headline';
     PageType = HeadlinePart;
     RefreshOnActivate = true;

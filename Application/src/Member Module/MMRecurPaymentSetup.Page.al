@@ -1,5 +1,6 @@
-page 6060077 "NPR MM Recur. Payment Setup"
+﻿page 6060077 "NPR MM Recur. Payment Setup"
 {
+    Extensible = False;
 
     Caption = 'Recurring Payment Setup';
     PageType = Card;

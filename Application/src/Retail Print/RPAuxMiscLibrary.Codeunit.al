@@ -1,5 +1,6 @@
-codeunit 6014550 "NPR RP Aux - Misc. Library"
+﻿codeunit 6014550 "NPR RP Aux - Misc. Library"
 {
+    Access = Internal;
 
 #pragma warning disable AA0150
     procedure ApplyCipher(var "Proccesing Value": Text[30]; HandleDecimals: Boolean) CifferCodeValue: Code[10]

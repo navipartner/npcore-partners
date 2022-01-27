@@ -1,5 +1,6 @@
-page 6014403 "NPR Retail ItemReclass.Journal"
+﻿page 6014403 "NPR Retail ItemReclass.Journal"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Item Reclass. Journal';
     DataCaptionFields = "Journal Batch Name";

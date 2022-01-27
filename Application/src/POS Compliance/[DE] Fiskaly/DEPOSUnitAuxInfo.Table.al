@@ -1,5 +1,6 @@
-table 6014532 "NPR DE POS Unit Aux. Info"
+﻿table 6014532 "NPR DE POS Unit Aux. Info"
 {
+    Access = Internal;
     Caption = 'DE POS Unit Aux. Info';
     DataClassification = CustomerContent;
 

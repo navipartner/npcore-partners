@@ -1,6 +1,9 @@
-#if not BC17
+﻿#if not BC17
 report 6014495 "NPR Whse. - Shipment"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/NP Whse. - ShipmentV18.rdl';
     UsageCategory = ReportsAndAnalysis;

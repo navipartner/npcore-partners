@@ -1,5 +1,6 @@
-page 6151585 "NPR Event Statistics"
+﻿page 6151585 "NPR Event Statistics"
 {
+    Extensible = False;
     Caption = 'Event Statistics';
     Editable = false;
     LinksAllowed = false;

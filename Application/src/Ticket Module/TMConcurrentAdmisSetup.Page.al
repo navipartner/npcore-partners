@@ -1,5 +1,6 @@
-page 6151136 "NPR TM Concurrent Admis. Setup"
+﻿page 6151136 "NPR TM Concurrent Admis. Setup"
 {
+    Extensible = False;
 
     Caption = 'Concurrent Admission Setup';
     PageType = List;

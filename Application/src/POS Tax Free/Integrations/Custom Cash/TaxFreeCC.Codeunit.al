@@ -1,5 +1,6 @@
-codeunit 6014661 "NPR Tax Free CC" implements "NPR Tax Free Handler Interface"
+﻿codeunit 6014661 "NPR Tax Free CC" implements "NPR Tax Free Handler Interface"
 {
+    Access = Internal;
     // TEST: 5A@d3[wsDK[c97b
     // PROD: Rbdx8hhwTvsHENprTCcq
     // Login: Navipartner

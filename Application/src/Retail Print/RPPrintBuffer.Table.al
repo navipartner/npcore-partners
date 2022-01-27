@@ -1,5 +1,6 @@
-table 6014541 "NPR RP Print Buffer"
+﻿table 6014541 "NPR RP Print Buffer"
 {
+    Access = Internal;
     Caption = 'Print Buffer';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,6 @@
-codeunit 6150792 "NPR POS Action - Discount"
+﻿codeunit 6150792 "NPR POS Action - Discount"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for handling discount';
         TotalAmountLabel: Label 'Type in the total amount that you want for the whole sales';

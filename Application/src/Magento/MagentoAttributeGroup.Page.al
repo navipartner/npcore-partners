@@ -1,5 +1,6 @@
-page 6151457 "NPR Magento Attribute Group"
+﻿page 6151457 "NPR Magento Attribute Group"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Attribute Group';
     DelayedInsert = true;

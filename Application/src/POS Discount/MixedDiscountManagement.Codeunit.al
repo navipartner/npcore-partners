@@ -1,5 +1,6 @@
-codeunit 6014416 "NPR Mixed Discount Management"
+﻿codeunit 6014416 "NPR Mixed Discount Management"
 {
+    Access = Internal;
     var
         TempCustDiscGroup: Record "Customer Discount Group" temporary;
         GLSetup: Record "General Ledger Setup";

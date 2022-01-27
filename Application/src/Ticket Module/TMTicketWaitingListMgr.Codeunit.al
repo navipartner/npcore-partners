@@ -1,5 +1,6 @@
-codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
+﻿codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
 {
+    Access = Internal;
     trigger OnRun()
     begin
 

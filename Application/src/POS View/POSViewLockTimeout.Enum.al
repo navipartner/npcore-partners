@@ -1,5 +1,8 @@
-enum 6014444 "NPR POS View LockTimeout"
+﻿enum 6014444 "NPR POS View LockTimeout"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     value(0; NEVER)
     {
         Caption = 'Never';

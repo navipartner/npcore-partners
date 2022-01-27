@@ -1,5 +1,6 @@
 ﻿codeunit 6014616 "NPR TaxFree GBI2 GetBlockedIIN"
 {
+    Access = Internal;
     // Codeunit is intended to be scheduled for NAS for customers running a Global Blue I2 Tax Free integration, for monthly execution.
     // It retrieves and stores a list of EFT IIN numbers that identify ineligible card hold countries.
 

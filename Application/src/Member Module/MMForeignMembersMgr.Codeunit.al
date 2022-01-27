@@ -1,5 +1,6 @@
-codeunit 6060145 "NPR MM Foreign Members. Mgr."
+﻿codeunit 6060145 "NPR MM Foreign Members. Mgr."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

@@ -1,5 +1,6 @@
-table 6150665 "NPR NPRE Seating"
+﻿table 6150665 "NPR NPRE Seating"
 {
+    Access = Internal;
     Caption = 'Seating';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Seating List";

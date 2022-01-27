@@ -1,5 +1,6 @@
-page 6150728 "NPR POS Pricing Profile Card"
+﻿page 6150728 "NPR POS Pricing Profile Card"
 {
+    Extensible = False;
     Caption = 'POS Pricing Profile';
     PageType = Card;
     SourceTable = "NPR POS Pricing Profile";

@@ -1,5 +1,6 @@
-page 6151020 "NPR NpRv Sales Line Ref."
+﻿page 6151020 "NPR NpRv Sales Line Ref."
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Issue Retail Voucher References';
     DataCaptionExpression = Format(Quantity) + ' ' + VoucherType.Description;

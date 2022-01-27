@@ -1,5 +1,6 @@
-codeunit 6014574 "NPR Lookup: BankDepositBinCode" implements "NPR IPOSLookupType"
+﻿codeunit 6014574 "NPR Lookup: BankDepositBinCode" implements "NPR IPOSLookupType"
 {
+    Access = Internal;
     EventSubscriberInstance = StaticAutomatic;
 
     var

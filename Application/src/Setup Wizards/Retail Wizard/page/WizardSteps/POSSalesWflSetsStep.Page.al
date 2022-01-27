@@ -1,5 +1,6 @@
-page 6014657 "NPR POS Sales Wfl. Sets Step"
+﻿page 6014657 "NPR POS Sales Wfl. Sets Step"
 {
+    Extensible = False;
     Caption = 'POS Sales Workflow Sets';
     PageType = ListPart;
     SourceTable = "NPR POS Sales Workflow Set";

@@ -1,5 +1,6 @@
-page 6150649 "NPR POS Entity Groups"
+﻿page 6150649 "NPR POS Entity Groups"
 {
+    Extensible = False;
     Caption = 'POS Entity Groups';
     DataCaptionExpression = GetFormCaption();
     PageType = List;

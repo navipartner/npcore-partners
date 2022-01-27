@@ -1,5 +1,6 @@
-table 6060157 "NPR Event Attr. Column Value"
+﻿table 6060157 "NPR Event Attr. Column Value"
 {
+    Access = Internal;
     Caption = 'Event Attribute Column Value';
     DataClassification = CustomerContent;
 

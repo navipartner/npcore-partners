@@ -1,5 +1,6 @@
-page 6059899 "NPR Data Log Records Subform"
+﻿page 6059899 "NPR Data Log Records Subform"
 {
+    Extensible = False;
     // DL1.00/MH/20140801  NP-AddOn: Data Log
     //   - This Page contains Field Values of logged Record Changes.
 

@@ -1,5 +1,6 @@
-table 6151558 "NPR NpXml Field Val. Buffer"
+﻿table 6151558 "NPR NpXml Field Val. Buffer"
 {
+    Access = Internal;
     Caption = 'NpXml Field Value Buffer';
     DataClassification = CustomerContent;
 

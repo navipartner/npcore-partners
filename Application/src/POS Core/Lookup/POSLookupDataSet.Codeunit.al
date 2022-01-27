@@ -1,9 +1,10 @@
-/// <summary>
+﻿/// <summary>
 /// Represents a data set for POS Lookup custom method. It contains internal data set state and serializes
 /// into JSON structure expected by the POS front-end lookup handler.
 /// </summary>
 codeunit 6014572 "NPR POS Lookup Data Set" implements "NPR IJsonSerializable"
 {
+    Access = Internal;
     var
         ResultSet: JsonArray;
         Generation: Integer;

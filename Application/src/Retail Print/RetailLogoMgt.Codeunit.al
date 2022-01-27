@@ -1,5 +1,6 @@
-codeunit 6014531 "NPR Retail Logo Mgt."
+﻿codeunit 6014531 "NPR Retail Logo Mgt."
 {
+    Access = Internal;
     var
         ResizeImage: ControlAddIn "NPR ResizeImage";
         CtrlAddInInitialized: Boolean;

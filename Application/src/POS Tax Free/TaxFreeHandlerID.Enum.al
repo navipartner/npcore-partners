@@ -1,5 +1,8 @@
-enum 6014418 "NPR Tax Free Handler ID" implements "NPR Tax Free Handler Interface"
+﻿enum 6014418 "NPR Tax Free Handler ID" implements "NPR Tax Free Handler Interface"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; PREMIER_PI)

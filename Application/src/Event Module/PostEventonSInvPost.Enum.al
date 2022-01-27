@@ -1,5 +1,8 @@
-enum 6014455 "NPR Post Event on S.Inv. Post"
+﻿enum 6014455 "NPR Post Event on S.Inv. Post"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; " ") { Caption = ' '; }

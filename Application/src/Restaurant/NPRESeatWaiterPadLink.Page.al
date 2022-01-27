@@ -1,5 +1,6 @@
-page 6150662 "NPR NPRE Seat.: WaiterPadLink"
+﻿page 6150662 "NPR NPRE Seat.: WaiterPadLink"
 {
+    Extensible = False;
     Caption = 'Seating - Waiter Pad Link';
     InsertAllowed = false;
     ModifyAllowed = false;

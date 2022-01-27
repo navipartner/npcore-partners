@@ -1,5 +1,6 @@
-codeunit 6151574 "NPR AF API - Notification Hub"
+﻿codeunit 6151574 "NPR AF API - Notification Hub"
 {
+    Access = Internal;
     procedure ReSendPushNotification(AFNotificationHub: Record "NPR AF Notification Hub")
     var
         NewAFNotificationHub: Record "NPR AF Notification Hub";

@@ -1,5 +1,6 @@
-codeunit 6014607 "NPR Upgrade Tag Definitions"
+﻿codeunit 6014607 "NPR Upgrade Tag Definitions"
 {
+    Access = Internal;
     // Register the new upgrade tag for new companies when they are created.
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerCompanyUpgradeTags', '', false, false)]
     local procedure OnGetPerCompanyTags(var PerCompanyUpgradeTags: List of [Code[250]]);

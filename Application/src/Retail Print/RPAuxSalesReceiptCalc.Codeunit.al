@@ -1,5 +1,6 @@
-codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
+﻿codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
 {
+    Access = Internal;
     // NPR5.43/MMV /20180628 CASE 315937 Created object
 
 

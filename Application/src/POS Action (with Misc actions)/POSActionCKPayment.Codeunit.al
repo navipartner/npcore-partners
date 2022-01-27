@@ -1,5 +1,6 @@
 ﻿codeunit 6150850 "NPR POS Action: CK Payment"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for CashKeeper Payments';
         Setup: Codeunit "NPR POS Setup";

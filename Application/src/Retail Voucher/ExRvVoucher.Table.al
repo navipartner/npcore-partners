@@ -1,5 +1,6 @@
-table 6151081 "NPR ExRv Voucher"
+﻿table 6151081 "NPR ExRv Voucher"
 {
+    Access = Internal;
     Caption = 'External Retail Voucher';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

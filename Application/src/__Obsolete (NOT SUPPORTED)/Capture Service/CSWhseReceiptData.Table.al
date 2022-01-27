@@ -1,5 +1,6 @@
-table 6151395 "NPR CS Whse. Receipt Data"
+﻿table 6151395 "NPR CS Whse. Receipt Data"
 {
+    Access = Internal;
 
     Caption = 'CS Whse. Receipt Data';
     DataClassification = CustomerContent;

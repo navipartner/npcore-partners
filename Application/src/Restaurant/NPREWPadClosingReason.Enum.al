@@ -1,5 +1,8 @@
-enum 6014483 "NPR NPRE W/Pad Closing Reason"
+﻿enum 6014483 "NPR NPRE W/Pad Closing Reason"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Caption = 'Waiter Pad Closing Reason';
     Extensible = true;
 

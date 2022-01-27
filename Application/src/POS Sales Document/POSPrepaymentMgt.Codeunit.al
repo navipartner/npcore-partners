@@ -1,5 +1,6 @@
-codeunit 6014408 "NPR POS Prepayment Mgt."
+﻿codeunit 6014408 "NPR POS Prepayment Mgt."
 {
+    Access = Internal;
     procedure GetPrepaymentAmountToDeductInclVAT(SalesHeader: Record "Sales Header"): Decimal
     var
         TempSalesLine: Record "Sales Line" temporary;

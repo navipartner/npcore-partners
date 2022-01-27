@@ -1,5 +1,6 @@
-table 6184506 "NPR EFT Trx Async Resp."
+﻿table 6184506 "NPR EFT Trx Async Resp."
 {
+    Access = Internal;
     // NPR5.48/MMV /20190124 CASE 341237 Created object
     // NPR5.54/MMV /20200218 CASE 387990 Added "Transaction Started" bool to track how critical error is.
 

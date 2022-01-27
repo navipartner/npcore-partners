@@ -1,5 +1,6 @@
-table 6060130 "NPR MM Members. Points Entry"
+﻿table 6060130 "NPR MM Members. Points Entry"
 {
+    Access = Internal;
 
     Caption = 'Membership Points Entry';
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-page 6014575 "NPR Package Printers"
+﻿page 6014575 "NPR Package Printers"
 {
+    Extensible = False;
 
     PageType = List;
     SourceTable = "NPR Package Printers";

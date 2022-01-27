@@ -1,5 +1,6 @@
-table 6014631 "NPR TM Detained Notification"
+﻿table 6014631 "NPR TM Detained Notification"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
 
     fields

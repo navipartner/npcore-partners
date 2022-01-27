@@ -1,5 +1,6 @@
 ﻿codeunit 6150861 "NPR POS Action: Doc. Import"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Import an open standard NAV sales document to current POS sale and delete the document.';
         CaptionDocType: Label 'Document Type';

@@ -1,5 +1,6 @@
-table 6014459 "NPR Register Types"
+﻿table 6014459 "NPR Register Types"
 {
+    Access = Internal;
     Caption = 'Cash Register Type';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

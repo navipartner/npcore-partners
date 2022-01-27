@@ -1,5 +1,6 @@
-page 6059836 "NPR EFT Recon. Provider Card"
+﻿page 6059836 "NPR EFT Recon. Provider Card"
 {
+    Extensible = False;
     Caption = 'EFT Recon. Provider Card';
     PageType = Card;
     SourceTable = "NPR EFT Recon. Provider";

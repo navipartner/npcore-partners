@@ -1,5 +1,6 @@
-codeunit 6150783 "NPR Front-End: SetFormat" implements "NPR Front-End Async Request"
+﻿codeunit 6150783 "NPR Front-End: SetFormat" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _json: JsonObject;
         _content: JsonObject;

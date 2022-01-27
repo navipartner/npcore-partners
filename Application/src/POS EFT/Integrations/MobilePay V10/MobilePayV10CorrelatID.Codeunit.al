@@ -1,5 +1,6 @@
-codeunit 6014509 "NPR MobilePayV10 Correlat. ID"
+﻿codeunit 6014509 "NPR MobilePayV10 Correlat. ID"
 {
+    Access = Internal;
     SingleInstance = true;
 
     var

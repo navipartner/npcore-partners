@@ -1,5 +1,6 @@
-codeunit 6014593 "NPR Change Log Auto Enabler"
+﻿codeunit 6014593 "NPR Change Log Auto Enabler"
 {
+    Access = Internal;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', true, false)]
     local procedure OnAfterInitialization()

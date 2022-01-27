@@ -1,5 +1,8 @@
-report 6014424 "NPR Ret. Jnl. - Import Items"
+﻿report 6014424 "NPR Ret. Jnl. - Import Items"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Import Items';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

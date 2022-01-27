@@ -1,5 +1,6 @@
-table 6151152 "NPR M2 Account Com. Template"
+﻿table 6151152 "NPR M2 Account Com. Template"
 {
+    Access = Internal;
     Caption = 'Account Com. Template';
     DataClassification = CustomerContent;
 

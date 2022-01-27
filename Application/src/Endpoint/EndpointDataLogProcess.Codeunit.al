@@ -1,5 +1,6 @@
 ﻿codeunit 6014674 "NPR Endpoint Data Log Process."
 {
+    Access = Internal;
     // NPR5.23\BR\20160518  CASE 237658 Object created, to be set up in table Data Log Subscriber
 
     TableNo = "NPR Data Log Record";

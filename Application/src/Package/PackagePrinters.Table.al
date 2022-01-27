@@ -1,5 +1,6 @@
-table 6014575 "NPR Package Printers"
+﻿table 6014575 "NPR Package Printers"
 {
+    Access = Internal;
     Caption = 'Package Printers';
     fields
     {

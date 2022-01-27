@@ -1,5 +1,8 @@
-enum 6014464 "NPR ND Entry Att. Int. Type"
+﻿enum 6014464 "NPR ND Entry Att. Int. Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; " ")

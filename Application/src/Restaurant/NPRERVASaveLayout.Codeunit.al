@@ -1,5 +1,6 @@
-codeunit 6150683 "NPR NPRE RVA: Save Layout"
+﻿codeunit 6150683 "NPR NPRE RVA: Save Layout"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('RV_SAVE_LAYOUT');

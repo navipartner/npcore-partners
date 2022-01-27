@@ -1,5 +1,6 @@
-page 6151490 "NPR Salesperson List"
+﻿page 6151490 "NPR Salesperson List"
 {
+    Extensible = False;
     Caption = 'Salesperson List';
     DeleteAllowed = false;
     InsertAllowed = false;

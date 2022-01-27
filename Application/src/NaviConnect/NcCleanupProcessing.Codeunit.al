@@ -1,5 +1,6 @@
-codeunit 6151510 "NPR Nc Cleanup Processing"
+﻿codeunit 6151510 "NPR Nc Cleanup Processing"
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

@@ -1,5 +1,6 @@
-page 6014627 "NPR Hardware Connector"
+﻿page 6014627 "NPR Hardware Connector"
 {
+    Extensible = False;
     Caption = 'Hardware Connector';
     Editable = false;
     PageType = StandardDialog;

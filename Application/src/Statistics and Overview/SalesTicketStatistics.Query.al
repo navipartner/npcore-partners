@@ -1,5 +1,6 @@
-query 6014401 "NPR Sales Ticket Statistics"
+﻿query 6014401 "NPR Sales Ticket Statistics"
 {
+    Access = Internal;
     //   Object created for report 6014409 "NPR Sales Ticket Statistics"
 
     Caption = 'Sales Ticket Statistics';

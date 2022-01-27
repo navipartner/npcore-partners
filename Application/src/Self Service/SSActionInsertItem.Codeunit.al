@@ -1,5 +1,6 @@
 ﻿codeunit 6151289 "NPR SS Action: Insert Item"
 {
+    Access = Internal;
     var
         TEXTActive: Label 'active';
         ERROR_ITEMSEARCH: Label 'Could not find a matching item for input %1';

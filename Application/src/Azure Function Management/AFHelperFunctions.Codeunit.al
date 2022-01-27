@@ -1,5 +1,6 @@
-codeunit 6151571 "NPR AF Helper Functions"
+﻿codeunit 6151571 "NPR AF Helper Functions"
 {
+    Access = Internal;
     procedure GetValueAsText(JObject: JsonObject; PropertyName: Text) ReturnValue: Text
     var
         Jtoken: JsonToken;

@@ -1,5 +1,6 @@
-page 6060096 "NPR POS Input Box Setups"
+﻿page 6060096 "NPR POS Input Box Setups"
 {
+    Extensible = False;
     Caption = 'POS Input Box Setups';
     CardPageID = "NPR POS Input Box Setup";
     Editable = false;

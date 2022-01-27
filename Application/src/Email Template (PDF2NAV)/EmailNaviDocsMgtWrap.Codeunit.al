@@ -1,5 +1,6 @@
-codeunit 6014466 "NPR E-mail NaviDocs Mgt.Wrap."
+﻿codeunit 6014466 "NPR E-mail NaviDocs Mgt.Wrap."
 {
+    Access = Internal;
     procedure GetCustomReportLayoutVariant(CustomReportSelection: Record "Custom Report Selection"; var ResultReportLayoutCode: Variant)
     begin
         ResultReportLayoutCode := CustomReportSelection."Custom Report Layout Code";

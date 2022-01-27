@@ -1,5 +1,6 @@
 ﻿codeunit 6150723 "NPR POS Action: Insert Item"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for inserting an item line into the current transaction';
         TEXTitemTracking_title: Label 'Enter Serial Number';

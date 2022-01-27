@@ -1,5 +1,6 @@
-page 6014457 "NPR MM Member Capture List"
+﻿page 6014457 "NPR MM Member Capture List"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = None;
     SourceTable = "NPR MM Member Info Capture";

@@ -1,5 +1,6 @@
 ﻿table 6150661 "NPR NPRE Waiter Pad Line"
 {
+    Access = Internal;
     Caption = 'Waiter Pad Line';
     DataClassification = CustomerContent;
 

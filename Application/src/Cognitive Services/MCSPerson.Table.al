@@ -1,5 +1,6 @@
-table 6059958 "NPR MCS Person"
+﻿table 6059958 "NPR MCS Person"
 {
+    Access = Internal;
 
     Caption = 'MCS Person';
     DataClassification = CustomerContent;

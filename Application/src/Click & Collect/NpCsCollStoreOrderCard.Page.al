@@ -1,5 +1,6 @@
-page 6151206 "NPR NpCs Coll. StoreOrder Card"
+﻿page 6151206 "NPR NpCs Coll. StoreOrder Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Collect in Store Order Card';
     SourceTable = "NPR NpCs Document";

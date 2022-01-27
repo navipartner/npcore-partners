@@ -1,5 +1,6 @@
-codeunit 6014563 "NPR POS PreSearch Method"
+﻿codeunit 6014563 "NPR POS PreSearch Method"
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
     local procedure OnPreSearch(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
     var

@@ -1,5 +1,6 @@
 ﻿codeunit 6150662 "NPR NPRE Seating Mgt."
 {
+    Access = Internal;
     var
         AdditionalFiltersSet: Boolean;
         SeatingFiltersGlobal: Record "NPR NPRE Seating";

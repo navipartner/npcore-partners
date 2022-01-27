@@ -1,5 +1,6 @@
-page 6151041 "NPR Notification List"
+﻿page 6151041 "NPR Notification List"
 {
+    Extensible = False;
 
     Caption = 'Notification List';
     CardPageID = "NPR Notification Card";

@@ -1,5 +1,6 @@
-page 6014594 "NPR Sales Stats Subform"
+﻿page 6014594 "NPR Sales Stats Subform"
 {
+    Extensible = False;
     Caption = 'Sales Statistics Subform';
     DeleteAllowed = false;
     InsertAllowed = false;

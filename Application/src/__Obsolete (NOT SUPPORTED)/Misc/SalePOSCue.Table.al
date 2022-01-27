@@ -1,5 +1,6 @@
-table 6059986 "NPR Sale POS Cue"
+﻿table 6059986 "NPR Sale POS Cue"
 {
+    Access = Internal;
     Caption = 'Sale POS Cue';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

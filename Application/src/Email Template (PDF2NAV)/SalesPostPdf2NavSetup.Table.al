@@ -1,5 +1,6 @@
-table 6014469 "NPR SalesPost Pdf2Nav Setup"
+﻿table 6014469 "NPR SalesPost Pdf2Nav Setup"
 {
+    Access = Internal;
     Caption = 'Sales-Post and Pdf2Nav Setup';
     DataClassification = CustomerContent;
 

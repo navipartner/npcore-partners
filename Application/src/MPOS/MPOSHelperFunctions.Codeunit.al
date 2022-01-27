@@ -1,5 +1,6 @@
-codeunit 6059984 "NPR MPOS Helper Functions"
+﻿codeunit 6059984 "NPR MPOS Helper Functions"
 {
+    Access = Internal;
     var
         ActiveSession: Record "Active Session";
 

@@ -1,5 +1,6 @@
-codeunit 6014665 "NPR Lookup: Item" implements "NPR IPOSLookupType"
+﻿codeunit 6014665 "NPR Lookup: Item" implements "NPR IPOSLookupType"
 {
+    Access = Internal;
     EventSubscriberInstance = StaticAutomatic;
 
     var

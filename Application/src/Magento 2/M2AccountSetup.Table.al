@@ -1,5 +1,6 @@
-table 6151150 "NPR M2 Account Setup"
+﻿table 6151150 "NPR M2 Account Setup"
 {
+    Access = Internal;
     Caption = 'Account Setup';
     DataClassification = CustomerContent;
 

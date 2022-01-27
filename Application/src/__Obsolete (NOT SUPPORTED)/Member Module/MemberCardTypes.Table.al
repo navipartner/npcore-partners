@@ -1,5 +1,6 @@
-table 6059771 "NPR Member Card Types"
+﻿table 6059771 "NPR Member Card Types"
 {
+    Access = Internal;
 
     Caption = 'Point Card';
     DataCaptionFields = "Code";

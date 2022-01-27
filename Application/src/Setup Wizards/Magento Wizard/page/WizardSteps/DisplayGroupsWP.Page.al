@@ -1,5 +1,6 @@
-page 6014616 "NPR Display Groups WP"
+﻿page 6014616 "NPR Display Groups WP"
 {
+    Extensible = False;
     Caption = 'Display Groups';
     PageType = ListPart;
     UsageCategory = Administration;

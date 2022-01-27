@@ -1,5 +1,8 @@
-report 6014616 "NPR Retail Campaign Items"
+﻿report 6014616 "NPR Retail Campaign Items"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Campaign Items.rdlc';
     UsageCategory = ReportsAndAnalysis;

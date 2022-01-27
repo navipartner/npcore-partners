@@ -1,5 +1,8 @@
-report 6014535 "NPR Sales Statistics By Dept."
+﻿report 6014535 "NPR Sales Statistics By Dept."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Statistics By Department.rdlc';
     Caption = 'Sales Statistics By Department';

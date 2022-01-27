@@ -1,5 +1,6 @@
-codeunit 6151534 "NPR Nc Try Catch Mgt."
+﻿codeunit 6151534 "NPR Nc Try Catch Mgt."
 {
+    Access = Internal;
     TableNo = "NPR Nc Task Output";
 
     trigger OnRun()

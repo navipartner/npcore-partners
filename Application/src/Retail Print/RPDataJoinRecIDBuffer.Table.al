@@ -1,5 +1,6 @@
-table 6014568 "NPR RP DataJoin Rec.ID Buffer"
+﻿table 6014568 "NPR RP DataJoin Rec.ID Buffer"
 {
+    Access = Internal;
     Caption = 'RP Data Join Record ID Buffer';
     DataClassification = CustomerContent;
 

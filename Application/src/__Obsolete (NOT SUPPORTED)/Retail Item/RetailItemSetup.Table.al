@@ -1,5 +1,6 @@
-table 6014466 "NPR Retail Item Setup"
+﻿table 6014466 "NPR Retail Item Setup"
 {
+    Access = Internal;
     Caption = 'Retail Item Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

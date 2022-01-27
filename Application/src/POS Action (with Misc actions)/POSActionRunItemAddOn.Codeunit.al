@@ -1,5 +1,6 @@
-codeunit 6151128 "NPR POS Action: Run Item AddOn"
+﻿codeunit 6151128 "NPR POS Action: Run Item AddOn"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('RUN_ITEM_ADDONS');

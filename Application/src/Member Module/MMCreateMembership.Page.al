@@ -1,5 +1,6 @@
-page 6060139 "NPR MM Create Membership"
+﻿page 6060139 "NPR MM Create Membership"
 {
+    Extensible = False;
 
     Caption = 'Create Membership';
     DeleteAllowed = false;

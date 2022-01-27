@@ -1,5 +1,6 @@
 ﻿codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
 {
+    Access = Internal;
     var
         POSSalePatternGuideLbl: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars';
         POSSaleLinePatternGuideLbl: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars\[NL] ~ Natural Line No.\[L] ~ Line No.';

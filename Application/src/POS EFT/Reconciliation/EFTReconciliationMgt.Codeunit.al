@@ -1,5 +1,6 @@
-codeunit 6014671 "NPR EFT Reconciliation Mgt."
+﻿codeunit 6014671 "NPR EFT Reconciliation Mgt."
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

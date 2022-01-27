@@ -1,5 +1,6 @@
-table 6014481 "NPR Report Usage Setup"
+﻿table 6014481 "NPR Report Usage Setup"
 {
+    Access = Internal;
     // NPR5.48/TJ  /20181108 CASE 324444 New object
 
     Caption = 'Report Usage Setup';

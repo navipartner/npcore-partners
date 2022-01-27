@@ -1,5 +1,6 @@
-page 6150652 "NPR POS Entry List"
+﻿page 6150652 "NPR POS Entry List"
 {
+    Extensible = False;
     Caption = 'POS Entry List';
     CardPageID = "NPR POS Entry Card";
     DeleteAllowed = false;

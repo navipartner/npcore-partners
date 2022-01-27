@@ -1,5 +1,6 @@
-table 6014579 "NPR Blob To Media Migration"
+﻿table 6014579 "NPR Blob To Media Migration"
 {
+    Access = Internal;
     DataClassification = SystemMetadata;
     Caption = 'Blob To Media Migration';
 

@@ -1,5 +1,6 @@
-page 6151503 "NPR Nc Task Fields"
+﻿page 6151503 "NPR Nc Task Fields"
 {
+    Extensible = False;
     Caption = 'Nc Task List Subform';
     Editable = false;
     PageType = List;

@@ -1,5 +1,6 @@
-codeunit 6014484 "NPR Pacsoft Management"
+﻿codeunit 6014484 "NPR Pacsoft Management"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         SendDocuments();

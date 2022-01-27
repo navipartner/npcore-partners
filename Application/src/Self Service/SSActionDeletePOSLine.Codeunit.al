@@ -1,5 +1,6 @@
-codeunit 6151282 "NPR SS Action: Delete POS Line"
+﻿codeunit 6151282 "NPR SS Action: Delete POS Line"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built in function deletes sales or payment line from the POS';
 

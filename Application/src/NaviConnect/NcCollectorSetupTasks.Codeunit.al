@@ -1,5 +1,6 @@
-codeunit 6151531 "NPR Nc Collector Setup Tasks"
+﻿codeunit 6151531 "NPR Nc Collector Setup Tasks"
 {
+    Access = Internal;
 
     var
         NaviConnectSetup: Record "NPR Nc Setup";

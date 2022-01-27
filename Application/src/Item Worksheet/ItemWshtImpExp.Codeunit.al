@@ -1,5 +1,6 @@
-codeunit 6060047 "NPR Item Wsht. Imp. Exp."
+﻿codeunit 6060047 "NPR Item Wsht. Imp. Exp."
 {
+    Access = Internal;
     var
         ItemWorksheet: Record "NPR Item Worksheet";
         IsExported: Boolean;

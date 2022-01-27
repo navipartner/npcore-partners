@@ -1,5 +1,6 @@
-codeunit 6060129 "NPR MM Member WebService Mgr"
+﻿codeunit 6060129 "NPR MM Member WebService Mgr"
 {
+    Access = Internal;
 
     TableNo = "NPR Nc Import Entry";
 

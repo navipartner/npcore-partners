@@ -1,5 +1,6 @@
-table 6014525 "NPR Master Line Map"
+﻿table 6014525 "NPR Master Line Map"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'Master Line Map';
 

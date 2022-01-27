@@ -1,5 +1,6 @@
-codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP Interface"
+﻿codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP Interface"
 {
+    Access = Internal;
     // XML CleanCash Signature Protocol (XCCSP)
 
     // URL: http://online.cleancash.se:8081/xccsp

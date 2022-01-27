@@ -1,5 +1,6 @@
-page 6014468 "NPR Sales Ticket Statistics"
+﻿page 6014468 "NPR Sales Ticket Statistics"
 {
+    Extensible = false;
     Caption = 'Sales Ticket Statistics';
     PageType = List;
     SourceTable = Date;

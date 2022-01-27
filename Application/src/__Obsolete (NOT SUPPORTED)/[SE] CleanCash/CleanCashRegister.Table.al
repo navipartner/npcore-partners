@@ -1,5 +1,6 @@
-table 6184503 "NPR CleanCash Register"
+﻿table 6184503 "NPR CleanCash Register"
 {
+    Access = Internal;
 
     Caption = 'CleanCash Cash Register';
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-page 6151561 "NPR NpXml Field Value Buffer"
+﻿page 6151561 "NPR NpXml Field Value Buffer"
 {
+    Extensible = False;
     Caption = 'NpXml Field Value Buffer';
     PageType = List;
     UsageCategory = Administration;

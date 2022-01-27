@@ -1,5 +1,6 @@
-page 6151204 "NPR NpCs Send to Store Orders"
+﻿page 6151204 "NPR NpCs Send to Store Orders"
 {
+    Extensible = False;
     Caption = 'Send to Store Orders';
     InsertAllowed = false;
     PageType = List;

@@ -1,5 +1,6 @@
-page 6151600 "NPR NpDc Arch. Coupon Card"
+﻿page 6151600 "NPR NpDc Arch. Coupon Card"
 {
+    Extensible = False;
     Caption = 'Archived Coupon Card';
     DeleteAllowed = false;
     Editable = false;

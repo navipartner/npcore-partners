@@ -1,5 +1,6 @@
-codeunit 6014432 "NPR Quantity Discount Mgt."
+﻿codeunit 6014432 "NPR Quantity Discount Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

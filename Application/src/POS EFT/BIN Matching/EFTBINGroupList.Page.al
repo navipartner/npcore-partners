@@ -1,5 +1,6 @@
-page 6184511 "NPR EFT BIN Group List"
+﻿page 6184511 "NPR EFT BIN Group List"
 {
+    Extensible = False;
     Caption = 'EFT Mapping Group List';
     CardPageID = "NPR EFT BIN Group Card";
     InsertAllowed = false;

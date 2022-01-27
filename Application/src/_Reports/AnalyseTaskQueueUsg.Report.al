@@ -1,5 +1,8 @@
-report 6059900 "NPR Analyse Task Queue Usg."
+﻿report 6059900 "NPR Analyse Task Queue Usg."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Analyse Task Queue Usage.rdlc';
     UsageCategory = ReportsAndAnalysis;

@@ -1,5 +1,6 @@
-codeunit 6014554 "NPR MobilePayV10 Poll Payment"
+﻿codeunit 6014554 "NPR MobilePayV10 Poll Payment"
 {
+    Access = Internal;
     // GET  /v10/payments/{paymentid}
     TableNo = "NPR EFT Transaction Request";
 

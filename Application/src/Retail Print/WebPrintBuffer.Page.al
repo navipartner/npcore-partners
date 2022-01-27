@@ -1,5 +1,6 @@
-page 6014581 "NPR Web Print Buffer"
+﻿page 6014581 "NPR Web Print Buffer"
 {
+    Extensible = False;
     // NPR4.15/MMV/20151001 CASE 223893 Created table for use with web service printing
 
     Caption = 'Web Print Buffer';

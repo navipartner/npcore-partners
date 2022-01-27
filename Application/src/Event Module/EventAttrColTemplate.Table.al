@@ -1,5 +1,6 @@
-table 6060155 "NPR Event Attr. Col. Template"
+﻿table 6060155 "NPR Event Attr. Col. Template"
 {
+    Access = Internal;
     Caption = 'Event Attribute Col. Template';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Event Attr. Col. Templates";

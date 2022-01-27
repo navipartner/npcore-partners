@@ -1,5 +1,6 @@
-codeunit 6014530 "NPR MobilePayV10 Can.Payment"
+﻿codeunit 6014530 "NPR MobilePayV10 Can.Payment"
 {
+    Access = Internal;
     // POST  /v10/payments/{paymentid}/cancel
 
     // This is only a request to cancel in MobilePays backend, the polling continues 

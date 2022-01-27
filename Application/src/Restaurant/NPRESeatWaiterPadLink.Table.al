@@ -1,5 +1,6 @@
-table 6150662 "NPR NPRE Seat.: WaiterPadLink"
+﻿table 6150662 "NPR NPRE Seat.: WaiterPadLink"
 {
+    Access = Internal;
     Caption = 'Seating - Waiter Pad Link';
     DataClassification = CustomerContent;
     LookupPageId = "NPR NPRE Seat.: WaiterPadLink";

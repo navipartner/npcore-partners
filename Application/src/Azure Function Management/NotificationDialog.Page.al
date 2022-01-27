@@ -1,5 +1,6 @@
-page 6151040 "NPR Notification Dialog"
+﻿page 6151040 "NPR Notification Dialog"
 {
+    Extensible = False;
     Caption = 'Notification Dialog';
     PageType = StandardDialog;
     UsageCategory = None;

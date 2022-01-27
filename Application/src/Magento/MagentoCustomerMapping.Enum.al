@@ -1,5 +1,8 @@
-enum 6014436 "NPR Magento Customer Mapping"
+﻿enum 6014436 "NPR Magento Customer Mapping"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "E-mail")

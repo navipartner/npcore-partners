@@ -1,5 +1,6 @@
-table 6151385 "NPR CS Rfid Tag Models"
+﻿table 6151385 "NPR CS Rfid Tag Models"
 {
+    Access = Internal;
 
     Caption = 'CS Rfid Tag Models';
     DataClassification = CustomerContent;

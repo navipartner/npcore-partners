@@ -1,5 +1,6 @@
-page 6184473 "NPR EFT Trx Log Factbox"
+﻿page 6184473 "NPR EFT Trx Log Factbox"
 {
+    Extensible = False;
     Caption = 'EFT Transaction Logs';
     DeleteAllowed = false;
     InsertAllowed = false;

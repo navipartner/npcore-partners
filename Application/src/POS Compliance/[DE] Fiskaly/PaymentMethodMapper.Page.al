@@ -1,5 +1,6 @@
-page 6014433 "NPR Payment Method Mapper"
+﻿page 6014433 "NPR Payment Method Mapper"
 {
+    Extensible = False;
 
 
     Caption = 'Payment Method Mapper';

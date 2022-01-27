@@ -1,5 +1,8 @@
-report 6151597 "NPR NpDc Request Priority"
+﻿report 6151597 "NPR NpDc Request Priority"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Request Priority';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

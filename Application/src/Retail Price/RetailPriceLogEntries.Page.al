@@ -1,5 +1,6 @@
-page 6014475 "NPR Retail Price Log Entries"
+﻿page 6014475 "NPR Retail Price Log Entries"
 {
+    Extensible = False;
     // NPR5.40/MHA /20180316  CASE 304031 Object created
 
     Caption = 'Retail Price Log Entries';

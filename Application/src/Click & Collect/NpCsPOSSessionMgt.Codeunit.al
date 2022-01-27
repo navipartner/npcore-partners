@@ -1,5 +1,6 @@
-codeunit 6151205 "NPR NpCs POSSession Mgt."
+﻿codeunit 6151205 "NPR NpCs POSSession Mgt."
 {
+    Access = Internal;
     var
         Text000: Label 'Deliver and Print Collect in Store Document';
 

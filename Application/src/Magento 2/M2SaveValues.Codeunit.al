@@ -1,5 +1,6 @@
-codeunit 6059834 "NPR M2 Save Values"
+﻿codeunit 6059834 "NPR M2 Save Values"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         ShowContactBuffer();

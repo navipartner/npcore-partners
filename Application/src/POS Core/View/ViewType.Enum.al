@@ -1,5 +1,8 @@
-enum 6150755 "NPR View Type"
+﻿enum 6150755 "NPR View Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; Uninitialized) { }

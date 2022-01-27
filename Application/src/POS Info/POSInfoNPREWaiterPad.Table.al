@@ -1,5 +1,6 @@
-table 6150648 "NPR POS Info NPRE Waiter Pad"
+﻿table 6150648 "NPR POS Info NPRE Waiter Pad"
 {
+    Access = Internal;
     // NPR5.53/ALPO/20191122 CASE 376538 POS Info - Waiter Pad integration: save sale pos info and restore it, when waiter pad lines are moved back to a sale
 
     Caption = 'POS Info Waiter Pad';

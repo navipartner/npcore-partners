@@ -1,5 +1,6 @@
-codeunit 6150881 "NPR Base Action" implements "NPR IJsonSerializable"
+﻿codeunit 6150881 "NPR Base Action" implements "NPR IJsonSerializable"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _parameters: JsonObject;

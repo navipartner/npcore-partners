@@ -1,5 +1,6 @@
-page 6014423 "NPR Report Selection: Retail"
+﻿page 6014423 "NPR Report Selection: Retail"
 {
+    Extensible = False;
     // NPR4.15/JDH/20150909 CASE 222525 Translated to English + changed caption values
     // NPR4.18/MMV/20151217 CASE 225584 Added fields 12, 13.
     // NPR4.18/MMV/20151230 CASE 229221 Blanked "Report Type" options: Label (Single) & Byttemærke (Single) - They are deprecated.

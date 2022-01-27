@@ -1,5 +1,6 @@
-codeunit 6151006 "NPR POS Saved Sale Mgt."
+﻿codeunit 6151006 "NPR POS Saved Sale Mgt."
 {
+    Access = Internal;
     var
         Text000: Label 'Delete all saved POS Saved Sales,Review saved POS Saved Sales';
         EFT_WARNING: Label 'WARNING:\%1 %2 has one or more POS Saved Sales linked to it with approved EFT transactions inside. These should be voided or completed as the transaction has already occurred!\\Do you want to continue with end of day?';

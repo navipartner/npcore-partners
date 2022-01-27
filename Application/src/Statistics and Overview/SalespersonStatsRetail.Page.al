@@ -1,5 +1,6 @@
-page 6014586 "NPR Salesperson Stats Retail"
+﻿page 6014586 "NPR Salesperson Stats Retail"
 {
+    Extensible = False;
     Caption = 'Salesperson Statistics';
     DeleteAllowed = false;
     Editable = false;

@@ -1,5 +1,6 @@
-page 6014656 "NPR POS EOD Profiles Step"
+﻿page 6014656 "NPR POS EOD Profiles Step"
 {
+    Extensible = False;
     Caption = 'POS EOD Profiles';
     PageType = ListPart;
     SourceTable = "NPR POS End of Day Profile";

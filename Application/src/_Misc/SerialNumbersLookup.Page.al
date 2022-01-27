@@ -1,5 +1,6 @@
-page 6014498 "NPR Serial Numbers Lookup"
+﻿page 6014498 "NPR Serial Numbers Lookup"
 {
+    Extensible = False;
     Caption = 'Serial Numbers Lookup';
     Editable = false;
     PageType = List;

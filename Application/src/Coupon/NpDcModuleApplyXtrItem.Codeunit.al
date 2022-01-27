@@ -1,5 +1,6 @@
-codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
+﻿codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
 {
+    Access = Internal;
     var
         Text000: Label 'Extra Coupon Item has not been defined for Coupon %1 (%2)';
         Text001: Label 'Apply Discount - Extra Item';

@@ -1,5 +1,6 @@
-codeunit 6150685 "NPR NPRE RVA: Set Table Status"
+﻿codeunit 6150685 "NPR NPRE RVA: Set Table Status"
 {
+    Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
         exit('RV_SET_TABLE_STATUS');

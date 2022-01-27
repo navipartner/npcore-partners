@@ -1,5 +1,6 @@
-codeunit 6151594 "NPR NpDc Module Apply: Default"
+﻿codeunit 6151594 "NPR NpDc Module Apply: Default"
 {
+    Access = Internal;
     var
         Text000: Label 'Apply Discount - Default';
 

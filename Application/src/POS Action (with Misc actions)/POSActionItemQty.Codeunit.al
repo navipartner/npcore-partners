@@ -1,5 +1,6 @@
-codeunit 6150856 "NPR POS Action: Item Qty."
+﻿codeunit 6150856 "NPR POS Action: Item Qty."
 {
+    Access = Internal;
     var
         Text000: Label 'Insert Item and Set Quantity directly from Barcode';
         Text001: Label 'Item not found';

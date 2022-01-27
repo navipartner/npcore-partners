@@ -1,5 +1,8 @@
-report 6014475 "NPR Item Replenish. by Store"
+﻿report 6014475 "NPR Item Replenish. by Store"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Replenishment by Store.rdlc';
     Caption = 'Inventory - List';

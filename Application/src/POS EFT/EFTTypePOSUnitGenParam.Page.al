@@ -1,5 +1,6 @@
-page 6184479 "NPR EFTType POSUnit Gen.Param."
+﻿page 6184479 "NPR EFTType POSUnit Gen.Param."
 {
+    Extensible = False;
     Caption = 'EFT Type POS Unit Gen. Param.';
     DeleteAllowed = false;
     InsertAllowed = false;

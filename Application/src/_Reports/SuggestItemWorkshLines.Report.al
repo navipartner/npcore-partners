@@ -1,5 +1,8 @@
-report 6060040 "NPR Suggest Item Worksh. Lines"
+﻿report 6060040 "NPR Suggest Item Worksh. Lines"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     Caption = 'Suggest Item Worksheet Lines';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;

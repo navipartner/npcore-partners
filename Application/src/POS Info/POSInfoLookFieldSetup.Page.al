@@ -1,5 +1,6 @@
-page 6150645 "NPR POS Info Look. Field Setup"
+﻿page 6150645 "NPR POS Info Look. Field Setup"
 {
+    Extensible = False;
     Caption = 'POS Info Lookup Field Setup';
     DelayedInsert = true;
     PageType = List;

@@ -1,5 +1,6 @@
-page 6014452 "NPR Mixed Discount List"
+﻿page 6014452 "NPR Mixed Discount List"
 {
+    Extensible = False;
     Caption = 'Mix Discount List';
     CardPageID = "NPR Mixed Discount";
     Editable = true;

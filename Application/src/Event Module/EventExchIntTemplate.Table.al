@@ -1,5 +1,6 @@
-table 6060150 "NPR Event Exch. Int. Template"
+﻿table 6060150 "NPR Event Exch. Int. Template"
 {
+    Access = Internal;
     Caption = 'Event Exch. Int. Template';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Event Exch. Int. Templates";

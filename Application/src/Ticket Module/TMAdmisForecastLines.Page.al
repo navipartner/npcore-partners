@@ -1,5 +1,6 @@
-page 6151139 "NPR TM Admis. Forecast Lines"
+﻿page 6151139 "NPR TM Admis. Forecast Lines"
 {
+    Extensible = False;
     // TM1.48/TSA /20200625 CASE 409741 Initial Version
 
     Caption = 'Admission Forecast Lines';

@@ -1,5 +1,6 @@
-page 6014532 "NPR POS Sale Tax"
+﻿page 6014532 "NPR POS Sale Tax"
 {
+    Extensible = False;
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR POS Sale Tax";

@@ -1,5 +1,6 @@
-table 6014567 "NPR RP Data Join Field Map"
+﻿table 6014567 "NPR RP Data Join Field Map"
 {
+    Access = Internal;
     Caption = 'RP Data Join Field Map';
     DataClassification = CustomerContent;
 

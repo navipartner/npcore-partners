@@ -1,5 +1,6 @@
-codeunit 6014582 "NPR Print Method Mgt."
+﻿codeunit 6014582 "NPR Print Method Mgt."
 {
+    Access = Internal;
 
     procedure PrintBytesLocal(PrinterName: Text; PrintBytes: Text; TargetEncoding: Text)
     var

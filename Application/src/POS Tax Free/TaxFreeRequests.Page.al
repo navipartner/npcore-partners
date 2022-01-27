@@ -1,5 +1,6 @@
-page 6014645 "NPR Tax Free Requests"
+﻿page 6014645 "NPR Tax Free Requests"
 {
+    Extensible = False;
 
     Caption = 'Tax Free Requests';
     DeleteAllowed = false;

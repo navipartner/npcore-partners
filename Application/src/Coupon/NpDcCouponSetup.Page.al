@@ -1,5 +1,6 @@
-page 6151602 "NPR NpDc Coupon Setup"
+﻿page 6151602 "NPR NpDc Coupon Setup"
 {
+    Extensible = False;
     Caption = 'Coupon Setup';
     PageType = Card;
     SourceTable = "NPR NpDc Coupon Setup";

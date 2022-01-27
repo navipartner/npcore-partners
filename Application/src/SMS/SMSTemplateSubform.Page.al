@@ -1,5 +1,6 @@
-page 6059942 "NPR SMS Template Subform"
+﻿page 6059942 "NPR SMS Template Subform"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Lines';
     PageType = ListPart;

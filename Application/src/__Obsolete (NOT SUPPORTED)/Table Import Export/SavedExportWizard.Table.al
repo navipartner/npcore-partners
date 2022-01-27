@@ -1,5 +1,6 @@
-table 6014511 "NPR Saved Export Wizard"
+﻿table 6014511 "NPR Saved Export Wizard"
 {
+    Access = Internal;
     Caption = 'Saved Export Wizard';
     DataCaptionFields = "Code", Description;
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-page 6150687 "NPR NPRE Kitchen Station Slct."
+﻿page 6150687 "NPR NPRE Kitchen Station Slct."
 {
+    Extensible = False;
     Caption = 'Kitchen Station Selection Setup';
     DataCaptionExpression = '';
     DelayedInsert = true;

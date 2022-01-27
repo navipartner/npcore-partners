@@ -1,6 +1,9 @@
-#if not BC17
+﻿#if not BC17
 report 6060127 "NPR MM Member Card Print QR"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Print QR.rdl';
     Caption = 'Member Card Print';

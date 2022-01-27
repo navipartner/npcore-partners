@@ -1,5 +1,6 @@
-page 6184478 "NPR EFT Type Pay. Gen. Param."
+﻿page 6184478 "NPR EFT Type Pay. Gen. Param."
 {
+    Extensible = False;
     Caption = 'EFT Type Payment Gen. Param.';
     DeleteAllowed = false;
     InsertAllowed = false;

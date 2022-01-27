@@ -1,5 +1,6 @@
-table 6014560 "NPR RP Device Settings"
+﻿table 6014560 "NPR RP Device Settings"
 {
+    Access = Internal;
     // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
 
     Caption = 'Device Settings';

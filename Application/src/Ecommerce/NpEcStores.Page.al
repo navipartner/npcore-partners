@@ -1,5 +1,6 @@
-page 6151300 "NPR NpEc Stores"
+﻿page 6151300 "NPR NpEc Stores"
 {
+    Extensible = False;
     Caption = 'E-commerce Stores';
     CardPageID = "NPR NpEc Store Card";
     Editable = false;

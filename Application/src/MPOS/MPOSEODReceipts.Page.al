@@ -1,5 +1,6 @@
-page 6059962 "NPR MPOS EOD Receipts"
+﻿page 6059962 "NPR MPOS EOD Receipts"
 {
+    Extensible = False;
     Caption = 'MPOS EOD Receips';
     Editable = false;
     PageType = List;

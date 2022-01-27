@@ -1,5 +1,6 @@
-table 6150720 "NPR POS Stargate Assem. Map"
+﻿table 6150720 "NPR POS Stargate Assem. Map"
 {
+    Access = Internal;
     Caption = 'POS Stargate Assembly Map';
     DataClassification = CustomerContent;
 

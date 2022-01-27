@@ -1,5 +1,6 @@
-page 6150905 "NPR HC Paym.Types Post. Setup"
+﻿page 6150905 "NPR HC Paym.Types Post. Setup"
 {
+    Extensible = False;
     Caption = 'HC Payment Types Posting Setup';
     PageType = List;
     SourceTable = "NPR HC Paym.Type Post.Setup";

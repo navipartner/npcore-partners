@@ -1,5 +1,8 @@
-enum 6014405 "NPR CleanCash Request Type" implements "NPR CleanCash XCCSP Interface"
+﻿enum 6014405 "NPR CleanCash Request Type" implements "NPR CleanCash XCCSP Interface"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; NotSelected)

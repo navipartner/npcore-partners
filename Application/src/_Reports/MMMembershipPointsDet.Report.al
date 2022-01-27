@@ -1,5 +1,8 @@
-report 6060131 "NPR MM Membership Points Det."
+﻿report 6060131 "NPR MM Membership Points Det."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Points Detail.rdlc';
     Caption = 'Membership Points Detail';

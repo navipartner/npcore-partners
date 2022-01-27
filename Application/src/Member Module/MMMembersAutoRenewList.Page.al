@@ -1,5 +1,6 @@
-page 6060070 "NPR MM Members. AutoRenew List"
+﻿page 6060070 "NPR MM Members. AutoRenew List"
 {
+    Extensible = False;
 
     Caption = 'Membership Auto Renew List';
     CardPageID = "NPR MM Members. AutoRenew Card";

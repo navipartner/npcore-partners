@@ -1,5 +1,6 @@
-page 6151054 "NPR POS Paym. View Event Setup"
+﻿page 6151054 "NPR POS Paym. View Event Setup"
 {
+    Extensible = False;
 
     Caption = 'POS Payment View Event Setup';
     PageType = Card;

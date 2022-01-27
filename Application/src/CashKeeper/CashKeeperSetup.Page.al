@@ -1,5 +1,6 @@
-page 6059945 "NPR CashKeeper Setup"
+﻿page 6059945 "NPR CashKeeper Setup"
 {
+    Extensible = False;
     // NPR5.29\CLVA\20161108 CASE NPR5.29 Object Created
     // NPR5.40/CLVA/20180307 CASE 291921 Added field "Payment Type"
     // NPR5.43/CLVA/20180620 CASE 319764 Added action CashKeeper Overview

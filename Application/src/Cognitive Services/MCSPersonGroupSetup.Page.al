@@ -1,5 +1,6 @@
-page 6059956 "NPR MCS Person Group Setup"
+﻿page 6059956 "NPR MCS Person Group Setup"
 {
+    Extensible = False;
 
     Caption = 'MCS Person Group Setup';
     PageType = List;

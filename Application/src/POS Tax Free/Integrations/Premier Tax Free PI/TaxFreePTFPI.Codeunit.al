@@ -1,5 +1,6 @@
-codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interface"
+﻿codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interface"
 {
+    Access = Internal;
     var
         POSUnitNo: Code[10];
         MinimumAmountLimit: Decimal;

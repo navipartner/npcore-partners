@@ -1,5 +1,6 @@
-codeunit 6150913 "NPR POS HC Gen. Web Req."
+﻿codeunit 6150913 "NPR POS HC Gen. Web Req."
 {
+    Access = Internal;
     var
         InvalidXml: Label 'The response is not in valid XML format.\\%1';
 

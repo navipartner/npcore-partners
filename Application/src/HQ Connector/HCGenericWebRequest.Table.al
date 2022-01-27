@@ -1,5 +1,6 @@
-table 6150908 "NPR HC Generic Web Request"
+﻿table 6150908 "NPR HC Generic Web Request"
 {
+    Access = Internal;
     Caption = 'Generic Web Request';
     DataClassification = CustomerContent;
 

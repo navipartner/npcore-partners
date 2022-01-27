@@ -1,5 +1,6 @@
-page 6014651 "NPR Retail Wizard"
+﻿page 6014651 "NPR Retail Wizard"
 {
+    Extensible = False;
     Caption = 'Retail Wizard';
     PageType = NavigatePage;
 

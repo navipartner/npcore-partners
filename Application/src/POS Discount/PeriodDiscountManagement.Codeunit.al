@@ -1,5 +1,6 @@
-codeunit 6014415 "NPR Period Discount Management"
+﻿codeunit 6014415 "NPR Period Discount Management"
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

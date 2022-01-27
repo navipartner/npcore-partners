@@ -1,5 +1,6 @@
-page 6150705 "NPR POS Parameter Values"
+﻿page 6150705 "NPR POS Parameter Values"
 {
+    Extensible = False;
     Caption = 'POS Parameter Values';
     DelayedInsert = true;
     DeleteAllowed = false;

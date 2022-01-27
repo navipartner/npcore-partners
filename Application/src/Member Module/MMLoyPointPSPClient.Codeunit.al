@@ -1,5 +1,6 @@
-codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
+﻿codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

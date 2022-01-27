@@ -1,5 +1,6 @@
-page 6151187 "NPR MM Member Comm. Setup"
+﻿page 6151187 "NPR MM Member Comm. Setup"
 {
+    Extensible = False;
 
     Caption = 'Member Communication Setup';
     PageType = List;

@@ -1,5 +1,6 @@
-page 6059817 "NPR Retail Top 10 S.person"
+﻿page 6059817 "NPR Retail Top 10 S.person"
 {
+    Extensible = False;
     Caption = 'Top 10 Sales Persons';
     CardPageID = "NPR Salesperson Card";
     Editable = true;

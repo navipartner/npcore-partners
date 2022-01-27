@@ -1,5 +1,6 @@
-page 6151132 "NPR TM Seating Wizard"
+﻿page 6151132 "NPR TM Seating Wizard"
 {
+    Extensible = False;
     Caption = 'Seating Wizard';
     PageType = Worksheet;
     SourceTable = "Integer";

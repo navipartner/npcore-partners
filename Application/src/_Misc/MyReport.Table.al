@@ -1,5 +1,6 @@
-table 6014618 "NPR My Report"
+﻿table 6014618 "NPR My Report"
 {
+    Access = Internal;
     Caption = 'My Item';
     DataClassification = CustomerContent;
 

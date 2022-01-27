@@ -1,5 +1,6 @@
-codeunit 6150837 "NPR POS Action: Boarding Pass"
+﻿codeunit 6150837 "NPR POS Action: Boarding Pass"
 {
+    Access = Internal;
 
     var
         ActionDescription: Label 'POS Action for boarding pass scan';

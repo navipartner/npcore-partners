@@ -1,5 +1,6 @@
-page 6059904 "NPR Task Log (Task)"
+﻿page 6059904 "NPR Task Log (Task)"
 {
+    Extensible = False;
     // TQ1.17/JDH/20141015 CASE 179044 Page made non editable
     // TQ1.28/MHA/20151216  CASE 229609 Task Queue
     // TQ1.29/JDH /20161101 CASE 242044 Changed sorting order

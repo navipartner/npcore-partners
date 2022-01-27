@@ -1,5 +1,6 @@
-page 6014634 "NPR MM Member Card FactBox"
+﻿page 6014634 "NPR MM Member Card FactBox"
 {
+    Extensible = False;
     PageType = CardPart;
     UsageCategory = None;
     SourceTable = "NPR MM Member Card";

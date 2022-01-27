@@ -1,5 +1,6 @@
 ﻿codeunit 6014615 "NPR TaxFree GBI2 GetBCountries"
 {
+    Access = Internal;
     // Codeunit is intended to be scheduled for NAS for customers running a Global Blue I2 Tax Free integration, for weekly execution.
     // It retrieves and stores a list of blocked enduser countries for use in the I2 integration flow.
     trigger OnRun()

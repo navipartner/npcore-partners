@@ -1,5 +1,6 @@
-page 6150713 "NPR POS Stargate Packages"
+﻿page 6150713 "NPR POS Stargate Packages"
 {
+    Extensible = False;
     Caption = 'POS Stargate Packages';
     InsertAllowed = false;
     PageType = List;

@@ -1,5 +1,6 @@
-table 6151107 "NPR NpRi Purch.Doc.Disc. Setup"
+﻿table 6151107 "NPR NpRi Purch.Doc.Disc. Setup"
 {
+    Access = Internal;
 
     Caption = 'Purchase Document Discount Reimbursement Setup';
     DataClassification = CustomerContent;

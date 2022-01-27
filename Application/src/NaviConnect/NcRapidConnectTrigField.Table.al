@@ -1,5 +1,6 @@
-table 6151093 "NPR Nc RapidConnect Trig.Field"
+﻿table 6151093 "NPR Nc RapidConnect Trig.Field"
 {
+    Access = Internal;
     Caption = 'Nc RapidConnect Trigger Field';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

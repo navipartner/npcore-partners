@@ -1,5 +1,6 @@
-table 6151132 "NPR TM Seating Attr. Defin."
+﻿table 6151132 "NPR TM Seating Attr. Defin."
 {
+    Access = Internal;
     // TM1.45/TSA/20200122  CASE 322432-01 Transport TM1.45 - 22 January 2020
 
     Caption = 'Seating Attr. Definition';

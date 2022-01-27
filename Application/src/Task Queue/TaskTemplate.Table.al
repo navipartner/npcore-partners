@@ -1,5 +1,6 @@
-table 6059900 "NPR Task Template"
+﻿table 6059900 "NPR Task Template"
 {
+    Access = Internal;
     // TQ1.11/JDH/20140905 CASE 190421 BullZip PDF Printer Added
     // TQ1.16/JDH/20140916 CASE 179044 Alignment to 2013
     // TQ1.16/JDH/20140923 CASE 179044 Added SMTP mail support

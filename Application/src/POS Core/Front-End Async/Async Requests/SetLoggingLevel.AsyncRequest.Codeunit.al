@@ -1,4 +1,4 @@
-/// <summary>
+﻿/// <summary>
 /// Sets logging level for browser console and Major Tom. By default, all messages are logged
 /// at INFO level, which includes all user-level messages (clicks, text entries, ...) and some
 /// relevant system-generated messages. If you need more restrictive or less restrictive logging
@@ -10,6 +10,7 @@
 /// </summary>
 codeunit 6014659 "NPR Front-End: SetLoggingLevel" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _loggingLevel: Integer;

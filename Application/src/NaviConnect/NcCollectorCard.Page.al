@@ -1,5 +1,6 @@
-page 6151529 "NPR Nc Collector Card"
+﻿page 6151529 "NPR Nc Collector Card"
 {
+    Extensible = False;
     Caption = 'Nc Collector Card';
     PageType = Card;
     UsageCategory = Administration;

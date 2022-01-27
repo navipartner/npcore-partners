@@ -1,5 +1,6 @@
-table 6151399 "NPR CS Counting schedule"
+﻿table 6151399 "NPR CS Counting schedule"
 {
+    Access = Internal;
 
     Caption = 'CS Counting schedule';
     DataClassification = CustomerContent;

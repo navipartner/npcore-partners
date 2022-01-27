@@ -1,5 +1,6 @@
-page 6014448 "NPR Mixed Disc. Time Interv."
+﻿page 6014448 "NPR Mixed Disc. Time Interv."
 {
+    Extensible = False;
     // NPR5.45/MHA /20180820  CASE 323568 Object created
     // NPR5.51/MAOT/20190614 CASE 352650 Fixed scaling error by changing grid layout to standard list
     // NPR5.54/SARA/20200218 CASE 388008 Make Weekdays non editable when Period Type is Daily

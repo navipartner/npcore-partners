@@ -1,5 +1,6 @@
-table 6014423 "NPR Period"
+﻿table 6014423 "NPR Period"
 {
+    Access = Internal;
     Caption = 'Period';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

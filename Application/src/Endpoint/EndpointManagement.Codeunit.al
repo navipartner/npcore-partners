@@ -1,5 +1,6 @@
 ﻿codeunit 6014675 "NPR Endpoint Management"
 {
+    Access = Internal;
     // NPR5.23\BR\20160518  CASE 237658 Object created
     // NPR5.25\BR\20160802  CASE 234602 Added function CreateQuery
 

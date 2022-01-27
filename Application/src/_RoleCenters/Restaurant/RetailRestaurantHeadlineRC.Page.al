@@ -1,5 +1,6 @@
-page 6151337 "NPR Restaurant Headline RC"
+﻿page 6151337 "NPR Restaurant Headline RC"
 {
+    Extensible = False;
     Caption = 'Headline';
     PageType = HeadlinePart;
     RefreshOnActivate = true;

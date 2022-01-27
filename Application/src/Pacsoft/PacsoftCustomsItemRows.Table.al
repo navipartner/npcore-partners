@@ -1,5 +1,6 @@
-table 6014472 "NPR Pacsoft Customs Item Rows"
+﻿table 6014472 "NPR Pacsoft Customs Item Rows"
 {
+    Access = Internal;
     // PS1.00/LS/20141201  CASE 200150 Pacsoft Module
 
     Caption = 'Pacsoft Customs Item Rows';

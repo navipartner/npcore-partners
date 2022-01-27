@@ -1,5 +1,6 @@
-page 6151061 "NPR Distrib. Matrix"
+﻿page 6151061 "NPR Distrib. Matrix"
 {
+    Extensible = False;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
 
     Caption = 'Distribution Matrix';

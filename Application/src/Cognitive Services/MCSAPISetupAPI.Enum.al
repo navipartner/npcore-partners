@@ -1,5 +1,8 @@
-enum 6014441 "NPR MCS API Setup API"
+﻿enum 6014441 "NPR MCS API Setup API"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; Face)

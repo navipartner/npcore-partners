@@ -1,5 +1,6 @@
-page 6184495 "NPR Pepper Terminal Types"
+﻿page 6184495 "NPR Pepper Terminal Types"
 {
+    Extensible = False;
     // NPR5.20\BR\20160316  CASE 231481 Object Created
 
     Caption = 'Pepper Terminal Types';

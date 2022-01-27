@@ -1,5 +1,6 @@
-table 6059811 "NPR Retail Sales Cue"
+﻿table 6059811 "NPR Retail Sales Cue"
 {
+    Access = Internal;
     Caption = 'NaviConnect Cue';
     DataClassification = CustomerContent;
 

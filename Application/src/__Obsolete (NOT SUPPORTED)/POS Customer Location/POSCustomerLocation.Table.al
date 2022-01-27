@@ -1,5 +1,6 @@
-table 6014530 "NPR POS Customer Location"
+﻿table 6014530 "NPR POS Customer Location"
 {
+    Access = Internal;
     Caption = 'POS Customer Location';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

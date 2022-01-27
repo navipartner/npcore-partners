@@ -1,5 +1,6 @@
-codeunit 6014571 "NPR TM Report - Ticket"
+﻿codeunit 6014571 "NPR TM Report - Ticket"
 {
+    Access = Internal;
     TableNo = "NPR TM Ticket";
 
     trigger OnRun()

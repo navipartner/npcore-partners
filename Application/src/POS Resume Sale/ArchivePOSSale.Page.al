@@ -1,5 +1,6 @@
-page 6150744 "NPR Archive POS Sale"
+﻿page 6150744 "NPR Archive POS Sale"
 {
+    Extensible = False;
     Caption = 'Archive POS Sale';
     Editable = false;
     PageType = Document;

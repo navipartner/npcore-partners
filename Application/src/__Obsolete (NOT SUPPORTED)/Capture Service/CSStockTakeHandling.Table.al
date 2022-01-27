@@ -1,5 +1,6 @@
-table 6151377 "NPR CS Stock-Take Handling"
+﻿table 6151377 "NPR CS Stock-Take Handling"
 {
+    Access = Internal;
 
     Caption = 'CS Stock-Take Handling';
     DataClassification = CustomerContent;

@@ -1,5 +1,6 @@
-page 6150734 "NPR POS Scenarios Set Entries"
+﻿page 6150734 "NPR POS Scenarios Set Entries"
 {
+    Extensible = False;
 
     Caption = 'POS Scenarios Set Entries';
     PageType = ListPart;

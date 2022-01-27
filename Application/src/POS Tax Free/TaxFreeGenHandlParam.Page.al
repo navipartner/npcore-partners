@@ -1,5 +1,6 @@
-page 6014646 "NPR Tax Free Gen. Handl. Param"
+﻿page 6014646 "NPR Tax Free Gen. Handl. Param"
 {
+    Extensible = False;
 
     Caption = 'Tax Free Handler Parameters';
     DelayedInsert = true;

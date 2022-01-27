@@ -1,5 +1,6 @@
-table 6151002 "NPR POS Saved Sale Entry"
+﻿table 6151002 "NPR POS Saved Sale Entry"
 {
+    Access = Internal;
     Caption = 'POS Saved Sale Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Saved Sales";

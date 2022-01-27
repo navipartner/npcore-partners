@@ -1,5 +1,6 @@
-page 6059949 "NPR NaviDocs Entry Attachments"
+﻿page 6059949 "NPR NaviDocs Entry Attachments"
 {
+    Extensible = False;
 
     Caption = 'Attachments';
     Editable = false;

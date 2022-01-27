@@ -1,5 +1,6 @@
-page 6014528 "NPR Payment Gateways WP"
+﻿page 6014528 "NPR Payment Gateways WP"
 {
+    Extensible = False;
     Caption = 'Payment Gateways';
     PageType = ListPart;
     UsageCategory = Administration;

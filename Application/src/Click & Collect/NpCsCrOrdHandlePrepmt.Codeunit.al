@@ -1,5 +1,6 @@
-codeunit 6151213 "NPR NpCs Cr.Ord: Handle Prepmt"
+﻿codeunit 6151213 "NPR NpCs Cr.Ord: Handle Prepmt"
 {
+    Access = Internal;
     trigger OnRun()
     begin
         HandlePrepayment();

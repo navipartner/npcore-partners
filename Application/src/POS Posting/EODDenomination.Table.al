@@ -1,5 +1,6 @@
-table 6014547 "NPR EOD Denomination"
+﻿table 6014547 "NPR EOD Denomination"
 {
+    Access = Internal;
     Caption = 'NPR EOD Denomination';
     DataClassification = CustomerContent;
 

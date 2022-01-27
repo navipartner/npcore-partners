@@ -1,5 +1,6 @@
-page 6014597 "NPR Prod. Group Code Stats"
+﻿page 6014597 "NPR Prod. Group Code Stats"
 {
+    Extensible = False;
     Caption = 'Product Group Code Statistics';
     Editable = false;
     PageType = List;

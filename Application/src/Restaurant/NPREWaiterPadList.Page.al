@@ -1,5 +1,6 @@
-page 6150663 "NPR NPRE Waiter Pad List"
+﻿page 6150663 "NPR NPRE Waiter Pad List"
 {
+    Extensible = False;
     Caption = 'Waiter Pad List';
     CardPageID = "NPR NPRE Waiter Pad";
     PageType = List;

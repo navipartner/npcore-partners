@@ -1,5 +1,6 @@
-table 6151413 "NPR Magento Payment Gateway"
+﻿table 6151413 "NPR Magento Payment Gateway"
 {
+    Access = Internal;
     Caption = 'Magento Payment Gateway';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,6 @@
-table 6014679 "NPR Endpoint Query Filter"
+﻿table 6014679 "NPR Endpoint Query Filter"
 {
+    Access = Internal;
     // NPR5.23\BR\20160518  CASE 237658 Object created
     // NPR5.48/JDH /20181109 CASE 334163 Added Captions
 

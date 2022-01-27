@@ -1,5 +1,6 @@
-codeunit 6014653 "NPR UPG POS Cross Ref"
+﻿codeunit 6014653 "NPR UPG POS Cross Ref"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
 

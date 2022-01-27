@@ -1,5 +1,6 @@
-page 6151251 "NPR Retail Enter. Act: Others"
+﻿page 6151251 "NPR Retail Enter. Act: Others"
 {
+    Extensible = False;
     Caption = 'Activities';
     PageType = CardPart;
     RefreshOnActivate = true;

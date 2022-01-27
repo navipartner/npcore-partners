@@ -1,5 +1,6 @@
-page 6014419 "NPR Exchange Label Setup"
+﻿page 6014419 "NPR Exchange Label Setup"
 {
+    Extensible = False;
     Caption = 'Exchange Label Setup';
     PageType = Card;
     SourceTable = "NPR Exchange Label Setup";

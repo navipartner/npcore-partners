@@ -1,5 +1,8 @@
 report 6014415 "NPR Rep. Check Missing Fields"
 {
+#IF NOT BC17
+    Extensible = False; 
+#ENDIF
     ApplicationArea = NPRRetail;
     Caption = 'Check Missing Fields';
     DefaultLayout = RDLC;

@@ -1,5 +1,6 @@
-query 6014403 "NPR APIV1 - G/L Entry Read"
+﻿query 6014403 "NPR APIV1 - G/L Entry Read"
 {
+    Access = Internal;
     APIGroup = 'core';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';

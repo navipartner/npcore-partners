@@ -1,5 +1,6 @@
-page 6151151 "NPR Customer GDPR Log Entries"
+﻿page 6151151 "NPR Customer GDPR Log Entries"
 {
+    Extensible = False;
     // NPR5.52/JAKUBV/20191022  CASE 358656 Transport NPR5.52 - 22 October 2019
     // NPR5.55/ZESO/20200427 CASE Added field Open Journal Entries/Statement
 

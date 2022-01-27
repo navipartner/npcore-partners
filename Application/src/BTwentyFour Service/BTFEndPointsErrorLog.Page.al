@@ -1,5 +1,6 @@
-page 6059923 "NPR BTF EndPoints Error Log"
+﻿page 6059923 "NPR BTF EndPoints Error Log"
 {
+    Extensible = False;
     UsageCategory = None;
     PageType = List;
     SourceTable = "NPR BTF EndPoint Error Log";

@@ -1,5 +1,6 @@
-page 6151261 "NPR Purchase Ord Chart"
+﻿page 6151261 "NPR Purchase Ord Chart"
 {
+    Extensible = False;
     Caption = 'Trailing Purchase Orders';
     PageType = CardPart;
     SourceTable = "Business Chart Buffer";

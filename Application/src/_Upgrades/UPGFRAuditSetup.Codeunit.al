@@ -1,5 +1,6 @@
-codeunit 6014670 "NPR UPG FR Audit Setup"
+﻿codeunit 6014670 "NPR UPG FR Audit Setup"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

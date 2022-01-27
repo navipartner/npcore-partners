@@ -1,5 +1,6 @@
-page 6150642 "NPR POS Info List"
+﻿page 6150642 "NPR POS Info List"
 {
+    Extensible = False;
     // NPR5.26/OSFI/20160810 CASE 246167 Object Created
     // NPR5.51/ALPO/20190826 CASE 364558 Define inheritable pos info codes (will be copied from Sales POS header to new lines)
 

@@ -1,5 +1,6 @@
-codeunit 6184493 "NPR Pepper End Workshift TSD"
+﻿codeunit 6184493 "NPR Pepper End Workshift TSD"
 {
+    Access = Internal;
     // NPR5.30/TSA/20170123  CASE 263458 Refactored for Transcendence
 
 

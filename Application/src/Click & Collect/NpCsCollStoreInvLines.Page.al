@@ -1,5 +1,6 @@
-page 6151219 "NPR NpCs Coll. Store Inv.Lines"
+﻿page 6151219 "NPR NpCs Coll. Store Inv.Lines"
 {
+    Extensible = False;
     Caption = 'Lines';
     Editable = false;
     PageType = ListPart;

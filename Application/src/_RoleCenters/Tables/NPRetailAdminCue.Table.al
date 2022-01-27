@@ -1,5 +1,6 @@
-table 6151248 "NPR NP Retail Admin Cue"
+﻿table 6151248 "NPR NP Retail Admin Cue"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'NP Retail Admin Cue';
     fields

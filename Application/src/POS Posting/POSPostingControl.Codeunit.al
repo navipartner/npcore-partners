@@ -1,5 +1,6 @@
-codeunit 6150637 "NPR POS Posting Control"
+﻿codeunit 6150637 "NPR POS Posting Control"
 {
+    Access = Internal;
     var
         DimConsistencyErr: Label 'There was an attempt to post a transaction with inconsistent dimensions. The following values were used:\%1=%2, %3=%4, %5=%6.\RecordID: %7.\This indicates a programming bug, no a user error. Please contact system vendor.\\Error call stack:\%8\Ref. case ID 375258';
         GLSetup: Record "General Ledger Setup";

@@ -1,5 +1,6 @@
-table 6060054 "NPR Item Status"
+﻿table 6060054 "NPR Item Status"
 {
+    Access = Internal;
     // NPR5.25\BR  \20160720  CASE 246088 Object Created
 
     Caption = 'Item Status';

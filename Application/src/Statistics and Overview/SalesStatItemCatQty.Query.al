@@ -1,5 +1,6 @@
-query 6014413 "NPR Sales Stat. -Item Cat Qty"
+﻿query 6014413 "NPR Sales Stat. -Item Cat Qty"
 {
+    Access = Internal;
     Caption = 'Sales Statistics -Item Cat Qty';
 
     elements

@@ -1,5 +1,6 @@
-page 6014633 "NPR MM Member Attr FactBox"
+﻿page 6014633 "NPR MM Member Attr FactBox"
 {
+    Extensible = False;
     PageType = CardPart;
     ApplicationArea = NPRetail;
     UsageCategory = Administration;

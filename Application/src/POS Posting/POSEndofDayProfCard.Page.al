@@ -1,5 +1,6 @@
-page 6150752 "NPR POS End of Day Prof. Card"
+﻿page 6150752 "NPR POS End of Day Prof. Card"
 {
+    Extensible = False;
     Caption = 'NPR POS End of Day Profile Card';
     PageType = Card;
     SourceTable = "NPR POS End of Day Profile";

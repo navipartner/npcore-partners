@@ -1,5 +1,6 @@
-page 6059950 "NPR POS Display Profiles"
+﻿page 6059950 "NPR POS Display Profiles"
 {
+    Extensible = False;
     Caption = 'POS Display Profiles';
     PageType = List;
     Editable = false;

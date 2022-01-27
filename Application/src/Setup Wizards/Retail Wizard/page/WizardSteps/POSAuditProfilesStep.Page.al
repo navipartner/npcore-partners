@@ -1,5 +1,6 @@
-page 6014654 "NPR POS Audit Profiles Step"
+﻿page 6014654 "NPR POS Audit Profiles Step"
 {
+    Extensible = False;
     Caption = 'POS Audit Profiles';
     PageType = ListPart;
     SourceTable = "NPR POS Audit Profile";

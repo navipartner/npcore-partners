@@ -1,6 +1,7 @@
-#pragma warning disable AA0139
+﻿#pragma warning disable AA0139
 page 6060078 "NPR MM Membership Kiosk"
 {
+    Extensible = False;
 
     // This file should probably be deleted. /Tim
 

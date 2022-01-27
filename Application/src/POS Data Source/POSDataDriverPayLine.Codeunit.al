@@ -1,5 +1,6 @@
-codeunit 6150713 "NPR POS Data Driver: Pay. Line"
+﻿codeunit 6150713 "NPR POS Data Driver: Pay. Line"
 {
+    Access = Internal;
     // NPR5.36/TJ  /20170825 CASE 287688 Text constants with nontranslatable text are now functions with hardcoded values
     // NPR5.38/MHA /20180105  CASE 301053 Updated signature of RefreshDataSet() to match new publisher signature
 

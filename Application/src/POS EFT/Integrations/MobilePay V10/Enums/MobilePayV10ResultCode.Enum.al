@@ -1,5 +1,8 @@
-enum 6014469 "NPR MobilePayV10 Result Code"
+﻿enum 6014469 "NPR MobilePayV10 Result Code"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = false;
 
     value(0; Prepared)

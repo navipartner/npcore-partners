@@ -1,5 +1,6 @@
-table 6150673 "NPR NPRE Serv.Flow Profile"
+﻿table 6150673 "NPR NPRE Serv.Flow Profile"
 {
+    Access = Internal;
     Caption = 'Rest. Service Flow Profile';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Service Flow Profiles";

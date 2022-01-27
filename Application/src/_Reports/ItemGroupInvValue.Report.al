@@ -1,5 +1,8 @@
-report 6014448 "NPR Item Group Inv. Value"
+﻿report 6014448 "NPR Item Group Inv. Value"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Group Inventory Value.rdlc';
     Caption = 'Item Group Inventory Value';

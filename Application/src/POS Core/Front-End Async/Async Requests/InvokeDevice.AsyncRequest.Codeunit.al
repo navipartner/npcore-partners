@@ -1,5 +1,6 @@
-codeunit 6150773 "NPR Front-End: InvokeDevice" implements "NPR Front-End Async Request"
+﻿codeunit 6150773 "NPR Front-End: InvokeDevice" implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _id: Text;

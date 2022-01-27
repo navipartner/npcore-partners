@@ -1,5 +1,6 @@
 ﻿codeunit 6151556 "NPR NpXml Template Mgt."
 {
+    Access = Internal;
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Text300: Label 'Please enter a Version Description';

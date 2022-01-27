@@ -1,5 +1,6 @@
-table 6014558 "NPR RP Data Join Buffer"
+﻿table 6014558 "NPR RP Data Join Buffer"
 {
+    Access = Internal;
     // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
 
     Caption = 'Data Join Buffer';

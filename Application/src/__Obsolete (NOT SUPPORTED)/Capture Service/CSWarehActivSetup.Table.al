@@ -1,5 +1,6 @@
-table 6151363 "NPR CS Wareh. Activ. Setup"
+﻿table 6151363 "NPR CS Wareh. Activ. Setup"
 {
+    Access = Internal;
     Caption = 'CS Warehouse Activity Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

@@ -1,5 +1,6 @@
 ﻿codeunit 6151103 "NPR NpRi Coll. Vendor Ledgers"
 {
+    Access = Internal;
     var
         Text000: Label 'Vendor Ledger Entries (Invoice and Credit Memo)';
         Text001: Label 'Collecting Vendor Ledger Entries: @1@@@@@@@@@@@@@@@@@@';

@@ -1,5 +1,6 @@
-page 6060151 "NPR Event Plan. Lines Sub."
+﻿page 6060151 "NPR Event Plan. Lines Sub."
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Lines';
     DataCaptionExpression = Rec.Caption();

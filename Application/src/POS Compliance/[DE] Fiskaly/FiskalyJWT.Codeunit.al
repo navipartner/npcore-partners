@@ -1,5 +1,6 @@
-codeunit 6014560 "NPR FiskalyJWT"
+﻿codeunit 6014560 "NPR FiskalyJWT"
 {
+    Access = Internal;
     SingleInstance = true;
 
     procedure SetJWT(JsonString: JsonObject; var TokenPar: Text)

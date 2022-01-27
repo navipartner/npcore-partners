@@ -1,5 +1,6 @@
-page 6059940 "NPR SMS Template List"
+﻿page 6059940 "NPR SMS Template List"
 {
+    Extensible = False;
     Caption = 'SMS Template List';
     CardPageID = "NPR SMS Template Card";
     Editable = false;

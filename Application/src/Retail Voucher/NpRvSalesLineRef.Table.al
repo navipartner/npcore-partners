@@ -1,5 +1,6 @@
-table 6151017 "NPR NpRv Sales Line Ref."
+﻿table 6151017 "NPR NpRv Sales Line Ref."
 {
+    Access = Internal;
     Caption = 'Retail Voucher Sales Line Reference';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Sales Line Ref.";

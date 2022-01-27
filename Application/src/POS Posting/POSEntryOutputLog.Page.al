@@ -1,5 +1,6 @@
-page 6150672 "NPR POS Entry Output Log"
+﻿page 6150672 "NPR POS Entry Output Log"
 {
+    Extensible = False;
     Caption = 'POS Entry Output Log';
     DeleteAllowed = false;
     Editable = false;

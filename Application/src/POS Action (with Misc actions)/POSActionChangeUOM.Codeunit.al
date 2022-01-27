@@ -1,5 +1,6 @@
-codeunit 6151140 "NPR POS Action: Change UOM"
+﻿codeunit 6151140 "NPR POS Action: Change UOM"
 {
+    Access = Internal;
     var
         ActionDescriptionCaption: Label 'Change unit of measure for POS sales line';
 

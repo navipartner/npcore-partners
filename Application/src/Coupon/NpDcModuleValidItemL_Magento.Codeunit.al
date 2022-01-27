@@ -1,5 +1,6 @@
-codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
+﻿codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
 {
+    Access = Internal;
     Description = 'Coupon Module Validation Item List with Magento Brand support';
 
     var

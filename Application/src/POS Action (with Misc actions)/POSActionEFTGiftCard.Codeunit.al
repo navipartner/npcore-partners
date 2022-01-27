@@ -1,5 +1,6 @@
-codeunit 6150874 "NPR POS Action: EFT Gift Card"
+﻿codeunit 6150874 "NPR POS Action: EFT Gift Card"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Sale of EFT Gift Cards';
         GIFTCARD_CAPTION_AMOUNT: Label 'Gift Card Amount';

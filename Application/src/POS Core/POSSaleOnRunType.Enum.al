@@ -1,5 +1,8 @@
-enum 6014448 "NPR POS Sale OnRunType"
+﻿enum 6014448 "NPR POS Sale OnRunType"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = false;
 
     value(0; Undefined) { }

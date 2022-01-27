@@ -1,5 +1,6 @@
-page 6014613 "NPR Retail Campgn.Item Subform"
+﻿page 6014613 "NPR Retail Campgn.Item Subform"
 {
+    Extensible = False;
     // NPR5.38.01/JKL /20180206  CASE 299436 Object created - Retail Campaign
     // NPR5.41/JKL /20180419 CASE 299278  added campaign profit calc + units pr. parcel + unit purchase price
     // TM1.39/TSA /20181102 CASE 334585 A control of type 'FlowFilter' is not allowed in a parent control of type 'Repeater'

@@ -1,5 +1,6 @@
-codeunit 6014469 "NPR Send SMS Job Handler"
+﻿codeunit 6014469 "NPR Send SMS Job Handler"
 {
+    Access = Internal;
     trigger OnRun()
     var
         MessageLog: Record "NPR SMS Log";

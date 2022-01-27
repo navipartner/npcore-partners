@@ -1,5 +1,6 @@
-table 6014571 "NPR POS Sale Tax Line"
+﻿table 6014571 "NPR POS Sale Tax Line"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'POS Sale Tax Line';
 

@@ -1,5 +1,6 @@
-page 6151130 "NPR TM Seating Setup"
+﻿page 6151130 "NPR TM Seating Setup"
 {
+    Extensible = False;
     Caption = 'Seating Setup';
     PageType = List;
     SourceTable = "NPR TM Seating Setup";

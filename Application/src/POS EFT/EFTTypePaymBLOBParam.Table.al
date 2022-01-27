@@ -1,5 +1,6 @@
-table 6184481 "NPR EFTType Paym. BLOB Param."
+﻿table 6184481 "NPR EFTType Paym. BLOB Param."
 {
+    Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.48/MMV /20181029 CASE 334105 Fixed invalid variant parameter.
 

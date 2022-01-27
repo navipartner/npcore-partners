@@ -1,5 +1,6 @@
-codeunit 6060149 "NPR RC MM Members.Burndown Mgt"
+﻿codeunit 6060149 "NPR RC MM Members.Burndown Mgt"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

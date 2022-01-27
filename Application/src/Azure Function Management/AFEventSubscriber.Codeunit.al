@@ -1,5 +1,6 @@
-codeunit 6151575 "NPR AF Event Subscriber"
+﻿codeunit 6151575 "NPR AF Event Subscriber"
 {
+    Access = Internal;
     [EventSubscriber(ObjectType::Table, Database::"NPR AF Notification Hub", 'OnAfterInsertEvent', '', true, true)]
     local procedure T6151574OnAfterInsert(var Rec: Record "NPR AF Notification Hub"; RunTrigger: Boolean)
     var

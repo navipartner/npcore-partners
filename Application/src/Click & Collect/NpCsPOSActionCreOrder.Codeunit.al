@@ -1,5 +1,6 @@
 ﻿codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 {
+    Access = Internal;
     var
         ActionDescriptionLbl: Label 'This built-in action create collect order from one to another store.';
         MissingStockInCompanyLbl: Label 'All Items might not be in stock in %1. Do you still wish to continue?', Comment = '%1="NPR NpCs Store"."Company Name';

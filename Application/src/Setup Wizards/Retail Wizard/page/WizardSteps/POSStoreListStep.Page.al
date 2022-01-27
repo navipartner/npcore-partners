@@ -1,5 +1,6 @@
-page 6014653 "NPR POS Store List Step"
+﻿page 6014653 "NPR POS Store List Step"
 {
+    Extensible = False;
     Caption = 'POS Stores';
     PageType = ListPart;
     InsertAllowed = false;

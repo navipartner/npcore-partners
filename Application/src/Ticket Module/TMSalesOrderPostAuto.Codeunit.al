@@ -1,5 +1,6 @@
-codeunit 6060124 "NPR TM Sales Order Post. Auto"
+﻿codeunit 6060124 "NPR TM Sales Order Post. Auto"
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

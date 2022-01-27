@@ -1,5 +1,6 @@
-page 6014430 "NPR SMS Rcpt. Group Line"
+﻿page 6014430 "NPR SMS Rcpt. Group Line"
 {
+    Extensible = False;
 
     Caption = 'SMS Recipient Group Line';
     PageType = ListPart;

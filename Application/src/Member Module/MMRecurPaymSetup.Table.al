@@ -1,5 +1,6 @@
-table 6060093 "NPR MM Recur. Paym. Setup"
+﻿table 6060093 "NPR MM Recur. Paym. Setup"
 {
+    Access = Internal;
 
     Caption = 'Recurring Payment Setup';
     DataClassification = CustomerContent;

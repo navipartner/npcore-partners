@@ -1,5 +1,6 @@
-table 6184513 "NPR EFT Transaction Log"
+﻿table 6184513 "NPR EFT Transaction Log"
 {
+    Access = Internal;
     // NPR5.53/MMV /20191120 CASE 377533 Created object
 
     Caption = 'EFT Transaction Logs';

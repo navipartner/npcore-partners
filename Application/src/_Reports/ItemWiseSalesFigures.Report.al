@@ -1,5 +1,8 @@
-report 6060052 "NPR Item Wise Sales Figures"
+﻿report 6060052 "NPR Item Wise Sales Figures"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Wise Sales Figures.rdlc';
     Caption = 'Item Wise Sales Figures';

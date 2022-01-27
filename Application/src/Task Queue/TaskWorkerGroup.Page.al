@@ -1,5 +1,6 @@
-page 6059906 "NPR Task Worker Group"
+﻿page 6059906 "NPR Task Worker Group"
 {
+    Extensible = False;
     // TQ1.28/MHA/20151216  CASE 229609 Task Queue
 
     Caption = 'Task Worker Group';

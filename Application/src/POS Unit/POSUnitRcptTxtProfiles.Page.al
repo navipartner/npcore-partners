@@ -1,5 +1,6 @@
-page 6151264 "NPR POS Unit Rcpt.Txt Profiles"
+﻿page 6151264 "NPR POS Unit Rcpt.Txt Profiles"
 {
+    Extensible = False;
     Caption = 'POS Unit Receipt Text Profiles';
     CardPageID = "NPR POS Unit Rcpt.Text Profile";
     Editable = false;

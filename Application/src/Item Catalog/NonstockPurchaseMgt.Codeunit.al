@@ -1,5 +1,6 @@
-codeunit 6060064 "NPR Nonstock Purchase Mgt."
+﻿codeunit 6060064 "NPR Nonstock Purchase Mgt."
 {
+    Access = Internal;
     var
         ItemUnitofMeasure: Record "Item Unit of Measure";
         UnitofMeasure: Record "Unit of Measure";

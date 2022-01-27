@@ -1,5 +1,6 @@
-table 6014594 "NPR TM Attendees Buffer"
+﻿table 6014594 "NPR TM Attendees Buffer"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'List of Attendees';
 

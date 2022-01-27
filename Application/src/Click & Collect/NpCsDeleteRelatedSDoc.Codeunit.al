@@ -1,5 +1,6 @@
-codeunit 6151211 "NPR NpCs Delete Related S.Doc."
+﻿codeunit 6151211 "NPR NpCs Delete Related S.Doc."
 {
+    Access = Internal;
     TableNo = "NPR NpCs Document";
 
     trigger OnRun()

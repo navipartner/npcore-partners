@@ -1,5 +1,6 @@
-codeunit 6014500 "NPR Upgrade Magento Passwords"
+﻿codeunit 6014500 "NPR Upgrade Magento Passwords"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

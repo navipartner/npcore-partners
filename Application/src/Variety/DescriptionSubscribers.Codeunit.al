@@ -1,5 +1,6 @@
 ﻿codeunit 6059969 "NPR Description Subscribers"
 {
+    Access = Internal;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Reference Management", 'OnAfterSalesItemItemRefNotFound', '', true, true)]
     local procedure ItemReferenceManagementOnAfterSalesItemItemRefNotFound(var SalesLine: Record "Sales Line"; var ItemVariant: Record "Item Variant")

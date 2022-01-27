@@ -1,5 +1,6 @@
-page 6059838 "NPR EFT Recon. Subscribers"
+﻿page 6059838 "NPR EFT Recon. Subscribers"
 {
+    Extensible = False;
     Caption = 'EFT Recon. Subscribers';
     PageType = List;
     SourceTable = "NPR EFT Recon. Subscriber";

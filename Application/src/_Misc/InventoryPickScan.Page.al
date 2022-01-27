@@ -1,5 +1,6 @@
-page 6014460 "NPR Inventory Pick Scan"
+﻿page 6014460 "NPR Inventory Pick Scan"
 {
+    Extensible = False;
     Caption = 'Inventory Pick';
     PageType = Document;
     UsageCategory = Administration;

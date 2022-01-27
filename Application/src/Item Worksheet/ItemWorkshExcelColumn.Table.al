@@ -1,5 +1,6 @@
-table 6060051 "NPR Item Worksh. Excel Column"
+﻿table 6060051 "NPR Item Worksh. Excel Column"
 {
+    Access = Internal;
     Caption = 'Item Worksheet Excel Column';
     DataClassification = CustomerContent;
 

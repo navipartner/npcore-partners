@@ -1,5 +1,6 @@
-table 6059965 "NPR MPOS Adyen Transactions"
+﻿table 6059965 "NPR MPOS Adyen Transactions"
 {
+    Access = Internal;
     Caption = 'MPOS Adyen Transactions';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

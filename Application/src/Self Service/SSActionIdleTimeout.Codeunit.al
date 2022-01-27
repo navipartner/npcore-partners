@@ -1,5 +1,6 @@
-codeunit 6151287 "NPR SS Action: Idle Timeout"
+﻿codeunit 6151287 "NPR SS Action: Idle Timeout"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This built in function handles idle timeout in self service POS';
 

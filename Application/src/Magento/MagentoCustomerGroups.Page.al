@@ -1,5 +1,6 @@
-page 6151440 "NPR Magento Customer Groups"
+﻿page 6151440 "NPR Magento Customer Groups"
 {
+    Extensible = False;
     Caption = 'Customer Groups';
     PageType = List;
     UsageCategory = Administration;

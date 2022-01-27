@@ -1,5 +1,6 @@
-table 6151169 "NPR NpGp Det. POS Sales Entry"
+﻿table 6151169 "NPR NpGp Det. POS Sales Entry"
 {
+    Access = Internal;
     Caption = 'Global Detailed Pos Sales Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpGp Det. POS S. Entries";

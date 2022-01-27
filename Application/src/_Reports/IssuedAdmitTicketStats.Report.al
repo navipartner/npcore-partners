@@ -1,5 +1,8 @@
-report 6014422 "NPR Issued/Admit. Ticket Stats"
+﻿report 6014422 "NPR Issued/Admit. Ticket Stats"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     RDLCLayout = './src/_Reports/layouts/IssuedAdmitted Ticket Stats.rdlc';
     Caption = 'Issued/Admitted Ticket Statistics';
     PreviewMode = PrintLayout;

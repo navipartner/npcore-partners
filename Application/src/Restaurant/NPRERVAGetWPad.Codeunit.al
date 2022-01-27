@@ -1,5 +1,6 @@
-codeunit 6150680 "NPR NPRE RVA: Get WPad"
+﻿codeunit 6150680 "NPR NPRE RVA: Get WPad"
 {
+    Access = Internal;
     var
         NotFoundErr: Label 'The waiter pad "%1", was not found.';
 

@@ -1,5 +1,6 @@
-table 6151365 "NPR CS Refill Section Data"
+﻿table 6151365 "NPR CS Refill Section Data"
 {
+    Access = Internal;
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
     ObsoleteReason = 'Object moved to NP Warehouse App.';

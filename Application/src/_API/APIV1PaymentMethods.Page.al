@@ -1,5 +1,6 @@
-page 6014662 "NPR APIV1 - Payment Methods"
+﻿page 6014662 "NPR APIV1 - Payment Methods"
 {
+    Extensible = False;
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';

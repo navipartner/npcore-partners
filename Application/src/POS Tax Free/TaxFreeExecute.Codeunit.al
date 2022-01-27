@@ -1,5 +1,6 @@
 ﻿codeunit 6014434 "NPR Tax Free Execute"
 {
+    Access = Internal;
     trigger OnRun()
     begin
 

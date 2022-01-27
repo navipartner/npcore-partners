@@ -1,5 +1,6 @@
-codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
+﻿codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

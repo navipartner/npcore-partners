@@ -1,5 +1,6 @@
-page 6151018 "NPR NpRv Sales Line Card"
+﻿page 6151018 "NPR NpRv Sales Line Card"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Issue Retail Voucher Card';
     DataCaptionExpression = Rec.Description;

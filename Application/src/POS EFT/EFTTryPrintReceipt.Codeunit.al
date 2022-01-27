@@ -1,5 +1,6 @@
-codeunit 6184509 "NPR EFT Try Print Receipt"
+﻿codeunit 6184509 "NPR EFT Try Print Receipt"
 {
+    Access = Internal;
     // NPR5.49/MMV /20190401 CASE 345188 Created object
 
     TableNo = "NPR EFT Transaction Request";

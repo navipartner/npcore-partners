@@ -1,5 +1,6 @@
-table 6151491 "NPR Raptor Setup"
+﻿table 6151491 "NPR Raptor Setup"
 {
+    Access = Internal;
     Caption = 'Raptor Setup';
     DataClassification = CustomerContent;
 

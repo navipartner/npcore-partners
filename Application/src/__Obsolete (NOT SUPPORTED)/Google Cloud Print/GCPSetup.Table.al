@@ -1,5 +1,6 @@
-table 6014583 "NPR GCP Setup"
+﻿table 6014583 "NPR GCP Setup"
 {
+    Access = Internal;
 
     Caption = 'Google Cloud Print Setup';
     DataClassification = CustomerContent;

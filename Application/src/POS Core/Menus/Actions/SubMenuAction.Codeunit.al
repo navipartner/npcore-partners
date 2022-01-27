@@ -1,5 +1,6 @@
-codeunit 6150888 "NPR SubMenu Action" implements "NPR IAction", "NPR IJsonSerializable"
+﻿codeunit 6150888 "NPR SubMenu Action" implements "NPR IAction", "NPR IJsonSerializable"
 {
+    Access = Internal;
     // This codeunit is there to support enum implementation. It is not intended to be used, and any attempt to actually use it will result in an error.
     var
         TextDoNotUse: Label 'Do not use codeunit "NPR SubMenu Action" directly.';

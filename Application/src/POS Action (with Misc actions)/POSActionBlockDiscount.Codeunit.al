@@ -1,5 +1,6 @@
-codeunit 6150838 "NPR POS Action: Block Discount"
+﻿codeunit 6150838 "NPR POS Action: Block Discount"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This action toggles the state of "Custom Disc Block" field.';
         Title: Label 'Block / Unblock Discount';

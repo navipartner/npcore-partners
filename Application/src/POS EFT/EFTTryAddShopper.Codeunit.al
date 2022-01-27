@@ -1,5 +1,6 @@
-codeunit 6184508 "NPR EFT Try Add Shopper"
+﻿codeunit 6184508 "NPR EFT Try Add Shopper"
 {
+    Access = Internal;
     TableNo = "NPR EFT Shopper Recognition";
 
     trigger OnRun()

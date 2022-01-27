@@ -1,5 +1,6 @@
-codeunit 6150818 "NPR POSAction: Set TaxAreaCode"
+﻿codeunit 6150818 "NPR POSAction: Set TaxAreaCode"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Set Tax Area Code';
 

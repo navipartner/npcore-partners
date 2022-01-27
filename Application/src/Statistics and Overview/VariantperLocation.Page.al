@@ -1,5 +1,6 @@
-page 6059976 "NPR Variant per Location"
+﻿page 6059976 "NPR Variant per Location"
 {
+    Extensible = False;
     Caption = 'Variant per Location';
     DeleteAllowed = false;
     Editable = false;

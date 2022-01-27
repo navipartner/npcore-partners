@@ -1,5 +1,6 @@
 ﻿codeunit 6060148 "NPR MM Membership Auto Renew"
 {
+    Access = Internal;
 
     trigger OnRun()
     begin

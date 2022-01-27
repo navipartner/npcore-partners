@@ -1,5 +1,6 @@
-table 6150660 "NPR NPRE Waiter Pad"
+﻿table 6150660 "NPR NPRE Waiter Pad"
 {
+    Access = Internal;
     Caption = 'Waiter Pad';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Waiter Pad List";

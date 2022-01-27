@@ -1,5 +1,6 @@
-page 6014539 "NPR Insurance Category"
+﻿page 6014539 "NPR Insurance Category"
 {
+    Extensible = False;
     Caption = 'Insurance Category';
     PageType = List;
     UsageCategory = Administration;

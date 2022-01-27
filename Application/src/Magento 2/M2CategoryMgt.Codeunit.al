@@ -1,5 +1,6 @@
 ﻿codeunit 6151464 "NPR M2 Category Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     begin
         UpdateCategories();

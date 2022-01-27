@@ -1,5 +1,6 @@
-page 6151501 "NPR Nc Task Setup"
+﻿page 6151501 "NPR Nc Task Setup"
 {
+    Extensible = False;
     Caption = 'NaviConnect Task Setup';
     PageType = List;
     SourceTable = "NPR Nc Task Setup";

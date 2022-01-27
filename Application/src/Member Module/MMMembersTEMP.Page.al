@@ -1,5 +1,6 @@
-page 6014587 "NPR MM Members TEMP"
+﻿page 6014587 "NPR MM Members TEMP"
 {
+    Extensible = False;
     Caption = 'Members (search result)';
     CardPageID = "NPR MM Member Card";
     DataCaptionExpression = Rec."External Member No.";

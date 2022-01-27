@@ -1,5 +1,6 @@
-page 6151161 "NPR MM Loyalty Server Trx Log"
+﻿page 6151161 "NPR MM Loyalty Server Trx Log"
 {
+    Extensible = False;
 
     Caption = 'Loyalty Server Trans. Log';
     PageType = List;

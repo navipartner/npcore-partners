@@ -1,5 +1,6 @@
-table 6184891 "NPR Storage Operation Type"
+﻿table 6184891 "NPR Storage Operation Type"
 {
+    Access = Internal;
     Caption = 'Storage Operations';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

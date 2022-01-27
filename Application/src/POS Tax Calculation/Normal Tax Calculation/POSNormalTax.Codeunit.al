@@ -1,5 +1,6 @@
-codeunit 6014636 "NPR POS Normal Tax" implements "NPR POS ITaxCalc"
+﻿codeunit 6014636 "NPR POS Normal Tax" implements "NPR POS ITaxCalc"
 {
+    Access = Internal;
     procedure Show(SourceRecSysId: Guid)
     var
         POSSaleTax: Record "NPR POS Sale Tax";

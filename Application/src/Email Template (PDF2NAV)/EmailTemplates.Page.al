@@ -1,5 +1,6 @@
-page 6059795 "NPR E-mail Templates"
+﻿page 6059795 "NPR E-mail Templates"
 {
+    Extensible = False;
 
     Caption = 'E-mail Templates';
     CardPageID = "NPR E-mail Template";

@@ -1,5 +1,6 @@
-page 6151491 "NPR Raptor Setup"
+﻿page 6151491 "NPR Raptor Setup"
 {
+    Extensible = False;
     AccessByPermission = TableData "NPR Raptor Setup" = M;
     Caption = 'Raptor Setup';
     DeleteAllowed = false;

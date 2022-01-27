@@ -1,5 +1,6 @@
-table 6059960 "NPR MCS Webcam Arg. Table"
+﻿table 6059960 "NPR MCS Webcam Arg. Table"
 {
+    Access = Internal;
 
     Caption = 'MCS Webcam Argument Table';
     DataClassification = CustomerContent;

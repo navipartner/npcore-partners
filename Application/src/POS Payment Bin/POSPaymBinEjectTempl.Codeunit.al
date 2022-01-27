@@ -1,5 +1,6 @@
-codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
+﻿codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
 {
+    Access = Internal;
     // NPR5.50/MMV /20190417 CASE 350812 Created object
 
 

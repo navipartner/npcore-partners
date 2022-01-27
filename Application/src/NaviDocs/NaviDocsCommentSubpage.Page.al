@@ -1,5 +1,6 @@
-page 6059770 "NPR NaviDocs Comment Subpage"
+﻿page 6059770 "NPR NaviDocs Comment Subpage"
 {
+    Extensible = False;
 
     Caption = 'Comments';
     DeleteAllowed = false;

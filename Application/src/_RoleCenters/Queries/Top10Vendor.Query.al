@@ -1,5 +1,6 @@
-query 6151241 "NPR Top 10 Vendor"
+﻿query 6151241 "NPR Top 10 Vendor"
 {
+    Access = Internal;
     OrderBy = Descending(Sum_Sales_Amount_Actual);
     TopNumberOfRows = 10;
     Caption = 'Top 10 Vendor';

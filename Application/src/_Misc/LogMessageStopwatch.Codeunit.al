@@ -1,5 +1,6 @@
 ﻿codeunit 6014443 "NPR LogMessage Stopwatch"
 {
+    Access = Internal;
     var
         _ActiveSession: Record "Active Session";
         _LogDict: Dictionary of [Text, Text];

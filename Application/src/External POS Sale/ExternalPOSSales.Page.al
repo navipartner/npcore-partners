@@ -1,5 +1,6 @@
-page 6059776 "NPR External POS Sales"
+﻿page 6059776 "NPR External POS Sales"
 {
+    Extensible = False;
 
     ApplicationArea = NPRRetail;
     Caption = 'External POS Sales List';

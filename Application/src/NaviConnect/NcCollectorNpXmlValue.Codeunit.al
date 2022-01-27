@@ -1,5 +1,6 @@
-codeunit 6151530 "NPR Nc Collector NpXml Value"
+﻿codeunit 6151530 "NPR Nc Collector NpXml Value"
 {
+    Access = Internal;
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()

@@ -1,5 +1,8 @@
-enum 6014427 "NPR Mag. Prod. Relation Type"
+﻿enum 6014427 "NPR Mag. Prod. Relation Type"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; " ")

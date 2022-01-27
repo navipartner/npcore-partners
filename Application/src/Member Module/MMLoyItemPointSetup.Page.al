@@ -1,5 +1,6 @@
-page 6060107 "NPR MM Loy. Item Point Setup"
+﻿page 6060107 "NPR MM Loy. Item Point Setup"
 {
+    Extensible = False;
 
     Caption = 'Loyalty Item Point Setup';
     PageType = List;

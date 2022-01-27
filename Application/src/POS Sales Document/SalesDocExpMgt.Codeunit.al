@@ -1,5 +1,6 @@
-codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
+﻿codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 {
+    Access = Internal;
     Permissions = TableData "NPR POS Entry" = rimd;
 
     var

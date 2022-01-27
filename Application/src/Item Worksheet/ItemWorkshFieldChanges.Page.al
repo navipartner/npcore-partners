@@ -1,5 +1,6 @@
-page 6060055 "NPR Item Worksh. Field Changes"
+﻿page 6060055 "NPR Item Worksh. Field Changes"
 {
+    Extensible = False;
     Caption = 'Item Worksheet Field Changes';
     Editable = false;
     PageType = List;

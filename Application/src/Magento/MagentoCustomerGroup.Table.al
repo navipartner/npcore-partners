@@ -1,5 +1,6 @@
-table 6151432 "NPR Magento Customer Group"
+﻿table 6151432 "NPR Magento Customer Group"
 {
+    Access = Internal;
     Caption = 'Magento Customer Group';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Customer Groups";

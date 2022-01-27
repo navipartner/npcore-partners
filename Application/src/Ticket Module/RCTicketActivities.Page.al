@@ -1,5 +1,6 @@
-page 6060108 "NPR RC Ticket Activities"
+﻿page 6060108 "NPR RC Ticket Activities"
 {
+    Extensible = False;
     Caption = 'Ticket Activities';
     PageType = CardPart;
     UsageCategory = Administration;

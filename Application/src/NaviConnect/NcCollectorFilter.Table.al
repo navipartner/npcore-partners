@@ -1,5 +1,6 @@
-table 6151526 "NPR Nc Collector Filter"
+﻿table 6151526 "NPR Nc Collector Filter"
 {
+    Access = Internal;
     Caption = 'Nc Collector Filter';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,6 @@
-table 6150667 "NPR NPRE Print Templ."
+﻿table 6150667 "NPR NPRE Print Templ."
 {
+    Access = Internal;
     Caption = 'NPRE Print Template';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Print Templ. Subpage";

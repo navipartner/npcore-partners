@@ -1,5 +1,8 @@
-report 6014662 "NPR Retail Inv.: Sales Stat."
+﻿report 6014662 "NPR Retail Inv.: Sales Stat."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Inventory - Sales Stat..rdlc';
     UsageCategory = ReportsAndAnalysis;

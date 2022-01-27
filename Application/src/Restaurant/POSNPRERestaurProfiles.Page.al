@@ -1,5 +1,6 @@
-page 6150625 "NPR POS NPRE Restaur. Profiles"
+﻿page 6150625 "NPR POS NPRE Restaur. Profiles"
 {
+    Extensible = False;
     PageType = List;
     UsageCategory = Administration;
 

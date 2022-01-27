@@ -1,5 +1,6 @@
-codeunit 6060156 "NPR Event Management TQ"
+﻿codeunit 6060156 "NPR Event Management TQ"
 {
+    Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()

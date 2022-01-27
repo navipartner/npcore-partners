@@ -1,5 +1,6 @@
-table 6184881 "NPR FTP Overview"
+﻿table 6184881 "NPR FTP Overview"
 {
+    Access = Internal;
     Caption = 'FTP Overview';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

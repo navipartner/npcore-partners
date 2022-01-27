@@ -1,5 +1,8 @@
-report 6014443 "NPR Period Discount Stat."
+﻿report 6014443 "NPR Period Discount Stat."
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Period Discount Statistics.rdlc';
     Caption = 'Period Discount Statistics';

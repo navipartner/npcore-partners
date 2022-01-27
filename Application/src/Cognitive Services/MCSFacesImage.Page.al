@@ -1,5 +1,6 @@
-page 6151307 "NPR MCS Faces Image"
+﻿page 6151307 "NPR MCS Faces Image"
 {
+    Extensible = False;
     Caption = 'NPR MCS Faces Image';
     DeleteAllowed = false;
     InsertAllowed = false;

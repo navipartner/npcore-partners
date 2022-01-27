@@ -1,5 +1,6 @@
-table 6014563 "NPR RP Data Item Constr."
+﻿table 6014563 "NPR RP Data Item Constr."
 {
+    Access = Internal;
     Caption = 'Data Item Constraint';
     DataClassification = CustomerContent;
 

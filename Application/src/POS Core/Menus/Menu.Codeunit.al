@@ -1,5 +1,6 @@
-codeunit 6150890 "NPR POS Menu" implements "NPR ISubMenu", "NPR IJsonSerializable"
+﻿codeunit 6150890 "NPR POS Menu" implements "NPR ISubMenu", "NPR IJsonSerializable"
 {
+    Access = Internal;
     var
         _id: Text;
         _caption: Text;

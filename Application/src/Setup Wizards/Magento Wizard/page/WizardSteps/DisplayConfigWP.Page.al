@@ -1,5 +1,6 @@
-page 6014617 "NPR Display Config WP"
+﻿page 6014617 "NPR Display Config WP"
 {
+    Extensible = False;
     Caption = 'Display Config';
     DelayedInsert = true;
     PageType = ListPart;

@@ -1,5 +1,6 @@
-page 6151106 "NPR NpRi Provision Setup"
+﻿page 6151106 "NPR NpRi Provision Setup"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Reimbursement Provision Setup';
     DeleteAllowed = false;

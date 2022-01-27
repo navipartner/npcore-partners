@@ -1,5 +1,6 @@
-table 6060048 "NPR Reg. Item Wsht Var. Value"
+﻿table 6060048 "NPR Reg. Item Wsht Var. Value"
 {
+    Access = Internal;
     Caption = 'Reg. Item Wsht Variety Value';
     DataClassification = CustomerContent;
 

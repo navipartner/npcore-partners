@@ -1,5 +1,6 @@
-table 6184871 "NPR DropBox Overview"
+﻿table 6184871 "NPR DropBox Overview"
 {
+    Access = Internal;
     Caption = 'DropBox Overview';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

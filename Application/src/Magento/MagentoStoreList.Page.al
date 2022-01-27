@@ -1,5 +1,6 @@
-page 6151438 "NPR Magento Store List"
+﻿page 6151438 "NPR Magento Store List"
 {
+    Extensible = False;
     Caption = 'Webshops';
     Editable = false;
     PageType = List;

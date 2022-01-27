@@ -1,5 +1,6 @@
 ﻿codeunit 6014506 "NPR Accessory Unfold Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     begin
     end;

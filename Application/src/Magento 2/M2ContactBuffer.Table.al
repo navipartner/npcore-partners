@@ -1,5 +1,6 @@
-table 6014572 "NPR M2 Contact Buffer"
+﻿table 6014572 "NPR M2 Contact Buffer"
 {
+    Access = Internal;
     Caption = 'Magento Contact Buffer';
     DataClassification = CustomerContent;
 

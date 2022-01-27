@@ -1,5 +1,6 @@
-table 6014484 "NPR RFID Print Log"
+﻿table 6014484 "NPR RFID Print Log"
 {
+    Access = Internal;
     // NPR5.55/MMV /20200713 CASE 407265 Created object
 
     Caption = 'RFID Print Log';

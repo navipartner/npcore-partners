@@ -1,5 +1,6 @@
 ﻿codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Set an event from Event Management module as active for current POS register and sale';
         EventNoLbl: Label 'Event No.';

@@ -1,5 +1,6 @@
-page 6151110 "NPR NpRi Sales Inv. Setup"
+﻿page 6151110 "NPR NpRi Sales Inv. Setup"
 {
+    Extensible = False;
     UsageCategory = None;
     Caption = 'Sales Invoice Reimbursement Setup';
     PageType = Card;

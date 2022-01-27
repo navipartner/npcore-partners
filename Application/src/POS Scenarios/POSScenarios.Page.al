@@ -1,5 +1,6 @@
-page 6150729 "NPR POS Scenarios"
+﻿page 6150729 "NPR POS Scenarios"
 {
+    Extensible = False;
 
     Caption = 'POS Scenarios';
     InsertAllowed = false;

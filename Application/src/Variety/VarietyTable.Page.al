@@ -1,5 +1,6 @@
-page 6059972 "NPR Variety Table"
+﻿page 6059972 "NPR Variety Table"
 {
+    Extensible = False;
     // VRT1.10/JDH/20160105 CASE 201022 Added field "Lock Table"
     // VRT1.11/JDH /20160602 CASE 242940 Added setup new line
     // NPR5.41/TS  /20180105 CASE 300893 ActionContainers cannot have captions

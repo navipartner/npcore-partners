@@ -1,5 +1,6 @@
-page 6060043 "NPR Item Worksh. Vrty. Subpage"
+﻿page 6060043 "NPR Item Worksh. Vrty. Subpage"
 {
+    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Item Worksheet Variety Subpage';
     PageType = ListPart;

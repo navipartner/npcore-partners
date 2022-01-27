@@ -1,5 +1,6 @@
-table 6184861 "NPR Azure Storage Overview"
+﻿table 6184861 "NPR Azure Storage Overview"
 {
+    Access = Internal;
     Caption = 'Azure Storage Overview';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

@@ -1,5 +1,6 @@
-page 6150659 "NPR POS Posting Log Parameters"
+﻿page 6150659 "NPR POS Posting Log Parameters"
 {
+    Extensible = False;
     Caption = 'POS Posting Log Parameters';
     Editable = false;
     PageType = CardPart;

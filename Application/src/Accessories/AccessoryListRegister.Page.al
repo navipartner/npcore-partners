@@ -1,5 +1,6 @@
-page 6014509 "NPR Accessory List - Register"
+﻿page 6014509 "NPR Accessory List - Register"
 {
+    Extensible = False;
     Caption = 'Accessories List Register';
     DeleteAllowed = false;
     Editable = false;

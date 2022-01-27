@@ -1,5 +1,6 @@
-codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
+﻿codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
 {
+    Access = Internal;
     // NPR5.48/MMV /20181205 CASE 327107 Created object
     // 
     // This single instance object can be set as "Pre processing codeunit" on a template - it will substitute the record from a physical Retail Journal Line to a temporary instance where all quantities have been

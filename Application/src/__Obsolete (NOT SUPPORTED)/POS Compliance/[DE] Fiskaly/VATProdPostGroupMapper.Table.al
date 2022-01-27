@@ -1,5 +1,6 @@
-table 6014534 "NPR VAT Prod Post Group Mapper"
+﻿table 6014534 "NPR VAT Prod Post Group Mapper"
 {
+    Access = Internal;
     Caption = 'VAT Product Posting Group Mapper';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;

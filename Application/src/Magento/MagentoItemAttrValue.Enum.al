@@ -1,5 +1,8 @@
-enum 6014414 "NPR Magento Item Attr. Value"
+﻿enum 6014414 "NPR Magento Item Attr. Value"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "")

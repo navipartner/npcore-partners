@@ -1,5 +1,6 @@
-page 6151421 "NPR Magento Product Relations"
+﻿page 6151421 "NPR Magento Product Relations"
 {
+    Extensible = False;
     Caption = 'Product Relations';
     DelayedInsert = true;
     LinksAllowed = false;

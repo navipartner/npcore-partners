@@ -1,5 +1,6 @@
-page 6150641 "NPR POS Info Subform"
+﻿page 6150641 "NPR POS Info Subform"
 {
+    Extensible = False;
     Caption = 'POS Info Subform';
     PageType = ListPart;
     UsageCategory = None;

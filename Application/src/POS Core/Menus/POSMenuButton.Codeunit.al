@@ -1,5 +1,6 @@
-codeunit 6150889 "NPR POS Menu Button" implements "NPR IJsonSerializable", "NPR ISubMenu"
+﻿codeunit 6150889 "NPR POS Menu Button" implements "NPR IJsonSerializable", "NPR ISubMenu"
 {
+    Access = Internal;
     var
         _caption: Text;
         _tooltip: Text;

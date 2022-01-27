@@ -1,5 +1,6 @@
-codeunit 6150794 "NPR POS Action: Tax Free"
+﻿codeunit 6150794 "NPR POS Action: Tax Free"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This is a built-in action for toggling tax free before completing sale';
         Caption_Enabled: Label 'Enabled';

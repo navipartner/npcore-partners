@@ -1,5 +1,6 @@
-table 6014461 "NPR E-mail Templ. Report"
+﻿table 6014461 "NPR E-mail Templ. Report"
 {
+    Access = Internal;
     Caption = 'Report Selections - E-mail';
     DataClassification = CustomerContent;
 

@@ -1,5 +1,6 @@
-table 6014550 "NPR Package Module Config."
+﻿table 6014550 "NPR Package Module Config."
 {
+    Access = Internal;
     // NPR-Package1.0, NPK, DL, 04-04-08, Table created
     //                      DL, 02-05-08, Added fields 13-15
 

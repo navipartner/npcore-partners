@@ -1,5 +1,6 @@
-codeunit 6014412 "NPR MCS Data Upgrade"
+﻿codeunit 6014412 "NPR MCS Data Upgrade"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

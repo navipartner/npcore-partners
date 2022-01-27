@@ -1,5 +1,6 @@
-table 6151016 "NPR NpRv Ret. Vouch. Type"
+﻿table 6151016 "NPR NpRv Ret. Vouch. Type"
 {
+    Access = Internal;
     Caption = 'Return Retail Voucher Type';
     DataClassification = CustomerContent;
 

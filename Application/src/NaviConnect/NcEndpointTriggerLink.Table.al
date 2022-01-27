@@ -1,5 +1,6 @@
-table 6151532 "NPR Nc Endpoint Trigger Link"
+﻿table 6151532 "NPR Nc Endpoint Trigger Link"
 {
+    Access = Internal;
     Caption = 'Nc Endpoint Trigger Link';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Endpoint Trigger Links";

@@ -116,6 +116,47 @@ _Misc:
 For anything not deemed to fit a specific module and/or not big enough to warrant its own folder. 
 Usually one-object scoped functionality that is independent from other functionality.
 
+# Internal access modifiers and _public folders
+Access modifiers are used to set accessibility of tables, table fields, codeunits, and queries, which controls whether the object can be used from other code in your module or other modules. Access modifiers in AL are designed to create solid APIs, by limiting the symbols that dependant modules can take a reference on. Limiting the API surface can hide implementation details and allow for later refactoring of code without breaking external code.
+
+You set the object accessibility by using the Access Property. If the Access property is not specified; default is Public.
+
+Access modifier - **internal** - The object or field can be accessed only by code in the same module, but not from another module.
+
+>**Important**<br>
+Access modifiers are only taken into consideration at compile time. For example, at compile time, a table with *Access = Internal* cannot be used from other modules that do not have access to the internals of the module where the table is defined, but at runtime, any module can access the table by using reflection-based mechanisms such as *RecordRef*, or *TransferFields*. And the *OnRun* trigger can be run on internal codeunits by using *Codeunit.Run*. Setting the object accessibility level as *Access = Internal*; cannot be used as a security boundary.
+
+### _public folder
+
+On NP Retail and WMS new folder is introduced and that is **_public**.
+
+**_public** - folder contains **ONLY** objects which **doesn't have** Access = Internal or Extendable = False in case of Pages.
+
+When developing, developer should think if object should be accessible outside NP Retail or WMS Module. In case of codeunits, queries and pages which will be used as Web services (SOAP codeunits and OData pages) they will be always put in _public so external application could use those for integration.
+
+### Pull Request Validation
+
+Same as folder _public which is introduced on NP Retail and WMS, also additional Pull Request Validation is introduced. 
+
+Additional Pull Request Validation will run when Pull Request is created and will check following:
+
+- If all objects which have Access = Internal or Extensible = False are placed outside _public folder
+- If all objects inside _public folder have Access = Public, are missing access modifier (as said before default is Public) or is Extensible = true
+
+**In case that AL object is not placed correctly Pull Request Validation will Fail!**
+
+Script scans all .al files in /src/ and checks if they are placed in _public folder correctly, as per either the "Access" property or "Extensible" property.
+The purpose is to always make it opt-in when we want to expose internals of the NPRetail to 3rd party dependencies, either our own customer extensions or partner extensions.
+
+### Breaking changes?
+One of the feature which we will accomplish with this change is also not having too much breaking changes to handle.
+
+Why? 
+
+Objects marked as Internal or Extensible = false will not be used by third app so change which would usually cause breaking change would not be in this case. 
+
+Handling of breaking changes for objects which are not marked as Internal or Extensible = false is still a must do with marking as Obsolete.
+
 # Code Review
 Do not be afraid to write feedback on a colleagues pull request - we all have to learn and improve :)
 And try not to take it personal if your pull request is failed in the first go.

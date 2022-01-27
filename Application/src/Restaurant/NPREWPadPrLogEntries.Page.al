@@ -1,5 +1,6 @@
-page 6150682 "NPR NPRE W.Pad Pr.Log Entries"
+﻿page 6150682 "NPR NPRE W.Pad Pr.Log Entries"
 {
+    Extensible = False;
     Caption = 'W. Pad Line Send Log Entries';
     Editable = false;
     PageType = List;

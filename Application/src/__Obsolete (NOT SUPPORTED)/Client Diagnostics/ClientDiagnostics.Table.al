@@ -1,5 +1,6 @@
-table 6059999 "NPR Client Diagnostics"
+﻿table 6059999 "NPR Client Diagnostics"
 {
+    Access = Internal;
 
     Caption = 'Client Diagnostics';
     DataClassification = CustomerContent;

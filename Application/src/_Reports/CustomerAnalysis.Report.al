@@ -1,5 +1,8 @@
-report 6014432 "NPR Customer Analysis"
+﻿report 6014432 "NPR Customer Analysis"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Customer Analysis.rdlc';
     Caption = 'Customer Analysis';

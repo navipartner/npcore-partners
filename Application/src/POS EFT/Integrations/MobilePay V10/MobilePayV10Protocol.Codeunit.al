@@ -1,5 +1,6 @@
-codeunit 6014519 "NPR MobilePayV10 Protocol"
+﻿codeunit 6014519 "NPR MobilePayV10 Protocol"
 {
+    Access = Internal;
     var
         AUTH_TOKEN_Err: Label 'Could not refresh MobilePay authorization token.\%1';
         UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err: Label '%1 isn`t a supported %2 for %3. Only %4 and %5 are supported.';

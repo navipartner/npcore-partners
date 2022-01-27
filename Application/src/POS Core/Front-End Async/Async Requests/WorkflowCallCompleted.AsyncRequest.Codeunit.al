@@ -1,5 +1,6 @@
-codeunit 6150770 "NPR Front-End: WkfCallCompl." implements "NPR Front-End Async Request"
+﻿codeunit 6150770 "NPR Front-End: WkfCallCompl." implements "NPR Front-End Async Request"
 {
+    Access = Internal;
     var
         _content: JsonObject;
         _workflowId: Integer;

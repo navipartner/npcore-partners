@@ -1,5 +1,6 @@
-table 6059944 "NPR NaviDocs Entry Attachment"
+﻿table 6059944 "NPR NaviDocs Entry Attachment"
 {
+    Access = Internal;
     Caption = 'NaviDocs Entry Attachment';
     DataClassification = CustomerContent;
 

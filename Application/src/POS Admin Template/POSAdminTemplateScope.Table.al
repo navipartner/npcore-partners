@@ -1,5 +1,6 @@
-table 6150734 "NPR POS Admin. Template Scope"
+﻿table 6150734 "NPR POS Admin. Template Scope"
 {
+    Access = Internal;
     Caption = 'POS Admin. Template Scope';
     DataClassification = CustomerContent;
 

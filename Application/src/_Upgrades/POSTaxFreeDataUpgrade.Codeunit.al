@@ -1,5 +1,6 @@
-codeunit 6014414 "NPR POS Tax Free Data Upgrade"
+﻿codeunit 6014414 "NPR POS Tax Free Data Upgrade"
 {
+    Access = Internal;
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()

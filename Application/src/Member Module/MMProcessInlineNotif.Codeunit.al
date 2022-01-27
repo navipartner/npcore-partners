@@ -1,5 +1,6 @@
 codeunit 6014687 "NPR MM Process Inline Notif"
 {
+    Access = Internal;
     TableNo = "NPR MM Membership Notific.";
 
     trigger OnRun()

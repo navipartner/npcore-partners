@@ -1,5 +1,6 @@
-table 6060133 "NPR Record Field Type"
+﻿table 6060133 "NPR Record Field Type"
 {
+    Access = Internal;
     Caption = 'Record Field Type';
     DataClassification = CustomerContent;
     fields

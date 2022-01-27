@@ -1,5 +1,6 @@
-table 6014483 "NPR RFID Setup"
+﻿table 6014483 "NPR RFID Setup"
 {
+    Access = Internal;
     // NPR5.48/MMV /20181206 Object created
 
     Caption = 'RFID Setup';

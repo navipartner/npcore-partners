@@ -1,5 +1,6 @@
 ﻿codeunit 6151460 "NPR M2 Setup Mgt."
 {
+    Access = Internal;
     var
         Text000: Label 'Root Categoery is missing for Website %1';
 

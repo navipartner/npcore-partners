@@ -1,5 +1,6 @@
-page 6150622 "NPR POS Paym. Bin Eject Params"
+﻿page 6150622 "NPR POS Paym. Bin Eject Params"
 {
+    Extensible = False;
     // NPR5.40/MMV /20180326 CASE 300660 Created object
     // NPR5.41/MMV /20180425 CASE 312990 Renamed object.
 

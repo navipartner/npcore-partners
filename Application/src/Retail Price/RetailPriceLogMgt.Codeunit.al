@@ -1,5 +1,6 @@
-codeunit 6014476 "NPR Retail Price Log Mgt."
+﻿codeunit 6014476 "NPR Retail Price Log Mgt."
 {
+    Access = Internal;
     trigger OnRun()
     begin
         UpdatePriceLog();

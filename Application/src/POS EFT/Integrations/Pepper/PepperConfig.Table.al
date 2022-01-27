@@ -1,5 +1,6 @@
-table 6184490 "NPR Pepper Config."
+﻿table 6184490 "NPR Pepper Config."
 {
+    Access = Internal;
     Caption = 'Pepper Configuration';
     DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;

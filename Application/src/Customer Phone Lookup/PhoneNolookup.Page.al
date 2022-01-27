@@ -1,5 +1,6 @@
-page 6014412 "NPR Phone No lookup"
+﻿page 6014412 "NPR Phone No lookup"
 {
+    Extensible = False;
     Caption = 'Phone No lookup';
     PageType = Card;
     UsageCategory = Administration;

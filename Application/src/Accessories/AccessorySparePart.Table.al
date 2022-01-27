@@ -1,5 +1,6 @@
-table 6014506 "NPR Accessory/Spare Part"
+﻿table 6014506 "NPR Accessory/Spare Part"
 {
+    Access = Internal;
     // NPR5.40/MHA /20180214  CASE 288039 Added field 85 "Unfold in Worksheet"
 
     Caption = 'Accessory/Spare Part';

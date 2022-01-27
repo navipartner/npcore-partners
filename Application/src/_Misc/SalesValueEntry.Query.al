@@ -1,5 +1,6 @@
-query 6151481 "NPR Sales Value Entry"
+﻿query 6151481 "NPR Sales Value Entry"
 {
+    Access = Internal;
     Caption = 'Sales Cust. Ledg. Entry';
 
     elements

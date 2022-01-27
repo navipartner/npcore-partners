@@ -1,5 +1,6 @@
-table 6151509 "NPR Nc Unique Task Buffer"
+﻿table 6151509 "NPR Nc Unique Task Buffer"
 {
+    Access = Internal;
     Caption = 'Nc Unique Task Buffer';
     DataClassification = CustomerContent;
 

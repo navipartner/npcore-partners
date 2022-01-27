@@ -1,5 +1,6 @@
-page 6151580 "NPR Event Exch.Int.Templ. Card"
+﻿page 6151580 "NPR Event Exch.Int.Templ. Card"
 {
+    Extensible = False;
     Caption = 'Event Exch. Int. Template Card';
     PageType = Card;
     UsageCategory = Administration;

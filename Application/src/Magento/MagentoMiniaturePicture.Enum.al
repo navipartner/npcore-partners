@@ -1,5 +1,8 @@
-enum 6014432 "NPR Magento Miniature Picture"
+﻿enum 6014432 "NPR Magento Miniature Picture"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
 
     value(0; "None")

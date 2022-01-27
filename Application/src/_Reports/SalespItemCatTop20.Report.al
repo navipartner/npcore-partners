@@ -1,5 +1,8 @@
-report 6014405 "NPR Salesp./Item Cat Top 20"
+﻿report 6014405 "NPR Salesp./Item Cat Top 20"
 {
+    #IF NOT BC17 
+    Extensible = False; 
+    #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Salesperson Item Category Top 20.rdlc';
     Caption = 'Salesperson/Item Category Top';

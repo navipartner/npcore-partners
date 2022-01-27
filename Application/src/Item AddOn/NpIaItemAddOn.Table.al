@@ -1,5 +1,6 @@
-table 6151125 "NPR NpIa Item AddOn"
+﻿table 6151125 "NPR NpIa Item AddOn"
 {
+    Access = Internal;
     Caption = 'Item AddOn';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpIa Item AddOns";

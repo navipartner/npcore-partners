@@ -1,5 +1,6 @@
-table 6060152 "NPR Event Web Sales Setup"
+﻿table 6060152 "NPR Event Web Sales Setup"
 {
+    Access = Internal;
     Caption = 'Event Web Sales Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Event Web Sales Setup";

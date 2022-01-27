@@ -1,5 +1,6 @@
-codeunit 6150724 "NPR POS Action - Change View"
+﻿codeunit 6150724 "NPR POS Action - Change View"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'Changes the current view.';
         RemainingLines: Label 'All lines could not be automatically deleted before selecting Login View. You need to cancel sales manually.';

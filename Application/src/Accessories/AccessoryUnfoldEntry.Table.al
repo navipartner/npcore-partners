@@ -1,5 +1,6 @@
-table 6014508 "NPR Accessory Unfold Entry"
+﻿table 6014508 "NPR Accessory Unfold Entry"
 {
+    Access = Internal;
     Caption = 'Accessory Unfold Entry';
     DataClassification = CustomerContent;
 

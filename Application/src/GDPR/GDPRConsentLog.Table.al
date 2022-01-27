@@ -1,5 +1,6 @@
-table 6151123 "NPR GDPR Consent Log"
+﻿table 6151123 "NPR GDPR Consent Log"
 {
+    Access = Internal;
     // MM1.29/TSA /20180509 CASE 313795 Initial Version
 
     Caption = 'GDPR Consent Log';

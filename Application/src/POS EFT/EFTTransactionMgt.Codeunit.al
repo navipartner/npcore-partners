@@ -1,5 +1,6 @@
-codeunit 6184473 "NPR EFT Transaction Mgt."
+﻿codeunit 6184473 "NPR EFT Transaction Mgt."
 {
+    Access = Internal;
     // Public API for EFT operations.
 
     trigger OnRun()

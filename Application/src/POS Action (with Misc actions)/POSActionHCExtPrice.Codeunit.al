@@ -1,5 +1,6 @@
-codeunit 6150909 "NPR POS Action: HC Ext. Price"
+﻿codeunit 6150909 "NPR POS Action: HC Ext. Price"
 {
+    Access = Internal;
     var
         ActionDescription: Label 'This action makes remote call to aquire item price information ';
 

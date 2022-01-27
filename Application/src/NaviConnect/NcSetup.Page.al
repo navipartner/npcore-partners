@@ -1,5 +1,6 @@
-page 6151500 "NPR Nc Setup"
+﻿page 6151500 "NPR Nc Setup"
 {
+    Extensible = False;
     Caption = 'NaviConnect Setup';
     DeleteAllowed = false;
     InsertAllowed = false;

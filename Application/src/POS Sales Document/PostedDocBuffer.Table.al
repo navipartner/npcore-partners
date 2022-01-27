@@ -1,5 +1,6 @@
-table 6014433 "NPR Posted Doc. Buffer"
+﻿table 6014433 "NPR Posted Doc. Buffer"
 {
+    Access = Internal;
     // NPR5.53/ALPO/20191010 CASE 360297 Prepayment/layaway functionality additions
 
     Caption = 'Posted Document Buffer';

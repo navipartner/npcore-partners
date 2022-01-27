@@ -1,5 +1,8 @@
-enum 6060150 "NPR Event Status"
+﻿enum 6060150 "NPR Event Status"
 {
+    #IF NOT BC17  
+    Access = Internal;       
+    #ENDIF
     Extensible = true;
     AssignmentCompatibility = true;
 

@@ -1,5 +1,6 @@
-page 6014680 "NPR Endpoint QueryFilt. S.form"
+﻿page 6014680 "NPR Endpoint QueryFilt. S.form"
 {
+    Extensible = False;
     // NPR5.25\BR\20160801  CASE 234602 Object created
     // NPR5.48/JDH /20181109 CASE 334163 Added object caption
 

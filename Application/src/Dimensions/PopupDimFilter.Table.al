@@ -1,5 +1,6 @@
-table 6014527 "NPR Popup Dim. Filter"
+﻿table 6014527 "NPR Popup Dim. Filter"
 {
+    Access = Internal;
     Caption = 'Popup Dimension Filter';
     DataClassification = CustomerContent;
 
