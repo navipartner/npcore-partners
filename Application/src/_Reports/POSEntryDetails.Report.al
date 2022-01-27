@@ -16,9 +16,11 @@ report 6014458 "NPR POS Entry Details"
         {
 
             DataItemTableView = SORTING("Posting Date", "Document No.")
-                                     WHERE("Entry Type" = FILTER(<> "Cancelled Sale"), "Entry Type" = FILTER(<> "Comment"));
+                WHERE("Entry Type" = FILTER(<> "Cancelled Sale"),
+                      "Entry Type" = FILTER(<> "Comment"),
+                      "System Entry" = filter(false));
 
-            RequestFilterFields = "Document No.", "POS Unit No.", "Posting Date";
+            RequestFilterFields = "Document No.", "POS Unit No.", "Posting Date", "Entry Type";
 
             column(RegisterNo_NPR_POS_Entry; "POS Unit No.")
             {
@@ -58,8 +60,24 @@ report 6014458 "NPR POS Entry Details"
             column(PostItemEntryStatus_POSEntryStauts; Format("NPR POS Entry"."Post Item Entry Status"))
             {
             }
+
+            column(DiscountAmount_NPR_POS_Entry; "NPR POS Entry"."Discount Amount")
+            {
+                IncludeCaption = true;
+            }
+
+            column(RoundingAmountLCY_NPR_POS_Entry; "NPR POS Entry"."Rounding Amount (LCY)")
+            {
+                IncludeCaption = true;
+            }
+            column(AmountIncTaxRound_NPR_POS_Entry; "NPR POS Entry"."Amount Incl. Tax & Round")
+            {
+                IncludeCaption = true;
+            }
+
             column(AmountIncludingVAT_NPR_POS_Entry_Sales_Line; POSEntrySalesLine."Amount Incl. VAT")
             {
+
             }
             column(Amount_NPR_POS_Entry_Sale_Line; POSEntrySalesLine."Amount Excl. VAT")
             {
@@ -67,16 +85,22 @@ report 6014458 "NPR POS Entry Details"
             column(LineDiscountAmount_NPR_POS_Entry_Sale_Line; POSEntrySalesLine."Line Discount Amount Incl. VAT")
             {
             }
-
             column(POSEntryTaxLine_TaxAmount; POSEntryTaxLine."Tax Amount")
             {
             }
+            column(Filters; Filters)
+            {
+            }
+            column(CompanyName; CompanyInfo.Name)
+            {
+            }
+
 
             trigger OnPreDataItem()
             begin
-                Filters := '';
-
-                Filters := "NPR POS Entry".GETFILTERS;
+                CompanyInfo.get();
+                if not IsEntryTypeFilterValid() then
+                    CurrReport.Break();
             end;
 
             trigger OnAfterGetRecord()
@@ -93,26 +117,10 @@ report 6014458 "NPR POS Entry Details"
                 if POSEntryTaxLine.FindSet() then begin
                     POSEntryTaxLine.CalcSums("Tax Amount");
                 end;
+
+
             end;
         }
-
-        DataItem(CompanyInformation; "Company Information")
-        {
-            column(COMPANYNAME; COMPANYNAME)
-            {
-            }
-            column(CompanyInformation_Picture; CompanyInformation.Picture)
-            {
-            }
-            column(Filters; Filters)
-            {
-            }
-            trigger OnAfterGetRecord()
-            begin
-                CalcFields(Picture);
-            end;
-        }
-
     }
     requestpage
     {
@@ -129,14 +137,34 @@ report 6014458 "NPR POS Entry Details"
     labels
     {
         Report_cap = 'POS Entry Details';
-        AmountIncl_cap = 'Amount Including Vat';
+        AmountIncl_cap = 'Amount Incl.Tax';
+        AmountExcl_cap = 'Amount Excl.Tax';
         Amount_cap = 'Amount';
-        LineDiscountAmount_cap = 'Line Discount Amount';
-        VatAmount_cap = 'Vat Amount';
+        LineDiscountAmount_cap = 'Discount Amount';
+        TaxAmount_cap = 'Tax Amount';
+        Post_Item_Entry_Status_cap = 'Post Item Entry Status';
+        Post_Entry_Status_cap = 'Post Entry Status';
+        SalesExclTax_cap = 'Sales Excl. Tax';
+        Filter_cap = 'Filter:';
+
+
     }
 
     var
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSEntryTaxLine: Record "NPR POS Entry Tax Line";
         Filters: Text;
+        CompanyInfo: Record "Company Information";
+
+
+    local procedure IsEntryTypeFilterValid() Result: boolean
+    var
+        NPRPOSEntry: Record "NPR POS Entry";
+    begin
+        NPRPOSEntry.FilterGroup(50);
+        NPRPOSEntry.SetFilter("Entry Type", NPRPOSEntry.GetFilter("Entry Type"));
+        NPRPOSEntry.FilterGroup(51);
+        NPRPOSEntry.SetFilter("Entry Type", '<>%1 & <>%2', NPRPOSEntry."Entry Type"::"Cancelled Sale", NPRPOSEntry."Entry Type"::"Comment");
+        Result := NPRPOSEntry.count() <> 0;
+    end;
 }
