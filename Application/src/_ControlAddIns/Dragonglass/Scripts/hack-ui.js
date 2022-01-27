@@ -51,14 +51,14 @@ function hideBusinessCentralGutter() {
       areaBox.style.setProperty("display", "none", "important");
     }
 
-    const gutterLeft = closestBody.querySelector(".ms-nav-layout-gutter-left");
-    if (gutterLeft) {
-      gutterLeft.style.setProperty("display", "none", "important");
+    const gutterLeft = closestBody.querySelectorAll(".ms-nav-layout-gutter-left");
+    for (let node of gutterLeft) {
+      node.style.setProperty("display", "none", "important")
     }
 
-    const gutterRight = closestBody.querySelector(".ms-nav-layout-gutter-right");
-    if (gutterRight) {
-      gutterRight.style.setProperty("display", "none", "important");
+    const gutterRight = closestBody.querySelectorAll(".ms-nav-layout-gutter-right");
+    for (let node of gutterRight) {
+      node.style.setProperty("display", "none", "important")
     }
 
     const addinContainer = window.frameElement.closest(".control-addin-container");
