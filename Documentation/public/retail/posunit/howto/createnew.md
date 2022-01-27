@@ -11,7 +11,7 @@ Each POS store can contain multiple POS units. Most of the time, these units hav
  
 To create a new POS unit:
 
-1. From the **Role Center**, search the **POS Unit List** and click on it once it's displayed in the results.  
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List** and choose the related link.     
    A list of all existing POS units is displayed.  
 2. Click on the POS unit you wish to use as a reference for creating a new one.  
    The **POS Unit Card** popup window is displayed.
@@ -26,7 +26,7 @@ To create a new POS unit:
 
 ## Next steps:
 
-After you create a POS unit, you need to link it to a user before it can become functional.
+After you create a POS unit, you need to link it to the POS user's ID before it can become functional.
 
 1. Navigate to **User Setup**.   
    The easiest way to achieve this is by using the built-in search functionality.
