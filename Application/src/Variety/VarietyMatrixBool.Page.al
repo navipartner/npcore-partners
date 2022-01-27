@@ -2006,7 +2006,7 @@ page 6059978 "NPR Variety Matrix Bool"
         VarietySetup.Get();
         VarietySetup.TestField("Variety Enabled", true);
 
-        HideInactive := false;
+        HideInactive := VarietySetup."Hide Inactive Values";
         Initialized := true;
     end;
 
