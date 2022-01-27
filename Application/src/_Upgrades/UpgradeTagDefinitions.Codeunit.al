@@ -58,6 +58,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'NpRvGlobalVoucher'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Item Blob 2 Media"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Member Blob 2 Media"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Fix POS Entry SystemId"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -191,6 +192,8 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                 exit('NPRMagentoDescription2Media');
             Codeunit::"NPR UPG Member Blob 2 Media":
                 exit('NPMMemberBlob2Media');
+            Codeunit::"NPR Fix POS Entry SystemId":
+                exit('NPRFixPOSEntrySystemId_20220126');
         end;
     end;
 }
