@@ -133,6 +133,7 @@
         end else begin
             RecRef.Open(TableID);
             RecRef.SetView(TableView);
+            if RecRef.FindFirst() then;
             RecRefVar := RecRef;
             if RunModal then
                 PAGE.RunModal(PageId, RecRefVar)
