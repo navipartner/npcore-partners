@@ -59,6 +59,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'NpRvGlobalVoucher'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Item Blob 2 Media"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Member Blob 2 Media"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'SalesDocExpPaymentMethodCode'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Fix POS Entry SystemId"));
     end;
 
@@ -193,6 +194,11 @@
                 exit('NPRMagentoDescription2Media');
             Codeunit::"NPR UPG Member Blob 2 Media":
                 exit('NPMMemberBlob2Media');
+            Codeunit::"NPR UPG POS Action Parameters":
+                case UpgradeStep of
+                    'SalesDocExpPaymentMethodCode':
+                        exit('NPR-POSActionPaymentMethodUpgrade-20220127');
+                end;
             Codeunit::"NPR Fix POS Entry SystemId":
                 exit('NPRFixPOSEntrySystemId_20220126');
         end;
