@@ -152,7 +152,6 @@
             ObsoleteReason = 'Field Is not needed anymore. Case 498936';
             Caption = 'Font Size';
             DataClassification = CustomerContent;
-            InitValue = Normal;
         }
         field(27; "Position X"; Integer)
         {
