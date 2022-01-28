@@ -503,15 +503,19 @@
     local procedure TrySendElectronicDoc(RecRef: RecordRef; DocumentSendingProfile: Record "Document Sending Profile")
     var
         TempDocumentSendingProfile: Record "Document Sending Profile" temporary;
-        ReportDistributionManagement: Codeunit "Report Distribution Management";
         PostedDocumentVariant: Variant;
+        ElectronicDocumentErr: Label 'Sending of Electronic Documents is not supported aymore!'; //Case 499652
     begin
+
         TempDocumentSendingProfile.Init();
         TempDocumentSendingProfile."Electronic Document" := TempDocumentSendingProfile."Electronic Document"::"Through Document Exchange Service";
         TempDocumentSendingProfile."Electronic Format" := DocumentSendingProfile."Electronic Format";
 
         PostedDocumentVariant := RecRef;
+        Error(ElectronicDocumentErr);
+        /*
         ReportDistributionManagement.VANDocumentReport(PostedDocumentVariant, TempDocumentSendingProfile);
+        */
     end;
 
     local procedure PrintDoc(ReportID: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant): Text
