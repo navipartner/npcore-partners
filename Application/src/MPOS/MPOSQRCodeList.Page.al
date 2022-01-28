@@ -28,12 +28,6 @@
                     ToolTip = 'Specifies the value of the Password field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Client Type"; Rec."Client Type")
-                {
-
-                    ToolTip = 'Specifies the value of the Client Type field';
-                    ApplicationArea = NPRRetail;
-                }
                 field(Company; Rec.Company)
                 {
 
