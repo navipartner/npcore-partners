@@ -1,6 +1,7 @@
 ﻿codeunit 6150859 "NPR POS Action: Doc. Export"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'Export current sale to a standard NAV sales document';
         ERRNOSALELINES: Label 'There are no sale lines to export';
@@ -35,7 +36,6 @@
         CaptionTransferSalesperson: Label 'Transfer Salesperson';
         CaptionTransferPostingSetup: Label 'Transfer Posting Setup';
         CaptionTransferDim: Label 'Transfer Dimensions';
-        CaptionTransferPaymentMethod: Label 'Transfer Payment Method';
         CaptionTransferTaxSetup: Label 'Transfer Tax Setup';
         CaptionAutoResrvSalesLine: Label 'Auto Reserve Sales Line';
         CaptionSendPdf2Nav: Label 'Send PDF2NAV';
@@ -60,7 +60,6 @@
         DescTransferSalesperson: Label 'Transfer salesperson from sale to exported document';
         DescTransferPostingSetup: Label 'Transfer posting setup from sale to exported document';
         DescTransferDim: Label 'Transfer dimensions from sale to exported document';
-        DescTransferPaymentMethod: Label 'Transfer payment method from sale to exported document';
         DescTransferTaxSetup: Label 'Transfer tax setup from sale to exported document';
         DescAutoResrvSalesLine: Label 'Automatically reserve items on exported document';
         DescSendPdf2Nav: Label 'Handle document output via PDF2NAV';
@@ -117,6 +116,10 @@
         DescCustomerLookupPage: Label 'Custom customer lookup page';
         CaptionEnforceCustomerFilter: Label 'Enforce Customer Filter';
         DescEnforceCustomerFilter: Label 'Enforce that the selected customer is within the defined filter in "CustomerTableView"';
+        SpecPaymentMethodCodeMustBeSpecified: Label 'POS Action''s parameter ''%1'' is set to ''%2''. You must specify payment method code to be used for sale document as a parameter of the POS action (the parameter name is ''%3'')', Comment = 'POS Action''s parameter ''Use Location From'' is set to ''Specific Location''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''Use Specific Location Code'')';
+        OptionPaymentMethodCodeFrom: Label 'Sales Header Default,Force Blank Code,Specific Payment Method Code';
+        CaptionPaymentMethodCodeFrom: Label 'Use Payment Method Code From';
+        DescPaymentMethodCodeFrom: Label 'Select source of payment method code for sales document';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -125,7 +128,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.14');
+        exit('1.15');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -192,6 +195,7 @@
             Sender.RegisterOptionParameter('UseLocationFrom', '<Undefined>,POS Store,POS Sale,SpecificLocation', 'POS Store');
             Sender.RegisterTextParameter('UseSpecLocationCode', '');
             Sender.RegisterBooleanParameter('SendICOrderConfirmation', false);
+            Sender.RegisterOptionParameter('PaymentMethodCodeFrom', 'Sales Header Default,Force Blank Code,Specific Payment Method Code', 'Sales Header Default');
             Sender.RegisterTextParameter('PaymentMethodCode', '');
             Sender.RegisterTextParameter('CustomerTableView', '');
             Sender.RegisterIntegerParameter('CustomerLookupPage', 0);
@@ -443,6 +447,7 @@
         DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict;
         DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict;
         LocationSource: Option Undefined,"POS Store","POS Sale",SpecificLocation;
+        PaymentMethodCodeSource: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code";
         SpecificLocationCode: Code[10];
         PaymentMethodCode: Code[10];
     begin
@@ -476,8 +481,9 @@
         SpecificLocationCode := COPYSTR(JSON.GetStringParameter('UseSpecLocationCode'), 1, MaxStrLen(SpecificLocationCode));
         SetLocationSource(RetailSalesDocMgt, LocationSource, SpecificLocationCode);
 
+        PaymentMethodCodeSource := JSON.GetIntegerParameterOrFail('PaymentMethodCodeFrom', ActionCode());
         PaymentMethodCode := COPYSTR(JSON.GetStringParameter('PaymentMethodCode'), 1, MaxStrLen(PaymentMethodCode));
-        RetailSalesDocMgt.SetPaymentMethod(PaymentMethodCode);
+        SetPaymentMethodCode(RetailSalesDocMgt, PaymentMethodCodeSource, PaymentMethodCode);
     end;
 
     procedure SetDocumentType(AmountInclVAT: Decimal; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict; DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict)
@@ -513,6 +519,15 @@
             Error(SpecLocationCodeMustBeSpecified, CaptionUseLocationFrom, SelectStr(LocationSource + 1, OptionUseLocationFrom), CaptionUseSpecLocationCode);
 
         RetailSalesDocMgt.SetLocationSource(LocationSource, SpecificLocationCode);
+    end;
+
+    procedure SetPaymentMethodCode(var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PaymentMethodCodeSource: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code"; SpecificPaymentMethodCode: Code[10])
+    begin
+        if (PaymentMethodCodeSource = PaymentMethodCodeSource::"Specific Payment Method Code") and (SpecificPaymentMethodCode = '') then
+            Error(SpecPaymentMethodCodeMustBeSpecified, CaptionPaymentMethodCodeFrom, SelectStr(PaymentMethodCodeSource + 1, OptionPaymentMethodCodeFrom), CaptionPaymentMethodCode);
+
+        RetailSalesDocMgt.SetPaymentMethodCodeFrom(PaymentMethodCodeSource);
+        RetailSalesDocMgt.SetPaymentMethod(SpecificPaymentMethodCode);
     end;
 
     local procedure GetPrepaymentValue(var JSON: Codeunit "NPR POS JSON Management"): Decimal
@@ -651,8 +666,6 @@
                 Caption := CaptionTransferPostingSetup;
             'SetTransferDimensions':
                 Caption := CaptionTransferDim;
-            'SetTransferPaymentMethod':
-                Caption := CaptionTransferPaymentMethod;
             'SetTransferTaxSetup':
                 Caption := CaptionTransferTaxSetup;
             'SetAutoReserveSalesLine':
@@ -701,6 +714,8 @@
                 Caption := CaptionSendICOrderConfirmation;
             'PaymentMethodCode':
                 Caption := CaptionPaymentMethodCode;
+            'PaymentMethodCodeFrom':
+                Caption := CaptionPaymentMethodCodeFrom;
             'CustomerTableView':
                 Caption := CaptionCustomerTableView;
             'CustomerLookupPage':
@@ -751,8 +766,6 @@
                 Caption := DescTransferPostingSetup;
             'SetTransferDimensions':
                 Caption := DescTransferDim;
-            'SetTransferPaymentMethod':
-                Caption := DescTransferPaymentMethod;
             'SetTransferTaxSetup':
                 Caption := DescTransferTaxSetup;
             'SetAutoReserveSalesLine':
@@ -801,6 +814,8 @@
                 Caption := DescSendICOrderConfirmation;
             'PaymentMethodCode':
                 Caption := DescPaymentMethodCode;
+            'PaymentMethodCodeFrom':
+                Caption := DescPaymentMethodCodeFrom;
             'CustomerTableView':
                 Caption := DescCustomerTableView;
             'CustomerLookupPage':
@@ -823,6 +838,8 @@
                 Caption := OptionDocTypeNegative;
             'UseLocationFrom':
                 Caption := OptionUseLocationFrom;
+            'PaymentMethodCodeFrom':
+                Caption := OptionPaymentMethodCodeFrom;
         end;
     end;
 
@@ -887,8 +904,8 @@
                 end;
             'PaymentMethodCode':
                 begin
-                    if PAGE.RunModal(0, PaymentMethod) = ACTION::LookupOK then
-                        POSParameterValue.Value := PaymentMethod.Code;
+                    if POSParameterValue.Value <> '' then
+                        PaymentMethod.Get(POSParameterValue.Value);
                 end;
             'CustomerTableView':
                 begin

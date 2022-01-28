@@ -44,7 +44,7 @@
         SendICOrderConf: Boolean;
         UseLocationFrom: Option "POS Unit","POS Store","POS Sale","Specific Location";
         UseLocationCode: Code[10];
-
+        UsePaymentMethodCodeFrom: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code";
         PaymentMethodCode: Code[10];
         CustomerCreditCheck: Boolean;
         CUSTOMER_CREDIT_CHECK_FAILED: Label 'Customer credit check failed';
@@ -163,6 +163,11 @@
     procedure SetCustomerCreditCheck(Set: Boolean)
     begin
         CustomerCreditCheck := Set;
+    end;
+
+    procedure SetPaymentMethodCodeFrom(NewPaymentMethodCodeFrom: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code")
+    begin
+        UsePaymentMethodCodeFrom := NewPaymentMethodCodeFrom;
     end;
 
     procedure SetPaymentMethod(NewPaymentMethodCode: Code[10])
@@ -312,7 +317,18 @@
         SalesHeader."Your Reference" := SalePOS.Reference;
         SalesHeader."External Document No." := SalePOS."External Document No.";
         SalesHeader.Validate("Location Code", GetLocationCode(SalePOS));
-        SalesHeader.Validate("Payment Method Code", PaymentMethodCode);
+
+        case UsePaymentMethodCodeFrom of
+            UsePaymentMethodCodeFrom::"Specific Payment Method Code":
+                begin
+                    SalesHeader.Validate("Payment Method Code", PaymentMethodCode);
+                end;
+            UsePaymentMethodCodeFrom::"Force Blank Code":
+                begin
+                    SalesHeader.Validate("Payment Method Code", '');
+                end;
+        end;
+
         SalesHeader.Ship := Ship;
         SalesHeader.Invoice := Invoice;
         SalesHeader.Receive := Receive;
