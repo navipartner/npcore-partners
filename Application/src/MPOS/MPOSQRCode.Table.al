@@ -34,6 +34,8 @@
         }
         field(12; "Client Type"; Option)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Field not used ';
             Caption = 'Client Type';
             DataClassification = CustomerContent;
             OptionCaption = 'Standard,Transcendence';
@@ -154,19 +156,11 @@
     var
         TmpQR: Codeunit "Temp Blob";
         JsonString: Text;
-        ClientType: Text[1];
         PaymentType: Text[10];
         InStr: InStream;
     begin
         MPOSQRCode.TestField("User ID");
         MPOSQRCode.TestField(Url);
-
-        case MPOSQRCode."Client Type" of
-            "Client Type"::Standard:
-                ClientType := 'S';
-            "Client Type"::Transcendence:
-                ClientType := 'T';
-        end;
 
         case MPOSQRCode."Payment Gateway" of
             "Payment Gateway"::Adyen:
@@ -181,7 +175,6 @@
                       '","B":"' + MPOSQRCode."User ID" +
                       '","C":"' + MPOSQRCode.Password +
                       '","D":"' + MPOSQRCode.Tenant +
-                      '","E":"' + ClientType +
                       '","F":"' + MPOSQRCode.Company +
                       '","G":"' + PaymentType +
                       '","H":"' + MPOSQRCode."Webservice Url" +
@@ -209,20 +202,12 @@
     var
         TmpQR: Codeunit "Temp Blob";
         JsonString: Text;
-        ClientType: Text[1];
         PaymentType: Text[10];
         JObject: JsonObject;
         InStr: InStream;
     begin
         MPOSQRCode.TestField("User ID");
         MPOSQRCode.TestField(Url);
-
-        case MPOSQRCode."Client Type" of
-            "Client Type"::Standard:
-                ClientType := 'S';
-            "Client Type"::Transcendence:
-                ClientType := 'T';
-        end;
 
         case MPOSQRCode."Payment Gateway" of
             "Payment Gateway"::Adyen:
@@ -237,7 +222,6 @@
         JObject.Add('B', MPOSQRCode."User ID");
         JObject.Add('C', MPOSQRCode.Password);
         JObject.Add('D', MPOSQRCode.Tenant);
-        JObject.Add('E', ClientType);
         JObject.Add('F', MPOSQRCode.Company);
         JObject.Add('G', PaymentType);
         JObject.Add('H', MPOSQRCode."Webservice Url");
