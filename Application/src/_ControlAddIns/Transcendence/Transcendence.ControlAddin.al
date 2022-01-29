@@ -12,14 +12,28 @@ controladdin "NPR Transcendence"
         'src/_ControlAddins/Transcendence/Scripts/numeral.min.js',
         'src/_ControlAddins/Transcendence/Scripts/moment.min.js',
         'src/_ControlAddins/Transcendence/Scripts/no-ie.js',
-        'src/_ControlAddins/Transcendence/Scripts/NaviPartner.min.js';
-
-    StyleSheets =
-        'src/_ControlAddins/Transcendence/Stylesheets/NaviPartner.Style.min.css',
-        'src/_ControlAddins/Transcendence/Stylesheets/NaviPartner.UserGuide.Style.css',
-        'src/_ControlAddins/Transcendence/Stylesheets/datepicker.css';
+        'src/_ControlAddins/Transcendence/Scripts/NaviPartner.min.js',
+        'src/_ControlAddins/Transcendence/Stylesheets/datepicker.css',
+        'src/_ControlAddins/Transcendence/Stylesheets/fontawesome-all.min.css';
 
     Images =
+        // Font Awesome
+        'src/_ControlAddins/Transcendence/webfonts/fa-brands-400.eot',
+        'src/_ControlAddins/Transcendence/webfonts/fa-brands-400.svg',
+        'src/_ControlAddins/Transcendence/webfonts/fa-brands-400.ttf',
+        'src/_ControlAddins/Transcendence/webfonts/fa-brands-400.woff',
+        'src/_ControlAddins/Transcendence/webfonts/fa-brands-400.woff2',
+        'src/_ControlAddins/Transcendence/webfonts/fa-regular-400.eot',
+        'src/_ControlAddins/Transcendence/webfonts/fa-regular-400.svg',
+        'src/_ControlAddins/Transcendence/webfonts/fa-regular-400.ttf',
+        'src/_ControlAddins/Transcendence/webfonts/fa-regular-400.woff',
+        'src/_ControlAddins/Transcendence/webfonts/fa-regular-400.woff2',
+        'src/_ControlAddins/Transcendence/webfonts/fa-solid-900.eot',
+        'src/_ControlAddins/Transcendence/webfonts/fa-solid-900.svg',
+        'src/_ControlAddins/Transcendence/webfonts/fa-solid-900.ttf',
+        'src/_ControlAddins/Transcendence/webfonts/fa-solid-900.woff',
+        'src/_ControlAddins/Transcendence/webfonts/fa-solid-900.woff2',
+
         'src/_ControlAddins/Transcendence/Images/npretaillogo_med.png',
         'src/_ControlAddins/Transcendence/Images/icon-warn.png',
         'src/_ControlAddins/Transcendence/Images/icon-quest.png',
