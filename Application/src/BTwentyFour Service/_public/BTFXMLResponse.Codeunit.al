@@ -1,98 +1,106 @@
-﻿codeunit 6014647 "NPR BTF JSON Response" implements "NPR BTF IFormatResponse"
+﻿codeunit 6014646 "NPR BTF XML Response" implements "NPR BTF IFormatResponse"
 {
-    Access = Internal;
     var
         NoBodyReturnedLbl: Label 'No body returned';
 
     procedure FormatInternalError(ErrorCode: Text; ErrorDescription: Text; var Result: Codeunit "Temp Blob")
     var
-        JObject: JsonObject;
-        Json: Text;
+        Document: XmlDocument;
+        Node: XmlNode;
+        ChildNode: XmlNode;
+        Xml: Text;
         OutStr: OutStream;
     begin
-        JObject.Add('error', ErrorCode);
-        JObject.Add('error_description', ErrorDescription);
-        JObject.WriteTo(Json);
+        Document := XmlDocument.Create();
+        Document.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'yes'));
+        Node := XmlElement.Create('root').AsXmlNode();
+        Document.Add(Node);
+
+        ChildNode := XmlElement.Create('error', '', ErrorCode).AsXmlNode();
+        Node.AsXmlElement().Add(ChildNode);
+
+        ChildNode := XmlElement.Create('error_description', '', ErrorDescription).AsXmlNode();
+        Node.AsXmlElement().Add(ChildNode);
+
+        Document.WriteTo(Xml);
+
         Result.CreateOutStream(OutStr);
-        OutStr.WriteText(Json);
+        OutStr.WriteText(Xml);
     end;
 
     procedure FoundErrorInResponse(Response: Codeunit "Temp Blob"; StatusCode: Integer): Boolean;
     var
-        JObject: JsonObject;
-        JToken: JsonToken;
+        Document: XmlDocument;
+        Node: XmlNode;
         InStr: InStream;
-        Json: Text;
     begin
         if StatusCode = 200 then
             exit;
         Response.CreateInStream(InStr);
-        InStr.ReadText(Json);
-        if not JObject.ReadFrom(Json) then
+        if not XmlDocument.ReadFrom(InStr, Document) then
             exit(true);
-        if (JObject.Contains('error') or JObject.Contains('Error')) then
+        if (Document.SelectSingleNode('.//error', Node)) or (Document.SelectSingleNode('.//Error', Node)) then
             exit(true);
-        if JObject.Contains('exceptionMessage') then
+        if Document.SelectSingleNode('.//exceptionMessage', Node) then
             exit(true);
-        if JObject.Get('message', JTOken) then
-            exit(JToken.IsObject());
-        if JObject.Get('Message', JTOken) then
-            exit(JToken.IsObject());
     end;
 
     procedure GetErrorDescription(Response: Codeunit "Temp Blob"): Text
     var
-        JObject: JsonObject;
-        JToken: JsonToken;
+        Document: XmlDocument;
+        Node: XmlNode;
         InStr: InStream;
-        Json: Text;
     begin
         Response.CreateInStream(InStr);
-        InStr.ReadText(Json);
-        if not JObject.ReadFrom(Json) then
+        if not XmlDocument.ReadFrom(InStr, Document) then
             exit(NoBodyReturnedLbl);
-        if JObject.Get('exceptionMessage', JToken) then
-            exit(JToken.AsValue().AsText());
-        if JObject.Get('error_description', JToken) then
-            exit(JToken.AsValue().AsText());
-        if JObject.Get('message', JToken) then
-            exit(JToken.AsValue().AsText());
+        if Document.SelectSingleNode('.//exceptionMessage', Node) then
+            exit(Node.AsXmlElement().InnerText());
+        if Document.SelectSingleNode('.//error_description', Node) then
+            exit(Node.AsXmlElement().InnerText());
+        if Node.AsXmlElement().SelectSingleNode('.//message', Node) then
+            exit(Node.AsXmlElement().InnerText());
+        if Node.AsXmlElement().SelectSingleNode('.//Message', Node) then
+            exit(Node.AsXmlElement().InnerText());
     end;
+
 
     [NonDebuggable]
     procedure GetToken(Response: Codeunit "Temp Blob"): Text
     var
-        JObject: JsonObject;
-        JToken: JsonToken;
+        Document: XmlDocument;
+        Element: XmlElement;
+        Node: XmlNode;
         InStr: InStream;
-        Json: Text;
     begin
         Response.CreateInStream(InStr);
-        InStr.ReadText(Json);
-        if not JObject.ReadFrom(Json) then
+        if not XmlDocument.ReadFrom(InStr, Document) then
             exit;
-        if not JObject.Get('access_token', JToken) then
+        if not Document.GetRoot(Element) then
             exit;
-        exit(JToken.AsValue().AsText());
+        if not Element.SelectSingleNode('.//access_token', Node) then
+            exit;
+        exit(Node.AsXmlElement().InnerText());
     end;
 
-    [NonDebuggable]
     procedure FoundToken(Response: Codeunit "Temp Blob"): Boolean
     var
-        JObject: JsonObject;
+        Document: XmlDocument;
+        Element: XmlElement;
+        Node: XmlNode;
         InStr: InStream;
-        Json: Text;
     begin
         Response.CreateInStream(InStr);
-        InStr.ReadText(Json);
-        if not JObject.ReadFrom(Json) then
+        if not XmlDocument.ReadFrom(InStr, Document) then
             exit;
-        exit(JObject.Contains('access_token'));
+        if not Document.GetRoot(Element) then
+            exit;
+        exit(Element.SelectSingleNode('.//access_token', Node));
     end;
 
     procedure GetFileExtension(): Text
     begin
-        exit('json');
+        exit('xml');
     end;
 
     procedure GetOrder(Content: Codeunit "Temp Blob"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"): Boolean

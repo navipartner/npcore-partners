@@ -1,8 +1,5 @@
 ﻿interface "NPR BTF IFormatResponse"
 {
-    #IF NOT BC17 
-    Access = Internal;      
-    #ENDIF
     procedure FormatInternalError(ErrorCode: Text; ErrorDescription: Text; var Result: Codeunit "Temp Blob");
     procedure FoundErrorInResponse(Response: Codeunit "Temp Blob"; StatusCode: Integer): Boolean;
     procedure GetErrorDescription(Response: Codeunit "Temp Blob"): Text;
