@@ -1,9 +1,7 @@
 ﻿page 6059920 "NPR BTF Service Setup"
 {
-    Extensible = False;
     AdditionalSearchTerms = 'btwentyfour omnichannel,b24';
     PageType = List;
-
     UsageCategory = Administration;
     SourceTable = "NPR BTF Service Setup";
     Editable = false;
