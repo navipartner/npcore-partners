@@ -1,7 +1,6 @@
 ﻿page 6060081 "NPR Adm. Scanner Stat. Factbox"
 {
     Extensible = False;
-
     Caption = 'NPR MM Admis. Scanner Station Factbox';
     InsertAllowed = false;
     PageType = CardPart;

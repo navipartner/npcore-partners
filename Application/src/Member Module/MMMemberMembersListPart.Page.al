@@ -5,10 +5,8 @@
     Caption = 'Member Memberships';
     InsertAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR MM Membership Role";
-    ApplicationArea = NPRRetail;
 
     layout
     {

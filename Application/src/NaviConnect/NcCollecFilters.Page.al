@@ -5,10 +5,9 @@
     DelayedInsert = true;
     MultipleNewLines = false;
     PageType = ListPart;
-    UsageCategory = Administration;
+    UsageCategory = None;
     PopulateAllFields = true;
     SourceTable = "NPR Nc Collector Filter";
-    ApplicationArea = NPRNaviConnect;
 
     layout
     {

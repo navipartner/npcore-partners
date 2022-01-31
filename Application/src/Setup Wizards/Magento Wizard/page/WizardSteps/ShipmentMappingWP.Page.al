@@ -3,12 +3,10 @@
     Extensible = False;
     Caption = 'Shipment Method Mapping';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Magento Shipment Mapping";
     SourceTableTemporary = true;
     DelayedInsert = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

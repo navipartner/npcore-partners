@@ -7,13 +7,11 @@
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     RefreshOnActivate = true;
     SourceTable = "Activity Log";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Activity Date");
-    ApplicationArea = NPRRetail;
 
     layout
     {

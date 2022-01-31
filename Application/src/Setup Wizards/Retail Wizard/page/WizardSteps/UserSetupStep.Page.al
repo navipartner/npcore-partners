@@ -6,6 +6,7 @@
     SourceTable = "User Setup";
     SourceTableTemporary = true;
     DelayedInsert = true;
+    UsageCategory = None;
 
     layout
     {

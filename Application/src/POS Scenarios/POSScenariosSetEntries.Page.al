@@ -1,13 +1,10 @@
 ﻿page 6150734 "NPR POS Scenarios Set Entries"
 {
     Extensible = False;
-
     Caption = 'POS Scenarios Set Entries';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR POS Sales WF Set Entry";
-    ApplicationArea = NPRRetail;
 
     layout
     {

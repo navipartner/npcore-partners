@@ -5,6 +5,7 @@
     InsertAllowed = false;
     PageType = ListPart;
     SourceTable = "NPR EFT Recon. Line";
+    UsageCategory = None;
 
     layout
     {

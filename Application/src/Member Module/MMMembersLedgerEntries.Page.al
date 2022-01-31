@@ -1,16 +1,13 @@
 ﻿page 6060129 "NPR MM Members. Ledger Entries"
 {
     Extensible = False;
-
     Caption = 'Membership Ledger Entries';
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR MM Membership Entry";
-    ApplicationArea = NPRRetail;
 
     layout
     {

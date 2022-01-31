@@ -8,10 +8,8 @@
 
     Caption = 'NP Attributes FactBox';
     PageType = CardPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = Item;
-    ApplicationArea = NPRRetail;
 
     layout
     {

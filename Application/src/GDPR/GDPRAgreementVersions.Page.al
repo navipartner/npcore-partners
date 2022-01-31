@@ -6,10 +6,8 @@
     Caption = 'GDPR Agreement Versions';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR GDPR Agreement Version";
-    ApplicationArea = NPRRetail;
 
     layout
     {

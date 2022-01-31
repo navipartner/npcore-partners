@@ -3,10 +3,8 @@
     Extensible = False;
     Caption = 'Ticket Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR RC Ticket Cues";
-    ApplicationArea = NPRRetail;
 
     layout
     {

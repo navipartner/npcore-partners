@@ -7,10 +7,8 @@
     Caption = 'Data Log Records Subform';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Data Log Field";
-    ApplicationArea = NPRRetail;
 
     layout
     {

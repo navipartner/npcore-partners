@@ -4,11 +4,9 @@
     Caption = 'Collect Store Inventory List';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpCs Store Inv. Buffer";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

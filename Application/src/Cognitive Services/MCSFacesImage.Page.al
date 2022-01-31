@@ -7,6 +7,7 @@
     LinksAllowed = false;
     PageType = CardPart;
     SourceTable = "NPR MCS Faces";
+    UsageCategory = None;
 
     layout
     {

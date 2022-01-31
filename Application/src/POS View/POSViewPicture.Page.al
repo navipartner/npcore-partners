@@ -7,6 +7,7 @@
     LinksAllowed = false;
     PageType = CardPart;
     SourceTable = "NPR POS View Profile";
+    UsageCategory = None;
 
     layout
     {

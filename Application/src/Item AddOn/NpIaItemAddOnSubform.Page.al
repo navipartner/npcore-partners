@@ -5,10 +5,8 @@
     Caption = 'Lines';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpIa Item AddOn Line";
-    ApplicationArea = NPRRetail;
     layout
     {
         area(content)

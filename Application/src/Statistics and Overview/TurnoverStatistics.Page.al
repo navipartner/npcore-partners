@@ -3,8 +3,7 @@
     Extensible = False;
     Caption = 'Turnover Statistics';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
 
 
     layout

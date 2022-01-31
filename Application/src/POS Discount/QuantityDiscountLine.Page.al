@@ -3,10 +3,8 @@
     Extensible = False;
     Caption = 'Multiple Unit Price';
     PageType = CardPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Quantity Discount Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

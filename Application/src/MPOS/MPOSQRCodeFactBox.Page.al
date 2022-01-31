@@ -3,11 +3,9 @@
     Extensible = False;
     Caption = 'MPOS QR Code FactBox';
     PageType = CardPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR MPOS QR Code";
-    ApplicationArea = NPRRetail;
 
     layout
     {

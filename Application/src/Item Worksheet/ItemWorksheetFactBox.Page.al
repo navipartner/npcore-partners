@@ -5,6 +5,7 @@
     PageType = CardPart;
     RefreshOnActivate = true;
     SourceTable = "NPR Item Worksheet Line";
+    UsageCategory = None;
     layout
     {
         area(content)

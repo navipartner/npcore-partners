@@ -2,8 +2,7 @@
 {
     Extensible = False;
     PageType = CardPart;
-    ApplicationArea = NPRetail;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR MM Member";
 
     layout

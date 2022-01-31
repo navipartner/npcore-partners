@@ -8,11 +8,9 @@
     AutoSplitKey = true;
     Caption = 'Template Line Designer';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR RP Template Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

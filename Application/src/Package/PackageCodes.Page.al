@@ -5,8 +5,7 @@
     Caption = 'Package Codes';
     PageType = ListPart;
     SourceTable = "NPR Package Code";
-    UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
 
 
     layout

@@ -4,10 +4,8 @@
     Caption = 'Period Discount Lines';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Period Discount Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

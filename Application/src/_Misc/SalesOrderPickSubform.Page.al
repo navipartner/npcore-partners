@@ -9,6 +9,7 @@
     PageType = ListPart;
     SourceTable = "Sales Line";
     SourceTableView = WHERE("Document Type" = FILTER(Order));
+    UsageCategory = None;
 
     layout
     {

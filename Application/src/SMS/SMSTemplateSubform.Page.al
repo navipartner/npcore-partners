@@ -4,10 +4,8 @@
     AutoSplitKey = true;
     Caption = 'Lines';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR SMS Template Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {
