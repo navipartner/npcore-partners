@@ -3,9 +3,8 @@
     Extensible = False;
     Caption = 'Nc Collector Req. Filter Subf.';
     PageType = ListPart;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Nc Collector Req. Filter";
-    ApplicationArea = NPRNaviConnect;
 
     layout
     {

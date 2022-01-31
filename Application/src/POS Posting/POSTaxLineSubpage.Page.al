@@ -4,10 +4,8 @@
     Caption = 'POS Tax Line Subpage';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR POS Entry Tax Line";
-    ApplicationArea = NPRRetail;
-
     layout
     {
         area(content)

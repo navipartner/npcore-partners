@@ -6,6 +6,7 @@
     InsertAllowed = false;
     SourceTable = "NPR POS Store";
     SourceTableTemporary = true;
+    UsageCategory = None;
 
     layout
     {

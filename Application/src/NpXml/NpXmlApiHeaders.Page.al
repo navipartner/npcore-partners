@@ -4,10 +4,8 @@
     Caption = 'NpXml Api Headers';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpXml Api Header";
-    ApplicationArea = NPRRetail;
 
     layout
     {

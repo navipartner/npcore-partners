@@ -4,10 +4,8 @@
     Caption = 'POS Sale Lines';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR POS Sale Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

@@ -4,10 +4,8 @@
     Caption = 'Event Resource Overview';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = Resource;
-    ApplicationArea = NPRRetail;
 
     layout
     {

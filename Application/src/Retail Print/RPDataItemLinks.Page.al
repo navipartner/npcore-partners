@@ -6,11 +6,9 @@
     Caption = 'Data Item Links';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR RP Data Item Links";
-    ApplicationArea = NPRRetail;
 
     layout
     {

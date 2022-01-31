@@ -5,7 +5,7 @@
     DelayedInsert = true;
     PageType = ListPart;
     SourceTable = "NPR Mixed Discount Line";
-
+    UsageCategory = None;
     layout
     {
         area(content)

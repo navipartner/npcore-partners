@@ -3,10 +3,8 @@
     Extensible = False;
     Caption = 'Discount Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Discount Cue";
-    ApplicationArea = NPRRetail;
 
     layout
     {

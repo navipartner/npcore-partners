@@ -5,11 +5,9 @@
     DelayedInsert = true;
     LinksAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR Magento Category Link";
-    ApplicationArea = NPRRetail;
 
     layout
     {

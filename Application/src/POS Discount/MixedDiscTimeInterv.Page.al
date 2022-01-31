@@ -9,10 +9,8 @@
     Caption = 'Active Time Intervals';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Mixed Disc. Time Interv.";
-    ApplicationArea = NPRRetail;
 
     layout
     {

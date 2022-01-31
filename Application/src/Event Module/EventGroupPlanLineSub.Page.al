@@ -5,10 +5,8 @@
     Caption = 'Grouped Planning Lines';
     DataCaptionExpression = Rec.Caption();
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "Job Planning Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

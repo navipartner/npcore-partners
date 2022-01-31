@@ -3,10 +3,8 @@
     Extensible = False;
     Caption = 'My Reports';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR My Report";
-    ApplicationArea = NPRRetail;
 
     layout
     {

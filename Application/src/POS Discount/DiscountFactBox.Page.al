@@ -1,14 +1,11 @@
 ﻿page 6014614 "NPR Discount FactBox"
 {
     Extensible = False;
-
     Caption = 'Discount FactBox';
     InsertAllowed = false;
     PageType = CardPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = Item;
-    ApplicationArea = NPRRetail;
 
     layout
     {

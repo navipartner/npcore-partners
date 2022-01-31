@@ -4,10 +4,8 @@
     Caption = 'Lines';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "Sales Invoice Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

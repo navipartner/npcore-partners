@@ -4,7 +4,6 @@
     PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR CleanCash Trans. VAT";
-
     Caption = 'VAT Details';
     ShowFilter = false;
     Editable = false;

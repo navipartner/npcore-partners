@@ -6,10 +6,8 @@
     Caption = 'Mix Discount Levels';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Mixed Discount Level";
-    ApplicationArea = NPRRetail;
 
     layout
     {

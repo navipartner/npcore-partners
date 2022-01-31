@@ -6,7 +6,7 @@
     SourceTable = "NPR NpGp POS Sales Setup";
     SourceTableTemporary = true;
     DelayedInsert = true;
-
+    UsageCategory = None;
     layout
     {
         area(content)

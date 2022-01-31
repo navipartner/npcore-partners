@@ -5,11 +5,9 @@
     Caption = 'Xml Template Triggers';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR NpXml Template Trigger";
-    ApplicationArea = NPRRetail;
 
     layout
     {

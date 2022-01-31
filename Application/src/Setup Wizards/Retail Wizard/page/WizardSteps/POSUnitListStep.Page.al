@@ -6,6 +6,7 @@
     SourceTable = "NPR POS Unit";
     SourceTableTemporary = true;
     InsertAllowed = false;
+    UsageCategory = None;
 
     layout
     {

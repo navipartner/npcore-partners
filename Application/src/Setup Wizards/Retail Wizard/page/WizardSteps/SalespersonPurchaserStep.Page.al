@@ -4,6 +4,7 @@
     Caption = 'Salespersons';
     PageType = ListPart;
     SourceTable = "NPR Salesperson Buffer";
+    UsageCategory = None;
 
     layout
     {

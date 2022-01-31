@@ -4,10 +4,8 @@
     AutoSplitKey = true;
     Caption = 'Filter Line';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR POS Menu Filter Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

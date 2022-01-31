@@ -5,10 +5,8 @@
     Caption = 'Xml Attributes';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpXml Attribute";
-    ApplicationArea = NPRRetail;
 
     layout
     {

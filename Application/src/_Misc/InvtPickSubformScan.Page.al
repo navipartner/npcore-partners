@@ -9,6 +9,7 @@
     PageType = ListPart;
     SourceTable = "Warehouse Activity Line";
     SourceTableView = WHERE("Activity Type" = CONST("Invt. Pick"));
+    UsageCategory = None;
 
     layout
     {

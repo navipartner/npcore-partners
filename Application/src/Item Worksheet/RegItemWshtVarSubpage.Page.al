@@ -8,6 +8,8 @@
     SourceTable = "NPR Reg. Item Wsht Var. Line";
     SourceTableView = SORTING("Registered Worksheet No.", "Registered Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                       ORDER(Ascending);
+    UsageCategory = None;
+
     layout
     {
         area(content)

@@ -4,10 +4,8 @@
     Caption = 'POS Posting Log Parameters';
     Editable = false;
     PageType = CardPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR POS Posting Log";
-    ApplicationArea = NPRRetail;
 
     layout
     {

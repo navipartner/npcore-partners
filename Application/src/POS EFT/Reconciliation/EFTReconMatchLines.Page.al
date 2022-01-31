@@ -4,7 +4,7 @@
     AutoSplitKey = true;
     PageType = ListPart;
     SourceTable = "NPR EFT Rec. Match/Score Line";
-
+    UsageCategory = None;
     layout
     {
         area(content)

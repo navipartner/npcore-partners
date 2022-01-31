@@ -6,7 +6,7 @@
     SourceTable = "NPR POS Audit Profile";
     SourceTableTemporary = true;
     DelayedInsert = true;
-
+    UsageCategory = None;
     layout
     {
         area(content)

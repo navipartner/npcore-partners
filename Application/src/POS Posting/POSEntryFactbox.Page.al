@@ -3,10 +3,8 @@
     Extensible = False;
     Caption = 'POS Entry Factbox';
     PageType = CardPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR POS Entry";
-    ApplicationArea = NPRRetail;
 
     layout
     {
