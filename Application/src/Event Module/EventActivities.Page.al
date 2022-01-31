@@ -16,16 +16,6 @@
 
                 actions
                 {
-                    action("New Event")
-                    {
-                        Caption = 'New Event';
-                        RunObject = Page "NPR Event Card";
-                        RunPageMode = Create;
-
-                        Image = TileNew;
-                        ToolTip = 'Creates a new event';
-                        ApplicationArea = NPRRetail;
-                    }
                     action("New Customer")
                     {
                         Caption = 'New Customer';
@@ -41,6 +31,17 @@
             cuegroup(Control7)
             {
                 ShowCaption = false;
+                field("Event List"; Rec."Event List")
+                {
+
+                    ToolTip = 'Specifies the value of the Event List field';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    begin
+                        DrillDownPage(Rec.FieldNo("Event List"));
+                    end;
+                }
                 field("Upcoming Events"; Rec."Upcoming Events")
                 {
 
@@ -63,6 +64,7 @@
                         DrillDownPage(Rec.FieldNo("Completed Events"));
                     end;
                 }
+
                 field("Cancelled Events"; Rec."Cancelled Events")
                 {
 
