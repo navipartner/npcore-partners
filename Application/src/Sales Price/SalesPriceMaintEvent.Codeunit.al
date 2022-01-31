@@ -74,6 +74,7 @@
         SalesPriceMaintenanceSetup: Record "NPR Sales Price Maint. Setup";
         PriceListLine: Record "Price List Line";
         PriceListHeader: Record "Price List Header";
+        xPriceListHeader: Record "Price List Header";
         VATPostingSetup: Record "VAT Posting Setup";
         VATPct: Decimal;
         Currency: Record Currency;
@@ -188,19 +189,31 @@
 
                     if not PriceListLine.FindFirst() then begin
                         Clear(PriceListLine);
+                        xPriceListHeader := PriceListHeader;
+                        if PriceListHeader.Status <> PriceListHeader.Status::Draft then begin
+                            PriceListHeader.Status := PriceListHeader.Status::Draft;
+                            PriceListHeader.Modify();
+                        end;
+
                         PriceListLine.Init();
                         PriceListLine.CopyFrom(PriceListHeader);
                         PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
                         PriceListLine.Validate("Asset No.", Item."No.");
                         PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Sale);
                         PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
+                        PriceListLine.Status := xPriceListHeader.Status;
                         PriceListLine.Insert(true);
+
+                        if PriceListHeader.Status <> xPriceListHeader.Status then begin
+                            PriceListHeader.Status := xPriceListHeader.Status;
+                            PriceListHeader.Modify();
+                        end;
                     end;
 
                     ConvertPriceLCYToFCY(PricesInCurrency, ExchRateDate, Currency, UnitPrice, CurrencyFactor);
-                    PriceListLine.Status := PriceListLine.Status::Draft;
-                    PriceListLine.Validate("Unit Price", UnitPrice);
-                    PriceListLine.Status := PriceListLine.Status::Active;
+                    PriceListLine."Unit Price" := UnitPrice;
+                    if PriceListLine."Unit Price" <> 0 then
+                        PriceListLine."Cost Factor" := 0;
                     PriceListLine.Modify(true)
                 end;
             until SalesPriceMaintenanceSetup.Next() = 0;

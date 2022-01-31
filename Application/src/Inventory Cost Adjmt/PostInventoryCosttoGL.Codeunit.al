@@ -3,14 +3,33 @@
 codeunit 6014683 "NPR Post Inventory Cost to G/L"
 {
     Access = Internal;
+    TableNo = "Job Queue Entry";
+
     trigger OnRun()
     var
+        ReportInbox: Record "Report Inbox";
         PostInvToGL: Report "Post Inventory Cost to G/L";
         PostMethod: Option "per Posting Group","per Entry";
+        OutStr: OutStream;
     begin
+        ReportInbox.Init();
+        ReportInbox."User ID" := Rec."User ID";
+        ReportInbox."Job Queue Log Entry ID" := Rec.ID;
+        ReportInbox."Report ID" := Report::"Post Inventory Cost to G/L";
+        ReportInbox.Description := Rec.Description;
+        ReportInbox."Report Output".CreateOutStream(OutStr);
+
         PostInvToGL.InitializeRequest(PostMethod::"per Entry", '', true);
         PostInvToGL.UseRequestPage(false);
-        PostInvToGL.Run();
+        PostInvToGL.SaveAs(GetReportParameters(), ReportFormat::Pdf, OutStr);
+
+        ReportInbox."Created Date-Time" := RoundDateTime(CurrentDateTime, 60000);
+        ReportInbox.Insert(true);
+    end;
+
+    local procedure GetReportParameters(): Text
+    begin
+        exit('');
     end;
 }
 #endif
