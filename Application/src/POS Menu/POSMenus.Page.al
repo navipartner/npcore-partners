@@ -16,38 +16,12 @@
             {
                 field("Code"; Rec.Code)
                 {
-
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Caption; Rec.Caption)
                 {
-
                     ToolTip = 'Specifies what the caption is';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Blocked; Rec.Blocked)
-                {
-
-                    ToolTip = 'Specifies whether it"s blocked or not';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Register Type"; Rec."Register Type")
-                {
-
-                    ToolTip = 'Specifies what POS View Profile is assigned';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Register No."; Rec."Register No.")
-                {
-
-                    ToolTip = 'Specifies what POS Unit is assigned';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Salesperson Code"; Rec."Salesperson Code")
-                {
-
-                    ToolTip = 'Specifies what salesperson is assigned';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -79,12 +79,6 @@
 
         PreloadParameters(TempPOSParameterValue);
 
-        Menu.SetCurrentKey(Blocked, "Register Type", "Register No.", "Salesperson Code");
-        Menu.SetRange(Blocked, false);
-        Menu.SetFilter("Register Type", '%1|%2', POSViewProfile.Code, '');
-        Menu.SetFilter("Register No.", '%1|%2', POSUnit."No.", '');
-        Menu.SetFilter("Salesperson Code", '%1|%2', Salesperson.Code, '');
-
         if Menu.FindSet() then
             repeat
                 Clear(MenuObj);
@@ -105,8 +99,6 @@
         MenuButton.SetRange("Menu Code", Menu.Code);
         MenuButton.SetRange("Parent ID", 0);
         MenuButton.SetRange(Blocked, false);
-        Menu.CopyFilter("Register Type", MenuButton."Register Type");
-        Menu.CopyFilter("Register No.", MenuButton."Register No.");
 
         InitializeMenuButtons(MenuButton, MenuObj, POSSession, tmpPOSParameterValue);
     end;
