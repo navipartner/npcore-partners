@@ -53,20 +53,20 @@
     {
         area(embedding)
         {
-            action(EventList)
-            {
-                Caption = 'Event List';
-                RunObject = Page "NPR Event List";
-
-                ToolTip = 'Executes the Event List action';
-                ApplicationArea = NPRRetail;
-            }
             action(CustomerList)
             {
                 Caption = 'Customer List';
                 RunObject = Page "Customer List";
 
                 ToolTip = 'Executes the Customer List action';
+                ApplicationArea = NPRRetail;
+            }
+            action(ItemList)
+            {
+                Caption = 'Item List';
+                RunObject = Page "Item List";
+
+                ToolTip = 'Executes the Item List action';
                 ApplicationArea = NPRRetail;
             }
             action(PlanningLines)
@@ -83,22 +83,6 @@
                 RunObject = Page "Resource List";
 
                 ToolTip = 'Executes the Resource List action';
-                ApplicationArea = NPRRetail;
-            }
-            action(AttributeTemplates)
-            {
-                Caption = 'Attribute Templates';
-                RunObject = Page "NPR Event Attribute Templ.";
-
-                ToolTip = 'Executes the Attribute Templates action';
-                ApplicationArea = NPRRetail;
-            }
-            action(ExchIntTemplates)
-            {
-                Caption = 'Exch. Int. Templates';
-                RunObject = Page "NPR Event Exch. Int. Templates";
-
-                ToolTip = 'Executes the Exch. Int. Templates action';
                 ApplicationArea = NPRRetail;
             }
             action(ExchIntEmails)
@@ -127,6 +111,39 @@
 
                 ToolTip = 'Executes the Event Overview';
                 ApplicationArea = NPRRetail;
+            }
+        }
+        area(Sections)
+        {
+            group(Setup)
+            {
+                Caption = 'Setup';
+
+                action(ExchIntTemplates)
+                {
+                    Caption = 'Exch. Int. Templates';
+                    RunObject = Page "NPR Event Exch. Int. Templates";
+
+                    ToolTip = 'Executes the Exch. Int. Templates action';
+                    ApplicationArea = NPRRetail;
+                }
+                action(AttributeTemplates)
+                {
+                    Caption = 'Attribute Templates';
+                    RunObject = Page "NPR Event Attribute Templ.";
+
+                    ToolTip = 'Executes the Attribute Templates action';
+                    ApplicationArea = NPRRetail;
+                }
+                action(JobsSetup)
+                {
+                    Caption = 'Jobs Setup';
+                    RunObject = Page "Jobs Setup";
+
+                    ToolTip = 'Executes the Jobs Setup action';
+                    ApplicationArea = NPRRetail;
+                }
+
             }
         }
     }

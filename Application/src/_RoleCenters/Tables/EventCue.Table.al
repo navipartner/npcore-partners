@@ -11,6 +11,14 @@
             Caption = 'Primary Key';
             DataClassification = CustomerContent;
         }
+        field(50; "Event List"; Integer)
+        {
+            CalcFormula = Count(Job WHERE("NPR Event" = CONST(true)));
+
+            Caption = 'Event List';
+            FieldClass = FlowField;
+        }
+
         field(10; "Upcoming Events"; Integer)
         {
             CalcFormula = Count(Job WHERE("NPR Event" = CONST(true),
@@ -28,7 +36,7 @@
         field(30; "Cancelled Events"; Integer)
         {
             CalcFormula = Count(Job WHERE("NPR Event" = CONST(true),
-                                           "NPR Event Status" = CONST(Completed)));
+                                           "NPR Event Status" = CONST(Cancelled)));
             Caption = 'Cancelled Events';
             FieldClass = FlowField;
         }
@@ -37,6 +45,7 @@
             Caption = 'Date Filter';
             FieldClass = FlowFilter;
         }
+
     }
 
     keys
