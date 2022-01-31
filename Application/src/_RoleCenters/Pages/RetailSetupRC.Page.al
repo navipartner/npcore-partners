@@ -280,6 +280,14 @@
                     ToolTip = 'Executes the Pepper Card Type Group action';
                     ApplicationArea = NPRRetail;
                 }
+                action("EFT Reconciliations")
+                {
+                    Caption = 'EFT Reconciliations';
+                    RunObject = Page "NPR EFT Reconciliation List";
+
+                    ToolTip = 'Executes the EFT Reconciliations action';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group("Coupons & Vouchers")
             {
