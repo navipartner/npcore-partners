@@ -1,4 +1,4 @@
-﻿codeunit 6014484 "NPR Pacsoft Management"
+﻿codeunit 6014484 "NPR Pacsoft Management" implements "NPR IShipping Provider Interface"
 {
     Access = Internal;
     trigger OnRun()
@@ -272,5 +272,58 @@
         PacsoftSetup.Get();
         GotIComm := true;
     end;
+
+
+    procedure CheckBalance()
+    begin
+        message(Text001);
+    end;
+
+    Procedure SendDocument(var ShipmentDocument: Record "NPR shipping provider Document")
+    var
+        OutStr: OutStream;
+    begin
+        GetIComm();
+        if not PacsoftSetup."Use Pacsoft integration" then exit;
+
+        ShipmentDocument.CalcFields("Request XML");
+        Clear(ShipmentDocument."Request XML");
+        ShipmentDocument.Modify();
+
+
+        if ShipmentDocument."Export Time" <> 0DT then
+            exit;
+
+        ShipmentDocument."Request XML Name" := 'Request ' +
+                                                Format(Today) +
+                                                ' ' +
+                                                Format(Time, 0, '<Hours24,2>-<Minutes,2>-<Seconds,2>') +
+                                                ' ' +
+                                                Format(ShipmentDocument."Entry No.") +
+                                                '.xml';
+        ShipmentDocument."Request XML".CreateOutStream(OutStr);
+        ShipmentDocument.SetRecFilter();
+        XMLPORT.Export(XMLPORT::"NPR Pacsoft Shipment Document", OutStr, ShipmentDocument);
+        ShipmentDocument.Modify();
+
+        Clear(OutStr);
+
+        PrepareXml(ShipmentDocument);
+        SendXML(ShipmentDocument);
+
+    end;
+
+    procedure PrintDocument(var ShipmentDocument: Record "NPR shipping provider Document")
+    begin
+        message(Text001);
+    end;
+
+    procedure PrintShipmentDocument(var SalesShipmentHeader: Record "Sales Shipment Header")
+    begin
+        message(Text001);
+    end;
+
+    var
+        Text001: Label 'Not available for Pacsoft';
 }
 

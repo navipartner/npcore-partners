@@ -118,14 +118,16 @@ table 6014574 "NPR Shipping Provider Setup"
             Caption = 'Package Service Codeunit ID';
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = FILTER(Codeunit));
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by enum "Shipping Provider"';
         }
         field(157; "Package ServiceCodeunit Name"; Text[249])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
-                                                                           "Object ID" = FIELD("Package Service Codeunit ID")));
             Caption = 'Package ServiceCodeunit Name';
             Editable = false;
-            FieldClass = FlowField;
+            DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by enum "Shipping Provider"';
         }
         field(158; "Use Pakkelable Printer API"; Boolean)
         {
@@ -157,6 +159,19 @@ table 6014574 "NPR Shipping Provider Setup"
         {
             Caption = 'Skip Own Agreement';
             InitValue = true;
+            DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used Anymore';
+        }
+        field(164; "Enable Shipping"; Boolean)
+        {
+            Caption = 'Enable Shipping';
+            DataClassification = CustomerContent;
+        }
+
+        field(165; "Shipping Provider"; Enum "NPR Shipping Provider Enum")
+        {
+            Caption = 'Shipping Provider';
             DataClassification = CustomerContent;
         }
     }
