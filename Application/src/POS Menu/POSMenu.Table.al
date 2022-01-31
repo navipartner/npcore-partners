@@ -17,6 +17,8 @@
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
         field(3; Caption; Text[50])
         {
@@ -32,6 +34,8 @@
         {
             Caption = 'Blocked';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
         field(6; "Custom Class Attribute"; Text[30])
         {
@@ -43,12 +47,16 @@
             Caption = 'POS View Profile';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS View Profile";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
         field(42; "Register No."; Code[10])
         {
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Unit";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
         field(43; "Salesperson Code"; Code[20])
         {
@@ -56,6 +64,8 @@
             DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser".Code;
             ValidateTableRelation = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
         field(44; "Available on Desktop"; Boolean)
         {
@@ -80,7 +90,11 @@
         key(Key1; "Code")
         {
         }
-        key(Key2; Blocked, "Register Type", "Register No.", "Salesperson Code") { }
+        key(Key2; Blocked, "Register Type", "Register No.", "Salesperson Code")
+        {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Fields are not used. Removed in case 508876.';
+        }
     }
 
     fieldgroups

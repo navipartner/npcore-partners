@@ -15,28 +15,13 @@ xmlport 6150701 "NPR POS Menu Export/Import"
                 fieldelement(Code; "POS Menu".Code)
                 {
                 }
-                fieldelement(Description; "POS Menu".Description)
-                {
-                }
                 fieldelement(Caption; "POS Menu".Caption)
                 {
                 }
                 fieldelement(Tooltip; "POS Menu".Tooltip)
                 {
                 }
-                fieldelement(Blocked; "POS Menu".Blocked)
-                {
-                }
                 fieldelement(CustomerClassAttribute; "POS Menu"."Custom Class Attribute")
-                {
-                }
-                fieldelement(RegisterType; "POS Menu"."Register Type")
-                {
-                }
-                fieldelement(RegisterNo; "POS Menu"."Register No.")
-                {
-                }
-                fieldelement(SalespersonCode; "POS Menu"."Salesperson Code")
                 {
                 }
                 tableelement("POS Menu Button"; "NPR POS Menu Button")
