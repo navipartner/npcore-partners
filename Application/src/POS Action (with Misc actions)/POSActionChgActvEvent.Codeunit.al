@@ -1,11 +1,12 @@
 ﻿codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
 {
     Access = Internal;
+
     var
-        ActionDescription: Label 'Set an event from Event Management module as active for current POS register and sale';
+        ActionDescription: Label 'Set an Event Management module event as active for current POS unit and sale';
         EventNoLbl: Label 'Event No.';
         DialogType: Option TextField,List;
-        IsAlreadyAssigned: Label 'The Event ''%1'' has already been set up as active event for %2=''%3''.';
+        IsAlreadyAssigned: Label 'The Event ''%1'' has already been set up as active event for %2=''%3''.', Comment = '%1 - event No., %2 - Sales Ticket No. field caption, %3 - Sales Ticket No.';
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
@@ -83,7 +84,7 @@
                     begin
                         EventNo := POSUnit.FindActiveEventFromCurrPOSUnit();
                         if not SelectEventFromList(EventNo) then
-                            Error('');
+                            exit;
                     end;
             end;
         end;
@@ -205,12 +206,13 @@
         end;
 
         if SalePOS."Event No." = EventNo then
-            Error(IsAlreadyAssigned, EventNo, SalePOS.FieldCaption("Sales Ticket No."), SalePOS."Sales Ticket No.");
-        SalePOS.Validate("Event No.", EventNo);
-        POSSale.Refresh(SalePOS);
-        POSSale.Modify(true, true);
-        POSSession.RequestRefreshData();
-
+            Message(IsAlreadyAssigned, EventNo, SalePOS.FieldCaption("Sales Ticket No."), SalePOS."Sales Ticket No.")
+        else begin
+            SalePOS.Validate("Event No.", EventNo);
+            POSSale.Refresh(SalePOS);
+            POSSale.Modify(true, true);
+            POSSession.RequestRefreshData();
+        end;
     end;
 
     local procedure FilterJobs(var Job: Record Job)
