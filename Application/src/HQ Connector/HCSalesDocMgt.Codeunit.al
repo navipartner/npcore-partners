@@ -528,6 +528,7 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
     begin
         CreateReservEntry.SetDates(
           ReservationEntry."Warranty Date", ReservationEntry."Expiration Date");
+#if not BC19 and not BC20
         CreateReservEntry.CreateReservEntryFor(
           ReservationEntry."Source Type",
           ReservationEntry."Source Subtype",
@@ -540,6 +541,19 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
           Abs(ReservationEntry."Quantity (Base)"),
           ReservationEntry."Serial No.",
           ReservationEntry."Lot No.");
+#else
+        CreateReservEntry.CreateReservEntryFor(
+        ReservationEntry."Source Type",
+        ReservationEntry."Source Subtype",
+        ReservationEntry."Source ID",
+        ReservationEntry."Source Batch Name",
+        ReservationEntry."Source Prod. Order Line",
+        ReservationEntry."Source Ref. No.",
+        ReservationEntry."Qty. per Unit of Measure",
+        0,
+        Abs(ReservationEntry."Quantity (Base)"),
+        ReservationEntry);
+#endif
         CreateReservEntry.CreateEntry(
           ReservationEntry."Item No.",
           ReservationEntry."Variant Code",
