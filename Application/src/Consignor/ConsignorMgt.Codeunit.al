@@ -1,4 +1,4 @@
-﻿codeunit 6184601 "NPR Consignor Mgt."
+﻿codeunit 6184601 "NPR Consignor Mgt." implements "NPR IShipping Provider Interface"
 {
     Access = Internal;
     [EventSubscriber(ObjectType::Table, Database::"NPR Consignor Entry", 'OnAfterInsertEvent', '', true, true)]
@@ -38,4 +38,27 @@
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry, JobQueueMgt.NowWithDelayInSeconds(1));
         until JobQueueEntry.Next() = 0;
     end;
+
+    procedure CheckBalance()
+    begin
+        message(Text001);
+    end;
+
+    Procedure SendDocument(var ShipmentDocument: Record "NPR shipping provider Document")
+    begin
+        message(Text001);
+    end;
+
+    procedure PrintDocument(var ShipmentDocument: Record "NPR shipping provider Document")
+    begin
+        message(Text001);
+    end;
+
+    procedure PrintShipmentDocument(var SalesShipmentHeader: Record "Sales Shipment Header")
+    begin
+        message(Text001);
+    end;
+
+    var
+        Text001: Label 'Not available for Consignor';
 }

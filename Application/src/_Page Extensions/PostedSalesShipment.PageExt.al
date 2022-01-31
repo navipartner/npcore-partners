@@ -100,12 +100,17 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
 
                     trigger OnAction()
                     var
-                        ShipmondoMgnt: Codeunit "NPR Shipmondo Mgnt.";
+                        ShippingProviderSetup: record "NPR Shipping Provider Setup";
                     begin
-                        ShipmondoMgnt.PrintShipmentDocument(Rec);
+                        if ShippingProviderSetup.Get() then
+                            PrintShipmentDocument(ShippingProviderSetup."Shipping Provider");
                     end;
                 }
             }
         }
     }
+    local procedure PrintShipmentDocument(IShippingProvider: Interface "NPR IShipping Provider Interface")
+    begin
+        IShippingProvider.PrintShipmentDocument(Rec);
+    end;
 }
