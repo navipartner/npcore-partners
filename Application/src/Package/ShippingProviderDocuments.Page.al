@@ -189,20 +189,10 @@ page 6014440 "NPR Shipping Provider Docs"
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
-                var
-                    PacsoftMgt: Codeunit "NPR Pacsoft Management";
-                    PacsoftSetup: Record "NPR Shipping Provider Setup";
-                    ShipmondoMgnt: Codeunit "NPR Shipmondo Mgnt.";
                 begin
                     if Confirm(StrSubstNo(TextConfirm, Rec.FieldCaption("Entry No."), Rec."Entry No."), true) then begin
-                        PacsoftSetup.Get();
-                        if PacsoftSetup."Use Pacsoft integration" then begin
-                            PacsoftMgt.SendDocument(Rec, true);
-                            Clear(Rec);
-                            CurrPage.Update(false);
-                        end;
-
-                        ShipmondoMgnt.SendDocument(Rec);
+                        if ShippingProviderSetup.Get() then
+                            SendDocuments(ShippingProviderSetup."Shipping Provider");
                     end;
                 end;
             }
@@ -228,9 +218,9 @@ page 6014440 "NPR Shipping Provider Docs"
 
                 trigger OnAction()
                 var
-                    ShipmondoMgnt: Codeunit "NPR Shipmondo Mgnt.";
                 begin
-                    ShipmondoMgnt.PrintDocument(Rec);
+                    if ShippingProviderSetup.Get() then
+                        IPrintDocument(ShippingProviderSetup."Shipping Provider");
                 end;
             }
         }
@@ -238,5 +228,17 @@ page 6014440 "NPR Shipping Provider Docs"
 
     var
         TextConfirm: Label 'Do you want to send %1 %2 ?';
+        ShippingProviderSetup: record "NPR Shipping Provider Setup";
+
+    local procedure SendDocuments(IShippingProvider: Interface "NPR IShipping Provider Interface")
+    begin
+        IShippingProvider.SendDocument(Rec);
+    end;
+
+    local procedure IPrintDocument(IShippingProvider: Interface "NPR IShipping Provider Interface");
+    begin
+        IShippingProvider.PrintDocument(Rec);
+    end;
+
 }
 

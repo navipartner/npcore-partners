@@ -1,6 +1,7 @@
-﻿codeunit 6014578 "NPR Shipmondo Mgnt."
+codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interface"
 {
     Access = Internal;
+
     var
         PackageProviderSetup: Record "NPR Shipping Provider Setup";
         ApiUser: Text;
@@ -422,22 +423,6 @@
     end;
 
 
-    [EventSubscriber(ObjectType::Page, Page::"NPR Shipping Provider Setup", 'GetPackageProvider', '', true, true)]
-    local procedure IdentifyMe_GetPackageProvider(var Sender: Page "NPR Shipping Provider Setup"; var tmpAllObjWithCaption: Record AllObjWithCaption temporary);
-    var
-        AllObjWithCaption: Record AllObjWithCaption;
-    begin
-        if tmpAllObjWithCaption.ISTEMPORARY then begin
-            AllObjWithCaption.GET(OBJECTTYPE::Codeunit, 6014578);
-            tmpAllObjWithCaption.INIT();
-            tmpAllObjWithCaption."Object Type" := AllObjWithCaption."Object Type";
-            tmpAllObjWithCaption."Object ID" := AllObjWithCaption."Object ID";
-            tmpAllObjWithCaption."Object Name" := AllObjWithCaption."Object Name";
-            tmpAllObjWithCaption."Object Caption" := AllObjWithCaption."Object Caption";
-            tmpAllObjWithCaption.INSERT();
-        end;
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, false)]
     local procedure C80OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header");
     var
@@ -480,9 +465,10 @@
         if not PackageProviderSetup.GET() then
             exit(false);
 
-        if PackageProviderSetup."Package Service Codeunit ID" = 0 then
-            exit(false);
-        if (PackageProviderSetup."Package Service Codeunit ID" <> CODEUNIT::"NPR Shipmondo Mgnt.") then
+        if not PackageProviderSetup."Enable Shipping" then
+            exit(False);
+
+        if PackageProviderSetup."Shipping Provider" <> PackageProviderSetup."Shipping Provider"::Shipmondo then
             exit(false);
 
         if (PackageProviderSetup."Api User" = '') or (PackageProviderSetup."Api Key" = '') then

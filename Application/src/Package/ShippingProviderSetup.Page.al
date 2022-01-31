@@ -14,6 +14,16 @@ page 6014574 "NPR Shipping Provider Setup"
         {
             group(General)
             {
+                field("Enable Shipping"; Rec."Enable Shipping")
+                {
+                    ToolTip = 'Enables Shipping Service';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Shipping Provider"; rec."Shipping Provider")
+                {
+                    ToolTip = 'Specifies the Shipping Provider To Use';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Use Pacsoft integration"; Rec."Use Pacsoft integration")
                 {
 
@@ -24,29 +34,6 @@ page 6014574 "NPR Shipping Provider Setup"
                 {
 
                     ToolTip = 'Specifies the value of the Use Consignor field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Package Service Codeunit ID"; Rec."Package Service Codeunit ID")
-                {
-
-                    ToolTip = 'Specifies the value of the Package Service Codeunit ID field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    var
-                        TempAllObjWithCaption: Record AllObjWithCaption temporary;
-                    begin
-                        GetPackageProvider(TempAllObjWithCaption);
-                        if PAGE.RunModal(PAGE::"All Objects with Caption", TempAllObjWithCaption) = ACTION::LookupOK then begin
-                            Rec."Package Service Codeunit ID" := TempAllObjWithCaption."Object ID";
-                            Rec."Package ServiceCodeunit Name" := TempAllObjWithCaption."Object Name";
-                        end;
-                    end;
-                }
-                field("Package ServiceCodeunit Name"; Rec."Package ServiceCodeunit Name")
-                {
-
-                    ToolTip = 'Specifies the value of the Package ServiceCodeunit Name field';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -199,12 +186,7 @@ page 6014574 "NPR Shipping Provider Setup"
                     ToolTip = 'Specifies the value of the Print Return Label field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Skip Own Agreement"; Rec."Skip Own Agreement")
-                {
 
-                    ToolTip = 'Specifies the value of the Skip Own Agreement field';
-                    ApplicationArea = NPRRetail;
-                }
             }
         }
     }
@@ -232,10 +214,11 @@ page 6014574 "NPR Shipping Provider Setup"
 
                 trigger OnAction()
                 var
-                    ShipmondoMgnt: Codeunit "NPR Shipmondo Mgnt.";
+                    ShippingProviderSetup: record "NPR Shipping Provider Setup";
 
                 begin
-                    ShipmondoMgnt.CheckBalance()
+                    if ShippingProviderSetup.get() then
+                        GetBalance(ShippingProviderSetup."Shipping Provider");
                 end;
             }
             action("Shipment Mapping(Foreign Countries)")
@@ -276,10 +259,9 @@ page 6014574 "NPR Shipping Provider Setup"
         end;
     end;
 
-    [IntegrationEvent(TRUE, FALSE)]
-    procedure GetPackageProvider(var tmpAllObjWithCaption: Record AllObjWithCaption temporary)
+    local procedure GetBalance(IShippingProvider: Interface "NPR IShipping Provider Interface")
     begin
-
+        IShippingProvider.CheckBalance();
     end;
 }
 
