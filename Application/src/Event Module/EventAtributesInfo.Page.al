@@ -4,10 +4,8 @@
     Caption = 'Event Atributes Info';
     InsertAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Event Attribute";
-    ApplicationArea = NPRRetail;
 
     layout
     {

@@ -5,10 +5,8 @@
     Caption = 'Opening Hours';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpCs Open. Hour Entry";
-    ApplicationArea = NPRRetail;
 
     layout
     {

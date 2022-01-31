@@ -3,12 +3,10 @@
     Extensible = False;
     Caption = 'Stores';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Magento Store";
     SourceTableTemporary = true;
     DelayedInsert = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

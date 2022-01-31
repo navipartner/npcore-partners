@@ -7,6 +7,7 @@
     LinksAllowed = false;
     PageType = CardPart;
     SourceTable = "NPR AF Args: Spire Barcode";
+    UsageCategory = None;
 
     layout
     {

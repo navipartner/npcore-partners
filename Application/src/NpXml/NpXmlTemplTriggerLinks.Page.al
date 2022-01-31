@@ -5,10 +5,8 @@
     Caption = 'Xml Trigger Links';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpXml Templ.Trigger Link";
-    ApplicationArea = NPRRetail;
 
     layout
     {

@@ -6,6 +6,7 @@
     PageType = CardPart;
     ShowFilter = false;
     SourceTable = "NPR Display Content Lines";
+    UsageCategory = None;
 
     layout
     {

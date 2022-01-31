@@ -5,10 +5,8 @@
     Caption = 'Attachments';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NaviDocs Entry Attachment";
-    ApplicationArea = NPRRetail;
 
     layout
     {

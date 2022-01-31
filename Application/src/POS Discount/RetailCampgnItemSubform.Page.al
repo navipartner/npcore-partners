@@ -8,11 +8,9 @@
     Caption = 'Retail Campaign Items';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Retail Campaign Items";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

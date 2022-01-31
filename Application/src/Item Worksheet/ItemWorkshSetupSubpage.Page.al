@@ -4,6 +4,8 @@
     Caption = 'Item Worksheet Setup Subpage';
     PageType = ListPart;
     SourceTable = "NPR Missing Setup Record";
+    UsageCategory = None;
+
     layout
     {
         area(content)

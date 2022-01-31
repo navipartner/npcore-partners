@@ -4,10 +4,8 @@
     Caption = 'POS Payment Line Subpage';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR POS Entry Payment Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

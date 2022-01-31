@@ -7,6 +7,7 @@
     LinksAllowed = false;
     PageType = CardPart;
     SourceTable = "NPR MM Member Info Capture";
+    UsageCategory = None;
 
     layout
     {

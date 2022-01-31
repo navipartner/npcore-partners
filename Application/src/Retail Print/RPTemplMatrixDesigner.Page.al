@@ -15,11 +15,9 @@
     AutoSplitKey = true;
     Caption = 'Template Matrix Designer';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR RP Template Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

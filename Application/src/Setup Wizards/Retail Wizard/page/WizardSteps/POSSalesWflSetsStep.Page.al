@@ -6,7 +6,7 @@
     SourceTable = "NPR POS Sales Workflow Set";
     SourceTableTemporary = true;
     DelayedInsert = true;
-
+    UsageCategory = None;
     layout
     {
         area(content)

@@ -5,10 +5,8 @@
     Caption = 'Issue On-Sale Subform';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpDc Iss.OnSale Setup Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

@@ -7,11 +7,9 @@
     Caption = 'Data Item Constraint Links';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR RP Data Item Constr. Links";
-    ApplicationArea = NPRRetail;
 
     layout
     {

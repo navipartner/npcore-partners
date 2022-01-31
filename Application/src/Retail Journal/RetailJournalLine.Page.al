@@ -34,11 +34,9 @@
     Caption = 'Lines';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Retail Journal Line";
     SourceTableView = SORTING("No.", "Line No.");
-    ApplicationArea = NPRRetail;
 
     layout
     {

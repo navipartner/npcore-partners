@@ -7,6 +7,7 @@
     SourceTable = "NPR SMS Rcpt. Group Line";
     AutoSplitKey = true;
     MultipleNewLines = true;
+    UsageCategory = None;
     layout
     {
         area(content)

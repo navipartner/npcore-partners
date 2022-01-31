@@ -4,10 +4,8 @@
     Caption = 'Store Workflow Relations';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpCs Store Workflow Rel.";
-    ApplicationArea = NPRRetail;
 
     layout
     {

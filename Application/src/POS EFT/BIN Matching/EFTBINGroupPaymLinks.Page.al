@@ -3,10 +3,8 @@
     Extensible = False;
     Caption = 'EFT Mapping Group Payment Links';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR EFT BIN Group Paym. Link";
-    ApplicationArea = NPRRetail;
 
     layout
     {

@@ -5,6 +5,7 @@
     PageType = ListPart;
     SourceTable = "NPR POS View Profile";
     SourceTableTemporary = true;
+    UsageCategory = None;
 
     layout
     {

@@ -5,12 +5,10 @@
     Caption = 'Coupon List Items';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpDc Coupon List Item";
     SourceTableView = SORTING("Coupon Type", "Line No.")
                       WHERE("Line No." = FILTER(>= 0));
-    ApplicationArea = NPRRetail;
 
     layout
     {

@@ -4,11 +4,9 @@
     Caption = 'Display Config';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Magento Display Config";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

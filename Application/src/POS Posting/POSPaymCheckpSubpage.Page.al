@@ -4,10 +4,8 @@
     Caption = 'POS Payment Bin Checkpoint';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR POS Payment Bin Checkp.";
-    ApplicationArea = NPRRetail;
 
     layout
     {

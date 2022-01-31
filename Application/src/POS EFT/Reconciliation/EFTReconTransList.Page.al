@@ -9,6 +9,7 @@
     SourceTableTemporary = true;
     SourceTableView = sorting("DCC Amount")
                       order(descending);
+    UsageCategory = None;
 
     layout
     {

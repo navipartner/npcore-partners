@@ -7,13 +7,11 @@
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "Field";
     SourceTableView = SORTING(TableNo, "No.");
-    ApplicationArea = NPRRetail;
 
     layout
     {

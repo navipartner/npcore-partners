@@ -6,10 +6,8 @@
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Sales Stats Time Period";
-    ApplicationArea = NPRRetail;
 
     layout
     {

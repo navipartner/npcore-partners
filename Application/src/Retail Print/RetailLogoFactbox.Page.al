@@ -7,9 +7,8 @@
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = CardPart;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Retail Logo";
-    ApplicationArea = NPRRetail;
 
     layout
     {

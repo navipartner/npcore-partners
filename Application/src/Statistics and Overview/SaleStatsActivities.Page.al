@@ -3,9 +3,8 @@
     Extensible = False;
     Caption = 'Sale Statistics';
     PageType = CardPart;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "Business Chart Buffer";
-    ApplicationArea = NPRRetail;
 
     layout
     {

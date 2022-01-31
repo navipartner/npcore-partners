@@ -7,13 +7,11 @@
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "NPR MM Members. Points Summary";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

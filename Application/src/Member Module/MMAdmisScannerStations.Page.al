@@ -5,10 +5,8 @@
     Caption = 'MM Admission Scanner Stations';
     PageType = ListPart;
     CardPageId = "NPR Admis. Scanner Stat. Card";
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR MM Admis. Scanner Stations";
-    ApplicationArea = NPRRetail;
 
     layout
     {

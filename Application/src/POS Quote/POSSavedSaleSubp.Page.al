@@ -4,10 +4,8 @@
     Caption = 'POS Saved Sale Subpage';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR POS Saved Sale Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

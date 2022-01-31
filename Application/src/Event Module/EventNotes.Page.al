@@ -4,11 +4,9 @@
     Caption = 'Event Notes';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "Record Link";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

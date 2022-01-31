@@ -6,7 +6,7 @@
     SourceTable = "NPR Ean Box Setup";
     SourceTableTemporary = true;
     DelayedInsert = true;
-
+    UsageCategory = None;
     layout
     {
         area(content)

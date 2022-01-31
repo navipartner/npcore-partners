@@ -4,11 +4,9 @@
     Caption = 'Namespaces';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR NpXml Namespace";
-    ApplicationArea = NPRRetail;
 
     layout
     {

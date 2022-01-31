@@ -5,10 +5,8 @@
     Editable = false;
     InsertAllowed = false;
     PageType = CardPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR RP Template Media Info";
-    ApplicationArea = NPRRetail;
 
     layout
     {

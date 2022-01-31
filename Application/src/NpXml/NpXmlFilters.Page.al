@@ -5,10 +5,8 @@
     Caption = 'Xml Filters';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpXml Filter";
-    ApplicationArea = NPRRetail;
 
     layout
     {

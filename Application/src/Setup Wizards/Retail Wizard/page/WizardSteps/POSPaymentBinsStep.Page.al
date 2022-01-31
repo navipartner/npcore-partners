@@ -6,7 +6,7 @@
     SourceTable = "NPR POS Payment Bin";
     SourceTableTemporary = true;
     InsertAllowed = false;
-
+    UsageCategory = None;
     layout
     {
         area(content)

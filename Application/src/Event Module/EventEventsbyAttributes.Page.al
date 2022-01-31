@@ -5,11 +5,9 @@
     CardPageID = "NPR Event Card";
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SaveValues = true;
     SourceTable = Job;
-    ApplicationArea = NPRRetail;
 
     layout
     {

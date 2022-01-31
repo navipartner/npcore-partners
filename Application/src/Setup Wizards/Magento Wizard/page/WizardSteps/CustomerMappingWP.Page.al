@@ -3,12 +3,10 @@
     Extensible = False;
     Caption = 'Magento Customer Mapping';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Magento Customer Mapping";
     SourceTableTemporary = true;
     DelayedInsert = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

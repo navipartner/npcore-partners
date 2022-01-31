@@ -7,11 +7,9 @@
     DelayedInsert = true;
     MultipleNewLines = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     PopulateAllFields = true;
     SourceTable = "NPR Endpoint Filter";
-    ApplicationArea = NPRRetail;
 
     layout
     {

@@ -3,12 +3,10 @@
     Extensible = False;
     Caption = 'Payment Method Mapping';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Magento Payment Mapping";
     SourceTableTemporary = true;
     DelayedInsert = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

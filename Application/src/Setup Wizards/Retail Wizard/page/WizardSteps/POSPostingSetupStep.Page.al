@@ -6,7 +6,7 @@
     SourceTable = "NPR POS Posting Setup";
     SourceTableTemporary = true;
     DelayedInsert = true;
-
+    UsageCategory = None;
     layout
     {
         area(content)

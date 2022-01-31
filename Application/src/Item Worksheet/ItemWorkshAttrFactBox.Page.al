@@ -4,6 +4,7 @@
     Caption = 'NP Attributes FactBox';
     PageType = CardPart;
     SourceTable = "NPR Item Worksheet Line";
+    UsageCategory = None;
     layout
     {
         area(content)

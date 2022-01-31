@@ -6,10 +6,8 @@
 
     Caption = 'Endpoint Query Filter Subform';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Endpoint Query Filter";
-    ApplicationArea = NPRRetail;
 
     layout
     {

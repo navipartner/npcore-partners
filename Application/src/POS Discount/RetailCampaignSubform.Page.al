@@ -7,10 +7,8 @@
     Caption = 'Discounts';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Retail Campaign Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

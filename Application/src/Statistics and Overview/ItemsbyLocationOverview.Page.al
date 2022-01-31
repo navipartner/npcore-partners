@@ -5,10 +5,8 @@
 
     Caption = 'Items by Location Overview';
     PageType = ListPlus;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SaveValues = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

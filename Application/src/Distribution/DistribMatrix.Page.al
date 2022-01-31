@@ -5,11 +5,9 @@
 
     Caption = 'Distribution Matrix';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Item Hierarchy Line";
     SourceTableView = SORTING("Linked Table Key Value");
-    ApplicationArea = NPRRetail;
 
     layout
     {

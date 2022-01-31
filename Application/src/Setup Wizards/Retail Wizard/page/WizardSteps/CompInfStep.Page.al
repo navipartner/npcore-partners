@@ -6,6 +6,7 @@
     PageType = CardPart;
     SourceTable = "Company Information";
     SourceTableTemporary = true;
+    UsageCategory = None;
 
     layout
     {

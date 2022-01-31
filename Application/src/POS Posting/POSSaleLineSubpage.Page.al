@@ -7,10 +7,9 @@
     Editable = false;
     ModifyAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR POS Entry Sales Line";
     SourceTableView = ORDER(Descending);
-    ApplicationArea = NPRRetail;
 
     layout
     {

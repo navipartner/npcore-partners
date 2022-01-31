@@ -8,10 +8,8 @@
     LinksAllowed = false;
     MultipleNewLines = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "Comment Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {

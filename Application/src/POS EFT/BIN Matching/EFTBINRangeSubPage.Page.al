@@ -3,10 +3,8 @@
     Extensible = False;
     Caption = 'EFT BIN Ranges';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR EFT BIN Range";
-    ApplicationArea = NPRRetail;
 
     layout
     {

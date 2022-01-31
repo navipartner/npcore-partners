@@ -6,10 +6,8 @@
     AutoSplitKey = true;
     Caption = 'Distribution Group Members';
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Distrib. Group Members";
-    ApplicationArea = NPRRetail;
 
     layout
     {

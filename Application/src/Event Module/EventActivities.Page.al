@@ -3,10 +3,8 @@
     Extensible = False;
     Caption = 'Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Event Cue";
-    ApplicationArea = NPRRetail;
 
     layout
     {

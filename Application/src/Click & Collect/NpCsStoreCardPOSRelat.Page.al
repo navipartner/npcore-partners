@@ -4,10 +4,8 @@
     Caption = 'Collect Store POS Relations';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpCs Store POS Relation";
-    ApplicationArea = NPRRetail;
 
     layout
     {

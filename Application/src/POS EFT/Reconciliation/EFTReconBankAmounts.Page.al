@@ -4,7 +4,7 @@
     Caption = 'EFT Recon. Bank Amounts';
     PageType = ListPart;
     SourceTable = "NPR EFT Recon. Bank Amount";
-
+    UsageCategory = None;
     layout
     {
         area(content)

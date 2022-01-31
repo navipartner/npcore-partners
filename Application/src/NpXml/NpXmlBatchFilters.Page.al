@@ -5,11 +5,9 @@
     Caption = 'Xml Batch Filters';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR NpXml Filter";
-    ApplicationArea = NPRRetail;
 
     layout
     {
