@@ -2,7 +2,7 @@ pageextension 6014410 "NPR Item Reference Entries" extends "Item Reference Entri
 {
     layout
     {
-        addbefore("Discontinue Bar Code")
+        addlast(Control1)
         {
             field("NPR Label Barcode"; Rec."NPR Label Barcode")
             {
