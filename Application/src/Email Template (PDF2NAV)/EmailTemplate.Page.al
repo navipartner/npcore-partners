@@ -119,6 +119,7 @@
                             InStr: InStream;
                         begin
                             TempBlob.CreateOutStream(OutStr);
+                            Rec.CalcFields("HTML Template");
                             Rec."HTML Template".CreateInStream(InStr);
                             CopyStream(OutStr, InStr);
                             if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
