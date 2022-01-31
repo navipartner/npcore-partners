@@ -409,7 +409,11 @@ codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
             ConfigPackageTable.SetFilter("Table ID", '<>%1&<>%2&<>%3&<>%4&<>%5&<>%6&<>%7&<>%8',
               DATABASE::"Config. Template Header", DATABASE::"Config. Template Line",
               DATABASE::"Config. Questionnaire", DATABASE::"Config. Question Area", DATABASE::"Config. Question",
+#if not BC19 and not BC20
               DATABASE::"Config. Line", DATABASE::"Config. Package Filter", DATABASE::"Config. Field Mapping");
+#else
+              DATABASE::"Config. Line", DATABASE::"Config. Package Filter", DATABASE::"Config. Field Map");
+#endif
 
         ConfigPackageTable.SetRange("Package Code", NcRapidConnectSetup."Package Code");
     end;
