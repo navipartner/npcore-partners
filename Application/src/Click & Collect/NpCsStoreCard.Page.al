@@ -67,6 +67,7 @@
                             InStr: InStream;
                         begin
                             TempBlob.CreateOutStream(OutStr);
+                            Rec.CalcFields("Magento Description");
                             Rec."Magento Description".CreateInStream(InStr);
                             CopyStream(OutStr, InStr);
                             if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin

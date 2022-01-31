@@ -300,6 +300,7 @@
                                                 InStr: InStream;
                                             begin
                                                 TempBlob.CreateOutStream(OutStr);
+                                                Rec.CalcFields(Rec."Webshop Description");
                                                 Rec."Webshop Description".CreateInStream(InStr);
                                                 CopyStream(OutStr, InStr);
                                                 if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
@@ -347,6 +348,7 @@
                                                 InStr: InStream;
                                             begin
                                                 TempBlob.CreateOutStream(OutStr);
+                                                Rec.CalcFields(Rec."Webshop Short Desc.");
                                                 Rec."Webshop Short Desc.".CreateInStream(InStr);
                                                 CopyStream(OutStr, InStr);
                                                 if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
