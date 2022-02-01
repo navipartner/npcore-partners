@@ -21,16 +21,16 @@ page 6014507 "NPR APIV1 - Customers"
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
                     Editable = false;
                 }
                 field(number; Rec."No.")
                 {
-                    Caption = 'No.';
+                    Caption = 'No.', Locked = true;
                 }
                 field(displayName; Rec.Name)
                 {
-                    Caption = 'Display Name';
+                    Caption = 'Display Name', Locked = true;
                     ShowMandatory = true;
 
                     trigger OnValidate()
@@ -43,11 +43,11 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(displayName2; Rec."Name 2")
                 {
-                    Caption = 'Display Name 2';
+                    Caption = 'Display Name 2', Locked = true;
                 }
                 field(type; Rec."Contact Type")
                 {
-                    Caption = 'Type';
+                    Caption = 'Type', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -57,12 +57,12 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(searchName; Rec."Search Name")
                 {
-                    Caption = 'Search Name';
+                    Caption = 'Search Name', Locked = true;
                 }
 
                 field(addressLine1; Rec.Address)
                 {
-                    Caption = 'Address Line 1';
+                    Caption = 'Address Line 1', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -71,7 +71,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(addressLine2; Rec."Address 2")
                 {
-                    Caption = 'Address Line 2';
+                    Caption = 'Address Line 2', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -80,7 +80,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(city; Rec.City)
                 {
-                    Caption = 'City';
+                    Caption = 'City', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -89,7 +89,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(state; Rec.County)
                 {
-                    Caption = 'State';
+                    Caption = 'State', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -98,7 +98,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(country; Rec."Country/Region Code")
                 {
-                    Caption = 'Country/Region Code';
+                    Caption = 'Country/Region Code', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -107,7 +107,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(postalCode; Rec."Post Code")
                 {
-                    Caption = 'Post Code';
+                    Caption = 'Post Code', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -116,7 +116,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(phoneNumber; Rec."Phone No.")
                 {
-                    Caption = 'Phone No.';
+                    Caption = 'Phone No.', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -126,7 +126,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(mobilePhoneNumber; Rec."Mobile Phone No.")
                 {
-                    Caption = 'Mobile Phone No.';
+                    Caption = 'Mobile Phone No.', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -135,7 +135,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(email; Rec."E-Mail")
                 {
-                    Caption = 'Email';
+                    Caption = 'Email', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -144,7 +144,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(website; Rec."Home Page")
                 {
-                    Caption = 'Website';
+                    Caption = 'Website', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -154,90 +154,90 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(contact; Rec.Contact)
                 {
-                    Caption = 'Contact';
+                    Caption = 'Contact', Locked = true;
                 }
 
                 field(telexNo; Rec."Telex No.")
                 {
-                    Caption = 'Telex No.';
+                    Caption = 'Telex No.', Locked = true;
                 }
 
                 field(shipToCode; Rec."Ship-to Code")
                 {
-                    Caption = 'Ship-to Code';
+                    Caption = 'Ship-to Code', Locked = true;
                 }
 
                 field(ourAccountNo; Rec."Our Account No.")
                 {
-                    Caption = 'Our Account No.';
+                    Caption = 'Our Account No.', Locked = true;
                 }
 
                 field(territoryCode; Rec."Territory Code")
                 {
-                    Caption = 'Territory Code';
+                    Caption = 'Territory Code', Locked = true;
                 }
 
                 field(chainName; Rec."Chain Name")
                 {
-                    Caption = 'Chain Name';
+                    Caption = 'Chain Name', Locked = true;
                 }
 
                 field(budgetedAmount; Rec."Budgeted Amount")
                 {
-                    Caption = 'Budgeted Amount';
+                    Caption = 'Budgeted Amount', Locked = true;
                 }
 
                 field(statisticsGroup; Rec."Statistics Group")
                 {
-                    Caption = 'Statistics Group';
+                    Caption = 'Statistics Group', Locked = true;
                 }
 
                 field(shippingAgentCode; Rec."Shipping Agent Code")
                 {
-                    Caption = 'Shipping Agent Code';
+                    Caption = 'Shipping Agent Code', Locked = true;
                 }
 
                 field(placeOfExport; Rec."Place of Export")
                 {
-                    Caption = 'Place of Export';
+                    Caption = 'Place of Export', Locked = true;
                 }
 
                 field(collectionMethod; Rec."Collection Method")
                 {
-                    Caption = 'Collection Method';
+                    Caption = 'Collection Method', Locked = true;
                 }
                 field(amount; Rec.Amount)
                 {
-                    Caption = 'Amount';
+                    Caption = 'Amount', Locked = true;
                 }
 
                 field(lastStatementNo; Rec."Last Statement No.")
                 {
-                    Caption = 'Last Statement No.';
+                    Caption = 'Last Statement No.', Locked = true;
                 }
 
                 field(printStatements; Rec."Print Statements")
                 {
-                    Caption = 'Print Statements';
+                    Caption = 'Print Statements', Locked = true;
                 }
 
                 field(priority; Rec.Priority)
                 {
-                    Caption = 'Priority';
+                    Caption = 'Priority', Locked = true;
                 }
 
                 field(lastDateModified; Rec."Last Date Modified")
                 {
-                    Caption = 'Last Date Modified';
+                    Caption = 'Last Date Modified', Locked = true;
                 }
 
                 field(pricesIncludingVat; Rec."Prices Including VAT")
                 {
-                    Caption = 'Prices Including VAT';
+                    Caption = 'Prices Including VAT', Locked = true;
                 }
                 field(taxLiable; Rec."Tax Liable")
                 {
-                    Caption = 'Tax Liable';
+                    Caption = 'Tax Liable', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -246,7 +246,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(taxAreaId; Rec."Tax Area ID")
                 {
-                    Caption = 'Tax Area Id';
+                    Caption = 'Tax Area Id', Locked = true;
 
                     trigger OnValidate()
                     var
@@ -263,16 +263,16 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(taxAreaCode; Rec."Tax Area Code")
                 {
-                    Caption = 'Tax Area Code';
+                    Caption = 'Tax Area Code', Locked = true;
                 }
                 field(taxAreaDisplayName; TaxAreaDisplayNameGlobal)
                 {
-                    Caption = 'Tax Area Display Name';
+                    Caption = 'Tax Area Display Name', Locked = true;
                     Editable = false;
                 }
                 field(taxRegistrationNumber; Rec."VAT Registration No.")
                 {
-                    Caption = 'Tax Registration No.';
+                    Caption = 'Tax Registration No.', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -281,7 +281,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(currencyId; Rec."Currency Id")
                 {
-                    Caption = 'Currency Id';
+                    Caption = 'Currency Id', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -300,7 +300,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(currencyCode; CurrencyCodeTxt)
                 {
-                    Caption = 'Currency Code';
+                    Caption = 'Currency Code', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -329,7 +329,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(paymentTermsId; Rec."Payment Terms Id")
                 {
-                    Caption = 'Payment Terms Id';
+                    Caption = 'Payment Terms Id', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -349,7 +349,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(paymentTermsCode; Rec."Payment Terms Code")
                 {
-                    Caption = 'Payment Terms Code';
+                    Caption = 'Payment Terms Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Payment Terms Id"));
@@ -358,7 +358,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 field(shipmentMethodId; Rec."Shipment Method Id")
                 {
-                    Caption = 'Shipment Method Id';
+                    Caption = 'Shipment Method Id', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -378,11 +378,11 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(shipmentMethodCode; Rec."Shipment Method Code")
                 {
-                    Caption = 'Shipment Method Code';
+                    Caption = 'Shipment Method Code', Locked = true;
                 }
                 field(paymentMethodId; Rec."Payment Method Id")
                 {
-                    Caption = 'Payment Method Id';
+                    Caption = 'Payment Method Id', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -402,26 +402,26 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(paymentMethodCode; Rec."Payment Method Code")
                 {
-                    Caption = 'Payment Method Code';
+                    Caption = 'Payment Method Code', Locked = true;
                 }
 
                 field(priceCalculationMethod; Rec."Price Calculation Method")
                 {
-                    Caption = 'Price Calculation Method';
+                    Caption = 'Price Calculation Method', Locked = true;
                 }
 
                 field(baseCalendarCode; Rec."Base Calendar Code")
                 {
-                    Caption = 'Base Calendar Code';
+                    Caption = 'Base Calendar Code', Locked = true;
                 }
                 field(validateEUVatRegNo; Rec."Validate EU Vat Reg. No.")
                 {
-                    Caption = 'Validate EU Vat Reg. No.';
+                    Caption = 'Validate EU Vat Reg. No.', Locked = true;
                 }
 
                 field(blocked; Rec.Blocked)
                 {
-                    Caption = 'Blocked';
+                    Caption = 'Blocked', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -431,54 +431,54 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(responsibilityCenter; Rec."Responsibility Center")
                 {
-                    Caption = 'Responsibility Center';
+                    Caption = 'Responsibility Center', Locked = true;
                 }
 
                 field(privacyBlocked; Rec."Privacy Blocked")
                 {
-                    Caption = 'Privacy Blocked';
+                    Caption = 'Privacy Blocked', Locked = true;
                 }
 
                 field(documentSendingProfile; Rec."Document Sending Profile")
                 {
-                    Caption = 'Document Sending Profile';
+                    Caption = 'Document Sending Profile', Locked = true;
                 }
                 field(icPartnerCode; Rec."IC Partner Code")
                 {
-                    Caption = 'IC Partner Code';
+                    Caption = 'IC Partner Code', Locked = true;
                 }
 
                 field(salespersonCode; Rec."Salesperson Code")
                 {
-                    Caption = 'Salesperson Code';
+                    Caption = 'Salesperson Code', Locked = true;
                 }
                 field(locationCode; Rec."Location Code")
                 {
-                    Caption = 'Location Code';
+                    Caption = 'Location Code', Locked = true;
                 }
                 field(vatRegistrationNo; Rec."VAT Registration No.")
                 {
-                    Caption = 'VAT Registration No.';
+                    Caption = 'VAT Registration No.', Locked = true;
                 }
 
                 field(invoiceCopies; Rec."Invoice Copies")
                 {
-                    Caption = 'Invoice Copies';
+                    Caption = 'Invoice Copies', Locked = true;
                 }
 
                 field(globalDimension1Code; Rec."Global Dimension 1 Code")
                 {
-                    Caption = 'Global Dimension 1 Code';
+                    Caption = 'Global Dimension 1 Code', Locked = true;
                 }
 
                 field(globalDimension2Code; Rec."Global Dimension 2 Code")
                 {
-                    Caption = 'Global Dimension 2 Code';
+                    Caption = 'Global Dimension 2 Code', Locked = true;
                 }
 
                 field(genBusPostingGroup; Rec."Gen. Bus. Posting Group")
                 {
-                    Caption = 'Gen. Bus. Posting Group';
+                    Caption = 'Gen. Bus. Posting Group', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Gen. Bus. Posting Group"));
@@ -487,7 +487,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(customerPostingGroup; Rec."Customer Posting Group")
                 {
-                    Caption = 'Customer Posting Group';
+                    Caption = 'Customer Posting Group', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Customer Posting Group"));
@@ -496,7 +496,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(vatBusPostingGroup; Rec."VAT Bus. Posting Group")
                 {
-                    Caption = 'VAT Bus. Posting Group';
+                    Caption = 'VAT Bus. Posting Group', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("VAT Bus. Posting Group"));
@@ -505,206 +505,206 @@ page 6014507 "NPR APIV1 - Customers"
 
                 field(customerPriceGroup; Rec."Customer Price Group")
                 {
-                    Caption = 'Customer Price Group';
+                    Caption = 'Customer Price Group', Locked = true;
                 }
 
                 field(invoiceDiscCode; Rec."Invoice Disc. Code")
                 {
-                    Caption = 'Invoice Disc. Code';
+                    Caption = 'Invoice Disc. Code', Locked = true;
                 }
 
                 field(customerDiscGroup; Rec."Customer Disc. Group")
                 {
-                    Caption = 'Customer Disc. Group';
+                    Caption = 'Customer Disc. Group', Locked = true;
                 }
                 field(allowLineDisc; Rec."Allow Line Disc.")
                 {
-                    Caption = 'Allow Line Disc.';
+                    Caption = 'Allow Line Disc.', Locked = true;
                 }
 
                 field(languageCode; Rec."Language Code")
                 {
-                    Caption = 'Language Code';
+                    Caption = 'Language Code', Locked = true;
                 }
 
                 field(combineShipments; Rec."Combine Shipments")
                 {
-                    Caption = 'Combine Shipments';
+                    Caption = 'Combine Shipments', Locked = true;
                 }
 
                 field(gln; Rec.GLN)
                 {
-                    Caption = 'GLN';
+                    Caption = 'GLN', Locked = true;
                 }
 
                 field(creditLimitLCY; Rec."Credit Limit (LCY)")
                 {
-                    Caption = 'Credit Limit (LCY)';
+                    Caption = 'Credit Limit (LCY)', Locked = true;
                 }
 
                 field(prepaymentPct; Rec."Prepayment %")
                 {
-                    Caption = 'Prepayment %';
+                    Caption = 'Prepayment %', Locked = true;
                 }
 
                 field(applicationMethod; Rec."Application Method")
                 {
-                    Caption = 'Application Method';
+                    Caption = 'Application Method', Locked = true;
                 }
 
                 field(partnerType; Rec."Partner Type")
                 {
-                    Caption = 'Partner Type';
+                    Caption = 'Partner Type', Locked = true;
                 }
 
                 field(reminderTermsCode; Rec."Reminder Terms Code")
                 {
-                    Caption = 'Reminder Terms Code';
+                    Caption = 'Reminder Terms Code', Locked = true;
                 }
 
                 field(finChargeTermsCode; Rec."Fin. Charge Terms Code")
                 {
-                    Caption = 'Finance Charge Terms Code';
+                    Caption = 'Finance Charge Terms Code', Locked = true;
                 }
 
                 field(blockPaymentTolerance; Rec."Block Payment Tolerance")
                 {
-                    Caption = 'Block Payment Tolerance';
+                    Caption = 'Block Payment Tolerance', Locked = true;
                 }
 
                 field(billToCustomerNo; Rec."Bill-to Customer No.")
                 {
-                    Caption = 'Bill-to Customer No.';
+                    Caption = 'Bill-to Customer No.', Locked = true;
                 }
 
                 field(faxNo; Rec."Fax No.")
                 {
-                    Caption = 'Fax No.';
+                    Caption = 'Fax No.', Locked = true;
                 }
 
                 field(telexAnswerBack; Rec."Telex Answer Back")
                 {
-                    Caption = 'Telex Answer Back';
+                    Caption = 'Telex Answer Back', Locked = true;
                 }
 
                 field(useGlnInElectronicDocument; Rec."Use GLN in Electronic Document")
                 {
-                    Caption = 'Use GLN in Electronic Document';
+                    Caption = 'Use GLN in Electronic Document', Locked = true;
                 }
 
                 field(noSeries; Rec."No. Series")
                 {
-                    Caption = 'No. Series';
+                    Caption = 'No. Series', Locked = true;
                 }
 
                 field(reserve; Rec.Reserve)
                 {
-                    Caption = 'Reserve';
+                    Caption = 'Reserve', Locked = true;
                 }
 
                 field(disableSearchByName; Rec."Disable Search by Name")
                 {
-                    Caption = 'Disable Search by Name';
+                    Caption = 'Disable Search by Name', Locked = true;
                 }
 
                 field(preferredBankAccountCode; Rec."Preferred Bank Account Code")
                 {
-                    Caption = 'Preferred Bank Account Code';
+                    Caption = 'Preferred Bank Account Code', Locked = true;
                 }
 
                 field(cashFlowPaymentTermsCode; Rec."Cash Flow Payment Terms Code")
                 {
-                    Caption = 'Cash Flow Payment Terms Code';
+                    Caption = 'Cash Flow Payment Terms Code', Locked = true;
                 }
 
                 field(primaryContactNo; Rec."Primary Contact No.")
                 {
-                    Caption = 'Primary Contact No.';
+                    Caption = 'Primary Contact No.', Locked = true;
                 }
 
                 field(shippingAdvice; Rec."Shipping Advice")
                 {
-                    Caption = 'Shipping Advice';
+                    Caption = 'Shipping Advice', Locked = true;
                 }
 
                 field(shippingTime; Rec."Shipping Time")
                 {
-                    Caption = 'Shipping Time';
+                    Caption = 'Shipping Time', Locked = true;
                 }
 
                 field(shippingAgentServiceCode; Rec."Shipping Agent Service Code")
                 {
-                    Caption = 'Shipping Agent Service Code';
+                    Caption = 'Shipping Agent Service Code', Locked = true;
                 }
 
                 field(serviceZoneCode; Rec."Service Zone Code")
                 {
-                    Caption = 'Service Zone Code';
+                    Caption = 'Service Zone Code', Locked = true;
                 }
 
                 field(copySellToAddrToQteFrom; Rec."Copy Sell-to Addr. to Qte From")
                 {
-                    Caption = 'Copy Sell-to Addr. to Qte From';
+                    Caption = 'Copy Sell-to Addr. to Qte From', Locked = true;
                 }
 
                 field(contactId; Rec."Contact ID")
                 {
-                    Caption = 'Contact ID';
+                    Caption = 'Contact ID', Locked = true;
                 }
 
                 field(contactGraphId; Rec."Contact Graph Id")
                 {
-                    Caption = 'Contact Graph Id';
+                    Caption = 'Contact Graph Id', Locked = true;
                 }
 
                 field(nprAnonymized; Rec."NPR Anonymized")
                 {
-                    Caption = 'NPR Anonymized';
+                    Caption = 'NPR Anonymized', Locked = true;
                 }
 
                 field(nprAnonymizedDate; Rec."NPR Anonymized Date")
                 {
-                    Caption = 'NPR Anonymized Date';
+                    Caption = 'NPR Anonymized Date', Locked = true;
                 }
 
                 field(nprExternalCustomerNo; Rec."NPR External Customer No.")
                 {
-                    Caption = 'NPR External Customer No.';
+                    Caption = 'NPR External Customer No.', Locked = true;
                 }
 
                 field(nprMagentoDisplayGroup; Rec."NPR Magento Display Group")
                 {
-                    Caption = 'NPR Magento Display Group';
+                    Caption = 'NPR Magento Display Group', Locked = true;
                 }
 
                 field(nprMagentoPaymentGroup; Rec."NPR Magento Payment Group")
                 {
-                    Caption = 'NPR Magento Payment Group';
+                    Caption = 'NPR Magento Payment Group', Locked = true;
                 }
 
                 field(nprMagentoShippingGroup; Rec."NPR Magento Shipping Group")
                 {
-                    Caption = 'NPR Magento Shipping Group';
+                    Caption = 'NPR Magento Shipping Group', Locked = true;
                 }
 
                 field(nprMagentoStoreCode; Rec."NPR Magento Store Code")
                 {
-                    Caption = 'NPR Magento Store Code';
+                    Caption = 'NPR Magento Store Code', Locked = true;
                 }
 
                 field(nprToAnonymize; Rec."NPR To Anonymize")
                 {
-                    Caption = 'NPR To Anonymize';
+                    Caption = 'NPR To Anonymize', Locked = true;
                 }
 
                 field(nprToAnonymizeOn; Rec."NPR To Anonymize On")
                 {
-                    Caption = 'NPR To Anonymize On';
+                    Caption = 'NPR To Anonymize On', Locked = true;
                 }
 
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
-                    Caption = 'Last Modified Date';
+                    Caption = 'Last Modified Date', Locked = true;
                 }
 
                 field(replicationCounter; Rec."NPR Replication Counter")
@@ -715,9 +715,9 @@ page 6014507 "NPR APIV1 - Customers"
                 part(customerFinancialDetails; "NPR APIV1 - Cust Fin Details")
                 {
 #IF BC17            // Multiplicity can be used only with platform version 6.3;
-                    Caption = 'Multiplicity=ZeroOrOne';
+                    Caption = 'Multiplicity=ZeroOrOne', Locked = true;
 #ELSE
-                    Caption = 'Customer Financial Details';
+                    Caption = 'Customer Financial Details', Locked = true;
                     Multiplicity = ZeroOrOne;
 #ENDIF
                     EntityName = 'customerFinancialDetail';
@@ -727,9 +727,9 @@ page 6014507 "NPR APIV1 - Customers"
                 part(picture; "NPR APIV1 - Pictures")
                 {
 #IF BC17            // Multiplicity can be used only with platform version 6.3;
-                    Caption = 'Multiplicity=ZeroOrOne';
+                    Caption = 'Multiplicity=ZeroOrOne', Locked = true;
 #ELSE
-                    Caption = 'Picture';
+                    Caption = 'Picture', Locked = true;
                     Multiplicity = ZeroOrOne;
 #ENDIF
                     EntityName = 'picture';
@@ -738,7 +738,7 @@ page 6014507 "NPR APIV1 - Customers"
                 }
                 part(defaultDimensions; "NPR APIV1 - Default Dimensions")
                 {
-                    Caption = 'Default Dimensions';
+                    Caption = 'Default Dimensions', Locked = true;
                     EntityName = 'defaultDimension';
                     EntitySetName = 'defaultDimensions';
                     SubPageLink = ParentId = Field(SystemId), "Parent Type" = const(Customer);

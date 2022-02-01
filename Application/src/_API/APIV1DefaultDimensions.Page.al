@@ -75,7 +75,7 @@ page 6014503 "NPR APIV1 - Default Dimensions"
 
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
-                    Caption = 'Last Modified Date';
+                    Caption = 'Last Modified Date', Locked = true;
                 }
 
                 field(replicationCounter; Rec."NPR Replication Counter")

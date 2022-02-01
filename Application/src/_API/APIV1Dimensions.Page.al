@@ -25,51 +25,51 @@ page 6014469 "NPR APIV1 - Dimensions"
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
                     Editable = false;
                 }
                 field("code"; Rec.Code)
                 {
-                    Caption = 'Code';
+                    Caption = 'Code', Locked = true;
                 }
                 field(displayName; Rec.Name)
                 {
-                    Caption = 'Display Name';
+                    Caption = 'Display Name', Locked = true;
                 }
 
                 field(codeCaption; Rec."Code Caption")
                 {
-                    Caption = 'Code Caption';
+                    Caption = 'Code Caption', Locked = true;
                 }
 
                 field(filterCaption; Rec."Filter Caption")
                 {
-                    Caption = 'Filter Caption';
+                    Caption = 'Filter Caption', Locked = true;
                 }
 
                 field(description; Rec.Description)
                 {
-                    Caption = 'Description';
+                    Caption = 'Description', Locked = true;
                 }
 
                 field(blocked; Rec.Blocked)
                 {
-                    Caption = 'Blocked';
+                    Caption = 'Blocked', Locked = true;
                 }
 
                 field(consolidationCode; Rec."Consolidation Code")
                 {
-                    Caption = 'Consolidation Code';
+                    Caption = 'Consolidation Code', Locked = true;
                 }
 
                 field(mapToICDimensionCode; Rec."Map-to IC Dimension Code")
                 {
-                    Caption = 'Map-to IC Dimension Code';
+                    Caption = 'Map-to IC Dimension Code', Locked = true;
                 }
 
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
-                    Caption = 'Last Modified Date';
+                    Caption = 'Last Modified Date', Locked = true;
                 }
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {
@@ -77,7 +77,7 @@ page 6014469 "NPR APIV1 - Dimensions"
                 }
                 part(dimensionValues; "NPR APIV1 - Dimension Values")
                 {
-                    Caption = 'Dimension Values';
+                    Caption = 'Dimension Values', Locked = true;
                     EntityName = 'dimensionValue';
                     EntitySetName = 'dimensionValues';
                     SubPageLink = "Dimension Id" = Field(SystemId);

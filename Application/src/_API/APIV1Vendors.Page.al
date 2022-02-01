@@ -21,16 +21,16 @@ page 6014410 "NPR APIV1 - Vendors"
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
                     Editable = false;
                 }
                 field(number; Rec."No.")
                 {
-                    Caption = 'No.';
+                    Caption = 'No.', Locked = true;
                 }
                 field(displayName; Rec.Name)
                 {
-                    Caption = 'Display Name';
+                    Caption = 'Display Name', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -39,7 +39,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(displayName2; Rec."Name 2")
                 {
-                    Caption = 'Display Name 2';
+                    Caption = 'Display Name 2', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Name 2"));
@@ -47,11 +47,11 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(searchName; Rec."Search Name")
                 {
-                    Caption = 'Search Name';
+                    Caption = 'Search Name', Locked = true;
                 }
                 field(contact; Rec.Contact)
                 {
-                    Caption = 'Contact';
+                    Caption = 'Contact', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo(Contact));
@@ -59,7 +59,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(telexNo; Rec."Telex No.")
                 {
-                    Caption = 'Telex No.';
+                    Caption = 'Telex No.', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Telex No."));
@@ -67,7 +67,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(ourAccountNo; Rec."Our Account No.")
                 {
-                    Caption = 'Our Account No.';
+                    Caption = 'Our Account No.', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Our Account No."));
@@ -76,7 +76,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(budgetedAmount; Rec."Budgeted Amount")
                 {
-                    Caption = 'Budgeted Amount';
+                    Caption = 'Budgeted Amount', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Budgeted Amount"));
@@ -84,7 +84,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(addressLine1; Rec.Address)
                 {
-                    Caption = 'Address Line 1';
+                    Caption = 'Address Line 1', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -93,7 +93,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(addressLine2; Rec."Address 2")
                 {
-                    Caption = 'Address Line 2';
+                    Caption = 'Address Line 2', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Address 2"));
@@ -101,7 +101,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(city; Rec.City)
                 {
-                    Caption = 'City';
+                    Caption = 'City', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("City"));
@@ -109,7 +109,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(state; Rec.County)
                 {
-                    Caption = 'State';
+                    Caption = 'State', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("County"));
@@ -117,7 +117,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(country; Rec."Country/Region Code")
                 {
-                    Caption = 'Country/Region Code';
+                    Caption = 'Country/Region Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Country/Region Code"));
@@ -125,7 +125,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(postalCode; Rec."Post Code")
                 {
-                    Caption = 'Post Code';
+                    Caption = 'Post Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Post Code"));
@@ -133,7 +133,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(phoneNumber; Rec."Phone No.")
                 {
-                    Caption = 'Phone No.';
+                    Caption = 'Phone No.', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Phone No."));
@@ -141,7 +141,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(email; Rec."E-Mail")
                 {
-                    Caption = 'Email';
+                    Caption = 'Email', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("E-Mail"));
@@ -149,7 +149,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(website; Rec."Home Page")
                 {
-                    Caption = 'Website';
+                    Caption = 'Website', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Home Page"));
@@ -158,7 +158,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(faxNo; Rec."Fax No.")
                 {
-                    Caption = 'Fax No.';
+                    Caption = 'Fax No.', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Fax No."));
@@ -166,7 +166,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(telexAnswerBack; Rec."Telex Answer Back")
                 {
-                    Caption = 'Telex Answer Back';
+                    Caption = 'Telex Answer Back', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Telex Answer Back"));
@@ -175,7 +175,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(noSeries; Rec."No. Series")
                 {
-                    Caption = 'No. Series';
+                    Caption = 'No. Series', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("No. Series"));
@@ -184,7 +184,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(disableSearchByName; Rec."Disable Search by Name")
                 {
-                    Caption = 'Disable Search by Name';
+                    Caption = 'Disable Search by Name', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Disable Search by Name"));
@@ -192,7 +192,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(taxAreaCode; Rec."Tax Area Code")
                 {
-                    Caption = 'Tax Area Code';
+                    Caption = 'Tax Area Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Tax Area Code"));
@@ -201,7 +201,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(taxRegistrationNumber; Rec."VAT Registration No.")
                 {
-                    Caption = 'Tax Registration No.';
+                    Caption = 'Tax Registration No.', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -210,7 +210,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(currencyId; Rec."Currency Id")
                 {
-                    Caption = 'Currency Id';
+                    Caption = 'Currency Id', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -229,7 +229,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(currencyCode; CurrencyCodeTxt)
                 {
-                    Caption = 'Currency Code';
+                    Caption = 'Currency Code', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -258,7 +258,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(paymentTermsId; Rec."Payment Terms Id")
                 {
-                    Caption = 'Payment Terms Id';
+                    Caption = 'Payment Terms Id', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -277,7 +277,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(paymentTermsCode; Rec."Payment Terms Code")
                 {
-                    Caption = 'Payment Terms Code';
+                    Caption = 'Payment Terms Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Payment Terms Id"));
@@ -286,7 +286,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(paymentMethodId; Rec."Payment Method Id")
                 {
-                    Caption = 'Payment Method Id';
+                    Caption = 'Payment Method Id', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -305,11 +305,11 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(paymentMethodCode; Rec."Payment Method Code")
                 {
-                    Caption = 'Payment Method Code';
+                    Caption = 'Payment Method Code', Locked = true;
                 }
                 field(taxLiable; Rec."Tax Liable")
                 {
-                    Caption = 'Tax Liable';
+                    Caption = 'Tax Liable', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -318,7 +318,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(territoryCode; Rec."Territory Code")
                 {
-                    Caption = 'Territory Code';
+                    Caption = 'Territory Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Territory Code"));
@@ -326,7 +326,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(purchaserCode; Rec."Purchaser Code")
                 {
-                    Caption = 'Purchaser Code';
+                    Caption = 'Purchaser Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Purchaser Code"));
@@ -334,7 +334,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(locationCode; Rec."Location Code")
                 {
-                    Caption = 'Location Code';
+                    Caption = 'Location Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Location Code"));
@@ -342,7 +342,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(shipmentMethodCode; Rec."Shipment Method Code")
                 {
-                    Caption = 'Shipment Method Code';
+                    Caption = 'Shipment Method Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Shipment Method Code"));
@@ -350,7 +350,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(shippingAgentCode; Rec."Shipping Agent Code")
                 {
-                    Caption = 'Shipping Agent Code';
+                    Caption = 'Shipping Agent Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Shipping Agent Code"));
@@ -359,7 +359,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(invoiceDiscCode; Rec."Invoice Disc. Code")
                 {
-                    Caption = 'Invoice Disc. Code';
+                    Caption = 'Invoice Disc. Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Invoice Disc. Code"));
@@ -368,7 +368,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(payToVendorNo; Rec."Pay-to Vendor No.")
                 {
-                    Caption = 'Pay-to Vendor No.';
+                    Caption = 'Pay-to Vendor No.', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Pay-to Vendor No."));
@@ -376,7 +376,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(applicationMethod; Rec."Application Method")
                 {
-                    Caption = 'Application Method';
+                    Caption = 'Application Method', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Application Method"));
@@ -385,7 +385,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(partnerType; Rec."Partner Type")
                 {
-                    Caption = 'Partner Type';
+                    Caption = 'Partner Type', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -394,7 +394,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(pricesIncludingVat; Rec."Prices Including VAT")
                 {
-                    Caption = 'Prices Including VAT';
+                    Caption = 'Prices Including VAT', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Prices Including VAT"));
@@ -402,7 +402,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(gln; Rec.GLN)
                 {
-                    Caption = 'GLN';
+                    Caption = 'GLN', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo(GLN));
@@ -410,7 +410,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(blockPaymentTolerance; Rec."Block Payment Tolerance")
                 {
-                    Caption = 'Block Payment Tolerance';
+                    Caption = 'Block Payment Tolerance', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Block Payment Tolerance"));
@@ -418,7 +418,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(responsibilityCenter; Rec."Responsibility Center")
                 {
-                    Caption = 'Responsibility Center';
+                    Caption = 'Responsibility Center', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Responsibility Center"));
@@ -426,7 +426,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(privacyBlocked; Rec."Privacy Blocked")
                 {
-                    Caption = 'Privacy Blocked';
+                    Caption = 'Privacy Blocked', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Privacy Blocked"));
@@ -434,7 +434,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(documentSendingProfile; Rec."Document Sending Profile")
                 {
-                    Caption = 'Document Sending Profile';
+                    Caption = 'Document Sending Profile', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Document Sending Profile"));
@@ -442,7 +442,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(icPartnerCode; Rec."IC Partner Code")
                 {
-                    Caption = 'IC Partner Code';
+                    Caption = 'IC Partner Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("IC Partner Code"));
@@ -450,7 +450,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(prepaymentPct; Rec."Prepayment %")
                 {
-                    Caption = 'Prepayment %';
+                    Caption = 'Prepayment %', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Prepayment %"));
@@ -458,7 +458,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(creditorNo; Rec."Creditor No.")
                 {
-                    Caption = 'Creditor No.';
+                    Caption = 'Creditor No.', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Creditor No."));
@@ -466,7 +466,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(preferredBankAccountCode; Rec."Preferred Bank Account Code")
                 {
-                    Caption = 'Preferred Bank Account Code';
+                    Caption = 'Preferred Bank Account Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Preferred Bank Account Code"));
@@ -474,7 +474,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(cashFlowPaymentTermsCode; Rec."Cash Flow Payment Terms Code")
                 {
-                    Caption = 'Cash Flow Payment Terms Code';
+                    Caption = 'Cash Flow Payment Terms Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Cash Flow Payment Terms Code"));
@@ -482,7 +482,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(primaryContactNo; Rec."Primary Contact No.")
                 {
-                    Caption = 'Primary Contact No.';
+                    Caption = 'Primary Contact No.', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Primary Contact No."));
@@ -490,7 +490,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(mobilePhoneNo; Rec."Mobile Phone No.")
                 {
-                    Caption = 'Mobile Phone No.';
+                    Caption = 'Mobile Phone No.', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Mobile Phone No."));
@@ -499,7 +499,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(leadTimeCalculation; Rec."Lead Time Calculation")
                 {
-                    Caption = 'Lead Time Calculation';
+                    Caption = 'Lead Time Calculation', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Lead Time Calculation"));
@@ -508,7 +508,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(priceCalculationMethod; Rec."Price Calculation Method")
                 {
-                    Caption = 'Price Calculation Method';
+                    Caption = 'Price Calculation Method', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Price Calculation Method"));
@@ -517,7 +517,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(baseCalendarCode; Rec."Base Calendar Code")
                 {
-                    Caption = 'Base Calendar Code';
+                    Caption = 'Base Calendar Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Base Calendar Code"));
@@ -525,7 +525,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(validateEUVatRegNo; Rec."Validate EU Vat Reg. No.")
                 {
-                    Caption = 'Validate EU Vat Reg. No.';
+                    Caption = 'Validate EU Vat Reg. No.', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Validate EU Vat Reg. No."));
@@ -534,7 +534,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(overReceiptCode; Rec."Over-Receipt Code")
                 {
-                    Caption = 'Over-Receipt Code';
+                    Caption = 'Over-Receipt Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Over-Receipt Code"));
@@ -543,7 +543,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(blocked; Rec.Blocked)
                 {
-                    Caption = 'Blocked';
+                    Caption = 'Blocked', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -552,12 +552,12 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(balance; Rec."Balance (LCY)")
                 {
-                    Caption = 'Balance';
+                    Caption = 'Balance', Locked = true;
                 }
 
                 field(languageCode; Rec."Language Code")
                 {
-                    Caption = 'Language Code';
+                    Caption = 'Language Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Language Code"));
@@ -566,7 +566,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(globalDimension1Code; Rec."Global Dimension 1 Code")
                 {
-                    Caption = 'Global Dimension 1 Code';
+                    Caption = 'Global Dimension 1 Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Global Dimension 1 Code"));
@@ -575,7 +575,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(globalDimension2Code; Rec."Global Dimension 2 Code")
                 {
-                    Caption = 'Global Dimension 2 Code';
+                    Caption = 'Global Dimension 2 Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Global Dimension 2 Code"));
@@ -584,7 +584,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(genBusPostingGroup; Rec."Gen. Bus. Posting Group")
                 {
-                    Caption = 'Gen. Bus. Posting Group';
+                    Caption = 'Gen. Bus. Posting Group', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Gen. Bus. Posting Group"));
@@ -593,7 +593,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(vendorPostingGroup; Rec."Vendor Posting Group")
                 {
-                    Caption = 'Vendor Posting Group';
+                    Caption = 'Vendor Posting Group', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Vendor Posting Group"));
@@ -602,7 +602,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(vatBusPostingGroup; Rec."VAT Bus. Posting Group")
                 {
-                    Caption = 'VAT Bus. Posting Group';
+                    Caption = 'VAT Bus. Posting Group', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("VAT Bus. Posting Group"));
@@ -611,7 +611,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(finChargeTermsCode; Rec."Fin. Charge Terms Code")
                 {
-                    Caption = 'Fin. Charge Terms Code';
+                    Caption = 'Fin. Charge Terms Code', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Fin. Charge Terms Code"));
@@ -620,7 +620,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(statisticsGroup; Rec."Statistics Group")
                 {
-                    Caption = 'Statistics Group';
+                    Caption = 'Statistics Group', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Statistics Group"));
@@ -628,7 +628,7 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 field(priority; Rec.Priority)
                 {
-                    Caption = 'Priority';
+                    Caption = 'Priority', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Priority"));
@@ -637,7 +637,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(lastDateModified; Rec."Last Date Modified")
                 {
-                    Caption = 'Last Date Modified';
+                    Caption = 'Last Date Modified', Locked = true;
                     trigger OnValidate()
                     begin
                         RegisterFieldSet(Rec.FieldNo("Last Date Modified"));
@@ -646,7 +646,7 @@ page 6014410 "NPR APIV1 - Vendors"
 
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
-                    Caption = 'Last Modified Date';
+                    Caption = 'Last Modified Date', Locked = true;
                 }
 
                 field(replicationCounter; Rec."NPR Replication Counter")
@@ -657,9 +657,9 @@ page 6014410 "NPR APIV1 - Vendors"
                 part(picture; "NPR APIV1 - Pictures")
                 {
 #IF BC17            // Multiplicity can be used only with platform version 6.3;
-                    Caption = 'Multiplicity=ZeroOrOne';
+                    Caption = 'Multiplicity=ZeroOrOne', Locked = true;
 #ELSE
-                    Caption = 'Picture';
+                    Caption = 'Picture', Locked = true;
                     Multiplicity = ZeroOrOne;
 #ENDIF
                     EntityName = 'picture';
@@ -668,27 +668,11 @@ page 6014410 "NPR APIV1 - Vendors"
                 }
                 part(defaultDimensions; "NPR APIV1 - Default Dimensions")
                 {
-                    Caption = 'Default Dimensions';
+                    Caption = 'Default Dimensions', Locked = true;
                     EntityName = 'defaultDimension';
                     EntitySetName = 'defaultDimensions';
                     SubPageLink = ParentId = Field(SystemId), "Parent Type" = const(Vendor);
                 }
-
-                //part(agedAccountsPayable; "APIV2 - Aged AP")
-                //{
-                //    Caption = 'Aged Accounts Payable';
-                //    Multiplicity = ZeroOrOne;
-                //    EntityName = 'agedAccountsPayable';
-                //    EntitySetName = 'agedAccountsPayables';
-                //    SubPageLink = AccountId = Field(SystemId);
-                //}
-                //part(contactsInformation; "APIV2 - Contacts Information")
-                //{
-                //  Caption = 'Contacts Information';
-                //    EntityName = 'contactInformation';
-                //    EntitySetName = 'contactsInformation';
-                //    SubPageLink = "Related Id" = field(SystemId), "Related Type" = const(2);
-                //}
             }
         }
     }

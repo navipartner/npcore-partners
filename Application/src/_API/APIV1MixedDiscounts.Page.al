@@ -154,7 +154,7 @@ page 6014477 "NPR APIV1 - Mixed Discounts"
 
                 part(mixedDiscountTimeIntervals; "NPR API V1 - Mix. Disc. Int")
                 {
-                    Caption = 'Period Discount Lines';
+                    Caption = 'Period Discount Lines', Locked = true;
                     EntityName = 'mixedDiscountTimeInterval';
                     EntitySetName = 'mixedDiscountTimeIntervals';
                     SubPageLink = "Mix Code" = field(Code);
@@ -162,7 +162,7 @@ page 6014477 "NPR APIV1 - Mixed Discounts"
 
                 part(mixedDiscountLevels; "NPR API V1 - Mix. Disc. Levels")
                 {
-                    Caption = 'Period Discount Lines';
+                    Caption = 'Period Discount Lines', Locked = true;
                     EntityName = 'mixedDiscountLevel';
                     EntitySetName = 'mixedDiscountLevels';
                     SubPageLink = "Mixed Discount Code" = field(Code);
@@ -170,7 +170,7 @@ page 6014477 "NPR APIV1 - Mixed Discounts"
 
                 part(mixedDiscountLines; "NPR API V1 - Mixed Disc. Lines")
                 {
-                    Caption = 'Period Discount Lines';
+                    Caption = 'Period Discount Lines', Locked = true;
                     EntityName = 'mixedDiscountLine';
                     EntitySetName = 'mixedDiscountLines';
                     SubPageLink = Code = field(Code);

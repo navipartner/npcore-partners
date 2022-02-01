@@ -21,12 +21,12 @@ page 6014489 "NPR APIV1 - Units of Measure"
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
                     Editable = false;
                 }
                 field("code"; Rec.Code)
                 {
-                    Caption = 'Code';
+                    Caption = 'Code', Locked = true;
                     ShowMandatory = true;
 
                     trigger OnValidate()
@@ -36,7 +36,7 @@ page 6014489 "NPR APIV1 - Units of Measure"
                 }
                 field(displayName; Rec.Description)
                 {
-                    Caption = 'Display Name';
+                    Caption = 'Display Name', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -45,7 +45,7 @@ page 6014489 "NPR APIV1 - Units of Measure"
                 }
                 field(internationalStandardCode; Rec."International Standard Code")
                 {
-                    Caption = 'International Standard Code';
+                    Caption = 'International Standard Code', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -54,7 +54,7 @@ page 6014489 "NPR APIV1 - Units of Measure"
                 }
                 field(symbol; Rec.Symbol)
                 {
-                    Caption = 'Symbol';
+                    Caption = 'Symbol', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -63,7 +63,7 @@ page 6014489 "NPR APIV1 - Units of Measure"
                 }
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
-                    Caption = 'Last Modified Date';
+                    Caption = 'Last Modified Date', Locked = true;
                 }
 
                 field(replicationCounter; Rec."NPR Replication Counter")

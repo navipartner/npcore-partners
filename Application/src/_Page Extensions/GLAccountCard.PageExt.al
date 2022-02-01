@@ -4,7 +4,7 @@ pageextension 6014422 "NPR G/L Account Card" extends "G/L Account Card"
     {
         addafter("Default IC Partner G/L Acc. No")
         {
-            field("NPR Retail Payment"; NPRAuxGLAccount."Retail Payment")
+            field("NPR Retail Payment"; NPRAuxGLAccountGlobal."Retail Payment")
             {
                 Caption = 'Retail Payment';
 
@@ -12,10 +12,13 @@ pageextension 6014422 "NPR G/L Account Card" extends "G/L Account Card"
                 ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
+                var
+                    NPRAuxGLAccount: Record "NPR Aux. G/L Account";
                 begin
                     Rec.TestField("No.");
                     CurrPage.SaveRecord();
-                    NPRAuxGLAccount.Validate("Retail Payment");
+                    Rec.NPRGetGLAccAdditionalFields(NPRAuxGLAccount); //need to reread --> related to codeunit 6014626 "NPR Replication Counter Mgmt." --> UpdateReplicationCounterOnBeforeModifyGLAccount
+                    NPRAuxGLAccount.Validate("Retail Payment", NPRAuxGLAccountGlobal."Retail Payment");
                     Rec.NPRSetGLAccAdditionalFields(NPRAuxGLAccount);
                     Rec.NPRSaveGLAccAdditionalFields();
                     CurrPage.Update(false);
@@ -25,11 +28,10 @@ pageextension 6014422 "NPR G/L Account Card" extends "G/L Account Card"
     }
 
     var
-        NPRAuxGLAccount: Record "NPR Aux. G/L Account";
-
+        NPRAuxGLAccountGlobal: Record "NPR Aux. G/L Account";
 
     trigger OnAfterGetCurrRecord()
     begin
-        Rec.NPRGetGLAccAdditionalFields(NPRAuxGLAccount);
+        Rec.NPRGetGLAccAdditionalFields(NPRAuxGLAccountGlobal);
     end;
 }

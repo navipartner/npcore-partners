@@ -174,6 +174,14 @@ codeunit 6014608 "NPR Replication Register"
         CurrenciesEndPointIDLbl: Label 'GetCurrencies', Locked = true;
         CurrenciesEndPointDescriptionLbl: Label 'Gets Currencies from related company.', Locked = true;
         CurrenciesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/currencies/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        GLAccountsEndPointIDLbl: Label 'GetGLAccounts', Locked = true;
+        GLAccountsEndPointDescriptionLbl: Label 'Gets G/L Accounts from related company.', Locked = true;
+        GLAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/glAccountsRead/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        AuxGLAccountsEndPointIDLbl: Label 'GetAuxGLAccounts', Locked = true;
+        AuxGLAccountsEndPointDescriptionLbl: Label 'Gets Aux. G/L Accounts from related company.', Locked = true;
+        AuxGLAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/glAccountsRead/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
     #endregion
 
     #region Register Service with EndPoints
@@ -1191,6 +1199,14 @@ codeunit 6014608 "NPR Replication Register"
         ServiceEndPoint.RegisterServiceEndPoint(MiscServiceCodeLbl, CurrenciesEndPointIDLbl, CurrenciesPathLbl,
                             CurrenciesEndPointDescriptionLbl, true, 600, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
                             1000, Database::Currency, false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MiscServiceCodeLbl, GLAccountsEndPointIDLbl, GLAccountsPathLbl,
+                            GLAccountsEndPointDescriptionLbl, true, 700, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                            1000, Database::"G/L Account", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MiscServiceCodeLbl, AuxGLAccountsEndPointIDLbl, AuxGLAccountsPathLbl,
+                           AuxGLAccountsEndPointDescriptionLbl, true, 701, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                           1000, Database::"NPR Aux. G/L Account", false, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
@@ -1274,6 +1290,38 @@ codeunit 6014608 "NPR Replication Register"
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
             Rec.FieldNo("Payment Tolerance %"), 'paymentTolerancePercent', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterGLAccountSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "G/L Account";
+    begin
+        if sender."Table ID" <> Database::"G/L Account" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(Name), 'displayName', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo("Last Modified Date Time"), 'lastModifiedDateTime2', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterAuxGLAccountSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Aux. G/L Account";
+    begin
+        if sender."Table ID" <> Database::"NPR Aux. G/L Account" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
     #endregion

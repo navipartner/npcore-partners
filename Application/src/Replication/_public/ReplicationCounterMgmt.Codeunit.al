@@ -693,6 +693,51 @@
         end;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR Aux. G/L Account", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertAuxGLAccount(var Rec: Record "NPR Aux. G/L Account"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Aux. G/L Account", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyAuxGLAccount(var Rec: Record "NPR Aux. G/L Account"; var xRec: Record "NPR Aux. G/L Account"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Aux. G/L Account", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameAuxGLAccount(var Rec: Record "NPR Aux. G/L Account"; var xRec: Record "NPR Aux. G/L Account"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
     #endregion
 
     #region TableExtensions
@@ -1819,6 +1864,50 @@
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"G/L Account", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertGLAccount(var Rec: Record "G/L Account"; RunTrigger: Boolean)
+    var
+        AuxGLAcc: Record "NPR Aux. G/L Account";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if not AuxGLAcc.Get(Rec."No.") then begin
+            AuxGLAcc."No." := Rec."No.";
+            AuxGLAcc.Insert();
+        end else
+            AuxGLAcc.Modify(); // triggers updateReplicationCounter for the Aux Table.
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"G/L Account", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyGLAccount(var Rec: Record "G/L Account"; var xRec: Record "G/L Account"; RunTrigger: Boolean)
+    var
+        AuxGLAcc: Record "NPR Aux. G/L Account";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if not AuxGLAcc.Get(Rec."No.") then begin
+            AuxGLAcc."No." := Rec."No.";
+            AuxGLAcc.Insert();
+        end else
+            AuxGLAcc.Modify(); // triggers updateReplicationCounter for the Aux Table.
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"G/L Account", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameGLAccount(var Rec: Record "G/L Account"; var xRec: Record "G/L Account"; RunTrigger: Boolean)
+    var
+        AuxGLAcc: Record "NPR Aux. G/L Account";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if not AuxGLAcc.Get(xRec."No.") then begin
+            AuxGLAcc."No." := xRec."No.";
+            AuxGLAcc.Insert();
+        end; // modify/rename not needed because it is handled in codeuninit 6014460 "NPR Aux. Tables Event Subs." function --> GLAccountOnAfterRename 
     end;
     #endregion
 

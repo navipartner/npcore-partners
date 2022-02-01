@@ -23,32 +23,32 @@ page 6014536 "NPR APIV1 - Pictures"
             {
                 field(id; Rec.Id)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
                     Editable = false;
                 }
                 field(parentType; Rec."Parent Type")
                 {
-                    Caption = 'Parent Type';
+                    Caption = 'Parent Type', Locked = true;
                     Editable = false;
                 }
                 field(width; Rec.Width)
                 {
-                    Caption = 'Width';
+                    Caption = 'Width', Locked = true;
                     Editable = false;
                 }
                 field(height; Rec.Height)
                 {
-                    Caption = 'Height';
+                    Caption = 'Height', Locked = true;
                     Editable = false;
                 }
                 field(contentType; Rec."Mime Type")
                 {
-                    Caption = 'Content Type';
+                    Caption = 'Content Type', Locked = true;
                     Editable = false;
                 }
                 field(pictureContent; Rec.Content)
                 {
-                    Caption = 'Picture Content';
+                    Caption = 'Picture Content', Locked = true;
                 }
             }
         }

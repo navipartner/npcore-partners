@@ -21,23 +21,23 @@ page 6059807 "NPR APIV1 Store Opening Hours"
             {
                 field(store; Rec.Store)
                 {
-                    Caption = 'Store Code';
+                    Caption = 'Store Code', Locked = true;
                 }
                 field(calendarDate; Rec."Calendar Date")
                 {
-                    Caption = 'Date';
+                    Caption = 'Date', Locked = true;
                 }
                 field(startTime; Rec."Start Time")
                 {
-                    Caption = 'Start Time';
+                    Caption = 'Start Time', Locked = true;
                 }
                 field(endTime; Rec."End Time")
                 {
-                    Caption = 'End Time';
+                    Caption = 'End Time', Locked = true;
                 }
                 field(weekday; Rec.Weekday)
                 {
-                    Caption = 'Weekday';
+                    Caption = 'Weekday', Locked = true;
                 }
             }
         }

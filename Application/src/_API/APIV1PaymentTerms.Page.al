@@ -1,4 +1,4 @@
-﻿page 6014661 "NPR APIV1 - Payment Terms"
+page 6014661 "NPR APIV1 - Payment Terms"
 {
     Extensible = False;
 
@@ -21,35 +21,35 @@
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
                 }
                 field("code"; Rec."Code")
                 {
-                    Caption = 'Code';
+                    Caption = 'Code', Locked = true;
                 }
                 field(description; Rec.Description)
                 {
-                    Caption = 'Description';
+                    Caption = 'Description', Locked = true;
                 }
                 field(discount; Rec."Discount %")
                 {
-                    Caption = 'Discount %';
+                    Caption = 'Discount %', Locked = true;
                 }
                 field(calcPmtDiscOnCrMemos; Rec."Calc. Pmt. Disc. on Cr. Memos")
                 {
-                    Caption = 'Calc. Pmt. Disc. on Cr. Memos';
+                    Caption = 'Calc. Pmt. Disc. on Cr. Memos', Locked = true;
                 }
                 field(discountDateCalculation; Rec."Discount Date Calculation")
                 {
-                    Caption = 'Discount Date Calculation';
+                    Caption = 'Discount Date Calculation', Locked = true;
                 }
                 field(dueDateCalculation; Rec."Due Date Calculation")
                 {
-                    Caption = 'Due Date Calculation';
+                    Caption = 'Due Date Calculation', Locked = true;
                 }
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
-                    Caption = 'Last Modified Date';
+                    Caption = 'Last Modified Date', Locked = true;
                 }
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {

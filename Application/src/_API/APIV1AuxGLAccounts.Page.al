@@ -1,16 +1,16 @@
-page 6014667 "NPR APIV1 - Ship. Methods"
+page 6059847 "NPR APIV1 - Aux. G/L Accounts"
 {
-    Extensible = False;
     APIGroup = 'core';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
-    Caption = 'Shipment Methods';
+    Caption = 'AuxGLAccounts';
     DelayedInsert = true;
-    EntityName = 'shipmentMethod';
-    EntitySetName = 'shipmentMethods';
+    EntityName = 'auxGLAccount';
+    EntitySetName = 'auxGLAccounts';
+    Extensible = false;
     ODataKeyFields = SystemId;
     PageType = API;
-    SourceTable = "Shipment Method";
+    SourceTable = "NPR Aux. G/L Account";
 
     layout
     {
@@ -18,23 +18,23 @@ page 6014667 "NPR APIV1 - Ship. Methods"
         {
             repeater(General)
             {
-                field(id; Rec.SystemId)
+                field(id; Rec.SystemID)
                 {
                     Caption = 'Id', Locked = true;
                 }
-                field("code"; Rec."Code")
+                field(no; Rec."No.")
                 {
-                    Caption = 'Code', Locked = true;
+                    Caption = 'No.', Locked = true;
                 }
-                field(description; Rec.Description)
+                field(retailPayment; Rec."Retail Payment")
                 {
-                    Caption = 'Description', Locked = true;
+                    Caption = 'Retail Payment', Locked = true;
                 }
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date', Locked = true;
                 }
-                field(replicationCounter; Rec."NPR Replication Counter")
+                field(replicationCounter; Rec."Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;
                 }

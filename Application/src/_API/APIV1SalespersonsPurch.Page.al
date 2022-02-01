@@ -1,4 +1,4 @@
-﻿page 6014636 "NPR APIV1 - Salespersons/Purch"
+page 6014636 "NPR APIV1 - Salespersons/Purch"
 {
     Extensible = False;
 
@@ -70,7 +70,7 @@
 
                 field(image; TempNPRBlob."Buffer 1")
                 {
-                    Caption = 'Image';
+                    Caption = 'Image', Locked = true;
                 }
 
                 field(nprRegisterPassword; Rec."NPR Register Password")

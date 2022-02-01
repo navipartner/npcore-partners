@@ -1,4 +1,4 @@
-﻿page 6014641 "NPR APIV1 Cust. Price Groups"
+page 6014641 "NPR APIV1 Cust. Price Groups"
 {
     Extensible = False;
 
@@ -21,39 +21,39 @@
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
                 }
                 field("code"; Rec."Code")
                 {
-                    Caption = 'Code';
+                    Caption = 'Code', Locked = true;
                 }
                 field(description; Rec.Description)
                 {
-                    Caption = 'Description';
+                    Caption = 'Description', Locked = true;
                 }
                 field(allowInvoiceDisc; Rec."Allow Invoice Disc.")
                 {
-                    Caption = 'Allow Invoice Disc.';
+                    Caption = 'Allow Invoice Disc.', Locked = true;
                 }
                 field(allowLineDisc; Rec."Allow Line Disc.")
                 {
-                    Caption = 'Allow Line Disc.';
+                    Caption = 'Allow Line Disc.', Locked = true;
                 }
                 field(priceCalculationMethod; Rec."Price Calculation Method")
                 {
-                    Caption = 'Price Calculation Method';
+                    Caption = 'Price Calculation Method', Locked = true;
                 }
                 field(priceIncludesVat; Rec."Price Includes VAT")
                 {
-                    Caption = 'Price Includes VAT';
+                    Caption = 'Price Includes VAT', Locked = true;
                 }
                 field(vatBusPostingGrPrice; Rec."VAT Bus. Posting Gr. (Price)")
                 {
-                    Caption = 'VAT Bus. Posting Gr. (Price)';
+                    Caption = 'VAT Bus. Posting Gr. (Price)', Locked = true;
                 }
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
-                    Caption = 'Last Modified Date';
+                    Caption = 'Last Modified Date', Locked = true;
                 }
 
                 field(replicationCounter; Rec."NPR Replication Counter")

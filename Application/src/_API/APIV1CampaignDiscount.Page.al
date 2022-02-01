@@ -139,7 +139,7 @@ page 6014470 "NPR APIV1 - Campaign Discount"
 
                 part(periodDiscountLines; "NPR APIV1 - Camp. Disc. Lines")
                 {
-                    Caption = 'Period Discount Lines';
+                    Caption = 'Period Discount Lines', Locked = true;
                     EntityName = 'periodDiscountLine';
                     EntitySetName = 'periodDiscountLines';
                     SubPageLink = Code = field(Code);
