@@ -19,12 +19,12 @@ page 6014537 "NPR APIV1 - Item Categories"
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
                     Editable = false;
                 }
                 field("code"; Rec.Code)
                 {
-                    Caption = 'Code';
+                    Caption = 'Code', Locked = true;
                     ShowMandatory = true;
 
                     trigger OnValidate()
@@ -34,7 +34,7 @@ page 6014537 "NPR APIV1 - Item Categories"
                 }
                 field(displayName; Rec.Description)
                 {
-                    Caption = 'Description';
+                    Caption = 'Description', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -44,7 +44,7 @@ page 6014537 "NPR APIV1 - Item Categories"
 
                 field(parentCategory; Rec."Parent Category")
                 {
-                    Caption = 'Parent Category';
+                    Caption = 'Parent Category', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -54,7 +54,7 @@ page 6014537 "NPR APIV1 - Item Categories"
 
                 field(presentationOrder; Rec."Presentation Order")
                 {
-                    Caption = 'Presentation Order';
+                    Caption = 'Presentation Order', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -64,7 +64,7 @@ page 6014537 "NPR APIV1 - Item Categories"
 
                 field(hasChildren; Rec."Has Children")
                 {
-                    Caption = 'Has Children';
+                    Caption = 'Has Children', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -74,7 +74,7 @@ page 6014537 "NPR APIV1 - Item Categories"
 
                 field(indentation; Rec.Indentation)
                 {
-                    Caption = 'Indentation';
+                    Caption = 'Indentation', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -84,37 +84,37 @@ page 6014537 "NPR APIV1 - Item Categories"
 
                 field(nprItemTemplateCode; Rec."NPR Item Template Code")
                 {
-                    Caption = 'Item Template Code';
+                    Caption = 'Item Template Code', Locked = true;
                 }
 
                 field(nprMainCategory; Rec."NPR Main Category")
                 {
-                    Caption = 'Main Category';
+                    Caption = 'Main Category', Locked = true;
                 }
 
                 field(nprMainCategoryCode; Rec."NPR Main Category Code")
                 {
-                    Caption = 'Main Category Code';
+                    Caption = 'Main Category Code', Locked = true;
                 }
 
                 field(nprBlocked; Rec."NPR Blocked")
                 {
-                    Caption = 'Blocked';
+                    Caption = 'Blocked', Locked = true;
                 }
 
                 field(nprGlobalDimension1Code; Rec."NPR Global Dimension 1 Code")
                 {
-                    Caption = 'Global Dimension 1 Code';
+                    Caption = 'Global Dimension 1 Code', Locked = true;
                 }
 
                 field(nprGlobalDimension2Code; Rec."NPR Global Dimension 2 Code")
                 {
-                    Caption = 'Global Dimension 2 Code';
+                    Caption = 'Global Dimension 2 Code', Locked = true;
                 }
 
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
-                    Caption = 'Last Modified Date';
+                    Caption = 'Last Modified Date', Locked = true;
                 }
 
                 field(replicationCounter; Rec."NPR Replication Counter")

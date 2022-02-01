@@ -21,12 +21,12 @@ page 6014506 "NPR APIV1 - Item Variants"
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
                     Editable = false;
                 }
                 field(itemId; Rec."Item Id")
                 {
-                    Caption = 'Item Id';
+                    Caption = 'Item Id', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -47,7 +47,7 @@ page 6014506 "NPR APIV1 - Item Variants"
                 }
                 field(itemNumber; Rec."Item No.")
                 {
-                    Caption = 'Item No.';
+                    Caption = 'Item No.', Locked = true;
 
                     trigger OnValidate()
                     begin
@@ -64,79 +64,79 @@ page 6014506 "NPR APIV1 - Item Variants"
                 }
                 field("code"; Rec.Code)
                 {
-                    Caption = 'Code';
+                    Caption = 'Code', Locked = true;
                 }
                 field(description; Rec.Description)
                 {
-                    Caption = 'Description';
+                    Caption = 'Description', Locked = true;
                 }
 
                 field(description2; Rec."Description 2")
                 {
-                    Caption = 'Description 2';
+                    Caption = 'Description 2', Locked = true;
                 }
                 field(variety1; Rec."NPR Variety 1")
                 {
-                    Caption = 'Variety 1';
+                    Caption = 'Variety 1', Locked = true;
                 }
 
                 field(variety1Table; Rec."NPR Variety 1 Table")
                 {
-                    Caption = 'Variety 1 Table';
+                    Caption = 'Variety 1 Table', Locked = true;
                 }
 
                 field(variety1Value; Rec."NPR Variety 1 Value")
                 {
-                    Caption = 'Variety 1 Value';
+                    Caption = 'Variety 1 Value', Locked = true;
                 }
 
                 field(variety2; Rec."NPR Variety 2")
                 {
-                    Caption = 'Variety 2';
+                    Caption = 'Variety 2', Locked = true;
                 }
 
                 field(variety2Table; Rec."NPR Variety 2 Table")
                 {
-                    Caption = 'Variety 2 Table';
+                    Caption = 'Variety 2 Table', Locked = true;
                 }
 
                 field(variety2Value; Rec."NPR Variety 2 Value")
                 {
-                    Caption = 'Variety 2 Value';
+                    Caption = 'Variety 2 Value', Locked = true;
                 }
 
                 field(variety3; Rec."NPR Variety 3")
                 {
-                    Caption = 'Variety 3';
+                    Caption = 'Variety 3', Locked = true;
                 }
 
                 field(variety3Table; Rec."NPR Variety 3 Table")
                 {
-                    Caption = 'Variety 3 Table';
+                    Caption = 'Variety 3 Table', Locked = true;
                 }
 
                 field(variety3Value; Rec."NPR Variety 3 Value")
                 {
-                    Caption = 'Variety 3 Value';
+                    Caption = 'Variety 3 Value', Locked = true;
                 }
 
                 field(variety4; Rec."NPR Variety 4")
                 {
-                    Caption = 'Variety 4';
+                    Caption = 'Variety 4', Locked = true;
                 }
 
                 field(variety4Table; Rec."NPR Variety 4 Table")
                 {
-                    Caption = 'Variety 4 Table';
+                    Caption = 'Variety 4 Table', Locked = true;
                 }
 
                 field(variety4Value; Rec."NPR Variety 4 Value")
                 {
-                    Caption = 'Variety 4 Value';
+                    Caption = 'Variety 4 Value', Locked = true;
                 }
                 field(blocked; Rec."NPR Blocked")
                 {
-                    Caption = 'Blocked';
+                    Caption = 'Blocked', Locked = true;
                 }
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {

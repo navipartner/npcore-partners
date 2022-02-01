@@ -167,8 +167,6 @@
                     ApplicationArea = NPRRetail;
                     Caption = 'Starting Time';
                     ToolTip = 'Specifies Job Queue Starting Time.';
-
-
                 }
                 field(JobQueueEndTime; Rec.JobQueueEndTime)
                 {
@@ -225,7 +223,7 @@
                 ApplicationArea = NPRRetail;
                 Caption = 'Run Import';
                 Image = ExecuteBatch;
-                ToolTip = 'Run import manually.';
+                ToolTip = 'Run the import manually.';
 
                 trigger OnAction()
                 var
