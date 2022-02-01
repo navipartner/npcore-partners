@@ -27,7 +27,27 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
             {
 
                 Visible = false;
-                ToolTip = 'Specifies the value of the Description 2 field';
+                ToolTip = 'Specifies an extended description of the product entry to be sold. To add a non-transactional text line, fill in the Description field only.';
+                ApplicationArea = NPRRetail;
+            }
+        }
+        addafter("Unit Cost (LCY)")
+        {
+            field("NPR Units per Parcel"; Rec."Units per Parcel")
+            {
+
+                Visible = false;
+                ToolTip = 'Specifies how many units are packed in one parcel.';
+                ApplicationArea = NPRRetail;
+            }
+        }
+        addafter("Inv. Discount Amount")
+        {
+            field("NPR Net Weight"; Rec."Net Weight")
+            {
+
+                Importance = Additional;
+                ToolTip = 'Specifies the Net Weight of the item to be sold.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -46,7 +66,7 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
 
-                ToolTip = 'Executes the Variety action';
+                ToolTip = 'View the variety matrix for the item used on the Purchase Order Line.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

@@ -10,7 +10,7 @@ pageextension 6014435 "NPR Extended Text" extends "Extended Text"
                 field("NPR Event"; Rec."NPR Event")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Event field';
+                    ToolTip = 'Specifies whether the extended text for an Event will be available.';
                     ApplicationArea = NPRRetail;
                 }
             }

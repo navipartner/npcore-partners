@@ -8,7 +8,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
             {
 
                 Visible = false;
-                ToolTip = 'Specifies the value of the Posting Description field';
+                ToolTip = 'Specifies the date when the posting of the sales document will be recorded.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -17,7 +17,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
             field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")
             {
 
-                ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
+                ToolTip = 'Specifies the e-mail address of the customer contact you are sending the invoice to.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -31,7 +31,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 Caption = 'POS Entry';
                 Image = Entry;
 
-                ToolTip = 'Executes the POS Entry action';
+                ToolTip = 'View all the POS entries for this item.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -52,7 +52,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                     Caption = 'Retail Vouchers';
                     Image = Certificate;
 
-                    ToolTip = 'Executes the Retail Vouchers action';
+                    ToolTip = 'View all vouchers for the selected customer.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -73,7 +73,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 Promoted = true;
                 PromotedOnly = true;
 
-                ToolTip = 'Executes the Import from scanner action';
+                ToolTip = 'Start importing the file from the scanner.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -95,7 +95,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                     Caption = 'Issue Voucher';
                     Image = PostedPayableVoucher;
 
-                    ToolTip = 'Executes the Issue Voucher action';
+                    ToolTip = 'View all the Issued Vouchers for the customer selected.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

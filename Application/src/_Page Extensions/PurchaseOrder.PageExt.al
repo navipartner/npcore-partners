@@ -7,7 +7,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
             field("NPR PostingDescription"; Rec."Posting Description")
             {
 
-                ToolTip = 'Specifies the value of the Posting Description field';
+                ToolTip = 'Specifies a posting description to appear on the resulting journal lines.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -23,7 +23,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Image = CoupledOrderList;
                 ShortCutKey = 'Ctrl+I';
 
-                ToolTip = 'Executes the Insert Line with Vendor Item action';
+                ToolTip = 'Enables selection of the item number only, having a Vendor Item specified on the item.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -84,7 +84,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Promoted = true;
                 PromotedOnly = true;
 
-                ToolTip = 'Executes the Import from scanner action';
+                ToolTip = 'Start importing the file from the scanner.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -109,7 +109,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 PromotedOnly = true;
                 PromotedCategory = Process;
 
-                ToolTip = 'Executes the Retail Print action';
+                ToolTip = 'Displays the Retail Journal Print page where different labels can be printed.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

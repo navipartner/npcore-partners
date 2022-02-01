@@ -14,7 +14,7 @@ pageextension 6014449 "NPR Sales Invoice Subform" extends "Sales Invoice Subform
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
 
-                ToolTip = 'Executes the Variety action';
+                ToolTip = 'View the variety matrix for the item used on the Sales Invoice Line.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

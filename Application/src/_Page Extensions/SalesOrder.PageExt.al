@@ -7,7 +7,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             field("NPR Sell-to Customer Name 2"; Rec."Sell-to Customer Name 2")
             {
 
-                ToolTip = 'Specifies the value of the Sell-to Customer Name 2 field';
+                ToolTip = 'Specifies the name of the customer who will receive the products and be billed by default.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -16,7 +16,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             field("NPR Ship-to Name 2"; Rec."Ship-to Name 2")
             {
 
-                ToolTip = 'Specifies the value of the Ship-to Name 2 field';
+                ToolTip = 'Specifies the additional name that products on the sales document will be shipped to.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -25,7 +25,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             field("NPR Bill-to Name 2"; Rec."Bill-to Name 2")
             {
 
-                ToolTip = 'Specifies the value of the Bill-to Name 2 field';
+                ToolTip = 'Specifies the customer to whom you will send the sales invoice, when different from the customer that you are selling to.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -34,19 +34,19 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             field("NPR Bill-to Company"; Rec."NPR Bill-to Company")
             {
 
-                ToolTip = 'Specifies the value of the NPR Bill-to Company field';
+                ToolTip = 'Specifies the company that you will send the invoice to.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Bill-To Vendor No."; Rec."NPR Bill-To Vendor No.")
             {
 
-                ToolTip = 'Specifies the value of the NPR Bill-To Vendor No. field';
+                ToolTip = 'Specifies the vendor number to whom you will send the sales invoice.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")
             {
 
-                ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
+                ToolTip = 'Specifies the e-mail address of the customer contact you are sending the invoice to.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -55,13 +55,13 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             field("NPR Delivery Location"; Rec."NPR Delivery Location")
             {
 
-                ToolTip = 'Specifies the value of the NPR Delivery Location field';
+                ToolTip = 'Specifies where the items from the sales document are shipped to.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Delivery Instructions"; Rec."NPR Delivery Instructions")
             {
 
-                ToolTip = 'Specifies the value of the NPR Delivery Instructions field';
+                ToolTip = 'Specifies the specific delivery instructions related to sales order.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -70,7 +70,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             field("NPR Kolli"; Rec."NPR Kolli")
             {
 
-                ToolTip = 'Specifies the value of the NPR Kolli field';
+                ToolTip = 'Specifies the number of packages';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -96,7 +96,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'POS Entry';
                 Image = Entry;
 
-                ToolTip = 'Executes the POS Entry action';
+                ToolTip = 'View the POS entry for this order.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -117,7 +117,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     Caption = 'Retail Vouchers';
                     Image = Certificate;
 
-                    ToolTip = 'Executes the Retail Vouchers action';
+                    ToolTip = 'View all vouchers for the selected customer.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -138,7 +138,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Promoted = true;
                 PromotedOnly = true;
 
-                ToolTip = 'Executes the Import From Scanner action';
+                ToolTip = 'Start importing the file from the scanner.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -158,7 +158,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'Select Recommended Item';
                 Image = SuggestLines;
 
-                ToolTip = 'Executes the Select Recommended Item action';
+                ToolTip = 'Select the item that is marked as Recommended.';
                 ApplicationArea = NPRRetail;
             }
             action("NPR InsertLineItem ")
@@ -167,7 +167,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Image = CoupledOrderList;
                 ShortCutKey = 'Ctrl+I';
 
-                ToolTip = 'Executes the Insert Line with Item action';
+                ToolTip = 'Enable inserting multiple items by searching through the item list.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -232,7 +232,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     Caption = 'Issue Voucher';
                     Image = PostedPayableVoucher;
 
-                    ToolTip = 'Executes the Issue Voucher action';
+                    ToolTip = 'Enable viewing/editing the voucher list.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -247,7 +247,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     Caption = 'Redeem Voucher';
                     Image = PostedReceivableVoucher;
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Redeem Voucher action';
+                    ToolTip = 'Enable searching the list of vouchers by reference number and redeeming it.';
 
                     trigger OnAction()
                     var
@@ -264,7 +264,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             {
                 Caption = 'Consignor Label';
 
-                ToolTip = 'Executes the Consignor Label action';
+                ToolTip = 'Print the Consignor Label.';
                 Image = Print;
                 ApplicationArea = NPRRetail;
 
@@ -280,7 +280,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'Shipping Label';
                 Image = PrintCheck;
 
-                ToolTip = 'Executes the Shipping Label action';
+                ToolTip = 'Create a Shipping Label with all necessary information.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -303,7 +303,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
 
-                    ToolTip = 'Executes the Send SMS action';
+                    ToolTip = 'Specifies whether a notification SMS should be sent to a responsible person. The messages are sent using SMS templates.';
                     ApplicationArea = NPRRetail;
                     trigger OnAction()
                     var
@@ -321,7 +321,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     Caption = 'Variety';
                     ShortCutKey = 'Ctrl+Alt+V';
 
-                    ToolTip = 'Executes the Variety action';
+                    ToolTip = 'View the variety matrix for the item used on the Purchase Order Line.';
                     Image = Edit;
                     ApplicationArea = NPRRetail;
 
@@ -344,7 +344,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Promoted = true;
                 PromotedCategory = Category12;
                 Caption = 'Transfer Orders';
-                ToolTip = 'Displays Transfer Orders which have External Document No. equal as Order No.';
+                ToolTip = 'Display Transfer Order which has External Document No. equal to Order No.';
                 Image = TransferOrder;
 
                 trigger OnAction()

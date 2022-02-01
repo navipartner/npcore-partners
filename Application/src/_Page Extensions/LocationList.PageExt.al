@@ -9,7 +9,7 @@ pageextension 6014420 "NPR Location List" extends "Location List"
 
                 Enabled = true;
                 Visible = false;
-                ToolTip = 'Specifies the value of the NPR Store Group Code field';
+                ToolTip = 'Specifies a Group Code that a set of POS Stores can be grouped into for BI purposes';
                 ApplicationArea = NPRRetail;
             }
         }

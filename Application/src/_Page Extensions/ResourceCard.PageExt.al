@@ -7,7 +7,7 @@ pageextension 6014481 "NPR Resource Card" extends "Resource Card"
             field("NPR Over Capacitate Resource"; Rec."NPR Over Capacitate Resource")
             {
 
-                ToolTip = 'Specifies the value of the NPR Over Capacitate Resource field';
+                ToolTip = 'Specifies if the task allocation can be exceeded, or not reach the maximum capacity.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -16,7 +16,7 @@ pageextension 6014481 "NPR Resource Card" extends "Resource Card"
             field("NPR E-Mail"; Rec."NPR E-Mail")
             {
 
-                ToolTip = 'Specifies the value of the NPR E-Mail field';
+                ToolTip = 'Specifies the E-mail address of the resource.';
                 ApplicationArea = NPRRetail;
             }
         }

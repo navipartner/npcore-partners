@@ -7,7 +7,7 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
             field("NPR Store Group Code"; Rec."NPR Store Group Code")
             {
 
-                ToolTip = 'Specifies the value of the NPR Store Group Code field';
+                ToolTip = 'Specifies a Group Code that a set of POS Stores can be grouped into for BI purposes.';
                 ApplicationArea = NPRRetail;
             }
         }

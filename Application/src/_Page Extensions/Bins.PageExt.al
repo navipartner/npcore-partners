@@ -9,7 +9,7 @@ pageextension 6014478 "NPR Bins" extends Bins
                 Caption = 'Print Label';
                 Image = BarCode;
 
-                ToolTip = 'Executes the Print Label action';
+                ToolTip = 'Allow customers to print BIN labels.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

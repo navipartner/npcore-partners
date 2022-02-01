@@ -10,7 +10,7 @@ pageextension 6014438 "NPR Item Journal" extends "Item Journal"
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
 
-                ToolTip = 'Executes the Variety action';
+                ToolTip = 'Executes the Variety action and opens Edit - Variety Matrix page';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -28,7 +28,7 @@ pageextension 6014438 "NPR Item Journal" extends "Item Journal"
                 Caption = 'Price Label';
                 Image = BinContent;
 
-                ToolTip = 'Executes the Price Label action';
+                ToolTip = 'Print the Price Label document.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

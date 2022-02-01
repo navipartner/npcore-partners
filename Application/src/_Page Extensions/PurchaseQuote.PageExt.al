@@ -12,7 +12,7 @@ pageextension 6014450 "NPR Purchase Quote" extends "Purchase Quote"
                 PromotedCategory = Process;
                 PromotedOnly = true;
 
-                ToolTip = 'Executes the Import from scanner action';
+                ToolTip = 'Start importing the file from the scanner.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
