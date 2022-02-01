@@ -17,85 +17,85 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the store ID, which can contain both letters and numbers. ';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the POS store name which will be displayed on sales documents, receipts etc.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Name 2"; Rec."Name 2")
                 {
 
-                    ToolTip = 'Specifies the value of the Name 2 field';
+                    ToolTip = 'Specifies a longer legal name of the store, if necessary. This name is not displayed on sales documents by default.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Address; Rec.Address)
                 {
 
-                    ToolTip = 'Specifies the value of the Address field';
+                    ToolTip = 'Specifies the POS store address which will be displayed on sales documents, receipts etc.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Address 2"; Rec."Address 2")
                 {
 
-                    ToolTip = 'Specifies the value of the Address 2 field';
+                    ToolTip = 'Specifies the optional second address.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Post Code"; Rec."Post Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Post Code field';
+                    ToolTip = 'Specifies the POS store''s postal code which will be displayed on sales documents, receipts etc.';
                     ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
 
-                    ToolTip = 'Specifies the value of the City field';
+                    ToolTip = 'Specifies the city in which the POS store is located.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Contact; Rec.Contact)
                 {
 
-                    ToolTip = 'Specifies the value of the Contact field';
+                    ToolTip = 'Specifies the name of the person that should be contacted regarding information about the store. This is also displayed on sales documents, receipts etc. ';
                     ApplicationArea = NPRRetail;
                 }
                 field(County; Rec.County)
                 {
 
-                    ToolTip = 'Specifies the value of the County field';
+                    ToolTip = 'Specifies the country in which the POS store is located.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Country/Region Code"; Rec."Country/Region Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Country/Region Code field';
+                    ToolTip = 'Specifies the POS store''s country/region code which will be displayed on sales documents, receipts etc. If you are reporting for Intrastat, please ensure this is correct.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Location Code field';
+                    ToolTip = 'Specifies the POS store''s location code, which is used for registering the store''s inventory. This field needs to be populated if your company has more than one store, if not, the location code is optional.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Language Code"; Rec."Language Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Language Code field';
+                    ToolTip = 'Specifies the system language, which could be for example DK (Danish) or ENG (English) among others.';
                     ApplicationArea = NPRRetail;
                 }
                 field("VAT Registration No."; Rec."VAT Registration No.")
                 {
 
-                    ToolTip = 'Specifies the value of the VAT Registration No. field';
+                    ToolTip = 'Specifies a unique number used for identifying a registered store owner.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Registration No."; Rec."Registration No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Registration No. field';
+                    ToolTip = 'Specifies the registration number. Will display on sales documents, receipts etc.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -105,19 +105,19 @@
                 field("Phone No."; Rec."Phone No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Phone No. field';
+                    ToolTip = 'Specifies the POS store''s phone number, which will be displayed on sales documents, receipts etc.';
                     ApplicationArea = NPRRetail;
                 }
                 field("E-Mail"; Rec."E-Mail")
                 {
 
-                    ToolTip = 'Specifies the value of the E-Mail field';
+                    ToolTip = 'Specifies the POS store''s email, which will be displayed on sales documents, receipts etc.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Home Page"; Rec."Home Page")
                 {
 
-                    ToolTip = 'Specifies the value of the Home Page field';
+                    ToolTip = 'Specifies the store''s home page URL.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -127,14 +127,14 @@
                 field("POS Restaurant Profile"; Rec."POS Restaurant Profile")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Restaurant Profile field';
+                    ToolTip = 'Specifies which restaurant the store is connected to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Posting Profile"; Rec."POS Posting Profile")
                 {
 
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the POS Posting Profile field';
+                    ToolTip = 'Specifies which General and VAT Posting group this store is using as well as journal definitions etc.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -144,55 +144,55 @@
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ToolTip = 'Specifies the department code - the dimension used for reporting. By setting up this dimension, it''s possible to filter reports in relation to the dimension and get more specific data that way.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ToolTip = 'Specifies the project code - the dimension used for reporting. By setting up this dimension, it''s possible to filter your reports in relation to the dimension and get more specific data that way.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Store Group Code"; Rec."Store Group Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Store Group Code field';
+                    ToolTip = 'Specifies the code of store groups. This is a useful field for reporting.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Store Category Code"; Rec."Store Category Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Store Category Code field';
+                    ToolTip = 'Specifies the code of store categories. This is a useful field for reporting.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Store Locality Code"; Rec."Store Locality Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Store Locality Code field';
+                    ToolTip = 'Specifies the locality code of stores. This is a useful field for reporting.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Store Size"; Rec."Store Size")
                 {
 
-                    ToolTip = 'Specifies the value of the Store Size field';
+                    ToolTip = 'Specifies the size of the POS store in square meters. ';
                     ApplicationArea = NPRRetail;
                 }
                 field("Opening Date"; Rec."Opening Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Opening Date field';
+                    ToolTip = 'Specifies the first business day. This field is used for reports.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Geolocation Latitude"; Rec."Geolocation Latitude")
                 {
 
-                    ToolTip = 'Specifies the value of the Geolocation Latitude field';
+                    ToolTip = 'Specifies the store''s location on Google Maps or Bing. This could help the customer get driving instructions or to figure out if the store is close enough for picking up a collect order.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Geolocation Longitude"; Rec."Geolocation Longitude")
                 {
 
-                    ToolTip = 'Specifies the value of the Geolocation Longitude field';
+                    ToolTip = 'Specifies the store''s location on Google Maps or Bing. This could help the customer get driving instructions or to figure out if the store is close enough for picking up a collect order.';
                     ApplicationArea = NPRRetail;
                 }
             }
