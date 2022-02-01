@@ -4,11 +4,11 @@ pageextension 6014421 "NPR Chart of Accounts" extends "Chart of Accounts"
     {
         addafter("Default IC Partner G/L Acc. No")
         {
-            field(NPRRetailPayment; NPRAuxGLAccount."Retail Payment")
+            field("NPR NPRRetailPayment"; NPRAuxGLAccount."Retail Payment")
             {
                 Caption = 'Retail Payment';
 
-                ToolTip = 'Specifies the value of the NPR Retail Payment field';
+                ToolTip = 'Specifies if the Retail Payment is included on the account';
                 ApplicationArea = NPRRetail;
 
                 trigger OnValidate()

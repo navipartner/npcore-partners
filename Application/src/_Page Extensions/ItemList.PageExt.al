@@ -10,7 +10,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Editable = true;
                 Caption = 'Smart Search';
                 ApplicationArea = NPRRetail;
-                ToolTip = 'This search is optimized to search relevant columns only.';
+                ToolTip = 'This search is optimized to search relevant columns only. To serach enter a value in the Searh box and click on this field.';
                 trigger OnValidate()
                 var
                     Item: Record Item;
@@ -68,7 +68,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             field("NPR Description 2"; Rec."Description 2")
             {
 
-                ToolTip = 'Specifies the value of the Description 2 field';
+                ToolTip = 'Specifies the description extension should more information be required for the item.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -78,7 +78,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             field("NPR Ticket Type"; Rec."NPR Ticket Type")
             {
 
-                ToolTip = 'Specifies the value of the NPR Ticket Type field';
+                ToolTip = 'Specifies the ticket type.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -88,14 +88,14 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             field("NPR Magento Item"; Rec."NPR Magento Item")
             {
 
-                ToolTip = 'Specifies the value of the NPR Magento Item field';
+                ToolTip = 'Specifies if the item will also be used as a Magento Item.';
                 ApplicationArea = NPRRetail;
             }
 
             field("NPR Item Status"; Rec."NPR Item Status")
             {
 
-                ToolTip = 'Specifies the value of the NPR Item Status field';
+                ToolTip = 'Specifies if the item is active or not as a Magento Item.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -105,7 +105,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             field("NPR Unit List Price"; Rec."Unit List Price")
             {
 
-                ToolTip = 'Specifies the value of the Unit List Price field';
+                ToolTip = 'View different prices for the item.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -117,7 +117,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Caption = 'Inv availability by location';
 
                 DecimalPlaces = 2 : 2;
-                ToolTip = 'Specifies the value of the Inv availability by location field';
+                ToolTip = 'View item availability by location.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnDrillDown()
@@ -148,7 +148,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             {
 
                 Visible = false;
-                ToolTip = 'Specifies the value of the NPR Item Brand field';
+                ToolTip = 'Specifies the item Brand.';
                 ApplicationArea = NPRRetail;
             }
 
@@ -160,14 +160,14 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             {
 
                 Visible = false;
-                ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                ToolTip = 'Specifies the default Global Dimension 1 Code for the item.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
             {
 
                 Visible = false;
-                ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                ToolTip = 'Specifies the default Global Dimension 2 Code for the item.';
                 ApplicationArea = NPRRetail;
             }
 
@@ -175,7 +175,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             {
 
                 Visible = false;
-                ToolTip = 'Specifies the value of the Units per Parcel field';
+                ToolTip = 'Specifies how many units are packed in one parcel.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -198,7 +198,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Caption = 'POS Sales Entries';
                 Image = Entries;
 
-                ToolTip = 'Executes the POS Sales Entries action';
+                ToolTip = 'View a list of all the POS sales entries for this item.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -216,7 +216,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 RunObject = Page "NPR Retail Price Log Entries";
                 RunPageLink = "Item No." = FIELD("No.");
 
-                ToolTip = 'Executes the Retail Price Log Entries action';
+                ToolTip = 'View a log of all Retail Prices for this item.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -235,7 +235,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled;
 
-                    ToolTip = 'Executes the Pictures action';
+                    ToolTip = 'Assign a picture to the item. You can either take a picture or import it.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -315,7 +315,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     PromotedCategory = Report;
                     ShortCutKey = 'Ctrl+Alt+L';
 
-                    ToolTip = 'Executes the Price Label action';
+                    ToolTip = 'Enable printing the Price Label for the item.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -338,7 +338,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     PromotedCategory = Report;
                     ShortCutKey = 'Ctrl+Alt+L';
 
-                    ToolTip = 'Executes the Shelf Label action';
+                    ToolTip = 'Enable printing the Shelf Label for the item.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -362,7 +362,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Caption = 'Timeline';
                 Image = Timeline;
 
-                ToolTip = 'Executes the Timeline action';
+                ToolTip = 'Specifies the timeline from the item.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -396,7 +396,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Image = Find;
                 ShortCutKey = 'Shift+Ctrl+S';
 
-                ToolTip = 'Executes the Search Item action';
+                ToolTip = 'Enable searching for items using specific criteria, such as code and description.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -429,7 +429,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Caption = 'Filter Search Items';
                 Image = "Filter";
 
-                ToolTip = 'Executes the Filter Search Items action';
+                ToolTip = 'Enable filtering search results using attribute code or text.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

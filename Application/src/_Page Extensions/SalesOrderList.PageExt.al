@@ -14,7 +14,7 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
 
                 Editable = false;
                 Visible = false;
-                ToolTip = 'Specifies the value of the NPR Magento Coupon field';
+                ToolTip = 'View the Magento Coupon used on this document.';
                 ApplicationArea = NPRRetail;
             }
         }

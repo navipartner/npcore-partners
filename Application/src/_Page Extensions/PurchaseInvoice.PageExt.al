@@ -7,7 +7,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
             field("NPR PostingDescription"; Rec."Posting Description")
             {
 
-                ToolTip = 'Specifies the value of the Posting Description field';
+                ToolTip = 'Specifies a posting description to appear on the resulting journal lines.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -30,7 +30,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
             {
                 Caption = 'Show Imported File';
 
-                ToolTip = 'Executes the Show Imported File action';
+                ToolTip = 'Executes the Show Imported File action and displays imported files.';
                 Image = View;
                 ApplicationArea = NPRRetail;
 
@@ -57,7 +57,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     PromotedOnly = true;
                     PromotedCategory = Process;
 
-                    ToolTip = 'Executes the Retail Print action';
+                    ToolTip = 'Displays the Retail Journal Print page where different labels can be printed.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

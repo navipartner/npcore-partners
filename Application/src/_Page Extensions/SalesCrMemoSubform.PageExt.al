@@ -10,7 +10,7 @@ pageextension 6014491 "NPR Sales Cr. Memo Subform" extends "Sales Cr. Memo Subfo
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
 
-                ToolTip = 'Executes the Variety action';
+                ToolTip = 'View the variety matrix for the item used on the Sales Credit Memo Line.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

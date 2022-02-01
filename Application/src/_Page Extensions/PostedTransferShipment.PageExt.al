@@ -13,7 +13,7 @@ pageextension 6014465 "NPR Posted Transfer Shipment" extends "Posted Transfer Sh
                 PromotedOnly = true;
                 PromotedCategory = Process;
 
-                ToolTip = 'Executes the Retail Print action';
+                ToolTip = 'Display the Retail Journal Print page where different labels can be printed.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

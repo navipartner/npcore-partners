@@ -11,7 +11,7 @@ pageextension 6014492 "NPR Customer List" extends "Customer List"
                 Editable = true;
                 Caption = 'Smart Search';
                 ApplicationArea = NPRRetail;
-                ToolTip = 'This search is optimized to search relevant columns only.';
+                ToolTip = 'This search is optimized to search relevant columns only. To serach enter a value in the Searh box and click on this field.';
                 trigger OnValidate()
                 var
                     Customer: Record Customer;
@@ -40,7 +40,7 @@ pageextension 6014492 "NPR Customer List" extends "Customer List"
             field("NPR E-Mail"; Rec."E-Mail")
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies Email.';
+                ToolTip = 'Specifies the customer''s e-mail address. Clicking on the e-mail address opens an e-mail application.';
             }
         }
 

@@ -9,7 +9,7 @@ pageextension 6014453 "NPR Contact List" extends "Contact List"
                 Caption = 'POS Entries';
                 Image = Entries;
 
-                ToolTip = 'Executes the POS Entries action';
+                ToolTip = 'View the POS Entries list which includes Entry Date, Document No, Starting Time, Ending Time, etc.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

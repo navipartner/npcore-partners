@@ -13,19 +13,19 @@ pageextension 6014401 "NPR User Setup" extends "User Setup"
             field("NPR Allow Register Switch"; Rec."NPR Allow Register Switch")
             {
 
-                ToolTip = 'Specifies the value of the NPR Allow Register Switch field';
+                ToolTip = 'Specifies if the user is allowed to switch between registers.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Register Switch Filter"; Rec."NPR Register Switch Filter")
             {
 
-                ToolTip = 'Specifies the value of the NPR Register Switch Filter field';
+                ToolTip = 'Specifies the list of registers the user is allowed to switch between.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Backoffice Restaurant Code"; Rec."NPR Backoffice Restaurant Code")
             {
 
-                ToolTip = 'Specifies the value of the NPR Backoffice Restaurant Code field';
+                ToolTip = 'Specifies the Backoffice Restaurant Code for the user.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -34,18 +34,18 @@ pageextension 6014401 "NPR User Setup" extends "User Setup"
             field("NPR Anonymize Customers"; Rec."NPR Anonymize Customers")
             {
 
-                ToolTip = 'Specifies the value of the NPR Anonymize Customers field';
+                ToolTip = 'Specifies if the user is allowed to anonymize customer information in the customer page.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Block Role Center"; Rec."NPR Block Role Center")
             {
 
-                ToolTip = 'Specifies the value of the NPR Block Role Center field';
+                ToolTip = 'Specifies if the user is allowed to personalize the Role Center.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR MM Allow MS Entry Edit"; Rec."NPR MM Allow MS Entry Edit")
             {
-                ToolTip = 'Specifies the value of the Allow Membership Entry Edit field.';
+                ToolTip = 'Specifies if the user can modify Membership Entries.';
                 ApplicationArea = NPRRetail;
             }
 

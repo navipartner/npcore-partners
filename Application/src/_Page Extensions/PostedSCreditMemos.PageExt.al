@@ -9,7 +9,7 @@ pageextension 6014417 "NPR Posted S.Credit Memos" extends "Posted Sales Credit M
 
                 Editable = false;
                 Visible = false;
-                ToolTip = 'Specifies the value of the NPR Magento Coupon field';
+                ToolTip = 'View the Magento Coupon used on this document.';
                 ApplicationArea = NPRRetail;
             }
         }

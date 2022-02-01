@@ -27,7 +27,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
             {
 
                 Visible = false;
-                ToolTip = 'Specifies the value of the Vendor Item No. field';
+                ToolTip = 'Specifies the number that the vendor uses for this item.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -36,7 +36,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
             field("NPR Description 2"; Rec."Description 2")
             {
 
-                ToolTip = 'Specifies the value of the Description 2 field';
+                ToolTip = 'Specifies a description of the entry of the product to be purchased. To add a non-transactional text line, fill in the Description field only.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -46,7 +46,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
             {
 
                 Visible = false;
-                ToolTip = 'Specifies the value of the NPR Exchange Label field';
+                ToolTip = 'Specifies the Exchange Label.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
@@ -122,7 +122,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
 
-                ToolTip = 'Executes the Variety action';
+                ToolTip = 'View the variety matrix for the item used on the Purchase Order Line.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -142,7 +142,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                 Caption = 'Nonstoc&k Items';
                 Image = NonStockItem;
 
-                ToolTip = 'Executes the Nonstoc&k Items action';
+                ToolTip = 'View the list of non stock items.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

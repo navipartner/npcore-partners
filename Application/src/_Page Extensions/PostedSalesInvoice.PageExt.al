@@ -7,7 +7,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
             field("NPR Sell-to Customer Name 2"; Rec."Sell-to Customer Name 2")
             {
 
-                ToolTip = 'Specifies the value of the Sell-to Customer Name 2 field';
+                ToolTip = 'Specifies the Sell-to Customer Name 2 that will appear on the new sales document.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -16,7 +16,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
             field("NPR Magento Payment Amount"; Rec."NPR Magento Payment Amount")
             {
 
-                ToolTip = 'Specifies the value of the NPR Magento Payment Amount field';
+                ToolTip = 'Specifies the sum of Payment Lines attached to the Posted Sales Invoice.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -25,7 +25,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
             field("NPR Ship-to Name 2"; Rec."Ship-to Name 2")
             {
 
-                ToolTip = 'Specifies the value of the Ship-to Name 2 field';
+                ToolTip = 'Specifies the additional name of the customer that you shipped the items on the invoice to.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -34,7 +34,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
             field("NPR Bill-to Name 2"; Rec."Bill-to Name 2")
             {
 
-                ToolTip = 'Specifies the value of the Bill-to Name 2 field';
+                ToolTip = 'Specifies the additinal name of the customer that the invoice was sent to.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -47,7 +47,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
             {
                 Caption = 'Consignor Label';
 
-                ToolTip = 'Executes the Consignor Label action';
+                ToolTip = 'Prints Consignor Label.';
                 Image = Print;
                 ApplicationArea = NPRRetail;
 

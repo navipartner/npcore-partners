@@ -13,25 +13,25 @@ pageextension 6014448 "NPR Jobs Setup" extends "Jobs Setup"
                     field("NPR Auto. Create Job Task Line"; Rec."NPR Auto. Create Job Task Line")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Auto. Create Job Task Line field';
+                        ToolTip = 'Specifies whether Job Task Lines will be automatically created.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Def. Job Task No."; Rec."NPR Def. Job Task No.")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Def. Job Task No. field';
+                        ToolTip = 'Specifies Default Job Task No to be used when automatically creating the Task Line.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Def. Job Task Description"; Rec."NPR Def. Job Task Description")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Def. Job Task Description field';
+                        ToolTip = 'Specifies Default Job Task Description to be used when automatically creating the Task Line.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Post Event on Sales Inv. Post"; Rec."NPR Post Event on S.Inv. Post")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Post Event on S.Inv. Post field';
+                        ToolTip = 'Specifies whether to allow posting from Sales Invoices to impact inventory only or both inventory and jobs.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -41,20 +41,20 @@ pageextension 6014448 "NPR Jobs Setup" extends "Jobs Setup"
                     field("NPR Qty. Relates to Start/End Time"; Rec."NPR Qty. Rel. 2 Start/End Time")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Qty. Rel. 2 Start/End Time field';
+                        ToolTip = 'Specifies the value of the quantity related to Start/End Time.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Time Calc. Unit of Measure"; Rec."NPR Time Calc. Unit of Measure")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Time Calc. Unit of Measure field';
+                        ToolTip = 'Specifies the unit of measure used when calculating time.';
                         ApplicationArea = NPRRetail;
                     }
                 }
                 field("NPR Over Capacitate Resource"; Rec."NPR Over Capacitate Resource")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Over Capacitate Resource field';
+                    ToolTip = 'Specifies if the task allocation can be exceeded, or not reach the maximum capacity.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR BlockEventDeletionValue"; Rec."NPR Block Event Deletion".HasValue)
@@ -62,7 +62,7 @@ pageextension 6014448 "NPR Jobs Setup" extends "Jobs Setup"
 
                     Caption = 'Block Event Deletion';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Block Event Deletion field';
+                    ToolTip = 'Display the Block Event Deletion.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -81,7 +81,7 @@ pageextension 6014448 "NPR Jobs Setup" extends "Jobs Setup"
                     Caption = 'Set Status to Block Event Delete';
                     Image = Setup;
 
-                    ToolTip = 'Executes the Set Status to Block Event Delete action';
+                    ToolTip = 'Open a page in which you can choose between the following options: planning, quote, order, completed, postponed, etc.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
