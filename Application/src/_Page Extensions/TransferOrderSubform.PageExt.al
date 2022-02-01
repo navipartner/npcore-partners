@@ -7,7 +7,7 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
             field("NPR Cross-Reference No."; Rec."NPR Cross-Reference No.")
             {
 
-                ToolTip = 'Specifies the value of the NPR Cross-Reference No. field';
+                ToolTip = 'Specifies the cross-referenced item number. If you enter a cross reference between yours and your vendor''s or customer''s item number, then this number will override the standard item number when you enter the cross-reference number on a sales or purchase document.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -17,7 +17,7 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
             {
 
                 Visible = false;
-                ToolTip = 'Specifies the value of the NPR Vendor Item No. field';
+                ToolTip = 'Specifies the number that the vendor uses for this item.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -26,7 +26,7 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
             field("NPR Description 2"; Rec."Description 2")
             {
 
-                ToolTip = 'Specifies the value of the Description 2 field';
+                ToolTip = 'Specifies the extended description of the entry.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -41,7 +41,7 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
 
-                ToolTip = 'Executes the Variety action';
+                ToolTip = 'View the variety matrix for the item used on transfer order';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

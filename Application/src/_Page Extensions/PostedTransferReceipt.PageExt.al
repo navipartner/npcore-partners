@@ -13,7 +13,7 @@ pageextension 6014466 "NPR Posted Transfer Receipt" extends "Posted Transfer Rec
                 PromotedOnly = true;
                 PromotedCategory = Process;
 
-                ToolTip = 'Executes the Retail Print action';
+                ToolTip = 'Displays the Retail Journal Print page where different labels can be printed';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -33,7 +33,7 @@ pageextension 6014466 "NPR Posted Transfer Receipt" extends "Posted Transfer Rec
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Price Label action';
+                ToolTip = 'Print the Price Label document.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

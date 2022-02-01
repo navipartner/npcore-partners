@@ -17,7 +17,7 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 PromotedOnly = true;
                 PromotedCategory = Process;
 
-                ToolTip = 'Executes the Retail Print action';
+                ToolTip = 'Displays the Retail Journal Print page where different labels can be printed';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -38,7 +38,7 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Promoted = true;
                 PromotedOnly = true;
 
-                ToolTip = 'Executes the Import From Scanner File action';
+                ToolTip = 'Start importing the file from the scanner.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -60,7 +60,7 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 PromotedOnly = true;
                 PromotedCategory = Process;
 
-                ToolTip = 'Executes the &Read from scanner action';
+                ToolTip = 'Enable reading the document from the scanner.';
                 Image = Add;
                 ApplicationArea = NPRRetail;
             }
@@ -78,7 +78,7 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 ShortCutKey = 'Shift+F9';
                 Visible = PostingVisibilityPOS;
 
-                ToolTip = 'Executes the POS Post and &Print action';
+                ToolTip = 'Finalize and prepare to print the document or journal. The values and quantities are posted to the related accounts. A report request window where you can specify what to include on the print-out.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

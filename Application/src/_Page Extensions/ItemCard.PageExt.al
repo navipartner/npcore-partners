@@ -8,7 +8,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             field("NPR Description 2"; Rec."Description 2")
             {
 
-                ToolTip = 'Specifies the value of the Description 2 field';
+                ToolTip = 'Specifies a description extension, should more information be required for the item.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -18,14 +18,14 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             field("NPR Item Status"; Rec."NPR Item Status")
             {
 
-                ToolTip = 'Specifies the value of the NPR Item Status field';
+                ToolTip = 'Specifies the actions allowed for the item.';
                 ApplicationArea = NPRRetail;
             }
 
             field("NPR Item Brand"; Rec."NPR Item Brand")
             {
 
-                ToolTip = 'Specifies the value of the NPR Item Brand field';
+                ToolTip = 'Specifies the make of the item.';
                 ApplicationArea = NPRRetail;
             }
 
@@ -37,7 +37,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             {
 
                 Caption = 'Average Cost ACY';
-                ToolTip = 'Specifies the value of the AverageCostACY field';
+                ToolTip = 'Specifies the cost of one unit of the item or resource on the line.';
                 ApplicationArea = NPRRetail;
                 trigger OnDrillDown()
                 begin
@@ -51,7 +51,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             field("NPR Statistics Group"; Rec."Statistics Group")
             {
 
-                ToolTip = 'Specifies the value of the Statistics Group field';
+                ToolTip = 'Allow the user to specify a statistics group code for statistical reporting purposes.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -61,7 +61,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             field("NPR Explode BOM auto"; Rec."NPR Explode BOM auto")
             {
 
-                ToolTip = 'Specifies the value of the NPR Explode BOM auto field';
+                ToolTip = 'Specifies whether the BOM is expanded to show the individual items on the BOM automatically.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -71,7 +71,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             field("NPR Custom Discount Blocked"; Rec."NPR Custom Discount Blocked")
             {
 
-                ToolTip = 'Specifies the value of the NPR Custom Discount Blocked field';
+                ToolTip = 'Specifies whether the custom discount is blocked for the item.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -81,7 +81,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             field("NPR Inventory Value Zero"; Rec."Inventory Value Zero")
             {
 
-                ToolTip = 'Specifies the value of the Inventory Value Zero field';
+                ToolTip = 'Specifies whether items with no inventory values are allowed.';
                 ApplicationArea = NPRRetail;
             }
 
@@ -92,7 +92,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             field("NPR Group sale"; Rec."NPR Group sale")
             {
 
-                ToolTip = 'Specifies the value of the NPR Group sale field';
+                ToolTip = 'Specifies various items on sale.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -102,13 +102,13 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             field("NPR Unit List Price"; Rec."Unit List Price")
             {
 
-                ToolTip = 'Specifies the value of the Unit List Price field';
+                ToolTip = 'Specifies the price of a single unit of measure for a sold product.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Units per Parcel"; Rec."Units per Parcel")
             {
 
-                ToolTip = 'Specifies the value of the Units per Parcel field';
+                ToolTip = 'Specifies how many units are packed in one parcel.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -121,14 +121,14 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 field("NPR Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ToolTip = 'Specifies the default Global Dimension 1 Code for the item.';
                     ApplicationArea = NPRRetail;
                 }
 
                 field("NPR Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ToolTip = 'Specifies the default Global Dimension 2 Code for the item.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -142,7 +142,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 field("NPR Has Mixed Discount"; Rec."NPR Has Mixed Discount")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Has Mixed Discount field';
+                    ToolTip = 'Specifies whether the item has Mixed Discount lines defined.';
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
@@ -160,7 +160,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 field("NPR Has Quantity Discount"; Rec."NPR Has Quantity Discount")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Has Quantity Discount field';
+                    ToolTip = 'Specifies whether the item has Quantity Discount lines defined.';
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
@@ -178,7 +178,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 field("NPR Has Period Discount"; Rec."NPR Has Period Discount")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Has Period Discount field';
+                    ToolTip = 'Specifies whether the item has Period Discount lines defined.';
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
@@ -204,67 +204,67 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 field("NPR Has Variants"; Rec."NPR Has Variants")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Has Variants field';
+                    ToolTip = 'Specifies whether the item has Variant lines defined.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety Group"; Rec."NPR Variety Group")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Variety Group field';
+                    ToolTip = 'Specifies the value of the Variety Group.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 1"; Rec."NPR Variety 1")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Variety 1 field';
+                    ToolTip = 'Specifies the value of the Variety 1.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 1 Table"; Rec."NPR Variety 1 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Variety 1 Table field';
+                    ToolTip = 'Specifies the value to be used for the Variety 1.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 2"; Rec."NPR Variety 2")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Variety 2 field';
+                    ToolTip = 'Specifies the value of the Variety 2.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 2 Table"; Rec."NPR Variety 2 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Variety 2 Table field';
+                    ToolTip = 'Specifies the value to be used for the Variety 2.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 3"; Rec."NPR Variety 3")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Variety 3 field';
+                    ToolTip = 'Specifies the value of the Variety 3.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 3 Table"; Rec."NPR Variety 3 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Variety 3 Table field';
+                    ToolTip = 'Specifies the value to be used for the Variety 3.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 4"; Rec."NPR Variety 4")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Variety 4 field';
+                    ToolTip = 'Specifies the value of the Variety 4.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 4 Table"; Rec."NPR Variety 4 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Variety 4 Table field';
+                    ToolTip = 'Specifies the value to be used for the Variety 4';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Cross Variety No."; Rec."NPR Cross Variety No.")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Cross Variety No. field';
+                    ToolTip = 'Specifies the default cross value to be used on the Variety Matrix.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -277,13 +277,13 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     field("NPR Item AddOn No."; Rec."NPR Item AddOn No.")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Item AddOn No. field';
+                        ToolTip = 'Allows the user to link additional items.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR NPRE Item Routing Profile"; Rec."NPR NPRE Item Routing Profile")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR NPRE Item Routing Profile field';
+                        ToolTip = 'Specifies the NPRE Item Routing Profile.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -295,25 +295,25 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     field("NPR Guarantee voucher"; Rec."NPR Guarantee voucher")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Guarantee voucher field';
+                        ToolTip = 'Specifies if the voucher type will be Guarantee.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR No Print on Reciept"; Rec."NPR No Print on Reciept")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR No Print on Reciept field';
+                        ToolTip = 'Specifies if the No is printed on the receipt.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Ticket Type"; Rec."NPR Ticket Type")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Ticket Type field';
+                        ToolTip = 'Specifies the ticket type that will be used with the item.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Print Tags"; Rec."NPR Print Tags")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Print Tags field';
+                        ToolTip = 'Specifies the item print tags.';
                         ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         var
@@ -342,7 +342,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
 
                         Importance = Promoted;
-                        ToolTip = 'Specifies the value of the NPR Magento Item field';
+                        ToolTip = 'Specifies if the item will also be used as a Magento Item.';
                         ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         begin
@@ -353,13 +353,13 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
 
                         Importance = Promoted;
-                        ToolTip = 'Specifies the value of the NPR Magento Status field';
+                        ToolTip = 'Specifies if the item is active or not as a Magento Item.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Magento Name"; Rec."NPR Magento Name")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Magento Name field';
+                        ToolTip = 'Specifies the item Magento Name.';
                         ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         begin
@@ -370,7 +370,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
 
                         Caption = 'Magento Description';
-                        ToolTip = 'Specifies the value of the Magento Description field';
+                        ToolTip = 'Specifies the item Magento Description.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
@@ -396,7 +396,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
 
                         Caption = 'Magento Short Description';
-                        ToolTip = 'Specifies the value of the Magento Short Description field';
+                        ToolTip = 'Specifies the item Magento Short Description.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
@@ -422,68 +422,67 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
 
                         Visible = MagentoEnabledBrand;
-                        ToolTip = 'Specifies the value of the NPR Magento Brand field';
+                        ToolTip = 'Specifies the item Magento Brand.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR MagentoUnitPrice"; Rec."Unit Price")
                     {
 
                         Importance = Promoted;
-                        ToolTip = 'Specifies the value of the Unit Price field';
+                        ToolTip = 'Specifies the Magento''s item Unit Price.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Product New From"; Rec."NPR Product New From")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Product New From field';
+                        ToolTip = 'Specifies the start date for the item to be tagged as New Product.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Product New To"; Rec."NPR Product New To")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Product New To field';
+                        ToolTip = 'Specifies the end date for the item to be tagged as New Product.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Featured From"; Rec."NPR Featured From")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Featured From field';
+                        ToolTip = 'Specifies the start date for the item to be tagged as Featured.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Featured To"; Rec."NPR Featured To")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Featured To field';
+                        ToolTip = 'Specifies the end date for the item to be tagged as Featured.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Special Price"; Rec."NPR Special Price")
                     {
 
                         Visible = MagentoEnabledSpecialPrices;
-                        ToolTip = 'Specifies the value of the NPR Special Price field';
+                        ToolTip = 'Specifies the Special Price for the Item to be displayed on the Webshop.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Special Price From"; Rec."NPR Special Price From")
                     {
 
                         Visible = MagentoEnabledSpecialPrices;
-                        ToolTip = 'Specifies the value of the NPR Special Price From field';
+                        ToolTip = 'Specifies the start date for the item to apply the special price.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Special Price To"; Rec."NPR Special Price To")
                     {
 
                         Visible = MagentoEnabledSpecialPrices;
-                        ToolTip = 'Specifies the value of the NPR Special Price To field';
+                        ToolTip = 'Specifies the end date for the item to apply the special price.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Custom Options"; Rec."NPR Custom Options")
                     {
 
                         Visible = MagentoEnabledCustomOptions;
-                        ToolTip = 'Specifies the value of the NPR Custom Options field';
+                        ToolTip = 'Shows custom options when Magento is enabled.';
                         ApplicationArea = NPRRetail;
-
                         trigger OnAssistEdit()
                         var
                             MagentoItemCustomOptions: Page "NPR Magento Item Cstm Options";
@@ -496,37 +495,37 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     field("NPR Backorder"; Rec."NPR Backorder")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Backorder field';
+                        ToolTip = 'Specifies whether to allow back order when processing sales order.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Display Only"; Rec."NPR Display Only")
                     {
 
-                        ToolTip = 'test';
+                        ToolTip = 'Specifies if the item is for Display Only.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Display only Text"; Rec."NPR Display only Text")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Display only Text field';
+                        ToolTip = 'Specifies the Display Only Text.';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Seo Link"; Rec."NPR Seo Link")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Seo Link field';
+                        ToolTip = 'Specifies the value of the Seo Link field';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Meta Title"; Rec."NPR Meta Title")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Meta Title field';
+                        ToolTip = 'Specifies the value of the Meta Title field';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Meta Description"; Rec."NPR Meta Description")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Meta Description field';
+                        ToolTip = 'Specifies the value of the Meta Description field';
                         ApplicationArea = NPRRetail;
                     }
                     field("NPR Attribute Set ID"; Rec."NPR Attribute Set ID")
@@ -535,7 +534,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         AssistEdit = true;
                         Editable = NOT Rec."NPR Magento Item";
                         Visible = MagentoEnabledAttributeSet;
-                        ToolTip = 'Specifies the value of the NPR Attribute Set ID field';
+                        ToolTip = 'Specifies the attribute to be assigned to the Magento item.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
@@ -557,7 +556,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     field("NPR Magento Picture Variety Type"; Rec."NPR Magento Pict. Variety Type")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Magento Pict. Variety Type field';
+                        ToolTip = 'Specifies how the Magento picture is related to the variety e.g. color, size.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -587,7 +586,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
+                    ToolTip = 'Specifies the item attribute value.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -601,7 +600,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
+                    ToolTip = 'Specifies the item attribute value.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -615,7 +614,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
+                    ToolTip = 'Specifies the item attribute value.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -629,7 +628,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
+                    ToolTip = 'Specifies the item attribute value.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -643,7 +642,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
+                    ToolTip = 'Specifies the item attribute value.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -657,7 +656,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     CaptionClass = '6014555,27,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
+                    ToolTip = 'Specifies the item attributes value.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -671,7 +670,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     CaptionClass = '6014555,27,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
+                    ToolTip = 'Specifies the item attributes value.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -685,7 +684,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     CaptionClass = '6014555,27,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
+                    ToolTip = 'Specifies the item attributes value.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -699,7 +698,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     CaptionClass = '6014555,27,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
+                    ToolTip = 'Specifies the item attributes value.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -713,7 +712,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     CaptionClass = '6014555,27,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
+                    ToolTip = 'Specifies the item attributes value.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -760,12 +759,12 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             PromotedOnly = true;
             PromotedCategory = Process;
         }
-        #if BC17
+#if BC17
         modify("Cross Re&ferences")
         {
             Visible = not ItemReferenceVisible;
         }
-        #endif
+#endif
         addafter("Va&riants")
         {
             action("NPR NPR_VarietyMatrix")
@@ -774,7 +773,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 Image = ItemAvailability;
                 ShortCutKey = 'Ctrl+Alt+v';
 
-                ToolTip = 'Executes the Variety Matrix action';
+                ToolTip = 'Executes the display Variety Matrix action. View or edit varieties for the item/';
                 ApplicationArea = NPRRetail;
             }
             action("NPR AttributeValues")
@@ -782,7 +781,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 Caption = 'All Attributes Values';
                 Image = ShowList;
 
-                ToolTip = 'Executes the All Attributes Values action';
+                ToolTip = 'View or edit all the attributes attached to this item.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -800,7 +799,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 Caption = 'POS Sales Entries';
                 Image = Entries;
 
-                ToolTip = 'Executes the POS Sales Entries action';
+                ToolTip = 'View all the POS entries for this item.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -823,7 +822,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 PromotedCategory = Process;
                 RunObject = Page 6014402;
 
-                ToolTip = 'Executes the Retail Item Journal action';
+                ToolTip = 'Open a list of retail journals where you can the physical of retail items on inventory.';
                 ApplicationArea = NPRRetail;
             }
 
@@ -836,7 +835,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 PromotedCategory = Process;
                 RunObject = Page 6014403;
 
-                ToolTip = 'Executes the Retail Item Reclassification Journal action';
+                ToolTip = 'Change information on item ledger entries, such as dimensions, location codes, bin codes, and serial or lot number.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -853,7 +852,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Caption = 'Transfer to Retail Journal';
                     Image = TransferToGeneralJournal;
 
-                    ToolTip = 'Executes the Transfer to Retail Journal action';
+                    ToolTip = 'Allows user to create a Retail Journal Transfer.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -907,7 +906,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Image = BinLedger;
                     ShortcutKey = 'Ctrl+Alt+L';
 
-                    ToolTip = 'Executes the Price Label action';
+                    ToolTip = 'Allows user to print Price Label for the item.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -936,7 +935,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Image = ItemVariant;
                     ShortCutKey = 'Ctrl+Alt+I';
 
-                    ToolTip = 'Executes the Variety Matrix action';
+                    ToolTip = 'Executes the display Variety Matrix action.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -955,7 +954,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     PromotedCategory = Category5;
                     Image = ItemVariant;
 
-                    ToolTip = 'Executes the Variety Maintenance action';
+                    ToolTip = 'Execute the display Variety Maintenance action. Allows you to view and edit variety for the item.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -1009,7 +1008,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Caption = 'Accessories';
                     Image = Allocations;
 
-                    ToolTip = 'Executes the Accessories action';
+                    ToolTip = 'Executes the Accessories action. Allows you to link other items to the item.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -1034,7 +1033,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     RunObject = Page 6150643;
                     RunPageLink = "Table ID" = const(27), "Primary Key" = field("No.");
 
-                    ToolTip = 'Executes the POS Info action';
+                    ToolTip = 'Executes the POS Info action. Allows you to link a POS info code with the item.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -1054,7 +1053,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     RunPageLink = "Item No." = field("No.");
                     RunPageMode = Edit;
 
-                    ToolTip = 'Executes the Multiple Unit Prices action';
+                    ToolTip = 'Setup different unit prices for the item. An item price is automatically granted on the invoice line when the specified criteria are such as quantity are met.';
                     ApplicationArea = NPRRetail;
                 }
                 action("NPR PeriodDiscount")
@@ -1065,7 +1064,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     PromotedCategory = Category6;
                     ShortCutKey = 'Ctrl+P';
 
-                    ToolTip = 'Executes the Period Discount action';
+                    ToolTip = 'View all period discount specified for this item.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -1090,7 +1089,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     PromotedCategory = Category6;
                     ShortcutKey = 'Ctrl+F';
 
-                    ToolTip = 'Executes the Mix Discount action';
+                    ToolTip = 'View all mix discount specified for this item.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -1125,7 +1124,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Visible = MagentoEnabled;
                     Image = Picture;
 
-                    ToolTip = 'Executes the Pictures action';
+                    ToolTip = 'Allows you to assign a picture to the item. You can either take a picture or import it.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

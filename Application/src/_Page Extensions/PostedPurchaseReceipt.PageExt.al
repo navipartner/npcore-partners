@@ -13,7 +13,7 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 PromotedOnly = true;
                 PromotedCategory = Process;
 
-                ToolTip = 'Executes the Retail Print action';
+                ToolTip = 'Displays the Retail Journal Print page where different labels can be printed.';
                 ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var

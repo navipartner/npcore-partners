@@ -11,19 +11,19 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                 {
 
                     ExtendedDatatype = Masked;
-                    ToolTip = 'Specifies the value of the NPR Register Password field';
+                    ToolTip = 'Enable defining a password for accessing a POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Supervisor POS"; Rec."NPR Supervisor POS")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Supervisor POS field';
+                    ToolTip = 'Enable specifying if the salesperson will be tagged as the Supervisor.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Locked-to Register No."; Rec."NPR Locked-to Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Locked-to Register No. field';
+                    ToolTip = 'Enable assigning the salesperson to a specific POS unit.';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -32,7 +32,7 @@ pageextension 6014408 "NPR Purch.Return Order Subform" extends "Purchase Return 
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = NPRRetail;
-                ToolTip = 'Executes the Variety action';
+                ToolTip = 'View the variety matrix for the item used on the Purchase Order Line.';
 
                 trigger OnAction()
                 var

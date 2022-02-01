@@ -10,7 +10,7 @@ pageextension 6014488 "NPR Sales Quote Subform" extends "Sales Quote Subform"
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
 
-                ToolTip = 'Executes the Variety action';
+                ToolTip = 'View the variety matrix for the item used on the Sales Quote Line.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
