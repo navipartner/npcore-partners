@@ -16,28 +16,28 @@
             {
                 field("Service Code"; Rec."Service Code")
                 {
-                    ToolTip = 'Specifies the Service Code';
+                    ToolTip = 'Specifies the Replication Service Code';
                     ApplicationArea = NPRRetail;
                     Editable = Not FieldsNonEditable;
                 }
 
                 field("EndPoint ID"; Rec."EndPoint ID")
                 {
-                    ToolTip = 'Specifies the EndPoint ID.';
+                    ToolTip = 'Specifies the Replication EndPoint ID.';
                     ApplicationArea = NPRRetail;
                     Editable = Not FieldsNonEditable;
                 }
 
                 field("Table ID"; Rec."Table ID")
                 {
-                    ToolTip = 'Specifies Table ID.';
+                    ToolTip = 'Specifies the Table ID.';
                     ApplicationArea = NPRRetail;
                     Editable = Not FieldsNonEditable;
                 }
 
                 field("Field ID"; Rec."Field ID")
                 {
-                    ToolTip = 'Specifies Field ID.';
+                    ToolTip = 'Specifies the Field ID.';
                     ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -58,31 +58,31 @@
 
                 field("Field Name"; Rec."Field Name")
                 {
-                    ToolTip = 'Specifies Field Name.';
+                    ToolTip = 'Specifies the table Field name.';
                     ApplicationArea = NPRRetail;
                 }
 
                 field("API Field Name"; Rec."API Field Name")
                 {
-                    ToolTip = 'Specifies API Field Name.';
+                    ToolTip = 'Specifies the API field name.';
                     ApplicationArea = NPRRetail;
                 }
 
                 field("With Validation"; Rec."With Validation")
                 {
-                    ToolTip = 'Specifies With Validation.';
+                    ToolTip = 'Specifies if the Validate trigger should be executed when a new value is assigned to the field.';
                     ApplicationArea = NPRRetail;
                 }
 
                 field("Skip"; Rec.Skip)
                 {
-                    ToolTip = 'Specifies Skip.';
+                    ToolTip = 'Specifies if any changes of the field value should be skipped.';
                     ApplicationArea = NPRRetail;
                 }
 
                 field(Priority; Rec.Priority)
                 {
-                    ToolTip = 'Specifies Priority.';
+                    ToolTip = 'Specifies the priority of the special field mapping.';
                     ApplicationArea = NPRRetail;
                 }
 

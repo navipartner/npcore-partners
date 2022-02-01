@@ -1,4 +1,4 @@
-﻿page 6014649 "NPR APIV1 - Cust Disc. Group"
+page 6014649 "NPR APIV1 - Cust Disc. Group"
 {
     Extensible = False;
 
@@ -21,19 +21,19 @@
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'SystemId';
+                    Caption = 'SystemId', Locked = true;
                 }
                 field("code"; Rec."Code")
                 {
-                    Caption = 'Code';
+                    Caption = 'Code', Locked = true;
                 }
                 field(description; Rec.Description)
                 {
-                    Caption = 'Description';
+                    Caption = 'Description', Locked = true;
                 }
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
-                    Caption = 'Last Modified DateTime';
+                    Caption = 'Last Modified DateTime', Locked = true;
                 }
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {

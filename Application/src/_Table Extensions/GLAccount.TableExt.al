@@ -56,6 +56,7 @@ tableextension 6014419 "NPR G/L Account" extends "G/L Account"
             FieldClass = FlowField;
             CalcFormula = lookup("NPR Aux. G/L Account"."Retail Payment" where("No." = field("No.")));
         }
+
     }
 
     trigger OnBeforeDelete()

@@ -1,4 +1,4 @@
-﻿page 6059775 "NPR APIV1 - External POS Sale"
+page 6059775 "NPR APIV1 - External POS Sale"
 {
     Extensible = False;
 
@@ -21,72 +21,72 @@
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'SystemId';
+                    Caption = 'SystemId', Locked = true;
                 }
                 field(entryNo; Rec."Entry No.")
                 {
-                    Caption = 'Entry No.';
+                    Caption = 'Entry No.', Locked = true;
                     Editable = false;
                 }
                 field(startTime; Rec."Start Time")
                 {
-                    Caption = 'Start Time';
+                    Caption = 'Start Time', Locked = true;
                 }
                 field("date"; Rec."Date")
                 {
-                    Caption = 'Date';
+                    Caption = 'Date', Locked = true;
                 }
                 field(registerNo; Rec."Register No.")
                 {
-                    Caption = 'POS Unit No.';
+                    Caption = 'POS Unit No.', Locked = true;
                 }
 
                 field(salesTicketNo; Rec."Sales Ticket No.")
                 {
-                    Caption = 'Sales Ticket No.';
+                    Caption = 'Sales Ticket No.', Locked = true;
                 }
                 field(salespersonCode; Rec."Salesperson Code")
                 {
-                    Caption = 'Salesperson Code';
+                    Caption = 'Salesperson Code', Locked = true;
                 }
                 field(posStoreCode; Rec."POS Store Code")
                 {
-                    Caption = 'POS Store Code';
+                    Caption = 'POS Store Code', Locked = true;
                 }
 
                 field(customerNo; Rec."Customer No.")
                 {
-                    Caption = 'Customer No.';
+                    Caption = 'Customer No.', Locked = true;
                 }
 
                 field(pricesIncludingVAT; Rec."Prices Including VAT")
                 {
-                    Caption = 'Prices Including VAT';
+                    Caption = 'Prices Including VAT', Locked = true;
                 }
                 field(eventNo; Rec."Event No.")
                 {
-                    Caption = 'Event No.';
+                    Caption = 'Event No.', Locked = true;
                 }
                 field(externalDocumentNo; Rec."External Document No.")
                 {
-                    Caption = 'External Document No.';
+                    Caption = 'External Document No.', Locked = true;
                 }
                 field(reference; Rec.Reference)
                 {
-                    Caption = 'Reference';
+                    Caption = 'Reference', Locked = true;
                 }
                 field(convertedToPOSEntry; Rec."Converted To POS Entry")
                 {
-                    Caption = 'Converted To POS Entry';
+                    Caption = 'Converted To POS Entry', Locked = true;
                 }
                 field(posEntrySystemId; Rec."POS Entry System Id")
                 {
-                    Caption = 'POS Entry System Id';
+                    Caption = 'POS Entry System Id', Locked = true;
                 }
 
                 part(externalPosSaleLines; "NPR APIV1 - Ext. POS Sale Line")
                 {
-                    Caption = 'External Pos Sale Lines';
+                    Caption = 'External Pos Sale Lines', Locked = true;
                     EntityName = 'externalPosSaleLine';
                     EntitySetName = 'externalPosSaleLines';
                     SubPageLink = "External POS Sale Entry No." = field("Entry No.");

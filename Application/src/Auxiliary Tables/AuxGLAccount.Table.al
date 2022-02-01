@@ -28,6 +28,11 @@
                 end;
             end;
         }
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -35,6 +40,9 @@
         key(Key1; "No.")
         {
             Clustered = true;
+        }
+        key(Key2; "Replication Counter")
+        {
         }
     }
 }

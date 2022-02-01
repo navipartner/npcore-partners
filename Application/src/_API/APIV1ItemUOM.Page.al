@@ -21,53 +21,53 @@ page 6014521 "NPR APIV1 - Item UOM"
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
                     Editable = false;
                 }
 
                 field(itemNumber; Rec."Item No.")
                 {
-                    Caption = 'Item No.';
+                    Caption = 'Item No.', Locked = true;
                 }
 
                 field("code"; Rec.Code)
                 {
-                    Caption = 'Code';
+                    Caption = 'Code', Locked = true;
                 }
 
                 field(qtyperUnitofMeasure; Rec."Qty. per Unit of Measure")
                 {
-                    Caption = 'Qty. per Unit of Measure';
+                    Caption = 'Qty. per Unit of Measure', Locked = true;
                 }
 
                 field(length; Rec.Length)
                 {
-                    Caption = 'Length';
+                    Caption = 'Length', Locked = true;
                 }
 
                 field(width; Rec.Width)
                 {
-                    Caption = 'Width';
+                    Caption = 'Width', Locked = true;
                 }
 
                 field(height; Rec.Height)
                 {
-                    Caption = 'Height';
+                    Caption = 'Height', Locked = true;
                 }
 
                 field(cubage; Rec.Cubage)
                 {
-                    Caption = 'Cubage';
+                    Caption = 'Cubage', Locked = true;
                 }
 
                 field(weight; Rec.Weight)
                 {
-                    Caption = 'Weight';
+                    Caption = 'Weight', Locked = true;
                 }
 
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
-                    Caption = 'Last Modified Date';
+                    Caption = 'Last Modified Date', Locked = true;
                     Editable = false;
                 }
 
