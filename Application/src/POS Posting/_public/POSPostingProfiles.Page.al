@@ -1,6 +1,5 @@
 ﻿page 6150638 "NPR POS Posting Profiles"
 {
-    Extensible = False;
     Caption = 'POS Posting Profiles';
     CardPageID = "NPR POS Post. Profile Card";
     Editable = false;
