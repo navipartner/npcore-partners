@@ -523,6 +523,14 @@
                     ToolTip = 'Open the SMS setup page';
                     ApplicationArea = NPRRetail;
                 }
+                action("Global POS Sales Setups")
+                {
+                    Caption = 'Global POS Sales Setups';
+                    RunObject = page "NPR NpGp Global POSSalesSetups";
+
+                    ToolTip = 'Open the Global POS Sales Setups page';
+                    ApplicationArea = NPRRetail;
+                }
 
             }
 
