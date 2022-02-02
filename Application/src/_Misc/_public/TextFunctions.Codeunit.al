@@ -1,6 +1,5 @@
 ﻿codeunit 6014604 "NPR Text Functions"
 {
-    Access = Internal;
 #IF BC17
     procedure Camelize(InputString: Text): Text
     var

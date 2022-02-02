@@ -1,7 +1,6 @@
 ﻿#if not BC17
 codeunit 6014528 "NPR Barcode Font Provider Mgt."
 {
-    Access = Internal;
     var
 
         BarcodeFontProvider: Interface "Barcode Font Provider";

@@ -1,6 +1,5 @@
 ﻿page 6014497 "NPR Retail Journal List"
 {
-    Extensible = False;
     Caption = 'Retail Journal List';
     CardPageID = "NPR Retail Journal Header";
     Editable = false;
@@ -8,7 +7,6 @@
     SourceTable = "NPR Retail Journal Header";
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
-
 
     layout
     {

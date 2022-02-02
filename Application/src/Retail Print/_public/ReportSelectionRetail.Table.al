@@ -1,6 +1,5 @@
 ﻿table 6014404 "NPR Report Selection Retail"
 {
-    Access = Internal;
     Caption = 'Usage - Retail';
     DataClassification = CustomerContent;
 

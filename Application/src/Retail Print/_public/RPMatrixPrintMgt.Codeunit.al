@@ -1,6 +1,5 @@
 ﻿codeunit 6014547 "NPR RP Matrix Print Mgt."
 {
-    Access = Internal;
     // Matrix Print Mgt.
     //  Work started by Nicolai Esbensen.
     // 

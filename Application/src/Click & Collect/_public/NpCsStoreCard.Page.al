@@ -1,6 +1,5 @@
 ﻿page 6151196 "NPR NpCs Store Card"
 {
-    Extensible = False;
     Caption = 'Collect Store Card';
     PageType = Card;
     UsageCategory = None;
