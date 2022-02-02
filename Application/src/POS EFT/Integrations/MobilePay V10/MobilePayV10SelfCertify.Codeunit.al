@@ -114,8 +114,19 @@
         QueryPayment(EftSetup, eftTrxRequest);
         Commit();
 
-        //MobilePayV10UnitSetup.Delete();
-        //EftSetup.Delete();
+        WaitBetweenSteps();
+
+        // Case 5: Capture full amount or cancel payment when partial capture is not possible
+        InitPayment(EftSetup, eftTrxRequest);
+        Commit();
+
+        QueryPayment(EftSetup, eftTrxRequest);
+        Commit();
+
+        CapturePayment(EftSetup, eftTrxRequest);
+        Commit();
+
+        WaitBetweenSteps();
 
         UnBindSubscription(MobilePayV10SelfCert);   // Not needed but for sanity reasons.
 
@@ -205,8 +216,25 @@
         mobilePayV10Integration.DeletePOS(EftSetup, MobilePayV10UnitSetup);
     end;
 
+    local procedure CreatePosUnit()
+    var
+        posUnit: Record "NPR POS Unit";
+        posUnitNo: Code[10];
+    begin
+        posUnitNo := GetSelfCertMerchangPosId();
+        if (posUnit.Get(posUnitNo)) then begin
+            exit;
+        end;
+
+        posUnit.FindFirst();
+        posUnit."No." := posUnitNo;
+        posUnit.Insert(true);
+    end;
+
     local procedure CreateEftSetup(var EftSetup: Record "NPR EFT Setup")
     begin
+        CreatePosUnit();
+
         if EftSetup.GET(GetSelfCertPosPaymentType(), GetSelfCertMerchangPosId()) then
             exit;
 
@@ -359,7 +387,7 @@
     begin
         EftTrxRequest.Init();
         EftTrxRequest."Entry No." := 0;
-        EftTrxRequest.Insert();
+        EftTrxRequest.Insert(true);
         eftTrxRequest."Register No." := EftSetup."POS Unit No.";
         EftTrxRequest."Original POS Payment Type Code" := EftSetup."Payment Type POS";
         EftTrxRequest."Reference Number Input" := Format(EftTrxRequest."Entry No.");
@@ -374,7 +402,7 @@
     begin
         EftTrxRequest.Init();
         EftTrxRequest."Entry No." := 0;
-        EftTrxRequest.Insert();
+        EftTrxRequest.Insert(true);
         eftTrxRequest."Register No." := EftSetup."POS Unit No.";
         EftTrxRequest."Original POS Payment Type Code" := EftSetup."Payment Type POS";
         EftTrxRequest."Reference Number Input" := Format(EftTrxRequest."Entry No.");
@@ -390,7 +418,7 @@
     begin
         EftTrxRequest.Init();
         EftTrxRequest."Entry No." := 0;
-        EftTrxRequest.Insert();
+        EftTrxRequest.Insert(true);
         eftTrxRequest."Register No." := EftSetup."POS Unit No.";
         EftTrxRequest."Original POS Payment Type Code" := EftSetup."Payment Type POS";
         EftTrxRequest."Reference Number Input" := Format(EftTrxRequest."Entry No.");
