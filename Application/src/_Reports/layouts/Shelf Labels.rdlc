@@ -476,8 +476,8 @@ End Function
         <Field Name="Barcode_TMPRetailJournalLineCol1">
           <DataField>Barcode_TMPRetailJournalLineCol1</DataField>
         </Field>
-        <Field Name="Itemgroup_TMPRetailJournalLineCol1">
-          <DataField>Itemgroup_TMPRetailJournalLineCol1</DataField>
+        <Field Name="ItemCategory_TMPRetailJournalLineCol1">
+          <DataField>ItemCategory_TMPRetailJournalLineCol1</DataField>
         </Field>
         <Field Name="BarCodeTempBlobCol1">
           <DataField>BarCodeTempBlobCol1</DataField>
@@ -488,8 +488,8 @@ End Function
         <Field Name="NewItemNo_TMPRetailJournalLineCol1">
           <DataField>NewItemNo_TMPRetailJournalLineCol1</DataField>
         </Field>
-        <Field Name="TMPItemGroup">
-          <DataField>TMPItemGroup</DataField>
+        <Field Name="TMPItemCategory">
+          <DataField>TMPItemCategory</DataField>
         </Field>
         <Field Name="BeforeCaption">
           <DataField>BeforeCaption</DataField>

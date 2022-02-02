@@ -1,11 +1,11 @@
-﻿report 6014449 "NPR Vendor trx by Item group"
+report 6014449 "NPR Vendor Trn. by Item Cat."
 {
     #IF NOT BC17 
     Extensible = False; 
     #ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Vendor trn. by Item group.rdlc';
-    Caption = 'Vendor Trn. By Item Group';
+    RDLCLayout = './src/_Reports/layouts/Vendor trn. by Item Cat.rdlc';
+    Caption = 'Vendor Trn. By Item Category';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
@@ -230,9 +230,9 @@
                 {
                     field("visuden salg"; visudensalg)
                     {
-                        Caption = 'Display Item Groups With No Sales';
+                        Caption = 'Display Item Category With No Sales';
 
-                        ToolTip = 'Specifies the value of the Display Item Groups With No Sales field';
+                        ToolTip = 'Specifies the value of the Display Item Category With No Sales field';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -243,12 +243,12 @@
 
     labels
     {
-        Report_Caption = 'Itemgroup/Supplier';
+        Report_Caption = 'Item Category/Supplier';
         Period_Caption = 'Period:';
-        ItemGroupFilter_Caption = 'Item Group Filter:';
+        ItemCategoryFilter_Caption = 'Item Category Filter:';
         DeptFilter_Caption = 'Departmentfilter:';
         SupplierFilter_Caption = 'Supplier Filter:';
-        ItemGroup_Caption = 'Itemgroup';
+        ItemCategory_Caption = 'Item Category';
         Supplier_Caption = 'Supplier';
         Description_Caption = 'Description';
         Purchases_Caption = 'Purchases';

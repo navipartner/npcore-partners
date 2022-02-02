@@ -1,11 +1,11 @@
-﻿report 6014435 "NPR Vendor/Item Group"
+report 6014435 "NPR Vendor/Item Category"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/VendorItem Group.rdlc';
-    Caption = 'Vendor/Item Group';
+    RDLCLayout = './src/_Reports/layouts/VendorItem Cat.rdlc';
+    Caption = 'Vendor/Item Category';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
@@ -17,7 +17,7 @@
             CalcFields = "NPR COGS (LCY)", "NPR Sales (LCY)", "Purchases (LCY)";
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Date Filter", "Global Dimension 1 Filter", "NPR Item Category Filter";
-            column(ItemGroupFilters; "Item Category".GetFilters)
+            column(ItemCategoryFilters; "Item Category".GetFilters)
             {
             }
             column(VendorFilters; GetFilters)
@@ -64,49 +64,49 @@
                 CalcFields = "NPR Sales (LCY)", "NPR Consumption (Amount)", "NPR Sales (Qty.)", "NPR Purchases (LCY)";
                 DataItemLink = "NPR Vendor Filter" = FIELD("No."), "NPR Date Filter" = FIELD("Date Filter"), "NPR Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter");
                 DataItemTableView = SORTING("Code");
-                column(No_ItemGroup; "Code")
+                column(No_ItemCategory; "Code")
                 {
                 }
-                column(Description_ItemGroup; Description)
+                column(Description_ItemCategory; Description)
                 {
                 }
-                column(SaleLCY_ItemGroup; "NPR Sales (LCY)")
+                column(SaleLCY_ItemCategory; "NPR Sales (LCY)")
                 {
                 }
-                column(PurchaseLCY_ItemGroup; "NPR Purchases (LCY)")
+                column(PurchaseLCY_ItemCategory; "NPR Purchases (LCY)")
                 {
                 }
-                column(PurchaseQty_ItemGroup; "NPR Purchases (Qty.)")
+                column(PurchaseQty_ItemCategory; "NPR Purchases (Qty.)")
                 {
                 }
                 column(pctoms; Pctoms)
                 {
                 }
-                column(SalesQty_ItemGroup; "NPR Sales (Qty.)")
+                column(SalesQty_ItemCategory; "NPR Sales (Qty.)")
                 {
                 }
-                column(CR_ItemGroup; "NPR Sales (LCY)" - "NPR Consumption (Amount)")
+                column(CR_ItemCategory; "NPR Sales (LCY)" - "NPR Consumption (Amount)")
                 {
                 }
-                column(dg_ItemGroup; DG)
+                column(dg_ItemCategory; DG)
                 {
                 }
-                column(AmtLY_ItemGroup; Antalsidsteaar)
+                column(AmtLY_ItemCategory; Antalsidsteaar)
                 {
                 }
-                column(TurnoverLY_ItemGroup; Omsaetningsidsteaar)
+                column(TurnoverLY_ItemCategory; Omsaetningsidsteaar)
                 {
                 }
-                column(sortervaregruppe_ItemGroup; Sortervaregruppe)
+                column(sortervaregruppe_ItemCategory; Sortervaregruppe)
                 {
                 }
-                column(viskunhovedtal_ItemGroup; Viskunhovedtal)
+                column(viskunhovedtal_ItemCategory; Viskunhovedtal)
                 {
                 }
-                column(SaleLCYLY_ItemGroup; Varegrupperec."NPR Sales (LCY)")
+                column(SaleLCYLY_ItemCategory; Varegrupperec."NPR Sales (LCY)")
                 {
                 }
-                column(PctaendringItemGroup; PctaendringItemGroup)
+                column(PctaendringItemCategory; PctaendringItemCategory)
                 {
                 }
 
@@ -177,9 +177,9 @@
                     SumCost += "NPR Consumption (Amount)";
 
                     if Varegrupperec."NPR Sales (LCY)" <> 0 then
-                        PctaendringItemGroup := (("NPR Sales (LCY)" - Varegrupperec."NPR Sales (LCY)") / (Varegrupperec."NPR Sales (LCY)")) * 100
+                        PctaendringItemCategory := (("NPR Sales (LCY)" - Varegrupperec."NPR Sales (LCY)") / (Varegrupperec."NPR Sales (LCY)")) * 100
                     else
-                        Clear(PctaendringItemGroup);
+                        Clear(PctaendringItemCategory);
                 end;
 
                 trigger OnPreDataItem()
@@ -231,7 +231,7 @@
                 column(VendorPctoms; VendorPctoms)
                 {
                 }
-                column(SumPctaendringItemGroup; SumPctaendringItemGroup)
+                column(SumPctaendringItemCategory; SumPctaendringItemCategory)
                 {
                 }
                 column(CRSumPct; CRSumPct)
@@ -259,9 +259,9 @@
                     TotalCost += SumCost;
 
                     if TurnoverLYSum <> 0 then
-                        SumPctaendringItemGroup := ((SaleLCYSum - TurnoverLYSum) / (TurnoverLYSum)) * 100
+                        SumPctaendringItemCategory := ((SaleLCYSum - TurnoverLYSum) / (TurnoverLYSum)) * 100
                     else
-                        Clear(SumPctaendringItemGroup);
+                        Clear(SumPctaendringItemCategory);
                     VendorPctoms := (SaleLCYSum / Vendor."NPR Sales (LCY)") * 100;
                 end;
             }
@@ -271,40 +271,40 @@
                 column(Number_Integer; Integer.Number)
                 {
                 }
-                column(No_ItemGroup2; "Item Category"."Code")
+                column(No_ItemCategory2; "Item Category"."Code")
                 {
                 }
-                column(Description_ItemGroup2; "Item Category".Description)
+                column(Description_ItemCategory2; "Item Category".Description)
                 {
                 }
-                column(SaleLCY_ItemGroup2; "Item Category"."NPR Sales (LCY)")
+                column(SaleLCY_ItemCategory2; "Item Category"."NPR Sales (LCY)")
                 {
                 }
-                column(PurchaseLCY_ItemGroup2; "Item Category"."NPR Purchases (LCY)")
+                column(PurchaseLCY_ItemCategory2; "Item Category"."NPR Purchases (LCY)")
                 {
                 }
-                column(SalesQty_ItemGroup2; "Item Category"."NPR Sales (Qty.)")
+                column(SalesQty_ItemCategory2; "Item Category"."NPR Sales (Qty.)")
                 {
                 }
-                column(CR_ItemGroup2; "Item Category"."NPR Sales (LCY)" - "Item Category"."NPR Consumption (Amount)")
+                column(CR_ItemCategory2; "Item Category"."NPR Sales (LCY)" - "Item Category"."NPR Consumption (Amount)")
                 {
                 }
-                column(PurchaseQty_ItemGroup2; "Item Category"."NPR Purchases (Qty.)")
+                column(PurchaseQty_ItemCategory2; "Item Category"."NPR Purchases (Qty.)")
                 {
                 }
-                column(dg_ItemGroup2; DG)
+                column(dg_ItemCategory2; DG)
                 {
                 }
-                column(TurnoverLY_ItemGroup2; TempNPRBuffer."Decimal 2")
+                column(TurnoverLY_ItemCategory2; TempNPRBuffer."Decimal 2")
                 {
                 }
                 column(pctoms2; TempNPRBuffer."Decimal 3")
                 {
                 }
-                column(AmtLY_ItemGroup2; TempNPRBuffer."Decimal 4")
+                column(AmtLY_ItemCategory2; TempNPRBuffer."Decimal 4")
                 {
                 }
-                column(PctaendringItemGroup2; PctaendringItemGroup)
+                column(PctaendringItemCategory2; PctaendringItemCategory)
                 {
                 }
 
@@ -325,9 +325,9 @@
                         DG := (("Item Category"."NPR Sales (LCY)" - "Item Category"."NPR Consumption (Amount)") / "Item Category"."NPR Sales (LCY)") * 100;
 
                     if TempNPRBuffer."Decimal 2" <> 0 then
-                        PctaendringItemGroup := (("Item Category"."NPR Sales (LCY)" - TempNPRBuffer."Decimal 2") / (TempNPRBuffer."Decimal 2")) * 100
+                        PctaendringItemCategory := (("Item Category"."NPR Sales (LCY)" - TempNPRBuffer."Decimal 2") / (TempNPRBuffer."Decimal 2")) * 100
                     else
-                        Clear(PctaendringItemGroup);
+                        Clear(PctaendringItemCategory);
                 end;
 
                 trigger OnPreDataItem()
@@ -423,7 +423,7 @@
             column(TotalSaleLCYYr; TotalSaleLCYYr)
             {
             }
-            column(TotalPctaendringItemGroup; TotalPctaendringItemGroup)
+            column(TotalPctaendringItemCategory; TotalPctaendringItemCategory)
             {
             }
 
@@ -436,9 +436,9 @@
                     TotalPctoms := (TotalSaleLCY / TotalVendorSalesLCY) * 100;
 
                 if TotalLastYr <> 0 then
-                    TotalPctaendringItemGroup := ((TotalSaleLCY - TotalLastYr) / (TotalLastYr)) * 100
+                    TotalPctaendringItemCategory := ((TotalSaleLCY - TotalLastYr) / (TotalLastYr)) * 100
                 else
-                    Clear(TotalPctaendringItemGroup);
+                    Clear(TotalPctaendringItemCategory);
             end;
         }
     }
@@ -461,9 +461,9 @@
                     }
                     field("Sortervare gruppe"; Sortervaregruppe)
                     {
-                        Caption = 'Sort Item Groups';
+                        Caption = 'Sort Item Category';
 
-                        ToolTip = 'Specifies the value of the Sort Item Groups field';
+                        ToolTip = 'Specifies the value of the Sort Item Category field';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -504,7 +504,7 @@
 
     labels
     {
-        Report_Caption = 'Vendor/Item Group';
+        Report_Caption = 'Vendor/Item Category';
         No_Caption = 'No.';
         Name_Caption = 'Name';
         Purchases_Caption = 'Purchases';
@@ -513,9 +513,9 @@
         PctChanges_Caption = '% Changes';
         DB_Caption = 'DB';
         Pct_Caption = '%-del';
-        ItemGroup_Caption = 'Itemgroups';
+        ItemCategory_Caption = 'Item Category';
         Description_Caption = 'Description';
-        PurItemGrp_Caption = 'Purchases, itemgroups';
+        PurItemCat_Caption = 'Purchases, Item Category';
         Turnover_Caption = 'Turnover';
         SalesQty_Caption = 'Sales (Qty)';
         CR_Caption = 'CR';
@@ -526,7 +526,7 @@
         NegPctChanges = '%-Changes';
         Total_Caption = 'Total';
         SalesAmt_Caption = 'Sales Amount';
-        TotalItemGrp = 'Total Item Group';
+        TotalItemCat = 'Total Item Category';
         PageNoLbl = 'Page';
     }
 
@@ -565,7 +565,7 @@
         DG: Decimal;
         DgSum: Decimal;
         Omsaetningsidsteaar: Decimal;
-        PctaendringItemGroup: Decimal;
+        PctaendringItemCategory: Decimal;
         PctaendringVen: Decimal;
         Pctoms: Decimal;
         Pctoms_Sum: Decimal;
@@ -575,12 +575,12 @@
         SaleLCYSum: Decimal;
         SalesQtySum: Decimal;
         SumCost: Decimal;
-        SumPctaendringItemGroup: Decimal;
+        SumPctaendringItemCategory: Decimal;
         TotalCost: Decimal;
         TotalCr: Decimal;
         TotalCrPct: Decimal;
         TotalLastYr: Decimal;
-        TotalPctaendringItemGroup: Decimal;
+        TotalPctaendringItemCategory: Decimal;
         TotalPctoms: Decimal;
         TotalPurchases: Decimal;
         TotalPurchasesQty: Decimal;

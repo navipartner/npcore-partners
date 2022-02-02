@@ -1,11 +1,11 @@
-﻿report 6014448 "NPR Item Group Inv. Value"
+report 6014448 "NPR Item Cat. Inv. Value"
 {
     #IF NOT BC17 
     Extensible = False; 
     #ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Item Group Inventory Value.rdlc';
-    Caption = 'Item Group Inventory Value';
+    RDLCLayout = './src/_Reports/layouts/Item Category Inventory Value.rdlc';
+    Caption = 'Item Category Inventory Value';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
@@ -40,10 +40,10 @@
             column(Description; Description)
             {
             }
-            column(ItemGroupMovementAtStartOf; ItemGroupMovementAtStartOf)
+            column(ItemCategoryMovementAtStartOf; ItemCategoryMovementAtStartOf)
             {
             }
-            column(ItemGroupInventoryAtStartOf; ItemGroupInventoryAtStartOf)
+            column(ItemCategoryInventoryAtStartOf; ItemCategoryInventoryAtStartOf)
             {
             }
             column(PurchaseQuantity; "NPR Purchases (Qty.)")
@@ -64,10 +64,10 @@
             column(Dg; Dg)
             {
             }
-            column(ItemGroupMovementAtEndOf; ItemGroupMovementAtEndOf)
+            column(ItemCategoryMovementAtEndOf; ItemCategoryMovementAtEndOf)
             {
             }
-            column(ItemGroupInventoryAtEndOf; ItemGroupInventoryAtEndOf)
+            column(ItemCategoryInventoryAtEndOf; ItemCategoryInventoryAtEndOf)
             {
             }
             column(SaleLbl; StrSubstNo(SaleLbl, GeneralLedgerSetup."LCY Code"))
@@ -87,8 +87,8 @@
 
                 ItemCategoryLast.CalcFields("NPR Movement", "NPR Inventory Value");
 
-                ItemGroupMovementAtEndOf := ItemCategoryLast."NPR Movement";
-                ItemGroupInventoryAtEndOf := ItemCategoryLast."NPR Inventory Value";
+                ItemCategoryMovementAtEndOf := ItemCategoryLast."NPR Movement";
+                ItemCategoryInventoryAtEndOf := ItemCategoryLast."NPR Inventory Value";
 
                 ItemCategoryFirst.Get("Code");
                 ItemCategoryFirst.SetFilter("NPR Date Filter", '..%1', GetRangeMin("NPR Date Filter") - 1);
@@ -98,8 +98,8 @@
 
                 ItemCategoryFirst.CalcFields("NPR Movement", "NPR Inventory Value");
 
-                ItemGroupMovementAtStartOf := ItemCategoryFirst."NPR Movement";
-                ItemGroupInventoryAtStartOf := ItemCategoryFirst."NPR Inventory Value";
+                ItemCategoryMovementAtStartOf := ItemCategoryFirst."NPR Movement";
+                ItemCategoryInventoryAtStartOf := ItemCategoryFirst."NPR Inventory Value";
 
                 Profit := "NPR Sales (LCY)" - "NPR Consumption (Amount)";
 
@@ -117,8 +117,8 @@
     }
     labels
     {
-        ReportCap = 'Item Group Inventory Value';
-        ItemGroupCap = 'Item Group';
+        ReportCap = 'Item Category Inventory Value';
+        ItemCategoryCap = 'Item Category';
         NameCap = 'Name';
         QtyCap = 'Qty';
         AmountCap = 'Amount';
@@ -142,10 +142,10 @@
         ItemCategoryFirst: Record "Item Category";
         ItemCategoryLast: Record "Item Category";
         Dg: Decimal;
-        ItemGroupInventoryAtEndOf: Decimal;
-        ItemGroupInventoryAtStartOf: Decimal;
-        ItemGroupMovementAtEndOf: Decimal;
-        ItemGroupMovementAtStartOf: Decimal;
+        ItemCategoryInventoryAtEndOf: Decimal;
+        ItemCategoryInventoryAtStartOf: Decimal;
+        ItemCategoryMovementAtEndOf: Decimal;
+        ItemCategoryMovementAtStartOf: Decimal;
         Profit: Decimal;
         EndOf: Label '------- End of %1 -------';
         PurchaseLbl: Label 'Purchases (%1)';

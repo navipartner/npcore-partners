@@ -69,14 +69,14 @@
                                     <TablixCells>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="No_ItemGroupHeader">
+                                          <Textbox Name="No_ItemCategoryHeader">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!No_ItemGroupHeader.Value</Value>
+                                                    <Value>=Fields!No_ItemCategoryHeader.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -87,7 +87,7 @@
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>No_ItemGroupHeader</rd:DefaultName>
+                                            <rd:DefaultName>No_ItemCategoryHeader</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Blue</Color>
@@ -107,7 +107,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Description_ItemGroupHeader.Value</Value>
+                                                    <Value>=Fields!Description_ItemCategoryHeader.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -139,11 +139,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemGroupHeader.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemCategoryHeader.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SalesQty_ItemGroupHeaderFormat.Value</Format>
+                                                      <Format>=Fields!SalesQty_ItemCategoryHeaderFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -206,11 +206,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemGroupHeader.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemCategoryHeader.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!ConsumptionAmount_ItemGroupHeaderFormat.Value</Format>
+                                                      <Format>=Fields!ConsumptionAmount_ItemCategoryHeaderFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -240,11 +240,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemGroupHeader.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemCategoryHeader.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SaleLCY_ItemGroupHeaderFormat.Value</Format>
+                                                      <Format>=Fields!SaleLCY_ItemCategoryHeaderFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -267,18 +267,18 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="TurnoverPct_ItemGroupSub3">
+                                          <Textbox Name="TurnoverPct_ItemCategorySub3">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemGroupH.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemCategoryH.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!TurnoverPct_ItemGroupHFormat.Value</Format>
+                                                      <Format>=Fields!TurnoverPct_ItemCategoryHFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -287,7 +287,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>TurnoverPct_ItemGroupSub1</rd:DefaultName>
+                                            <rd:DefaultName>TurnoverPct_ItemCategorySub1</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Blue</Color>
@@ -308,11 +308,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Profit_ItemGroupH.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!Profit_ItemCategoryH.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Profit_ItemGroupHFormat.Value</Format>
+                                                      <Format>=Fields!Profit_ItemCategoryHFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -342,11 +342,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemGroupH.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemCategoryH.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupHFormat.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategoryHFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -376,11 +376,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemGroupH.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemCategoryH.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!CoveragePct_ItemGroupHFormat.Value</Format>
+                                                      <Format>=Fields!CoveragePct_ItemCategoryHFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1055,14 +1055,14 @@
                                     <TablixCells>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="No_ItemGroupSub6">
+                                          <Textbox Name="No_ItemCategorySub6">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!No_ItemGroupSub1.Value</Value>
+                                                    <Value>=Fields!No_ItemCategorySub1.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -1073,7 +1073,7 @@
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>No_ItemGroupSub1</rd:DefaultName>
+                                            <rd:DefaultName>No_ItemCategorySub1</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1093,7 +1093,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Description_ItemGroupSub1.Value</Value>
+                                                    <Value>=Fields!Description_ItemCategorySub1.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -2031,14 +2031,14 @@
                                     <TablixCells>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="No_ItemGroupSub5">
+                                          <Textbox Name="No_ItemCategorySub5">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!No_ItemGroupSub2.Value</Value>
+                                                    <Value>=Fields!No_ItemCategorySub2.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -2049,7 +2049,7 @@
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>No_ItemGroupSub2</rd:DefaultName>
+                                            <rd:DefaultName>No_ItemCategorySub2</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Red</Color>
@@ -2070,7 +2070,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Description_ItemGroupSub2.Value</Value>
+                                                    <Value>=Fields!Description_ItemCategorySub2.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -3024,7 +3024,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!No_ItemGroupSub3.Value</Value>
+                                                    <Value>=Fields!No_ItemCategorySub3.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -3056,7 +3056,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Description_ItemGroupSub3.Value</Value>
+                                                    <Value>=Fields!Description_ItemCategorySub3.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -4010,7 +4010,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!No_ItemGroupSub4.Value</Value>
+                                                    <Value>=Fields!No_ItemCategorySub4.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -4042,7 +4042,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Description_ItemGroupSub4.Value</Value>
+                                                    <Value>=Fields!Description_ItemCategorySub4.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -4077,7 +4077,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SalesQty_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!SalesQty_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -4144,7 +4144,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!ConsumptionAmount_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!ConsumptionAmount_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -4178,7 +4178,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SaleLCY_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!SaleLCY_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -4201,7 +4201,7 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="TurnoverPct_ItemGroupSub5">
+                                          <Textbox Name="TurnoverPct_ItemCategorySub5">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -4212,7 +4212,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!TurnoverPct_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!TurnoverPct_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -4221,7 +4221,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>TurnoverPct_ItemGroupSub1</rd:DefaultName>
+                                            <rd:DefaultName>TurnoverPct_ItemCategorySub1</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Purple</Color>
@@ -4246,7 +4246,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Profit_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Profit_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -4280,7 +4280,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -4314,7 +4314,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5036,11 +5036,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemGroupSub4.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemCategorySub4.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SalesQty_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!SalesQty_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5101,11 +5101,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemGroupSub4.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemCategorySub4.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!ConsumptionAmount_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!ConsumptionAmount_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5134,11 +5134,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemGroupSub4.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemCategorySub4.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SaleLCY_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!SaleLCY_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5167,11 +5167,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemGroupSub4.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemCategorySub4.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!TurnoverPct_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!TurnoverPct_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5200,11 +5200,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Profit_ItemGroupSub4.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!Profit_ItemCategorySub4.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Profit_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Profit_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5233,11 +5233,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemGroupSub4.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemCategorySub4.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5266,11 +5266,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemGroupSub4.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemCategorySub4.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5337,11 +5337,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemGroupSub3.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemCategorySub3.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SalesQty_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!SalesQty_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5403,11 +5403,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemGroupSub3.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemCategorySub3.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!ConsumptionAmount_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!ConsumptionAmount_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5437,11 +5437,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemGroupSub3.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemCategorySub3.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SaleLCY_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!SaleLCY_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5464,18 +5464,18 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="TurnoverPct_ItemGroupSub4">
+                                          <Textbox Name="TurnoverPct_ItemCategorySub4">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemGroupSub3.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemCategorySub3.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!TurnoverPct_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!TurnoverPct_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5484,7 +5484,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>TurnoverPct_ItemGroupSub1</rd:DefaultName>
+                                            <rd:DefaultName>TurnoverPct_ItemCategorySub1</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>LimeGreen</Color>
@@ -5505,11 +5505,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Profit_ItemGroupSub3.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!Profit_ItemCategorySub3.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Profit_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Profit_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5539,11 +5539,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemGroupSub3.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemCategorySub3.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5573,11 +5573,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemGroupSub3.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemCategorySub3.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5645,11 +5645,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemGroupSub2.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemCategorySub2.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SalesQty_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!SalesQty_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5711,11 +5711,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemGroupSub2.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemCategorySub2.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!ConsumptionAmount_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!ConsumptionAmount_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5745,11 +5745,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemGroupSub2.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemCategorySub2.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SaleLCY_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!SaleLCY_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5772,18 +5772,18 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="TurnoverPct_ItemGroupSub2">
+                                          <Textbox Name="TurnoverPct_ItemCategorySub2">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemGroupSub2.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemCategorySub2.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!TurnoverPct_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!TurnoverPct_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5792,7 +5792,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>TurnoverPct_ItemGroupSub1</rd:DefaultName>
+                                            <rd:DefaultName>TurnoverPct_ItemCategorySub1</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Red</Color>
@@ -5813,11 +5813,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Profit_ItemGroupSub2.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!Profit_ItemCategorySub2.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Profit_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Profit_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5847,11 +5847,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemGroupSub2.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemCategorySub2.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5881,11 +5881,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemGroupSub2.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemCategorySub2.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5953,11 +5953,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemGroupSub1.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemCategorySub1.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SalesQty_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!SalesQty_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -6018,11 +6018,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemGroupSub1.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemCategorySub1.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!ConsumptionAmount_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!ConsumptionAmount_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -6051,11 +6051,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemGroupSub1.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemCategorySub1.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SaleLCY_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!SaleLCY_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -6077,18 +6077,18 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="TurnoverPct_ItemGroupSub1">
+                                          <Textbox Name="TurnoverPct_ItemCategorySub1">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemGroupSub1.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemCategorySub1.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!TurnoverPct_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!TurnoverPct_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -6097,7 +6097,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>TurnoverPct_ItemGroupSub1</rd:DefaultName>
+                                            <rd:DefaultName>TurnoverPct_ItemCategorySub1</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -6117,11 +6117,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Profit_ItemGroupSub1.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!Profit_ItemCategorySub1.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Profit_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Profit_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -6150,11 +6150,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemGroupSub1.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemCategorySub1.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -6183,11 +6183,11 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemGroupSub1.Value)</Value>
+                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemCategorySub1.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemGroupSub1Format.Value</Format>
+                                                      <Format>=Fields!Coverage_ItemCategorySub1Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -7184,20 +7184,20 @@
                               <TablixRowHierarchy>
                                 <TablixMembers>
                                   <TablixMember>
-                                    <Group Name="No_ItemGroupHeader">
+                                    <Group Name="No_ItemCategoryHeader">
                                       <GroupExpressions>
-                                        <GroupExpression>=Fields!No_ItemGroupHeader.Value</GroupExpression>
+                                        <GroupExpression>=Fields!No_ItemCategoryHeader.Value</GroupExpression>
                                       </GroupExpressions>
                                     </Group>
                                     <SortExpressions>
                                       <SortExpression>
-                                        <Value>=Fields!No_ItemGroupHeader.Value</Value>
+                                        <Value>=Fields!No_ItemCategoryHeader.Value</Value>
                                       </SortExpression>
                                     </SortExpressions>
                                     <TablixMembers>
                                       <TablixMember>
                                         <Visibility>
-                                          <Hidden>=iif(Len(Fields!No_ItemGroupHeader.Value)=0,TRUE,FALSE)</Hidden>
+                                          <Hidden>=iif(Len(Fields!No_ItemCategoryHeader.Value)=0,TRUE,FALSE)</Hidden>
                                         </Visibility>
                                       </TablixMember>
                                       <TablixMember>
@@ -7222,20 +7222,20 @@
                                         <KeepWithGroup>Before</KeepWithGroup>
                                       </TablixMember>
                                       <TablixMember>
-                                        <Group Name="No_ItemGroupSub1">
+                                        <Group Name="No_ItemCategorySub1">
                                           <GroupExpressions>
-                                            <GroupExpression>=Fields!No_ItemGroupSub1.Value</GroupExpression>
+                                            <GroupExpression>=Fields!No_ItemCategorySub1.Value</GroupExpression>
                                           </GroupExpressions>
                                         </Group>
                                         <SortExpressions>
                                           <SortExpression>
-                                            <Value>=Fields!No_ItemGroupSub1.Value</Value>
+                                            <Value>=Fields!No_ItemCategorySub1.Value</Value>
                                           </SortExpression>
                                         </SortExpressions>
                                         <TablixMembers>
                                           <TablixMember>
                                             <Visibility>
-                                              <Hidden>=iif(Len(Fields!No_ItemGroupSub1.Value)=0,true,false)</Hidden>
+                                              <Hidden>=iif(Len(Fields!No_ItemCategorySub1.Value)=0,true,false)</Hidden>
                                             </Visibility>
                                           </TablixMember>
                                           <TablixMember>
@@ -7263,20 +7263,20 @@
                                             <KeepWithGroup>Before</KeepWithGroup>
                                           </TablixMember>
                                           <TablixMember>
-                                            <Group Name="No_ItemGroupSub2">
+                                            <Group Name="No_ItemCategorySub2">
                                               <GroupExpressions>
-                                                <GroupExpression>=Fields!No_ItemGroupSub2.Value</GroupExpression>
+                                                <GroupExpression>=Fields!No_ItemCategorySub2.Value</GroupExpression>
                                               </GroupExpressions>
                                             </Group>
                                             <SortExpressions>
                                               <SortExpression>
-                                                <Value>=Fields!No_ItemGroupSub2.Value</Value>
+                                                <Value>=Fields!No_ItemCategorySub2.Value</Value>
                                               </SortExpression>
                                             </SortExpressions>
                                             <TablixMembers>
                                               <TablixMember>
                                                 <Visibility>
-                                                  <Hidden>=iif(Len(Fields!No_ItemGroupSub2.Value)=0,true,false)</Hidden>
+                                                  <Hidden>=iif(Len(Fields!No_ItemCategorySub2.Value)=0,true,false)</Hidden>
                                                 </Visibility>
                                               </TablixMember>
                                               <TablixMember>
@@ -7304,20 +7304,20 @@
                                                 <KeepWithGroup>Before</KeepWithGroup>
                                               </TablixMember>
                                               <TablixMember>
-                                                <Group Name="No_ItemGroupSub3">
+                                                <Group Name="No_ItemCategorySub3">
                                                   <GroupExpressions>
-                                                    <GroupExpression>=Fields!No_ItemGroupSub3.Value</GroupExpression>
+                                                    <GroupExpression>=Fields!No_ItemCategorySub3.Value</GroupExpression>
                                                   </GroupExpressions>
                                                 </Group>
                                                 <SortExpressions>
                                                   <SortExpression>
-                                                    <Value>=Fields!No_ItemGroupSub3.Value</Value>
+                                                    <Value>=Fields!No_ItemCategorySub3.Value</Value>
                                                   </SortExpression>
                                                 </SortExpressions>
                                                 <TablixMembers>
                                                   <TablixMember>
                                                     <Visibility>
-                                                      <Hidden>=iif(Len(Fields!No_ItemGroupSub3.Value)=0,true,false)</Hidden>
+                                                      <Hidden>=iif(Len(Fields!No_ItemCategorySub3.Value)=0,true,false)</Hidden>
                                                     </Visibility>
                                                     <KeepWithGroup>After</KeepWithGroup>
                                                   </TablixMember>
@@ -7343,20 +7343,20 @@
                                                     <KeepWithGroup>Before</KeepWithGroup>
                                                   </TablixMember>
                                                   <TablixMember>
-                                                    <Group Name="No_ItemGroupSub4">
+                                                    <Group Name="No_ItemCategorySub4">
                                                       <GroupExpressions>
-                                                        <GroupExpression>=Fields!No_ItemGroupSub4.Value</GroupExpression>
+                                                        <GroupExpression>=Fields!No_ItemCategorySub4.Value</GroupExpression>
                                                       </GroupExpressions>
                                                     </Group>
                                                     <SortExpressions>
                                                       <SortExpression>
-                                                        <Value>=Fields!No_ItemGroupSub4.Value</Value>
+                                                        <Value>=Fields!No_ItemCategorySub4.Value</Value>
                                                       </SortExpression>
                                                     </SortExpressions>
                                                     <TablixMembers>
                                                       <TablixMember>
                                                         <Visibility>
-                                                          <Hidden>=iif(Len(Fields!No_ItemGroupSub4.Value)=0,true,false)</Hidden>
+                                                          <Hidden>=iif(Len(Fields!No_ItemCategorySub4.Value)=0,true,false)</Hidden>
                                                         </Visibility>
                                                         <KeepWithGroup>After</KeepWithGroup>
                                                       </TablixMember>
@@ -7378,7 +7378,7 @@
                                                       </TablixMember>
                                                       <TablixMember>
                                                         <Visibility>
-                                                          <Hidden>=iif(Len(Fields!No_ItemGroupSub4.Value)=0,true,false)</Hidden>
+                                                          <Hidden>=iif(Len(Fields!No_ItemCategorySub4.Value)=0,true,false)</Hidden>
                                                         </Visibility>
                                                         <KeepWithGroup>Before</KeepWithGroup>
                                                       </TablixMember>
@@ -7386,7 +7386,7 @@
                                                   </TablixMember>
                                                   <TablixMember>
                                                     <Visibility>
-                                                      <Hidden>=iif(Len(Fields!No_ItemGroupSub3.Value)=0,true,false)</Hidden>
+                                                      <Hidden>=iif(Len(Fields!No_ItemCategorySub3.Value)=0,true,false)</Hidden>
                                                     </Visibility>
                                                     <KeepWithGroup>Before</KeepWithGroup>
                                                   </TablixMember>
@@ -7394,7 +7394,7 @@
                                               </TablixMember>
                                               <TablixMember>
                                                 <Visibility>
-                                                  <Hidden>=iif(Len(Fields!No_ItemGroupSub2.Value)=0,true,false)</Hidden>
+                                                  <Hidden>=iif(Len(Fields!No_ItemCategorySub2.Value)=0,true,false)</Hidden>
                                                 </Visibility>
                                                 <KeepWithGroup>Before</KeepWithGroup>
                                               </TablixMember>
@@ -7402,13 +7402,13 @@
                                           </TablixMember>
                                           <TablixMember>
                                             <Visibility>
-                                              <Hidden>=iif(Len(Fields!No_ItemGroupSub1.Value)=0,true,false)</Hidden>
+                                              <Hidden>=iif(Len(Fields!No_ItemCategorySub1.Value)=0,true,false)</Hidden>
                                             </Visibility>
                                             <KeepWithGroup>Before</KeepWithGroup>
                                           </TablixMember>
                                           <TablixMember>
                                             <Visibility>
-                                              <Hidden>=iif(Len(Fields!No_ItemGroupSub1.Value)=0,true,false)</Hidden>
+                                              <Hidden>=iif(Len(Fields!No_ItemCategorySub1.Value)=0,true,false)</Hidden>
                                             </Visibility>
                                             <KeepWithGroup>Before</KeepWithGroup>
                                           </TablixMember>
@@ -7456,9 +7456,9 @@
             <TablixRowHierarchy>
               <TablixMembers>
                 <TablixMember>
-                  <Group Name="ItemGroupHeaderGrp">
+                  <Group Name="ItemCategoryHeaderGrp">
                     <GroupExpressions>
-                      <GroupExpression>=Fields!No_ItemGroupHeader.Value</GroupExpression>
+                      <GroupExpression>=Fields!No_ItemCategoryHeader.Value</GroupExpression>
                     </GroupExpressions>
                   </Group>
                 </TablixMember>
@@ -7518,7 +7518,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=First(Fields!Filters_ItemGroupHeader.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!Filters_ItemCategoryHeader.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -8640,86 +8640,86 @@ End Function</Code>
         <Field Name="Today">
           <DataField>Today</DataField>
         </Field>
-        <Field Name="DateFilter_ItemGroupHeader">
-          <DataField>DateFilter_ItemGroupHeader</DataField>
+        <Field Name="DateFilter_ItemCategoryHeader">
+          <DataField>DateFilter_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="Filters_ItemGroupHeader">
-          <DataField>Filters_ItemGroupHeader</DataField>
+        <Field Name="Filters_ItemCategoryHeader">
+          <DataField>Filters_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="No_ItemGroupHeader">
-          <DataField>No_ItemGroupHeader</DataField>
+        <Field Name="No_ItemCategoryHeader">
+          <DataField>No_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="Description_ItemGroupHeader">
-          <DataField>Description_ItemGroupHeader</DataField>
+        <Field Name="Description_ItemCategoryHeader">
+          <DataField>Description_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupHeader">
-          <DataField>SalesQty_ItemGroupHeader</DataField>
+        <Field Name="SalesQty_ItemCategoryHeader">
+          <DataField>SalesQty_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupHeaderFormat">
-          <DataField>SalesQty_ItemGroupHeaderFormat</DataField>
+        <Field Name="SalesQty_ItemCategoryHeaderFormat">
+          <DataField>SalesQty_ItemCategoryHeaderFormat</DataField>
         </Field>
-        <Field Name="ConsumptionAmount_ItemGroupHeader">
-          <DataField>ConsumptionAmount_ItemGroupHeader</DataField>
+        <Field Name="ConsumptionAmount_ItemCategoryHeader">
+          <DataField>ConsumptionAmount_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="ConsumptionAmount_ItemGroupHeaderFormat">
-          <DataField>ConsumptionAmount_ItemGroupHeaderFormat</DataField>
+        <Field Name="ConsumptionAmount_ItemCategoryHeaderFormat">
+          <DataField>ConsumptionAmount_ItemCategoryHeaderFormat</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupHeader">
-          <DataField>SaleLCY_ItemGroupHeader</DataField>
+        <Field Name="SaleLCY_ItemCategoryHeader">
+          <DataField>SaleLCY_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupHeaderFormat">
-          <DataField>SaleLCY_ItemGroupHeaderFormat</DataField>
+        <Field Name="SaleLCY_ItemCategoryHeaderFormat">
+          <DataField>SaleLCY_ItemCategoryHeaderFormat</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupHeader">
-          <DataField>Profit_ItemGroupHeader</DataField>
+        <Field Name="Profit_ItemCategoryHeader">
+          <DataField>Profit_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupHeaderFormat">
-          <DataField>Profit_ItemGroupHeaderFormat</DataField>
+        <Field Name="Profit_ItemCategoryHeaderFormat">
+          <DataField>Profit_ItemCategoryHeaderFormat</DataField>
         </Field>
-        <Field Name="TotalProfit_ItemGroupHeader">
-          <DataField>TotalProfit_ItemGroupHeader</DataField>
+        <Field Name="TotalProfit_ItemCategoryHeader">
+          <DataField>TotalProfit_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="TotalProfit_ItemGroupHeaderFormat">
-          <DataField>TotalProfit_ItemGroupHeaderFormat</DataField>
+        <Field Name="TotalProfit_ItemCategoryHeaderFormat">
+          <DataField>TotalProfit_ItemCategoryHeaderFormat</DataField>
         </Field>
-        <Field Name="TotalRevenue_ItemGroupHeader">
-          <DataField>TotalRevenue_ItemGroupHeader</DataField>
+        <Field Name="TotalRevenue_ItemCategoryHeader">
+          <DataField>TotalRevenue_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="TotalRevenue_ItemGroupHeaderFormat">
-          <DataField>TotalRevenue_ItemGroupHeaderFormat</DataField>
+        <Field Name="TotalRevenue_ItemCategoryHeaderFormat">
+          <DataField>TotalRevenue_ItemCategoryHeaderFormat</DataField>
         </Field>
-        <Field Name="TotalConsumption_ItemGroupHeader">
-          <DataField>TotalConsumption_ItemGroupHeader</DataField>
+        <Field Name="TotalConsumption_ItemCategoryHeader">
+          <DataField>TotalConsumption_ItemCategoryHeader</DataField>
         </Field>
-        <Field Name="TotalConsumption_ItemGroupHeaderFormat">
-          <DataField>TotalConsumption_ItemGroupHeaderFormat</DataField>
+        <Field Name="TotalConsumption_ItemCategoryHeaderFormat">
+          <DataField>TotalConsumption_ItemCategoryHeaderFormat</DataField>
         </Field>
         <Field Name="ShowItem">
           <DataField>ShowItem</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupH">
-          <DataField>Profit_ItemGroupH</DataField>
+        <Field Name="Profit_ItemCategoryH">
+          <DataField>Profit_ItemCategoryH</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupHFormat">
-          <DataField>Profit_ItemGroupHFormat</DataField>
+        <Field Name="Profit_ItemCategoryHFormat">
+          <DataField>Profit_ItemCategoryHFormat</DataField>
         </Field>
-        <Field Name="Coverage_ItemGroupH">
-          <DataField>Coverage_ItemGroupH</DataField>
+        <Field Name="Coverage_ItemCategoryH">
+          <DataField>Coverage_ItemCategoryH</DataField>
         </Field>
-        <Field Name="Coverage_ItemGroupHFormat">
-          <DataField>Coverage_ItemGroupHFormat</DataField>
+        <Field Name="Coverage_ItemCategoryHFormat">
+          <DataField>Coverage_ItemCategoryHFormat</DataField>
         </Field>
-        <Field Name="CoveragePct_ItemGroupH">
-          <DataField>CoveragePct_ItemGroupH</DataField>
+        <Field Name="CoveragePct_ItemCategoryH">
+          <DataField>CoveragePct_ItemCategoryH</DataField>
         </Field>
-        <Field Name="CoveragePct_ItemGroupHFormat">
-          <DataField>CoveragePct_ItemGroupHFormat</DataField>
+        <Field Name="CoveragePct_ItemCategoryHFormat">
+          <DataField>CoveragePct_ItemCategoryHFormat</DataField>
         </Field>
-        <Field Name="TurnoverPct_ItemGroupH">
-          <DataField>TurnoverPct_ItemGroupH</DataField>
+        <Field Name="TurnoverPct_ItemCategoryH">
+          <DataField>TurnoverPct_ItemCategoryH</DataField>
         </Field>
-        <Field Name="TurnoverPct_ItemGroupHFormat">
-          <DataField>TurnoverPct_ItemGroupHFormat</DataField>
+        <Field Name="TurnoverPct_ItemCategoryHFormat">
+          <DataField>TurnoverPct_ItemCategoryHFormat</DataField>
         </Field>
         <Field Name="Picture_CompanyInformation">
           <DataField>Picture_CompanyInformation</DataField>
@@ -8757,53 +8757,53 @@ End Function</Code>
         <Field Name="InventoryFormat">
           <DataField>InventoryFormat</DataField>
         </Field>
-        <Field Name="No_ItemGroupSub1">
-          <DataField>No_ItemGroupSub1</DataField>
+        <Field Name="No_ItemCategorySub1">
+          <DataField>No_ItemCategorySub1</DataField>
         </Field>
-        <Field Name="Description_ItemGroupSub1">
-          <DataField>Description_ItemGroupSub1</DataField>
+        <Field Name="Description_ItemCategorySub1">
+          <DataField>Description_ItemCategorySub1</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupSub1">
-          <DataField>SalesQty_ItemGroupSub1</DataField>
+        <Field Name="SalesQty_ItemCategorySub1">
+          <DataField>SalesQty_ItemCategorySub1</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupSub1Format">
-          <DataField>SalesQty_ItemGroupSub1Format</DataField>
+        <Field Name="SalesQty_ItemCategorySub1Format">
+          <DataField>SalesQty_ItemCategorySub1Format</DataField>
         </Field>
-        <Field Name="ConsumptionAmount_ItemGroupSub1">
-          <DataField>ConsumptionAmount_ItemGroupSub1</DataField>
+        <Field Name="ConsumptionAmount_ItemCategorySub1">
+          <DataField>ConsumptionAmount_ItemCategorySub1</DataField>
         </Field>
-        <Field Name="ConsumptionAmount_ItemGroupSub1Format">
-          <DataField>ConsumptionAmount_ItemGroupSub1Format</DataField>
+        <Field Name="ConsumptionAmount_ItemCategorySub1Format">
+          <DataField>ConsumptionAmount_ItemCategorySub1Format</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupSub1">
-          <DataField>SaleLCY_ItemGroupSub1</DataField>
+        <Field Name="SaleLCY_ItemCategorySub1">
+          <DataField>SaleLCY_ItemCategorySub1</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupSub1Format">
-          <DataField>SaleLCY_ItemGroupSub1Format</DataField>
+        <Field Name="SaleLCY_ItemCategorySub1Format">
+          <DataField>SaleLCY_ItemCategorySub1Format</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupSub1">
-          <DataField>Profit_ItemGroupSub1</DataField>
+        <Field Name="Profit_ItemCategorySub1">
+          <DataField>Profit_ItemCategorySub1</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupSub1Format">
-          <DataField>Profit_ItemGroupSub1Format</DataField>
+        <Field Name="Profit_ItemCategorySub1Format">
+          <DataField>Profit_ItemCategorySub1Format</DataField>
         </Field>
-        <Field Name="Coverage_ItemGroupSub1">
-          <DataField>Coverage_ItemGroupSub1</DataField>
+        <Field Name="Coverage_ItemCategorySub1">
+          <DataField>Coverage_ItemCategorySub1</DataField>
         </Field>
-        <Field Name="Coverage_ItemGroupSub1Format">
-          <DataField>Coverage_ItemGroupSub1Format</DataField>
+        <Field Name="Coverage_ItemCategorySub1Format">
+          <DataField>Coverage_ItemCategorySub1Format</DataField>
         </Field>
-        <Field Name="CoveragePct_ItemGroupSub1">
-          <DataField>CoveragePct_ItemGroupSub1</DataField>
+        <Field Name="CoveragePct_ItemCategorySub1">
+          <DataField>CoveragePct_ItemCategorySub1</DataField>
         </Field>
-        <Field Name="CoveragePct_ItemGroupSub1Format">
-          <DataField>CoveragePct_ItemGroupSub1Format</DataField>
+        <Field Name="CoveragePct_ItemCategorySub1Format">
+          <DataField>CoveragePct_ItemCategorySub1Format</DataField>
         </Field>
-        <Field Name="TurnoverPct_ItemGroupSub1">
-          <DataField>TurnoverPct_ItemGroupSub1</DataField>
+        <Field Name="TurnoverPct_ItemCategorySub1">
+          <DataField>TurnoverPct_ItemCategorySub1</DataField>
         </Field>
-        <Field Name="TurnoverPct_ItemGroupSub1Format">
-          <DataField>TurnoverPct_ItemGroupSub1Format</DataField>
+        <Field Name="TurnoverPct_ItemCategorySub1Format">
+          <DataField>TurnoverPct_ItemCategorySub1Format</DataField>
         </Field>
         <Field Name="ItemGrpNoLvl1">
           <DataField>ItemGrpNoLvl1</DataField>
@@ -8838,53 +8838,53 @@ End Function</Code>
         <Field Name="Inventory1Format">
           <DataField>Inventory1Format</DataField>
         </Field>
-        <Field Name="No_ItemGroupSub2">
-          <DataField>No_ItemGroupSub2</DataField>
+        <Field Name="No_ItemCategorySub2">
+          <DataField>No_ItemCategorySub2</DataField>
         </Field>
-        <Field Name="Description_ItemGroupSub2">
-          <DataField>Description_ItemGroupSub2</DataField>
+        <Field Name="Description_ItemCategorySub2">
+          <DataField>Description_ItemCategorySub2</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupSub2">
-          <DataField>SalesQty_ItemGroupSub2</DataField>
+        <Field Name="SalesQty_ItemCategorySub2">
+          <DataField>SalesQty_ItemCategorySub2</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupSub2Format">
-          <DataField>SalesQty_ItemGroupSub2Format</DataField>
+        <Field Name="SalesQty_ItemCategorySub2Format">
+          <DataField>SalesQty_ItemCategorySub2Format</DataField>
         </Field>
-        <Field Name="ConsumptionAmount_ItemGroupSub2">
-          <DataField>ConsumptionAmount_ItemGroupSub2</DataField>
+        <Field Name="ConsumptionAmount_ItemCategorySub2">
+          <DataField>ConsumptionAmount_ItemCategorySub2</DataField>
         </Field>
-        <Field Name="ConsumptionAmount_ItemGroupSub2Format">
-          <DataField>ConsumptionAmount_ItemGroupSub2Format</DataField>
+        <Field Name="ConsumptionAmount_ItemCategorySub2Format">
+          <DataField>ConsumptionAmount_ItemCategorySub2Format</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupSub2">
-          <DataField>SaleLCY_ItemGroupSub2</DataField>
+        <Field Name="SaleLCY_ItemCategorySub2">
+          <DataField>SaleLCY_ItemCategorySub2</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupSub2Format">
-          <DataField>SaleLCY_ItemGroupSub2Format</DataField>
+        <Field Name="SaleLCY_ItemCategorySub2Format">
+          <DataField>SaleLCY_ItemCategorySub2Format</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupSub2">
-          <DataField>Profit_ItemGroupSub2</DataField>
+        <Field Name="Profit_ItemCategorySub2">
+          <DataField>Profit_ItemCategorySub2</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupSub2Format">
-          <DataField>Profit_ItemGroupSub2Format</DataField>
+        <Field Name="Profit_ItemCategorySub2Format">
+          <DataField>Profit_ItemCategorySub2Format</DataField>
         </Field>
-        <Field Name="Coverage_ItemGroupSub2">
-          <DataField>Coverage_ItemGroupSub2</DataField>
+        <Field Name="Coverage_ItemCategorySub2">
+          <DataField>Coverage_ItemCategorySub2</DataField>
         </Field>
-        <Field Name="Coverage_ItemGroupSub2Format">
-          <DataField>Coverage_ItemGroupSub2Format</DataField>
+        <Field Name="Coverage_ItemCategorySub2Format">
+          <DataField>Coverage_ItemCategorySub2Format</DataField>
         </Field>
-        <Field Name="CoveragePct_ItemGroupSub2">
-          <DataField>CoveragePct_ItemGroupSub2</DataField>
+        <Field Name="CoveragePct_ItemCategorySub2">
+          <DataField>CoveragePct_ItemCategorySub2</DataField>
         </Field>
-        <Field Name="CoveragePct_ItemGroupSub2Format">
-          <DataField>CoveragePct_ItemGroupSub2Format</DataField>
+        <Field Name="CoveragePct_ItemCategorySub2Format">
+          <DataField>CoveragePct_ItemCategorySub2Format</DataField>
         </Field>
-        <Field Name="TurnoverPct_ItemGroupSub2">
-          <DataField>TurnoverPct_ItemGroupSub2</DataField>
+        <Field Name="TurnoverPct_ItemCategorySub2">
+          <DataField>TurnoverPct_ItemCategorySub2</DataField>
         </Field>
-        <Field Name="TurnoverPct_ItemGroupSub2Format">
-          <DataField>TurnoverPct_ItemGroupSub2Format</DataField>
+        <Field Name="TurnoverPct_ItemCategorySub2Format">
+          <DataField>TurnoverPct_ItemCategorySub2Format</DataField>
         </Field>
         <Field Name="ItemGrpNoLvl2">
           <DataField>ItemGrpNoLvl2</DataField>
@@ -8919,53 +8919,53 @@ End Function</Code>
         <Field Name="Inventory2Format">
           <DataField>Inventory2Format</DataField>
         </Field>
-        <Field Name="No_ItemGroupSub3">
-          <DataField>No_ItemGroupSub3</DataField>
+        <Field Name="No_ItemCategorySub3">
+          <DataField>No_ItemCategorySub3</DataField>
         </Field>
-        <Field Name="Description_ItemGroupSub3">
-          <DataField>Description_ItemGroupSub3</DataField>
+        <Field Name="Description_ItemCategorySub3">
+          <DataField>Description_ItemCategorySub3</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupSub3">
-          <DataField>SalesQty_ItemGroupSub3</DataField>
+        <Field Name="SalesQty_ItemCategorySub3">
+          <DataField>SalesQty_ItemCategorySub3</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupSub3Format">
-          <DataField>SalesQty_ItemGroupSub3Format</DataField>
+        <Field Name="SalesQty_ItemCategorySub3Format">
+          <DataField>SalesQty_ItemCategorySub3Format</DataField>
         </Field>
-        <Field Name="ConsumptionAmount_ItemGroupSub3">
-          <DataField>ConsumptionAmount_ItemGroupSub3</DataField>
+        <Field Name="ConsumptionAmount_ItemCategorySub3">
+          <DataField>ConsumptionAmount_ItemCategorySub3</DataField>
         </Field>
-        <Field Name="ConsumptionAmount_ItemGroupSub3Format">
-          <DataField>ConsumptionAmount_ItemGroupSub3Format</DataField>
+        <Field Name="ConsumptionAmount_ItemCategorySub3Format">
+          <DataField>ConsumptionAmount_ItemCategorySub3Format</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupSub3">
-          <DataField>SaleLCY_ItemGroupSub3</DataField>
+        <Field Name="SaleLCY_ItemCategorySub3">
+          <DataField>SaleLCY_ItemCategorySub3</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupSub3Format">
-          <DataField>SaleLCY_ItemGroupSub3Format</DataField>
+        <Field Name="SaleLCY_ItemCategorySub3Format">
+          <DataField>SaleLCY_ItemCategorySub3Format</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupSub3">
-          <DataField>Profit_ItemGroupSub3</DataField>
+        <Field Name="Profit_ItemCategorySub3">
+          <DataField>Profit_ItemCategorySub3</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupSub3Format">
-          <DataField>Profit_ItemGroupSub3Format</DataField>
+        <Field Name="Profit_ItemCategorySub3Format">
+          <DataField>Profit_ItemCategorySub3Format</DataField>
         </Field>
-        <Field Name="Coverage_ItemGroupSub3">
-          <DataField>Coverage_ItemGroupSub3</DataField>
+        <Field Name="Coverage_ItemCategorySub3">
+          <DataField>Coverage_ItemCategorySub3</DataField>
         </Field>
-        <Field Name="Coverage_ItemGroupSub3Format">
-          <DataField>Coverage_ItemGroupSub3Format</DataField>
+        <Field Name="Coverage_ItemCategorySub3Format">
+          <DataField>Coverage_ItemCategorySub3Format</DataField>
         </Field>
-        <Field Name="CoveragePct_ItemGroupSub3">
-          <DataField>CoveragePct_ItemGroupSub3</DataField>
+        <Field Name="CoveragePct_ItemCategorySub3">
+          <DataField>CoveragePct_ItemCategorySub3</DataField>
         </Field>
-        <Field Name="CoveragePct_ItemGroupSub3Format">
-          <DataField>CoveragePct_ItemGroupSub3Format</DataField>
+        <Field Name="CoveragePct_ItemCategorySub3Format">
+          <DataField>CoveragePct_ItemCategorySub3Format</DataField>
         </Field>
-        <Field Name="TurnoverPct_ItemGroupSub3">
-          <DataField>TurnoverPct_ItemGroupSub3</DataField>
+        <Field Name="TurnoverPct_ItemCategorySub3">
+          <DataField>TurnoverPct_ItemCategorySub3</DataField>
         </Field>
-        <Field Name="TurnoverPct_ItemGroupSub3Format">
-          <DataField>TurnoverPct_ItemGroupSub3Format</DataField>
+        <Field Name="TurnoverPct_ItemCategorySub3Format">
+          <DataField>TurnoverPct_ItemCategorySub3Format</DataField>
         </Field>
         <Field Name="ItemGrpNoLvl3">
           <DataField>ItemGrpNoLvl3</DataField>
@@ -9000,53 +9000,53 @@ End Function</Code>
         <Field Name="Inventory3Format">
           <DataField>Inventory3Format</DataField>
         </Field>
-        <Field Name="No_ItemGroupSub4">
-          <DataField>No_ItemGroupSub4</DataField>
+        <Field Name="No_ItemCategorySub4">
+          <DataField>No_ItemCategorySub4</DataField>
         </Field>
-        <Field Name="Description_ItemGroupSub4">
-          <DataField>Description_ItemGroupSub4</DataField>
+        <Field Name="Description_ItemCategorySub4">
+          <DataField>Description_ItemCategorySub4</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupSub4">
-          <DataField>SalesQty_ItemGroupSub4</DataField>
+        <Field Name="SalesQty_ItemCategorySub4">
+          <DataField>SalesQty_ItemCategorySub4</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupSub4Format">
-          <DataField>SalesQty_ItemGroupSub4Format</DataField>
+        <Field Name="SalesQty_ItemCategorySub4Format">
+          <DataField>SalesQty_ItemCategorySub4Format</DataField>
         </Field>
-        <Field Name="ConsumptionAmount_ItemGroupSub4">
-          <DataField>ConsumptionAmount_ItemGroupSub4</DataField>
+        <Field Name="ConsumptionAmount_ItemCategorySub4">
+          <DataField>ConsumptionAmount_ItemCategorySub4</DataField>
         </Field>
-        <Field Name="ConsumptionAmount_ItemGroupSub4Format">
-          <DataField>ConsumptionAmount_ItemGroupSub4Format</DataField>
+        <Field Name="ConsumptionAmount_ItemCategorySub4Format">
+          <DataField>ConsumptionAmount_ItemCategorySub4Format</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupSub4">
-          <DataField>SaleLCY_ItemGroupSub4</DataField>
+        <Field Name="SaleLCY_ItemCategorySub4">
+          <DataField>SaleLCY_ItemCategorySub4</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupSub4Format">
-          <DataField>SaleLCY_ItemGroupSub4Format</DataField>
+        <Field Name="SaleLCY_ItemCategorySub4Format">
+          <DataField>SaleLCY_ItemCategorySub4Format</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupSub4">
-          <DataField>Profit_ItemGroupSub4</DataField>
+        <Field Name="Profit_ItemCategorySub4">
+          <DataField>Profit_ItemCategorySub4</DataField>
         </Field>
-        <Field Name="Profit_ItemGroupSub4Format">
-          <DataField>Profit_ItemGroupSub4Format</DataField>
+        <Field Name="Profit_ItemCategorySub4Format">
+          <DataField>Profit_ItemCategorySub4Format</DataField>
         </Field>
-        <Field Name="Coverage_ItemGroupSub4">
-          <DataField>Coverage_ItemGroupSub4</DataField>
+        <Field Name="Coverage_ItemCategorySub4">
+          <DataField>Coverage_ItemCategorySub4</DataField>
         </Field>
-        <Field Name="Coverage_ItemGroupSub4Format">
-          <DataField>Coverage_ItemGroupSub4Format</DataField>
+        <Field Name="Coverage_ItemCategorySub4Format">
+          <DataField>Coverage_ItemCategorySub4Format</DataField>
         </Field>
-        <Field Name="CoveragePct_ItemGroupSub4">
-          <DataField>CoveragePct_ItemGroupSub4</DataField>
+        <Field Name="CoveragePct_ItemCategorySub4">
+          <DataField>CoveragePct_ItemCategorySub4</DataField>
         </Field>
-        <Field Name="CoveragePct_ItemGroupSub4Format">
-          <DataField>CoveragePct_ItemGroupSub4Format</DataField>
+        <Field Name="CoveragePct_ItemCategorySub4Format">
+          <DataField>CoveragePct_ItemCategorySub4Format</DataField>
         </Field>
-        <Field Name="TurnoverPct_ItemGroupSub4">
-          <DataField>TurnoverPct_ItemGroupSub4</DataField>
+        <Field Name="TurnoverPct_ItemCategorySub4">
+          <DataField>TurnoverPct_ItemCategorySub4</DataField>
         </Field>
-        <Field Name="TurnoverPct_ItemGroupSub4Format">
-          <DataField>TurnoverPct_ItemGroupSub4Format</DataField>
+        <Field Name="TurnoverPct_ItemCategorySub4Format">
+          <DataField>TurnoverPct_ItemCategorySub4Format</DataField>
         </Field>
         <Field Name="ItemGrpNoLvl4">
           <DataField>ItemGrpNoLvl4</DataField>

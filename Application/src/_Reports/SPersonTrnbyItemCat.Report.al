@@ -1,11 +1,11 @@
-﻿report 6014431 "NPR S.Person Trx by Item Gr."
+report 6014431 "NPR S.Person Trn by Item Cat."
 {
     #IF NOT BC17 
     Extensible = False; 
     #ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Person Trn. by Item Gr..rdlc';
-    Caption = 'Sales Person Trn. By Item Gr.';
+    RDLCLayout = './src/_Reports/layouts/Sales Person Trn. by Item Cat..rdlc';
+    Caption = 'Sales Person Transactions By Item Category';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
@@ -75,7 +75,7 @@
                 {
                     AutoFormatType = 1;
                 }
-                column(SalesPersonPercentItemGroupSale; PercentItemGroupSale)
+                column(SalesPersonPercentItemCategorySale; PercentItemCategorySale)
                 {
                 }
                 column(SalesPersonDb; "NPR Sales (LCY)" - "NPR COGS (LCY)")
@@ -118,9 +118,9 @@
                         TempVendorAmount.Insert();
                     end;
 
-                    Clear(PercentItemGroupSale);
+                    Clear(PercentItemCategorySale);
                     if "Item Category"."NPR Sales (LCY)" <> 0 then
-                        PercentItemGroupSale := '(' + Format(("NPR Sales (LCY)" / "Item Category"."NPR Sales (LCY)" * 100), -4) + '%)';
+                        PercentItemCategorySale := '(' + Format(("NPR Sales (LCY)" / "Item Category"."NPR Sales (LCY)" * 100), -4) + '%)';
                 end;
 
                 trigger OnPreDataItem()
@@ -148,7 +148,7 @@
                 {
                     AutoFormatType = 1;
                 }
-                column(IntPcttekst; PercentItemGroupSale)
+                column(IntPcttekst; PercentItemCategorySale)
                 {
                 }
                 column(IntDb; "Salesperson/Purchaser"."NPR Sales (LCY)" - "Salesperson/Purchaser"."NPR COGS (LCY)")
@@ -176,9 +176,9 @@
                     if "Salesperson/Purchaser"."NPR Sales (LCY)" <> 0 then
                         Dg := (("Salesperson/Purchaser"."NPR Sales (LCY)" - "Salesperson/Purchaser"."NPR COGS (LCY)") / "Salesperson/Purchaser"."NPR Sales (LCY)") * 100;
 
-                    Clear(PercentItemGroupSale);
+                    Clear(PercentItemCategorySale);
                     if "Item Category"."NPR Sales (LCY)" <> 0 then
-                        PercentItemGroupSale := '(' + Format(("Salesperson/Purchaser"."NPR Sales (LCY)" / "Item Category"."NPR Sales (LCY)" * 100), -4) + '%)';
+                        PercentItemCategorySale := '(' + Format(("Salesperson/Purchaser"."NPR Sales (LCY)" / "Item Category"."NPR Sales (LCY)" * 100), -4) + '%)';
                 end;
 
                 trigger OnPreDataItem()
@@ -190,7 +190,7 @@
 
             trigger OnAfterGetRecord()
             begin
-                if not ShowItemsGrpWithoutSale then begin
+                if not ShowItemsCatWithoutSale then begin
                     if "NPR Sales (Qty.)" = 0 then
                         CurrReport.Skip();
                 end;
@@ -226,11 +226,11 @@
                 group(Setting)
                 {
                     Caption = 'Setting';
-                    field("Show itemgroups with no sales"; ShowItemsGrpWithoutSale)
+                    field("Show ItemCategory with no sales"; ShowItemsCatWithoutSale)
                     {
 
-                        Caption = 'Show Item Groups With No Sales';
-                        ToolTip = 'Specifies the value of the Show Item Groups With No Sales field';
+                        Caption = 'Show Item Category With No Sales';
+                        ToolTip = 'Specifies the value of the Show Item Category With No Sales field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Sort salespersons"; SortSalesPerson)
@@ -266,7 +266,7 @@
     labels
     {
         Name = 'ConstValue';
-        NoCap = 'Item group';
+        NoCap = 'Item Category';
         SalesPersonCap = 'Sales person';
         DescCap = 'Description';
         qtyCap = 'Qty';
@@ -275,14 +275,14 @@
         DbCap = 'Margin';
         DgCap = 'Cover-age. (%)';
         TotalSalesCap = '% total sales';
-        ReportCap = 'Sales person turnover per item group';
+        ReportCap = 'Sales person turnover per Item Category';
     }
 
     trigger OnInitReport()
     begin
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
-        ShowItemsGrpWithoutSale := false;
+        ShowItemsCatWithoutSale := false;
         SortSalesPerson := false;
         SortOrder := SortOrder::Highest;
         SortBy := SortBy::Quantity;
@@ -292,7 +292,7 @@
         CompanyInformation: Record "Company Information";
         AuxValueEntry: Record "NPR Aux. Value Entry";
         TempVendorAmount: Record "Vendor Amount" temporary;
-        ShowItemsGrpWithoutSale: Boolean;
+        ShowItemsCatWithoutSale: Boolean;
         [InDataSet]
         SortSalesPerson: Boolean;
         Dg: Decimal;
@@ -301,6 +301,6 @@
         Multpl: Integer;
         SortOrder: Option Highest,Lowest;
         SortBy: Option Quantity,Turnover,DB;
-        PercentItemGroupSale: Text[30];
+        PercentItemCategorySale: Text[30];
 }
 

@@ -33,7 +33,7 @@
             {
                 AutoFormatType = 2;
             }
-            column(ShowItemGroup; ShowItemGroup)
+            column(ShowItemCategory; ShowItemCategory)
             {
             }
             column(DateFilter; DateFilter)
@@ -70,20 +70,20 @@
             {
                 AutoFormatType = 2;
             }
-            column(ShowItemGroup_Vendor; ShowItemGroup)
+            column(ShowItemCategory_Vendor; ShowItemCategory)
             {
             }
             dataitem(Varegruppe; "Item Category")
             {
                 DataItemTableView = SORTING(Code);
                 PrintOnlyIfDetail = true;
-                column(ItemGroupDesc; ItemGroupDesc)
+                column(ItemCategoryDesc; ItemCategoryDesc)
                 {
                 }
-                column(ItemGroupNo; Varegruppe.Code)
+                column(ItemCategoryNo; Varegruppe.Code)
                 {
                 }
-                column(ItemGroupFooterDesc; ItemGroupFooterDesc)
+                column(ItemCategoryFooterDesc; ItemCategoryFooterDesc)
                 {
                 }
                 dataitem(Item; Item)
@@ -100,7 +100,7 @@
                     column(ItemNo; Item."No.")
                     {
                     }
-                    column(ItemItemGroup; Item."Item Category Code")
+                    column(ItemItemCategory; Item."Item Category Code")
                     {
                     }
                     column(ItemPurchasesQty; Item."Purchases (Qty.)")
@@ -224,8 +224,8 @@
 
                 trigger OnAfterGetRecord()
                 begin
-                    ItemGroupDesc := Text10600004 + Code + ' ' + Description;
-                    ItemGroupFooterDesc := Text10600006 + Vendor.Name;
+                    ItemCategoryDesc := Text10600004 + Code + ' ' + Description;
+                    ItemCategoryFooterDesc := Text10600006 + Vendor.Name;
                 end;
 
                 trigger OnPreDataItem()
@@ -269,11 +269,11 @@
                         ToolTip = 'Specifies the value of the View Items field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Show Item Group"; ShowItemGroup)
+                    field("Show Item Category"; ShowItemCategory)
                     {
 
-                        Caption = 'Show Item Groups';
-                        ToolTip = 'Specifies the value of the Show Item Groups field';
+                        Caption = 'Show Item Category';
+                        ToolTip = 'Specifies the value of the Show Item Category field';
                         ApplicationArea = NPRRetail;
                     }
                     field(InventoryValueIsBasedOn; ValueMethod)
@@ -297,7 +297,7 @@
         Desc_Cap = 'Description';
         VendorItemNo_Cap = 'Supplier item no.';
         ItemNo_Cap = 'No.';
-        ItemItemGroup_Cap = 'Belong to item gr. no.';
+        ItemItemCategory_Cap = 'Belong to Item Cat. no.';
         Purchase_Cap = 'Purchase (qty)';
         SalesQty_Cap = 'Sales (qty)';
         SalesAmount_Cap = 'Sales (DKK)';
@@ -326,7 +326,7 @@
         Item2: Record Item;
         ItemCostMgt: Codeunit ItemCostManagement;
         ShowItem: Boolean;
-        ShowItemGroup: Boolean;
+        ShowItemCategory: Boolean;
         ShowItemWithSales: Boolean;
         EndDate: Date;
         StartDate: Date;
@@ -349,17 +349,17 @@
         Text10600007: Label 'Department';
         Text10600002: Label 'For the period';
         Text10600008: Label 'Inventory is equal to inventories per %1 * %2 + delivery costs';
-        Text10600004: Label 'Item group';
+        Text10600004: Label 'Item Category';
         Text10600003: Label 'M';
         Text10600006: Label 'Total ';
-        Text10600005: Label 'Total for the item group';
+        Text10600005: Label 'Total for the Item Category';
         ValueMethod: Option "sidste koebspris","kostpris (gns.)";
         DateFilter: Text[100];
         FilterDesc: Text[200];
         InventoryValueDesc: Text[200];
         ItemFooterDesc: Text[200];
-        ItemGroupDesc: Text[200];
-        ItemGroupFooterDesc: Text[200];
+        ItemCategoryDesc: Text[200];
+        ItemCategoryFooterDesc: Text[200];
 
     procedure Calculate(DateFrom: Date; DateTo: Date): Decimal
     begin

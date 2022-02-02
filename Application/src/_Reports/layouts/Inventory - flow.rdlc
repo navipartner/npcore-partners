@@ -964,14 +964,14 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="ItemGroup_Item">
+                        <Textbox Name="ItemCategory_Item">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!ItemGroup_Item.Value</Value>
+                                  <Value>=Fields!ItemCategory_Item.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>7pt</FontSize>
@@ -981,7 +981,7 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>ItemGroup_Item</rd:DefaultName>
+                          <rd:DefaultName>ItemCategory_Item</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1984,7 +1984,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!ItemGroup_Caption.Value+ " "+Fields!ItemGroup_Item.Value</Value>
+                                  <Value>=Parameters!ItemCategory_Caption.Value+ " "+Fields!ItemCategory_Item.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>7pt</FontSize>
@@ -2046,14 +2046,14 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Description_ItemGroup">
+                        <Textbox Name="Description_ItemCategory">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Description_ItemGroup.Value</Value>
+                                  <Value>=Fields!Description_ItemCategory.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>7pt</FontSize>
@@ -2064,7 +2064,7 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Description_ItemGroup</rd:DefaultName>
+                          <rd:DefaultName>Description_ItemCategory</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -4851,13 +4851,13 @@
                       </SortExpressions>
                       <TablixMembers>
                         <TablixMember>
-                          <Group Name="GrpItemGroup">
+                          <Group Name="GrpItemCategory">
                             <GroupExpressions>
-                              <GroupExpression>=Fields!No_ItemGroup.Value</GroupExpression>
+                              <GroupExpression>=Fields!No_ItemCategory.Value</GroupExpression>
                             </GroupExpressions>
                             <Filters>
                               <Filter>
-                                <FilterExpression>=Fields!No_ItemGroup.Value</FilterExpression>
+                                <FilterExpression>=Fields!No_ItemCategory.Value</FilterExpression>
                                 <Operator>GreaterThan</Operator>
                                 <FilterValues>
                                   <FilterValue>""</FilterValue>
@@ -4867,7 +4867,7 @@
                           </Group>
                           <SortExpressions>
                             <SortExpression>
-                              <Value>=Fields!ItemGroup_Item.Value</Value>
+                              <Value>=Fields!ItemCategory_Item.Value</Value>
                             </SortExpression>
                           </SortExpressions>
                           <TablixMembers>
@@ -4881,7 +4881,7 @@
                         </TablixMember>
                         <TablixMember>
                           <Visibility>
-                            <Hidden>=iif(Fields!ShowItemGroupSection_ItemGroup.Value=TRUE,FALSE,TRUE)</Hidden>
+                            <Hidden>=iif(Fields!ShowItemCategorySection_ItemCategory.Value=TRUE,FALSE,TRUE)</Hidden>
                           </Visibility>
                           <KeepWithGroup>Before</KeepWithGroup>
                         </TablixMember>
@@ -4912,7 +4912,7 @@
                 </FilterValues>
               </Filter>
               <Filter>
-                <FilterExpression>=Fields!No_ItemGroup.Value</FilterExpression>
+                <FilterExpression>=Fields!No_ItemCategory.Value</FilterExpression>
                 <Operator>GreaterThan</Operator>
                 <FilterValues>
                   <FilterValue>""</FilterValue>
@@ -5877,14 +5877,14 @@
       </DefaultValue>
       <Prompt>Total_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ItemGroup_Caption">
+    <ReportParameter Name="ItemCategory_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ItemGroup_Caption</Value>
+          <Value>ItemCategory_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ItemGroup_Caption</Prompt>
+      <Prompt>ItemCategory_Caption</Prompt>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
@@ -5980,7 +5980,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>17</RowIndex>
-          <ParameterName>ItemGroup_Caption</ParameterName>
+          <ParameterName>ItemCategory_Caption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -6075,8 +6075,8 @@ End Function
         <Field Name="Description_Item">
           <DataField>Description_Item</DataField>
         </Field>
-        <Field Name="ItemGroup_Item">
-          <DataField>ItemGroup_Item</DataField>
+        <Field Name="ItemCategory_Item">
+          <DataField>ItemCategory_Item</DataField>
         </Field>
         <Field Name="StockInventoryStart_Item">
           <DataField>StockInventoryStart_Item</DataField>
@@ -6153,11 +6153,11 @@ End Function
         <Field Name="ShowItemSection_Item">
           <DataField>ShowItemSection_Item</DataField>
         </Field>
-        <Field Name="No_ItemGroup">
-          <DataField>No_ItemGroup</DataField>
+        <Field Name="No_ItemCategory">
+          <DataField>No_ItemCategory</DataField>
         </Field>
-        <Field Name="Description_ItemGroup">
-          <DataField>Description_ItemGroup</DataField>
+        <Field Name="Description_ItemCategory">
+          <DataField>Description_ItemCategory</DataField>
         </Field>
         <Field Name="StockInventoryStart2">
           <DataField>StockInventoryStart2</DataField>
@@ -6165,8 +6165,8 @@ End Function
         <Field Name="StockInventoryStart2Format">
           <DataField>StockInventoryStart2Format</DataField>
         </Field>
-        <Field Name="ShowItemGroupSection_ItemGroup">
-          <DataField>ShowItemGroupSection_ItemGroup</DataField>
+        <Field Name="ShowItemCategorySection_ItemCategory">
+          <DataField>ShowItemCategorySection_ItemCategory</DataField>
         </Field>
       </Fields>
       <Query>

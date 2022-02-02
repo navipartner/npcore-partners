@@ -1,11 +1,11 @@
-﻿report 6014408 "NPR Item Group Overview"
+report 6014408 "NPR Item Category Overview"
 {
     #IF NOT BC17 
     Extensible = False; 
     #ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Item Group Overview.rdlc';
-    Caption = 'Item Group Overview';
+    RDLCLayout = './src/_Reports/layouts/Item Category Overview.rdlc';
+    Caption = 'Item Category Overview';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
@@ -15,6 +15,7 @@
         dataitem("Item Category"; "Item Category")
         {
             DataItemTableView = SORTING("Code");
+
             RequestFilterFields = "Code", "NPR Main Category";
             column(PageNoCaptionLbl; PageNoCaptionLbl)
             {
@@ -47,7 +48,7 @@
             column(Item_Group_Inventory_Posting_Group_; InventoryPostingGroupCode)
             {
             }
-            column(ItemGroupCaption; ItemGroupCaptionLbl)
+            column(ItemCategoryCaption; ItemCategoryCaptionLbl)
             {
             }
             column(DescriptionCaption; DescriptionCaptionLbl)
@@ -79,7 +80,7 @@
     }
     labels
     {
-        BelongInMainItemGrp_Caption = 'Belongs in Main Item Group';
+        BelongInMainItemCat_Caption = 'Belongs in Main Item Category';
         VATProdPostingGrp_Caption = 'VAT Prod. Posting Group';
         VATBusPostingGrp_Caption = 'VAT Bus. Posting Group';
         GenBusPostingGrp_Caption = 'Gen. Bus. Posting Group';
@@ -100,8 +101,8 @@
         VATBusPostingGroupCode: Code[20];
         InventoryPostingGroupCode: Code[20];
         DescriptionCaptionLbl: Label 'Description';
-        ItemGroupCaptionLbl: Label 'Item Group';
-        Report_Caption_Lbl: Label 'Item Group Overview';
+        ItemCategoryCaptionLbl: Label 'Item Category';
+        Report_Caption_Lbl: Label 'Item Category Overview';
         PageNoCaptionLbl: Label 'Page';
 }
 

@@ -1,10 +1,10 @@
-﻿report 6014420 "NPR Item Group Top"
+report 6014420 "NPR Item Category Top"
 {
-    #IF NOT BC17 
+    #IF NOT BC17
     Extensible = False; 
     #ENDIF
-    RDLCLayout = './src/_Reports/layouts/Item Group Top.rdlc';
-    Caption = 'Item Group Top';
+    RDLCLayout = './src/_Reports/layouts/Item Category Top.rdlc';
+    Caption = 'Item Category Top';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
@@ -115,16 +115,16 @@
                 column(Name_DimensionValue; "Dimension Value".Name)
                 {
                 }
-                column(No_ItemGroup; "Item Category"."Code")
+                column(No_ItemCategory; "Item Category"."Code")
                 {
                 }
-                column(Description_ItemGroup; "Item Category".Description)
+                column(Description_ItemCategory; "Item Category".Description)
                 {
                 }
-                column(SalesQty_ItemGroup; IleSalesQty)
+                column(SalesQty_ItemCategory; IleSalesQty)
                 {
                 }
-                column(SaleLCY_ItemGroup; IleSalesLCY)
+                column(SaleLCY_ItemCategory; IleSalesLCY)
                 {
                 }
                 column(db; db)
@@ -276,15 +276,15 @@
 
     labels
     {
-        Report_Caption = 'Item Group Top';
+        Report_Caption = 'Item Category Top';
         Sequence_Caption = 'Sequence';
-        ItemGroup_Caption = 'Item Group';
+        ItemCategory_Caption = 'Item Category';
         Description_Caption = 'Description';
         Quantity_Caption = 'Quantity';
         Sale_LCY_Caption = 'Sale (LCY)';
         Profit_LCY_Caption = 'Profit (LCY)';
         Profit_Pct_Caption = 'Profit %';
-        Ikke_Caption = 'Not in item group';
+        NotInItemCategory_Caption = 'Not in Item Category';
     }
 
     trigger OnInitReport()

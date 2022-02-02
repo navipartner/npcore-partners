@@ -56,7 +56,7 @@ report 6014428 "NPR Shelf Labels"
             column(Barcode_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1.Barcode)
             {
             }
-            column(Itemgroup_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Item group")
+            column(ItemCategory_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Item group")
             {
             }
             column(BarCodeTempBlobCol1; TempBlobBuffer."Buffer 1")
@@ -68,7 +68,7 @@ report 6014428 "NPR Shelf Labels"
             column(NewItemNo_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."New Item No.")
             {
             }
-            column(TMPItemGroup; TMPItemGroup)
+            column(TMPItemCategory; TMPItemCategory)
             {
             }
             column(BeforeCaption; BeforeCaptionTxt)
@@ -107,9 +107,9 @@ report 6014428 "NPR Shelf Labels"
                     if ItemVariant.Get(Item."No.", "Variant Code") then;
                 end;
 
-                Clear(TMPItemGroup);
+                Clear(TMPItemCategory);
                 if ItemCategory.Get(TMPRetail_Journal_Line_Col1."Item group") then
-                    TMPItemGroup := ItemCategory.Description;
+                    TMPItemCategory := ItemCategory.Description;
 
                 TMPBeforeUnitPrice := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
                 TMPUnitPriceCard := Item."Unit Price";
@@ -199,7 +199,7 @@ report 6014428 "NPR Shelf Labels"
         NowCaptionLbl: Label 'Now';
         UnitPriceOption: Option "Use Retail Journal Line Prices","Use Item Card Unit Prices","Use Campaign Unit Prices";
         BeforeCaptionTxt: Text;
-        TMPItemGroup: Text;
+        TMPItemCategory: Text;
         TMPUnitPriceDecimal: Text;
         TMPUnitPriceWhole: Text;
         NPRAtrributeTextArray: array[20] of Text;

@@ -2082,14 +2082,14 @@
                       <KeepWithGroup>After</KeepWithGroup>
                     </TablixMember>
                     <TablixMember>
-                      <Group Name="ItemGroup">
+                      <Group Name="ItemCategory">
                         <GroupExpressions>
-                          <GroupExpression>=Fields!ItemGroupNo.Value</GroupExpression>
+                          <GroupExpression>=Fields!ItemCategoryNo.Value</GroupExpression>
                         </GroupExpressions>
                       </Group>
                       <SortExpressions>
                         <SortExpression>
-                          <Value>=Fields!ItemGroupNo.Value</Value>
+                          <Value>=Fields!ItemCategoryNo.Value</Value>
                         </SortExpression>
                       </SortExpressions>
                       <TablixHeader>
@@ -2117,7 +2117,7 @@
                                   <Paragraph>
                                     <TextRuns>
                                       <TextRun>
-                                        <Value>=Fields!ItemGroupDesc.Value</Value>
+                                        <Value>=Fields!ItemCategoryDesc.Value</Value>
                                         <Style>
                                           <FontFamily>Segoe UI</FontFamily>
                                           <FontSize>7pt</FontSize>
@@ -3687,7 +3687,7 @@
                         </TablixMember>
                       </TablixMembers>
                       <Visibility>
-                        <Hidden>=iif(Fields!ShowItemGroup_Vendor.Value = TRUE, true, false)</Hidden>
+                        <Hidden>=iif(Fields!ShowItemCategory_Vendor.Value = TRUE, true, false)</Hidden>
                       </Visibility>
                     </TablixMember>
                     <TablixMember>
@@ -3701,7 +3701,7 @@
                               <Paragraph>
                                 <TextRuns>
                                   <TextRun>
-                                    <Value>=Fields!ItemGroupFooterDesc.Value</Value>
+                                    <Value>=Fields!ItemCategoryFooterDesc.Value</Value>
                                     <Style>
                                       <FontFamily>Segoe UI</FontFamily>
                                       <FontSize>7pt</FontSize>
@@ -5986,14 +5986,14 @@
       </DefaultValue>
       <Prompt>ItemNo_Cap</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ItemItemGroup_Cap">
+    <ReportParameter Name="ItemItemCategory_Cap">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ItemItemGroup_Cap</Value>
+          <Value>ItemItemCategory_Cap</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ItemItemGroup_Cap</Prompt>
+      <Prompt>ItemItemCategory_Cap</Prompt>
     </ReportParameter>
     <ReportParameter Name="Purchase_Cap">
       <DataType>String</DataType>
@@ -6133,7 +6133,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>6</RowIndex>
-          <ParameterName>ItemItemGroup_Cap</ParameterName>
+          <ParameterName>ItemItemCategory_Cap</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -6249,8 +6249,8 @@ End Function
         <Field Name="ShowItemWithSales">
           <DataField>ShowItemWithSales</DataField>
         </Field>
-        <Field Name="ShowItemGroup">
-          <DataField>ShowItemGroup</DataField>
+        <Field Name="ShowItemCategory">
+          <DataField>ShowItemCategory</DataField>
         </Field>
         <Field Name="DateFilter">
           <DataField>DateFilter</DataField>
@@ -6273,17 +6273,17 @@ End Function
         <Field Name="ShowItemWithSales_Vendor">
           <DataField>ShowItemWithSales_Vendor</DataField>
         </Field>
-        <Field Name="ShowItemGroup_Vendor">
-          <DataField>ShowItemGroup_Vendor</DataField>
+        <Field Name="ShowItemCategory_Vendor">
+          <DataField>ShowItemCategory_Vendor</DataField>
         </Field>
-        <Field Name="ItemGroupDesc">
-          <DataField>ItemGroupDesc</DataField>
+        <Field Name="ItemCategoryDesc">
+          <DataField>ItemCategoryDesc</DataField>
         </Field>
-        <Field Name="ItemGroupNo">
-          <DataField>ItemGroupNo</DataField>
+        <Field Name="ItemCategoryNo">
+          <DataField>ItemCategoryNo</DataField>
         </Field>
-        <Field Name="ItemGroupFooterDesc">
-          <DataField>ItemGroupFooterDesc</DataField>
+        <Field Name="ItemCategoryFooterDesc">
+          <DataField>ItemCategoryFooterDesc</DataField>
         </Field>
         <Field Name="ItemDesc">
           <DataField>ItemDesc</DataField>
@@ -6294,8 +6294,8 @@ End Function
         <Field Name="ItemNo">
           <DataField>ItemNo</DataField>
         </Field>
-        <Field Name="ItemItemGroup">
-          <DataField>ItemItemGroup</DataField>
+        <Field Name="ItemItemCategory">
+          <DataField>ItemItemCategory</DataField>
         </Field>
         <Field Name="ItemPurchasesQty">
           <DataField>ItemPurchasesQty</DataField>
