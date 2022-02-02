@@ -1,6 +1,5 @@
 ﻿codeunit 6014413 "NPR Label Library"
 {
-    Access = Internal;
     trigger OnRun()
     begin
     end;

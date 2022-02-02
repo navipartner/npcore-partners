@@ -1,10 +1,8 @@
 ﻿page 6014453 "NPR Campaign Discount"
 {
-    Extensible = False;
     Caption = 'Period Discount';
     PageType = Card;
     UsageCategory = Administration;
-
     SourceTable = "NPR Period Discount";
     ApplicationArea = NPRRetail;
 

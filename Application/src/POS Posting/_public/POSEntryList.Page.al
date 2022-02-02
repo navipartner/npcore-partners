@@ -1,11 +1,9 @@
 ﻿page 6150652 "NPR POS Entry List"
 {
-    Extensible = False;
     Caption = 'POS Entry List';
     CardPageID = "NPR POS Entry Card";
     DeleteAllowed = false;
     InsertAllowed = false;
-
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,POS Entry Lists,Failed POS Lists,Posting Entries';
     SourceTable = "NPR POS Entry";
