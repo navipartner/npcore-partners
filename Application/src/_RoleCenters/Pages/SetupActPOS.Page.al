@@ -68,8 +68,7 @@
                     action("Download Major Tom")
                     {
                         Caption = 'Download Major Tom';
-
-                        ToolTip = 'Specifies download URL for Major Tom Setup';
+                        ToolTip = 'Open URL with the option to download either 32-bit or 64-bit version.';
                         Image = TileCloud;
                         ApplicationArea = NPRRetail;
 
@@ -81,8 +80,7 @@
                     action("Download HW Connector")
                     {
                         Caption = 'Download HW Connector';
-
-                        ToolTip = 'Specifies download URL for Hardware Connector Setup';
+                        ToolTip = 'Download the setup wizard for the Hardware Connector Setup.';
                         Image = TileCloud;
                         ApplicationArea = NPRRetail;
 
@@ -95,9 +93,8 @@
                     {
                         Caption = 'Download Template Data';
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies download URL for Template Data Setup';
+                        ToolTip = 'Download and import the template which contains data to base and NPR tables.';
                         Image = TileCloud;
-
                         RunObject = page "NPR RapidStart Base Data Imp.";
                     }
                 }
