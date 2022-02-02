@@ -389,7 +389,7 @@
         PageCaptionLbl: Label 'Page';
         ProfitCaptionLbl: Label 'Profit';
         SalesLCYCaptionLbl: Label 'Sales(LCY)';
-        ReportCaptionLbl: Label 'Salesperson/Item Group Top';
+        ReportCaptionLbl: Label 'Salesperson/Item Category Top';
         Trans0001: Label 'Sorted by turnover';
         TurnoverCaptionLbl: Label 'Turnover';
         SPDateFilter: Text;

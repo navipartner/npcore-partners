@@ -364,11 +364,11 @@
                         }
                         action("NPR Item Group Inventory Value")
                         {
-                            Caption = 'Item Group Inventory Value';
+                            Caption = 'Item Category Inventory Value';
                             Image = Report;
-                            RunObject = report "NPR Item Group Inv. Value";
+                            RunObject = report "NPR Item Cat. Inv. Value";
 
-                            ToolTip = 'Executes the Item Group Inventory Value action';
+                            ToolTip = 'Executes the Item Category Inventory Value action';
                             ApplicationArea = NPRRetail;
                         }
 
@@ -467,11 +467,11 @@
                         }
                         action("NPR Item Group Top")
                         {
-                            Caption = 'Item Group Top';
+                            Caption = 'Item Category Top';
                             Image = Report;
-                            RunObject = report "NPR Item Group Top";
+                            RunObject = report "NPR Item Category Top";
 
-                            ToolTip = 'Executes the Item Group Top action';
+                            ToolTip = 'Executes the Item Category Top action';
                             ApplicationArea = NPRRetail;
                         }
                     }
@@ -482,18 +482,18 @@
 
                         action("NPR Item Group Overview")
                         {
-                            Caption = 'Item Group Overview';
+                            Caption = 'Item Category Overview';
                             Image = Report;
-                            RunObject = Report "NPR Item Group Overview";
+                            RunObject = Report "NPR Item Category Overview";
 
-                            ToolTip = 'Executes the Item Group Overview action';
+                            ToolTip = 'Executes the Item Category Overview action';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Vendor Sales per Line")
                         {
                             Caption = 'Vendor Sales per Line';
                             Image = Report;
-                            RunObject = report "NPR Vendor trx by Item group";
+                            RunObject = report "NPR Vendor Trn. by Item Cat.";
                             ToolTip = 'Executes the Vendor sales per line action';
                             ApplicationArea = NPRRetail;
                         }
@@ -501,8 +501,8 @@
                         {
                             Caption = 'Sales Person Trn. by Item Cat.';
                             Image = Report;
-                            RunObject = Report "NPR S.Person Trx by Item Gr.";
-                            ToolTip = 'Executes the Sales Person Trn. by Item Gr. action';
+                            RunObject = Report "NPR S.Person Trn by Item Cat.";
+                            ToolTip = 'Runs Sales Person Trnansactions by Item Category report';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales Stat/Analysis")

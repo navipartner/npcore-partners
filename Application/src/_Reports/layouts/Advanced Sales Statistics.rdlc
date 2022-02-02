@@ -2474,7 +2474,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!ItemGroupFilter_Caption.Value</Value>
+                      <Value>=Parameters!ItemCategoryFilter_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -2501,7 +2501,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=First(Fields!ItemGroupFilter.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!ItemCategoryFilter.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -3102,14 +3102,14 @@
       </DefaultValue>
       <Prompt>GlobalDim2_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ItemGroupFilter_Caption">
+    <ReportParameter Name="ItemCategoryFilter_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ItemGroupFilter_Caption</Value>
+          <Value>ItemCategoryFilter_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ItemGroupFilter_Caption</Prompt>
+      <Prompt>ItemCategoryFilter_Caption</Prompt>
     </ReportParameter>
     <ReportParameter Name="Period_Caption">
       <DataType>String</DataType>
@@ -3275,7 +3275,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>4</RowIndex>
-          <ParameterName>ItemGroupFilter_Caption</ParameterName>
+          <ParameterName>ItemCategoryFilter_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -3408,8 +3408,8 @@ End Function
         <Field Name="Dim2Filter">
           <DataField>Dim2Filter</DataField>
         </Field>
-        <Field Name="ItemGroupFilter">
-          <DataField>ItemGroupFilter</DataField>
+        <Field Name="ItemCategoryFilter">
+          <DataField>ItemCategoryFilter</DataField>
         </Field>
         <Field Name="PeriodeFilter">
           <DataField>PeriodeFilter</DataField>

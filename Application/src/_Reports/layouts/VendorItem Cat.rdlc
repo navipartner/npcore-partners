@@ -457,17 +457,17 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="TotalPctaendringItemGroup">
+                        <Textbox Name="TotalPctaendringItemCategory">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!TotalPctaendringItemGroup.Value</Value>
+                                  <Value>=Fields!TotalPctaendringItemCategory.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
-                                    <Format>=Fields!TotalPctaendringItemGroupFormat.Value</Format>
+                                    <Format>=Fields!TotalPctaendringItemCategoryFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -476,7 +476,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>TotalPctaendringItemGroup</rd:DefaultName>
+                          <rd:DefaultName>TotalPctaendringItemCategory</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -519,7 +519,7 @@
                 <TablixMember>
                   <Group Name="Details4" />
                   <Visibility>
-                    <Hidden>=iif(First(Fields!viskunhovedtal_ItemGroup.Value, "DataSet_Result")=TRUE,TRUE,FALSE)</Hidden>
+                    <Hidden>=iif(First(Fields!viskunhovedtal_ItemCategory.Value, "DataSet_Result")=TRUE,TRUE,FALSE)</Hidden>
                   </Visibility>
                 </TablixMember>
               </TablixMembers>
@@ -611,7 +611,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!No_ItemGroup.Value</Value>
+                                                    <Value>=Fields!No_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
                                                     </Style>
@@ -642,7 +642,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Description_ItemGroup.Value</Value>
+                                                    <Value>=Fields!Description_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
                                                     </Style>
@@ -666,17 +666,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="PurchaseQuantity_ItemGroup">
+                                          <Textbox Name="PurchaseQuantity_ItemCategory">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!PurchaseQty_ItemGroup.Value</Value>
+                                                    <Value>=Fields!PurchaseQty_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!PurchaseQty_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!PurchaseQty_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -685,7 +685,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>PurchaseQuantity_ItemGroup</rd:DefaultName>
+                                            <rd:DefaultName>PurchaseQuantity_ItemCategory</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -707,10 +707,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!PurchaseLCY_ItemGroup.Value</Value>
+                                                    <Value>=Fields!PurchaseLCY_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!PurchaseLCY_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!PurchaseLCY_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -741,10 +741,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!SaleLCY_ItemGroup.Value</Value>
+                                                    <Value>=Fields!SaleLCY_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!SaleLCY_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!SaleLCY_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -809,10 +809,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!SalesQty_ItemGroup.Value</Value>
+                                                    <Value>=Fields!SalesQty_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!SalesQty_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!SalesQty_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -843,10 +843,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!CR_ItemGroup.Value</Value>
+                                                    <Value>=Fields!CR_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!CR_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!CR_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -877,10 +877,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!dg_ItemGroup.Value</Value>
+                                                    <Value>=Fields!dg_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!dg_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!dg_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -911,10 +911,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!AmtLY_ItemGroup.Value</Value>
+                                                    <Value>=Fields!AmtLY_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!AmtLY_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!AmtLY_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -945,10 +945,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!TurnoverLY_ItemGroup.Value</Value>
+                                                    <Value>=Fields!TurnoverLY_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!TurnoverLY_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!TurnoverLY_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -979,10 +979,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!PctaendringItemGroup.Value</Value>
+                                                    <Value>=Fields!PctaendringItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!PctaendringItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!PctaendringItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1029,7 +1029,7 @@
                                   <TablixMember>
                                     <Group Name="Details2" />
                                     <Visibility>
-                                      <Hidden>=iif((Fields!SalesLCY_Vendor.Value&gt;0) AND (Fields!viskunhovedtal.Value=FALSE) AND (Fields!sortervaregruppe_ItemGroup.Value=FALSE),FALSE,TRUE)</Hidden>
+                                      <Hidden>=iif((Fields!SalesLCY_Vendor.Value&gt;0) AND (Fields!viskunhovedtal.Value=FALSE) AND (Fields!sortervaregruppe_ItemCategory.Value=FALSE),FALSE,TRUE)</Hidden>
                                     </Visibility>
                                   </TablixMember>
                                 </TablixMembers>
@@ -1037,7 +1037,7 @@
                               <DataSetName>DataSet_Result</DataSetName>
                               <Filters>
                                 <Filter>
-                                  <FilterExpression>=Fields!No_ItemGroup.Value</FilterExpression>
+                                  <FilterExpression>=Fields!No_ItemCategory.Value</FilterExpression>
                                   <Operator>GreaterThan</Operator>
                                   <FilterValues>
                                     <FilterValue>""</FilterValue>
@@ -1103,7 +1103,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Parameters!TotalItemGrp.Value</Value>
+                                                    <Value>=Parameters!TotalItemCat.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -1418,24 +1418,24 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SumPctaendringItemGroup">
+                                          <Textbox Name="SumPctaendringItemCategory">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!SumPctaendringItemGroup.Value</Value>
+                                                    <Value>=Fields!SumPctaendringItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!SumPctaendringItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!SumPctaendringItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SumPctaendringItemGroup</rd:DefaultName>
+                                            <rd:DefaultName>SumPctaendringItemCategory</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1479,7 +1479,7 @@
         (Len(Fields!CRSum_ItemGrpSum.Value)=0) AND 
         (Len(Fields!SaleLCYLYSum_ItemGrpSum.Value)=0) AND 
         (Len(Fields!AmtLYSum_ItemGrpSum.Value)=0) AND 
-        (Len(Fields!SumPctaendringItemGroup.Value)=0),true,false)</Hidden>
+        (Len(Fields!SumPctaendringItemCategory.Value)=0),true,false)</Hidden>
                                     </Visibility>
                                   </TablixMember>
                                 </TablixMembers>
@@ -1550,14 +1550,14 @@
                                     <TablixCells>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="No_ItemGroup">
+                                          <Textbox Name="No_ItemCategory">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!No_ItemGroup2.Value</Value>
+                                                    <Value>=Fields!No_ItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
                                                     </Style>
@@ -1566,7 +1566,7 @@
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>No_ItemGroup</rd:DefaultName>
+                                            <rd:DefaultName>No_ItemCategory</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1588,7 +1588,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Description_ItemGroup2.Value</Value>
+                                                    <Value>=Fields!Description_ItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
                                                     </Style>
@@ -1612,17 +1612,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="PurchaseQuantity_ItemGroup2">
+                                          <Textbox Name="PurchaseQuantity_ItemCategory2">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!PurchaseQty_ItemGroup2.Value</Value>
+                                                    <Value>=Fields!PurchaseQty_ItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!PurchaseQty_ItemGroup2Format.Value</Format>
+                                                      <Format>=Fields!PurchaseQty_ItemCategory2Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1631,7 +1631,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>PurchaseQuantity_ItemGroup</rd:DefaultName>
+                                            <rd:DefaultName>PurchaseQuantity_ItemCategory</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1653,10 +1653,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!PurchaseLCY_ItemGroup2.Value</Value>
+                                                    <Value>=Fields!PurchaseLCY_ItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!PurchaseLCY_ItemGroup2Format.Value</Format>
+                                                      <Format>=Fields!PurchaseLCY_ItemCategory2Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1687,10 +1687,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!SaleLCY_ItemGroup2.Value</Value>
+                                                    <Value>=Fields!SaleLCY_ItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!SaleLCY_ItemGroup2Format.Value</Format>
+                                                      <Format>=Fields!SaleLCY_ItemCategory2Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1755,10 +1755,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!SalesQty_ItemGroup2.Value</Value>
+                                                    <Value>=Fields!SalesQty_ItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!SalesQty_ItemGroup2Format.Value</Format>
+                                                      <Format>=Fields!SalesQty_ItemCategory2Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1789,10 +1789,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!CR_ItemGroup2.Value</Value>
+                                                    <Value>=Fields!CR_ItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!CR_ItemGroup2Format.Value</Format>
+                                                      <Format>=Fields!CR_ItemCategory2Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1823,10 +1823,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!dg_ItemGroup2.Value</Value>
+                                                    <Value>=Fields!dg_ItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!dg_ItemGroup2Format.Value</Format>
+                                                      <Format>=Fields!dg_ItemCategory2Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1857,10 +1857,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!AmtLY_ItemGroup2.Value</Value>
+                                                    <Value>=Fields!AmtLY_ItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!AmtLY_ItemGroup2Format.Value</Format>
+                                                      <Format>=Fields!AmtLY_ItemCategory2Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1884,17 +1884,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="TurnoverLY_ItemGroup2">
+                                          <Textbox Name="TurnoverLY_ItemCategory2">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!TurnoverLY_ItemGroup2.Value</Value>
+                                                    <Value>=Fields!TurnoverLY_ItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!TurnoverLY_ItemGroup2Format.Value</Format>
+                                                      <Format>=Fields!TurnoverLY_ItemCategory2Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1903,7 +1903,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>TurnoverLY_ItemGroup2</rd:DefaultName>
+                                            <rd:DefaultName>TurnoverLY_ItemCategory2</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1925,10 +1925,10 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!PctaendringItemGroup2.Value</Value>
+                                                    <Value>=Fields!PctaendringItemCategory2.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
-                                                      <Format>=Fields!PctaendringItemGroup2Format.Value</Format>
+                                                      <Format>=Fields!PctaendringItemCategory2Format.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1975,7 +1975,7 @@
                                   <TablixMember>
                                     <Group Name="Details3" />
                                     <Visibility>
-                                      <Hidden>=iif(Fields!No_ItemGroup2.Value&lt;&gt;"",false,true)</Hidden>
+                                      <Hidden>=iif(Fields!No_ItemCategory2.Value&lt;&gt;"",false,true)</Hidden>
                                     </Visibility>
                                   </TablixMember>
                                 </TablixMembers>
@@ -2728,7 +2728,7 @@
                                       </TablixMember>
                                       <TablixMember>
                                         <Visibility>
-                                          <Hidden>=iif((Fields!viskunhovedtal.Value=FALSE) OR (Fields!No_ItemGroup2.Value&lt;&gt;""),FALSE,TRUE)</Hidden>
+                                          <Hidden>=iif((Fields!viskunhovedtal.Value=FALSE) OR (Fields!No_ItemCategory2.Value&lt;&gt;""),FALSE,TRUE)</Hidden>
                                         </Visibility>
                                       </TablixMember>
                                     </TablixMembers>
@@ -2959,7 +2959,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!ItemGroup_Caption.Value</Value>
+                                  <Value>=Parameters!ItemCategory_Caption.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -3075,7 +3075,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!PurItemGrp_Caption.Value</Value>
+                                  <Value>=Parameters!PurItemCat_Caption.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -3454,7 +3454,7 @@
             <DataSetName>DataSet_Result</DataSetName>
             <Filters>
               <Filter>
-                <FilterExpression>=Fields!No_ItemGroup.Value</FilterExpression>
+                <FilterExpression>=Fields!No_ItemCategory.Value</FilterExpression>
                 <Operator>GreaterThan</Operator>
                 <FilterValues>
                   <FilterValue>""</FilterValue>
@@ -3622,7 +3622,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=First(Fields!ItemGroupFilters.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!ItemCategoryFilters.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -3770,14 +3770,14 @@
       </DefaultValue>
       <Prompt>Pct_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ItemGroup_Caption">
+    <ReportParameter Name="ItemCategory_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ItemGroup_Caption</Value>
+          <Value>ItemCategory_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ItemGroup_Caption</Prompt>
+      <Prompt>ItemCategory_Caption</Prompt>
     </ReportParameter>
     <ReportParameter Name="Description_Caption">
       <DataType>String</DataType>
@@ -3788,14 +3788,14 @@
       </DefaultValue>
       <Prompt>Description_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="PurItemGrp_Caption">
+    <ReportParameter Name="PurItemCat_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>PurItemGrp_Caption</Value>
+          <Value>PurItemCat_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>PurItemGrp_Caption</Prompt>
+      <Prompt>PurItemCat_Caption</Prompt>
     </ReportParameter>
     <ReportParameter Name="Turnover_Caption">
       <DataType>String</DataType>
@@ -3887,14 +3887,14 @@
       </DefaultValue>
       <Prompt>SalesAmt_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="TotalItemGrp">
+    <ReportParameter Name="TotalItemCat">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>TotalItemGrp</Value>
+          <Value>TotalItemCat</Value>
         </Values>
       </DefaultValue>
-      <Prompt>TotalItemGrp</Prompt>
+      <Prompt>TotalItemCat</Prompt>
     </ReportParameter>
     <ReportParameter Name="PageNoLbl">
       <DataType>String</DataType>
@@ -3959,7 +3959,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>9</RowIndex>
-          <ParameterName>ItemGroup_Caption</ParameterName>
+          <ParameterName>ItemCategory_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -3969,7 +3969,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>11</RowIndex>
-          <ParameterName>PurItemGrp_Caption</ParameterName>
+          <ParameterName>PurItemCat_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -4024,7 +4024,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>22</RowIndex>
-          <ParameterName>TotalItemGrp</ParameterName>
+          <ParameterName>TotalItemCat</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -4195,8 +4195,8 @@ End Function
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
-        <Field Name="ItemGroupFilters">
-          <DataField>ItemGroupFilters</DataField>
+        <Field Name="ItemCategoryFilters">
+          <DataField>ItemCategoryFilters</DataField>
         </Field>
         <Field Name="VendorFilters">
           <DataField>VendorFilters</DataField>
@@ -4261,29 +4261,29 @@ End Function
         <Field Name="viskunhovedtal">
           <DataField>viskunhovedtal</DataField>
         </Field>
-        <Field Name="No_ItemGroup">
-          <DataField>No_ItemGroup</DataField>
+        <Field Name="No_ItemCategory">
+          <DataField>No_ItemCategory</DataField>
         </Field>
-        <Field Name="Description_ItemGroup">
-          <DataField>Description_ItemGroup</DataField>
+        <Field Name="Description_ItemCategory">
+          <DataField>Description_ItemCategory</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroup">
-          <DataField>SaleLCY_ItemGroup</DataField>
+        <Field Name="SaleLCY_ItemCategory">
+          <DataField>SaleLCY_ItemCategory</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupFormat">
-          <DataField>SaleLCY_ItemGroupFormat</DataField>
+        <Field Name="SaleLCY_ItemCategoryFormat">
+          <DataField>SaleLCY_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="PurchaseLCY_ItemGroup">
-          <DataField>PurchaseLCY_ItemGroup</DataField>
+        <Field Name="PurchaseLCY_ItemCategory">
+          <DataField>PurchaseLCY_ItemCategory</DataField>
         </Field>
-        <Field Name="PurchaseLCY_ItemGroupFormat">
-          <DataField>PurchaseLCY_ItemGroupFormat</DataField>
+        <Field Name="PurchaseLCY_ItemCategoryFormat">
+          <DataField>PurchaseLCY_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="PurchaseQty_ItemGroup">
-          <DataField>PurchaseQty_ItemGroup</DataField>
+        <Field Name="PurchaseQty_ItemCategory">
+          <DataField>PurchaseQty_ItemCategory</DataField>
         </Field>
-        <Field Name="PurchaseQty_ItemGroupFormat">
-          <DataField>PurchaseQty_ItemGroupFormat</DataField>
+        <Field Name="PurchaseQty_ItemCategoryFormat">
+          <DataField>PurchaseQty_ItemCategoryFormat</DataField>
         </Field>
         <Field Name="pctoms">
           <DataField>pctoms</DataField>
@@ -4291,53 +4291,53 @@ End Function
         <Field Name="pctomsFormat">
           <DataField>pctomsFormat</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroup">
-          <DataField>SalesQty_ItemGroup</DataField>
+        <Field Name="SalesQty_ItemCategory">
+          <DataField>SalesQty_ItemCategory</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupFormat">
-          <DataField>SalesQty_ItemGroupFormat</DataField>
+        <Field Name="SalesQty_ItemCategoryFormat">
+          <DataField>SalesQty_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="CR_ItemGroup">
-          <DataField>CR_ItemGroup</DataField>
+        <Field Name="CR_ItemCategory">
+          <DataField>CR_ItemCategory</DataField>
         </Field>
-        <Field Name="CR_ItemGroupFormat">
-          <DataField>CR_ItemGroupFormat</DataField>
+        <Field Name="CR_ItemCategoryFormat">
+          <DataField>CR_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="dg_ItemGroup">
-          <DataField>dg_ItemGroup</DataField>
+        <Field Name="dg_ItemCategory">
+          <DataField>dg_ItemCategory</DataField>
         </Field>
-        <Field Name="dg_ItemGroupFormat">
-          <DataField>dg_ItemGroupFormat</DataField>
+        <Field Name="dg_ItemCategoryFormat">
+          <DataField>dg_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="AmtLY_ItemGroup">
-          <DataField>AmtLY_ItemGroup</DataField>
+        <Field Name="AmtLY_ItemCategory">
+          <DataField>AmtLY_ItemCategory</DataField>
         </Field>
-        <Field Name="AmtLY_ItemGroupFormat">
-          <DataField>AmtLY_ItemGroupFormat</DataField>
+        <Field Name="AmtLY_ItemCategoryFormat">
+          <DataField>AmtLY_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="TurnoverLY_ItemGroup">
-          <DataField>TurnoverLY_ItemGroup</DataField>
+        <Field Name="TurnoverLY_ItemCategory">
+          <DataField>TurnoverLY_ItemCategory</DataField>
         </Field>
-        <Field Name="TurnoverLY_ItemGroupFormat">
-          <DataField>TurnoverLY_ItemGroupFormat</DataField>
+        <Field Name="TurnoverLY_ItemCategoryFormat">
+          <DataField>TurnoverLY_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="sortervaregruppe_ItemGroup">
-          <DataField>sortervaregruppe_ItemGroup</DataField>
+        <Field Name="sortervaregruppe_ItemCategory">
+          <DataField>sortervaregruppe_ItemCategory</DataField>
         </Field>
-        <Field Name="viskunhovedtal_ItemGroup">
-          <DataField>viskunhovedtal_ItemGroup</DataField>
+        <Field Name="viskunhovedtal_ItemCategory">
+          <DataField>viskunhovedtal_ItemCategory</DataField>
         </Field>
-        <Field Name="SaleLCYLY_ItemGroup">
-          <DataField>SaleLCYLY_ItemGroup</DataField>
+        <Field Name="SaleLCYLY_ItemCategory">
+          <DataField>SaleLCYLY_ItemCategory</DataField>
         </Field>
-        <Field Name="SaleLCYLY_ItemGroupFormat">
-          <DataField>SaleLCYLY_ItemGroupFormat</DataField>
+        <Field Name="SaleLCYLY_ItemCategoryFormat">
+          <DataField>SaleLCYLY_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="PctaendringItemGroup">
-          <DataField>PctaendringItemGroup</DataField>
+        <Field Name="PctaendringItemCategory">
+          <DataField>PctaendringItemCategory</DataField>
         </Field>
-        <Field Name="PctaendringItemGroupFormat">
-          <DataField>PctaendringItemGroupFormat</DataField>
+        <Field Name="PctaendringItemCategoryFormat">
+          <DataField>PctaendringItemCategoryFormat</DataField>
         </Field>
         <Field Name="Number_ItemGrpSum">
           <DataField>Number_ItemGrpSum</DataField>
@@ -4408,11 +4408,11 @@ End Function
         <Field Name="VendorPctomsFormat">
           <DataField>VendorPctomsFormat</DataField>
         </Field>
-        <Field Name="SumPctaendringItemGroup">
-          <DataField>SumPctaendringItemGroup</DataField>
+        <Field Name="SumPctaendringItemCategory">
+          <DataField>SumPctaendringItemCategory</DataField>
         </Field>
-        <Field Name="SumPctaendringItemGroupFormat">
-          <DataField>SumPctaendringItemGroupFormat</DataField>
+        <Field Name="SumPctaendringItemCategoryFormat">
+          <DataField>SumPctaendringItemCategoryFormat</DataField>
         </Field>
         <Field Name="CRSumPct">
           <DataField>CRSumPct</DataField>
@@ -4423,53 +4423,53 @@ End Function
         <Field Name="Number_Integer">
           <DataField>Number_Integer</DataField>
         </Field>
-        <Field Name="No_ItemGroup2">
-          <DataField>No_ItemGroup2</DataField>
+        <Field Name="No_ItemCategory2">
+          <DataField>No_ItemCategory2</DataField>
         </Field>
-        <Field Name="Description_ItemGroup2">
-          <DataField>Description_ItemGroup2</DataField>
+        <Field Name="Description_ItemCategory2">
+          <DataField>Description_ItemCategory2</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroup2">
-          <DataField>SaleLCY_ItemGroup2</DataField>
+        <Field Name="SaleLCY_ItemCategory2">
+          <DataField>SaleLCY_ItemCategory2</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroup2Format">
-          <DataField>SaleLCY_ItemGroup2Format</DataField>
+        <Field Name="SaleLCY_ItemCategory2Format">
+          <DataField>SaleLCY_ItemCategory2Format</DataField>
         </Field>
-        <Field Name="PurchaseLCY_ItemGroup2">
-          <DataField>PurchaseLCY_ItemGroup2</DataField>
+        <Field Name="PurchaseLCY_ItemCategory2">
+          <DataField>PurchaseLCY_ItemCategory2</DataField>
         </Field>
-        <Field Name="PurchaseLCY_ItemGroup2Format">
-          <DataField>PurchaseLCY_ItemGroup2Format</DataField>
+        <Field Name="PurchaseLCY_ItemCategory2Format">
+          <DataField>PurchaseLCY_ItemCategory2Format</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroup2">
-          <DataField>SalesQty_ItemGroup2</DataField>
+        <Field Name="SalesQty_ItemCategory2">
+          <DataField>SalesQty_ItemCategory2</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroup2Format">
-          <DataField>SalesQty_ItemGroup2Format</DataField>
+        <Field Name="SalesQty_ItemCategory2Format">
+          <DataField>SalesQty_ItemCategory2Format</DataField>
         </Field>
-        <Field Name="CR_ItemGroup2">
-          <DataField>CR_ItemGroup2</DataField>
+        <Field Name="CR_ItemCategory2">
+          <DataField>CR_ItemCategory2</DataField>
         </Field>
-        <Field Name="CR_ItemGroup2Format">
-          <DataField>CR_ItemGroup2Format</DataField>
+        <Field Name="CR_ItemCategory2Format">
+          <DataField>CR_ItemCategory2Format</DataField>
         </Field>
-        <Field Name="PurchaseQty_ItemGroup2">
-          <DataField>PurchaseQty_ItemGroup2</DataField>
+        <Field Name="PurchaseQty_ItemCategory2">
+          <DataField>PurchaseQty_ItemCategory2</DataField>
         </Field>
-        <Field Name="PurchaseQty_ItemGroup2Format">
-          <DataField>PurchaseQty_ItemGroup2Format</DataField>
+        <Field Name="PurchaseQty_ItemCategory2Format">
+          <DataField>PurchaseQty_ItemCategory2Format</DataField>
         </Field>
-        <Field Name="dg_ItemGroup2">
-          <DataField>dg_ItemGroup2</DataField>
+        <Field Name="dg_ItemCategory2">
+          <DataField>dg_ItemCategory2</DataField>
         </Field>
-        <Field Name="dg_ItemGroup2Format">
-          <DataField>dg_ItemGroup2Format</DataField>
+        <Field Name="dg_ItemCategory2Format">
+          <DataField>dg_ItemCategory2Format</DataField>
         </Field>
-        <Field Name="TurnoverLY_ItemGroup2">
-          <DataField>TurnoverLY_ItemGroup2</DataField>
+        <Field Name="TurnoverLY_ItemCategory2">
+          <DataField>TurnoverLY_ItemCategory2</DataField>
         </Field>
-        <Field Name="TurnoverLY_ItemGroup2Format">
-          <DataField>TurnoverLY_ItemGroup2Format</DataField>
+        <Field Name="TurnoverLY_ItemCategory2Format">
+          <DataField>TurnoverLY_ItemCategory2Format</DataField>
         </Field>
         <Field Name="pctoms2">
           <DataField>pctoms2</DataField>
@@ -4477,17 +4477,17 @@ End Function
         <Field Name="pctoms2Format">
           <DataField>pctoms2Format</DataField>
         </Field>
-        <Field Name="AmtLY_ItemGroup2">
-          <DataField>AmtLY_ItemGroup2</DataField>
+        <Field Name="AmtLY_ItemCategory2">
+          <DataField>AmtLY_ItemCategory2</DataField>
         </Field>
-        <Field Name="AmtLY_ItemGroup2Format">
-          <DataField>AmtLY_ItemGroup2Format</DataField>
+        <Field Name="AmtLY_ItemCategory2Format">
+          <DataField>AmtLY_ItemCategory2Format</DataField>
         </Field>
-        <Field Name="PctaendringItemGroup2">
-          <DataField>PctaendringItemGroup2</DataField>
+        <Field Name="PctaendringItemCategory2">
+          <DataField>PctaendringItemCategory2</DataField>
         </Field>
-        <Field Name="PctaendringItemGroup2Format">
-          <DataField>PctaendringItemGroup2Format</DataField>
+        <Field Name="PctaendringItemCategory2Format">
+          <DataField>PctaendringItemCategory2Format</DataField>
         </Field>
         <Field Name="Number_Summary">
           <DataField>Number_Summary</DataField>
@@ -4546,11 +4546,11 @@ End Function
         <Field Name="TotalSaleLCYYrFormat">
           <DataField>TotalSaleLCYYrFormat</DataField>
         </Field>
-        <Field Name="TotalPctaendringItemGroup">
-          <DataField>TotalPctaendringItemGroup</DataField>
+        <Field Name="TotalPctaendringItemCategory">
+          <DataField>TotalPctaendringItemCategory</DataField>
         </Field>
-        <Field Name="TotalPctaendringItemGroupFormat">
-          <DataField>TotalPctaendringItemGroupFormat</DataField>
+        <Field Name="TotalPctaendringItemCategoryFormat">
+          <DataField>TotalPctaendringItemCategoryFormat</DataField>
         </Field>
       </Fields>
       <Query>
