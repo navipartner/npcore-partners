@@ -462,7 +462,7 @@
 
     internal procedure GetClientVersion(): Text
     begin
-        exit('1.0.0');
+        exit('1.1.0');
     end;
 
     internal procedure WriteLogEntry(EFTSetup: Record "NPR EFT Setup"; IsError: Boolean; EntryNo: Integer; Description: Text; LogContents: Text; CommitChanges: Boolean)
