@@ -24,52 +24,52 @@
             column(Today; Format(Today, 0, 4))
             {
             }
-            column(DateFilter_ItemGroupHeader; ItemCategoryHeader.GetFilter("NPR Date Filter"))
+            column(DateFilter_ItemCategoryHeader; ItemCategoryHeader.GetFilter("NPR Date Filter"))
             {
             }
-            column(Filters_ItemGroupHeader; ItemCategoryHeader.GetFilters)
+            column(Filters_ItemCategoryHeader; ItemCategoryHeader.GetFilters)
             {
             }
-            column(No_ItemGroupHeader; ItemCategoryHeader."Code")
+            column(No_ItemCategoryHeader; ItemCategoryHeader."Code")
             {
             }
-            column(Description_ItemGroupHeader; ItemCategoryHeader.Description)
+            column(Description_ItemCategoryHeader; ItemCategoryHeader.Description)
             {
             }
-            column(SalesQty_ItemGroupHeader; ItemCategoryHeader."NPR Sales (Qty.)")
+            column(SalesQty_ItemCategoryHeader; ItemCategoryHeader."NPR Sales (Qty.)")
             {
             }
-            column(ConsumptionAmount_ItemGroupHeader; ItemCategoryHeader."NPR Consumption (Amount)")
+            column(ConsumptionAmount_ItemCategoryHeader; ItemCategoryHeader."NPR Consumption (Amount)")
             {
             }
-            column(SaleLCY_ItemGroupHeader; ItemCategoryHeader."NPR Sales (LCY)")
+            column(SaleLCY_ItemCategoryHeader; ItemCategoryHeader."NPR Sales (LCY)")
             {
             }
-            column(Profit_ItemGroupHeader; ItemCategoryHeader."NPR Sales (LCY)" - ItemCategoryHeader."NPR Consumption (Amount)")
+            column(Profit_ItemCategoryHeader; ItemCategoryHeader."NPR Sales (LCY)" - ItemCategoryHeader."NPR Consumption (Amount)")
             {
             }
-            column(TotalProfit_ItemGroupHeader; TotalProfit)
+            column(TotalProfit_ItemCategoryHeader; TotalProfit)
             {
             }
-            column(TotalRevenue_ItemGroupHeader; TotalRevenue)
+            column(TotalRevenue_ItemCategoryHeader; TotalRevenue)
             {
             }
-            column(TotalConsumption_ItemGroupHeader; TotalConsumption)
+            column(TotalConsumption_ItemCategoryHeader; TotalConsumption)
             {
             }
             column(ShowItem; ShowItem)
             {
             }
-            column(Profit_ItemGroupH; Profit)
+            column(Profit_ItemCategoryH; Profit)
             {
             }
-            column(Coverage_ItemGroupH; Coverage)
+            column(Coverage_ItemCategoryH; Coverage)
             {
             }
-            column(CoveragePct_ItemGroupH; CoveragePct)
+            column(CoveragePct_ItemCategoryH; CoveragePct)
             {
             }
-            column(TurnoverPct_ItemGroupH; TurnoverPct)
+            column(TurnoverPct_ItemCategoryH; TurnoverPct)
             {
             }
             column(Picture_CompanyInformation; CompanyInfo.Picture)
@@ -124,31 +124,31 @@
                 CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)";
                 DataItemLink = "Parent Category" = FIELD("Code");
                 DataItemTableView = SORTING("Presentation Order");
-                column(No_ItemGroupSub1; "Code")
+                column(No_ItemCategorySub1; "Code")
                 {
                 }
-                column(Description_ItemGroupSub1; Description)
+                column(Description_ItemCategorySub1; Description)
                 {
                 }
-                column(SalesQty_ItemGroupSub1; "NPR Sales (Qty.)")
+                column(SalesQty_ItemCategorySub1; "NPR Sales (Qty.)")
                 {
                 }
-                column(ConsumptionAmount_ItemGroupSub1; "NPR Consumption (Amount)")
+                column(ConsumptionAmount_ItemCategorySub1; "NPR Consumption (Amount)")
                 {
                 }
-                column(SaleLCY_ItemGroupSub1; "NPR Sales (LCY)")
+                column(SaleLCY_ItemCategorySub1; "NPR Sales (LCY)")
                 {
                 }
-                column(Profit_ItemGroupSub1; Profit)
+                column(Profit_ItemCategorySub1; Profit)
                 {
                 }
-                column(Coverage_ItemGroupSub1; Coverage)
+                column(Coverage_ItemCategorySub1; Coverage)
                 {
                 }
-                column(CoveragePct_ItemGroupSub1; CoveragePct)
+                column(CoveragePct_ItemCategorySub1; CoveragePct)
                 {
                 }
-                column(TurnoverPct_ItemGroupSub1; TurnoverPct)
+                column(TurnoverPct_ItemCategorySub1; TurnoverPct)
                 {
                 }
                 column(ItemGrpNoLvl1; StrSubstNo(TotalText, "Code"))
@@ -200,31 +200,31 @@
                     CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)";
                     DataItemLink = "Parent Category" = FIELD("Code");
                     DataItemTableView = SORTING("Presentation Order");
-                    column(No_ItemGroupSub2; "Code")
+                    column(No_ItemCategorySub2; "Code")
                     {
                     }
-                    column(Description_ItemGroupSub2; Description)
+                    column(Description_ItemCategorySub2; Description)
                     {
                     }
-                    column(SalesQty_ItemGroupSub2; "NPR Sales (Qty.)")
+                    column(SalesQty_ItemCategorySub2; "NPR Sales (Qty.)")
                     {
                     }
-                    column(ConsumptionAmount_ItemGroupSub2; "NPR Consumption (Amount)")
+                    column(ConsumptionAmount_ItemCategorySub2; "NPR Consumption (Amount)")
                     {
                     }
-                    column(SaleLCY_ItemGroupSub2; "NPR Sales (LCY)")
+                    column(SaleLCY_ItemCategorySub2; "NPR Sales (LCY)")
                     {
                     }
-                    column(Profit_ItemGroupSub2; Profit)
+                    column(Profit_ItemCategorySub2; Profit)
                     {
                     }
-                    column(Coverage_ItemGroupSub2; Coverage)
+                    column(Coverage_ItemCategorySub2; Coverage)
                     {
                     }
-                    column(CoveragePct_ItemGroupSub2; CoveragePct)
+                    column(CoveragePct_ItemCategorySub2; CoveragePct)
                     {
                     }
-                    column(TurnoverPct_ItemGroupSub2; TurnoverPct)
+                    column(TurnoverPct_ItemCategorySub2; TurnoverPct)
                     {
                     }
                     column(ItemGrpNoLvl2; StrSubstNo(TotalText, "Code"))
@@ -276,31 +276,31 @@
                         CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)";
                         DataItemLink = "Parent Category" = FIELD("Code");
                         DataItemTableView = SORTING("Presentation Order");
-                        column(No_ItemGroupSub3; "Code")
+                        column(No_ItemCategorySub3; "Code")
                         {
                         }
-                        column(Description_ItemGroupSub3; Description)
+                        column(Description_ItemCategorySub3; Description)
                         {
                         }
-                        column(SalesQty_ItemGroupSub3; "NPR Sales (Qty.)")
+                        column(SalesQty_ItemCategorySub3; "NPR Sales (Qty.)")
                         {
                         }
-                        column(ConsumptionAmount_ItemGroupSub3; "NPR Consumption (Amount)")
+                        column(ConsumptionAmount_ItemCategorySub3; "NPR Consumption (Amount)")
                         {
                         }
-                        column(SaleLCY_ItemGroupSub3; "NPR Sales (LCY)")
+                        column(SaleLCY_ItemCategorySub3; "NPR Sales (LCY)")
                         {
                         }
-                        column(Profit_ItemGroupSub3; Profit)
+                        column(Profit_ItemCategorySub3; Profit)
                         {
                         }
-                        column(Coverage_ItemGroupSub3; Coverage)
+                        column(Coverage_ItemCategorySub3; Coverage)
                         {
                         }
-                        column(CoveragePct_ItemGroupSub3; CoveragePct)
+                        column(CoveragePct_ItemCategorySub3; CoveragePct)
                         {
                         }
-                        column(TurnoverPct_ItemGroupSub3; TurnoverPct)
+                        column(TurnoverPct_ItemCategorySub3; TurnoverPct)
                         {
                         }
                         column(ItemGrpNoLvl3; StrSubstNo(TotalText, "Code"))
@@ -352,31 +352,31 @@
                             CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)";
                             DataItemLink = "Parent Category" = FIELD("Code");
                             DataItemTableView = SORTING("Presentation Order");
-                            column(No_ItemGroupSub4; "Code")
+                            column(No_ItemCategorySub4; "Code")
                             {
                             }
-                            column(Description_ItemGroupSub4; Description)
+                            column(Description_ItemCategorySub4; Description)
                             {
                             }
-                            column(SalesQty_ItemGroupSub4; "NPR Sales (Qty.)")
+                            column(SalesQty_ItemCategorySub4; "NPR Sales (Qty.)")
                             {
                             }
-                            column(ConsumptionAmount_ItemGroupSub4; "NPR Consumption (Amount)")
+                            column(ConsumptionAmount_ItemCategorySub4; "NPR Consumption (Amount)")
                             {
                             }
-                            column(SaleLCY_ItemGroupSub4; "NPR Sales (LCY)")
+                            column(SaleLCY_ItemCategorySub4; "NPR Sales (LCY)")
                             {
                             }
-                            column(Profit_ItemGroupSub4; Profit)
+                            column(Profit_ItemCategorySub4; Profit)
                             {
                             }
-                            column(Coverage_ItemGroupSub4; Coverage)
+                            column(Coverage_ItemCategorySub4; Coverage)
                             {
                             }
-                            column(CoveragePct_ItemGroupSub4; CoveragePct)
+                            column(CoveragePct_ItemCategorySub4; CoveragePct)
                             {
                             }
-                            column(TurnoverPct_ItemGroupSub4; TurnoverPct)
+                            column(TurnoverPct_ItemCategorySub4; TurnoverPct)
                             {
                             }
                             column(ItemGrpNoLvl4; StrSubstNo(TotalText, "Code"))
@@ -718,7 +718,7 @@
 
     labels
     {
-        Report_Caption = 'Sales Statistics/Item Group Analysis';
+        Report_Caption = 'Sales Statistics/Item Category Analysis';
         Page_Caption = 'Page';
         No_Caption = 'No.';
         Name_Caption = 'Name';
@@ -790,7 +790,7 @@
         TurnoverPct: Decimal;
         LevelsCount: Integer;
         GroupByText: Label 'Group by ';
-        TotalText: Label 'Total for Item Group %1';
+        TotalText: Label 'Total for Item Category %1';
         CaptionClassDim1: Text[30];
         TxtDim1: Text;
         TxtLabeldim1: Text[100];

@@ -594,7 +594,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!SalesPersonPercentItemGroupSale.Value</Value>
+                                  <Value>=Fields!SalesPersonPercentItemCategorySale.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2284,8 +2284,8 @@ End Function
         <Field Name="SalesPersonSalesLcyFormat">
           <DataField>SalesPersonSalesLcyFormat</DataField>
         </Field>
-        <Field Name="SalesPersonPercentItemGroupSale">
-          <DataField>SalesPersonPercentItemGroupSale</DataField>
+        <Field Name="SalesPersonPercentItemCategorySale">
+          <DataField>SalesPersonPercentItemCategorySale</DataField>
         </Field>
         <Field Name="SalesPersonDb">
           <DataField>SalesPersonDb</DataField>

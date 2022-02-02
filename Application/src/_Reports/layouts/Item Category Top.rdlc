@@ -181,7 +181,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Parameters!ItemGroup_Caption.Value</Value>
+                                                    <Value>=Parameters!ItemCategory_Caption.Value</Value>
                                                     <Style>
                                                       <FontSize>7pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -990,7 +990,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Parameters!ItemGroup_Caption.Value</Value>
+                                                    <Value>=Parameters!ItemCategory_Caption.Value</Value>
                                                     <Style>
                                                       <FontSize>7pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -1419,14 +1419,14 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="No_ItemGroup">
+                                          <Textbox Name="No_ItemCategory">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!No_ItemGroup.Value</Value>
+                                                    <Value>=Fields!No_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>7pt</FontSize>
                                                     </Style>
@@ -1435,7 +1435,7 @@
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>No_ItemGroup</rd:DefaultName>
+                                            <rd:DefaultName>No_ItemCategory</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1450,14 +1450,14 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="Description_ItemGroup">
+                                          <Textbox Name="Description_ItemCategory">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Description_ItemGroup.Value</Value>
+                                                    <Value>=Fields!Description_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>7pt</FontSize>
                                                     </Style>
@@ -1466,7 +1466,7 @@
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Description_ItemGroup</rd:DefaultName>
+                                            <rd:DefaultName>Description_ItemCategory</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1514,17 +1514,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SalesQty_ItemGroup">
+                                          <Textbox Name="SalesQty_ItemCategory">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!SalesQty_ItemGroup.Value</Value>
+                                                    <Value>=Fields!SalesQty_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>7pt</FontSize>
-                                                      <Format>=Fields!SalesQty_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!SalesQty_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1533,7 +1533,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SalesQty_ItemGroup</rd:DefaultName>
+                                            <rd:DefaultName>SalesQty_ItemCategory</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1581,17 +1581,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SaleLCY_ItemGroup">
+                                          <Textbox Name="SaleLCY_ItemCategory">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!SaleLCY_ItemGroup.Value</Value>
+                                                    <Value>=Fields!SaleLCY_ItemCategory.Value</Value>
                                                     <Style>
                                                       <FontSize>7pt</FontSize>
-                                                      <Format>=Fields!SaleLCY_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!SaleLCY_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1600,7 +1600,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SaleLCY_ItemGroup</rd:DefaultName>
+                                            <rd:DefaultName>SaleLCY_ItemCategory</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1889,7 +1889,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Parameters!Ikke_Caption.Value</Value>
+                                                    <Value>=Parameters!NotInItemCategory_Caption.Value</Value>
                                                     <Style>
                                                       <FontSize>7pt</FontSize>
                                                       <FontWeight>Normal</FontWeight>
@@ -2417,25 +2417,25 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SalesQty_ItemGroup2">
+                                          <Textbox Name="SalesQty_ItemCategory2">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=SUM(Fields!SalesQty_ItemGroup.Value)+SUM(Fields!QtyOutside.Value)</Value>
+                                                    <Value>=SUM(Fields!SalesQty_ItemCategory.Value)+SUM(Fields!QtyOutside.Value)</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
-                                                      <Format>=Fields!SalesQty_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!SalesQty_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SalesQty_ItemGroup</rd:DefaultName>
+                                            <rd:DefaultName>SalesQty_ItemCategory</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -2498,25 +2498,25 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SaleLCY_ItemGroup2">
+                                          <Textbox Name="SaleLCY_ItemCategory2">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=SUM(Fields!SaleLCY_ItemGroup.Value)+Fields!SalesOutside.Value</Value>
+                                                    <Value>=SUM(Fields!SaleLCY_ItemCategory.Value)+Fields!SalesOutside.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
-                                                      <Format>=Fields!SaleLCY_ItemGroupFormat.Value</Format>
+                                                      <Format>=Fields!SaleLCY_ItemCategoryFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SaleLCY_ItemGroup</rd:DefaultName>
+                                            <rd:DefaultName>SaleLCY_ItemCategory</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -2667,7 +2667,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=iif(SUM(Fields!db.Value)&lt;&gt;0,SUM(Fields!db.Value)/(SUM(Fields!SaleLCY_ItemGroup.Value)+Fields!SalesOutside.Value)*100,0)</Value>
+                                                    <Value>=iif(SUM(Fields!db.Value)&lt;&gt;0,SUM(Fields!db.Value)/(SUM(Fields!SaleLCY_ItemCategory.Value)+Fields!SalesOutside.Value)*100,0)</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -3231,14 +3231,14 @@
       </DefaultValue>
       <Prompt>Sequence_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ItemGroup_Caption">
+    <ReportParameter Name="ItemCategory_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ItemGroup_Caption</Value>
+          <Value>ItemCategory_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ItemGroup_Caption</Prompt>
+      <Prompt>ItemCategory_Caption</Prompt>
     </ReportParameter>
     <ReportParameter Name="Description_Caption">
       <DataType>String</DataType>
@@ -3285,14 +3285,14 @@
       </DefaultValue>
       <Prompt>Profit_Pct_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="Ikke_Caption">
+    <ReportParameter Name="NotInItemCategory_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>Ikke_Caption</Value>
+          <Value>NotInItemCategory_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>Ikke_Caption</Prompt>
+      <Prompt>NotInItemCategory_Caption</Prompt>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
@@ -3313,7 +3313,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>2</RowIndex>
-          <ParameterName>ItemGroup_Caption</ParameterName>
+          <ParameterName>ItemCategory_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -3343,7 +3343,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>8</RowIndex>
-          <ParameterName>Ikke_Caption</ParameterName>
+          <ParameterName>NotInItemCategory_Caption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -3514,23 +3514,23 @@ End Function</Code>
         <Field Name="Name_DimensionValue">
           <DataField>Name_DimensionValue</DataField>
         </Field>
-        <Field Name="No_ItemGroup">
-          <DataField>No_ItemGroup</DataField>
+        <Field Name="No_ItemCategory">
+          <DataField>No_ItemCategory</DataField>
         </Field>
-        <Field Name="Description_ItemGroup">
-          <DataField>Description_ItemGroup</DataField>
+        <Field Name="Description_ItemCategory">
+          <DataField>Description_ItemCategory</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroup">
-          <DataField>SalesQty_ItemGroup</DataField>
+        <Field Name="SalesQty_ItemCategory">
+          <DataField>SalesQty_ItemCategory</DataField>
         </Field>
-        <Field Name="SalesQty_ItemGroupFormat">
-          <DataField>SalesQty_ItemGroupFormat</DataField>
+        <Field Name="SalesQty_ItemCategoryFormat">
+          <DataField>SalesQty_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroup">
-          <DataField>SaleLCY_ItemGroup</DataField>
+        <Field Name="SaleLCY_ItemCategory">
+          <DataField>SaleLCY_ItemCategory</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupFormat">
-          <DataField>SaleLCY_ItemGroupFormat</DataField>
+        <Field Name="SaleLCY_ItemCategoryFormat">
+          <DataField>SaleLCY_ItemCategoryFormat</DataField>
         </Field>
         <Field Name="db">
           <DataField>db</DataField>

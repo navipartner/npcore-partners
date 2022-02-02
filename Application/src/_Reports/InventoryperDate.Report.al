@@ -63,11 +63,11 @@
             column(EndDate; EndDate)
             {
             }
-            column(ItemGroup_Item; Item."Item Category Code")
+            column(ItemCategory_Item; Item."Item Category Code")
             {
                 IncludeCaption = true;
             }
-            column(GroupByItemGroup; GroupByItemGroup)
+            column(GroupByItemCategory; GroupByItemCategory)
             {
             }
             column(LatestPurchaseDate_ItemLedgerEntry; LatestPurchaseDate)
@@ -227,11 +227,11 @@
                     ToolTip = 'Specifies the value of the Choose Calc. Method field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Group By Item Group"; GroupByItemGroup)
+                field("Group By Item Category"; GroupByItemCategory)
                 {
-                    Caption = 'Sort Items by Item Group';
+                    Caption = 'Sort Items by Item Category';
 
-                    ToolTip = 'Specifies the value of the Sort Items by Item Group field';
+                    ToolTip = 'Specifies the value of the Sort Items by Item Category field';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -276,7 +276,7 @@
         CompanyInfo: Record "Company Information";
         ItemLedgerEntry: Record "Item Ledger Entry";
         VATPostingSetup: Record "VAT Posting Setup";
-        GroupByItemGroup: Boolean;
+        GroupByItemCategory: Boolean;
         IncludeItemStock: Boolean;
         NegativVolumeShow: Boolean;
         NotUnitPrice: Boolean;

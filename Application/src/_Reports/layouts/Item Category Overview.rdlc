@@ -53,7 +53,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=First(Fields!ItemGroupCaption.Value)</Value>
+                                  <Value>=First(Fields!ItemCategoryCaption.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -127,7 +127,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!BelongInMainItemGrp_Caption.Value</Value>
+                                  <Value>=Parameters!BelongInMainItemCat_Caption.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -795,14 +795,14 @@
     </ReportSection>
   </ReportSections>
   <ReportParameters>
-    <ReportParameter Name="BelongInMainItemGrp_Caption">
+    <ReportParameter Name="BelongInMainItemCat_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>BelongInMainItemGrp_Caption</Value>
+          <Value>BelongInMainItemCat_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>BelongInMainItemGrp_Caption</Prompt>
+      <Prompt>BelongInMainItemCat_Caption</Prompt>
     </ReportParameter>
     <ReportParameter Name="VATProdPostingGrp_Caption">
       <DataType>String</DataType>
@@ -867,7 +867,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>BelongInMainItemGrp_Caption</ParameterName>
+          <ParameterName>BelongInMainItemCat_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -974,8 +974,8 @@ End Function
         <Field Name="Item_Group_Inventory_Posting_Group_">
           <DataField>Item_Group_Inventory_Posting_Group_</DataField>
         </Field>
-        <Field Name="ItemGroupCaption">
-          <DataField>ItemGroupCaption</DataField>
+        <Field Name="ItemCategoryCaption">
+          <DataField>ItemCategoryCaption</DataField>
         </Field>
         <Field Name="DescriptionCaption">
           <DataField>DescriptionCaption</DataField>

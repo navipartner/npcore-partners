@@ -52,16 +52,16 @@
             column(Total_Caption; Total_Caption_Lbl)
             {
             }
-            column(No_ItemGroupHeader; "Code")
+            column(No_ItemCategoryHeader; "Code")
             {
             }
-            column(Description_ItemGroupHeader; Description)
+            column(Description_ItemCategoryHeader; Description)
             {
             }
             column(ShowItem; ShowItem)
             {
             }
-            column(Main_Item_Group_ItemGroupHeader; "NPR Main Category Code")
+            column(Main_Item_Category_ItemCategoryHeader; "NPR Main Category Code")
             {
             }
             column(PeriodLength; PeriodLength)
@@ -175,10 +175,10 @@
             {
                 DataItemLink = "Parent Category" = FIELD("Code");
                 DataItemTableView = SORTING("Code");
-                column(No_ItemGroupSub1; "Code")
+                column(No_ItemCategorySub1; "Code")
                 {
                 }
-                column(Description_ItemGroupSub1; Description)
+                column(Description_ItemCategorySub1; Description)
                 {
                 }
                 column(ItemGrpNoLvl1; StrSubstNo(TotalText, "Code"))
@@ -271,10 +271,10 @@
                 {
                     DataItemLink = "Parent Category" = FIELD("Code");
                     DataItemTableView = SORTING("Presentation Order");
-                    column(No_ItemGroupSub2; "Code")
+                    column(No_ItemCategorySub2; "Code")
                     {
                     }
-                    column(Description_ItemGroupSub2; Description)
+                    column(Description_ItemCategorySub2; Description)
                     {
                     }
                     column(ItemGrpNoLvl2; StrSubstNo(TotalText, "Code"))
@@ -368,10 +368,10 @@
                     {
                         DataItemLink = "Parent Category" = FIELD("Code");
                         DataItemTableView = SORTING("Parent Category");
-                        column(No_ItemGroupSub3; "Code")
+                        column(No_ItemCategorySub3; "Code")
                         {
                         }
-                        column(Description_ItemGroupSub3; Description)
+                        column(Description_ItemCategorySub3; Description)
                         {
                         }
                         column(ItemGrpNoLvl3; StrSubstNo(TotalText, "Code"))
@@ -466,10 +466,10 @@
                         {
                             DataItemLink = "Parent Category" = FIELD("Code");
                             DataItemTableView = SORTING("Parent Category");
-                            column(No_ItemGroupSub4; "Code")
+                            column(No_ItemCategorySub4; "Code")
                             {
                             }
-                            column(Description_ItemGroupSub4; Description)
+                            column(Description_ItemCategorySub4; Description)
                             {
                             }
                             column(ItemGrpNoLvl4; StrSubstNo(TotalText, "Code"))
@@ -729,9 +729,9 @@
                     }
                     field("Item Grp Level"; ItemGrpLevel)
                     {
-                        Caption = 'Item Group Level';
+                        Caption = 'Item Category Level';
 
-                        ToolTip = 'Specifies the value of the Item Group Level field';
+                        ToolTip = 'Specifies the value of the Item Category Level field';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -808,7 +808,7 @@
         Total_Caption_Lbl: Label 'Total';
         RequestPageFilters: Text;
         TxtShowItem: Label 'Show Item';
-        TotalText: Label 'Total for Item Group %1';
+        TotalText: Label 'Total for Item Category %1';
         ItemSection: array[5] of Boolean;
         ItemFound: array[5] of Boolean;
         CheckItem: Record Item;

@@ -46,7 +46,7 @@
                 column(Description_Item; Item.Description)
                 {
                 }
-                column(ItemGroup_Item; "Item Category Code")
+                column(ItemCategory_Item; "Item Category Code")
                 {
                 }
                 column(StockInventoryStart_Item; StockInventoryStart)
@@ -92,16 +92,16 @@
                 {
                     DataItemLink = "Code" = FIELD("Item Category Code"), "NPR Vendor Filter" = FIELD("Vendor No.");
                     DataItemTableView = SORTING("Code");
-                    column(No_ItemGroup; "Item Category"."Code")
+                    column(No_ItemCategory; "Item Category"."Code")
                     {
                     }
-                    column(Description_ItemGroup; "Item Category".Description)
+                    column(Description_ItemCategory; "Item Category".Description)
                     {
                     }
                     column(StockInventoryStart2; StockInventoryStart2)
                     {
                     }
-                    column(ShowItemGroupSection_ItemGroup; ShowItemGroupSection)
+                    column(ShowItemCategorySection_ItemCategory; ShowItemCategorySection)
                     {
                     }
 
@@ -157,7 +157,7 @@
                                 until Item2.Next() = 0;
                         end;
 
-                        ShowItemGroupSection := (ShowGroups and ShowTotalGroup);
+                        ShowItemCategorySection := (ShowGroups and ShowTotalGroup);
                     end;
 
                     trigger OnPreDataItem()
@@ -250,7 +250,7 @@
                     end;
 
                     UpdateGroupSales := true;
-                    if ItemGroupPrevious = Item."Item Category Code" then begin
+                    if ItemCategoryPrevious = Item."Item Category Code" then begin
                         if SkipNoSales then
                             if "Sales (LCY)" = 0 then
                                 UpdateGroupSales := false;
@@ -267,7 +267,7 @@
                     end else begin
                     end;
 
-                    ItemGroupPrevious := Item."Item Category Code";
+                    ItemCategoryPrevious := Item."Item Category Code";
 
                     ShowItem := false;
                     ShowItemSection := (not OnlyTotal and not SkipWithoutPortfolio and not SkipNoSales);
@@ -363,7 +363,7 @@
         Profit_Pct_Caption = 'Profit %';
         InventoryFlow_Amt_Caption = 'InventoryFlow (LCY) (&)';
         Total_Caption = 'Total';
-        ItemGroup_Caption = 'Item Group';
+        ItemCategory_Caption = 'Item Category';
     }
 
     trigger OnPreReport()
@@ -373,7 +373,7 @@
 
         ShowVendorSection := false;
         ShowItemSection := false;
-        ShowItemGroupSection := false;
+        ShowItemCategorySection := false;
     end;
 
     var
@@ -384,14 +384,14 @@
         OnlyTotal: Boolean;
         ShowGroups: Boolean;
         ShowItem: Boolean;
-        ShowItemGroupSection: Boolean;
+        ShowItemCategorySection: Boolean;
         ShowItemSection: Boolean;
         ShowTotalGroup: Boolean;
         ShowTotalGroup2: Boolean;
         ShowVendorSection: Boolean;
         SkipNoSales: Boolean;
         SkipWithoutPortfolio: Boolean;
-        ItemGroupPrevious: Code[20];
+        ItemCategoryPrevious: Code[20];
         ItemNo: Code[20];
         dg: Decimal;
         Regulatory: Decimal;

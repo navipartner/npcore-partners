@@ -415,7 +415,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!ItemGroup_ItemCaption.Value</Value>
+                                  <Value>=Parameters!ItemCategory_ItemCaption.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -447,7 +447,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!ItemGroup_Item.Value</Value>
+                                  <Value>=Fields!ItemCategory_Item.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1413,20 +1413,20 @@
                   <RepeatOnNewPage>true</RepeatOnNewPage>
                 </TablixMember>
                 <TablixMember>
-                  <Group Name="ItemGroup_Item">
+                  <Group Name="ItemCategory_Item">
                     <GroupExpressions>
-                      <GroupExpression>=Fields!ItemGroup_Item.Value</GroupExpression>
+                      <GroupExpression>=Fields!ItemCategory_Item.Value</GroupExpression>
                     </GroupExpressions>
                   </Group>
                   <SortExpressions>
                     <SortExpression>
-                      <Value>=Fields!ItemGroup_Item.Value</Value>
+                      <Value>=Fields!ItemCategory_Item.Value</Value>
                     </SortExpression>
                   </SortExpressions>
                   <TablixMembers>
                     <TablixMember>
                       <Visibility>
-                        <Hidden>=iif(Fields!GroupByItemGroup.Value, false, true)</Hidden>
+                        <Hidden>=iif(Fields!GroupByItemCategory.Value, false, true)</Hidden>
                       </Visibility>
                       <KeepWithGroup>After</KeepWithGroup>
                     </TablixMember>
@@ -1438,7 +1438,7 @@
                       </Group>
                       <SortExpressions>
                         <SortExpression>
-                          <Value>=IIF(Fields!GroupByItemGroup.Value, Fields!ItemGroup_Item.Value,Fields!No_Item.Value)</Value>
+                          <Value>=IIF(Fields!GroupByItemCategory.Value, Fields!ItemCategory_Item.Value,Fields!No_Item.Value)</Value>
                         </SortExpression>
                       </SortExpressions>
                     </TablixMember>
@@ -1909,14 +1909,14 @@
       </DefaultValue>
       <Prompt>LastDirectCost_ItemCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ItemGroup_ItemCaption">
+    <ReportParameter Name="ItemCategory_ItemCaption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ItemGroup_ItemCaption</Value>
+          <Value>ItemCategory_ItemCaption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ItemGroup_ItemCaption</Prompt>
+      <Prompt>ItemCategory_ItemCaption</Prompt>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
@@ -2007,7 +2007,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>16</RowIndex>
-          <ParameterName>ItemGroup_ItemCaption</ParameterName>
+          <ParameterName>ItemCategory_ItemCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -2127,11 +2127,11 @@ End Function
         <Field Name="EndDate">
           <DataField>EndDate</DataField>
         </Field>
-        <Field Name="ItemGroup_Item">
-          <DataField>ItemGroup_Item</DataField>
+        <Field Name="ItemCategory_Item">
+          <DataField>ItemCategory_Item</DataField>
         </Field>
-        <Field Name="GroupByItemGroup">
-          <DataField>GroupByItemGroup</DataField>
+        <Field Name="GroupByItemCategory">
+          <DataField>GroupByItemCategory</DataField>
         </Field>
         <Field Name="LatestPurchaseDate_ItemLedgerEntry">
           <DataField>LatestPurchaseDate_ItemLedgerEntry</DataField>

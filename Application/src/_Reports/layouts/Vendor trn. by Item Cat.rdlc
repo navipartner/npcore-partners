@@ -2105,7 +2105,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=Parameters!ItemGroup_Caption.Value</Value>
+                    <Value>=Parameters!ItemCategory_Caption.Value</Value>
                     <Style>
                       <FontSize>7pt</FontSize>
                       <FontWeight>Bold</FontWeight>
@@ -2649,7 +2649,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!ItemGroupFilter_Caption.Value+" "+First(Fields!No_Filter.Value, "DataSet_Result")</Value>
+                      <Value>=Parameters!ItemCategoryFilter_Caption.Value+" "+First(Fields!No_Filter.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
                       </Style>
@@ -2894,14 +2894,14 @@
       </DefaultValue>
       <Prompt>Period_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ItemGroupFilter_Caption">
+    <ReportParameter Name="ItemCategoryFilter_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ItemGroupFilter_Caption</Value>
+          <Value>ItemCategoryFilter_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ItemGroupFilter_Caption</Prompt>
+      <Prompt>ItemCategoryFilter_Caption</Prompt>
     </ReportParameter>
     <ReportParameter Name="DeptFilter_Caption">
       <DataType>String</DataType>
@@ -2921,14 +2921,14 @@
       </DefaultValue>
       <Prompt>SupplierFilter_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ItemGroup_Caption">
+    <ReportParameter Name="ItemCategory_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ItemGroup_Caption</Value>
+          <Value>ItemCategory_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ItemGroup_Caption</Prompt>
+      <Prompt>ItemCategory_Caption</Prompt>
     </ReportParameter>
     <ReportParameter Name="Supplier_Caption">
       <DataType>String</DataType>
@@ -3039,7 +3039,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>2</RowIndex>
-          <ParameterName>ItemGroupFilter_Caption</ParameterName>
+          <ParameterName>ItemCategoryFilter_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -3054,7 +3054,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>5</RowIndex>
-          <ParameterName>ItemGroup_Caption</ParameterName>
+          <ParameterName>ItemCategory_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>

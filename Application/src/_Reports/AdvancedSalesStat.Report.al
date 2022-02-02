@@ -28,7 +28,7 @@
             column(Dim2Filter; Dim2Filter)
             {
             }
-            column(ItemGroupFilter; ItemCategoryFilter)
+            column(ItemCategoryFilter; ItemCategoryFilter)
             {
             }
             column(PeriodeFilter; PeriodeFilter)
@@ -236,7 +236,7 @@
         Page_Caption = 'Page';
         GlobalDim1_Caption = 'Global dim. 1:';
         GlobalDim2_Caption = 'Global dim. 2:';
-        ItemGroupFilter_Caption = 'Item Group filter:';
+        ItemCategoryFilter_Caption = 'Item Category filter:';
         Period_Caption = 'Period:';
         No_Caption = 'No.';
         Description_Caption = 'Description';
@@ -298,7 +298,7 @@
         "Count": Integer;
         Lines: Integer;
         TitleCustomer: Label 'Customers';
-        TitleItemGroup: Label 'Item Groups';
+        TitleItemCategory: Label 'Item Category';
         TitleItem: Label 'Items';
         TitlePeriod: Label 'Period';
         DialogText: Label 'Processing No. #1######## @2@@@@@@@@';
@@ -306,7 +306,7 @@
         TitleVendor: Label 'Vendor';
         Day: Option Day,Week,Month,Quarter,Year;
         SortBy: Option "No.",Description,"Period Start","Sales qty.","Sales qty. last year","Sales LCY","Sales LCY last year","Profit LCY","Profit LCY last year","Profit %","Profit % last year";
-        Type: Option Period,Salesperson,ItemGroup,Item,Customer,Vendor,Projectcode;
+        Type: Option Period,Salesperson,ItemCategory,Item,Customer,Vendor,Projectcode;
         Title: Text[30];
         CalcLastYear: Text[50];
         PeriodeFilter: Text[255];
@@ -314,13 +314,13 @@
         Pct1Lbl: Label '%1..', locked = true;
         Pct2Lbl: Label '%1..%2', locked = true;
 
-    procedure setFilter(xType: Option Period,Salesperson,ItemGroup,Item,Customer,Vendor,Projectcode; xDay: Option Day,Week,Month,Quarter,Year; GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemGroup: Code[20]; LastYearCalc: Text[50]; hide: Boolean)
+    procedure setFilter(xType: Option Period,Salesperson,ItemCategory,Item,Customer,Vendor,Projectcode; xDay: Option Day,Week,Month,Quarter,Year; GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemCategory: Code[20]; LastYearCalc: Text[50]; hide: Boolean)
     begin
         Dim1Filter := GlobalDim1;
         Dim2Filter := GlobalDim2;
         Periodestart := DatoStart;
         Periodeslut := DatoEnd;
-        ItemCategoryFilter := ItemGroup;
+        ItemCategoryFilter := ItemCategory;
         CalcLastYear := LastYearCalc;
         Day := xDay;
         Type := xType;
@@ -365,12 +365,12 @@
                     Title := TitleItem;
                 end;
 
-            Type::ItemGroup:
+            Type::ItemCategory:
                 begin
                     Record.Open(DATABASE::"Item Category");
                     Field := Record.Field(ItemCategory.FieldNo(Code));
                     Caption := Record.Field(ItemCategory.FieldNo(Description));
-                    Title := TitleItemGroup;
+                    Title := TitleItemCategory;
                 end;
 
             Type::Salesperson:
@@ -477,7 +477,7 @@
         case Type of
             Type::Item:
                 AuxItemLedgerEntry.SetRange("Item No.", Code);
-            Type::ItemGroup:
+            Type::ItemCategory:
                 AuxItemLedgerEntry.SetRange("Item Category Code", Code);
             Type::Salesperson:
                 AuxItemLedgerEntry.SetRange("Salespers./Purch. Code", Code);
@@ -497,7 +497,7 @@
         else
             AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
 
-        if Type <> Type::ItemGroup then begin
+        if Type <> Type::ItemCategory then begin
             if ItemCategoryFilter <> '' then
                 AuxItemLedgerEntry.SetRange("Item Category Code", ItemCategoryFilter)
             else
@@ -524,7 +524,7 @@
         case Type of
             Type::Item:
                 AuxValueEntry.SetRange("Item No.", Code);
-            Type::ItemGroup:
+            Type::ItemCategory:
                 AuxValueEntry.SetRange("Item Category Code", Code);
             Type::Salesperson:
                 AuxValueEntry.SetRange("Salespers./Purch. Code", Code);
@@ -544,7 +544,7 @@
         else
             AuxValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
 
-        if Type <> Type::ItemGroup then begin
+        if Type <> Type::ItemCategory then begin
             if ItemCategoryFilter <> '' then
                 AuxValueEntry.SetRange("Item Category Code", ItemCategoryFilter)
             else
