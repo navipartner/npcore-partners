@@ -1,6 +1,7 @@
 ﻿codeunit 6150788 "NPR POS Action: PrintExchLabel"
 {
     Access = Internal;
+
     var
         ReadingErr: Label 'reading in %1 of %2';
 
@@ -19,7 +20,7 @@
     var
         ActionDescriptionLbl: Label 'This is a built-in action for printing exchange labels';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, CopyStr(ActionVersion(), 1, 20)) then begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
             Sender.RegisterWorkflow20(
                 'await workflow.respond("AddPresetValuesToContext");' +
                 'if (($parameters.Setting == $parameters.Setting["Package"]) || ($parameters.Setting == $parameters.Setting["Selection"])) {' +

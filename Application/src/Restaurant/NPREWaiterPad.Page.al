@@ -206,7 +206,7 @@
 
                         trigger OnAction()
                         begin
-                            HospitalityPrint.RequestRunServingStepToKitchen(Rec, true, '');
+                            HospitalityPrint.RequestRunServingStepToKitchenWithMessage(Rec, true, '');
                         end;
                     }
                     action(RunServingStep)
