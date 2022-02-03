@@ -16,7 +16,7 @@
     var
         ActionDescriptionLbl: Label 'This built in function deletes sales or payment line from the POS';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, CopyStr(ActionVersion(), 1, 20)) then begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
             Sender.RegisterWorkflow20(
                 'let saleLines = runtime.getData("BUILTIN_SALELINE");' +
                 'if ((!saleLines.length) || (saleLines._invalid)) {' +

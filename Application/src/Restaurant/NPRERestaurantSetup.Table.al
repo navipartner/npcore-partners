@@ -248,6 +248,23 @@
                     Validate("Set Number of Guests Action");
             end;
         }
+        field(150; "Go to POS Action"; Code[20])
+        {
+            Caption = 'Go to POS Action';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                ParamMgt.ClearParametersForRecord(RecordId, FieldNo("Go to POS Action"));
+                ParamMgt.CopyFromActionToField("Go to POS Action", RecordId, FieldNo("Go to POS Action"));
+            end;
+
+            trigger OnLookup()
+            begin
+                if ActionMgt.LookupAction("Go to POS Action") then
+                    Validate("Go to POS Action");
+            end;
+        }
     }
 
     keys

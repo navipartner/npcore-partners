@@ -58,6 +58,12 @@
             Sender.ConfigureReusableWorkflow(
                 TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Set Number of Guests Action")), RestaurantSetup.FieldNo("Set Number of Guests Action"));
         end;
+
+        if RestaurantSetup."Go to POS Action" <> '' then begin
+            POSSession.RetrieveSessionAction(RestaurantSetup."Go to POS Action", TempPOSAction);
+            Sender.ConfigureReusableWorkflow(
+                TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Go to POS Action")), RestaurantSetup.FieldNo("Go to POS Action"));
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnSetOptions', '', true, true)]
@@ -87,8 +93,8 @@
         end;
 
         if RestaurantSetup."Select Restaurant Action" <> '' then begin
-            Options.Add('npre_SelectTableAction', RestaurantSetup."Select Restaurant Action");
-            Options.Add('npre_SelectTableActionParameters', POSActionParameterMgt.GetParametersAsJson(RestaurantSetup.RecordId, RestaurantSetup.FieldNo("Select Restaurant Action")));
+            Options.Add('npre_SelectRestaurantAction', RestaurantSetup."Select Restaurant Action");
+            Options.Add('npre_SelectRestaurantActionParameters', POSActionParameterMgt.GetParametersAsJson(RestaurantSetup.RecordId, RestaurantSetup.FieldNo("Select Restaurant Action")));
         end;
 
         if RestaurantSetup."Save Layout Action" <> '' then begin
@@ -109,6 +115,11 @@
         if RestaurantSetup."Set Number of Guests Action" <> '' then begin
             Options.Add('npre_SetNumberOfGuestsAction', RestaurantSetup."Set Number of Guests Action");
             Options.Add('npre_SetNumberOfGuestsParameters', POSActionParameterMgt.GetParametersAsJson(RestaurantSetup.RecordId, RestaurantSetup.FieldNo("Set Number of Guests Action")));
+        end;
+
+        if RestaurantSetup."Go to POS Action" <> '' then begin
+            Options.Add('npre_GotoPOSAction', RestaurantSetup."Go to POS Action");
+            Options.Add('npre_GotoPOSParameters', POSActionParameterMgt.GetParametersAsJson(RestaurantSetup.RecordId, RestaurantSetup.FieldNo("Go to POS Action")));
         end;
 
         Setup.GetPOSRestProfile(POSRestaurantProfile);

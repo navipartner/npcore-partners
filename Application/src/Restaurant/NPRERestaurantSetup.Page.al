@@ -157,6 +157,16 @@
                         ParamMgt.EditParametersForField(Rec."Select Table Action", Rec.RecordId, Rec.FieldNo("Select Table Action"));
                     end;
                 }
+                field("Go to POS Action"; Rec."Go to POS Action")
+                {
+                    ToolTip = 'Specifies the value of the Go to POS Action field';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAssistEdit()
+                    begin
+                        ParamMgt.EditParametersForField(Rec."Go to POS Action", Rec.RecordId, Rec.FieldNo("Go to POS Action"));
+                    end;
+                }
                 field("New Waiter Pad Action"; Rec."New Waiter Pad Action")
                 {
 

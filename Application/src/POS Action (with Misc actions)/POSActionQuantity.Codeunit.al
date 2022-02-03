@@ -1,6 +1,7 @@
 ﻿codeunit 6150808 "NPR POS Action: Quantity"
 {
     Access = Internal;
+
     var
         MustBePositiveErr: Label 'Quantity must be positive.';
         MustBeNegativeErr: Label 'Quantity must be negative.';
@@ -21,7 +22,7 @@
     var
         ActionDescriptionLbl: Label 'This is a build in function to change quantity.';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, CopyStr(ActionVersion(), 1, 20)) then begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
             Sender.RegisterWorkflow20(GetActionJavascript());
 
             Sender.RegisterOptionParameter('InputType', 'Ask,Fixed,Increment', 'Ask');

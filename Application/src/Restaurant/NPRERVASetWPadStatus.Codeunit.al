@@ -18,7 +18,10 @@
     begin
         if Sender.DiscoverAction20(ActionCode(), ActionDescription, ActionVersion()) then begin
             Sender.RegisterWorkflow20(
-              'await workflow.respond();');
+                'await workflow.respond();' +
+                'if ($context.ShowResultMessage) {' +
+                '   popup.message($context.ResultMessageText);' +
+                '};');
 
             Sender.RegisterTextParameter('WaiterPadCode', '');
             Sender.RegisterTextParameter('StatusCode', '');
@@ -32,6 +35,7 @@
         WaiterPad: Record "NPR NPRE Waiter Pad";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
         NewStatusCode: Code[10];
+        ResultMessageText: Text;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -48,9 +52,11 @@
         FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::WaiterPad, FlowStatus."Status Object"::WaiterPadLineMealFlow);
         FlowStatus.SetRange(Code, NewStatusCode);
         FlowStatus.FindFirst();
-        if FlowStatus."Status Object" = FlowStatus."Status Object"::WaiterPadLineMealFlow then
-            RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, NewStatusCode)
-        else begin
+        if FlowStatus."Status Object" = FlowStatus."Status Object"::WaiterPadLineMealFlow then begin
+            ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, NewStatusCode);
+            Context.SetContext('ShowResultMessage', ResultMessageText <> '');
+            Context.SetContext('ResultMessageText', ResultMessageText);
+        end else begin
             WaiterPad.Status := NewStatusCode;
             WaiterPad.Modify();
         end;
