@@ -18,6 +18,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         TaxGroup: Record "Tax Group";
         POSSession: Codeunit "NPR POS Session";
         Assert: Codeunit Assert;
+        LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryRandom: Codeunit "Library - Random";
         LibraryTaxCalc: Codeunit "NPR POS Lib. - Tax Calc.";
 
@@ -100,7 +101,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
@@ -115,6 +115,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -125,12 +126,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -327,7 +322,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         POSEntry: Record "NPR POS Entry";
         GLEntry: Record "G/L Entry";
         GeneralPostingSetup: Record "General Posting Setup";
@@ -347,6 +341,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -357,12 +352,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -433,7 +422,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         POSEntry: Record "NPR POS Entry";
         GLEntry: Record "G/L Entry";
         GeneralPostingSetup: Record "General Posting Setup";
@@ -453,6 +441,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -463,12 +452,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -982,7 +965,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
@@ -997,6 +979,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -1007,12 +990,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -1210,7 +1187,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         POSEntry: Record "NPR POS Entry";
         GLEntry: Record "G/L Entry";
         GeneralPostingSetup: Record "General Posting Setup";
@@ -1230,6 +1206,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -1240,12 +1217,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -1536,7 +1507,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
@@ -1558,6 +1528,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableSalesTaxSetup();
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         CityTaxRate := 1.5;
@@ -1577,12 +1548,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignTaxDetailToPOSPostingProfile(TaxArea.Code, true);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::"Sales Tax";
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -1631,7 +1596,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
@@ -1653,6 +1617,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableSalesTaxSetup();
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         CityTaxRate := 1.5;
@@ -1672,12 +1637,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignTaxDetailToPOSPostingProfile(TaxArea.Code, true);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::"Sales Tax";
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -1931,7 +1890,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         POSEntry: Record "NPR POS Entry";
         GLEntry: Record "G/L Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
@@ -1959,6 +1917,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableSalesTaxSetup();
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         TaxJurisdiction.DeleteAll();
@@ -1979,12 +1938,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignTaxDetailToPOSPostingProfile(TaxArea.Code, true);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::"Sales Tax";
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Update rounding amount account
         UpdatePOSSalesRoundingAcc();
@@ -2058,7 +2011,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         POSEntry: Record "NPR POS Entry";
         GLEntry: Record "G/L Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
@@ -2086,6 +2038,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableSalesTaxSetup();
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         TaxJurisdiction.DeleteAll();
@@ -2106,12 +2059,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignTaxDetailToPOSPostingProfile(TaxArea.Code, true);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::"Sales Tax";
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Update rounding amount account
         UpdatePOSSalesRoundingAcc();
@@ -2496,7 +2443,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
@@ -2511,6 +2457,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -2521,12 +2468,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -2742,7 +2683,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         POSEntry: Record "NPR POS Entry";
         GLEntry: Record "G/L Entry";
         GeneralPostingSetup: Record "General Posting Setup";
@@ -2762,6 +2702,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -2772,12 +2713,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -3084,7 +3019,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
@@ -3099,6 +3033,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -3109,12 +3044,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAt;
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -3329,7 +3258,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         POSEntry: Record "NPR POS Entry";
         GLEntry: Record "G/L Entry";
         GeneralPostingSetup: Record "General Posting Setup";
@@ -3349,6 +3277,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableSalesTaxSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -3359,12 +3288,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::"Sales Tax";
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -3670,7 +3593,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
@@ -3692,6 +3614,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableSalesTaxSetup();
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         CityTaxRate := 1.5;
@@ -3711,12 +3634,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignTaxDetailToPOSPostingProfile(TaxArea.Code, true);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::"Sales Tax";
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -3880,7 +3797,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         POSEntry: Record "NPR POS Entry";
         GLEntry: Record "G/L Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
@@ -3906,6 +3822,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableSalesTaxSetup();
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         TaxJurisdiction.DeleteAll();
@@ -3926,12 +3843,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignTaxDetailToPOSPostingProfile(TaxArea.Code, true);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::"Sales Tax";
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Update rounding amount account
         UpdatePOSSalesRoundingAcc();
@@ -4199,7 +4110,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
@@ -4210,6 +4120,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -4220,12 +4131,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -4406,7 +4311,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
@@ -4417,6 +4321,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -4427,12 +4332,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -4613,7 +4512,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
-        POSViewProfile: Record "NPR POS View Profile";
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
@@ -4629,6 +4527,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableSalesTaxSetup();
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         CityTaxRate := 1.5;
@@ -4648,12 +4547,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
         AssignTaxDetailToPOSPostingProfile(TaxArea.Code, true);
-
-        // [GIVEN] POS View Profile
-        CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::"Sales Tax";
-        POSViewProfile.Modify();
-        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -4901,20 +4794,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleLine."Unit Price" := Item."Unit Price";
         POSSaleLine."Unit of Measure Code" := Item."Sales Unit of Measure";
         POSSaleLine.Insert();
-    end;
-
-    local procedure CreatePOSViewProfile(var POSViewProfile: Record "NPR POS View Profile")
-    var
-        LibraryPOSMasterData: codeunit "NPR Library - POS Master Data";
-    begin
-        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
-    end;
-
-    local procedure AssignPOSViewProfileToPOSUnit(POSViewProfileCode: Code[20])
-    var
-        LibraryPOSMasterData: codeunit "NPR Library - POS Master Data";
-    begin
-        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(POSUnit, POSViewProfileCode);
     end;
 
     local procedure CreateCustomer(var Customer: Record Customer; PricesIncludingTax: Boolean; AllowLineDisc: Boolean)

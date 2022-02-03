@@ -86,9 +86,8 @@
         {
             Caption = 'POS Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.54';
-            OptionCaption = 'Attended,Unattended';
-            OptionMembers = ATTENDED,UNATTENDED;
+            OptionCaption = 'Full/Fixed,Unattended,mPos,External';
+            OptionMembers = "FULL/FIXED",UNATTENDED,MPOS,EXTERNAL;
         }
         field(200; "Ean Box Sales Setup"; Code[20])
         {
@@ -213,7 +212,8 @@
         {
             Caption = 'MPOS Profile';
             DataClassification = CustomerContent;
-            TableRelation = "NPR MPOS Profile";
+            ObsoleteState = Removed;
+            ObsoleteReason = '1. Field "Ticket Admission Web Url" moved from MPOS Profile table to table "NPR TM Ticket Setup". 2. Use field "POS Type" to identify if the POS is an mPos device.';
         }
         field(600; "POS Self Service Profile"; Code[20])
         {
@@ -295,14 +295,6 @@
         if "POS Pricing Profile" = '' then
             exit;
         exit(POSPricingProfile.Get("POS Pricing Profile"));
-    end;
-
-    procedure GetProfile(var MPOSProfile: Record "NPR MPOS Profile"): Boolean
-    begin
-        Clear(MPOSProfile);
-        if "MPOS Profile" = '' then
-            exit;
-        exit(MPOSProfile.Get("MPOS Profile"));
     end;
 
     procedure GetProfile(var POSViewProfile: Record "NPR POS View Profile"): Boolean
@@ -392,5 +384,14 @@
     begin
         POSUnitEvent.DeleteActiveEvent(Rec."No.");
     end;
-}
 
+    procedure ShowPricesIncludingVAT(): Boolean
+    var
+        PosViewProfile: Record "NPR POS View Profile";
+        ApplicationAreaMgmt: Codeunit "Application Area Mgmt.";
+    begin
+        if GetProfile(PosViewProfile) then
+            exit(PosViewProfile."Show Prices Including VAT");
+        exit(not ApplicationAreaMgmt.IsSalesTaxEnabled());
+    end;
+}

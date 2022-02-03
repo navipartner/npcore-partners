@@ -519,6 +519,7 @@
 
     procedure CreatePOSViewProfile(var POSViewProfile: Record "NPR POS View Profile")
     var
+        ApplicationAreaMgmt: Codeunit "Application Area Mgmt.";
         LibraryUtility: Codeunit "Library - Utility";
     begin
         POSViewProfile.Init();
@@ -527,7 +528,7 @@
           CopyStr(
             LibraryUtility.GenerateRandomCode(POSViewProfile.FieldNo(Code), DATABASE::"NPR POS View Profile"), 1,
             LibraryUtility.GetFieldLength(DATABASE::"NPR POS Audit Profile", POSViewProfile.FieldNo(Code))));
-
+        POSViewProfile."Show Prices Including VAT" := not ApplicationAreaMgmt.IsSalesTaxEnabled();
         POSViewProfile.Insert();
     end;
 

@@ -115,12 +115,10 @@
 
     procedure CashDrawerPassword(CashDrawerNo: Text): Text
     var
-        POSUnit: Record "NPR POS Unit";
-        POSViewProfile: Record "NPR POS View Profile";
+        POSSecurtyProfile: Record "NPR POS Security Profile";
     begin
-        GetPOSUnit(POSUnit);
-        POSUnit.GetProfile(POSViewProfile);
-        exit(POSViewProfile."Open Register Password");
+        GetPOSSecurityProfile(POSSecurtyProfile);
+        exit(POSSecurtyProfile."Unlock Password");
     end;
 
     procedure RestaurantCode(): Code[20]
@@ -197,6 +195,12 @@
         exit(POSUnitRec.GetProfile(POSViewProfile));
     end;
 
+    procedure GetPOSSecurityProfile(var POSSecurtyProfile: Record "NPR POS Security Profile"): Boolean
+    begin
+        POSUnitRec.TestField("No.");
+        exit(POSUnitRec.GetProfile(POSSecurtyProfile));
+    end;
+
     procedure GetPOSStore(var POSStoreOut: Record "NPR POS Store")
     begin
         POSStoreOut := POSStoreRec;
@@ -209,20 +213,25 @@
 
     procedure GetLockTimeout() LockTimeoutInSeconds: Integer
     var
-        POSViewProfile: Record "NPR POS View Profile";
+        POSSecurtyProfile: Record "NPR POS Security Profile";
+        Handled: Boolean;
     begin
-        GetPOSViewProfile(POSViewProfile);
+        GetPOSSecurityProfile(POSSecurtyProfile);
 
-        case POSViewProfile."Lock Timeout" of
-            POSViewProfile."Lock Timeout"::"30S":
+        OnGetLockTimeout(POSSecurtyProfile, LockTimeoutInSeconds, Handled);
+        if Handled then
+            exit;
+
+        case POSSecurtyProfile."Lock Timeout" of
+            POSSecurtyProfile."Lock Timeout"::"30S":
                 LockTimeoutInSeconds := 30;
-            POSViewProfile."Lock Timeout"::"60S":
+            POSSecurtyProfile."Lock Timeout"::"60S":
                 LockTimeoutInSeconds := 60;
-            POSViewProfile."Lock Timeout"::"90S":
+            POSSecurtyProfile."Lock Timeout"::"90S":
                 LockTimeoutInSeconds := 90;
-            POSViewProfile."Lock Timeout"::"120S":
+            POSSecurtyProfile."Lock Timeout"::"120S":
                 LockTimeoutInSeconds := 120;
-            POSViewProfile."Lock Timeout"::"600S":
+            POSSecurtyProfile."Lock Timeout"::"600S":
                 LockTimeoutInSeconds := 600;
             else
                 LockTimeoutInSeconds := 0;
@@ -368,4 +377,11 @@
     end;
 
     #endregion "Action Settings"
+
+    #region events
+    [IntegrationEvent(true, false)]
+    local procedure OnGetLockTimeout(POSSecurtyProfile: Record "NPR POS Security Profile"; var LockTimeoutInSeconds: Integer; var Handled: Boolean)
+    begin
+    end;
+    #endregion events
 }
