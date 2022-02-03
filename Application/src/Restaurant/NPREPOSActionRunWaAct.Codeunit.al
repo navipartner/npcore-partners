@@ -8,7 +8,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.1');
+        exit('2.0');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, false)]
@@ -16,15 +16,12 @@
     var
         ActionDescription: Label 'An action to run Waiter Pad functions directly from Sales View';
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('RunWorkflowSteps', 'respond();');
-            Sender.RegisterWorkflow(false);
+        if Sender.DiscoverAction20(ActionCode(), ActionDescription, ActionVersion()) then begin
+            Sender.RegisterWorkflow20(
+                'await workflow.respond();' +
+                'if ($context.ShowResultMessage) {' +
+                '   popup.message($context.ResultMessageText);' +
+                '};');
 
             Sender.RegisterOptionParameter('WaiterPadAction', 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Close w/out Saving', 'Print Pre-Receipt');
             Sender.RegisterOptionParameter('LinesToSend', 'New/Updated,All', 'New/Updated');
@@ -34,13 +31,12 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, false)]
+    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SalePOS: Record "NPR POS Sale";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPad2: Record "NPR NPRE Waiter Pad";
-        JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
@@ -49,6 +45,7 @@
         WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
         WPadLinesToSend: Option "New/Updated",All;
         ServingStepToRequest: Code[10];
+        ResultMessageText: Text;
         ClearSaleOnFinish: Boolean;
         ReturnToDefaultView: Boolean;
         WPadNotSelectedErr: Label 'Please select a waiter pad first.';
@@ -57,10 +54,9 @@
             exit;
         Handled := true;
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        WPadAction := JSON.GetIntegerParameterOrFail('WaiterPadAction', ActionCode());
-        ClearSaleOnFinish := JSON.GetBooleanParameter('MoveSaleToWPadOnFinish');
-        ReturnToDefaultView := JSON.GetBooleanParameter('ReturnToDefaultView');
+        WPadAction := Context.GetIntegerParameterOrFail('WaiterPadAction', ActionCode());
+        ClearSaleOnFinish := Context.GetBooleanParameter('MoveSaleToWPadOnFinish');
+        ReturnToDefaultView := Context.GetBooleanParameter('ReturnToDefaultView');
         if ReturnToDefaultView then
             ClearSaleOnFinish := true;
 
@@ -81,22 +77,22 @@
 
                 WPadAction::"Send Kitchen Order":
                     begin
-                        WPadLinesToSend := JSON.GetIntegerParameter('LinesToSend');
+                        WPadLinesToSend := Context.GetIntegerParameter('LinesToSend');
                         RestaurantPrint.PrintWaiterPadPreOrderToKitchenPressed(WaiterPad, WPadLinesToSend = WPadLinesToSend::All);
                     end;
 
                 WPadAction::"Request Next Serving":
                     begin
-                        RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, true, '');
+                        ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, true, '');
                     end;
 
                 WPadAction::"Request Specific Serving":
                     begin
-                        ServingStepToRequest := CopyStr(JSON.GetStringParameter('ServingStep'), 1, MaxStrLen(ServingStepToRequest));
+                        ServingStepToRequest := CopyStr(Context.GetStringParameter('ServingStep'), 1, MaxStrLen(ServingStepToRequest));
                         if ServingStepToRequest = '' then
                             if not LookupServingStep(ServingStepToRequest) then
                                 Error('');
-                        RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, ServingStepToRequest);
+                        ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, ServingStepToRequest);
                     end;
 
                 WPadAction::"Merge Waiter Pad":
@@ -110,6 +106,9 @@
                     end;
             end;
         end;
+
+        Context.SetContext('ShowResultMessage', ResultMessageText <> '');
+        Context.SetContext('ResultMessageText', ResultMessageText);
 
         if ClearSaleOnFinish or
            (WPadAction in [WPadAction::"Merge Waiter Pad", WPadAction::"Close w/out Saving"])

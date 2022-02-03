@@ -8,7 +8,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.0');
+        exit('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
@@ -17,7 +17,11 @@
         ActionDescription: Label 'This built-in action allows to run Waiter Pad related functions directly from Restaurant View';
     begin
         if Sender.DiscoverAction20(ActionCode(), ActionDescription, ActionVersion()) then begin
-            Sender.RegisterWorkflow20('await workflow.respond();');
+            Sender.RegisterWorkflow20(
+                'await workflow.respond();' +
+                'if ($context.ShowResultMessage) {' +
+                '   popup.message($context.ResultMessageText);' +
+                '};');
 
             Sender.RegisterTextParameter('WaiterPadCode', '');
             Sender.RegisterOptionParameter('WaiterPadAction', 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Open Waiter Pad', 'Print Pre-Receipt');
@@ -61,6 +65,7 @@
         WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Open Waiter Pad";
         WPadLinesToSend: Option "New/Updated",All;
         ServingStepToRequest: Code[10];
+        ResultMessageText: Text;
         WPadIsOpenedInPOSSale: Label 'The waiter pad is opened in a POS sale at the moment and might have unsaved changes. Are you sure you want to continue on running the action?';
     begin
         WaiterPad."No." := CopyStr(Context.GetStringParameterOrFail('WaiterPadCode', ActionCode()), 1, MaxStrLen(WaiterPad."No."));
@@ -87,7 +92,7 @@
 
             WPadAction::"Request Next Serving":
                 begin
-                    RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, true, '');
+                    ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, true, '');
                 end;
 
             WPadAction::"Request Specific Serving":
@@ -96,7 +101,7 @@
                     if ServingStepToRequest = '' then
                         if not LookupServingStep(ServingStepToRequest) then
                             Error('');
-                    RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, ServingStepToRequest);
+                    ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, ServingStepToRequest);
                 end;
 
             WPadAction::"Merge Waiter Pad":
@@ -111,6 +116,9 @@
                     Page.Run(Page::"NPR NPRE Waiter Pad", WaiterPad);
                 end;
         end;
+
+        Context.SetContext('ShowResultMessage', ResultMessageText <> '');
+        Context.SetContext('ResultMessageText', ResultMessageText);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, false)]

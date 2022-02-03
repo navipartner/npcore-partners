@@ -1,6 +1,7 @@
 ﻿codeunit 6150664 "NPR NPRE Restaurant Print"
 {
     Access = Internal;
+
     var
         PrintKitchOderConfMsg: Label 'Do you want to send the order to the kitchen now?';
         NoMoreMealGroupsLbl: Label 'No more meal groups left to be sent to the kitchen.';
@@ -468,7 +469,16 @@
             until WPadLinePrintLogEntry.Next() = 0;
     end;
 
-    procedure RequestRunServingStepToKitchen(var WaiterPad: Record "NPR NPRE Waiter Pad"; AutoSelectFlowStatus: Boolean; FlowStatusCode: Code[10])
+    procedure RequestRunServingStepToKitchenWithMessage(var WaiterPad: Record "NPR NPRE Waiter Pad"; AutoSelectFlowStatus: Boolean; FlowStatusCode: Code[10])
+    var
+        MessageText: Text;
+    begin
+        MessageText := RequestRunServingStepToKitchen(WaiterPad, AutoSelectFlowStatus, FlowStatusCode);
+        if MessageText <> '' then
+            Message(MessageText);
+    end;
+
+    procedure RequestRunServingStepToKitchen(var WaiterPad: Record "NPR NPRE Waiter Pad"; AutoSelectFlowStatus: Boolean; FlowStatusCode: Code[10]): Text
     var
         FlowStatus: Record "NPR NPRE Flow Status";
     begin
@@ -478,9 +488,9 @@
             if WaiterPad."Serving Step Code" = '' then
                 FlowStatus.FindFirst()
             else begin
-                FlowStatus.Code := WaiterPad."Serving Step Code";
-                FlowStatus."Status Object" := FlowStatus."Status Object"::WaiterPadLineMealFlow;
-                FlowStatus.Find();
+                FlowStatus.setrange(Code, WaiterPad."Serving Step Code");
+                FlowStatus.FindFirst();
+                FlowStatus.setrange(Code);
                 if FlowStatus.Next() = 0 then
                     Error(NoMoreMealGroupsLbl);
             end;
@@ -503,7 +513,8 @@
             FlowStatus.Get(FlowStatusCode, FlowStatus."Status Object"::WaiterPadLineMealFlow);
         if FlowStatus.Description = '' then
             FlowStatus.Description := FlowStatus.Code;
-        Message(ServingReqestedMsg, FlowStatus.Description, WaiterPad."Current Seating FF", WaiterPad."No.");
+
+        exit(StrSubstNo(ServingReqestedMsg, FlowStatus.Description, WaiterPad."Current Seating FF", WaiterPad."No."));
     end;
 
     procedure SelectAndRequestRunServingStepToKitchen(var WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -516,7 +527,7 @@
             FlowStatus.Get(WaiterPad."Serving Step Code", FlowStatus."Status Object"::WaiterPadLineMealFlow);
 
         if PAGE.RunModal(0, FlowStatus) = Action::LookupOK then
-            RequestRunServingStepToKitchen(WaiterPad, false, FlowStatus.Code);
+            RequestRunServingStepToKitchenWithMessage(WaiterPad, false, FlowStatus.Code);
     end;
 
     local procedure SetWaiterPadMealFlowStatus(var WaiterPad: Record "NPR NPRE Waiter Pad"; NewFlowStatusCode: Code[10])

@@ -21,7 +21,7 @@
     var
         ActionDescriptionLbl: Label 'This built-in action inserts Item AddOns for a selected POS Sale Line', MaxLength = 250;
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, CopyStr(ActionVersion(), 1, 20)) then begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
             Sender.RegisterWorkflow20(
                 'let AddonJson = await workflow.respond("GetSalesLineAddonConfigJson");' +
                 'if ($context.UserSelectionRequired) {' +
