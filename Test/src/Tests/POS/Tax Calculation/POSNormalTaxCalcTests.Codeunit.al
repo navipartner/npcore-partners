@@ -2264,6 +2264,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
+        LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibraryERM: Codeunit "Library - ERM";
     begin
@@ -2275,6 +2276,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         if not Initialized then begin
             LibraryTaxCalc.BindNormalTaxCalcTest();
+            LibraryApplicationArea.EnableVATSetup();
             LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
             LibraryPOSMasterData.CreatePOSSetup(POSSetup);
             LibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
@@ -2327,7 +2329,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     begin
         LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
         if PricesIncludingTax then
-            POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT
+            POSViewProfile."Show Prices Including VAT" := PricesIncludingTax
         else
             Error('For other Sales Tax Type use test unit POSSalesTaxCalcTests.Codeunit.al');
         POSViewProfile.Modify();

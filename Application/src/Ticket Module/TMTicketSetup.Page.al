@@ -146,6 +146,15 @@
                     }
                 }
             }
+            group(mPos)
+            {
+                Caption = 'mPos';
+                field("Ticket Admission Web Url"; Rec."Ticket Admission Web Url")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies an Url to open the ticket admission web page from mobile POS (mPos)';
+                }
+            }
             group("Prepaid / Postpaid")
             {
                 Caption = 'Prepaid / Postpaid';

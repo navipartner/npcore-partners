@@ -198,10 +198,9 @@ codeunit 6184514 "NPR EFT MobilePay Prot."
 
     local procedure IsMPOSDevice(RegisterId: Code[10]): Boolean
     var
-        MPOSProfile: Record "NPR MPOS Profile";
         POSUnit: Record "NPR POS Unit";
     begin
-        exit(POSUnit.Get(RegisterId) and POSUnit.GetProfile(MPOSProfile));
+        exit(POSUnit.Get(RegisterId) and (POSUnit."POS Type" = POSUnit."POS Type"::MPOS));
     end;
 
     local procedure InitState()

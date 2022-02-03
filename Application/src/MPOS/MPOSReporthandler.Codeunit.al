@@ -6,12 +6,11 @@
 
     procedure ExecutionHandler(ReportId: Integer; RegisterId: Code[10])
     var
-        MPOSProfile: Record "NPR MPOS Profile";
         POSUnit: Record "NPR POS Unit";
         RecVariant: Variant;
     begin
         if POSUnit.Get(RegisterId) then begin
-            if POSUnit.GetProfile(MPOSProfile) then
+            if POSUnit."POS Type" = POSUnit."POS Type"::MPOS then
                 SendReportToLocalOS(ReportId, RecVariant)
             else
                 REPORT.RunModal(ReportId);
@@ -21,7 +20,6 @@
 
     procedure ExecutionHandlerWithVars(ReportId: Integer; RecVariant: Variant; ReqWindow: Boolean; SystemPrinter: Boolean)
     var
-        MPOSProfile: Record "NPR MPOS Profile";
         POSUnit: Record "NPR POS Unit";
         RegisterId: Code[10];
         UserSetup: Record "User Setup";
@@ -30,7 +28,7 @@
             RegisterId := UserSetup."NPR POS Unit No.";
 
         if POSUnit.Get(RegisterId) then begin
-            if POSUnit.GetProfile(MPOSProfile) then
+            if POSUnit."POS Type" = POSUnit."POS Type"::MPOS then
                 SendReportToLocalOS(ReportId, RecVariant)
             else
                 REPORT.RunModal(ReportId, ReqWindow, SystemPrinter, RecVariant);

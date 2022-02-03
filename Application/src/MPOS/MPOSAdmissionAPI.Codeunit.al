@@ -38,12 +38,10 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        TicketSetup: Record "NPR TM Ticket Setup";
+        JsonMgt: Codeunit "NPR POS JSON Management";
         JSBridge: Page "NPR JS Bridge";
         JSONtext: Text;
-        MPOSProfile: Record "NPR MPOS Profile";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSUnit: Record "NPR POS Unit";
-        JSONMgr: Codeunit "NPR POS JSON Management";
         AdmissionCode: Code[20];
     begin
 
@@ -55,21 +53,13 @@
 
         Handled := true;
 
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetPOSUnit(POSUnit);
-        POSUnit.Get(POSUnit."No.");
-        if not POSUnit.GetProfile(MPOSProfile) then
-            exit;
+        JSONtext := BuildJSONParams(TicketSetup.GetTicketAdmissionWebUrl(true), '', '', '', AdmissionFailedErr);
 
-        MPOSProfile.TestField("Ticket Admission Web Url");
-        JSONtext := BuildJSONParams(MPOSProfile."Ticket Admission Web Url", '', '', '', AdmissionFailedErr);
-
-        JSONMgr.InitializeJObjectParser(Context, FrontEnd);
-        AdmissionCode := JSONMgr.GetStringParameter('AdmissionCode');
+        JsonMgt.InitializeJObjectParser(Context, FrontEnd);
+        AdmissionCode := JsonMgt.GetStringParameter('AdmissionCode');
         JSBridge.SetParameters('Admission', JSONtext, AdmissionCode);
 
         JSBridge.RunModal();
-
     end;
 
     local procedure BuildJSONParams(BaseAddress: Text; Endpoint: Text; PrintJob: Text; RequestType: Text; ErrorCaption: Text) JSON: Text

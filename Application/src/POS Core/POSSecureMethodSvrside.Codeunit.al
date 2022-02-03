@@ -194,7 +194,7 @@
 
     local procedure ValidatePOSUnitOpenRegisterPassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; POSUnit: Record "NPR POS Unit"; Password: Text): Boolean
     var
-        POSViewProfile: Record "NPR POS View Profile";
+        POSSecurtyProfile: Record "NPR POS Security Profile";
         Reason: Text;
     begin
         Reason := StrSubstNo(Text006, Text005);
@@ -204,8 +204,8 @@
             exit;
         end;
 
-        POSUnit.GetProfile(POSViewProfile);
-        if (Password = POSViewProfile."Open Register Password") then begin
+        POSUnit.GetProfile(POSSecurtyProfile);
+        if (Password = POSSecurtyProfile."Unlock Password") then begin
             Sender.ConfirmPassword('OpenReg');
             exit(true);
         end;

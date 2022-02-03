@@ -3,12 +3,10 @@
     Extensible = False;
     Caption = 'POS Menu Buttons';
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     PromotedActionCategories = 'New,Process,Reports,Level,Order';
     SourceTable = "NPR POS Menu Button";
     SourceTableView = SORTING("Menu Code", Ordinal);
-    ApplicationArea = NPRRetail;
 
     layout
     {

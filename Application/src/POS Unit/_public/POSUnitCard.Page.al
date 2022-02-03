@@ -52,8 +52,7 @@
                 }
                 field("POS Type"; Rec."POS Type")
                 {
-
-                    ToolTip = 'Specifies the value of the POS Type field';
+                    ToolTip = 'Specifies the type of the POS';
                     ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
@@ -128,12 +127,6 @@
                 {
 
                     ToolTip = 'Specifies the value of the POS Pricing Profile field where customer discount and price group should be set.';
-                    ApplicationArea = NPRRetail;
-                }
-                field("MPOS Profile"; Rec."MPOS Profile")
-                {
-
-                    ToolTip = 'Specifies the value of the MPOS Profile field where ticket admission should be set.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Self Service Profile"; Rec."POS Self Service Profile")

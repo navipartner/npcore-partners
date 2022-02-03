@@ -17,6 +17,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
         POSSession: Codeunit "NPR POS Session";
         Assert: Codeunit Assert;
+        LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryRandom: Codeunit "Library - Random";
         LibraryTaxCalc: Codeunit "NPR POS Lib. - Tax Calc.";
         Initialized: Boolean;
@@ -209,6 +210,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
+        LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibraryERM: Codeunit "Library - ERM";
     begin
@@ -221,6 +223,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
 
         if not Initialized then begin
             LibraryTaxCalc.BindNormalTaxCalcTest();
+            LibraryApplicationArea.EnableVATSetup();
             LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
             LibraryPOSMasterData.CreatePOSSetup(POSSetup);
             LibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
@@ -259,6 +262,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
     begin
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
@@ -269,8 +273,6 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
-        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
-        POSViewProfile.Modify();
         AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Item with unit price        

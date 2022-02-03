@@ -11,17 +11,15 @@
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS View Profile', 'OnUpgradePerCompany');
 
-        // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS View Profile")) then begin
-            LogMessageStopwatch.LogFinish();
-            exit;
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS View Profile")) then begin
+            Upgrade();
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS View Profile"));
         end;
 
-        // Run upgrade code
-        Upgrade();
-
-        // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS View Profile"));
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS View Profile", 'UpgradeTaxType')) then begin
+            UpgradeTaxType();
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS View Profile", 'UpgradeTaxType'));
+        end;
 
         LogMessageStopwatch.LogFinish();
     end;
@@ -96,5 +94,50 @@
             if ModifyProfile then
                 POSViewProfile.Modify();
         until POSViewProfile.Next() = 0;
+    end;
+
+    local procedure UpgradeTaxType()
+    var
+        POSViewProfile: Record "NPR POS View Profile";
+        ActivateSalesTax: Boolean;
+        ActivateVAT: Boolean;
+    begin
+        if POSViewProfile.FindSet(true) then
+            repeat
+                POSViewProfile."Show Prices Including VAT" := POSViewProfile."Tax Type" = POSViewProfile."Tax Type"::VAT;
+
+                case POSViewProfile."Tax Type" of
+                    POSViewProfile."Tax Type"::VAT:
+                        ActivateVAT := true;
+                    POSViewProfile."Tax Type"::"Sales Tax":
+                        ActivateSalesTax := true;
+                end;
+            until POSViewProfile.Next() = 0;
+
+        if not (ActivateSalesTax or ActivateVAT) then
+            ActivateVAT := true;
+
+        ActivateApplicationArea(ActivateSalesTax, ActivateVAT);
+    end;
+
+    local procedure ActivateApplicationArea(ActivateSalesTax: Boolean; ActivateVAT: Boolean)
+    var
+        ApplicationAreaSetup: Record "Application Area Setup";
+        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
+        Experience: Text;
+    begin
+        if not (ActivateSalesTax or ActivateVAT) then
+            exit;
+
+        if not ApplicationAreaMgmtFacade.GetExperienceTierCurrentCompany(Experience) then
+            exit;
+        ApplicationAreaSetup.SetRange("Company Name", CompanyName());
+        if ApplicationAreaSetup.IsEmpty() then
+            exit;
+
+        if ActivateSalesTax then
+            ApplicationAreaSetup.ModifyAll("Sales Tax", ActivateSalesTax);
+        if ActivateVAT then
+            ApplicationAreaSetup.ModifyAll(VAT, ActivateVAT);
     end;
 }

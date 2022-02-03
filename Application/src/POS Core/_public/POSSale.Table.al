@@ -76,7 +76,6 @@
                 Contact: Record Contact;
                 POSPricingProfile: Record "NPR POS Pricing Profile";
                 POSPostingProfile: Record "NPR POS Posting Profile";
-                POSViewProfile: Record "NPR POS View Profile";
                 Cust: Record Customer;
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
                 xSaleLinePOS: Record "NPR POS Sale Line";
@@ -149,10 +148,8 @@
 
                 if Cust."No." <> '' then
                     "Prices Including VAT" := Cust."Prices Including VAT"
-                else begin
-                    POSUnit.GetProfile(POSViewProfile);
-                    "Prices Including VAT" := POSViewProfile."Tax Type" = POSViewProfile."Tax Type"::VAT;
-                end;
+                else
+                    "Prices Including VAT" := POSUnit.ShowPricesIncludingVAT();
 
                 if not Modify() then;
 

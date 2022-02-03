@@ -251,6 +251,12 @@
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
+        field(400; "Ticket Admission Web Url"; Text[250])
+        {
+            Caption = 'Ticket Admission Web Url';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = URL;
+        }
     }
 
     keys
@@ -260,8 +266,12 @@
         }
     }
 
-    fieldgroups
-    {
-    }
+    procedure GetTicketAdmissionWebUrl(Mandatory: Boolean): Text
+    begin
+        if not Rec.Get() then
+            Rec.Init();
+        if Mandatory then
+            Rec.TestField("Ticket Admission Web Url");
+        exit("Ticket Admission Web Url");
+    end;
 }
-
