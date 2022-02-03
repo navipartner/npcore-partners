@@ -623,30 +623,28 @@
     end;
 
     procedure SetWorkflowTypeAttended()
-    var
-        POSAction: Record "NPR POS Action";
     begin
         "Requires POS Type" := "Requires POS Type"::ATTENDED;
         POSSession.DiscoverSessionAction(Rec);
-        if (IsTemporary()) then begin
-            if (POSAction.Get(Code)) then begin
-                POSAction."Requires POS Type" := "Requires POS Type"::UNATTENDED;
-                POSAction.Modify();
-            end;
-        end;
+        if (IsTemporary()) then
+            UpdatePersistentRecordPOSType(Rec);
     end;
 
     procedure SetWorkflowTypeUnattended()
-    var
-        POSAction: Record "NPR POS Action";
     begin
         "Requires POS Type" := "Requires POS Type"::UNATTENDED;
         POSSession.DiscoverSessionAction(Rec);
-        if (IsTemporary()) then begin
-            if (POSAction.Get(Code)) then begin
-                POSAction."Requires POS Type" := "Requires POS Type"::UNATTENDED;
-                POSAction.Modify();
-            end;
+        if (IsTemporary()) then
+            UpdatePersistentRecordPOSType(Rec);
+    end;
+
+    local procedure UpdatePersistentRecordPOSType(ActionIn: Record "NPR POS Action")
+    var
+        POSAction: Record "NPR POS Action";
+    begin
+        if POSAction.Get(ActionIn."Code") then begin
+            POSAction."Requires POS Type" := ActionIn."Requires POS Type";
+            POSAction.Modify();
         end;
     end;
 

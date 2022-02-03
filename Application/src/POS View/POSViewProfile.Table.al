@@ -121,6 +121,8 @@
         {
             Caption = 'Lock Timeout';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to table 6014601 "NPR POS Security Profile"';
         }
         field(70; "Tax Type"; Option)
         {
@@ -128,11 +130,20 @@
             DataClassification = CustomerContent;
             OptionMembers = VAT,"Sales Tax";
             OptionCaption = 'VAT,Sales Tax';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use ApplicationAreaMgmt.IsSalesTaxEnabled() to identify whether we are in Sales Tax environment';
+        }
+        field(80; "Show Prices Including VAT"; Boolean)
+        {
+            Caption = 'Show Prices Including VAT';
+            DataClassification = CustomerContent;
         }
         field(5058; "Open Register Password"; Code[20])
         {
             Caption = 'Open POS Unit Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to table 6014601 "NPR POS Security Profile"';
         }
         field(6232; "POS - Show discount fields"; Boolean)
         {

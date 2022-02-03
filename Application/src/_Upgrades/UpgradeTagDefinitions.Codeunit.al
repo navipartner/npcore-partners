@@ -9,10 +9,13 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Tax Calc."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Scanner Stations"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Register"));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MPOS App Setup"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MPOS App Setup", 'NPRMPOSAppSetup'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MPOS App Setup", 'ObsoleteMPOSProfile'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Rcpt. Profile"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS View Profile"));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pass"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS View Profile", 'UpgradeTaxType'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pass", 'UpgradePOSUnitPasswords'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pass", 'MoveLockPassToPOSSecurityProfile'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SS Profile"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pricing Profile"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustSplitBillPOSActionParameters'));
@@ -84,13 +87,28 @@
             Codeunit::"NPR UPG Register":
                 exit('NPRRegister-623d5a37-44aa-4244-a4c3-6d8f6b1ccd88');
             Codeunit::"NPR UPG MPOS App Setup":
-                exit('NPRMPOSAppSetup-76e69e8f-d2fe-4d24-bc9f-823b60acfaad');
+                case UpgradeStep of
+                    'NPRMPOSAppSetup':
+                        exit('NPRMPOSAppSetup-76e69e8f-d2fe-4d24-bc9f-823b60acfaad');
+                    'ObsoleteMPOSProfile':
+                        exit('ObsoleteMPOSProfile_20220125')
+                end;
             Codeunit::"NPR UPG Rcpt. Profile":
                 exit('NPRPOSUnitRcptTxtProfile-99e3b857-d3cf-4ff8-b9fa-4768a63e33b3');
             Codeunit::"NPR UPG POS View Profile":
-                exit(POSViewProfile.TableCaption() + '-' + Format(Today(), 0, 9));
+                case UpgradeStep of
+                    '':
+                        exit(POSViewProfile.TableCaption());
+                    'UpgradeTaxType':
+                        exit('POSViewProfile_TaxType-20220128')
+                end;
             Codeunit::"NPR UPG POS Pass":
-                exit(CompanyName() + 'NPRPOSUnitPasswords' + Format(Today(), 0, 9));
+                case UpgradeStep of
+                    'UpgradePOSUnitPasswords':
+                        exit('NPRPOSUnitPasswords');
+                    'MoveLockPassToPOSSecurityProfile':
+                        exit('MoveLockPassToPOSSecurityProfile');
+                end;
             Codeunit::"NPR UPG POS SS Profile":
                 exit('NPRPOSUnit-ee2acd97-c63a-479b-bbe7-4d6d10514974');
             Codeunit::"NPR UPG POS Pricing Profile":

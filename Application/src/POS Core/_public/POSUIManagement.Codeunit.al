@@ -715,12 +715,20 @@
         Options.Add('adminMenuWorkflow_parameters', POSActionParameterMgt.GetParametersAsJson(POSSetup.RecordId, POSSetup.FieldNo("Admin Menu Action Code")));
         Options.Add('nprVersion', GetDisplayVersion());
         Setup.GetPOSViewProfile(POSViewProfile);
-        Options.Add('taxationType', Format(POSViewProfile."Tax Type", 0, 9));
+        Options.Add('taxationType', GetTaxEnvironmentType());
         Options.Add('lineOrderOnScreen', POSViewProfile."Line Order on Screen");
 
         OnSetOptions(Setup, Options);
 
         FrontEnd.SetOptions(Options);
+    end;
+
+    local procedure GetTaxEnvironmentType(): Text[1]
+    var
+        ApplicationAreaMgmt: Codeunit "Application Area Mgmt.";
+    begin
+        //0 - VAT, 1 - Sales Tax
+        exit(Format(ApplicationAreaMgmt.IsSalesTaxEnabled(), 0, 2));
     end;
 
     local procedure GetDisplayVersion(): Text
@@ -796,7 +804,10 @@
         POSUnit: Record "NPR POS Unit";
     begin
         POSSetup.GetPOSUnit(POSUnit);
-        exit(POSUnit."POS Type");
+        if POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED then
+            exit(POSUnit."POS Type")
+        else
+            exit(POSUnit."POS Type"::"FULL/FIXED");
     end;
 
     [IntegrationEvent(true, false)]

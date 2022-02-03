@@ -100,7 +100,6 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure ShowReturnAmountDialog(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
-        MPOSProfile: Record "NPR MPOS Profile";
         POSUnit: Record "NPR POS Unit";
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
@@ -114,7 +113,7 @@
         if not POSSession.IsActiveSession(POSFrontEnd) then
             exit;
         POSUnit.Get(SalePOS."Register No.");
-        if not POSUnit.GetProfile(MPOSProfile) then
+        if POSUnit."POS Type" <> POSUnit."POS Type"::MPOS then
             exit;
 
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");

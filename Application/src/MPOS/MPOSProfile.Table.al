@@ -3,7 +3,9 @@
     Access = Internal;
     Caption = 'MPOS Profile';
     DataClassification = CustomerContent;
-    LookupPageID = "NPR MPOS Profiles";
+    //LookupPageID = "NPR MPOS Profiles";
+    ObsoleteState = Removed;
+    ObsoleteReason = '1. Field "Ticket Admission Web Url" moved to table "NPR TM Ticket Setup"; 2. Use field "POS Type" on POS Unit to identify if the POS is an mPos device.';
 
     fields
     {

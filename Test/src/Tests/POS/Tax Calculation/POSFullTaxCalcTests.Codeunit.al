@@ -36,7 +36,7 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
         CreateVATPostingSetup(VATPostingSetup);
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
 
-        // [GIVEN] POS Pricing Profile
+        // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile, false);
         AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
@@ -181,6 +181,7 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
+        LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibraryTaxCalc: Codeunit "NPR POS Lib. - Tax Calc.";
         LibraryERM: Codeunit "Library - ERM";
@@ -192,6 +193,7 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
         end;
 
         if not Initialized then begin
+            LibraryApplicationArea.EnableVATSetup();
             LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
             LibraryPOSMasterData.CreatePOSSetup(POSSetup);
             LibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
@@ -241,10 +243,7 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
         LibraryPOSMasterData: codeunit "NPR Library - POS Master Data";
     begin
         LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
-        if PricesIncludingTax then
-            POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT
-        else
-            POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::"Sales Tax";
+        POSViewProfile."Show Prices Including VAT" := PricesIncludingTax;
         POSViewProfile.Modify();
     end;
 
