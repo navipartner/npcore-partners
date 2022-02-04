@@ -38,6 +38,15 @@
                 column(Exclude_from_Posting; "Exclude from Posting")
                 {
                 }
+                dataitem(Value_Entry; "Value Entry")
+                {
+                    DataItemLink = "Document No." = POS_Sales_Line."Document No.", "Document Line No." = POS_Sales_Line."Line No.", "Dimension Set ID" = POS_Sales_Line."Dimension Set ID";
+                    DataItemTableFilter = "Item Ledger Entry Type" = FILTER(Sale);
+                    column(Sum_Cost_Amount_Actual; "Cost Amount (Actual)")
+                    {
+                        Method = Sum;
+                    }
+                }
             }
         }
     }
