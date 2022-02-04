@@ -1,8 +1,8 @@
 ﻿report 6014441 "NPR POS Item Sales with Dim."
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/POS Item Sales with Dimensions.rdlc';
     Caption = 'POS Item Sales With Dimensions';
@@ -39,9 +39,9 @@
 
             trigger OnAfterGetRecord()
             var
-                TempDimBuf: Record "Dimension Buffer" temporary;
                 DimSetEntry: Record "Dimension Set Entry";
                 POSSalesLine2: Record "NPR POS Entry Sales Line";
+                TempDimBuf: Record "Dimension Buffer" temporary;
                 POSEntryQry: Query "NPR POS Entry with Sales Lines";
                 DimensionBufferID: Integer;
             begin
@@ -82,7 +82,8 @@
                     POSSalesLineCons.SetRange("Dimension Set ID", DimensionBufferID);
                     if not POSSalesLineCons.FindFirst() then begin
                         POSSalesLineCons := POSSalesLine2;
-                        POSSalesLineCons."Unit Cost (LCY)" := Round(POSSalesLine2."Unit Cost (LCY)" * POSSalesLine2.Quantity, Currency."Amount Rounding Precision");
+                        //POSSalesLineCons."Unit Cost (LCY)" := Round(POSSalesLine2."Unit Cost (LCY)" * POSSalesLine2.Quantity, Currency."Amount Rounding Precision");
+                        POSSalesLineCons."Unit Cost (LCY)" := Abs(POSEntryQry.Sum_Cost_Amount_Actual);
                         POSSalesLineCons."Planned Delivery Date" := POSEntryQry.Posting_Date;
                         POSSalesLineCons."Dimension Set ID" := DimensionBufferID;
                         POSSalesLineCons.Insert();
@@ -91,7 +92,8 @@
                         POSSalesLineCons."Amount Excl. VAT (LCY)" := POSSalesLineCons."Amount Excl. VAT (LCY)" + POSSalesLine2."Amount Excl. VAT (LCY)";
                         POSSalesLineCons."Amount Incl. VAT (LCY)" := POSSalesLineCons."Amount Incl. VAT (LCY)" + POSSalesLine2."Amount Incl. VAT (LCY)";
                         POSSalesLineCons."Line Dsc. Amt. Excl. VAT (LCY)" := POSSalesLineCons."Line Dsc. Amt. Excl. VAT (LCY)" + POSSalesLine2."Line Dsc. Amt. Excl. VAT (LCY)";
-                        POSSalesLineCons."Unit Cost (LCY)" := POSSalesLineCons."Unit Cost (LCY)" + Round(POSSalesLine2."Unit Cost (LCY)" * POSSalesLine2.Quantity, Currency."Amount Rounding Precision");
+                        //POSSalesLineCons."Unit Cost (LCY)" := POSSalesLineCons."Unit Cost (LCY)" + Round(POSSalesLine2."Unit Cost (LCY)" * POSSalesLine2.Quantity, Currency."Amount Rounding Precision");
+                        POSSalesLineCons."Unit Cost (LCY)" += Abs(POSEntryQry.Sum_Cost_Amount_Actual);
                         POSSalesLineCons.Modify();
                     end;
                 end;
@@ -172,6 +174,13 @@
             column(DimSetID; "Dimension Set ID")
             {
             }
+
+            column(UnitCost_; UnitCost)
+            {
+            }
+            column(CoverageMargin_; CoverageMargin)
+            {
+            }
             dataitem(DimBuffer; "Dimension Buffer")
             {
                 DataItemTableView = SORTING("Table ID", "Entry No.", "Dimension Code");
@@ -206,6 +215,13 @@
             begin
                 LineNo += 1;
                 DimBufMgt.RetrieveDimensions("Dimension Set ID", DimBuffer);
+
+                Clear(UnitCost);
+                if POSSalesLineCons."Quantity (Base)" <> 0 then
+                    UnitCost := POSSalesLineCons."Unit Cost (LCY)" / POSSalesLineCons."Quantity (Base)";
+
+                if POSSalesLineCons."Amount Excl. VAT (LCY)" <> 0 then
+                    CoverageMargin := POSSalesLineCons."Unit Cost (LCY)" / POSSalesLineCons."Amount Excl. VAT (LCY)";
             end;
 
             trigger OnPreDataItem()
@@ -290,6 +306,8 @@
         FilterIsNotSupportedErr: Label 'You cannot set filter for field "%1" of table "%2" in this report.\Please contact system vendor if you want the report to support such filter.';
         ColumnDim: Text[250];
         DimSetFilter: Text;
+        CoverageMargin: Decimal;
+        UnitCost: Decimal;
 
     local procedure GenerateDimSetIDFilter()
     var
