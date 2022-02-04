@@ -78,7 +78,7 @@
                     Image = "Report";
                     RunObject = Report Statement;
 
-                    ToolTip = 'Executes the S&tatement action';
+                    ToolTip = 'Executes the S&tatement action.';
                     ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150667)
@@ -90,7 +90,7 @@
                     Image = "Report";
                     RunObject = Report "Customer - Order Summary";
 
-                    ToolTip = 'Executes the Customer - Order Su&mmary action';
+                    ToolTip = 'Executes the Customer - Order Su&mmary action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Customer - T&op 10 List")
@@ -99,7 +99,7 @@
                     Image = "Report";
                     RunObject = Report "Customer - Top 10 List";
 
-                    ToolTip = 'Executes the Customer - T&op 10 List action';
+                    ToolTip = 'Executes the Customer - T&op 10 List action.';
                     ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150663)
@@ -114,7 +114,7 @@
                     Image = "Report";
                     RunObject = Report "Inventory - Sales Back Orders";
 
-                    ToolTip = 'Executes the Inventory - Sales &Back Orders action';
+                    ToolTip = 'Executes the Inventory - Sales &Back Orders action.';
                     ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150658)
@@ -126,7 +126,7 @@
                     Image = "Report";
                     RunObject = Report "Trial Balance";
 
-                    ToolTip = 'Executes the &G/L Trial Balance action';
+                    ToolTip = 'Executes the &G/L Trial Balance action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Trial Balance by &Period")
@@ -135,7 +135,7 @@
                     Image = "Report";
                     RunObject = Report "Trial Balance by Period";
 
-                    ToolTip = 'Executes the Trial Balance by &Period action';
+                    ToolTip = 'Executes the Trial Balance by &Period action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Closing T&rial Balance")
@@ -144,7 +144,7 @@
                     Image = "Report";
                     RunObject = Report "Closing Trial Balance";
 
-                    ToolTip = 'Executes the Closing T&rial Balance action';
+                    ToolTip = 'Executes the Closing T&rial Balance action.';
                     ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150654)
@@ -156,7 +156,7 @@
                     Image = "Report";
                     RunObject = Report "Aged Accounts Receivable";
 
-                    ToolTip = 'Executes the Aged Ac&counts Receivable action';
+                    ToolTip = 'Executes the Aged Ac&counts Receivable action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Aged Accounts Pa&yable")
@@ -165,7 +165,7 @@
                     Image = "Report";
                     RunObject = Report "Aged Accounts Payable";
 
-                    ToolTip = 'Executes the Aged Accounts Pa&yable action';
+                    ToolTip = 'Executes the Aged Accounts Pa&yable action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Reconcile Cust. and &Vend. Accs")
@@ -174,7 +174,7 @@
                     Image = "Report";
                     RunObject = Report "Reconcile Cust. and Vend. Accs";
 
-                    ToolTip = 'Executes the Reconcile Cust. and &Vend. Accs action';
+                    ToolTip = 'Executes the Reconcile Cust. and &Vend. Accs action.';
                     ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150650)
@@ -186,7 +186,7 @@
                     Image = "Report";
                     RunObject = Report "VAT Registration No. Check";
 
-                    ToolTip = 'Executes the VAT Registration No. Chec&k action';
+                    ToolTip = 'Executes the VAT Registration No. Chec&k action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("VAT E&xceptions")
@@ -195,7 +195,7 @@
                     Image = "Report";
                     RunObject = Report "VAT Exceptions";
 
-                    ToolTip = 'Executes the VAT E&xceptions action';
+                    ToolTip = 'Executes the VAT E&xceptions action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("V&AT Statement")
@@ -204,7 +204,7 @@
                     Image = "Report";
                     RunObject = Report "VAT Statement";
 
-                    ToolTip = 'Executes the V&AT Statement action';
+                    ToolTip = 'Executes the V&AT Statement action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("VAT-VIES Declaration Tax A&uth")
@@ -213,7 +213,7 @@
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Tax Auth";
 
-                    ToolTip = 'Executes the VAT - VIES Declaration Tax A&uth action';
+                    ToolTip = 'Executes the VAT - VIES Declaration Tax A&uth action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("VAT - VIES Declaration &Disk")
@@ -222,7 +222,7 @@
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Disk";
 
-                    ToolTip = 'Executes the VAT - VIES Declaration &Disk action';
+                    ToolTip = 'Executes the VAT - VIES Declaration &Disk action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("EC Sal&es List")
@@ -231,7 +231,7 @@
                     Image = "Report";
                     RunObject = Report "EC Sales List";
 
-                    ToolTip = 'Executes the EC Sal&es List action';
+                    ToolTip = 'Executes the EC Sal&es List action.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -252,7 +252,7 @@
                             Image = Report2;
                             RunObject = Report "NPR Sales Person Top 20";
 
-                            ToolTip = 'Executes the Sales Person Top 20 action';
+                            ToolTip = 'View the report which measures the salespeoples'' effectiveness.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales code/Item Category top")
@@ -261,7 +261,7 @@
                             Image = Report2;
                             RunObject = Report "NPR Salesp./Item Cat Top 20";
 
-                            ToolTip = 'Executes the Sales Code/Item category top action';
+                            ToolTip = 'View the report which measures which salesperson was most successful with a certain category of items.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Sale Statistics per Vendor")
@@ -270,7 +270,7 @@
                             Image = Report2;
                             RunObject = Report "NPR Sale Statistics per Vendor";
 
-                            ToolTip = 'Executes the Sale Statistics Per Vendor action';
+                            ToolTip = 'View the report which measures sales proceeds achieved per a vendor.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales Statistics By Department")
@@ -279,7 +279,7 @@
                             Image = Report2;
                             RunObject = Report "NPR Sales Statistics By Dept.";
 
-                            ToolTip = 'Executes the Sales Statistics By Department action';
+                            ToolTip = 'View the report which measures sales proceeds achieved per a department.';
                             ApplicationArea = NPRRetail;
                         }
                     }
@@ -299,7 +299,7 @@
                                 Image = Report2;
                                 RunObject = page "NPR Sales Ticket Statistics";
 
-                                ToolTip = 'Executes the Sales Ticket Statistics action';
+                                ToolTip = 'Generate the daily sales report per quantity.';
                                 ApplicationArea = NPRRetail;
                             }
                             action("Advanced Sales Statistics")
@@ -308,7 +308,7 @@
                                 Image = ListPage;
                                 RunObject = page "NPR Advanced Sales Stats";
 
-                                ToolTip = 'Executes the Advanced Sales Statistics action';
+                                ToolTip = 'Generate the daily sales report per quantity and amount';
                                 ApplicationArea = NPRRetail;
                             }
                         }
@@ -321,7 +321,7 @@
                                 Caption = 'Sales per Week Year/Last Year';
                                 Image = Report2;
                                 RunObject = Report "NPR Sales per week year/Last";
-                                ToolTip = 'Executes the Sales per week year/Last year action';
+                                ToolTip = 'View the report of sales for a specified month, along with the comparison with the last year''s report for the same month.';
                                 ApplicationArea = NPRRetail;
                             }
                         }
@@ -341,7 +341,7 @@
                             Caption = 'Inventory by Age';
                             Image = Report;
                             RunObject = report "NPR Inventory by age";
-                            ToolTip = 'Executes the Inventory by age action';
+                            ToolTip = 'Generate Inventory Ageing Report.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Inv. Sales Statistics")
@@ -350,7 +350,7 @@
                             Image = Report;
                             RunObject = report "NPR Item Sales Stats/Provider";
 
-                            ToolTip = 'Executes the Inv. Sales Statistics action';
+                            ToolTip = 'Generate sales per item/item category.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Inventory per Date")
@@ -359,7 +359,7 @@
                             Image = Report;
                             RunObject = report "NPR Inventory per Date";
 
-                            ToolTip = 'Executes the Inventory per Date action';
+                            ToolTip = 'View the report listing the inventory per date.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Item Group Inventory Value")
@@ -368,7 +368,7 @@
                             Image = Report;
                             RunObject = report "NPR Item Cat. Inv. Value";
 
-                            ToolTip = 'Executes the Item Category Inventory Value action';
+                            ToolTip = 'View the report containing stock movement by item group.';
                             ApplicationArea = NPRRetail;
                         }
 
@@ -378,7 +378,7 @@
                             Image = Report;
                             RunObject = report "NPR Item Sales Postings";
 
-                            ToolTip = 'Executes the Statistic - Sales action';
+                            ToolTip = 'Generate statistic per item/item category.';
                             ApplicationArea = NPRRetail;
                         }
 
@@ -388,7 +388,7 @@
                             Image = Report;
                             RunObject = report "NPR Items With Low Sales";
 
-                            ToolTip = 'Executes the Low Sales action';
+                            ToolTip = 'Generate Sales/Profit per item.';
                             ApplicationArea = NPRRetail;
                         }
 
@@ -398,7 +398,7 @@
                             Image = Report;
                             RunObject = report "NPR Item - Loss";
 
-                            ToolTip = 'Executes the Shrinkage action';
+                            ToolTip = 'View the summary of item quantity modified by negative adjustments and the Reason code.';
                             ApplicationArea = NPRRetail;
                         }
 
@@ -408,7 +408,7 @@
                             Image = Report;
                             RunObject = report "NPR Item Loss - Ret. Reason";
 
-                            ToolTip = 'Executes the Item Loss - Return Reason action';
+                            ToolTip = 'Generate the list for Loss of item, with the Return Reason.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales Statistics Variant")
@@ -417,7 +417,7 @@
                             Image = Report;
                             RunObject = report "NPR Sales Stats Per Variety";
 
-                            ToolTip = 'Executes the Sales Statistics Variant action';
+                            ToolTip = 'Generate the Sales/Profit report per Variant.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Inventory per Variant at Date")
@@ -425,7 +425,7 @@
                             Caption = 'Inventory per Variant at Date';
                             Image = Report;
                             RunObject = report "NPR Inventory per Variant/date";
-                            ToolTip = 'Executes the Inventory per Variant at date action';
+                            ToolTip = 'Generate the Stock Inventory report per Variant.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Item Barcode Sheet")
@@ -434,7 +434,7 @@
                             Image = Report;
                             RunObject = report "NPR Item Barcode Status Sheet";
 
-                            ToolTip = 'Executes the Item Barcode Sheet action';
+                            ToolTip = 'Generate Item Barcodes per Item/Variant.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Return Reason Code Statistics")
@@ -443,7 +443,7 @@
                             Image = Report;
                             RunObject = report "NPR Return Reason Code Stat.";
 
-                            ToolTip = 'Executes the Return Reason Code Statistics action';
+                            ToolTip = 'View the summary of items with quantity and value modified by negative adjustments and the Reason code. The report is sorted according to the Reason code and Item Number.';
                             ApplicationArea = NPRRetail;
                         }
 
@@ -453,7 +453,7 @@
                             Image = Report;
                             RunObject = report "NPR Adjust Cost: ItemEntriesTQ";
 
-                            ToolTip = 'Executes the Adjust Cost - Item Entries action';
+                            ToolTip = 'Generate the Adjust Cost - Item Entries.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Item Sales Statistics")
@@ -462,7 +462,7 @@
                             Image = Report;
                             RunObject = report "NPR Item Sales Statistics";
 
-                            ToolTip = 'Executes the Item Sales Statistics action';
+                            ToolTip = 'Generate Inventory Movement per Document Type.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Item Group Top")
@@ -471,7 +471,7 @@
                             Image = Report;
                             RunObject = report "NPR Item Category Top";
 
-                            ToolTip = 'Executes the Item Category Top action';
+                            ToolTip = 'Generate Top 20 Sales/Profit per Store & Item Category.';
                             ApplicationArea = NPRRetail;
                         }
                     }
@@ -479,22 +479,12 @@
                     {
                         Caption = 'Lines';
                         Image = AllLines;
-
-                        action("NPR Item Group Overview")
-                        {
-                            Caption = 'Item Category Overview';
-                            Image = Report;
-                            RunObject = Report "NPR Item Category Overview";
-
-                            ToolTip = 'Executes the Item Category Overview action';
-                            ApplicationArea = NPRRetail;
-                        }
                         action("NPR Vendor Sales per Line")
                         {
                             Caption = 'Vendor Sales per Line';
                             Image = Report;
                             RunObject = report "NPR Vendor Trn. by Item Cat.";
-                            ToolTip = 'Executes the Vendor sales per line action';
+                            ToolTip = 'Generate the Turnover/Profit report per category & vendor.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales Person Trn. by Item Cat.")
@@ -502,7 +492,7 @@
                             Caption = 'Sales Person Trn. by Item Cat.';
                             Image = Report;
                             RunObject = Report "NPR S.Person Trn by Item Cat.";
-                            ToolTip = 'Runs Sales Person Trnansactions by Item Category report';
+                            ToolTip = 'Generate the Turnover/Profit report per category & salesperson.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales Stat/Analysis")
@@ -511,7 +501,7 @@
                             Image = Report;
                             RunObject = Report "NPR Sales Stat/Analysis";
 
-                            ToolTip = 'Executes the Sales Stat/Analysis action';
+                            ToolTip = 'Generate the Turnover/Profit report per category.';
                             ApplicationArea = NPRRetail;
                         }
                     }
@@ -525,7 +515,7 @@
                             Image = Report;
                             RunObject = report "NPR Period Discount Stat.";
 
-                            ToolTip = 'Executes the Period Discount Statistics action';
+                            ToolTip = 'Generate the Turnover/Profit report per Period Discount.';
                             ApplicationArea = NPRRetail;
                         }
 
@@ -535,7 +525,7 @@
                             Image = Report;
                             RunObject = Report "NPR Inventory Campaign Stat.";
 
-                            ToolTip = 'Executes the Inventory Campaign Stat. action';
+                            ToolTip = 'Generate the Turnover/Profit report per Mix Discount.';
                             ApplicationArea = NPRRetail;
                         }
                     }
@@ -585,7 +575,7 @@
                     Caption = 'Member List';
                     Image = Customer;
                     RunObject = page "NPR MM Member Card List";
-                    ToolTip = 'View Member List';
+                    ToolTip = 'View Member List.';
                     ApplicationArea = NPRRetail;
                 }
 
@@ -595,7 +585,7 @@
                     Caption = 'Memberships';
                     Image = Customer;
                     RunObject = page "NPR MM Memberships";
-                    ToolTip = 'View Membership List';
+                    ToolTip = 'View Membership List.';
                     ApplicationArea = NPRRetail;
 
                 }
@@ -606,7 +596,7 @@
                     Caption = 'EFT Shopper Recognition';
                     Image = Customer;
                     RunObject = page "NPR EFT Shopper Recognition";
-                    ToolTip = 'View the shopper recognition details';
+                    ToolTip = 'View the shopper recognition details.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -619,7 +609,7 @@
                     Caption = 'Retail Item List';
                     RunObject = Page "Item List";
 
-                    ToolTip = 'Executes the Retail Item List action';
+                    ToolTip = 'Executes the Retail Item List action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Item Categories")
@@ -627,7 +617,7 @@
                     Caption = 'Item Categories';
                     RunObject = Page "Item Categories";
 
-                    ToolTip = 'Executes the Item Categories action';
+                    ToolTip = 'Executes the Item Categories action.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -642,7 +632,7 @@
                     Caption = 'Item Journal List';
                     RunObject = page "Item Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST(Item));
-                    ToolTip = 'Executes the Item Journal List action';
+                    ToolTip = 'Executes the Item Journal List action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Physical Inventory Journals")
@@ -652,7 +642,7 @@
                     RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"),
                                          Recurring = CONST(false));
 
-                    ToolTip = 'Executes the Physical Inventory Journals action';
+                    ToolTip = 'Executes the Physical Inventory Journals action.';
                     ApplicationArea = NPRRetail;
                 }
                 action(ItemWorksheets)
@@ -660,7 +650,7 @@
 
                     Caption = 'Item Worksheets';
                     RunObject = page "NPR Item Worksheets";
-                    ToolTip = 'Executes the Item Worksheets action';
+                    ToolTip = 'Executes the Item Worksheets action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Retail Journal List")
@@ -668,7 +658,7 @@
                     Caption = 'Retail Journal List';
                     RunObject = page "NPR Retail Journal List";
 
-                    ToolTip = 'Executes the Retail Journal List action';
+                    ToolTip = 'Executes the Retail Journal List action.';
                     ApplicationArea = NPRRetail;
                 }
 
@@ -761,7 +751,7 @@
                     Caption = 'Campaign Discount List';
                     RunObject = page "NPR Campaign Discount List";
 
-                    ToolTip = 'Executes the Campaign Discount List action';
+                    ToolTip = 'Executes the Campaign Discount List action.';
                     ApplicationArea = NPRRetail;
                 }
 
@@ -770,7 +760,7 @@
                     Caption = 'Mixed Discount List';
                     RunObject = page "NPR Mixed Discount List";
 
-                    ToolTip = 'Executes the Mixed Discount List action';
+                    ToolTip = 'Executes the Mixed Discount List action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Coupon List")
@@ -778,7 +768,7 @@
                     Caption = 'Coupon List';
                     RunObject = page "NPR NpDc Coupons";
 
-                    ToolTip = 'Executes the Coupon List action';
+                    ToolTip = 'Executes the Coupon List action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Voucher List")
@@ -786,7 +776,7 @@
                     Caption = 'Voucher List';
                     RunObject = page "NPR NpRv Vouchers";
 
-                    ToolTip = 'Executes the Voucher List action';
+                    ToolTip = 'Executes the Voucher List action.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -801,7 +791,7 @@
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
 
-                ToolTip = 'Executes the Sales &Order action';
+                ToolTip = 'Create Sales Order.';
                 ApplicationArea = NPRRetail;
             }
             action("Sales &Return Order")
@@ -811,7 +801,7 @@
                 RunObject = Page "Sales Return Order";
                 RunPageMode = Create;
 
-                ToolTip = 'Executes the Sales &Return Order action';
+                ToolTip = 'Create Sales Return Order.';
                 ApplicationArea = NPRRetail;
             }
             action("&Transfer Order")
@@ -821,7 +811,7 @@
                 RunObject = Page "Transfer Order";
                 RunPageMode = Create;
 
-                ToolTip = 'Executes the &Transfer Order action';
+                ToolTip = 'Create Transfer Order.';
                 ApplicationArea = NPRRetail;
             }
             action("&Purchase Order")
@@ -832,7 +822,7 @@
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
 
-                ToolTip = 'Executes the &Purchase Order action';
+                ToolTip = 'Create Purchase Order.';
                 ApplicationArea = NPRRetail;
             }
             action("Purchase Return Order")
@@ -841,7 +831,7 @@
                 Image = Document;
                 RunObject = Page "Purchase Return Order";
 
-                ToolTip = 'Executes the Purchase Return Order action';
+                ToolTip = 'Executes the Purchase Return Order action.';
                 ApplicationArea = NPRRetail;
             }
         }
