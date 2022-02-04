@@ -1069,7 +1069,7 @@
             TableRelation = "NPR Insurance Category";
             ValidateTableRelation = false;
         }
-        field(6014509; "Item Brand"; Code[10])
+        field(6014509; "Item Brand"; Code[20])
         {
             Caption = 'Item brand';
             DataClassification = CustomerContent;
