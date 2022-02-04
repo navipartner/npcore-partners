@@ -152,7 +152,7 @@ tableextension 6014427 "NPR Item" extends Item
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
         }
-        field(6014509; "NPR Item Brand"; Code[10])
+        field(6014509; "NPR Item Brand"; Code[20])
         {
             Caption = 'Item brand';
             DataClassification = CustomerContent;
