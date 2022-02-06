@@ -284,6 +284,64 @@
                     }
                 }
             }
+            // Download Data Step
+            group(DownloadDataStep)
+            {
+                Visible = DownloadDataStepVisible;
+                group(DownloadData)
+                {
+                    Caption = 'Download and Import Test Data';
+                    
+                    field("Package Name"; package)
+                    {
+                        Caption = 'Package Name';
+                        Lookup = true;
+                        ToolTip = 'Specifies the value of the package field';
+                        ApplicationArea = NPRRetail;
+                        trigger OnLookup(var value: Text): Boolean
+                        var
+                            TempRetailList: Record "NPR Retail List" temporary;
+                            AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+                            rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
+                            packageList: List of [Text];
+                            BaseUri: Text;
+                            package: Text;
+                            Secret: Text;
+                        begin
+                            BaseUri := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl');
+                            Secret := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataSecret');
+
+                            rapidstartBaseDataMgt.GetAllPackagesInBlobStorage(BaseUri + '/pos-test-data/?restype=container&comp=list'
+                                + '&sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageList);
+                            foreach package in packageList do begin
+                                TempRetailList.Number += 1;
+                                TempRetailList.Value := CopyStr(package, 1, MaxStrLen(TempRetailList.Value));
+                                TempRetailList.Choice := CopyStr(package, 1, MaxStrLen(TempRetailList.Choice));
+                                TempRetailList.Insert();
+                            end;
+
+                            if Page.Runmodal(Page::"NPR Retail List", TempRetailList) <> Action::LookupOK then
+                                exit(false);
+
+                            value := TempRetailList.Value;
+                            exit(true);
+                        end;
+                    }
+                    field("Adjust Table Names"; AdjustTableNames)
+                    {
+                        Caption = 'Adjust Table Names';
+                        ToolTip = 'Specifies whether table names in the package should be adjusted. The option should be enabled if the package contains NPRetail tables, and it was created in NAV/BC version prior to BC16';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Run In Background"; RunInBackground)
+                    {
+                        Caption = 'Run In Background';
+                        ToolTip = 'Specifies should data be imported in background.';
+                        ApplicationArea = NPRRetail;
+
+                    }
+                }
+            }
 
             // Finish Step
             group(Finish)
@@ -495,6 +553,17 @@
 
                             }
                         }
+                        group(TestDataMissing)
+                        {
+                            Caption = '';
+                            Visible = not TestDataToCreate;
+                            label(TestLabel)
+                            {
+                                ApplicationArea = NPRRetail;
+                                Caption = '- Test Data';
+                                ToolTip = 'Specifies the value of the TestLabel field';
+                            }
+                        }
                     }
                 }
                 group(NotAllMandatoryDataFilledInMsg)
@@ -687,6 +756,17 @@
                                 ToolTip = 'Specifies the value of the UserSetupLabel field';
                             }
                         }
+                        group(TestDataExist)
+                        {
+                            Caption = '';
+                            Visible = TestDataToCreate;
+                            label(TestLabel1)
+                            {
+                                ApplicationArea = NPRRetail;
+                                Caption = '- Test Data';
+                                ToolTip = 'Specifies the value of the TestLabel1 field';
+                            }
+                        }
                     }
                 }
                 group(AnyDataFilledInMsg)
@@ -789,7 +869,7 @@
         TempAllPOSPaymentMethod: Record "NPR POS Payment Method" temporary;
         TempAllSalesperson: Record "NPR Salesperson Buffer" temporary;
         TempAllUser: Record User temporary;
-        Step: Option Start,CompanyInfoStep,POSStoresStep,POSProfilesStep,POSUnitStep,POSPaymentBinStep,POSPaymentMethodStep,POSPostingSetupStep,SalespersonStep,UserSetupStep,Finish;
+        Step: Option Start,CompanyInfoStep,POSStoresStep,POSProfilesStep,POSUnitStep,POSPaymentBinStep,POSPaymentMethodStep,POSPostingSetupStep,SalespersonStep,UserSetupStep,DownloadDataStep,Finish;
         BackActionEnabled: Boolean;
         FinishActionEnabled: Boolean;
         NextActionEnabled: Boolean;
@@ -803,6 +883,7 @@
         POSPostingSetupStepVisible: Boolean;
         SalespersonStepVisible: Boolean;
         UserSetupStepVisible: Boolean;
+        DownloadDataStepVisible: Boolean;
         FinishStepVisible: Boolean;
         TopBannerVisible: Boolean;
         EmptyVar: Integer;
@@ -825,6 +906,10 @@
         SalespersonDataToCreate: Boolean;
         UserSetupDataToCreate: Boolean;
         AnyDataToCreate: Boolean;
+        TestDataToCreate: Boolean;
+        AdjustTableNames: Boolean;
+        RunInBackground: Boolean;
+        package: Text;
 
     local procedure EnableControls();
     begin
@@ -851,6 +936,8 @@
                 ShowSalespersonStep();
             Step::UserSetupStep:
                 ShowUserSetupStep();
+            Step::DownloadDataStep:
+                ShowDownloadDataStep();
             Step::Finish:
                 ShowFinishStep();
         end;
@@ -965,6 +1052,12 @@
         CurrPage.UserSetupPG.Page.SetGlobals(TempAllSalesperson, TempAllUser, TempAllPOSUnit);
     end;
 
+    local procedure ShowDownloadDataStep()
+    begin
+        DownloadDataStepVisible := true;
+        RunInBackground := true;
+    end;
+
     local procedure ShowFinishStep()
     begin
         CheckIfDataFilledIn();
@@ -987,6 +1080,7 @@
         EanBoxSetupDataToCreate := CurrPage.EANBoxSetups.Page.EanBoxSetupDataToCreate();
         POSSalesWorkflowSetDataToCreate := CurrPage.POSSalesWorkflowSets.Page.POSSalesWorkflowSetDataToCreate();
         GlobalPOSSalesSetupDataToCreate := CurrPage.GlobalPOSSalesSetups.Page.GlobalPOSSalesSetupDataToCreate();
+        TestDataToCreate := package <> '';
 
         POSProfileDataToCreate := POSAuditProfileDataToCreate or
                                   POSViewProfileDataToCreate or
@@ -1025,7 +1119,8 @@
                            POSPaymentMethodDataToCreate and
                            POSPostingSetupDataToCreate and
                            SalespersonDataToCreate and
-                           UserSetupDataToCreate;
+                           UserSetupDataToCreate and
+                           TestDataToCreate;
 
         AnyDataToCreate := CompanyInfoDataToCreate or
                            POSStoreDataToCreate or
@@ -1041,7 +1136,8 @@
                            POSPaymentMethodDataToCreate or
                            POSPostingSetupDataToCreate or
                            SalespersonDataToCreate or
-                           UserSetupDataToCreate;
+                           UserSetupDataToCreate or
+                           TestDataToCreate;
     end;
 
     local procedure FinishAction();
@@ -1063,6 +1159,7 @@
         CurrPage.POSPostingSetupPG.Page.CreatePOSPostingSetupData();
         CurrPage.SalespersonListPG.Page.CreateSalespersonData();
         CurrPage.UserSetupPG.Page.CreateUserSetupData();
+        ImportDemoData();
 
         SalespersonBuffer.DeleteAll();
 
@@ -1087,6 +1184,7 @@
         POSPostingSetupStepVisible := false;
         SalespersonStepVisible := false;
         UserSetupStepVisible := false;
+        DownloadDataStepVisible := false;
         FinishStepVisible := false;
     end;
 
@@ -1099,6 +1197,23 @@
                MediaResourcesDone.GET(MediaRepositoryDone."Media Resources Ref")
             then
                 TopBannerVisible := MediaResourcesDone."Media Reference".HasValue();
+    end;
+
+    local procedure ImportDemoData()
+    var
+        BackgroundPackageImport: Record "NPR Background Package Import";
+        BackgroundPackageImp: Codeunit "NPR Background Package Imp.";
+        SessionId: Integer;
+    begin
+        if package = '' then
+            exit;
+        BackgroundPackageImport."Package Name" := package;
+        BackgroundPackageImport."Adjust Table Names" := AdjustTableNames;
+        BackgroundPackageImport.Insert();
+        if RunInBackground then
+            Session.StartSession(SessionId, Codeunit::"NPR Background Package Imp.", CompanyName, BackgroundPackageImport)
+        else
+            BackgroundPackageImp.Run(BackgroundPackageImport);
     end;
 
     [BusinessEvent(false)]
