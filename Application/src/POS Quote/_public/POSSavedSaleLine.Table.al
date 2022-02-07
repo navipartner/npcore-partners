@@ -199,7 +199,11 @@
 
     trigger OnDelete()
     begin
-        TestField("EFT Approved", false);
+        If "EFT Approved" then begin
+            Error(POSSavedSalesHasApprovedEFTError, FieldCaption("Quote Entry No."), "Quote Entry No.", FieldCaption("Line No."), "Line No.");
+        end;
     end;
-}
 
+    var
+        POSSavedSalesHasApprovedEFTError: label 'POS Saved Sales %1 ''%2'', %3 ''%4'' has an approved EFT Transaction and cannot be deleted. Either complete this POS Saved Sales or review to ignore temporarily';
+}
