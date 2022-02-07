@@ -22,37 +22,18 @@ tableextension 6014459 "NPR Price List line" extends "Price List Line"
         }
 
     }
-
-    trigger OnInsert()
+    procedure UpdateReferencedIds()
     var
         PriceListHeader: Record "Price List Header";
     begin
-        if "Price List Code" <> '' then
-            if PriceListHeader.Get("Price List Code") then begin
-                "NPR Price List Id" := PriceListHeader.SystemId;
-                exit;
-            end;
+        if "Price List Code" = '' then begin
+            Clear("NPR Price List Id");
+            exit;
+        end;
 
-        if not IsNullGuid("NPR Price List Id") then
-            if PriceListHeader.GetBySystemId("NPR Price List Id") then
-                "Price List Code" := PriceListHeader.Code;
-    end;
+        if not PriceListHeader.Get(Rec."Price List Code") then
+            exit;
 
-    trigger OnRename()
-    var
-        PriceListHeader: Record "Price List Header";
-    begin
-        if "Price List Code" <> '' then
-            if PriceListHeader.Get("Price List Code") then
-                "NPR Price List Id" := PriceListHeader.SystemId;
-    end;
-
-    trigger OnModify()
-    var
-        PriceListHeader: Record "Price List Header";
-    begin
-        if not IsNullGuid("NPR Price List Id") then
-            if PriceListHeader.GetBySystemId("NPR Price List Id") then
-                Rename(PriceListHeader.Code, "Line No.");
+        "NPR Price List Id" := PriceListHeader.SystemId;
     end;
 }
