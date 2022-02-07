@@ -20,45 +20,45 @@
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the event''s ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Module Name"; Rec."Module Name")
                 {
 
-                    ToolTip = 'Specifies the value of the Module Name field';
+                    ToolTip = 'Specifies the name of the module to which the event is tied.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the event.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Action Code"; Rec."Action Code")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Action Code field';
+                    ToolTip = 'Specifies the POS action code associated with the event.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Action Description"; Rec."Action Description")
                 {
 
-                    ToolTip = 'Specifies the value of the Action Description field';
+                    ToolTip = 'Specifies the description of the POS action.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS View"; Rec."POS View")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the POS View field';
+                    ToolTip = 'Specifies the type of view that the event is used on.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Event Codeunit"; Rec."Event Codeunit")
                 {
 
-                    ToolTip = 'Specifies the value of the Event Codeunit field';
+                    ToolTip = 'Specifies the number of the codeunit that contains this function.';
                     ApplicationArea = NPRRetail;
                 }
             }
