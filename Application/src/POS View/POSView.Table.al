@@ -66,7 +66,13 @@
         OutStream.Write(Text);
     end;
 
+    [Obsolete('Replaced with same function without SalespersonCode. Salesperson is not used anymore on Default View filtering. Case 508848.')]
     procedure FindViewByType(ViewType: Option; SalespersonCode: Code[20]; RegisterCode: Code[10]): Boolean
+    begin
+       exit(FindViewByType(ViewType, RegisterCode));
+    end;
+
+    procedure FindViewByType(ViewType: Option; RegisterCode: Code[10]): Boolean
     var
         DefaultView: Record "NPR POS Default View";
         DefaultUserView: Record "NPR POS Default User View";
@@ -78,79 +84,24 @@
         end;
 
         DefaultView.SetRange(Type, ViewType);
-        DefaultView.SetFilter("Starting Date", '%1|<=%2', 0D, WorkDate());
-        DefaultView.SetFilter("Ending Date", '%1|>=%2', 0D, WorkDate());
-        case Date2DWY(WorkDate(), 1) of
-            1:
-                DefaultView.SetRange(Monday, true);
-            2:
-                DefaultView.SetRange(Tuesday, true);
-            3:
-                DefaultView.SetRange(Wednesday, true);
-            4:
-                DefaultView.SetRange(Thursday, true);
-            5:
-                DefaultView.SetRange(Friday, true);
-            6:
-                DefaultView.SetRange(Saturday, true);
-            7:
-                DefaultView.SetRange(Sunday, true);
-        end;
         if DefaultView.IsEmpty then
             exit(false);
 
-        // Both salesperson and register explicitly set to exact value
-        if (SalespersonCode <> '') and (RegisterCode <> '') then begin
-            DefaultView.SetRange("Salesperson Filter", SalespersonCode);
+        // Register explicitly set to exact value
+        if  (RegisterCode <> '') then begin
             DefaultView.SetRange("Register Filter", RegisterCode);
             if FindApplicableView(DefaultView) then
                 exit(true);
         end;
 
-        // Register explicitly set, salesperson not set
-        if (RegisterCode <> '') then begin
-            DefaultView.SetRange("Salesperson Filter", '');
-            DefaultView.SetRange("Register Filter", RegisterCode);
-            if FindApplicableView(DefaultView) then
-                exit(true);
-        end;
-
-        // Salesperson explicitly set, register not set
-        if (SalespersonCode <> '') then begin
-            DefaultView.SetRange("Salesperson Filter", SalespersonCode);
-            DefaultView.SetRange("Register Filter", '');
-            if FindApplicableView(DefaultView) then
-                exit(true);
-        end;
-
-        // Register set to a filter with salesperson explicitly set
-        DefaultView.SetRange("Salesperson Filter", SalespersonCode);
+        // Register set to a filter
         DefaultView.SetFilter("Register Filter", '<>%1', '');
-        if FilterApplicableView(DefaultView, SalespersonCode, RegisterCode) then
-            exit(true);
-
-        // Salesperson set to a filter, with register explicitly set
-        DefaultView.SetFilter("Salesperson Filter", '<>%1', '');
-        DefaultView.SetRange("Register Filter", RegisterCode);
-        if FilterApplicableView(DefaultView, SalespersonCode, RegisterCode) then
-            exit(true);
-
-        // Register set to a filter with salesperson not set
-        DefaultView.SetRange("Salesperson Filter");
-        DefaultView.SetFilter("Register Filter", '<>%1', '');
-        if FilterApplicableView(DefaultView, SalespersonCode, RegisterCode) then
-            exit(true);
-
-        // Salesperson set to a filter, with register not set
-        DefaultView.SetFilter("Salesperson Filter", '<>%1', '');
-        DefaultView.SetRange("Register Filter");
-        if FilterApplicableView(DefaultView, SalespersonCode, RegisterCode) then
+        if FilterApplicableView(DefaultView, RegisterCode) then
             exit(true);
 
         // Any other combination
         DefaultView.SetRange("Register Filter");
-        DefaultView.SetRange("Salesperson Filter");
-        if FilterApplicableView(DefaultView, SalespersonCode, RegisterCode) then
+        if FilterApplicableView(DefaultView, RegisterCode) then
             exit(true);
 
         exit(false);
@@ -166,12 +117,10 @@
         exit(true);
     end;
 
-    local procedure FilterApplicableView(var DefaultView: Record "NPR POS Default View"; SalespersonCode: Code[20]; UnitCode: Code[10]): Boolean
+    local procedure FilterApplicableView(var DefaultView: Record "NPR POS Default View"; UnitCode: Code[10]): Boolean
     var
         POSUnit: Record "NPR POS Unit";
-        Salesperson: Record "Salesperson/Purchaser";
         TempPOSUnit: Record "NPR POS Unit" temporary;
-        TempSalesperson: Record "Salesperson/Purchaser" temporary;
     begin
         if UnitCode <> '' then begin
             if POSUnit.Get(UnitCode) then begin
@@ -180,21 +129,12 @@
             end;
         end;
 
-        if SalespersonCode <> '' then begin
-            if Salesperson.Get(SalespersonCode) then begin
-                TempSalesperson := Salesperson;
-                TempSalesperson.Insert();
-            end;
-        end;
-
         if DefaultView.FindSet() then
             repeat
                 if DefaultView."Register Filter" <> '' then
                     TempPOSUnit.SetFilter("No.", DefaultView."Register Filter");
-                if DefaultView."Salesperson Filter" <> '' then
-                    TempSalesperson.SetFilter(Code, DefaultView."Salesperson Filter");
 
-                if ((not TempPOSUnit.IsEmpty()) or (UnitCode = '')) and ((not TempSalesperson.IsEmpty) or (SalespersonCode = '')) then begin
+                if ((not TempPOSUnit.IsEmpty()) or (UnitCode = '')) then begin
                     DefaultView.TestField("POS View Code");
                     Get(DefaultView."POS View Code");
                     exit(true);
