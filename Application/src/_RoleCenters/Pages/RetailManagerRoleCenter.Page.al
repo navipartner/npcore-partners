@@ -692,7 +692,18 @@
                     ApplicationArea = NPRRetail;
 
                 }
+                action("Global POS Sales Entries")
+                {
+                    Caption = 'Global POS Sales Entries';
+                    Image = RegisteredDocs;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    RunObject = page "NPR NpGp POS Sales Entries";
+                    ToolTip = 'View Global POS Sales Entries.';
+                    ApplicationArea = NPRRetail;
 
+                }
                 action(POSQuotes)
                 {
                     Caption = 'POS Saved Sales';
