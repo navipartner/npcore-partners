@@ -120,11 +120,9 @@
             Caption = 'Customer Price Group';
             DataClassification = CustomerContent;
         }
-        field(36; "Sales Document Type"; Option)
+        field(36; "Sales Document Type"; Enum "Sales Document Type")
         {
             Caption = 'Sales Document Type';
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
-            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
             DataClassification = CustomerContent;
         }
         field(37; "Sales Document No."; Code[20])
@@ -339,6 +337,22 @@
             Caption = 'Event No.';
             TableRelation = Job WHERE("NPR Event" = CONST(true));
             DataClassification = CustomerContent;
+        }
+        field(210; "User ID"; Code[50])
+        {
+            Caption = 'User ID';
+            DataClassification = EndUserIdentifiableInformation;
+            Description = 'NPR5.54';
+        }
+        field(220; "Server Instance ID"; Integer)
+        {
+            Caption = 'Server Instance ID';
+            DataClassification = SystemMetadata;
+        }
+        field(230; "User Session ID"; Integer)
+        {
+            Caption = 'User Session ID';
+            DataClassification = SystemMetadata;
         }
         field(300; Amount; Decimal)
         {
