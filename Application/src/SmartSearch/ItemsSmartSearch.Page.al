@@ -58,88 +58,88 @@
                 Editable = false;
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the number of the item.';
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies a description of the item.';
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies a description 2 of the item.';
                 }
                 field(InventoryField; Rec.Inventory)
                 {
-                    ApplicationArea = Basic, Suite, Invoicing;
+                    ApplicationArea = NPRRetail;
                     HideValue = IsNonInventoriable;
                     ToolTip = 'Specifies how many units, such as pieces, boxes, or cans, of the item are in inventory.';
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if the item card represents a physical inventory unit (Inventory), a labor time unit (Service), or a physical unit that is not tracked in inventory (Non-Inventory).';
                     Visible = IsFoundationEnabled;
                 }
                 field("Substitutes Exist"; Rec."Substitutes Exist")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies that a substitute exists for this item.';
                 }
                 field("Assembly BOM"; Rec."Assembly BOM")
                 {
                     AccessByPermission = TableData "BOM Component" = R;
-                    ApplicationArea = Assembly;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if the item is an assembly BOM.';
                 }
                 field("Production BOM No."; Rec."Production BOM No.")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the number of the production BOM that the item represents.';
                 }
                 field("Routing No."; Rec."Routing No.")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the number of the production routing that the item is used in.';
                 }
                 field("Base Unit of Measure"; Rec."Base Unit of Measure")
                 {
-                    ApplicationArea = Basic, Suite, Invoicing;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the base unit used to measure the item, such as piece, box, or pallet. The base unit of measure also serves as the conversion basis for alternate units of measure.';
                 }
                 field("Cost is Adjusted"; Rec."Cost is Adjusted")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether the item''s unit cost has been adjusted, either automatically or manually.';
                 }
                 field("Unit Cost"; Rec."Unit Cost")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the cost per unit of the item.';
                 }
 
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = Basic, Suite, Invoicing;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the price for one unit of the item, in LCY.';
                 }
 
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the vendor code of who supplies this item by default.';
                 }
 
                 field("Search Description"; Rec."Search Description")
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies a search description that you use to find the item in lists.';
                 }
                 field("Default Deferral Template Code"; Rec."Default Deferral Template Code")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Default Deferral Template';
                     Importance = Additional;
                     ToolTip = 'Specifies the default template that governs how to defer revenues and expenses to the periods when they occurred.';
@@ -158,7 +158,7 @@
                 Image = DataEntry;
                 action("&Units of Measure")
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = '&Units of Measure';
                     Image = UnitOfMeasure;
                     RunObject = Page "Item Units of Measure";
@@ -168,7 +168,7 @@
                 }
                 action("Va&riants")
                 {
-                    ApplicationArea = Planning;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Va&riants';
                     Image = ItemVariant;
                     RunObject = Page "Item Variants";
@@ -177,7 +177,7 @@
                 }
                 action("Substituti&ons")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Substituti&ons';
                     Image = ItemSubstitution;
                     RunObject = Page "Item Substitution Entry";
@@ -187,7 +187,7 @@
                 }
                 action(Identifiers)
                 {
-                    ApplicationArea = Warehouse;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Identifiers';
                     Image = BarCode;
                     RunObject = Page "Item Identifiers";
@@ -197,11 +197,11 @@
                 }
                 action("Item Refe&rences")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Item References';
-                    #if BC17 or BC18
+#if BC17 or BC18
                     Visible = ItemReferenceVisible;
-                    #endif
+#endif
                     Image = Change;
                     Promoted = true;
                     PromotedCategory = Category4;
@@ -213,7 +213,7 @@
                 }
                 action("E&xtended Texts")
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
@@ -225,7 +225,7 @@
                 }
                 action(Translations)
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Translations';
                     Image = Translations;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
@@ -242,7 +242,7 @@
                     Image = Dimensions;
                     action(DimensionsSingle)
                     {
-                        ApplicationArea = Dimensions;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
@@ -255,7 +255,7 @@
                     action(DimensionsMultiple)
                     {
                         AccessByPermission = TableData Dimension = R;
-                        ApplicationArea = Dimensions;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
                         ToolTip = 'View or edit dimensions for a group of records. You can assign dimension codes to transactions to distribute costs and analyze historical information.';
@@ -282,7 +282,7 @@
                     Image = Entries;
                     action("Ledger E&ntries")
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Ledger E&ntries';
                         Image = ItemLedger;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
@@ -297,7 +297,7 @@
                     }
                     action("&Phys. Inventory Ledger Entries")
                     {
-                        ApplicationArea = Warehouse;
+                        ApplicationArea = NPRRetail;
                         Caption = '&Phys. Inventory Ledger Entries';
                         Image = PhysicalInventoryLedger;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
@@ -310,7 +310,7 @@
                     }
                     action("&Reservation Entries")
                     {
-                        ApplicationArea = Reservation;
+                        ApplicationArea = NPRRetail;
                         Caption = '&Reservation Entries';
                         Image = ReservationLedger;
                         RunObject = Page "Reservation Entries";
@@ -321,7 +321,7 @@
                     }
                     action("&Value Entries")
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = '&Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
@@ -331,7 +331,7 @@
                     }
                     action("Item &Tracking Entries")
                     {
-                        ApplicationArea = ItemTracking;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Item &Tracking Entries';
                         Image = ItemTrackingLedger;
                         ToolTip = 'View serial or lot numbers that are assigned to items.';
@@ -345,7 +345,7 @@
                     }
                     action("&Warehouse Entries")
                     {
-                        ApplicationArea = Warehouse;
+                        ApplicationArea = NPRRetail;
                         Caption = '&Warehouse Entries';
                         Image = BinLedger;
                         RunObject = Page "Warehouse Entries";
@@ -360,7 +360,7 @@
                 Caption = 'Prices and Discounts';
                 action(SalesPriceLists)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Sales Price Lists (Prices)';
                     Image = Price;
                     Scope = Repeater;
@@ -377,7 +377,7 @@
                 }
                 action(SalesPriceListsDiscounts)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Sales Price Lists (Discounts)';
                     Image = LineDiscount;
                     Scope = Repeater;
@@ -398,7 +398,7 @@
                 Caption = 'Periodic Activities';
                 action("Adjust Cost - Item Entries")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Adjust Cost - Item Entries';
                     Image = AdjustEntries;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
@@ -408,7 +408,7 @@
                 }
                 action("Post Inventory Cost to G/L")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Post Inventory Cost to G/L';
                     Image = PostInventoryToGL;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
@@ -418,7 +418,7 @@
                 }
                 action("Physical Inventory Journal")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Physical Inventory Journal';
                     Image = PhysicalInventory;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
@@ -428,7 +428,7 @@
                 }
                 action("Revaluation Journal")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Revaluation Journal';
                     Image = Journal;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
@@ -444,7 +444,7 @@
                 action("&Create Stockkeeping Unit")
                 {
                     AccessByPermission = TableData "Stockkeeping Unit" = R;
-                    ApplicationArea = Warehouse;
+                    ApplicationArea = NPRRetail;
                     Caption = '&Create Stockkeeping Unit';
                     Image = CreateSKU;
                     ToolTip = 'Create an instance of the item at each location that is set up.';
@@ -460,7 +460,7 @@
                 action("C&alculate Counting Period")
                 {
                     AccessByPermission = TableData "Phys. Invt. Item Selection" = R;
-                    ApplicationArea = Warehouse;
+                    ApplicationArea = NPRRetail;
                     Caption = 'C&alculate Counting Period';
                     Image = CalculateCalendar;
                     ToolTip = 'Prepare for a physical inventory by calculating which items or SKUs need to be counted in the current period.';
@@ -477,7 +477,7 @@
                 action(CopyItem)
                 {
                     AccessByPermission = TableData Item = I;
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Copy Item';
                     Image = Copy;
                     ToolTip = 'Create a copy of the current item.';
@@ -490,7 +490,7 @@
             }
             action("Requisition Worksheet")
             {
-                ApplicationArea = Planning;
+                ApplicationArea = NPRRetail;
                 Caption = 'Requisition Worksheet';
                 Image = Worksheet;
                 RunObject = Page "Req. Worksheet";
@@ -498,7 +498,7 @@
             }
             action("Item Journal")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Item Journal';
                 Image = Journals;
                 Promoted = true;
@@ -508,7 +508,7 @@
             }
             action("Item Reclassification Journal")
             {
-                ApplicationArea = Warehouse;
+                ApplicationArea = NPRRetail;
                 Caption = 'Item Reclassification Journal';
                 Image = Journals;
                 Promoted = true;
@@ -518,7 +518,7 @@
             }
             action("Item Tracing")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Item Tracing';
                 Image = ItemTracing;
                 RunObject = Page "Item Tracing";
@@ -526,7 +526,7 @@
             }
             action("Adjust Item Cost/Price")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Adjust Item Cost/Price';
                 Image = AdjustItemCost;
                 RunObject = Report "Adjust Item Costs/Prices";
@@ -540,7 +540,7 @@
                 Caption = 'Assembly/Production';
                 action("Assemble to Order - Sales")
                 {
-                    ApplicationArea = Assembly;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Assemble to Order - Sales';
                     Image = "Report";
                     RunObject = Report "Assemble to Order - Sales";
@@ -548,7 +548,7 @@
                 }
                 action("Where-Used (Top Level)")
                 {
-                    ApplicationArea = Assembly;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Where-Used (Top Level)';
                     Image = "Report";
                     RunObject = Report "Where-Used (Top Level)";
@@ -556,7 +556,7 @@
                 }
                 action("Quantity Explosion of BOM")
                 {
-                    ApplicationArea = Assembly;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Quantity Explosion of BOM';
                     Image = "Report";
                     RunObject = Report "Quantity Explosion of BOM";
@@ -568,7 +568,7 @@
                     Image = ItemCosts;
                     action("Inventory Valuation - WIP")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Inventory Valuation - WIP';
                         Image = "Report";
                         RunObject = Report "Inventory Valuation - WIP";
@@ -576,7 +576,7 @@
                     }
                     action("Cost Shares Breakdown")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Cost Shares Breakdown';
                         Image = "Report";
                         RunObject = Report "Cost Shares Breakdown";
@@ -584,7 +584,7 @@
                     }
                     action("Detailed Calculation")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Detailed Calculation';
                         Image = "Report";
                         RunObject = Report "Detailed Calculation";
@@ -592,7 +592,7 @@
                     }
                     action("Rolled-up Cost Shares")
                     {
-                        ApplicationArea = Manufacturing;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Rolled-up Cost Shares';
                         Image = "Report";
                         RunObject = Report "Rolled-up Cost Shares";
@@ -600,7 +600,7 @@
                     }
                     action("Single-Level Cost Shares")
                     {
-                        ApplicationArea = Manufacturing;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Single-Level Cost Shares';
                         Image = "Report";
                         RunObject = Report "Single-level Cost Shares";
@@ -613,7 +613,7 @@
                 Caption = 'Inventory';
                 action("Inventory - List")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Inventory - List';
                     Image = "Report";
                     RunObject = Report "Inventory - List";
@@ -621,7 +621,7 @@
                 }
                 action("Inventory - Availability Plan")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Inventory - Availability Plan';
                     Image = ItemAvailability;
                     RunObject = Report "Inventory - Availability Plan";
@@ -629,7 +629,7 @@
                 }
                 action("Item/Vendor Catalog")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Item/Vendor Catalog';
                     Image = "Report";
                     RunObject = Report "Item/Vendor Catalog";
@@ -637,7 +637,7 @@
                 }
                 action("Phys. Inventory List")
                 {
-                    ApplicationArea = Warehouse;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Phys. Inventory List';
                     Image = "Report";
                     RunObject = Report "Phys. Inventory List";
@@ -645,7 +645,7 @@
                 }
                 action("Catalog Item Sales")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Catalog Item Sales';
                     Image = "Report";
                     RunObject = Report "Catalog Item Sales";
@@ -653,7 +653,7 @@
                 }
                 action("Item Substitutions")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Item Substitutions';
                     Image = "Report";
                     RunObject = Report "Item Substitutions";
@@ -661,7 +661,7 @@
                 }
                 action("Inventory Cost and Price List")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Inventory Cost and Price List';
                     Image = "Report";
                     RunObject = Report "Inventory Cost and Price List";
@@ -669,7 +669,7 @@
                 }
                 action("Inventory Availability")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Inventory Availability';
                     Image = "Report";
                     RunObject = Report "Inventory Availability";
@@ -681,7 +681,7 @@
                     Image = ItemRegisters;
                     action("Item Register - Quantity")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Item Register - Quantity';
                         Image = "Report";
                         RunObject = Report "Item Register - Quantity";
@@ -689,7 +689,7 @@
                     }
                     action("Item Register - Value")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Item Register - Value';
                         Image = "Report";
                         RunObject = Report "Item Register - Value";
@@ -702,7 +702,7 @@
                     Image = ItemCosts;
                     action("Inventory - Cost Variance")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Inventory - Cost Variance';
                         Image = ItemCosts;
                         RunObject = Report "Inventory - Cost Variance";
@@ -710,7 +710,7 @@
                     }
                     action("Invt. Valuation - Cost Spec.")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Invt. Valuation - Cost Spec.';
                         Image = "Report";
                         RunObject = Report "Invt. Valuation - Cost Spec.";
@@ -718,7 +718,7 @@
                     }
                     action("Compare List")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Compare List';
                         Image = "Report";
                         RunObject = Report "Compare List";
@@ -731,7 +731,7 @@
                     Image = "Report";
                     action("Inventory - Transaction Detail")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Inventory - Transaction Detail';
                         Image = "Report";
                         RunObject = Report "Inventory - Transaction Detail";
@@ -739,7 +739,7 @@
                     }
                     action("Item Charges - Specification")
                     {
-                        ApplicationArea = ItemCharges;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Item Charges - Specification';
                         Image = "Report";
                         RunObject = Report "Item Charges - Specification";
@@ -747,7 +747,7 @@
                     }
                     action("Item Age Composition - Quantity")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Item Age Composition - Quantity';
                         Image = "Report";
                         RunObject = Report "Item Age Composition - Qty.";
@@ -755,7 +755,7 @@
                     }
                     action("Item Expiration - Quantity")
                     {
-                        ApplicationArea = ItemTracking;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Item Expiration - Quantity';
                         Image = "Report";
                         RunObject = Report "Item Expiration - Quantity";
@@ -768,7 +768,7 @@
                     Image = "Report";
                     action("Inventory - Sales Statistics")
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Inventory - Sales Statistics';
                         Image = "Report";
                         RunObject = Report "Inventory - Sales Statistics";
@@ -776,7 +776,7 @@
                     }
                     action("Inventory - Customer Sales")
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Inventory - Customer Sales';
                         Image = "Report";
                         RunObject = Report "Inventory - Customer Sales";
@@ -784,7 +784,7 @@
                     }
                     action("Inventory - Top 10 List")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Inventory - Top 10 List';
                         Image = "Report";
                         RunObject = Report "Inventory - Top 10 List";
@@ -797,7 +797,7 @@
                     Image = "Report";
                     action("Inventory Valuation")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Inventory Valuation';
                         Image = "Report";
                         RunObject = Report "Inventory Valuation";
@@ -805,7 +805,7 @@
                     }
                     action(Status)
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Status';
                         Image = "Report";
                         RunObject = Report Status;
@@ -813,7 +813,7 @@
                     }
                     action("Item Age Composition - Value")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Item Age Composition - Value';
                         Image = "Report";
                         RunObject = Report "Item Age Composition - Value";
@@ -826,7 +826,7 @@
                 Caption = 'Orders';
                 action("Inventory Order Details")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Inventory Order Details';
                     Image = "Report";
                     RunObject = Report "Inventory Order Details";
@@ -834,7 +834,7 @@
                 }
                 action("Inventory Purchase Orders")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Inventory Purchase Orders';
                     Image = "Report";
                     RunObject = Report "Inventory Purchase Orders";
@@ -842,7 +842,7 @@
                 }
                 action("Inventory - Vendor Purchases")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Inventory - Vendor Purchases';
                     Image = "Report";
                     RunObject = Report "Inventory - Vendor Purchases";
@@ -850,7 +850,7 @@
                 }
                 action("Inventory - Reorders")
                 {
-                    ApplicationArea = Planning;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Inventory - Reorders';
                     Image = "Report";
                     Promoted = true;
@@ -860,7 +860,7 @@
                 }
                 action("Inventory - Sales Back Orders")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Inventory - Sales Back Orders';
                     Image = "Report";
                     Promoted = true;
@@ -879,7 +879,7 @@
                 action("Items b&y Location")
                 {
                     AccessByPermission = TableData Location = R;
-                    ApplicationArea = Location;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Items b&y Location';
                     Image = ItemAvailbyLoc;
                     ToolTip = 'Show a list of items grouped by location.';
@@ -895,7 +895,7 @@
                     Image = ItemAvailability;
                     action("<Action5>")
                     {
-                        ApplicationArea = Advanced;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Event';
                         Image = "Event";
                         ToolTip = 'View how the actual and the projected available balance of an item will develop over time according to supply and demand events.';
@@ -907,7 +907,7 @@
                     }
                     action(Period)
                     {
-                        ApplicationArea = Advanced;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Period';
                         Image = Period;
                         RunObject = Page "Item Availability by Periods";
@@ -921,7 +921,7 @@
                     }
                     action("Variant")
                     {
-                        ApplicationArea = Planning;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Variant';
                         Image = ItemVariant;
                         RunObject = Page "Item Availability by Variant";
@@ -935,7 +935,7 @@
                     }
                     action(Location)
                     {
-                        ApplicationArea = Advanced;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Location';
                         Image = Warehouse;
                         RunObject = Page "Item Availability by Location";
@@ -949,7 +949,7 @@
                     }
                     action("BOM Level")
                     {
-                        ApplicationArea = Assembly;
+                        ApplicationArea = NPRRetail;
                         Caption = 'BOM Level';
                         Image = BOMLevel;
                         ToolTip = 'View availability figures for items on bills of materials that show how many units of a parent item you can make based on the availability of child items.';
@@ -961,7 +961,7 @@
                     }
                     action("Unit of Measure")
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Unit of Measure';
                         Image = UnitOfMeasure;
                         RunObject = Page "Item Availability by UOM";
@@ -981,7 +981,7 @@
                 Image = Production;
                 action(Structure)
                 {
-                    ApplicationArea = Assembly;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Structure';
                     Image = Hierarchy;
                     ToolTip = 'View which child items are used in an item''s assembly BOM or production BOM. Each item level can be collapsed or expanded to obtain an overview or detailed view.';
@@ -996,7 +996,7 @@
                 }
                 action("Cost Shares")
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Cost Shares';
                     Image = CostBudget;
                     ToolTip = 'View how the costs of underlying items in the BOM roll up to the parent item. The information is organized according to the BOM structure to reflect at which levels the individual costs apply. Each item level can be collapsed or expanded to obtain an overview or detailed view.';
@@ -1015,7 +1015,7 @@
                     Image = AssemblyBOM;
                     action("<Action32>")
                     {
-                        ApplicationArea = Assembly;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Assembly BOM';
                         Image = BOM;
                         RunObject = Page "Assembly BOM";
@@ -1024,7 +1024,7 @@
                     }
                     action("Where-Used")
                     {
-                        ApplicationArea = Assembly;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Where-Used';
                         Image = Track;
                         RunObject = Page "Where-Used List";
@@ -1036,7 +1036,7 @@
                     action("Calc. Stan&dard Cost")
                     {
                         AccessByPermission = TableData "BOM Component" = R;
-                        ApplicationArea = Assembly;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Calc. Stan&dard Cost';
                         Image = CalculateCost;
                         ToolTip = 'Calculate the unit cost of the item by rolling up the unit cost of each component and resource in the item''s assembly BOM or production BOM. The unit cost of a parent item must always equals the total of the unit costs of its components, subassemblies, and any resources.';
@@ -1049,7 +1049,7 @@
                     action("Calc. Unit Price")
                     {
                         AccessByPermission = TableData "BOM Component" = R;
-                        ApplicationArea = Assembly;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Calc. Unit Price';
                         Image = SuggestItemPrice;
                         ToolTip = 'Calculate the unit price based on the unit cost and the profit percentage.';
@@ -1066,7 +1066,7 @@
                     Image = Production;
                     action("Production BOM")
                     {
-                        ApplicationArea = Manufacturing;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Production BOM';
                         Image = BOM;
                         RunObject = Page "Production BOM";
@@ -1076,7 +1076,7 @@
                     action(Action29)
                     {
                         AccessByPermission = TableData "BOM Component" = R;
-                        ApplicationArea = Manufacturing;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Where-Used';
                         Image = "Where-Used";
                         ToolTip = 'View a list of BOMs in which the item is used.';
@@ -1092,7 +1092,7 @@
                     action(Action24)
                     {
                         AccessByPermission = TableData "Production BOM Header" = R;
-                        ApplicationArea = Manufacturing;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Calc. Stan&dard Cost';
                         Image = CalculateCost;
                         ToolTip = 'Calculate the unit cost of the item by rolling up the unit cost of each component and resource in the item''s assembly BOM or production BOM. The unit cost of a parent item must always equals the total of the unit costs of its components, subassemblies, and any resources.';
@@ -1109,7 +1109,7 @@
                     Image = Statistics;
                     action(Action16)
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Statistics';
                         Image = Statistics;
                         ShortCutKey = 'F7';
@@ -1125,7 +1125,7 @@
                     }
                     action("Entry Statistics")
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Entry Statistics';
                         Image = EntryStatistics;
                         RunObject = Page "Item Entry Statistics";
@@ -1140,7 +1140,7 @@
                     }
                     action("T&urnover")
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'T&urnover';
                         Image = Turnover;
                         RunObject = Page "Item Turnover";
@@ -1155,7 +1155,7 @@
                 }
                 action("Co&mments")
                 {
-                    ApplicationArea = Comments;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
@@ -1170,7 +1170,7 @@
                 Image = Sales;
                 action("Prepa&yment Percentages")
                 {
-                    ApplicationArea = Prepayments;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Sales Prepayment Percentages";
@@ -1179,7 +1179,7 @@
                 }
                 action(Action37)
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Orders';
                     Image = Document;
                     RunObject = Page "Sales Orders";
@@ -1190,7 +1190,7 @@
                 }
                 action("Returns Orders")
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Returns Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Sales Return Orders";
@@ -1206,7 +1206,7 @@
                 Image = Purchasing;
                 action("Ven&dors")
                 {
-                    ApplicationArea = Planning;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Ven&dors';
                     Image = Vendor;
                     RunObject = Page "Item Vendor Catalog";
@@ -1216,7 +1216,7 @@
                 }
                 action(Action125)
                 {
-                    ApplicationArea = Prepayments;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Purchase Prepmt. Percentages";
@@ -1225,7 +1225,7 @@
                 }
                 action(Action40)
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Orders';
                     Image = Document;
                     RunObject = Page "Purchase Orders";
@@ -1236,7 +1236,7 @@
                 }
                 action("Return Orders")
                 {
-                    ApplicationArea = SalesReturnOrder;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Return Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Purchase Return Orders";
@@ -1247,7 +1247,7 @@
                 }
                 action("Ca&talog Items")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Ca&talog Items';
                     Image = NonStockItem;
                     RunObject = Page "Catalog Item List";
@@ -1259,7 +1259,7 @@
                 Caption = 'Special Purchase Prices & Discounts';
                 action(PurchPriceLists)
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Purchase Price Lists (Prices)';
                     Image = Price;
                     Visible = ExtendedPriceEnabled;
@@ -1276,7 +1276,7 @@
                 }
                 action(PurchPriceListsDiscounts)
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Purchase Price Lists (Discounts)';
                     Image = LineDiscount;
                     Visible = ExtendedPriceEnabled;
@@ -1298,7 +1298,7 @@
                 Image = Warehouse;
                 action("&Bin Contents")
                 {
-                    ApplicationArea = Warehouse;
+                    ApplicationArea = NPRRetail;
                     Caption = '&Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Item Bin Contents";
@@ -1308,7 +1308,7 @@
                 }
                 action("Stockkeepin&g Units")
                 {
-                    ApplicationArea = Warehouse;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Stockkeepin&g Units';
                     Image = SKU;
                     RunObject = Page "Stockkeeping Unit List";
@@ -1323,7 +1323,7 @@
                 Image = ServiceItem;
                 action("Ser&vice Items")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Ser&vice Items';
                     Image = ServiceItem;
                     RunObject = Page "Service Items";
@@ -1334,7 +1334,7 @@
                 action(Troubleshooting)
                 {
                     AccessByPermission = TableData "Service Header" = R;
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Troubleshooting';
                     Image = Troubleshoot;
                     ToolTip = 'View or edit information about technical problems with a service item.';
@@ -1348,7 +1348,7 @@
                 }
                 action("Troubleshooting Setup")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Troubleshooting Setup';
                     Image = Troubleshoot;
                     RunObject = Page "Troubleshooting Setup";
@@ -1363,7 +1363,7 @@
                 Image = Resource;
                 action("Resource &Skills")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Resource &Skills';
                     Image = ResourceSkills;
                     RunObject = Page "Resource Skills";
@@ -1374,7 +1374,7 @@
                 action("Skilled R&esources")
                 {
                     AccessByPermission = TableData "Service Header" = R;
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Skilled R&esources';
                     Image = ResourceSkills;
                     ToolTip = 'View a list of all registered resources with information about whether they have the skills required to service the particular service item group, item, or service item.';
@@ -1394,15 +1394,15 @@
 
     trigger OnOpenPage()
     var
-    #if BC17 or BC18
+#if BC17 or BC18
         ItemReferenceMgt: Codeunit "Item Reference Management";
-        #endif
+#endif
 
     begin
         IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled();
-        #if BC17 or BC18
+#if BC17 or BC18
         ItemReferenceVisible := ItemReferenceMgt.IsEnabled();
-        #endif
+#endif
         ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
     end;
 
@@ -1413,9 +1413,9 @@
 
     var
         IsFoundationEnabled: Boolean;
-        #if BC17 or BC18
+#if BC17 or BC18
         ItemReferenceVisible: Boolean;
-        #endif
+#endif
         ExtendedPriceEnabled: Boolean;
         [InDataSet]
         IsNonInventoriable: Boolean;

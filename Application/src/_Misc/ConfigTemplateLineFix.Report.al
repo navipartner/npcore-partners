@@ -1,9 +1,9 @@
 ﻿report 6014410 "NPR Config. Template Line Fix"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
-    ApplicationArea = All;
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
+    ApplicationArea = NPRRetail;
     Caption = 'Config. Template Line Fix';
     UsageCategory = Administration;
     ProcessingOnly = true;

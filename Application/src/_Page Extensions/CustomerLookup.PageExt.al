@@ -39,7 +39,7 @@ pageextension 6014493 "NPR Customer Lookup" extends "Customer Lookup"
         {
             field("NPR E-Mail"; Rec."E-Mail")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the customer''s e-mail address. Clicking on the e-mail address opens an e-mail application.';
             }
         }

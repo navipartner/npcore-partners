@@ -50,37 +50,37 @@
                 Editable = false;
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the customer''s name. This name will appear on all sales documents for the customer.';
                 }
                 field("Responsibility Center"; Rec."Responsibility Center")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the code of the responsibility center, such as a distribution hub, that is associated with the involved user, company, customer, or vendor.';
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = Location;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies from which location sales to this customer will be processed by default.';
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the customer''s telephone number.';
                 }
                 field(Contact; Rec.Contact)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the name of the person you regularly contact when you do business with this customer.';
                 }
                 field("Balance (LCY)"; Rec."Balance (LCY)")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the payment amount that the customer owes for completed sales. This value is also known as the customer''s balance.';
 
                     trigger OnDrillDown()
@@ -90,7 +90,7 @@
                 }
                 field("Balance Due (LCY)"; Rec."Balance Due (LCY)")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies payments from the customer that are overdue per today''s date.';
 
                     trigger OnDrillDown()
@@ -100,12 +100,12 @@
                 }
                 field("Sales (LCY)"; Rec."Sales (LCY)")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the total net amount of sales to the customer in LCY.';
                 }
                 field("Payments (LCY)"; Rec."Payments (LCY)")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the sum of payments received from the customer.';
                 }
             }
@@ -122,7 +122,7 @@
                 Image = Customer;
                 action("Co&mments")
                 {
-                    ApplicationArea = Comments;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     Promoted = true;
@@ -135,7 +135,7 @@
 
                 action(New)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'New';
                     Image = NewCustomer;
                     Promoted = true;
@@ -153,7 +153,7 @@
                     Image = Dimensions;
                     action(DimensionsSingle)
                     {
-                        ApplicationArea = Dimensions;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
@@ -165,7 +165,7 @@
                     action(DimensionsMultiple)
                     {
                         AccessByPermission = TableData Dimension = R;
-                        ApplicationArea = Dimensions;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
                         ToolTip = 'View or edit dimensions for a group of records. You can assign dimension codes to transactions to distribute costs and analyze historical information.';
@@ -183,7 +183,7 @@
                 }
                 action("Bank Accounts")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Bank Accounts';
                     Image = BankAccount;
                     RunObject = Page "Customer Bank Account List";
@@ -192,7 +192,7 @@
                 }
                 action("Direct Debit Mandates")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Direct Debit Mandates';
                     Image = MakeAgreement;
                     RunObject = Page "SEPA Direct Debit Mandates";
@@ -201,7 +201,7 @@
                 }
                 action(ShipToAddresses)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Ship-&to Addresses';
                     Image = ShipAddress;
                     RunObject = Page "Ship-to Address List";
@@ -211,7 +211,7 @@
                 action("C&ontact")
                 {
                     AccessByPermission = TableData Contact = R;
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'C&ontact';
                     Image = ContactPerson;
                     Promoted = true;
@@ -225,7 +225,7 @@
                 }
                 action("Item References")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Item Refe&rences';
 #if BC17 or BC18
                     Visible = ItemReferenceVisible;
@@ -242,7 +242,7 @@
                 action(ApprovalEntries)
                 {
                     AccessByPermission = TableData "Approval Entry" = R;
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Approvals';
                     Image = Approvals;
                     Promoted = true;
@@ -261,7 +261,7 @@
                 Image = History;
                 action(CustomerLedgerEntries)
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     Promoted = true;
@@ -276,7 +276,7 @@
                 }
                 action(Statistics)
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Statistics';
                     Image = Statistics;
                     Promoted = true;
@@ -292,7 +292,7 @@
                 }
                 action("S&ales")
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'S&ales';
                     Image = Sales;
                     RunObject = Page "Customer Sales";
@@ -303,7 +303,7 @@
                 }
                 action("Entry Statistics")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Entry Statistics';
                     Image = EntryStatistics;
                     RunObject = Page "Customer Entry Statistics";
@@ -315,7 +315,7 @@
                 }
                 action("Statistics by C&urrencies")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Statistics by C&urrencies';
                     Image = Currencies;
                     RunObject = Page "Cust. Stats. by Curr. Lines";
@@ -332,7 +332,7 @@
                 Image = Sales;
                 action("Sales_InvoiceDiscounts")
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Invoice &Discounts';
                     Image = CalculateInvoiceDiscount;
                     RunObject = Page "Cust. Invoice Discounts";
@@ -341,7 +341,7 @@
                 }
                 action("Prepa&yment Percentages")
                 {
-                    ApplicationArea = Prepayments;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Sales Prepayment Percentages";
@@ -352,7 +352,7 @@
                 }
                 action("Recurring Sales Lines")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Recurring Sales Lines';
                     Image = CodesList;
                     RunObject = Page "Standard Customer Sales Codes";
@@ -366,7 +366,7 @@
                 Image = Documents;
                 action(Quotes)
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Quotes';
                     Image = Quote;
                     Promoted = true;
@@ -378,7 +378,7 @@
                 }
                 action(Orders)
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Orders';
                     Image = Document;
                     Promoted = true;
@@ -390,7 +390,7 @@
                 }
                 action("Return Orders")
                 {
-                    ApplicationArea = SalesReturnOrder;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Return Orders';
                     Image = ReturnOrder;
                     Promoted = true;
@@ -406,7 +406,7 @@
                     Image = Documents;
                     action("Issued &Reminders")
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Issued &Reminders';
                         Image = OrderReminder;
                         RunObject = Page "Issued Reminder List";
@@ -416,7 +416,7 @@
                     }
                     action("Issued &Finance Charge Memos")
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Issued &Finance Charge Memos';
                         Image = FinChargeMemo;
                         RunObject = Page "Issued Fin. Charge Memo List";
@@ -427,7 +427,7 @@
                 }
                 action("Blanket Orders")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Blanket Orders';
                     Image = BlanketOrder;
                     RunObject = Page "Blanket Sales Orders";
@@ -442,7 +442,7 @@
                 Image = ServiceItem;
                 action("Service Orders")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Service Orders';
                     Image = Document;
                     RunObject = Page "Service Orders";
@@ -452,7 +452,7 @@
                 }
                 action("Ser&vice Contracts")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Ser&vice Contracts';
                     Image = ServiceAgreement;
                     RunObject = Page "Customer Service Contracts";
@@ -462,7 +462,7 @@
                 }
                 action("Service &Items")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Service &Items';
                     Image = ServiceItem;
                     RunObject = Page "Service Items";
@@ -476,7 +476,7 @@
         {
             action(NewSalesBlanketOrder)
             {
-                ApplicationArea = Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Blanket Sales Order';
                 Image = BlanketOrder;
                 RunObject = Page "Blanket Sales Order";
@@ -486,7 +486,7 @@
             }
             action(NewSalesQuote)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Sales Quote';
                 Image = NewSalesQuote;
                 Promoted = true;
@@ -500,7 +500,7 @@
             }
             action(NewSalesInvoice)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Sales Invoice';
                 Image = NewSalesInvoice;
                 Promoted = true;
@@ -514,7 +514,7 @@
             }
             action(NewSalesOrder)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Sales Order';
                 Image = Document;
                 Promoted = true;
@@ -528,7 +528,7 @@
             }
             action(NewSalesCrMemo)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Sales Credit Memo';
                 Image = CreditMemo;
                 Promoted = true;
@@ -542,7 +542,7 @@
             }
             action(NewSalesReturnOrder)
             {
-                ApplicationArea = SalesReturnOrder;
+                ApplicationArea = NPRRetail;
                 Caption = 'Sales Return Order';
                 Image = ReturnOrder;
                 RunObject = Page "Sales Return Order";
@@ -552,7 +552,7 @@
             }
             action(NewServiceQuote)
             {
-                ApplicationArea = Service;
+                ApplicationArea = NPRRetail;
                 Caption = 'Service Quote';
                 Image = Quote;
                 RunObject = Page "Service Quote";
@@ -562,7 +562,7 @@
             }
             action(NewServiceInvoice)
             {
-                ApplicationArea = Service;
+                ApplicationArea = NPRRetail;
                 Caption = 'Service Invoice';
                 Image = Invoice;
                 RunObject = Page "Service Invoice";
@@ -572,7 +572,7 @@
             }
             action(NewServiceOrder)
             {
-                ApplicationArea = Service;
+                ApplicationArea = NPRRetail;
                 Caption = 'Service Order';
                 Image = Document;
                 RunObject = Page "Service Order";
@@ -582,7 +582,7 @@
             }
             action(NewServiceCrMemo)
             {
-                ApplicationArea = Service;
+                ApplicationArea = NPRRetail;
                 Caption = 'Service Credit Memo';
                 Image = CreditMemo;
                 RunObject = Page "Service Credit Memo";
@@ -592,7 +592,7 @@
             }
             action(NewReminder)
             {
-                ApplicationArea = Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Reminder';
                 Image = Reminder;
                 Promoted = true;
@@ -605,7 +605,7 @@
             }
             action(NewFinChargeMemo)
             {
-                ApplicationArea = Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Finance Charge Memo';
                 Image = FinChargeMemo;
                 RunObject = Page "Finance Charge Memo";
@@ -622,7 +622,7 @@
                 Image = History;
                 action(CustomerLedgerEntriesHistory)
                 {
-                    ApplicationArea = Advanced;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     RunObject = Page "Customer Ledger Entries";
@@ -635,7 +635,7 @@
             }
             action("Cash Receipt Journal")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Cash Receipt Journal';
                 Image = CashReceiptJournal;
                 Promoted = true;
@@ -645,7 +645,7 @@
             }
             action("Sales Journal")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Sales Journal';
                 Image = Journals;
                 Promoted = true;
@@ -655,7 +655,7 @@
             }
             action(PaymentRegistration)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Register Customer Payments';
                 Image = Payment;
                 Promoted = true;
@@ -678,7 +678,7 @@
                     Image = "Report";
                     action(ReportCustomerTop10List)
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Customer - Top 10 List';
                         Image = "Report";
                         RunObject = Report "Customer - Top 10 List";
@@ -686,7 +686,7 @@
                     }
                     action(ReportCustomerSalesList)
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Customer - Sales List';
                         Image = "Report";
                         RunObject = Report "Customer - Sales List";
@@ -694,7 +694,7 @@
                     }
                     action(ReportSalesStatistics)
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Sales Statistics';
                         Image = "Report";
                         RunObject = Report "Sales Statistics";
@@ -707,7 +707,7 @@
                     Image = "Report";
                     action(Statement)
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Statement';
                         Image = "Report";
                         RunObject = Report "Customer Statement";
@@ -715,7 +715,7 @@
                     }
                     action(BackgroundStatement)
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Scheduled Statements';
                         Image = "Report";
                         ToolTip = 'Schedule Customer Statements in the Job Queue.';
@@ -729,7 +729,7 @@
                     }
                     action(ReportCustomerBalanceToDate)
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Customer - Balance to Date';
                         Image = "Report";
                         RunObject = Report "Customer - Balance to Date";
@@ -737,7 +737,7 @@
                     }
                     action(ReportCustomerTrialBalance)
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Customer - Trial Balance';
                         Image = "Report";
                         RunObject = Report "Customer - Trial Balance";
@@ -745,7 +745,7 @@
                     }
                     action(ReportCustomerDetailTrial)
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Customer - Detail Trial Bal.';
                         Image = "Report";
                         RunObject = Report "Customer - Detail Trial Bal.";
@@ -753,7 +753,7 @@
                     }
                     action(ReportCustomerSummaryAging)
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Customer - Summary Aging';
                         Image = "Report";
                         RunObject = Report "Customer - Summary Aging";
@@ -761,7 +761,7 @@
                     }
                     action(ReportCustomerDetailedAging)
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Customer - Detailed Aging';
                         Image = "Report";
                         RunObject = Report "Customer Detailed Aging";
@@ -769,7 +769,7 @@
                     }
                     action(ReportAgedAccountsReceivable)
                     {
-                        ApplicationArea = Basic, Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Aged Accounts Receivable';
                         Image = "Report";
                         RunObject = Report "Aged Accounts Receivable";
@@ -777,7 +777,7 @@
                     }
                     action(ReportCustomerPaymentReceipt)
                     {
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Customer - Payment Receipt';
                         Image = "Report";
                         RunObject = Report "Customer - Payment Receipt";
@@ -786,7 +786,7 @@
                 }
                 action(Reminder)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Reminder';
                     Image = Reminder;
                     RunObject = Report Reminder;
@@ -798,7 +798,7 @@
                 Caption = 'General';
                 action("Customer List")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Customer List';
                     Image = "Report";
                     RunObject = Report "Customer - List";
@@ -806,7 +806,7 @@
                 }
                 action("Customer Register")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Customer Register';
                     Image = "Report";
                     RunObject = Report "Customer Register";
@@ -814,7 +814,7 @@
                 }
                 action("Customer - Top 10 List")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Customer - Top 10 List';
                     Image = "Report";
                     RunObject = Report "Customer - Top 10 List";
@@ -827,7 +827,7 @@
                 Image = Sales;
                 action("Customer - Order Summary")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Customer - Order Summary';
                     Image = "Report";
                     Promoted = true;
@@ -837,7 +837,7 @@
                 }
                 action("Customer - Order Detail")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Customer - Order Detail';
                     Image = "Report";
                     RunObject = Report "Customer - Order Detail";
@@ -845,7 +845,7 @@
                 }
                 action("Customer - Sales List")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Customer - Sales List';
                     Image = "Report";
                     Promoted = true;
@@ -855,7 +855,7 @@
                 }
                 action("Sales Statistics")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Sales Statistics';
                     Image = "Report";
                     RunObject = Report "Sales Statistics";
@@ -863,7 +863,7 @@
                 }
                 action("Customer/Item Sales")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Customer/Item Sales';
                     Image = "Report";
                     RunObject = Report "Customer/Item Sales";

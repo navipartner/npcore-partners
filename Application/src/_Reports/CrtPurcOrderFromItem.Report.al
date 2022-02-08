@@ -1,7 +1,7 @@
 report 6014411 "NPR Crt. Purc. Order From Item"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     Caption = 'Add to Purchase Order';
     ProcessingOnly = true;
@@ -22,7 +22,7 @@ report 6014411 "NPR Crt. Purc. Order From Item"
                         Caption = 'Purchase Order No.';
                         ToolTip = 'Choose Existing Purchase Order or leave it empty if You want to create a new one.';
                         TableRelation = "Purchase Header"."No." where("Document Type" = filter(Order), Status = const(Open));
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -35,7 +35,7 @@ report 6014411 "NPR Crt. Purc. Order From Item"
                         Caption = 'Vendor No.';
                         ToolTip = 'In case You want to create new Purchase Order, please set Vendor.';
                         TableRelation = Vendor."No.";
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         Editable = not NotEditableFieldsG;
                     }
 
@@ -44,14 +44,14 @@ report 6014411 "NPR Crt. Purc. Order From Item"
                         Caption = 'Location Code';
                         ToolTip = 'In case You want to define specific location, choose one. Otherwise, system will use location from Document Header';
                         TableRelation = Location.Code;
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
 
                     field("Processing Item No"; ItemToProcessG."No.")
                     {
                         Caption = 'Processing Item No.';
                         Editable = false;
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Processing Item No. field.';
                     }
 
@@ -59,7 +59,7 @@ report 6014411 "NPR Crt. Purc. Order From Item"
                     {
                         Caption = 'Processing Item Description.';
                         Editable = false;
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Processing Item Description. field.';
                     }
 
@@ -67,7 +67,7 @@ report 6014411 "NPR Crt. Purc. Order From Item"
                     {
                         Caption = 'Open Purchase Order';
                         ToolTip = 'If You want to open Purchase Order Card after adding the item, You need to check this option';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

@@ -45,7 +45,7 @@
             part(PowerBI; "Power BI Report Spinner Part")
             {
                 AccessByPermission = TableData "Power BI User Configuration" = I;
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
             }
             part(MyJobQueue; "My Job Queue")
             {

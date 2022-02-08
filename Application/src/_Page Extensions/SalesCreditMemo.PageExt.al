@@ -6,7 +6,7 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
         {
             field("NPR Correction"; Rec.Correction)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Importance = Additional;
                 ToolTip = 'Specifies whether this credit memo is to be posted as a corrective entry.';
             }
