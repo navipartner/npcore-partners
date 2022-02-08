@@ -366,11 +366,10 @@
         TextSetupPaymentTypeMissing: Label 'No counting details have been setup for %1, enter counted amount/quantity as is.';
         PageMode: Option PRELIMINARY_COUNT,FINAL_COUNT,TRANSFER,VIEW;
         NetTransfer: Decimal;
+        AutoCountCompleted: Boolean;
         ShowCountingSection: Boolean;
         ShowClosingSection: Boolean;
         ViewMode: Boolean;
-        AutoCountBin: Label '%1 is configured to %2, but there is no value specified for %3.';
-        AutoCount: Label 'Calculated by Auto-Count.';
         IsBlindCount: Boolean;
 
     local procedure OnAssistEditCounting()
@@ -624,57 +623,19 @@
     procedure DoOnOpenPageProcessing()
     var
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        POSPaymentMethod: Record "NPR POS Payment Method";
-        POSPaymentBin: Record "NPR POS Payment Bin";
-        PymMethodLbl: Label '%1:%2', Locked = true;
     begin
         case PageMode of
             PageMode::TRANSFER:
                 Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::TRANSFER);
             PageMode::FINAL_COUNT:
-                Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::ZREPORT);
+                if not AutoCountCompleted then
+                    Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::ZREPORT);
             PageMode::PRELIMINARY_COUNT:
                 Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::XREPORT);
         end;
 
-        if (PageMode = PageMode::FINAL_COUNT) then begin
-            POSPaymentBinCheckpoint.CopyFilters(Rec);
-            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
-            if (POSPaymentBinCheckpoint.FindSet()) then begin
-                repeat
-                    POSPaymentMethod.Get(POSPaymentBinCheckpoint."Payment Method No.");
-                    if (POSPaymentMethod."Bin for Virtual-Count" = '') then
-                        Error(AutoCountBin, POSPaymentMethod.TableCaption(), POSPaymentMethod."Include In Counting", POSPaymentMethod.FieldCaption("Bin for Virtual-Count"));
-
-                    POSPaymentBin.Get(POSPaymentMethod."Bin for Virtual-Count");
-
-                    POSPaymentBinCheckpoint."Counted Amount Incl. Float" := POSPaymentBinCheckpoint."Calculated Amount Incl. Float";
-
-                    POSPaymentBinCheckpoint."Move to Bin Code" := POSPaymentMethod."Bin for Virtual-Count";
-                    POSPaymentBinCheckpoint.Validate("Move to Bin Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
-                    POSPaymentBinCheckpoint."Move to Bin Reference" := StrSubstNo(PymMethodLbl, POSPaymentBinCheckpoint."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
-                    POSPaymentBinCheckpoint."New Float Amount" := 0;
-                    POSPaymentBinCheckpoint.Comment := AutoCount;
-                    POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
-                    POSPaymentBinCheckpoint.Modify();
-
-                until (POSPaymentBinCheckpoint.Next() = 0);
-            end;
-
-            POSPaymentBinCheckpoint.Reset();
-            POSPaymentBinCheckpoint.CopyFilters(Rec);
-            POSPaymentBinCheckpoint.SetFilter("Calculated Amount Incl. Float", '<%1', 0);
-            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '<>%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
-            if (POSPaymentBinCheckpoint.FindSet()) then begin
-                repeat
-                    POSPaymentBinCheckpoint.Validate("Counted Amount Incl. Float", 0);
-                    POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
-                    POSPaymentBinCheckpoint."New Float Amount" := 0;
-                    POSPaymentBinCheckpoint.Comment := AutoCount;
-                    POSPaymentBinCheckpoint.Modify();
-                until (POSPaymentBinCheckpoint.Next() = 0);
-            end;
-        end;
+        if (PageMode = PageMode::FINAL_COUNT) and not AutoCountCompleted then
+            AutoCount(Rec);
 
         if (IsBlindCount) then begin
             POSPaymentBinCheckpoint.Reset();
@@ -710,6 +671,50 @@
         end;
     end;
 
+    procedure AutoCount(var POSPaymentBinCheckpoint2: Record "NPR POS Payment Bin Checkp.")
+    var
+        POSPaymentBin: Record "NPR POS Payment Bin";
+        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        AutoCountBinLbl: Label '%1 is configured to %2, but there is no value specified for %3.', Comment = '%1 - POS Payment Method tablecaption, %2 - "Virtual" ("Include in Counting" field option), %3 - "Bin for Virtual-Count" fieldcaption';
+        CalculatedByAutoCountLbl: Label 'Calculated by Auto-Count.';
+        PymMethodLbl: Label '%1:%2', Locked = true;
+    begin
+        POSPaymentBinCheckpoint.CopyFilters(POSPaymentBinCheckpoint2);
+        POSPaymentBinCheckpoint.SetRange("Include In Counting", POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
+        if POSPaymentBinCheckpoint.FindSet(true) then
+            repeat
+                POSPaymentMethod.Get(POSPaymentBinCheckpoint."Payment Method No.");
+                if (POSPaymentMethod."Bin for Virtual-Count" = '') then
+                    Error(AutoCountBinLbl, POSPaymentMethod.TableCaption(), POSPaymentMethod."Include In Counting", POSPaymentMethod.FieldCaption("Bin for Virtual-Count"));
+                POSPaymentBin.Get(POSPaymentMethod."Bin for Virtual-Count");
+
+                POSPaymentBinCheckpoint."Counted Amount Incl. Float" := POSPaymentBinCheckpoint."Calculated Amount Incl. Float";
+                POSPaymentBinCheckpoint."Move to Bin Code" := POSPaymentMethod."Bin for Virtual-Count";
+                POSPaymentBinCheckpoint.Validate("Move to Bin Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
+                POSPaymentBinCheckpoint."Move to Bin Reference" := StrSubstNo(PymMethodLbl, POSPaymentBinCheckpoint."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
+                POSPaymentBinCheckpoint."New Float Amount" := 0;
+                POSPaymentBinCheckpoint.Comment := CalculatedByAutoCountLbl;
+                POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
+                POSPaymentBinCheckpoint.Modify();
+            until POSPaymentBinCheckpoint.Next() = 0;
+
+        POSPaymentBinCheckpoint.SetFilter("Calculated Amount Incl. Float", '<%1', 0);
+        POSPaymentBinCheckpoint.SetFilter("Include In Counting", '<>%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
+        if POSPaymentBinCheckpoint.FindSet(true) then
+            repeat
+                POSPaymentBinCheckpoint.Validate("Counted Amount Incl. Float", 0);
+                POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
+                POSPaymentBinCheckpoint."New Float Amount" := 0;
+                POSPaymentBinCheckpoint.Comment := CalculatedByAutoCountLbl;
+                POSPaymentBinCheckpoint.Modify();
+            until POSPaymentBinCheckpoint.Next() = 0;
+    end;
+
+    procedure SetAutoCountCompleted(Set: Boolean)
+    begin
+        AutoCountCompleted := Set;
+    end;
 
     procedure DoOnClosePageProcessing(): Boolean
     var
@@ -746,6 +751,4 @@
 
         exit(HaveError);
     end;
-
 }
-

@@ -388,7 +388,9 @@
 
                 trigger OnAction()
                 begin
-                    CreateBinCheckpoint();
+                    if PageMode <> PageMode::FINAL then
+                        CreateBinCheckpoint();
+                    ShowBinCheckpoint();
                 end;
             }
             action("Create X-Report")
@@ -487,10 +489,13 @@
     trigger OnOpenPage()
     begin
         CurrPage.POSPaymentBins.PAGE.SetShowBin();
+        if PageMode = PageMode::FINAL then
+            CreateBinCheckpoint();
     end;
 
     var
         PageMode: Option PRELIMINARY,FINAL,VIEW;
+        AutoCountCompleted: Boolean;
         IsBlindCount: Boolean;
         IsTurnoverSectionVisible: Boolean;
 
@@ -501,15 +506,30 @@
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
         POSWorkshiftCheckpoint.CreateBinCheckpoint(Rec."Entry No.");
+        if PageMode = PageMode::FINAL then begin
+            POSPaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", Rec."Entry No.");
+            POSPaymentBinCheckpoint.SetRange("Include In Counting", POSPaymentBinCheckpoint."Include In Counting"::YES);
+            if POSPaymentBinCheckpoint.IsEmpty then begin
+                POSPaymentBinCheckpoint.SetRange("Include In Counting");
+                POSPaymentBinCheckpoint.ModifyAll(Type, POSPaymentBinCheckpoint.Type::ZREPORT);
+                PaymentBinCheckpointPage.AutoCount(POSPaymentBinCheckpoint);
+                AutoCountCompleted := true;
+            end;
+        end;
         Commit();
+    end;
 
+    local procedure ShowBinCheckpoint()
+    var
+        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        PaymentBinCheckpointPage: Page "NPR POS Payment Bin Checkpoint";
+    begin
         POSPaymentBinCheckpoint.Reset();
         POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', Rec."Entry No.");
         PaymentBinCheckpointPage.SetTableView(POSPaymentBinCheckpoint);
         PaymentBinCheckpointPage.SetCheckpointMode(PageMode);
-
         PaymentBinCheckpointPage.SetBlindCount(IsBlindCount);
-
+        PaymentBinCheckpointPage.SetAutoCountCompleted(AutoCountCompleted);
         PaymentBinCheckpointPage.RunModal();
     end;
 
