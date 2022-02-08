@@ -40,7 +40,7 @@ Major Tom is Windows desktop POS software which embeds the web client and serves
 
 ClickOnce is a deployment technology that enables you to create self-updating Windows-based applications that can be installed and run with minimal user interaction. 
 
-1. Click the **ClickOnce Client Installation** link from the email you received from NaviPartner when you requested a trial version of NP REtail.    
+1. Click the **ClickOnce Client Installation** link from the email you received from NaviPartner when you requested a trial version of NP Retail.    
    The page containing the installation links is displayed.
 2. Click **Install now**.
 3. During the installation, you will need to provide credentials to log into Microsoft Dynamics NAV.   
