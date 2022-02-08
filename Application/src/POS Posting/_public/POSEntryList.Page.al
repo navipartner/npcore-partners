@@ -1,6 +1,7 @@
 ﻿page 6150652 "NPR POS Entry List"
 {
     Caption = 'POS Entry List';
+    AdditionalSearchTerms = 'POS Entries';
     CardPageID = "NPR POS Entry Card";
     DeleteAllowed = false;
     InsertAllowed = false;
