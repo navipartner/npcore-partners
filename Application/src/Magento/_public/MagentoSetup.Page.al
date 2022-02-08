@@ -576,7 +576,7 @@
                 field("Auto Transfer Order Enabled"; Rec."Auto Transfer Order Enabled")
                 {
                     ToolTip = 'Specifies if Transfer orders will be automatically created when ordered quantity of Item is greater than available quantity of that Item in Location which is configured on Magento Website. If you enable this, you should go to page "Replenishment Transfer Mapping" and configure it.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 group(AutoTransfer)
                 {
@@ -585,7 +585,7 @@
                     field("Auto Create Req. Lines"; Rec."Auto Create Req. Lines")
                     {
                         ToolTip = 'Specifies if Requisiton lines will be automatically created when needed quantity of Item is was not found in Locations from "Replenishment Transfer Mapping". If you enable this, you should go configure "Req. Worsheet Template Code".';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(RequisitionLines)
@@ -595,12 +595,12 @@
                     field("Req. Worsheet Template Code"; Rec."Req. Worsheet Template Code")
                     {
                         ToolTip = 'Specifies Req. Worsheet Template Code in which requisition lines will be created, for Items and Quantities which were not found in Locations from "Replenishment Transfer Mapping".';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                     field("Req. Worsheet Jnl. Batch Name"; Rec."Req. Worsheet Jnl. Batch Name")
                     {
                         ToolTip = 'Specifies Req. Worsheet Template Code in which requisition lines will be created, for Items and Quantities which were not found in Locations from "Replenishment Transfer Mapping".';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(IncomingQuantites)
@@ -610,7 +610,7 @@
                     field("Include Projected quantities"; Rec."Include Projected Quantities")
                     {
                         ToolTip = 'Specifies if "Incoming" quantities (from Purchase Orders, Transfer Orders, Requision Lines...) will be included in the availability calculation. If this field is disabled it will consider actual stocks only.';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(IncomingQuantitiesPeriod)
@@ -620,7 +620,7 @@
                     field("Projected. Qty. within period"; Rec."Projected. Qty. Within Period")
                     {
                         ToolTip = 'Specifies the incoming period (DateTime formula) used for culation of available quantity in the future (from Purchase Orders, Transfer Orders, Requision Lines...).';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

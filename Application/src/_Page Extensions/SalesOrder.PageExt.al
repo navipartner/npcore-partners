@@ -340,7 +340,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         {
             action("NPR TransferOrders")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Promoted = true;
                 PromotedCategory = Category12;
                 Caption = 'Transfer Orders';

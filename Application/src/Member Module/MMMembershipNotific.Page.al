@@ -93,32 +93,32 @@
                 field("Coupon No."; Rec."Coupon No.")
                 {
                     ToolTip = 'Specifies the value of the Coupon No. field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Loyalty Point Setup Id"; Rec."Loyalty Point Setup Id")
                 {
                     ToolTip = 'Specifies the value of the Loyalty Point Setup Id field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
                     ToolTip = 'Specifies the value of the External Member No. field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Card Entry No."; Rec."Member Card Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Member Card Entry No. field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Entry No."; Rec."Member Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Member Entry No. field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Method Source"; Rec."Notification Method Source")
                 {
                     ToolTip = 'Specifies the value of the Notification Method Source field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Filter Value"; Rec."Template Filter Value")
                 {

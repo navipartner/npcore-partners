@@ -171,7 +171,7 @@
                     {
 
                         ToolTip = 'Specifies the value of the Starting Date Formula  field.';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                     field("Ending Date"; Rec."Ending Date")
                     {
@@ -182,7 +182,7 @@
                     field("Ending Date Formula"; Rec."Ending Date DateFormula")
                     {
                         ToolTip = 'Specifies the value of the Ending Date Formula field.';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

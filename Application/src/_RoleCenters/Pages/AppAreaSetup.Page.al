@@ -6,7 +6,7 @@
     SourceTable = "Application Area Setup";
     UsageCategory = Administration;
     AdditionalSearchTerms = 'NaviPartner Setup';
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,22 +17,22 @@
                 field("Company Name"; Rec."Company Name")
                 {
                     ToolTip = 'Specifies the value of the Company Name field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Profile ID"; Rec."Profile ID")
                 {
                     ToolTip = 'Specifies the value of the Profile ID field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
                     ToolTip = 'Specifies the value of the User ID field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Retail"; Rec."NPR Retail")
                 {
                     ToolTip = 'Specifies the value of the NPR Retail field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

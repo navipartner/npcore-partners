@@ -16,22 +16,22 @@
             {
                 field("Shop ID"; Rec."Shop ID")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Shop ID field';
                 }
                 field("Shop User Name"; Rec."Shop User Name")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Shop User Name field';
                 }
                 field("Shop Password"; Rec."Shop Password")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Shop Password field';
                 }
                 field("X Auth Token"; Rec."X Auth Token")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the X Auth Token field';
                 }
             }
@@ -39,12 +39,12 @@
             {
                 field("Minimal Amount"; Rec."Minimal Amount")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Minimal Amount field';
                 }
                 field("Maximal Amount"; Rec."Maximal Amount")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Maximal Amount field';
                 }
             }

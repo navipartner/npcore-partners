@@ -1215,7 +1215,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 ToolTip = 'You will create new or select one of existing Purcase Orders and add Item with all its variants (if Item has them).';
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Image = MakeOrder;
 
                 trigger OnAction();

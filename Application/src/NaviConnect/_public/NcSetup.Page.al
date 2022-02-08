@@ -78,7 +78,7 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+                ApplicationArea = NPRNaviConnect;
                 ToolTip = 'Sets up Job Queue Entry for Task List Processing';
 
                 trigger OnAction()

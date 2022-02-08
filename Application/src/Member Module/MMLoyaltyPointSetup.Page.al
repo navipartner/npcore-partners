@@ -71,7 +71,7 @@
                 field("Notification Code"; Rec."Notification Code")
                 {
                     ToolTip = 'Specifies the value of the Notification Code field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
 
             }
