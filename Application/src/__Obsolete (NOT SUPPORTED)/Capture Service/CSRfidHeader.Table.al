@@ -69,7 +69,6 @@
             Caption = 'Sell-to Customer No.';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = Customer;
         }
         field(19; "Document Type"; Option)
         {
@@ -121,7 +120,6 @@
             Caption = 'Warehouse Receipt No.';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = "Warehouse Receipt Header";
         }
         field(33; "Document Matched"; Boolean)
         {

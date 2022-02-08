@@ -23,7 +23,6 @@
         {
             Caption = 'Unit of Measure';
             DataClassification = CustomerContent;
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
         }
         field(10; Barcode; Text[30])
         {
@@ -40,7 +39,6 @@
         {
             Caption = 'Currency Code';
             DataClassification = CustomerContent;
-            TableRelation = Currency;
         }
         field(17; "Unit Cost incl. VAT"; Decimal)
         {
@@ -71,21 +69,16 @@
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = Location;
         }
         field(50; "Item No."; Code[20])
         {
             Caption = 'Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item."No.";
-
-
         }
         field(51; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
         field(54; "Unit Cost ex. VAT"; Decimal)
         {

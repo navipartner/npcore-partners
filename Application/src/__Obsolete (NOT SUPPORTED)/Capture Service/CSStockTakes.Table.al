@@ -24,7 +24,6 @@
         {
             Caption = 'Location';
             DataClassification = CustomerContent;
-            TableRelation = Location;
         }
         field(12; Created; DateTime)
         {
@@ -145,13 +144,11 @@
         {
             Caption = 'Journal Template Name';
             DataClassification = CustomerContent;
-            TableRelation = "Item Journal Template";
         }
         field(39; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
             DataClassification = CustomerContent;
-            TableRelation = "Item Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
         }
         field(40; "Predicted Qty."; Decimal)
         {

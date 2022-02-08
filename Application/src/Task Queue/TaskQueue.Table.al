@@ -147,8 +147,7 @@
         {
             Caption = 'Assigned To User';
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
             DataClassification = EndUserIdentifiableInformation;
         }

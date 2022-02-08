@@ -53,8 +53,7 @@
             IF ("Sales Document Type" = CONST(RETURN_RECEIPT)) "Return Receipt Header"."No."
             ELSE
             IF ("Sales Document Type" = CONST(SERVICE_ITEM)) "Service Item"."No.";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
     }

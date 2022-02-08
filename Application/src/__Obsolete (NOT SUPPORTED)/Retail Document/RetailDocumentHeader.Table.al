@@ -355,7 +355,6 @@
         field(78; "Country Code"; Code[10])
         {
             Caption = 'Country Code';
-            TableRelation = "Country/Region";
             DataClassification = CustomerContent;
         }
         field(100; "No. Series"; Code[20])
@@ -372,7 +371,6 @@
         field(103; "Vendor Index"; Code[20])
         {
             Caption = 'Vendor Index';
-            TableRelation = Vendor."No.";
             DataClassification = CustomerContent;
         }
         field(104; Status; Option)
@@ -580,7 +578,6 @@
         field(148; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location.Code;
             DataClassification = CustomerContent;
         }
         field(149; "Shortcut Dimension 2 Code"; Code[20])

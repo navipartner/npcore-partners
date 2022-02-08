@@ -256,8 +256,7 @@
             Caption = 'Customer Disc. Group Filter';
             Description = 'NPR5.31';
             TableRelation = "Customer Discount Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
 

@@ -12,7 +12,6 @@
         {
             Caption = 'Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item."No.";
 
 
         }
@@ -20,13 +19,11 @@
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
         field(3; Location; Code[10])
         {
             Caption = 'Location';
             DataClassification = CustomerContent;
-            TableRelation = Location.Code;
         }
         field(4; "Stock-Take Id"; Guid)
         {

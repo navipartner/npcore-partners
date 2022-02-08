@@ -41,8 +41,7 @@
             TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
             ELSE
             IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -57,8 +56,7 @@
             TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
             ELSE
             IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -181,7 +179,6 @@
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "Gen. Business Posting Group";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to dedicated POS Unit Profile';
             ObsoleteTag = 'NPR POS Store -> NPR POS Unit -> NPR POS Posting Profile';
@@ -190,7 +187,6 @@
         {
             Caption = 'Tax Area Code';
             DataClassification = CustomerContent;
-            TableRelation = "Tax Area";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to POS Posting Profile';
             ObsoleteTag = 'POS Store -> POS Posting Profile';
@@ -207,7 +203,6 @@
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "VAT Business Posting Group";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to dedicated POS Unit Profile';
             ObsoleteTag = 'NPR POS Store -> NPR POS Unit -> NPR POS Posting Profile';
@@ -234,7 +229,6 @@
         {
             Caption = 'POS Period Register No. Series';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to dedicated POS Posting Profile';
             ObsoleteTag = 'NPR POS Store -> NPR POS Posting Profile';
@@ -316,7 +310,6 @@
             Caption = 'VAT Customer No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
-            TableRelation = Customer;
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to POS Posting Profile';
             ObsoleteTag = 'POS Store -> POS Posting Profile';

@@ -13,7 +13,6 @@
             Caption = 'Item Category Code';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "Item Category";
         }
         field(20; "Item Group"; Code[10])
         {

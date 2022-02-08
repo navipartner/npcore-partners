@@ -7,7 +7,6 @@ tableextension 6014454 "NPR User Setup" extends "User Setup"
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = "NPR POS Unit";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }

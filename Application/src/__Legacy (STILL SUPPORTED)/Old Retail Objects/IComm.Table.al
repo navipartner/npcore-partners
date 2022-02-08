@@ -69,7 +69,6 @@
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Company';
             Description = 'regnskab til clearing af gavekort og tilgodebeviser';
-            TableRelation = Company;
             DataClassification = CustomerContent;
         }
         field(53; "VirtualPDF Name"; Text[50])
@@ -180,7 +179,6 @@
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Config. Template (Customer)';
             Description = '226819';
-            TableRelation = "Config. Template Header".Code WHERE("Table ID" = CONST(18));
             DataClassification = CustomerContent;
         }
         field(176; "Config. Template (Vendor)"; Code[10])
@@ -189,7 +187,6 @@
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Config. Template (Vendor)';
             Description = '226819';
-            TableRelation = "Config. Template Header".Code WHERE("Table ID" = CONST(23));
             DataClassification = CustomerContent;
         }
         field(177; "Config. Template (Contact)"; Code[10])
@@ -198,7 +195,6 @@
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Config. Template (Contact)';
             Description = '226819';
-            TableRelation = "Config. Template Header".Code WHERE("Table ID" = CONST(5050));
             DataClassification = CustomerContent;
         }
         field(200; "SMS Provider"; Option)

@@ -45,27 +45,17 @@
         {
             Caption = 'No.';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST("G/L")) "G/L Account"."No."
-            ELSE
-            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code
-            ELSE
-            IF (Type = CONST(Customer)) Customer."No."
-            ELSE
-            IF (Type = CONST(Item)) Item."No." WHERE(Blocked = CONST(false));
-            ValidateTableRelation = false;
         }
         field(7; Lokationskode; Code[10])
         {
             Caption = 'Location Code';
             DataClassification = CustomerContent;
-            TableRelation = Location;
         }
         field(8; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group";
         }
         field(9; "Qty. Discount Code"; Code[20])
         {
@@ -81,10 +71,6 @@
         {
             Caption = 'Unit of Measure Code';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item),
-                                "No." = FILTER(<> '')) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
-            "Unit of Measure";
         }
         field(12; Quantity; Decimal)
         {
@@ -190,7 +176,6 @@
         {
             Caption = 'Price Group Code';
             DataClassification = CustomerContent;
-            TableRelation = "Customer Price Group";
         }
         field(42; "Allow Quantity Discount"; Boolean)
         {
@@ -224,7 +209,6 @@
             Caption = 'Invoice to Customer No.';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = Customer;
         }
         field(47; "Invoice Discount Amount"; Decimal)
         {
@@ -237,32 +221,27 @@
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "Gen. Business Posting Group";
         }
         field(49; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "Gen. Product Posting Group";
         }
         field(50; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "VAT Business Posting Group";
         }
         field(51; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "VAT Product Posting Group";
         }
         field(52; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = Currency;
         }
         field(53; "Claim (LCY)"; Decimal)
         {
@@ -288,7 +267,6 @@
         {
             Caption = 'Period Discount code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Period Discount".Code;
         }
         field(59; "Gift voucher ref."; Code[20])
         {
@@ -326,14 +304,12 @@
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
         field(71; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
         field(72; "Offline - Gift voucher ref."; Code[20])
         {
@@ -355,7 +331,6 @@
         {
             Caption = 'Bin Code';
             DataClassification = CustomerContent;
-            TableRelation = Bin;
         }
         field(80; "Special price"; Decimal)
         {
@@ -367,7 +342,6 @@
             Caption = 'Tax Area Code';
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
-            TableRelation = "Tax Area";
         }
         field(86; "Tax Liable"; Boolean)
         {
@@ -380,7 +354,6 @@
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
-            TableRelation = "Tax Group";
         }
         field(88; "Use Tax"; Boolean)
         {
@@ -392,7 +365,6 @@
         {
             Caption = 'Return Reason Code';
             DataClassification = CustomerContent;
-            TableRelation = "Return Reason";
         }
         field(95; "Clustered Key"; Integer)
         {
@@ -418,7 +390,6 @@
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
         }
         field(105; "Allocated No."; Code[10])
         {
@@ -519,14 +490,12 @@
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
-            TableRelation = "Salesperson/Purchaser";
         }
         field(201; "Reversed by Salesperson Code"; Code[20])
         {
             Caption = 'Reversed by Salesperson Code';
             DataClassification = CustomerContent;
             Description = 'Udfyldes med sælgerkoden der tilbagef¢rer bon''en';
-            TableRelation = "Salesperson/Purchaser";
         }
         field(202; "Reverseing Sales Ticket No."; Code[20])
         {
@@ -568,7 +537,6 @@
             Caption = 'Discount Authorised by';
             DataClassification = CustomerContent;
             Description = 'NPR5.39';
-            TableRelation = "Salesperson/Purchaser";
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -738,7 +706,6 @@
         {
             Caption = 'Reason Code';
             DataClassification = CustomerContent;
-            TableRelation = "Reason Code";
         }
         field(6005; "Description 2"; Text[50])
         {

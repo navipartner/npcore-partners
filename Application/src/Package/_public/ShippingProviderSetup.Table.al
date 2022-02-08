@@ -116,7 +116,6 @@ table 6014574 "NPR Shipping Provider Setup"
         field(156; "Package Service Codeunit ID"; Integer)
         {
             Caption = 'Package Service Codeunit ID';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = FILTER(Codeunit));
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
             ObsoleteReason = 'Replaced by enum "Shipping Provider"';

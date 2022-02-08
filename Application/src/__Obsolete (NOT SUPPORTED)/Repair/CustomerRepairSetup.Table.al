@@ -18,7 +18,6 @@
             Caption = 'Customer Repair Management';
             DataClassification = CustomerContent;
             Description = 'nummerstyring til  kunderep.';
-            TableRelation = "No. Series";
         }
         field(20; "Repair Msg."; Boolean)
         {

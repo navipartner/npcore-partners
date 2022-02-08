@@ -71,7 +71,6 @@
             Caption = 'Company ID';
             DataClassification = CustomerContent;
             Description = '#Login Info';
-            TableRelation = Customer;
         }
         field(145; "User Security ID"; Text[100])
         {

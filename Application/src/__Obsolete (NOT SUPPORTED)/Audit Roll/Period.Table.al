@@ -102,7 +102,6 @@
         {
             Caption = 'Sales Ticket No.';
             Editable = false;
-            TableRelation = "NPR POS Entry"."Document No.";
             DataClassification = CustomerContent;
         }
         field(16; "Opening Sales Ticket No."; Code[10])
@@ -297,7 +296,6 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
             DataClassification = CustomerContent;
 
             trigger OnLookup()
@@ -316,7 +314,6 @@
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
             DataClassification = CustomerContent;
 
             trigger OnLookup()
@@ -334,7 +331,6 @@
         field(104; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location.Code;
             DataClassification = CustomerContent;
         }
         field(105; "Money bag no."; Code[20])

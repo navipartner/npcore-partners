@@ -180,7 +180,6 @@
         field(40; "Alt. Import Codeunit"; Integer)
         {
             Caption = 'Alt. import codeunit';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
         }
         field(41; "Import to Server Folder First"; Text[250])

@@ -18,15 +18,11 @@
         {
             Caption = 'Customer No.';
             DataClassification = CustomerContent;
-            TableRelation = Customer;
         }
         field(10; "Account No."; Code[20])
         {
             Caption = 'Account No.';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account" WHERE("Direct Posting" = CONST(true),
-                                                 "Account Type" = CONST(Posting),
-                                                 Blocked = CONST(false));
         }
         field(15; "Source Type"; Option)
         {
@@ -55,7 +51,6 @@
             Caption = 'Dimension Set ID';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = "Dimension Set Entry";
 
             trigger OnLookup()
             begin
@@ -67,7 +62,6 @@
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
 
             trigger OnValidate()
             begin
@@ -79,7 +73,6 @@
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
 
             trigger OnValidate()
             begin

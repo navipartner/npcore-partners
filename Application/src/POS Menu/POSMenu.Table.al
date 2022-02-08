@@ -46,7 +46,6 @@
         {
             Caption = 'POS View Profile';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS View Profile";
             ObsoleteState = Removed;
             ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
@@ -54,7 +53,6 @@
         {
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Unit";
             ObsoleteState = Removed;
             ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
@@ -62,8 +60,6 @@
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
-            TableRelation = "Salesperson/Purchaser".Code;
-            ValidateTableRelation = false;
             ObsoleteState = Removed;
             ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }

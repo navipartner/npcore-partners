@@ -16,10 +16,6 @@
         field(2; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
-            TableRelation = IF ("Customer Type" = CONST(Cash)) Contact
-            ELSE
-            IF ("Customer Type" = CONST(Ordinary)) Customer;
-            ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }
         field(3; Name; Text[100])
@@ -41,7 +37,6 @@
         field(6; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = "Post Code";
             DataClassification = CustomerContent;
         }
         field(7; City; Text[30])
@@ -52,8 +47,6 @@
         field(8; "Invoice To"; Code[20])
         {
             Caption = 'Invoice To';
-            TableRelation = IF ("Customer Type" = CONST(Ordinary)) Customer;
-            ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }
         field(9; "Customer Name"; Text[100])
@@ -74,7 +67,6 @@
         field(12; "Customer Post Code"; Code[20])
         {
             Caption = 'Customer Post Code';
-            TableRelation = "Post Code";
             DataClassification = CustomerContent;
         }
         field(13; "Customer City"; Text[30])
@@ -85,7 +77,6 @@
         field(14; "Repairer No."; Code[20])
         {
             Caption = 'Repairer No.';
-            TableRelation = Vendor;
             DataClassification = CustomerContent;
         }
         field(15; "Repairer Name"; Text[100])
@@ -106,7 +97,6 @@
         field(18; "Repairer Post Code"; Code[20])
         {
             Caption = 'Repairer Post Code';
-            TableRelation = "Post Code";
             DataClassification = CustomerContent;
         }
         field(19; "Repairer City"; Text[30])
@@ -152,7 +142,6 @@
         field(27; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
-            TableRelation = "Salesperson/Purchaser";
             DataClassification = CustomerContent;
         }
         field(28; "Phone No."; Text[30])
@@ -330,7 +319,6 @@
         field(61; Location; Code[10])
         {
             Caption = 'Location';
-            TableRelation = Location.Code;
             DataClassification = CustomerContent;
         }
         field(100; "No. Series"; Code[20])
@@ -389,7 +377,6 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
             DataClassification = CustomerContent;
         }
         field(113; "Register No."; Code[10])
@@ -410,7 +397,6 @@
         field(116; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
             DataClassification = CustomerContent;
         }
         field(117; "Warranty Text"; Text[100])
@@ -466,7 +452,6 @@
         field(170; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            TableRelation = Item."No.";
             DataClassification = CustomerContent;
 
             trigger OnValidate()

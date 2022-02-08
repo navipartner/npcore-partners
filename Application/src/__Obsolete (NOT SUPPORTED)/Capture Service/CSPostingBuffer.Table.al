@@ -33,8 +33,6 @@
             Caption = 'Created By';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = User."User Name";
-            ValidateTableRelation = false;
 
 
         }

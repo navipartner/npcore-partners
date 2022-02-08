@@ -30,8 +30,7 @@
             Caption = 'POS Store Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Store";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(105; "POS Unit No."; Code[10])
@@ -39,8 +38,7 @@
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Unit";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(110; "Document No."; Code[20])
@@ -72,8 +70,7 @@
             IF (Type = CONST(Item)) Item
             ELSE
             IF (Type = CONST(Rounding)) "G/L Account";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(210; "Variant Code"; Code[10])

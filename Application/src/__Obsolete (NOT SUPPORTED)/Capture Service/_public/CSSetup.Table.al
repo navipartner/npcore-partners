@@ -39,7 +39,6 @@
         {
             Caption = 'Price Calc. Customer No.';
             DataClassification = CustomerContent;
-            TableRelation = Customer;
         }
         field(17; "Max Records In Search Result"; Integer)
         {
@@ -80,13 +79,11 @@
         {
             Caption = 'Item Reclass. Jour Temp Name';
             DataClassification = CustomerContent;
-            TableRelation = "Item Journal Template";
         }
         field(25; "Item Reclass. Jour Batch Name"; Code[10])
         {
             Caption = 'Item Reclass. Jour Batch Name';
             DataClassification = CustomerContent;
-            TableRelation = "Item Journal Batch".Name WHERE("Journal Template Name" = FIELD("Item Reclass. Jour Temp Name"));
         }
         field(26; "Create Worksheet after Trans."; Boolean)
         {
@@ -97,13 +94,11 @@
         {
             Caption = 'Phys. Inv Jour Temp Name';
             DataClassification = CustomerContent;
-            TableRelation = "Item Journal Template";
         }
         field(28; "Phys. Inv Jour No. Series"; Code[20])
         {
             Caption = 'Phys. Inv Jour No. Series';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
         }
         field(29; "Sum Qty. to Handle"; Boolean)
         {
@@ -119,7 +114,6 @@
         {
             Caption = 'Job Queue Category Code';
             DataClassification = CustomerContent;
-            TableRelation = "Job Queue Category";
         }
         field(40; "Job Queue Priority for Post"; Integer)
         {

@@ -34,13 +34,11 @@
         {
             Caption = 'Journal Batch Name';
             DataClassification = CustomerContent;
-            TableRelation = "Item Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
         }
         field(13; "Journal Template Name"; Code[10])
         {
             Caption = 'Journal Template Name';
             DataClassification = CustomerContent;
-            TableRelation = "Item Journal Template";
         }
         field(14; "Shelf  No."; Code[10])
         {
@@ -51,7 +49,6 @@
         {
             Caption = 'Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item."No.";
 
 
         }
@@ -59,13 +56,11 @@
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
         field(19; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
             DataClassification = CustomerContent;
-            TableRelation = Location;
         }
         field(20; "Bin Code"; Code[20])
         {

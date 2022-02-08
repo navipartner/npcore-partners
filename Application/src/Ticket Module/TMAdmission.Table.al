@@ -107,7 +107,6 @@
         {
             Caption = 'Dependent Admission Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR TM Admission";
             ObsoleteState = Removed;
             ObsoleteReason = 'Replace by NPR TM Adm. Dependency subtables to handle more complex setup';
         }

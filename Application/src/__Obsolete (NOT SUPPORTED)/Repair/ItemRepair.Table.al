@@ -16,19 +16,11 @@
         {
             Caption = 'Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item;
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(10; Description; Text[100])
         {
@@ -92,110 +84,66 @@
             Caption = 'Variety 1 (Item)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety";
         }
         field(6059971; "Variety 1 Table (Item)"; Code[40])
         {
             Caption = 'Variety 1 Table (Item)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 1 (Item)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059972; "Variety 1 Value (Var) (NEW)"; Code[20])
         {
             Caption = 'Variety 1 Value (Var) (NEW)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = IF ("Variety 1 (Var)" = FILTER(<> '')) "NPR Variety Value".Value WHERE(Type = FIELD("Variety 1 (Var)"),
-                                                                                             Table = FIELD("Variety 1 Table (Var)"))
-            ELSE
-            IF ("Variety 1 (Item)" = FILTER(<> '')) "NPR Variety Value".Value WHERE(Type = FIELD("Variety 1 (Item)"),
-                                                                                                                                                                    Table = FIELD("Variety 1 Table (Item)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059973; "Variety 2 (Item)"; Code[10])
         {
             Caption = 'Variety 2 (Item)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety";
         }
         field(6059974; "Variety 2 Table (Item)"; Code[40])
         {
             Caption = 'Variety 2 Table (Item)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 2 (Item)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059975; "Variety 2 Value (Var) (NEW)"; Code[20])
         {
             Caption = 'Variety 2 Value (Var) (NEW)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = IF ("Variety 2 (Var)" = FILTER(<> '')) "NPR Variety Value".Value WHERE(Type = FIELD("Variety 2 (Var)"),
-                                                                                             Table = FIELD("Variety 2 Table (Var)"))
-            ELSE
-            IF ("Variety 2 (Item)" = FILTER(<> '')) "NPR Variety Value".Value WHERE(Type = FIELD("Variety 2 (Item)"),
-                                                                                                                                                                    Table = FIELD("Variety 2 Table (Item)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059976; "Variety 3 (Item)"; Code[10])
         {
             Caption = 'Variety 3 (Item)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety";
         }
         field(6059977; "Variety 3 Table (Item)"; Code[40])
         {
             Caption = 'Variety 3 Table (Item)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 3 (Item)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059978; "Variety 3 Value (Var) (NEW)"; Code[20])
         {
             Caption = 'Variety 3 Value (Var) (NEW)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = IF ("Variety 3 (Var)" = FILTER(<> '')) "NPR Variety Value".Value WHERE(Type = FIELD("Variety 3 (Var)"),
-                                                                                             Table = FIELD("Variety 3 Table (Var)"))
-            ELSE
-            IF ("Variety 3 (Item)" = FILTER(<> '')) "NPR Variety Value".Value WHERE(Type = FIELD("Variety 3 (Item)"),
-                                                                                                                                                                    Table = FIELD("Variety 3 Table (Item)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059979; "Variety 4 (Item)"; Code[10])
         {
             Caption = 'Variety 4 (Item)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety";
         }
         field(6059980; "Variety 4 Table (Item)"; Code[40])
         {
             Caption = 'Variety 4 Table (Item)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 4 (Item)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059981; "Cross Variety No."; Option)
         {
@@ -210,132 +158,83 @@
             Caption = 'Variety Group';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Group";
         }
         field(6059983; "Variety 4 Value (Var) (NEW)"; Code[20])
         {
             Caption = 'Variety 4 Value (Var) (NEW)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = IF ("Variety 4 (Var)" = FILTER(<> '')) "NPR Variety Value".Value WHERE(Type = FIELD("Variety 4 (Var)"),
-                                                                                             Table = FIELD("Variety 4 Table (Var)"))
-            ELSE
-            IF ("Variety 4 (Item)" = FILTER(<> '')) "NPR Variety Value".Value WHERE(Type = FIELD("Variety 4 (Item)"),
-                                                                                                                                                                    Table = FIELD("Variety 4 Table (Item)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059990; "Variety 1 (Var)"; Code[10])
         {
             Caption = 'Variety 1 (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety";
         }
         field(6059991; "Variety 1 Table (Var)"; Code[40])
         {
             Caption = 'Variety 1 Table (Var)';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 1 (Var)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059992; "Variety 1 Value (Var)"; Code[20])
         {
             Caption = 'Variety 1 Value (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Value".Value WHERE(Type = FIELD("Variety 1 (Var)"),
-                                                         Table = FIELD("Variety 1 Table (Var)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059993; "Variety 2 (Var)"; Code[10])
         {
             Caption = 'Variety 2 (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety";
         }
         field(6059994; "Variety 2 Table (Var)"; Code[40])
         {
             Caption = 'Variety 2 Table (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 2 (Var)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059995; "Variety 2 Value (Var)"; Code[20])
         {
             Caption = 'Variety 2 Value (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Value".Value WHERE(Type = FIELD("Variety 2 (Var)"),
-                                                         Table = FIELD("Variety 2 Table (Var)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059996; "Variety 3 (Var)"; Code[10])
         {
             Caption = 'Variety 3 (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety";
         }
         field(6059997; "Variety 3 Table (Var)"; Code[40])
         {
             Caption = 'Variety 3 Table (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 3 (Var)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059998; "Variety 3 Value (Var)"; Code[20])
         {
             Caption = 'Variety 3 Value (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Value".Value WHERE(Type = FIELD("Variety 3 (Var)"),
-                                                         Table = FIELD("Variety 3 Table (Var)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6059999; "Variety 4 (Var)"; Code[10])
         {
             Caption = 'Variety 4 (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety";
         }
         field(6060000; "Variety 4 Table (Var)"; Code[40])
         {
             Caption = 'Variety 4 Table (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 4 (Var)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6060001; "Variety 4 Value (Var)"; Code[20])
         {
             Caption = 'Variety 4 Value (Var)';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
-            TableRelation = "NPR Variety Value".Value WHERE(Type = FIELD("Variety 4 (Var)"),
-                                                         Table = FIELD("Variety 4 Table (Var)"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(6060002; "Blocked (Var)"; Boolean)
         {

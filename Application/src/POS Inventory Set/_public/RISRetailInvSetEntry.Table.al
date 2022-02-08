@@ -23,8 +23,7 @@
             DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Company;
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(15; "Location Filter"; Text[100])

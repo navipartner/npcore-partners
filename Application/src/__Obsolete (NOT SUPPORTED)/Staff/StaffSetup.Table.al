@@ -26,7 +26,6 @@
         {
             Caption = 'Staff Disc. Group';
             DataClassification = CustomerContent;
-            TableRelation = "Customer Discount Group";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }
@@ -34,7 +33,6 @@
         {
             Caption = 'Staff Price Group';
             DataClassification = CustomerContent;
-            TableRelation = "Customer Price Group";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }

@@ -23,7 +23,6 @@ tableextension 6014447 "NPR Value Entry" extends "Value Entry"
             Caption = 'Vendor No.';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = Vendor;
             ObsoleteState = Removed;
             ObsoleteReason = 'Auxiliary table will be used instead ("NPR Aux. Value Entry").';
         }
@@ -58,7 +57,6 @@ tableextension 6014447 "NPR Value Entry" extends "Value Entry"
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = "Salesperson/Purchaser";
             ObsoleteState = Removed;
             ObsoleteReason = 'Auxiliary table will be used instead ("NPR Aux. Value Entry").';
         }
