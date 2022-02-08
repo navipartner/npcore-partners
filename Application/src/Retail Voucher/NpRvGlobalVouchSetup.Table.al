@@ -19,8 +19,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.49';
             TableRelation = Company;
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnValidate()

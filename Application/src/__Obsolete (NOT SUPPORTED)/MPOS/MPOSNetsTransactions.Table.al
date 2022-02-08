@@ -49,7 +49,6 @@
         {
             Caption = 'Currency Code';
             DataClassification = CustomerContent;
-            TableRelation = Currency;
         }
         field(17; "Created Date"; DateTime)
         {
@@ -279,7 +278,6 @@
         {
             Caption = 'EFT Transaction Entry No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR EFT Transaction Request";
         }
     }
 

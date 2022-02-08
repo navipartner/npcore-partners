@@ -942,8 +942,7 @@
             Caption = 'Item Disc. Group';
             TableRelation = IF (Type = CONST(Item),
                                 "No." = FILTER(<> '')) "Item Discount Group" WHERE(Code = FIELD("Item Disc. Group"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }

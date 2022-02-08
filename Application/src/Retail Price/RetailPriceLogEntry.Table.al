@@ -34,8 +34,7 @@
             Caption = 'User ID';
             TableRelation = User."User Name";
             DataClassification = EndUserIdentifiableInformation;
-            //This property is currently not supported
-            //TestTableRelation = false;
+
         }
         field(20; "Change Log Entry No."; BigInteger)
         {

@@ -47,7 +47,6 @@
             Caption = 'Item Part No.';
             DataClassification = CustomerContent;
             Description = 'NPR70.00.01.01';
-            TableRelation = Item;
         }
         field(7; Quantity; Decimal)
         {
@@ -79,7 +78,6 @@
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
             Description = 'NPR5.26';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item Part No."));
         }
         field(21; "Unit Price Excl. VAT"; Decimal)
         {
@@ -119,13 +117,11 @@
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "VAT Business Posting Group";
         }
         field(42; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "VAT Product Posting Group";
         }
         field(43; "VAT Identifier"; Code[20])
         {

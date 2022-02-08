@@ -19,8 +19,7 @@
             Caption = 'Task Entry No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR Nc Task";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(10; Data; BLOB)

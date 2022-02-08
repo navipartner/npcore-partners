@@ -23,7 +23,6 @@
         {
             Caption = 'POS Entry No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Entry";
         }
         field(4; "Line Type"; Option)
         {
@@ -63,7 +62,6 @@
         {
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Unit";
         }
         field(30; "Item Entry Posted By"; Option)
         {

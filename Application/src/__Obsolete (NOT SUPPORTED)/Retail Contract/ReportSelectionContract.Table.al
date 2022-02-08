@@ -25,7 +25,6 @@
         field(3; "Report ID"; Integer)
         {
             Caption = 'Report ID';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
             DataClassification = CustomerContent;
         }
         field(4; "Report Name"; Text[30])
@@ -39,7 +38,6 @@
         field(5; "XML Port ID"; Integer)
         {
             Caption = 'XML Port ID';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(XMLport));
             DataClassification = CustomerContent;
         }
         field(6; "XML Port Name"; Text[30])
@@ -53,13 +51,11 @@
         field(7; "Register No."; Code[10])
         {
             Caption = 'POS Unit No.';
-            TableRelation = "NPR POS Unit";
             DataClassification = CustomerContent;
         }
         field(8; "Codeunit ID"; Integer)
         {
             Caption = 'Codeunit ID';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
         }
         field(9; "Codeunit Name"; Text[30])
@@ -73,7 +69,6 @@
         field(11; "Print Template"; Code[20])
         {
             Caption = 'Print Template';
-            TableRelation = "NPR RP Template Header".Code;
             DataClassification = CustomerContent;
         }
     }

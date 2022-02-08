@@ -37,7 +37,6 @@
         {
             Caption = 'G/L Account';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account";
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -69,7 +68,6 @@
         {
             Caption = 'Cost Account';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account";
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -129,7 +127,6 @@
         {
             Caption = 'Customer';
             DataClassification = CustomerContent;
-            TableRelation = Customer;
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -250,7 +247,6 @@
         {
             Caption = 'Salesperson filter';
             FieldClass = FlowFilter;
-            TableRelation = "Salesperson/Purchaser".Code;
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -296,7 +292,6 @@
         {
             Caption = 'Bank';
             DataClassification = CustomerContent;
-            TableRelation = "Bank Account"."No.";
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -306,7 +301,6 @@
             Caption = 'Fee';
             DataClassification = CustomerContent;
             Description = 'Deprecated';
-            TableRelation = "G/L Account";
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -334,7 +328,6 @@
             Caption = 'Fee item';
             DataClassification = CustomerContent;
             Description = 'Deprecated';
-            TableRelation = Item;
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -407,7 +400,6 @@
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension Code 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -417,7 +409,6 @@
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension Code 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -427,7 +418,6 @@
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
-            TableRelation = Location;
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -452,7 +442,6 @@
         {
             Caption = 'Day Clearing Account';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account";
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
@@ -616,7 +605,6 @@
             CaptionClass = '1,1,1';
             Caption = 'Only used by Global Dimension 1';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
@@ -626,7 +614,6 @@
             CaptionClass = '1,1,2';
             Caption = 'Only used by Global Dimension 2';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
@@ -644,7 +631,6 @@
         {
             Caption = 'Payment Method Code';
             DataClassification = CustomerContent;
-            TableRelation = "Payment Method";
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
@@ -664,7 +650,6 @@
             Caption = 'Validation Codeunit';
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit when a Sale Line POS with type payment is being inserted.';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type - Integration cleanup';
         }
@@ -673,7 +658,6 @@
             Caption = 'On Sale End Codeunit';
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit before a sale is finished. Can interrupt the end of a sale.';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type - Integration cleanup';
         }
@@ -682,7 +666,6 @@
             Caption = 'Post Processing Codeunit';
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit when a sale is finished eg. transferred to the auditroll.';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type - Integration cleanup';
         }
@@ -716,7 +699,6 @@
         {
             Caption = 'Surcharge Service Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item WHERE(Type = CONST(Service));
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
@@ -725,7 +707,6 @@
         {
             Caption = 'Tip Service Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item WHERE(Type = CONST(Service));
             ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';

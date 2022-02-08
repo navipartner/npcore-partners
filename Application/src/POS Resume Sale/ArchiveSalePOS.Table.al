@@ -52,8 +52,7 @@
             TableRelation = IF ("Customer Type" = CONST(Ord)) Customer."No."
             ELSE
             IF ("Customer Type" = CONST(Cash)) Contact."No.";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }

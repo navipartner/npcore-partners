@@ -166,7 +166,6 @@
             Caption = 'POS Posting Profile';
             DataClassification = CustomerContent;
             Description = 'NPR5.52';
-            TableRelation = "NPR POS Posting Profile";
             NotBlank = true;
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to POS Store';

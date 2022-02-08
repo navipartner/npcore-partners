@@ -26,8 +26,7 @@
             Caption = 'Name';
             DataClassification = CustomerContent;
             TableRelation = Company;
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnValidate()

@@ -59,7 +59,6 @@
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
             ObsoleteReason = 'Replaced with table 6150674 "NPR NPRE Assigned Flow Status"';
-            TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
         }
         field(41; "Meal Flow Description"; Text[50])
         {

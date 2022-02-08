@@ -40,19 +40,16 @@
         {
             Caption = 'Journal Template Name';
             DataClassification = CustomerContent;
-            TableRelation = "Item Journal Template";
         }
         field(13; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
             DataClassification = CustomerContent;
-            TableRelation = "Item Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
         }
         field(14; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
             DataClassification = CustomerContent;
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
         }
         field(21; "No."; Code[20])
         {
@@ -65,7 +62,6 @@
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = Location;
         }
         field(23; "Shelf No."; Code[10])
         {

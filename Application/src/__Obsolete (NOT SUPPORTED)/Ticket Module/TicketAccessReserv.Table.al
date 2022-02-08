@@ -38,7 +38,6 @@
         {
             Caption = 'Customer No.';
             DataClassification = CustomerContent;
-            TableRelation = Customer;
         }
         field(21; "Member Card Code"; Code[10])
         {

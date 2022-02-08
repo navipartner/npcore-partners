@@ -11,13 +11,11 @@
         field(1; "Payment No."; Code[10])
         {
             Caption = 'Payment Type';
-            TableRelation = "NPR POS Payment Method".Code;
             DataClassification = CustomerContent;
         }
         field(2; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
-            TableRelation = IF ("Payment No." = CONST('<>''')) "NPR POS Unit"."No.";
             DataClassification = CustomerContent;
         }
         field(3; Weight; Decimal)

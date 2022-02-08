@@ -12,8 +12,7 @@
             DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "NPR NpXml Template";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(5; Name; Text[250])

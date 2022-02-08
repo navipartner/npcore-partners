@@ -21,7 +21,6 @@
         {
             Caption = 'Default POS Entry No. Series';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'It''s not used anywhere';
         }
@@ -132,7 +131,6 @@
         {
             Caption = 'POS Payment Bin';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Payment Bin";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to POS Unit';
             ObsoleteTag = 'POS Posting Profile -> POS Unit';

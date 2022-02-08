@@ -39,7 +39,6 @@
         {
             Caption = 'Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item."No.";
 
             trigger OnValidate()
             begin
@@ -50,7 +49,6 @@
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
         field(100; "Table No."; Integer)
         {

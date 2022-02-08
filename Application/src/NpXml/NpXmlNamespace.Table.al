@@ -12,8 +12,7 @@
             DataClassification = CustomerContent;
             Description = 'MAG2.00';
             TableRelation = "NPR NpXml Template";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(5; Alias; Text[50])

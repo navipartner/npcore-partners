@@ -30,7 +30,6 @@
         {
             Caption = 'Default POS Unit No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Unit";
         }
         field(25; Description; Text[80])
         {

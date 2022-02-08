@@ -36,7 +36,6 @@
             Caption = 'Gift Voucher Account';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "G/L Account"."No.";
             ObsoleteState = Removed;
             ObsoleteReason = 'Gift voucher won''t be used anymore';
             ObsoleteTag = 'NPR Gift Voucher';
@@ -45,7 +44,6 @@
         {
             Caption = 'Credit Voucher Account';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account";
             ObsoleteState = Removed;
             ObsoleteReason = 'Credit voucher won''t be used anymore';
             ObsoleteTag = 'NPR Credit Voucher';
@@ -75,7 +73,6 @@
             Caption = 'Gift Voucher Discount Account';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "G/L Account"."No.";
             ObsoleteState = Removed;
             ObsoleteReason = 'Gift voucher won''t be used anymore';
             ObsoleteTag = 'NPR Gift Voucher';

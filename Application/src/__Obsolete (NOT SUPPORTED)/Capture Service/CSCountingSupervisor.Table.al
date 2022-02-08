@@ -15,8 +15,6 @@
         {
             Caption = 'User ID';
             NotBlank = true;
-            TableRelation = User."User Name";
-            ValidateTableRelation = false;
             DataClassification = EndUserIdentifiableInformation;
 
             trigger OnValidate()
