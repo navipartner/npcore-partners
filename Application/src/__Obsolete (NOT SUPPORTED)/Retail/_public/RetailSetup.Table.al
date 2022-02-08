@@ -82,7 +82,6 @@
             Caption = 'Posting Source Code';
             DataClassification = CustomerContent;
             Description = 'Kildespor til bogf¢ring';
-            TableRelation = "Source Code";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore. "NPR NP Retail Setup"."Source Code" used instead.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -92,7 +91,6 @@
             Caption = 'Posting No. Management';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til kassebogf¢ring';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -102,7 +100,6 @@
             Caption = 'Used Goods No. Management';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til brugtvarer';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -112,7 +109,6 @@
             Caption = 'Internal EAN No. Management';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til EAN numre';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Variety Setup"."Internal EAN No. Series".';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -122,7 +118,6 @@
             Caption = 'Credit Voucher No. Management';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til tilgodebevis';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Credit voucher won''t be used anymore';
             ObsoleteTag = 'NPR Credit Voucher';
@@ -132,7 +127,6 @@
             Caption = 'Gift Voucher No. Management';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til gavekort';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Gift voucher won''t be used anymore';
             ObsoleteTag = 'NPR Gift Voucher';
@@ -142,7 +136,6 @@
             Caption = 'External EAN-No. Management';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til eksterne EAN numre';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Variety Setup"."External EAN No. Series';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -325,7 +318,6 @@
             DataClassification = CustomerContent;
             Description = 'nummerstyring til variation';
             InitValue = '0';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -335,7 +327,6 @@
             Caption = 'Mixed Discount No. Management';
             DataClassification = CustomerContent;
             Description = 'nummerstyring til miksrabat';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Discount Priority"."Discount No. Series';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -345,7 +336,6 @@
             Caption = 'Period Discount No. Management';
             DataClassification = CustomerContent;
             Description = 'nummerstyring til perioderabat';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Discount Priority"."Discount No. Series';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -355,7 +345,6 @@
             Caption = 'Customer Repair Management';
             DataClassification = CustomerContent;
             Description = 'nummerstyring til  kunderep.';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Retail Customer Repair Setup"."Customer Repair No. Series"';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -365,7 +354,6 @@
             Caption = 'Quantity Discount Nos.';
             DataClassification = CustomerContent;
             Description = 'Nummerstyring til flerstyksprishoveder';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Discount Priority"."Discount No. Series';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -395,7 +383,6 @@
             Caption = 'Selection Nos.';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til udlejning';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -405,7 +392,6 @@
             Caption = 'Order No.';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til bestilling';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -415,7 +401,6 @@
             Caption = 'Rental Contract Nos.';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til udk¢rsel';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -425,7 +410,6 @@
             Caption = 'Purchase Contract Nos.';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til udk¢rsel';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -435,7 +419,6 @@
             Caption = 'Customization Nos.';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til udk¢rsel';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -445,7 +428,6 @@
             Caption = 'Quote Nos.';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til udk¢rsel';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -455,7 +437,6 @@
             Caption = 'Exchange Label Nos.';
             DataClassification = CustomerContent;
             Description = 'Nummerserie Til Bytte Mærker';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore, moved to "NPR Exchange Label Setup".';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -465,7 +446,6 @@
             Caption = 'Variant Std. No. Serie';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til 10-code variantkode (ikke EAN)';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Variety Setup"."EAN-External';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -830,7 +810,6 @@
             Caption = 'Cash Cust. No. Series';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til kontantkunder';
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1116,7 +1095,6 @@
             Caption = 'Cash Customer Deposit Rel.';
             DataClassification = CustomerContent;
             Description = 'Depositumsrelation for e.g. bestilling til kontantkunder';
-            TableRelation = Customer;
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1166,7 +1144,6 @@
             Caption = 'Journal Type';
             DataClassification = CustomerContent;
             Description = 'Kladdetype for bogf¢ring';
-            TableRelation = "Gen. Journal Template".Name;
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1326,7 +1303,6 @@
         {
             Caption = 'Foreign Gift Voucher No. Series';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Gift voucher won''t be used anymore';
             ObsoleteTag = 'NPR Gift Voucher';
@@ -1335,7 +1311,6 @@
         {
             Caption = 'Foreign Credit Voucher No. Series';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Credit voucher won''t be used anymore';
             ObsoleteTag = 'NPR Credit Voucher';
@@ -1394,7 +1369,6 @@
         {
             Caption = 'Internal Departement Code';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1448,7 +1422,6 @@
             Caption = 'Stat. Dimension';
             DataClassification = CustomerContent;
             Description = 'Dimension som bruges til statistik';
-            TableRelation = Dimension;
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1528,7 +1501,6 @@
         {
             Caption = 'Credit Voucher No. Management';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore, moved to "NPR NP Retail Setup"."Retail Journal No. Series"';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1595,7 +1567,6 @@
         {
             Caption = 'Staff Disc. Group';
             DataClassification = CustomerContent;
-            TableRelation = "Customer Discount Group";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Staff Setup".';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1604,7 +1575,6 @@
         {
             Caption = 'Staff Price Group';
             DataClassification = CustomerContent;
-            TableRelation = "Customer Price Group";
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Staff Setup".';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1630,7 +1600,6 @@
         {
             Caption = 'Staff SalesPrice Calc Codeunit';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Staff Setup".';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1667,7 +1636,6 @@
         {
             Caption = 'Reason Code No. Series';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1721,7 +1689,6 @@
             Caption = 'Customer Config. Template';
             DataClassification = CustomerContent;
             Description = 'NPR5.30';
-            TableRelation = "Config. Template Header";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';

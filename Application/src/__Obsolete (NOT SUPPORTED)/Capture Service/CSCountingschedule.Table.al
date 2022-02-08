@@ -15,7 +15,6 @@
             Caption = 'POS Store';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR POS Store";
         }
         field(10; "Earliest Start Date/Time"; DateTime)
         {

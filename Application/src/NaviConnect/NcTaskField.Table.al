@@ -46,8 +46,7 @@
             DataClassification = CustomerContent;
             Description = 'NC1.07';
             TableRelation = "NPR Nc Task";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(1000; "Task Exists"; Boolean)

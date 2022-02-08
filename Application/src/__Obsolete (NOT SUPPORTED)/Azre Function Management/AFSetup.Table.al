@@ -148,7 +148,6 @@
         {
             Caption = 'Msg Service - Report ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
 
             trigger OnValidate()
             begin

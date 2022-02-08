@@ -56,7 +56,6 @@
         {
             Caption = 'Account No.';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account" where("Direct Posting" = const(true), "Account Type" = const(Posting), Blocked = const(false));
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }
@@ -180,7 +179,6 @@
             CaptionClass = '1,1,1';
             Caption = 'Only used by Global Dimension 1';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }
@@ -189,7 +187,6 @@
             CaptionClass = '1,1,2';
             Caption = 'Only used by Global Dimension 2';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }
@@ -203,7 +200,6 @@
         {
             Caption = 'Payment Method Code';
             DataClassification = CustomerContent;
-            TableRelation = "Payment Method";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }

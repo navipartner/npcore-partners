@@ -68,8 +68,7 @@
             Caption = 'E-mail Template (Pending)';
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -91,8 +90,7 @@
             Caption = 'E-mail Template (Confirmed)';
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -114,8 +112,7 @@
             Caption = 'E-mail Template (Rejected)';
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -137,8 +134,7 @@
             Caption = 'E-mail Template (Expired)';
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -165,8 +161,7 @@
             Caption = 'Sms Template (Pending)';
             DataClassification = CustomerContent;
             TableRelation = "NPR SMS Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -188,8 +183,7 @@
             Caption = 'Sms Template (Confirmed)';
             DataClassification = CustomerContent;
             TableRelation = "NPR SMS Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -211,8 +205,7 @@
             Caption = 'Sms Template (Rejected)';
             DataClassification = CustomerContent;
             TableRelation = "NPR SMS Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -234,8 +227,7 @@
             Caption = 'Sms Template (Expired)';
             DataClassification = CustomerContent;
             TableRelation = "NPR SMS Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -258,8 +250,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
             TableRelation = "NPR RP Template Header" WHERE("Table ID" = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -281,8 +272,7 @@
             Caption = 'Delivery Print Template (POS)';
             DataClassification = CustomerContent;
             TableRelation = "NPR RP Template Header" WHERE("Table ID" = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -304,8 +294,7 @@
             Caption = 'Delivery Template (Sales Document)';
             DataClassification = CustomerContent;
             TableRelation = "NPR RP Template Header" WHERE("Table ID" = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -334,8 +323,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -358,8 +346,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -388,8 +375,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             TableRelation = "NPR SMS Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -412,8 +398,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             TableRelation = "NPR SMS Template Header".Code WHERE("Table No." = CONST(6151198));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnLookup()

@@ -24,7 +24,6 @@
         {
             Caption = 'Card No. Series';
             Description = 'Nummerserie til point kort';
-            TableRelation = "No. Series";
             DataClassification = CustomerContent;
         }
         field(4; "EAN Prefix"; Code[10])
@@ -55,13 +54,11 @@
         field(20; "Payment Method Code"; Code[20])
         {
             Caption = 'Payment Method Code';
-            TableRelation = "Payment Method";
             DataClassification = CustomerContent;
         }
         field(25; "Point Account"; Code[20])
         {
             Caption = 'Point Account';
-            TableRelation = "G/L Account";
             DataClassification = CustomerContent;
         }
         field(30; "Post Point Earnings"; Boolean)
@@ -78,7 +75,6 @@
         field(55; "Customer Template"; Code[20])
         {
             Caption = 'Customer Template';
-            TableRelation = "Customer Templ.";
             DataClassification = CustomerContent;
         }
         field(60; "Member Name Required"; Boolean)
@@ -106,25 +102,21 @@
         field(100; "Sync Points To Company"; Text[50])
         {
             Caption = 'Sync Points To Company';
-            TableRelation = Company;
             DataClassification = CustomerContent;
         }
         field(101; "Sync Cards To Company"; Text[50])
         {
             Caption = 'Sync Cards To Company';
-            TableRelation = Company;
             DataClassification = CustomerContent;
         }
         field(102; "Sync Loyalty Cust. To Company"; Text[50])
         {
             Caption = 'Sync Loyalty Cust. To Company';
-            TableRelation = Company;
             DataClassification = CustomerContent;
         }
         field(200; "Card Action 1 Codeunit"; Integer)
         {
             Caption = 'Card Action 1 Codeunit';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
         }
         field(201; "Card Action 1 Parameter"; Code[20])
@@ -140,7 +132,6 @@
         field(203; "Card Action 2 Codeunit"; Integer)
         {
             Caption = 'Card Action 2 Codeunit';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
         }
         field(204; "Card Action 2 Parameter"; Code[20])
@@ -156,7 +147,6 @@
         field(206; "Card Action 3 Codeunit"; Integer)
         {
             Caption = 'Card Action 3 Codeunit';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
         }
         field(207; "Card Action 3 Parameter"; Code[20])

@@ -80,7 +80,6 @@
         {
             Caption = 'Location Code';
             DataClassification = CustomerContent;
-            TableRelation = Location.Code;
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register -> NPR POS Store';
@@ -98,7 +97,6 @@
             Caption = 'Account';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "G/L Account"."No.";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register';
@@ -108,7 +106,6 @@
             Caption = 'Gift Voucher Account';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "G/L Account"."No.";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register';
@@ -117,7 +114,6 @@
         {
             Caption = 'Credit Voucher Account';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register';
@@ -126,7 +122,6 @@
         {
             Caption = 'Difference Account';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register -> NPR POS Posting Profile';
@@ -143,7 +138,6 @@
         {
             Caption = 'Difference Account - Neg.';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register -> NPR POS Posting Profile';
@@ -153,7 +147,6 @@
             Caption = 'Gift Voucher Discount Account';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "G/L Account"."No.";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register';
@@ -162,7 +155,6 @@
         {
             Caption = 'Gen. Business Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "Gen. Business Posting Group";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register to NPR POS Store';
@@ -171,7 +163,6 @@
         {
             Caption = 'VAT Gen. Business Posting Group (Price)';
             DataClassification = CustomerContent;
-            TableRelation = "VAT Business Posting Group";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register to NPR POS Store';
@@ -196,7 +187,6 @@
         {
             Caption = 'Register Change Account';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account"."No.";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
@@ -205,7 +195,6 @@
         {
             Caption = 'City gift voucher account';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
@@ -214,7 +203,6 @@
         {
             Caption = 'City Gift Voucher Discount';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
@@ -264,7 +252,6 @@
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
@@ -274,7 +261,6 @@
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
@@ -390,8 +376,6 @@
         {
             Caption = 'Post Code';
             DataClassification = CustomerContent;
-            TableRelation = "Post Code";
-            ValidateTableRelation = false;
             ObsoleteState = Pending;
             ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
             ObsoleteTag = 'NPR Register -> NPR POS Store';
@@ -602,7 +586,6 @@
             CaptionClass = '1,2,1';
             Caption = 'Global Dimension 1 Code';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
         field(317; "Global Dimension 2 Code"; Code[20])
         {
@@ -612,14 +595,12 @@
             CaptionClass = '1,2,2';
             Caption = 'Global Dimension 2 Code';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
         field(325; "Customer Disc. Group"; Code[20])
         {
             Caption = 'Customer Disc. Group';
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
-            TableRelation = "Customer Discount Group";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register -> NPR POS Unit -> NPR POS Pricing Profile';
@@ -628,7 +609,6 @@
         {
             Caption = 'Item price group';
             DataClassification = CustomerContent;
-            TableRelation = "Customer Price Group";
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register -> NPR POS Unit -> NPR POS Pricing Profile';
@@ -885,7 +865,6 @@
             Caption = 'VAT Customer No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
-            TableRelation = Customer;
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
@@ -964,7 +943,6 @@
             Caption = 'Active Event No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.52 [368673]';
-            TableRelation = Job WHERE("NPR Event" = CONST(true));
             ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register -> NPR POS Unit';

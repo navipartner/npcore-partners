@@ -19,7 +19,6 @@
             Caption = 'Endpoint Code';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Nc Endpoint";
         }
         field(1000; "Endpoint Type"; Code[20])
         {
@@ -27,8 +26,6 @@
             Caption = 'Endpoint Type';
             Editable = false;
             FieldClass = FlowField;
-            TableRelation = "NPR Nc Endpoint Type";
-            ValidateTableRelation = false;
         }
         field(1005; Description; Text[50])
         {

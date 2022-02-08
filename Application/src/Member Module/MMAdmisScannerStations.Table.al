@@ -12,8 +12,7 @@
             Caption = 'Scanner Station Id';
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Admis. Service Entry"."Scanner Station Id";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(10; "Guest Avatar"; BLOB)

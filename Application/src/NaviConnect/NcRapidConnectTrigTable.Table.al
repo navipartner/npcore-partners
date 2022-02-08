@@ -19,7 +19,6 @@
             Caption = 'Table ID';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
         }
         field(10; "Table Name"; Text[30])
         {
@@ -52,7 +51,6 @@
             Caption = 'Package Code';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = "Config. Package";
         }
         field(1005; "Export Enabled"; Boolean)
         {
@@ -65,7 +63,6 @@
             Caption = 'Task Processor Code';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = "NPR Nc Task Processor";
         }
         field(1015; "Trigger Fields"; Integer)
         {

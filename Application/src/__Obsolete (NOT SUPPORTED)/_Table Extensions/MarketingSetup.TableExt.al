@@ -63,7 +63,6 @@ tableextension 6014438 "NPR Marketing Setup" extends "Marketing Setup"
             Caption = 'Interaction Log Opens';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = "Interaction Template";
             ObsoleteState = Removed;
             ObsoleteReason = 'Work Item 3296 - Job 451159';
         }
@@ -72,7 +71,6 @@ tableextension 6014438 "NPR Marketing Setup" extends "Marketing Setup"
             Caption = 'Interaction Log Bounces';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = "Interaction Template";
             ObsoleteState = Removed;
             ObsoleteReason = 'Work Item 3296 - Job 451159';
         }
@@ -81,7 +79,6 @@ tableextension 6014438 "NPR Marketing Setup" extends "Marketing Setup"
             Caption = 'Interaction Log Clicks';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = "Interaction Template";
             ObsoleteState = Removed;
             ObsoleteReason = 'Work Item 3296 - Job 451159';
         }
@@ -90,7 +87,6 @@ tableextension 6014438 "NPR Marketing Setup" extends "Marketing Setup"
             Caption = 'Interaction Log Unsubscribes';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = "Interaction Template";
             ObsoleteState = Removed;
             ObsoleteReason = 'Work Item 3296 - Job 451159';
         }

@@ -41,7 +41,6 @@ tableextension 6014431 "NPR Item Ledger Entry" extends "Item Ledger Entry"
             Caption = 'Vendor No.';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = Vendor;
             ObsoleteState = Removed;
             ObsoleteReason = 'Using auxiliary table ("NPR Aux. Item Ledger Entry").';
         }
@@ -58,10 +57,6 @@ tableextension 6014431 "NPR Item Ledger Entry" extends "Item Ledger Entry"
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = "Salesperson/Purchaser";
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
             ObsoleteState = Removed;
             ObsoleteReason = 'Using auxiliary table ("NPR Aux. Item Ledger Entry").';
         }

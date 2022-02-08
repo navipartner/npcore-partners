@@ -20,15 +20,11 @@
         {
             Caption = 'Cross-Reference Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item."No.";
-
-
         }
         field(12; "Cross-Reference Variant Code"; Code[10])
         {
             Caption = 'Cross-Reference Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Cross-Reference Item No."));
         }
         field(15; "Item Group Code"; Code[10])
         {
@@ -55,7 +51,6 @@
         {
             Caption = 'Cross-Reference UoM';
             DataClassification = CustomerContent;
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Cross-Reference Item No."));
         }
         field(21; "Cross-Reference Description"; Text[50])
         {
@@ -71,7 +66,6 @@
         {
             Caption = 'Last Known Store Location';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Store".Code;
         }
         field(24; Created; DateTime)
         {

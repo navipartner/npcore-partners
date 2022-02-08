@@ -18,7 +18,6 @@
         {
             Caption = 'Source Code';
             DataClassification = CustomerContent;
-            TableRelation = "Source Code";
             ObsoleteState = Removed;
             ObsoleteReason = 'This field won''t be used anymore.';
             ObsoleteTag = 'Moved to POS Posting Profile';
@@ -66,7 +65,6 @@
             Caption = 'Default POS Posting Profile';
             DataClassification = CustomerContent;
             Description = 'NPR5.52';
-            TableRelation = "NPR POS Posting Profile";
             ObsoleteState = Removed;
             ObsoleteReason = 'This field won''t be used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -150,7 +148,6 @@
         {
             Caption = 'Retail Journal No. Series';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'This field won''t be used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -193,8 +190,6 @@
         field(10002; "Last Data Model Build User ID"; Code[50])
         {
             Caption = 'Last Data Model Build User ID';
-            TableRelation = User."User Name";
-            ValidateTableRelation = false;
             DataClassification = EndUserIdentifiableInformation;
             ObsoleteState = Removed;
             ObsoleteReason = 'This field is not being used anymore';

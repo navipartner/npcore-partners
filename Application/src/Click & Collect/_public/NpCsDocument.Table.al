@@ -328,8 +328,7 @@
             Caption = 'Prepayment Account No.';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account" WHERE("Direct Posting" = CONST(true));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(225; "Delivery Document Type"; Option)

@@ -11,8 +11,7 @@
             Caption = 'Xml Template Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpXml Template";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(5; "Xml Template Trigger Line No."; Integer)

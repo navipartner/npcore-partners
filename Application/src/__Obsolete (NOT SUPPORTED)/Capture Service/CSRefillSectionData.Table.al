@@ -15,7 +15,6 @@
         {
             Caption = 'Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item."No.";
         }
         field(10; "Item Description"; Text[50])
         {

@@ -13,8 +13,7 @@
             Description = 'NC2.01';
             NotBlank = true;
             TableRelation = "NPR NpXml Template";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(2; "Template Version No."; Code[20])

@@ -38,7 +38,6 @@
         field(7; "Customer Group"; Code[10])
         {
             Caption = 'Customer Group';
-            TableRelation = "Customer Posting Group";
             DataClassification = CustomerContent;
         }
         field(9; "Base Calculation On"; Option)

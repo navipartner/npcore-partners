@@ -259,8 +259,7 @@
         {
             Caption = 'Printer Name';
             TableRelation = Printer;
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }
@@ -314,8 +313,7 @@
         {
             Caption = 'Last Modified By User';
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
             DataClassification = EndUserIdentifiableInformation;
         }

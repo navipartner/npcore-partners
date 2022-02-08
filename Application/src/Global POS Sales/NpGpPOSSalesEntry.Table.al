@@ -38,8 +38,7 @@
             Caption = 'POS Store Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Store";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(105; "POS Unit No."; Code[10])
@@ -47,8 +46,7 @@
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Unit";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(107; "Original Company"; Text[30])

@@ -15,19 +15,11 @@
         {
             Caption = 'Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item;
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
         }
         field(20; "Item Ledger Entry Qty."; Integer)
         {

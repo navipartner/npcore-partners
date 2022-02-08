@@ -53,7 +53,6 @@
         {
             Caption = 'Source No.';
             DataClassification = CustomerContent;
-            TableRelation = if ("Source Type" = Const("Gift Voucher")) "NPR NpRv Voucher"."No.";
         }
         field(40; "Reference No."; Code[20])
         {
@@ -86,7 +85,6 @@
             Caption = 'Dimension Set ID';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = "Dimension Set Entry";
 
             trigger OnLookup()
             begin
@@ -98,7 +96,6 @@
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
 
             trigger OnValidate()
             begin
@@ -110,7 +107,6 @@
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
 
             trigger OnValidate()
             begin

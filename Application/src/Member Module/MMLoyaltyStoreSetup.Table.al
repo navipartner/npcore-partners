@@ -22,8 +22,7 @@
             Caption = 'Client Company Name';
             DataClassification = CustomerContent;
             TableRelation = Company;
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(5; Setup; Option)

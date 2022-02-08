@@ -19,7 +19,6 @@
             Caption = 'Table ID';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
         }
         field(10; "Field No."; Integer)
         {
@@ -27,7 +26,6 @@
             Caption = 'Field No.';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table ID"));
 
             trigger OnLookup()
             var

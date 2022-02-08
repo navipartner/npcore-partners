@@ -18,7 +18,6 @@
         {
             Caption = 'CleanCash No. Series';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
         }
         field(3; "CleanCash Integration"; Boolean)
         {

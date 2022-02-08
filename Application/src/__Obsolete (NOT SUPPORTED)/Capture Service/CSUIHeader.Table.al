@@ -72,7 +72,6 @@
         {
             Caption = 'Handling Codeunit';
             DataClassification = CustomerContent;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(21; "Next UI"; Code[20])
         {

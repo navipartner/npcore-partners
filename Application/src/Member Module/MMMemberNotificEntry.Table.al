@@ -202,8 +202,7 @@
             Caption = 'ZIP Code';
             DataClassification = CustomerContent;
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(132; City; Text[50])

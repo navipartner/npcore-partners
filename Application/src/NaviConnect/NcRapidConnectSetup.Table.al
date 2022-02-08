@@ -23,7 +23,6 @@
         {
             Caption = 'Package Code';
             DataClassification = CustomerContent;
-            TableRelation = "Config. Package";
         }
         field(100; "Export Enabled"; Boolean)
         {
@@ -34,7 +33,6 @@
         {
             Caption = 'Task Processor Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Nc Task Processor";
         }
         field(110; "Export File Type"; Option)
         {
@@ -53,7 +51,6 @@
         {
             Caption = 'Import Type';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Nc Import Type" WHERE("Import Codeunit ID" = CONST(6151092));
         }
         field(210; "Ftp Host"; Text[250])
         {

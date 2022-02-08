@@ -17,9 +17,6 @@
         field(2; "Customer No"; Code[20])
         {
             Caption = 'Customer No.';
-            TableRelation = IF ("Customer Type" = CONST(Customer)) Customer."No."
-            ELSE
-            IF ("Customer Type" = CONST(Contact)) Contact."No.";
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -65,7 +62,6 @@
         field(6; Salesperson; Code[20])
         {
             Caption = 'Salesperson';
-            TableRelation = "Salesperson/Purchaser".Code;
             DataClassification = CustomerContent;
         }
         field(8; Status; Option)
@@ -94,10 +90,6 @@
         field(12; "ZIP Code"; Code[20])
         {
             Caption = 'ZIP Code';
-            TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }
         field(13; City; Text[50])

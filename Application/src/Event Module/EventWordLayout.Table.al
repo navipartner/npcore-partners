@@ -30,7 +30,6 @@
         {
             Caption = 'Basic Layout ID';
             DataClassification = CustomerContent;
-            TableRelation = "Custom Report Layout".Code WHERE("Report ID" = FIELD("Report ID"));
         }
         field(20; Layout; BLOB)
         {

@@ -28,16 +28,12 @@
             Caption = 'Item No.';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = Item."No.";
-
-
         }
         field(11; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
         field(14; Created; DateTime)
         {

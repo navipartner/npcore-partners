@@ -322,8 +322,7 @@
             Description = 'NC1.01,NC1.07,NC1.10,NC1.16';
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit),
                                                       "Object Name" = FILTER('NpXml Value*'));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
 
             trigger OnValidate()

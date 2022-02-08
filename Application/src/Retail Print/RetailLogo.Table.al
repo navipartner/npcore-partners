@@ -15,8 +15,7 @@
         {
             Caption = 'POS Unit No.';
             TableRelation = "NPR POS Unit"."No.";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }

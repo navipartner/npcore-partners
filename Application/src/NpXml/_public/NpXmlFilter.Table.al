@@ -11,8 +11,7 @@
             DataClassification = CustomerContent;
             Description = 'NC1.05';
             TableRelation = "NPR NpXml Template";
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(5; "Xml Element Line No."; Integer)

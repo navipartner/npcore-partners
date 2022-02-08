@@ -50,7 +50,6 @@
         {
             Caption = 'Alt. No. No. Series (Variant)';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }

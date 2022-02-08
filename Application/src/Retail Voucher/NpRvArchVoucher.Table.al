@@ -200,8 +200,7 @@
             TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
             ELSE
             IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(235; City; Text[30])
@@ -211,8 +210,7 @@
             TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
             ELSE
             IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+
             ValidateTableRelation = false;
         }
         field(240; County; Text[30])
