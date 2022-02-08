@@ -20,31 +20,31 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code used in association with a variety.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the variety description.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Use in Variant Description"; Rec."Use in Variant Description")
                 {
 
-                    ToolTip = 'Specifies the value of the Use in Variant Description field';
+                    ToolTip = 'Use this variety to generate the description for the relevant variant.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pre tag In Variant Description"; Rec."Pre tag In Variant Description")
                 {
 
-                    ToolTip = 'Specifies the value of the Pre tag In Variant Description field';
+                    ToolTip = 'Generate the description on the variant with the provided tag in front of the value. Only works if Use in Variant Description is ticked.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Use Description field"; Rec."Use Description field")
                 {
 
-                    ToolTip = 'Specifies the value of the Use Description field field';
+                    ToolTip = 'Specifies whether the code field or the description field of the variant value is used in generating the variant description. Only works if Use in Variant Description is ticked.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -57,7 +57,7 @@
         {
             action("Variety Tabel")
             {
-                Caption = 'Variety Tabel';
+                Caption = 'Variety Table';
                 Image = "Table";
                 Promoted = true;
                 PromotedOnly = true;
@@ -67,7 +67,7 @@
                 RunPageLink = Type = FIELD(Code);
                 RunPageView = SORTING(Type, Code);
 
-                ToolTip = 'Executes the Variety Tabel action';
+                ToolTip = 'Open the Variety Table.';
                 ApplicationArea = NPRRetail;
             }
         }

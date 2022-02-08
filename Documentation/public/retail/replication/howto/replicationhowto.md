@@ -16,9 +16,10 @@ This topic describes the process of configuring the Replication Setup. As soon a
    This field is used by the system when it makes API requests to retrieve data from the selected company.
 6. Enter the **From Company Tenant** if you work in a multitenant environment.
 7. Select the authorization type and the necessary credentials, then enable the authorization if needed.
-8. (Optional) Enter an Email Address in the field **Error Notification Email Address**. This will make the system send a predefined email to that address if any error occurs in the data replication process. 
-9. Press **Test Connection** to see if the connection can be established.
-10. Press **Enable** if the connection was successful.     
+8. (Optional) Enter an email address in the field **Error Notification Email Address**.       
+   This will make the system send a predefined email to that address if any errors occur during the data replication process. 
+9. Click **Test Connection** to see if the connection can be established.
+10. Click **Enable** if the connection was successful.     
     After confirmation, the Replication Setup is enabled and all data in the **From Company** will be imported into the current company.
 > [!Note]  	
 > When enabling the Replication Setup, a Naviconnect Import Type and a Job Queue Entry are created in the background, so the import is done automatically based on setup of these records.
@@ -32,12 +33,12 @@ After you're done configuring the **General** Replication Setup options, you can
 The import is done based on the **Endpoints** subpage setup. If necessary, you can configure it.
 
 It is possible to:
-- disable specific endpoints (which will stop importing data for those tables)
-- change the order in which tables are imported
-- update the **Replication Counter** field manually
-- update the **Replication Counter** field automatically by using action **Get Last Replication Counter**. When you use this, the system makes a web request to retrieve the Last Replication Counter from the source database table. This should be used if the starting point of the replication needs to be changed
+- disable specific endpoints (which will stop importing data for those tables).
+- change the order in which tables are imported.
+- update the **Replication Counter** field manually.
+- update the **Replication Counter** field automatically by using action **Get Last Replication Counter**. When you use this, the system makes a web request to retrieve the Last Replication Counter from the source database table. This should be used if the starting point of the replication needs to be changed.
 - add a **Fixed Filter** which will be added to the URL when sending the request. You can use this option if only some of the records need to be replicated and not the whole table. Example: *number gt '10003' and number lt '10008'*. [See more](https://docs.microsoft.com/en-us/dynamics-nav/using-filter-expressions-in-odata-uris).
-- add new endpoint configuration
+- add new endpoint configuration.
 
 ### Configuring Special Field Mappings
 

@@ -10,3 +10,5 @@
     href: howto/createnew.md
   - name: Configure a receipt printout for a POS unit
     href: howto/receipt-printout.md
+  - name: Set up the POS Customer Display
+    href: howto/POSCustomerDisplay.md

@@ -19,121 +19,121 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code for this Variety Group.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of this Variety Group.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Cross Variety No."; Rec."Cross Variety No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Cross Variety No. field';
+                    ToolTip = 'Choose which variety number (1-4) will be displayed in the matrix horizontally.';
                     ApplicationArea = NPRRetail;
                 }
                 field("No. Series"; Rec."No. Series")
                 {
 
-                    ToolTip = 'Specifies the value of the No. Series field';
+                    ToolTip = 'Specifies the number series that will be used in the Copy naming variety x field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variety 1"; Rec."Variety 1")
                 {
 
-                    ToolTip = 'Specifies the value of the Variety 1 field';
+                    ToolTip = 'Specifies the value that will be added as Variety 1 on the item.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variety 1 Table"; Rec."Variety 1 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the Variety 1 Table field';
+                    ToolTip = 'Specifies the value that will be added as the Variety 1 table on the item.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Create Copy of Variety 1 Table"; Rec."Create Copy of Variety 1 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the Create Copy of Variety 1 Table field';
+                    ToolTip = 'Create a copy of the table selected in the Variety 1 table.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Copy Naming Variety 1"; Rec."Copy Naming Variety 1")
                 {
 
-                    ToolTip = 'Specifies the value of the Copy Naming Variety 1 field';
+                    ToolTip = 'Choose between two values. Table Code + No. Series uses the Variety 1 table code and the next number from the number series; Table Code + Item No uses the Variety 1 table code and the Item Number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variety 2"; Rec."Variety 2")
                 {
 
-                    ToolTip = 'Specifies the value of the Variety 2 field';
+                    ToolTip = 'Specifies the value that will be added as Variety 2 on the item.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variety 2 Table"; Rec."Variety 2 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the Variety 2 Table field';
+                    ToolTip = 'Specifies the value that will be added as the Variety 2 table on the item.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Create Copy of Variety 2 Table"; Rec."Create Copy of Variety 2 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the Create Copy of Variety 2 Table field';
+                    ToolTip = 'Create a copy of the table selected in the Variety 2 table.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Copy Naming Variety 2"; Rec."Copy Naming Variety 2")
                 {
 
-                    ToolTip = 'Specifies the value of the Copy Naming Variety 2 field';
+                    ToolTip = 'Choose between two values. Table Code + No. Series uses the Variety 3 table code and the next number from the number series; Table Code + Item No uses the Variety 3 table code and the Item Number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variety 3"; Rec."Variety 3")
                 {
 
-                    ToolTip = 'Specifies the value of the Variety 3 field';
+                    ToolTip = 'Specifies the value that will be added as Variety 3 on the item.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variety 3 Table"; Rec."Variety 3 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the Variety 3 Table field';
+                    ToolTip = 'Specifies the value that will be added as the Variety 3 table on the item.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Create Copy of Variety 3 Table"; Rec."Create Copy of Variety 3 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the Create Copy of Variety 3 Table field';
+                    ToolTip = 'Create a copy of the table selected in the Variety 3 table.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Copy Naming Variety 3"; Rec."Copy Naming Variety 3")
                 {
 
-                    ToolTip = 'Specifies the value of the Copy Naming Variety 3 field';
+                    ToolTip = 'Choose between two values. Table Code + No. Series uses the Variety 3 table code and the next number from the number series; Table Code + Item No uses the Variety 3 table code and the Item Number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variety 4"; Rec."Variety 4")
                 {
 
-                    ToolTip = 'Specifies the value of the Variety 4 field';
+                    ToolTip = 'Specifies the value that will be added as Variety 4 on the item.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variety 4 Table"; Rec."Variety 4 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the Variety 4 Table field';
+                    ToolTip = 'Specifies the value that will be added as the Variety 4 table on the item.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Create Copy of Variety 4 Table"; Rec."Create Copy of Variety 4 Table")
                 {
 
-                    ToolTip = 'Specifies the value of the Create Copy of Variety 4 Table field';
+                    ToolTip = 'Create a copy of the table selected in the Variety 4 table.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Copy Naming Variety 4"; Rec."Copy Naming Variety 4")
                 {
 
-                    ToolTip = 'Specifies the value of the Copy Naming Variety 4 field';
+                    ToolTip = 'Choose between two values. Table Code + No. Series uses the Variety 4 table code and the next number from the number series; Table Code + Item No uses the Variety 4 table code and the Item Number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Code Part 1"; Rec."Variant Code Part 1")
