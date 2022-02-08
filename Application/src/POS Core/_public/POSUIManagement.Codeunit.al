@@ -95,7 +95,7 @@
         POSSession.DebugWithTimestamp('Initializing menu [' + Menu.Code + ']');
         InitializeMenuObject(Menu, MenuObj);
 
-        MenuButton.SetCurrentKey("Menu Code", "Parent ID", Blocked, "Register Type", "Register No.");
+        MenuButton.SetCurrentKey("Menu Code", "Parent ID", Blocked, "Register No.");
         MenuButton.SetRange("Menu Code", Menu.Code);
         MenuButton.SetRange("Parent ID", 0);
         MenuButton.SetRange(Blocked, false);

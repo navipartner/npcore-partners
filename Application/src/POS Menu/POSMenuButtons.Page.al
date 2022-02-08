@@ -126,12 +126,6 @@
                     ToolTip = 'Specifies if the button has been assigned a secure method code';
                     ApplicationArea = NPRRetail;
                 }
-                field("Register Type"; Rec."Register Type")
-                {
-
-                    ToolTip = 'Specifies if the button has been allocated to a POS view profile';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Register No."; Rec."Register No.")
                 {
 
