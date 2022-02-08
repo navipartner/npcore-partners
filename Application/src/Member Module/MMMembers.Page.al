@@ -115,7 +115,7 @@
                 field(Blocked; Rec.Blocked)
                 {
                     ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

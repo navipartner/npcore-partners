@@ -239,7 +239,7 @@
                 Caption = 'Tasks';
                 action("Service Tas&ks")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Service Tas&ks';
                     Image = ServiceTasks;
                     RunObject = Page "Service Tasks";
@@ -247,7 +247,7 @@
                 }
                 action("C&reate Contract Service Orders")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'C&reate Contract Service Orders';
                     Image = "Report";
                     RunObject = Report "Create Contract Service Orders";
@@ -255,7 +255,7 @@
                 }
                 action("Create Contract In&voices")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Create Contract In&voices';
                     Image = "Report";
                     RunObject = Report "Create Contract Invoices";
@@ -263,7 +263,7 @@
                 }
                 action("Post &Prepaid Contract Entries")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Post &Prepaid Contract Entries';
                     Image = "Report";
                     RunObject = Report "Post Prepaid Contract Entries";
@@ -271,7 +271,7 @@
                 }
                 action("Order Pla&nning")
                 {
-                    ApplicationArea = Planning;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Order Pla&nning';
                     Image = Planning;
                     RunObject = Page "Order Planning";

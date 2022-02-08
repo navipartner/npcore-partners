@@ -15,7 +15,7 @@ page 6014660 "NPR Generic Key List"
             {
                 field(SortingKey; SortingKey)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Sorting Key';
                     ToolTip = 'Specifies the value of the Sorting Key field.';
                 }

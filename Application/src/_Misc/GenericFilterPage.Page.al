@@ -21,7 +21,7 @@ page 6059845 "NPR Generic Filter Page"
                     ShowCaption = false;
                     field(SortingKey; SortingKey)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Key';
                         Editable = false;
                         Lookup = true;
@@ -42,7 +42,7 @@ page 6059845 "NPR Generic Filter Page"
                     }
                     field(Descending; Descending)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Descending';
                         ToolTip = 'Specifies the value of the Descending field.';
                     }
@@ -52,19 +52,19 @@ page 6059845 "NPR Generic Filter Page"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field.';
                 }
                 field("Field Caption"; Rec."Field Caption")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Field Caption field.';
                 }
                 field("Filter"; FilterText)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Filter';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the Filter field.';
@@ -110,7 +110,7 @@ page 6059845 "NPR Generic Filter Page"
                 }
                 field(Include; Include)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Include';
                     ToolTip = 'Specifies the value of the Include field.';
 
@@ -128,7 +128,7 @@ page 6059845 "NPR Generic Filter Page"
                 }
                 field(Static; Static)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Static';
                     ToolTip = 'Specifies the value of the Static field.';
 
