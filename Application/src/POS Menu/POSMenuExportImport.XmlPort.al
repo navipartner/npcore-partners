@@ -85,9 +85,6 @@ xmlport 6150701 "NPR POS Menu Export/Import"
                     fieldelement(Enabled; "POS Menu Button".Enabled)
                     {
                     }
-                    fieldelement(ButtonRegisterType; "POS Menu Button"."Register Type")
-                    {
-                    }
                     fieldelement(ButtonRegisterNo; "POS Menu Button"."Register No.")
                     {
                     }
