@@ -1,4 +1,4 @@
-#if BC17
+#if BC17 or BC18
 codeunit 6184850 "NPR FR Audit Mgt."
 {
     Access = Internal;
