@@ -47,33 +47,32 @@
                     field(FromCompany; Rec.FromCompany)
                     {
                         ApplicationArea = NPRRetail;
-                        Caption = 'From Company Name';
+                        Caption = 'Source Company Name';
                         Tooltip = 'Specifies the From Company Name. A company from the local database can be selected';
                     }
 
                     field(FromCompanyID; Rec.FromCompanyID)
                     {
                         ApplicationArea = NPRRetail;
-                        Caption = 'From Company Id';
+                        Caption = 'Source Company Id';
                         Tooltip = 'Specifies the Id of the local database company.';
                     }
 
                     field("From Company Tenant"; Rec."From Company Tenant")
                     {
                         ApplicationArea = NPRRetail;
+                        Caption = 'Source Company Tenant';
                         Tooltip = 'Specifies the From Company Tenant.';
                     }
                 }
-
                 group("External DB Company")
                 {
                     Caption = 'External Database Company';
                     Visible = IsExternalDB;
-
                     field("From Company Name - External"; Rec."From Company Name - External")
                     {
                         ApplicationArea = NPRRetail;
-                        Caption = 'From Company Name';
+                        Caption = 'Source Company Name';
                         Tooltip = 'Specifies the From Company Name. A web request is sent and a company from the external database can be selected.';
                         trigger OnAssistEdit()
                         begin
@@ -83,12 +82,13 @@
                     field("From Company Id - External"; Rec."From Company id - External")
                     {
                         ApplicationArea = NPRRetail;
-                        Caption = 'From Company Id';
+                        Caption = 'Source Company Id';
                         Tooltip = 'Specifies the Id of the external database company.';
                     }
                     field("From Company Tenant 2"; Rec."From Company Tenant")
                     {
                         ApplicationArea = NPRRetail;
+                        Caption = 'Source Company Tenant';
                         Tooltip = 'Specifies the From Company Tenant.';
                     }
                 }
