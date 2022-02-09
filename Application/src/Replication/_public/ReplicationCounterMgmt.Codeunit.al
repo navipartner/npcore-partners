@@ -6,11 +6,22 @@
     var
         FRefReplicationCounter: FieldRef;
     begin
+        if not CheckReplicationCounterUpdateIsEnabled() then
+            exit;
+
         if not NumberSequence.Exists('NPRReplicationModule_' + Format(RecRef.Number), true) then
             NumberSequence.Insert('NPRReplicationModule_' + Format(RecRef.Number), 1, 1, true);
 
         FRefReplicationCounter := RecRef.Field(ReplicationCounterFieldNo);
         FRefReplicationCounter.Value := NumberSequence.Next('NPRReplicationModule_' + Format(RecRef.Number), true);
+    end;
+
+    local procedure CheckReplicationCounterUpdateIsEnabled(): Boolean
+    var
+        ReplicationSetupSourceCompany: Record "NPR Replication Setup (Source)";
+    begin
+        if ReplicationSetupSourceCompany.Get() then
+            exit(ReplicationSetupSourceCompany."Enable Replication Counter");
     end;
     #endregion
 

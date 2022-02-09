@@ -133,6 +133,7 @@
             var
                 UseDifferentCompanyErr: Label 'From Company must be different than current company';
             begin
+                Rec.TestField(Enabled, false);
                 if FromCompany = CompanyName then
                     Error(UseDifferentCompanyErr);
             end;
