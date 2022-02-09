@@ -45,6 +45,11 @@
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Responsibility Center"; Rec."Responsibility Center")
+                {
+                    ToolTip = 'Specifies the code of the responsibility center, such as a distribution hub, that is associated with the involved user, company, customer, or vendor. When webshop order is created and imported to Business Central, if Code of this Website is named, then value from this field will be passed to the Sales Header.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

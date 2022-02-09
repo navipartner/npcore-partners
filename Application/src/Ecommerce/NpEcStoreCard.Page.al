@@ -53,6 +53,11 @@
                     ToolTip = 'Specifies the code of the customer configuration template.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Responsibility Center"; Rec."Responsibility Center")
+                {
+                    ToolTip = 'Specifies the code of the responsibility center, such as a distribution hub, that is associated with the involved user, company, customer, or vendor. When webshop order is created and imported to Business Central, if Code of this Store is named, then value from this field will be passed to the Sales Header.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Allow Create Customers"; Rec."Allow Create Customers")
                 {
                     ToolTip = 'Specifies if customer will be created for current e-commerce store. Customer will be created if it''s not found when order is imported.';
