@@ -7,7 +7,7 @@ You can set up the content of customer display in **Display Setup**. Here, it is
 - change the place in which the receipt is located.
 - set up whether any media is downloaded.
 
-#### Prerequisite:
+### Prerequisites:
 
  - Have at least one existing POS unit in the system set up for sales.
  - Have dedicated customer display hardware attached to the POS units that will receive this setup.

@@ -2,8 +2,6 @@
   href: gettingstarted/toc.yml
 - name: POS unit
   href: posunit/toc.yml
-- name: POS fiscalization
-  href: posfiscalization/toc.yml
 - name: POS tax free
   href: postaxfree/toc.yml  
 - name: Electronic funds transfer
