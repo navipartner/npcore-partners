@@ -2018,6 +2018,47 @@
         ValidateShortcutDimCode(FieldNumber, ShortcutDimCode);
     end;
 
+    procedure SetDimension(DimCode: Code[20]; DimValueCode: Code[20])
+    var
+        Dim: Record Dimension;
+        DimVal: Record "Dimension Value";
+        TempDimSetEntry: Record "Dimension Set Entry" temporary;
+    begin
+        if DimCode = '' then
+            exit;
+
+        Dim.Get(DimCode);
+        if DimValueCode <> '' then
+            DimVal.Get(Dim.Code, DimValueCode);
+
+        DimMgt.GetDimensionSet(TempDimSetEntry, Rec."Dimension Set ID");
+        if TempDimSetEntry.Get(TempDimSetEntry."Dimension Set ID", Dim.Code) then
+            if TempDimSetEntry."Dimension Value Code" <> DimValueCode then
+                TempDimSetEntry.Delete();
+        if DimValueCode <> '' then begin
+            TempDimSetEntry."Dimension Code" := DimVal."Dimension Code";
+            TempDimSetEntry."Dimension Value Code" := DimVal.Code;
+            TempDimSetEntry."Dimension Value ID" := DimVal."Dimension Value ID";
+            if TempDimSetEntry.Insert() then;
+        end;
+
+        Rec."Dimension Set ID" := TempDimSetEntry.GetDimensionSetID(TempDimSetEntry);
+        DimMgt.UpdateGlobalDimFromDimSetID(Rec."Dimension Set ID", Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code");
+        Rec.Modify();
+    end;
+
+    procedure ShowDimensions() IsChanged: Boolean
+    var
+        OldDimSetID: Integer;
+        DimSetIdLbl: Label '%1 %2 %3', Locked = true;
+    begin
+        OldDimSetID := "Dimension Set ID";
+        "Dimension Set ID" :=
+            DimMgt.EditDimensionSet("Dimension Set ID", StrSubstNo(DimSetIdLbl, "Register No.", "Sales Ticket No.", "Line No."));
+        DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+        IsChanged := OldDimSetID <> "Dimension Set ID";
+    end;
+
     procedure UpdateVATSetup()
     var
         VATPostingSetup: Record "VAT Posting Setup";
