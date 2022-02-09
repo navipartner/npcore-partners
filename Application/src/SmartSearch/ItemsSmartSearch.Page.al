@@ -611,14 +611,6 @@
             group(Inventory)
             {
                 Caption = 'Inventory';
-                action("Inventory - List")
-                {
-                    ApplicationArea = NPRRetail;
-                    Caption = 'Inventory - List';
-                    Image = "Report";
-                    RunObject = Report "Inventory - List";
-                    ToolTip = 'View various information about the item, such as name, unit of measure, posting group, shelf number, vendor''s item number, lead time calculation, minimum inventory, and alternate item number. You can also see if the item is blocked.';
-                }
                 action("Inventory - Availability Plan")
                 {
                     ApplicationArea = NPRRetail;
@@ -659,34 +651,10 @@
                     RunObject = Report "Item Substitutions";
                     ToolTip = 'View or edit any substitute items that are set up to be traded instead of the item in case it is not available.';
                 }
-                action("Inventory Cost and Price List")
-                {
-                    ApplicationArea = NPRRetail;
-                    Caption = 'Inventory Cost and Price List';
-                    Image = "Report";
-                    RunObject = Report "Inventory Cost and Price List";
-                    ToolTip = 'View, print, or save a list of your items and their price and cost information. The report specifies direct unit cost, last direct cost, unit price, profit percentage, and profit.';
-                }
-                action("Inventory Availability")
-                {
-                    ApplicationArea = NPRRetail;
-                    Caption = 'Inventory Availability';
-                    Image = "Report";
-                    RunObject = Report "Inventory Availability";
-                    ToolTip = 'View, print, or save a summary of historical inventory transactions with selected items, for example, to decide when to purchase the items. The report specifies quantity on sales order, quantity on purchase order, back orders from vendors, minimum inventory, and whether there are reorders.';
-                }
                 group("Item Register")
                 {
                     Caption = 'Item Register';
                     Image = ItemRegisters;
-                    action("Item Register - Quantity")
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Item Register - Quantity';
-                        Image = "Report";
-                        RunObject = Report "Item Register - Quantity";
-                        ToolTip = 'View one or more selected item registers showing quantity. The report can be used to document a register''s contents for internal or external audits.';
-                    }
                     action("Item Register - Value")
                     {
                         ApplicationArea = NPRRetail;
@@ -729,14 +697,6 @@
                 {
                     Caption = 'Inventory Details';
                     Image = "Report";
-                    action("Inventory - Transaction Detail")
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Inventory - Transaction Detail';
-                        Image = "Report";
-                        RunObject = Report "Inventory - Transaction Detail";
-                        ToolTip = 'View transaction details with entries for the selected items for a selected period. The report shows the inventory at the beginning of the period, all of the increase and decrease entries during the period with a running update of the inventory, and the inventory at the close of the period. The report can be used at the close of an accounting period, for example, or for an audit.';
-                    }
                     action("Item Charges - Specification")
                     {
                         ApplicationArea = NPRRetail;
@@ -760,35 +720,6 @@
                         Image = "Report";
                         RunObject = Report "Item Expiration - Quantity";
                         ToolTip = 'View an overview of the quantities of selected items in your inventory whose expiration dates fall within a certain period. The list shows the number of units of the selected item that will expire in a given time period. For each of the items that you specify when setting up the report, the printed document shows the number of units that will expire during each of three periods of equal length and the total inventory quantity of the selected item.';
-                    }
-                }
-                group(Reports)
-                {
-                    Caption = 'Inventory Statistics';
-                    Image = "Report";
-                    action("Inventory - Sales Statistics")
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Inventory - Sales Statistics';
-                        Image = "Report";
-                        RunObject = Report "Inventory - Sales Statistics";
-                        ToolTip = 'View, print, or save a summary of selected items'' sales per customer, for example, to analyze the profit on individual items or trends in revenues and profit. The report specifies direct unit cost, unit price, sales quantity, sales in LCY, profit percentage, and profit.';
-                    }
-                    action("Inventory - Customer Sales")
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Inventory - Customer Sales';
-                        Image = "Report";
-                        RunObject = Report "Inventory - Customer Sales";
-                        ToolTip = 'View, print, or save a list of customers that have purchased selected items within a selected period, for example, to analyze customers'' purchasing patterns. The report specifies quantity, amount, discount, profit percentage, and profit.';
-                    }
-                    action("Inventory - Top 10 List")
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Inventory - Top 10 List';
-                        Image = "Report";
-                        RunObject = Report "Inventory - Top 10 List";
-                        ToolTip = 'View information about the items with the highest or lowest sales within a selected period. You can also choose that items that are not on hand or have not been sold are not included in the report. The items are sorted by order size within the selected period. The list gives a quick overview of the items that have sold either best or worst, or the items that have the most or fewest units on inventory.';
                     }
                 }
                 group("Finance Reports")
@@ -831,22 +762,6 @@
                     Image = "Report";
                     RunObject = Report "Inventory Order Details";
                     ToolTip = 'View a list of the orders that have not yet been shipped or received and the items in the orders. It shows the order number, customer''s name, shipment date, order quantity, quantity on back order, outstanding quantity and unit price, as well as possible discount percentage and amount. The quantity on back order and outstanding quantity and amount are totaled for each item. The report can be used to find out whether there are currently shipment problems or any can be expected.';
-                }
-                action("Inventory Purchase Orders")
-                {
-                    ApplicationArea = NPRRetail;
-                    Caption = 'Inventory Purchase Orders';
-                    Image = "Report";
-                    RunObject = Report "Inventory Purchase Orders";
-                    ToolTip = 'View a list of items on order from vendors. It also shows the expected receipt date and the quantity and amount on back orders. The report can be used, for example, to see when items should be received and whether a reminder of a back order should be issued.';
-                }
-                action("Inventory - Vendor Purchases")
-                {
-                    ApplicationArea = NPRRetail;
-                    Caption = 'Inventory - Vendor Purchases';
-                    Image = "Report";
-                    RunObject = Report "Inventory - Vendor Purchases";
-                    ToolTip = 'View a list of the vendors that your company has purchased items from within a selected period. It shows invoiced quantity, amount and discount. The report can be used to analyze a company''s item purchases.';
                 }
                 action("Inventory - Reorders")
                 {
