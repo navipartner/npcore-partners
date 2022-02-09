@@ -1,10 +1,10 @@
 ﻿codeunit 6150826 "NPR POS Action: Sale Dimension"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This Action updates the POS Sale Dimension with either a fixed value or provides a list of valid value';
-        ValueSelection: Option LIST,"FIXED",PROMPT_N,PROMPT_A;
-        DimensionSource: Option SHORTCUT1,SHORTCUT2,ANY;
+        DimensionSourceOptions: Option SHORTCUT1,SHORTCUT2,ANY;
         DIMSET: Label 'Dimension code %1 set to %2.';
         TITLE: Label 'Dimension and Statistics';
         ReadingErr: Label 'reading in %1';
@@ -16,7 +16,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.4');
+        exit('1.5');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -31,22 +31,18 @@
         then begin
             Sender.RegisterWorkflowStep('numeric_input', 'if (param.ValueSelection == 2) {numpad ({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);};');
             Sender.RegisterWorkflowStep('alpha_input', 'if (param.ValueSelection == 3) {input  ({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);};');
-
             Sender.RegisterWorkflowStep('step_1', 'respond();');
 
-            Sender.RegisterOptionParameter('ValueSelection', 'List,Fixed,Numpad,Textpad', 'List');
-            Sender.RegisterOptionParameter('DimensionSource', 'Shortcut1,Shortcut2,Any', 'Shortcut1');
-
-            Sender.RegisterTextParameter('DimensionCode', '');
-            Sender.RegisterTextParameter('DimensionValue', '');
-
-            Sender.RegisterIntegerParameter('StatisticsFrequency', 1);
-
-            Sender.RegisterBooleanParameter('ShowConfirmMessage', false);
-            Sender.RegisterBooleanParameter('CreateDimValue', false);
+            Sender.RegisterOptionParameter(ParameterValueSelection_Name(), 'List,Fixed,Numpad,Textpad', 'List');
+            Sender.RegisterOptionParameter(ParameterDimensionSource_Name(), 'Shortcut1,Shortcut2,Any', 'Shortcut1');
+            Sender.RegisterOptionParameter(ParameterApplyTo_Name(), 'Sale,CurrentLine,LinesOfTypeSale', 'Sale');
+            Sender.RegisterTextParameter(ParameterDimensionCode_Name(), '');
+            Sender.RegisterTextParameter(ParameterDimensionValue_Name(), '');
+            Sender.RegisterIntegerParameter(ParameterStatisticsFrequency_Name(), 1);
+            Sender.RegisterBooleanParameter(ParameterShowConfirmMessage_Name(), false);
+            Sender.RegisterBooleanParameter(ParameterCreateDimValue_Name(), false);
 
             Sender.RegisterWorkflow(true);
-
         end;
     end;
 
@@ -61,30 +57,18 @@
     var
         Context: Codeunit "NPR POS JSON Management";
         JSON: Codeunit "NPR POS JSON Management";
-        DimensionCode: Code[20];
+        DimCode: Code[20];
         Dimension: Record Dimension;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         CaptionText: Text;
     begin
-
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
-        GeneralLedgerSetup.Get();
 
-        DimensionSource := JSON.GetIntegerOrFail('DimensionSource', StrSubstNo(ReadingErr, ActionCode()));
-        case DimensionSource of
-            DimensionSource::SHORTCUT1:
-                DimensionCode := GeneralLedgerSetup."Global Dimension 1 Code";
-            DimensionSource::SHORTCUT2:
-                DimensionCode := GeneralLedgerSetup."Global Dimension 2 Code";
-            DimensionSource::ANY:
-                DimensionCode := CopyStr(JSON.GetStringOrFail('DimensionCode', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(DimensionCode));
-        end;
-
-        CaptionText := DimensionCode;
-        if (Dimension.Get(DimensionCode)) then
+        DimCode := GetDimensionCode(JSON);
+        CaptionText := DimCode;
+        if (Dimension.Get(DimCode)) then
             CaptionText := Dimension.Name;
 
         Context.SetContext('CaptionText', CaptionText);
@@ -97,156 +81,198 @@
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        DimensionCode: Code[20];
-        DimensionValue: Code[20];
+        DimCode: Code[20];
+        DimValueCode: Code[20];
         StrMessage: Text;
+        ApplyDimTo: Option Sale,CurrentLine,LinesOfTypeSale;
+        ValueSelection: Option "LIST","FIXED",PROMPT_N,PROMPT_A;
+        StatisticsFrequency: Integer;
         ShowMessage: Boolean;
         WithCreate: Boolean;
-        StatisticsFrequency: Integer;
+        MissingParameterErr: Label 'POS action parameter ''%1'' must be specified.', Comment = '%1 - parameter name';
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
 
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScopeParameters(ActionCode());
 
         Randomize();
-        StatisticsFrequency := JSON.GetIntegerOrFail('StatisticsFrequency', StrSubstNo(ReadingErr, ActionCode()));
+        StatisticsFrequency := JSON.GetIntegerParameter(ParameterStatisticsFrequency_Name());
         if (StatisticsFrequency < 1) then
             StatisticsFrequency := 1;
         if (Random(StatisticsFrequency) > 1) then
             exit;
 
-        ValueSelection := JSON.GetIntegerOrFail('ValueSelection', StrSubstNo(ReadingErr, ActionCode()));
-        if (ValueSelection = -1) then
-            ValueSelection := ValueSelection::LIST;
+        ValueSelection := JSON.GetIntegerParameter(ParameterValueSelection_Name());
+        if (ValueSelection < 0) then
+            ValueSelection := ValueSelection::"LIST";
 
-        DimensionSource := JSON.GetIntegerOrFail('DimensionSource', StrSubstNo(ReadingErr, ActionCode()));
-        if (DimensionSource = -1) then
-            DimensionSource := DimensionSource::SHORTCUT1;
+        DimCode := GetDimensionCode(JSON);
+        if (DimCode = '') and (ValueSelection <> ValueSelection::"LIST") then
+            Error(MissingParameterErr, ParameterDimensionCode_Caption());
 
-        ShowMessage := JSON.GetBooleanOrFail('ShowConfirmMessage', StrSubstNo(ReadingErr, ActionCode()));
-        WithCreate := JSON.GetBooleanOrFail('CreateDimValue', StrSubstNo(ReadingErr, ActionCode()));
+        ApplyDimTo := JSON.GetIntegerParameter(ParameterApplyTo_Name());
+        if ApplyDimTo < 0 then
+            ApplyDimTo := ApplyDimTo::Sale;
 
-        POSSale.RefreshCurrent();
+        ShowMessage := JSON.GetBooleanParameter(ParameterShowConfirmMessage_Name());
+        WithCreate := JSON.GetBooleanParameter(ParameterCreateDimValue_Name());
 
         case ValueSelection of
             ValueSelection::PROMPT_N:
-                StrMessage := SetDimensionValue(JSON, POSSale, DimensionSource, WithCreate, CopyStr(GetNumpad(JSON, 'numeric_input'), 1, MaxStrLen(DimensionValue)));
+                DimValueCode := CopyStr(GetNumpad(JSON, 'numeric_input'), 1, MaxStrLen(DimValueCode));
             ValueSelection::PROMPT_A:
-                StrMessage := SetDimensionValue(JSON, POSSale, DimensionSource, WithCreate, CopyStr(GetInput(JSON, 'alpha_input'), 1, MaxStrLen(DimensionValue)));
-            ValueSelection::FIXED:
-                StrMessage := SetDimensionValue(JSON, POSSale, DimensionSource, WithCreate, CopyStr(GetParamterString(JSON, 'DimensionValue'), 1, MaxStrLen(DimensionValue)));
-            ValueSelection::LIST:
-                case DimensionSource of
-                    DimensionSource::SHORTCUT1:
-                        begin
-                            if not SalePOS.LookUpShortcutDimCode(1, DimensionValue) then
-                                Error('');
-                            POSSale.SetShortcutDimCode1(DimensionValue);
-                        end;
-                    DimensionSource::SHORTCUT2:
-                        begin
-                            if not SalePOS.LookUpShortcutDimCode(2, DimensionValue) then
-                                Error('');
-                            POSSale.SetShortcutDimCode2(DimensionValue);
-                        end;
-                    DimensionSource::ANY:
-                        begin
-                            DimensionCode := CopyStr(GetParamterString(JSON, 'DimensionCode'), 1, MaxStrLen(DimensionCode));
-                            if DimensionCode = '' then begin
-                                SalePOS.ShowDocDim();
-                                SalePOS.Modify();
-                            end else begin
-                                if not LookupDimensionValue(DimensionCode, DimensionValue) then
-                                    Error('');
-                                SetDimensionValue(JSON, POSSale, DimensionSource, WithCreate, DimensionValue);
-                            end;
-                        end;
-                end;
+                DimValueCode := CopyStr(GetInput(JSON, 'alpha_input'), 1, MaxStrLen(DimValueCode));
+            ValueSelection::"FIXED":
+                DimValueCode := CopyStr(JSON.GetStringParameterOrFail(ParameterDimensionValue_Name(), StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(DimValueCode));
+            ValueSelection::"LIST":
+                if DimCode <> '' then
+                    if not LookupDimensionValue(DimCode, DimValueCode) then
+                        Error('');
         end;
 
-        POSSale.RefreshCurrent();
+        if ApplyDimTo = ApplyDimTo::Sale then
+            StrMessage := AdjustHeaderDimensions(POSSession, DimCode, DimValueCode, WithCreate)
+        else
+            StrMessage := AdjustLineDimensions(POSSession, DimCode, DimValueCode, ApplyDimTo, WithCreate);
 
-        POSSale.SetModified();
         POSSession.RequestRefreshData();
 
         if (ShowMessage) and (StrMessage <> '') then
             Message(StrMessage);
     end;
 
-    local procedure LookupDimensionValue(DimensionCode: Code[20]; var DimensionValueCode: Code[20]): Boolean
+    local procedure AdjustHeaderDimensions(POSSession: Codeunit "NPR POS Session"; DimCode: Code[20]; DimValueCode: Code[20]; WithCreate: Boolean) StrMessage: Text
+    var
+        POSSale: Codeunit "NPR POS Sale";
+        SalePOS: Record "NPR POS Sale";
+    begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        if DimCode = '' then
+            SalePOS.ShowDocDim()
+        else
+            StrMessage := SetHeaderDimensionValue(POSSale, DimCode, DimValueCode, WithCreate);
+
+        POSSale.RefreshCurrent();
+        POSSale.SetModified();
+    end;
+
+    local procedure AdjustLineDimensions(POSSession: Codeunit "NPR POS Session"; DimCode: Code[20]; DimValueCode: Code[20]; ApplyDimTo: Option Sale,CurrentLine,LinesOfTypeSale; WithCreate: Boolean) StrMessage: Text
+    var
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        MultiLineDimensionEditNotSupportedErr: Label 'Multi-line dimension edit is not supported. Please select a specific Dimension Code for the POS action.';
+    begin
+        if ApplyDimTo = ApplyDimTo::Sale then
+            exit;
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        case ApplyDimTo of
+            ApplyDimTo::CurrentLine:
+                SaleLinePOS.SetRecFilter();
+            ApplyDimTo::LinesOfTypeSale:
+                begin
+                    SaleLinePOS.SetRange("Register No.", SaleLinePOS."Register No.");
+                    SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+                    SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
+                end;
+        end;
+
+        if DimCode = '' then begin
+            if SaleLinePOS.Count = 1 then begin
+                if SaleLinePOS.ShowDimensions() then
+                    SaleLinePOS.Modify();
+            end else
+                //TODO: multi-line dimension edit
+                Error(MultiLineDimensionEditNotSupportedErr);
+        end else
+            StrMessage := SetLineDimensionValue(SaleLinePOS, DimCode, DimValueCode, WithCreate);
+
+        POSSession.GetSale(POSSale);
+        POSSale.SetModified();
+    end;
+
+    local procedure GetDimensionCode(JSON: Codeunit "NPR POS JSON Management") DimCode: Code[20]
+    var
+        DimSource: Option;
+    begin
+        DimSource := JSON.GetIntegerOrFail(ParameterDimensionSource_Name(), StrSubstNo(ReadingErr, ActionCode()));
+        if DimSource < 0 then
+            DimSource := DimensionSourceOptions::SHORTCUT1;
+
+        case DimSource of
+            DimensionSourceOptions::SHORTCUT1,
+            DimensionSourceOptions::SHORTCUT2:
+                DimCode := GetGlobalDimensionCode(DimSource);
+            DimensionSourceOptions::ANY:
+                DimCode := CopyStr(JSON.GetStringParameter(ParameterDimensionCode_Name()), 1, MaxStrLen(DimCode));
+        end;
+    end;
+
+    local procedure LookupDimensionValue(DimCode: Code[20]; var DimValueCode: Code[20]): Boolean
     var
         DimensionValue: Record "Dimension Value";
     begin
         DimensionValue.FilterGroup(2);
-        DimensionValue.SetRange("Dimension Code", DimensionCode);
+        DimensionValue.SetRange("Dimension Code", DimCode);
         DimensionValue.FilterGroup(0);
+        if DimValueCode <> '' then begin
+            DimensionValue."Dimension Code" := DimCode;
+            DimensionValue.Code := DimValueCode;
+            if DimensionValue.Find('=><') then;
+        end;
         if PAGE.RunModal(0, DimensionValue) <> ACTION::LookupOK then
             exit(false);
 
-        DimensionValueCode := DimensionValue.Code;
+        DimValueCode := DimensionValue.Code;
         exit(true);
     end;
 
-    local procedure SetDimensionValue(JSON: Codeunit "NPR POS JSON Management"; var POSSale: Codeunit "NPR POS Sale"; DimSource: Option; WithCreate: Boolean; DimensionValue: Code[20]) StrMessage: Text
-    var
-        DimensionCode: Code[20];
+    local procedure SetHeaderDimensionValue(POSSale: Codeunit "NPR POS Sale"; DimCode: Code[20]; DimValueCode: Code[20]; WithCreate: Boolean) StrMessage: Text
     begin
+        if WithCreate then
+            CheckCreateDimensionValue(DimCode, DimValueCode);
 
-        if (WithCreate) then
-            CheckCreateDimensionValue(JSON, DimSource, DimensionValue);
-
-        case DimSource of
-            DimensionSource::SHORTCUT1:
-                begin
-                    POSSale.SetShortcutDimCode1(DimensionValue);
-                    StrMessage := StrSubstNo(DIMSET, 1, DimensionValue);
-                end;
-            DimensionSource::SHORTCUT2:
-                begin
-                    POSSale.SetShortcutDimCode2(DimensionValue);
-                    StrMessage := StrSubstNo(DIMSET, 2, DimensionValue);
-                end;
-            DimensionSource::ANY:
-                begin
-                    DimensionCode := CopyStr(GetParamterString(JSON, 'DimensionCode'), 1, MaxStrLen(DimensionCode));
-                    POSSale.SetDimension(DimensionCode, DimensionValue);
-                    StrMessage := StrSubstNo(DIMSET, DimensionCode, DimensionValue);
-                end;
-        end;
+        POSSale.SetDimension(DimCode, DimValueCode);
+        StrMessage := StrSubstNo(DIMSET, DimCode, DimValueCode);
     end;
 
-    local procedure CheckCreateDimensionValue(JSON: Codeunit "NPR POS JSON Management"; DimSource: Option; DimValue: Code[20])
+    local procedure SetLineDimensionValue(var SaleLinePOS: Record "NPR POS Sale Line"; DimCode: Code[20]; DimValueCode: Code[20]; WithCreate: Boolean) StrMessage: Text
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        DimensionValue: Record "Dimension Value";
-        DimCode: Code[20];
+        SaleLinePOS2: Record "NPR POS Sale Line";
     begin
+        if SaleLinePOS.IsEmpty() then
+            exit;
 
-        GeneralLedgerSetup.Get();
-        case DimSource of
-            DimensionSource::SHORTCUT1:
-                DimCode := GeneralLedgerSetup."Global Dimension 1 Code";
-            DimensionSource::SHORTCUT2:
-                DimCode := GeneralLedgerSetup."Global Dimension 2 Code";
-            DimensionSource::ANY:
-                DimCode := CopyStr(GetParamterString(JSON, 'DimensionCode'), 1, MaxStrLen(DimCode));
-        end;
+        if WithCreate then
+            CheckCreateDimensionValue(DimCode, DimValueCode);
 
-        if (DimensionValue.Get(DimCode, DimValue)) then
+        SaleLinePOS.FindSet(true);
+        repeat
+            SaleLinePOS2 := SaleLinePOS;
+            SaleLinePOS2.SetDimension(DimCode, DimValueCode);
+        until SaleLinePOS.Next() = 0;
+
+        StrMessage := StrSubstNo(DIMSET, DimCode, DimValueCode);
+    end;
+
+    local procedure CheckCreateDimensionValue(DimCode: Code[20]; DimValueCode: Code[20])
+    var
+        DimensionValue: Record "Dimension Value";
+    begin
+        if DimensionValue.Get(DimCode, DimValueCode) then
             exit;
 
         DimensionValue.Init();
         DimensionValue."Dimension Code" := DimCode;
-        DimensionValue.Code := DimValue;
+        DimensionValue.Code := DimValueCode;
         DimensionValue."Dimension Value Type" := DimensionValue."Dimension Value Type"::Standard;
         DimensionValue.Insert(true);
     end;
@@ -269,10 +295,310 @@
         exit(JSON.GetString('input'));
     end;
 
-    local procedure GetParamterString(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
+    local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
+    var
+        Dimension: Record Dimension;
+        SelectedValue: Code[20];
     begin
-        JSON.SetScopeRoot();
-        JSON.SetScopeParameters(ActionCode());
-        exit(JSON.GetStringOrFail(Path, StrSubstNo(ReadingErr, ActionCode())));
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            ParameterDimensionCode_Name():
+                begin
+                    SelectedValue := CopyStr(POSParameterValue.Value, 1, MaxStrLen(SelectedValue));
+                    if SelectedValue <> '' then begin
+                        Dimension.Code := SelectedValue;
+                        if Dimension.Find('=><') then;
+                    end;
+                    if Page.RunModal(0, Dimension) = Action::LookupOK then
+                        POSParameterValue.Value := Dimension.Code;
+                end;
+
+            ParameterDimensionValue_Name():
+                begin
+                    if not GetDimension(POSParameterValue, Dimension, false) then
+                        exit;
+                    SelectedValue := CopyStr(POSParameterValue.Value, 1, MaxStrLen(SelectedValue));
+                    If LookupDimensionValue(Dimension.Code, SelectedValue) then
+                        POSParameterValue.Value := SelectedValue;
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', false, false)]
+    local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
+    var
+        Dimension: Record Dimension;
+        DimensionValue: Record "Dimension Value";
+        FilterMaskLbl: Label '@%1*', Locked = true;
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            ParameterDimensionCode_Name():
+                begin
+                    if POSParameterValue.Value = '' then
+                        exit;
+                    Dimension.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(Dimension.Code));
+                    if not Dimension.Find() then begin
+                        Dimension.SetFilter(Code, StrSubstNo(FilterMaskLbl, POSParameterValue.Value));
+                        Dimension.FindFirst();
+                    end;
+                    POSParameterValue.Value := Dimension.Code;
+                end;
+            ParameterDimensionValue_Name():
+                begin
+                    GetDimension(POSParameterValue, Dimension, true);
+                    DimensionValue."Dimension Code" := Dimension.Code;
+                    DimensionValue.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(DimensionValue.Code));
+                    if not DimensionValue.Find() then begin
+                        DimensionValue.SetRange("Dimension Code", Dimension.Code);
+                        DimensionValue.SetFilter(Code, StrSubstNo(FilterMaskLbl, POSParameterValue.Value));
+                        DimensionValue.FindFirst();
+                    end;
+                    POSParameterValue.Value := DimensionValue.Code;
+                end;
+        end;
+    end;
+
+    local procedure GetDimension(ForPOSParameterValue: Record "NPR POS Parameter Value"; var Dimension: Record Dimension; WithError: Boolean): Boolean
+    var
+        POSParameterValue2: Record "NPR POS Parameter Value";
+        DimSource: Integer;
+        DimCode: Code[20];
+        ParameterValueMissingErr: Label 'Please select a value for parameter "%1"', Comment = '%1 - parameter name';
+    begin
+        POSParameterValue2.SetRange("Table No.", ForPOSParameterValue."Table No.");
+        POSParameterValue2.SetRange(Code, ForPOSParameterValue.Code);
+        POSParameterValue2.SetRange(ID, ForPOSParameterValue.ID);
+        POSParameterValue2.SetRange("Record ID", ForPOSParameterValue."Record ID");
+        POSParameterValue2.SetRange(Name, ParameterDimensionSource_Name());
+        if not (POSParameterValue2.FindFirst() and TryGetDimensionSourceOptionNo(POSParameterValue2, DimSource)) then begin
+            if WithError then
+                Error(ParameterValueMissingErr, ParameterDimensionSource_Caption());
+            exit(false);
+        end;
+
+        case DimSource of
+            DimensionSourceOptions::SHORTCUT1,
+            DimensionSourceOptions::SHORTCUT2:
+                DimCode := GetGlobalDimensionCode(DimSource);
+            DimensionSourceOptions::ANY:
+                begin
+                    POSParameterValue2.SetRange(Name, ParameterDimensionCode_Name());
+                    if not (POSParameterValue2.FindFirst() and (POSParameterValue2.Value <> '')) then begin
+                        if WithError then
+                            Error(ParameterValueMissingErr, ParameterDimensionCode_Caption());
+                        exit(false);
+                    end;
+                    DimCode := CopyStr(POSParameterValue2.Value, 1, MaxStrLen(Dimension.Code));
+                end;
+        end;
+
+        if WithError then begin
+            Dimension.Get(DimCode);
+            exit(true);
+        end else
+            exit(Dimension.Get(DimCode));
+    end;
+
+    local procedure GetGlobalDimensionCode(DimSource: Integer) DimCode: Code[20]
+    var
+        FailErr: Label '%1\AL stack trace:\%2';
+    begin
+        if not TryGetGlobalDimensionCode(DimSource, DimCode) then
+            Error(FailErr, GetLastErrorText(), GetLastErrorCallStack());
+    end;
+
+    [TryFunction]
+    local procedure TryGetGlobalDimensionCode(DimSource: Integer; var DimCode: Code[20])
+    var
+        GLSetup: Record "General Ledger Setup";
+        IncorrectCallErr: Label 'Function call with an incorrect parameter (DimSource = ''%1''). This is a programming bug, not a user error. Please contact system vendor.';
+    begin
+        if not (DimSource in [DimensionSourceOptions::SHORTCUT1, DimensionSourceOptions::SHORTCUT2]) then
+            error(IncorrectCallErr, DimSource);
+
+        GLSetup.Get();
+        case DimSource of
+            DimensionSourceOptions::SHORTCUT1:
+                begin
+                    GLSetup.TestField("Global Dimension 1 Code");
+                    DimCode := GLSetup."Global Dimension 1 Code";
+                end;
+            DimensionSourceOptions::SHORTCUT2:
+                begin
+                    GLSetup.TestField("Global Dimension 2 Code");
+                    DimCode := GLSetup."Global Dimension 2 Code";
+                end;
+        end;
+    end;
+
+    [TryFunction]
+    local procedure TryGetDimensionSourceOptionNo(POSParameterValue: Record "NPR POS Parameter Value"; var DimSource: Integer)
+    var
+        POSActionParameter: Record "NPR POS Action Parameter";
+    begin
+        POSActionParameter.Get(POSParameterValue."Action Code", POSParameterValue.Name);
+        DimSource := POSActionParameter.GetOptionInt(POSParameterValue.Value);
+        if DimSource < 0 then
+            DimSource := 0;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
+    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        CaptionApplyTo: Label 'Apply-To';
+        CaptionCreateDimValue: Label 'Create Value';
+        CaptionShowConfirmMessage: Label 'Confirm';
+        CaptionStatisticsFrequency: Label 'Statistics Frequency';
+        CaptionValueSelection: Label 'Value Selection';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            ParameterDimensionCode_Name():
+                Caption := ParameterDimensionCode_Caption();
+            ParameterDimensionValue_Name():
+                Caption := ParameterDimensionValue_Caption();
+            ParameterDimensionSource_Name():
+                Caption := ParameterDimensionSource_Caption();
+            ParameterCreateDimValue_Name():
+                Caption := CaptionCreateDimValue;
+            ParameterValueSelection_Name():
+                Caption := CaptionValueSelection;
+            ParameterApplyTo_Name():
+                Caption := CaptionApplyTo;
+            ParameterStatisticsFrequency_Name():
+                Caption := CaptionStatisticsFrequency;
+            ParameterShowConfirmMessage_Name():
+                Caption := CaptionShowConfirmMessage;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
+    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        DescApplyTo: Label 'Specifies the scope the dimension is to be applied to. ''All Sales Items'' means all lines of type ''Sale''';
+        DescCreateDimValue: Label 'Specifies if the system will automatically create missing dimension values';
+        DescDimensionCode: Label 'Specifies the code of the dimension you want to assign to the sale';
+        DescDimensionSource: Label 'Specifies the source of the dimension code to be used for the POS action';
+        DescDimensionValue: Label 'Specifies the dimention value you want to assign to the sale';
+        DescShowConfirmMessage: Label 'Specifies whether system should acknowledge successful dimension assignment with a confirmation message';
+        DescStatisticsFrequency: Label 'Specifies the probability system will run the POS action. 1 - means 100% (always), 2 - 50%, 4 - 25% etc.';
+        DescValueSelection: Label 'Specifies the way system will ask user to specify a dimension value';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            ParameterDimensionCode_Name():
+                Caption := DescDimensionCode;
+            ParameterDimensionValue_Name():
+                Caption := DescDimensionValue;
+            ParameterDimensionSource_Name():
+                Caption := DescDimensionSource;
+            ParameterCreateDimValue_Name():
+                Caption := DescCreateDimValue;
+            ParameterValueSelection_Name():
+                Caption := DescValueSelection;
+            ParameterApplyTo_Name():
+                Caption := DescApplyTo;
+            ParameterStatisticsFrequency_Name():
+                Caption := DescStatisticsFrequency;
+            ParameterShowConfirmMessage_Name():
+                Caption := DescShowConfirmMessage;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', true, false)]
+    local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        OptionApplyTo: Label 'Entire Sale,Current Line,All Sales Items';
+        OptionValueSelection: Label 'List,Fixed,Numpad,Textpad';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            ParameterDimensionSource_Name():
+                Caption := ParameterDimensionSource_OptionCaptions();
+            ParameterValueSelection_Name():
+                Caption := OptionValueSelection;
+            ParameterApplyTo_Name():
+                Caption := OptionApplyTo;
+        end;
+    end;
+
+    local procedure ParameterDimensionCode_Name(): Text[30]
+    begin
+        exit('DimensionCode');
+    end;
+
+    local procedure ParameterDimensionCode_Caption(): Text[30]
+    var
+        DimensionCodeLbl: Label 'Dimension Code', MaxLength = 30;
+    begin
+        exit(DimensionCodeLbl);
+    end;
+
+    local procedure ParameterDimensionValue_Name(): Text[30]
+    begin
+        exit('DimensionValue');
+    end;
+
+    local procedure ParameterDimensionValue_Caption(): Text[30]
+    var
+        DimensionValueCodeLbl: Label 'Dimension Value Code', MaxLength = 30;
+    begin
+        exit(DimensionValueCodeLbl);
+    end;
+
+    local procedure ParameterDimensionSource_Name(): Text[30]
+    begin
+        exit('DimensionSource');
+    end;
+
+    local procedure ParameterDimensionSource_OptionCaptions(): Text
+    var
+        DimensionSourceOptionsLbl: Label '1st Global Dimension,2nd Global Dimension,Any';
+    begin
+        exit(DimensionSourceOptionsLbl);
+    end;
+
+    local procedure ParameterDimensionSource_Caption(): Text[30]
+    var
+        DimensionSourceLbl: Label 'Dimension Source', MaxLength = 30;
+    begin
+        exit(DimensionSourceLbl);
+    end;
+
+    local procedure ParameterCreateDimValue_Name(): Text[30]
+    begin
+        exit('CreateDimValue');
+    end;
+
+    local procedure ParameterValueSelection_Name(): Text[30]
+    begin
+        exit('ValueSelection');
+    end;
+
+    local procedure ParameterApplyTo_Name(): Text[30]
+    begin
+        exit('ApplyTo');
+    end;
+
+    local procedure ParameterStatisticsFrequency_Name(): Text[30]
+    begin
+        exit('StatisticsFrequency');
+    end;
+
+    local procedure ParameterShowConfirmMessage_Name(): Text[30]
+    begin
+        exit('ShowConfirmMessage');
     end;
 }

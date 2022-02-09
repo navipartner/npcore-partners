@@ -248,7 +248,7 @@
         OnRefresh(Rec);
     end;
 
-    procedure SetDimension(DimCode: Code[20]; DimValue: Code[20])
+    procedure SetDimension(DimCode: Code[20]; DimValueCode: Code[20])
     var
         Dim: Record Dimension;
         DimVal: Record "Dimension Value";
@@ -259,19 +259,20 @@
         if (not Dim.Get(DimCode)) then
             Error(SetDimension01, DimCode);
 
-        if (not DimVal.Get(Dim.Code, DimValue)) then
-            Error(SetDimension02, DimValue, DimCode);
+        if DimValueCode <> '' then
+            if (not DimVal.Get(Dim.Code, DimValueCode)) then
+                Error(SetDimension02, DimValueCode, DimCode);
 
         DimMgt.GetDimensionSet(TempDimSetEntry, Rec."Dimension Set ID");
-
-        TempDimSetEntry.SetRange("Dimension Code", Dim.Code);
-        if (TempDimSetEntry.FindFirst()) then;
-        TempDimSetEntry."Dimension Code" := Dim.Code;
-        TempDimSetEntry."Dimension Value Code" := DimVal.Code;
-        TempDimSetEntry."Dimension Value ID" := DimVal."Dimension Value ID";
-
-        if (not TempDimSetEntry.Insert()) then
-            TempDimSetEntry.Modify();
+        if TempDimSetEntry.Get(TempDimSetEntry."Dimension Set ID", Dim.Code) then
+            if TempDimSetEntry."Dimension Value Code" <> DimValueCode then
+                TempDimSetEntry.Delete();
+        if DimValueCode <> '' then begin
+            TempDimSetEntry."Dimension Code" := DimVal."Dimension Code";
+            TempDimSetEntry."Dimension Value Code" := DimVal.Code;
+            TempDimSetEntry."Dimension Value ID" := DimVal."Dimension Value ID";
+            if TempDimSetEntry.Insert() then;
+        end;
 
         OldDimSetID := Rec."Dimension Set ID";
         Rec."Dimension Set ID" := TempDimSetEntry.GetDimensionSetID(TempDimSetEntry);
