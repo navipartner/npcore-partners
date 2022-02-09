@@ -467,6 +467,7 @@
         PaymentMapping: Record "NPR Magento Payment Mapping";
         NPRMagentoMgt: Codeunit "NPR Magento Mgt.";
         NoSeriesMgt: Codeunit NoSeriesManagement;
+        ManulBoundEventSubMgt: Codeunit "NPR Manul Bound Event Sub. Mgt";
         RecRef: RecordRef;
         XmlElement2: XmlElement;
         XNode: XmlNode;
@@ -505,6 +506,13 @@
         OnBeforeInsertSalesHeader(CurrImportType, CurrImportEntry, XmlElement, SalesHeader);
         SalesHeader.Insert(true);
         SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
+
+        if MagentoWebsite."Responsibility Center" <> '' then begin
+            BindSubscription(ManulBoundEventSubMgt);
+            SalesHeader.Validate("Responsibility Center", MagentoWebsite."Responsibility Center");
+            UnbindSubscription(ManulBoundEventSubMgt);
+        end;
+
         SalesHeader."Sell-to Customer Name" := CopyStr(NpXmlDomMgt.GetElementText(XmlElement2, 'name', MaxStrLen(SalesHeader."Sell-to Customer Name"), true), 1, MaxStrLen(SalesHeader."Sell-to Customer Name"));
         SalesHeader."Sell-to Customer Name 2" := CopyStr(NpXmlDomMgt.GetElementText(XmlElement2, 'name_2', MaxStrLen(SalesHeader."Sell-to Customer Name 2"), false), 1, MaxStrLen(SalesHeader."Sell-to Customer Name 2"));
         SalesHeader."Sell-to Address" := CopyStr(NpXmlDomMgt.GetElementText(XmlElement2, 'address', MaxStrLen(SalesHeader."Sell-to Address"), true), 1, MaxStrLen(SalesHeader."Sell-to Address"));

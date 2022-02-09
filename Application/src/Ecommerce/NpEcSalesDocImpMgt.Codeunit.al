@@ -254,6 +254,7 @@
     var
         NpEcDocument: Record "NPR NpEc Document";
         NpEcStore: Record "NPR NpEc Store";
+        ManulBoundEventSubMgt: Codeunit "NPR Manul Bound Event Sub. Mgt";
         Node: XmlNode;
     begin
         FindStore(Element, NpEcStore);
@@ -279,6 +280,13 @@
             SalesHeader."External Document No." := CopyStr(NpEcDocument."Reference No.", 1, MaxStrLen(SalesHeader."External Document No."));
 
         SetSellToCustomer(Element, SalesHeader);
+
+        if NpEcStore."Responsibility Center" <> '' then begin
+            BindSubscription(ManulBoundEventSubMgt);
+            SalesHeader.Validate("Responsibility Center", NpEcStore."Responsibility Center");
+            UnbindSubscription(ManulBoundEventSubMgt);
+        end;
+
         SetShipToCustomer(Element, SalesHeader);
         SetOrderDates(Element, SalesHeader);
         SetShipmentMethod(Element, SalesHeader);
