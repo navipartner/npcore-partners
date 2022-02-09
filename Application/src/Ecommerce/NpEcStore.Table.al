@@ -77,6 +77,12 @@
             Caption = 'Release Order on Import';
             DataClassification = CustomerContent;
         }
+        field(190; "Responsibility Center"; Code[10])
+        {
+            Caption = 'Responsibility Center';
+            DataClassification = CustomerContent;
+            TableRelation = "Responsibility Center";
+        }
     }
 
     keys
