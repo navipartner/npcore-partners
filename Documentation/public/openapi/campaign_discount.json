@@ -1,0 +1,3837 @@
+{
+	"openapi": "3.0.1",
+	"info": {
+		"title": "Navipartner API Campaign Discounts",
+		"description": "These examples show how to use Navipartner Campaign Discounts API"
+	},
+	"servers": [
+		{
+			"url": "https://api.businesscentral.dynamics.com/v2.0/{environmentName}/api/navipartner/core/v1.0/",
+			"variables": {
+				"environmentName": {
+					"default": "REPLACE_ME",
+					"description": "Environment name"
+				}
+			},
+			"description": "Microsoft BC Cloud"
+		},
+		{
+			"url": "https://{tenantId}.dynamics-retail.com:7069/BC/api/navipartner/core/v1.0/",
+			"variables": {
+				"tenantId": {
+					"default": "REPLACE_ME",
+					"description": "Tenant ID"
+				}
+			},
+			"description": "NaviPartner OnPrem"
+		},
+		{
+			"url": "https://{containerName}.dynamics-retail.net:443/BC/api/navipartner/core/v1.0/",
+			"variables": {
+				"containerName": {
+					"default": "REPLACE_ME",
+					"description": "Container Name"
+				}
+			},
+			"description": "NaviPartner Crane Container"
+		}
+	],
+	"security": [
+		{
+			"BasicAuth": [],
+			"OAuth2": [
+				"https://api.businesscentral.dynamics.com/.default"
+			]
+		}
+	],
+	"paths": {
+		"/companies": {
+			"get": {
+				"tags": [
+					"companies.company"
+				],
+				"summary": "Get entities from companies",
+				"operationId": "companies.company.ListCompany",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"id desc",
+									"systemVersion",
+									"systemVersion desc",
+									"name",
+									"name desc",
+									"displayName",
+									"displayName desc",
+									"businessProfileId",
+									"businessProfileId desc",
+									"systemCreatedAt",
+									"systemCreatedAt desc",
+									"systemCreatedBy",
+									"systemCreatedBy desc",
+									"systemModifiedAt",
+									"systemModifiedAt desc",
+									"systemModifiedBy",
+									"systemModifiedBy desc"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"systemVersion",
+									"name",
+									"displayName",
+									"businessProfileId",
+									"systemCreatedAt",
+									"systemCreatedBy",
+									"systemModifiedAt",
+									"systemModifiedBy",
+									"periodDiscounts"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"periodDiscounts"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entities",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of company",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.company"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				}
+			}
+		},
+		"/companies({id})": {
+			"get": {
+				"tags": [
+					"companies.company"
+				],
+				"summary": "Get entity from companies by key",
+				"operationId": "companies.company.GetCompany",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"systemVersion",
+									"name",
+									"displayName",
+									"businessProfileId",
+									"systemCreatedAt",
+									"systemCreatedBy",
+									"systemModifiedAt",
+									"systemModifiedBy",
+									"periodDiscounts"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"periodDiscounts"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entity",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.company"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/periodDiscounts": {
+			"get": {
+				"tags": [
+					"companies.periodDiscount"
+				],
+				"summary": "Get periodDiscounts from companies",
+				"operationId": "companies.ListPeriodDiscounts",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"id desc",
+									"code",
+									"code desc",
+									"blockCustomDisc",
+									"blockCustomDisc desc",
+									"createdDate",
+									"createdDate desc",
+									"customerDiscGroupFilter",
+									"customerDiscGroupFilter desc",
+									"description",
+									"description desc",
+									"startingDate",
+									"startingDate desc",
+									"startingTime",
+									"startingTime desc",
+									"endingDate",
+									"endingDate desc",
+									"endingTime",
+									"endingTime desc",
+									"globalDimension1Code",
+									"globalDimension1Code desc",
+									"globalDimension2Code",
+									"globalDimension2Code desc",
+									"locationCode",
+									"locationCode desc",
+									"noSeries",
+									"noSeries desc",
+									"periodDescription",
+									"periodDescription desc",
+									"periodType",
+									"periodType desc",
+									"quantitySold",
+									"quantitySold desc",
+									"turnover",
+									"turnover desc",
+									"monday",
+									"monday desc",
+									"tuesday",
+									"tuesday desc",
+									"wednesday",
+									"wednesday desc",
+									"thursday",
+									"thursday desc",
+									"friday",
+									"friday desc",
+									"saturday",
+									"saturday desc",
+									"sunday",
+									"sunday desc",
+									"status",
+									"status desc",
+									"lastDateModified",
+									"lastDateModified desc",
+									"systemModifiedAt",
+									"systemModifiedAt desc",
+									"replicationCounter",
+									"replicationCounter desc"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"code",
+									"blockCustomDisc",
+									"createdDate",
+									"customerDiscGroupFilter",
+									"description",
+									"startingDate",
+									"startingTime",
+									"endingDate",
+									"endingTime",
+									"globalDimension1Code",
+									"globalDimension2Code",
+									"locationCode",
+									"noSeries",
+									"periodDescription",
+									"periodType",
+									"quantitySold",
+									"turnover",
+									"monday",
+									"tuesday",
+									"wednesday",
+									"thursday",
+									"friday",
+									"saturday",
+									"sunday",
+									"status",
+									"lastDateModified",
+									"systemModifiedAt",
+									"replicationCounter",
+									"customerDiscountGroup",
+									"dimensionValue",
+									"location",
+									"periodDiscountLines"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"customerDiscountGroup",
+									"dimensionValue",
+									"location",
+									"periodDiscountLines"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of periodDiscount",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"post": {
+				"tags": [
+					"companies.periodDiscount"
+				],
+				"summary": "Create new navigation property to periodDiscounts for companies",
+				"operationId": "companies.CreatePeriodDiscounts",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created navigation property.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/periodDiscounts({id1})": {
+			"get": {
+				"tags": [
+					"companies.periodDiscount"
+				],
+				"summary": "Get periodDiscounts from companies",
+				"operationId": "companies.GetPeriodDiscounts",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"code",
+									"blockCustomDisc",
+									"createdDate",
+									"customerDiscGroupFilter",
+									"description",
+									"startingDate",
+									"startingTime",
+									"endingDate",
+									"endingTime",
+									"globalDimension1Code",
+									"globalDimension2Code",
+									"locationCode",
+									"noSeries",
+									"periodDescription",
+									"periodType",
+									"quantitySold",
+									"turnover",
+									"monday",
+									"tuesday",
+									"wednesday",
+									"thursday",
+									"friday",
+									"saturday",
+									"sunday",
+									"status",
+									"lastDateModified",
+									"systemModifiedAt",
+									"replicationCounter",
+									"customerDiscountGroup",
+									"dimensionValue",
+									"location",
+									"periodDiscountLines"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"customerDiscountGroup",
+									"dimensionValue",
+									"location",
+									"periodDiscountLines"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.periodDiscount"
+				],
+				"summary": "Update the navigation property periodDiscounts in companies",
+				"operationId": "companies.UpdatePeriodDiscounts",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.periodDiscount"
+				],
+				"summary": "Delete navigation property periodDiscounts for companies",
+				"operationId": "companies.DeletePeriodDiscounts",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/periodDiscounts({id1})/customerDiscountGroup": {
+			"get": {
+				"tags": [
+					"companies.periodDiscounts.customerDiscountGroup"
+				],
+				"summary": "Get customerDiscountGroup from companies",
+				"operationId": "companies.periodDiscounts.GetCustomerDiscountGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.customerDiscountGroup"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.periodDiscounts.customerDiscountGroup"
+				],
+				"summary": "Update the navigation property customerDiscountGroup in companies",
+				"operationId": "companies.periodDiscounts.UpdateCustomerDiscountGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.customerDiscountGroup"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.periodDiscounts.customerDiscountGroup"
+				],
+				"summary": "Delete navigation property customerDiscountGroup for companies",
+				"operationId": "companies.periodDiscounts.DeleteCustomerDiscountGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/periodDiscounts({id1})/dimensionValue": {
+			"get": {
+				"tags": [
+					"companies.periodDiscounts.dimensionValue"
+				],
+				"summary": "Get dimensionValue from companies",
+				"operationId": "companies.periodDiscounts.GetDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.dimensionValue"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.periodDiscounts.dimensionValue"
+				],
+				"summary": "Update the navigation property dimensionValue in companies",
+				"operationId": "companies.periodDiscounts.UpdateDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.dimensionValue"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.periodDiscounts.dimensionValue"
+				],
+				"summary": "Delete navigation property dimensionValue for companies",
+				"operationId": "companies.periodDiscounts.DeleteDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/periodDiscounts({id1})/location": {
+			"get": {
+				"tags": [
+					"companies.periodDiscounts.location"
+				],
+				"summary": "Get location from companies",
+				"operationId": "companies.periodDiscounts.GetLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.location"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.periodDiscounts.location"
+				],
+				"summary": "Update the navigation property location in companies",
+				"operationId": "companies.periodDiscounts.UpdateLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.location"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.periodDiscounts.location"
+				],
+				"summary": "Delete navigation property location for companies",
+				"operationId": "companies.periodDiscounts.DeleteLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/periodDiscounts({id1})/periodDiscountLines": {
+			"get": {
+				"tags": [
+					"companies.periodDiscounts.periodDiscountLine"
+				],
+				"summary": "Get periodDiscountLines from companies",
+				"operationId": "companies.periodDiscounts.ListPeriodDiscountLines",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of periodDiscountLine",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"post": {
+				"tags": [
+					"companies.periodDiscounts.periodDiscountLine"
+				],
+				"summary": "Create new navigation property to periodDiscountLines for companies",
+				"operationId": "companies.periodDiscounts.CreatePeriodDiscountLines",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created navigation property.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/periodDiscounts({id1})/periodDiscountLines()": {
+			"get": {
+				"tags": [
+					"companies.periodDiscounts.periodDiscountLine"
+				],
+				"summary": "Get periodDiscountLines from companies",
+				"operationId": "companies.periodDiscounts.GetPeriodDiscountLines",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.periodDiscounts.periodDiscountLine"
+				],
+				"summary": "Update the navigation property periodDiscountLines in companies",
+				"operationId": "companies.periodDiscounts.UpdatePeriodDiscountLines",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.periodDiscounts.periodDiscountLine"
+				],
+				"summary": "Delete navigation property periodDiscountLines for companies",
+				"operationId": "companies.periodDiscounts.DeletePeriodDiscountLines",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/entityDefinitions": {
+			"get": {
+				"tags": [
+					"entityDefinitions.entityMetadata"
+				],
+				"summary": "Get entities from entityDefinitions",
+				"operationId": "entityDefinitions.entityMetadata.ListEntityMetadata",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"entityName",
+									"entityName desc",
+									"entitySetName",
+									"entitySetName desc",
+									"entityCaptions",
+									"entityCaptions desc",
+									"entitySetCaptions",
+									"entitySetCaptions desc",
+									"properties",
+									"properties desc",
+									"actions",
+									"actions desc",
+									"enumMembers",
+									"enumMembers desc"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"entityName",
+									"entitySetName",
+									"entityCaptions",
+									"entitySetCaptions",
+									"properties",
+									"actions",
+									"enumMembers"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entities",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of entityMetadata",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.entityMetadata"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"entityDefinitions.entityMetadata"
+				],
+				"summary": "Add new entity to entityDefinitions",
+				"operationId": "entityDefinitions.entityMetadata.CreateEntityMetadata",
+				"requestBody": {
+					"description": "New entity",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.entityMetadata"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created entity",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadata"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/entityDefinitions({entityName})": {
+			"get": {
+				"tags": [
+					"entityDefinitions.entityMetadata"
+				],
+				"summary": "Get entity from entityDefinitions by key",
+				"operationId": "entityDefinitions.entityMetadata.GetEntityMetadata",
+				"parameters": [
+					{
+						"name": "entityName",
+						"in": "path",
+						"description": "key: entityName of entityMetadata",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"x-ms-docs-key-type": "entityMetadata"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"entityName",
+									"entitySetName",
+									"entityCaptions",
+									"entitySetCaptions",
+									"properties",
+									"actions",
+									"enumMembers"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entity",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadata"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"entityDefinitions.entityMetadata"
+				],
+				"summary": "Update entity in entityDefinitions",
+				"operationId": "entityDefinitions.entityMetadata.UpdateEntityMetadata",
+				"parameters": [
+					{
+						"name": "entityName",
+						"in": "path",
+						"description": "key: entityName of entityMetadata",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"x-ms-docs-key-type": "entityMetadata"
+					}
+				],
+				"requestBody": {
+					"description": "New property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.entityMetadata"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"entityDefinitions.entityMetadata"
+				],
+				"summary": "Delete entity from entityDefinitions",
+				"operationId": "entityDefinitions.entityMetadata.DeleteEntityMetadata",
+				"parameters": [
+					{
+						"name": "entityName",
+						"in": "path",
+						"description": "key: entityName of entityMetadata",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"x-ms-docs-key-type": "entityMetadata"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/periodDiscounts": {
+			"get": {
+				"tags": [
+					"periodDiscounts.periodDiscount"
+				],
+				"summary": "Get entities from periodDiscounts",
+				"operationId": "periodDiscounts.periodDiscount.ListPeriodDiscount",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"id desc",
+									"code",
+									"code desc",
+									"blockCustomDisc",
+									"blockCustomDisc desc",
+									"createdDate",
+									"createdDate desc",
+									"customerDiscGroupFilter",
+									"customerDiscGroupFilter desc",
+									"description",
+									"description desc",
+									"startingDate",
+									"startingDate desc",
+									"startingTime",
+									"startingTime desc",
+									"endingDate",
+									"endingDate desc",
+									"endingTime",
+									"endingTime desc",
+									"globalDimension1Code",
+									"globalDimension1Code desc",
+									"globalDimension2Code",
+									"globalDimension2Code desc",
+									"locationCode",
+									"locationCode desc",
+									"noSeries",
+									"noSeries desc",
+									"periodDescription",
+									"periodDescription desc",
+									"periodType",
+									"periodType desc",
+									"quantitySold",
+									"quantitySold desc",
+									"turnover",
+									"turnover desc",
+									"monday",
+									"monday desc",
+									"tuesday",
+									"tuesday desc",
+									"wednesday",
+									"wednesday desc",
+									"thursday",
+									"thursday desc",
+									"friday",
+									"friday desc",
+									"saturday",
+									"saturday desc",
+									"sunday",
+									"sunday desc",
+									"status",
+									"status desc",
+									"lastDateModified",
+									"lastDateModified desc",
+									"systemModifiedAt",
+									"systemModifiedAt desc",
+									"replicationCounter",
+									"replicationCounter desc"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"code",
+									"blockCustomDisc",
+									"createdDate",
+									"customerDiscGroupFilter",
+									"description",
+									"startingDate",
+									"startingTime",
+									"endingDate",
+									"endingTime",
+									"globalDimension1Code",
+									"globalDimension2Code",
+									"locationCode",
+									"noSeries",
+									"periodDescription",
+									"periodType",
+									"quantitySold",
+									"turnover",
+									"monday",
+									"tuesday",
+									"wednesday",
+									"thursday",
+									"friday",
+									"saturday",
+									"sunday",
+									"status",
+									"lastDateModified",
+									"systemModifiedAt",
+									"replicationCounter",
+									"customerDiscountGroup",
+									"dimensionValue",
+									"location",
+									"periodDiscountLines"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"customerDiscountGroup",
+									"dimensionValue",
+									"location",
+									"periodDiscountLines"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entities",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of periodDiscount",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"periodDiscounts.periodDiscount"
+				],
+				"summary": "Add new entity to periodDiscounts",
+				"operationId": "periodDiscounts.periodDiscount.CreatePeriodDiscount",
+				"requestBody": {
+					"description": "New entity",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created entity",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/periodDiscounts({id})": {
+			"get": {
+				"tags": [
+					"periodDiscounts.periodDiscount"
+				],
+				"summary": "Get entity from periodDiscounts by key",
+				"operationId": "periodDiscounts.periodDiscount.GetPeriodDiscount",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"code",
+									"blockCustomDisc",
+									"createdDate",
+									"customerDiscGroupFilter",
+									"description",
+									"startingDate",
+									"startingTime",
+									"endingDate",
+									"endingTime",
+									"globalDimension1Code",
+									"globalDimension2Code",
+									"locationCode",
+									"noSeries",
+									"periodDescription",
+									"periodType",
+									"quantitySold",
+									"turnover",
+									"monday",
+									"tuesday",
+									"wednesday",
+									"thursday",
+									"friday",
+									"saturday",
+									"sunday",
+									"status",
+									"lastDateModified",
+									"systemModifiedAt",
+									"replicationCounter",
+									"customerDiscountGroup",
+									"dimensionValue",
+									"location",
+									"periodDiscountLines"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"customerDiscountGroup",
+									"dimensionValue",
+									"location",
+									"periodDiscountLines"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entity",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"periodDiscounts.periodDiscount"
+				],
+				"summary": "Update entity in periodDiscounts",
+				"operationId": "periodDiscounts.periodDiscount.UpdatePeriodDiscount",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"periodDiscounts.periodDiscount"
+				],
+				"summary": "Delete entity from periodDiscounts",
+				"operationId": "periodDiscounts.periodDiscount.DeletePeriodDiscount",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/periodDiscounts({id})/customerDiscountGroup": {
+			"get": {
+				"tags": [
+					"periodDiscounts.customerDiscountGroup"
+				],
+				"summary": "Get customerDiscountGroup from periodDiscounts",
+				"operationId": "periodDiscounts.GetCustomerDiscountGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.customerDiscountGroup"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"periodDiscounts.customerDiscountGroup"
+				],
+				"summary": "Update the navigation property customerDiscountGroup in periodDiscounts",
+				"operationId": "periodDiscounts.UpdateCustomerDiscountGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.customerDiscountGroup"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"periodDiscounts.customerDiscountGroup"
+				],
+				"summary": "Delete navigation property customerDiscountGroup for periodDiscounts",
+				"operationId": "periodDiscounts.DeleteCustomerDiscountGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/periodDiscounts({id})/dimensionValue": {
+			"get": {
+				"tags": [
+					"periodDiscounts.dimensionValue"
+				],
+				"summary": "Get dimensionValue from periodDiscounts",
+				"operationId": "periodDiscounts.GetDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.dimensionValue"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"periodDiscounts.dimensionValue"
+				],
+				"summary": "Update the navigation property dimensionValue in periodDiscounts",
+				"operationId": "periodDiscounts.UpdateDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.dimensionValue"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"periodDiscounts.dimensionValue"
+				],
+				"summary": "Delete navigation property dimensionValue for periodDiscounts",
+				"operationId": "periodDiscounts.DeleteDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/periodDiscounts({id})/location": {
+			"get": {
+				"tags": [
+					"periodDiscounts.location"
+				],
+				"summary": "Get location from periodDiscounts",
+				"operationId": "periodDiscounts.GetLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.location"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"periodDiscounts.location"
+				],
+				"summary": "Update the navigation property location in periodDiscounts",
+				"operationId": "periodDiscounts.UpdateLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.location"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"periodDiscounts.location"
+				],
+				"summary": "Delete navigation property location for periodDiscounts",
+				"operationId": "periodDiscounts.DeleteLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/periodDiscounts({id})/periodDiscountLines": {
+			"get": {
+				"tags": [
+					"periodDiscounts.periodDiscountLine"
+				],
+				"summary": "Get periodDiscountLines from periodDiscounts",
+				"operationId": "periodDiscounts.ListPeriodDiscountLines",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of periodDiscountLine",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"post": {
+				"tags": [
+					"periodDiscounts.periodDiscountLine"
+				],
+				"summary": "Create new navigation property to periodDiscountLines for periodDiscounts",
+				"operationId": "periodDiscounts.CreatePeriodDiscountLines",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created navigation property.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/periodDiscounts({id})/periodDiscountLines()": {
+			"get": {
+				"tags": [
+					"periodDiscounts.periodDiscountLine"
+				],
+				"summary": "Get periodDiscountLines from periodDiscounts",
+				"operationId": "periodDiscounts.GetPeriodDiscountLines",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"periodDiscounts.periodDiscountLine"
+				],
+				"summary": "Update the navigation property periodDiscountLines in periodDiscounts",
+				"operationId": "periodDiscounts.UpdatePeriodDiscountLines",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"periodDiscounts.periodDiscountLine"
+				],
+				"summary": "Delete navigation property periodDiscountLines for periodDiscounts",
+				"operationId": "periodDiscounts.DeletePeriodDiscountLines",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of periodDiscount",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "periodDiscount"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Microsoft.NAV.entityMetadata": {
+				"title": "entityMetadata",
+				"type": "object",
+				"properties": {
+					"entityName": {
+						"type": "string"
+					},
+					"entitySetName": {
+						"type": "string",
+						"nullable": true
+					},
+					"entityCaptions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataLabel"
+								}
+							],
+							"nullable": true
+						}
+					},
+					"entitySetCaptions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataLabel"
+								}
+							],
+							"nullable": true
+						}
+					},
+					"properties": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataField"
+								}
+							],
+							"nullable": true
+						}
+					},
+					"actions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataAction"
+								}
+							],
+							"nullable": true
+						}
+					},
+					"enumMembers": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataEnumMember"
+								}
+							],
+							"nullable": true
+						}
+					}
+				}
+			},
+			"Microsoft.NAV.entityMetadataLabel": {
+				"title": "entityMetadataLabel",
+				"type": "object",
+				"properties": {
+					"languageCode": {
+						"maximum": 2147483647,
+						"minimum": -2147483648,
+						"type": "integer",
+						"format": "int32"
+					},
+					"caption": {
+						"type": "string"
+					}
+				}
+			},
+			"Microsoft.NAV.entityMetadataField": {
+				"title": "entityMetadataField",
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"captions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataLabel"
+								}
+							],
+							"nullable": true
+						}
+					}
+				}
+			},
+			"Microsoft.NAV.entityMetadataAction": {
+				"title": "entityMetadataAction",
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"captions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataLabel"
+								}
+							],
+							"nullable": true
+						}
+					}
+				}
+			},
+			"Microsoft.NAV.entityMetadataEnumMember": {
+				"title": "entityMetadataEnumMember",
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"value": {
+						"maximum": 2147483647,
+						"minimum": -2147483648,
+						"type": "integer",
+						"format": "int32"
+					},
+					"captions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataLabel"
+								}
+							],
+							"nullable": true
+						}
+					}
+				}
+			},
+			"Microsoft.NAV.company": {
+				"title": "company",
+				"type": "object",
+				"properties": {
+					"id": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid"
+					},
+					"systemVersion": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"maxLength": 30,
+						"type": "string",
+						"nullable": true
+					},
+					"displayName": {
+						"maxLength": 250,
+						"type": "string",
+						"nullable": true
+					},
+					"businessProfileId": {
+						"maxLength": 250,
+						"type": "string",
+						"nullable": true
+					},
+					"systemCreatedAt": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$",
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"systemCreatedBy": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid",
+						"nullable": true
+					},
+					"systemModifiedAt": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$",
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"systemModifiedBy": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid",
+						"nullable": true
+					},
+					"periodDiscounts": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Microsoft.NAV.periodDiscount"
+						}
+					}
+				}
+			},
+			"Microsoft.NAV.periodDiscount": {
+				"title": "periodDiscount",
+				"type": "object",
+				"properties": {
+					"id": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid"
+					},
+					"code": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"blockCustomDisc": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"createdDate": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$",
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					},
+					"customerDiscGroupFilter": {
+						"maxLength": 250,
+						"type": "string",
+						"nullable": true
+					},
+					"description": {
+						"maxLength": 50,
+						"type": "string",
+						"nullable": true
+					},
+					"startingDate": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$",
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					},
+					"startingTime": {
+						"type": "string",
+						"nullable": true
+					},
+					"endingDate": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$",
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					},
+					"endingTime": {
+						"type": "string",
+						"nullable": true
+					},
+					"globalDimension1Code": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"globalDimension2Code": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"locationCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"noSeries": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"periodDescription": {
+						"maxLength": 250,
+						"type": "string",
+						"nullable": true
+					},
+					"periodType": {
+						"type": "string",
+						"nullable": true
+					},
+					"quantitySold": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"turnover": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"monday": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"tuesday": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"wednesday": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"thursday": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"friday": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"saturday": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"sunday": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"status": {
+						"type": "string",
+						"nullable": true
+					},
+					"lastDateModified": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$",
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					},
+					"systemModifiedAt": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$",
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"replicationCounter": {
+						"type": "integer",
+						"format": "int64",
+						"nullable": true
+					},
+					"customerDiscountGroup": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.customerDiscountGroup"
+							}
+						],
+						"nullable": true
+					},
+					"dimensionValue": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.dimensionValue"
+							}
+						],
+						"nullable": true
+					},
+					"location": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.location"
+							}
+						],
+						"nullable": true
+					},
+					"periodDiscountLines": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Microsoft.NAV.periodDiscountLine"
+						}
+					}
+				}
+			},
+			"odata.error": {
+				"required": [
+					"error"
+				],
+				"type": "object",
+				"properties": {
+					"error": {
+						"$ref": "#/components/schemas/odata.error.main"
+					}
+				}
+			},
+			"odata.error.main": {
+				"required": [
+					"code",
+					"message"
+				],
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"target": {
+						"type": "string"
+					},
+					"details": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/odata.error.detail"
+						}
+					},
+					"innererror": {
+						"type": "object",
+						"description": "The structure of this object is service-specific"
+					}
+				}
+			},
+			"odata.error.detail": {
+				"required": [
+					"code",
+					"message"
+				],
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"target": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"responses": {
+			"error": {
+				"description": "error",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/odata.error"
+						}
+					}
+				}
+			}
+		},
+		"parameters": {
+			"top": {
+				"name": "$top",
+				"in": "query",
+				"description": "Show only the first n items",
+				"schema": {
+					"minimum": 0,
+					"type": "integer"
+				},
+				"example": 50
+			},
+			"skip": {
+				"name": "$skip",
+				"in": "query",
+				"description": "Skip the first n items",
+				"schema": {
+					"minimum": 0,
+					"type": "integer"
+				}
+			},
+			"count": {
+				"name": "$count",
+				"in": "query",
+				"description": "Include count of items",
+				"schema": {
+					"type": "boolean"
+				}
+			},
+			"filter": {
+				"name": "$filter",
+				"in": "query",
+				"description": "Filter items by property values",
+				"schema": {
+					"type": "string"
+				}
+			},
+			"search": {
+				"name": "$search",
+				"in": "query",
+				"description": "Search items by search phrases",
+				"schema": {
+					"type": "string"
+				}
+			}
+		},
+		"examples": {
+			"Microsoft.NAV.entityMetadata": {
+				"value": {
+					"actions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataAction"
+						}
+					],
+					"entityCaptions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataLabel"
+						}
+					],
+					"entityName": "String (identifier)",
+					"entitySetCaptions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataLabel"
+						}
+					],
+					"entitySetName": "String",
+					"enumMembers": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataEnumMember"
+						}
+					],
+					"properties": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataField"
+						}
+					]
+				}
+			},
+			"Microsoft.NAV.entityMetadataLabel": {
+				"value": {
+					"caption": "String",
+					"languageCode": 0
+				}
+			},
+			"Microsoft.NAV.entityMetadataField": {
+				"value": {
+					"captions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataLabel"
+						}
+					],
+					"name": "String"
+				}
+			},
+			"Microsoft.NAV.entityMetadataAction": {
+				"value": {
+					"captions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataLabel"
+						}
+					],
+					"name": "String"
+				}
+			},
+			"Microsoft.NAV.entityMetadataEnumMember": {
+				"value": {
+					"captions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataLabel"
+						}
+					],
+					"name": "String",
+					"value": 0
+				}
+			},
+			"Microsoft.NAV.company": {
+				"value": {
+					"businessProfileId": "String",
+					"displayName": "String",
+					"id": "00000000-0000-0000-0000-000000000000 (identifier)",
+					"name": "String",
+					"periodDiscounts": [
+						{
+							"@odata.type": "Microsoft.NAV.periodDiscount"
+						}
+					],
+					"systemCreatedAt": "0001-01-01T00:00:00.0000000+00:00",
+					"systemCreatedBy": "00000000-0000-0000-0000-000000000000",
+					"systemModifiedAt": "0001-01-01T00:00:00.0000000+00:00",
+					"systemModifiedBy": "00000000-0000-0000-0000-000000000000",
+					"systemVersion": "String"
+				}
+			},
+			"Microsoft.NAV.periodDiscount": {
+				"value": {
+					"blockCustomDisc": true,
+					"code": "String",
+					"createdDate": "0001-01-01T00:00:00.0000000",
+					"customerDiscGroupFilter": "String",
+					"customerDiscountGroup": {
+						"@odata.type": "Microsoft.NAV.customerDiscountGroup"
+					},
+					"description": "String",
+					"dimensionValue": {
+						"@odata.type": "Microsoft.NAV.dimensionValue"
+					},
+					"endingDate": "0001-01-01T00:00:00.0000000",
+					"endingTime": "String",
+					"friday": true,
+					"globalDimension1Code": "String",
+					"globalDimension2Code": "String",
+					"id": "00000000-0000-0000-0000-000000000000 (identifier)",
+					"lastDateModified": "0001-01-01T00:00:00.0000000",
+					"location": {
+						"@odata.type": "Microsoft.NAV.location"
+					},
+					"locationCode": "String",
+					"monday": true,
+					"noSeries": "String",
+					"periodDescription": "String",
+					"periodDiscountLines": [
+						{
+							"@odata.type": "Microsoft.NAV.periodDiscountLine"
+						}
+					],
+					"periodType": "String",
+					"quantitySold": 0,
+					"replicationCounter": 0,
+					"saturday": true,
+					"startingDate": "0001-01-01T00:00:00.0000000",
+					"startingTime": "String",
+					"status": "String",
+					"sunday": true,
+					"systemModifiedAt": "0001-01-01T00:00:00.0000000+00:00",
+					"thursday": true,
+					"tuesday": true,
+					"turnover": 0,
+					"wednesday": true
+				}
+			}
+		},
+		"securitySchemes": {
+			"BasicAuth": {
+				"type": "http",
+				"scheme": "basic"
+			},
+			"OAuth2": {
+				"type": "oauth2",
+				"flows": {
+					"authorizationCode": {
+						"authorizationUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+						"tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+						"scopes": {
+							"https://api.businesscentral.dynamics.com/.default": "Grants API access"
+						}
+					}
+				}
+			}
+		}
+	},
+	"tags": [
+		{
+			"name": "companies.company",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.periodDiscount",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.periodDiscounts.customerDiscountGroup",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.periodDiscounts.dimensionValue",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.periodDiscounts.location",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.periodDiscounts.periodDiscountLine",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "entityDefinitions.entityMetadata",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "periodDiscounts.periodDiscount",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "periodDiscounts.customerDiscountGroup",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "periodDiscounts.dimensionValue",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "periodDiscounts.location",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "periodDiscounts.periodDiscountLine",
+			"x-ms-docs-toc-type": "page"
+		}
+	]
+}

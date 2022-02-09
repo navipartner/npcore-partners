@@ -1,0 +1,7722 @@
+{
+	"openapi": "3.0.1",
+	"info": {
+		"title": "Navipartner API Vendors",
+		"description": "These examples show how to use Navipartner Vendors API"
+	},
+	"servers": [
+		{
+			"url": "https://api.businesscentral.dynamics.com/v2.0/{environmentName}/api/navipartner/core/v1.0/",
+			"variables": {
+				"environmentName": {
+					"default": "REPLACE_ME",
+					"description": "Environment name"
+				}
+			},
+			"description": "Microsoft BC Cloud"
+		},
+		{
+			"url": "https://{tenantId}.dynamics-retail.com:7069/BC/api/navipartner/core/v1.0/",
+			"variables": {
+				"tenantId": {
+					"default": "REPLACE_ME",
+					"description": "Tenant ID"
+				}
+			},
+			"description": "NaviPartner OnPrem"
+		},
+		{
+			"url": "https://{containerName}.dynamics-retail.net:443/BC/api/navipartner/core/v1.0/",
+			"variables": {
+				"containerName": {
+					"default": "REPLACE_ME",
+					"description": "Container Name"
+				}
+			},
+			"description": "NaviPartner Crane Container"
+		}
+	],
+	"security": [
+		{
+			"BasicAuth": [],
+			"OAuth2": [
+				"https://api.businesscentral.dynamics.com/.default"
+			]
+		}
+	],
+	"paths": {
+		"/companies": {
+			"get": {
+				"tags": [
+					"companies.company"
+				],
+				"summary": "Get entities from companies",
+				"operationId": "companies.company.ListCompany",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"id desc",
+									"systemVersion",
+									"systemVersion desc",
+									"name",
+									"name desc",
+									"displayName",
+									"displayName desc",
+									"businessProfileId",
+									"businessProfileId desc",
+									"systemCreatedAt",
+									"systemCreatedAt desc",
+									"systemCreatedBy",
+									"systemCreatedBy desc",
+									"systemModifiedAt",
+									"systemModifiedAt desc",
+									"systemModifiedBy",
+									"systemModifiedBy desc"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"systemVersion",
+									"name",
+									"displayName",
+									"businessProfileId",
+									"systemCreatedAt",
+									"systemCreatedBy",
+									"systemModifiedAt",
+									"systemModifiedBy",
+									"vendors"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"vendors"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entities",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of company",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.company"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				}
+			}
+		},
+		"/companies({id})": {
+			"get": {
+				"tags": [
+					"companies.company"
+				],
+				"summary": "Get entity from companies by key",
+				"operationId": "companies.company.GetCompany",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"systemVersion",
+									"name",
+									"displayName",
+									"businessProfileId",
+									"systemCreatedAt",
+									"systemCreatedBy",
+									"systemModifiedAt",
+									"systemModifiedBy",
+									"vendors"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"vendors"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entity",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.company"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors": {
+			"get": {
+				"tags": [
+					"companies.vendor"
+				],
+				"summary": "Get vendors from companies",
+				"operationId": "companies.ListVendors",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"id desc",
+									"number",
+									"number desc",
+									"displayName",
+									"displayName desc",
+									"displayName2",
+									"displayName2 desc",
+									"searchName",
+									"searchName desc",
+									"contact",
+									"contact desc",
+									"telexNo",
+									"telexNo desc",
+									"ourAccountNo",
+									"ourAccountNo desc",
+									"budgetedAmount",
+									"budgetedAmount desc",
+									"addressLine1",
+									"addressLine1 desc",
+									"addressLine2",
+									"addressLine2 desc",
+									"city",
+									"city desc",
+									"state",
+									"state desc",
+									"country",
+									"country desc",
+									"postalCode",
+									"postalCode desc",
+									"phoneNumber",
+									"phoneNumber desc",
+									"email",
+									"email desc",
+									"website",
+									"website desc",
+									"faxNo",
+									"faxNo desc",
+									"telexAnswerBack",
+									"telexAnswerBack desc",
+									"noSeries",
+									"noSeries desc",
+									"disableSearchByName",
+									"disableSearchByName desc",
+									"taxAreaCode",
+									"taxAreaCode desc",
+									"taxRegistrationNumber",
+									"taxRegistrationNumber desc",
+									"currencyId",
+									"currencyId desc",
+									"currencyCode",
+									"currencyCode desc",
+									"paymentTermsId",
+									"paymentTermsId desc",
+									"paymentTermsCode",
+									"paymentTermsCode desc",
+									"paymentMethodId",
+									"paymentMethodId desc",
+									"paymentMethodCode",
+									"paymentMethodCode desc",
+									"taxLiable",
+									"taxLiable desc",
+									"territoryCode",
+									"territoryCode desc",
+									"purchaserCode",
+									"purchaserCode desc",
+									"locationCode",
+									"locationCode desc",
+									"shipmentMethodCode",
+									"shipmentMethodCode desc",
+									"shippingAgentCode",
+									"shippingAgentCode desc",
+									"invoiceDiscCode",
+									"invoiceDiscCode desc",
+									"payToVendorNo",
+									"payToVendorNo desc",
+									"applicationMethod",
+									"applicationMethod desc",
+									"partnerType",
+									"partnerType desc",
+									"pricesIncludingVat",
+									"pricesIncludingVat desc",
+									"gln",
+									"gln desc",
+									"blockPaymentTolerance",
+									"blockPaymentTolerance desc",
+									"responsibilityCenter",
+									"responsibilityCenter desc",
+									"privacyBlocked",
+									"privacyBlocked desc",
+									"documentSendingProfile",
+									"documentSendingProfile desc",
+									"icPartnerCode",
+									"icPartnerCode desc",
+									"prepaymentPct",
+									"prepaymentPct desc",
+									"creditorNo",
+									"creditorNo desc",
+									"preferredBankAccountCode",
+									"preferredBankAccountCode desc",
+									"cashFlowPaymentTermsCode",
+									"cashFlowPaymentTermsCode desc",
+									"primaryContactNo",
+									"primaryContactNo desc",
+									"mobilePhoneNo",
+									"mobilePhoneNo desc",
+									"leadTimeCalculation",
+									"leadTimeCalculation desc",
+									"priceCalculationMethod",
+									"priceCalculationMethod desc",
+									"baseCalendarCode",
+									"baseCalendarCode desc",
+									"validateEUVatRegNo",
+									"validateEUVatRegNo desc",
+									"overReceiptCode",
+									"overReceiptCode desc",
+									"blocked",
+									"blocked desc",
+									"balance",
+									"balance desc",
+									"languageCode",
+									"languageCode desc",
+									"globalDimension1Code",
+									"globalDimension1Code desc",
+									"globalDimension2Code",
+									"globalDimension2Code desc",
+									"genBusPostingGroup",
+									"genBusPostingGroup desc",
+									"vendorPostingGroup",
+									"vendorPostingGroup desc",
+									"vatBusPostingGroup",
+									"vatBusPostingGroup desc",
+									"finChargeTermsCode",
+									"finChargeTermsCode desc",
+									"statisticsGroup",
+									"statisticsGroup desc",
+									"priority",
+									"priority desc",
+									"lastDateModified",
+									"lastDateModified desc",
+									"lastModifiedDateTime",
+									"lastModifiedDateTime desc",
+									"replicationCounter",
+									"replicationCounter desc"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"number",
+									"displayName",
+									"displayName2",
+									"searchName",
+									"contact",
+									"telexNo",
+									"ourAccountNo",
+									"budgetedAmount",
+									"addressLine1",
+									"addressLine2",
+									"city",
+									"state",
+									"country",
+									"postalCode",
+									"phoneNumber",
+									"email",
+									"website",
+									"faxNo",
+									"telexAnswerBack",
+									"noSeries",
+									"disableSearchByName",
+									"taxAreaCode",
+									"taxRegistrationNumber",
+									"currencyId",
+									"currencyCode",
+									"paymentTermsId",
+									"paymentTermsCode",
+									"paymentMethodId",
+									"paymentMethodCode",
+									"taxLiable",
+									"territoryCode",
+									"purchaserCode",
+									"locationCode",
+									"shipmentMethodCode",
+									"shippingAgentCode",
+									"invoiceDiscCode",
+									"payToVendorNo",
+									"applicationMethod",
+									"partnerType",
+									"pricesIncludingVat",
+									"gln",
+									"blockPaymentTolerance",
+									"responsibilityCenter",
+									"privacyBlocked",
+									"documentSendingProfile",
+									"icPartnerCode",
+									"prepaymentPct",
+									"creditorNo",
+									"preferredBankAccountCode",
+									"cashFlowPaymentTermsCode",
+									"primaryContactNo",
+									"mobilePhoneNo",
+									"leadTimeCalculation",
+									"priceCalculationMethod",
+									"baseCalendarCode",
+									"validateEUVatRegNo",
+									"overReceiptCode",
+									"blocked",
+									"balance",
+									"languageCode",
+									"globalDimension1Code",
+									"globalDimension2Code",
+									"genBusPostingGroup",
+									"vendorPostingGroup",
+									"vatBusPostingGroup",
+									"finChargeTermsCode",
+									"statisticsGroup",
+									"priority",
+									"lastDateModified",
+									"lastModifiedDateTime",
+									"replicationCounter",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of vendor",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"post": {
+				"tags": [
+					"companies.vendor"
+				],
+				"summary": "Create new navigation property to vendors for companies",
+				"operationId": "companies.CreateVendors",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created navigation property.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})": {
+			"get": {
+				"tags": [
+					"companies.vendor"
+				],
+				"summary": "Get vendors from companies",
+				"operationId": "companies.GetVendors",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"number",
+									"displayName",
+									"displayName2",
+									"searchName",
+									"contact",
+									"telexNo",
+									"ourAccountNo",
+									"budgetedAmount",
+									"addressLine1",
+									"addressLine2",
+									"city",
+									"state",
+									"country",
+									"postalCode",
+									"phoneNumber",
+									"email",
+									"website",
+									"faxNo",
+									"telexAnswerBack",
+									"noSeries",
+									"disableSearchByName",
+									"taxAreaCode",
+									"taxRegistrationNumber",
+									"currencyId",
+									"currencyCode",
+									"paymentTermsId",
+									"paymentTermsCode",
+									"paymentMethodId",
+									"paymentMethodCode",
+									"taxLiable",
+									"territoryCode",
+									"purchaserCode",
+									"locationCode",
+									"shipmentMethodCode",
+									"shippingAgentCode",
+									"invoiceDiscCode",
+									"payToVendorNo",
+									"applicationMethod",
+									"partnerType",
+									"pricesIncludingVat",
+									"gln",
+									"blockPaymentTolerance",
+									"responsibilityCenter",
+									"privacyBlocked",
+									"documentSendingProfile",
+									"icPartnerCode",
+									"prepaymentPct",
+									"creditorNo",
+									"preferredBankAccountCode",
+									"cashFlowPaymentTermsCode",
+									"primaryContactNo",
+									"mobilePhoneNo",
+									"leadTimeCalculation",
+									"priceCalculationMethod",
+									"baseCalendarCode",
+									"validateEUVatRegNo",
+									"overReceiptCode",
+									"blocked",
+									"balance",
+									"languageCode",
+									"globalDimension1Code",
+									"globalDimension2Code",
+									"genBusPostingGroup",
+									"vendorPostingGroup",
+									"vatBusPostingGroup",
+									"finChargeTermsCode",
+									"statisticsGroup",
+									"priority",
+									"lastDateModified",
+									"lastModifiedDateTime",
+									"replicationCounter",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendor"
+				],
+				"summary": "Update the navigation property vendors in companies",
+				"operationId": "companies.UpdateVendors",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendor"
+				],
+				"summary": "Delete navigation property vendors for companies",
+				"operationId": "companies.DeleteVendors",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/currency": {
+			"get": {
+				"tags": [
+					"companies.vendors.currency"
+				],
+				"summary": "Get currency from companies",
+				"operationId": "companies.vendors.GetCurrency",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.currency"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.currency"
+				],
+				"summary": "Update the navigation property currency in companies",
+				"operationId": "companies.vendors.UpdateCurrency",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.currency"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.currency"
+				],
+				"summary": "Delete navigation property currency for companies",
+				"operationId": "companies.vendors.DeleteCurrency",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/defaultDimensions": {
+			"get": {
+				"tags": [
+					"companies.vendors.defaultDimension"
+				],
+				"summary": "Get defaultDimensions from companies",
+				"operationId": "companies.vendors.ListDefaultDimensions",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of defaultDimension",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"post": {
+				"tags": [
+					"companies.vendors.defaultDimension"
+				],
+				"summary": "Create new navigation property to defaultDimensions for companies",
+				"operationId": "companies.vendors.CreateDefaultDimensions",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created navigation property.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/defaultDimensions()": {
+			"get": {
+				"tags": [
+					"companies.vendors.defaultDimension"
+				],
+				"summary": "Get defaultDimensions from companies",
+				"operationId": "companies.vendors.GetDefaultDimensions",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.defaultDimension"
+				],
+				"summary": "Update the navigation property defaultDimensions in companies",
+				"operationId": "companies.vendors.UpdateDefaultDimensions",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.defaultDimension"
+				],
+				"summary": "Delete navigation property defaultDimensions for companies",
+				"operationId": "companies.vendors.DeleteDefaultDimensions",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/dimensionValue": {
+			"get": {
+				"tags": [
+					"companies.vendors.dimensionValue"
+				],
+				"summary": "Get dimensionValue from companies",
+				"operationId": "companies.vendors.GetDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.dimensionValue"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.dimensionValue"
+				],
+				"summary": "Update the navigation property dimensionValue in companies",
+				"operationId": "companies.vendors.UpdateDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.dimensionValue"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.dimensionValue"
+				],
+				"summary": "Delete navigation property dimensionValue for companies",
+				"operationId": "companies.vendors.DeleteDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/location": {
+			"get": {
+				"tags": [
+					"companies.vendors.location"
+				],
+				"summary": "Get location from companies",
+				"operationId": "companies.vendors.GetLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.location"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.location"
+				],
+				"summary": "Update the navigation property location in companies",
+				"operationId": "companies.vendors.UpdateLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.location"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.location"
+				],
+				"summary": "Delete navigation property location for companies",
+				"operationId": "companies.vendors.DeleteLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/paymentMethod": {
+			"get": {
+				"tags": [
+					"companies.vendors.paymentMethod"
+				],
+				"summary": "Get paymentMethod from companies",
+				"operationId": "companies.vendors.GetPaymentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.paymentMethod"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.paymentMethod"
+				],
+				"summary": "Update the navigation property paymentMethod in companies",
+				"operationId": "companies.vendors.UpdatePaymentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.paymentMethod"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.paymentMethod"
+				],
+				"summary": "Delete navigation property paymentMethod for companies",
+				"operationId": "companies.vendors.DeletePaymentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/paymentTerm": {
+			"get": {
+				"tags": [
+					"companies.vendors.paymentTerm"
+				],
+				"summary": "Get paymentTerm from companies",
+				"operationId": "companies.vendors.GetPaymentTerm",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.paymentTerm"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.paymentTerm"
+				],
+				"summary": "Update the navigation property paymentTerm in companies",
+				"operationId": "companies.vendors.UpdatePaymentTerm",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.paymentTerm"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.paymentTerm"
+				],
+				"summary": "Delete navigation property paymentTerm for companies",
+				"operationId": "companies.vendors.DeletePaymentTerm",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/picture": {
+			"get": {
+				"tags": [
+					"companies.vendors.picture"
+				],
+				"summary": "Get picture from companies",
+				"operationId": "companies.vendors.GetPicture",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"parentType",
+									"width",
+									"height",
+									"contentType",
+									"pictureContent"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.picture"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.picture"
+				],
+				"summary": "Update the navigation property picture in companies",
+				"operationId": "companies.vendors.UpdatePicture",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.picture"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.picture"
+				],
+				"summary": "Delete navigation property picture for companies",
+				"operationId": "companies.vendors.DeletePicture",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/picture/pictureContent": {
+			"get": {
+				"tags": [
+					"companies.vendors.picture"
+				],
+				"summary": "Get media content for the navigation property picture from companies",
+				"operationId": "companies.vendors.GetPicturePictureContent",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved media content",
+						"content": {
+							"application/octet-stream": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/salespersonPurchaser": {
+			"get": {
+				"tags": [
+					"companies.vendors.salespersonPurchaser"
+				],
+				"summary": "Get salespersonPurchaser from companies",
+				"operationId": "companies.vendors.GetSalespersonPurchaser",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.salespersonPurchaser"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.salespersonPurchaser"
+				],
+				"summary": "Update the navigation property salespersonPurchaser in companies",
+				"operationId": "companies.vendors.UpdateSalespersonPurchaser",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.salespersonPurchaser"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.salespersonPurchaser"
+				],
+				"summary": "Delete navigation property salespersonPurchaser for companies",
+				"operationId": "companies.vendors.DeleteSalespersonPurchaser",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/shipmentMethod": {
+			"get": {
+				"tags": [
+					"companies.vendors.shipmentMethod"
+				],
+				"summary": "Get shipmentMethod from companies",
+				"operationId": "companies.vendors.GetShipmentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.shipmentMethod"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.shipmentMethod"
+				],
+				"summary": "Update the navigation property shipmentMethod in companies",
+				"operationId": "companies.vendors.UpdateShipmentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.shipmentMethod"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.shipmentMethod"
+				],
+				"summary": "Delete navigation property shipmentMethod for companies",
+				"operationId": "companies.vendors.DeleteShipmentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/vendor": {
+			"get": {
+				"tags": [
+					"companies.vendors.vendor"
+				],
+				"summary": "Get vendor from companies",
+				"operationId": "companies.vendors.GetVendor",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"number",
+									"displayName",
+									"displayName2",
+									"searchName",
+									"contact",
+									"telexNo",
+									"ourAccountNo",
+									"budgetedAmount",
+									"addressLine1",
+									"addressLine2",
+									"city",
+									"state",
+									"country",
+									"postalCode",
+									"phoneNumber",
+									"email",
+									"website",
+									"faxNo",
+									"telexAnswerBack",
+									"noSeries",
+									"disableSearchByName",
+									"taxAreaCode",
+									"taxRegistrationNumber",
+									"currencyId",
+									"currencyCode",
+									"paymentTermsId",
+									"paymentTermsCode",
+									"paymentMethodId",
+									"paymentMethodCode",
+									"taxLiable",
+									"territoryCode",
+									"purchaserCode",
+									"locationCode",
+									"shipmentMethodCode",
+									"shippingAgentCode",
+									"invoiceDiscCode",
+									"payToVendorNo",
+									"applicationMethod",
+									"partnerType",
+									"pricesIncludingVat",
+									"gln",
+									"blockPaymentTolerance",
+									"responsibilityCenter",
+									"privacyBlocked",
+									"documentSendingProfile",
+									"icPartnerCode",
+									"prepaymentPct",
+									"creditorNo",
+									"preferredBankAccountCode",
+									"cashFlowPaymentTermsCode",
+									"primaryContactNo",
+									"mobilePhoneNo",
+									"leadTimeCalculation",
+									"priceCalculationMethod",
+									"baseCalendarCode",
+									"validateEUVatRegNo",
+									"overReceiptCode",
+									"blocked",
+									"balance",
+									"languageCode",
+									"globalDimension1Code",
+									"globalDimension2Code",
+									"genBusPostingGroup",
+									"vendorPostingGroup",
+									"vatBusPostingGroup",
+									"finChargeTermsCode",
+									"statisticsGroup",
+									"priority",
+									"lastDateModified",
+									"lastModifiedDateTime",
+									"replicationCounter",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.vendor"
+				],
+				"summary": "Update the navigation property vendor in companies",
+				"operationId": "companies.vendors.UpdateVendor",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.vendor"
+				],
+				"summary": "Delete navigation property vendor for companies",
+				"operationId": "companies.vendors.DeleteVendor",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/vendorBankAccount": {
+			"get": {
+				"tags": [
+					"companies.vendors.vendorBankAccount"
+				],
+				"summary": "Get vendorBankAccount from companies",
+				"operationId": "companies.vendors.GetVendorBankAccount",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.vendorBankAccount"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.vendorBankAccount"
+				],
+				"summary": "Update the navigation property vendorBankAccount in companies",
+				"operationId": "companies.vendors.UpdateVendorBankAccount",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.vendorBankAccount"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.vendorBankAccount"
+				],
+				"summary": "Delete navigation property vendorBankAccount for companies",
+				"operationId": "companies.vendors.DeleteVendorBankAccount",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/companies({id})/vendors({id1})/vendorPostGroup": {
+			"get": {
+				"tags": [
+					"companies.vendors.vendorPostGroup"
+				],
+				"summary": "Get vendorPostGroup from companies",
+				"operationId": "companies.vendors.GetVendorPostGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.vendorPostGroup"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"companies.vendors.vendorPostGroup"
+				],
+				"summary": "Update the navigation property vendorPostGroup in companies",
+				"operationId": "companies.vendors.UpdateVendorPostGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.vendorPostGroup"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"companies.vendors.vendorPostGroup"
+				],
+				"summary": "Delete navigation property vendorPostGroup for companies",
+				"operationId": "companies.vendors.DeleteVendorPostGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of company",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "company"
+					},
+					{
+						"name": "id1",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/entityDefinitions": {
+			"get": {
+				"tags": [
+					"entityDefinitions.entityMetadata"
+				],
+				"summary": "Get entities from entityDefinitions",
+				"operationId": "entityDefinitions.entityMetadata.ListEntityMetadata",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"entityName",
+									"entityName desc",
+									"entitySetName",
+									"entitySetName desc",
+									"entityCaptions",
+									"entityCaptions desc",
+									"entitySetCaptions",
+									"entitySetCaptions desc",
+									"properties",
+									"properties desc",
+									"actions",
+									"actions desc",
+									"enumMembers",
+									"enumMembers desc"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"entityName",
+									"entitySetName",
+									"entityCaptions",
+									"entitySetCaptions",
+									"properties",
+									"actions",
+									"enumMembers"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entities",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of entityMetadata",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.entityMetadata"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"entityDefinitions.entityMetadata"
+				],
+				"summary": "Add new entity to entityDefinitions",
+				"operationId": "entityDefinitions.entityMetadata.CreateEntityMetadata",
+				"requestBody": {
+					"description": "New entity",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.entityMetadata"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created entity",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadata"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/entityDefinitions({entityName})": {
+			"get": {
+				"tags": [
+					"entityDefinitions.entityMetadata"
+				],
+				"summary": "Get entity from entityDefinitions by key",
+				"operationId": "entityDefinitions.entityMetadata.GetEntityMetadata",
+				"parameters": [
+					{
+						"name": "entityName",
+						"in": "path",
+						"description": "key: entityName of entityMetadata",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"x-ms-docs-key-type": "entityMetadata"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"entityName",
+									"entitySetName",
+									"entityCaptions",
+									"entitySetCaptions",
+									"properties",
+									"actions",
+									"enumMembers"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entity",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadata"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"entityDefinitions.entityMetadata"
+				],
+				"summary": "Update entity in entityDefinitions",
+				"operationId": "entityDefinitions.entityMetadata.UpdateEntityMetadata",
+				"parameters": [
+					{
+						"name": "entityName",
+						"in": "path",
+						"description": "key: entityName of entityMetadata",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"x-ms-docs-key-type": "entityMetadata"
+					}
+				],
+				"requestBody": {
+					"description": "New property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.entityMetadata"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"entityDefinitions.entityMetadata"
+				],
+				"summary": "Delete entity from entityDefinitions",
+				"operationId": "entityDefinitions.entityMetadata.DeleteEntityMetadata",
+				"parameters": [
+					{
+						"name": "entityName",
+						"in": "path",
+						"description": "key: entityName of entityMetadata",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"x-ms-docs-key-type": "entityMetadata"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors": {
+			"get": {
+				"tags": [
+					"vendors.vendor"
+				],
+				"summary": "Get entities from vendors",
+				"operationId": "vendors.vendor.ListVendor",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"id desc",
+									"number",
+									"number desc",
+									"displayName",
+									"displayName desc",
+									"displayName2",
+									"displayName2 desc",
+									"searchName",
+									"searchName desc",
+									"contact",
+									"contact desc",
+									"telexNo",
+									"telexNo desc",
+									"ourAccountNo",
+									"ourAccountNo desc",
+									"budgetedAmount",
+									"budgetedAmount desc",
+									"addressLine1",
+									"addressLine1 desc",
+									"addressLine2",
+									"addressLine2 desc",
+									"city",
+									"city desc",
+									"state",
+									"state desc",
+									"country",
+									"country desc",
+									"postalCode",
+									"postalCode desc",
+									"phoneNumber",
+									"phoneNumber desc",
+									"email",
+									"email desc",
+									"website",
+									"website desc",
+									"faxNo",
+									"faxNo desc",
+									"telexAnswerBack",
+									"telexAnswerBack desc",
+									"noSeries",
+									"noSeries desc",
+									"disableSearchByName",
+									"disableSearchByName desc",
+									"taxAreaCode",
+									"taxAreaCode desc",
+									"taxRegistrationNumber",
+									"taxRegistrationNumber desc",
+									"currencyId",
+									"currencyId desc",
+									"currencyCode",
+									"currencyCode desc",
+									"paymentTermsId",
+									"paymentTermsId desc",
+									"paymentTermsCode",
+									"paymentTermsCode desc",
+									"paymentMethodId",
+									"paymentMethodId desc",
+									"paymentMethodCode",
+									"paymentMethodCode desc",
+									"taxLiable",
+									"taxLiable desc",
+									"territoryCode",
+									"territoryCode desc",
+									"purchaserCode",
+									"purchaserCode desc",
+									"locationCode",
+									"locationCode desc",
+									"shipmentMethodCode",
+									"shipmentMethodCode desc",
+									"shippingAgentCode",
+									"shippingAgentCode desc",
+									"invoiceDiscCode",
+									"invoiceDiscCode desc",
+									"payToVendorNo",
+									"payToVendorNo desc",
+									"applicationMethod",
+									"applicationMethod desc",
+									"partnerType",
+									"partnerType desc",
+									"pricesIncludingVat",
+									"pricesIncludingVat desc",
+									"gln",
+									"gln desc",
+									"blockPaymentTolerance",
+									"blockPaymentTolerance desc",
+									"responsibilityCenter",
+									"responsibilityCenter desc",
+									"privacyBlocked",
+									"privacyBlocked desc",
+									"documentSendingProfile",
+									"documentSendingProfile desc",
+									"icPartnerCode",
+									"icPartnerCode desc",
+									"prepaymentPct",
+									"prepaymentPct desc",
+									"creditorNo",
+									"creditorNo desc",
+									"preferredBankAccountCode",
+									"preferredBankAccountCode desc",
+									"cashFlowPaymentTermsCode",
+									"cashFlowPaymentTermsCode desc",
+									"primaryContactNo",
+									"primaryContactNo desc",
+									"mobilePhoneNo",
+									"mobilePhoneNo desc",
+									"leadTimeCalculation",
+									"leadTimeCalculation desc",
+									"priceCalculationMethod",
+									"priceCalculationMethod desc",
+									"baseCalendarCode",
+									"baseCalendarCode desc",
+									"validateEUVatRegNo",
+									"validateEUVatRegNo desc",
+									"overReceiptCode",
+									"overReceiptCode desc",
+									"blocked",
+									"blocked desc",
+									"balance",
+									"balance desc",
+									"languageCode",
+									"languageCode desc",
+									"globalDimension1Code",
+									"globalDimension1Code desc",
+									"globalDimension2Code",
+									"globalDimension2Code desc",
+									"genBusPostingGroup",
+									"genBusPostingGroup desc",
+									"vendorPostingGroup",
+									"vendorPostingGroup desc",
+									"vatBusPostingGroup",
+									"vatBusPostingGroup desc",
+									"finChargeTermsCode",
+									"finChargeTermsCode desc",
+									"statisticsGroup",
+									"statisticsGroup desc",
+									"priority",
+									"priority desc",
+									"lastDateModified",
+									"lastDateModified desc",
+									"lastModifiedDateTime",
+									"lastModifiedDateTime desc",
+									"replicationCounter",
+									"replicationCounter desc"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"number",
+									"displayName",
+									"displayName2",
+									"searchName",
+									"contact",
+									"telexNo",
+									"ourAccountNo",
+									"budgetedAmount",
+									"addressLine1",
+									"addressLine2",
+									"city",
+									"state",
+									"country",
+									"postalCode",
+									"phoneNumber",
+									"email",
+									"website",
+									"faxNo",
+									"telexAnswerBack",
+									"noSeries",
+									"disableSearchByName",
+									"taxAreaCode",
+									"taxRegistrationNumber",
+									"currencyId",
+									"currencyCode",
+									"paymentTermsId",
+									"paymentTermsCode",
+									"paymentMethodId",
+									"paymentMethodCode",
+									"taxLiable",
+									"territoryCode",
+									"purchaserCode",
+									"locationCode",
+									"shipmentMethodCode",
+									"shippingAgentCode",
+									"invoiceDiscCode",
+									"payToVendorNo",
+									"applicationMethod",
+									"partnerType",
+									"pricesIncludingVat",
+									"gln",
+									"blockPaymentTolerance",
+									"responsibilityCenter",
+									"privacyBlocked",
+									"documentSendingProfile",
+									"icPartnerCode",
+									"prepaymentPct",
+									"creditorNo",
+									"preferredBankAccountCode",
+									"cashFlowPaymentTermsCode",
+									"primaryContactNo",
+									"mobilePhoneNo",
+									"leadTimeCalculation",
+									"priceCalculationMethod",
+									"baseCalendarCode",
+									"validateEUVatRegNo",
+									"overReceiptCode",
+									"blocked",
+									"balance",
+									"languageCode",
+									"globalDimension1Code",
+									"globalDimension2Code",
+									"genBusPostingGroup",
+									"vendorPostingGroup",
+									"vatBusPostingGroup",
+									"finChargeTermsCode",
+									"statisticsGroup",
+									"priority",
+									"lastDateModified",
+									"lastModifiedDateTime",
+									"replicationCounter",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entities",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of vendor",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"vendors.vendor"
+				],
+				"summary": "Add new entity to vendors",
+				"operationId": "vendors.vendor.CreateVendor",
+				"requestBody": {
+					"description": "New entity",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created entity",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})": {
+			"get": {
+				"tags": [
+					"vendors.vendor"
+				],
+				"summary": "Get entity from vendors by key",
+				"operationId": "vendors.vendor.GetVendor",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"number",
+									"displayName",
+									"displayName2",
+									"searchName",
+									"contact",
+									"telexNo",
+									"ourAccountNo",
+									"budgetedAmount",
+									"addressLine1",
+									"addressLine2",
+									"city",
+									"state",
+									"country",
+									"postalCode",
+									"phoneNumber",
+									"email",
+									"website",
+									"faxNo",
+									"telexAnswerBack",
+									"noSeries",
+									"disableSearchByName",
+									"taxAreaCode",
+									"taxRegistrationNumber",
+									"currencyId",
+									"currencyCode",
+									"paymentTermsId",
+									"paymentTermsCode",
+									"paymentMethodId",
+									"paymentMethodCode",
+									"taxLiable",
+									"territoryCode",
+									"purchaserCode",
+									"locationCode",
+									"shipmentMethodCode",
+									"shippingAgentCode",
+									"invoiceDiscCode",
+									"payToVendorNo",
+									"applicationMethod",
+									"partnerType",
+									"pricesIncludingVat",
+									"gln",
+									"blockPaymentTolerance",
+									"responsibilityCenter",
+									"privacyBlocked",
+									"documentSendingProfile",
+									"icPartnerCode",
+									"prepaymentPct",
+									"creditorNo",
+									"preferredBankAccountCode",
+									"cashFlowPaymentTermsCode",
+									"primaryContactNo",
+									"mobilePhoneNo",
+									"leadTimeCalculation",
+									"priceCalculationMethod",
+									"baseCalendarCode",
+									"validateEUVatRegNo",
+									"overReceiptCode",
+									"blocked",
+									"balance",
+									"languageCode",
+									"globalDimension1Code",
+									"globalDimension2Code",
+									"genBusPostingGroup",
+									"vendorPostingGroup",
+									"vatBusPostingGroup",
+									"finChargeTermsCode",
+									"statisticsGroup",
+									"priority",
+									"lastDateModified",
+									"lastModifiedDateTime",
+									"replicationCounter",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved entity",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.vendor"
+				],
+				"summary": "Update entity in vendors",
+				"operationId": "vendors.vendor.UpdateVendor",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.vendor"
+				],
+				"summary": "Delete entity from vendors",
+				"operationId": "vendors.vendor.DeleteVendor",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/currency": {
+			"get": {
+				"tags": [
+					"vendors.currency"
+				],
+				"summary": "Get currency from vendors",
+				"operationId": "vendors.GetCurrency",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.currency"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.currency"
+				],
+				"summary": "Update the navigation property currency in vendors",
+				"operationId": "vendors.UpdateCurrency",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.currency"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.currency"
+				],
+				"summary": "Delete navigation property currency for vendors",
+				"operationId": "vendors.DeleteCurrency",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/defaultDimensions": {
+			"get": {
+				"tags": [
+					"vendors.defaultDimension"
+				],
+				"summary": "Get defaultDimensions from vendors",
+				"operationId": "vendors.ListDefaultDimensions",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"$ref": "#/components/parameters/top"
+					},
+					{
+						"$ref": "#/components/parameters/skip"
+					},
+					{
+						"$ref": "#/components/parameters/search"
+					},
+					{
+						"$ref": "#/components/parameters/filter"
+					},
+					{
+						"$ref": "#/components/parameters/count"
+					},
+					{
+						"name": "$orderby",
+						"in": "query",
+						"description": "Order items by property values",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"title": "Collection of defaultDimension",
+									"type": "object",
+									"properties": {
+										"value": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"post": {
+				"tags": [
+					"vendors.defaultDimension"
+				],
+				"summary": "Create new navigation property to defaultDimensions for vendors",
+				"operationId": "vendors.CreateDefaultDimensions",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created navigation property.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/defaultDimensions()": {
+			"get": {
+				"tags": [
+					"vendors.defaultDimension"
+				],
+				"summary": "Get defaultDimensions from vendors",
+				"operationId": "vendors.GetDefaultDimensions",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.defaultDimension"
+				],
+				"summary": "Update the navigation property defaultDimensions in vendors",
+				"operationId": "vendors.UpdateDefaultDimensions",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.defaultDimension"
+				],
+				"summary": "Delete navigation property defaultDimensions for vendors",
+				"operationId": "vendors.DeleteDefaultDimensions",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/dimensionValue": {
+			"get": {
+				"tags": [
+					"vendors.dimensionValue"
+				],
+				"summary": "Get dimensionValue from vendors",
+				"operationId": "vendors.GetDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.dimensionValue"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.dimensionValue"
+				],
+				"summary": "Update the navigation property dimensionValue in vendors",
+				"operationId": "vendors.UpdateDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.dimensionValue"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.dimensionValue"
+				],
+				"summary": "Delete navigation property dimensionValue for vendors",
+				"operationId": "vendors.DeleteDimensionValue",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/location": {
+			"get": {
+				"tags": [
+					"vendors.location"
+				],
+				"summary": "Get location from vendors",
+				"operationId": "vendors.GetLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.location"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.location"
+				],
+				"summary": "Update the navigation property location in vendors",
+				"operationId": "vendors.UpdateLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.location"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.location"
+				],
+				"summary": "Delete navigation property location for vendors",
+				"operationId": "vendors.DeleteLocation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/paymentMethod": {
+			"get": {
+				"tags": [
+					"vendors.paymentMethod"
+				],
+				"summary": "Get paymentMethod from vendors",
+				"operationId": "vendors.GetPaymentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.paymentMethod"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.paymentMethod"
+				],
+				"summary": "Update the navigation property paymentMethod in vendors",
+				"operationId": "vendors.UpdatePaymentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.paymentMethod"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.paymentMethod"
+				],
+				"summary": "Delete navigation property paymentMethod for vendors",
+				"operationId": "vendors.DeletePaymentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/paymentTerm": {
+			"get": {
+				"tags": [
+					"vendors.paymentTerm"
+				],
+				"summary": "Get paymentTerm from vendors",
+				"operationId": "vendors.GetPaymentTerm",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.paymentTerm"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.paymentTerm"
+				],
+				"summary": "Update the navigation property paymentTerm in vendors",
+				"operationId": "vendors.UpdatePaymentTerm",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.paymentTerm"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.paymentTerm"
+				],
+				"summary": "Delete navigation property paymentTerm for vendors",
+				"operationId": "vendors.DeletePaymentTerm",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/picture": {
+			"get": {
+				"tags": [
+					"vendors.picture"
+				],
+				"summary": "Get picture from vendors",
+				"operationId": "vendors.GetPicture",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"parentType",
+									"width",
+									"height",
+									"contentType",
+									"pictureContent"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.picture"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.picture"
+				],
+				"summary": "Update the navigation property picture in vendors",
+				"operationId": "vendors.UpdatePicture",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.picture"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.picture"
+				],
+				"summary": "Delete navigation property picture for vendors",
+				"operationId": "vendors.DeletePicture",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/picture/pictureContent": {
+			"get": {
+				"tags": [
+					"vendors.picture"
+				],
+				"summary": "Get media content for the navigation property picture from vendors",
+				"operationId": "vendors.GetPicturePictureContent",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved media content",
+						"content": {
+							"application/octet-stream": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"put": {
+				"tags": [
+					"vendors.picture"
+				],
+				"summary": "Update media content for the navigation property picture in vendors",
+				"operationId": "vendors.UpdatePicturePictureContent",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New media content.",
+					"content": {
+						"application/octet-stream": {
+							"schema": {
+								"type": "string",
+								"format": "binary"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/salespersonPurchaser": {
+			"get": {
+				"tags": [
+					"vendors.salespersonPurchaser"
+				],
+				"summary": "Get salespersonPurchaser from vendors",
+				"operationId": "vendors.GetSalespersonPurchaser",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.salespersonPurchaser"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.salespersonPurchaser"
+				],
+				"summary": "Update the navigation property salespersonPurchaser in vendors",
+				"operationId": "vendors.UpdateSalespersonPurchaser",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.salespersonPurchaser"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.salespersonPurchaser"
+				],
+				"summary": "Delete navigation property salespersonPurchaser for vendors",
+				"operationId": "vendors.DeleteSalespersonPurchaser",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/shipmentMethod": {
+			"get": {
+				"tags": [
+					"vendors.shipmentMethod"
+				],
+				"summary": "Get shipmentMethod from vendors",
+				"operationId": "vendors.GetShipmentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.shipmentMethod"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.shipmentMethod"
+				],
+				"summary": "Update the navigation property shipmentMethod in vendors",
+				"operationId": "vendors.UpdateShipmentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.shipmentMethod"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.shipmentMethod"
+				],
+				"summary": "Delete navigation property shipmentMethod for vendors",
+				"operationId": "vendors.DeleteShipmentMethod",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/vendor": {
+			"get": {
+				"tags": [
+					"vendors.vendor"
+				],
+				"summary": "Get vendor from vendors",
+				"operationId": "vendors.GetVendor",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"id",
+									"number",
+									"displayName",
+									"displayName2",
+									"searchName",
+									"contact",
+									"telexNo",
+									"ourAccountNo",
+									"budgetedAmount",
+									"addressLine1",
+									"addressLine2",
+									"city",
+									"state",
+									"country",
+									"postalCode",
+									"phoneNumber",
+									"email",
+									"website",
+									"faxNo",
+									"telexAnswerBack",
+									"noSeries",
+									"disableSearchByName",
+									"taxAreaCode",
+									"taxRegistrationNumber",
+									"currencyId",
+									"currencyCode",
+									"paymentTermsId",
+									"paymentTermsCode",
+									"paymentMethodId",
+									"paymentMethodCode",
+									"taxLiable",
+									"territoryCode",
+									"purchaserCode",
+									"locationCode",
+									"shipmentMethodCode",
+									"shippingAgentCode",
+									"invoiceDiscCode",
+									"payToVendorNo",
+									"applicationMethod",
+									"partnerType",
+									"pricesIncludingVat",
+									"gln",
+									"blockPaymentTolerance",
+									"responsibilityCenter",
+									"privacyBlocked",
+									"documentSendingProfile",
+									"icPartnerCode",
+									"prepaymentPct",
+									"creditorNo",
+									"preferredBankAccountCode",
+									"cashFlowPaymentTermsCode",
+									"primaryContactNo",
+									"mobilePhoneNo",
+									"leadTimeCalculation",
+									"priceCalculationMethod",
+									"baseCalendarCode",
+									"validateEUVatRegNo",
+									"overReceiptCode",
+									"blocked",
+									"balance",
+									"languageCode",
+									"globalDimension1Code",
+									"globalDimension2Code",
+									"genBusPostingGroup",
+									"vendorPostingGroup",
+									"vatBusPostingGroup",
+									"finChargeTermsCode",
+									"statisticsGroup",
+									"priority",
+									"lastDateModified",
+									"lastModifiedDateTime",
+									"replicationCounter",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*",
+									"currency",
+									"paymentTerm",
+									"paymentMethod",
+									"salespersonPurchaser",
+									"location",
+									"shipmentMethod",
+									"vendor",
+									"vendorBankAccount",
+									"dimensionValue",
+									"vendorPostGroup",
+									"picture",
+									"defaultDimensions"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.vendor"
+				],
+				"summary": "Update the navigation property vendor in vendors",
+				"operationId": "vendors.UpdateVendor",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.vendor"
+				],
+				"summary": "Delete navigation property vendor for vendors",
+				"operationId": "vendors.DeleteVendor",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/vendorBankAccount": {
+			"get": {
+				"tags": [
+					"vendors.vendorBankAccount"
+				],
+				"summary": "Get vendorBankAccount from vendors",
+				"operationId": "vendors.GetVendorBankAccount",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.vendorBankAccount"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.vendorBankAccount"
+				],
+				"summary": "Update the navigation property vendorBankAccount in vendors",
+				"operationId": "vendors.UpdateVendorBankAccount",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.vendorBankAccount"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.vendorBankAccount"
+				],
+				"summary": "Delete navigation property vendorBankAccount for vendors",
+				"operationId": "vendors.DeleteVendorBankAccount",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		},
+		"/vendors({id})/vendorPostGroup": {
+			"get": {
+				"tags": [
+					"vendors.vendorPostGroup"
+				],
+				"summary": "Get vendorPostGroup from vendors",
+				"operationId": "vendors.GetVendorPostGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "$select",
+						"in": "query",
+						"description": "Select properties to be returned",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "$expand",
+						"in": "query",
+						"description": "Expand related entities",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"uniqueItems": true,
+							"type": "array",
+							"items": {
+								"enum": [
+									"*"
+								],
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Retrieved navigation property",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Microsoft.NAV.vendorPostGroup"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"patch": {
+				"tags": [
+					"vendors.vendorPostGroup"
+				],
+				"summary": "Update the navigation property vendorPostGroup in vendors",
+				"operationId": "vendors.UpdateVendorPostGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					}
+				],
+				"requestBody": {
+					"description": "New navigation property values",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Microsoft.NAV.vendorPostGroup"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			},
+			"delete": {
+				"tags": [
+					"vendors.vendorPostGroup"
+				],
+				"summary": "Delete navigation property vendorPostGroup for vendors",
+				"operationId": "vendors.DeleteVendorPostGroup",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "key: id of vendor",
+						"required": true,
+						"schema": {
+							"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+							"type": "string",
+							"format": "uuid"
+						},
+						"x-ms-docs-key-type": "vendor"
+					},
+					{
+						"name": "If-Match",
+						"in": "header",
+						"description": "ETag",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Success"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				},
+				"x-ms-docs-operation-type": "operation"
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Microsoft.NAV.entityMetadata": {
+				"title": "entityMetadata",
+				"type": "object",
+				"properties": {
+					"entityName": {
+						"type": "string"
+					},
+					"entitySetName": {
+						"type": "string",
+						"nullable": true
+					},
+					"entityCaptions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataLabel"
+								}
+							],
+							"nullable": true
+						}
+					},
+					"entitySetCaptions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataLabel"
+								}
+							],
+							"nullable": true
+						}
+					},
+					"properties": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataField"
+								}
+							],
+							"nullable": true
+						}
+					},
+					"actions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataAction"
+								}
+							],
+							"nullable": true
+						}
+					},
+					"enumMembers": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataEnumMember"
+								}
+							],
+							"nullable": true
+						}
+					}
+				}
+			},
+			"Microsoft.NAV.entityMetadataLabel": {
+				"title": "entityMetadataLabel",
+				"type": "object",
+				"properties": {
+					"languageCode": {
+						"maximum": 2147483647,
+						"minimum": -2147483648,
+						"type": "integer",
+						"format": "int32"
+					},
+					"caption": {
+						"type": "string"
+					}
+				}
+			},
+			"Microsoft.NAV.entityMetadataField": {
+				"title": "entityMetadataField",
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"captions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataLabel"
+								}
+							],
+							"nullable": true
+						}
+					}
+				}
+			},
+			"Microsoft.NAV.entityMetadataAction": {
+				"title": "entityMetadataAction",
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"captions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataLabel"
+								}
+							],
+							"nullable": true
+						}
+					}
+				}
+			},
+			"Microsoft.NAV.entityMetadataEnumMember": {
+				"title": "entityMetadataEnumMember",
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"value": {
+						"maximum": 2147483647,
+						"minimum": -2147483648,
+						"type": "integer",
+						"format": "int32"
+					},
+					"captions": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/Microsoft.NAV.entityMetadataLabel"
+								}
+							],
+							"nullable": true
+						}
+					}
+				}
+			},
+			"Microsoft.NAV.vendor": {
+				"title": "vendor",
+				"type": "object",
+				"properties": {
+					"id": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid"
+					},
+					"number": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"displayName": {
+						"maxLength": 100,
+						"type": "string",
+						"nullable": true
+					},
+					"displayName2": {
+						"maxLength": 50,
+						"type": "string",
+						"nullable": true
+					},
+					"searchName": {
+						"maxLength": 100,
+						"type": "string",
+						"nullable": true
+					},
+					"contact": {
+						"maxLength": 100,
+						"type": "string",
+						"nullable": true
+					},
+					"telexNo": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"ourAccountNo": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"budgetedAmount": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"addressLine1": {
+						"maxLength": 100,
+						"type": "string",
+						"nullable": true
+					},
+					"addressLine2": {
+						"maxLength": 50,
+						"type": "string",
+						"nullable": true
+					},
+					"city": {
+						"maxLength": 30,
+						"type": "string",
+						"nullable": true
+					},
+					"state": {
+						"maxLength": 30,
+						"type": "string",
+						"nullable": true
+					},
+					"country": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"postalCode": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"phoneNumber": {
+						"maxLength": 30,
+						"type": "string",
+						"nullable": true
+					},
+					"email": {
+						"maxLength": 80,
+						"type": "string",
+						"nullable": true
+					},
+					"website": {
+						"maxLength": 80,
+						"type": "string",
+						"nullable": true
+					},
+					"faxNo": {
+						"maxLength": 30,
+						"type": "string",
+						"nullable": true
+					},
+					"telexAnswerBack": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"noSeries": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"disableSearchByName": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"taxAreaCode": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"taxRegistrationNumber": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"currencyId": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid",
+						"nullable": true
+					},
+					"currencyCode": {
+						"type": "string",
+						"nullable": true
+					},
+					"paymentTermsId": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid",
+						"nullable": true
+					},
+					"paymentTermsCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"paymentMethodId": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid",
+						"nullable": true
+					},
+					"paymentMethodCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"taxLiable": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"territoryCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"purchaserCode": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"locationCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"shipmentMethodCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"shippingAgentCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"invoiceDiscCode": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"payToVendorNo": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"applicationMethod": {
+						"type": "string",
+						"nullable": true
+					},
+					"partnerType": {
+						"type": "string",
+						"nullable": true
+					},
+					"pricesIncludingVat": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"gln": {
+						"maxLength": 13,
+						"type": "string",
+						"nullable": true
+					},
+					"blockPaymentTolerance": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"responsibilityCenter": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"privacyBlocked": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"documentSendingProfile": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"icPartnerCode": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"prepaymentPct": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"creditorNo": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"preferredBankAccountCode": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"cashFlowPaymentTermsCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"primaryContactNo": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"mobilePhoneNo": {
+						"maxLength": 30,
+						"type": "string",
+						"nullable": true
+					},
+					"leadTimeCalculation": {
+						"type": "string",
+						"nullable": true
+					},
+					"priceCalculationMethod": {
+						"type": "string",
+						"nullable": true
+					},
+					"baseCalendarCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"validateEUVatRegNo": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"overReceiptCode": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"blocked": {
+						"type": "string",
+						"nullable": true
+					},
+					"balance": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"languageCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"globalDimension1Code": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"globalDimension2Code": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"genBusPostingGroup": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"vendorPostingGroup": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"vatBusPostingGroup": {
+						"maxLength": 20,
+						"type": "string",
+						"nullable": true
+					},
+					"finChargeTermsCode": {
+						"maxLength": 10,
+						"type": "string",
+						"nullable": true
+					},
+					"statisticsGroup": {
+						"maximum": 2147483647,
+						"minimum": -2147483648,
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"priority": {
+						"maximum": 2147483647,
+						"minimum": -2147483648,
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"lastDateModified": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$",
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					},
+					"lastModifiedDateTime": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$",
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"replicationCounter": {
+						"type": "integer",
+						"format": "int64",
+						"nullable": true
+					},
+					"currency": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.currency"
+							}
+						],
+						"nullable": true
+					},
+					"paymentTerm": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.paymentTerm"
+							}
+						],
+						"nullable": true
+					},
+					"paymentMethod": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.paymentMethod"
+							}
+						],
+						"nullable": true
+					},
+					"salespersonPurchaser": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.salespersonPurchaser"
+							}
+						],
+						"nullable": true
+					},
+					"location": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.location"
+							}
+						],
+						"nullable": true
+					},
+					"shipmentMethod": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.shipmentMethod"
+							}
+						],
+						"nullable": true
+					},
+					"vendor": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+							}
+						],
+						"nullable": true
+					},
+					"vendorBankAccount": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.vendorBankAccount"
+							}
+						],
+						"nullable": true
+					},
+					"dimensionValue": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.dimensionValue"
+							}
+						],
+						"nullable": true
+					},
+					"vendorPostGroup": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.vendorPostGroup"
+							}
+						],
+						"nullable": true
+					},
+					"picture": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Microsoft.NAV.picture"
+							}
+						],
+						"nullable": true
+					},
+					"defaultDimensions": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Microsoft.NAV.defaultDimension"
+						}
+					}
+				}
+			},
+			"Microsoft.NAV.picture": {
+				"title": "picture",
+				"type": "object",
+				"properties": {
+					"id": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid"
+					},
+					"parentType": {
+						"type": "string",
+						"nullable": true
+					},
+					"width": {
+						"maximum": 2147483647,
+						"minimum": -2147483648,
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"height": {
+						"maximum": 2147483647,
+						"minimum": -2147483648,
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"contentType": {
+						"maxLength": 100,
+						"type": "string",
+						"nullable": true
+					},
+					"pictureContent": {
+						"type": "string",
+						"format": "base64url",
+						"nullable": true
+					}
+				}
+			},
+			"Microsoft.NAV.company": {
+				"title": "company",
+				"type": "object",
+				"properties": {
+					"id": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid"
+					},
+					"systemVersion": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"maxLength": 30,
+						"type": "string",
+						"nullable": true
+					},
+					"displayName": {
+						"maxLength": 250,
+						"type": "string",
+						"nullable": true
+					},
+					"businessProfileId": {
+						"maxLength": 250,
+						"type": "string",
+						"nullable": true
+					},
+					"systemCreatedAt": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$",
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"systemCreatedBy": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid",
+						"nullable": true
+					},
+					"systemModifiedAt": {
+						"pattern": "^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$",
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"systemModifiedBy": {
+						"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+						"type": "string",
+						"format": "uuid",
+						"nullable": true
+					},
+					"vendors": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Microsoft.NAV.vendor"
+						}
+					}
+				}
+			},
+			"odata.error": {
+				"required": [
+					"error"
+				],
+				"type": "object",
+				"properties": {
+					"error": {
+						"$ref": "#/components/schemas/odata.error.main"
+					}
+				}
+			},
+			"odata.error.main": {
+				"required": [
+					"code",
+					"message"
+				],
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"target": {
+						"type": "string"
+					},
+					"details": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/odata.error.detail"
+						}
+					},
+					"innererror": {
+						"type": "object",
+						"description": "The structure of this object is service-specific"
+					}
+				}
+			},
+			"odata.error.detail": {
+				"required": [
+					"code",
+					"message"
+				],
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"target": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"responses": {
+			"error": {
+				"description": "error",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/odata.error"
+						}
+					}
+				}
+			}
+		},
+		"parameters": {
+			"top": {
+				"name": "$top",
+				"in": "query",
+				"description": "Show only the first n items",
+				"schema": {
+					"minimum": 0,
+					"type": "integer"
+				},
+				"example": 50
+			},
+			"skip": {
+				"name": "$skip",
+				"in": "query",
+				"description": "Skip the first n items",
+				"schema": {
+					"minimum": 0,
+					"type": "integer"
+				}
+			},
+			"count": {
+				"name": "$count",
+				"in": "query",
+				"description": "Include count of items",
+				"schema": {
+					"type": "boolean"
+				}
+			},
+			"filter": {
+				"name": "$filter",
+				"in": "query",
+				"description": "Filter items by property values",
+				"schema": {
+					"type": "string"
+				}
+			},
+			"search": {
+				"name": "$search",
+				"in": "query",
+				"description": "Search items by search phrases",
+				"schema": {
+					"type": "string"
+				}
+			}
+		},
+		"examples": {
+			"Microsoft.NAV.entityMetadata": {
+				"value": {
+					"actions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataAction"
+						}
+					],
+					"entityCaptions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataLabel"
+						}
+					],
+					"entityName": "String (identifier)",
+					"entitySetCaptions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataLabel"
+						}
+					],
+					"entitySetName": "String",
+					"enumMembers": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataEnumMember"
+						}
+					],
+					"properties": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataField"
+						}
+					]
+				}
+			},
+			"Microsoft.NAV.entityMetadataLabel": {
+				"value": {
+					"caption": "String",
+					"languageCode": 0
+				}
+			},
+			"Microsoft.NAV.entityMetadataField": {
+				"value": {
+					"captions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataLabel"
+						}
+					],
+					"name": "String"
+				}
+			},
+			"Microsoft.NAV.entityMetadataAction": {
+				"value": {
+					"captions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataLabel"
+						}
+					],
+					"name": "String"
+				}
+			},
+			"Microsoft.NAV.entityMetadataEnumMember": {
+				"value": {
+					"captions": [
+						{
+							"@odata.type": "Microsoft.NAV.entityMetadataLabel"
+						}
+					],
+					"name": "String",
+					"value": 0
+				}
+			},
+			"Microsoft.NAV.vendor": {
+				"value": {
+					"addressLine1": "String",
+					"addressLine2": "String",
+					"applicationMethod": "String",
+					"balance": 0,
+					"baseCalendarCode": "String",
+					"blocked": "String",
+					"blockPaymentTolerance": true,
+					"budgetedAmount": 0,
+					"cashFlowPaymentTermsCode": "String",
+					"city": "String",
+					"contact": "String",
+					"country": "String",
+					"creditorNo": "String",
+					"currency": {
+						"@odata.type": "Microsoft.NAV.currency"
+					},
+					"currencyCode": "String",
+					"currencyId": "00000000-0000-0000-0000-000000000000",
+					"defaultDimensions": [
+						{
+							"@odata.type": "Microsoft.NAV.defaultDimension"
+						}
+					],
+					"dimensionValue": {
+						"@odata.type": "Microsoft.NAV.dimensionValue"
+					},
+					"disableSearchByName": true,
+					"displayName": "String",
+					"displayName2": "String",
+					"documentSendingProfile": "String",
+					"email": "String",
+					"faxNo": "String",
+					"finChargeTermsCode": "String",
+					"genBusPostingGroup": "String",
+					"gln": "String",
+					"globalDimension1Code": "String",
+					"globalDimension2Code": "String",
+					"icPartnerCode": "String",
+					"id": "00000000-0000-0000-0000-000000000000 (identifier)",
+					"invoiceDiscCode": "String",
+					"languageCode": "String",
+					"lastDateModified": "0001-01-01T00:00:00.0000000",
+					"lastModifiedDateTime": "0001-01-01T00:00:00.0000000+00:00",
+					"leadTimeCalculation": "String",
+					"location": {
+						"@odata.type": "Microsoft.NAV.location"
+					},
+					"locationCode": "String",
+					"mobilePhoneNo": "String",
+					"noSeries": "String",
+					"number": "String",
+					"ourAccountNo": "String",
+					"overReceiptCode": "String",
+					"partnerType": "String",
+					"paymentMethod": {
+						"@odata.type": "Microsoft.NAV.paymentMethod"
+					},
+					"paymentMethodCode": "String",
+					"paymentMethodId": "00000000-0000-0000-0000-000000000000",
+					"paymentTerm": {
+						"@odata.type": "Microsoft.NAV.paymentTerm"
+					},
+					"paymentTermsCode": "String",
+					"paymentTermsId": "00000000-0000-0000-0000-000000000000",
+					"payToVendorNo": "String",
+					"phoneNumber": "String",
+					"picture": {
+						"@odata.type": "Microsoft.NAV.picture"
+					},
+					"postalCode": "String",
+					"preferredBankAccountCode": "String",
+					"prepaymentPct": 0,
+					"priceCalculationMethod": "String",
+					"pricesIncludingVat": true,
+					"primaryContactNo": "String",
+					"priority": 0,
+					"privacyBlocked": true,
+					"purchaserCode": "String",
+					"replicationCounter": 0,
+					"responsibilityCenter": "String",
+					"salespersonPurchaser": {
+						"@odata.type": "Microsoft.NAV.salespersonPurchaser"
+					},
+					"searchName": "String",
+					"shipmentMethod": {
+						"@odata.type": "Microsoft.NAV.shipmentMethod"
+					},
+					"shipmentMethodCode": "String",
+					"shippingAgentCode": "String",
+					"state": "String",
+					"statisticsGroup": 0,
+					"taxAreaCode": "String",
+					"taxLiable": true,
+					"taxRegistrationNumber": "String",
+					"telexAnswerBack": "String",
+					"telexNo": "String",
+					"territoryCode": "String",
+					"validateEUVatRegNo": true,
+					"vatBusPostingGroup": "String",
+					"vendor": {
+						"@odata.type": "Microsoft.NAV.vendor"
+					},
+					"vendorBankAccount": {
+						"@odata.type": "Microsoft.NAV.vendorBankAccount"
+					},
+					"vendorPostGroup": {
+						"@odata.type": "Microsoft.NAV.vendorPostGroup"
+					},
+					"vendorPostingGroup": "String",
+					"website": "String"
+				}
+			},
+			"Microsoft.NAV.picture": {
+				"value": {
+					"contentType": "String",
+					"height": 0,
+					"id": "00000000-0000-0000-0000-000000000000 (identifier)",
+					"parentType": "String",
+					"pictureContent": "Stream",
+					"width": 0
+				}
+			},
+			"Microsoft.NAV.company": {
+				"value": {
+					"businessProfileId": "String",
+					"displayName": "String",
+					"id": "00000000-0000-0000-0000-000000000000 (identifier)",
+					"name": "String",
+					"systemCreatedAt": "0001-01-01T00:00:00.0000000+00:00",
+					"systemCreatedBy": "00000000-0000-0000-0000-000000000000",
+					"systemModifiedAt": "0001-01-01T00:00:00.0000000+00:00",
+					"systemModifiedBy": "00000000-0000-0000-0000-000000000000",
+					"systemVersion": "String",
+					"vendors": [
+						{
+							"@odata.type": "Microsoft.NAV.vendor"
+						}
+					]
+				}
+			}
+		},
+		"securitySchemes": {
+			"BasicAuth": {
+				"type": "http",
+				"scheme": "basic"
+			},
+			"OAuth2": {
+				"type": "oauth2",
+				"flows": {
+					"authorizationCode": {
+						"authorizationUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+						"tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+						"scopes": {
+							"https://api.businesscentral.dynamics.com/.default": "Grants API access"
+						}
+					}
+				}
+			}
+		}
+	},
+	"tags": [
+		{
+			"name": "companies.company",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendor",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.currency",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.defaultDimension",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.dimensionValue",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.location",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.paymentMethod",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.paymentTerm",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.picture",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.salespersonPurchaser",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.shipmentMethod",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.vendor",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.vendorBankAccount",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "companies.vendors.vendorPostGroup",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "entityDefinitions.entityMetadata",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.vendor",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.currency",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.defaultDimension",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.dimensionValue",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.location",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.paymentMethod",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.paymentTerm",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.picture",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.salespersonPurchaser",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.shipmentMethod",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.vendorBankAccount",
+			"x-ms-docs-toc-type": "page"
+		},
+		{
+			"name": "vendors.vendorPostGroup",
+			"x-ms-docs-toc-type": "page"
+		}
+	]
+}

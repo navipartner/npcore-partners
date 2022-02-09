@@ -1,6 +1,6 @@
 codeunit 6014608 "NPR Replication Register"
 {
-    Access = Internal;
+    Access = Public;
     Permissions =
         tabledata "NPR Replication Service Setup" = rim,
         tabledata "NPR Replication Endpoint" = rim,
@@ -111,6 +111,10 @@ codeunit 6014608 "NPR Replication Register"
         VendorPostGrEndPointIDLbl: Label 'GetVendorPostingGroups', Locked = true;
         VendorPostGrEndPointDescriptionLbl: Label 'Gets Vendor Posting Groups from related company.', Locked = true;
         VendorPostGrPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendorPostGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        VendorItemEndPointIDLbl: Label 'GetVendorItems', Locked = true;
+        VendorItemEndPointDescriptionLbl: Label 'Gets Vendor Items from related company.', Locked = true;
+        VendorItemPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendorItems/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
         #endregion
 
         #region NP RETAIL endpoints data
@@ -827,6 +831,10 @@ codeunit 6014608 "NPR Replication Register"
         ServiceEndPoint.RegisterServiceEndPoint(VendServiceCodeLbl, VendorBankAccEndPointIDLbl, VendorBankAccPathLbl,
                     VendorBankAccEndPointDescriptionLbl, true, 600, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
                     1000, Database::"Vendor Bank Account", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(VendServiceCodeLbl, VendorItemEndPointIDLbl, VendorItemPathLbl,
+                    VendorItemEndPointDescriptionLbl, true, 700, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                    1000, Database::"Item Vendor", false, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
@@ -912,6 +920,19 @@ codeunit 6014608 "NPR Replication Register"
         Rec: Record "Vendor Posting Group";
     begin
         if sender."Table ID" <> Database::"Vendor Posting Group" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterVendorItemSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "Item Vendor";
+    begin
+        if sender."Table ID" <> Database::"Item Vendor" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",

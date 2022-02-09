@@ -1,5 +1,6 @@
 ﻿codeunit 6014626 "NPR Replication Counter Mgmt."
 {
+    Access = Public;
     #region General
     procedure UpdateReplicationCounter(RecRef: RecordRef; ReplicationCounterFieldNo: Integer)
     var
@@ -1853,6 +1854,51 @@
 
     [EventSubscriber(ObjectType::Table, Database::"Vendor Posting Group", 'OnBeforeRenameEvent', '', false, false)]
     local procedure UpdateReplicationCounterOnBeforeRenameVendorPostGr(var Rec: Record "Vendor Posting Group"; var xRec: Record "Vendor Posting Group"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Vendor", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertVendItem(var Rec: Record "Item Vendor"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Vendor", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyItemVendor(var Rec: Record "Item Vendor"; var xRec: Record "Item Vendor"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Vendor", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameItemVendor(var Rec: Record "Item Vendor"; var xRec: Record "Item Vendor"; RunTrigger: Boolean)
     var
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
