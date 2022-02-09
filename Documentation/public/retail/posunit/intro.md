@@ -4,4 +4,4 @@ POS units are a central part of the POS sales solution. They consist of hardware
 
 ### Related links
 - [POS units - explanation](./explanation/POSUnit.md)
-- [Create a new POS (using an old one as a reference)](./howto/createnew.md)
+- [Create a new POS (by using an existing one as a reference)](./howto/createnew.md)

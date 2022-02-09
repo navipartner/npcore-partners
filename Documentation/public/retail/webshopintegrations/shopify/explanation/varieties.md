@@ -24,3 +24,4 @@ When calculating the variety description string, which is sent to Shopify, the *
 - [Shopify SKU](./shopifysku.md)
 - [Synchronize Items List](../howto/syncitemslist.md)
 - [Set up Shopify integration](../howto/setupshopifyintegration.md)
+- [Varieties in NP Retail](/public/retail/varieties/intro.md)

@@ -1,4 +1,4 @@
+- name: Entertainment
+  href: intro.md
 - name: Ticket module
   href: ticket/toc.yml
-- name: Member module
-  href: member/toc.yml
