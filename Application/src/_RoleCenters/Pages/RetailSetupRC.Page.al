@@ -697,6 +697,15 @@
                     ToolTip = 'Executes the Replication API Setup List action';
                     ApplicationArea = NPRRetail;
                 }
+
+                action("Replication Setup (Source Company)")
+                {
+                    Caption = 'Replication Setup (Source Company)';
+                    RunObject = Page "NPR Replication Setup (Source)";
+
+                    ToolTip = 'Opens the page Replication Setup (Source Company)';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group("Posting Setup")
             {
