@@ -1,2 +1,12 @@
+- name: Campaign Discount
+  href: campaigndiscount.md
+- name: Campaign Discount Line
+  href: campaigndiscountline.md
+- name: Customer
+  href: customer.md
 - name: External POS Sale
-  href: 001_externalpossale.md
+  href: externalpossale.md
+- name: Item
+  href: item.md
+- name: Vendor
+  href: vendor.md
