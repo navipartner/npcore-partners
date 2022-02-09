@@ -1,4 +1,4 @@
-# Create a new POS unit (apply the same setup to multiple POS units)
+# Create a new POS unit (by using an existing one as reference)
 
 This topic describes the process of creating a new POS unit by using an already existing one as a reference. As soon as you have at least one POS unit in the system, you can use data inside it as a source of information for creating a new one with ease. 
 

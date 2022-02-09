@@ -28,7 +28,7 @@ This topic describes the process of configuring the Replication Setup. As soon a
 
 After you're done configuring the **General** Replication Setup options, you can also configure the **Endpoints** and **Special Field Mappings**.
 
-### Configuring Endpoints
+### Configure Endpoints
 
 The import is done based on the **Endpoints** subpage setup. If necessary, you can configure it.
 
@@ -40,7 +40,7 @@ It is possible to:
 - add a **Fixed Filter** which will be added to the URL when sending the request. You can use this option if only some of the records need to be replicated and not the whole table. Example: *number gt '10003' and number lt '10008'*. [See more](https://docs.microsoft.com/en-us/dynamics-nav/using-filter-expressions-in-odata-uris).
 - add new endpoint configuration.
 
-### Configuring Special Field Mappings
+### Configure Special Field Mappings
 
 In general, the fields for each table (endpoint) are mapped automatically. In the API page used as a webservice, most fields are named like the table fields in the CamelCase.    
 
@@ -53,7 +53,7 @@ However, there are special cases when the field names are different. You can use
 
 ![ReplicationSetupEndpointsFieldMappings.jpg](images/ReplicationSetupEndpointsFieldMappings.jpg)
 
-### Checking Missing Fields
+### Check Missing Fields
 
 You can check if there are table fields that are not handled by the Data Replication by running report **Check Missing Fields**.
 
