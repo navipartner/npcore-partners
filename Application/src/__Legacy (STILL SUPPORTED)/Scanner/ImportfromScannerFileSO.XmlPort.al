@@ -48,14 +48,14 @@ xmlport 6014418 "NPR Import from ScannerFileSO"
         }
     }
 
-    trigger OnInitXmlPort()
-    begin
-        SessionName := Format(CurrentDateTime(), 0, 9);
-    end;
-
     var
         SalesHeader: Record "Sales Header";
-        SessionName: Text[40];
+        LineNo: Integer;
+
+    trigger OnPreXmlPort()
+    begin
+        LineNo := GetInitialLineNo();
+    end;
 
     procedure SelectTable(Sheader: Record "Sales Header")
     begin
@@ -65,31 +65,34 @@ xmlport 6014418 "NPR Import from ScannerFileSO"
     local procedure ImportSalesLine(SalesHeader: Record "Sales Header")
     var
         SalesLine: Record "Sales Line";
-        Item: Record Item;
-        NextLineNo: Integer;
-        Qty: Decimal;
+        ScannerImportMgt: Codeunit "NPR Scanner Import Mgt.";
     begin
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.FindLast() then
-            NextLineNo := SalesLine."Line No." + 10000
-        else
-            NextLineNo := 10000;
-
         SalesLine.Init();
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
-        SalesLine."Line No." := NextLineNo;
-        SalesLine.Type := SalesLine.Type::Item;
-        SalesLine.Validate("No.", '');
-
-        if Item.Get(scanned_item_code) then begin
-            SalesLine.Validate("No.", Item."No.");
-        end else
-            SalesLine.Validate("Item Reference No.", scanned_item_code);
-        Evaluate(Qty, quantity);
-        SalesLine.Validate(Quantity, Qty);
-
+        SalesLine."Line No." := LineNo;
         SalesLine.Insert();
+
+        SalesLine.Type := SalesLine.Type::Item;
+        SalesLine.Validate("No.", ScannerImportMgt.GetItemNoFromScannedCode(scanned_item_code));
+        Evaluate(SalesLine.Quantity, quantity);
+        SalesLine.Validate(Quantity);
+        SalesLine.Modify();
+
+        LineNo += 10000;
+    end;
+
+    local procedure GetInitialLineNo() InitialLineNo: Integer
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        InitialLineNo := 10000;
+
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        if SalesLine.FindLast() then
+            InitialLineNo += SalesLine."Line No.";
+
+        exit(InitialLineNo);
     end;
 }

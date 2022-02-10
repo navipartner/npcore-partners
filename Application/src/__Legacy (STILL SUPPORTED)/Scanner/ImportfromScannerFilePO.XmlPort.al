@@ -48,14 +48,14 @@ xmlport 6014414 "NPR Import from ScannerFilePO"
         }
     }
 
-    trigger OnInitXmlPort()
-    begin
-        SessionName := Format(CurrentDateTime(), 0, 9);
-    end;
-
     var
         PurchaseHeader: Record "Purchase Header";
-        SessionName: Text[40];
+        LineNo: Integer;
+
+    trigger OnPreXmlPort()
+    begin
+        LineNo := GetInitialLineNo();
+    end;
 
     procedure SelectTable(Pheader: Record "Purchase Header")
     begin
@@ -65,25 +65,34 @@ xmlport 6014414 "NPR Import from ScannerFilePO"
     local procedure ImportPurchaseLine(PurchHeader: Record "Purchase Header")
     var
         PurchaseLine: Record "Purchase Line";
-        NextLineNo: Integer;
+        ScannerImportMgt: Codeunit "NPR Scanner Import Mgt.";
     begin
-        PurchaseLine.SetRange("Document Type", PurchHeader."Document Type");
-        PurchaseLine.SetRange("Document No.", PurchHeader."No.");
-        if PurchaseLine.FindLast() then
-            NextLineNo := PurchaseLine."Line No." + 10000
-        else
-            NextLineNo := 10000;
-
         PurchaseLine.Init();
         PurchaseLine."Document Type" := PurchHeader."Document Type";
         PurchaseLine."Document No." := PurchHeader."No.";
-        PurchaseLine."Line No." := NextLineNo;
-        PurchaseLine.Type := PurchaseLine.Type::Item;
-        PurchaseLine."No." := '';
+        PurchaseLine."Line No." := LineNo;
+        PurchaseLine.Insert();
 
-        PurchaseLine.Validate("Item Reference No.", scanned_item_code);
+        PurchaseLine.Type := PurchaseLine.Type::Item;
+        PurchaseLine.Validate("No.", ScannerImportMgt.GetItemNoFromScannedCode(scanned_item_code));
         Evaluate(PurchaseLine.Quantity, quantity);
         PurchaseLine.Validate(Quantity);
-        PurchaseLine.Insert();
+        PurchaseLine.Modify();
+
+        LineNo += 10000;
+    end;
+
+    local procedure GetInitialLineNo() InitialLineNo: Integer
+    var
+        PurchaseLine: Record "Purchase Line";
+    begin
+        InitialLineNo := 10000;
+
+        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+        if PurchaseLine.FindLast() then
+            InitialLineNo += PurchaseLine."Line No.";
+
+        exit(InitialLineNo);
     end;
 }
