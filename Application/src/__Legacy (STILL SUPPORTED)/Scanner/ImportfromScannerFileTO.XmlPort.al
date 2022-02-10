@@ -29,7 +29,7 @@ xmlport 6014413 "NPR ImportFromScannerFile TO"
 
                 trigger OnBeforeInsertRecord()
                 begin
-                    ImportTransferLine(TransferOrderHeader);
+                    ImportTransferLine(TransferOrderHeader."No.");
                 end;
             }
         }
@@ -50,33 +50,46 @@ xmlport 6014413 "NPR ImportFromScannerFile TO"
 
     var
         TransferOrderHeader: Record "Transfer Header";
+        LineNo: Integer;
+
+    trigger OnPreXmlPort()
+    begin
+        LineNo := GetInitialLineNo();
+    end;
 
     procedure SelectTable(Theader: Record "Transfer Header")
     begin
         TransferOrderHeader := Theader;
     end;
 
-    local procedure ImportTransferLine(TransferHeader: Record "Transfer Header")
+    local procedure ImportTransferLine(DocumentNo: Code[20])
     var
         TransferLine: Record "Transfer Line";
-        Item: Record Item;
-        LineNo: Integer;
+        ScannerImportMgt: Codeunit "NPR Scanner Import Mgt.";
     begin
-        TransferLine.SetRange("Document No.", TransferHeader."No.");
-        if TransferLine.FindLast() then
-            LineNo := TransferLine."Line No." + 10000
-        else
-            LineNo := 10000;
-
         TransferLine.Init();
-        TransferLine."Document No." := TransferHeader."No.";
+        TransferLine."Document No." := DocumentNo;
         TransferLine."Line No." := LineNo;
-        TransferLine."Item No." := '';
-        Evaluate(TransferLine.Quantity, quantity);
-        if Item.Get(scanned_item_code) then
-            TransferLine.Validate("Item No.", Item."No.")
-        else
-            TransferLine.Validate("NPR Cross-Reference No.", scanned_item_code);
         TransferLine.Insert();
+
+        TransferLine.Validate("Item No.", ScannerImportMgt.GetItemNoFromScannedCode(scanned_item_code));
+        Evaluate(TransferLine.Quantity, quantity);
+        TransferLine.Validate(Quantity);
+        TransferLine.Modify();
+
+        LineNo += 10000;
+    end;
+
+    local procedure GetInitialLineNo() InitialLineNo: Integer
+    var
+        TransferLine: Record "Transfer Line";
+    begin
+        InitialLineNo := 10000;
+
+        TransferLine.SetRange("Document No.", TransferOrderHeader."No.");
+        if TransferLine.FindLast() then
+            InitialLineNo += TransferLine."Line No.";
+
+        exit(InitialLineNo);
     end;
 }
