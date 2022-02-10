@@ -1,6 +1,5 @@
 ﻿page 6150628 "NPR POS Payment Bin Checkpoint"
 {
-    Extensible = False;
     Caption = 'POS Payment Bin Checkpoint';
     DeleteAllowed = false;
     InsertAllowed = false;
