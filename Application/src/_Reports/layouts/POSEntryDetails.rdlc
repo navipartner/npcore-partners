@@ -1040,6 +1040,7 @@
                                   <Value>=Fields!Amount_NPR_POS_Entry_Sale_Line.Value+Fields!DiscountAmount_NPR_POS_Entry.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
+                                    <Format>f2</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -1061,6 +1062,7 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
