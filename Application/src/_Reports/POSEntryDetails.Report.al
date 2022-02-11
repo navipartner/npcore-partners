@@ -1,8 +1,8 @@
 ﻿report 6014458 "NPR POS Entry Details"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
 
     Caption = 'POS Entry Details';
     PreviewMode = PrintLayout;
@@ -112,6 +112,7 @@
                 Clear(POSEntryTaxLine);
 
                 POSEntrySalesLine.SetRange("POS Entry No.", "NPR POS Entry"."Entry No.");
+                POSEntrySalesLine.setfilter(Type, '<>%1', POSEntrySalesLine.Type::Rounding);
                 if POSEntrySalesLine.findset() then begin
                     POSEntrySalesLine.CalcSums("Amount Incl. VAT", "Amount Excl. VAT", "Line Discount Amount Incl. VAT");
                 end;
