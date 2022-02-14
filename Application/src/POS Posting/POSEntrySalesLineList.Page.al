@@ -149,6 +149,11 @@
                     ToolTip = 'Specifies the value of the Line No. field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Reason Code"; Rec."Reason Code")
+                {
+                    ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
