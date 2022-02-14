@@ -14,7 +14,7 @@
 
             {
                 Caption = 'Purchase';
-                field("NP Purchase Quote"; Rec."NPR Purchase Quote")
+                field("NP Purchase Quote"; PurchQuoteCount)
                 {
                     Caption = 'Purchase Quote';
 
@@ -22,7 +22,7 @@
                     ToolTip = 'Specifies the number of purchase quotes.';
                     ApplicationArea = NPRRetail;
                 }
-                field("NP Purchase Order"; Rec."NPR Purchase Order")
+                field("NP Purchase Order"; PurchOrderCount)
                 {
                     Caption = 'Purchase Order';
                     ApplicationArea = NPRRetail;
@@ -89,9 +89,23 @@
         end;
 
         Rec.SetFilter("Due Date Filter", '<=%1', WorkDate());
+
+        CountPurchaseDocuments();
+    end;
+
+    local procedure CountPurchaseDocuments()
+    var
+        PurchaseHeader: Record "Purchase Header";
+    begin
+        PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Order);
+        PurchOrderCount := PurchaseHeader.Count();
+        PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Quote);
+        PurchQuoteCount := PurchaseHeader.Count();
     end;
 
     var
         UserTaskManagement: Codeunit "User Task Management";
+        PurchOrderCount: Integer;
+        PurchQuoteCount: Integer;
 }
 
