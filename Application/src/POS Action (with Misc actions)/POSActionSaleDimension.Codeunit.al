@@ -3,11 +3,14 @@
     Access = Internal;
 
     var
-        ActionDescription: Label 'This Action updates the POS Sale Dimension with either a fixed value or provides a list of valid value';
         DimensionSourceOptions: Option SHORTCUT1,SHORTCUT2,ANY;
+        ValueSelectionOptions: Option "LIST","FIXED",PROMPT_N,PROMPT_A;
+        ActionDescription: Label 'This Action updates the POS Sale Dimension with either a fixed value or provides a list of valid value';
         DIMSET: Label 'Dimension code %1 set to %2.';
-        TITLE: Label 'Dimension and Statistics';
+        ParameterValueIncorrectErr: Label 'Please assign value ''%1'' to parameter "%2" before selecting "%3"', Comment = '%1 - required related parameter value, %2 - related parameter name, %3 - changed parameter name';
+        ParameterValueMissingErr: Label 'Please select a value for parameter "%1"', Comment = '%1 - parameter name';
         ReadingErr: Label 'reading in %1';
+        TITLE: Label 'Dimension and Statistics';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -85,8 +88,8 @@
         DimValueCode: Code[20];
         StrMessage: Text;
         ApplyDimTo: Option Sale,CurrentLine,LinesOfTypeSale;
-        ValueSelection: Option "LIST","FIXED",PROMPT_N,PROMPT_A;
         StatisticsFrequency: Integer;
+        ValueSelection: Integer;
         ShowMessage: Boolean;
         WithCreate: Boolean;
         MissingParameterErr: Label 'POS action parameter ''%1'' must be specified.', Comment = '%1 - parameter name';
@@ -108,10 +111,10 @@
 
         ValueSelection := JSON.GetIntegerParameter(ParameterValueSelection_Name());
         if (ValueSelection < 0) then
-            ValueSelection := ValueSelection::"LIST";
+            ValueSelection := ValueSelectionOptions::"LIST";
 
         DimCode := GetDimensionCode(JSON);
-        if (DimCode = '') and (ValueSelection <> ValueSelection::"LIST") then
+        if (DimCode = '') and (ValueSelection <> ValueSelectionOptions::"LIST") then
             Error(MissingParameterErr, ParameterDimensionCode_Caption());
 
         ApplyDimTo := JSON.GetIntegerParameter(ParameterApplyTo_Name());
@@ -122,13 +125,13 @@
         WithCreate := JSON.GetBooleanParameter(ParameterCreateDimValue_Name());
 
         case ValueSelection of
-            ValueSelection::PROMPT_N:
+            ValueSelectionOptions::PROMPT_N:
                 DimValueCode := CopyStr(GetNumpad(JSON, 'numeric_input'), 1, MaxStrLen(DimValueCode));
-            ValueSelection::PROMPT_A:
+            ValueSelectionOptions::PROMPT_A:
                 DimValueCode := CopyStr(GetInput(JSON, 'alpha_input'), 1, MaxStrLen(DimValueCode));
-            ValueSelection::"FIXED":
+            ValueSelectionOptions::"FIXED":
                 DimValueCode := CopyStr(JSON.GetStringParameterOrFail(ParameterDimensionValue_Name(), StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(DimValueCode));
-            ValueSelection::"LIST":
+            ValueSelectionOptions::"LIST":
                 if DimCode <> '' then
                     if not LookupDimensionValue(DimCode, DimValueCode) then
                         Error('');
@@ -313,7 +316,7 @@
                         if Dimension.Find('=><') then;
                     end;
                     if Page.RunModal(0, Dimension) = Action::LookupOK then
-                        POSParameterValue.Value := Dimension.Code;
+                        POSParameterValue.Validate(Value, Dimension.Code);
                 end;
 
             ParameterDimensionValue_Name():
@@ -322,7 +325,7 @@
                         exit;
                     SelectedValue := CopyStr(POSParameterValue.Value, 1, MaxStrLen(SelectedValue));
                     If LookupDimensionValue(Dimension.Code, SelectedValue) then
-                        POSParameterValue.Value := SelectedValue;
+                        POSParameterValue.Validate(Value, SelectedValue);
                 end;
         end;
     end;
@@ -332,25 +335,61 @@
     var
         Dimension: Record Dimension;
         DimensionValue: Record "Dimension Value";
+        POSParameterValue2: Record "NPR POS Parameter Value";
+        DimMgt: Codeunit DimensionManagement;
+        SelectedOptionNo: Integer;
         FilterMaskLbl: Label '@%1*', Locked = true;
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
+            ParameterDimensionSource_Name():
+                begin
+                    TryGetParameterOptionNo(POSParameterValue, SelectedOptionNo);
+                    if SelectedOptionNo <> DimensionSourceOptions::ANY then begin
+                        POSParameterValue2 := POSParameterValue;
+                        POSParameterValue2.SetRecFilter();
+                        POSParameterValue2.SetRange(Name, ParameterDimensionCode_Name());
+                        if POSParameterValue2.FindFirst() then
+                            if POSParameterValue2.Value <> '' then begin
+                                POSParameterValue2.Validate(Value, '');
+                                POSParameterValue2.Modify();
+                            end;
+                    end;
+                    POSParameterValue.Modify();
+
+                    GetDimension(POSParameterValue, Dimension, false);
+                    ReevaluateDimensionValueCodeParameter(POSParameterValue, Dimension);
+                end;
+
             ParameterDimensionCode_Name():
+                begin
+                    Clear(Dimension);
+                    GetDimensionSourceParameter(POSParameterValue, SelectedOptionNo, true);
+                    if POSParameterValue.Value <> '' then begin
+                        if SelectedOptionNo <> DimensionSourceOptions::ANY then
+                            Error(ParameterValueIncorrectErr, SelectStr(DimensionSourceOptions::ANY + 1, ParameterDimensionSource_OptionCaptions()), ParameterDimensionSource_Caption(), ParameterDimensionCode_Caption());
+                        Dimension.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(Dimension.Code));
+                        if not Dimension.Find() then begin
+                            Dimension.SetFilter(Code, StrSubstNo(FilterMaskLbl, POSParameterValue.Value));
+                            Dimension.FindFirst();
+                        end;
+                        POSParameterValue.Value := Dimension.Code;
+                    end;
+                    if SelectedOptionNo = DimensionSourceOptions::ANY then
+                        ReevaluateDimensionValueCodeParameter(POSParameterValue, Dimension);
+                end;
+
+            ParameterDimensionValue_Name():
                 begin
                     if POSParameterValue.Value = '' then
                         exit;
-                    Dimension.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(Dimension.Code));
-                    if not Dimension.Find() then begin
-                        Dimension.SetFilter(Code, StrSubstNo(FilterMaskLbl, POSParameterValue.Value));
-                        Dimension.FindFirst();
-                    end;
-                    POSParameterValue.Value := Dimension.Code;
-                end;
-            ParameterDimensionValue_Name():
-                begin
+
+                    GetValueSelectionParameter(POSParameterValue, SelectedOptionNo, true);
+                    if SelectedOptionNo <> ValueSelectionOptions::"FIXED" then
+                        Error(ParameterValueIncorrectErr, SelectStr(ValueSelectionOptions::"FIXED" + 1, ParameterValueSelection_OptionCaptions()), ParameterValueSelection_Caption(), ParameterDimensionValue_Caption());
+
                     GetDimension(POSParameterValue, Dimension, true);
                     DimensionValue."Dimension Code" := Dimension.Code;
                     DimensionValue.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(DimensionValue.Code));
@@ -359,43 +398,62 @@
                         DimensionValue.SetFilter(Code, StrSubstNo(FilterMaskLbl, POSParameterValue.Value));
                         DimensionValue.FindFirst();
                     end;
+                    if not DimMgt.CheckDimValue(DimensionValue."Dimension Code", DimensionValue.Code) then
+                        Error(DimMgt.GetDimErr());
                     POSParameterValue.Value := DimensionValue.Code;
+                end;
+
+            ParameterValueSelection_Name():
+                begin
+                    TryGetParameterOptionNo(POSParameterValue, SelectedOptionNo);
+                    if SelectedOptionNo <> ValueSelectionOptions::"FIXED" then begin
+                        POSParameterValue2 := POSParameterValue;
+                        POSParameterValue2.SetRecFilter();
+                        POSParameterValue2.SetRange(Name, ParameterDimensionValue_Name());
+                        if POSParameterValue2.FindFirst() then
+                            if POSParameterValue2.Value <> '' then begin
+                                POSParameterValue2.Validate(Value, '');
+                                POSParameterValue2.Modify();
+                            end;
+                    end;
                 end;
         end;
     end;
 
-    local procedure GetDimension(ForPOSParameterValue: Record "NPR POS Parameter Value"; var Dimension: Record Dimension; WithError: Boolean): Boolean
+    local procedure ReevaluateDimensionValueCodeParameter(POSParameterValue: Record "NPR POS Parameter Value"; Dimension: Record Dimension)
     var
-        POSParameterValue2: Record "NPR POS Parameter Value";
+        DimensionValue: Record "Dimension Value";
+        ClearValue: Boolean;
+    begin
+        POSParameterValue.SetRecFilter();
+        POSParameterValue.SetRange(Name, ParameterDimensionValue_Name());
+        if not POSParameterValue.FindFirst() or (POSParameterValue.Value = '') then
+            exit;
+
+        ClearValue := Dimension.Code = '';
+        if not ClearValue then
+            ClearValue := not DimensionValue.Get(Dimension.Code, CopyStr(POSParameterValue.Value, 1, MaxStrLen(DimensionValue.Code)));
+        if not ClearValue then
+            exit;
+
+        POSParameterValue.Validate(Value, '');
+        POSParameterValue.Modify();
+    end;
+
+    local procedure GetDimension(POSParameterValue: Record "NPR POS Parameter Value"; var Dimension: Record Dimension; WithError: Boolean): Boolean
+    var
         DimSource: Integer;
         DimCode: Code[20];
-        ParameterValueMissingErr: Label 'Please select a value for parameter "%1"', Comment = '%1 - parameter name';
     begin
-        POSParameterValue2.SetRange("Table No.", ForPOSParameterValue."Table No.");
-        POSParameterValue2.SetRange(Code, ForPOSParameterValue.Code);
-        POSParameterValue2.SetRange(ID, ForPOSParameterValue.ID);
-        POSParameterValue2.SetRange("Record ID", ForPOSParameterValue."Record ID");
-        POSParameterValue2.SetRange(Name, ParameterDimensionSource_Name());
-        if not (POSParameterValue2.FindFirst() and TryGetDimensionSourceOptionNo(POSParameterValue2, DimSource)) then begin
-            if WithError then
-                Error(ParameterValueMissingErr, ParameterDimensionSource_Caption());
+        if not GetDimensionSourceParameter(POSParameterValue, DimSource, WithError) then
             exit(false);
-        end;
-
         case DimSource of
             DimensionSourceOptions::SHORTCUT1,
             DimensionSourceOptions::SHORTCUT2:
                 DimCode := GetGlobalDimensionCode(DimSource);
             DimensionSourceOptions::ANY:
-                begin
-                    POSParameterValue2.SetRange(Name, ParameterDimensionCode_Name());
-                    if not (POSParameterValue2.FindFirst() and (POSParameterValue2.Value <> '')) then begin
-                        if WithError then
-                            Error(ParameterValueMissingErr, ParameterDimensionCode_Caption());
-                        exit(false);
-                    end;
-                    DimCode := CopyStr(POSParameterValue2.Value, 1, MaxStrLen(Dimension.Code));
-                end;
+                if not GetDimensionCodeParameter(POSParameterValue, DimCode, WithError) then
+                    exit(false);
         end;
 
         if WithError then begin
@@ -437,15 +495,55 @@
         end;
     end;
 
+    local procedure GetDimensionCodeParameter(POSParameterValue: Record "NPR POS Parameter Value"; var DimCode: Code[20]; WithError: Boolean): Boolean
+    begin
+        POSParameterValue.SetRecFilter();
+        POSParameterValue.SetRange(Name, ParameterDimensionCode_Name());
+        if not (POSParameterValue.FindFirst() and (POSParameterValue.Value <> '')) then begin
+            if WithError then
+                Error(ParameterValueMissingErr, ParameterDimensionCode_Caption());
+            DimCode := '';
+            exit(false);
+        end;
+        DimCode := CopyStr(POSParameterValue.Value, 1, MaxStrLen(DimCode));
+        exit(true);
+    end;
+
+    local procedure GetDimensionSourceParameter(POSParameterValue: Record "NPR POS Parameter Value"; var DimSource: Integer; WithError: Boolean): Boolean
+    begin
+        DimSource := 0;
+        POSParameterValue.SetRecFilter();
+        POSParameterValue.SetRange(Name, ParameterDimensionSource_Name());
+        if not (POSParameterValue.FindFirst() and TryGetParameterOptionNo(POSParameterValue, DimSource)) then begin
+            if WithError then
+                Error(ParameterValueMissingErr, ParameterDimensionSource_Caption());
+            exit(false);
+        end;
+        exit(true);
+    end;
+
+    local procedure GetValueSelectionParameter(POSParameterValue: Record "NPR POS Parameter Value"; var ValueSelection: Integer; WithError: Boolean): Boolean
+    begin
+        ValueSelection := 0;
+        POSParameterValue.SetRecFilter();
+        POSParameterValue.SetRange(Name, ParameterValueSelection_Name());
+        if not (POSParameterValue.FindFirst() and TryGetParameterOptionNo(POSParameterValue, ValueSelection)) then begin
+            if WithError then
+                Error(ParameterValueMissingErr, ParameterValueSelection_Caption());
+            exit(false);
+        end;
+        exit(true);
+    end;
+
     [TryFunction]
-    local procedure TryGetDimensionSourceOptionNo(POSParameterValue: Record "NPR POS Parameter Value"; var DimSource: Integer)
+    local procedure TryGetParameterOptionNo(POSParameterValue: Record "NPR POS Parameter Value"; var SelectedOptionNo: Integer)
     var
         POSActionParameter: Record "NPR POS Action Parameter";
     begin
         POSActionParameter.Get(POSParameterValue."Action Code", POSParameterValue.Name);
-        DimSource := POSActionParameter.GetOptionInt(POSParameterValue.Value);
-        if DimSource < 0 then
-            DimSource := 0;
+        SelectedOptionNo := POSActionParameter.GetOptionInt(POSParameterValue.Value);
+        if SelectedOptionNo < 0 then
+            SelectedOptionNo := 0;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
@@ -455,7 +553,6 @@
         CaptionCreateDimValue: Label 'Create Value';
         CaptionShowConfirmMessage: Label 'Confirm';
         CaptionStatisticsFrequency: Label 'Statistics Frequency';
-        CaptionValueSelection: Label 'Value Selection';
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -470,7 +567,7 @@
             ParameterCreateDimValue_Name():
                 Caption := CaptionCreateDimValue;
             ParameterValueSelection_Name():
-                Caption := CaptionValueSelection;
+                Caption := ParameterValueSelection_Caption();
             ParameterApplyTo_Name():
                 Caption := CaptionApplyTo;
             ParameterStatisticsFrequency_Name():
@@ -519,7 +616,6 @@
     local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
         OptionApplyTo: Label 'Entire Sale,Current Line,All Sales Items';
-        OptionValueSelection: Label 'List,Fixed,Numpad,Textpad';
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -528,7 +624,7 @@
             ParameterDimensionSource_Name():
                 Caption := ParameterDimensionSource_OptionCaptions();
             ParameterValueSelection_Name():
-                Caption := OptionValueSelection;
+                Caption := ParameterValueSelection_OptionCaptions();
             ParameterApplyTo_Name():
                 Caption := OptionApplyTo;
         end;
@@ -539,9 +635,9 @@
         exit('DimensionCode');
     end;
 
-    local procedure ParameterDimensionCode_Caption(): Text[30]
+    local procedure ParameterDimensionCode_Caption(): Text
     var
-        DimensionCodeLbl: Label 'Dimension Code', MaxLength = 30;
+        DimensionCodeLbl: Label 'Dimension Code';
     begin
         exit(DimensionCodeLbl);
     end;
@@ -551,9 +647,9 @@
         exit('DimensionValue');
     end;
 
-    local procedure ParameterDimensionValue_Caption(): Text[30]
+    local procedure ParameterDimensionValue_Caption(): Text
     var
-        DimensionValueCodeLbl: Label 'Dimension Value Code', MaxLength = 30;
+        DimensionValueCodeLbl: Label 'Dimension Value Code';
     begin
         exit(DimensionValueCodeLbl);
     end;
@@ -563,18 +659,18 @@
         exit('DimensionSource');
     end;
 
+    local procedure ParameterDimensionSource_Caption(): Text
+    var
+        DimensionSourceLbl: Label 'Dimension Source';
+    begin
+        exit(DimensionSourceLbl);
+    end;
+
     local procedure ParameterDimensionSource_OptionCaptions(): Text
     var
         DimensionSourceOptionsLbl: Label '1st Global Dimension,2nd Global Dimension,Any';
     begin
         exit(DimensionSourceOptionsLbl);
-    end;
-
-    local procedure ParameterDimensionSource_Caption(): Text[30]
-    var
-        DimensionSourceLbl: Label 'Dimension Source', MaxLength = 30;
-    begin
-        exit(DimensionSourceLbl);
     end;
 
     local procedure ParameterCreateDimValue_Name(): Text[30]
@@ -585,6 +681,20 @@
     local procedure ParameterValueSelection_Name(): Text[30]
     begin
         exit('ValueSelection');
+    end;
+
+    local procedure ParameterValueSelection_Caption(): Text
+    var
+        ValueSelectionLbl: Label 'Value Selection';
+    begin
+        exit(ValueSelectionLbl);
+    end;
+
+    local procedure ParameterValueSelection_OptionCaptions(): Text
+    var
+        OptionValueSelectionLbl: Label 'List,Fixed,Numpad,Textpad';
+    begin
+        exit(OptionValueSelectionLbl);
     end;
 
     local procedure ParameterApplyTo_Name(): Text[30]
