@@ -188,7 +188,7 @@ page 6059846 "NPR APIV1 - GL Accounts"
                 {
                     Caption = 'Last Modified Date Time', Locked = true;
                 }
-                field(nprIsRetailPayment; Rec."NPR Is Retail Payment")
+                field(nprIsRetailPayment; IsRetailPayment)
                 {
                     Caption = 'Retail Payment', Locked = true;
                 }
@@ -255,9 +255,36 @@ page 6059846 "NPR APIV1 - GL Accounts"
             }
         }
     }
+    Var
+        IsRetailPayment: Boolean;
 
     trigger OnInit()
     begin
         CurrentTransactionType := TransactionType::Update;
     end;
+
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    begin
+        SetAuxGLAccount();
+    end;
+
+    trigger OnModifyRecord(): Boolean
+    begin
+        SetAuxGLAccount();
+    end;
+
+    local procedure SetAuxGLAccount()
+    var
+        AuxGLAccount: Record "NPR Aux. G/L Account";
+    begin
+        if not AuxGLAccount.Get(Rec."No.") then begin
+            AuxGLAccount."No." := Rec."No.";
+            AuxGLAccount.Insert();
+        end;
+        if AuxGLAccount."Retail Payment" <> IsRetailPayment then begin
+            AuxGLAccount."Retail Payment" := IsRetailPayment;
+            AuxGLAccount.Modify();
+        end;
+    end;
+
 }

@@ -184,10 +184,6 @@
             {
                 Caption = 'Last Modified Date Time', Locked = true;
             }
-            column(nprIsRetailPayment; "NPR Is Retail Payment")
-            {
-                Caption = 'Retail Payment', Locked = true;
-            }
             column(netChange; "Net Change")
             {
                 Caption = 'Net Change', Locked = true;
