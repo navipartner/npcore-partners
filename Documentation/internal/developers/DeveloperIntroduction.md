@@ -170,15 +170,18 @@ Procedure is as described:
 1. Always merge to master branch first via a topic branch and PR. Same as any other change, so the master cannot fall behind a hotfix release.
 2. Create a hotfix release branch inside the releases/ folder with name of the 2nd+3rd digit (our version numbers).
 **Hotfix release branches must be branched from the last release, NOT master, so that we don't deploy anything done on master since last release if we are only hotfixing. This way, hotfixes will be additive but at least they won't contain everything, only the bare minimum!**
+**Make sure you are not creating a new branch from release branch where work is in progress. Good thing to check is the number of commits behind/ahead, whether the branch is locked and if pipeline has been completed**
 3. Create a topic branch from 2). This is the branch where you will prepare the hotfix code, before PRing back onto the release branch created in 2)
 4. Cherry pick the commits from the master branch (using commit IDs) onto your topic branch.
 5. Manually test the hotfix .app if necessary. Remember that the unique combination of changes might cause a different behaviour than on master branch.
 6. Create a PR from your topic branch to your release branch. 
 7. When PR is approved, the new hotfix release branch should now contain the changes you wish to release. Any further hotfixes will need to go into another newer hotfix release.
+**If you are done with changes, you can now lock the branch**
 8. Run the release pipeline on this new release branch. It will output release artifacts to the npcore nuget feed.
 These can be deployed to prod tenants via triskelions lookup into the nuget feed.
 The release pipeline is found here: https://navipartner.visualstudio.com/NpCore/_build?definitionId=38 (NpCore Release build)
 **Note - Since pipeline execution is manual, please pay attention to if the developer before you is done with his hotfix (=pipeline has run, .app is in release feed). Otherwise you might beat him in the "race" with a higher version than his, if creating hotfixes in parallel. Ideally two hotfixes in the same day could instead be one, with changes from two developers.**
+**It is a recommended that you announce new release in Teams Channel NAV Developers (sync'ed) - NP Core Releases. If another developer already announced new release you could contact them and join them in release.**
 
 # Restructuring the repo or renaming files - important!
 
