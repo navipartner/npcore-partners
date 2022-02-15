@@ -1,8 +1,8 @@
 ﻿report 6014459 "NPR Balancing Report A4 POS"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - POS.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -29,12 +29,17 @@
             column(Voucherslbl_; Voucherslbl)
             {
             }
-            column(TurnoverProfitlbl_; TurnoverProfitlbl)
+            column(Turnoverlbl_; Turnoverlbl)
             {
             }
             column(Discountlbl_; Discountlbl)
             {
             }
+
+            column(OnOrderlbl_; OnOrderlbl)
+            {
+            }
+
             column(DiscountAmtlbl_; DiscountAmtlbl)
             {
             }
@@ -62,6 +67,12 @@
             column(Workshiftlbl_; Workshiftlbl)
             {
             }
+            column(EFTlbl_; EFTlbl)
+            {
+            }
+            column(POSUnitLbl_; POSUnitLbl)
+            {
+            }
             column(WorkshiftNo_; "POS Workshift Checkpoint"."Entry No.")
             {
             }
@@ -74,7 +85,7 @@
             column(NetTurnoverLCY_; "POS Workshift Checkpoint"."Net Turnover (LCY)")
             {
             }
-            column(ReturnSalesLCY_; "POS Workshift Checkpoint"."Direct Item Returns (LCY)")
+            column(DirectReturnSalesLCY_; "POS Workshift Checkpoint"."Direct Item Returns (LCY)")
             {
             }
             column(TotalDiscountLCY_; "POS Workshift Checkpoint"."Total Discount (LCY)")
@@ -95,10 +106,10 @@
             column(CashMovementLCY_; "POS Workshift Checkpoint"."Local Currency (LCY)")
             {
             }
-            column(CreatedGiftVoucherLCY_; "POS Workshift Checkpoint"."Issued Vouchers (LCY)")
+            column(IssuedVoucherLCY_; "POS Workshift Checkpoint"."Issued Vouchers (LCY)")
             {
             }
-            column(RedeemedGiftVoucherLCY_; "POS Workshift Checkpoint"."Redeemed Vouchers (LCY)")
+            column(RedeemedVoucherLCY_; "POS Workshift Checkpoint"."Redeemed Vouchers (LCY)")
             {
             }
             column(RedeemedCreditVoucherLCY_; "POS Workshift Checkpoint"."Redeemed Credit Voucher (LCY)")
@@ -128,7 +139,7 @@
             column(DebitsalesCount_; "POS Workshift Checkpoint"."Credit Item Quantity Sum")
             {
             }
-            column(SalesLCY_; "POS Workshift Checkpoint"."Direct Item Sales (LCY)")
+            column(DirectSalesLCY_; "POS Workshift Checkpoint"."Direct Item Sales (LCY)")
             {
             }
             column(SalesStaffLCY_; "POS Workshift Checkpoint"."Direct Sales - Staff (LCY)")
@@ -137,7 +148,7 @@
             column(DebitSalesLCY_; "POS Workshift Checkpoint"."Credit Item Sales (LCY)")
             {
             }
-            column(CustomerPaymentLCY_; "POS Workshift Checkpoint"."Debtor Payment (LCY)")
+            column(DebtorPaymentLCY_; "POS Workshift Checkpoint"."Debtor Payment (LCY)")
             {
             }
             column(ForeignCurrencyLCY_; "POS Workshift Checkpoint"."Foreign Currency (LCY)")
@@ -209,13 +220,40 @@
             column(TotalDiscountPerc_; "POS Workshift Checkpoint"."Total Discount %")
             {
             }
+            column(DirectTurnoverLCY_; "POS Workshift Checkpoint"."Direct Turnover (LCY)")
+            {
+            }
+            column(CreditTurnoverLCY_; "POS Workshift Checkpoint"."Credit Turnover (LCY)")
+            {
+            }
+            column(DirectNetTurnoverLCY_; "POS Workshift Checkpoint"."Direct Net Turnover (LCY)")
+            {
+            }
+            column(CreditRealAmtLCY_; "POS Workshift Checkpoint"."Credit Real. Sale Amt. (LCY)")
+            {
+            }
+            column(CreditRealReturnAmtLCY_; "POS Workshift Checkpoint"."Credit Real. Return Amt. (LCY)")
+            {
+            }
+            column(CreditNetTurnOverLCY_; "POS Workshift Checkpoint"."Credit Net Turnover (LCY)")
+            {
+            }
+            column(CreditUnrealSaleAmtLCY_; "POS Workshift Checkpoint"."Credit Unreal. Sale Amt. (LCY)")
+            {
+            }
+            column(EFTLCY_; "POS Workshift Checkpoint"."EFT (LCY)")
+            {
+            }
+            column(LocalCurrencyLCY_; "POS Workshift Checkpoint"."Local Currency (LCY)")
+            {
+            }
             column(VarMain_; VarMain)
             {
             }
             column(NetTurnoverLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Net Turnover (LCY)"))
             {
             }
-            column(ReturnSalesLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Direct Item Returns (LCY)"))
+            column(DirectReturnSalesLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Direct Item Returns (LCY)"))
             {
             }
             column(TotalDiscountLClbl_; "POS Workshift Checkpoint".FieldCaption("Total Discount (LCY)"))
@@ -236,10 +274,10 @@
             column(CashMovementLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Local Currency (LCY)"))
             {
             }
-            column(CreatedGiftVoucherLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Issued Vouchers (LCY)"))
+            column(IssuedVoucherLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Issued Vouchers (LCY)"))
             {
             }
-            column(RedeemedGiftVoucherLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Redeemed Vouchers (LCY)"))
+            column(RedeemedVoucherLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Redeemed Vouchers (LCY)"))
             {
             }
             column(RedeemedCreditVoucherLClbl_; "POS Workshift Checkpoint".FieldCaption("Redeemed Credit Voucher (LCY)"))
@@ -269,7 +307,7 @@
             column(DebitSalesCountlbl_; "POS Workshift Checkpoint".FieldCaption("Credit Item Quantity Sum"))
             {
             }
-            column(SalesLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Direct Item Sales (LCY)"))
+            column(DirectSalesLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Direct Item Sales (LCY)"))
             {
             }
             column(SalesStaffLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Direct Sales - Staff (LCY)"))
@@ -278,7 +316,7 @@
             column(DebitSalesLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Credit Item Sales (LCY)"))
             {
             }
-            column(CustomerPaymentLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Debtor Payment (LCY)"))
+            column(DebtorPaymentLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Debtor Payment (LCY)"))
             {
             }
             column(ForeignCurrencyLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Foreign Currency (LCY)"))
@@ -353,7 +391,34 @@
             column(TotalDiscountPerclbl_; "POS Workshift Checkpoint".FieldCaption("Total Discount %"))
             {
             }
-            column(StoreCode_; POSEntry."POS Unit No.")
+            column(DirectTurnoverLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Direct Turnover (LCY)"))
+            {
+            }
+            column(CreditTurnoverLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Credit Turnover (LCY)"))
+            {
+            }
+            column(DirectNetTurnoverLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Direct Net Turnover (LCY)"))
+            {
+            }
+            column(CreditRealAmtLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Credit Real. Sale Amt. (LCY)"))
+            {
+            }
+            column(CreditRealReturnAmtLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Credit Real. Return Amt. (LCY)"))
+            {
+            }
+            column(CreditNetTurnOverLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Credit Net Turnover (LCY)"))
+            {
+            }
+            column(CreditUnrealSaleAmtLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Credit Unreal. Sale Amt. (LCY)"))
+            {
+            }
+            column(EFTLCYlbl_; "POS Workshift Checkpoint".FieldCaption("EFT (LCY)"))
+            {
+            }
+            column(LocalCurrencyLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Local Currency (LCY)"))
+            {
+            }
+            column(StoreCode_; POSEntry."POS Store Code")
             {
             }
             column(DocumentNo_; POSEntry."Document No.")
@@ -368,7 +433,13 @@
             column(ClosingDate_; POSEntry."Entry Date")
             {
             }
-            column(RegisterNoLbl_; RegisterNoLbl)
+            column(UserFullName_; User."Full Name")
+            {
+            }
+            column(SalespersonName_; Salesperson.Name)
+            {
+            }
+            column(StoreLbl_; StoreLbl)
             {
             }
             column(SalesTicketNoLbl_; SalesTicketNoLbl)
@@ -383,10 +454,19 @@
             column(SignatureLbl_; SignatureLbl)
             {
             }
+            column(PrintedBylbl_; PrintedByLbl)
+            {
+            }
+            column(Salespersonlbl_; Salespersonlbl)
+            {
+            }
             column(PricesIncVAT_; Format(POSEntry."Prices Including VAT"))
             {
             }
             column(PricesIncVATLbl_; POSEntry.FieldCaption("Prices Including VAT"))
+            {
+            }
+            column(OtherPaymentslbl; OtherPaymentslbl)
             {
             }
             column(CompanyName_; CompanyName)
@@ -408,6 +488,10 @@
             {
             }
             column(PrintVouchers_; PrintVouchers)
+            {
+            }
+
+            column(PrintOnOrder_; PrintOnOrder)
             {
             }
             column(PrintTurnover_; PrintTurnOver)
@@ -435,6 +519,18 @@
             {
             }
             column(PrintEmptyLines_; PrintEmptyLines)
+            {
+            }
+            column(PrintNetTurnover_; PrintNetTurnover)
+            {
+            }
+            column(PrintDiscount_; PrintDiscount)
+            {
+            }
+            column(PrintCountedAmtInclFloat_; PrintCountedAmtInclFloat)
+            {
+            }
+            column(PrintEFT_; PrintEFT)
             {
             }
             dataitem("POS Unit"; "NPR POS Unit")
@@ -606,11 +702,39 @@
                 column(Comment_; BinCounting.Comment)
                 {
                 }
+                column(TransferredAmount_; BinCounting."Transfer In Amount" + BinCounting."Transfer Out Amount")
+                {
+                }
                 column(VarBin_; VarBin)
                 {
                 }
                 column(BinEntryNo_; BinCounting."Entry No.")
                 {
+                }
+                dataitem(BinDenomination; "NPR POS Paym. Bin Denomin.")
+                {
+                    DataItemLink = "Bin Checkpoint Entry No." = FIELD("Entry No.");
+                    DataItemTableView = SORTING("Bin Checkpoint Entry No.");
+                    column(Denomination_Type; BinDenomination."Denomination Type")
+                    {
+                    }
+                    column(Denomination; BinDenomination.Denomination)
+                    {
+                    }
+                    column(Amount; BinDenomination.Amount)
+                    {
+                    }
+                    column(Quantity; BinDenomination.Quantity)
+                    {
+                    }
+                    column(VarDenomination_; VarDenomination)
+                    {
+                    }
+
+                    trigger OnAfterGetRecord()
+                    begin
+                        VarDenomination := 1;
+                    end;
                 }
 
                 trigger OnAfterGetRecord()
@@ -624,6 +748,7 @@
             dataitem(AttachedPaymentBins; "NPR POS Unit to Bin Relation")
             {
                 DataItemLink = "POS Unit No." = FIELD("POS Unit No.");
+                DataItemTableView = SORTING("POS Unit No.", "POS Payment Bin No.");
                 column(AttPOSUnitNo_; AttachedPaymentBins."POS Unit No.")
                 {
                 }
@@ -673,6 +798,7 @@
 
                 if POSEntry.Get("POS Workshift Checkpoint"."POS Entry No.") then;
                 if Salesperson.Get(POSEntry."Salesperson Code") then;
+                IF User.GET(USERSECURITYID()) THEN;
 
                 VarBalancedBy := '';
                 VarBalancedBy := BalancedByLbl + ' ' + Salesperson.Name + ' ' + WithLbl;
@@ -697,82 +823,75 @@
                 group("Print Options")
                 {
                     Caption = 'Print Options';
-                    field("Print Sales"; PrintSales)
-                    {
-                        Caption = 'Print Sales';
-
-                        ToolTip = 'Specifies the value of the Print Sales field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Print Receipts"; PrintReceipts)
-                    {
-                        Caption = 'Print Receipts';
-                        ToolTip = 'Specifies the value of the Print Receipts field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Print Terminals"; PrintTerminals)
-                    {
-                        Caption = 'Print Terminals';
-                        ToolTip = 'Specifies the value of the Print Terminals field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Print Vouchers"; PrintVouchers)
-                    {
-                        Caption = 'Print Vouchers';
-                        ToolTip = 'Specifies the value of the Print Vouchers field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Print Turn Over"; PrintTurnOver)
+                    field("Print TurnOver"; PrintTurnOver)
                     {
                         Caption = 'Print TurnOver';
+
                         ToolTip = 'Specifies the value of the Print TurnOver field';
                         ApplicationArea = NPRRetail;
                     }
-                    group(PrintDiscount)
-                    {
-                        Caption = 'Discount';
-                        field("Print Discount Amt"; PrintDiscountAmt)
-                        {
-                            Caption = '        Print Discount Amount';
-                            ToolTip = 'Specifies the value of the         Print Discount Amount field';
-                            ApplicationArea = NPRRetail;
-                        }
-                        field("Print Discount Perc"; PrintDiscountPerc)
-                        {
-                            Caption = '        Print Discount %';
-                            ToolTip = 'Specifies the value of the         Print Discount % field';
-                            ApplicationArea = NPRRetail;
 
-                        }
-                        field("Print Discount Total"; PrintDiscountTotal)
-                        {
-                            Caption = '        Print Discount Total';
-                            ToolTip = 'Specifies the value of the         Print Discount Total field';
-                            ApplicationArea = NPRRetail;
-
-                        }
-                    }
-                    field("Print Counting"; PrintCounting)
+                    field("Print On Order"; PrintOnOrder)
                     {
-                        Caption = 'Print Counting';
-                        ToolTip = 'Specifies the value of the Print Counting field';
+                        Caption = 'Print On Order';
+
+                        ToolTip = 'Specifies the value of the Print On Order field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Print Closing"; PrintClosing)
+
+                    field("Print Discount"; PrintDiscount)
                     {
-                        Caption = 'Print Closing';
-                        ToolTip = 'Specifies the value of the Print Closing field';
+                        Caption = 'Print Discount';
+
+                        ToolTip = 'Specifies the value of the Print Discount field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print VAT"; PrintVAT)
                     {
                         Caption = 'Print VAT';
+
                         ToolTip = 'Specifies the value of the Print VAT field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Print EFT"; PrintEFT)
+                    {
+                        Caption = 'Print EFT';
+
+                        ToolTip = 'Specifies the value of the Print EFT field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Print Vouchers"; PrintVouchers)
+                    {
+                        Caption = 'Print Vouchers';
+
+                        ToolTip = 'Specifies the value of the Print Vouchers field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Print Counting"; PrintCounting)
+                    {
+                        Caption = 'Print Counting';
+
+                        ToolTip = 'Specifies the value of the Print Counting field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Print Counted Amt Incl Float"; PrintCountedAmtInclFloat)
+                    {
+                        Caption = 'Print Counted Amt Incl Float';
+
+                        ToolTip = 'Specifies the value of the Print Counted Amt Incl Float field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Print Closing"; PrintClosing)
+                    {
+                        Caption = 'Print Closing';
+
+                        ToolTip = 'Specifies the value of the Print Closing field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Attached Bins"; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
+
                         ToolTip = 'Specifies the value of the Print Attached Bins field';
                         ApplicationArea = NPRRetail;
                     }
@@ -785,7 +904,22 @@
                 }
             }
         }
+
+        trigger OnOpenPage()
+        begin
+            PrintTurnOver := true;
+            PrintDiscount := true;
+            PrintVAT := true;
+            PrintEFT := true;
+            PrintVouchers := true;
+            PrintCounting := true;
+            PrintCountedAmtInclFloat := true;
+            PrintClosing := true;
+            PrintAttachedBins := true;
+            PrintOnOrder := true;
+        end;
     }
+
     trigger OnPreReport()
     begin
         if CompanyInfo.Get() then;
@@ -796,47 +930,62 @@
         CompanyInfo: Record "Company Information";
         POSEntry: Record "NPR POS Entry";
         Salesperson: Record "Salesperson/Purchaser";
-        VarTax: Integer;
-        VarMain: Integer;
-        VarBin: Integer;
-        RegisterNoLbl: Label 'Register No.';
-        SalesTicketNoLbl: Label 'Sales Ticket No';
-        OpeningHrsLbl: Label 'Opening Hours';
-        ClosingDatelbl: Label 'Closing Date';
-        BalancedByLbl: Label 'Register Balanced By';
-        VarBalancedBy: Text;
-        WithLbl: Label 'With';
-        VarReportTitle: Text;
-        LblXReport: Label 'X-Report';
-        LblZReport: Label 'Z-Report';
-        SignatureLbl: Label 'Signature';
-        VarAttachedBin: Integer;
-        PrintSales: Boolean;
-        PrintReceipts: Boolean;
-        PrintTerminals: Boolean;
-        PrintVouchers: Boolean;
-        PrintTurnOver: Boolean;
+        User: Record User;
+        PrintAttachedBins: Boolean;
+        PrintClosing: Boolean;
+        PrintCountedAmtInclFloat: Boolean;
+        PrintCounting: Boolean;
+        PrintDiscount: Boolean;
         PrintDiscountAmt: Boolean;
         PrintDiscountPerc: Boolean;
         PrintDiscountTotal: Boolean;
-        PrintCounting: Boolean;
-        PrintClosing: Boolean;
-        PrintVAT: Boolean;
-        PrintAttachedBins: Boolean;
+        PrintEFT: Boolean;
         PrintEmptyLines: Boolean;
-        Saleslbl: Label 'Sales';
-        Receiptslbl: Label 'Receipts';
-        Terminalslbl: Label 'Terminals';
-        Voucherslbl: Label 'Vouchers';
-        TurnoverProfitlbl: Label 'Turnover /Profit';
+        PrintNetTurnover: Boolean;
+        PrintReceipts: Boolean;
+        PrintSales: Boolean;
+        PrintTerminals: Boolean;
+        PrintTurnOver: Boolean;
+        PrintVAT: Boolean;
+        PrintVouchers: Boolean;
+        PrintOnOrder: Boolean;
+        VarAttachedBin: Integer;
+        VarBin: Integer;
+        VarDenomination: Integer;
+        VarMain: Integer;
+        VarTax: Integer;
+        AttachedPaymentBinslbl: Label 'Attached Payment Bins';
+        Closinglbl: Label 'Closing';
+        ClosingDatelbl: Label 'Closing Date';
+        Countinglbl: Label 'Counting';
         Discountlbl: Label 'Discount';
         DiscountAmtlbl: Label 'Discount Amount';
         DiscountPerclbl: Label 'Discount Percentage';
         DiscountTotallbl: Label 'Discount Total';
-        Countinglbl: Label 'Counting';
-        Closinglbl: Label 'Closing';
-        VATTaxSummarylbl: Label 'VAT & TAX Summary';
-        AttachedPaymentBinslbl: Label 'Attached Payment Bins';
+        EFTlbl: Label 'EFT';
+        OpeningHrsLbl: Label 'Opening Hours';
         CustomerPaymentLbl: Label 'Payment';
+        StoreLbl: Label 'POS Store';
+        POSUnitLbl: Label 'POS Unit';
+        Receiptslbl: Label 'Receipts';
+        BalancedByLbl: Label 'Register Balanced By';
+        Saleslbl: Label 'Sales';
+        SalesTicketNoLbl: Label 'Sales Ticket No';
+        SignatureLbl: Label 'Signature';
+        Terminalslbl: Label 'Terminals';
+        Turnoverlbl: Label 'Turnover (LCY)';
+        VATTaxSummarylbl: Label 'VAT & TAX Summary';
+        Voucherslbl: Label 'Vouchers';
+        WithLbl: Label 'With';
         Workshiftlbl: Label 'Workshift';
+        LblXReport: Label 'X-Report';
+        LblZReport: Label 'Z-Report';
+        VarBalancedBy: Text;
+        VarReportTitle: Text;
+        PrintedByLbl: Label 'Printed by';
+        Salespersonlbl: Label 'Salesperson';
+        OnOrderlbl: Label 'On Order';
+        OtherPaymentslbl: Label 'Other Payments (LCY)';
+
 }
+
