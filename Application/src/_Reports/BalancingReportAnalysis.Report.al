@@ -1,10 +1,10 @@
-﻿report 6014460 "NPR Balancing Report A4"
+﻿report 6014460 "NPR Balancing Report Analysis"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - NEW.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Balancing Report-Analysis.rdlc';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Balancing Report - A4';
