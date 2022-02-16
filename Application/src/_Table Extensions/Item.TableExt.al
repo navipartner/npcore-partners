@@ -419,6 +419,8 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Custom Options';
             Editable = false;
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
 
         field(6151496; "NPR Has Mixed Discount"; Boolean)

@@ -477,9 +477,9 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ToolTip = 'Specifies the end date for the item to apply the special price.';
                         ApplicationArea = NPRRetail;
                     }
-                    field("NPR Custom Options"; Rec."NPR Custom Options")
+                    field("NPR Custom Options"; NPRCustomOptionCount)
                     {
-
+                        Caption = 'Custom Options';
                         Visible = MagentoEnabledCustomOptions;
                         ToolTip = 'Shows custom options when Magento is enabled.';
                         ApplicationArea = NPRRetail;
@@ -1256,6 +1256,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         OriginalRec: Record Item;
         AccessorySparePart: Record "NPR Accessory/Spare Part";
         ItemCostMgt: Codeunit ItemCostManagement;
+        NPRCustomOptionCount: Integer;
         AverageCostACY: Decimal;
         Text6151400: Label 'Update Seo Link?';
 
@@ -1281,6 +1282,16 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
     begin
         NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Item, Rec."No.");
         NPRAttrEditable := CurrPage.EDITABLE();
+        CalcMagentoItemCustomOption();
+    end;
+
+    local procedure CalcMagentoItemCustomOption()
+    var
+        NPRMagentoItemCustomOption: Record "NPR Magento Item Custom Option";
+    begin
+        NPRMagentoItemCustomOption.SetRange("Item No.", Rec."No.");
+        NPRMagentoItemCustomOption.SetRange(Enabled, true);
+        NPRCustomOptionCount := NPRMagentoItemCustomOption.Count();
     end;
 
     trigger OnAfterGetCurrRecord()
