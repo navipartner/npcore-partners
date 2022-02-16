@@ -1,15 +1,15 @@
-﻿report 6014458 "NPR POS Entry Details"
+﻿report 6014458 "NPR POS Entry Overview"
 {
 #IF NOT BC17
     Extensible = False; 
 #ENDIF
 
-    Caption = 'POS Entry Details';
+    Caption = 'POS Entry Overview';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/POSEntryDetails.rdlc';
+    RDLCLayout = './src/_Reports/layouts/POSEntryOverview.rdlc';
     DataAccessIntent = ReadOnly;
 
     dataset
@@ -140,7 +140,7 @@
 
     labels
     {
-        Report_cap = 'POS Entry Details';
+        Report_cap = 'POS Entry Overview';
         AmountIncl_cap = 'Amount Incl.Tax';
         AmountExcl_cap = 'Amount Excl.Tax';
         Amount_cap = 'Amount';
