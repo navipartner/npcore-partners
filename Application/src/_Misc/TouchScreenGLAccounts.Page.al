@@ -5,13 +5,8 @@
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-
     SourceTable = "G/L Account";
-    SourceTableView = SORTING("Search Name")
-                      ORDER(Ascending)
-                      WHERE("No." = FILTER(<> ''),
-                            Blocked = CONST(false),
-                            "NPR Is Retail Payment" = CONST(true));
+    SourceTableView = SORTING("Search Name") ORDER(Ascending);
     ApplicationArea = NPRRetail;
 
     layout
@@ -36,4 +31,24 @@
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        AuxGLAccount: Record "NPR Aux. G/L Account";
+        GLAccount: Record "G/L Account";
+    begin
+        if Rec.MarkedOnly() then
+            exit;
+        GLAccount := Rec;
+        AuxGLAccount.SetCurrentKey("Retail Payment");
+        AuxGLAccount.SetRange("Retail Payment", true);
+        if AuxGLAccount.FindSet() then
+            repeat
+                if Rec.Get(AuxGLAccount."No.") and not Rec.Blocked then
+                    Rec.Mark(true);
+            until AuxGLAccount.Next() = 0;
+        Rec.MarkedOnly(true);
+        Rec := GLAccount;
+        if Rec.find('=><') then;
+    end;
 }
