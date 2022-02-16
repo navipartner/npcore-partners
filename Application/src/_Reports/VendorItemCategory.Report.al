@@ -508,7 +508,7 @@ report 6014435 "NPR Vendor/Item Category"
         No_Caption = 'No.';
         Name_Caption = 'Name';
         Purchases_Caption = 'Purchases';
-        ItemSales_Caption = 'Itemsales';
+        ItemSales_Caption = 'ItemSales';
         LastYear_Caption = 'Last year';
         PctChanges_Caption = '% Changes';
         DB_Caption = 'DB';

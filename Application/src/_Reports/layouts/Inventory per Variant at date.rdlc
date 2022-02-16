@@ -7,6 +7,7 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>b9fdac00-f0ef-4506-8895-0d7e5bcbc1cb</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -60,7 +61,7 @@
                   <Width>0.64805in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.65792in</Width>
+                  <Width>1.03514in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -2254,7 +2255,7 @@
             </Filters>
             <Top>0.3175cm</Top>
             <Height>0.80043in</Height>
-            <Width>8.07975in</Width>
+            <Width>8.45697in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -2286,7 +2287,7 @@
                   <Width>1.64605cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.67663cm</Width>
+                  <Width>2.62926cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -2547,7 +2548,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=((Last(Fields!ItemSalesValue.Value) - Last(Fields!ItemTotalCostValue.Value)) / Last(Fields!ItemSalesValue.Value))*100</Value>
+                                  <Value>=IF(Last(Fields!ItemSalesValue.Value)&lt;&gt;0,((Last(Fields!ItemSalesValue.Value) - Last(Fields!ItemTotalCostValue.Value)) / Last(Fields!ItemSalesValue.Value))*100,00)</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -2579,6 +2580,7 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -2645,7 +2647,7 @@
             <DataSetName>DataSet_Result</DataSetName>
             <Top>2.84313cm</Top>
             <Height>0.44981cm</Height>
-            <Width>20.52808cm</Width>
+            <Width>21.48071cm</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
@@ -2657,7 +2659,7 @@
         <Height>3.29294cm</Height>
         <Style />
       </Body>
-      <Width>20.52808cm</Width>
+      <Width>21.50704cm</Width>
       <Page>
         <PageHeader>
           <Height>5.85786cm</Height>
@@ -2684,7 +2686,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>1.05392in</Top>
-              <Left>13.97665cm</Left>
+              <Left>14.95562cm</Left>
               <Height>14pt</Height>
               <Width>2.5793in</Width>
               <Style>
@@ -2718,7 +2720,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.8596in</Top>
-              <Left>13.97666cm</Left>
+              <Left>14.95563cm</Left>
               <Height>14pt</Height>
               <Width>2.57929in</Width>
               <ZIndex>1</ZIndex>
@@ -2785,7 +2787,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.6596in</Top>
-              <Left>13.97666cm</Left>
+              <Left>14.95563cm</Left>
               <Height>14pt</Height>
               <Width>2.56893in</Width>
               <ZIndex>3</ZIndex>
@@ -2889,7 +2891,7 @@
               <Top>1.41958in</Top>
               <Left>10.25467cm</Left>
               <Height>0.24987in</Height>
-              <Width>4.04248in</Width>
+              <Width>4.4197in</Width>
               <ZIndex>6</ZIndex>
               <Style>
                 <Border>
@@ -3200,7 +3202,7 @@
                   <rd:DefaultName>Textbox560</rd:DefaultName>
                   <Left>18.85886cm</Left>
                   <Height>0.55564cm</Height>
-                  <Width>1.66921cm</Width>
+                  <Width>2.62185cm</Width>
                   <ZIndex>7</ZIndex>
                   <Style>
                     <Border>
@@ -3249,7 +3251,7 @@
               <KeepTogether>true</KeepTogether>
               <Top>1.78124in</Top>
               <Height>0.21876in</Height>
-              <Width>8.08192in</Width>
+              <Width>8.45697in</Width>
               <ZIndex>8</ZIndex>
               <Style>
                 <Border>
@@ -3322,7 +3324,7 @@
               <Top>0in</Top>
               <Left>15.45778cm</Left>
               <Height>13.50473pt</Height>
-              <Width>5.06478cm</Width>
+              <Width>6.02293cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
@@ -3338,7 +3340,6 @@
         <PageHeight>21cm</PageHeight>
         <PageWidth>29.7cm</PageWidth>
         <LeftMargin>1.5cm</LeftMargin>
-        <RightMargin>1.5cm</RightMargin>
         <TopMargin>0.5cm</TopMargin>
         <BottomMargin>0.5cm</BottomMargin>
         <ColumnSpacing>1.27cm</ColumnSpacing>

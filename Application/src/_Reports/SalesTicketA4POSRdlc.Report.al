@@ -1,10 +1,10 @@
 ﻿report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Rdlc.rdlc';
-    Caption = 'Sales Ticket A4 - POS Rdlc';
+    Caption = 'Sales Ticket A4 - POS';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DefaultLayout = RDLC;

@@ -15,6 +15,7 @@
         dataitem("MM Membership Entry"; "NPR MM Membership Entry")
         {
             RequestFilterFields = "Valid From Date", "Valid Until Date";
+
             column(ValidFromDate_MMMembershipEntry; "MM Membership Entry"."Valid From Date")
             {
                 IncludeCaption = true;
@@ -30,6 +31,7 @@
             dataitem("MM Membership"; "NPR MM Membership")
             {
                 DataItemLink = "Entry No." = FIELD("Membership Entry No.");
+                RequestFilterFields = "External Membership No.";
                 column(IssuedDate_MMMembership; "MM Membership"."Issued Date")
                 {
                     IncludeCaption = true;
@@ -41,6 +43,7 @@
                 dataitem("MM Membership Role"; "NPR MM Membership Role")
                 {
                     DataItemLink = "Membership Entry No." = FIELD("Entry No.");
+                    RequestFilterFields = "Member Role";
                     dataitem("MM Member"; "NPR MM Member")
                     {
                         DataItemLink = "Entry No." = FIELD("Member Entry No.");

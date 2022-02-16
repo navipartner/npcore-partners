@@ -8,8 +8,70 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>3f8bbe9f-abbd-4e56-b69f-49e9c5dfcff6</rd:DataSourceID>
     </DataSource>
   </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+      <Fields>
+        <Field Name="ValidFromDate_MMMembershipEntry">
+          <DataField>ValidFromDate_MMMembershipEntry</DataField>
+        </Field>
+        <Field Name="MembershipEntryNo_MMMembershipEntry">
+          <DataField>MembershipEntryNo_MMMembershipEntry</DataField>
+        </Field>
+        <Field Name="ValidUntilDate_MMMembershipEntry">
+          <DataField>ValidUntilDate_MMMembershipEntry</DataField>
+        </Field>
+        <Field Name="IssuedDate_MMMembership">
+          <DataField>IssuedDate_MMMembership</DataField>
+        </Field>
+        <Field Name="ExternalMembershipNo_MMMembership">
+          <DataField>ExternalMembershipNo_MMMembership</DataField>
+        </Field>
+        <Field Name="ExternalMemberNo_MMMember">
+          <DataField>ExternalMemberNo_MMMember</DataField>
+        </Field>
+        <Field Name="DisplayName_MMMember">
+          <DataField>DisplayName_MMMember</DataField>
+        </Field>
+        <Field Name="FirstName_MMMember">
+          <DataField>FirstName_MMMember</DataField>
+        </Field>
+        <Field Name="LastName_MMMember">
+          <DataField>LastName_MMMember</DataField>
+        </Field>
+        <Field Name="Birthday_MMMember">
+          <DataField>Birthday_MMMember</DataField>
+        </Field>
+        <Field Name="PhoneNo_MMMember">
+          <DataField>PhoneNo_MMMember</DataField>
+        </Field>
+        <Field Name="Address_MMMember">
+          <DataField>Address_MMMember</DataField>
+        </Field>
+        <Field Name="PostCodeCode_MMMember">
+          <DataField>PostCodeCode_MMMember</DataField>
+        </Field>
+        <Field Name="City_MMMember">
+          <DataField>City_MMMember</DataField>
+        </Field>
+        <Field Name="CountryCode_MMMember">
+          <DataField>CountryCode_MMMember</DataField>
+        </Field>
+        <Field Name="Country_MMMember">
+          <DataField>Country_MMMember</DataField>
+        </Field>
+        <Field Name="EMailAddress_MMMember">
+          <DataField>EMailAddress_MMMember</DataField>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -18,60 +80,60 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.42708in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.46875in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.54167in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.55208in</Width>
+                  <Width>0.60416in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.67708in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.60417in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.69792in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.70833in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.48959in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.79167in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.79167in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.67708in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.54166in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.5in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.77083in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.51042in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.79167in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
                 <TablixRow>
-                  <Height>0.25in</Height>
+                  <Height>0.55208in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -1262,8 +1324,8 @@
               </SortExpression>
             </SortExpressions>
             <Top>0.26042in</Top>
-            <Height>0.5in</Height>
-            <Width>17.55208in</Width>
+            <Height>0.80208in</Height>
+            <Width>10.59376in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1271,11 +1333,14 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>1.0625in</Height>
+        <Height>2.69875cm</Height>
         <Style />
       </Body>
-      <Width>17.71875in</Width>
+      <Width>26.90814cm</Width>
       <Page>
+        <PageHeight>21.59cm</PageHeight>
+        <PageWidth>27.94cm</PageWidth>
+        <ColumnSpacing>1.27cm</ColumnSpacing>
         <Style />
       </Page>
     </ReportSection>
@@ -1579,66 +1644,6 @@ End Function
 </Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
-  <rd:ReportUnitType>Inch</rd:ReportUnitType>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Fields>
-        <Field Name="ValidFromDate_MMMembershipEntry">
-          <DataField>ValidFromDate_MMMembershipEntry</DataField>
-        </Field>
-        <Field Name="MembershipEntryNo_MMMembershipEntry">
-          <DataField>MembershipEntryNo_MMMembershipEntry</DataField>
-        </Field>
-        <Field Name="ValidUntilDate_MMMembershipEntry">
-          <DataField>ValidUntilDate_MMMembershipEntry</DataField>
-        </Field>
-        <Field Name="IssuedDate_MMMembership">
-          <DataField>IssuedDate_MMMembership</DataField>
-        </Field>
-        <Field Name="ExternalMembershipNo_MMMembership">
-          <DataField>ExternalMembershipNo_MMMembership</DataField>
-        </Field>
-        <Field Name="ExternalMemberNo_MMMember">
-          <DataField>ExternalMemberNo_MMMember</DataField>
-        </Field>
-        <Field Name="DisplayName_MMMember">
-          <DataField>DisplayName_MMMember</DataField>
-        </Field>
-        <Field Name="FirstName_MMMember">
-          <DataField>FirstName_MMMember</DataField>
-        </Field>
-        <Field Name="LastName_MMMember">
-          <DataField>LastName_MMMember</DataField>
-        </Field>
-        <Field Name="Birthday_MMMember">
-          <DataField>Birthday_MMMember</DataField>
-        </Field>
-        <Field Name="PhoneNo_MMMember">
-          <DataField>PhoneNo_MMMember</DataField>
-        </Field>
-        <Field Name="Address_MMMember">
-          <DataField>Address_MMMember</DataField>
-        </Field>
-        <Field Name="PostCodeCode_MMMember">
-          <DataField>PostCodeCode_MMMember</DataField>
-        </Field>
-        <Field Name="City_MMMember">
-          <DataField>City_MMMember</DataField>
-        </Field>
-        <Field Name="CountryCode_MMMember">
-          <DataField>CountryCode_MMMember</DataField>
-        </Field>
-        <Field Name="Country_MMMember">
-          <DataField>Country_MMMember</DataField>
-        </Field>
-        <Field Name="EMailAddress_MMMember">
-          <DataField>EMailAddress_MMMember</DataField>
-        </Field>
-      </Fields>
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-    </DataSet>
-  </DataSets>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>514da64b-52a8-4824-83af-fdd7b8b4f1ac</rd:ReportID>
 </Report>

@@ -8,7 +8,7 @@
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'NP Purchase Order';
-    DefaultLayout = Word;
+    DefaultLayout = RDLC;
     PreviewMode = PrintLayout;
     DataAccessIntent = ReadOnly;
 

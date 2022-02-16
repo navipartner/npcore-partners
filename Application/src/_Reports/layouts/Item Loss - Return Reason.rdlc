@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>8335c8a1-3eb7-471b-99d9-fd557e28ed4f</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -1508,7 +1509,6 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.1905cm</Top>
-              <Left>0.22225cm</Left>
               <Height>0.423cm</Height>
               <Width>7.5cm</Width>
               <ZIndex>1</ZIndex>
@@ -1555,7 +1555,6 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.6135cm</Top>
-              <Left>0.22225cm</Left>
               <Height>0.423cm</Height>
               <Width>7.5cm</Width>
               <ZIndex>3</ZIndex>
@@ -1717,6 +1716,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>24a739e1-934a-4d8b-aa92-5b3984266e64</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>

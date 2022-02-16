@@ -9,10 +9,6 @@
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
-    requestpage
-    {
-        SaveValues = true;
-    }
 
 }
 

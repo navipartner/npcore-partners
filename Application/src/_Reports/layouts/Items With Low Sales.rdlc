@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>ef360630-aaf6-4a34-9488-07923b357116</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -550,7 +551,9 @@
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>textbox20</rd:DefaultName>
@@ -580,7 +583,9 @@
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>textbox24</rd:DefaultName>
@@ -1191,7 +1196,9 @@
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <ZIndex>10</ZIndex>
@@ -1220,7 +1227,9 @@
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <ZIndex>9</ZIndex>
@@ -1310,7 +1319,9 @@
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <ZIndex>6</ZIndex>
@@ -2823,7 +2834,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.95238cm</Top>
-              <Left>13.01587cm</Left>
+              <Left>16.07931cm</Left>
               <Height>0.423cm</Height>
               <Width>0.75cm</Width>
               <Style>
@@ -2970,7 +2981,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.95238cm</Top>
-              <Left>13.76587cm</Left>
+              <Left>16.82931cm</Left>
               <Height>0.423cm</Height>
               <Width>0.45cm</Width>
               <ZIndex>6</ZIndex>
@@ -3040,6 +3051,7 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>2289567a-4d87-4943-9fed-c94584cc62bc</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
