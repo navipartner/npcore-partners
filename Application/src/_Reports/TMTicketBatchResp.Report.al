@@ -83,6 +83,10 @@
         TicketNumber = 'Ticket No';
         ValidFrom = 'Valid From';
         ValidUntil = 'Valid Until';
+        ItemNumber = 'Item No.';
+        ItemDesc = 'Item Description';
+        Qty = 'Quantity';
+
     }
 
     trigger OnPreReport()

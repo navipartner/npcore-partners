@@ -292,6 +292,7 @@
         ObjectType_Cap = 'Object Type';
         ObjectNo_Cap = 'Object No.';
         Status_Cap = 'Status';
+        Report_Caption = 'Analyse Task Queue Usage';
     }
 
     var

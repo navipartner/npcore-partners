@@ -9,9 +9,5 @@
     ApplicationArea = NPRRetail;
     Caption = 'Report Selection Overview';
     DataAccessIntent = ReadOnly;
-    requestpage
-    {
-        SaveValues = true;
-    }
 }
 
