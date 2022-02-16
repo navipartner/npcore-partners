@@ -7,6 +7,8 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>388927be-fa01-4a66-896f-c8b9ea9cfb65</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -17,46 +19,46 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.54515in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.8in</Width>
+                  <Width>0.68889in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.91944in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.25417in</Width>
+                  <Width>0.97014in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.8125in</Width>
+                  <Width>0.87431in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.2125in</Width>
+                  <Width>0.61874in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.84375in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.83333in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.7882in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.70556in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.70417in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.69793in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.97292in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.95832in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -107,7 +109,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!ValidFromDate.Value</Value>
+                                  <Value>=Fields!ValidFromDate.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -143,7 +145,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!ValidUntilDate.Value</Value>
+                                  <Value>=Fields!ValidUntilDate.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -179,7 +181,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!ExternalMembershipNo_Membership.Value</Value>
+                                  <Value>=Fields!ExternalMembershipNo_Membership.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -210,7 +212,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!IssuedDate_Membership.Value</Value>
+                                  <Value>=Fields!IssuedDate_Membership.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -246,7 +248,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!ExternalMemberNo_Member.Value</Value>
+                                  <Value>=Fields!ExternalMemberNo_Member.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -279,7 +281,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!FirstName_Member.Value</Value>
+                                  <Value>=Fields!FirstName_Member.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -312,7 +314,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!LastName_Member.Value</Value>
+                                  <Value>=Fields!LastName_Member.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -345,7 +347,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Address_Member.Value</Value>
+                                  <Value>=Fields!Address_Member.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -378,7 +380,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!PostCode_Member.Value</Value>
+                                  <Value>=Fields!PostCode_Member.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -411,7 +413,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!City_Member.Value</Value>
+                                  <Value>=Fields!City_Member.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -444,7 +446,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!CountryCode_Member.Value</Value>
+                                  <Value>=Fields!CountryCode_Member.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -477,7 +479,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Email_Member.Value</Value>
+                                  <Value>=Fields!Email_Member.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -510,7 +512,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!EmailNewsLetter_Member.Value</Value>
+                                  <Value>=Fields!EmailNewsLetter_Member.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -548,7 +550,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -580,7 +582,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -612,7 +614,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -644,7 +646,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -704,7 +706,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -1048,8 +1050,10 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
+            <Top>0.42863cm</Top>
+            <Left>0.03523cm</Left>
             <Height>0.4in</Height>
-            <Width>14.07917in</Width>
+            <Width>11.12085in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1057,13 +1061,13 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>1.38125in</Height>
+        <Height>2.02671cm</Height>
         <Style />
       </Body>
-      <Width>15.06591in</Width>
+      <Width>28.28219cm</Width>
       <Page>
         <PageHeader>
-          <Height>0.25in</Height>
+          <Height>1.81682cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <ReportItems>
             <Textbox Name="Textbox4">
@@ -1073,7 +1077,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Fields!ExternalMembershipNoCaption.Value</Value>
+                      <Value>=Fields!ExternalMembershipNoCaption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1084,9 +1088,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox4</rd:DefaultName>
-              <Left>2.8in</Left>
-              <Height>0.25in</Height>
-              <Width>1.25417in</Width>
+              <Top>0.06174cm</Top>
+              <Left>2.1507in</Left>
+              <Height>0.69098in</Height>
+              <Width>0.93125in</Width>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -1104,7 +1109,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Fields!DateCaption.Value</Value>
+                      <Value>=Fields!DateCaption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1115,9 +1120,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox5</rd:DefaultName>
-              <Left>2.54cm</Left>
-              <Height>0.25in</Height>
-              <Width>0.8in</Width>
+              <Top>0.03528cm</Top>
+              <Left>1.27881cm</Left>
+              <Height>0.67362in</Height>
+              <Width>0.73056in</Width>
               <ZIndex>1</ZIndex>
               <Style>
                 <Border>
@@ -1136,7 +1142,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Fields!IssuedDateCaption.Value</Value>
+                      <Value>=Fields!IssuedDateCaption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1147,9 +1153,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox13</rd:DefaultName>
-              <Left>4.05417in</Left>
-              <Height>0.25in</Height>
-              <Width>0.8125in</Width>
+              <Top>0.06174cm</Top>
+              <Left>3.13751in</Left>
+              <Height>0.6632in</Height>
+              <Width>0.82638in</Width>
               <ZIndex>2</ZIndex>
               <Style>
                 <Border>
@@ -1168,7 +1175,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Fields!ExternalMemberNoCaption.Value</Value>
+                      <Value>=Fields!ExternalMemberNoCaption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1179,9 +1186,9 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox26</rd:DefaultName>
-              <Left>4.86667in</Left>
-              <Height>0.25in</Height>
-              <Width>1.2125in</Width>
+              <Left>3.96389in</Left>
+              <Height>0.7014in</Height>
+              <Width>0.63889in</Width>
               <ZIndex>3</ZIndex>
               <Style>
                 <Border>
@@ -1200,7 +1207,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Parameters!Address_MemberCaption.Value</Value>
+                      <Value>=Parameters!Address_MemberCaption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1211,9 +1218,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox44</rd:DefaultName>
-              <Left>8.07917in</Left>
-              <Height>0.25in</Height>
-              <Width>1in</Width>
+              <Top>0.01764cm</Top>
+              <Left>6.32153in</Left>
+              <Height>0.70834in</Height>
+              <Width>0.76042in</Width>
               <ZIndex>4</ZIndex>
               <Style>
                 <Border>
@@ -1232,7 +1240,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Parameters!Email_MemberCaption.Value</Value>
+                      <Value>=Parameters!Email_MemberCaption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1243,9 +1251,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox46</rd:DefaultName>
-              <Left>12.07917in</Left>
-              <Height>0.25in</Height>
-              <Width>1in</Width>
+              <Top>0.07055cm</Top>
+              <Left>9.23126in</Left>
+              <Height>0.67362in</Height>
+              <Width>0.93125in</Width>
               <ZIndex>5</ZIndex>
               <Style>
                 <Border>
@@ -1264,7 +1273,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Fields!MembershipType_Caption.Value</Value>
+                      <Value>=Fields!MembershipType_Caption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1275,8 +1284,9 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox1</rd:DefaultName>
-              <Height>0.25in</Height>
-              <Width>1in</Width>
+              <Top>0.03528cm</Top>
+              <Height>0.67362in</Height>
+              <Width>0.50347in</Width>
               <ZIndex>6</ZIndex>
               <Style>
                 <Border>
@@ -1295,7 +1305,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Fields!Date2Caption.Value</Value>
+                      <Value>=Fields!Date2Caption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1306,9 +1316,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox11</rd:DefaultName>
-              <Left>1.8in</Left>
-              <Height>0.25in</Height>
-              <Width>1in</Width>
+              <Top>0.06174cm</Top>
+              <Left>1.26181in</Left>
+              <Height>0.67709in</Height>
+              <Width>0.84722in</Width>
               <ZIndex>7</ZIndex>
               <Style>
                 <Border>
@@ -1327,7 +1338,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Parameters!FirstName_MemberCaption.Value</Value>
+                      <Value>=Parameters!FirstName_MemberCaption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1338,9 +1349,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox16</rd:DefaultName>
-              <Left>6.07917in</Left>
-              <Height>0.25in</Height>
-              <Width>1in</Width>
+              <Top>0.03527cm</Top>
+              <Left>4.64445in</Left>
+              <Height>0.7014in</Height>
+              <Width>0.80208in</Width>
               <ZIndex>8</ZIndex>
               <Style>
                 <Border>
@@ -1359,7 +1371,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Parameters!LastName_MemberCaption.Value</Value>
+                      <Value>=Parameters!LastName_MemberCaption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1370,9 +1382,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox19</rd:DefaultName>
-              <Left>7.07917in</Left>
-              <Height>0.25in</Height>
-              <Width>1in</Width>
+              <Top>0.02645cm</Top>
+              <Left>5.44653in</Left>
+              <Height>0.69098in</Height>
+              <Width>0.83333in</Width>
               <ZIndex>9</ZIndex>
               <Style>
                 <Border>
@@ -1391,7 +1404,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Fields!ZipCode_Caption.Value</Value>
+                      <Value>=Fields!ZipCode_Caption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1402,9 +1415,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox6</rd:DefaultName>
-              <Left>9.07917in</Left>
-              <Height>0.25in</Height>
-              <Width>1in</Width>
+              <Top>0.01764cm</Top>
+              <Left>7.08195in</Left>
+              <Height>0.69445in</Height>
+              <Width>0.69792in</Width>
               <ZIndex>10</ZIndex>
               <Style>
                 <Border>
@@ -1423,7 +1437,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Fields!City_Caption.Value</Value>
+                      <Value>=Fields!City_Caption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1434,9 +1448,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox15</rd:DefaultName>
-              <Left>10.07917in</Left>
-              <Height>0.25in</Height>
-              <Width>1in</Width>
+              <Top>0.02645cm</Top>
+              <Left>7.79375in</Left>
+              <Height>0.69098in</Height>
+              <Width>0.69792in</Width>
               <ZIndex>11</ZIndex>
               <Style>
                 <Border>
@@ -1455,7 +1470,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Fields!Country_Caption.Value</Value>
+                      <Value>=Fields!Country_Caption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1466,9 +1481,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox17</rd:DefaultName>
-              <Left>11.07917in</Left>
-              <Height>0.25in</Height>
-              <Width>1in</Width>
+              <Top>0.07055cm</Top>
+              <Left>8.54723in</Left>
+              <Height>0.67362in</Height>
+              <Width>0.64237in</Width>
               <ZIndex>12</ZIndex>
               <Style>
                 <Border>
@@ -1487,7 +1503,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Parameters!EmailNewsLetter_MemberCaption.Value</Value>
+                      <Value>=Parameters!EmailNewsLetter_MemberCaption.Value</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -1498,9 +1514,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox21</rd:DefaultName>
-              <Left>13.07917in</Left>
-              <Height>0.25in</Height>
-              <Width>1in</Width>
+              <Top>0.07055cm</Top>
+              <Left>10.1764in</Left>
+              <Height>0.68751in</Height>
+              <Width>0.94443in</Width>
               <ZIndex>13</ZIndex>
               <Style>
                 <Border>
@@ -1519,11 +1536,12 @@
             </Border>
           </Style>
         </PageHeader>
-        <PageHeight>8.27in</PageHeight>
-        <PageWidth>11.69in</PageWidth>
-        <LeftMargin>0.8cm</LeftMargin>
+        <PageHeight>21cm</PageHeight>
+        <PageWidth>29.7cm</PageWidth>
+        <LeftMargin>0.5cm</LeftMargin>
         <TopMargin>1cm</TopMargin>
         <BottomMargin>1cm</BottomMargin>
+        <ColumnSpacing>1.27cm</ColumnSpacing>
         <Style />
       </Page>
     </ReportSection>
@@ -1645,7 +1663,8 @@ End Function
 </Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
-  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>fdd4e6df-73e7-4036-927d-24662920bf4b</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>

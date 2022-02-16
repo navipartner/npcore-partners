@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>9dd55505-637a-43d6-a939-656f8c28ab6d</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -33,16 +34,16 @@
                               <TablixBody>
                                 <TablixColumns>
                                   <TablixColumn>
-                                    <Width>1in</Width>
+                                    <Width>1.01115in</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1in</Width>
+                                    <Width>1.01115in</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1in</Width>
+                                    <Width>1.01115in</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>2.625in</Width>
+                                    <Width>2.63615in</Width>
                                   </TablixColumn>
                                 </TablixColumns>
                                 <TablixRows>
@@ -65,7 +66,7 @@
                                                   </TextRun>
                                                 </TextRuns>
                                                 <Style>
-                                                  <TextAlign>Right</TextAlign>
+                                                  <TextAlign>Left</TextAlign>
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
@@ -98,7 +99,9 @@
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
-                                                <Style />
+                                                <Style>
+                                                  <TextAlign>Left</TextAlign>
+                                                </Style>
                                               </Paragraph>
                                             </Paragraphs>
                                             <rd:DefaultName>Description_Item</rd:DefaultName>
@@ -183,9 +186,9 @@
                                 </Filter>
                               </Filters>
                               <Top>0.0125in</Top>
-                              <Left>0.08652in</Left>
+                              <Left>0.0419in</Left>
                               <Height>0.17708in</Height>
-                              <Width>5.625in</Width>
+                              <Width>5.66962in</Width>
                               <Style>
                                 <Border>
                                   <Style>None</Style>
@@ -292,7 +295,9 @@
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
-                                                <Style />
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
                                               </Paragraph>
                                             </Paragraphs>
                                             <rd:DefaultName>Textbox33</rd:DefaultName>
@@ -324,7 +329,9 @@
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
-                                                <Style />
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
                                               </Paragraph>
                                             </Paragraphs>
                                             <rd:DefaultName>Textbox29</rd:DefaultName>
@@ -360,7 +367,9 @@
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
-                                                <Style />
+                                                <Style>
+                                                  <TextAlign>Left</TextAlign>
+                                                </Style>
                                               </Paragraph>
                                             </Paragraphs>
                                             <rd:DefaultName>Name_SalespersonPurchaser</rd:DefaultName>
@@ -658,19 +667,19 @@
                               <TablixBody>
                                 <TablixColumns>
                                   <TablixColumn>
-                                    <Width>0.66567in</Width>
+                                    <Width>1.02494in</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1.66978in</Width>
+                                    <Width>1.64785in</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>0.20381in</Width>
+                                    <Width>0.19792in</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1.31703in</Width>
+                                    <Width>1.32292in</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1.30933in</Width>
+                                    <Width>1.30344in</Width>
                                   </TablixColumn>
                                 </TablixColumns>
                                 <TablixRows>
@@ -693,7 +702,7 @@
                                                   </TextRun>
                                                 </TextRuns>
                                                 <Style>
-                                                  <TextAlign>Right</TextAlign>
+                                                  <TextAlign>Left</TextAlign>
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
@@ -725,7 +734,9 @@
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
-                                                <Style />
+                                                <Style>
+                                                  <TextAlign>Left</TextAlign>
+                                                </Style>
                                               </Paragraph>
                                             </Paragraphs>
                                             <rd:DefaultName>SalespersonName_Heltal</rd:DefaultName>
@@ -739,6 +750,7 @@
                                               <PaddingBottom>2pt</PaddingBottom>
                                             </Style>
                                           </Textbox>
+                                          <rd:Selected>true</rd:Selected>
                                         </CellContents>
                                       </TablixCell>
                                       <TablixCell>
@@ -788,7 +800,9 @@
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
-                                                <Style />
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
@@ -819,7 +833,9 @@
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
-                                                <Style />
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
@@ -948,7 +964,9 @@
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
-                                                <Style />
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
@@ -979,7 +997,9 @@
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
-                                                <Style />
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
@@ -1038,9 +1058,9 @@
                                 </Filter>
                               </Filters>
                               <Top>0.78264in</Top>
-                              <Left>0.37924in</Left>
+                              <Left>0.0419in</Left>
                               <Height>0.2986in</Height>
-                              <Width>5.16562in</Width>
+                              <Width>5.49707in</Width>
                               <ZIndex>2</ZIndex>
                               <Style>
                                 <Border>
@@ -1481,6 +1501,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>b08addad-7093-48c8-8267-28b7fc0f590d</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>

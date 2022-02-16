@@ -5,7 +5,7 @@ report 6014495 "NPR Whse. - Shipment"
     Extensible = False; 
     #ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/NP Whse. - Shipment.rdlc';
+    RDLCLayout = './src/_Reports/layouts/NP Whse. - ShipmentV17.rdl';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Whse. - Shipment';

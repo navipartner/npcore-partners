@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>18b27a66-399a-4f8f-9fe6-3d0730303585</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -598,7 +599,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!No_Item.Value</Value>
+                                  <Value>=Fields!No_Item.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -628,7 +629,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Description_Item.Value</Value>
+                                  <Value>=Fields!Description_Item.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -658,7 +659,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TotalIssuedTicketPerItem.Value</Value>
+                                  <Value>=Fields!TotalIssuedTicketPerItem.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -690,7 +691,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TotalAdmittedTicketPerItem.Value</Value>
+                                  <Value>=Fields!TotalAdmittedTicketPerItem.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -757,7 +758,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Variant.Value</Value>
+                                  <Value>=Fields!Variant.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>7pt</FontSize>
@@ -787,7 +788,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TotalIssuedTicketPerVariant.Value</Value>
+                                  <Value>=Fields!TotalIssuedTicketPerVariant.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>7pt</FontSize>
@@ -819,7 +820,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TotalAdmittedTicketPerVariant.Value</Value>
+                                  <Value>=Fields!TotalAdmittedTicketPerVariant.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>7pt</FontSize>
@@ -886,7 +887,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!TotalCaption.Value</Value>
+                                  <Value>=Parameters!TotalCaption.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -919,7 +920,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Sum(Fields!TotalIssuedTicketPerItem.Value)</Value>
+                                  <Value>=Sum(Fields!TotalIssuedTicketPerItem.Value)</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -953,7 +954,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Sum(Fields!TotalAdmittedTicketPerItem.Value)</Value>
+                                  <Value>=Sum(Fields!TotalAdmittedTicketPerItem.Value)</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -1398,7 +1399,7 @@
               <rd:DefaultName>Textbox6</rd:DefaultName>
               <Top>0.46038cm</Top>
               <Height>0.79904cm</Height>
-              <Width>14.605cm</Width>
+              <Width>11.2589cm</Width>
               <Style>
                 <Border>
                   <Color>LightGrey</Color>
@@ -1431,9 +1432,9 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox6</rd:DefaultName>
-              <Left>11.43529cm</Left>
+              <Left>10.27112cm</Left>
               <Height>0.43744cm</Height>
-              <Width>3.16971cm</Width>
+              <Width>4.33388cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
                 <Border>
@@ -1462,9 +1463,9 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox6</rd:DefaultName>
-              <Top>0.4057cm</Top>
+              <Top>0.47272cm</Top>
               <Left>11.43529cm</Left>
-              <Height>0.44803cm</Height>
+              <Height>0.38101cm</Height>
               <Width>3.16971cm</Width>
               <ZIndex>2</ZIndex>
               <Style>
@@ -1734,6 +1735,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>08e36bf7-6c37-4241-8700-b4efd5ee11d8</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>

@@ -1,8 +1,8 @@
 report 6014449 "NPR Vendor Trn. by Item Cat."
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Vendor trn. by Item Cat.rdlc';
     Caption = 'Vendor Trn. By Item Category';
@@ -254,10 +254,10 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
         Purchases_Caption = 'Purchases';
         Quantity_Caption = 'Quantity';
         Turnover_Caption = 'Turnover';
-        PctLastYear_Caption = '% last year';
+        PctLastYear_Caption = '% Last Year';
         DB_Caption = 'DB';
         DB_Pct_Caption = 'DB%';
-        TotalSales_Caption = '% total sales';
+        TotalSales_Caption = '% Total Sales';
         Total_Caption = 'Total';
     }
 
