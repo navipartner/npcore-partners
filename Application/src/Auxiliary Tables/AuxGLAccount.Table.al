@@ -41,8 +41,7 @@
         {
             Clustered = true;
         }
-        key(Key2; "Replication Counter")
-        {
-        }
+        key(Key2; "Replication Counter") { }
+        key(Key3; "Retail Payment") { }
     }
 }

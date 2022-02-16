@@ -50,13 +50,6 @@ tableextension 6014419 "NPR G/L Account" extends "G/L Account"
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used.';
         }
-        field(6014405; "NPR Is Retail Payment"; Boolean)
-        {
-            Caption = 'Retail Payment';
-            FieldClass = FlowField;
-            CalcFormula = lookup("NPR Aux. G/L Account"."Retail Payment" where("No." = field("No.")));
-        }
-
     }
 
     trigger OnBeforeDelete()
