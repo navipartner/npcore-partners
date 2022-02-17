@@ -32,13 +32,14 @@
         {
             Caption = 'Field No.';
             DataClassification = CustomerContent;
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."), ObsoleteState = filter(<> Removed));
 
             trigger OnLookup()
             var
                 "Field": Record "Field";
             begin
                 Field.SetRange(TableNo, "Table No.");
+                Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
                 if PAGE.RunModal(Page::"NPR Field Lookup", Field) = ACTION::LookupOK then
                     "Field No." := Field."No.";
 
