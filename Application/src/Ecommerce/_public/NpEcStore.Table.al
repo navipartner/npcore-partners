@@ -1,6 +1,6 @@
 ﻿table 6151300 "NPR NpEc Store"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'E-commerce Store';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpEc Stores";

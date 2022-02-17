@@ -1,6 +1,6 @@
 ﻿page 6151012 "NPR NpRv Voucher Type Card"
 {
-    Extensible = False;
+    Extensible = true;
     UsageCategory = None;
     Caption = 'Retail Voucher Type Card';
     PromotedActionCategories = 'New,Process,Reports,Manage,Setup';

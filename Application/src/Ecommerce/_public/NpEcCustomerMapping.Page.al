@@ -1,6 +1,6 @@
 ﻿page 6151305 "NPR NpEc Customer Mapping"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'Np E-commerce Customer Mapping';
     DelayedInsert = true;
     PageType = List;
