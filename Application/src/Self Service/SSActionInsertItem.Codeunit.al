@@ -1,6 +1,7 @@
 ﻿codeunit 6151289 "NPR SS Action: Insert Item"
 {
     Access = Internal;
+
     var
         TEXTActive: Label 'active';
         ERROR_ITEMSEARCH: Label 'Could not find a matching item for input %1';
@@ -585,8 +586,10 @@
     local procedure AddItemAddOns(POSFrontEnd: Codeunit "NPR POS Front End Management"; Item: Record Item)
     var
         POSAction: Record "NPR POS Action";
+        ItemAdditionalFields: Record "NPR Item Additional Fields";
     begin
-        if Item."NPR Item AddOn No." = '' then
+        Item.GetItemAdditionalFields(ItemAdditionalFields);
+        if ItemAdditionalFields."Item AddOn No." = '' then
             exit;
 
         POSAction.Get('SS-ITEM-ADDON');

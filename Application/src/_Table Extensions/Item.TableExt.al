@@ -296,6 +296,8 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Item AddOn No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpIa Item AddOn";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "NPR Item Additional Fields".';
         }
         field(6151400; "NPR Magento Item"; Boolean)
         {
@@ -545,6 +547,7 @@ tableextension 6014427 "NPR Item" extends Item
 
     var
         SalesSetup: Record "Sales & Receivables Setup";
+        _ItemAdditionalFields: Record "NPR Item Additional Fields";
 
     local procedure UpdateVendorItemRef(var Item: Record Item; xItem: Record Item)
     var
@@ -587,5 +590,39 @@ tableextension 6014427 "NPR Item" extends Item
         if Item."NPR Group sale" then
             if Item."Costing Method" = Item."Costing Method"::Standard then
                 Error(ErrStd, Item."No.");
+    end;
+
+    procedure GetItemAdditionalFields(var ItemAdditionalFields: Record "NPR Item Additional Fields")
+    begin
+        ReadItemAdditionalFields();
+        ItemAdditionalFields := _ItemAdditionalFields;
+    end;
+
+    procedure SetItemAdditionalFields(var ItemAdditionalFields: Record "NPR Item Additional Fields")
+    begin
+        _ItemAdditionalFields := ItemAdditionalFields;
+    end;
+
+    procedure SaveItemAdditionalFields()
+    begin
+        if not IsNullGuid(_ItemAdditionalFields.Id) then
+            if not _ItemAdditionalFields.Modify() then
+                _ItemAdditionalFields.Insert(false, true);
+    end;
+
+    procedure DeleteItemAdditionalFields()
+    begin
+        ReadItemAdditionalFields();
+        if _ItemAdditionalFields.Delete() then;
+    end;
+
+    local procedure ReadItemAdditionalFields()
+    begin
+        if _ItemAdditionalFields.Id <> SystemId then
+            if not _ItemAdditionalFields.Get(SystemId) then begin
+                _ItemAdditionalFields.Init();
+                _ItemAdditionalFields.Id := SystemId;
+                _ItemAdditionalFields.SystemId := SystemId;
+            end;
     end;
 }

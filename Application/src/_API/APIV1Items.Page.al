@@ -824,7 +824,7 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'Ticket Type', Locked = true;
                 }
 
-                field(nprItemAddonNo; Rec."NPR Item AddOn No.")
+                field(nprItemAddonNo; ItemAdditionalFields."Item Addon No.")
                 {
                     Caption = 'Item AddOn No.', Locked = true;
                 }
@@ -1075,6 +1075,8 @@ page 6014501 "NPR APIV1 - Items"
             TempNPRBlob."Buffer 2".CreateOutStream(OStr);
             GetTenantMedia(Rec."NPR Magento Short Desc.".MediaId, OStr);
         end;
+
+        Rec.GetItemAdditionalFields(ItemAdditionalFields);
     end;
 
     local procedure GetTenantMedia(MediaId: Guid; var OStr: OutStream)
@@ -1134,6 +1136,7 @@ page 6014501 "NPR APIV1 - Items"
 
     var
         TempFieldSet: Record Field temporary;
+        ItemAdditionalFields: Record "NPR Item Additional Fields";
         ItemCategory: Record "Item Category";
         TaxGroup: Record "Tax Group";
         GraphCollectionMgtItem: Codeunit "Graph Collection Mgt - Item";
