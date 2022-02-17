@@ -1,6 +1,7 @@
 ﻿codeunit 6151125 "NPR NpIa Item AddOn Mgt."
 {
     Access = Internal;
+
     var
         IsAutoSplitKeyRecord: Boolean;
 
@@ -693,6 +694,7 @@
         Item: Record Item;
         SaleLinePOS2: Record "NPR POS Sale Line";
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ItemAdditionalFields: Record "NPR Item Additional Fields";
     begin
         Clear(ItemAddOn);
 
@@ -727,9 +729,11 @@
 
         if not Item.Get(SaleLinePOS2."No.") then
             exit(false);
-        if Item."NPR Item AddOn No." = '' then
+
+        Item.GetItemAdditionalFields(ItemAdditionalFields);
+        if ItemAdditionalFields."Item AddOn No." = '' then
             exit(false);
-        if not ItemAddOn.Get(Item."NPR Item AddOn No.") then
+        if not ItemAddOn.Get(ItemAdditionalFields."Item AddOn No.") then
             exit(false);
 
         exit(ItemAddOn.Enabled);

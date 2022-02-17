@@ -1,6 +1,7 @@
 ﻿codeunit 6150723 "NPR POS Action: Insert Item"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This is a built-in action for inserting an item line into the current transaction';
         TEXTitemTracking_title: Label 'Enter Serial Number';
@@ -458,8 +459,10 @@
     local procedure AddItemAddOns(POSFrontEnd: Codeunit "NPR POS Front End Management"; Item: Record Item; BaseLineNo: Integer)
     var
         POSAction: Record "NPR POS Action";
+        ItemAdditionalFields: Record "NPR Item Additional Fields";
     begin
-        if Item."NPR Item AddOn No." = '' then
+        Item.GetItemAdditionalFields(ItemAdditionalFields);
+        if ItemAdditionalFields."Item AddOn No." = '' then
             exit;
 
         POSAction.Get('RUN_ITEM_ADDONS');

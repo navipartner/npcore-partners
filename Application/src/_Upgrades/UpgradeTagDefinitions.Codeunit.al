@@ -65,6 +65,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'SalesDocExpPaymentMethodCode'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Fix POS Entry SystemId"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Table Extension Fields"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -223,6 +224,8 @@
 
             Codeunit::"NPR Upgrade Shipping Provider":
                 Exit('NPRShippingProvider');
+            Codeunit::"NPR UPG Table Extension Fields":
+                Exit('NPRUPGTableExtFields')
         end;
     end;
 }
