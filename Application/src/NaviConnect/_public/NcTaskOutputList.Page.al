@@ -1,6 +1,6 @@
 ﻿page 6151510 "NPR Nc Task Output List"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'Task Output List';
     Editable = false;
     PageType = List;

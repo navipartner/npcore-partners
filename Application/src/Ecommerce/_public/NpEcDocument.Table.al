@@ -1,6 +1,6 @@
 ﻿table 6151310 "NPR NpEc Document"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'E-Commerce Document';
     DataClassification = CustomerContent;
     fields
