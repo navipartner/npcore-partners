@@ -274,11 +274,15 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 {
                     ShowCaption = false;
 
-                    field("NPR Item AddOn No."; Rec."NPR Item AddOn No.")
+                    field("NPR Item AddOn No."; ItemAdditionalFields."Item Addon No.")
                     {
-
+                        Caption = 'Item AddOn No.';
                         ToolTip = 'Allows the user to link additional items.';
                         ApplicationArea = NPRRetail;
+                        trigger OnValidate()
+                        begin
+                            Rec.SetItemAdditionalFields(ItemAdditionalFields);
+                        end;
                     }
                     field("NPR NPRE Item Routing Profile"; Rec."NPR NPRE Item Routing Profile")
                     {
@@ -1255,6 +1259,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         MagentoPictureVarietyTypeVisible: Boolean;
         OriginalRec: Record Item;
         AccessorySparePart: Record "NPR Accessory/Spare Part";
+        ItemAdditionalFields: Record "NPR Item Additional Fields";
         ItemCostMgt: Codeunit ItemCostManagement;
         NPRCustomOptionCount: Integer;
         AverageCostACY: Decimal;
@@ -1276,6 +1281,21 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
         NPRAttrEditable := CurrPage.EDITABLE();
+    end;
+
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    begin
+        Rec.SaveItemAdditionalFields();
+    end;
+
+    trigger OnModifyRecord(): Boolean
+    begin
+        Rec.SaveItemAdditionalFields();
+    end;
+
+    trigger OnClosePage()
+    begin
+        Rec.SaveItemAdditionalFields();
     end;
 
     trigger OnAfterGetRecord()
@@ -1300,6 +1320,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         CurrPage.NPRMagentoPictureDragDropAddin.Page.SetItemNo(Rec."No.");
         CurrPage.NPRMagentoPictureDragDropAddin.Page.SetHidePicture(true);
         ItemCostMgt.CalculateAverageCost(Rec, AverageCostACY, AverageCostACY);
+        Rec.GetItemAdditionalFields(ItemAdditionalFields);
     end;
 
     procedure NPR_SetMagentoEnabled()
