@@ -202,7 +202,6 @@
             exit;
 
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
-        SalesHeader.CalcFields("NPR Magento Payment Amount");
         PaymentLine.Reset();
         PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
