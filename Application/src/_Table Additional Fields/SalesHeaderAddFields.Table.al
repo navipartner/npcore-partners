@@ -33,12 +33,18 @@ table 6014636 "NPR Sales Header Add. Fields"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6014407; "Bill-to Company"; Text[30])
+        field(40; "Bill-to Company"; Text[30])
         {
             Caption = 'Bill-to Company (IC)';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = Company;
+        }
+        field(50; "Package Code"; Code[20])
+        {
+            Caption = 'Package Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Package Code".Code;
         }
     }
 

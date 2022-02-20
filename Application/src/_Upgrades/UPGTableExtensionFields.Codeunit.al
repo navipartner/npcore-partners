@@ -64,4 +64,22 @@ codeunit 6059781 "NPR UPG Table Extension Fields"
                     ToMigrationRec.Modify();
             until FromMigrationRec.Next() = 0;
     end;
+    procedure UpgradePackageCodeToRelationTable()
+    var
+        FromMigrationRec: Record "Sales Header";
+        ToMigrationRec: Record "NPR Sales Header Add. Fields";
+    begin
+        if FromMigrationRec.IsEmpty() then
+            exit;
+
+        FromMigrationRec.SetLoadFields("NPR Package Code");
+        FromMigrationRec.SetRange("NPR Package Code", '<>%1', '');
+        if FromMigrationRec.FindSet() then
+            repeat
+                ToMigrationRec.Id := FromMigrationRec.SystemId;
+                ToMigrationRec."Package Code" := FromMigrationRec."NPR Package Code";
+                if not ToMigrationRec.Insert() then
+                    ToMigrationRec.Modify();
+            until FromMigrationRec.Next() = 0;
+    end;
 }
