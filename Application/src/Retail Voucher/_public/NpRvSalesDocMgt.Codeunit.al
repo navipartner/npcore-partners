@@ -354,7 +354,6 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterCheckSalesDoc', '', true, false)]
     local procedure CheckVoucherAmounts(var SalesHeader: Record "Sales Header")
     var
-        SalesHeaderAddFields: Record "NPR Sales Header Add. Fields";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucher: Record "NPR NpRv Voucher";
@@ -453,10 +452,9 @@
         end;
 
         TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
-        SalesHeader.GetSalesHeaderAdditionalFields(SalesHeaderAddFields);
-        SalesHeaderAddFields.CalcFields("Magento Payment Amount");
-        if TotalAmtInclVat < SalesHeaderAddFields."Magento Payment Amount" then
-            Error(Text003, TotalAmtInclVat, SalesHeaderAddFields."Magento Payment Amount");
+        SalesHeader.CalcFields("NPR Magento Payment Amount");
+        if TotalAmtInclVat < SalesHeader."NPR Magento Payment Amount" then
+            Error(Text003, TotalAmtInclVat, SalesHeader."NPR Magento Payment Amount");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostLines', '', true, false)]
@@ -695,7 +693,6 @@
 
     local procedure RedeemVoucher(SalesHeader: Record "Sales Header"; ReferenceNo: Text)
     var
-        SalesHeaderAddFields: Record "NPR Sales Header Add. Fields";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         Voucher: Record "NPR NpRv Voucher";
@@ -712,9 +709,8 @@
             Error(VoucherInUseErr);
 
         // Default to the remaining amount to be paid
-        SalesHeader.GetSalesHeaderAdditionalFields(SalesHeaderAddFields);
-        SalesHeaderAddFields.CalcFields("Magento Payment Amount");
-        Amount := GetTotalAmtInclVat(SalesHeader) - SalesHeaderAddFields."Magento Payment Amount";
+        SalesHeader.CalcFields("NPR Magento Payment Amount");
+        Amount := GetTotalAmtInclVat(SalesHeader) - SalesHeader."NPR Magento Payment Amount";
 
         if Amount <= 0 then
             Error(AmountNotGtZero);

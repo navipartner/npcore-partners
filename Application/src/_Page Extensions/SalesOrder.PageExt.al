@@ -76,7 +76,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         }
         addlast("Invoice Details")
         {
-            field("NPR Magento Payment Amount"; SalesHeaderAdditionalFields."Magento Payment Amount")
+            field("NPR Magento Payment Amount"; Rec."NPR Magento Payment Amount")
             {
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the sum of Payment Lines attached to the Sales Order';
@@ -357,27 +357,4 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             }
         }
     }
-    var
-        SalesHeaderAdditionalFields: Record "NPR Sales Header Add. Fields";
-
-    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
-    begin
-        Rec.SaveSalesHeaderAdditionalFields();
-    end;
-
-    trigger OnModifyRecord(): Boolean
-    begin
-        Rec.SaveSalesHeaderAdditionalFields();
-    end;
-
-    trigger OnClosePage()
-    begin
-        Rec.SaveSalesHeaderAdditionalFields();
-    end;
-
-    trigger OnAfterGetCurrRecord()
-    begin
-        Rec.GetSalesHeaderAdditionalFields(SalesHeaderAdditionalFields);
-    end;
-
 }

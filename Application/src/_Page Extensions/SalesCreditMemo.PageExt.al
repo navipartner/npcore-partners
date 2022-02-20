@@ -13,18 +13,11 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
         }
         addlast("Credit Memo Details")
         {
-            field("NPR Magento Payment Amount"; SalesHeaderAdditionalFields."Magento Payment Amount")
+            field("NPR Magento Payment Amount"; Rec."NPR Magento Payment Amount")
             {
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the sum of Payment Lines attached to the Sales Credit Memo';
             }
         }
     }
-    var
-        SalesHeaderAdditionalFields: Record "NPR Sales Header Add. Fields";
-
-    trigger OnAfterGetCurrRecord()
-    begin
-        Rec.GetSalesHeaderAdditionalFields(SalesHeaderAdditionalFields);
-    end;
 }

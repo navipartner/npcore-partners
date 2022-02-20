@@ -1,7 +1,6 @@
 ﻿codeunit 6151017 "NPR NpRv Module Pay.: Default"
 {
     Access = Internal;
-
     var
         Text000: Label 'Apply Payment - Default (Full Payment)';
 
@@ -82,7 +81,6 @@
 
     procedure ApplyPaymentSalesDoc(NpRvVoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
-        SalesHeaderAddFields: Record "NPR Sales Header Add. Fields";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         MagentoPaymentLineNew: Record "NPR Magento Payment Line";
         NpRvVoucher: Record "NPR NpRv Voucher";
@@ -112,9 +110,8 @@
         NpRvReturnVoucherType.TestField("Return Voucher Type");
         NpRvVoucherTypeNew.Get(NpRvReturnVoucherType."Return Voucher Type");
 
-        SalesHeader.GetSalesHeaderAdditionalFields(SalesHeaderAddFields);
-        SalesHeaderAddFields.CalcFields("Magento Payment Amount");
-        ReturnAmount := SalesHeaderAddFields."Magento Payment Amount" - GetTotalAmtInclVat(SalesHeader);
+        SalesHeader.CalcFields("NPR Magento Payment Amount");
+        ReturnAmount := SalesHeader."NPR Magento Payment Amount" - GetTotalAmtInclVat(SalesHeader);
         NpRvSalesLineNew.SetRange("Parent Id", NpRvSalesLine.Id);
         NpRvSalesLineNew.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         NpRvSalesLineNew.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
