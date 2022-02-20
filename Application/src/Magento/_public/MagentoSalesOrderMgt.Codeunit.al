@@ -91,6 +91,7 @@
 
     local procedure InsertCollectDocument(XmlElement: XmlElement; var SalesHeader: Record "Sales Header")
     var
+        SalesHeaderAddFields: Record "NPR Sales Header Add. Fields";
         NpCsWorkflow: Record "NPR NpCs Workflow";
         NpCsDocument: Record "NPR NpCs Document";
         NpCsStoreFrom: Record "NPR NpCs Store";
@@ -117,8 +118,9 @@
         NpCsCollectMgt.InitSendToStoreDocument(SalesHeader, NpCsStoreTo, NpCsWorkflow, NpCsDocument);
         OnAfterInitSendToStoreDocument(SalesHeader, NpCsStoreTo, NpCsWorkflow, NpCsDocument);
 
-        SalesHeader.CalcFields("NPR Magento Payment Amount");
-        if SalesHeader."NPR Magento Payment Amount" <> 0 then
+        SalesHeader.GetSalesHeaderAdditionalFields(SalesHeaderAddFields);
+        SalesHeaderAddFields.CalcFields("Magento Payment Amount");
+        if SalesHeaderAddFields."Magento Payment Amount" <> 0 then
             NpCsDocument."Bill via" := NpCsDocument."Bill via"::"Sales Document"
         else
             NpCsDocument."Bill via" := NpCsDocument."Bill via"::POS;
@@ -144,8 +146,8 @@
         if not NpCsDocument."Notify Customer via Sms" then
             NpCsDocument."Notify Customer via E-mail" := true;
 
-        SalesHeader.CalcFields("NPR Magento Payment Amount");
-        NpCsDocument."Prepaid Amount" := SalesHeader."NPR Magento Payment Amount";
+        SalesHeaderAddFields.CalcFields("Magento Payment Amount");
+        NpCsDocument."Prepaid Amount" := SalesHeaderAddFields."Magento Payment Amount";
         NpCsDocument.Modify(true);
 
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);

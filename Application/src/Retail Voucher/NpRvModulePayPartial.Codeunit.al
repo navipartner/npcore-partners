@@ -1,6 +1,7 @@
 ﻿codeunit 6151018 "NPR NpRv Module Pay. - Partial"
 {
     Access = Internal;
+
     var
         Text000: Label 'Apply Payment - Partial';
 
@@ -31,11 +32,13 @@
 
     procedure ApplyPaymentSalesDoc(NpRvVoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
+        SalesHeaderAddFields: Record "NPR Sales Header Add. Fields";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         ReturnAmount: Decimal;
     begin
-        SalesHeader.CalcFields("NPR Magento Payment Amount");
-        ReturnAmount := SalesHeader."NPR Magento Payment Amount" - GetTotalAmtInclVat(SalesHeader);
+        SalesHeader.GetSalesHeaderAdditionalFields(SalesHeaderAddFields);
+        SalesHeaderAddFields.CalcFields("Magento Payment Amount");
+        ReturnAmount := SalesHeaderAddFields."Magento Payment Amount" - GetTotalAmtInclVat(SalesHeader);
         if ReturnAmount <= 0 then
             exit;
 

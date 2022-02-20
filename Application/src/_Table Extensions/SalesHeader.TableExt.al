@@ -90,6 +90,8 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             Description = 'MAG2.00';
             Editable = false;
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6151405; "NPR External Order No."; Code[20])
         {
@@ -112,4 +114,41 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             DataClassification = CustomerContent;
         }
     }
+
+    var
+        _SalesHeaderAdditionalFields: Record "NPR Sales Header Add. Fields";
+
+    procedure GetSalesHeaderAdditionalFields(var SalesHeaderAdditionalFields: Record "NPR Sales Header Add. Fields")
+    begin
+        ReadSalesHeaderAdditionalFields();
+        SalesHeaderAdditionalFields := _SalesHeaderAdditionalFields;
+    end;
+
+    procedure SetSalesHeaderAdditionalFields(var SalesHeaderAdditionalFields: Record "NPR Sales Header Add. Fields")
+    begin
+        _SalesHeaderAdditionalFields := SalesHeaderAdditionalFields;
+    end;
+
+    procedure SaveSalesHeaderAdditionalFields()
+    begin
+        if not IsNullGuid(_SalesHeaderAdditionalFields.Id) then
+            if not _SalesHeaderAdditionalFields.Modify() then
+                _SalesHeaderAdditionalFields.Insert(false, true);
+    end;
+
+    procedure DeleteSalesHeaderAdditionalFields()
+    begin
+        ReadSalesHeaderAdditionalFields();
+        if _SalesHeaderAdditionalFields.Delete() then;
+    end;
+
+    local procedure ReadSalesHeaderAdditionalFields()
+    begin
+        if _SalesHeaderAdditionalFields.Id <> SystemId then
+            if not _SalesHeaderAdditionalFields.Get(SystemId) then begin
+                _SalesHeaderAdditionalFields.Init();
+                _SalesHeaderAdditionalFields.Id := SystemId;
+                _SalesHeaderAdditionalFields.SystemId := SystemId;
+            end;
+    end;
 }
