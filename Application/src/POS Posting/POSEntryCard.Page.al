@@ -783,7 +783,7 @@
                     begin
                         Clear(POSEntry);
                         POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
-                        REPORT.Run(REPORT::"NPR Posting Overview POS", true, true, POSEntry);
+                        REPORT.Run(REPORT::"NPR POS Entry Sales Details", true, true, POSEntry);
                     end;
                 }
             }

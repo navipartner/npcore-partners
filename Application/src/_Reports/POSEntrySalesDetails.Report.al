@@ -1,22 +1,21 @@
-﻿report 6150614 "NPR Posting Overview POS"
+﻿report 6150614 "NPR POS Entry Sales Details"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Posting Overview POS.rdlc';
+    RDLCLayout = './src/_Reports/layouts/NPR POS Entry Sales Details.rdlc';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-    Caption = 'Posting Overview POS';
+    Caption = 'NPR POS Entry Sales Details';
     PreviewMode = PrintLayout;
     DataAccessIntent = ReadOnly;
-
     dataset
     {
         dataitem(POS_Entry; "NPR POS Entry")
         {
             DataItemTableView = SORTING("Entry No.");
-            RequestFilterFields = "Entry No.", "POS Store Code";
+            RequestFilterFields = "Entry No.", "POS Store Code", "POS Unit No.", "Document Date";
             column(EntryNo_POS_Entry; "Entry No.")
             {
             }
@@ -30,6 +29,7 @@
             }
             column(POSUnitNo_POS_Entry; "POS Unit No.")
             {
+                IncludeCaption = true;
             }
             column(EndingTime_POS_Entry; "Ending Time")
             {
@@ -128,6 +128,9 @@
                             NoText := Item."Vendor Item No.";
 
                         TotalAmountInclTax += "Amount Incl. VAT";
+
+                        if ("Amount Incl. VAT" = 0) and ExcludeZero then
+                            CurrReport.Skip();
                     end;
                 }
                 dataitem(POS_Sales_GLAccount_Line; "NPR POS Entry Sales Line")
@@ -310,10 +313,10 @@
                 group(Options)
                 {
                     Caption = 'Options';
-                    field("Include Credit Card Transaction"; IncludeCreditCardTransaction)
+                    field("Exclude Zero"; ExcludeZero)
                     {
-                        Caption = 'Include Credit Card Transaction';
-                        ToolTip = 'Specifies the value of the Include Credit Card Transaction field';
+                        Caption = 'Exclude Zero Values';
+                        ToolTip = 'Specifies entries without 0 amount.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -325,7 +328,7 @@
     {
         StoreCodeLabel = 'Store Code';
         TotalLabel = 'Total';
-        EntryOverviewLabel = 'POS Entry Overview';
+        EntryOverviewLabel = 'NPR POS Entry Sales Details';
         PageLabel = 'Page %1 of %2';
     }
 
@@ -339,5 +342,6 @@
         NoFilter: Text;
         NoText: Text;
         POSStoreFilter: Text;
+        ExcludeZero: boolean;
 }
 
