@@ -63,8 +63,6 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             Caption = 'Package Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Package Code".Code;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014636 "Package Code".';
         }
         field(6014425; "NPR Order Type"; Option)
         {
