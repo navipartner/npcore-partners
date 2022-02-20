@@ -143,16 +143,9 @@ xmlport 6151195 "NPR NpCs Sales Document"
                     fieldelement(contact; TempSalesHeader."Sell-to Contact")
                     {
                     }
-                    tableelement(tempsalesheaderaddfields; "NPR Sales Header Add. Fields")
+                    fieldelement(phone_no; TempSalesHeader."NPR Bill-to Company")
                     {
-                        LinkFields = Id = FIELD(SystemId);
-                        LinkTable = TempSalesHeader;
                         MinOccurs = Zero;
-                        UseTemporary = true;
-                        fieldelement(phone_no; tempsalesheaderaddfields."Bill-to Company")
-                        {
-                            MinOccurs = Zero;
-                        }
                     }
                     fieldelement(email; TempSalesHeader."NPR Bill-to E-mail")
                     {
