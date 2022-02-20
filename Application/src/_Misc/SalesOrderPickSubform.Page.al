@@ -1004,26 +1004,6 @@
                         Rec.OpenItemTrackingLines();
                     end;
                 }
-                action("Select Item Substitution")
-                {
-                    AccessByPermission = TableData "Item Substitution" = R;
-                    Caption = 'Select Item Substitution';
-                    Image = SelectItemSubstitution;
-
-                    ToolTip = 'Executes the Select Item Substitution action';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnAction()
-                    var
-                        ItemSubstitutionMgt: Codeunit "Item Subst.";
-                    begin
-                        Clear(SalesHeader);
-                        Rec.TestStatusOpen();
-                        ItemSubstitutionMgt.ItemSubstGet(Rec);
-                        if TransferExtendedText.SalesCheckIfAnyExtText(Rec, false) then
-                            TransferExtendedText.InsertSalesExtText(Rec);
-                    end;
-                }
                 action(Dimensions)
                 {
                     AccessByPermission = TableData Dimension = R;
