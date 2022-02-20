@@ -284,11 +284,15 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                             Rec.SetItemAdditionalFields(ItemAdditionalFields);
                         end;
                     }
-                    field("NPR NPRE Item Routing Profile"; Rec."NPR NPRE Item Routing Profile")
+                    field("NPR NPRE Item Routing Profile"; ItemAdditionalFields."NPRE Item Routing Profile")
                     {
 
                         ToolTip = 'Specifies the NPRE Item Routing Profile.';
                         ApplicationArea = NPRRetail;
+                        trigger OnValidate()
+                        begin
+                            Rec.SetItemAdditionalFields(ItemAdditionalFields);
+                        end;
                     }
                 }
 

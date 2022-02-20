@@ -1,6 +1,7 @@
 ﻿codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
 {
     Access = Internal;
+
     var
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         InQuotes: Label '''%1''', Locked = true;
@@ -544,6 +545,7 @@
     var
         FlowStatus: Record "NPR NPRE Flow Status";
         Item: Record Item;
+        ItemAdditionalFields: Record "NPR Item Additional Fields";
         ItemRoutingProfile: Record "NPR NPRE Item Routing Profile";
         NewAssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
         PrintCategory: Record "NPR NPRE Print/Prod. Cat.";
@@ -576,9 +578,12 @@
 
             RestSetup."Serving Step Discovery Method"::"Item Routing Profiles":
                 begin
-                    if not (Item.Get(WaiterPadLine."No.") and (Item."NPR NPRE Item Routing Profile" <> '')) then
+                    if not Item.Get(WaiterPadLine."No.") then
                         exit;
-                    ItemRoutingProfile.Get(Item."NPR NPRE Item Routing Profile");
+                    Item.GetItemAdditionalFields(ItemAdditionalFields);
+                    if ItemAdditionalFields."NPRE Item Routing Profile" = '' then
+                        exit;
+                    ItemRoutingProfile.Get(ItemAdditionalFields."NPRE Item Routing Profile");
                     CopyAssignedPrintCategories(ItemRoutingProfile.RecordId, WaiterPadLine.RecordId);
                     CopyAssignedFlowStatuses(ItemRoutingProfile.RecordId, WaiterPadLine.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow);
                 end;

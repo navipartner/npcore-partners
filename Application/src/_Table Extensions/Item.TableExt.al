@@ -171,6 +171,8 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Rest. Item Routing Profile';
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Item Routing Profile";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "NPRE Item Routing Profile".';
         }
         field(6014609; "NPR Has Variants"; Boolean)
         {

@@ -17,6 +17,12 @@ table 6014635 "NPR Item Additional Fields"
             DataClassification = CustomerContent;
             TableRelation = "NPR NpIa Item AddOn";
         }
+        field(30; "NPRE Item Routing Profile"; Code[20])
+        {
+            Caption = 'Rest. Item Routing Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPRE Item Routing Profile";
+        }
     }
 
     keys
