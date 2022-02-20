@@ -463,7 +463,6 @@
     local procedure InsertSalesHeader(XmlElement: XmlElement; var SalesHeader: Record "Sales Header")
     var
         Customer: Record Customer;
-        SalesHeaderAddFields: Record "NPR Sales Header Add. Fields";
         TempCustomer: Record Customer temporary;
         MagentoWebsite: Record "NPR Magento Website";
         ShipmentMapping: Record "NPR Magento Shipment Mapping";
@@ -554,10 +553,7 @@
                         SalesHeader."Bill-to Address 2" := SalesHeader."Sell-to Address 2";
                         SalesHeader."Bill-to Post Code" := SalesHeader."Sell-to Post Code";
                         SalesHeader."Bill-to City" := SalesHeader."Sell-to City";
-                        SalesHeader.GetSalesHeaderAdditionalFields(SalesHeaderAddFields);
-                        SalesHeaderAddFields."Bill-to Company" := '';
-                        SalesHeader.SetSalesHeaderAdditionalFields(SalesHeaderAddFields);
-                        SalesHeader.SaveSalesHeaderAdditionalFields();
+                        SalesHeader."NPR Bill-to Company" := '';
                         SalesHeader."Bill-to Contact" := SalesHeader."Sell-to Contact";
                         SalesHeader."Bill-to Contact No." := SalesHeader."Sell-to Contact No.";
                         SalesHeader."Bill-to Country/Region Code" := SalesHeader."Sell-to Country/Region Code";

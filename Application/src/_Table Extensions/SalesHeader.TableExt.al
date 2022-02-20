@@ -28,8 +28,6 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = Company;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014636 "Bill-to Company".';
         }
         field(6014408; "NPR Bill-To Vendor No."; Code[10])
         {
@@ -93,7 +91,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             Editable = false;
             FieldClass = FlowField;
             ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014636 "Magento Payment Amount".';
+            ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6151405; "NPR External Order No."; Code[20])
         {

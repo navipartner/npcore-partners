@@ -31,7 +31,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         }
         addafter(Control85)
         {
-            field("NPR Bill-to Company"; SalesHeaderAdditionalFields."Bill-to Company")
+            field("NPR Bill-to Company"; Rec."NPR Bill-to Company")
             {
 
                 ToolTip = 'Specifies the company that you will send the invoice to.';
