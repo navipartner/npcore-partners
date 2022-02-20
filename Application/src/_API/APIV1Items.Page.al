@@ -966,7 +966,7 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'Print Tags', Locked = true;
                 }
 
-                field(nprNpreItemRoutingProfile; Rec."NPR NPRE Item Routing Profile")
+                field(nprNpreItemRoutingProfile; ItemAdditionalFields."NPRE Item Routing Profile")
                 {
                     Caption = 'NPRE Item Routing Profile', Locked = true;
                 }
