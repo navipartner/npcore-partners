@@ -432,7 +432,7 @@
                     ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Magento Payment Amount"; SalesHeaderAdditionalFields."Magento Payment Amount")
+                field("Magento Payment Amount"; Rec."NPR Magento Payment Amount")
                 {
 
                     ToolTip = 'Specifies the value of the NPR Magento Payment Amount field';
@@ -737,7 +737,6 @@
     trigger OnAfterGetCurrRecord()
     begin
         DynamicEditable := CurrPage.Editable();
-        Rec.GetSalesHeaderAdditionalFields(SalesHeaderAdditionalFields);
     end;
 
     trigger OnAfterGetRecord()
@@ -776,7 +775,6 @@
     var
         ItemBarcode: Record Item;
         ItemVariantBarcode: Record "Item Variant";
-        SalesHeaderAdditionalFields: Record "NPR Sales Header Add. Fields";
         ReportPrint: Codeunit "Test Report-Print";
         UserMgt: Codeunit "User Setup Management";
         DocNoVisible: Boolean;
