@@ -484,6 +484,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         ShiptoAddress: Record "Ship-to Address";
         SalesHeader: Record "Sales Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
+        SalesHeaderAddFields: Record "NPR Sales Header Add. Fields";
         PakkeShippingAgent: Record "NPR Package Shipping Agent";
     begin
         case RecRef.NUMBER of
@@ -508,9 +509,9 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
                             else
                                 SalesHeader.TESTFIELD(SalesHeader."Shipping Agent Service Code");
 
-
+                            SalesHeader.GetSalesHeaderAdditionalFields(SalesHeaderAddFields);
                             if PakkeShippingAgent."Package Type Required" then
-                                SalesHeader.TESTFIELD("NPR Package Code");
+                                SalesHeaderAddFields.TESTFIELD("Package Code");
 
                             if SalesHeader."Ship-to Code" <> '' then begin
                                 ShiptoAddress.GET(SalesHeader."Sell-to Customer No.", SalesHeader."Ship-to Code");
