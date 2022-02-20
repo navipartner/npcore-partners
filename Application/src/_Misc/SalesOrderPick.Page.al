@@ -337,7 +337,7 @@
                     ToolTip = 'Specifies the value of the Bill-to Contact field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Bill-to Company"; Rec."NPR Bill-to Company")
+                field("Bill-to Company"; SalesHeaderAdditionalFields."Bill-to Company")
                 {
 
                     ToolTip = 'Specifies the value of the NPR Bill-to Company field';
