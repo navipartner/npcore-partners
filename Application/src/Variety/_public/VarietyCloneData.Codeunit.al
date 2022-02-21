@@ -99,6 +99,7 @@
         NewSalesLine: Record "Sales Line";
         SalesLine2: Record "Sales Line";
         RecRef: RecordRef;
+        SameOrderRecRef: RecordRef;
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         LineNo: Integer;
     begin
@@ -111,18 +112,11 @@
             exit(Format(RecRef.RecordId));
         end;
 
+        RecRef.GetTable(MasterSalesLine);
         SalesLine2.SetRange("Document Type", MasterSalesLine."Document Type");
         SalesLine2.SetRange("Document No.", MasterSalesLine."Document No.");
-        SalesLine2.FindLast();
-
-        // if SalesLine2."NPR Master Line No." = MasterSalesLine."Line No." then
-        if MasterLineMapMgt.IsMaster(Database::"Sales Line", SalesLine2.SystemId) then
-            LineNo := SalesLine2."Line No." + 10000
-        else begin
-            LineNo := SalesLine2."Line No." + 1; // fallback
-            if SalesLine2.GetBySystemId(MasterLineMapMgt.GetLastInLineSystemId(Database::"Sales Line", MasterSalesLine.SystemId)) then
-                LineNo := SalesLine2."Line No." + 1;
-        end;
+        SameOrderRecRef.GetTable(SalesLine2);
+        LineNo := GetNextLineNo(RecRef, SameOrderRecRef, MasterSalesLine.FieldNo("Line No."));
 
         NewSalesLine := MasterSalesLine;
         NewSalesLine."Line No." := LineNo;
@@ -145,6 +139,7 @@
         NewPurchLine: Record "Purchase Line";
         PurchLine2: Record "Purchase Line";
         RecRef: RecordRef;
+        SameOrderRecRef: RecordRef;
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         LineNo: Integer;
     begin
@@ -157,17 +152,11 @@
             exit(Format(RecRef.RecordId));
         end;
 
+        RecRef.GetTable(MasterPurchLine);
         PurchLine2.SetRange("Document Type", MasterPurchLine."Document Type");
         PurchLine2.SetRange("Document No.", MasterPurchLine."Document No.");
-        PurchLine2.FindLast();
-
-        if MasterLineMapMgt.IsMaster(Database::"Purchase Line", PurchLine2.SystemId) then
-            LineNo := PurchLine2."Line No." + 10000
-        else begin
-            LineNo := PurchLine2."Line No." + 1; // fallback
-            if PurchLine2.GetBySystemId(MasterLineMapMgt.GetLastInLineSystemId(Database::"Purchase Line", MasterPurchLine.SystemId)) then
-                LineNo := PurchLine2."Line No." + 1;
-        end;
+        SameOrderRecRef.GetTable(PurchLine2);
+        LineNo := GetNextLineNo(RecRef, SameOrderRecRef, MasterPurchLine.FieldNo("Line No."));
 
         NewPurchLine := MasterPurchLine;
         NewPurchLine."Line No." := LineNo;
@@ -250,6 +239,7 @@
         NewRetailJournalLine: Record "NPR Retail Journal Line";
         RetailJournalLine2: Record "NPR Retail Journal Line";
         RecRef: RecordRef;
+        SameJournalRecRef: RecordRef;
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         LineNo: Integer;
     begin
@@ -262,16 +252,10 @@
             exit(Format(RecRef.RecordId));
         end;
 
+        RecRef.GetTable(MasterRetailJournalLine);
         RetailJournalLine2.SetRange("No.", MasterRetailJournalLine."No.");
-        RetailJournalLine2.FindLast();
-
-        if MasterLineMapMgt.IsMaster(Database::"NPR Retail Journal Line", RetailJournalLine2.SystemId) then
-            LineNo := RetailJournalLine2."Line No." + 10000
-        else begin
-            LineNo := RetailJournalLine2."Line No." + 1; // fallback
-            if RetailJournalLine2.GetBySystemId(MasterLineMapMgt.GetLastInLineSystemId(Database::"NPR Retail Journal Line", MasterRetailJournalLine.SystemId)) then
-                LineNo := RetailJournalLine2."Line No." + 1;
-        end;
+        SameJournalRecRef.GetTable(RetailJournalLine2);
+        LineNo := GetNextLineNo(RecRef, SameJournalRecRef, MasterRetailJournalLine.FieldNo("Line No."));
 
         NewRetailJournalLine := MasterRetailJournalLine;
         NewRetailJournalLine."Line No." := LineNo;
@@ -308,6 +292,7 @@
         NewItemJnlLine: Record "Item Journal Line";
         ItemJnlLine2: Record "Item Journal Line";
         RecRef: RecordRef;
+        SameJournalRecRef: RecordRef;
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         LineNo: Integer;
     begin
@@ -319,6 +304,12 @@
             RecRef.GetTable(MasterItemJnlLine);
             exit(Format(RecRef.RecordId));
         end;
+
+        RecRef.GetTable(MasterItemJnlLine);
+        ItemJnlLine2.SetRange("Journal Template Name", MasterItemJnlLine."Journal Template Name");
+        ItemJnlLine2.SetRange("Journal Batch Name", MasterItemJnlLine."Journal Batch Name");
+        SameJournalRecRef.GetTable(ItemJnlLine2);
+        LineNo := GetNextLineNo(RecRef, SameJournalRecRef, MasterItemJnlLine.FieldNo("Line No."));
 
         ItemJnlLine2.SetRange("Journal Template Name", MasterItemJnlLine."Journal Template Name");
         ItemJnlLine2.SetRange("Journal Batch Name", MasterItemJnlLine."Journal Batch Name");
@@ -344,6 +335,36 @@
 
         RecRef.GetTable(NewItemJnlLine);
         exit(Format(RecRef.RecordId));
+    end;
+
+    local procedure GetNextLineNo(var MasterRecRef: RecordRef; var DatasetRecRef: RecordRef; LineNoField: Integer): Integer
+    var
+        SameMasterRecRef: RecordRef;
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
+        LineNoFldRef: FieldRef;
+        LineNo: Integer;
+        LastInMasterLineNo: Integer;
+        NextLineNo: Integer;
+    begin
+        SameMasterRecRef.Open(MasterRecRef.Number);
+        MasterLineMapMgt.FilterRecRefOnMasterId(SameMasterRecRef, MasterRecRef, false);
+        SameMasterRecRef.FindLast();
+        LastInMasterLineNo := SameMasterRecRef.Field(LineNoField).Value;
+
+        LineNoFldRef := DatasetRecRef.Field(LineNoField);
+        LineNoFldRef.SetFilter('>%1', LastInMasterLineNo);
+        if DatasetRecRef.FindFirst() then begin
+            NextLineNo := DatasetRecRef.Field(LineNoField).Value;
+            LineNo := LastInMasterLineNo + Round((NextLineNo - LastInMasterLineNo) / 2, 1);
+            if (LineNo = LastInMasterLineNo) or (LineNo = NextLineNo) then begin
+                LineNoFldRef.SetRange();
+                DatasetRecRef.FindLast();
+                LineNo := DatasetRecRef.Field(LineNoField).Value;
+                LineNo += 10000;
+            end;
+        end else
+            LineNo := LastInMasterLineNo + 10000;
+        exit(LineNo);
     end;
 
     procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]) NewVariantCode: Code[10]
