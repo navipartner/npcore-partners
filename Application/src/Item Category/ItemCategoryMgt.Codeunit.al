@@ -290,6 +290,8 @@
     procedure CreateItemTemplate(ItemCategory: Record "Item Category"; TempItem: Record Item temporary): Code[10]
     var
         ConfigTemplateHeader: Record "Config. Template Header";
+        ConfigTemplateLine: Record "Config. Template Line";
+        Fields: Record Field;
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         TemplateFields: Array[20] of FieldRef;
         ConfigTemplateCode: Code[10];
@@ -331,6 +333,16 @@
             ConfigTemplateHeader."Instance No. Series" := TempItem."No. Series";
             ConfigTemplateHeader.Modify();
         end;
+
+        ConfigTemplateLine.Reset();
+        ConfigTemplateLine.SetRange("Data Template Code", ConfigTemplateCode);
+        if ConfigTemplateLine.FindSet() then
+            repeat
+                if Fields.Get(ConfigTemplateLine."Table ID", ConfigTemplateLine."Field ID") then begin
+                    ConfigTemplateLine."Field Name" := Fields.FieldName;
+                    ConfigTemplateLine.Modify();
+                end;
+            until ConfigTemplateLine.Next() = 0;
 
         exit(ConfigTemplateCode);
     end;
