@@ -143,5 +143,23 @@
         NoSeriesLine.Insert(true);
         exit(SeriesCode);
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnAfterCopyToPriceAsset', '', false, false)]
+    local procedure OnAfterCopyToPriceAsset(var PriceAsset: Record "Price Asset")
+    var
+        ItemVariant: Record "Item Variant";
+        SystemGeneratedEntry: Label 'System Generated Entry', Locked = true;
+    begin
+        if (PriceAsset."Asset Type" = PriceAsset."Asset Type"::Item) and (PriceAsset."Variant Code" <> '') then
+            if not ItemVariant.get(PriceAsset."Variant Code", PriceAsset."Asset No.") then begin
+                ItemVariant.Init();
+                ItemVariant.Validate(Code, PriceAsset."Variant Code");
+                ItemVariant.Validate("Item No.", PriceAsset."Asset No.");
+                ItemVariant.validate(Description, PriceAsset.Description);
+                ItemVariant.Validate("Item Id", PriceAsset."Asset ID");
+                ItemVariant.Validate("Description 2", SystemGeneratedEntry);
+                ItemVariant.Insert();
+            end;
+    end;
 }
 
