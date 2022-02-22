@@ -1,6 +1,7 @@
 ﻿codeunit 6151004 "NPR POS Action: SavePOSSvSl"
 {
     Access = Internal;
+
     var
         Text000: Label 'Save POS Sale as POS Quote';
         Text001: Label 'POS Quote';
@@ -120,14 +121,13 @@
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Find();
 
         CreatePOSQuote(SalePOS, POSQuoteEntry);
+        POSCreateEntry.InsertParkSaleEntry(SalePOS."Register No.", SalePOS."Salesperson Code");
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.DeleteAll();
         SalePOS.Delete();
-        POSCreateEntry.InsertParkSaleEntry(SalePOS."Register No.", SalePOS."Salesperson Code");
         Commit();
 
         POSSale.SelectViewForEndOfSale(POSSession);

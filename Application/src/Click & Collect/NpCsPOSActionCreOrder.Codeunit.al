@@ -1,6 +1,7 @@
 ﻿codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 {
     Access = Internal;
+
     var
         ActionDescriptionLbl: Label 'This built-in action create collect order from one to another store.';
         MissingStockInCompanyLbl: Label 'All Items might not be in stock in %1. Do you still wish to continue?', Comment = '%1="NPR NpCs Store"."Company Name';
@@ -554,11 +555,12 @@
 
         if PrevRec <> Format(SalePOS) then
             SalePOS.Modify(true);
+        POSSale.RefreshCurrent();
         Commit();
 
         SetParameters(POSSaleLine, RetailSalesDocMgt, Context);
         RetailSalesDocMgt.TestSalePOS(SalePOS);
-        RetailSalesDocMgt.ProcessPOSSale(SalePOS);
+        RetailSalesDocMgt.ProcessPOSSale(POSSale);
     end;
 
     local procedure SetParameters(var POSSaleLine: Codeunit "NPR POS Sale Line"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; Context: Codeunit "NPR POS JSON Management")

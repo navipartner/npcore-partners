@@ -56,23 +56,16 @@
     var
         ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError;
         ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote,SkipAndNew;
-        Confirmed: Boolean;
         ForceSaveAsQuote: Boolean;
         Handled: Boolean;
         SkipDialog: Boolean;
-        ConfirmActionCnf: Label 'You have chosen to %1 an existing unfinished sale. The sale was created in another session, which at the moment is still active. Are you sure you want to go on with your selected action? If you do NOT confirm, system will leave the sale intact.';
-        ActionOptionLabels: Label 'resume,cancel,save as quote (park)';
     begin
         if SalePOS.IsEmpty then
             exit(false);
 
         SalePOS.FindFirst();
-        if not SalePOS.SalesLinesExist() then begin
-            if IsAnotherActiveSessionSale(SalePOS) then
-                ActionOption := ActionOption::SkipAndNew  //Leave this empty unfinished sale untouched, because it may have been just started in another active session
-            else
-                ActionOption := ActionOption::CancelAndNew;  //Silently cancel any unfinished sale with no lines
-        end;
+        if not SalePOS.SalesLinesExist() then
+            ActionOption := ActionOption::CancelAndNew;  //Silently cancel any unfinished sale with no lines
         ActionOnCancelError := ActionOnCancelError::SaveAsQuote;
 
         OnBeforePromptResumeSale(SalePOS, POSSession, SkipDialog, ActionOption, ActionOnCancelError, Handled);
@@ -89,14 +82,6 @@
                     Error('');
             end;
 
-        if ActionOption in [ActionOption::Resume, ActionOption::CancelAndNew, ActionOption::SaveAsQuote] then
-            if IsAnotherActiveSessionSale(SalePOS) then begin
-                Confirmed := SkipDialog;
-                if not Confirmed then
-                    Confirmed := Confirm(ConfirmActionCnf, false, SelectStr(ActionOption, ActionOptionLabels));
-                if not Confirmed then
-                    ActionOption := ActionOption::SkipAndNew;
-            end;
         if ActionOption = ActionOption::SkipAndNew then begin
             SalePOS.Mark(false);
             ActionOption := ActionOption::" ";
@@ -140,17 +125,6 @@
         exit(ActionOption = ActionOption::Resume);
     end;
 
-    local procedure IsAnotherActiveSessionSale(SalePOS: Record "NPR POS Sale"): Boolean
-    var
-        ActiveSession: Record "Active Session";
-    begin
-        if (SalePOS."Server Instance ID" = 0) or (SalePOS."User Session ID" = 0) then
-            exit(false);
-        if not ActiveSession.Get(SalePOS."Server Instance ID", SalePOS."User Session ID") then
-            exit(false);
-        exit(not ((SalePOS."Server Instance ID" = Database.ServiceInstanceId()) and (SalePOS."User Session ID" = Database.SessionId())));
-    end;
-
     procedure DoSaveAsPOSQuote(POSSession: Codeunit "NPR POS Session"; SalePOS: Record "NPR POS Sale"; SkipDialog: Boolean): Integer
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
@@ -166,6 +140,7 @@
         end;
 
         SalePOS.Delete(true);
+        POSSession.ClearSale();
         Commit();
 
         if not SkipDialog then

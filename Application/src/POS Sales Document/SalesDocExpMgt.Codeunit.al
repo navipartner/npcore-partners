@@ -175,9 +175,10 @@
         PaymentMethodCode := NewPaymentMethodCode;
     end;
 
-    procedure ProcessPOSSale(var SalePOS: Record "NPR POS Sale")
+    procedure ProcessPOSSale(POSSale: Codeunit "NPR POS Sale")
     var
         SalesHeader: Record "Sales Header";
+        SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesPost: Codeunit "Sales-Post";
         SalesPostYesNo: Codeunit "Sales-Post (Yes/No)";
@@ -187,6 +188,7 @@
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
         Post: Boolean;
     begin
+        POSSale.GetCurrentSale(SalePOS);
         CreateSalesHeader(SalePOS, SalesHeader);
 
         if CustomerCreditCheck then begin
@@ -231,6 +233,7 @@
         POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, Posted);
         SaleLinePOS.DeleteAll();
         SalePOS.Delete();
+        POSSale.SetEnded(true);
 
         Commit();
 

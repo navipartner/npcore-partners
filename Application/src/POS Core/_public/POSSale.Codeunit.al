@@ -77,6 +77,7 @@
         Rec.FilterGroup := 0;
 
         IsModified := true;
+        Ended := false;
     end;
 
     procedure GetNextReceiptNo(POSUnitNo: Text) ReceiptNo: Code[20]
@@ -209,6 +210,16 @@
         IsModified := true;
     end;
 
+    procedure SetEnded(NewEnded: Boolean)
+    begin
+        Ended := NewEnded;
+    end;
+
+    procedure PosSaleRecMustExit(): Boolean
+    begin
+        exit((Rec."Sales Ticket No." <> '') and not Ended);
+    end;
+
     procedure GetTotals(var SalesAmountOut: Decimal; var PaidAmountOut: Decimal; var ChangeAmountOut: Decimal; var RoundingAmountOut: Decimal)
     var
         ReturnAmount: Decimal;
@@ -244,8 +255,17 @@
 
     procedure RefreshCurrent()
     begin
-        Rec.Get(Rec."Register No.", Rec."Sales Ticket No.");
+        if not Rec.Get(Rec."Register No.", Rec."Sales Ticket No.") then
+            ThrowNonExistentSaleErr(Rec);
         OnRefresh(Rec);
+    end;
+
+    local procedure ThrowNonExistentSaleErr(SalePOS: Record "NPR POS Sale")
+    var
+        SaleNotFoundErr: Label 'POS %1 "%2" for POS Unit No. "%3" does not exist anymore. Someone probably opened up a new session for this POS unit using the same BC user Id and deleted or finished your sale. Please contact system administrator to have system setups fixed, making sure there are no multiple POS sessions started with the same BC user Id at any time.',
+                                Comment = '%1 - field "Sales Ticket No." caption, %2 - Sales Ticket No., %3 - POS Unit No.';
+    begin
+        Error(SaleNotFoundErr, SalePOS.FieldCaption("Sales Ticket No."), SalePOS."Sales Ticket No.", SalePOS."Register No.");
     end;
 
     procedure SetDimension(DimCode: Code[20]; DimValueCode: Code[20])

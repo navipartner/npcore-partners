@@ -356,7 +356,7 @@
         ActionState.Add(Key, Object);
     end;
 
-    local procedure ClearSale()
+    procedure ClearSale()
     var
         LastSalePOSEntry: Record "NPR POS Entry";
     begin
@@ -436,6 +436,8 @@
 
     procedure GetSale(var SaleOut: Codeunit "NPR POS Sale")
     begin
+        if Sale.PosSaleRecMustExit() then
+            Sale.RefreshCurrent();
         SaleOut := Sale;
     end;
 

@@ -249,9 +249,6 @@
         POSSale.GetCurrentSale(SalePOS);
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-
-        SalePOS.FindFirst();
-
         if (JSON.GetBooleanParameter('SelectCustomer')) then begin
             CustomerTableView := JSON.GetStringParameterOrFail('CustomerTableView', ActionCode());
             CustomerLookupPage := JSON.GetIntegerParameterOrFail('CustomerLookupPage', ActionCode());
@@ -264,7 +261,8 @@
         SetParameters(POSSaleLine, JSON, RetailSalesDocMgt);
         ValidateSale(SalePOS, RetailSalesDocMgt, JSON);
 
-        RetailSalesDocMgt.ProcessPOSSale(SalePOS);
+        POSSale.RefreshCurrent();
+        RetailSalesDocMgt.ProcessPOSSale(POSSale);
 
         Commit();
 
