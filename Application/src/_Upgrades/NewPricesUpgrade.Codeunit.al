@@ -144,6 +144,14 @@
         exit(SeriesCode);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::CopyFromToPriceListLine, 'OnBeforeInsertHeader', '', false, false)]
+    local procedure OnBeforeInsertHeader(PriceListLine: Record "Price List Line"; var PriceListHeader: Record "Price List Header");
+    begin
+        if PriceListHeader."Source Group" = PriceListHeader."Source Group"::All then
+            if PriceListHeader.Code = '' then
+                PriceListHeader.Code := CopyStr(DelChr(CreateGuid(), '=', '{}-01'), 1, 20);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnAfterCopyToPriceAsset', '', false, false)]
     local procedure OnAfterCopyToPriceAsset(var PriceAsset: Record "Price Asset")
     var
