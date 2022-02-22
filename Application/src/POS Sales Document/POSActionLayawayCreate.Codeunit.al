@@ -1,6 +1,7 @@
 ﻿codeunit 6150868 "NPR POS Action: Layaway Create"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'Create layaway of sales order via prepayment invoices.';
         TextDownpaymentPctTitle: Label 'Down payment';
@@ -185,7 +186,7 @@
         RetailSalesDocMgt.SetSendPostedPdf2Nav(false);
         RetailSalesDocMgt.SetRetailPrint(true);
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
-        RetailSalesDocMgt.ProcessPOSSale(SalePOS);
+        RetailSalesDocMgt.ProcessPOSSale(POSSale);
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeaderOut);
     end;
 
