@@ -159,7 +159,7 @@
         SystemGeneratedEntry: Label 'System Generated Entry', Locked = true;
     begin
         if (PriceAsset."Asset Type" = PriceAsset."Asset Type"::Item) and (PriceAsset."Variant Code" <> '') then
-            if not ItemVariant.get(PriceAsset."Variant Code", PriceAsset."Asset No.") then begin
+            if not ItemVariant.get(PriceAsset."Asset No.", PriceAsset."Variant Code") then begin
                 ItemVariant.Init();
                 ItemVariant.Validate(Code, PriceAsset."Variant Code");
                 ItemVariant.Validate("Item No.", PriceAsset."Asset No.");
