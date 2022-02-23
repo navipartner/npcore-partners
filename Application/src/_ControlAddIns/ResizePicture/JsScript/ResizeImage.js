@@ -30,8 +30,11 @@ function ResizeImage(base64, imageExtension) {
         canvas.height = paddedHeight;
 
         ctx.drawImage(img, 0, 0, width, height);
+        ctx.globalCompositeOperation = "destination-over";
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        var idata = ctx.getImageData(0, 0, canvas.width, canvas.height);;
+        var idata = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
         var buffer = idata.data,
             len = buffer.length,
