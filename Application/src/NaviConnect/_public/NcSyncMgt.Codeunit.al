@@ -215,6 +215,11 @@
         TaskSetup.SetRange("Table No.", Task."Table No.");
         if TaskSetup.FindSet() then
             repeat
+                // Due to NST caching and the possiblity that another
+                // NST has updated the records in the meantime, we
+                // skip caching here.
+                SelectLatestVersion();
+
                 if Task.Get(Task."Entry No.") then;
                 ClearLastError();
                 if not CODEUNIT.Run(TaskSetup."Codeunit ID", Task) then begin
