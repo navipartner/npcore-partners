@@ -19,6 +19,12 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Rec.Reset();
                     Rec.ClearMarks();
                     Rec.MarkedOnly(false);
+
+                    if TableView <> '' then begin
+                        Rec.SetView(TableView);
+                        Item.SetView(TableView);
+                    end;
+
                     if (_SearchTerm = '') then begin
                         CurrPage.Update(false);
                         exit;
@@ -462,6 +468,8 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     begin
         RetailInventoryEnabled := NPRRetailInventorySetMgt.IsRetailInventoryEnabled();
         NPR_SetMagentoEnabled();
+
+        TableView := Rec.GetView(false);
     end;
 
     procedure NPR_SetMagentoEnabled()
@@ -512,4 +520,5 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         Text001: Label 'Item No.';
         RetailInventoryEnabled: Boolean;
         _SearchTerm: Text[100];
+        TableView: Text;
 }

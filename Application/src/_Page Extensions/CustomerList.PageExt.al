@@ -20,6 +20,12 @@ pageextension 6014492 "NPR Customer List" extends "Customer List"
                     Rec.Reset();
                     Rec.ClearMarks();
                     Rec.MarkedOnly(false);
+
+                    if TableView <> '' then begin
+                        Rec.SetView(TableView);
+                        Customer.SetView(TableView);
+                    end;
+
                     if (_SearchTerm = '') then begin
                         CurrPage.Update(false);
                         exit;
@@ -50,6 +56,12 @@ pageextension 6014492 "NPR Customer List" extends "Customer List"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        TableView := Rec.GetView(false);
+    end;
+
     var
         _SearchTerm: Text[100];
+        TableView: Text;
 }
