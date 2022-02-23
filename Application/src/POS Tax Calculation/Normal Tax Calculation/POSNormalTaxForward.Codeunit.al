@@ -4,6 +4,8 @@
     procedure UpdateSourceBeforeCalculateTax(var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
     begin
         Rec.Amount := Round(Rec.Amount, Currency."Amount Rounding Precision");
+        Rec."VAT Base Amount" := Rec.Amount;
+        Rec."Amount Including VAT" := Rec.Amount;
     end;
 
     procedure CalculateTax(var POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
