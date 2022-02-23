@@ -508,6 +508,11 @@
             "justification": "Permission sets should not be defined in XML. Instead, use the dedicated AL object for 'PermissionSet'."
         },
         {
+            "id": "AS0099",
+            "action":"Error",
+            "justification": "The member ID should be within the allowed range."
+        },
+        {
             "id": "AW0004",
             "action": "Error",
             "justification": "A Blob cannot be used as a source expression for a page field."
