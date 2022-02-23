@@ -1,6 +1,6 @@
 page 6014486 "NPR Shipping Provider Document"
 {
-    Extensible = False;
+    Extensible = true;
 
     Caption = 'Shipping Provider Document';
     DeleteAllowed = false;

@@ -55,8 +55,10 @@
     end;
 
     procedure PrintShipmentDocument(var SalesShipmentHeader: Record "Sales Shipment Header")
+    var
+        ConsignorEntry: Record "NPR Consignor Entry";
     begin
-        message(Text001);
+        ConsignorEntry.InsertFromShipmentHeader(SalesShipmentHeader."No.");
     end;
 
     var

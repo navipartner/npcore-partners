@@ -1,6 +1,6 @@
 ﻿table 6014576 "NPR Services Combination"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Services Combination';
 
     fields

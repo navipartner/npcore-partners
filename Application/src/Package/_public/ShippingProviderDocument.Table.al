@@ -1,7 +1,7 @@
 table 6014452 "NPR Shipping Provider Document"
 {
-    Access = Internal;
-    Caption = 'Shipping Provider  Document';
+    Access = public;
+    Caption = 'Shipping Provider Document';
     DrillDownPageID = "NPR Shipping Provider Docs";
     LookupPageID = "NPR Shipping Provider Docs";
     PasteIsValid = false;
@@ -477,9 +477,13 @@ table 6014452 "NPR Shipping Provider Document"
         CreateShipmentDocument: Page "NPR Shipping Provider Document";
         ShippingAgentServicesCode: Code[10];
     begin
-        if not PacsoftSetup.Get() then exit;
-        if (not PacsoftSetup."Use Pacsoft integration") and (not ShowWindow) then exit;
-        if (not PacsoftSetup."Use Pacsoft integration") and (ShowWindow) then
+        if not PacsoftSetup.Get() then
+            exit;
+        if not PacsoftSetup."Enable Shipping" then
+            exit;
+        if (PacsoftSetup."Shipping Provider" <> PacsoftSetup."Shipping Provider"::Pacsoft) and (not ShowWindow) then
+            exit;
+        if (PacsoftSetup."Shipping Provider" <> PacsoftSetup."Shipping Provider"::Pacsoft) and (ShowWindow) then
             Error(TextNotActivated);
 
         Clear(ShipmentDocument);
