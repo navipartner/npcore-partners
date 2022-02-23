@@ -1,6 +1,7 @@
 ﻿codeunit 6014585 "NPR RP Package Handler"
 {
     Access = Internal;
+
     var
         ImportedMessage: Label 'Templates imported:\Created: %1\Replaced: %2';
 
@@ -123,10 +124,10 @@
         ManagedPackageMgt.ImportFromBlob(TempBlob);
     end;
 
+    [NonDebuggable]
     procedure DeployPackageFromBlobStorage()
     var
         ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Header");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Line");
@@ -136,7 +137,7 @@
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Data Item Constr. Links");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Device Settings");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Media Info");
-        ManagedPackageMgt.DeployPackageFromURL(AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl') + '/retailprinttemplates/templates.json');
+        ManagedPackageMgt.DeployPackageFromURL(GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl') + '/retailprinttemplates/templates.json');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Managed Package Mgt.", 'OnLoadPackage', '', false, false)]
@@ -375,6 +376,28 @@
         DataItemConstraintLinks.DeleteAll();
         DeviceSettings.DeleteAll();
         MediaInfo.DeleteAll();
+    end;
+
+    [NonDebuggable]
+    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
+    var
+        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
+        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
+        TextMgt: Codeunit "NPR Text Mgt.";
+        AppKeyVaultSecretProviderInitialised: Boolean;
+    begin
+        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
+            if not AppKeyVaultSecretProviderInitialised then
+                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
+
+            if not AppKeyVaultSecretProviderInitialised then
+                Error(GetLastErrorText());
+
+            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
+                InMemorySecretProvider.AddSecret(Name, KeyValue)
+            else
+                Error(TextMgt.GetSecretFailedErr(), Name);
+        end;
     end;
 }
 

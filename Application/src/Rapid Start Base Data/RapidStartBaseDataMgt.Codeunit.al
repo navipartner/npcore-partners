@@ -34,6 +34,7 @@
         end;
     end;
 
+    [NonDebuggable]
     procedure GetAllPackagesInBlobStorage(URL: Text; var Packages: List of [Text])
     var
         httpClient: HttpClient;
@@ -54,6 +55,7 @@
         end;
     end;
 
+    [NonDebuggable]
     procedure ImportPackage(URL: Text; PackageCode: Text; AdjustPackageTableNames: Boolean)
     var
         configPackage: Record "Config. Package";
