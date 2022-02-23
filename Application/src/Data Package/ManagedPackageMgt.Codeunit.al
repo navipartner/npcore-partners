@@ -101,6 +101,7 @@
         LoadPackage(Jtoken);
     end;
 
+    [NonDebuggable]
     procedure DeployPackageFromURL(URL: Text)
     var
         Client: HttpClient;

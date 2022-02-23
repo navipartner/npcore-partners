@@ -1,13 +1,14 @@
 ﻿codeunit 6014519 "NPR MobilePayV10 Protocol"
 {
     Access = Internal;
+
     var
         AUTH_TOKEN_Err: Label 'Could not refresh MobilePay authorization token.\%1';
         UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err: Label '%1 isn`t a supported %2 for %3. Only %4 and %5 are supported.';
         CANCEL_DEAD_TRANSACTIONS_JOBQUEUE_DESCRIPTION_Lbl: Label 'Cancel dead (reserved) MobilePay transactions.';
         CREATE_DEAD_TRANSACTIONS_JOBQUEUE_ENTRY_Qst: Label 'Do you want to create a Job Queue task to run cancellation of dead reserved MobilePay transactions?';
         CANCELED_BY_USER_Err: Label 'Action canceled by user.';
-        AzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
+
         MobilePayResponseExpectedButEmptyErr: Label 'This is a programming bug!!!\MobilePay response content expected but empty.\Can''t read any JSON response content.';
         IsRunningOutOfPosSession: Boolean;
         MobilePayJobQueueCategoryCode_Lbl: Label 'MOBILEPAY', Locked = true;
@@ -575,6 +576,7 @@
         IsRunningOutOfPosSession := RunningOutOfPosSession
     end;
 
+    [NonDebuggable]
     internal procedure GetClientId(eftSetup: Record "NPR EFT Setup"): Text
     var
         mobilePayPaymentSetup: Record "NPR MobilePayV10 Payment Setup";
@@ -583,12 +585,13 @@
 
         case mobilePayPaymentSetup.Environment of
             mobilePayPaymentSetup.Environment::Production:
-                exit(AzureKeyVault.GetSecret('NpRetailMobilePayV10ProductionClientId'));
+                exit(GetAzureKeyVaultSecret('NpRetailMobilePayV10ProductionClientId'));
             mobilePayPaymentSetup.Environment::Sandbox:
-                exit(AzureKeyVault.GetSecret('NpRetailMobilePayV10SandboxClientId'));
+                exit(GetAzureKeyVaultSecret('NpRetailMobilePayV10SandboxClientId'));
         end;
     end;
 
+    [NonDebuggable]
     internal procedure GetClientSecret(eftSetup: Record "NPR EFT Setup"): Text
     var
         mobilePayPaymentSetup: Record "NPR MobilePayV10 Payment Setup";
@@ -597,9 +600,9 @@
 
         case mobilePayPaymentSetup.Environment of
             mobilePayPaymentSetup.Environment::Production:
-                exit(AzureKeyVault.GetSecret('NpRetailMobilePayV10ProductionClientSecret'));
+                exit(GetAzureKeyVaultSecret('NpRetailMobilePayV10ProductionClientSecret'));
             mobilePayPaymentSetup.Environment::Sandbox:
-                exit(AzureKeyVault.GetSecret('NpRetailMobilePayV10SandboxClientSecret'));
+                exit(GetAzureKeyVaultSecret('NpRetailMobilePayV10SandboxClientSecret'));
         end;
     end;
 
@@ -913,6 +916,28 @@
             success := mobilePayCancelRefund.Run(EftTrxRequest);
             WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelRefund.GetRequestResponse(), true);
             exit(success);
+        end;
+    end;
+
+    [NonDebuggable]
+    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
+    var
+        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
+        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
+        TextMgt: Codeunit "NPR Text Mgt.";
+        AppKeyVaultSecretProviderInitialised: Boolean;
+    begin
+        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
+            if not AppKeyVaultSecretProviderInitialised then
+                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
+
+            if not AppKeyVaultSecretProviderInitialised then
+                Error(GetLastErrorText());
+
+            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
+                InMemorySecretProvider.AddSecret(Name, KeyValue)
+            else
+                Error(TextMgt.GetSecretFailedErr(), Name);
         end;
     end;
 

@@ -27,6 +27,7 @@
         exit(StrSubstNo(ReqRespLbl, _request, _responseHttpCode, _response));
     end;
 
+    [NonDebuggable]
     local procedure SendRequest(var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
         reqMessage: HttpRequestMessage;

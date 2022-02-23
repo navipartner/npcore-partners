@@ -89,6 +89,7 @@
     end;
 
     // The try function attemps to send the request to clean cash server
+    [NonDebuggable]
     [TryFunction]
     local procedure TrySendRequest(Url: Text; XmlIn: XmlDocument; var XmlOut: XmlDocument)
     var
@@ -102,7 +103,7 @@
         Username: Text;
         Password: Text;
         JObject: JsonObject;
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+
         RequestMethodTok: Label 'POST', Locked = true;
         UserAgentTok: Label 'User-Agent', Locked = true;
         UserAgentTxt: Label 'NP Dynamics Retail / Dynamics 365 Business Central', Locked = true;
@@ -119,7 +120,7 @@
         Request.Method := RequestMethodTok;
         Request.SetRequestUri('https://navipartner.azure-api.net/npcleancash/CleanCash'); //CleanCash API --> CleanCash Azure Function --> DigestAuth Proxy
         Request.GetHeaders(Headers);
-        Headers.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetSecret('CleanCashApiKey'));
+        Headers.Add('Ocp-Apim-Subscription-Key', GetAzureKeyVaultSecret('CleanCashApiKey'));
         Headers.Add(UserAgentTok, UserAgentTxt);
 
         JObject.Add('url', Url);
@@ -290,5 +291,27 @@
         InnerText := copystr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(InnerText));
         exit(true);
 
+    end;
+
+    [NonDebuggable]
+    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
+    var
+        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
+        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
+        TextMgt: Codeunit "NPR Text Mgt.";
+        AppKeyVaultSecretProviderInitialised: Boolean;
+    begin
+        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
+            if not AppKeyVaultSecretProviderInitialised then
+                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
+
+            if not AppKeyVaultSecretProviderInitialised then
+                Error(GetLastErrorText());
+
+            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
+                InMemorySecretProvider.AddSecret(Name, KeyValue)
+            else
+                Error(TextMgt.GetSecretFailedErr(), Name);
+        end;
     end;
 }
