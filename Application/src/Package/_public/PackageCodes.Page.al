@@ -1,6 +1,6 @@
 ﻿page 6014570 "NPR Package Codes"
 {
-    Extensible = False;
+    Extensible = true;
 
     Caption = 'Package Codes';
     PageType = ListPart;

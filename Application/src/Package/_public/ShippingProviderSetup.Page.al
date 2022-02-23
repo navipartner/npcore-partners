@@ -1,6 +1,6 @@
 page 6014574 "NPR Shipping Provider Setup"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'Shipping Provider Setup';
     PageType = Card;
     SourceTable = "NPR Shipping Provider Setup";
@@ -24,18 +24,7 @@ page 6014574 "NPR Shipping Provider Setup"
                     ToolTip = 'Specifies the Shipping Provider To Use';
                     ApplicationArea = NPRRetail;
                 }
-                field("Use Pacsoft integration"; Rec."Use Pacsoft integration")
-                {
 
-                    ToolTip = 'Specifies the value of the Use Pacsoft integration field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Use Consignor"; Rec."Use Consignor")
-                {
-
-                    ToolTip = 'Specifies the value of the Use Consignor field';
-                    ApplicationArea = NPRRetail;
-                }
             }
             group(Pacsoft)
             {

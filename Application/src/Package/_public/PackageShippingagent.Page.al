@@ -1,6 +1,6 @@
 ﻿page 6014568 "NPR Package Shipping agent"
 {
-    Extensible = False;
+    Extensible = true;
 
     PageType = Card;
     SourceTable = "NPR package Shipping Agent";

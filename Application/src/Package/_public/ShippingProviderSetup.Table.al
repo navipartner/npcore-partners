@@ -1,5 +1,6 @@
 table 6014574 "NPR Shipping Provider Setup"
 {
+    Access = Public;
     Caption = 'Shipping Provider Setup';
     DataClassification = CustomerContent;
 
@@ -14,6 +15,8 @@ table 6014574 "NPR Shipping Provider Setup"
         {
             Caption = 'Use Pacsoft integration';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'replaced by "Shipping Provider"';
         }
         field(3; "Send Doc. Immediately(Pacsoft)"; Boolean)
         {
@@ -87,11 +90,16 @@ table 6014574 "NPR Shipping Provider Setup"
         {
             Caption = 'Use Consignor';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'replaced by "Shipping Provider"';
         }
         field(150; "Use Pakkelabels"; Boolean)
         {
             Caption = 'Use Pakkelabels';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'replaced by "Shipping Provider"';
+
         }
         field(151; "Api User"; Text[50])
         {

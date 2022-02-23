@@ -1,6 +1,6 @@
 ﻿table 6014575 "NPR Package Printers"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Package Printers';
     fields
     {

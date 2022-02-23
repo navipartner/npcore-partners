@@ -163,12 +163,12 @@
 
     local procedure InsertHeader(InCode: Code[20])
     var
-        PacsoftSetup: Record "NPR Shipping Provider Setup";
+        ShippingProviderSetup: Record "NPR Shipping Provider Setup";
     begin
-        if not PacsoftSetup.Get() then
+        if not ShippingProviderSetup.Get() then
             exit;
 
-        if not PacsoftSetup."Use Consignor" then
+        if ShippingProviderSetup."Shipping Provider" <> ShippingProviderSetup."Shipping Provider"::Consignor then
             exit;
 
         Code := InCode;
