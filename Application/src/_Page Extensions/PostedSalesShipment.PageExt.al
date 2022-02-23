@@ -55,41 +55,8 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
     {
         addafter("&Navigate")
         {
-            action("NPR Consignor Label")
+            group("NPR Print Shipment Document")
             {
-                Caption = 'Consignor Label';
-
-                ToolTip = 'Prints Consignor Label.';
-                Image = Print;
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    ConsignorEntry: Record "NPR Consignor Entry";
-                begin
-                    ConsignorEntry.InsertFromShipmentHeader(Rec."No.");
-                end;
-            }
-            group("NPR Pacsoft")
-            {
-                Caption = 'Pacsoft';
-                action("NPR CreatePacsoftDocument")
-                {
-                    Caption = 'Create Pacsoft Shipment Document';
-
-                    ToolTip = 'Enable creation of the Pacsoft Shipment document.';
-                    Image = CreateDocument;
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnAction()
-                    var
-                        ShipmentDocument: Record "NPR shipping Provider Document";
-                        RecRef: RecordRef;
-                    begin
-                        RecRef.GetTable(Rec);
-                        ShipmentDocument.AddEntry(RecRef, true);
-                    end;
-                }
                 action("NPR PrintShipmentDocument")
                 {
                     Caption = 'Print Shipment Document';

@@ -7,8 +7,8 @@
     end;
 
     var
-        PacsoftSetup: Record "NPR Shipping Provider Setup";
-        GotIComm: Boolean;
+
+        PackageProviderSetup: Record "NPR Shipping Provider Setup";
         SendShipmentAgainQst: Label 'The shipment was already sent to Pacsoft, do you wish to send it again?';
 
     procedure SendDocuments()
@@ -29,8 +29,7 @@
         OutStr: OutStream;
         DocumentSentMsg: Label 'Document sent.';
     begin
-        GetIComm();
-        if not PacsoftSetup."Use Pacsoft integration" then exit;
+        if not InitPackageProvider() then exit;
 
         ShipmentDocument.CalcFields("Request XML");
         Clear(ShipmentDocument."Request XML");
@@ -79,7 +78,7 @@
         if not ShipmentDocument."Request XML".HasValue() then
             exit;
 
-        URI := StrSubstNo(PacsoftSetup."Send Order URI", PacsoftSetup.Session, PacsoftSetup.User, PacsoftSetup.Pin);
+        URI := StrSubstNo(PackageProviderSetup."Send Order URI", PackageProviderSetup.Session, PackageProviderSetup.User, PackageProviderSetup.Pin);
 
         ShipmentDocument."Request XML".CreateInStream(InStr);
         Content.WriteFrom(InStr);
@@ -265,14 +264,18 @@
             end;
     end;
 
-    local procedure GetIComm()
+    local procedure InitPackageProvider(): Boolean;
     begin
-        if GotIComm then exit;
+        if not PackageProviderSetup.GET() then
+            exit(false);
 
-        PacsoftSetup.Get();
-        GotIComm := true;
+        if not PackageProviderSetup."Enable Shipping" then
+            exit(False);
+
+        if PackageProviderSetup."Shipping Provider" <> PackageProviderSetup."Shipping Provider"::Pacsoft then
+            exit(false);
+        exit(true);
     end;
-
 
     procedure CheckBalance()
     begin
@@ -283,8 +286,8 @@
     var
         OutStr: OutStream;
     begin
-        GetIComm();
-        if not PacsoftSetup."Use Pacsoft integration" then exit;
+
+        if not InitPackageProvider() then exit;
 
         ShipmentDocument.CalcFields("Request XML");
         Clear(ShipmentDocument."Request XML");
@@ -319,8 +322,14 @@
     end;
 
     procedure PrintShipmentDocument(var SalesShipmentHeader: Record "Sales Shipment Header")
+    var
+        SalesShptHeader: Record "Sales Shipment Header";
+        ShipmentDocument: Record "NPR Shipping Provider Document";
+        RecRef: RecordRef;
     begin
-        message(Text001);
+
+        RecRef.GetTable(SalesShptHeader);
+        ShipmentDocument.AddEntry(RecRef, true);
     end;
 
     var

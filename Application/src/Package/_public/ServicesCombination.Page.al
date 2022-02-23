@@ -1,6 +1,6 @@
 ﻿page 6014576 "NPR Services Combination"
 {
-    Extensible = False;
+    Extensible = true;
     PageType = ListPart;
     SourceTable = "NPR Services Combination";
     Caption = 'NPR Services Combination';
