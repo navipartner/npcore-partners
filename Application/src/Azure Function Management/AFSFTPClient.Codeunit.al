@@ -1,14 +1,16 @@
 ﻿codeunit 6151612 "NPR AF SFTP Client"
 {
     Access = Internal;
+
     var
         //CodeUnit variables
         SftpClient: HttpClient;
         gConvert: Codeunit "Base64 Convert";
-        gAzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
         //CodeUnit Constants
         gHttpUrlConst, gHttpUsernameConst, gHttpPasswordConst, gHttpPortConst, gHttpPrivateKeyConst : Text;
-        gHttpPathConst, gHttpFilePathConst, gHttpFileContentConst, gHttpTimeoutMsConst, gHttpHostKey : Text;
+        gHttpPathConst, gHttpFilePathConst, gHttpFileContentConst, gHttpTimeoutMsConst : Text;
+        [NonDebuggable]
+        gHttpHostKey: Text;
         gErrorConst, gErrMsg_Post_Fail, gErrMsg_Parse_Fail : Text;
         gResponseMsg_StatusCode, gResponseMsg_ServerJson : Text;
         //SftpParameters
@@ -29,6 +31,7 @@
         gPrivateKey := PrivateKeyBase64;
     end;
 
+    [NonDebuggable]
     local procedure CommonConstruct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer)
     var
         baseurl: Text;
@@ -38,7 +41,7 @@
         gPassword := Password;
         gPort := Port;
         gTimeoutMs := TimeoutMs;
-        baseurl := gAzureKeyVault.GetSecret('SftpAzureFunctionUrl');
+        baseurl := GetAzureKeyVaultSecret('SftpAzureFunctionUrl');
         SftpClient.SetBaseAddress(baseurl);
         gHttpUrlConst := 'url';
         gHttpUsernameConst := 'username';
@@ -54,7 +57,7 @@
         gResponseMsg_StatusCode := 'StatusCode';
         gResponseMsg_ServerJson := 'ServerMsg';
         gErrorConst := 'Error';
-        gHttpHostKey := gAzureKeyVault.GetSecret('SftpAzureFunction');
+        gHttpHostKey := GetAzureKeyVaultSecret('SftpAzureFunction');
     end;
 
     procedure Destruct()
@@ -498,6 +501,28 @@
             returnVal := (returnVal and reqContent.Add(gHttpPrivateKeyConst, gPrivateKey));
         end;
         exit(returnVal);
+    end;
+
+    [NonDebuggable]
+    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
+    var
+        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
+        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
+        TextMgt: Codeunit "NPR Text Mgt.";
+        AppKeyVaultSecretProviderInitialised: Boolean;
+    begin
+        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
+            if not AppKeyVaultSecretProviderInitialised then
+                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
+
+            if not AppKeyVaultSecretProviderInitialised then
+                Error(GetLastErrorText());
+
+            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
+                InMemorySecretProvider.AddSecret(Name, KeyValue)
+            else
+                Error(TextMgt.GetSecretFailedErr(), Name);
+        end;
     end;
 }
 

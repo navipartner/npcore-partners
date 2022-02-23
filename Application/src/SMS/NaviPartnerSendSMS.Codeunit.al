@@ -8,11 +8,12 @@
         NotAllowedServiceErr: Label 'You are not allowed to use the %1 service.';
         ErrorSendSMS: Label 'SMS wasn''t sent. The service returned:\%1';
 
+    [NonDebuggable]
     procedure SendSMS(PhoneNo: Text; SenderNo: Text; Message: Text)
     var
         SMSSetup: Record "NPR SMS Setup";
         ServiceCalc: Codeunit "NPR Service Calculation";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+
         HttpCont: HttpContent;
         HttpResp: HttpResponseMessage;
         ForeignPhone: Boolean;
@@ -41,7 +42,7 @@
 
         if ServiceCalc.useService(ServiceCode) then begin
             CreateHttpContent(HttpCont, SenderNo, PhoneNo, Message);
-            if not SendHttpRequest(HttpResp, HttpCont, AzureKeyVaultMgt.GetSecret('SMSMgtHTTPRequestUrl'), 'POST') then
+            if not SendHttpRequest(HttpResp, HttpCont, GetAzureKeyVaultSecret('SMSMgtHTTPRequestUrl'), 'POST') then
                 Error(ErrorSendSMS, GetLastErrorText);
         end else
             Error(NotAllowedServiceErr, ServiceCode);
@@ -65,17 +66,18 @@
         exit((CopyStr(PhoneNo, 1, 1) = '+') and (CopyStr(PhoneNo, 1, 3) <> SMSSetup."Domestic Phone Prefix"));
     end;
 
+    [NonDebuggable]
     [TryFunction]
     local procedure SendHttpRequest(var HttpRespMessage: HttpResponseMessage; HttpCont: HttpContent; Uri: Text; Method: Text)
     var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+
         HttpClnt: HttpClient;
         RequestHeaders: HttpHeaders;
         HttpReqMessage: HttpRequestMessage;
         Content: Text;
     begin
         HttpReqMessage.GetHeaders(RequestHeaders);
-        RequestHeaders.Add('Authorization', 'Basic ' + GetBasicAuthInfo(AzureKeyVaultMgt.GetSecret('SMSMgtUsername'), AzureKeyVaultMgt.GetSecret('SMSMgtPassword')));
+        RequestHeaders.Add('Authorization', 'Basic ' + GetBasicAuthInfo(GetAzureKeyVaultSecret('SMSMgtUsername'), GetAzureKeyVaultSecret('SMSMgtPassword')));
         HttpReqMessage.Method(Method);
         HttpCont.ReadAs(Content);
         if Content <> '' then
@@ -89,9 +91,9 @@
 
     end;
 
+    [NonDebuggable]
     local procedure CreateHttpContent(var HttpCont: HttpContent; Sender: Text; Destination: Text; SMSMessage: Text)
     var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         ContentHeaders: HttpHeaders;
         JsonObj: JsonObject;
         JsonMsg: Text;
@@ -100,7 +102,7 @@
         JsonObj.Add('destination', Destination);
         JsonObj.Add('userData', SMSMessage);
         JsonObj.Add('platformId', 'COOL');
-        JsonObj.Add('platformPartnerId', AzureKeyVaultMgt.GetSecret('SMSMgtPlatformPartnerId'));
+        JsonObj.Add('platformPartnerId', GetAzureKeyVaultSecret('SMSMgtPlatformPartnerId'));
         JsonObj.Add('useDeliveryReport', 'false');
         JsonObj.WriteTo(JsonMsg);
 
@@ -110,6 +112,7 @@
         ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
     end;
 
+    [NonDebuggable]
     local procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
     var
         Base64Convert: Codeunit "Base64 Convert";
@@ -121,5 +124,27 @@
     local procedure ValidatePhone(PhoneNo: Text): Boolean;
     begin
         exit(DelChr(PhoneNo, '<=>', '+1234567890 ') = '');
+    end;
+
+    [NonDebuggable]
+    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
+    var
+        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
+        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
+        TextMgt: Codeunit "NPR Text Mgt.";
+        AppKeyVaultSecretProviderInitialised: Boolean;
+    begin
+        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
+            if not AppKeyVaultSecretProviderInitialised then
+                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
+
+            if not AppKeyVaultSecretProviderInitialised then
+                Error(GetLastErrorText());
+
+            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
+                InMemorySecretProvider.AddSecret(Name, KeyValue)
+            else
+                Error(TextMgt.GetSecretFailedErr(), Name);
+        end;
     end;
 }

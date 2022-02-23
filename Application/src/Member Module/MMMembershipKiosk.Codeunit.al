@@ -121,6 +121,7 @@
         '}';
     end;
 
+    [NonDebuggable]
     local procedure WelcomePage() Html: Text
     var
         PlaceHolderLbl: Label '               <img src="%1/images/logo.gif" alt="Navipartner" />', Locked = true;
@@ -162,6 +163,7 @@
         ContainerCss(Css);
     end;
 
+    [NonDebuggable]
     local procedure ScanTicketBarcodePage() Html: Text
     var
         PlaceHolderLbl: Label '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', Locked = true;
@@ -222,6 +224,7 @@
         ContainerCss(Css);
     end;
 
+    [NonDebuggable]
     local procedure MemberInfoCapturePage(var Parameters: JsonObject) Html: Text
     var
         PlaceHolderLbl: Label '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', Locked = true;
@@ -305,6 +308,7 @@
         ContainerCss(Css);
     end;
 
+    [NonDebuggable]
     local procedure TakePhotoPage() Html: Text
     var
         PlaceHolderLbl: Label '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', Locked = true;
@@ -366,6 +370,7 @@
         ContainerCss(Css);
     end;
 
+    [NonDebuggable]
     local procedure PreviewCardPage(var Parameters: JsonObject) Html: Text
     var
         PlaceHolderLbl: Label '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', Locked = true;
@@ -443,6 +448,7 @@
         '}';
     end;
 
+    [NonDebuggable]
     local procedure PrintPage() Html: Text
     var
         PlaceHolderLbl: Label '                   <img id="small-printer" src="%1/images/print.png" alt="Navipartner" />', Locked = true;
@@ -597,6 +603,7 @@
         '}';
     end;
 
+    [NonDebuggable]
     local procedure ContainerCss(var Css: Text)
     var
         PlaceHolderLbl: Label ' background:url(%1/images/sprite.png) no-repeat;', Locked = true;
@@ -817,11 +824,34 @@
         '}';
     end;
 
+    [NonDebuggable]
     local procedure GetMMMembershipKioskBaseUrl(): Text
     var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt."; //Single instance, buffering secrets!        
+    //Single instance, buffering secrets!        
     begin
-        Exit(AzureKeyVaultMgt.GetSecret('NpSelfServiceKioskBaseUrl'));
+        Exit(GetAzureKeyVaultSecret('NpSelfServiceKioskBaseUrl'));
+    end;
+
+    [NonDebuggable]
+    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
+    var
+        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
+        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
+        TextMgt: Codeunit "NPR Text Mgt.";
+        AppKeyVaultSecretProviderInitialised: Boolean;
+    begin
+        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
+            if not AppKeyVaultSecretProviderInitialised then
+                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
+
+            if not AppKeyVaultSecretProviderInitialised then
+                Error(GetLastErrorText());
+
+            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
+                InMemorySecretProvider.AddSecret(Name, KeyValue)
+            else
+                Error(TextMgt.GetSecretFailedErr(), Name);
+        end;
     end;
 }
 
