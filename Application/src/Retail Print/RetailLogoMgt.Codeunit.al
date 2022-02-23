@@ -1,6 +1,7 @@
 ﻿codeunit 6014531 "NPR Retail Logo Mgt."
 {
     Access = Internal;
+
     var
         ResizeImage: ControlAddIn "NPR ResizeImage";
         CtrlAddInInitialized: Boolean;
@@ -37,14 +38,15 @@
     procedure UploadLogo()
     var
         NotInitializedErr: Label 'Control Add-In not initialized.';
+        Base64Img: Text;
         TempBlob: Codeunit "Temp Blob";
-        Base64Converter: Codeunit "Base64 Convert";
         InStr: InStream;
         ImageHelper: Codeunit "Image Helpers";
         OutStr: OutStream;
 #if BC20
         Image: Codeunit Image;
 #else
+        Base64Converter: Codeunit "Base64 Convert";
         DotNetImage: Codeunit DotNet_Image;
         DotNetImageFormat: Codeunit DotNet_ImageFormat;
         Width: Integer;
@@ -64,6 +66,7 @@
         Image.FromStream(InStr);
         Image.SetFormat(Enum::"Image Format"::Bmp);
         Image.Save(OutStr);
+        Base64Img := Image.ToBase64();
 #else
         ImageHandler.GetImageSize(InStr, Width, Height);
         Clear(DotNetImage);
@@ -71,9 +74,11 @@
         DotNetImage.FromBitmap(Width, Height);
         DotNetImageFormat.Bmp();
         DotNetImage.Save(OutStr, DotNetImageFormat);
+        Base64Img := Base64Converter.ToBase64(InStr);
 #endif
-
-        ResizeImage.ResizeImage(Base64Converter.ToBase64(InStr), ImageHelper.GetImageType(InStr));
+        Clear(InStr);
+        TempBlob.CreateInStream(InStr);
+        ResizeImage.ResizeImage(Base64Img, ImageHelper.GetImageType(InStr));
     end;
 
     #region AUX
@@ -162,4 +167,3 @@
 
     #endregion
 }
-
