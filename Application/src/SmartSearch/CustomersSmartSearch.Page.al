@@ -30,6 +30,12 @@
                     Rec.Reset();
                     Rec.ClearMarks();
                     Rec.MarkedOnly(false);
+
+                    if TableView <> '' then begin
+                        Rec.SetView(TableView);
+                        Customer.SetView(TableView);
+                    end;
+
                     if (_SearchTerm = '') then begin
                         CurrPage.Update(false);
                         exit;
@@ -835,6 +841,8 @@
 #if BC17 or BC18
         ItemReferenceVisible := ItemReferenceMgt.IsEnabled();
 #endif
+
+        TableView := Rec.GetView(false);
     end;
 
     local procedure CreateCustomerFromTemplate()
@@ -855,4 +863,5 @@
         ItemReferenceVisible: Boolean;
 #endif
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+        TableView: Text;
 }

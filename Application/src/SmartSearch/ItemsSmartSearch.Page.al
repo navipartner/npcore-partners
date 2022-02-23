@@ -30,6 +30,12 @@
                     Rec.Reset();
                     Rec.ClearMarks();
                     Rec.MarkedOnly(false);
+
+                    if TableView <> '' then begin
+                        Rec.SetView(TableView);
+                        Item.SetView(TableView);
+                    end;
+
                     if (_SearchTerm = '') then begin
                         CurrPage.Update(false);
                         exit;
@@ -1319,6 +1325,8 @@
         ItemReferenceVisible := ItemReferenceMgt.IsEnabled();
 #endif
         ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
+
+        TableView := Rec.GetView(false);
     end;
 
     trigger OnAfterGetRecord()
@@ -1340,4 +1348,5 @@
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         CalculateStdCost: Codeunit "Calculate Standard Cost";
         _SearchTerm: Text[100];
+        TableView: Text;
 }
