@@ -9,6 +9,7 @@ codeunit 6014683 "NPR Post Inventory Cost to G/L"
     var
         ReportInbox: Record "Report Inbox";
         PostInvToGL: Report "Post Inventory Cost to G/L";
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         PostMethod: Option "per Posting Group","per Entry";
         OutStr: OutStream;
     begin
@@ -23,6 +24,9 @@ codeunit 6014683 "NPR Post Inventory Cost to G/L"
         PostInvToGL.UseRequestPage(false);
         PostInvToGL.SaveAs(GetReportParameters(), ReportFormat::Pdf, OutStr);
 
+        JQParamStrMgt.Parse(Rec."Parameter String");
+        if not JQParamStrMgt.GetParamValueAsBoolean(ParamSaveToReportInbox()) then
+            exit;
         ReportInbox."Created Date-Time" := RoundDateTime(CurrentDateTime, 60000);
         ReportInbox.Insert(true);
     end;
@@ -30,6 +34,11 @@ codeunit 6014683 "NPR Post Inventory Cost to G/L"
     local procedure GetReportParameters(): Text
     begin
         exit('');
+    end;
+
+    procedure ParamSaveToReportInbox(): Text
+    begin
+        exit('save_to_report_inbox');
     end;
 }
 #endif
