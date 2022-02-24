@@ -1,30 +1,5 @@
-[[_TOC_]]
 
-# Why use Azure KeyVault with BC
-
-The point of this section is to try explaining what should be stored in Azure KeyVault. As Microsoft documentation explains:
- 
-_Some Business Central extensions make web service calls to  non-Business Central services. For example, one extension might call  Azure Storage to read/write blobs. Another extension might call the  extension publisher's web service to do an operation.
-These web service calls are typically authenticated, which means the  extension must provide a credential in the call. The credentials enable  the other service to accept or reject the call. You can consider the  credentials as a kind of secret to the extension. A secret shouldn't be  leaked to customers, partners, or anybody else. So where can the  extension get the secret from? Here is where Azure Key Vault is used.  Azure Key Vault is a cloud service that works as a secure secrets store.  It provides centralized storage for secrets, enabling you to control  access and distribution of the secrets._
-
-We need to consider two scenarios:
-
-- We have enabled customer to save their data to the cloud drive (OneDrive, DropBox etc). In this scenario, the data itself is owned by the customer. Authentication data (username, password, token etc) is also owned by the customer, **so this is clearly NOT a scenario to use with Azure KeyVault**.
-
-- We have enabled connection between our NpCore and 3rd party service (Download of newest dependancies and scripts). In this scenario, everything related to the communication is owned by NaviPartner (Service endpoint URLs, tokens etc). This scenario, **is customer-agnostic FROM AUTHENTICATION perspective, uses same auth data for all the customers, is ideal to use with Azure KeyVault**.
-
-
-A good video on the topic:  https://events1.social27.com/MSDyn365BCLaunchEvent/agenda/player/61367
-
-# NPR Azure Key Vault Mgt. codeunit
-
-Fetching Azure Key Vault secrets takes some time, especially if you're doing it from environment that is not hosted in Azure, the environment is hosted in different Azure region.
-
-In order to mitigate the issue, especially when we're reusing the values read from Azure Key Vault (API Kay used for frequent API calls), **NPR Azure Key Vault Mgt.** codeunit has been created. This single instance codeunit, automatically cashes all secrets read from the Key Vault (_procedure GetSecret(Name: Text) KeyValue: Text)_ thus removing the performance bottleneck from all subsequent uses of previously read secrets.
-
-Considering this, **NPR Azure Key Vault Mgt.** should be always used when reading secrets from Azure Key Vault!
-
-#BC Certificate/NST Setup for Azure KeyVault
+# BC Certificate/NST Setup for Azure KeyVault
 In order to use KeyVault with BC app, we need to setup the KeyVault first. Most of the process is well documented in Microsoft official documentation:
 
 https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-app-key-vault-overview
