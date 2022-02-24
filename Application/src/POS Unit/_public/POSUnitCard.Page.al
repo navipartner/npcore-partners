@@ -153,6 +153,11 @@
                     ToolTip = 'Specifies the value of the POS Security Profile field';
                     ApplicationArea = NPRRetail;
                 }
+                field("POS Inventory Profile"; Rec."POS Inventory Profile")
+                {
+                    ToolTip = 'Specifies a POS Inventory Profile, which is used for the POS unit.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

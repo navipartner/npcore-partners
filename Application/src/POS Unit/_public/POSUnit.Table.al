@@ -172,6 +172,12 @@
             ObsoleteTag = 'POS Unit -> POS Store';
 
         }
+        field(530; "POS Inventory Profile"; Code[20])
+        {
+            Caption = 'POS Inventory Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Inventory Profile";
+        }
         field(540; "POS Unit Receipt Text Profile"; Code[20])
         {
             Caption = 'POS Unit Receipt Text Profile';
@@ -350,6 +356,14 @@
         if "POS End of Day Profile" = '' then
             exit;
         exit(POSEoDProfile.Get("POS End of Day Profile"));
+    end;
+
+    procedure GetProfile(var PosInventoryProfile: Record "NPR POS Inventory Profile"): Boolean
+    begin
+        Clear(PosInventoryProfile);
+        if "POS Inventory Profile" = '' then
+            exit;
+        exit(PosInventoryProfile.Get("POS Inventory Profile"));
     end;
 
     procedure GetCurrentPOSUnit(): Code[10]

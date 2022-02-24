@@ -13,7 +13,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('2.0');
+        exit('2.1');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
@@ -32,6 +32,7 @@
 
             Sender.RegisterDataSourceBinding(CopyStr(BuiltInSaleLine(), 1, 50));
             Sender.RegisterTextParameter('ItemAddOnNo', '');
+            Sender.RegisterBooleanParameter('SkipItemAvailabilityCheck', false);
         end;
     end;
 
@@ -108,13 +109,16 @@
     local procedure OnActionRunAddOns(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management")
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
+        PosInventoryProfile: Record "NPR POS Inventory Profile";
         SaleLinePOS: Record "NPR POS Sale Line";
         ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         UserSelectionJToken: JsonToken;
         AppliesToLineNo: Integer;
         CompulsoryAddOn: Boolean;
         RequestFrontEndRefresh: Boolean;
+        SkipItemAvailabilityCheck: Boolean;
         UpdateActiveSaleLine: Boolean;
         ReadingErr: Label 'reading in %1 of %2';
     begin
@@ -132,6 +136,13 @@
         ItemAddOn.TestField(Enabled);
         CompulsoryAddOn := Context.GetBoolean('CompulsoryAddOn');
 
+        SkipItemAvailabilityCheck := Context.GetBooleanParameter('SkipItemAvailabilityCheck');
+        if not SkipItemAvailabilityCheck then begin
+            PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
+            if PosInventoryProfile."Stockout Warning" then
+                PosItemCheckAvail.SetxDataset(POSSession);
+        end;
+
         Clear(ItemAddOnMgt);
         if not Context.GetBoolean('UserSelectionRequired') then
             RequestFrontEndRefresh := ItemAddOnMgt.InsertMandatoryPOSAddOnLinesSilent(ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn)
@@ -144,12 +155,14 @@
         end;
 
         if RequestFrontEndRefresh then begin
-            if ItemAddOnMgt.InsertedWithAutoSplitKey() then begin
-                POSSession.ChangeViewSale();  //there is no other way to refresh the lines, so they appear in correct order
-                exit;
-            end;
-            POSSession.RequestRefreshData();
+            if ItemAddOnMgt.InsertedWithAutoSplitKey() then
+                POSSession.ChangeViewSale()  //there is no other way to refresh the lines, so they appear in correct order
+            else
+                POSSession.RequestRefreshData();
         end;
+
+        if not SkipItemAvailabilityCheck and PosInventoryProfile."Stockout Warning" then
+            PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
     end;
 
     local procedure LookupItemAddOn(var AddOnNo: Code[20]): Boolean

@@ -26,7 +26,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.8');
+        exit('1.9');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -56,6 +56,7 @@
             Sender.RegisterBooleanParameter('usePreSetUnitPrice', false);
             Sender.RegisterDecimalParameter('preSetUnitPrice', 0);
             Sender.RegisterBooleanParameter('AllowToSelectSerialNoFromList', false);
+            Sender.RegisterBooleanParameter('SkipItemAvailabilityCheck', false);
 
             Sender.RegisterBlockingUI(false);
         end;
@@ -109,6 +110,9 @@
         CustomDescription: Text;
         ValidatedSerialNumber: Text;
         ValidatedVariantCode: Text;
+        PosInventoryProfile: Record "NPR POS Inventory Profile";
+        PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
+        SkipItemAvailabilityCheck: Boolean;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         HasPrompted := JSON.GetBoolean('promptPrice') or JSON.GetBoolean('promptSerial');
@@ -118,6 +122,7 @@
         ItemQuantity := JSON.GetDecimal('itemQuantity');
         UsePresetUnitPrice := JSON.GetBoolean('usePreSetUnitPrice');
         PresetUnitPrice := JSON.GetDecimal('preSetUnitPrice');
+        SkipItemAvailabilityCheck := JSON.GetBooleanParameter('SkipItemAvailabilityCheck');
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
@@ -171,7 +176,14 @@
         if JSON.SetScope('$editDescription') then
             CustomDescription := JSON.GetString('input');
 
+        if not SkipItemAvailabilityCheck then begin
+            PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
+            if PosInventoryProfile."Stockout Warning" then
+                PosItemCheckAvail.SetxDataset(POSSession);
+        end;
         AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, SetUnitPrice, CustomDescription, InputSerial, UseSpecificTracking, ValidatedSerialNumber, POSSession, FrontEnd);
+        if not SkipItemAvailabilityCheck and PosInventoryProfile."Stockout Warning" then
+            PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
     end;
 
     local procedure Step_ItemTracking(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
