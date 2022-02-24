@@ -7,8 +7,6 @@
         if Method <> 'SetDragonglass' then
             exit;
 
-        POSSession.SetDragonglassSession();
-
         Handled := true;
     end;
 }

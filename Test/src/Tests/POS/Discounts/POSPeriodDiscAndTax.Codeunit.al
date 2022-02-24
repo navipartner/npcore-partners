@@ -4628,7 +4628,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     begin
         if Initialized then begin
             //Clean any previous mock session
-            POSSession.Destructor();
+            POSSession.ClearAll();
             Clear(POSSession);
         end;
 

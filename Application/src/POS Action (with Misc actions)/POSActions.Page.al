@@ -22,28 +22,16 @@
                     ToolTip = 'Specifies the code for the POS Action';
                     ApplicationArea = NPRRetail;
                 }
-                field(Description; Rec.Description)
+                field(Description; ActionDescription)
                 {
-
                     ToolTip = 'Specifies what the POS Action does.';
                     ApplicationArea = NPRRetail;
-                }
-                field(Version; Rec.Version)
-                {
-
-                    ToolTip = 'Specifies the version of the Codeunit for the POS action.';
-                    ApplicationArea = NPRRetail;
+                    Caption = 'Description';
                 }
                 field(Blocked; Rec.Blocked)
                 {
 
                     ToolTip = 'Specifies whether or not the POS Action is blocked';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Type; Rec.Type)
-                {
-
-                    ToolTip = 'Specifies which type the action belongs to. The default type is Generic, while the Button & BackEnd types are not used.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Workflow Defined"; Rec.Workflow.HasValue())
@@ -59,24 +47,10 @@
                     ToolTip = 'Specifies the data source that is used for/by the POS action.Currently there are 4 values:BUILTIN_PAYMENTLINE, BUILTIN_REGISTER_BALANCING, BUILTIN_SALE & BUILTIN_SALELINE';
                     ApplicationArea = NPRRetail;
                 }
-                field("Blocking UI"; Rec."Blocking UI")
+                field("Workflow Implementation"; Rec."Workflow Implementation")
                 {
-
+                    ToolTip = 'The workflow implementation codeunit for this action';
                     Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Blocking UI field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("<Blocking UI>"; Rec."Codeunit ID")
-                {
-
-                    ToolTip = 'Specifies which Codeunit is related to the POS Action';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Secure Method Code"; Rec."Secure Method Code")
-                {
-
-                    ToolTip = 'Specifies which security code can be assigned to the POS Action. There are the following options:ADMIN-PWD: Admin password, ANY-SALESP: Any salesperson password, CUR-SALESP:Current salesperson password, REGIST-PWD: Open register password, SUPERVISOR: Supervisors password';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -177,12 +151,25 @@
             if Rec.FindFirst() then;
     end;
 
+    trigger OnAfterGetRecord()
+    var
+        WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
+    begin
+        if Rec."Workflow Implementation" = Enum::"NPR POS Workflow"::LEGACY then begin
+            ActionDescription := Rec.Description;
+        end else begin
+            ActionDescription := WorkflowCaptionBuffer.GetActionDescription(Rec.Code);
+        end;
+    end;
+
     var
         Text001: Label 'Action workflow for selected %1 action(s) has been successfully refreshed.';
         POSActionCode: Code[20];
         SkipDiscovery: Boolean;
         ActionSpecified: Boolean;
+        ActionDescription: Text;
 
+    [Obsolete('Delete once all actions are v3. Manual refresh requirement is a bug.')]
     local procedure RefreshActions()
     var
         "Action": Record "NPR POS Action";

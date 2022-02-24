@@ -190,7 +190,7 @@ codeunit 85006 "NPR POS Payment Tests"
     begin
         if _Initialized then begin
             //Clean any previous mock session
-            _POSSession.Destructor();
+            _POSSession.ClearAll();
             Clear(_POSSession);
         end;
 

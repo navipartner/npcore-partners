@@ -181,6 +181,7 @@
             Rec."Unit Price" := Line."Unit Price";
             Rec.Amount := Line.Amount;
             Rec."Amount Including VAT" := Line."Amount Including VAT";
+            Rec."Reason Code" := Line."Reason Code";
         end;
 
         if Line."Serial No." <> '' then begin //Because existing validation code cant handle blank serial number
@@ -362,12 +363,27 @@
         SetDepositLineType(LinePOS);
     end;
 
+    procedure InitPayoutPayInLine(var LinePOS: Record "NPR POS Sale Line")
+    begin
+        SetPayoutPayInLineType(LinePOS);
+    end;
+
     local procedure SetDepositLineType(var LinePOS: Record "NPR POS Sale Line")
     begin
         LinePOS."Register No." := Sale."Register No.";
         LinePOS."Sales Ticket No." := Sale."Sales Ticket No.";
         LinePOS.Date := Sale.Date;
         LinePOS."Sale Type" := LinePOS."Sale Type"::Deposit;
+        LinePOS.Quantity := 1;
+    end;
+
+    local procedure SetPayoutPayInLineType(var LinePOS: Record "NPR POS Sale Line")
+    begin
+        LinePOS."Register No." := Sale."Register No.";
+        LinePOS."Sales Ticket No." := Sale."Sales Ticket No.";
+        LinePOS.Date := Sale.Date;
+        LinePOS.Type := LinePOS.Type::"G/L Entry";
+        LinePOS."Sale Type" := LinePOS."Sale Type"::"Out payment";
         LinePOS.Quantity := 1;
     end;
 

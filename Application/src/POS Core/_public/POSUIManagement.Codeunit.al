@@ -15,6 +15,7 @@
         Caption: Record "NPR POS Localized Caption";
         CaptionMgt: Codeunit "NPR POS Caption Management";
         Captions: JsonObject;
+        WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
     begin
         Language.Get(GlobalLanguage);
         ConfigureCaptions(Captions);
@@ -31,6 +32,7 @@
 
         CaptionMgt.Initialize(FrontEnd);
         OnInitializeCaptions(CaptionMgt);
+        WorkflowCaptionBuffer.GetAllParameterCaptionsOnPOSSessionInit(CaptionMgt);
         CaptionMgt.Finalize(Captions);
 
         FrontEnd.ConfigureCaptions(Captions);
@@ -67,13 +69,14 @@
         FrontEnd.ConfigureLogo(Base64.ToBase64(InStr));
     end;
 
-    procedure InitializeMenus(POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser"; POSSession: Codeunit "NPR POS Session")
+    procedure InitializeMenus(POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser")
     var
         Menu: Record "NPR POS Menu";
         TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
         POSViewProfile: Record "NPR POS View Profile";
         MenuObj: Codeunit "NPR POS Menu";
         Menus: JsonArray;
+        POSSession: Codeunit "NPR POS Session";
     begin
         POSUnit.GetProfile(POSViewProfile);
 
@@ -640,8 +643,9 @@
         end;
     end;
 
-    procedure ConfigureReusableWorkflows(POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup")
+    procedure ConfigureReusableWorkflows(Setup: Codeunit "NPR POS Setup")
     var
+        POSSession: Codeunit "NPR POS Session";
         TempAction: Record "NPR POS Action" temporary;
         POSSetup: Record "NPR POS Setup";
         ConfigureReusableWorkflowLbl: Label '%1, %2', Locked = true;
@@ -758,6 +762,7 @@
         Captions.Add(ActionCode + '.' + CaptionId, CaptionText);
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     [IntegrationEvent(false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin

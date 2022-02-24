@@ -490,7 +490,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
         Assert.AreEqual(false, TransactionEnded, 'Transaction end not according to test scenario.');
         Assert.AreEqual(TransactionAmount - PaymentAmount, SubTotal, 'Transaction balance not according to test scenario.');
         Assert.AreEqual(ExpectedSuggestion, Suggestion, 'Remaining suggestion not according to test scenario.');
-          end;
+    end;
 
     local procedure NewTransactionFinish(TransactionAmount: Decimal; PaymentAmount: Decimal; ReturnAmount: Decimal; RoundingAmount: Decimal)
     var
@@ -579,7 +579,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
         Suggestion := POSPaymentLine.CalculateRemainingPaymentSuggestionInCurrentSale(_POSPaymentMethodDKK);
         ForeignSuggestion := POSPaymentLine.CalculateRemainingPaymentSuggestionInCurrentSale(_POSPaymentMethodEUR);
-        
+
 
         // [THEN] Then check 
         Assert.AreEqual(false, TransactionEnded, 'Transaction end not according to test scenario.');
@@ -683,7 +683,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
     begin
         if _Initialized then begin
             //Clean any previous mock session
-            _POSSession.Destructor();
+            _POSSession.ClearAll();
             Clear(_POSSession);
         end;
 
