@@ -24,6 +24,16 @@
                     ToolTip = 'Specifies what the caption is';
                     ApplicationArea = NPRRetail;
                 }
+                field("Register No."; Rec."Register No.")
+                {
+                    ToolTip = 'Specifies what POS Unit is assigned';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Salesperson Code"; Rec."Salesperson Code")
+                {
+                    ToolTip = 'Specifies what salesperson is assigned';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

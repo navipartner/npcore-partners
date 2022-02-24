@@ -53,15 +53,11 @@
         {
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
         field(43; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
         field(44; "Available on Desktop"; Boolean)
         {
@@ -90,6 +86,9 @@
         {
             ObsoleteState = Removed;
             ObsoleteReason = 'Fields are not used. Removed in case 508876.';
+        }
+        key(Key3; "Register No.", "Salesperson Code")
+        {
         }
     }
 
