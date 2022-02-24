@@ -18,19 +18,16 @@
                 IndentationControls = Caption;
                 field(Caption; Rec.Caption)
                 {
-
                     ToolTip = 'Specifies the caption which will be displayed on the button';
                     ApplicationArea = NPRRetail;
                 }
                 field(Tooltip; Rec.Tooltip)
                 {
-
                     ToolTip = 'Specifies what will be displayed when the cursor hovers over the button';
                     ApplicationArea = NPRRetail;
                 }
                 field("Action Type"; Rec."Action Type")
                 {
-
                     ToolTip = 'Specifies what type of action is triggered by clicking the button';
                     ApplicationArea = NPRRetail;
 
@@ -41,7 +38,6 @@
                 }
                 field("Action Code"; Rec."Action Code")
                 {
-
                     Style = Unfavorable;
                     StyleExpr = NeedParameterRefresh;
                     ToolTip = 'Specifies what workflow is defined for the action';
@@ -49,92 +45,76 @@
                 }
                 field("Data Source Name"; Rec."Data Source Name")
                 {
-
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Data Source Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-
                     ToolTip = 'Specifies whether the action is blocked or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show Plus/Minus Buttons"; Rec."Show Plus/Minus Buttons")
                 {
-
                     ToolTip = 'Specifies whether or not plus/minus buttons will be displayed';
                     ApplicationArea = NPRRetail;
                 }
                 field("Background Color"; Rec."Background Color")
                 {
-
                     ToolTip = 'Specifies the background color that is displayed on the button';
                     ApplicationArea = NPRRetail;
                 }
                 field("Foreground Color"; Rec."Foreground Color")
                 {
-
                     ToolTip = 'Specifies the foreground color that is displayed on the button';
                     ApplicationArea = NPRRetail;
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
-
                     ToolTip = 'Specifies the logo that is used on the button';
                     ApplicationArea = NPRRetail;
                 }
                 field("Background Image Url"; Rec."Background Image Url")
                 {
-
                     ToolTip = 'Specifies the url for the background image';
                     ApplicationArea = NPRRetail;
                 }
                 field("Caption Position"; Rec."Caption Position")
                 {
-
                     ToolTip = 'Specifies where on the button the caption should be';
                     ApplicationArea = NPRRetail;
                 }
                 field("Custom Class Attribute"; Rec."Custom Class Attribute")
                 {
-
                     ToolTip = 'Specifies what the custom class attribute is';
                     ApplicationArea = NPRRetail;
                 }
                 field("Position X"; Rec."Position X")
                 {
-
                     ToolTip = 'Specifies the position of the button on the x-axis';
                     ApplicationArea = NPRRetail;
                 }
                 field("Position Y"; Rec."Position Y")
                 {
-
                     ToolTip = 'Specifies the position of the button on the y-axis';
                     ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-
                     ToolTip = 'Specifies whether or not the button is enabled or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Secure Method Code"; Rec."Secure Method Code")
                 {
-
                     ToolTip = 'Specifies if the button has been assigned a secure method code';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-
                     ToolTip = 'Specifies if the button has been allocated to a POS Unit';
                     ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-
                     ToolTip = 'Specifies if the button has been allocated to a salesperson';
                     ApplicationArea = NPRRetail;
                 }
