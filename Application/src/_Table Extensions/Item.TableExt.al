@@ -18,8 +18,10 @@ tableextension 6014427 "NPR Item" extends Item
             begin
                 if not Rec.IsTemporary() then
                     if Rec."Item Category Code" <> xRec."Item Category Code" then
-                        if ItemCategory.Get(Rec."Item Category Code") then
+                        if ItemCategory.Get(Rec."Item Category Code") then begin
                             ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
+                            Rec.Validate("Base Unit of Measure", Rec."Base Unit of Measure");
+                        end;
             end;
         }
         modify(GTIN)
