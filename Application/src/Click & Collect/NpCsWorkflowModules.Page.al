@@ -18,31 +18,31 @@
                 field(Type; Rec.Type)
                 {
 
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies the Type of Workflow Module.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the Code of the Workflow Module.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the Description of the Workflow Module.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Event Codeunit ID"; Rec."Event Codeunit ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Event Codeunit ID field';
+                    ToolTip = 'Specifies the Event Codeunit ID to be used with the Workflow Module selected.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Event Codeunit Name"; Rec."Event Codeunit Name")
                 {
 
-                    ToolTip = 'Specifies the value of the Event Codeunit Name field';
+                    ToolTip = 'Specifies the Description of the Event Codeunit used with the Workflow Module.';
                     ApplicationArea = NPRRetail;
                 }
             }
