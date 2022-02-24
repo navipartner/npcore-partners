@@ -1,6 +1,7 @@
 ﻿codeunit 6150735 "NPR POS Workflows 2.0: Require"
 {
     Access = Internal;
+
     var
         CustomHandlerMissingErr: Label 'Custom Require method handler for require type "%1" was not found.';
         LookupTemplateMissingErr: Label 'Lookup template wiht code "%1" was not found.';
@@ -80,7 +81,7 @@
         ActionCode := CopyStr(JSON.GetStringOrFail('action', StrSubstNo(ReadingErr, MethodName())), 1, MaxStrLen(ActionCode));
 
         if not POSSession.RetrieveSessionAction(ActionCode, POSAction) then begin
-            if not POSAction.Get(ActionCode) or (POSAction."Workflow Engine Version" <> '2.0') or not POSAction.Workflow.HasValue() then
+            if not POSAction.Get(ActionCode) or (not (POSAction."Workflow Engine Version" in ['2.0', '3.0'])) or not POSAction.Workflow.HasValue() then
                 exit;
             POSAction.CalcFields(Workflow);
         end;
@@ -94,8 +95,6 @@
             JavaScriptJson := POSAction.GetCustomJavaScriptLogic();
             WorkflowAction.Content().Add('CustomJavaScript', JavaScriptJson);
         end;
-        if POSAction.Description <> '' then
-            WorkflowAction.Content().Add('Description', POSAction.Description);
 
         POSActionParam.SetRange("POS Action Code", POSAction.Code);
         if POSActionParam.FindSet() then

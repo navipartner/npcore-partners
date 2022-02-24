@@ -1,6 +1,7 @@
 ﻿codeunit 6150850 "NPR POS Action: CK Payment"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This is a built-in action for CashKeeper Payments';
         Setup: Codeunit "NPR POS Setup";
@@ -346,13 +347,11 @@
     local procedure GetTransactionRequest(POSSession: Codeunit "NPR POS Session"; var CashKeeperTransaction: Record "NPR CashKeeper Transaction")
     var
         EntryNo: Integer;
-        TmpVariant: Variant;
     begin
-        POSSession.RetrieveActionState('TransactionRequest_EntryNo', TmpVariant);
-        EntryNo := TmpVariant;
+        POSSession.RetrieveActionState('TransactionRequest_EntryNo', EntryNo);
 
         if (not CashKeeperTransaction.Get(EntryNo)) then
-            Error(RequestNotFound, ActionCode(), TmpVariant, CashKeeperTransaction.TableCaption);
+            Error(RequestNotFound, ActionCode(), EntryNo, CashKeeperTransaction.TableCaption);
     end;
     #endregion
 

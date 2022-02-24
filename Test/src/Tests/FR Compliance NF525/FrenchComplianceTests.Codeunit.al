@@ -791,7 +791,7 @@ codeunit 85039 "NPR French Compliance Tests"
         end;
         POSEntry.SetRange("Document No.", POSSaleRecord."Sales Ticket No.");
         POSEntry.FindFirst();
-        _POSSession.Destructor();
+        _POSSession.ClearAll();
         Clear(_POSSession);
         Exit(POSEntry."Entry No.");
     end;
@@ -817,7 +817,7 @@ codeunit 85039 "NPR French Compliance Tests"
         end;
         POSEntry.SetRange("Document No.", POSSaleRecord."Sales Ticket No.");
         POSEntry.FindFirst();
-        _POSSession.Destructor();
+        _POSSession.ClearAll();
         Clear(_POSSession);
         Exit(POSEntry."Entry No.");
     end;
@@ -843,7 +843,7 @@ codeunit 85039 "NPR French Compliance Tests"
         end;
         POSEntry.SetRange("Document No.", POSSaleRecord."Sales Ticket No.");
         POSEntry.FindFirst();
-        _POSSession.Destructor();
+        _POSSession.ClearAll();
         Clear(_POSSession);
         Exit(POSEntry."Entry No.");
     end;
@@ -870,7 +870,7 @@ codeunit 85039 "NPR French Compliance Tests"
     begin
         if _Initialized then begin
             //Clean any previous mock session
-            _POSSession.Destructor();
+            _POSSession.ClearAll();
             Clear(_POSSession);
         end else begin
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);

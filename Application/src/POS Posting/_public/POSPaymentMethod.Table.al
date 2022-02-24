@@ -18,12 +18,12 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(10; "Processing Type"; Option)
+        field(10; "Processing Type"; Enum "NPR Payment Processing Type")
         {
             Caption = 'Processing Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Cash,Voucher,Check,EFT,CUSTOMER,PayOut,Foreign Voucher';
-            OptionMembers = CASH,VOUCHER,CHECK,EFT,CUSTOMER,PAYOUT,"FOREIGN VOUCHER";
+            //OptionCaption = 'Cash,Voucher,Check,EFT,CUSTOMER,PayOut,Foreign Voucher';
+            //OptionMembers = CASH,VOUCHER,CHECK,EFT,CUSTOMER,PAYOUT,"FOREIGN VOUCHER";
         }
         field(15; "Currency Code"; Code[10])
         {

@@ -1,5 +1,8 @@
 ﻿codeunit 6150703 "NPR POS JSON Management"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Use "NPR POS JSON Helper" instead';
+
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
         Scope: Dictionary of [Guid, Text];

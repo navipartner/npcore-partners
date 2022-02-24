@@ -1,6 +1,9 @@
 ﻿codeunit 6150809 "NPR POSAction: PayIn Payout"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Use new action "NPR POS Action Pay-in Payout"';
     Access = Internal;
+
     var
         ActionDescription: Label 'This built in function handles cash deposit / withdrawls from the till';
         PayOptionType: Option PAYIN,PAYOUT;
@@ -157,6 +160,7 @@
 
         Line.Type := Line.Type::"G/L Entry";
         Line."Sale Type" := Line."Sale Type"::"Out payment";
+
         Line.Validate("No.", AccountNo);
         Line."Custom Descr" := (Description <> '');
         if Line."Custom Descr" then

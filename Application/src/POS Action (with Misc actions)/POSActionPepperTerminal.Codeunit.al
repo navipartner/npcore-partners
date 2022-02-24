@@ -1,6 +1,7 @@
 ﻿codeunit 6150779 "NPR POS Action: PepperTerminal"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This command sends different commands to the Pin Pad. Specify command using the Parameters.';
         EFTIntegration: Codeunit "NPR EFT Framework Mgt.";
@@ -214,18 +215,14 @@
     var
         EntryNo: Integer;
         Token: Guid;
-        TmpVariant: Variant;
         AlternativTransactionRequest: Record "NPR EFT Transaction Request";
     begin
 
-        POSSession.RetrieveActionState('TransactionRequest_EntryNo', TmpVariant);
-        EntryNo := TmpVariant;
-
-        POSSession.RetrieveActionState('TransactionRequest_Token', TmpVariant);
-        Token := TmpVariant;
+        POSSession.RetrieveActionState('TransactionRequest_EntryNo', EntryNo);
+        POSSession.RetrieveActionState('TransactionRequest_Token', Token);
 
         if (not EFTTransactionRequest.Get(EntryNo)) then
-            Error(EftRequestNotFound, ActionCode(), TmpVariant, EFTTransactionRequest.TableCaption);
+            Error(EftRequestNotFound, ActionCode(), EntryNo, EFTTransactionRequest.TableCaption);
 
         if (EFTTransactionRequest.Token <> Token) then
             Error(EftRequestMissMatch, ActionCode(), EntryNo, Token, EFTTransactionRequest.Token);

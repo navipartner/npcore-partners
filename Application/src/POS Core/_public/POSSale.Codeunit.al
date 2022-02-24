@@ -23,6 +23,11 @@
         EndedRoundingAmount: Decimal;
         Text000: Label 'During End Sale';
         ERROR_AFTER_END_SALE: Label 'An error occurred after the sale ended: %1';
+        _LastSaleTotal: Decimal;
+        _LastSalePayment: Decimal;
+        _LastSaleDateText: Text;
+        _LastSaleReturnAmount: Decimal;
+        _LastReceiptNo: Text;
 
     procedure InitializeAtLogin(POSUnitIn: Record "NPR POS Unit"; SetupIn: Codeunit "NPR POS Setup")
     begin
@@ -197,15 +202,28 @@
                 LastReceiptNoOut := '';
                 LastSaleDateTextOut := '';
             end;
+            _LastReceiptNo := LastReceiptNoOut;
+            _LastSaleDateText := LastSaleDateTextOut;
+            _LastSaleTotal := LastSaleTotalOut;
+            _LastSalePayment := LastSalePaymentOut;
+            _LastSaleReturnAmount := LastSaleReturnAmountOut;
+        end else begin
+            LastSaleTotalOut := _LastSaleTotal;
+            LastSalePaymentOut := _LastSalePayment;
+            LastSaleReturnAmountOut := _LastSaleReturnAmount;
+            LastSaleDateTextOut := _LastSaleDateText;
+            LastReceiptNoOut := _LastReceiptNo;
         end;
     end;
 
+    [Obsolete('Automatic in workflow v3')]
     procedure GetModified() Result: Boolean
     begin
         Result := IsModified or (not Initialized);
         IsModified := false;
     end;
 
+    [Obsolete('Automatic in workflow v3')]
     procedure SetModified()
     begin
         IsModified := true;

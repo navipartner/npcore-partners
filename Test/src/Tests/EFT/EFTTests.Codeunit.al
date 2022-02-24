@@ -2840,7 +2840,7 @@ codeunit 85004 "NPR EFT Tests"
     begin
         if _Initialized then begin
             //Clean any previous mock session
-            _POSSession.Destructor();
+            _POSSession.ClearAll();
             Clear(_POSSession);
         end;
 

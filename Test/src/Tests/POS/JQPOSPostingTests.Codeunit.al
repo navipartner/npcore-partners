@@ -33,7 +33,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         _PosUnitNo1 := _POSUnit."No.";
         CreateSales(3);
 
-        _POSSession.Destructor();
+        _POSSession.ClearAll();
         Clear(_POSSession);
         Clear(_Initialized);
 
@@ -338,7 +338,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     begin
         if _Initialized then begin
             //Clean any previous mock session
-            _POSSession.Destructor();
+            _POSSession.ClearAll();
             Clear(_POSSession);
         end;
 

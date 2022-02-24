@@ -119,26 +119,39 @@
     end;
 
     local procedure SetParameterName()
+    var
+        WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
     begin
         Clear(ParameterName);
+        ParameterName := WorkflowCaptionBuffer.GetParameterNameCaption(Rec."Action Code", Rec.Name);
+        if ParameterName <> '' then
+            exit;
         Rec.OnGetParameterNameCaption(Rec, ParameterName);
         if (ParameterName = '') then
             ParameterName := Rec.Name;
     end;
 
     local procedure SetParameterDescription()
+    var
+        WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
     begin
         Clear(ParameterDescription);
-        Rec.OnGetParameterDescriptionCaption(Rec, ParameterDescription);
+        ParameterDescription := WorkflowCaptionBuffer.GetParameterDescriptionCaption(Rec."Action Code", Rec.Name);
+        if ParameterDescription = '' then
+            Rec.OnGetParameterDescriptionCaption(Rec, ParameterDescription);
     end;
 
     local procedure SetParameterValue()
     var
+        WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
         ParameterOptionString: Text;
     begin
         Clear(ParameterOptionString);
         Clear(ParameterValue);
-        Rec.OnGetParameterOptionStringCaption(Rec, ParameterOptionString);
+        ParameterOptionString := WorkflowCaptionBuffer.GetParameterOptionsCaption(Rec."Action Code", Rec.Name);
+        if ParameterOptionString = '' then
+            Rec.OnGetParameterOptionStringCaption(Rec, ParameterOptionString);
+
         if Rec."Data Type" = Rec."Data Type"::Boolean then
             ParameterValue := Rec.GetBooleanStringCaption()
         else

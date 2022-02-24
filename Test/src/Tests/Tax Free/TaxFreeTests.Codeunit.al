@@ -1329,7 +1329,7 @@ codeunit 85019 "NPR Tax Free Tests"
         Clear(_YesCnfrmList);
         if _Initialized then begin
             //Clean any previous mock session
-            _POSSession.Destructor();
+            _POSSession.ClearAll();
             Clear(_POSSession);
         end;
 

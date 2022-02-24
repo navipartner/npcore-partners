@@ -81,7 +81,7 @@ codeunit 85007 "NPR POS Saved Sale Tests"
         POSQuoteLine.TestField(SystemId, PreviousSaleLineSystemId);
 
         // [When] Loading POS Quote in another POS session
-        _POSSession.Destructor();
+        _POSSession.ClearAll();
         Clear(_POSSession);
         WorkDate(LoadSaleDate);
 
@@ -110,7 +110,7 @@ codeunit 85007 "NPR POS Saved Sale Tests"
     begin
         if _Initialized then begin
             //Clean any previous mock session
-            _POSSession.Destructor();
+            _POSSession.ClearAll();
             Clear(_POSSession);
         end;
 

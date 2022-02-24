@@ -1,159 +1,166 @@
 ﻿codeunit 6150700 "NPR POS Session"
 {
-    // This object is used to manage session state for a POS session.
-    // 
-    // Some very important information:
-    // - It must never ever ever be set to SingleInstance=Yes. Never. Did I say never? Good. So - never.
-    // - In Transcendence, there should be no single-instance codeunits at all. If you ever feel like creating one,
-    //   please talk to me (Vjeko), and let's discuss.
-    // - An instance of this codeunit is created by the POS page, and one (and only one) instance of this codeunit
-    //   belongs to an instance of the POS page. Once the page closes, the codeunit instance dies.
-    // - One of the primary goals of this codeunit is to contain the reference to the Framework control add-in and to
-    //   allow other codeunits to talk to the JavaScript. Therefore, the variable of this codeunit type must be passed
-    //   to all functions that may have anything to do with front end. This is no problem, because all events that are
-    //   ever sent from the front end pass the instance to this codeunit as a part of the event signature, and then
-    //   any event subscribers should make sure to pass this instance around.
-    // - Never keep a global variable of this codeunit type. It should only be locals and parameters. No globals.
-    // - No business logic belongs in here. This is infrastructure only.
-
-    EventSubscriberInstance = Manual;
+    SingleInstance = true;
 
     var
-        POSUnit: Record "NPR POS Unit";
+        _POSUnit: Record "NPR POS Unit";
+        _FrontEnd: Codeunit "NPR POS Front End Management";
+        _Sale: Codeunit "NPR POS Sale";
+        _Setup: Codeunit "NPR POS Setup";
+        _ActionStateInt: Dictionary of [Text, Integer];
+        _ActionStateDec: Dictionary of [Text, Decimal];
+        _ActionStateText: Dictionary of [Text, Text];
+        _ActionStateGuid: Dictionary of [Text, Guid];
+        _DataStore: Codeunit "NPR Data Store";
+        _CurrentView: Codeunit "NPR POS View";
+        _ActionStateRecRef: array[1024] of RecordRef;
+        _ActionStateCurrentActionId: Guid;
+        _ActionStateCurrentAction: Text;
+        _ActionStateRecRefCounter: Integer;
+        _ActionStateInAction: Boolean;
+        _InAction: Boolean;
+        _SessionStarted: Boolean;
+        _Initialized: Boolean;
+        _InitializedUI: Boolean;
+        _ActionsDiscovered: Boolean;
+        _DebugTrace: Text;
+        _ServerStopwatch: Text;
+        _POSPageId: Guid;
+        _Framework: Interface "NPR Framework Interface";
+        _ACTION_STATE_ERROR: Label 'Action %1 has attempted to store an object into action state, which failed due to following error:\\%2';
         TempSessionActions: Record "NPR POS Action" temporary;
-        FrontEnd: Codeunit "NPR POS Front End Management";
-        FrontEndKeeper: Codeunit "NPR POS Front End Keeper";
-        Sale: Codeunit "NPR POS Sale";
-        Setup: Codeunit "NPR POS Setup";
-        This: Codeunit "NPR POS Session";
-        Stargate: Codeunit "NPR POS Stargate Management";
-        ActionState: DotNet NPRNetDictionary_Of_T_U;
-        DataStore: Codeunit "NPR Data Store";
-        CurrentView: Codeunit "NPR POS View";
-        KeyboardBindings: List of [Text];
-        ActionStateRecRef: array[1024] of RecordRef;
-        ActionStateCurrentActionId: Guid;
-        ActionStateCurrentAction: Text;
-        ActionStateRecRefCounter: Integer;
-        ActionStateInAction: Boolean;
-        InAction: Boolean;
-        SessionStarted: Boolean;
-        Text001: Label 'You should not be seeing this message. The fact that you are seeing it, though, means there is a potential bug in the code, and we were smart enough to capture it.\\So, how do you proceed from here?\1. Take a screenshot of this message.\2. Contact support and tell them what you did to get this message.\\You can now proceed working as if nothing has happened because in all likelihood everything will work just fine. But, just in case, we recommend that you sign out and then sign in again.';
-        Text003: Label 'Action %1 has attempted to store an object into action state, which failed due to following error:\\%2';
-        Text004: Label 'Action %1 has been invoked while another action %2 with ID %3 is still running.';
-        Text005: Label 'An attempt was made to finish action %1 with ID %2, while another action %3 with ID %4 is in progress.';
-        DataRefreshRequested: Boolean;
-        Initialized: Boolean;
-        InitializedUI: Boolean;
-        Text006: Label 'A keyboard handler subscribed to handling the [%1] key press event, but it did not respond when the key was pressed.';
-        ActionsDiscovered: Boolean;
-        DebugTrace: Text;
-        ServerStopwatch: Text;
-        Finalized: Boolean;
-        SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';
-        FRONTEND_MISSING: Label 'POS Front End object could not be retrieved. This is a programming bug, not a user error.';
-        DragonglassSession: Boolean;
-        Workflow20State: array[1000] of Codeunit "NPR POS WF 2.0: State";
-        Workflow20StateIndex: DotNet NPRNetDictionary_Of_T_U;
-        Workflow20Map: array[1000] of Boolean;
 
     //#region Initialization
 
-    procedure Constructor(FrameworkIn: Interface "NPR Framework Interface"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; SessionIn: Codeunit "NPR POS Session")
+    internal procedure Constructor(FrameworkIn: Interface "NPR Framework Interface"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; PageId: Guid)
     var
         JavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
-        OldPOSSession: Codeunit "NPR POS Session";
-        OldFrontEnd: Codeunit "NPR POS Front End Management";
     begin
-        if not Initialized then begin
-            if OldPOSSession.IsActiveSession(OldFrontEnd) then begin
-                //Cleanup previous POS Session before initializing new one.
-                OldFrontEnd.GetSession(OldPOSSession);
-                OldPOSSession.Destructor();
-            end;
+        ClearAll();
 
-            FrontEndIn.Initialize(FrameworkIn, SessionIn);
-            FrontEnd := FrontEndIn;
-            Setup := SetupIn;
-            This := SessionIn;
-            Clear(Stargate);
+        _POSPageId := PageId;
+        FrontEndIn.Initialize(FrameworkIn);
+        _FrontEnd := FrontEndIn;
+        _Framework := FrameworkIn;
+        _Setup := SetupIn;
+        _Setup.Initialize();
+        JavaScriptInterface.Initialize(FrontEndIn);
 
-            Setup.Initialize();
-
-            JavaScriptInterface.Initialize(SessionIn, FrontEndIn);
-            FrontEndKeeper.Initialize(FrameworkIn, FrontEnd, This);
-            BindSubscription(FrontEndKeeper);
-
-            OnInitialize(FrontEnd);
-        end else begin
-            Message(Text001);
-        end;
-
-        Initialized := true;
+        _Initialized := true;
+        OnInitialize(_FrontEnd);
     end;
 
-    procedure InitializeUI()
+    internal procedure ClearAll()
+    begin
+        Clear(_POSUnit);
+        Clear(_FrontEnd);
+        Clear(_Sale);
+        Clear(_Setup);
+        Clear(_ActionStateInt);
+        Clear(_ActionStateDec);
+        Clear(_ActionStateText);
+        Clear(_ActionStateGuid);
+        Clear(_DataStore);
+        Clear(_CurrentView);
+        Clear(_ActionStateRecRef);
+        Clear(_ActionStateCurrentActionId);
+        Clear(_ActionStateCurrentAction);
+        Clear(_ActionStateRecRefCounter);
+        Clear(_ActionStateInAction);
+        Clear(_InAction);
+        Clear(_SessionStarted);
+        Clear(_Initialized);
+        Clear(_InitializedUI);
+        Clear(_ActionsDiscovered);
+        Clear(_DebugTrace);
+        Clear(_ServerStopwatch);
+        Clear(_POSPageId);
+        Clear(_Framework);
+        Clear(TempSessionActions);
+    end;
+
+    procedure IsInitialized(): Boolean
+    begin
+        exit(_Initialized);
+    end;
+
+    internal procedure AttachedToPageId(PageId: Guid): Boolean
+    begin
+        exit(_POSPageId = PageId);
+    end;
+
+    internal procedure SetPageId(PageId: Guid)
+    begin
+        _POSPageId := PageId;
+    end;
+
+    internal procedure GetFramework(var FrameworkOut: Interface "NPR Framework Interface")
+    begin
+        FrameworkOut := _Framework;
+    end;
+
+    internal procedure InitializeUI()
     var
         Salesperson: Record "Salesperson/Purchaser";
         UI: Codeunit "NPR POS UI Management";
     begin
         // This method is intended to be called only from the POS page during the initialization stage of the page.
         // Do not call this method from elsewhere!
-        if InitializedUI then
+        if _InitializedUI then
             exit;
 
         DebugWithTimestamp('GetSalespersonRecord');
-        Setup.GetSalespersonRecord(Salesperson);
+        _Setup.GetSalespersonRecord(Salesperson);
         DebugWithTimestamp('GetPOSUnit');
-        Setup.GetPOSUnit(POSUnit);
+        _Setup.GetPOSUnit(_POSUnit);
         DebugWithTimestamp('UI.Initialize');
-        UI.Initialize(FrontEnd);
+        UI.Initialize(_FrontEnd);
         DebugWithTimestamp('UI.SetOptions');
-        UI.SetOptions(Setup);
+        UI.SetOptions(_Setup);
         DebugWithTimestamp('UI.InitializeCaptions');
         UI.InitializeCaptions();
         DebugWithTimestamp('UI.InitializeNumberAndDateFormat');
-        UI.InitializeNumberAndDateFormat(POSUnit);
+        UI.InitializeNumberAndDateFormat(_POSUnit);
         DebugWithTimestamp('UI.InitializeLogo');
-        UI.InitializeLogo(POSUnit);
+        UI.InitializeLogo(_POSUnit);
         DebugWithTimestamp('UI.ConfigureFonts');
         UI.ConfigureFonts();
         DebugWithTimestamp('UI.InitializeMenus');
-        UI.InitializeMenus(POSUnit, Salesperson, This);
+        UI.InitializeMenus(_POSUnit, Salesperson);
         DebugWithTimestamp('UI.ConfigureReusableWorkflow');
-        UI.ConfigureReusableWorkflows(This, Setup);
+        UI.ConfigureReusableWorkflows(_Setup);
         DebugWithTimestamp('AdvertiseStargatePackages');
-        FrontEnd.AdvertiseStargatePackages();
+        _FrontEnd.AdvertiseStargatePackages();
         DebugWithTimestamp('InitializeSecureMethods');
-        FrontEnd.ConfigureSecureMethods();
+        _FrontEnd.ConfigureSecureMethods();
         DebugWithTimestamp('ConfigureActionSequences');
-        FrontEnd.ConfigureActionSequences(TempSessionActions);
+        _FrontEnd.ConfigureActionSequences(TempSessionActions);
         DebugWithTimestamp('InitializeTheme');
-        UI.InitializeTheme(POSUnit);
+        UI.InitializeTheme(_POSUnit);
         DebugWithTimestamp('InitializeAdminTemplates');
-        UI.InitializeAdministrativeTemplates(POSUnit);
+        UI.InitializeAdministrativeTemplates(_POSUnit);
         DebugWithTimestamp('InitializeTelemetricsMetadata');
-        Frontend.InitializeTelemetricsMetadata();
-        InitializedUI := true;
+        _FrontEnd.InitializeTelemetricsMetadata();
+        _InitializedUI := true;
     end;
 
-    procedure InitializeSession(ResendMenus: Boolean)
+    internal procedure InitializeSession(ResendMenus: Boolean)
     var
         Salesperson: Record "Salesperson/Purchaser";
         UI: Codeunit "NPR POS UI Management";
         PreviousRegisterNo: Code[10];
     begin
-        PreviousRegisterNo := POSUnit."No.";
-        Setup.GetPOSUnit(POSUnit);
+        PreviousRegisterNo := _POSUnit."No.";
+        _Setup.GetPOSUnit(_POSUnit);
 
         if (ResendMenus) then begin
-            Setup.GetSalespersonRecord(Salesperson);
+            _Setup.GetSalespersonRecord(Salesperson);
 
-            UI.Initialize(FrontEnd);
-            UI.InitializeMenus(POSUnit, Salesperson, This);
+            UI.Initialize(_FrontEnd);
+            UI.InitializeMenus(_POSUnit, Salesperson);
 
-            if (PreviousRegisterNo <> POSUnit."No.") then
-                UI.InitializeLogo(POSUnit);
+            if (PreviousRegisterNo <> _POSUnit."No.") then
+                UI.InitializeLogo(_POSUnit);
 
         end;
         StartPOSSession();
@@ -164,16 +171,15 @@
         JS: Codeunit "NPR POS JavaScript Interface";
         DataSources: JsonArray;
     begin
-        Clear(DataStore);
+        Clear(_DataStore);
 
-        DataSources := CurrentView.GetDataSources();
-        DataStore.Constructor(DataSources);
+        DataSources := _CurrentView.GetDataSources();
+        _DataStore.Constructor(DataSources);
 
-        OnInitializeDataSource(DataStore);
+        OnInitializeDataSource(_DataStore);
 
-        if DataStore.DataSources().Count() > 0 then begin
-            RequestRefreshData();
-            JS.RefreshData(This, FrontEnd);
+        if _DataStore.DataSources().Count() > 0 then begin
+            JS.RefreshData(_FrontEnd);
         end;
     end;
 
@@ -181,86 +187,17 @@
     begin
         InitializePOSSession();
         ChangeViewLogin();
-        if not SessionStarted then
-            OnInitializationComplete(FrontEnd);
-        SessionStarted := true;
+        if not _SessionStarted then
+            OnInitializationComplete(_FrontEnd);
+        _SessionStarted := true;
     end;
 
     local procedure InitializePOSSession()
     begin
         ClearSale();
-        Setup.Initialize();
-        Setup.GetPOSUnit(POSUnit);
-        Sale.InitializeAtLogin(POSUnit, Setup);
-    end;
-
-    //#endregion
-
-    //#region Finalization
-
-    procedure Destructor()
-    begin
-        if not Finalized then begin
-            OnFinalize(FrontEnd);
-            UnbindSubscription(FrontEndKeeper);
-            ClearAll();
-            TempSessionActions.DeleteAll();
-            Finalized := true;
-        end;
-    end;
-
-    procedure IsFinalized(): Boolean
-    begin
-        exit(Finalized);
-    end;
-
-    //#endregion
-
-    //#region Workflows 2.0 State
-
-    procedure GetWorkflow20State(WorkflowId: Integer; ActionCode: Text; var State: Codeunit "NPR POS WF 2.0: State")
-    var
-        StateIndex: Integer;
-    begin
-        if (IsNull(Workflow20StateIndex)) then
-            Workflow20StateIndex := Workflow20StateIndex.Dictionary();
-
-        if (not Workflow20StateIndex.ContainsKey(WorkflowId)) then begin
-            StateIndex := GetNextWorkflow20StateIndex();
-            Workflow20StateIndex.Add(WorkflowId, StateIndex);
-            Clear(Workflow20State[StateIndex]);
-            Workflow20State[StateIndex].Constructor(FrontEnd, ActionCode);
-        end else
-            StateIndex := Workflow20StateIndex.Item(WorkflowId);
-
-        State := Workflow20State[StateIndex];
-    end;
-
-    local procedure GetNextWorkflow20StateIndex(): Integer
-    var
-        i: Integer;
-    begin
-        for i := 1 to 1000 do begin
-            if not Workflow20Map[i] then begin
-                Workflow20Map[i] := true;
-                exit(i);
-            end;
-        end;
-
-        // TODO: Here either we should retry to recover an old ID, or we should throw an error
-    end;
-
-    procedure FreeWorkflow20State(WorkflowId: Integer)
-    var
-        StateIndex: Integer;
-    begin
-        if (not Workflow20StateIndex.ContainsKey(WorkflowId)) then
-            exit;
-
-        StateIndex := Workflow20StateIndex.Item(WorkflowId);
-        Workflow20StateIndex.Remove(WorkflowId);
-        Workflow20Map[StateIndex] := false;
-        Clear(Workflow20State[StateIndex]);
+        _Setup.Initialize();
+        _Setup.GetPOSUnit(_POSUnit);
+        _Sale.InitializeAtLogin(_POSUnit, _Setup);
     end;
 
     //#endregion
@@ -270,99 +207,220 @@
     procedure StartTransaction()
     begin
         ClearSale();
-        Sale.InitializeNewSale(POSUnit, FrontEnd, Setup, Sale);
+        _Sale.InitializeNewSale(_POSUnit, _FrontEnd, _Setup, _Sale);
     end;
 
-    procedure ResumeTransaction(SalePOS: Record "NPR POS Sale")
+    internal procedure ResumeTransaction(SalePOS: Record "NPR POS Sale")
     begin
         ClearSale();
-        Sale.ResumeExistingSale(SalePOS, POSUnit, FrontEnd, Setup, Sale);
+        _Sale.ResumeExistingSale(SalePOS, _POSUnit, _FrontEnd, _Setup, _Sale);
     end;
 
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
     procedure BeginAction("Action": Text): Guid
+    var
+        Text004: Label 'Action %1 has been invoked while another action %2 with ID %3 is still running.';
     begin
-        if ActionStateInAction then
-            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, Action, ActionStateCurrentAction, ActionStateCurrentActionId));
+        if _ActionStateInAction then
+            _FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, Action, _ActionStateCurrentAction, _ActionStateCurrentActionId));
 
-        ActionStateInAction := true;
-        ActionState := ActionState.Dictionary();
-        Clear(ActionStateRecRef);
-        ActionStateRecRefCounter := 1;
-        ActionStateCurrentAction := Action;
-        ActionStateCurrentActionId := CreateGuid();
-        exit(ActionStateCurrentActionId);
+        _ActionStateInAction := true;
+        Clear(_ActionStateInt);
+        Clear(_ActionStateDec);
+        Clear(_ActionStateText);
+        Clear(_ActionStateGuid);
+        Clear(_ActionStateRecRef);
+        _ActionStateRecRefCounter := 1;
+        _ActionStateCurrentAction := Action;
+        _ActionStateCurrentActionId := CreateGuid();
+        exit(_ActionStateCurrentActionId);
     end;
 
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
     procedure StoreActionState("Key": Text; "Object": Variant)
+    var
+        RecRefKey: Integer;
     begin
-        if Object.IsRecord then
-            Object := StoreActionStateRecRef(Object);
+        if not Object.IsRecord then
+            Error('Only record variants are supported');
 
+        RecRefKey := StoreActionStateRecRef(Object);
+
+        if not TryStoreActionState(Key, RecRefKey) then
+            _FrontEnd.ReportBugAndThrowError(StrSubstNo(_ACTION_STATE_ERROR, _ActionStateCurrentAction, GetLastErrorText));
+    end;
+
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure StoreActionState("Key": Text; "Object": Integer)
+    begin
         if not TryStoreActionState(Key, Object) then
-            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, ActionStateCurrentAction, GetLastErrorText));
+            _FrontEnd.ReportBugAndThrowError(StrSubstNo(_ACTION_STATE_ERROR, _ActionStateCurrentAction, GetLastErrorText));
     end;
 
-    procedure RetrieveActionState("Key": Text; var "Object": Variant)
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure StoreActionState("Key": Text; "Object": Text)
     begin
-        Object := ActionState.Item(Key);
+        if not TryStoreActionState(Key, Object) then
+            _FrontEnd.ReportBugAndThrowError(StrSubstNo(_ACTION_STATE_ERROR, _ActionStateCurrentAction, GetLastErrorText));
     end;
 
-    procedure RetrieveActionStateSafe("Key": Text; var "Object": Variant): Boolean
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure StoreActionState("Key": Text; "Object": Decimal)
     begin
-        if ActionState.ContainsKey(Key) then begin
+        if not TryStoreActionState(Key, Object) then
+            _FrontEnd.ReportBugAndThrowError(StrSubstNo(_ACTION_STATE_ERROR, _ActionStateCurrentAction, GetLastErrorText));
+    end;
+
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure StoreActionState("Key": Text; "Object": Guid)
+    begin
+        if not TryStoreActionState(Key, Object) then
+            _FrontEnd.ReportBugAndThrowError(StrSubstNo(_ACTION_STATE_ERROR, _ActionStateCurrentAction, GetLastErrorText));
+    end;
+
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure RetrieveActionState("Key": Text; var "Object": Integer)
+    begin
+        Object := _ActionStateInt.Get(Key);
+    end;
+
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure RetrieveActionState("Key": Text; var "Object": Text)
+    begin
+        Object := _ActionStateText.Get(Key);
+    end;
+
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure RetrieveActionState("Key": Text; var "Object": Decimal)
+    begin
+        Object := _ActionStateDec.Get(Key);
+    end;
+
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure RetrieveActionState("Key": Text; var "Object": Guid)
+    begin
+        Object := _ActionStateGuid.Get(Key);
+    end;
+
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure RetrieveActionStateSafe("Key": Text; var "Object": Integer): Boolean
+    begin
+        if _ActionStateInt.ContainsKey(Key) then begin
             RetrieveActionState(Key, Object);
             exit(true);
         end;
     end;
 
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure RetrieveActionStateSafe("Key": Text; var "Object": Text): Boolean
+    begin
+        if _ActionStateText.ContainsKey(Key) then begin
+            RetrieveActionState(Key, Object);
+            exit(true);
+        end;
+    end;
+
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure RetrieveActionStateSafe("Key": Text; var "Object": Decimal): Boolean
+    begin
+        if _ActionStateDec.ContainsKey(Key) then begin
+            RetrieveActionState(Key, Object);
+            exit(true);
+        end;
+    end;
+
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    procedure RetrieveActionStateSafe("Key": Text; var "Object": Guid): Boolean
+    begin
+        if _ActionStateGuid.ContainsKey(Key) then begin
+            RetrieveActionState(Key, Object);
+            exit(true);
+        end;
+    end;
+
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
     procedure RetrieveActionStateRecordRef("Key": Text; var RecRef: RecordRef)
     var
         Index: Integer;
     begin
-        Index := ActionState.Item(Key);
-        RecRef := ActionStateRecRef[Index];
+        Index := _ActionStateInt.Get(Key);
+        RecRef := _ActionStateRecRef[Index];
     end;
 
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
     procedure EndAction("Action": Text; Id: Guid)
+    var
+        Text005: Label 'An attempt was made to finish action %1 with ID %2, while another action %3 with ID %4 is in progress.';
     begin
-        if (Action <> ActionStateCurrentAction) or (Id <> ActionStateCurrentActionId) then
-            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text005, Action, Id, ActionStateCurrentAction, ActionStateCurrentActionId));
+        if (Action <> _ActionStateCurrentAction) or (Id <> _ActionStateCurrentActionId) then
+            _FrontEnd.ReportBugAndThrowError(StrSubstNo(Text005, Action, Id, _ActionStateCurrentAction, _ActionStateCurrentActionId));
 
         ClearActionState();
     end;
 
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
     procedure ClearActionState()
     begin
-        Clear(ActionStateInAction);
-        Clear(ActionState);
-        Clear(ActionStateRecRefCounter);
-        Clear(ActionStateCurrentAction);
-        Clear(ActionStateCurrentActionId);
+        Clear(_ActionStateInAction);
+        Clear(_ActionStateInt);
+        Clear(_ActionStateDec);
+        Clear(_ActionStateText);
+        Clear(_ActionStateGuid);
+        Clear(_ActionStateRecRefCounter);
+        Clear(_ActionStateCurrentAction);
+        Clear(_ActionStateCurrentActionId);
     end;
 
     local procedure StoreActionStateRecRef("Object": Variant) StoredIndex: Integer
     begin
-        StoredIndex := ActionStateRecRefCounter;
-        ActionStateRecRef[StoredIndex].GetTable(Object);
-        ActionStateRecRefCounter += 1;
+        StoredIndex := _ActionStateRecRefCounter;
+        _ActionStateRecRef[StoredIndex].GetTable(Object);
+        _ActionStateRecRefCounter += 1;
     end;
 
     [TryFunction]
-    local procedure TryStoreActionState("Key": Text; "Object": Variant)
+    local procedure TryStoreActionState("Key": Text; "Object": Integer)
     begin
-        if ActionState.ContainsKey(Key) then
-            ActionState.Remove(Key);
+        if _ActionStateInt.ContainsKey(Key) then
+            _ActionStateInt.Remove(Key);
 
-        ActionState.Add(Key, Object);
+        _ActionStateInt.Add(Key, Object);
+    end;
+
+    [TryFunction]
+    local procedure TryStoreActionState("Key": Text; "Object": Text)
+    begin
+        if _ActionStateText.ContainsKey(Key) then
+            _ActionStateText.Remove(Key);
+
+        _ActionStateText.Add(Key, Object);
+    end;
+
+    [TryFunction]
+    local procedure TryStoreActionState("Key": Text; "Object": Decimal)
+    begin
+        if _ActionStateDec.ContainsKey(Key) then
+            _ActionStateDec.Remove(Key);
+
+        _ActionStateDec.Add(Key, Object);
+    end;
+
+    [TryFunction]
+    local procedure TryStoreActionState("Key": Text; "Object": Guid)
+    begin
+        if _ActionStateGuid.ContainsKey(Key) then
+            _ActionStateGuid.Remove(Key);
+
+        _ActionStateGuid.Add(Key, Object);
     end;
 
     procedure ClearSale()
     var
         LastSalePOSEntry: Record "NPR POS Entry";
     begin
-        Sale.GetLastSalePOSEntry(LastSalePOSEntry);
-        Clear(Sale);
-        Sale.SetLastSalePOSEntry(LastSalePOSEntry);
+        _Sale.GetLastSalePOSEntry(LastSalePOSEntry);
+        Clear(_Sale);
+        _Sale.SetLastSalePOSEntry(LastSalePOSEntry);
     end;
 
     //#endregion
@@ -372,18 +430,20 @@
     // These methods are used to keep track of "known" actions inside of this session.
     // Primarily this is used to prevent invalid action setup.
 
-    procedure DiscoverActionsOnce()
+    [Obsolete('Remove once workflow v1 and v2 is gone, since v3 keeps the persistant table "POS Action" up to date')]
+    internal procedure DiscoverActionsOnce()
     var
         POSAction: Record "NPR POS Action";
     begin
-        if ActionsDiscovered then
+        if _ActionsDiscovered then
             exit;
 
         POSAction.DiscoverActions();
-        ActionsDiscovered := true;
+        _ActionsDiscovered := true;
     end;
 
-    procedure DiscoverSessionAction(var ActionIn: Record "NPR POS Action" temporary)
+    [Obsolete('Remove once RetrieveSessionAction() is no longer in use')]
+    internal procedure DiscoverSessionAction(var ActionIn: Record "NPR POS Action" temporary)
     begin
         TempSessionActions := ActionIn;
         if not TempSessionActions.Insert() then begin
@@ -396,10 +456,19 @@
     end;
 
     procedure RetrieveSessionAction(ActionCode: Code[20]; var ActionOut: Record "NPR POS Action"): Boolean
+    var
+        POSAction: Record "NPR POS Action";
     begin
         Clear(ActionOut);
-        if not TempSessionActions.Get(ActionCode) then
-            exit(false);
+        if not TempSessionActions.Get(ActionCode) then begin
+            if (not POSAction.Get(ActionCode)) then
+                exit(false);
+            // During named workflow discovery, v3 workflows are not included in action discovery. 
+            POSAction.CalcFields(Workflow);
+            POSAction.CalcFields("Custom JavaScript Logic");
+            TempSessionActions.TransferFields(POSAction);
+            TempSessionActions.Insert();
+        end;
 
         ActionOut := TempSessionActions;
         TempSessionActions.CalcFields(Workflow);
@@ -408,99 +477,79 @@
         ActionOut."Custom JavaScript Logic" := TempSessionActions."Custom JavaScript Logic";
         exit(true);
     end;
-
-    procedure IsSessionAction("Code": Code[20]): Boolean
-    begin
-        exit(TempSessionActions.Get(Code));
-    end;
-
     //#endregion
 
     //#region General Methods
 
     procedure GetSetup(var SetupOut: Codeunit "NPR POS Setup")
     begin
-        SetupOut := Setup;
+        SetupOut := _Setup;
     end;
 
     procedure GetCurrentView(var ViewOut: Codeunit "NPR POS View")
     begin
-        ViewOut := CurrentView;
+        ViewOut := _CurrentView;
     end;
 
     procedure GetSaleContext(var SaleOut: Codeunit "NPR POS Sale"; var SaleLineOut: Codeunit "NPR POS Sale Line"; var PaymentLineOut: Codeunit "NPR POS Payment Line")
     begin
-        SaleOut := Sale;
-        Sale.GetContext(SaleLineOut, PaymentLineOut);
+        SaleOut := _Sale;
+        _Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
     procedure GetSale(var SaleOut: Codeunit "NPR POS Sale")
     begin
-        if Sale.PosSaleRecMustExit() then
-            Sale.RefreshCurrent();
-        SaleOut := Sale;
+        if _Sale.PosSaleRecMustExit() then
+            _Sale.RefreshCurrent();
+        SaleOut := _Sale;
     end;
 
     procedure GetSaleLine(var SaleLineOut: Codeunit "NPR POS Sale Line")
     var
         PaymentLineOut: Codeunit "NPR POS Payment Line";
     begin
-        Sale.GetContext(SaleLineOut, PaymentLineOut);
+        _Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
     procedure GetPaymentLine(var PaymentLineOut: Codeunit "NPR POS Payment Line")
     var
         SaleLineOut: Codeunit "NPR POS Sale Line";
     begin
-        Sale.GetContext(SaleLineOut, PaymentLineOut);
+        _Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
     procedure GetDataStore(var DataStoreOut: Codeunit "NPR Data Store")
     begin
-        DataStoreOut := DataStore;
+        DataStoreOut := _DataStore;
     end;
 
-    procedure GetStargate(var StargateOut: Codeunit "NPR POS Stargate Management")
-    begin
-        StargateOut := Stargate;
-    end;
-
-    procedure ProcessKeyPress(KeyPress: Text) Handled: Boolean
-    begin
-        if (KeyboardBindings.Count() = 0) and (not KeyboardBindings.Contains(KeyPress)) then
-            exit(false);
-
-        OnKeyPress(KeyPress, This, Setup, FrontEnd, Handled);
-
-        if not Handled then
-            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text006, KeyPress));
-    end;
-
+    [Obsolete('Remove when obsolete references are gone. Workflow v3 only supports nesting on frontend inside the javascript')]
     procedure IsInAction(): Boolean
     begin
-        exit(InAction);
+        exit(_InAction);
     end;
 
+    [Obsolete('Remove when obsolete references are gone. Workflow v3 only supports nesting on frontend inside the javascript')]
     procedure SetInAction(InActionNew: Boolean)
     begin
-        InAction := InActionNew;
+        _InAction := InActionNew;
     end;
 
     procedure InitializeViewDataSources(View: Codeunit "NPR POS View")
     begin
-        CurrentView := View;
+        _CurrentView := View;
         InitializeDataSources();
     end;
 
     procedure DebugWithTimestamp(Trace: Text)
     begin
-        DebugTrace += Trace + ' at ' + Format(CurrentDateTime, 0, '<Hours24,2>:<Minutes,2>:<Seconds,2><Second dec>') + ';';
+        _DebugTrace += Trace + ' at ' + Format(CurrentDateTime, 0, '<Hours24,2>:<Minutes,2>:<Seconds,2><Second dec>') + ';';
     end;
 
     procedure DebugFlush() Result: Text
     begin
-        Result := DebugTrace;
-        DebugTrace := '';
+        Result := _DebugTrace;
+        _DebugTrace := '';
     end;
 
     procedure AddServerStopwatch(Keyword: Text; Duration: Duration)
@@ -509,128 +558,97 @@
         Durationms: Integer;
     begin
         Durationms := Duration;
-        ServerStopwatch += StrSubstNo(ServerStopwatchLbl, DelChr(Keyword, '=', '[:]'), Durationms);
+        _ServerStopwatch += StrSubstNo(ServerStopwatchLbl, DelChr(Keyword, '=', '[:]'), Durationms);
     end;
 
     procedure ServerStopwatchFlush() Result: Text
     begin
-        Result := ServerStopwatch;
-        ServerStopwatch := '';
+        Result := _ServerStopwatch;
+        _ServerStopwatch := '';
     end;
-
-    procedure SetDragonglassSession()
-    begin
-        DragonglassSession := true;
-    end;
-
-    procedure IsDragonglassSession(): Boolean
-    begin
-        exit(DragonglassSession);
-    end;
-
     //#endregion
 
     //#region Data Refresh
 
+    [Obsolete('Refresh is automatically handled')]
     procedure RequestRefreshData()
     begin
-        DataRefreshRequested := true;
     end;
-
-    procedure IsDataRefreshNeeded() IsNeeded: Boolean
-    begin
-        IsNeeded := DataRefreshRequested;
-        DataRefreshRequested := false;
-    end;
-
     //#endregion
 
     //#region View Changing Methods
 
     procedure ChangeViewLogin()
     begin
-        FrontEnd.LoginView(Setup);
+        _FrontEnd.LoginView(_Setup);
     end;
 
     procedure ChangeViewSale()
     begin
-        FrontEnd.SaleView(Setup);
+        _FrontEnd.SaleView(_Setup);
     end;
 
     procedure ChangeViewPayment()
     var
         POSViewChangeWorkflowMgt: Codeunit "NPR POS View Change WF Mgt.";
     begin
-        POSViewChangeWorkflowMgt.InvokeOnPaymentViewWorkflow(This);
-        FrontEnd.PaymentView(Setup);
+        POSViewChangeWorkflowMgt.InvokeOnPaymentViewWorkflow();
+        _FrontEnd.PaymentView(_Setup);
     end;
 
     procedure ChangeViewLocked()
     begin
-        FrontEnd.LockedView(Setup);
+        _FrontEnd.LockedView(_Setup);
     end;
 
     procedure ChangeViewBalancing()
     begin
-        FrontEnd.BalancingView(Setup);
+        _FrontEnd.BalancingView(_Setup);
     end;
 
     procedure ChangeViewRestaurant()
-    var
-        RestViewNotSupportedErr: Label 'Restaurant view is not supported in this version. Change the setup on the POS View Profile. The default view is selected.';
     begin
-        if (IsDragonglassSession()) then begin
-            FrontEnd.RestaurantView(Setup);
-            exit;
-        end;
-
-        Message(RestViewNotSupportedErr);
-        ChangeViewSale();
+        _FrontEnd.RestaurantView(_Setup);
     end;
 
     //#endregion
 
-    //#region Framework Auto-Detection
-
+    [Obsolete('Use GetFrontEnd or just use session directly since it''s single instance now')]
     procedure IsActiveSession(var FrontEndOut: Codeunit "NPR POS Front End Management"): Boolean
-    var
-        POSSessionCheck: Codeunit "NPR POS Session";
-        Active: Boolean;
     begin
-        OnDetectFramework(FrontEndOut, POSSessionCheck, Active);
-        exit(Active);
+        FrontEndOut := _FrontEnd;
+        exit(_Initialized);
     end;
 
+    [Obsolete('Use session directly since it''s single instance now')]
     procedure GetSession(var POSSessionOut: Codeunit "NPR POS Session"; WithError: Boolean): Boolean
     var
-        Active: Boolean;
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';
     begin
-        OnDetectFramework(POSFrontEnd, POSSessionOut, Active);
-        if WithError and (not Active) then
+        if not _Initialized then
             Error(SESSION_MISSING);
-        exit(Active);
+        exit(true);
     end;
 
     procedure GetFrontEnd(var POSFrontEndOut: Codeunit "NPR POS Front End Management"; WithError: Boolean): Boolean
+    var
+        FRONTEND_MISSING: Label 'POS Front End object could not be retrieved. This is a programming bug, not a user error.';
     begin
-        if not Initialized then begin
+        if not _Initialized then begin
             if WithError then
                 Error(FRONTEND_MISSING)
             else
                 exit(false);
         end;
 
-        POSFrontEndOut := FrontEnd;
+        POSFrontEndOut := _FrontEnd;
         exit(true);
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnDetectFramework(var FrontEndOut: Codeunit "NPR POS Front End Management"; var POSSessionOut: Codeunit "NPR POS Session"; var Active: Boolean)
+    procedure GetFrontEnd(var POSFrontEndOut: Codeunit "NPR POS Front End Management")
     begin
+        GetFrontEnd(POSFrontEndOut, true);
     end;
-
-    //#endregion
 
     //#region Event Publishers
 
@@ -648,16 +666,5 @@
     local procedure OnInitializeDataSource(DataStore: Codeunit "NPR Data Store")
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnKeyPress(KeyPress: Text; POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFinalize(FrontEnd: Codeunit "NPR POS Front End Management")
-    begin
-    end;
-
     //#endregion
 }

@@ -850,7 +850,7 @@ codeunit 85020 "NPR POS End of Day"
     begin
         if _Initialized then begin
             //Clean any previous mock session
-            _POSSession.Destructor();
+            _POSSession.ClearAll();
             Clear(_POSSession);
             WorkDate(Today);
         end;

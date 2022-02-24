@@ -55,7 +55,7 @@ codeunit 85026 "NPR POS Resume Tests"
         PreviousSalesTicketNo := SalePOS."Sales Ticket No.";
 
         // [Given] A crashed session when a sale was active
-        _POSSession.Destructor();
+        _POSSession.ClearAll();
         Clear(_POSSession);
 
         // [When] Using the login action to enter a new sale and confirming the prompt to resume previous sale
@@ -87,7 +87,7 @@ codeunit 85026 "NPR POS Resume Tests"
     begin
         if _Initialized then begin
             //Clean any previous mock session
-            _POSSession.Destructor();
+            _POSSession.ClearAll();
             Clear(_POSSession);
         end;
 

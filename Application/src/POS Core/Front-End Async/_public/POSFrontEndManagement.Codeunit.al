@@ -1,165 +1,175 @@
 ﻿codeunit 6150704 "NPR POS Front End Management"
 {
     var
-        POSSession: Codeunit "NPR POS Session";
-        Framework: Interface "NPR Framework Interface";
-        Text001: Label '%1\\This is a programming bug, not a user error.';
-        Text002: Label 'A function that requires a POS session to be running has been invoked outside of a POS session.';
-        Text003: Label 'Unsupported view type requested: %1.';
-        RegisteredWorkflows: List of [Text];
-        WorkflowStack: Codeunit "NPR Stack of [Integer]";
-        ActionStack: Codeunit "NPR Stack of [Integer]";
-        QueuedWorkflows: JsonArray;
-        WorkflowResponseContent: Variant;
-        HasWorkflowResponse: Boolean;
-        Initialized: Boolean;
-        Text005: Label 'You attempted to retrieve a POS session instance outside of an active POS session, with no POS user interface currently running.';
-        Text006: Label 'An unknown workflow was invoked: %1.';
-        Pausing: Boolean;
-        Text008: Label 'A request was made to pause a workflow outside of a workflow context.';
-        PausedWorkflowID: Integer;
-        Text009: Label 'A request was made to pause workflow ID %1 while a workflow ID %2 is already paused. This is a critical back-end error which will reset the back-end state. You may be able to retry the same action again, and you may even be able to conitnue with the current transaction; however, the safest way to proceed would be to start a new sale transaction if possible.';
-        Text010: Label 'A request was made to resume a paused workflow (ID %1) from within the context of another workflow (ID %2). This is a critical back-end error which will reset the back-end state. You may be able to retry the same action again, and you may even be able to conitnue with the current transaction; however, the safest way to proceed would be to start a new sale transaction if possible.';
-        Workflow20ID: Integer;
-        StepToContinueAt: Text;
-        Text011: Label 'A request was made to continue current workflow at step %1, while no workflow is currently running.';
-        Text012: Label 'A request was made to resume a workflow, while no workflow is currently in the paused state.';
-        Text013: Label 'A method call was made on an uninitialized instance of the POS Front End Management codeunit, that requires an active and initialized instance to succeed.';
-        Text015: Label 'A function that requires Workflow 2.0 engine to be initialized has been invoked from a Workflow 1.0 action.';
-        ErrorDoNotCallSetActionContext: Label 'You have invoked SetActionContext from within a Workflows 2.0 action. This is an invalid operation.\\If you want to pass context to front end from a Workflows 2.0 action, it is enough to write to the Context object. In Workflows 2.0, context is automatically synchronized between AL and JavaScript.';
-        DragonglassResponseContextLbl: Label '_dragonglassResponseContext', Locked = true;
-        DragonglassInvocationRespondedLbl: Label '_dragonglassResponseContext', Locked = true;
+        _POSSession: Codeunit "NPR POS Session";
+        _Framework: Interface "NPR Framework Interface";
+        _RegisteredWorkflows: List of [Text];//TODO: Delete when workflow v1/v2 are gone
 
-    procedure Initialize(FrameworkIn: Interface "NPR Framework Interface"; SessionIn: Codeunit "NPR POS Session")
+        _WorkflowStack: Codeunit "NPR Stack of [Integer]";//TODO: Delete when workflow v1/v2 are gone
+
+        _ActionStack: Codeunit "NPR Stack of [Integer]"; //TODO: Delete when workflow v1/v2 are gone
+        _QueuedWorkflows: JsonArray;
+        _WorkflowResponseContent: Variant;
+        _HasWorkflowResponse: Boolean;
+        _Initialized: Boolean;
+        _Pausing: Boolean;//TODO: Delete when workflow v1/v2 are gone
+
+        _PausedWorkflowID: Integer;//TODO: Delete when workflow v1/v2 are gone
+
+        _WorkflowID: Integer;
+        _StepToContinueAt: Text;//TODO: Delete when workflow v1/v2 are gone
+
+        _DragonglassResponseContextLbl: Label '_dragonglassResponseContext', Locked = true;
+        _DragonglassInvocationRespondedLbl: Label '_dragonglassResponseContext', Locked = true;
+
+    internal procedure Initialize(FrameworkIn: Interface "NPR Framework Interface")
     begin
-        Framework := FrameworkIn;
-        POSSession := SessionIn;
+        _Framework := FrameworkIn;
 
-        Clear(RegisteredWorkflows);
-        Clear(WorkflowStack);
-        Clear(ActionStack);
-        Clear(QueuedWorkflows);
+        Clear(_RegisteredWorkflows);
+        Clear(_WorkflowStack);
+        Clear(_ActionStack);
+        Clear(_QueuedWorkflows);
 
         // The following variable is used only in debugging sessions to indicate whether this instance of the codeunit has actually
         // been initialized. There is no other purpose to this variable, but it is absolutely indispensable for debugging purposes.
-        Initialized := true;
+        _Initialized := true;
     end;
 
     local procedure IsActiveSession(): Boolean
     var
-        FrameworkCheck: Interface "NPR Framework Interface";
-        POSSessionCheck: Codeunit "NPR POS Session";
-        Handled: Boolean;
+        Framework: Interface "NPR Framework Interface";
+        POSSession: Codeunit "NPR POS Session";
     begin
-        OnDetectFramework(FrameworkCheck, POSSessionCheck, Handled);
-        if Handled then begin
-            Initialize(FrameworkCheck, POSSessionCheck);
+        if POSSession.IsInitialized() then begin
+            POSSession.GetFramework(Framework);
+            Initialize(Framework);
             exit(true);
         end else
             exit(false);
     end;
 
     procedure GetSession(var SessionOut: Codeunit "NPR POS Session")
+    var
+        Text005: Label 'You attempted to retrieve a POS session instance outside of an active POS session, with no POS user interface currently running.';
     begin
-        if not Initialized then
+        if not _Initialized then
             Error(Text005);
 
-        SessionOut := POSSession;
+        SessionOut := _POSSession;
     end;
 
     #region Workflows 1.0 Coordination
 
+    [Obsolete('Not supported in workflow v3')]
     procedure WorkflowBackEndStepBegin(WorkflowId: Integer; ActionId: Integer)
     begin
-        WorkflowStack.Push(WorkflowId);
-        ActionStack.Push(ActionId);
+        _WorkflowStack.Push(WorkflowId);
+        _ActionStack.Push(ActionId);
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     procedure WorkflowBackEndStepEnd()
     begin
-        if StepToContinueAt <> '' then begin
-            RequestWorkflowStep(StepToContinueAt);
-            StepToContinueAt := '';
+        if _StepToContinueAt <> '' then begin
+            RequestWorkflowStep(_StepToContinueAt);
+            _StepToContinueAt := '';
         end;
 
-        if not Pausing then begin
-            if WorkflowStack.Count() > 0 then
-                WorkflowStack.Pop()
+        if not _Pausing then begin
+            if _WorkflowStack.Count() > 0 then
+                _WorkflowStack.Pop()
         end else
-            Pausing := false;
+            _Pausing := false;
 
-        if ActionStack.Count() > 0 then
-            ActionStack.Pop();
+        if _ActionStack.Count() > 0 then
+            _ActionStack.Pop();
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     local procedure CurrentWorkflowID(): Integer
     begin
-        if WorkflowStack.Count() > 0 then
-            exit(WorkflowStack.Peek());
+        if _WorkflowStack.Count() > 0 then
+            exit(_WorkflowStack.Peek());
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     local procedure CurrentActionID(): Integer
     begin
-        if ActionStack.Count() > 0 then
-            exit(ActionStack.Peek());
+        if _ActionStack.Count() > 0 then
+            exit(_ActionStack.Peek());
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     procedure AbortWorkflow(WorkflowID: Integer)
     begin
         if WorkflowID = CurrentWorkflowID() then begin
-            WorkflowStack.Pop();
+            _WorkflowStack.Pop();
         end;
 
-        if WorkflowID = PausedWorkflowID then
-            PausedWorkflowID := 0;
+        if WorkflowID = _PausedWorkflowID then
+            _PausedWorkflowID := 0;
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     procedure AbortWorkflows()
     begin
-        Pausing := false;
-        PausedWorkflowID := 0;
-        Clear(WorkflowStack);
-        Clear(ActionStack);
-        POSSession.ClearActionState();
+        _Pausing := false;
+        _PausedWorkflowID := 0;
+        Clear(_WorkflowStack);
+        Clear(_ActionStack);
+        _POSSession.ClearActionState();
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     procedure ContinueAtStep(Step: Text)
+    var
+        Text011: Label 'A request was made to continue current workflow at step %1, while no workflow is currently running.';
     begin
         if CurrentWorkflowID() = 0 then
             ReportBugAndThrowError(StrSubstNo(Text011, Step));
 
-        StepToContinueAt := Step;
+        _StepToContinueAt := Step;
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     procedure IsPaused(): Boolean
     begin
-        exit(PausedWorkflowID > 0);
+        exit(_PausedWorkflowID > 0);
     end;
 
     #endregion
 
     #region Workflows 2.0 Coordination
 
+    [Obsolete('Not supported in workflow v3')]
     procedure CloneForWorkflow20(WorkflowIDIn: Integer; var FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
-        FrontEndIn.Initialize(Framework, POSSession);
+        FrontEndIn.Initialize(_Framework);
         FrontEndIn.SetWorkflowID(WorkflowIDIn);
     end;
 
     procedure SetWorkflowID(WorkflowIDIn: Integer)
     begin
-        Workflow20ID := WorkflowIDIn;
+        _WorkflowID := WorkflowIDIn;
+    end;
+
+    procedure ClearWorkflowID()
+    begin
+        Clear(_WorkflowID);
     end;
 
     #endregion
 
     local procedure MakeSureFrameworkIsAvailable(WithError: Boolean): Boolean
+    var
+        Text002: Label 'A function that requires a POS session to be running has been invoked outside of a POS session.';
     begin
-        if not Initialized then
+        if not _Initialized then
             if IsActiveSession() then
                 exit(true);
 
-        if Initialized then
+        if _Initialized then
             exit(true);
 
         if WithError then
@@ -169,8 +179,10 @@
     end;
 
     local procedure MakeSureFrameworkIsAvailableIn20(WithError: Boolean): Boolean
+    var
+        Text015: Label 'A function that requires Workflow 2.0/3.0 engine to be initialized has been invoked from a Workflow 1.0 action.';
     begin
-        if Workflow20ID = 0 then begin
+        if _WorkflowID = 0 then begin
             if WithError then
                 Error(GetBugErrorMessage(Text015))
             else
@@ -181,31 +193,38 @@
     end;
 
     local procedure MakeSureFrameworkIsInitialized()
+    var
+        Text013: Label 'A method call was made on an uninitialized instance of the POS Front End Management codeunit, that requires an active and initialized instance to succeed.';
     begin
-        if (not Initialized) THEN
+        if (not _Initialized) THEN
             ReportBugAndThrowError(Text013);
     end;
 
     local procedure GetBugErrorMessage(Text: Text): Text
+    var
+        Text001: Label '%1\\This is a programming bug, not a user error.';
     begin
         exit(StrSubstNo(Text001, Text));
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     local procedure RegisterWorkflowIfNecessary(Name: Code[20])
     var
         POSAction: Record "NPR POS Action";
         Button: Record "NPR POS Menu Button";
         WorkflowAction: Codeunit "NPR Workflow Action";
+        Text006: Label 'An unknown workflow was invoked: %1.';
     begin
-        if RegisteredWorkflows.Contains(Name) then
+        if _RegisteredWorkflows.Contains(Name) then
             exit;
 
-        if not POSSession.RetrieveSessionAction(Name, POSAction) then
-            ReportBugAndThrowError(StrSubstNo(Text006, Name));
+        if not _POSSession.RetrieveSessionAction(Name, POSAction) then
+            if not POSAction.Get(Name) then
+                ReportBugAndThrowError(StrSubstNo(Text006, Name));
 
         Button."Action Type" := Button."Action Type"::Action;
         Button."Action Code" := POSAction.Code;
-        WorkflowAction.ConfigureFromMenuButton(Button, POSSession, WorkflowAction);
+        WorkflowAction.ConfigureFromMenuButton(Button, _POSSession, WorkflowAction);
 
         ConfigureReusableWorkflow(WorkflowAction);
     end;
@@ -261,6 +280,7 @@
         Request: Codeunit "NPR Front-End: SetView";
         CurrView: Codeunit "NPR POS View";
         CHANGE_VIEW_ERROR: Label 'There was a problem changing view and adding data drivers: %1';
+        Text003: Label 'Unsupported view type requested: %1.';
     begin
         MakeSureFrameworkIsAvailable(true);
         case ViewType of
@@ -298,23 +318,23 @@
                 ReportBugAndThrowError(StrSubstNo(Text003, ViewType));
         end;
 
-        POSSession.GetCurrentView(CurrView);
+        _POSSession.GetCurrentView(CurrView);
         case ViewType of
             DefaultView.Type::Login:
-                OnBeforeChangeToLoginView(POSSession);
+                OnBeforeChangeToLoginView(_POSSession);
             DefaultView.Type::Sale:
                 begin
                     if CurrView.Type() = CurrView.Type() ::Login then
-                        POSViewChangeWorkflowMgt.InvokeOnAfterLoginWorkflow(POSSession);
+                        POSViewChangeWorkflowMgt.InvokeOnAfterLoginWorkflow(_POSSession);
 
-                    OnBeforeChangeToSaleView(POSSession);
+                    OnBeforeChangeToSaleView(_POSSession);
                 end;
             DefaultView.Type::Payment:
-                OnBeforeChangeToPaymentView(POSSession);
+                OnBeforeChangeToPaymentView(_POSSession);
             DefaultView.Type::Balance:
-                OnBeforeChangeToBalanceRegisterView(POSSession);
+                OnBeforeChangeToBalanceRegisterView(_POSSession);
             DefaultView.Type::Restaurant:
-                OnBeforeChangeToRestaurantView(POSSession);
+                OnBeforeChangeToRestaurantView(_POSSession);
         end;
 
         Commit();
@@ -360,7 +380,7 @@
 
         InvokeFrontEndAsync(Request);
 
-        POSSession.InitializeViewDataSources(RequestView);
+        _POSSession.InitializeViewDataSources(RequestView);
     end;
     #endregion
 
@@ -370,15 +390,15 @@
         DebugTrace: Text;
         ServerStopwatch: Text;
     begin
-        DebugTrace := POSSession.DebugFlush();
+        DebugTrace := _POSSession.DebugFlush();
         if DebugTrace <> '' then
             Trace(Request, 'debug_trace', DebugTrace);
 
-        ServerStopwatch := POSSession.ServerStopwatchFlush();
+        ServerStopwatch := _POSSession.ServerStopwatchFlush();
         if ServerStopwatch <> '' then
             Trace(Request, 'server_stopwatch', ServerStopwatch);
 
-        Framework.InvokeFrontEndAsync(Request.GetJson());
+        _Framework.InvokeFrontEndAsync(Request.GetJson());
     end;
 
     procedure InvokeFrontEndMethod(Request: Interface "NPR Front-End Async Request")
@@ -399,7 +419,7 @@
         EmitError(ErrorText);
 
         if MakeSureFrameworkIsAvailable(false) then begin
-            POSSession.SetInAction(false);
+            _POSSession.SetInAction(false);
             Request.Initialize(ErrorText);
             InvokeFrontEndAsync(Request);
             Error(''); // Transaction must aborted and rolled back. It is mandatory.
@@ -455,7 +475,7 @@
         Request: Codeunit "NPR Front-End: ReportBug";
     begin
         if MakeSureFrameworkIsAvailable(false) then begin
-            POSSession.SetInAction(false);
+            _POSSession.SetInAction(false);
             Request.Initialize(ErrorText);
             Request.SetInvalidCustomMethod(Method);
             InvokeFrontEndAsync(Request);
@@ -587,37 +607,17 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    procedure ConfigureKeyboardBindings(KeyboardBindings: List of [Text])
-    var
-        Request: Codeunit "NPR Front-End: ConfigKeyBind.";
-    begin
-        MakeSureFrameworkIsAvailable(true);
-        Request.SetBindings(KeyboardBindings);
-        InvokeFrontEndAsync(Request);
-    end;
-
     procedure ConfigureReusableWorkflow("Action": Codeunit "NPR Workflow Action")
     var
         Request: Codeunit "NPR Front-End: CfgReusableWkf.";
         Workflow: Codeunit "NPR Workflow";
     begin
         Action.GetWorkflow(Workflow);
-        if not RegisteredWorkflows.Contains(Workflow.Name()) then
-            RegisteredWorkflows.Add(Workflow.Name());
+        if not _RegisteredWorkflows.Contains(Workflow.Name()) then
+            _RegisteredWorkflows.Add(Workflow.Name());
 
         MakeSureFrameworkIsAvailable(true);
         Request.Initialize(Action);
-        InvokeFrontEndAsync(Request);
-    end;
-
-    procedure ConfigureWatermark(WatermarkBase64: Text; WatermarkText: Text)
-    var
-        Request: Codeunit "NPR Front-End: SetImage";
-    begin
-        MakeSureFrameworkIsAvailable(true);
-        Request.SetImage('watermark', WatermarkBase64);
-        if WatermarkText <> '' then
-            Request.GetContent().Add('watermarkText', WatermarkText);
         InvokeFrontEndAsync(Request);
     end;
 
@@ -674,6 +674,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('Remove the need for this request in frontend and delete this. It is currently a dummy event in backend')]
     procedure HardwareInitializationComplete()
     var
         Request: Codeunit "NPR Front-End: Generic";
@@ -717,7 +718,6 @@
             exit('Sandbox');
     end;
 
-    // TODO: Request must be of an interface type that describes all stargate requests
     procedure InvokeDevice(Request: DotNet NPRNetRequest0; ActionName: Text; Step: Text)
     var
         Stargate: Codeunit "NPR POS Stargate Management";
@@ -726,7 +726,6 @@
     begin
         MakeSureFrameworkIsAvailable(true);
 
-        POSSession.GetStargate(Stargate);
         Stargate.ResetRequestState(ActionName);
         Stargate.StoreRequest(Request, ActionName, Step);
 
@@ -748,7 +747,6 @@
         MakeSureFrameworkIsAvailable(true);
 
         if Repeating then begin
-            POSSession.GetStargate(Stargate);
             Stargate.StoreRequest(Request, ActionName, Step);
         end;
 
@@ -759,28 +757,7 @@
         InvokeFrontEndAsync(DeviceRequest);
     end;
 
-    // TODO: This method is unused. If by now nobody has ever called it from anywhere, most likely we don't need it!
-    procedure InvokeDeviceAsync(Request: DotNet NPRNetRequest0; ActionName: Text; Step: Text)
-    var
-        Stargate: Codeunit "NPR POS Stargate Management";
-        DeviceRequest: Codeunit "NPR Front-End: InvokeDevice";
-        Envelope: DotNet NPRNetRequestEnvelope0;
-    begin
-        MakeSureFrameworkIsAvailable(true);
-
-        POSSession.GetStargate(Stargate);
-        Stargate.ResetRequestState(ActionName);
-        Stargate.StoreRequest(Request, ActionName, Step);
-
-        Envelope := Envelope.RequestEnvelope(Request);
-
-        DeviceRequest.Initialize(Request.Method, Envelope.ToString());
-        DeviceRequest.SetAction(ActionName, Step);
-        DeviceRequest.SetMethod(Request.Method, Request.TypeName);
-        DeviceRequest.SetAsync();
-        InvokeFrontEndAsync(DeviceRequest);
-    end;
-
+    [Obsolete('Not supported in workflow v3')]
     procedure InvokeWorkflow(var POSAction: Record "NPR POS Action")
     var
         Request: Codeunit "NPR Front-End: WorkflowRequest";
@@ -792,7 +769,7 @@
 
         Request.Initialize(CurrentWorkflowID(), POSAction.Code, '', CreateGuid());
         Request.SetExplicit(true);
-        if POSSession.IsInAction() and (CurrentWorkflowID() > 0) then
+        if _POSSession.IsInAction() and (CurrentWorkflowID() > 0) then
             Request.SetNested(true);
 
         POSAction.GetWorkflowInvocationContext(WorkflowInvocationParameters, WorkflowInvocationContext);
@@ -802,28 +779,31 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     procedure PauseWorkflow(): Integer
     var
         Request: Codeunit "NPR Front-End: PauseWorkflow";
         ErrorText: Text;
+        Text008: Label 'A request was made to pause a workflow outside of a workflow context.';
+        Text009: Label 'A request was made to pause workflow ID %1 while a workflow ID %2 is already paused. This is a critical back-end error which will reset the back-end state. You may be able to retry the same action again, and you may even be able to conitnue with the current transaction; however, the safest way to proceed would be to start a new sale transaction if possible.';
     begin
         if CurrentWorkflowID() = 0 then
             ReportBugAndThrowError(Text008);
 
-        if PausedWorkflowID > 0 then begin
-            ErrorText := StrSubstNo(Text009, PausedWorkflowID, CurrentWorkflowID());
+        if _PausedWorkflowID > 0 then begin
+            ErrorText := StrSubstNo(Text009, _PausedWorkflowID, CurrentWorkflowID());
             AbortWorkflows();
             ReportBugAndThrowError(ErrorText);
         end;
 
-        Pausing := true;
-        PausedWorkflowID := CurrentWorkflowID();
+        _Pausing := true;
+        _PausedWorkflowID := CurrentWorkflowID();
 
         MakeSureFrameworkIsInitialized();
         Request.Initialize(CurrentWorkflowID());
         InvokeFrontEndAsync(Request);
 
-        exit(PausedWorkflowID);
+        exit(_PausedWorkflowID);
     end;
 
     procedure RefreshData(DataSets: JsonArray)
@@ -860,6 +840,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     local procedure RequestWorkflowStep(StepId: Text)
     var
         Request: Codeunit "NPR Front-End: WorkflowRequest";
@@ -869,25 +850,28 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('Not supported in workflow v3')]
     procedure ResumeWorkflow()
     var
         Request: Codeunit "NPR Front-End: ResumeWorkflow";
         ErrorText: Text;
+        Text010: Label 'A request was made to resume a paused workflow (ID %1) from within the context of another workflow (ID %2). This is a critical back-end error which will reset the back-end state. You may be able to retry the same action again, and you may even be able to conitnue with the current transaction; however, the safest way to proceed would be to start a new sale transaction if possible.';
+        Text012: Label 'A request was made to resume a workflow, while no workflow is currently in the paused state.';
     begin
-        if PausedWorkflowID = 0 then
+        if _PausedWorkflowID = 0 then
             ReportBugAndThrowError(Text012);
 
-        if (CurrentWorkflowID() <> PausedWorkflowID) and (CurrentWorkflowID() <> 0) then begin
-            ErrorText := StrSubstNo(Text010, PausedWorkflowID, CurrentWorkflowID());
+        if (CurrentWorkflowID() <> _PausedWorkflowID) and (CurrentWorkflowID() <> 0) then begin
+            ErrorText := StrSubstNo(Text010, _PausedWorkflowID, CurrentWorkflowID());
             AbortWorkflows();
             ReportBugAndThrowError(ErrorText);
         end;
 
         MakeSureFrameworkIsInitialized();
-        Request.Initialize(PausedWorkflowID, CurrentActionID());
+        Request.Initialize(_PausedWorkflowID, CurrentActionID());
 
-        Pausing := false;
-        PausedWorkflowID := 0;
+        _Pausing := false;
+        _PausedWorkflowID := 0;
 
         InvokeFrontEndAsync(Request);
     end;
@@ -907,15 +891,6 @@
     begin
         MakeSureFrameworkIsAvailable(true);
         Request.SetOptions(Options);
-        InvokeFrontEndAsync(Request);
-    end;
-
-    procedure SetLoggingLevel(Level: Integer)
-    var
-        Request: Codeunit "NPR Front-End: SetLoggingLevel";
-    begin
-        MakeSureFrameworkIsAvailable(true);
-        Request.SetLoggingLevel(Level);
         InvokeFrontEndAsync(Request);
     end;
 
@@ -987,11 +962,13 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('Delete once all wf 1.0 are gone')]
     procedure SetActionContext("Action": Text; Context: Codeunit "NPR POS JSON Management")
     var
         Request: Codeunit "NPR Front-End: ProvideContext";
+        ErrorDoNotCallSetActionContext: Label 'You have invoked SetActionContext from within a Workflows 2.0 action. This is an invalid operation.\\If you want to pass context to front end from a Workflows 2.0 action, it is enough to write to the Context object. In Workflows 2.0, context is automatically synchronized between AL and JavaScript.';
     begin
-        if Workflow20ID > 0 then
+        if _WorkflowID > 0 then
             Error(ErrorDoNotCallSetActionContext);
 
         Request.Initialize(CurrentWorkflowID(), Action);
@@ -1002,13 +979,13 @@
     procedure WorkflowCallCompleted(Request: Codeunit "NPR Front-End: WkfCallCompl.")
     begin
         MakeSureFrameworkIsInitialized();
-        if Workflow20ID > 0 then begin
-            if HasWorkflowResponse then begin
-                HasWorkflowResponse := false;
-                Request.SetWorkflowResponse(WorkflowResponseContent);
+        if _WorkflowID > 0 then begin
+            if _HasWorkflowResponse then begin
+                _HasWorkflowResponse := false;
+                Request.SetWorkflowResponse(_WorkflowResponseContent);
             end;
-            if QueuedWorkflows.Count() > 0 then
-                Request.SetQueuedWorkflows(QueuedWorkflows);
+            if _QueuedWorkflows.Count() > 0 then
+                Request.SetQueuedWorkflows(_QueuedWorkflows);
         end;
         InvokeFrontEndAsync(Request);
     end;
@@ -1016,8 +993,8 @@
     procedure WorkflowResponse(ResponseContent: Variant)
     begin
         MakeSureFrameworkIsAvailableIn20(true);
-        HasWorkflowResponse := true;
-        WorkflowResponseContent := ResponseContent;
+        _HasWorkflowResponse := true;
+        _WorkflowResponseContent := ResponseContent;
     end;
 
     procedure QueueWorkflow(ActionCode: Text; Context: Text)
@@ -1025,7 +1002,7 @@
         QueuedWorkflowsLbl: Label '%1;%2', Locked = true;
     begin
         MakeSureFrameworkIsAvailableIn20(true);
-        QueuedWorkflows.Add(StrSubstNo(QueuedWorkflowsLbl, ActionCode, Context));
+        _QueuedWorkflows.Add(StrSubstNo(QueuedWorkflowsLbl, ActionCode, Context));
     end;
 
     #region Dragonglass Awaitable Methods Response Context
@@ -1038,7 +1015,7 @@
     /// <returns></returns>
     procedure HasDragonglassResponseContext(Context: JsonObject): Boolean
     begin
-        exit(Context.Contains(DragonglassResponseContextLbl));
+        exit(Context.Contains(_DragonglassResponseContextLbl));
     end;
 
     /// <summary>
@@ -1064,7 +1041,7 @@
             exit;
 
         JSON.InitializeJObjectParser(Context, This);
-        JSON.SetScope(DragonglassResponseContextLbl);
+        JSON.SetScope(_DragonglassResponseContextLbl);
         Id := JSON.GetStringOrFail('invocationId', RetrievingMethodContextErr);
         Method := JSON.GetStringOrFail('method', RetrievingMethodContextErr);
         Request.SetMethod('BackEndMethodInvocationResult');
@@ -1075,8 +1052,8 @@
         InvokeFrontEndAsync(Request);
 
         JSON.SetScopeRoot();
-        DragonglassContext := JSON.GetJsonObject(DragonglassResponseContextLbl);
-        DragonglassContext.Add(DragonglassInvocationRespondedLbl, true);
+        DragonglassContext := JSON.GetJsonObject(_DragonglassResponseContextLbl);
+        DragonglassContext.Add(_DragonglassInvocationRespondedLbl, true);
     end;
 
     /// <summary>
@@ -1090,12 +1067,12 @@
         Token: JsonToken;
         DragonglassContext: JsonObject;
     begin
-        if not Context.Get(DragonglassResponseContextLbl, Token) or not Token.IsObject() then
+        if not Context.Get(_DragonglassResponseContextLbl, Token) or not Token.IsObject() then
             exit(false);
 
         DragonglassContext := Token.AsObject();
 
-        if not DragonglassContext.Get(DragonglassInvocationRespondedLbl, Token) or not Token.IsValue() then
+        if not DragonglassContext.Get(_DragonglassInvocationRespondedLbl, Token) or not Token.IsValue() then
             exit(false);
 
         exit(Token.AsValue().AsBoolean());
@@ -1130,12 +1107,6 @@
     #endregion
 
     #region Event Publishers
-
-    [IntegrationEvent(false, false)]
-    local procedure OnDetectFramework(var FrameworkOut: Interface "NPR Framework Interface"; var POSSessionOut: Codeunit "NPR POS Session"; var Handled: Boolean)
-    begin
-    end;
-
     [IntegrationEvent(true, false)]
     local procedure OnBeforeChangeToLoginView(POSSession: Codeunit "NPR POS Session")
     begin
