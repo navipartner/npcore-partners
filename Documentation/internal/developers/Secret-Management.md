@@ -5,8 +5,10 @@ These should be managed via our NPCore azure keyvault:
 https://portal.azure.com/#@navipartner.dk/resource/subscriptions/5f16aa70-9e36-47ec-bfc3-29f0af339cb1/resourceGroups/NpCore-KeyVault/providers/Microsoft.KeyVault/vaults/NPCore/overview
 If you are missing permission to add new secrets here, please contact hosting - it should be assigned via the NAV developer AD group.
 
-As our NPCore apps are already hooked up to this keyvault, reading the secrets from AL code requires nothing more than invoking the keyvault cache codeunit with the name of your secret:
-codeunit 6014494 "NPR Azure Key Vault Mgt."
+As our NPCore apps are already hooked up to this keyvault, reading the secrets from AL code requires nothing more than invoking the keyvault codeunit with the name of your secret:
+codeunit 3800 "App Key Vault Secret Provider"
+
+Example here: https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-app-key-vault#add-code-to-retrieve-secrets-from-the-key-vault
 
 Examples of usecases:
 API key for calling an internal azure function that has core functionality, shared across all customers.
