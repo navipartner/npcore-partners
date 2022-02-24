@@ -2,10 +2,8 @@
 {
     // NPR5.50/JAKUBV/20190603  CASE 338666 Transport NPR5.50 - 3 June 2019
 
-
-    trigger OnRun()
-    begin
-    end;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'No-cross invocation state in actions going forward, apart from the database! Delete when last workflow v2 is gone';
 
     var
         FrontEnd: Codeunit "NPR POS Front End Management";

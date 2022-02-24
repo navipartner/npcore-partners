@@ -62,7 +62,8 @@ End Function
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
   <DataSets>
     <DataSet Name="DataSet_Result">
-            <Query>
+      <Fields />
+      <Query>
         <DataSourceName>DataSource</DataSourceName>
         <CommandText />
       </Query>

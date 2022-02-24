@@ -39,7 +39,7 @@
         exit('PAYMENT_VIEW');
     end;
 
-    procedure InvokeOnPaymentViewWorkflow(var POSSession: Codeunit "NPR POS Session")
+    procedure InvokeOnPaymentViewWorkflow()
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
@@ -47,6 +47,7 @@
         SalePOS: Record "NPR POS Sale";
         StartTime: DateTime;
         POSSale: Codeunit "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
     begin
         StartTime := CurrentDateTime;
 

@@ -121,13 +121,16 @@
         Param: Record "NPR POS Action Parameter";
         OptionsCaption: Text;
         BaseOption: Text;
+        WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
     begin
         OnValidateValue(Rec);
         Param."Data Type" := "Data Type";
         Param.Options := CopyStr(GetOptions(), 1, MaxStrLen(Param.Options));
         if Param."Data Type" = Param."Data Type"::Boolean then
             OptionsCaption := BoolOptionMLCaptions();
-        OnGetParameterOptionStringCaption(Rec, OptionsCaption);
+        OptionsCaption := WorkflowCaptionBuffer.GetParameterOptionsCaption(Rec."Action Code", Rec.Name);
+        if OptionsCaption = '' then
+            OnGetParameterOptionStringCaption(Rec, OptionsCaption);
         if OptionsCaption <> '' then
             if TryGetBaseOptionStringValue(Param.Options, OptionsCaption, Value, BaseOption) then
                 Value := CopyStr(BaseOption, 1, MaxStrLen(Value));
@@ -272,6 +275,7 @@
         "Part": Text;
         OptionsCaption: Text;
         Handled: Boolean;
+        WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
     begin
         OnLookupValue(Rec, Handled);
         if Handled then
@@ -280,7 +284,9 @@
             "Data Type"::Option:
                 begin
                     Options := GetOptions();
-                    OnGetParameterOptionStringCaption(Rec, OptionsCaption);
+                    OptionsCaption := WorkflowCaptionBuffer.GetParameterOptionsCaption(Rec."Action Code", Rec.Name);
+                    if OptionsCaption = '' then
+                        OnGetParameterOptionStringCaption(Rec, OptionsCaption);
                     if OptionsCaption <> '' then
                         POSActionParamMgt.SplitString(OptionsCaption, Parts)
                     else
@@ -383,16 +389,19 @@
         exit(ParamFilterIndicator);
     end;
 
+    [Obsolete('Use v3 workflow inline captions instead')]
     [IntegrationEvent(false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
     end;
 
+    [Obsolete('Use v3 workflow inline captions instead')]
     [IntegrationEvent(false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
     end;
 
+    [Obsolete('Use v3 workflow inline captions instead')]
     [IntegrationEvent(false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin

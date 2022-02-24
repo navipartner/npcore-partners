@@ -216,7 +216,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
     begin
         if Initialized then begin
             //Clean any previous mock session
-            POSSession.Destructor();
+            POSSession.ClearAll();
             Clear(POSSession);
             DeletePOSPostedEntries();
         end;

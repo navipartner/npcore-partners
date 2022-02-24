@@ -16,8 +16,10 @@
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Text that should follow user language cannot be table data. Changed to page variable populated runtime in workflow v3.';
         }
-        field(3; Version; Text[30])
+        field(3; Version; Text[32])
         {
             Caption = 'Version';
             DataClassification = CustomerContent;
@@ -39,6 +41,8 @@
             Editable = false;
             OptionCaption = 'Generic,Button,BackEnd';
             OptionMembers = Generic,Button,BackEnd;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Was never implemented fully. Not needed in v3 workflows';
         }
         field(7; "Subscriber Instances Allowed"; Option)
         {
@@ -46,6 +50,8 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Single,Multiple';
             OptionMembers = Single,Multiple;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Was never implemented fully. Not needed in v3 workflows';
         }
         field(8; "Bound to DataSource"; Boolean)
         {
@@ -81,6 +87,8 @@
             Caption = 'Tooltip';
             DataClassification = CustomerContent;
             Description = 'NPR5.32.11';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Was never implemented by any of our actions. A reimplementation should probably be only a POS menu button level, not here.';
         }
         field(13; "Codeunit ID"; Integer)
         {
@@ -88,6 +96,8 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.32.11';
             Editable = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by enum for workflow v3. This implementation also assumed that EventSubscription."Number of Calls" count increased by +1 within user session but it was across entire NST. So it never worked robustly.';
         }
         field(14; "Secure Method Code"; Code[10])
         {
@@ -95,6 +105,8 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.43';
             TableRelation = "NPR POS Secure Method";
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Was never implemented by any of our actions. A reimplementation should probably be only a POS menu button level, not here.';
         }
         field(15; "Workflow Engine Version"; Text[30])
         {
@@ -108,6 +120,11 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Attended,Unattended';
             OptionMembers = ATTENDED,UNATTENDED;
+        }
+        field(40; "Workflow Implementation"; Enum "NPR POS Workflow")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Workflow Implementation';
         }
     }
 
@@ -143,11 +160,6 @@
         Text007: Label 'You have called a Workflow 1.0 function in the context of a Workflow 2.0 discovery process.';
         Text008: Label 'You have called a Workflow 2.0 function in the context of a Workflow 1.0 discovery process.';
 
-    procedure SetSession(SessionIn: Codeunit "NPR POS Session")
-    begin
-        POSSession := SessionIn;
-    end;
-
     local procedure DeleteParameters(ActionCode: Text)
     var
         Param: Record "NPR POS Action Parameter";
@@ -156,12 +168,14 @@
         Param.DeleteAll();
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure InitializeWorkflowDiscovery()
     begin
         Clear(WorkflowObj);
         ActionInDiscovery := '';
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure MakeSureDiscoveryIsAllowed("Action": Text)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -177,6 +191,7 @@
         TempDiscoveredAction.Insert();
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure DiscoverAction("Code": Code[20]; Description: Text[250]; Version: Text[30]; Type: Integer; AllowedInstances: Option): Boolean
     var
         xPOSAction: Record "NPR POS Action";
@@ -228,7 +243,8 @@
         exit(true);
     end;
 
-    procedure DiscoverAction20("Code": Code[20]; Description: Text[250]; Version: Text[30]): Boolean
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    procedure DiscoverAction20("Code": Code[20]; Description: Text[250]; Version: Text[32]): Boolean
     var
         xPOSAction: Record "NPR POS Action";
     begin
@@ -279,6 +295,7 @@
         exit(true);
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure ActionUpdateCheck("Code": Text; Version: Text): Boolean
     var
         POSAction: Record "NPR POS Action";
@@ -292,6 +309,7 @@
         end;
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure HandleActionUpdates()
     begin
         TempUpdatedActions.SetAutoCalcFields(Workflow);
@@ -302,6 +320,7 @@
             until TempUpdatedActions.Next() = 0;
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterWorkflowStep(Label: Text; "Code": Text)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -316,6 +335,7 @@
         WorkflowObj.Steps().Add(WorkflowStep);
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterWorkflow(WithOnBeforeWorkflowEvent: Boolean)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -333,6 +353,7 @@
         InitializeWorkflowDiscovery();
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterWorkflow20("Code": Text)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -353,6 +374,7 @@
         InitializeWorkflowDiscovery();
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterTextParameter(Name: Text; DefaultValue: Text)
     var
         Param: Record "NPR POS Action Parameter";
@@ -360,6 +382,7 @@
         RegisterParameter(Name, Param."Data Type"::Text, DefaultValue, '');
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterIntegerParameter(Name: Text; DefaultValue: Integer)
     var
         Param: Record "NPR POS Action Parameter";
@@ -367,6 +390,7 @@
         RegisterParameter(Name, Param."Data Type"::Integer, Format(DefaultValue, 0, 9), '');
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterDateParameter(Name: Text; DefaultValue: Date)
     var
         Param: Record "NPR POS Action Parameter";
@@ -374,6 +398,7 @@
         RegisterParameter(Name, Param."Data Type"::Date, Format(DefaultValue, 0, 9), '');
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterBooleanParameter(Name: Text; DefaultValue: Boolean)
     var
         Param: Record "NPR POS Action Parameter";
@@ -381,6 +406,7 @@
         RegisterParameter(Name, Param."Data Type"::Boolean, Format(DefaultValue, 0, 9), '');
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterDecimalParameter(Name: Text; DefaultValue: Decimal)
     var
         Param: Record "NPR POS Action Parameter";
@@ -388,6 +414,7 @@
         RegisterParameter(Name, Param."Data Type"::Decimal, Format(DefaultValue, 0, 9), '');
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterOptionParameter(Name: Text; Options: Text; DefaultValue: Text)
     var
         Param: Record "NPR POS Action Parameter";
@@ -395,6 +422,7 @@
         RegisterParameter(Name, Param."Data Type"::Option, DefaultValue, Options);
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure RegisterParameter(Name: Text; DataType: Option; DefaultValue: Text; Options: Text)
     var
         Param: Record "NPR POS Action Parameter";
@@ -415,6 +443,7 @@
         Param.Insert();
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterDataBinding()
     begin
         "Bound to DataSource" := true;
@@ -422,6 +451,7 @@
         UpdateActionBuffers();
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterDataSourceBinding(DataSource: Code[50])
     begin
         "Bound to DataSource" := true;
@@ -430,6 +460,7 @@
         UpdateActionBuffers();
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
     var
         Json: JsonObject;
@@ -448,6 +479,22 @@
         UpdateActionBuffers();
     end;
 
+    procedure RegisterCustomJavaScriptLogicV3(Method: Text; JavaScriptCode: Text)
+    var
+        Json: JsonObject;
+    begin
+        CalcFields("Custom JavaScript Logic");
+        if "Custom JavaScript Logic".HasValue() then begin
+            Json := GetCustomJavaScriptLogic();
+            if Json.Contains(Method) then
+                Json.Remove(Method);
+        end;
+
+        Json.Add(Method, JavaScriptCode);
+        StreamCustomJavaScriptToBlobV3(Json);
+    end;
+
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterDataSource(Name: Code[50])
     begin
         "Data Source Name" := Name;
@@ -455,6 +502,7 @@
         UpdateActionBuffers();
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterBlockingUI(Blocking: Boolean)
     begin
         "Blocking UI" := Blocking;
@@ -462,6 +510,7 @@
         UpdateActionBuffers();
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterTooltip(TooltipIn: Text)
     begin
         Tooltip := CopyStr(TooltipIn, 1, MaxStrLen(Tooltip));
@@ -469,16 +518,19 @@
         UpdateActionBuffers();
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RegisterSecureMethod(SecureMethodCode: Code[10])
     begin
         "Secure Method Code" := SecureMethodCode;
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure IsThisAction("Code": Code[20]): Boolean
     begin
         exit(Rec.Code = Code);
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure UpdateActionBuffers()
     begin
         if Rec.IsTemporary then
@@ -490,6 +542,7 @@
         end;
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure RefreshWorkflow()
     begin
         ActionInRefresh := Code;
@@ -498,6 +551,7 @@
             OnAfterActionUpdated(TempUpdatedActions);
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure StreamWorkflowToBlob()
     var
         OutStr: OutStream;
@@ -507,6 +561,25 @@
         WorkflowObj.GetJson().WriteTo(OutStr);
     end;
 
+    internal procedure StreamWorkflowToBlobV3(ActionCode: Text; Javascript: Text)
+    var
+        OutStr: OutStream;
+        WorkflowStep: JsonObject;
+        WorkflowWrapper: Codeunit "NPR Workflow";
+    begin
+        WorkflowWrapper.SetName(ActionCode);
+        ActionInDiscovery := Code;
+        WorkflowWrapper.Content().Add('engineVersion', '2.0');
+        WorkflowStep.Add('Code', Javascript);
+        WorkflowWrapper.Steps().Add(WorkflowStep);
+
+        Clear(Workflow);
+        Workflow.CreateOutStream(OutStr);
+        WorkflowWrapper.GetJson().WriteTo(OutStr);
+    end;
+
+
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure StreamCustomJavaScriptToBlob(Json: JsonObject)
     var
         OutStr: OutStream;
@@ -515,6 +588,15 @@
         "Custom JavaScript Logic".CreateOutStream(OutStr);
         Json.WriteTo(OutStr);
         Modify();
+    end;
+
+    local procedure StreamCustomJavaScriptToBlobV3(Json: JsonObject)
+    var
+        OutStr: OutStream;
+    begin
+        Clear("Custom JavaScript Logic");
+        "Custom JavaScript Logic".CreateOutStream(OutStr);
+        Json.WriteTo(OutStr);
     end;
 
     procedure GetCustomJavaScriptLogic() Json: JsonObject
@@ -569,6 +651,12 @@
         SetWorkflowInvocationDictionary(WorkflowInvocationParameters, Name, Value);
     end;
 
+    procedure SetWorkflowInvocationParameterUnsafe(Name: Text; Value: Variant)
+    begin
+        SetWorkflowInvocationDictionary(WorkflowInvocationParameters, Name, Value);
+    end;
+
+
     procedure SetWorkflowInvocationContext(Name: Text; Value: Variant)
     begin
         SetWorkflowInvocationDictionary(WorkflowInvocationContext, Name, Value);
@@ -582,15 +670,15 @@
 
     procedure DiscoverActions()
     var
-        CodeunitInstanceDetector: Codeunit "NPR POS Action Management";
+        DiscoverAllWorkflows: Codeunit "NPR POS Refresh Workflows";
     begin
-        CodeunitInstanceDetector.InitializeActionDiscovery();
-        BindSubscription(CodeunitInstanceDetector);
-        OnDiscoverActions();
-        UnbindSubscription(CodeunitInstanceDetector);
-        HandleActionUpdates();
+        OnDiscoverActions(); //v1+v2
+        HandleActionUpdates(); //v1+v2
+
+        DiscoverAllWorkflows.RefreshAll(); //v3
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure RequireVersion10()
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -599,6 +687,7 @@
             FrontEnd.ReportBugAndThrowError(Text007);
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure RequireVersion20()
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -607,18 +696,20 @@
             FrontEnd.ReportBugAndThrowError(Text008);
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     [IntegrationEvent(TRUE, false)]
     local procedure OnDiscoverActions()
     begin
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     [IntegrationEvent(false, false)]
     local procedure OnActionDiscovered(var Rec: Record "NPR POS Action")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterActionUpdated("Action": Record "NPR POS Action")
+    internal procedure OnAfterActionUpdated("Action": Record "NPR POS Action")
     begin
     end;
 
@@ -653,6 +744,7 @@
         exit("Requires POS Type");
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     local procedure UpdateMLDescription("Code": Code[20]; Description: Text[250])
     var
         POSAction: Record "NPR POS Action";

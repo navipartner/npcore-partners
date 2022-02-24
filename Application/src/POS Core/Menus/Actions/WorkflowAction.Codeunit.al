@@ -1,6 +1,7 @@
 ﻿codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSerializable"
 {
     Access = Internal;
+
     var
         _workflow: Codeunit "NPR Workflow";
         _state: JsonObject;
@@ -51,9 +52,11 @@
 
         // Action does not exist
         if not POSSession.RetrieveSessionAction(CopyStr(_workflow.Name(), 1, MaxStrLen(POSAction.Code)), POSAction) then begin
-            Severity := 100;
-            ErrorText := StrSubstNo(TextActionDoesNotExist, _workflow.Name());
-            exit(false);
+            if not POSAction.Get(_workflow.Name()) then begin
+                Severity := 100;
+                ErrorText := StrSubstNo(TextActionDoesNotExist, _workflow.Name());
+                exit(false);
+            end;
         end;
 
         // Action is blocked
@@ -120,27 +123,29 @@
     var
         TempPOSAction: Record "NPR POS Action" temporary;
         InStr: InStream;
-        Calculated: Boolean;
         Workflow: Codeunit "NPR Workflow";
+        POSAction: Record "NPR POS Action";
     begin
         Instance.GetWorkflow(Workflow);
 
-        if POSSession.RetrieveSessionAction(MenuButton."Action Code", TempPOSAction) then begin
-            if TempPOSAction.Workflow.HasValue() then begin
-                TempPOSAction.Workflow.CreateInStream(InStr);
-                Workflow.DeserializeFromJsonStream(InStr);
-                if TempPOSAction."Bound to DataSource" then
-                    Instance.Content().Add('DataBinding', true);
-                if TempPOSAction."Custom JavaScript Logic".HasValue() then begin
-                    Instance.Content().Add('CustomJavaScript', TempPOSAction.GetCustomJavaScriptLogic());
-                end;
-                if TempPOSAction.Description <> '' then
-                    Instance.Content().Add('Description', TempPOSAction.Description);
-                Calculated := true;
+        if not POSSession.RetrieveSessionAction(MenuButton."Action Code", TempPOSAction) then begin
+            POSAction.SetAutoCalcFields(Workflow, "Custom JavaScript Logic");
+            if not POSAction.Get(MenuButton."Action Code") then begin
+                Workflow.SetName(TempPOSAction.Code);
+                exit;
             end;
+            TempPOSAction.TransferFields(POSAction, true);
         end;
 
-        if not Calculated then begin
+        if TempPOSAction.Workflow.HasValue() then begin
+            TempPOSAction.Workflow.CreateInStream(InStr);
+            Workflow.DeserializeFromJsonStream(InStr);
+            if TempPOSAction."Bound to DataSource" then
+                Instance.Content().Add('DataBinding', true);
+            if TempPOSAction."Custom JavaScript Logic".HasValue() then begin
+                Instance.Content().Add('CustomJavaScript', TempPOSAction.GetCustomJavaScriptLogic());
+            end;
+        end else begin
             Workflow.SetName(TempPOSAction.Code);
         end;
     end;

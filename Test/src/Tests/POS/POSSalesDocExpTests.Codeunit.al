@@ -147,7 +147,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     begin
         if _Initialized then begin
             //Clean any previous mock session
-            _POSSession.Destructor();
+            _POSSession.ClearAll();
             Clear(_POSSession);
         end;
 

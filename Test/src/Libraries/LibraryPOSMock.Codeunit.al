@@ -93,9 +93,10 @@ codeunit 85003 "NPR Library - POS Mock"
         ActionID: Guid;
     begin
         POSSession.GetFrontEnd(FrontEnd, true);
+        POSSession.GetSale(POSSale);
         Item.Get(ItemNo);
 
-        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, false, '', '', false, '', POSSession, FrontEnd); //Insert step of item action
+        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, false, '', '', false, '', POSSale); //Insert step of item action
     end;
 
     procedure EndSale(POSSession: Codeunit "NPR POS Session"): Boolean

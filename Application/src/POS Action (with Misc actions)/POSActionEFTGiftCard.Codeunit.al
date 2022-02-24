@@ -1,6 +1,7 @@
 ﻿codeunit 6150874 "NPR POS Action: EFT Gift Card"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'Sale of EFT Gift Cards';
         GIFTCARD_CAPTION_AMOUNT: Label 'Gift Card Amount';
@@ -157,17 +158,14 @@
         Amount: Decimal;
         PaymentType: Text;
         EftEntryNo: Integer;
-        Variant: Variant;
         POSSale: Codeunit "NPR POS Sale";
         EFTSetup: Record "NPR EFT Setup";
         SalePOS: Record "NPR POS Sale";
         POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
-        POSSession.RetrieveActionState('eft_gift_card_amount', Variant);
-        Amount := Variant;
-        POSSession.RetrieveActionState('eft_gift_card_payment_type', Variant);
-        PaymentType := Variant;
+        POSSession.RetrieveActionState('eft_gift_card_amount', Amount);
+        POSSession.RetrieveActionState('eft_gift_card_payment_type', PaymentType);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -193,14 +191,10 @@
         Amount: Decimal;
         DiscountPercent: Decimal;
         Currency: Record Currency;
-        Variant: Variant;
     begin
-        POSSession.RetrieveActionState('eft_gift_card_entry_no', Variant);
-        EftEntryNo := Variant;
-        POSSession.RetrieveActionState('eft_gift_card_discount_percent', Variant);
-        DiscountPercent := Variant;
-        POSSession.RetrieveActionState('eft_gift_card_amount', Variant);
-        Amount := Variant;
+        POSSession.RetrieveActionState('eft_gift_card_entry_no', EftEntryNo);
+        POSSession.RetrieveActionState('eft_gift_card_discount_percent', DiscountPercent);
+        POSSession.RetrieveActionState('eft_gift_card_amount', Amount);
 
         EFTTransactionRequest.Get(EftEntryNo);
         if (not EFTTransactionRequest.Successful) or (EFTTransactionRequest."Result Amount" = 0) or (EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD) then begin
@@ -243,12 +237,9 @@
     var
         TotalNumber: Integer;
         CurrentNumber: Integer;
-        Variant: Variant;
     begin
-        POSSession.RetrieveActionState('eft_gift_card_total_number', Variant);
-        TotalNumber := Variant;
-        POSSession.RetrieveActionState('eft_gift_card_current_number', Variant);
-        CurrentNumber := Variant;
+        POSSession.RetrieveActionState('eft_gift_card_total_number', TotalNumber);
+        POSSession.RetrieveActionState('eft_gift_card_current_number', CurrentNumber);
 
         if CurrentNumber >= TotalNumber then
             exit; //Done

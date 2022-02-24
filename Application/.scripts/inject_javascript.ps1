@@ -14,7 +14,14 @@ foreach ($file in $fileList)
         if ($jsfileFound) 
         {
             $jsfileContent = Get-Content -Path $jsfilePath -Raw            
-            $minifiedJs = $jsfileContent | .\.scripts\esbuild.exe --minify
+            if (-not $jsfileContent.Length -eq 0)
+            {
+                $minifiedJs = $jsfileContent | .\.scripts\esbuild.exe --minify
+            }
+            else 
+            {
+                $minifiedJs = "";
+            }
 
             $alfileContent = Get-Content -Path $file.FullName
             $alfileContent[$find.LineNumber] = "'" + $minifiedJs.Replace("'","''") + "'";

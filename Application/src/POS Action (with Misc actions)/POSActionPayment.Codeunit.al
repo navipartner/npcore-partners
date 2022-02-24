@@ -1,6 +1,7 @@
 ﻿codeunit 6150725 "NPR POS Action: Payment"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This is a built-in action for inserting a payment line into the current transaction';
         Setup: Codeunit "NPR POS Setup";
@@ -443,8 +444,6 @@
         exit(true);
     end;
 
-
-
     local procedure CaptureEftPayment(AmountToCapture: Decimal; POSSession: Codeunit "NPR POS Session"; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         POSSale: Codeunit "NPR POS Sale";
@@ -492,13 +491,10 @@
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EntryNo: Integer;
         Token: Guid;
-        TmpVariant: Variant;
         SecondaryEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        if POSSession.RetrieveActionStateSafe('TransactionRequest_EntryNo', TmpVariant) then
-            EntryNo := TmpVariant;
-        if POSSession.RetrieveActionStateSafe('TransactionRequest_Token', TmpVariant) then
-            Token := TmpVariant;
+        if POSSession.RetrieveActionStateSafe('TransactionRequest_EntryNo', EntryNo) then;
+        if POSSession.RetrieveActionStateSafe('TransactionRequest_Token', Token) then;
 
         if EntryNo = 0 then
             exit(false);

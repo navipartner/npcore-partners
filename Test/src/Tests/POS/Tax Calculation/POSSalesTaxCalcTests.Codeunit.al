@@ -2125,7 +2125,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     begin
         if Initialized then begin
             //Clean any previous mock session
-            POSSession.Destructor();
+            POSSession.ClearAll();
             Clear(POSSession);
         end;
 

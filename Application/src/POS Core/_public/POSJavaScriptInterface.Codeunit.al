@@ -1,194 +1,20 @@
 ﻿codeunit 6150701 "NPR POS JavaScript Interface"
 {
     var
-        Text001: Label 'Action %1 does not seem to have a registered handler, or the registered handler failed to notify the framework about successful processing of the action.';
-        Text002: Label 'An unknown method was invoked by the front end (JavaScript).\\Method: %1\Context: %2';
-        Text003: Label 'No handler has responded to the RequestContext stage for action %1, or the registered handler failed to notify the framework about successful processing of the request.';
-        Text004: Label 'No data driver responded to %1 event for %2 data source.';
-        LastView: Codeunit "NPR POS View";
-        Text005: Label 'One or more action codeunits have responded to %1 event during back-end workflow engine initialization. This is a critical condition, therefore your session cannot continue. You should immediately contact support.';
-        Stopwatch: Codeunit "NPR Stopwatch";
-        Text006: Label 'No protocol codeunit responded to %1 method, sender ''%2'', event ''%3''. Protocol user interface %4 will now be aborted.';
-        Text007: Label 'No protocol codeunit responded to Timer request. Protocol user interface %1 will now be aborted.';
-        TextErrorMustNotRunThisCodeunit: Label 'You must not run this codeunit directly. This codeunit is intended to be run only from within itself.', Locked = true; // This is development type of error, do not translate!
-        ReadingParametersFailedErr: Label 'accessing parameters for workflow %1';
-        ReadingWorkflowIdErr: Label 'reading workflow ID';
-        ReadingActionNameErr: Label 'reading action name';
-        ActionBlockedErr: Label 'Action %1 is blocked and cannot be invoked. Please contact system manager if you think this should be changed.';
+        _LastView: Codeunit "NPR POS View";
+        _Stopwatch: Codeunit "NPR Stopwatch";
 
-        OnRunType: Option InvokeAction,BeforeWorkflow,MethodInvocation;
-        OnRunInitialized: Boolean;
-        OnRunPOSAction: Record "NPR POS Action";
-        OnRunWorkflowStep: Text;
-        OnRunContext: JsonObject;
-        OnRunParameters: JsonObject;
-        OnRunPOSSession: Codeunit "NPR POS Session";
-        OnRunFrontEnd: Codeunit "NPR POS Front End Management";
-        OnRunHandled: Boolean;
-        OnRunMethod: Text;
-
-    trigger OnRun()
-    begin
-        if not OnRunInitialized then
-            Error(TextErrorMustNotRunThisCodeunit);
-
-        if (OnRunType in [OnRunType::InvokeAction, OnRunType::BeforeWorkflow]) and OnRunPOSAction.Blocked then
-            Error(ActionBlockedErr, OnRunPOSAction.Code);
-
-        case OnRunType of
-            OnRunType::InvokeAction:
-                OnAction(OnRunPOSAction, OnRunWorkflowStep, OnRunContext, OnRunPOSSession, OnRunFrontEnd, OnRunHandled);
-            OnRunType::BeforeWorkflow:
-                OnBeforeWorkflow(OnRunPOSAction, OnRunParameters, OnRunPOSSession, OnRunFrontEnd, OnRunHandled);
-            OnRunType::MethodInvocation:
-                OnCustomMethod(OnRunMethod, OnRunContext, OnRunPOSSession, OnRunFrontEnd, OnRunHandled);
-        end;
-    end;
-
-    local procedure InvokeOnActionThroughOnRun(POSActionIn: Record "NPR POS Action"; WorkflowStepIn: Text; ContextIn: JsonObject; POSSessionIn: Codeunit "NPR POS Session"; FrontEndIn: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface"; var Handled: Boolean) Success: Boolean
-    begin
-        OnRunHandled := false;
-        OnRunInitialized := true;
-
-        OnRunPOSAction := POSActionIn;
-        OnRunWorkflowStep := WorkflowStepIn;
-        OnRunContext := ContextIn;
-        OnRunPOSSession := POSSessionIn;
-        OnRunFrontEnd := FrontEndIn;
-        OnRunType := OnRunType::InvokeAction;
-        ClearLastError();
-
-        Success := Self.Run();
-        Handled := OnRunHandled;
-        EmitResult(Success, Handled);
-
-        OnRunInitialized := false;
-    end;
-
-    local procedure InvokeOnBeforeWorkflowThroughOnRun(POSActionIn: Record "NPR POS Action"; ParametersIn: JsonObject; POSSessionIn: Codeunit "NPR POS Session"; FrontEndIn: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface"; var Handled: Boolean) Success: Boolean
-    begin
-        OnRunHandled := false;
-        OnRunInitialized := true;
-
-        OnRunPOSAction := POSActionIn;
-        OnRunParameters := ParametersIn;
-        OnRunPOSSession := POSSessionIn;
-        OnRunFrontEnd := FrontEndIn;
-        OnRunType := OnRunType::BeforeWorkflow;
-
-        Success := Self.Run();
-        Handled := OnRunHandled;
-        EmitResult(Success, Handled);
-
-        OnRunInitialized := false;
-    end;
-
-    local procedure InvokeCustomMethodThroughOnRun(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface"; var Handled: Boolean) Success: Boolean
-    begin
-        OnRunHandled := false;
-        OnRunInitialized := true;
-
-        OnRunMethod := Method;
-        OnRunContext := Context;
-        OnRunPOSSession := POSSession;
-        OnRunFrontEnd := FrontEnd;
-        OnRunType := OnRunType::MethodInvocation;
-
-        Success := Self.Run();
-        Handled := OnRunHandled;
-        EmitResult(Success, Handled);
-
-        OnRunInitialized := false;
-    end;
-
-    local procedure EmitResult(Success: Boolean; Handled: Boolean)
-    var
-        CustomDimensions: Dictionary of [Text, Text];
-        ActiveSession: Record "Active Session";
-        VerbosityLevel: Verbosity;
-        TempText: Text;
-        MessageText: Text;
-        TempActionCode: Code[20];
-    begin
-
-        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
-            Clear(ActiveSession);
-
-        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
-        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
-        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
-        CustomDimensions.Add('NPR_CompanyName', CompanyName());
-        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
-        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
-        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
-        CustomDimensions.Add('NPR_RunType', Format(OnRunType, 0, 9));
-
-        TempActionCode := OnRunPOSAction.Code;
-        if (TempActionCode = '') then
-            TempActionCode := '<BLANK>';
-
-        VerbosityLevel := Verbosity::Normal;
-        if ((not Success) or (not Handled)) then begin
-            TempText := GetLastErrorText();
-            VerbosityLevel := Verbosity::Error;
-
-            if ((not Success) and (TempText = '')) then // This is probably a "rollback event" or a framework error.
-                VerbosityLevel := Verbosity::Warning;
-
-            if (not Handled) and (OnRunPOSAction.Code = '') then
-                TempText := StrSubstNo(Text001, '<blank>');
-
-            CustomDimensions.Add('NPR_ErrorText', TempText);
-            CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
-        end;
-
-        if (OnRunType = OnRunType::BeforeWorkflow) then begin
-            CustomDimensions.Add('NPR_Action', TempActionCode);
-            OnRunParameters.WriteTo(TempText);
-            CustomDimensions.Add('NPR_Parameters', TempText); // Could contain sensitive data
-            MessageText := StrSubstNo('OnBeforeWorkflow => %1', TempActionCode);
-        end;
-
-        if (OnRunType = OnRunType::InvokeAction) then begin
-            CustomDimensions.Add('NPR_Action', TempActionCode);
-            CustomDimensions.Add('NPR_WorkflowStep', OnRunWorkflowStep);
-            OnRunContext.WriteTo(TempText);
-            CustomDimensions.Add('NPR_Context', TempText); // Could contain sensitive data
-            MessageText := StrSubstNo('InvokeAction => %1, %2', TempActionCode, OnRunWorkflowStep);
-        end;
-
-        if (OnRunType = OnRunType::MethodInvocation) then begin
-            OnRunContext.WriteTo(TempText);
-            CustomDimensions.Add('NPR_Context', TempText); // Could contain sensitive data
-            CustomDimensions.Add('NPR_Method', OnRunMethod);
-            MessageText := StrSubstNo('InvokeMethod => %1 (%2)', GetValueAsText(OnRunContext, 'name'), OnRunMethod);
-        end;
-
-        Session.LogMessage('NPR_PosAction', MessageText, VerbosityLevel, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
-    end;
-
-    local procedure GetValueAsText(JObject: JsonObject; KeyName: Text): Text
-    var
-        JToken: JsonToken;
-    begin
-        if (not JObject.Contains(KeyName)) then
-            exit('');
-
-        if (not JObject.SelectToken(KeyName, JToken)) then
-            exit('');
-
-        if (JToken.AsValue().IsNull()) then
-            exit('');
-
-        exit(JToken.AsValue().AsText());
-    end;
 
     // The purpose of this function is to detect if there are action codeunits that respond to either OnBeforeWorkflow or OnAction not intended for them.
-    procedure Initialize(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+
+    [Obsolete('Replaced with workflow v3. Delete when last v1 workflow is gone')]
+    internal procedure Initialize(FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSAction: Record "NPR POS Action";
         Parameters: JsonObject;
         Handled: Boolean;
+        Text005: Label 'One or more action codeunits have responded to %1 event during back-end workflow engine initialization. This is a critical condition, therefore your session cannot continue. You should immediately contact support.';
+        POSSession: Codeunit "NPR POS Session";
     begin
         OnBeforeWorkflow(POSAction, Parameters, POSSession, FrontEnd, Handled);
         if Handled then
@@ -200,27 +26,30 @@
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text005, 'OnAction'));
     end;
 
-    procedure InvokeAction("Action": Text[20]; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
+    [Obsolete('Replaced with workflow v3. Delete when last v1 workflow is gone')]
+    internal procedure InvokeAction("Action": Text[20]; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
     var
         POSAction: Record "NPR POS Action";
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
         Handled: Boolean;
         Success: Boolean;
+        Text001: Label 'Action %1 does not seem to have a registered handler, or the registered handler failed to notify the framework about successful processing of the action.';
+        JSInterfaceErrorHandler: Codeunit "NPR JS Interface Error Handler";
     begin
-        Stopwatch.ResetAll();
+        _Stopwatch.ResetAll();
         POSSession.RetrieveSessionAction(Action, POSAction);
-        Stopwatch.Start('All');
+        _Stopwatch.Start('All');
         ApplyDataState(Context, POSSession, FrontEnd);
 
         OnBeforeInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd);
 
         POSSession.SetInAction(true);
         FrontEnd.WorkflowBackEndStepBegin(WorkflowId, ActionId);
-        Stopwatch.Start('Action');
+        _Stopwatch.Start('Action');
 
-        Success := InvokeOnActionThroughOnRun(POSAction, WorkflowStep, Context, POSSession, FrontEnd, Self, Handled);
+        Success := JSInterfaceErrorHandler.InvokeOnActionThroughOnRun(POSAction, WorkflowStep, Context, POSSession, FrontEnd, JSInterfaceErrorHandler, Handled);
 
-        Stopwatch.Stop('Action');
+        _Stopwatch.Stop('Action');
         FrontEnd.WorkflowBackEndStepEnd();
         POSSession.SetInAction(false);
 
@@ -229,31 +58,32 @@
 
         if Success then begin
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd);
-            Stopwatch.Start('Data');
-            RefreshData(POSSession, FrontEnd);
-            Stopwatch.Stop('Data');
+            _Stopwatch.Start('Data');
+            RefreshData(FrontEnd);
+            _Stopwatch.Stop('Data');
             Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
             Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText);
             FrontEnd.Trace(Signal, 'ErrorCallStack', GetLastErrorCallstack);
         end;
 
-        Stopwatch.Stop('All');
-        FrontEnd.Trace(Signal, 'durationAll', Stopwatch.ElapsedMilliseconds('All'));
-        FrontEnd.Trace(Signal, 'durationAction', Stopwatch.ElapsedMilliseconds('Action'));
-        FrontEnd.Trace(Signal, 'durationData', Stopwatch.ElapsedMilliseconds('Data'));
-        FrontEnd.Trace(Signal, 'durationOverhead', Stopwatch.ElapsedMilliseconds('All') - Stopwatch.ElapsedMilliseconds('Action') - Stopwatch.ElapsedMilliseconds('Data'));
+        _Stopwatch.Stop('All');
+        FrontEnd.Trace(Signal, 'durationAll', _Stopwatch.ElapsedMilliseconds('All'));
+        FrontEnd.Trace(Signal, 'durationAction', _Stopwatch.ElapsedMilliseconds('Action'));
+        FrontEnd.Trace(Signal, 'durationData', _Stopwatch.ElapsedMilliseconds('Data'));
+        FrontEnd.Trace(Signal, 'durationOverhead', _Stopwatch.ElapsedMilliseconds('All') - _Stopwatch.ElapsedMilliseconds('Action') - _Stopwatch.ElapsedMilliseconds('Data'));
 
         FrontEnd.WorkflowCallCompleted(Signal);
     end;
 
-    procedure InvokeMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
+    internal procedure InvokeMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
     begin
-        // A method invoked from JavaScript logic that requests C/AL to execute specific non-business-logic processing (e.g. infrastructure, etc.)
         OnBeforeInvokeMethod(Method, Context, POSSession, FrontEnd);
 
-        // TODO: All of these should be "custom" methods and run thorugh the InvokeCustomMethod codeunit
         case Method of
+            'OnAction20':
+                if not Method_RunAction30(Context, FrontEnd) then //Action30 is using the same event as Action20 in frontend. We fall back to old 2.0 backend implementation if not detected as enum impl.
+                    InvokeCustomMethod(Method, Context, FrontEnd);
             'AbortWorkflow':
                 Method_AbortWorkflow(FrontEnd, Context);
             'AbortAllWorkflows':
@@ -269,19 +99,21 @@
             'Protocol':
                 Method_Protocol(POSSession, FrontEnd, Context);
             'FrontEndId':
-                FrontEnd.HardwareInitializationComplete(); //TODO: Delete when gone from addin
+                FrontEnd.HardwareInitializationComplete();
             'Unlock':
                 Method_Unlock(POSSession, FrontEnd, Context, Self);
             'ProtocolUIResponse':
                 Method_ProtocolUIResponse(POSSession, FrontEnd, Context);
+            'InitializationComplete':
+                InitializationComplete(POSSession);
             else
-                InvokeCustomMethod(Method, Context, POSSession, FrontEnd, Self);
+                InvokeCustomMethod(Method, Context, FrontEnd);
         end;
 
         OnAfterInvokeMethod(Method, Context, POSSession, FrontEnd);
     end;
 
-    local procedure InvokeCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
+    local procedure InvokeCustomMethod(Method: Text; Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         FailedInvocationResponse: JsonObject;
         Handled: Boolean;
@@ -289,12 +121,14 @@
         Success: Boolean;
         ContextString: Text;
         CustomMethodWithoutResponseErr: Label 'Custom awaitable method %1 was invoked, but it did not provide a response. This is a bug in the custom method handler codeunit.';
+        Text002: Label 'An unknown method was invoked by the front end (JavaScript).\\Method: %1\Context: %2';
+        JSInterfaceErrorHandler: Codeunit "NPR JS Interface Error Handler";
     begin
         if (Context.Contains('_dragonglassResponseContext')) then begin
             ExpectsResponse := true;
         end;
 
-        Success := InvokeCustomMethodThroughOnRun(Method, Context, POSSession, FrontEnd, Self, Handled);
+        Success := JSInterfaceErrorHandler.InvokeCustomMethodThroughOnRun(Method, Context, FrontEnd, JSInterfaceErrorHandler, Handled);
 
         if ExpectsResponse then begin
             if not FrontEnd.IsDragonglassInvocationResponded(Context) then begin
@@ -312,7 +146,15 @@
         end;
     end;
 
-    procedure RefreshData(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure InitializationComplete(POSSession: Codeunit "NPR POS Session")
+    begin
+        POSSession.DebugWithTimestamp('InitializeUI');
+        POSSession.InitializeUI();
+        POSSession.DebugWithTimestamp('InitializeSession');
+        POSSession.InitializeSession(false);
+    end;
+
+    internal procedure RefreshData(FrontEnd: Codeunit "NPR POS Front End Management")
     var
         DataMgt: Codeunit "NPR POS Data Management";
         DataSetsJson: JsonArray;
@@ -323,17 +165,15 @@
         DataStore: Codeunit "NPR Data Store";
         View: Codeunit "NPR POS View";
         RefreshSource: Boolean;
+        POSSession: Codeunit "NPR POS Session";
     begin
-        if not POSSession.IsDataRefreshNeeded() then
-            exit;
-
         POSSession.GetCurrentView(View);
         POSSession.GetDataStore(DataStore);
         foreach DataSourceToken in View.GetDataSources() do begin
             Clear(DataSource);
             DataSource.Constructor(DataSourceToken.AsObject());
             RefreshSource := false;
-            if (View.InstanceId() = LastView.InstanceId()) and DataSource.PerSession() then
+            if (View.InstanceId() = _LastView.InstanceId()) and DataSource.PerSession() then
                 DataMgt.OnIsDataSourceModified(POSSession, DataSource.Id(), RefreshSource)
             else
                 RefreshSource := true;
@@ -348,13 +188,14 @@
 
         FrontEnd.RefreshData(DataSetsJson);
 
-        LastView := View;
+        _LastView := View;
     end;
 
     local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var DataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         DataMgt: Codeunit "NPR POS Data Management";
         Handled: Boolean;
+        Text004: Label 'No data driver responded to %1 event for %2 data source.';
     begin
         DataMgt.OnRefreshDataSet(POSSession, DataSource, DataSet, FrontEnd, Handled);
         if not Handled then
@@ -362,7 +203,7 @@
         DataMgt.OnAfterRefreshDataSet(POSSession, DataSource, DataSet, FrontEnd);
     end;
 
-    procedure ApplyDataState(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    internal procedure ApplyDataState(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
         JObject: JsonObject;
@@ -400,16 +241,26 @@
     var
         Data: Codeunit "NPR POS Data Management";
         Handled: Boolean;
+        Text004: Label 'No data driver responded to %1 event for %2 data source.';
     begin
         Data.OnSetPosition(DataSet.DataSource(), Position, POSSession, Handled);
         if not Handled then
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, 'OnSetPosition', DataSet.DataSource()));
     end;
 
+    local procedure Method_RunAction30(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    var
+        Workflow30: Codeunit "NPR POS Workflow 3.0";
+    begin
+        exit(Workflow30.RunIfAction30(Context, FrontEnd));
+    end;
+
+    [Obsolete('Delete when workflow v1 is gone')]
     local procedure Method_AbortWorkflow(FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "NPR POS JSON Management";
         WorkflowID: Integer;
+        ReadingWorkflowIdErr: Label 'reading workflow ID';
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         WorkflowID := JSON.GetIntegerOrFail('id', ReadingWorkflowIdErr);
@@ -417,11 +268,13 @@
             FrontEnd.AbortWorkflow(WorkflowID);
     end;
 
+    [Obsolete('Delete when workflow v1 is gone')]
     local procedure Method_AbortAllWorkflows(FrontEnd: Codeunit "NPR POS Front End Management")
     begin
         FrontEnd.AbortWorkflows();
     end;
 
+    [Obsolete('Delete when workflow v1 is gone')]
     local procedure Method_BeforeWorkflow(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")
     var
         POSAction: Record "NPR POS Action";
@@ -433,8 +286,13 @@
         WorkflowId: Integer;
         Handled: Boolean;
         Success: Boolean;
+        Text003: Label 'No handler has responded to the RequestContext stage for action %1, or the registered handler failed to notify the framework about successful processing of the request.';
+        ReadingParametersFailedErr: Label 'accessing parameters for workflow %1';
+        ReadingActionNameErr: Label 'reading action name';
+        ReadingWorkflowIdErr: Label 'reading workflow ID';
+        JSInterfaceErrorHandler: Codeunit "NPR JS Interface Error Handler";
     begin
-        Stopwatch.ResetAll();
+        _Stopwatch.ResetAll();
 
         ApplyDataState(Context, POSSession, FrontEnd);
 
@@ -446,11 +304,11 @@
 
         POSSession.RetrieveSessionAction(ActionName, POSAction);
         FrontEnd.WorkflowBackEndStepBegin(WorkflowId, 0);
-        Stopwatch.Start('Before');
+        _Stopwatch.Start('Before');
 
-        Success := InvokeOnBeforeWorkflowThroughOnRun(POSAction, Parameters, POSSession, FrontEnd, Self, Handled);
+        Success := JSInterfaceErrorHandler.InvokeOnBeforeWorkflowThroughOnRun(POSAction, Parameters, POSSession, FrontEnd, JSInterfaceErrorHandler, Handled);
 
-        Stopwatch.Stop('Before');
+        _Stopwatch.Stop('Before');
         FrontEnd.WorkflowBackEndStepEnd();
 
         if (not Success) or (not Handled) then begin
@@ -466,7 +324,7 @@
         end;
 
         Signal.SignalSuccess(WorkflowId, 0);
-        Signal.GetContent().Add('durationBefore', Stopwatch.ElapsedMilliseconds('Before'));
+        Signal.GetContent().Add('durationBefore', _Stopwatch.ElapsedMilliseconds('Before'));
 
         FrontEnd.WorkflowCallCompleted(Signal);
     end;
@@ -489,6 +347,7 @@
         InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd, Self);
     end;
 
+    [Obsolete('Delete when stargate is removed')]
     local procedure Method_InvokeDeviceResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -507,13 +366,13 @@
         ActionName := JSON.GetStringOrFail('action', ReadingDeviceResponseErr);
         Step := JSON.GetStringOrFail('step', ReadingDeviceResponseErr);
 
-        POSSession.GetStargate(Stargate);
         if Success then
             Stargate.DeviceResponse(Method, Response, POSSession, FrontEnd, ActionName, Step)
         else
             Stargate.DeviceError(Method, Response, POSSession, FrontEnd);
     end;
 
+    [Obsolete('Delete when stargate is removed')]
     local procedure Method_Protocol(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -526,7 +385,6 @@
         Forced: Boolean;
         ReadingFromProtocolMethodErr: Label 'reading from Protocol method context';
     begin
-        POSSession.GetStargate(Stargate);
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         SerializedArguments := JSON.GetStringOrFail('arguments', ReadingFromProtocolMethodErr);
@@ -555,6 +413,7 @@
             POSSession.ChangeViewSale();
     end;
 
+    [Obsolete('Delete when workflow v1/v2 are gone')]
     local procedure Method_ProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -565,6 +424,8 @@
         Handled: Boolean;
         IsTimer: Boolean;
         ReadingFromProtocolUIResponseErr: Label 'reading from protocol UI response';
+        Text006: Label 'No protocol codeunit responded to %1 method, sender ''%2'', event ''%3''. Protocol user interface %4 will now be aborted.';
+        Text007: Label 'No protocol codeunit responded to Timer request. Protocol user interface %1 will now be aborted.';
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         Evaluate(ModelID, JSON.GetStringOrFail('modelId', ReadingFromProtocolUIResponseErr));
@@ -588,8 +449,9 @@
         end;
     end;
 
+    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.')]
     [IntegrationEvent(false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    internal procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
@@ -603,8 +465,9 @@
     begin
     end;
 
+    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.')]
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    internal procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
@@ -619,15 +482,17 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    internal procedure OnCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
+    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.')]
     [IntegrationEvent(false, false)]
     local procedure OnProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
     begin
     end;
 
+    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.')]
     [IntegrationEvent(false, false)]
     local procedure OnProtocolUITimer(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; var Handled: Boolean)
     begin

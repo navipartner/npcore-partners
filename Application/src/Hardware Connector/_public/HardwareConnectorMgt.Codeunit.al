@@ -322,9 +322,10 @@
             Error(ClosedPageErr);
         end;
 
-        if Response.Get('success', JToken) then
+        if Response.Get('Success', JToken) then
             SuccessResponse := JToken.AsValue().AsBoolean();
 
+        // TODO verify reason key
         if not SuccessResponse then begin
             Response.Get('errorText', JToken);
             Error(JToken.AsValue().AsText());

@@ -1,5 +1,8 @@
 ﻿codeunit 6150733 "NPR POS Workflows 2.0"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced with workflow v3. Remove when last v2 is gone';
+
     var
         Text001: Label 'Action %1 does not seem to have a registered handler, or the registered handler failed to notify the framework about successful processing of the action.';
         Stopwatch: Codeunit "NPR Stopwatch";
@@ -82,12 +85,11 @@
         OnRunInitialized := false;
     end;
 
-    procedure InvokeAction20("Action": Text; WorkflowId: Integer; WorkflowStep: Text; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS Workflows 2.0")
+    internal procedure InvokeAction20("Action": Text; WorkflowId: Integer; WorkflowStep: Text; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS Workflows 2.0")
     var
         POSAction: Record "NPR POS Action";
         JavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
         JSON: Codeunit "NPR POS JSON Management";
-        State: Codeunit "NPR POS WF 2.0: State";
         FrontEnd20: Codeunit "NPR POS Front End Management";
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
         Success: Boolean;
@@ -101,7 +103,6 @@
         Stopwatch.Start('All');
         JavaScriptInterface.ApplyDataState(Context, POSSession, FrontEnd20);
         JSON.InitializeJObjectParser(Context, FrontEnd20);
-        POSSession.GetWorkflow20State(WorkflowId, Action, State);
 
         OnBeforeInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd20);
 
@@ -119,7 +120,7 @@
         if Success then begin
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd20);
             Stopwatch.Start('Data');
-            JavaScriptInterface.RefreshData(POSSession, FrontEnd20);
+            JavaScriptInterface.RefreshData(FrontEnd20);
             Stopwatch.Stop('Data');
             Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
