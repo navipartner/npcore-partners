@@ -14,7 +14,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('2.0');
+        exit('2.1');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
@@ -32,6 +32,7 @@
             Sender.RegisterBooleanParameter('NegativeInput', false);
             Sender.RegisterBooleanParameter('PromptUnitPriceOnNegativeInput', true);
             Sender.RegisterDecimalParameter('MaxQuantityAllowed', 0);
+            Sender.RegisterBooleanParameter('SkipItemAvailabilityCheck', false);
         end;
     end;
 
@@ -60,14 +61,17 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        PosInventoryProfile: Record "NPR POS Inventory Profile";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         SaleLinePOS: Record "NPR POS Sale Line";
+        PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
         SaleLine: Codeunit "NPR POS Sale Line";
         Quantity: Decimal;
         UnitPrice: Decimal;
         ConstraintOption: Option "No Constraint","Positive Quantity Only","Negative Quantity Only";
         ReturnReasonCode: Code[20];
         NegativeInput: Boolean;
+        SkipItemAvailabilityCheck: Boolean;
         SaleMustBePositiveErr: Label 'Quantity must be positive on the sales line.';
         SaleMustBeNegativeErr: Label 'Quantity must be negative on the sales line.';
         WrongQuantityErr: Label 'The minimum number of units to sell must be greater than zero.';
@@ -96,6 +100,7 @@
         UnitPrice := Context.GetDecimal('PromptUnitPrice');
         ConstraintOption := Context.GetIntegerParameter('Constraint');
         NegativeInput := Context.GetBooleanParameter('NegativeInput');
+        SkipItemAvailabilityCheck := Context.GetBooleanParameter('SkipItemAvailabilityCheck');
 
         if NegativeInput and (Quantity > 0) then
             Quantity := -Quantity;
@@ -128,6 +133,12 @@
                 end;
         end;
 
+        if not SkipItemAvailabilityCheck then begin
+            PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
+            if PosInventoryProfile."Stockout Warning" then
+                PosItemCheckAvail.SetxDataset(POSSession);
+        end;
+
         SaleLine.SetQuantity(Quantity);
 
         // Manual Unit Price when returning goods
@@ -140,6 +151,9 @@
             SaleLinePOS.Modify();
             SaleLine.RefreshCurrent();
         END;
+
+        if not SkipItemAvailabilityCheck and PosInventoryProfile."Stockout Warning" then
+            PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
 
         POSSession.RequestRefreshData();
     end;
