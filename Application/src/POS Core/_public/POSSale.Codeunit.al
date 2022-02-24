@@ -14,6 +14,7 @@
         Initialized: Boolean;
         Ended: Boolean;
         LastSaleRetrieved: Boolean;
+        SkipItemAvailabilityCheck: Boolean;
         SetDimension01: Label 'Dimension %1 does not exist';
         SetDimension02: Label 'Dimension Value %1 does not exist for dimension %2';
         EndedSalesAmount: Decimal;
@@ -331,6 +332,8 @@
             Error('POS Sale codeunit not initialized. This is a programming bug, not a user error');
         RefreshCurrent();
 
+        CheckItemAvailability();
+
         OnAttemptEndSale(Rec);
 
         PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
@@ -359,7 +362,6 @@
     /// </returns>
     procedure TryEndDirectSaleWithBalancing(POSSession: Codeunit "NPR POS Session"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
-
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
@@ -372,6 +374,8 @@
         if not Initialized then
             Error('POS Sale codeunit not initialized. This is a programming bug, not a user error');
         RefreshCurrent();
+
+        CheckItemAvailability();
 
         OnAttemptEndSale(Rec);
 
@@ -742,6 +746,24 @@
             exit;
         POSFrontEnd.GetSession(POSSession);
         POSSession.AddServerStopwatch(Keyword, Duration);
+    end;
+
+    local procedure CheckItemAvailability()
+    var
+        ItemCheckAvail: Codeunit "Item-Check Avail.";
+        PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
+    begin
+        if SkipItemAvailabilityCheck then
+            exit;
+        BindSubscription(PosItemCheckAvail);
+        if not PosItemCheckAvail.CheckAvailability_PosSale(Rec, true) then
+            ItemCheckAvail.RaiseUpdateInterruptedError();
+        UnbindSubscription(PosItemCheckAvail);
+    end;
+
+    procedure SetSkipItemAvailabilityCheck(Set: Boolean)
+    begin
+        SkipItemAvailabilityCheck := Set;
     end;
 
     #region Events
