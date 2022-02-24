@@ -19,26 +19,26 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the Code for the Collect Store.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the Collect Store’s Name.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Company Name field';
+                    ToolTip = 'Specifies the value of the Company Name field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Local Store"; Rec."Local Store")
                 {
 
-                    ToolTip = 'Specifies the value of the Local Store field';
+                    ToolTip = 'Specifies that the Collect Store belongs to the current company.';
                     ApplicationArea = NPRRetail;
                 }
             }

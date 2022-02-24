@@ -18,13 +18,13 @@
                 field(Type; Rec.Type)
                 {
 
-                    ToolTip = 'Specifies the type of mapping.';
+                    ToolTip = 'Specifies the Type of mapping.';
                     ApplicationArea = NPRRetail;
                 }
                 field("From Store Code"; Rec."From Store Code")
                 {
 
-                    ToolTip = 'Specifies the store code where the Click and Collect order has been created.';
+                    ToolTip = 'Indicates the Store Code where the Click and Collect order has been created.';
                     ApplicationArea = NPRRetail;
                 }
                 field("From No."; Rec."From No.")
@@ -36,31 +36,31 @@
                 field("From Description"; Rec."From Description")
                 {
 
-                    ToolTip = 'Specifies the description of the ‘From No’.';
+                    ToolTip = 'Specifies the Description of the From No. field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("From Description 2"; Rec."From Description 2")
                 {
 
-                    ToolTip = 'Specifies the longer description of the From No. field, if needed';
+                    ToolTip = 'Specifies the longer Description of the From No. field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("To No."; Rec."To No.")
                 {
 
-                    ToolTip = 'Specifies the customer/item no. that will be mapped in the collect store.';
+                    ToolTip = 'Indicates the Customer/Item No. that will be mapped in the Collect Store.';
                     ApplicationArea = NPRRetail;
                 }
                 field("To Description"; Rec."To Description")
                 {
 
-                    ToolTip = 'Specifies the description of the To No. field.';
+                    ToolTip = 'Specifies the Description of the To No. field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("To Description 2"; Rec."To Description 2")
                 {
 
-                    ToolTip = 'Specifies the longer description of the To No. field, if needed.';
+                    ToolTip = 'Specifies the longer Description of the To No. field.';
                     ApplicationArea = NPRRetail;
                 }
             }
