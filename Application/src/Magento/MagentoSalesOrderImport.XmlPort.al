@@ -358,11 +358,13 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                             var
                                 TempBlob: Codeunit "Temp Blob";
                                 OutStream: OutStream;
+                                InStr: InStream;
                             begin
                                 Clear(TempItem."NPR Magento Desc.");
                                 TempBlob.CreateOutStream(OutStream);
-                                TempItem."NPR Magento Desc.".ExportStream(OutStream);
                                 OutStream.WriteText(comment);
+                                TempBlob.CreateInStream(InStr);
+                                TempItem."NPR Magento Desc.".ImportStream(InStr, '');
                             end;
                         }
 
