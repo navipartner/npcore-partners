@@ -827,31 +827,12 @@
     [NonDebuggable]
     local procedure GetMMMembershipKioskBaseUrl(): Text
     var
-    //Single instance, buffering secrets!        
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
-        Exit(GetAzureKeyVaultSecret('NpSelfServiceKioskBaseUrl'));
+        //Single instance, buffering secrets!        
+        Exit(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpSelfServiceKioskBaseUrl'));
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 }
 

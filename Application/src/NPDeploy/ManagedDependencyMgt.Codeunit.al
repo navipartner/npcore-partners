@@ -234,6 +234,7 @@
     [TryFunction]
     procedure GetJSON(DepMgtSetup: Record "NPR Dependency Mgt. Setup"; Entity: Text; var JToken: JsonToken; FilterText: Text; Specific: Boolean)
     var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Client: HttpClient;
         ResponseMessage: HttpResponseMessage;
         Url: Text;
@@ -241,7 +242,7 @@
         JSON: Text;
 
     begin
-        Client.UseWindowsAuthentication(GetAzureKeyVaultSecret('NpDeployOdataUsername'), GetAzureKeyVaultSecret('NpDeployOdataPassword'));
+        Client.UseWindowsAuthentication(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpDeployOdataUsername'), AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpDeployOdataPassword'));
         Url := 'https://npdeploy.dynamics-retail.com:7088/NPDeploy/OData/Company(''RetailDemo'')/' + Entity + '?$format=json' + FilterText;
 
         if not Client.Get(URL, ResponseMessage) then
@@ -263,13 +264,13 @@
     procedure UpdateLog(Dependency: Jsonobject)
     var
         DepMgtSetup: Record "NPR Dependency Mgt. Setup";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         JObject: JsonObject;
         JSON: text;
         Client: HttpClient;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         Response: HttpResponseMessage;
-
     begin
         GetDependencyMgtSetup(DepMgtSetup);
 
@@ -290,7 +291,7 @@
         ContentHeader.Add('Content-Type', 'application/json');
         ContentHeader := Client.DefaultRequestHeaders();
 
-        Client.UseWindowsAuthentication(GetAzureKeyVaultSecret('NpDeployOdataUsername'), GetAzureKeyVaultSecret('NpDeployOdataPassword'));
+        Client.UseWindowsAuthentication(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpDeployOdataUsername'), AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpDeployOdataPassword'));
         Client.Post('https://npdeploy.dynamics-retail.com:7088/NPDeploy/OData/Company(''RetailDemo'')/' + 'ManagedDependenciesLog?$format=json', RequestContent, Response);
 
         if not Response.IsSuccessStatusCode then
@@ -593,26 +594,6 @@
         exit(false);
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 }
 

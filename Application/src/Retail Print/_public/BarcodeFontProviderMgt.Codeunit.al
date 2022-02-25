@@ -39,6 +39,7 @@ codeunit 6014528 "NPR Barcode Font Provider Mgt."
     [NonDebuggable]
     procedure GenerateQRCodeAZ(DataToEncode: Text; ECCLevel: Text; EciMode: Text; ForceUTF8: Boolean; UTF8BOM: Boolean; PixelsPerModule: Integer): Text
     var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Secret: Text;
         Client: HttpClient;
         Content: HttpContent;
@@ -50,7 +51,7 @@ codeunit 6014528 "NPR Barcode Font Provider Mgt."
         JsonTokValue: JsonToken;
         JsonObj: JsonObject;
     begin
-        Secret := GetAzureKeyVaultSecret('QRCodeGenerator');
+        Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('QRCodeGenerator');
         JsonReq := CreateQRCodeJSON(DataToEncode, ECCLevel, EciMode, ForceUTF8, UTF8BOM, PixelsPerModule);
         Content.WriteFrom(JsonReq);
         Content.GetHeaders(Headers);
@@ -95,26 +96,6 @@ codeunit 6014528 "NPR Barcode Font Provider Mgt."
         JObject.WriteTo(ContentText);
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 }
 #endif

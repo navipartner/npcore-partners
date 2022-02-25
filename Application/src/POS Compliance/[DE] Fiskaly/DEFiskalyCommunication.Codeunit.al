@@ -226,7 +226,7 @@
     [NonDebuggable]
     local procedure SendRequest(RequestBodyPar: JsonObject; ResponseJsonPar: JsonObject)
     var
-
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Client: HttpClient;
@@ -245,7 +245,7 @@
         Headers.Add('Content-Type', 'application/json');
 
         HttpWebRequest.Content(Content);
-        HttpWebRequest.SetRequestUri(GetAzureKeyVaultSecret('NpFiskalyAPIURL'));
+        HttpWebRequest.SetRequestUri(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpFiskalyAPIURL'));
         HttpWebRequest.Method := 'POST';
 
         Client.Send(HttpWebRequest, HttpWebResponse);
@@ -340,27 +340,7 @@
         ResponseJsonPar.ReadFrom(Response);
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 
     var
         DEAuditSetup: Record "NPR DE Audit Setup";

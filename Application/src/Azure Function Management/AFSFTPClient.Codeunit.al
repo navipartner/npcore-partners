@@ -34,6 +34,7 @@
     [NonDebuggable]
     local procedure CommonConstruct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer)
     var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         baseurl: Text;
     begin
         gHost := Host;
@@ -41,7 +42,7 @@
         gPassword := Password;
         gPort := Port;
         gTimeoutMs := TimeoutMs;
-        baseurl := GetAzureKeyVaultSecret('SftpAzureFunctionUrl');
+        baseurl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('SftpAzureFunctionUrl');
         SftpClient.SetBaseAddress(baseurl);
         gHttpUrlConst := 'url';
         gHttpUsernameConst := 'username';
@@ -57,7 +58,7 @@
         gResponseMsg_StatusCode := 'StatusCode';
         gResponseMsg_ServerJson := 'ServerMsg';
         gErrorConst := 'Error';
-        gHttpHostKey := GetAzureKeyVaultSecret('SftpAzureFunction');
+        gHttpHostKey := AzureKeyVaultMgt.GetAzureKeyVaultSecret('SftpAzureFunction');
     end;
 
     procedure Destruct()
@@ -503,26 +504,6 @@
         exit(returnVal);
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 }
 

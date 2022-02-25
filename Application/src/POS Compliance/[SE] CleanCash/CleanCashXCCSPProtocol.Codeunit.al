@@ -93,6 +93,7 @@
     [TryFunction]
     local procedure TrySendRequest(Url: Text; XmlIn: XmlDocument; var XmlOut: XmlDocument)
     var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Client: HttpClient;
         Request: HttpRequestMessage;
         Response: HttpResponseMessage;
@@ -120,7 +121,7 @@
         Request.Method := RequestMethodTok;
         Request.SetRequestUri('https://navipartner.azure-api.net/npcleancash/CleanCash'); //CleanCash API --> CleanCash Azure Function --> DigestAuth Proxy
         Request.GetHeaders(Headers);
-        Headers.Add('Ocp-Apim-Subscription-Key', GetAzureKeyVaultSecret('CleanCashApiKey'));
+        Headers.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetAzureKeyVaultSecret('CleanCashApiKey'));
         Headers.Add(UserAgentTok, UserAgentTxt);
 
         JObject.Add('url', Url);
@@ -293,25 +294,5 @@
 
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 }

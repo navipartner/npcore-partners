@@ -21,7 +21,7 @@
     procedure ImportRapidPackageFromFeed(package: Text)
     var
         autoRapidstartImportLog: Record "NPR Auto Rapidstart Import Log";
-
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         rapidStartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         BaseUri: Text;
         packageName: Text;
@@ -37,7 +37,7 @@
         EnvironmentHandler.EnableAllowHttpInSandbox();
 
         BaseUri := 'https://npretailbasedata.blob.core.windows.net';
-        Secret := GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
+        Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         BindSubscription(rapidStartBaseDataMgt);
         rapidStartBaseDataMgt.ImportPackage(
@@ -47,25 +47,5 @@
         autoRapidstartImportLog.Insert();
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 }
