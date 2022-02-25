@@ -17,11 +17,12 @@ pageextension 6014450 "NPR Purchase Quote" extends "Purchase Quote"
 
                 trigger OnAction()
                 var
-                    ImportfromScannerFilePO: XMLport "NPR Import from ScannerFilePO";
+                    ScannerImport: XmlPort "NPR Scanner Import";
+                    RecRef: RecordRef;
                 begin
-                    ImportfromScannerFilePO.SelectTable(Rec);
-                    ImportfromScannerFilePO.SetTableView(Rec);
-                    ImportfromScannerFilePO.Run();
+                    RecRef.GetTable(Rec);
+                    ScannerImport.ScannerImportFactory(Enum::"NPR Scanner Import"::PURCHASE, RecRef);
+                    ScannerImport.Run();
                 end;
             }
         }
