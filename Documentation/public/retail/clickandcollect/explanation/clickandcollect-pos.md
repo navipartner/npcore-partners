@@ -13,4 +13,4 @@ In the **POS Parameter Values section**, you can pre-set the order amount percen
 - **Pickup Click N Collect Order** with the **DELIVER_COLLECT_ORD** action code is mainly used for delivering the processed collect orders via the POS in the collecting store. 
 
 ### Related links
--[Set up the Click & Collect module in NP Retail](../howto/clickandcollect_setup.md)
+- [Set up the Click & Collect module in NP Retail](../howto/clickandcollect_setup.md)
