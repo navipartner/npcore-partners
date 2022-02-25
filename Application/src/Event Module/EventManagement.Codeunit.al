@@ -679,8 +679,8 @@
     begin
         Resource.Get(Rec."No.");
         Resource.SetFilter("Date Filter", Format(Rec."Planning Date"));
-        Resource.CalcFields("Qty. on Order (Job)", "Qty. Quoted (Job)", Capacity, "NPR Qty. Planned (Job)");
-        TotalCapacity := Resource."Qty. on Order (Job)" + Resource."Qty. Quoted (Job)" + Resource."NPR Qty. Planned (Job)";
+        Resource.CalcFields("Qty. on Order (Job)", "Qty. Quoted (Job)", Capacity);
+        TotalCapacity := Resource."Qty. on Order (Job)" + Resource."Qty. Quoted (Job)" + GetQtyPlannedJob(Resource);
         if xRec.Quantity > 0 then
             TotalCapacity -= xRec.Quantity;
         AvailCap := Resource.Capacity - TotalCapacity;
@@ -1996,7 +1996,18 @@
             Error(BlockDeleteErr, Job."No.", Format(Job."NPR Event Status"), JobsSetup.TableCaption);
     end;
 
-
+    local procedure GetQtyPlannedJob(Resource: Record Resource): Decimal
+    var
+        JobPlanningLine: Record "Job Planning Line";
+    begin
+        JobPlanningLine.SetRange(Status, JobPlanningLine.Status::Planning);
+        JobPlanningLine.SetRange("Schedule Line", true);
+        JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Resource);
+        JobPlanningLine.SetRange("No.", Resource."No.");
+        JobPlanningLine.SetFilter("Planning Date", '%1', Resource."Date Filter");
+        JobPlanningLine.CalcSums("Quantity (Base)");
+        exit(JobPlanningLine."Quantity (Base)");
+    end;
 
     procedure SetBufferMode()
     begin
