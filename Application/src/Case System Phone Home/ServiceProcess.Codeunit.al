@@ -160,6 +160,7 @@
     [NonDebuggable]
     local procedure InvokeServiceLibrary(ServiceMethod: Text; BodyXmlText: Text): Boolean
     var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Client: HttpClient;
         Content: HttpContent;
         Headers: HttpHeaders;
@@ -173,10 +174,10 @@
         Headers.Remove('Content-Type');
         Headers.Add('Content-Type', 'text/xml; charset=utf-8');
         Headers.Add('SOAPAction', StrSubstNo(SoapActionLbl, ServiceLibraryNamespaceUri, ServiceMethod));
-        Headers.Add('Ocp-Apim-Subscription-Key', GetAzureKeyVaultSecret('ServiceLibraryKey'));
+        Headers.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetAzureKeyVaultSecret('ServiceLibraryKey'));
         RequestMessage.Content(Content);
         RequestMessage.Method('POST');
-        RequestMessage.SetRequestUri(StrSubstNo(UriLbl, GetAzureKeyVaultSecret('ApiHostUri')));
+        RequestMessage.SetRequestUri(StrSubstNo(UriLbl, AzureKeyVaultMgt.GetAzureKeyVaultSecret('ApiHostUri')));
 
         Client.Timeout(5000);
         if not Client.Send(RequestMessage, ResponseMessage) then
@@ -202,25 +203,5 @@
 
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 }

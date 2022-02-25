@@ -944,6 +944,7 @@
     var
         XmlTemplate: Record "NPR NpXml Template";
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         TemplateCode: Text;
         [NonDebuggable]
         BaseURL: Text;
@@ -957,7 +958,7 @@
             else
                 exit;
 
-        BaseURL := GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl') + '/npxml/' + XmlTemplateFileName.Substring(1, XmlTemplateFileName.LastIndexOf('/'));
+        BaseURL := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl') + '/npxml/' + XmlTemplateFileName.Substring(1, XmlTemplateFileName.LastIndexOf('/'));
         NpXmlTemplateMgt.ImportNpXmlTemplateUrl(CopyStr(TemplateCode, 1, 20), BaseURL);
     end;
 
@@ -995,25 +996,5 @@
         Rec.Modify();
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 }
