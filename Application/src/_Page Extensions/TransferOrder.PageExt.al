@@ -43,11 +43,12 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
 
                 trigger OnAction()
                 var
-                    ImportfromScannerFileTO: XMLport "NPR ImportFromScannerFile TO";
+                    ScannerImport: XmlPort "NPR Scanner Import";
+                    RecRef: RecordRef;
                 begin
-                    ImportfromScannerFileTO.SelectTable(Rec);
-                    ImportfromScannerFileTO.SetTableView(Rec);
-                    ImportfromScannerFileTO.Run();
+                    RecRef.GetTable(Rec);
+                    ScannerImport.ScannerImportFactory(Enum::"NPR Scanner Import"::TRANSFER, RecRef);
+                    ScannerImport.Run();
                 end;
             }
         }

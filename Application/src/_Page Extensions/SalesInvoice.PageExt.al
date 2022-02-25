@@ -78,11 +78,12 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
 
                 trigger OnAction()
                 var
-                    ImportfromScannerFileSO: XMLport "NPR Import from ScannerFileSO";
+                    ScannerImport: XmlPort "NPR Scanner Import";
+                    RecRef: RecordRef;
                 begin
-                    ImportfromScannerFileSO.SelectTable(Rec);
-                    ImportfromScannerFileSO.SetTableView(Rec);
-                    ImportfromScannerFileSO.Run();
+                    RecRef.GetTable(Rec);
+                    ScannerImport.ScannerImportFactory(Enum::"NPR Scanner Import"::SALES, RecRef);
+                    ScannerImport.Run();
                 end;
             }
         }

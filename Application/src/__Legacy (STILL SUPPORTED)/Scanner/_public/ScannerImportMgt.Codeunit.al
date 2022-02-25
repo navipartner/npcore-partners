@@ -1,7 +1,10 @@
 codeunit 6059780 "NPR Scanner Import Mgt."
 {
+    Access = Public;
+
     procedure GetItemNoFromScannedCode(ScannedCode: Text[50]): Code[20]
     var
+        CannotFindItemErr: Label 'Cannot find item with reference %1.', Comment = '%1 = Item Reference';
         ItemNo: Code[20];
     begin
         if TryGetItemNoFromItem(ScannedCode, ItemNo) then
@@ -43,6 +46,11 @@ codeunit 6059780 "NPR Scanner Import Mgt."
         exit(true);
     end;
 
-    var
-        CannotFindItemErr: Label 'Cannot find item with reference %1.', Comment = '%1 = Item Reference';
+    procedure CreateErrorMessage(var TempErrorMessage: Record "Error Message" temporary)
+    begin
+        TempErrorMessage.ID += 1;
+        TempErrorMessage.Description := GetLastErrorText();
+        TempErrorMessage.Insert();
+    end;
+
 }

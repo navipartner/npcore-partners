@@ -17,11 +17,12 @@ pageextension 6014456 "NPR Purchase Credit Memo" extends "Purchase Credit Memo"
 
                 trigger OnAction()
                 var
-                    ImportfromScannerFilePO: XMLport "NPR Import from ScannerFilePO";
+                    ScannerImport: XmlPort "NPR Scanner Import";
+                    RecRef: RecordRef;
                 begin
-                    ImportfromScannerFilePO.SelectTable(Rec);
-                    ImportfromScannerFilePO.SetTableView(Rec);
-                    ImportfromScannerFilePO.Run();
+                    RecRef.GetTable(Rec);
+                    ScannerImport.ScannerImportFactory(Enum::"NPR Scanner Import"::PURCHASE, RecRef);
+                    ScannerImport.Run();
                 end;
             }
         }

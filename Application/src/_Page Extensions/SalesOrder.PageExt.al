@@ -143,11 +143,12 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
 
                 trigger OnAction()
                 var
-                    ImportfromScannerFileSO: XMLport "NPR Import from ScannerFileSO";
+                    ScannerImport: XmlPort "NPR Scanner Import";
+                    RecRef: RecordRef;
                 begin
-                    ImportfromScannerFileSO.SelectTable(Rec);
-                    ImportfromScannerFileSO.SetTableView(Rec);
-                    ImportfromScannerFileSO.Run();
+                    RecRef.GetTable(Rec);
+                    ScannerImport.ScannerImportFactory(Enum::"NPR Scanner Import"::SALES, RecRef);
+                    ScannerImport.Run();
                 end;
             }
         }
