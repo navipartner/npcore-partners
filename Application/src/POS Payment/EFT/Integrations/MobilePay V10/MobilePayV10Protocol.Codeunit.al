@@ -580,14 +580,15 @@
     internal procedure GetClientId(eftSetup: Record "NPR EFT Setup"): Text
     var
         mobilePayPaymentSetup: Record "NPR MobilePayV10 Payment Setup";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         mobilePayPaymentSetup.Get(eftSetup."Payment Type POS");
 
         case mobilePayPaymentSetup.Environment of
             mobilePayPaymentSetup.Environment::Production:
-                exit(GetAzureKeyVaultSecret('NpRetailMobilePayV10ProductionClientId'));
+                exit(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailMobilePayV10ProductionClientId'));
             mobilePayPaymentSetup.Environment::Sandbox:
-                exit(GetAzureKeyVaultSecret('NpRetailMobilePayV10SandboxClientId'));
+                exit(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailMobilePayV10SandboxClientId'));
         end;
     end;
 
@@ -595,14 +596,15 @@
     internal procedure GetClientSecret(eftSetup: Record "NPR EFT Setup"): Text
     var
         mobilePayPaymentSetup: Record "NPR MobilePayV10 Payment Setup";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         mobilePayPaymentSetup.Get(eftSetup."Payment Type POS");
 
         case mobilePayPaymentSetup.Environment of
             mobilePayPaymentSetup.Environment::Production:
-                exit(GetAzureKeyVaultSecret('NpRetailMobilePayV10ProductionClientSecret'));
+                exit(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailMobilePayV10ProductionClientSecret'));
             mobilePayPaymentSetup.Environment::Sandbox:
-                exit(GetAzureKeyVaultSecret('NpRetailMobilePayV10SandboxClientSecret'));
+                exit(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailMobilePayV10SandboxClientSecret'));
         end;
     end;
 
@@ -919,27 +921,7 @@
         end;
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetBaseURL(var url: text; var handled: boolean)

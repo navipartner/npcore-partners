@@ -106,33 +106,14 @@
         packages: Text;
         PackageNamesFromFileNames: Text;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 
     [NonDebuggable]
     local procedure OnLookupPackage(var SelectedValues: Text): Boolean
     var
         TempRetailList: Record "NPR Retail List" temporary;
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         packageList: List of [Text];
         RetailListPage: Page "NPR Retail List";
         package: Text;
@@ -140,8 +121,8 @@
         Secret: Text;
         PackageNameFromFileName: Text;
     begin
-        BaseUri := GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
-        Secret := GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
+        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
+        Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         rapidstartBaseDataMgt.GetAllPackagesInBlobStorage(BaseUri + '/membermanagement/?restype=container&comp=list'
             + '&sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageList);
@@ -185,14 +166,15 @@
     local procedure OnFinishAction()
     var
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         packageName: Text;
         BaseUri: Text;
         Secret: Text;
         RapidPackageList: List of [Text];
         RapidPackage: Text;
     begin
-        BaseUri := GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
-        Secret := GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
+        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
+        Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         RapidPackageList := packages.Split(',');
         foreach RapidPackage in RapidPackageList do begin

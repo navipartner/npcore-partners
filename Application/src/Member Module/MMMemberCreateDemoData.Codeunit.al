@@ -451,6 +451,7 @@
     var
         MemberNotificationSetup: Record "NPR MM Member Notific. Setup";
         MemberNotification: Codeunit "NPR MM Member Notification";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         outstr: OutStream;
     begin
 
@@ -473,10 +474,10 @@
         MemberNotificationSetup."Cancel Overdue Notif. (Days)" := 1;
         MemberNotificationSetup."Target Member Role" := MemberNotificationSetup."Target Member Role"::ALL_ADMINS;
         MemberNotificationSetup."Processing Method" := MemberNotificationSetup."Processing Method"::INLINE;
-        MemberNotificationSetup."NP Pass Server Base URL" := CopyStr(GetAzureKeyVaultSecret('PassesServerBaseUrl'), 1, MaxStrLen(MemberNotificationSetup."NP Pass Server Base URL"));
+        MemberNotificationSetup."NP Pass Server Base URL" := CopyStr(AzureKeyVaultMgt.GetAzureKeyVaultSecret('PassesServerBaseUrl'), 1, MaxStrLen(MemberNotificationSetup."NP Pass Server Base URL"));
         MemberNotificationSetup."Pass Notification Method" := MemberNotificationSetup."Pass Notification Method"::SYNCHRONOUS;
         MemberNotificationSetup."Passes API" := '/passes/%1/%2';
-        MemberNotificationSetup."Pass Token" := CopyStr(GetAzureKeyVaultSecret('PassesToken'), 1, MaxStrLen(MemberNotificationSetup."Pass Token"));
+        MemberNotificationSetup."Pass Token" := CopyStr(AzureKeyVaultMgt.GetAzureKeyVaultSecret('PassesToken'), 1, MaxStrLen(MemberNotificationSetup."Pass Token"));
         MemberNotificationSetup."Pass Type Code" := 'npmembership';
         MemberNotificationSetup."Include NP Pass" := true;
 
@@ -491,7 +492,7 @@
     var
         MemberNotificationSetup: Record "NPR MM Member Notific. Setup";
         MemberNotification: Codeunit "NPR MM Member Notification";
-
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         outstr: OutStream;
     begin
 
@@ -509,10 +510,10 @@
         MemberNotificationSetup."Cancel Overdue Notif. (Days)" := 1;
         MemberNotificationSetup."Target Member Role" := MemberNotificationSetup."Target Member Role"::ALL_ADMINS;
         MemberNotificationSetup."Processing Method" := MemberNotificationSetup."Processing Method"::INLINE;
-        MemberNotificationSetup."NP Pass Server Base URL" := CopyStr(GetAzureKeyVaultSecret('PassesServerBaseUrl'), 1, MaxStrLen(MemberNotificationSetup."NP Pass Server Base URL"));
+        MemberNotificationSetup."NP Pass Server Base URL" := CopyStr(AzureKeyVaultMgt.GetAzureKeyVaultSecret('PassesServerBaseUrl'), 1, MaxStrLen(MemberNotificationSetup."NP Pass Server Base URL"));
         MemberNotificationSetup."Pass Notification Method" := MemberNotificationSetup."Pass Notification Method"::SYNCHRONOUS;
         MemberNotificationSetup."Passes API" := '/passes/%1/%2';
-        MemberNotificationSetup."Pass Token" := CopyStr(GetAzureKeyVaultSecret('PassesToken'), 1, MaxStrLen(MemberNotificationSetup."Pass Token"));
+        MemberNotificationSetup."Pass Token" := CopyStr(AzureKeyVaultMgt.GetAzureKeyVaultSecret('PassesToken'), 1, MaxStrLen(MemberNotificationSetup."Pass Token"));
         MemberNotificationSetup."Pass Type Code" := 'npmembership';
         MemberNotificationSetup."Include NP Pass" := true;
 
@@ -905,26 +906,6 @@
                 'MM-DEMO01'));
     end;
 
-    [NonDebuggable]
-    local procedure GetAzureKeyVaultSecret(Name: Text) KeyValue: Text
-    var
-        AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
-        InMemorySecretProvider: Codeunit "In Memory Secret Provider";
-        TextMgt: Codeunit "NPR Text Mgt.";
-        AppKeyVaultSecretProviderInitialised: Boolean;
-    begin
-        if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
-            if not AppKeyVaultSecretProviderInitialised then
-                AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
-            if not AppKeyVaultSecretProviderInitialised then
-                Error(GetLastErrorText());
-
-            if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
-                InMemorySecretProvider.AddSecret(Name, KeyValue)
-            else
-                Error(TextMgt.GetSecretFailedErr(), Name);
-        end;
-    end;
 
 }
