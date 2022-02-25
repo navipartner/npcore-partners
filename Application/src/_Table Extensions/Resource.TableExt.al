@@ -18,15 +18,13 @@ tableextension 6014421 "NPR Resource" extends Resource
         }
         field(6060152; "NPR Qty. Planned (Job)"; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line"."Quantity (Base)" WHERE(Status = CONST(Planning),
-                                                                           "Schedule Line" = CONST(true),
-                                                                           Type = CONST(Resource),
-                                                                           "No." = FIELD("No."),
-                                                                           "Planning Date" = FIELD("Date Filter")));
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Flowfields should not be used on the TableExt.';
             Caption = 'Qty. Planned (Job)';
             Description = 'NPR5.40';
             Editable = false;
-            FieldClass = FlowField;
+            DataClassification = CustomerContent;
+            FieldClass = Normal;
         }
     }
 }
