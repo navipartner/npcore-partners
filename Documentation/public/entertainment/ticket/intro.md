@@ -5,4 +5,4 @@ The ticket module in NPRetail manages tickets, a sort of voucher, that entitles 
 ### Related links
 - [**Issuing tickets from Business Central**](./howto/issue_ticket.md)
 - [**Ticket Admission**](./explanation/admission.md)
-- [**Tickets**](./explanation/ticket.md)    
+- [**Tickets**](./explanation/ticket.md)
