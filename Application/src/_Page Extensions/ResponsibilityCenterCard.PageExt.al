@@ -5,7 +5,7 @@ pageextension 6014427 "NPR Responsibility Center Card" extends "Responsibility C
         addafter("Location Code")
         {
 
-            field("NPR Picture"; Rec."NPR Picture")
+            field("NPR Picture"; Rec."NPR Image")
             {
                 ToolTip = 'Display the picture of the Responsibility Center.';
                 ApplicationArea = NPRRetail;
