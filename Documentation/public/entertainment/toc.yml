@@ -1,4 +1,4 @@
-- name: Entertainment
+- name: Getting started
   href: intro.md
 - name: Ticket module
   href: ticket/toc.yml
