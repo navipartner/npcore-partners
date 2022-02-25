@@ -712,20 +712,6 @@
                         RunObject = Report "Customer Statement";
                         ToolTip = 'View a list of a customer''s transactions for a selected period, for example, to send to the customer at the close of an accounting period. You can choose to have all overdue balances displayed regardless of the period specified, or you can choose to include an aging band.';
                     }
-                    action(BackgroundStatement)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Scheduled Statements';
-                        Image = "Report";
-                        ToolTip = 'Schedule Customer Statements in the Job Queue.';
-
-                        trigger OnAction()
-                        var
-                            CustomerLayoutStatement: Codeunit "Customer Layout - Statement";
-                        begin
-                            CustomerLayoutStatement.EnqueueReport();
-                        end;
-                    }
                     action(ReportCustomerBalanceToDate)
                     {
                         ApplicationArea = NPRRetail;
