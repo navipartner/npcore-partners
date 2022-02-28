@@ -302,7 +302,6 @@ dotnet
 
     assembly("Newtonsoft.Json")
     {
-
         Culture = 'neutral';
         PublicKeyToken = '30ad4fe6b2a6aeed';
 
