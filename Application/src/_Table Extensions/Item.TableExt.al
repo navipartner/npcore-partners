@@ -54,21 +54,6 @@ tableextension 6014427 "NPR Item" extends Item
                 ItemCostMgt.UpdateUnitCost(Rec, '', '', 0, 0, false, false, true, Rec.FieldNo("NPR Group sale"));
             end;
         }
-        field(6014408; "NPR Season"; Code[10])
-        {
-            Caption = 'Season';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This field won"t be used anymore';
-            ObsoleteTag = 'Refactoring 2/2/2021';
-        }
-        field(6014410; "NPR Label Barcode"; Code[50])
-        {
-            Caption = 'Label barcode';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used';
-        }
         field(6014418; "NPR Explode BOM auto"; Boolean)
         {
             Caption = 'Auto-explode BOM';
@@ -79,79 +64,11 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Guarantee voucher';
             DataClassification = CustomerContent;
         }
-        field(6014424; "NPR Cannot edit unit price"; Boolean)
-        {
-            Caption = 'Can''t edit unit price';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used anymore.';
-        }
-        field(6014428; "NPR Primary Key Length"; Integer)
-        {
-            Caption = 'Primary Key Length';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used anymore.';
-        }
-        field(6014435; "NPR Last Changed at"; DateTime)
-        {
-            Caption = 'Last Changed at';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used';
-        }
-        field(6014440; "NPR Last Changed by"; Code[50])
-        {
-            Caption = 'Last Changed by';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used';
-        }
-        field(6014500; "NPR Second-hand number"; Code[20])
-        {
-            Caption = 'Second-hand number';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used anymore.';
-        }
-        field(6014502; "NPR Condition"; Option)
-        {
-            Caption = 'Condition';
-            DataClassification = CustomerContent;
-            OptionCaption = 'New,Mint,Mint boxed,A,B,C,D,E,F,B+';
-            OptionMembers = New,Mint,"Mint boxed",A,B,C,D,E,F,"B+";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This field won"t be used anymore';
-            ObsoleteTag = 'Refactoring 2/2/2021';
-        }
-        field(6014503; "NPR Second-hand"; Boolean)
-        {
-            Caption = 'Second-hand';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used anymore.';
-        }
-        field(6014504; "NPR Guarantee Index"; Option)
-        {
-            Caption = 'Guarantee Index';
-            DataClassification = CustomerContent;
-            OptionCaption = ' ,Move to Warranty';
-            OptionMembers = " ","Flyt til garanti kar.";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used anymore.';
-        }
         field(6014506; "NPR Has Accessories"; Boolean)
         {
             CalcFormula = Exist("NPR Accessory/Spare Part" WHERE(Code = FIELD("No.")));
             Caption = 'Has Accessories';
             FieldClass = FlowField;
-        }
-        field(6014508; "NPR Insurrance category"; Code[50])
-        {
-            Caption = 'Insurance Section';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used anymore.';
         }
         field(6014509; "NPR Item Brand"; Code[20])
         {
@@ -168,59 +85,16 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Print Tags';
             DataClassification = CustomerContent;
         }
-        field(6014514; "NPR NPRE Item Routing Profile"; Code[20])
-        {
-            Caption = 'Rest. Item Routing Profile';
-            DataClassification = CustomerContent;
-            TableRelation = "NPR NPRE Item Routing Profile";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "NPRE Item Routing Profile".';
-        }
         field(6014609; "NPR Has Variants"; Boolean)
         {
             CalcFormula = Exist("Item Variant" WHERE("Item No." = FIELD("No.")));
             Caption = 'Has Variants';
             FieldClass = FlowField;
         }
-        field(6014625; "NPR Std. Sales Qty."; Decimal)
-        {
-            Caption = 'Std. Sales Qty.';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used';
-        }
-        field(6014630; "NPR Blocked on Pos"; Boolean)
-        {
-            Caption = 'Blocked on Pos';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014635; "NPR Sale Blocked"; Boolean)
-        {
-            Caption = 'Sale Blocked';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used anymore.';
-        }
-        field(6014640; "NPR Purchase Blocked"; Boolean)
-        {
-            Caption = 'Purchase Blocked';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used anymore.';
-        }
         field(6014641; "NPR Custom Discount Blocked"; Boolean)
         {
             Caption = 'Custom Discount Blocked';
             DataClassification = CustomerContent;
-        }
-        field(6014642; "NPR Shelf Label Type"; Code[50])
-        {
-            Caption = 'Shelf Label Type';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used';
         }
         field(6059784; "NPR Ticket Type"; Code[10])
         {
@@ -418,17 +292,6 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Display Only';
             DataClassification = CustomerContent;
         }
-        field(6151495; "NPR Custom Options"; Integer)
-        {
-            CalcFormula = Count("NPR Magento Item Custom Option" WHERE("Item No." = FIELD("No."),
-                                                                    Enabled = CONST(true)));
-            Caption = 'Custom Options';
-            Editable = false;
-            FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions.';
-        }
-
         field(6151496; "NPR Has Mixed Discount"; Boolean)
         {
             Caption = 'Has Mixed Discount';
@@ -476,12 +339,6 @@ tableextension 6014427 "NPR Item" extends Item
             Enabled = false;
             //Obsoleting keys generates an error when using CurrentKeyIndex with RecRef.
             //See details: https://github.com/microsoft/AL/issues/6734
-            //ObsoleteState = Removed;
-            //ObsoleteReason = 'Not used anymore.';
-        }
-        key("NPR Key2"; "NPR Primary Key Length")
-        {
-            Enabled = false;
             //ObsoleteState = Removed;
             //ObsoleteReason = 'Not used anymore.';
         }

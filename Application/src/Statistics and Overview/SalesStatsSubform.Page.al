@@ -93,7 +93,6 @@
         TempRec: Record "NPR Sales Stats Time Period" temporary;
         StartDateTime: DateTime;
         EndDateTime: DateTime;
-        ItemGroupFilter: Text;
         Dim1Filter: Text;
         Dim2Filter: Text;
         ItemNoFilter: Text;
@@ -102,9 +101,9 @@
 
     procedure PopulateTemp(StartDate: Date; EndDate: Date; StartTime: Time; EndTime: Time; VarStatisticsBy: Option ,Item,"Item Category"; VarItemFilter: Text; VarItemCatFilter: Text; VarDim1Filter: Text; VarDim2Filter: Text)
     var
-        ItemQtyQuery: Query "NPR Sales Stat - Item Qty";
+        ItemQtyQuery: Query "NPR Sales Stat. -Item Cat Qty";
         ItemCatQtyQuery: Query "NPR Sales Stat. -Item Cat Qty";
-        ItemAmtQuery: Query "NPR Sales Stats - Item Sales";
+        ItemAmtQuery: Query "NPR Sales Stats: Item Cat.";
         ItemCatAmtQuery: Query "NPR Sales Stats: Item Cat.";
         Item: Record Item;
         ItemCategory: Record "Item Category";
@@ -123,7 +122,6 @@
                     ItemQtyQuery.SetRange(ItemQtyQuery.Filter_Entry_Type, ItemQtyQuery.Filter_Entry_Type::Sale);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_DateTime, '%1..%2', StartDateTime, EndDateTime);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Item_No, ItemNoFilter);
-                    ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Item_Group_No, ItemGroupFilter);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Dim_1_Code, Dim1Filter);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Dim_2_Code, Dim2Filter);
@@ -140,7 +138,6 @@
                     ItemAmtQuery.SetRange(ItemAmtQuery.Filter_Entry_Type, ItemAmtQuery.Filter_Entry_Type::Sale);
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_DateTime, '%1..%2', StartDateTime, EndDateTime);
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Item_No, ItemNoFilter);
-                    ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Item_Group_No, ItemGroupFilter);
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Dim_1_Code, Dim1Filter);
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Dim_2_Code, Dim2Filter);
@@ -236,7 +233,7 @@
             AuxValueEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    procedure GetGlobals(var InStartDate: Date; var InEndDate: Date; var InStartTime: Time; var InEndTime: Time; var InVarStatisticsBy: Option; var InVarItemFilter: Text; var InVarItemCatFilter: Text; var InVarItemGroupFilter: Text; var InVarDim1Filter: Text; var InVarDim2Filter: Text)
+    procedure GetGlobals(var InStartDate: Date; var InEndDate: Date; var InStartTime: Time; var InEndTime: Time; var InVarStatisticsBy: Option; var InVarItemFilter: Text; var InVarItemCatFilter: Text; var InVarDim1Filter: Text; var InVarDim2Filter: Text)
     begin
         InStartDate := DT2Date(StartDateTime);
         InEndDate := DT2Date(EndDateTime);
@@ -245,7 +242,6 @@
         InVarStatisticsBy := Statistics;
         InVarItemFilter := ItemNoFilter;
         InVarItemCatFilter := ItemCategoryCodeFilter;
-        InVarItemGroupFilter := ItemGroupFilter;
         InVarDim1Filter := Dim1Filter;
         InVarDim2Filter := Dim2Filter;
     end;

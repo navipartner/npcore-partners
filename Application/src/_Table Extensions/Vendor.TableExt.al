@@ -30,14 +30,6 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
         }
-        field(6014402; "NPR Auto"; Boolean)
-        {
-            Caption = 'Auto';
-            DataClassification = CustomerContent;
-            Description = 'NPR7.100.000';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
         field(6014403; "NPR Item Category Filter"; Code[20])
         {
             Caption = 'Item Group Filter';
@@ -78,38 +70,6 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             Caption = 'Stock';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
-        }
-        field(6014407; "NPR Primary key length"; Integer)
-        {
-            Caption = 'Primary Key Length';
-            DataClassification = CustomerContent;
-            Description = 'NPR7.100.000';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014408; "NPR Purchase Value (LCY)"; Decimal)
-        {
-            CalcFormula = - Sum("NPR Aux. Value Entry"."Purchase Amount (Actual)"
-                                WHERE(
-                                    "Vendor No." = FIELD("No."),
-                                    "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                    "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                    "Posting Date" = FIELD("Date Filter"),
-                                    "Item Category Code" = FIELD("NPR Item Category Filter"),
-                                    "Item Ledger Entry Type" = CONST(Purchase)));
-            Caption = 'Purchase Value (LCY)';
-            Description = 'NPR7.100.000';
-            FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014409; "NPR Change-to No."; Code[20])
-        {
-            Caption = 'Change-to No.';
-            DataClassification = CustomerContent;
-            Description = 'NPR7.100.000';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
         }
         field(6014415; "NPR Document Processing"; Option)
         {

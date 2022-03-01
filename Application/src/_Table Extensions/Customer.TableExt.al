@@ -2,68 +2,6 @@ tableextension 6014423 "NPR Customer" extends Customer
 {
     fields
     {
-        field(6014400; "NPR Type"; Option)
-        {
-            Caption = 'Type';
-            DataClassification = CustomerContent;
-            OptionCaption = 'Customer,Cash';
-            OptionMembers = Customer,Cash;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014402; "NPR Internal y/n"; Boolean)
-        {
-            Caption = 'Internal';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014403; "NPR Auto"; Boolean)
-        {
-            Caption = 'Auto';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014404; "NPR Record on Debitsale"; Option)
-        {
-            Caption = 'Record on Debitsale';
-            DataClassification = CustomerContent;
-            OptionCaption = ' ,Invoice,Shipping Note,Ask';
-            OptionMembers = " ",Invoice,"Shipping Note",Ask;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014405; "NPR Record on neg. Debitsale"; Option)
-        {
-            Caption = 'Record on negative Debitsale';
-            DataClassification = CustomerContent;
-            OptionCaption = ' ,Return Order,Credit Memo,Ask';
-            OptionMembers = " ","Return Order","Credit Memo",Ask;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014407; "NPR Primary Key Length"; Integer)
-        {
-            Caption = 'Primary Key Length';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014408; "NPR Sales invoice Report No."; Integer)
-        {
-            Caption = 'Sales invoice Report No.';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014409; "NPR Change-to No."; Code[20])
-        {
-            Caption = 'Change-to No.';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
         field(6014415; "NPR Document Processing"; Option)
         {
             ObsoleteState = Removed;
@@ -74,27 +12,6 @@ tableextension 6014423 "NPR Customer" extends Customer
             OptionCaption = 'Print,E-mail,OIO,Print and E-Mail';
             OptionMembers = Print,Email,OIO,PrintAndEmail;
             InitValue = Email;
-        }
-        field(6014416; "NPR Bill-to Company"; Text[30])
-        {
-            Caption = 'Bill-to Company (IC)';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014417; "NPR Bill-to Vendor No."; Code[20])
-        {
-            Caption = 'Bill-to Vendor No. (IC)';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6059771; "NPR Loyalty Customer"; Boolean)
-        {
-            Caption = 'Loyalty Customer';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
         }
         field(6151060; "NPR Anonymized"; Boolean)
         {

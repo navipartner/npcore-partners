@@ -8,24 +8,6 @@ tableextension 6014403 "NPR Sales Shipment Header" extends "Sales Shipment Heade
             Description = 'NPR7.100.000';
             DataClassification = CustomerContent;
         }
-        field(6014414; "NPR Bill-to E-mail"; Text[80])
-        {
-            Caption = 'Bill-to E-mail';
-            Description = 'PN1.00';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
-        field(6014415; "NPR Document Processing"; Option)
-        {
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Document Sending Profile from Customer is used.';
-            Caption = 'Document Processing';
-            Description = 'PN1.00';
-            OptionCaption = 'Print,E-mail,OIO,Print and E-Mail';
-            OptionMembers = Print,Email,OIO,PrintAndEmail;
-            DataClassification = CustomerContent;
-        }
         field(6014420; "NPR Delivery Location"; Code[10])
         {
             Caption = 'Delivery Location';
@@ -38,15 +20,6 @@ tableextension 6014403 "NPR Sales Shipment Header" extends "Sales Shipment Heade
             Caption = 'Package Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Package Code".Code;
-        }
-        field(6014425; "NPR Order Type"; Option)
-        {
-            Caption = 'Order Type';
-            OptionCaption = ',Order,Lending';
-            OptionMembers = ,"Order",Lending;
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
         }
         field(6014450; "NPR Kolli"; Integer)
         {

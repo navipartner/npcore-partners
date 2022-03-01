@@ -39,7 +39,6 @@
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NP Retail Setup Upgrade", 'RemoveSourceCode'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NP Retail Setup Upgrade", 'UpgradeFiedsToDedicatedSetups'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Aux. Tables"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Item Group"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Magento Passwords"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install"));
@@ -153,8 +152,6 @@
                     'UpgradeFiedsToDedicatedSetups':
                         exit('NPRetailSetup_MoveFieldsToDedicatedSetups-20210303');
                 end;
-            Codeunit::"NPR UPG Aux. Tables":
-                exit('NPRPUGAuxTables_Upgrade-20210315-01');
             Codeunit::"NPR UPG Item Group":
                 exit('NPRPUGItemGroup_Upgrade-20210430');
             Codeunit::"NPR Upgrade Magento Passwords":
