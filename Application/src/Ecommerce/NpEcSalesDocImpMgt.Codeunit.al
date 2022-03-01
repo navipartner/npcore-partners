@@ -1,6 +1,7 @@
 ﻿codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
 {
     Access = Internal;
+
     var
         XmlAttributeIsMissingInElementErr: Label 'Xml attribute %1 is missing in <%2>', Comment = '%1=Xml attribute name;%2=Xml element name';
         InvalidLineTypeErr: Label 'Invalid Line Type: %1', Comment = '%1=xml attribute type';
@@ -918,9 +919,9 @@
     begin
         Clear(NpEcCustomerMapping);
         FindStore(Element, NpEcStore);
-        if Element.SelectSingleNode('/country_code', Node) then
+        if Element.SelectSingleNode('.//sell_to_customer/country_code', Node) then
             CountryCode := Node.AsXmlElement().InnerText();
-        if Element.SelectSingleNode('/post_code', Node) then
+        if Element.SelectSingleNode('.//sell_to_customer/post_code', Node) then
             PostCode := Node.AsXmlElement().InnerText();
 
         if NpEcCustomerMapping.Get(NpEcStore.Code, CountryCode, PostCode) then
