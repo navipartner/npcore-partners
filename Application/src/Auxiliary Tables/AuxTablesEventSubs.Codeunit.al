@@ -86,11 +86,14 @@
 
     [EventSubscriber(ObjectType::Table, Database::"G/L Account", 'OnAfterDeleteEvent', '', false, false)]
     local procedure GLAccountOnAfterOnDelete(var Rec: Record "G/L Account")
+    var
+        AuxGLAccount: Record "NPR Aux. G/L Account";
     begin
         if Rec.IsTemporary() then
             exit;
 
-        Rec.NPRDeleteGLAccAdditionalFields();
+        if AuxGLAccount.Get(Rec."No.") then
+            AuxGLAccount.Delete();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"G/L Account", 'OnAfterRenameEvent', '', false, false)]

@@ -82,4 +82,32 @@
         AuxGLEntry.TransferFields(GLEntry);
         AuxGLEntry.Insert();
     end;
+
+    #region Table - G/L Account
+    procedure NPRGetGLAccAdditionalFields(var AuxGLAccount: Record "NPR Aux. G/L Account"; GLAccountNo: Code[20])
+    var
+        _AuxGLAccount: Record "NPR Aux. G/L Account";
+    begin
+        ReadGLAccAdditionalFields(GLAccountNo, _AuxGLAccount);
+        AuxGLAccount := _AuxGLAccount;
+    end;
+
+    procedure NPRSetGLAccAdditionalFields(var AuxGLAccount: Record "NPR Aux. G/L Account")
+    var
+        _AuxGLAccount: Record "NPR Aux. G/L Account";
+    begin
+        _AuxGLAccount := AuxGLAccount;
+        if _AuxGLAccount."No." <> '' then
+            if not _AuxGLAccount.Modify() then
+                _AuxGLAccount.Insert();
+    end;
+
+    local procedure ReadGLAccAdditionalFields(GLAccountNo: Code[20]; var _AuxGLAccount: Record "NPR Aux. G/L Account")
+    begin
+        if not _AuxGLAccount.Get(GLAccountNo) then begin
+            _AuxGLAccount.Init();
+            _AuxGLAccount."No." := GLAccountNo;
+        end;
+    end;
+    #endregion
 }

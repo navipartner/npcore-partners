@@ -25,10 +25,7 @@
         end;
 
         UpgradeItemJournalLineMasterLineData();
-        UpgradePurchaseLineMasterLineData();
-        UpgradePurchasePriceMasterLineData();
         UpgradeSalesLineMasterLineData();
-        UpgradeSalesPriceMasterLineData();
         UpgradeTransferLineMasterLineData();
         UpgradeItemReplByStoreMasterLineData();
         UpgradeRetailJournalLineMasterLineData();
@@ -59,46 +56,6 @@
             until MasterItemJournalLine.Next() = 0;
     end;
 
-    local procedure UpgradePurchaseLineMasterLineData()
-    var
-        MasterPurchaseLine: Record "Purchase Line";
-        PurchaseLine: Record "Purchase Line";
-    begin
-        MasterPurchaseLine.SetRange("NPR Is Master", true);
-        if MasterPurchaseLine.FindSet() then
-            repeat
-                MasterLineMapMgt.CreateMap(Database::"Purchase Line", MasterPurchaseLine.SystemId, MasterPurchaseLine.SystemId);
-
-                PurchaseLine.SetRange("Document Type", MasterPurchaseLine."Document Type");
-                PurchaseLine.SetRange("Document No.", MasterPurchaseLine."Document No.");
-                PurchaseLine.SetRange("NPR Master Line No.", MasterPurchaseLine."Line No.");
-                PurchaseLine.SetRange("NPR Is Master", false);
-                if PurchaseLine.FindSet() then
-                    repeat
-                        MasterLineMapMgt.CreateMap(Database::"Purchase Line", PurchaseLine.SystemId, MasterPurchaseLine.SystemId);
-                    until PurchaseLine.Next() = 0;
-            until MasterPurchaseLine.Next() = 0;
-    end;
-
-    local procedure UpgradePurchasePriceMasterLineData()
-    var
-        MasterPurchasePrice: Record "Purchase Price";
-        PurchasePrice: Record "Purchase Price";
-    begin
-        MasterPurchasePrice.SetRange("NPR Is Master", true);
-        if MasterPurchasePrice.FindSet() then
-            repeat
-                MasterLineMapMgt.CreateMap(Database::"Purchase Price", MasterPurchasePrice.SystemId, MasterPurchasePrice.SystemId);
-
-                PurchasePrice.SetRange("NPR Master Record Reference", MasterPurchasePrice.GetPosition(false));
-                PurchasePrice.SetRange("NPR Is Master", false);
-                if PurchasePrice.FindSet() then
-                    repeat
-                        MasterLineMapMgt.CreateMap(Database::"Purchase Price", PurchasePrice.SystemId, MasterPurchasePrice.SystemId);
-                    until PurchasePrice.Next() = 0;
-            until MasterPurchasePrice.Next() = 0;
-    end;
-
     local procedure UpgradeSalesLineMasterLineData()
     var
         MasterSalesLine: Record "Sales Line";
@@ -118,25 +75,6 @@
                         MasterLineMapMgt.CreateMap(Database::"Sales Line", SalesLine.SystemId, MasterSalesLine.SystemId);
                     until SalesLine.Next() = 0;
             until MasterSalesLine.Next() = 0;
-    end;
-
-    local procedure UpgradeSalesPriceMasterLineData()
-    var
-        MasterSalesPrice: Record "Sales Price";
-        SalesPrice: Record "Sales Price";
-    begin
-        MasterSalesPrice.SetRange("NPR Is Master", true);
-        if MasterSalesPrice.FindSet() then
-            repeat
-                MasterLineMapMgt.CreateMap(Database::"Sales Price", MasterSalesPrice.SystemId, MasterSalesPrice.SystemId);
-
-                SalesPrice.SetRange("NPR Master Record Reference", MasterSalesPrice.GetPosition(false));
-                SalesPrice.SetRange("NPR Is Master", false);
-                if SalesPrice.FindSet() then
-                    repeat
-                        MasterLineMapMgt.CreateMap(Database::"Sales Price", SalesPrice.SystemId, MasterSalesPrice.SystemId);
-                    until SalesPrice.Next() = 0;
-            until MasterSalesPrice.Next() = 0;
     end;
 
     local procedure UpgradeTransferLineMasterLineData()

@@ -2,14 +2,6 @@ tableextension 6014454 "NPR User Setup" extends "User Setup"
 {
     fields
     {
-        field(6014400; "NPR Backoffice Register No."; Code[10])
-        {
-            Caption = 'POS Unit No.';
-            DataClassification = CustomerContent;
-            Description = 'NPR7.100.000';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used';
-        }
         field(6014401; "NPR POS Unit No."; Code[10])
         {
             Caption = 'POS Unit No.';
