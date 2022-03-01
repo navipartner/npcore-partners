@@ -715,7 +715,7 @@
                             DataLogSetup."Log Modification" := DataLogSetup."Log Modification"::Changes;
                         if NpXmlTemplateTrigger."Delete Trigger" then
                             DataLogSetup."Log Deletion" := DataLogSetup."Log Deletion"::Detailed;
-                        DurationBuffer := CreateDateTime(DMY2Date(31, 1, 2001), 000000T) - CreateDateTime(DMY2Date(1, 1, 2001), 000000T);
+                        DurationBuffer := CreateDateTime(DMY2Date(8, 1, 2001), 000000T) - CreateDateTime(DMY2Date(1, 1, 2001), 000000T);
                         DataLogSetup."Keep Log for" := DurationBuffer;
                         DataLogSetup.Insert(true);
                     end else begin
