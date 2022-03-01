@@ -16,7 +16,7 @@
                 field("Issued Tickets"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Issued Tickets"))))
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Issued Tickets field';
+                    ToolTip = 'Specifies the list of issued tickets.';
                     Caption = 'Issued Tickets';
 
                     trigger OnDrillDown()
@@ -27,7 +27,7 @@
                 field("Ticket Requests"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Ticket Requests"))))
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Ticket Requests field';
+                    ToolTip = 'Specifies the list of ticket requests.';
                     Caption = 'Ticket Requests';
 
                     trigger OnDrillDown()
@@ -38,7 +38,7 @@
                 field("Ticket Types"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Ticket Types"))))
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Ticket Type field';
+                    ToolTip = 'Specifies the list of ticket types.';
                     Caption = 'Ticket Types';
 
                     trigger OnDrillDown()
@@ -60,7 +60,7 @@
                 field("Ticket Schedules"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Ticket Schedules"))))
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Ticket Schedules field';
+                    ToolTip = 'Specifies the Ticket Schedules.';
                     Caption = 'Ticket Schedules';
 
                     trigger OnDrillDown()
@@ -72,7 +72,7 @@
                 {
                     ApplicationArea = NPRRetail;
                     DrillDownPageID = "NPR TM Ticket Admissions";
-                    ToolTip = 'Specifies the value of the Ticket Admissions field';
+                    ToolTip = 'Specifies the list of Ticket Admissions.';
                     Caption = 'Ticket Admissions';
 
                     trigger OnDrillDown()
@@ -88,7 +88,7 @@
                 {
                     ApplicationArea = NPRRetail;
                     ShowCaption = false;
-                    ToolTip = 'Specifies the value of the Members field';
+                    ToolTip = 'Specifies the list of Members associated with different Memberships.';
                     Caption = 'Members';
 
                     trigger OnDrillDown()
@@ -99,7 +99,7 @@
                 field(Memberships; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Memberships))))
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Memberships field';
+                    ToolTip = 'Specifies the list of Memberships.';
                     Caption = 'Memberships';
 
                     trigger OnDrillDown()
@@ -110,7 +110,7 @@
                 field(Membercards; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Membercards))))
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Membercards field';
+                    ToolTip = 'Specifies the list of Member Cards.';
                     Caption = 'Member Cards';
 
                     trigger OnDrillDown()
@@ -126,7 +126,7 @@
                 field(Items; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Items))))
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Items field';
+                    ToolTip = 'Specifies the list of Items.';
                     Caption = 'Items';
 
                     trigger OnDrillDown()
@@ -138,7 +138,7 @@
                 field(Contacts; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Contacts))))
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Contacts field';
+                    ToolTip = 'Specifies the list of Contacts.';
                     Caption = 'Contacts';
 
                     trigger OnDrillDown()
@@ -150,7 +150,7 @@
                 field(Customers; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Customers))))
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Customers field';
+                    ToolTip = 'Specifies the list of Customers.';
                     Caption = 'Customers';
 
                     trigger OnDrillDown()
