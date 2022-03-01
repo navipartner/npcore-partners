@@ -34,6 +34,9 @@
             column(Item_Category_Code; "Item Category Code")
             {
             }
+            column(Item_No; "Item No.")
+            {
+            }
             column(Sum_Sales_Amount_Actual; "Sales Amount (Actual)")
             {
                 Method = Sum;
