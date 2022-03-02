@@ -360,6 +360,9 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                                 OutStream: OutStream;
                                 InStr: InStream;
                             begin
+                                if comment = '' then
+                                    exit;
+
                                 Clear(TempItem."NPR Magento Desc.");
                                 TempBlob.CreateOutStream(OutStream);
                                 OutStream.WriteText(comment);
