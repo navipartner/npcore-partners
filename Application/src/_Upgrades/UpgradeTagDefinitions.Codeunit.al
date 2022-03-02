@@ -23,7 +23,6 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Cross Ref"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Master Line Map"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Gift Voucher"));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Document Send. Prof."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Distr. And Exch. Map"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Credit Voucher"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Bitmap 2 Media"));
@@ -119,8 +118,6 @@
                 exit('NPRPUGMasterLineMap_Upgrade-20210312');
             Codeunit::"NPR UPG Gift Voucher":
                 exit('NPRGiftVoucher-58afcbe8-d720-4770-8e65-28e0bc15e4a8');
-            Codeunit::"NPR UPG Document Send. Prof.":
-                exit('NPR_DocumentProcessing_DocumentSendingProfile_20210222');
             Codeunit::"NPR UPG Distr. And Exch. Map":
                 exit('NPRPUGDistrAndExchMap_Upgrade-20210312');
             Codeunit::"NPR UPG Credit Voucher":
