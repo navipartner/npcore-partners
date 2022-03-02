@@ -1,7 +1,7 @@
-# NP WMS Role center
+# NP WMS Role Center
 
-This is the main page for NP WMS Extension.
-The Role Center is called 'NP WMS'. From this page you will be able to access the Setups for NP WMS, Download the mobile Apps and to download either Test Data or Live templates.
+NP WMS Role Center is the main page for NP WMS Extension.
+From this page you can access all the available setups for NP WMS, download the mobile apps, as well as the Test Data or Live (sample) templates.
 
 From the WMS Role Center, you can access the following links:
 

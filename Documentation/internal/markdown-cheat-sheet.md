@@ -68,6 +68,14 @@ Putting this all together an internal link looks like this:
 
 ![alt text](https://www.markdownguide.org/assets/images/tux.png)
 
+### Resizing images
+
+<img src="https://www.markdownguide.org/assets/images/tux.png" width="200">
+
+### Videos
+
+[Microsoft documentation instructions](https://docs.microsoft.com/en-us/dynamics365/business-central/purchasing-how-record-purchases)
+
 ## Extended Syntax
 
 These elements extend the basic syntax by adding additional features. Not all Markdown applications support these elements.

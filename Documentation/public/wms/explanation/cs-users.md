@@ -1,13 +1,10 @@
 # Capture service users
 
-All users who will access NP WMS should be created as a CS User.
-The CS users should be an active BC user. 
+All users who will should have access to NP WMS should be created in the **CS Users** setup section. Each CS user should also be an active BC user. 
 
 > [!NOTE]
->
-> Each Device which will use the NP WMS will be assigned a BC user. 
-> This BC User should be of Licence type **Device Only** (ISV)  and active.
+> Each device which uses NP WMS will be assigned a BC user. This user should be active and have their **License Type** set to be **Device Only User** (ISV).
 
 # Related Links
 
--[ Setup CS Users](../howto/set-up-cs-users.md)
+- [Set up CS Users](../howto/set-up-cs-users.md)
