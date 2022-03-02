@@ -2,6 +2,7 @@
 
 A QR code is a machine-readable optical label that can contain information about the entity it's attached to. Each of the existing users has their own unique QR code. To create a QR code in NP WMS:
 
+
 1. Click the ![Lightbulb that opens the Tell Me feature](../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **NPRW CS QR Code List** and choose the related link.        
    The list of configured users is displayed.              
    You can find the QR code in the **NPRW CS QR Code FactBox** section for configured users.

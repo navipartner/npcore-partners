@@ -6,9 +6,14 @@ It's possible to fetch preset configurations on your environment, to make the ov
    The **RapidStart WMS Data Imp** popup window is displayed.
 2. Click the ![Ellipsis icon](../../images/Icons/elipsis_icon.png "Assist Edit") button, and then select the data template you wish to fetch.
 
-    NaviPartner offers 2 sets of setup data for NP WMS:
+    NaviPartner offers 3 sets of setup data for NP WMS:
+    - Live Template - Capture Services (***NP WMS LIVE - CS ONLY***)
+      The live template contains preconfigured setup tables and master data ready to be used when setting up a new company.
+      Only Setup tables for Capture Services are included.
+
     - Live Template (**NP WMS LIVE**)            
-      The live template contains preconfigured setup tables and master data ready to be used when setting up a new company.   
+      The live template contains preconfigured setup tables and master data ready to be used when setting up a new company.
+      Also included a set of preconfigured Locations for warehousing  
 
     - Demo Data (**NP WMS TEST DATA**)             
       The demo template contains preset examples and data that can be used for demo purposes or training.
@@ -21,4 +26,5 @@ It's possible to fetch preset configurations on your environment, to make the ov
    Fetching the selected setup is complete, and the relevant data becomes available in the environment.
 
 ### Related links
+- [Setup CS Users](./set-up-cs-users.md)
 - [Create QR codes](./create-qr-codes.md)
