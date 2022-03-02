@@ -1,4 +1,5 @@
-﻿codeunit 6184534 "NPR EFT NETSCloud Protocol"
+﻿#if not CLOUD
+codeunit 6184534 "NPR EFT NETSCloud Protocol"
 {
     Access = Internal;
     // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
@@ -891,4 +892,4 @@
         EFTNETSCloudIntegration.HandleProtocolResponse(EftTransactionRequest);
     end;
 }
-
+#endif

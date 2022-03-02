@@ -1,4 +1,5 @@
-﻿codeunit 6014525 "NPR MobilePayV10 Get Payment"
+﻿#if not CLOUD
+codeunit 6014525 "NPR MobilePayV10 Get Payment"
 {
     Access = Internal;
     // GET /v10/payments/{paymentid}
@@ -118,3 +119,4 @@
         exit('/pos/v10/payments/');
     end;
 }
+#endif

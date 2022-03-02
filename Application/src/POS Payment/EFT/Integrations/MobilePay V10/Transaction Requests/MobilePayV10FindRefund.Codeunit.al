@@ -1,4 +1,5 @@
-﻿codeunit 6014516 "NPR MobilePayV10 Find Refund"
+﻿#if not CLOUD
+codeunit 6014516 "NPR MobilePayV10 Find Refund"
 {
     Access = Internal;
     // GET /v10/refunds
@@ -102,3 +103,4 @@
         end;
     end;
 }
+#endif

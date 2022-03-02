@@ -1,4 +1,5 @@
-﻿codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
+﻿#if not CLOUD
+codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
 {
     Access = Internal;
     // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
@@ -605,4 +606,4 @@
         JObject := JObject.Parse(OptionalData);
     end;
 }
-
+#endif

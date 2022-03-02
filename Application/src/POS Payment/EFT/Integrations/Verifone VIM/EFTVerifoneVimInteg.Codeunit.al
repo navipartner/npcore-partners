@@ -1,4 +1,5 @@
-﻿codeunit 6184526 "NPR EFT Verifone Vim Integ."
+﻿#if not CLOUD
+codeunit 6184526 "NPR EFT Verifone Vim Integ."
 {
     Access = Internal;
     // NPR5.53/MMV /20191203 CASE 349520 Created object
@@ -12,6 +13,7 @@
     var
         INTEGRATION_DESC: Label 'Verifone VIM via stargate';
         BALANCE_CHECK_DEC: Label 'Balance Enquiry';
+        #if not CLOUD
         TRX_ERROR: Label '%1 %2 failed\%3\%4';
         VOID_SUCCESS: Label 'Transaction %1 voided successfully';
         CARD: Label 'Card: %1';
@@ -19,6 +21,7 @@
         OPERATION_SUCCESS: Label '%1 %2 Success';
         RECONCILIATION: Label 'Acquirer Reconciliation';
         BALANCE_PROMPT: Label 'Balance: %1 %2\Expiry Date: %3';
+        #endif
 
     local procedure IntegrationType(): Code[20]
     begin
@@ -251,7 +254,7 @@
         EftTransactionRequest."Reference Number Input" := Format(EftTransactionRequest."Entry No.");
         EftTransactionRequest.Modify(true);
     end;
-
+#if not CLOUD
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
     local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
@@ -263,7 +266,7 @@
 
         EFTVerifoneVimProtocol.SendEftDeviceRequest(EftTransactionRequest);
     end;
-
+#endif
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnPrintReceipt', '', false, false)]
     local procedure OnPrintReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
@@ -523,7 +526,7 @@
         GetPaymentTypeParameters(EFTSetup, EFTVerifonePaymentParameter);
         exit(EFTVerifonePaymentParameter."Post Reconcile Delay Seconds");
     end;
-
+    
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Verifone Vim Prot.", 'OnAfterProtocolResponse', '', false, false)]
     local procedure OnAfterProtocolResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
@@ -578,4 +581,5 @@
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
     end;
 }
+    #endif
 

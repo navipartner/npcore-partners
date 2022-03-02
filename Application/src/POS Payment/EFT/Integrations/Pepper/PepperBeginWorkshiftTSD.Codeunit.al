@@ -1,4 +1,5 @@
-﻿codeunit 6184491 "NPR Pepper Begin Workshift TSD"
+﻿#if not CLOUD
+codeunit 6184491 "NPR Pepper Begin Workshift TSD"
 {
     Access = Internal;
     // NPR5.30/TSA/20170123  CASE 263458 Refactored for Transcendence
@@ -315,4 +316,4 @@
     begin
     end;
 }
-
+#endif

@@ -1,6 +1,8 @@
-﻿codeunit 6184487 "NPR Pepper Library TSD"
+﻿
+codeunit 6184487 "NPR Pepper Library TSD"
 {
     Access = Internal;
+    #if not CLOUD
     var
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -827,13 +829,13 @@
         if (POSSession.IsActiveSession(FrontEnd)) then
             FrontEnd.ResumeWorkflow();
     end;
-
+#endif
     procedure GetIntegrationType(): Code[10]
     begin
 
         exit('PEPPER');
     end;
-
+#if not CLOUD
     local procedure CreateBeginWorkshiftRequest(RegisterNo: Code[10]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     begin
 
@@ -2045,5 +2047,5 @@
         exit(0);
 
     end;
+#endif
 }
-

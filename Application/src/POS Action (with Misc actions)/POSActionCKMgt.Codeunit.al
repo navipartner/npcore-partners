@@ -1,4 +1,5 @@
-﻿codeunit 6150854 "NPR POS Action - CK Mgt."
+﻿#if not CLOUD
+codeunit 6150854 "NPR POS Action - CK Mgt."
 {
     Access = Internal;
     var
@@ -143,4 +144,4 @@
         end;
     end;
 }
-
+#endif

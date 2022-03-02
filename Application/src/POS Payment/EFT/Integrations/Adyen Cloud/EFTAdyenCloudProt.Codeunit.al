@@ -1,4 +1,5 @@
-﻿codeunit 6184518 "NPR EFT Adyen Cloud Prot."
+﻿#if not CLOUD
+codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 {
     Access = Internal;
     // NPR5.48/MMV /20190124 CASE 341237 Created object
@@ -1235,4 +1236,4 @@
         EFTAdyenCloudIntegration.HandleProtocolResponse(EftTransactionRequest);
     end;
 }
-
+#endif

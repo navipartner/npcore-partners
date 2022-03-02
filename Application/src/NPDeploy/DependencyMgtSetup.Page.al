@@ -1,4 +1,5 @@
-﻿page 6014670 "NPR Dependency Mgt. Setup"
+﻿#if not CLOUD
+page 6014670 "NPR Dependency Mgt. Setup"
 {
     Extensible = False;
     Caption = 'Dependency Management Setup';
@@ -72,4 +73,4 @@
         end;
     end;
 }
-
+#endif

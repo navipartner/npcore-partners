@@ -48,7 +48,9 @@
         TestTable(DATABASE::"VAT Posting Setup");
         TestTable(DATABASE::"NPR Object Output Selection");
         TestTable(DATABASE::"NPR Report Selection Retail");
+#if not CLOUD
         TestTable(DATABASE::"NPR Dependency Mgt. Setup");
+#endif
         TestTable(DATABASE::"NPR POS Unit");
         TestTable(DATABASE::"NPR POS Store");
         TestTable(DATABASE::"NPR POS Audit Profile");

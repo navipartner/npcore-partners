@@ -1,4 +1,5 @@
-﻿table 6014625 "NPR Dependency Mgt. Setup"
+﻿#if not CLOUD
+table 6014625 "NPR Dependency Mgt. Setup"
 {
     Access = Internal;
     Caption = 'Dependency Management Setup';
@@ -78,4 +79,4 @@
         }
     }
 }
-
+#endif

@@ -1,4 +1,5 @@
-﻿codeunit 6184485 "NPR Pepper Terminal Captions"
+﻿#if not CLOUD
+codeunit 6184485 "NPR Pepper Terminal Captions"
 {
     Access = Internal;
     // NPR5.26/TSA/20160809 CASE 248452 Assembly Version Up - JBAXI Support, General Improvements
@@ -123,4 +124,4 @@
         //+NPR5.38 [301053]
     end;
 }
-
+#endif

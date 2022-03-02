@@ -1,4 +1,5 @@
-﻿codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
+﻿#if not CLOUD
+codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
 {
     Access = Internal;
     // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
@@ -199,4 +200,4 @@
         exit(LookupResult);
     end;
 }
-
+#endif

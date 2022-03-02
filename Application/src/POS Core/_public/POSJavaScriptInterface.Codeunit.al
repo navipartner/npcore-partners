@@ -94,10 +94,12 @@
                 Method_Login(POSSession, FrontEnd, Context, Self);
             'TextEnter':
                 Method_TextEnter(POSSession, FrontEnd, Context, Self);
+#if not CLOUD
             'InvokeDeviceResponse':
                 Method_InvokeDeviceResponse(POSSession, FrontEnd, Context);
             'Protocol':
                 Method_Protocol(POSSession, FrontEnd, Context);
+#endif
             'FrontEndId':
                 FrontEnd.HardwareInitializationComplete();
             'Unlock':
@@ -346,6 +348,7 @@
         Setup.Action_TextEnter(Action, POSSession);
         InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd, Self);
     end;
+#if not CLOUD
 
     [Obsolete('Delete when stargate is removed')]
     local procedure Method_InvokeDeviceResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
@@ -401,7 +404,7 @@
         Callback := JSON.GetBooleanOrFail('callback', ReadingFromProtocolMethodErr);
         Stargate.AppGatewayProtocol(ActionName, Step, EventName, SerializedArguments, Callback, FrontEnd);
     end;
-
+#endif
     local procedure Method_Unlock(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")
     var
         "Action": Record "NPR POS Action";

@@ -128,14 +128,14 @@
 
                     CreateTransaction(POSSession, AmountToCapture, PaymentTypeNo, NumpadAmount);
                 end;
-
+#if not CLOUD
             'InvokeDevice':
                 begin
                     GetTransactionRequest(POSSession, CashKeeperTransaction);
                     FrontEnd.PauseWorkflow();
                     OnInvokeDevice(CashKeeperTransaction);
                 end;
-
+#endif
             'CheckTransactionResult':
                 begin
                     GetTransactionRequest(POSSession, CashKeeperTransaction);
@@ -356,7 +356,7 @@
     #endregion
 
     #region Stargate
-
+#if not CLOUD
     procedure OnInvokeDevice(var CashKeeperTransaction: Record "NPR CashKeeper Transaction")
     var
         CashKeeperRequest: DotNet NPRNetCashKeeperRequest0;
@@ -431,10 +431,11 @@
                 CloseForm(Data);
         end;
     end;
+#endif
     #endregion
 
     #region Protocol Events
-
+#if not CLOUD
     local procedure CloseForm(Data: Text)
     var
         State: DotNet NPRNetState4;
@@ -465,6 +466,7 @@
 
         Commit();
     end;
+    #endif
     #endregion
 
     #region Subscriber

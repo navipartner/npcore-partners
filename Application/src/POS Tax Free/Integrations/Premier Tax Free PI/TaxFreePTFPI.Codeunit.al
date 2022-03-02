@@ -107,8 +107,10 @@
     local procedure TryPrintVoucher(var TaxFreeRequest: Record "NPR Tax Free Request")
     begin
         case TaxFreeRequest."Print Type" of
+        #if not CLOUD
             TaxFreeRequest."Print Type"::PDF:
                 PrintPDF(TaxFreeRequest);
+                #endif
             TaxFreeRequest."Print Type"::Thermal:
                 PrintThermalReceipt(TaxFreeRequest);
         end;
@@ -623,6 +625,7 @@
             Printer.NewLine();
     end;
 
+#if not CLOUD
     [Obsolete('PrintMethodMgt: Codeunit "NPR Print Method Mgt." needs to be refractored ')]
     local procedure PrintPDF(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
@@ -669,6 +672,7 @@
                 PrintMethodMgt.PrintFileLocal(Output, MemoryStream, 'pdf');
         end;
     end;
+#endif
     #endregion
     #region Web Service Request functions
 

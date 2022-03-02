@@ -145,7 +145,9 @@
     var
         SaleLine: Record "NPR POS Sale Line";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
+#if not CLOUD
         PepperLibraryTranscendence: Codeunit "NPR Pepper Library TSD";
+#endif
         EFTSetup: Record "NPR EFT Setup";
     begin
 
@@ -181,6 +183,7 @@
                     //SetOffline
                     if OtherCommand = 0 then
                         OtherCommand := StrMenu(OtherCommandStringMenu, 0);
+#if not CLOUD
                     case OtherCommand of
                         1:
                             PepperLibraryTranscendence.SetTerminalToOfflineMode(POSUnit, 0); //Activate
@@ -188,6 +191,7 @@
                             PepperLibraryTranscendence.SetTerminalToOfflineMode(POSUnit, 1); //Deactivate
                     end;
                     NextWorkflowStep := NextWorkflowStep::Done;
+#endif
                     exit;
                 end;
 

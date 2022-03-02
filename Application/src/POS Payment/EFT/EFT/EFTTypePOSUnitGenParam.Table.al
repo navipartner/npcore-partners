@@ -151,8 +151,13 @@
     procedure LookupValue()
     var
         TempRetailList: Record "NPR Retail List" temporary;
+#if not CLOUD
         Parts: DotNet NPRNetArray;
         "Part": DotNet NPRNetString;
+#else
+        Parts: List of [Text];
+        "Part": Text;
+#endif
         OptionStringCaption: Text;
         Handled: Boolean;
     begin
@@ -172,7 +177,7 @@
         else
             SplitString(OptionString, Parts);
 
-        foreach Part in Parts do begin
+        foreach "Part" in Parts do begin
             TempRetailList.Number += 1;
             TempRetailList.Choice := Part;
             TempRetailList.Insert();
@@ -293,7 +298,7 @@
     begin
         OptionOut := SelectStr(Ordinal + 1, OptionStringIn);
     end;
-
+#if not CLOUD
     local procedure SplitString(Text: Text; var Parts: DotNet NPRNetArray)
     var
         String: DotNet NPRNetString;
@@ -303,6 +308,12 @@
         Char := ',';
         Parts := String.Split(Char.ToCharArray());
     end;
+#else
+    local procedure SplitString(Text: Text; var Parts: List of [Text])
+    begin
+        Parts := Text.Split(',');
+    end;
+#endif
 
     [IntegrationEvent(false, false)]
     procedure OnGetParameterNameCaption(Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Caption: Text)

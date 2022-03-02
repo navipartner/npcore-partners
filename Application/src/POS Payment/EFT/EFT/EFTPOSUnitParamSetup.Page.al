@@ -1,4 +1,5 @@
-﻿page 6184480 "NPR EFT POSUnit Param. Setup"
+﻿#if not CLOUD
+page 6184480 "NPR EFT POSUnit Param. Setup"
 {
     Extensible = False;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
@@ -163,4 +164,4 @@
         ShowPOSUnitBLOBParameter: Boolean;
         IsMobilePay: Boolean;
 }
-
+#endif

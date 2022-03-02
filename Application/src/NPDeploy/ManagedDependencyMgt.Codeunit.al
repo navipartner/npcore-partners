@@ -1,9 +1,9 @@
-﻿codeunit 6014627 "NPR Managed Dependency Mgt."
+﻿#if not CLOUD
+codeunit 6014627 "NPR Managed Dependency Mgt."
 {
     Access = Internal;
     Permissions = TableData "NPR Web Client Dependency" = rimd,
                   TableData "NPR POS Stargate Package" = rimd;
-
     trigger OnRun()
     begin
         ClearLastError();
@@ -29,7 +29,12 @@
           false);
     end;
 
-    procedure ExportManifest("Record": Variant; var JArray: JsonArray; PayloadVersion: Integer)
+
+    procedure ExportManifest("Record": Variant;
+
+    var
+        JArray: JsonArray;
+        PayloadVersion: Integer)
     var
         JObject: JsonObject;
         RecRef: RecordRef;
@@ -174,6 +179,7 @@
             OnDependenciesDeployed();
     end;
 
+
     local procedure DeployDependency(Base64: Text): Boolean
     var
         JObject: JsonObject;
@@ -305,6 +311,7 @@
         if JObject.Get(TokenKey, JToken) then
             JTokenValueText := Jtoken.AsValue().AsText();
     end;
+
 
     procedure GetServerID() ID: Text
     var
@@ -593,7 +600,5 @@
         ErrorReasonPhrase := ResponseMessage.ReasonPhrase;
         exit(false);
     end;
-
-
 }
-
+#endif

@@ -1,3 +1,4 @@
+#if not CLOUD
 dotnet
 {
     assembly("System.Xml")
@@ -996,3 +997,4 @@ dotnet
     }
 
 }
+#endif

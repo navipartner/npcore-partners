@@ -87,12 +87,13 @@
         if PAGE.RunModal(0, TempEFTIntegrationType) = ACTION::LookupOK then
             "EFT Integration Type" := TempEFTIntegrationType.Code;
     end;
-
+#if not CLOUD
     procedure ShowEftPOSUnitParameters()
     begin
         Commit(); //In case any parameters were just injected
         PAGE.RunModal(PAGE::"NPR EFT POSUnit Param. Setup", Rec);
     end;
+#endif
 
     procedure ShowEftPaymentParameters()
     begin

@@ -61,6 +61,7 @@
         tmpEFTAuxOperation.Insert();
     end;
 
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationUnitSetup', '', false, false)]
     local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
     var
@@ -76,10 +77,12 @@
         GetVirtualCOM(EFTSetup);
         GetPOSUnitBlob1(EFTSetup, Blob1);
         GetPOSUnitBlob2(EFTSetup, Blob2);
-
+#if not CLOUD
         //Show the generic parameter page.
         EFTSetup.ShowEftPOSUnitParameters();
+#endif
     end;
+
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationPaymentSetup', '', false, false)]
     local procedure OnConfigureIntegrationPaymentSetup(EFTSetup: Record "NPR EFT Setup")

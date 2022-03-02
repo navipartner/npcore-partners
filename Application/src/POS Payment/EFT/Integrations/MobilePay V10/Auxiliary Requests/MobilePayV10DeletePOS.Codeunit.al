@@ -1,4 +1,5 @@
-﻿codeunit 6014529 "NPR MobilePayV10 Delete POS"
+﻿#if not CLOUD
+codeunit 6014529 "NPR MobilePayV10 Delete POS"
 {
     Access = Internal;
     // DELETE  /v10/pointofsales/{posid}
@@ -65,3 +66,4 @@
         eftTrxRequest.Modify();
     end;
 }
+#endif

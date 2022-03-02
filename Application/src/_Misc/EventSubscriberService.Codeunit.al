@@ -8,7 +8,9 @@
 
         RegisterMagentoSetup(ServiceConnection);
         RegisterRaptorSetup(ServiceConnection);
+#if not CLOUD
         RegisterDependencyMgtSetup(ServiceConnection);
+#endif
     end;
 
 
@@ -44,6 +46,7 @@
             HostName, PAGE::"NPR Raptor Setup");
     end;
 
+#if not CLOUD
     local procedure RegisterDependencyMgtSetup(var ServiceConnection: Record "Service Connection")
     var
         DependencyMagtSetup: Record "NPR Dependency Mgt. Setup";
@@ -59,5 +62,6 @@
             ServiceConnection, DependencyMagtSetup.RecordId, ServiceNameDepMgtLbl,
             HostName, PAGE::"NPR Dependency Mgt. Setup");
     end;
+#endif
 }
 

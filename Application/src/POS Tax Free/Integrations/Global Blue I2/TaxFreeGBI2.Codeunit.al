@@ -560,8 +560,10 @@
         case TaxFreeRequest."Print Type" of
             TaxFreeRequest."Print Type"::Thermal:
                 PrintThermal(TaxFreeRequest);
+#if not CLOUD
             TaxFreeRequest."Print Type"::PDF:
                 PrintPDF(TaxFreeRequest);
+#endif
         end;
     end;
 
@@ -696,6 +698,7 @@
         end;
     end;
 
+#if not CLOUD
     [Obsolete('Need to refractor "NPR Print Method Mgt."')]
     local procedure PrintPDF(TaxFreeRequest: Record "NPR Tax Free Request")
     var
@@ -724,6 +727,7 @@
                 PrintMethodMgt.PrintFileLocal(Output, MemoryStream, 'pdf');
         end;
     end;
+#endif
 
     local procedure Base64ToBlob(base64: Text; var TempBlobOut: Codeunit "Temp Blob")
     var

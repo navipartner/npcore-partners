@@ -1,4 +1,5 @@
-﻿table 6184508 "NPR EFT Adyen Paym. Type Setup"
+﻿#if not CLOUD
+table 6184508 "NPR EFT Adyen Paym. Type Setup"
 {
     Access = Internal;
     // NPR5.49/MMV /20190401 CASE 345188 Created object
@@ -102,4 +103,4 @@
     {
     }
 }
-
+#endif
