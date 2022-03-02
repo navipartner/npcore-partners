@@ -17,17 +17,25 @@
                 field("NP Purchase Quote"; PurchQuoteCount)
                 {
                     Caption = 'Purchase Quote';
-
-                    DrillDownPageID = "Purchase Quotes";
                     ToolTip = 'Specifies the number of purchase quotes.';
                     ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    begin
+                        Page.RunModal(Page::"Purchase Quotes");
+                        CurrPage.Update(false);
+                    end;
+
                 }
                 field("NP Purchase Order"; PurchOrderCount)
                 {
                     Caption = 'Purchase Order';
-                    ApplicationArea = NPRRetail;
-                    DrillDownPageID = "Purchase Order List";
                     ToolTip = 'Specifies the number of purchase orders.';
+                    ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    begin
+                        Page.RunModal(Page::"Purchase Order List");
+                        CurrPage.Update(false);
+                    end;
                 }
 
                 field("Purchase Return Orders"; Rec."Purchase Return Orders")
