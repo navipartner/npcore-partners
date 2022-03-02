@@ -116,20 +116,6 @@
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6059970; "Is Master"; Boolean)
-        {
-            Caption = 'Is Master';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = '"NPR Master Line Map" used instead.';
-        }
-        field(6059972; "Master Record Reference"; Text[250])
-        {
-            Caption = 'Master Record Reference';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = '"NPR Master Line Map" used instead.';
-        }
     }
 
     keys
