@@ -514,22 +514,6 @@
                 until (ExchangeLabel.Next() = 0) or (not ExchangeLabel."Packaged Batch");
             end;
         }
-        field(6059970; "Is Master"; Boolean)
-        {
-            Caption = 'Is Master';
-            Description = 'VRT';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = '"NPR Master Line Map" used instead.';
-        }
-        field(6059971; "Master Line No."; Integer)
-        {
-            Caption = 'Master Line No.';
-            Description = 'VRT';
-            DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = '"NPR Master Line Map" used instead.';
-        }
     }
 
     keys

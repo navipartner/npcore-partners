@@ -46,21 +46,5 @@ tableextension 6014452 "NPR Item Journal Line" extends "Item Journal Line"
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6059970; "NPR Is Master"; Boolean)
-        {
-            Caption = 'Is Master';
-            DataClassification = CustomerContent;
-            Description = 'VRT';
-            ObsoleteState = Removed;
-            ObsoleteReason = '"NPR Master Line Map" used instead.';
-        }
-        field(6059971; "NPR Master Line No."; Integer)
-        {
-            Caption = 'Master Line No.';
-            DataClassification = CustomerContent;
-            Description = 'VRT';
-            ObsoleteState = Removed;
-            ObsoleteReason = '"NPR Master Line Map" used instead.';
-        }
     }
 }
