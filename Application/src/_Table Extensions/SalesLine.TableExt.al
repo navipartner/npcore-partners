@@ -14,21 +14,5 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Discount Code';
             DataClassification = CustomerContent;
         }
-        field(6059970; "NPR Is Master"; Boolean)
-        {
-            Caption = 'Is Master';
-            DataClassification = CustomerContent;
-            Description = 'VRT1.00';
-            ObsoleteState = Removed;
-            ObsoleteReason = '"NPR Master Line Map" used instead.';
-        }
-        field(6059971; "NPR Master Line No."; Integer)
-        {
-            Caption = 'Master Line No.';
-            DataClassification = CustomerContent;
-            Description = 'VRT1.00';
-            ObsoleteState = Removed;
-            ObsoleteReason = '"NPR Master Line Map" used instead.';
-        }
     }
 }

@@ -21,9 +21,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustSplitBillPOSActionParameters'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustDeletePOSLinePOSActionParameters'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Cross Ref"));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Master Line Map"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Gift Voucher"));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Distr. And Exch. Map"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Credit Voucher"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Bitmap 2 Media"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Azure Functions Data"));
@@ -113,12 +111,8 @@
                 exit('NPRRegister-a306e4b4-b004-4ac5-8749-fcd1c8ba5d1f');
             Codeunit::"NPR UPG POS Cross Ref":
                 exit(CompanyName() + 'NPRPOSCrossRef' + Format(Today(), 0, 9));
-            Codeunit::"NPR UPG Master Line Map":
-                exit('NPRPUGMasterLineMap_Upgrade-20210312');
             Codeunit::"NPR UPG Gift Voucher":
                 exit('NPRGiftVoucher-58afcbe8-d720-4770-8e65-28e0bc15e4a8');
-            Codeunit::"NPR UPG Distr. And Exch. Map":
-                exit('NPRPUGDistrAndExchMap_Upgrade-20210312');
             Codeunit::"NPR UPG Credit Voucher":
                 exit('NPRCreditVoucher-58afcbe8-d720-4770-8e65-28e0bc15e4a8');
             Codeunit::"NPR UPG Bitmap 2 Media":
