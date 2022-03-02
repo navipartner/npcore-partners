@@ -1,10 +1,11 @@
-# Capture service UIs 
-The Capture Service User Interface (CS UI) is defining the user interface on mobile device.
+# Capture service UIs
+
+The Capture Service user interface (CS UI) setup section is used for defining the user interface on mobile devices.
 
 There should be one **Start UI** for the company.
 Generally its the LOGIN UI.
 
-There are mainly 3 types of UIS
+There are mainly 3 types of UIs:
 
 1. Menus (type Selection List). 
     Used to create menu
@@ -21,23 +22,21 @@ There are mainly 3 types of UIS
 
 A UI is made up of 3 sections.
 
-1. The header part defines the type of UI.
+- The header part defines the type of UI.
 
-2. The detail part defines the fields to be displayed on the header part on the mobile device.
+- The detail part defines the fields to be displayed on the header part on the mobile device.
 
-3. The link to **Data Pattern Code** will defines the data displayed as lines on the mobile apps.
-
-
-
->[Note]
->
->Navipartner provides standard UIs which can be implemented and modified as per requirements of the users.
+- The link to **Data Pattern Code** will defines the data displayed as lines on the mobile apps.
 
 
 
-# Related links
+> [!Note]
+> NaviPartner provides standard UIs which can be implemented and modified as per requirements of the users.
 
-[Setup UIs](../howto/set-up-cs-uis.md)
 
-[Setup Data Pattern Code](../howto/set-up-datapatterncode.md)
 
+### Related links
+
+- [Set up UIs](../howto/set-up-cs-uis.md)
+
+- [Set up Data Pattern Code](../howto/set-up-datapatterncode.md)
