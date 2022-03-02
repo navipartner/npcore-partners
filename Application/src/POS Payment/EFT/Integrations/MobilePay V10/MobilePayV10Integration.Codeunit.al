@@ -4,7 +4,7 @@
    Depending on the log level, these separate request/responses are visible in the logging factbox for the original trx.
    Everything else is treated as a separate transaction request.
 */
-
+#if not CLOUD
 codeunit 6014518 "NPR MobilePayV10 Integration"
 {
     Access = Internal;
@@ -434,3 +434,4 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     end;
 
 }
+#endif

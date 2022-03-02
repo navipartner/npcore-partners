@@ -1,4 +1,5 @@
-﻿codeunit 6014530 "NPR MobilePayV10 Can.Payment"
+﻿#if not CLOUD
+codeunit 6014530 "NPR MobilePayV10 Can.Payment"
 {
     Access = Internal;
     // POST  /v10/payments/{paymentid}/cancel
@@ -63,3 +64,4 @@
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, false, '');
     end;
 }
+#endif

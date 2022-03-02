@@ -1,7 +1,7 @@
 ﻿// TODO: Case 430713
 //       UI in this Codeunit can be replaced with Workflows 2.0 simplePayment dialog.
 //       https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object?anchor=code-example%3A-%60simplepayment%60-dialog
-
+#if not CLOUD
 codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
 {
     Access = Internal;
@@ -339,3 +339,4 @@ codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
         exit(EFTTransactionRequest."Amount Input");
     end;
 }
+#endif

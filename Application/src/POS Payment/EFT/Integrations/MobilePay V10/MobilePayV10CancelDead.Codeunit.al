@@ -1,4 +1,5 @@
-﻿codeunit 6014510 "NPR MobilePayV10 CancelDead"
+﻿#if not CLOUD
+codeunit 6014510 "NPR MobilePayV10 CancelDead"
 {
     Access = Internal;
     var
@@ -96,3 +97,4 @@
         end;
     end;
 }
+#endif

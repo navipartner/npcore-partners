@@ -1,4 +1,5 @@
-﻿codeunit 6184529 "NPR EFT Adyen Resp. Parser"
+﻿#if not CLOUD
+codeunit 6184529 "NPR EFT Adyen Resp. Parser"
 {
     Access = Internal;
     // NPR5.53/MMV /20191120 CASE 377533 Created object
@@ -720,4 +721,4 @@
         exit(Value);
     end;
 }
-
+#endif

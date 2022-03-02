@@ -1,7 +1,7 @@
 ﻿// TODO: Case 430713
 //       This dialog does not really need Model UI. The only thing it does is that it runs some JavaScript. It should never have been
 //       built with Model UI. This can be done easily with a Workflows 2.0 action that runs the exact same JavaScript code.
-
+#if not CLOUD
 codeunit 6014584 "NPR Mobile Print Mgt."
 {
     Access = Internal;
@@ -107,3 +107,4 @@ codeunit 6014584 "NPR Mobile Print Mgt."
         JSON += '}';
     end;
 }
+#endif

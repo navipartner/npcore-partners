@@ -532,15 +532,24 @@
     procedure GetPrintBytes(): Text
     var
         PrintBufferInStream: InStream;
+#if not CLOUD
         MemoryStream: DotNet NPRNetMemoryStream;
         StreamReader: DotNet NPRNetStreamReader;
         NetEncoding: DotNet NPRNetEncoding;
+#else
+        TextInStream: Text;
+#endif
     begin
         PrintBuffer.CreateInStream(PrintBufferInStream, TEXTENCODING::UTF8);
+#if not CLOUD
         MemoryStream := PrintBufferInStream;
         MemoryStream.Position := 0;
         StreamReader := StreamReader.StreamReader(MemoryStream, NetEncoding.UTF8);
         exit(StreamReader.ReadToEnd());
+#else
+        PrintBufferInStream.ReadText(TextInStream);
+        exit(TextInStream);
+#endif
     end;
 
     local procedure LineFeed()
@@ -550,13 +559,15 @@
 
     local procedure PrintBitmapFromKeyword(Keyword: Code[20]; RegisterNo: Code[10])
     var
+        RetailLogo: Record "NPR Retail Logo";
         RetailLogoMgt: Codeunit "NPR Retail Logo Mgt.";
         LogoAsText: Text;
         InStream: InStream;
+#if not CLOUD
         MemoryStream: DotNet NPRNetMemoryStream;
         NetEncoding: DotNet NPRNetEncoding;
-        RetailLogo: Record "NPR Retail Logo";
         StreamReader: DotNet NPRNetStreamReader;
+#endif
         PrintBitmapFromKeywordLbl: Label '<SP%1,%2><RL><bmp><G%3>%4', Locked = true;
     begin
         RetailLogo.SetAutoCalcFields(OneBitLogo);
@@ -565,10 +576,14 @@
             repeat
                 if RetailLogo.OneBitLogo.HasValue() then begin
                     RetailLogo.OneBitLogo.CreateInStream(InStream);
+#if not CLOUD
                     MemoryStream := InStream;
                     MemoryStream.Position := 0;
                     StreamReader := StreamReader.StreamReader(MemoryStream, NetEncoding.GetEncoding('ibm850'));
                     LogoAsText := StreamReader.ReadToEnd();
+#else
+                    InStream.ReadText(LogoAsText);
+#endif
 
                     AddTextToBuffer(StrSubstNo(PrintBitmapFromKeywordLbl, (PageWidth div 1.077), yCoord, RetailLogo.OneBitLogoByteSize, LogoAsText)); // Might need to update placement of logo in the future
                     yCoord += RetailLogo.Height + 30; // Might need to make this dynamic in the future

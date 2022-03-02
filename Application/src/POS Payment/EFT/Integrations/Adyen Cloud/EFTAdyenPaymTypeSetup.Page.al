@@ -1,4 +1,5 @@
-﻿page 6184504 "NPR EFT Adyen Paym. Type Setup"
+﻿#if not CLOUD
+page 6184504 "NPR EFT Adyen Paym. Type Setup"
 {
     Extensible = False;
     Caption = 'EFT Adyen Payment Type Setup';
@@ -97,4 +98,4 @@
     {
     }
 }
-
+#endif

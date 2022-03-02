@@ -1,4 +1,5 @@
-﻿table 6014614 "NPR DotNet Assembly"
+﻿#if not CLOUD
+table 6014614 "NPR DotNet Assembly"
 {
     Access = Internal;
     Caption = '.NET Assembly';
@@ -68,4 +69,4 @@
         end;
     end;
 }
-
+#endif

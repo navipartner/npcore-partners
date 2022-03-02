@@ -1,8 +1,8 @@
 ﻿report 6060042 "NPR Import Excel Item Worksh."
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     Caption = 'Import Excel Item Worksheet';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
@@ -113,7 +113,6 @@
         trigger OnQueryClosePage(CloseAction: Action): Boolean
         var
             UploadResult: Boolean;
-            InStream: InStream;
             ImportFileLbl: Label 'Import Excel File';
             ExcelFileExtensionTok: Label 'Excel File (.xlsx)|*.xlsx', Locked = true;
         begin
@@ -124,7 +123,7 @@
                 if ServerFileName = '' then
                     exit(false);
 
-                SheetName := ExcelBuf.SelectSheetsName(ServerFileName);
+                SheetName := ExcelBuf.SelectSheetsNameStream(InStream);
                 if SheetName = '' then
                     exit(false);
             end;
@@ -140,7 +139,7 @@
     begin
         GLSetup.Get();
         ExcelBuf.LockTable();
-        ExcelBuf.OpenBook(ServerFileName, SheetName);
+        ExcelBuf.OpenBookStream(InStream, SheetName);
         ExcelBuf.ReadSheet();
     end;
 
@@ -172,6 +171,7 @@
         ExcludeColumnsFilter: Text;
         ServerFileName: Text;
         SheetName: Text[250];
+        InStream: InStream;
 
     local procedure AnalyzeData()
     var

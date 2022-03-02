@@ -321,7 +321,7 @@
         TxtRemotetestmode: Label 'WARNING: switching on Remote test mode process transactions to the terminal as normal but log them as test. You must set the terminal to test manually! Are you sure want to continue? ';
         TxtProductionmode: Label 'WARNING: this will mark this configuration as production and process all transactons normally.';
         Txt001: Label '%1 cannot be greater than %2.';
-
+#if not CLOUD
     procedure UploadFile(FileType: Option License,AdditionalParameters)
     var
         FileManagement: Codeunit "File Management";
@@ -386,7 +386,7 @@
                 end;
         end;
     end;
-
+#endif
     procedure ClearFile(FileType: Option License,AdditionalParameters)
     var
         TxtNoLicense: Label 'No license file is configured.';

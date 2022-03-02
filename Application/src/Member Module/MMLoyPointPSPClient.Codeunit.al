@@ -103,6 +103,7 @@
         Message('VOID');
     end;
 
+#if not CLOUD
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
     local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
@@ -123,6 +124,7 @@
 
         LoyaltyPointsMgrClient.MakeServiceRequest(EftTransactionRequest);
     end;
+#endif
 
     procedure OnServiceRequestResponse(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var

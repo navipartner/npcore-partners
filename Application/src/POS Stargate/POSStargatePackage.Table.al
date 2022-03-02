@@ -1,4 +1,5 @@
-﻿table 6150713 "NPR POS Stargate Package"
+﻿#if not CLOUD
+table 6150713 "NPR POS Stargate Package"
 {
     Access = Internal;
     Caption = 'POS Stargate Package';
@@ -52,4 +53,4 @@
         StargatePackageMethod.DeleteAll();
     end;
 }
-
+#endif

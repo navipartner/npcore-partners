@@ -1,6 +1,8 @@
-﻿codeunit 6184544 "NPR SS Action - Adyen Unatt."
+﻿#if not CLOUD
+codeunit 6184544 "NPR SS Action - Adyen Unatt."
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'Adyen Cloud Unattended Transaction';
         DIALOG_CAPTION: Label 'Continue on terminal';
@@ -98,7 +100,6 @@
 
         EFTAdyenCloudProtocol.SendEftDeviceRequest(EFTTransactionRequest, false);
     end;
-
     local procedure CheckResponse(Context: Codeunit "NPR POS JSON Management"): Boolean
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -130,3 +131,4 @@
         exit(DelChr(DIALOG_CAPTION, '=', '"'));
     end;
 }
+#endif

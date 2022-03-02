@@ -1,4 +1,5 @@
-﻿codeunit 6014519 "NPR MobilePayV10 Protocol"
+﻿#if not CLOUD
+codeunit 6014519 "NPR MobilePayV10 Protocol"
 {
     Access = Internal;
 
@@ -928,3 +929,4 @@
     begin
     end;
 }
+#endif

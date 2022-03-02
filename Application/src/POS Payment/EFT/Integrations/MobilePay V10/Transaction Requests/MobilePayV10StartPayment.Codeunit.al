@@ -1,4 +1,5 @@
-﻿codeunit 6014521 "NPR MobilePayV10 Start Payment"
+﻿#if not CLOUD
+codeunit 6014521 "NPR MobilePayV10 Start Payment"
 {
     Access = Internal;
     // POST  /v10/payments
@@ -90,3 +91,4 @@
         eftTrxRequest.Modify();
     end;
 }
+#endif

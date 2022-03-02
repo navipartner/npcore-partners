@@ -1,4 +1,5 @@
-﻿codeunit 6184515 "NPR EFT Flexiiterm Integ."
+﻿#if not CLOUD
+codeunit 6184515 "NPR EFT Flexiiterm Integ."
 {
     Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
@@ -92,7 +93,7 @@
         EftTransactionRequest.Insert(true);
         //+NPR5.51 [359385]
     end;
-
+#if not CLOUD
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
     local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
@@ -112,6 +113,7 @@
     begin
         EFTInterface.EftIntegrationResponse(EFTTransactionRequest);
     end;
+    #endif
 
     procedure GetPOSDescription(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
     var
@@ -163,4 +165,4 @@
         exit(EFTTypePaymentGenParam.GetOptionParameterValue(IntegrationType(), EFTSetup."Payment Type POS", 'Transaction Type', 0, 'Not Forced,Forced Online,Forced Offline', true));
     end;
 }
-
+#endif

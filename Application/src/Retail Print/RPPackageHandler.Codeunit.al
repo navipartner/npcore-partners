@@ -195,7 +195,7 @@
         TableNo: Integer;
         RecRef: RecordRef;
         FieldReference: FieldRef;
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
+        ConvertHelper: Codeunit "NPR Convert Helper";
         ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
         JObject: JsonObject;
         JArray: JsonArray;
@@ -239,7 +239,7 @@
             foreach FieldID in FieldIDList do
                 if ManagedPackageMgt.FieldRefByID(RecRef, FieldID, FieldReference) then begin
                     JObject.Get(FieldID, JToken);
-                    if not ManagedDependencyMgt.JValueToFieldRef(JToken.AsValue(), FieldReference) then
+                    if not ConvertHelper.JValueToFieldRef(JToken.AsValue(), FieldReference) then
                         Error('Unexpected field data.');
                 end;
 

@@ -1,4 +1,5 @@
-﻿codeunit 6151001 "NPR POS Proxy: File Print"
+﻿#if not CLOUD
+codeunit 6151001 "NPR POS Proxy: File Print"
 {
     Access = Internal;
     // NPR5.43/MMV /20180528 CASE 315838 Updated assembly reference
@@ -73,4 +74,4 @@
              'G9NvxTzLN7ZSUv//fcpkOOyL5V66eUaMaaJqFth3Pr73kpoCgdyyvGofy092vE1ZsE8zw7Ft5JriNdPh3WWsMawNQ3xh0I1Lh45HiUDdIrcSM0v9aiBwRUyDXFNU=');
     end;
 }
-
+#endif

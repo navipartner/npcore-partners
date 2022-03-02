@@ -1,4 +1,5 @@
-﻿codeunit 6184513 "NPR EFT MobilePay Integ."
+﻿#if not CLOUD
+codeunit 6184513 "NPR EFT MobilePay Integ."
 {
     Access = Internal;
     // NPR5.46/MMV /20181008 CASE 290734 Created object
@@ -980,4 +981,4 @@
         exit(EFTTypePaymentGenParam.GetOptionParameterValue(IntegrationType(), EFTSetupIn."Payment Type POS", 'Environment', 0, 'PROD,DEMO', true));
     end;
 }
-
+#endif

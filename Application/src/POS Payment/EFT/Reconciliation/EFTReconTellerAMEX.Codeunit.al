@@ -1,4 +1,5 @@
-﻿codeunit 6014667 "NPR EFT Recon. Teller / AMEX"
+﻿#if not CLOUD
+codeunit 6014667 "NPR EFT Recon. Teller / AMEX"
 {
     Access = Internal;
 
@@ -30,7 +31,6 @@
         end;
         exit(true);
     end;
-
 
     procedure ImportStream(var Reconciliation: Record "NPR EFT Reconciliation"; var DataStream: InStream)
     var
@@ -80,7 +80,6 @@
         StripReferenceNo(Reconciliation);
         Reconciliation.Modify(true);
     end;
-
     local procedure HandleLineType110(var ReconHeader: Record "NPR EFT Reconciliation"; DataArray: array[40] of Text; LineCounter: Integer; EntryType: Integer)
     var
         ReconLine: Record "NPR EFT Recon. Line";
@@ -282,4 +281,4 @@
             Handled := ImportFile(EFTReconciliation);
     end;
 }
-
+#endif

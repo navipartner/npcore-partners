@@ -1,4 +1,5 @@
-﻿page 6014405 "NPR MobilePayV10 Unit Setup"
+﻿#if not CLOUD
+page 6014405 "NPR MobilePayV10 Unit Setup"
 {
     Extensible = False;
     PageType = Card;
@@ -116,3 +117,4 @@
     var
         _eftSetup: Record "NPR EFT Setup";
 }
+#endif

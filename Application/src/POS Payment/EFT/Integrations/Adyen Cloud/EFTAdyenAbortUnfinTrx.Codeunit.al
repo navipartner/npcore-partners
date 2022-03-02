@@ -1,4 +1,5 @@
-﻿codeunit 6184531 "NPR EFT Adyen Abort Unfin. Trx"
+﻿#if not CLOUD
+codeunit 6184531 "NPR EFT Adyen Abort Unfin. Trx"
 {
     Access = Internal;
     // NPR5.53/MMV /20200126 CASE 377533 Created object
@@ -76,4 +77,4 @@
         exit(EntryNoToCheck);
     end;
 }
-
+#endif

@@ -1,4 +1,5 @@
-﻿table 6150720 "NPR POS Stargate Assem. Map"
+﻿#if not CLOUD
+table 6150720 "NPR POS Stargate Assem. Map"
 {
     Access = Internal;
     Caption = 'POS Stargate Assembly Map';
@@ -39,4 +40,4 @@
     {
     }
 }
-
+#endif

@@ -1,4 +1,5 @@
-﻿codeunit 6184522 "NPR EFT Adyen Backgnd. Resp."
+﻿#if not CLOUD
+codeunit 6184522 "NPR EFT Adyen Backgnd. Resp."
 {
     Access = Internal;
     // NPR5.49/MMV /20190409 CASE 351678 Created object
@@ -34,3 +35,4 @@
     end;
 }
 
+#endif
