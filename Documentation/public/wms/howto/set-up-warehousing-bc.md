@@ -1,1 +1,1 @@
-# Set up warehousing in Business Central
+# Setup Warehousing in BC
