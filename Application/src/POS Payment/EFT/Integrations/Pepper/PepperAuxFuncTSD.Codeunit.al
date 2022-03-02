@@ -1,4 +1,5 @@
-﻿codeunit 6184494 "NPR Pepper Aux Func. TSD"
+﻿#if not CLOUD
+codeunit 6184494 "NPR Pepper Aux Func. TSD"
 {
     Access = Internal;
     // NPR5.30/TSA/20170123  CASE 263458 Refactored for Transcendence
@@ -267,4 +268,4 @@
     begin
     end;
 }
-
+#endif

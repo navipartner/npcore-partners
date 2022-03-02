@@ -1,4 +1,5 @@
-﻿codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
+﻿#if not CLOUD
+codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
 {
     Access = Internal;
     // NPR5.53/MMV /20191204 CASE 349520 Added object
@@ -407,4 +408,4 @@
         ParseReceipt(EFTTransactionRequest, TransactionResponse.Receipt2, OutStream);
     end;
 }
-
+#endif

@@ -130,8 +130,10 @@
         DebugWithTimestamp('UI.ConfigureReusableWorkflow');
         UI.ConfigureReusableWorkflows(_Setup);
         DebugWithTimestamp('AdvertiseStargatePackages');
+#if not CLOUD
         _FrontEnd.AdvertiseStargatePackages();
         DebugWithTimestamp('InitializeSecureMethods');
+#endif
         _FrontEnd.ConfigureSecureMethods();
         DebugWithTimestamp('ConfigureActionSequences');
         _FrontEnd.ConfigureActionSequences(TempSessionActions);

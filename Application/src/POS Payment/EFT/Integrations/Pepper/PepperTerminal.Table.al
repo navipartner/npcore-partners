@@ -261,7 +261,7 @@
     begin
         FillDefaultPrintFileNames();
     end;
-
+#if not CLOUD
     procedure UploadFile(FileType: Option License,AdditionalParameters)
     var
         FileManagement: Codeunit "File Management";
@@ -338,7 +338,7 @@
 
         end;
     end;
-
+#endif
     procedure ClearFile(FileType: Option License,AdditionalParameters)
     var
         TxtNoLicense: Label 'Are you sure you want to delete the additional parameters?';
@@ -524,4 +524,3 @@
 
     end;
 }
-

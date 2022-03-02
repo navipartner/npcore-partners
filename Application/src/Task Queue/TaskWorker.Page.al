@@ -12,6 +12,7 @@
     {
         area(content)
         {
+#if not CLOUD
             usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
             {
                 ApplicationArea = NPRRetail;
@@ -28,6 +29,7 @@
                     CurrPage.Update(false);
                 end;
             }
+#endif
             repeater(Group)
             {
                 field("Server Instance ID"; Rec."Server Instance ID")

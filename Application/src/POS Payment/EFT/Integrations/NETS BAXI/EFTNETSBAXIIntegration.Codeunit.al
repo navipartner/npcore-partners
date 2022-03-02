@@ -1,4 +1,5 @@
-﻿codeunit 6184540 "NPR EFT NETS BAXI Integration"
+﻿#if not CLOUD
+codeunit 6184540 "NPR EFT NETS BAXI Integration"
 {
     Access = Internal;
     // NPR5.54/MMV /20200129 CASE 364340 Created object
@@ -477,4 +478,4 @@
         Error(ERROR_ONLY_LAST, Format(EFTTransactionRequestIn."Processing Type"), EFTTransactionRequestIn."Hardware ID");
     end;
 }
-
+#endif

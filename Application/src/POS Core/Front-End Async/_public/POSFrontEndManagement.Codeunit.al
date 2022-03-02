@@ -495,7 +495,7 @@
         Request.Initialize(EventName, EventData);
         InvokeFrontEndAsync(Request);
     end;
-
+#if not CLOUD
     procedure AdvertiseStargatePackages()
     var
         Package: Record "NPR POS Stargate Package";
@@ -525,6 +525,7 @@
             InvokeFrontEndAsync(Request);
         end;
     end;
+#endif
 
     procedure ApplyAdministrativeTemplates(Templates: JsonArray)
     var
@@ -717,6 +718,7 @@
         if EnvInfo.IsSandbox() then
             exit('Sandbox');
     end;
+#if not CLOUD
 
     procedure InvokeDevice(Request: DotNet NPRNetRequest0; ActionName: Text; Step: Text)
     var
@@ -756,6 +758,7 @@
         DeviceRequest.SetMethod(Request.Method, Request.TypeName);
         InvokeFrontEndAsync(DeviceRequest);
     end;
+#endif
 
     [Obsolete('Not supported in workflow v3')]
     procedure InvokeWorkflow(var POSAction: Record "NPR POS Action")
@@ -895,6 +898,7 @@
     end;
 
     #region Model UI - TODO: refactor into Dragonglass!
+#if not CLOUD
 
     [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object')]
     procedure ShowModel(Model: DotNet NPRNetModel) ModelID: Guid
@@ -940,6 +944,7 @@
         Request.GetContent().Add('script', Script);
         InvokeFrontEndAsync(Request);
     end;
+#endif
 
     [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object')]
     procedure CloseModel(ModelID: Guid)
@@ -950,7 +955,6 @@
         Request.GetContent().Add('modelId', ModelID);
         InvokeFrontEndAsync(Request);
     end;
-
     #endregion
 
     procedure StartTransaction(Sale: Record "NPR POS Sale")

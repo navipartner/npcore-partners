@@ -1,4 +1,5 @@
-﻿page 6059808 "NPR .NET Assemblies"
+﻿#if not CLOUD
+page 6059808 "NPR .NET Assemblies"
 {
     Extensible = False;
     Caption = '.NET Assemblies';
@@ -89,3 +90,4 @@
         end;
     end;
 }
+#endif

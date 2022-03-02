@@ -1,4 +1,5 @@
-﻿codeunit 6014658 "NPR DotNet Assembly Resolver"
+﻿#if not CLOUD
+codeunit 6014658 "NPR DotNet Assembly Resolver"
 {
     Access = Internal;
     SingleInstance = true;
@@ -101,4 +102,4 @@
                                    CLIENTTYPE::Background]);
     end;
 }
-
+#endif

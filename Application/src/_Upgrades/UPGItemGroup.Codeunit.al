@@ -84,14 +84,17 @@
             CopyDefaultDimensions(ItemGroup, ItemCategory);
         until ItemGroup.Next() = 0;
 
+#if not CLOUD
         ItemCategory.Reset();
         if ItemCategory.FindSet(true) then
             repeat
                 DoItemCategoryPresentation(ItemCategory);
                 ItemCategory.Modify();
             until ItemCategory.Next() = 0;
+#endif
     end;
 
+#if not CLOUD
     local procedure DoItemCategoryPresentation(var ItemCategory: Record "Item Category")
     var
         ParentItemCategory: Record "Item Category";
@@ -104,6 +107,7 @@
 
         BaseItemCategoryMgt.CalcPresentationOrder(ItemCategory);
     end;
+#endif
 
     local procedure CopyDefaultDimensions(FromItemGroup: Record "NPR Item Group"; ToItemCategory: Record "Item Category")
     var

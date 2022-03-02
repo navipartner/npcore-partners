@@ -1,4 +1,5 @@
-﻿codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
+﻿#if not CLOUD
+codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
 {
     Access = Internal;
     // NPR5.30/TSA/20170123  CASE 263458 Refactored for Transcendence, intentionally SingleInstance to avoid seeking in BLOB when delivering the chunks
@@ -188,4 +189,4 @@
     begin
     end;
 }
-
+#endif

@@ -1,4 +1,5 @@
-﻿codeunit 6184492 "NPR Pepper Transaction TSD"
+﻿#if not CLOUD
+codeunit 6184492 "NPR Pepper Transaction TSD"
 {
     Access = Internal;
     // NPR5.30/TSA/20170123  CASE 263458 Refactored for Transcendence
@@ -378,4 +379,4 @@
     begin
     end;
 }
-
+#endif

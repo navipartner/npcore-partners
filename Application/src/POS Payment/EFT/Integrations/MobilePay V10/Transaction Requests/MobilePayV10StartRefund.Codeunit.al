@@ -1,4 +1,5 @@
-﻿codeunit 6014557 "NPR MobilePayV10 Start Refund"
+﻿#if not CLOUD
+codeunit 6014557 "NPR MobilePayV10 Start Refund"
 {
     Access = Internal;
     // POST  /v10/refunds
@@ -97,3 +98,4 @@
         eftTrxRequest.Modify();
     end;
 }
+#endif

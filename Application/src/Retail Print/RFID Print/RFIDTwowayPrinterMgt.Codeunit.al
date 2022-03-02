@@ -6,10 +6,12 @@
     var
         HandlerCodeunit: Integer;
         TempRFIDPrintBuffer: Record "NPR RFID Print Buffer" temporary;
+#if not CLOUD
         LastLineQuantity: Decimal;
         ERR_PRINT_QUANTITY: Label 'Can only handle one RFID print per item quantity';
-        RecordSend: Boolean;
         ERR_PRINT_RECORD: Label 'RFID module does not support more than one record at a time';
+        RecordSend: Boolean;
+#endif
         ERR_HANDLER_OVERLAP: Label 'Cannot set multiple RFID handlers in one print batch';
 
     procedure PrintItem(Item: Record Item; ReportType: Integer)
@@ -39,8 +41,10 @@
     local procedure PreparePrintBufferEntry(JournalLine: Record "NPR Retail Journal Line")
     begin
         JournalLine.TestField("Item No.");
+#if not CLOUD
         RecordSend := false;
         LastLineQuantity := JournalLine."Quantity to Print";
+#endif
 
         TempRFIDPrintBuffer."Item No." := JournalLine."Item No.";
         TempRFIDPrintBuffer."Variant Code" := JournalLine."Variant Code";
@@ -94,6 +98,7 @@
         HandlerCodeunit := CodeunitID;
     end;
 
+#if not CLOUD
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Object Output Mgt.", 'OnBeforeSendMatrixPrint', '', false, false)]
     local procedure OnBeforeSendMatrixObjectOutput(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer; var Skip: Boolean)
     var
@@ -123,6 +128,7 @@
             TempRFIDPrintBuffer.Insert();
         end;
     end;
+#endif
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Label Library", 'OnBeforePrintRetailJournal', '', false, false)]
     local procedure OnBeforePrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer; var Skip: Boolean)

@@ -1,7 +1,8 @@
-﻿codeunit 6184517 "NPR EFT Adyen Cloud Integ."
+﻿
+codeunit 6184517 "NPR EFT Adyen Cloud Integ."
 {
     Access = Internal;
-
+#if not CLOUD
     trigger OnRun()
     begin
     end;
@@ -27,12 +28,12 @@
         UNKNOWN_SHOPPER: Label 'Unknown shopper reference ID associated with card: %1';
         DISABLE_CONTRACT: Label 'Disable Shopper Recurring Contract';
         DISABLE_SHOPPER_SUCCESS: Label 'Shopper Reference Disabled: %1';
-
+#endif
     procedure IntegrationType(): Code[20]
     begin
         exit('ADYEN_CLOUD');
     end;
-
+#if not CLOUD
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
@@ -935,5 +936,5 @@
         HandleProtocolResponse(OriginalEFTTransactionRequest);
     end;
     #endregion
+#endif
 }
-

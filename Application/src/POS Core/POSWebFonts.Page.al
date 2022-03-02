@@ -217,6 +217,7 @@
                         ImportConfiguration();
                     end;
                 }
+#if not CLOUD
                 action("Export Managed Dependency Manifest")
                 {
                     Caption = 'Export Managed Dependency Manifest';
@@ -240,6 +241,7 @@
                         ManagedDepMgt.ExportManifest(Rec2, JArray, 0);
                     end;
                 }
+#endif
             }
         }
     }

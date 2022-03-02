@@ -1,4 +1,5 @@
-﻿codeunit 6014583 "NPR Report Printer Interface"
+﻿
+codeunit 6014583 "NPR Report Printer Interface"
 {
     trigger OnRun()
     begin
@@ -6,10 +7,12 @@
 
     var
         ReportLayoutSelection: Record "Report Layout Selection";
-        SuppressError: Boolean;
         LastErrorText: Text;
-        Err_ReportPrint: Label 'Error when printing report %1 %2';
         RecordSpecified: Boolean;
+        #if not CLOUD
+        Err_ReportPrint: Label 'Error when printing report %1 %2';
+        SuppressError: Boolean;
+        #endif
 
     procedure RunReport(Number: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
     begin
@@ -36,8 +39,9 @@
                 RunStandardReportFlow(Number, CustomReportLayoutCode, ReqWindow, SystemPrinter, Record);
             exit;
         end;
-
+#if not CLOUD
         RunCustomReportFlow(Number, CustomReportLayoutCode, ReqWindow, Record, ObjectOutputSelection);
+#endif
     end;
 
     local procedure RunStandardReportFlow(Number: Integer; CustomReportLayoutCode: Code[20]; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
@@ -54,7 +58,7 @@
 
         ReportLayoutSelection.SetTempLayoutSelected('');
     end;
-
+#if not CLOUD
     local procedure RunCustomReportFlow(Number: Integer; CustomReportLayoutCode: Code[20]; ReqWindow: Boolean; "Record": Variant; ObjectOutputSelection: Record "NPR Object Output Selection")
     var
         PDFStream: DotNet NPRNetMemoryStream;
@@ -85,12 +89,13 @@
     begin
         SuppressError := SuppressErrorIn;
     end;
+#endif
 
     procedure GetLastError(): Text
     begin
         exit(LastErrorText);
     end;
-
+#if not CLOUD
     local procedure CreatePDF(Number: Integer; CustomReportLayoutCode: Code[20]; ReqWindow: Boolean; var "Record": Variant; var OutPDFStream: DotNet NPRNetMemoryStream): Boolean
     var
         Parameters: Text;
@@ -125,7 +130,6 @@
         ReportLayoutSelection.SetTempLayoutSelected('');
         exit(true);
     end;
-
     [TryFunction]
     local procedure TryPrintPDF(OutputPath: Text; var Stream: DotNet NPRNetMemoryStream; OutputType: Integer; ObjectID: Integer)
     var
@@ -146,4 +150,5 @@
                 end;
         end;
     end;
+#endif
 }

@@ -181,6 +181,7 @@
 
     procedure GetOauthToken(): Text
     var
+        TypeHelper: Codeunit "Type Helper";
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
@@ -189,17 +190,22 @@
         APIResult: Text;
         RequestBody: Text;
         ErrorTxt: text;
-        HttpUtility: DotNet HttpUtility;
+        ClientId:Text;
+        ClientSecret:Text;
+        LocScope:Text;
     begin
         if CheckExistingTokenIsValid() then // if existing token is not expired use it
             exit(Rec.GetSecret(Rec.FieldNo("Access Token")));
 
         Client.SetBaseAddress(GetTokenBaseAddress());
         RequestMessage.Method('POST');
+        ClientId := GetSecret(FieldNo("Client ID"));
+        ClientSecret := GetSecret(FieldNo("Client Secret"));
+        LocScope := GetScope();
         RequestBody := StrSubstNo('grant_type=client_credentials&client_id=%1&client_secret=%2&scope=%3',
-                        HttpUtility.UrlEncode(GetSecret(FieldNo("Client ID"))),
-                        HttpUtility.UrlEncode(GetSecret(FieldNo("Client Secret"))),
-                        HttpUtility.UrlEncode(GetScope()));
+                        TypeHelper.UrlEncode(ClientId),
+                        TypeHelper.UrlEncode(ClientSecret),
+                        TypeHelper.UrlEncode(LocScope));
 
         Content.WriteFrom(RequestBody);
         Content.GetHeaders(RequestHeaders);

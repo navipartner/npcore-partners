@@ -1,4 +1,5 @@
-﻿codeunit 6150716 "NPR POS Stargate Management"
+﻿#if not CLOUD
+codeunit 6150716 "NPR POS Stargate Management"
 {
     Access = Internal;
     EventSubscriberInstance = Manual;
@@ -357,4 +358,5 @@
     begin
     end;
 }
+#endif
 

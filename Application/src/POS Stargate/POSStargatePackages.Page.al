@@ -1,4 +1,5 @@
-﻿page 6150713 "NPR POS Stargate Packages"
+﻿#if not CLOUD
+page 6150713 "NPR POS Stargate Packages"
 {
     Extensible = False;
     Caption = 'POS Stargate Packages';
@@ -43,6 +44,7 @@
     {
         area(processing)
         {
+
             action("Import Package")
             {
                 Caption = 'Import Package';
@@ -180,4 +182,5 @@
         CurrPage.Update(false);
     end;
 }
+#endif
 

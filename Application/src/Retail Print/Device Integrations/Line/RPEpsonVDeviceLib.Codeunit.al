@@ -156,7 +156,7 @@
                 TargetEncoding := 'Windows-1256';
         end;
     end;
-
+#if not CLOUD
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnPrepareJobForHTTP', '', false, false)]
     local procedure OnPrepareJobForHTTP(var FormattedTargetEncoding: Text; var HTTPEndpoint: Text; var Supported: Boolean)
     begin
@@ -165,6 +165,7 @@
         FormatJobForHTTP();
         Supported := true;
     end;
+#endif
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnPrepareJobForBluetooth', '', false, false)]
     local procedure OnPrepareJobForBluetooth(var FormattedTargetEncoding: Text; var Supported: Boolean)
@@ -179,7 +180,7 @@
         end;
         Supported := true;
     end;
-
+    
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnGetPrintBytes', '', false, false)]
     local procedure OnGetPrintBytes(var PrintBytes: Text)
     begin
@@ -500,15 +501,24 @@
     procedure GetPrintBytes(): Text
     var
         PrintBufferInStream: InStream;
+#if not CLOUD
         MemoryStream: DotNet NPRNetMemoryStream;
         StreamReader: DotNet NPRNetStreamReader;
         NetEncoding: DotNet NPRNetEncoding;
+#else
+        TextInStream: Text;
+#endif
     begin
         PrintBuffer.CreateInStream(PrintBufferInStream, TEXTENCODING::UTF8);
+#if not CLOUD
         MemoryStream := PrintBufferInStream;
         MemoryStream.Position := 0;
         StreamReader := StreamReader.StreamReader(MemoryStream, NetEncoding.UTF8);
         exit(StreamReader.ReadToEnd());
+#else
+        PrintBufferInStream.ReadText(TextInStream);
+        exit(TextInStream);
+#endif
     end;
 
     procedure HorizontalTab()
@@ -604,13 +614,15 @@
 
     local procedure PrintBitmapFromKeyword(Keyword: Code[20]; RegisterNo: Code[10])
     var
+        RetailLogo: Record "NPR Retail Logo";
         RetailLogoMgt: Codeunit "NPR Retail Logo Mgt.";
         ESCPOS: Text;
         InStream: InStream;
+#if not CLOUD
         MemoryStream: DotNet NPRNetMemoryStream;
         NetEncoding: DotNet NPRNetEncoding;
-        RetailLogo: Record "NPR Retail Logo";
         StreamReader: DotNet NPRNetStreamReader;
+#endif
     begin
         RetailLogo.SetAutoCalcFields(ESCPOSLogo);
 
@@ -618,10 +630,14 @@
             repeat
                 if RetailLogo.ESCPOSLogo.HasValue() then begin
                     RetailLogo.ESCPOSLogo.CreateInStream(InStream);
+#if not CLOUD
                     MemoryStream := InStream;
                     MemoryStream.Position := 0;
                     StreamReader := StreamReader.StreamReader(MemoryStream, NetEncoding.UTF8);
                     ESCPOS := StreamReader.ReadToEnd();
+#else
+                    InStream.ReadText(ESCPOS);
+#endif
                     PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
                 end;
             until RetailLogo.Next() = 0;
@@ -904,7 +920,7 @@
     begin
         PrintBufferOutStream.WriteText(Text);
     end;
-
+#if not CLOUD
     local procedure FormatJobForHTTP()
     var
         DotNetEncoding: DotNet NPRNetEncoding;
@@ -938,6 +954,7 @@
                         '</s:Body>' +
                       '</s:Envelope>');
     end;
+#endif
 
     procedure SelectFont(var Value: Text): Boolean
     var
@@ -1047,7 +1064,6 @@
         i: Integer;
         Numeric: Boolean;
         Code128: Text;
-        Char: DotNet NPRNetChar;
         ConsecutiveNumbers: Integer;
         CurrentMode: Option " ",CodeA,CodeB,CodeC;
         Buffer: Text;
@@ -1062,7 +1078,7 @@
             exit('');
 
         for i := 1 to Length do begin
-            Numeric := Char.IsNumber(Value[i]);
+            Numeric := IsNumber(Value[i]);
 
             if (not Numeric) and (ConsecutiveNumbers > 4) then
                 if (StrLen(Code128) = 0) or (ConsecutiveNumbers > 6) then
@@ -1084,6 +1100,11 @@
         end;
 
         exit(Code128);
+    end;
+
+    local procedure IsNumber(Value: Variant): Boolean
+    begin
+        exit(Value.IsDecimal() or Value.IsInteger() or Value.IsChar())
     end;
 
     local procedure PrepareNumericDataC128(var Data: Text; var CurrentMode: Option " ",CodeA,CodeB,CodeC; First: Boolean) ReturnValue: Text

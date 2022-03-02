@@ -1,4 +1,5 @@
-﻿codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
+﻿#if not CLOUD
+codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
 {
     Access = Internal;
 
@@ -521,3 +522,4 @@
     end;
 }
 
+#endif

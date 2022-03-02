@@ -1,4 +1,5 @@
-﻿codeunit 6014508 "NPR MobilePayV10 SelfCertify"
+﻿#if not CLOUD
+codeunit 6014508 "NPR MobilePayV10 SelfCertify"
 {
     Access = Internal;
     Subtype = Test;
@@ -464,3 +465,4 @@
     end;
     #endregion
 }
+#endif

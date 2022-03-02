@@ -1,4 +1,5 @@
-﻿codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
+﻿#if not CLOUD
+codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
 {
     Access = Internal;
     TableNo = "NPR EFT Trx Async Req.";
@@ -154,4 +155,4 @@
         //+NPR5.53 [377533]
     end;
 }
-
+#endif

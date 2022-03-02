@@ -1,4 +1,5 @@
-﻿codeunit 6014515 "NPR MobilePayV10 Auth"
+﻿#if not CLOUD
+codeunit 6014515 "NPR MobilePayV10 Auth"
 {
     Access = Internal;
     // POST  /connect/token
@@ -91,3 +92,4 @@
         _eftSetupSet := true;
     end;
 }
+#endif

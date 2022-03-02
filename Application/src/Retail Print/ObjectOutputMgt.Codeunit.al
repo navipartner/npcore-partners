@@ -8,7 +8,9 @@
 
     var
         ErrNoOutputFound: Label 'No output found for\Object: %1 %2\Template: %3';
+#if not CLOUD
         Error_UnsupportedOutput: Label 'Output Type %1 is not supported for %2';
+#endif
 
     procedure GetCodeunitOutputPath(ObjectID: Integer) Path: Text[250]
     var
@@ -130,7 +132,7 @@
 
         exit(true);
     end;
-
+#if not CLOUD
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnSendPrintJob', '', false, false)]
     local procedure OnSendMatrixPrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer)
     var
@@ -252,6 +254,7 @@
                 end;
         end;
     end;
+#endif
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnGetDeviceType', '', false, false)]
     local procedure OnGetMatrixDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var DeviceType: Text)
@@ -275,6 +278,7 @@
             DeviceType := ObjectOutput."Output Path";
     end;
 
+#if not CLOUD
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSendMatrixPrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer; var Skip: Boolean)
     begin
@@ -284,5 +288,6 @@
     local procedure OnBeforeSendLinePrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Line Printer Interf."; NoOfPrints: Integer; var Skip: Boolean)
     begin
     end;
+#endif
 }
 

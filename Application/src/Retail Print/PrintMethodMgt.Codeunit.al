@@ -1,7 +1,7 @@
-﻿codeunit 6014582 "NPR Print Method Mgt."
+﻿#if not CLOUD
+codeunit 6014582 "NPR Print Method Mgt."
 {
     Access = Internal;
-
     procedure PrintBytesLocal(PrinterName: Text; PrintBytes: Text; TargetEncoding: Text)
     var
         POSFrontEnd: Codeunit "NPR POS Front End Management";
@@ -102,7 +102,7 @@
 
         PrintNodeAPIMgt.SendPDFStream(PrinterID, TempBlob, DocumentDescription, '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
     end;
-
+    
     procedure PrintViaPrintNodeRaw(PrinterID: Text; PrintBytes: Text; TargetEncoding: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)
     var
         PrintNodeAPIMgt: Codeunit "NPR PrintNode API Mgt.";
@@ -126,3 +126,4 @@
         MobilePrintMgt.PrintJobBluetooth(DeviceName, PrintBytes, TargetEncoding);
     end;
 }
+#endif

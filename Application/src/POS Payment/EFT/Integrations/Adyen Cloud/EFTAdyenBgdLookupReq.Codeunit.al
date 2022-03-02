@@ -1,4 +1,5 @@
-﻿codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
+﻿#if not CLOUD
+codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
 {
     Access = Internal;
     // NPR5.53/MMV /20191120 CASE 377533 Created object
@@ -134,7 +135,6 @@
             EFTTransactionLoggingMgt.WriteLogEntry(TrxEntryNo, 'Lookup request done', '');
         end;
     end;
-
     local procedure InsertTrxResponse(TrxEntryNo: Integer; Success: Boolean; Response: Text)
     var
         OutStream: OutStream;
@@ -157,4 +157,5 @@
         EFTTransactionAsyncResponse.Insert();
     end;
 }
+#endif
 

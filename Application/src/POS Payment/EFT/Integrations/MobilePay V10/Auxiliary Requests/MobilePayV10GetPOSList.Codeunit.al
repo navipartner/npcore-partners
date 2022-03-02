@@ -1,4 +1,5 @@
-﻿codeunit 6014524 "NPR MobilePayV10 GetPOSList"
+﻿#if not CLOUD
+codeunit 6014524 "NPR MobilePayV10 GetPOSList"
 {
     Access = Internal;
     // GET  /v10/pointofsales
@@ -60,3 +61,4 @@
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');
     end;
 }
+#endif

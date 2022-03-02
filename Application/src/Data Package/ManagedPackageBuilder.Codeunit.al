@@ -21,7 +21,7 @@
         RecRef: RecordRef;
         FieldValue: Variant;
         i: Integer;
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
+        ConvertHelper: Codeunit "NPR Convert Helper";
         Total: Integer;
     begin
         if Record.IsRecord then
@@ -48,8 +48,8 @@
             JObject.Add('Record', RecRef.Number);
             clear(JObjectRec);
             for i := 1 to RecRef.FieldCount do begin
-                ManagedDependencyMgt.FieldRefToVariant(RecRef.FieldIndex(i), FieldValue);
-                ManagedDependencyMgt.AddToJObject(JObjectRec, Format(RecRef.FieldIndex(i).Number), FieldValue);
+                ConvertHelper.FieldRefToVariant(RecRef.FieldIndex(i), FieldValue);
+                ConvertHelper.AddToJObject(JObjectRec, Format(RecRef.FieldIndex(i).Number), FieldValue);
             end;
             JObject.Add('Fields', JObjectRec);
             GlobalJArray.Add(JObject);
@@ -86,16 +86,16 @@
 
     local procedure CreateManifest(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer) ReturnJsonText: Text
     var
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
+        ConvertHelper: Codeunit "NPR Convert Helper";
         JObject: JsonObject;
         JArray: JsonArray;
     begin
         if GlobalJArray.Count() = 0 then
             Error(Error_NoData);
 
-        ManagedDependencyMgt.CreateDependencyJObject(JObject, 'Data Package', Name, Version);
-        ManagedDependencyMgt.AddToJObject(JObject, 'Description', Description);
-        ManagedDependencyMgt.AddToJObject(JObject, 'Primary Package Table', PrimaryPackageTable);
+        ConvertHelper.CreateDependencyJObject(JObject, 'Data Package', Name, Version);
+        ConvertHelper.AddToJObject(JObject, 'Description', Description);
+        ConvertHelper.AddToJObject(JObject, 'Primary Package Table', PrimaryPackageTable);
 
         TempGlobalTableList.FindSet();
         repeat

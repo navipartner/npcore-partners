@@ -1,4 +1,5 @@
-﻿page 6150714 "NPR POS Stargate Pckg Method"
+﻿#if not CLOUD
+page 6150714 "NPR POS Stargate Pckg Method"
 {
     Extensible = False;
     Caption = 'POS Stargate Package Method';
@@ -35,4 +36,4 @@
     {
     }
 }
-
+#endif

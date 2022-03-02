@@ -1,4 +1,5 @@
-﻿table 6014544 "NPR MobilePayV10 Unit Setup"
+﻿#if not CLOUD
+table 6014544 "NPR MobilePayV10 Unit Setup"
 {
     Access = Internal;
     Caption = 'MobilePayV10 Unit Setup';
@@ -75,3 +76,4 @@
         }
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿codeunit 6184516 "NPR EFT Flexiiterm Prot."
+﻿#if not CLOUD
+codeunit 6184516 "NPR EFT Flexiiterm Prot."
 {
     Access = Internal;
     SingleInstance = true;
@@ -287,4 +288,4 @@
 
     #endregion
 }
-
+#endif

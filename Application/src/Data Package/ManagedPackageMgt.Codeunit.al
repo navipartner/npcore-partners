@@ -202,7 +202,7 @@
         FieldReference: FieldRef;
         TableNo: Integer;
         i: Integer;
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
+        ConvertHelper: Codeunit "NPR Convert Helper";
         JObject: JsonObject;
         JArray: JsonArray;
         FieldIDList: List of [Text];
@@ -241,7 +241,7 @@
             foreach FieldID in FieldIDList do
                 if FieldRefByID(RecRef, FieldID, FieldReference) then begin
                     JObject.Get(FieldID, JToken);
-                    if not ManagedDependencyMgt.JValueToFieldRef(JToken.AsValue(), FieldReference) then
+                    if not ConvertHelper.JValueToFieldRef(JToken.AsValue(), FieldReference) then
                         exit(false);
                 end;
 

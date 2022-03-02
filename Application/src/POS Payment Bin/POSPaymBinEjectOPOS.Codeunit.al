@@ -1,4 +1,5 @@
-﻿codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
+﻿#if not CLOUD
+codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
 {
     Access = Internal;
     // NPR5.40/MMV /20180228 CASE 300660 Created object
@@ -98,7 +99,7 @@
                 Caption := DescriptionDevice;
         end;
     end;
-
+    
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnDeviceResponse', '', false, false)]
     local procedure OnOPOSEjectResponse(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
@@ -116,4 +117,5 @@
             Message(ErrorEject, OPOSEjectDrawerResponse.DeviceName, ErrorMessage);
     end;
 }
+#endif
 
