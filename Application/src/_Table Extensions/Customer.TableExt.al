@@ -2,17 +2,6 @@ tableextension 6014423 "NPR Customer" extends Customer
 {
     fields
     {
-        field(6014415; "NPR Document Processing"; Option)
-        {
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Use standard field Document Sending Profile';
-            Caption = 'Document Processing';
-            DataClassification = CustomerContent;
-            Description = 'PN1.00';
-            OptionCaption = 'Print,E-mail,OIO,Print and E-Mail';
-            OptionMembers = Print,Email,OIO,PrintAndEmail;
-            InitValue = Email;
-        }
         field(6151060; "NPR Anonymized"; Boolean)
         {
             Caption = 'Anonymized';

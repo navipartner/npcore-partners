@@ -71,17 +71,6 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
         }
-        field(6014415; "NPR Document Processing"; Option)
-        {
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Standard field Document Sending Profile is used.';
-            Caption = 'Document Processing';
-            DataClassification = CustomerContent;
-            Description = 'PN1.00';
-            OptionCaption = 'Print,E-mail,,Print and E-Mail';
-            OptionMembers = Print,Email,OIO,PrintAndEmail;
-        }
-
         field(6151479; "NPR Replication Counter"; BigInteger)
         {
             Caption = 'Replication Counter';
