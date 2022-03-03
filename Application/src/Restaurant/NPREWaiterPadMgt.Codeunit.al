@@ -580,7 +580,7 @@
                 begin
                     if not Item.Get(WaiterPadLine."No.") then
                         exit;
-                    Item.GetItemAdditionalFields(ItemAdditionalFields);
+                    Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
                     if ItemAdditionalFields."NPRE Item Routing Profile" = '' then
                         exit;
                     ItemRoutingProfile.Get(ItemAdditionalFields."NPRE Item Routing Profile");

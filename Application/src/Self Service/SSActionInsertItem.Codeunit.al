@@ -588,7 +588,7 @@
         POSAction: Record "NPR POS Action";
         ItemAdditionalFields: Record "NPR Item Additional Fields";
     begin
-        Item.GetItemAdditionalFields(ItemAdditionalFields);
+        Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
         if ItemAdditionalFields."Item AddOn No." = '' then
             exit;
 
