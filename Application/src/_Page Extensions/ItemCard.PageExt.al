@@ -281,7 +281,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         begin
-                            Rec.SetItemAdditionalFields(ItemAdditionalFields);
+                            Rec.NPR_SetItemAdditionalFields(ItemAdditionalFields);
                         end;
                     }
                     field("NPR NPRE Item Routing Profile"; ItemAdditionalFields."NPRE Item Routing Profile")
@@ -291,7 +291,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         begin
-                            Rec.SetItemAdditionalFields(ItemAdditionalFields);
+                            Rec.NPR_SetItemAdditionalFields(ItemAdditionalFields);
                         end;
                     }
                 }
@@ -1289,17 +1289,17 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        Rec.SaveItemAdditionalFields();
+        Rec.NPR_SaveItemAdditionalFields();
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        Rec.SaveItemAdditionalFields();
+        Rec.NPR_SaveItemAdditionalFields();
     end;
 
     trigger OnClosePage()
     begin
-        Rec.SaveItemAdditionalFields();
+        Rec.NPR_SaveItemAdditionalFields();
     end;
 
     trigger OnAfterGetRecord()
@@ -1324,7 +1324,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         CurrPage.NPRMagentoPictureDragDropAddin.Page.SetItemNo(Rec."No.");
         CurrPage.NPRMagentoPictureDragDropAddin.Page.SetHidePicture(true);
         ItemCostMgt.CalculateAverageCost(Rec, AverageCostACY, AverageCostACY);
-        Rec.GetItemAdditionalFields(ItemAdditionalFields);
+        Rec.NPR_GetItemAdditionalFields(ItemAdditionalFields);
     end;
 
     procedure NPR_SetMagentoEnabled()

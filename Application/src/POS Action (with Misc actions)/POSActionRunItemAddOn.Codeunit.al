@@ -85,7 +85,7 @@
         AddOnNo := CopyStr(Context.GetStringParameter('ItemAddOnNo'), 1, MaxStrLen(AddOnNo));
         if AddOnNo = '' then begin
             Item.Get(SaleLinePOS."No.");
-            Item.GetItemAdditionalFields(ItemAdditionalFields);
+            Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
             AddOnNo := ItemAdditionalFields."Item Addon No.";
             Context.SetContext('CompulsoryAddOn', not ItemAddOnMgt.AttachedIteamAddonLinesExist(SaleLinePOS));
         end;

@@ -730,7 +730,7 @@
         if not Item.Get(SaleLinePOS2."No.") then
             exit(false);
 
-        Item.GetItemAdditionalFields(ItemAdditionalFields);
+        Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
         if ItemAdditionalFields."Item AddOn No." = '' then
             exit(false);
         if not ItemAddOn.Get(ItemAdditionalFields."Item AddOn No.") then

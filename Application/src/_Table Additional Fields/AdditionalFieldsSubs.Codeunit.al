@@ -7,6 +7,6 @@ codeunit 6059782 "NPR Additional Fields Subs."
     begin
         if Rec.IsTemporary() then
             exit;
-        Rec.DeleteItemAdditionalFields();
+        Rec.NPR_DeleteItemAdditionalFields();
     end;
 }
