@@ -2,13 +2,6 @@ tableextension 6014427 "NPR Item" extends Item
 {
     fields
     {
-        modify("Costing Method")
-        {
-            trigger OnBeforeValidate()
-            begin
-                CheckGroupSale(Rec);
-            end;
-        }
         modify("Item Category Code")
         {
             trigger OnAfterValidate()
@@ -50,7 +43,6 @@ tableextension 6014427 "NPR Item" extends Item
             var
                 ItemCostMgt: Codeunit ItemCostManagement;
             begin
-                CheckGroupSale(Rec);
                 ItemCostMgt.UpdateUnitCost(Rec, '', '', 0, 0, false, false, true, Rec.FieldNo("NPR Group sale"));
             end;
         }
@@ -442,15 +434,6 @@ tableextension 6014427 "NPR Item" extends Item
             ItemReference.Description := '';
             ItemReference.Insert(true);
         end;
-    end;
-
-    local procedure CheckGroupSale(var Item: Record Item)
-    var
-        ErrStd: Label 'Item %1 can''t be Group sale as it''s Costing Method is Standard.';
-    begin
-        if Item."NPR Group sale" then
-            if Item."Costing Method" = Item."Costing Method"::Standard then
-                Error(ErrStd, Item."No.");
     end;
 
     procedure NPR_GetItemAdditionalFields(var ItemAdditionalFields: Record "NPR Item Additional Fields")
