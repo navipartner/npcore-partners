@@ -1,6 +1,6 @@
 ﻿page 6151403 "NPR Magento Websites"
 {
-    Caption = 'Websites';
+    Caption = 'Magento Websites';
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR Magento Website";

@@ -4,10 +4,9 @@
     Caption = 'Kitchen Request List';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR NPRE Kitchen Request";
-    ApplicationArea = NPRRetail;
 
     layout
     {

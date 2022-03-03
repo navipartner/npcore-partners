@@ -1,7 +1,7 @@
 ﻿page 6151439 "NPR Magento Store Item List"
 {
     Extensible = False;
-    Caption = 'Webshops';
+    Caption = 'Magento Store Item List';
     PageType = List;
     UsageCategory = Administration;
 

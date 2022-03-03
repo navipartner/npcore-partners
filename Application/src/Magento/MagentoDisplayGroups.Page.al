@@ -1,7 +1,7 @@
 ﻿page 6151444 "NPR Magento Display Groups"
 {
     Extensible = False;
-    Caption = 'Display Groups';
+    Caption = 'Magento Display Groups';
     PageType = List;
     SourceTable = "NPR Magento Display Group";
     UsageCategory = Lists;

@@ -1,7 +1,7 @@
 ﻿page 6151404 "NPR Magento Website List"
 {
     Extensible = False;
-    Caption = 'Websites';
+    Caption = 'Magento Website List';
     CardPageID = "NPR Magento Websites";
     Editable = false;
     PageType = List;

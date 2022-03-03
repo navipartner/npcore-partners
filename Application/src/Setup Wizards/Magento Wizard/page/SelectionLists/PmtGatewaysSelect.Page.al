@@ -3,11 +3,10 @@
     Extensible = False;
     Caption = 'Payment Gateways';
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Magento Payment Gateway";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

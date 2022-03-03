@@ -2,7 +2,7 @@
 {
     Extensible = False;
 
-    Caption = 'Loyalty Store Setup (Server)';
+    Caption = 'Loyalty Store Setup (Client)';
     PageType = List;
     UsageCategory = Administration;
 

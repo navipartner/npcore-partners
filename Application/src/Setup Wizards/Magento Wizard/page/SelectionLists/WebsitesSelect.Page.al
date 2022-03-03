@@ -3,11 +3,10 @@
     Extensible = False;
     Caption = 'Websites';
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Magento Website";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

@@ -3,12 +3,11 @@
     Extensible = False;
     Caption = 'Display Groups';
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Magento Display Group";
     SourceTableTemporary = true;
     Editable = false;
-    ApplicationArea = NPRRetail;
 
     layout
     {
