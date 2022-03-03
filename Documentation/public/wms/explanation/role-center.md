@@ -5,15 +5,8 @@ From this page you can access all the available setups for NP WMS, download the 
 
 From the WMS Role Center, you can access the following links:
 
-- Download Data (Test Data or Live Template Packages)
-- Setup CS WMS
-- Create Users
-- Setup RFID
-- Setup Counting
-
-### Related Links
-- [Download CS Data](../howto/fetch-setup-data.md)
-- [Setup CS Users](../howto/set-up-cs-users.md)
-- [Create Users]
-- [Setup RFID](../howto/set-up-rfid.md)
-- [Setup Counting](../howto/set-up-counting.md)
+- [Fetch preset CS data](../howto/fetch-setup-data.md)
+- [Set up CS users](../howto/set-up-cs-users.md)
+- [Set up warehouse employees](/Documentation/public/wms/howto/set-up-warehouse-users)
+- [Set up RFID](../howto/set-up-rfid.md)
+- [Set up counting](../howto/set-up-counting.md)

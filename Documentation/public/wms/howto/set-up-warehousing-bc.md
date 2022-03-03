@@ -1,1 +1,1 @@
-# Setup Warehousing in BC
+# Set up Warehousing in BC

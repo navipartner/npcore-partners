@@ -50,3 +50,7 @@ The important fields in the **Header** are:
         Here the text to be displayed as footer on the UI.
     
     Enter the required fields.
+
+### Related links
+
+- [Capture Service UIs](/Documentation/public/wms/explanation/cs-uis)
