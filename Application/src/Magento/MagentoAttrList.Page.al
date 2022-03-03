@@ -6,10 +6,9 @@
     CardPageID = "NPR Magento Attributes";
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Magento Attribute";
-    ApplicationArea = NPRRetail;
 
     layout
     {
