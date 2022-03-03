@@ -3,12 +3,11 @@
     Extensible = False;
     Caption = 'Brands';
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Magento Brand";
     SourceTableTemporary = true;
     Editable = false;
-    ApplicationArea = NPRRetail;
 
     layout
     {

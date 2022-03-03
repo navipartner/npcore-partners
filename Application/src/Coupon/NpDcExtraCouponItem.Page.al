@@ -4,10 +4,9 @@
     AutoSplitKey = true;
     Caption = 'Extra Coupon Item';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR NpDc Extra Coupon Item";
-    ApplicationArea = NPRRetail;
 
     layout
     {

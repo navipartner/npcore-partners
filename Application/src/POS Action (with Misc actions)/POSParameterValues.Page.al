@@ -6,10 +6,9 @@
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR POS Parameter Value";
-    ApplicationArea = NPRRetail;
 
     layout
     {
