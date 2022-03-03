@@ -78,7 +78,7 @@
                 exit;
             if (not Item.Get(SaleLinePOS."No.")) then
                 exit;
-            Item.GetItemAdditionalFields(ItemAdditionalFields);
+            Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
             if (not ItemAddOn.Get(ItemAdditionalFields."Item AddOn No.")) then
                 exit;
         end;
@@ -221,7 +221,7 @@
                 exit;
             if (not Item.Get(SaleLinePOS."No.")) then
                 exit;
-            Item.GetItemAdditionalFields(ItemAdditionalFields);
+            Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
             if (not ItemAddOn.Get(ItemAdditionalFields."Item AddOn No.")) then
                 exit;
             MasterLineNumber := SaleLinePOS."Line No.";

@@ -6,7 +6,7 @@ codeunit 6059779 "NPR API - Update Ref. Fields"
     begin
         if Rec.IsTemporary() then
             exit;
-        Rec.UpdateReferencedIds();
+        Rec.NPR_UpdateReferencedIds();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeRenameEvent', '', false, false)]
@@ -14,7 +14,7 @@ codeunit 6059779 "NPR API - Update Ref. Fields"
     begin
         if Rec.IsTemporary() then
             exit;
-        Rec.UpdateReferencedIds();
+        Rec.NPR_UpdateReferencedIds();
     end;
 
 }

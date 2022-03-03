@@ -22,7 +22,7 @@ tableextension 6014459 "NPR Price List line" extends "Price List Line"
         }
 
     }
-    procedure UpdateReferencedIds()
+    procedure NPR_UpdateReferencedIds()
     var
         PriceListHeader: Record "Price List Header";
     begin

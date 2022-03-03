@@ -1076,7 +1076,7 @@ page 6014501 "NPR APIV1 - Items"
             GetTenantMedia(Rec."NPR Magento Short Desc.".MediaId, OStr);
         end;
 
-        Rec.GetItemAdditionalFields(ItemAdditionalFields);
+        Rec.NPR_GetItemAdditionalFields(ItemAdditionalFields);
     end;
 
     local procedure GetTenantMedia(MediaId: Guid; var OStr: OutStream)
