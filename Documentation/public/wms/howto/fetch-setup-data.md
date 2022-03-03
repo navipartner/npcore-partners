@@ -1,4 +1,4 @@
-# Fetch setup data
+# Fetch preset setup data
 
 It's possible to fetch preset configurations on your environment, to make the overall environment setup easier. To do this, follow the provided steps: 
 
@@ -18,7 +18,8 @@ It's possible to fetch preset configurations on your environment, to make the ov
     - Demo Data (**NP WMS TEST DATA**)             
       The demo template contains preset examples and data that can be used for demo purposes or training.
 3. Click **Finish**.      
-   The template installation is initiated.    
+   The template installation is initiated.
+   
    > [!Note]
    > During the process, you will be prompted to take action If there are data duplicates, if some data was previously updated in the tenant, or if any other action is required. If you've changed the **Order Date** on the sales order, or made some other changes that may impact the prices or discounts, you will be advised to review the sales order lines after the template installation is complete.    
 
