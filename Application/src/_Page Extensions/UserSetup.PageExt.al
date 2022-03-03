@@ -37,12 +37,6 @@ pageextension 6014401 "NPR User Setup" extends "User Setup"
                 ToolTip = 'Specifies if the user is allowed to anonymize customer information in the customer page.';
                 ApplicationArea = NPRRetail;
             }
-            field("NPR Block Role Center"; Rec."NPR Block Role Center")
-            {
-
-                ToolTip = 'Specifies if the user is allowed to personalize the Role Center.';
-                ApplicationArea = NPRRetail;
-            }
             field("NPR MM Allow MS Entry Edit"; Rec."NPR MM Allow MS Entry Edit")
             {
                 ToolTip = 'Specifies if the user can modify Membership Entries.';
