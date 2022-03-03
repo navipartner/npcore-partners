@@ -20,16 +20,16 @@
     href: explanation/role-center.md
 - name: How-to
   items: 
+  - name: Install mobile apps
+    href: howto/install-mobile-apps.md
+  - name: Set up capture service users
+    href: howto/set-up-cs-users.md
   - name: Create QR codes
     href: howto/create-qr-codes.md
   - name: Fetch setup data
     href: howto/fetch-setup-data.md
-  - name: Install mobile apps
-    href: howto/install-mobile-apps.md
   - name: Set up Business Central licensing
     href: howto/set-up-bc-licensing.md
-  - name: Set up capture service users
-    href: howto/set-up-cs-users.md
   - name: Set up RFID
     href: howto/set-up-rfid.md
   - name: Set up warehouse users

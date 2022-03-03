@@ -1,1 +1,1 @@
-# SetUp Counting
+# Set up counting

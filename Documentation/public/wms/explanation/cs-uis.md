@@ -38,5 +38,4 @@ A UI is made up of 3 sections.
 ### Related links
 
 - [Set up UIs](../howto/set-up-cs-uis.md)
-
 - [Set up Data Pattern Code](../howto/set-up-datapatterncode.md)

@@ -1,4 +1,4 @@
-# Download NP WMS extension
+# Download and install NP WMS extension
 
 To download and install NP WMS, follow the provided steps:
 
