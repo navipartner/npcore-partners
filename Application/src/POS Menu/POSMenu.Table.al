@@ -53,11 +53,13 @@
         {
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
+            TableRelation = "NPR POS Unit"."No.";
         }
         field(43; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
+            TableRelation = "Salesperson/Purchaser".Code;
         }
         field(44; "Available on Desktop"; Boolean)
         {
