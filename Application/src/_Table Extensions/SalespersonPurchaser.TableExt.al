@@ -152,7 +152,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
     trigger OnAfterDelete()
     var
         POSEntry: Record "NPR POS Entry";
-        SalesPersonDeleteErr: Label 'you cannot delete Salesperson/purchaser %1 before the sale is posted in the Audit roll!', Comment = '%1 = Salesperson/purchaser';
+        SalesPersonDeleteErr: Label 'you cannot delete Salesperson/purchaser %1 before the sale is posted in the POS Entry!', Comment = '%1 = Salesperson/purchaser';
     begin
         POSEntry.SetRange("Salesperson Code", Rec.Code);
         POSEntry.SetFilter("Post Entry Status", '%1|%2', POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting");
