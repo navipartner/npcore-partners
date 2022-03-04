@@ -4,6 +4,6 @@ NP Entertainment is all-in-one ticketing and membership management system that s
 
 ### Highlighted articles
 
-- [Restaurant module](/Documentation/public/entertainment/restaurant/intro)
-- [Ticket module](/Documentation/public/entertainment/ticket/explanation/ticket)
-- [Issuing tickets from Business Central](/Documentation/public/entertainment/ticket/howto/issue_ticket)
+- [Restaurant module](../entertainment/restaurant/intro.md)
+- [Ticket module](../entertainment/ticket/explanation/ticket.md)
+- [Issuing tickets from Business Central](../entertainment/ticket/howto/issue_ticket.md)

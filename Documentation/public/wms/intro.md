@@ -18,26 +18,26 @@ Once the extension is installed, the SAAS license can be purchased online. A tri
 
 The NP WMS setup process consists of the following tasks:
 
-- [CS setup](/Documentation/public/wms/explanation/cs-setup)
+- [CS setup](./explanation/cs-setup.md)
     Setting up the main parameters for NP WMS
 
-- [CS UIs setup](/Documentation/public/wms/howto/set-up-cs-uis)
+- [CS UIs setup](./howto/set-up-cs-uis.md)
     Setting up the mobile user interface
 
-- [CS users setup](/Documentation/public/wms/howto/set-up-cs-users)
+- [CS users setup](./howto/set-up-cs-users.md)
     Setting up users who will have access on the mobile devices
 
-- [Warehouse employee setup](/Documentation/public/wms/howto/set-up-warehouse-users)
+- [Warehouse employee setup](./howto/set-up-warehouse-users.md)
     Setting up users to have access to BC warehouses
 
-- [BC warehousing setup](/Documentation/public/wms/howto/set-up-warehousing-bc)
+- [BC warehousing setup](./howto/set-up-warehousing-bc.md)
     Setting up standard BC warehousing
 
 ### Related Links
 
-- [Download and install NP WMS extension](/Documentation/public/wms/howto/Install-NP-WMS)
-- [NP WMS Role Center](/Documentation/public/wms/explanation/role-center)
-- [Fetch preset setup data](/Documentation/public/wms/howto/fetch-setup-data)
+- [Download and install NP WMS extension](./howto/Install-NP-WMS.md)
+- [NP WMS Role Center](./explanation/role-center.md)
+- [Fetch preset setup data](./howto/fetch-setup-data.md)
 - [Capture Service Logging](./explanation/cs-logging.md)
-- [Capture service UIs](/Documentation/public/wms/explanation/cs-uis)
-- [Create QR codes](/Documentation/public/wms/howto/create-qr-codes)
+- [Capture service UIs](./explanation/cs-uis.md)
+- [Create QR codes](./howto/create-qr-codes.md)

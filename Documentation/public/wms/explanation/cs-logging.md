@@ -12,7 +12,7 @@ Once done, then you can install the apps on the mobile device.
 
 ### Related Links
 
-- [Download and install the NP WMS extension](/Documentation/public/wms/howto/Install-NP-WMS)
-- [Install Apps](/Documentation/public/wms/howto/install-mobile-apps)
+- [Download and install the NP WMS extension](../howto/Install-NP-WMS.md)
+- [Install Apps](../howto/install-mobile-apps.md)
 - [Setup CS Service](../howto/set-up-rfid.md)
 - [Install the Apps on a mobile phone](../howto/install-mobile-apps.md)
