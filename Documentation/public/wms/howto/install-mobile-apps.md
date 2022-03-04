@@ -17,5 +17,5 @@ As a result, NP WMS can now be accessed.
 
 ### Related links
 
-- [Warehouse Management System](/Documentation/public/wms/intro)
-- [Download and install NP WMS extension](/Documentation/public/wms/howto/Install-NP-WMS)
+- [Warehouse Management System](../intro.md)
+- [Download and install NP WMS extension](../howto/Install-NP-WMS.md)

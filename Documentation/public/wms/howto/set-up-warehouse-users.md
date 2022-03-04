@@ -17,6 +17,5 @@ The list of the configured users is displayed.
 4. Repeat **Step 3** for other warehouse employees that you wish to assign to specific locations, or assign non-default locations to the existing warehouse employees.
 
 ### Related links:
-- [Set up warehousing in BC](/Documentation/public/wms/howto/set-up-warehousing-bc)
-- [Set up CS users](/Documentation/public/wms/howto/set-up-cs-users)
-- [Set up RFID](/Documentation/public/wms/howto/set-up-rfid)
+- [Set up CS users](./set-up-cs-users.md)
+- [Set up RFID](./set-up-rfid.md)
