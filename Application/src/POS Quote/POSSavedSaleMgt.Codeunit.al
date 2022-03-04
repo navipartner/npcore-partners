@@ -1,6 +1,7 @@
 ﻿codeunit 6151006 "NPR POS Saved Sale Mgt."
 {
     Access = Internal;
+
     var
         Text000: Label 'Delete all saved POS Saved Sales,Review saved POS Saved Sales';
         EFT_WARNING: Label 'WARNING:\%1 %2 has one or more POS Saved Sales linked to it with approved EFT transactions inside. These should be voided or completed as the transaction has already occurred!\\Do you want to continue with end of day?';
@@ -76,6 +77,7 @@
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         POSInfoTransaction: Record "NPR POS Info Transaction";
         POSCrossReference: Record "NPR POS Cross Reference";
+        NpCsSaleLinePOSRef: Record "NPR NpCs Sale Line POS Ref.";
         SaleLinePOS: Record "NPR POS Sale Line";
         TempNpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         TempNpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
@@ -84,6 +86,7 @@
         TempNpRvSalesLineFieldBuffer: Record "Field" temporary;
         TempPOSInfoTransactionFieldBuffer: Record "Field" temporary;
         TempPOSCrossReferenceFieldBuffer: Record "Field" temporary;
+        TempNpCsSaleLinePOSRefFieldBuffer: Record "Field" temporary;
         TempSalePOSFieldBuffer: Record "Field" temporary;
         TempSaleLinePOSFieldBuffer: Record "Field" temporary;
         XmlRoot: XmlElement;
@@ -121,6 +124,9 @@
 
         RecRef.GetTable(POSCrossReference);
         FindFields(RecRef, false, TempPOSCrossReferenceFieldBuffer, false);
+
+        RecRef.GetTable(NpCsSaleLinePOSRef);
+        FindFields(RecRef, false, TempNpCsSaleLinePOSRefFieldBuffer, false);
 
         XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?><pos_sale />', XmlDoc);
         XmlDoc.GetRoot(XmlRoot);
@@ -252,6 +258,22 @@
                         RecRef2Xml(RecRef, Element4, TempPOSCrossReferenceFieldBuffer);
                     end;
 
+                NpCsSaleLinePOSRef.SetRange("Register No.", SaleLinePOS."Register No.");
+                NpCsSaleLinePOSRef.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+                NpCsSaleLinePOSRef.SetRange("Sale Type", SaleLinePOS."Sale Type");
+                NpCsSaleLinePOSRef.SetRange("Sale Date", SaleLinePOS.Date);
+                NpCsSaleLinePOSRef.SetRange("Sale Line No.", SaleLinePOS."Line No.");
+                if NpCsSaleLinePOSRef.FindSet() then begin
+                    Element3 := XmlElement.Create('collect_documents');
+                    Element2.Add(Element3);
+                    repeat
+                        Element4 := XmlElement.Create('collect_document');
+                        Element3.Add(Element4);
+                        RecRef.GetTable(NpCsSaleLinePOSRef);
+                        RecRef2Xml(RecRef, Element4, TempNpCsSaleLinePOSRefFieldBuffer);
+                    until NpCsSaleLinePOSRef.Next() = 0;
+                end;
+
                 OnPOSSaleLine2Xml(SaleLinePOS, Element);
             until SaleLinePOS.Next() = 0;
         end;
@@ -381,6 +403,7 @@
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         POSInfoTransaction: Record "NPR POS Info Transaction";
         POSCrossReference: Record "NPR POS Cross Reference";
+        NpCsSaleLinePOSRef: Record "NPR NpCs Sale Line POS Ref.";
         SaleLinePOS: Record "NPR POS Sale Line";
         TempNpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         TempNpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
@@ -389,6 +412,7 @@
         TempNpRvSalesLineFieldBuffer: Record "Field" temporary;
         TempPOSInfoTransactionFieldBuffer: Record "Field" temporary;
         TempPOSCrossReferenceFieldBuffer: Record "Field" temporary;
+        TempNpCsSaleLinePOSRefFieldBuffer: Record "Field" temporary;
         TempSalePOSFieldBuffer: Record "Field" temporary;
         TempSaleLinePOSFieldBuffer: Record "Field" temporary;
         Element: XmlElement;
@@ -411,6 +435,8 @@
         RetailCrossReferenceNode: XmlNode;
         NewDiscountCouponNodes: XmlNodeList;
         NewDiscountCouponNode: XmlNode;
+        NewCollectDocumentNodes: XmlNodeList;
+        NewCollectDocumentNode: XmlNode;
         xSalePOS: Record "NPR POS Sale";
         POSCrossRefLbl: Label '%1_%2', Locked = true;
     begin
@@ -451,6 +477,9 @@
 
         RecRef.GetTable(POSCrossReference);
         FindFields(RecRef, false, TempPOSCrossReferenceFieldBuffer, false);
+
+        RecRef.GetTable(NpCsSaleLinePOSRef);
+        FindFields(RecRef, false, TempNpCsSaleLinePOSRefFieldBuffer, false);
 
         xSalePOS := SalePOS;
         RecRef.GetTable(SalePOS);
@@ -573,6 +602,18 @@
                 else
                     POSCrossReference."Record Value" := SalePOS."Sales Ticket No.";
                 POSCrossReference.Insert(true);
+            end;
+
+            Element.SelectNodes('collect_documents/collect_document', NewCollectDocumentNodes);
+            foreach NewCollectDocumentNode in NewCollectDocumentNodes do begin
+                NpCsSaleLinePOSRef.Init();
+                RecRef.GetTable(NpCsSaleLinePOSRef);
+                Xml2RecRef(NewCollectDocumentNode.AsXmlElement(), TempNpCsSaleLinePOSRefFieldBuffer, RecRef);
+                RecRef.SetTable(NpCsSaleLinePOSRef);
+                NpCsSaleLinePOSRef."Register No." := SalePOS."Register No.";
+                NpCsSaleLinePOSRef."Sales Ticket No." := SalePOS."Sales Ticket No.";
+                NpCsSaleLinePOSRef."Sale Date" := SalePOS.Date;
+                NpCsSaleLinePOSRef.Insert(true);
             end;
 
             OnXml2POSSaleLine(Element, SaleLinePOS);
