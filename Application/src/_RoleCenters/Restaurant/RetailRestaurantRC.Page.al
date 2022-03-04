@@ -19,17 +19,15 @@
                 ApplicationArea = NPRRetail;
 
             }
-
-            part(Control21; "Report Inbox Part")
-            {
-                AccessByPermission = TableData "Report Inbox" = R;
-                ApplicationArea = NPRRetail;
-            }
-
             part("MyReports"; "NPR My Reports")
             {
                 ApplicationArea = NPRRetail;
 
+            }
+            part(Control21; "Report Inbox Part")
+            {
+                AccessByPermission = TableData "Report Inbox" = R;
+                ApplicationArea = NPRRetail;
             }
 
             part(PowerBi; "Power BI Report Spinner Part")
