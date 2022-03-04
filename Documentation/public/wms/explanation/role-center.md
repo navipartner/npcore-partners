@@ -7,6 +7,6 @@ From the WMS Role Center, you can access the following links:
 
 - [Fetch preset CS data](../howto/fetch-setup-data.md)
 - [Set up CS users](../howto/set-up-cs-users.md)
-- [Set up warehouse employees](/Documentation/public/wms/howto/set-up-warehouse-users)
+- [Set up warehouse employees](../howto/set-up-warehouse-users.md)
 - [Set up RFID](../howto/set-up-rfid.md)
 - [Set up counting](../howto/set-up-counting.md)

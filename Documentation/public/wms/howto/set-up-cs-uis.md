@@ -53,4 +53,4 @@ The important fields in the **Header** are:
 
 ### Related links
 
-- [Capture Service UIs](/Documentation/public/wms/explanation/cs-uis)
+- [Capture Service UIs](../explanation/cs-uis.md)

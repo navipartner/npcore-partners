@@ -22,6 +22,6 @@ All users working on the [mobile apps](/Documentation/public/wms/howto/install-m
 
 
 ### Related links
-- [CS Logging](/Documentation/public/wms/explanation/cs-logging)
-- [CS Users](/Documentation/public/wms/explanation/cs-users)
-- [CS UIs](/Documentation/public/wms/explanation/cs-uis)
+- [CS Logging](../explanation/cs-logging.md)
+- [CS Users](../explanation/cs-users.md)
+- [CS UIs](../explanation/cs-uis.md)
