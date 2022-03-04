@@ -211,7 +211,6 @@
         Element: XmlElement;
         NamespaceManager: XmlNamespaceManager;
         Node: XmlNode;
-        ResponseValue: Text;
     begin
 
         CleanCashResponse.SetFilter("Request Entry No.", '=%1', CleanCashTransactionRequest."Entry No.");
@@ -233,16 +232,14 @@
 
             if (Element.SelectSingleNode('cc:data', NamespaceManager, Node)) then begin
                 DataElement := Node.AsXmlElement();
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:Code', ResponseValue);
-                CleanCashResponse."CleanCash Code" := CopyStr(ResponseValue, 1, MaxStrLen(CleanCashResponse."CleanCash Code"));
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitId', ResponseValue);
-                CleanCashResponse."CleanCash Unit Id" := CopyStr(ResponseValue, 1, MaxStrLen(CleanCashResponse."CleanCash Unit Id"));
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:Code', CleanCashResponse."CleanCash Code", MaxStrLen(CleanCashResponse."CleanCash Code"));
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitId', CleanCashResponse."CleanCash Unit Id", MaxStrLen(CleanCashResponse."CleanCash Unit Id"));
 
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitMainStatus', EnumAsText);
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitMainStatus', EnumAsText, MaxStrLen(EnumAsText));
                 if (not Evaluate(CleanCashResponse."CleanCash Main Status", EnumAsText)) then
                     CleanCashResponse."CleanCash Main Status" := CleanCashResponse."CleanCash Main Status"::NO_VALUE;
 
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitStorageStatus', EnumAsText);
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitStorageStatus', EnumAsText, MaxStrLen(EnumAsText));
                 if (not Evaluate(CleanCashResponse."CleanCash Storage Status", EnumAsText)) then
                     CleanCashResponse."CleanCash Storage Status" := CleanCashResponse."CleanCash Storage Status"::NO_VALUE;
 
