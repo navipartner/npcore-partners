@@ -9,7 +9,7 @@
     end;
 
     var
-        Text000: Label 'Invalid EAN13: %1.';
+        InvalidRefNoErr: Label 'Invalid EAN13: %1.', Comment = '%1=ReferenceNo';
 
     procedure ResetInUseQty(Voucher: Record "NPR NpRv Voucher")
     var
@@ -1050,9 +1050,9 @@
             if StrLen(ReferenceNo) < 12 then
                 ReferenceNo := CopyStr(ReferenceNo, 1, 2) + PadStr('', 12 - StrLen(ReferenceNo), '0') + CopyStr(ReferenceNo, 3);
             if StrLen(ReferenceNo) > 12 then
-                Error(Text000, ReferenceNo);
+                Error(InvalidRefNoErr, ReferenceNo);
             if not TryGetCheckSum(ReferenceNo, CheckSum) then
-                Error(Text000, ReferenceNo);
+                Error(InvalidRefNoErr, ReferenceNo);
             ReferenceNo := ReferenceNo + Format(CheckSum);
 
             Voucher2.SetFilter("No.", '<>%1', Voucher."No.");
@@ -1167,7 +1167,6 @@
         VoucherType: Record "NPR NpRv Voucher Type";
         Voucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        GLAcc: Record "G/L Account";
     begin
         VoucherType.Get(VoucherTypeCode);
         PrepareVoucherBuffer(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
@@ -1182,12 +1181,9 @@
         POSPaymentLine.GetCurrentPaymentLine(POSLine);
         PaymentLine."Discount Code" := TempNpRvVoucherBuffer."No.";
         if FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then begin
-            if GLAcc.get(Voucher."Account No.") then begin
-                POSLine."VAT Prod. Posting Group" := GLAcc."VAT Prod. Posting Group";
-                UpdateTaxSetup(POSLine, SalePOS);
-                POSPaymentLine.ReverseUnrealizedSalesVAT(POSLine);
-                POSLine.Modify();
-            end;
+            UpdateTaxSetup(POSLine, SalePOS, Voucher."Account No.");
+            POSPaymentLine.ReverseUnrealizedSalesVAT(POSLine);
+            POSLine.Modify();
         end;
 
         POSSession.RequestRefreshData();
@@ -1203,7 +1199,6 @@
         Voucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         PaymentNpRvSalesLine: Record "NPR NpRv Sales Line";
-        GLAcc: Record "G/L Account";
     begin
         VoucherType.Get(VoucherTypeCode);
         InsertForeignVoucher(Voucher, VoucherType, VoucherNumber);
@@ -1219,12 +1214,10 @@
         POSPaymentLine.GetCurrentPaymentLine(POSLine);
         PaymentLine."Discount Code" := TempNpRvVoucherBuffer."No.";
         if FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then begin
-            if GLAcc.get(Voucher."Account No.") then begin
-                POSLine."VAT Prod. Posting Group" := GLAcc."VAT Prod. Posting Group";
-                UpdateTaxSetup(POSLine, SalePOS);
-                POSPaymentLine.ReverseUnrealizedSalesVAT(POSLine);
-                POSLine.Modify();
-            end;
+            UpdateTaxSetup(POSLine, SalePOS, Voucher."Account No.");
+            POSPaymentLine.ReverseUnrealizedSalesVAT(POSLine);
+            POSLine.Modify();
+
         end;
 
         POSSession.RequestRefreshData();
@@ -1235,13 +1228,30 @@
         ApplyPayment(FrontEnd, POSSession, PaymentNpRvSalesLine, false);
     end;
 
-    local procedure UpdateTaxSetup(var Line: Record "NPR POS Sale Line"; SalePOS: Record "NPR POS Sale")
+    local procedure UpdateTaxSetup(var Line: Record "NPR POS Sale Line"; SalePOS: Record "NPR POS Sale"; AccountNo: Code[20])
     var
         VATPostingSetup: Record "VAT Posting Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
     begin
+        InitFromGLAccount(Line, AccountNo);
         VATPostingSetup.Get(Line."VAT Bus. Posting Group", Line."VAT Prod. Posting Group");
         POSSaleTaxCalc.UpdateSourceTaxSetup(Line, VATPostingSetup, SalePOS, 0);
+    end;
+
+    local procedure InitFromGLAccount(var Line: Record "NPR POS Sale Line"; AccountNo: Code[20])
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        if AccountNo = '' then
+            exit;
+        GLAccount.Get(AccountNo);
+        GLAccount.CheckGLAcc();
+        Line."Gen. Posting Type" := GLAccount."Gen. Posting Type";
+        Line."Gen. Bus. Posting Group" := GLAccount."Gen. Bus. Posting Group";
+        Line."Gen. Prod. Posting Group" := GLAccount."Gen. Prod. Posting Group";
+        Line."VAT Bus. Posting Group" := GLAccount."VAT Bus. Posting Group";
+        Line."VAT Prod. Posting Group" := GLAccount."VAT Prod. Posting Group";
+        Line."Tax Group Code" := GLAccount."Tax Group Code";
     end;
 
     local procedure InsertForeignVoucher(var Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherNumber: Text)
@@ -1301,7 +1311,7 @@
         ReturnAmount: Decimal;
         SaleAmount: Decimal;
         SubTotal: Decimal;
-        Text004: Label 'Maximum Return Amount is: %1';
+        MaximumReturnAmountErr: Label 'Maximum Return Amount is: %1', Comment = '%1=ReturnAmount';
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, SubTotal);
@@ -1313,7 +1323,7 @@
             ReturnAmount := Round(ReturnAmount, POSPaymentMethod."Rounding Precision");
 
         if Amount > ReturnAmount then
-            Error(Text004, ReturnAmount);
+            Error(MaximumReturnAmountErr, ReturnAmount);
 
         NpRvVoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher);
 
@@ -1330,6 +1340,8 @@
         POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
         SaleLinePOS.Quantity := 1;
         SaleLinePOS.Description := TempVoucher.Description;
+        UpdateTaxSetup(SaleLinePOS, SalePOS, TempVoucher."Account No.");
+        POSPaymentLine.ReverseUnrealizedSalesVAT(SaleLinePOS);
         SaleLinePOS.Modify();
 
         POSSession.RequestRefreshData();
