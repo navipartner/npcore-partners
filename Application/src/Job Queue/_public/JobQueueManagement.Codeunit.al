@@ -228,7 +228,7 @@
             Parameters."Run on Sundays" := true;
             Parameters."No. of Minutes between Runs" := NoOfMinutesBetweenRuns;
         end;
-        Parameters."Notify On Success" := true;
+        Parameters."Notify On Success" := false;
         Parameters."Parameter String" := CopyStr(ParameterString, 1, MaxStrLen(Parameters."Parameter String"));
         Parameters.Description := CopyStr(JobDescription, 1, MaxStrLen(Parameters.Description));
         Parameters."Job Queue Category Code" := JobQueueCatagoryCode;

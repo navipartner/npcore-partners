@@ -41,6 +41,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'NotifyOnSuccessFalse'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Prices Install"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG App. Area User Exp."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Event Report Layout Upg."));
@@ -154,6 +155,8 @@
                         exit('NPRJobQueueUpdate-20211020');
                     'AddTaskCountResetJQ':
                         exit('NPRJobQueueInstall-20211125');
+                    'NotifyOnSuccessFalse':
+                        exit('NotifyOnSuccessFalse-20220304');
                 end;
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210920');

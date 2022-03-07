@@ -47,6 +47,11 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'NotifyOnSuccessFalse')) then begin
+            SetJQNotifyOnSuccessFalse();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'NotifyOnSuccessFalse'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -238,5 +243,13 @@
         JobQueueEntry."Earliest Start Date/Time" := JobQueueMgt.NowWithDelayInSeconds(600);
         JobQueueEntry.Modify();
         JobQueueEntry.Restart();
+    end;
+
+    local procedure SetJQNotifyOnSuccessFalse()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetFilter("Object ID to Run", '6014400..6184471'); //NP object range
+        JobQueueEntry.ModifyAll("Notify On Success", false, false); //Make sure not to validate
     end;
 }
