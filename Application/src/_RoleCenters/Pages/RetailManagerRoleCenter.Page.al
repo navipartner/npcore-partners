@@ -42,11 +42,6 @@
                 Visible = false;
                 ApplicationArea = NPRRetail;
             }
-            part(PowerBI; "Power BI Report Spinner Part")
-            {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
-                ApplicationArea = NPRRetail;
-            }
             part(MyJobQueue; "My Job Queue")
             {
                 Caption = 'Job Queue';

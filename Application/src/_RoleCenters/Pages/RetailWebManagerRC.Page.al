@@ -38,10 +38,7 @@
             {
                 ApplicationArea = NPRRetail;
             }
-            part(PowerBi; "Power BI Report Spinner Part")
-            {
-                ApplicationArea = NPRRetail;
-            }
+
         }
     }
 
