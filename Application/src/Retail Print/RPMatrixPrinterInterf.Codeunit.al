@@ -81,67 +81,67 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
+    internal procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
+    internal procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnEndJob()
+    internal procedure OnEndJob()
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnLookupFont(var LookupOK: Boolean; var Value: Text)
+    internal procedure OnLookupFont(var LookupOK: Boolean; var Value: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnLookupCommand(var LookupOK: Boolean; var Value: Text)
+    internal procedure OnLookupCommand(var LookupOK: Boolean; var Value: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnLookupDeviceSetting(var LookupOK: Boolean; var tmpDeviceSetting: Record "NPR RP Device Settings" temporary)
+    internal procedure OnLookupDeviceSetting(var LookupOK: Boolean; var tmpDeviceSetting: Record "NPR RP Device Settings" temporary)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
+    internal procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetTargetEncoding(var TargetEncoding: Text)
+    internal procedure OnGetTargetEncoding(var TargetEncoding: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnPrepareJobForHTTP(var FormattedTargetEncoding: Text; var HTTPEndpoint: Text; var Supported: Boolean)
+    internal procedure OnPrepareJobForHTTP(var FormattedTargetEncoding: Text; var HTTPEndpoint: Text; var Supported: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnPrepareJobForBluetooth(var FormattedTargetEncoding: Text; var Supported: Boolean)
+    internal procedure OnPrepareJobForBluetooth(var FormattedTargetEncoding: Text; var Supported: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetPrintBytes(var PrintBytes: Text)
+    internal procedure OnGetPrintBytes(var PrintBytes: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnSetPrintBytes(var PrintBytes: Text)
+    internal procedure OnSetPrintBytes(var PrintBytes: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnBuildDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)
+    internal procedure OnBuildDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
     end;
 }

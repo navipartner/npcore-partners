@@ -9,13 +9,13 @@
         Text002: Label 'Caption with ID %1 has already been added to the front end, and an attempt was made to add it again. The original caption value is retained.';
         Text003: Label 'There have been %1 duplicate captions detected during action initialization. This indicates a programming issue, most likely an action codeunit that uses the same action ID as another action codeunit. Please check the front-end log for warnings to learn which captions are duplicated.';
 
-    procedure Initialize(var FrontEndIn: Codeunit "NPR POS Front End Management")
+    internal procedure Initialize(var FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
         FrontEnd := FrontEndIn;
         Initialized := true;
     end;
 
-    procedure Finalize(var CaptionsOut: JsonObject)
+    internal procedure Finalize(var CaptionsOut: JsonObject)
     var
         CaptionKey: Text;
         CaptionToken: JsonToken;
@@ -55,7 +55,7 @@
         Target.Add(CaptionId, CaptionValue);
     end;
 
-    procedure AddCaption(CaptionId: Text; CaptionText: Text)
+    internal procedure AddCaption(CaptionId: Text; CaptionText: Text)
     begin
         FailIfNotInitialized();
         AddCaptionToCollection(Captions, CaptionId, CaptionText, true);

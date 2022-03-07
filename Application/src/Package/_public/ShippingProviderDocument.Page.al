@@ -409,12 +409,12 @@ page 6014486 "NPR Shipping Provider Document"
         [InDataSet]
         TotalWeightEditable: Boolean;
 
-    procedure OKButtonWasPressed(): Boolean
+    internal procedure OKButtonWasPressed(): Boolean
     begin
         exit(OKButtonPressed);
     end;
 
-    procedure ValidateWeights(Update: Boolean)
+    internal procedure ValidateWeights(Update: Boolean)
     begin
         TotalWeightEditable := (Rec."Parcel Qty." > 1);
         if Update then

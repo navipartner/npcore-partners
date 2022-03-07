@@ -218,7 +218,7 @@
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
         ActionMgt: Codeunit "NPR POS Action Management";
 
-    procedure AssistEdit(ActionCode: Code[20]; "Field": Integer)
+    internal procedure AssistEdit(ActionCode: Code[20]; "Field": Integer)
     begin
         ParamMgt.EditParametersForField(ActionCode, RecordId, Field);
     end;

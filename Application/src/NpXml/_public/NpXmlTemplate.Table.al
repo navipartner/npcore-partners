@@ -616,7 +616,7 @@
         NpXmlApiHeader.DeleteAll();
     end;
 
-    procedure GetApiUsername(): Text[250]
+    internal procedure GetApiUsername(): Text[250]
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
     begin
@@ -628,7 +628,7 @@
         end;
     end;
 
-    procedure InitVersion()
+    internal procedure InitVersion()
     var
         NpXmlTemplateHistory: Record "NPR NpXml Template History";
     begin
@@ -674,7 +674,7 @@
             Rec."API Authorization" := '';
     end;
 
-    procedure UpdateNaviConnectSetup()
+    internal procedure UpdateNaviConnectSetup()
     var
         DataLogSetup: Record "NPR Data Log Setup (Table)";
         DataLogSubscriber: Record "NPR Data Log Subscriber";
@@ -746,7 +746,7 @@
             until NpXmlTemplateTrigger.Next() = 0;
     end;
 
-    procedure VersionArchived(): Boolean
+    internal procedure VersionArchived(): Boolean
     var
         NpXmlTemplateArchive: Record "NPR NpXml Template Arch.";
     begin
@@ -755,7 +755,7 @@
         exit(NpXmlTemplateArchive.FindFirst());
     end;
 
-    procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
+    internal procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
     var
         AuthParamsBuff: Record "NPR Auth. Param. Buffer";
         iAuth: Interface "NPR API IAuthorization";

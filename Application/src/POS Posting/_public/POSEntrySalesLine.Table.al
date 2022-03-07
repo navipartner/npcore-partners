@@ -576,7 +576,7 @@
     {
     }
 
-    procedure ShowDimensions()
+    internal procedure ShowDimensions()
     var
         DimMgt: Codeunit DimensionManagement;
         POSEntry: Record "NPR POS Entry";

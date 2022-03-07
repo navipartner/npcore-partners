@@ -122,8 +122,8 @@
         }
     }
 
-    [IntegrationEvent(TRUE, false)]
-    procedure IsOpen()
+    [IntegrationEvent(true, false)]
+    internal procedure IsOpen()
     begin
     end;
 

@@ -415,7 +415,7 @@
         PeriodDiscount: Record "NPR Period Discount";
         DimMgt: Codeunit DimensionManagement;
 
-    procedure AssistEdit(PeriodDisc: Record "NPR Period Discount"): Boolean
+    internal procedure AssistEdit(PeriodDisc: Record "NPR Period Discount"): Boolean
     begin
         PeriodDiscount := Rec;
         if NoSeriesMgt.SelectSeries(GetNoSeries(), PeriodDisc."No. Series", PeriodDiscount."No. Series") then begin
@@ -432,7 +432,7 @@
         exit(PeriodDiscountMgt.GetNoSeries());
     end;
 
-    procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    internal procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         //-NPR5.29 [261710]

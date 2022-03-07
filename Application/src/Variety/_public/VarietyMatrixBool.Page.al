@@ -2009,7 +2009,7 @@
         Initialized := true;
     end;
 
-    procedure Load(MatrixColumns1: array[100] of Text[1024]; var MatrixRecords1: array[100] of Record "NPR Variety Buffer"; CurrentNoOfMatrixColumns: Integer)
+    internal procedure Load(MatrixColumns1: array[100] of Text[1024]; var MatrixRecords1: array[100] of Record "NPR Variety Buffer"; CurrentNoOfMatrixColumns: Integer)
     var
         i: Integer;
     begin
@@ -2044,7 +2044,7 @@
         MATRIX_CellData[MATRIX_ColumnOrdinal] := TMPBool;
     end;
 
-    procedure UpdateMatrix(ReloadMatrixData: Boolean)
+    internal procedure UpdateMatrix(ReloadMatrixData: Boolean)
     begin
         Clear(Rec);
         Load(MATRIX_CaptionSet, MATRIX_MatrixRecords, MATRIX_CurrentNoOfColumns);
@@ -2071,7 +2071,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure SetRecordRef(RecRef2: RecordRef; var Item2: Record Item; ShowFieldNo: Integer)
+    internal procedure SetRecordRef(RecRef2: RecordRef; var Item2: Record Item; ShowFieldNo: Integer)
     begin
         RecRef := RecRef2;
         Item := Item2;
@@ -2104,7 +2104,7 @@
         CurrVRTField.SetRange("Is Table Default");
     end;
 
-    procedure SetValue(FieldNo: Integer): Text[250]
+    internal procedure SetValue(FieldNo: Integer): Text[250]
     var
         VRT1Value: Code[50];
         VRT2Value: Code[50];
@@ -2130,7 +2130,7 @@
         MATRIX_CellData[FieldNo] := VRTMatrixMgt.GetValueBool(VRT1Value, VRT2Value, VRT3Value, VRT4Value, CurrVRTField, LocationFilter, GD1, GD2);
     end;
 
-    procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
+    internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     begin
         Clear(MATRIX_MatrixRecords);
         VRTMatrixMgt.MATRIX_GenerateColumnCaptions(MATRIX_SetWanted, Item, ShowCrossVRTNo, MATRIX_CaptionSet, MATRIX_CurrentNoOfColumns, MATRIX_CaptionRange, HideInactive, MATRIX_PrimKeyFirstCaptionInCu);

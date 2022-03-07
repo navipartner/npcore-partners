@@ -201,7 +201,7 @@
         Print: Boolean;
         LabelLibrary: Codeunit "NPR Label Library";
 
-    procedure InvertSelection()
+    internal procedure InvertSelection()
     var
         RecRef: RecordRef;
     begin

@@ -217,7 +217,7 @@
         exit(true);
     end;
 
-    procedure HasActiveImport(): Boolean
+    internal procedure HasActiveImport(): Boolean
     var
         ActiveSession: Record "Active Session";
     begin

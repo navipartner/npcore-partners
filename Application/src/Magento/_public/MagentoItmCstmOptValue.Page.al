@@ -86,7 +86,7 @@
         ItemCustomOptValue.Insert(true);
     end;
 
-    procedure SetSourceTable(ItemNo: Code[20]; CustomOptionNo: Code[20])
+    internal procedure SetSourceTable(ItemNo: Code[20]; CustomOptionNo: Code[20])
     var
         CustomOption: Record "NPR Magento Custom Option";
         CustomOptionValue: Record "NPR Magento Custom Optn. Value";

@@ -1,6 +1,6 @@
 ﻿codeunit 6059970 "NPR Variety Wrapper"
 {
-    procedure ShowVarietyMatrix(var ItemParm: Record Item; ShowFieldNo: Integer)
+    internal procedure ShowVarietyMatrix(var ItemParm: Record Item; ShowFieldNo: Integer)
     var
         RecRef: RecordRef;
         VRTShowTable: Codeunit "NPR Variety ShowTables";
@@ -14,7 +14,7 @@
 
     end;
 
-    procedure ShowMaintainItemMatrix(var ItemParm: Record Item; ShowFieldNo: Integer)
+    internal procedure ShowMaintainItemMatrix(var ItemParm: Record Item; ShowFieldNo: Integer)
     var
         RecRef: RecordRef;
         VRTShowTable: Codeunit "NPR Variety ShowTables";
@@ -28,7 +28,7 @@
         VRTShowTable.ShowBooleanMatrix(RecRef, ItemParm, ShowFieldNo);
     end;
 
-    procedure SalesLineShowVariety(SalesLine: Record "Sales Line"; ShowFieldNo: Integer)
+    internal procedure SalesLineShowVariety(SalesLine: Record "Sales Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
         MasterLineMap: Record "NPR Master Line Map";
@@ -66,7 +66,7 @@
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
-    procedure PurchLineShowVariety(PurchLine: Record "Purchase Line"; ShowFieldNo: Integer)
+    internal procedure PurchLineShowVariety(PurchLine: Record "Purchase Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
         MasterLineMap: Record "NPR Master Line Map";
@@ -104,7 +104,7 @@
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
-    procedure PriceShowVariety(PriceListLine: Record "Price List Line"; ShowFieldNo: Integer)
+    internal procedure PriceShowVariety(PriceListLine: Record "Price List Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
         MasterLineMap: Record "NPR Master Line Map";
@@ -135,7 +135,7 @@
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
-    procedure RetailJournalLineShowVariety(RetailJournalLine: Record "NPR Retail Journal Line"; ShowFieldNo: Integer)
+    internal procedure RetailJournalLineShowVariety(RetailJournalLine: Record "NPR Retail Journal Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
         MasterLineMap: Record "NPR Master Line Map";
@@ -164,7 +164,7 @@
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
-    procedure ItemReplenishmentShowVariety(ItemReplenishByStore: Record "NPR Item Repl. by Store"; ShowFieldNo: Integer)
+    internal procedure ItemReplenishmentShowVariety(ItemReplenishByStore: Record "NPR Item Repl. by Store"; ShowFieldNo: Integer)
     var
         Item: Record Item;
         MasterLineMap: Record "NPR Master Line Map";
@@ -195,7 +195,7 @@
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
-    procedure ItemJnlLineShowVariety(ItemJnlLine: Record "Item Journal Line"; ShowFieldNo: Integer)
+    internal procedure ItemJnlLineShowVariety(ItemJnlLine: Record "Item Journal Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
         MasterLineMap: Record "NPR Master Line Map";
@@ -235,12 +235,12 @@
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
-    procedure TestItemIsVariety(Item: Record Item)
+    internal procedure TestItemIsVariety(Item: Record Item)
     begin
         // forgotten check? todo?
     end;
 
-    procedure TransferLineShowVariety(TransferLine: Record "Transfer Line"; ShowFieldNo: Integer)
+    internal procedure TransferLineShowVariety(TransferLine: Record "Transfer Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
         MasterLineMap: Record "NPR Master Line Map";

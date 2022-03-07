@@ -344,12 +344,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnBeforePrintEntry(POSEntry: Record "NPR POS Entry"; IsReprint: Boolean)
+    internal procedure OnBeforePrintEntry(POSEntry: Record "NPR POS Entry"; IsReprint: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterPrintEntry(POSEntry: Record "NPR POS Entry"; IsReprint: Boolean)
+    internal procedure OnAfterPrintEntry(POSEntry: Record "NPR POS Entry"; IsReprint: Boolean)
     begin
     end;
 }

@@ -31,7 +31,7 @@
         exit(SendEmailTemplate(RecRef, EmailTemplateHeader, RecipientEmail, Silent));
     end;
 
-    procedure SendEmailTemplate(var RecRef: RecordRef; var EmailTemplateHeader: Record "NPR E-mail Template Header"; RecipientEmail: Text[250]; Silent: Boolean) ErrorMessage: Text
+    internal procedure SendEmailTemplate(var RecRef: RecordRef; var EmailTemplateHeader: Record "NPR E-mail Template Header"; RecipientEmail: Text[250]; Silent: Boolean) ErrorMessage: Text
     begin
         if (StrLen(RecipientEmail) > 250) then
             Error(EmailTemplateErr);
@@ -137,7 +137,7 @@
             until EmailAttachment.Next() = 0;
     end;
 
-    procedure AddFileToSmtpMessage(Filename: Text) FileAttached: Boolean
+    internal procedure AddFileToSmtpMessage(Filename: Text) FileAttached: Boolean
     var
         TempEmailAttachment: Record "NPR E-mail Attachment" temporary;
         InStream: InStream;
@@ -168,7 +168,7 @@
         exit(true);
     end;
 
-    procedure AddAttachmentToSmtpMessage(var EmailAttachment: Record "NPR E-mail Attachment"): Boolean
+    internal procedure AddAttachmentToSmtpMessage(var EmailAttachment: Record "NPR E-mail Attachment"): Boolean
     begin
         exit(AddAttachmentToBuffer(EmailAttachment));
     end;
@@ -195,7 +195,7 @@
         exit(true);
     end;
 
-    procedure CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef: RecordRef; ReportID: Integer) ErrorMessage: Text[1024]
+    internal procedure CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef: RecordRef; ReportID: Integer) ErrorMessage: Text[1024]
     var
         EmailTemplateLine: Record "NPR E-mail Templ. Line";
         EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
@@ -269,7 +269,7 @@
         exit('');
     end;
 
-    procedure SendSmtpMessage(var RecRef: RecordRef; Silent: Boolean) ErrorMessage: Text[1024]
+    internal procedure SendSmtpMessage(var RecRef: RecordRef; Silent: Boolean) ErrorMessage: Text[1024]
     var
         TransactionalEmail: Record "NPR Smart Email";
         EmailLog: Record "NPR E-mail Log";
@@ -356,7 +356,7 @@
     #endregion
     #region Setup
 
-    procedure SetupEmailTemplate(var RecRef: RecordRef; RecipientEmail: Text[250]; Silent: Boolean; var EmailTemplateHeader: Record "NPR E-mail Template Header") ErrorMessage: Text[1024]
+    internal procedure SetupEmailTemplate(var RecRef: RecordRef; RecipientEmail: Text[250]; Silent: Boolean; var EmailTemplateHeader: Record "NPR E-mail Template Header") ErrorMessage: Text[1024]
     begin
         ErrorMessage := '';
         if GetEmailTemplateHeader(RecRef, EmailTemplateHeader) then begin
@@ -375,7 +375,7 @@
         exit(ErrorMessage);
     end;
 
-    procedure GetDefaultGroupFilter(): Text
+    internal procedure GetDefaultGroupFilter(): Text
     begin
         exit('');
     end;
@@ -497,7 +497,7 @@
         exit(RecordExists);
     end;
 
-    procedure GetFilename(EmailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef: RecordRef) Filename: Text
+    internal procedure GetFilename(EmailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef: RecordRef) Filename: Text
     var
         EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
     begin
@@ -519,7 +519,7 @@
     begin
     end;
 
-    procedure GetReportIDFromRecRef(RecRef: RecordRef) ReportID: Integer
+    internal procedure GetReportIDFromRecRef(RecRef: RecordRef) ReportID: Integer
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         ReportSelections: Record "Report Selections";
@@ -564,7 +564,7 @@
     begin
     end;
 
-    procedure GetEmailAddressFromRecRef(var RecRef: RecordRef): Text
+    internal procedure GetEmailAddressFromRecRef(var RecRef: RecordRef): Text
     var
         EmailAddress: Text;
         Handled: Boolean;
@@ -619,7 +619,7 @@
         end;
     end;
 
-    procedure GetCustomReportEmailAddress(): Text
+    internal procedure GetCustomReportEmailAddress(): Text
     begin
         if UseCustomReportSelection then
             exit(GlobalCustomReportSelection."Send To Email");
@@ -652,7 +652,7 @@
         end;
     end;
 
-    procedure StoreRequestParameters(ReportID: Integer; Parameters: Text)
+    internal procedure StoreRequestParameters(ReportID: Integer; Parameters: Text)
     begin
         if ReqParamStoreDict.ContainsKey(ReportID) then
             ReqParamStoreDict.Set(ReportID, Parameters)
@@ -666,7 +666,7 @@
             exit(ReqParamStoreDict.Get(ReportID));
     end;
 
-    procedure ClearRequestParameters(ReportID: Integer)
+    internal procedure ClearRequestParameters(ReportID: Integer)
     begin
         if ReqParamStoreDict.ContainsKey(ReportID) then
             ReqParamStoreDict.Remove(ReportID);
@@ -746,7 +746,7 @@
     end;
 
     [TryFunction]
-    procedure CheckEmailSyntax(EmailAddress: Text)
+    internal procedure CheckEmailSyntax(EmailAddress: Text)
     var
         MailManagement: Codeunit "Mail Management";
     begin
@@ -759,7 +759,7 @@
         Error(ErrorMessage);
     end;
 
-    procedure ConfirmResendEmail(var RecRef: RecordRef): Boolean
+    internal procedure ConfirmResendEmail(var RecRef: RecordRef): Boolean
     begin
         if EmailLogExists(RecRef) then
             exit(Confirm(Text010));
@@ -767,7 +767,7 @@
         exit(true);
     end;
 
-    procedure RunEmailLog(RecRef: RecordRef)
+    internal procedure RunEmailLog(RecRef: RecordRef)
     var
         EmailLog: Record "NPR E-mail Log";
     begin

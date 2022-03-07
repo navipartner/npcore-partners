@@ -134,12 +134,12 @@
     var
         NcTriggerTaskMgt: Codeunit "NPR Nc Trigger Task Mgt.";
 
-    procedure GetEndpointTypeCode(): Code[20]
+    internal procedure GetEndpointTypeCode(): Code[20]
     begin
         exit('FTP');
     end;
 
-    procedure ShowEndpointTriggerLinks()
+    internal procedure ShowEndpointTriggerLinks()
     var
         NcEndpointTriggerLink: Record "NPR Nc Endpoint Trigger Link";
         NcEndpointTriggerLinks: Page "NPR Nc Endpoint Trigger Links";

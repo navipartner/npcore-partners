@@ -2,7 +2,7 @@
 {
     #region UI
 
-    procedure LookupPicture(PictureType: Enum "NPR Magento Picture Type"; PictureName: Text[250]): Text
+    internal procedure LookupPicture(PictureType: Enum "NPR Magento Picture Type"; PictureName: Text[250]): Text
     var
         MagentoPicture: Record "NPR Magento Picture";
     begin

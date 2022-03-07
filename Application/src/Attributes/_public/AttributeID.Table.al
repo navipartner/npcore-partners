@@ -84,7 +84,7 @@
     var
         Text001: Label '%1 already occupies %2 %3.\Select a different value for%2.';
 
-    procedure CheckOverlappingID()
+    internal procedure CheckOverlappingID()
     var
         AttributeID: Record "NPR Attribute ID";
     begin

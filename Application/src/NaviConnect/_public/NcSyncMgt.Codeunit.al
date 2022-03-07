@@ -10,7 +10,7 @@
 
     #region "Download Ftp"
 
-    procedure DownloadFtpType(ImportType: Record "NPR Nc Import Type"): Boolean
+    internal procedure DownloadFtpType(ImportType: Record "NPR Nc Import Type"): Boolean
     var
         TempImportEntry: Record "NPR Nc Import Entry" temporary;
         Filename: Text;
@@ -47,7 +47,7 @@
     end;
 
     [TryFunction]
-    procedure TryImportNewEntry(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text)
+    internal procedure TryImportNewEntry(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text)
     var
         SourceUri: Text;
         TargetUri: Text;
@@ -115,7 +115,7 @@
     end;
 
     [TryFunction]
-    procedure TryImportNewEntrySftp(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text)
+    internal procedure TryImportNewEntrySftp(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text)
     var
         OutStr: OutStream;
         RemotePath: Text;
@@ -231,7 +231,7 @@
         exit(true);
     end;
 
-    procedure ProcessTasks(TaskProcessor: Record "NPR Nc Task Processor"; MaxRetry: Integer)
+    internal procedure ProcessTasks(TaskProcessor: Record "NPR Nc Task Processor"; MaxRetry: Integer)
     var
         Task: Record "NPR Nc Task";
         Task2: Record "NPR Nc Task";
@@ -316,7 +316,7 @@
         Commit();
     end;
 
-    procedure TaskResetCount()
+    internal procedure TaskResetCount()
     var
         NaviConnectTask: Record "NPR Nc Task";
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
@@ -330,7 +330,7 @@
         Commit();
     end;
 
-    procedure UpdateTaskProcessor(var TaskProcessor: Record "NPR Nc Task Processor")
+    internal procedure UpdateTaskProcessor(var TaskProcessor: Record "NPR Nc Task Processor")
     var
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         TaskProcDescrLbl: Label 'NaviConnect Default';
@@ -615,32 +615,32 @@
     #endregion Aux
 
     #region Constants
-    procedure "Parameter.DownloadFtp"(): Code[20]
+    internal procedure "Parameter.DownloadFtp"(): Code[20]
     begin
         exit('DOWNLOAD_FTP');
     end;
 
-    procedure "Parameter.DownloadType"(): Code[20]
+    internal procedure "Parameter.DownloadType"(): Code[20]
     begin
         exit('DOWNLOAD_IMPORT_TYPE');
     end;
 
-    procedure "Parameter.ImportNewTasks"(): Code[20]
+    internal procedure "Parameter.ImportNewTasks"(): Code[20]
     begin
         exit('IMPORT_NEW_TASKS');
     end;
 
-    procedure "Parameter.ProcessTasks"(): Code[20]
+    internal procedure "Parameter.ProcessTasks"(): Code[20]
     begin
         exit('PROCESS_TASKS');
     end;
 
-    procedure "Parameter.ResetTaskCount"(): Code[20]
+    internal procedure "Parameter.ResetTaskCount"(): Code[20]
     begin
         exit('RESET_RETRY_COUNT');
     end;
 
-    procedure "Parameter.TaskRetryCount"(): Code[20]
+    internal procedure "Parameter.TaskRetryCount"(): Code[20]
     begin
         exit('TASK_RETRY_COUNT');
     end;

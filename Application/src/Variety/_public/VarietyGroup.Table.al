@@ -328,7 +328,7 @@
         MaxLengthExceeded: Label 'The Maximum length of the Variety combinations has been exceeded. A Variant Code ca only be 10 characters long';
         IllegalCharacter: Label 'The character %1 is not allowed to use as a seperator';
 
-    procedure GetVariety1Table(Item: Record Item): Code[40]
+    internal procedure GetVariety1Table(Item: Record Item): Code[40]
     begin
         if not "Create Copy of Variety 1 Table" then
             exit("Variety 1 Table");
@@ -342,7 +342,7 @@
         exit(CopyStr("Variety 1 Table" + '-' + GetNextNo(), 1, 40));
     end;
 
-    procedure GetVariety2Table(Item: Record Item): Code[40]
+    internal procedure GetVariety2Table(Item: Record Item): Code[40]
     begin
         if not "Create Copy of Variety 2 Table" then
             exit("Variety 2 Table");
@@ -356,7 +356,7 @@
         exit(CopyStr("Variety 2 Table" + '-' + GetNextNo(), 1, 40));
     end;
 
-    procedure GetVariety3Table(Item: Record Item): Code[40]
+    internal procedure GetVariety3Table(Item: Record Item): Code[40]
     begin
         if not "Create Copy of Variety 3 Table" then
             exit("Variety 3 Table");
@@ -370,7 +370,7 @@
         exit(CopyStr("Variety 3 Table" + '-' + GetNextNo(), 1, 40));
     end;
 
-    procedure GetVariety4Table(Item: Record Item): Code[40]
+    Internal procedure GetVariety4Table(Item: Record Item): Code[40]
     begin
         if not "Create Copy of Variety 4 Table" then
             exit("Variety 4 Table");
@@ -384,7 +384,7 @@
         exit(CopyStr("Variety 4 Table" + '-' + GetNextNo(), 1, 40));
     end;
 
-    procedure GetNextNo(): Code[20]
+    internal procedure GetNextNo(): Code[20]
     var
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
@@ -395,7 +395,7 @@
         NextNoSeriesCode := NoSeriesMgt.GetNextNo("No. Series", Today, true);
     end;
 
-    procedure CopyTableData(Item: Record Item)
+    internal procedure CopyTableData(Item: Record Item)
     begin
         if "Create Copy of Variety 1 Table" then
             CopyTable2NewTable("Variety 1", "Variety 1 Table", Item."NPR Variety 1 Table");
@@ -407,7 +407,7 @@
             CopyTable2NewTable("Variety 4", "Variety 4 Table", Item."NPR Variety 4 Table");
     end;
 
-    procedure CopyTable2NewTable(Type: Code[10]; FromTable: Code[40]; ToTable: Code[40])
+    internal procedure CopyTable2NewTable(Type: Code[10]; FromTable: Code[40]; ToTable: Code[40])
     var
         FromVRTTable: Record "NPR Variety Table";
         ToVRTTable: Record "NPR Variety Table";
@@ -489,7 +489,7 @@
         //+NPR5.43 [317108]
     end;
 
-    procedure GetVariantCodeExample(): Code[50]
+    internal procedure GetVariantCodeExample(): Code[50]
     var
         Var1Value: Code[50];
         Var2Value: Code[50];

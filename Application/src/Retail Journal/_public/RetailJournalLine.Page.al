@@ -402,7 +402,7 @@
         IsWebClient: Boolean;
         ItemNo: Text;
 
-    procedure GetSelectionFilter(var Lines: Record "NPR Retail Journal Line")
+    internal procedure GetSelectionFilter(var Lines: Record "NPR Retail Journal Line")
     var
         t001: Label 'No lines chosen!\Select using mouse or keyboard';
         t002: Label 'Only one item chosen. Continue?';
@@ -416,7 +416,7 @@
             if not Confirm(t002, true) then Error('');
     end;
 
-    procedure SetItemFilter(ItemNo1: Code[20])
+    internal procedure SetItemFilter(ItemNo1: Code[20])
     begin
         if ItemNo1 = '' then
             Rec.SetRange("Item No.")
@@ -426,7 +426,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure InvertSelection()
+    internal procedure InvertSelection()
     var
         RecRef: RecordRef;
     begin
@@ -474,14 +474,14 @@
         //+NPR5.34 [282048]
     end;
 
-    procedure SetSkipConfirm(SkipConfirmHere: Boolean)
+    internal procedure SetSkipConfirm(SkipConfirmHere: Boolean)
     begin
         //-NPR5.53 [375557]
         SkipConfirm := SkipConfirmHere;
         //+NPR5.53 [375557]
     end;
 
-    procedure SetLineFilters(VendorFilter: Text; ItemGroupFilter: Text; ShowUnknown: Option All,"Only existing items","Only unknown items"; ShowNew: Option All,"Only existing items","Only new items"; ShowInventory: Option All,"In stock","Not in stock")
+    internal procedure SetLineFilters(VendorFilter: Text; ItemGroupFilter: Text; ShowUnknown: Option All,"Only existing items","Only unknown items"; ShowNew: Option All,"Only existing items","Only new items"; ShowInventory: Option All,"In stock","Not in stock")
     begin
         //-NPR5.53 [374290]
         Rec.FilterGroup(40);

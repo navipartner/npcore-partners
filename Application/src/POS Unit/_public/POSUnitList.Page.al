@@ -174,7 +174,7 @@
         }
     }
 
-    procedure GetSelectionFilter(): Text
+    internal procedure GetSelectionFilter(): Text
     var
         POSUnit: Record "NPR POS Unit";
         SelectionFilterManagement: Codeunit SelectionFilterManagement;

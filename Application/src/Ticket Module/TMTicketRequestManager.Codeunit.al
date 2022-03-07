@@ -1524,12 +1524,12 @@
     // ***************** EVENTS
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterBlockTicketPublisher(TicketNo: Code[20])
+    internal procedure OnAfterBlockTicketPublisher(TicketNo: Code[20])
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterUnblockTicketPublisher(TicketNo: Code[20])
+    internal procedure OnAfterUnblockTicketPublisher(TicketNo: Code[20])
     begin
     end;
 

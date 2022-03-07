@@ -90,8 +90,8 @@
             Modify(true);
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnDiscoverPOSSalesWorkflows()
+    [IntegrationEvent(true, false)]
+    internal procedure OnDiscoverPOSSalesWorkflows()
     begin
     end;
 

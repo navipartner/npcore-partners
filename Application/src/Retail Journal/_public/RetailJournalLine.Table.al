@@ -544,7 +544,7 @@
         Text001: Label 'Creating lines @1@@@@@@@';
         Currency: Record Currency;
 
-    procedure FindItemSalesPrice()
+    internal procedure FindItemSalesPrice()
     var
         TempSalePOS: Record "NPR POS Sale" temporary;
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
@@ -617,7 +617,7 @@
         "Discount Pct." := TempSaleLinePOS2."Discount %";
     end;
 
-    procedure calcProfit()
+    internal procedure calcProfit()
     var
         TempItem: Record Item temporary;
         Item1: Record Item;
@@ -646,7 +646,7 @@
         end;
     end;
 
-    procedure SelectRetailJournal(RetailJournalCode: Code[40]) JournalSelected: Boolean
+    internal procedure SelectRetailJournal(RetailJournalCode: Code[40]) JournalSelected: Boolean
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
         POSUnit: Record "NPR POS Unit";
@@ -666,7 +666,7 @@
         exit(true);
     end;
 
-    procedure UseGUI(TotalNoOfLines: Integer)
+    internal procedure UseGUI(TotalNoOfLines: Integer)
     begin
         if not GuiAllowed then
             exit;
@@ -680,7 +680,7 @@
         Dia.Open(Text001);
     end;
 
-    procedure InitLine()
+    internal procedure InitLine()
     var
         POSUnit: Record "NPR POS Unit";
     begin
@@ -704,7 +704,7 @@
             "Register No." := RetailJournalHeader."Register No.";
     end;
 
-    procedure SetItem(ItemNo: Code[20]; VariantCode: Code[10]; BarcodeValue: Code[50])
+    internal procedure SetItem(ItemNo: Code[20]; VariantCode: Code[10]; BarcodeValue: Code[50])
     begin
         if Barcode <> '' then
             Validate(Barcode, BarcodeValue)
@@ -714,7 +714,7 @@
         end;
     end;
 
-    procedure SetDiscountType(DiscountType: Option " ",Campaign,Mix,Quantity,Manual,"BOM List","Photo work",Rounding,Combination,Customer; DiscountCode: Code[20]; DiscountPrice: Decimal; DiscountQuantity: Decimal; PriceInclVAT: Boolean)
+    internal procedure SetDiscountType(DiscountType: Option " ",Campaign,Mix,Quantity,Manual,"BOM List","Photo work",Rounding,Combination,Customer; DiscountCode: Code[20]; DiscountPrice: Decimal; DiscountQuantity: Decimal; PriceInclVAT: Boolean)
     begin
         "Discount Type" := DiscountType;
         "Discount Code" := DiscountCode;
@@ -725,7 +725,7 @@
             Validate("Discount Price Excl. VAT", DiscountPrice);
     end;
 
-    procedure CloseGUI()
+    internal procedure CloseGUI()
     begin
         if not ShowDialog then
             exit;
@@ -756,7 +756,7 @@
         end;
     end;
 
-    procedure SetupNewLine(var LastRetailJnlLine: Record "NPR Retail Journal Line")
+    internal procedure SetupNewLine(var LastRetailJnlLine: Record "NPR Retail Journal Line")
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
         POSUnit: Record "NPR POS Unit";

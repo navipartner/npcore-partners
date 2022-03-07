@@ -2,62 +2,62 @@
 {
     Access = Internal;
     [IntegrationEvent(false, false)]
-    procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
+    internal procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnHasIssueCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; var HasIssueSetup: Boolean)
+    internal procedure OnHasIssueCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; var HasIssueSetup: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnSetupIssueCoupon(var CouponType: Record "NPR NpDc Coupon Type")
+    internal procedure OnSetupIssueCoupon(var CouponType: Record "NPR NpDc Coupon Type")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRunIssueCoupon(CouponType: Record "NPR NpDc Coupon Type"; var Handled: Boolean)
+    internal procedure OnRunIssueCoupon(CouponType: Record "NPR NpDc Coupon Type"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnHasValidateCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; var HasValidateSetup: Boolean)
+    internal procedure OnHasValidateCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; var HasValidateSetup: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnSetupValidateCoupon(var CouponType: Record "NPR NpDc Coupon Type")
+    internal procedure OnSetupValidateCoupon(var CouponType: Record "NPR NpDc Coupon Type")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRunValidateCoupon(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
+    internal procedure OnRunValidateCoupon(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnHasApplyDiscountSetup(CouponType: Record "NPR NpDc Coupon Type"; var HasApplySetup: Boolean)
+    internal procedure OnHasApplyDiscountSetup(CouponType: Record "NPR NpDc Coupon Type"; var HasApplySetup: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnSetupApplyDiscount(var CouponType: Record "NPR NpDc Coupon Type")
+    internal procedure OnSetupApplyDiscount(var CouponType: Record "NPR NpDc Coupon Type")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRunApplyDiscount(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var Handled: Boolean)
+    internal procedure OnRunApplyDiscount(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnPostDiscountApplication(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; Coupon: Record "NPR NpDc Coupon"; CouponEntry: Record "NPR NpDc Coupon Entry")
+    internal procedure OnPostDiscountApplication(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; Coupon: Record "NPR NpDc Coupon"; CouponEntry: Record "NPR NpDc Coupon Entry")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnCancelDiscountApplication(Coupon: Record "NPR NpDc Coupon"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon")
+    internal procedure OnCancelDiscountApplication(Coupon: Record "NPR NpDc Coupon"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon")
     begin
     end;
 }

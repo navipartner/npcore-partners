@@ -430,7 +430,7 @@
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         TEXT6060000: Label 'The %1 %2 is already in use.';
 
-    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    internal procedure GetImageContent(var TenantMedia: Record "Tenant Media")
     begin
         TenantMedia.Init();
         if not Image.HasValue() then

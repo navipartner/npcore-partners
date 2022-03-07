@@ -6,7 +6,7 @@
         MagentoFunctions: Codeunit "NPR Magento Functions";
         Text000: Label 'Replicating Special Prices to Sales Prices:';
 
-    procedure DeleteMagentoData(var Item: Record Item)
+    internal procedure DeleteMagentoData(var Item: Record Item)
     var
         MagentoItemAttribute: Record "NPR Magento Item Attr.";
         MagentoItemAttributeValue: Record "NPR Magento Item Attr. Value";
@@ -109,7 +109,7 @@
             until MagentoStore.Next() = 0;
     end;
 
-    procedure InitReplicateSpecialPrice2SalesPrices()
+    internal procedure InitReplicateSpecialPrice2SalesPrices()
     var
         Item: Record Item;
         Window: Dialog;
@@ -252,7 +252,7 @@
     /// but this can be overwritten in the `OnBeforeItemSeoLinkFormat()` integration event.
     /// </summary>
     /// <param name="Item">Item to be modified</param>
-    procedure UpdateItemSeoLink(var Item: Record Item)
+    internal procedure UpdateItemSeoLink(var Item: Record Item)
     var
         PrevRec: Text;
         SeoLinkText: Text;
@@ -274,7 +274,7 @@
         exit(StockQty);
     end;
 
-    procedure GetStockQty2(var RecRef: RecordRef) StockQty: Decimal
+    internal procedure GetStockQty2(var RecRef: RecordRef) StockQty: Decimal
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -298,13 +298,13 @@
         exit(StockQty);
     end;
 
-    procedure GetStockQty3(ItemNo: Code[20]; VariantFilter: Text; MagentoInventoryCompany: Record "NPR Magento Inv. Company") StockQty: Decimal
+    internal procedure GetStockQty3(ItemNo: Code[20]; VariantFilter: Text; MagentoInventoryCompany: Record "NPR Magento Inv. Company") StockQty: Decimal
     begin
         StockQty := CalcStockQty(ItemNo, VariantFilter, MagentoInventoryCompany."Location Filter");
         exit(StockQty);
     end;
 
-    procedure CalcStockQty(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) StockQty: Decimal
+    internal procedure CalcStockQty(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) StockQty: Decimal
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -365,7 +365,7 @@
         exit(StockQty);
     end;
 
-    procedure CalcQtyOnSalesOrder(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
+    internal procedure CalcQtyOnSalesOrder(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -414,7 +414,7 @@
         exit(Qty);
     end;
 
-    procedure CalcQtyOnSalesReturn(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
+    internal procedure CalcQtyOnSalesReturn(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -463,7 +463,7 @@
         exit(Qty);
     end;
 
-    procedure CalcQtyOnPurchOrder(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
+    internal procedure CalcQtyOnPurchOrder(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -512,7 +512,7 @@
         exit(Qty);
     end;
 
-    procedure CalcQtyOnPurchReturn(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
+    internal procedure CalcQtyOnPurchReturn(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -577,7 +577,7 @@
             UpsertStockTriggers();
     end;
 
-    procedure UpsertStockTriggers()
+    internal procedure UpsertStockTriggers()
     var
         NpXmlTemplate: Record "NPR NpXml Template";
         Item: Record Item;
@@ -614,7 +614,7 @@
         UpsertStockTrigger(NpXmlTemplate, Item.FieldNo("No."), DATABASE::"Sales Line", SalesLine.FieldNo("No."), true, true, true);
     end;
 
-    procedure UpsertStockTrigger(NpXmlTemplate: Record "NPR NpXml Template"; LinkFieldNoParent: Integer; TableNo: Integer; LinkFieldNoChild: Integer; TriggerOnInsert: Boolean; TriggerOnModify: Boolean; TriggerOnDelete: Boolean)
+    internal procedure UpsertStockTrigger(NpXmlTemplate: Record "NPR NpXml Template"; LinkFieldNoParent: Integer; TableNo: Integer; LinkFieldNoChild: Integer; TriggerOnInsert: Boolean; TriggerOnModify: Boolean; TriggerOnDelete: Boolean)
     var
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         NpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link";

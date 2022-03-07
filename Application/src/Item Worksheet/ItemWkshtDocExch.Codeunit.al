@@ -120,7 +120,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterInsertItemWorksheetLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure OnAfterInsertItemWorksheetLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     begin
     end;
 }

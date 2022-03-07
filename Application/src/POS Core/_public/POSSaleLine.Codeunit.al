@@ -490,28 +490,28 @@
 
     //--- Publishers ---
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnAfterDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    [IntegrationEvent(true, false)]
+    internal procedure OnAfterDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    [IntegrationEvent(true, false)]
+    internal procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnUpdateLine(var SaleLinePOS: Record "NPR POS Sale Line")
+    [IntegrationEvent(true, false)]
+    internal procedure OnUpdateLine(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     procedure OnAfterSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnBeforeSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
+    [IntegrationEvent(true, false)]
+    internal procedure OnBeforeSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     begin
     end;
 

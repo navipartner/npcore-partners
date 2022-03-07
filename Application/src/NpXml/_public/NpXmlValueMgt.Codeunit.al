@@ -1,6 +1,6 @@
 ﻿codeunit 6151555 "NPR NpXml Value Mgt."
 {
-    procedure GetXmlValue(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer) XmlValue: Text
+    internal procedure GetXmlValue(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer) XmlValue: Text
     var
         TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
@@ -164,7 +164,7 @@
         end;
     end;
 
-    procedure FillCustomValueBuffer(RecRef: RecordRef; NPXmlElement: Record "NPR NpXml Element"; var TempNpXmlCustomValueBuffer: Record "NPR NpXml Custom Val. Buffer" temporary)
+    internal procedure FillCustomValueBuffer(RecRef: RecordRef; NPXmlElement: Record "NPR NpXml Element"; var TempNpXmlCustomValueBuffer: Record "NPR NpXml Custom Val. Buffer" temporary)
     begin
         TempNpXmlCustomValueBuffer.DeleteAll();
         TempNpXmlCustomValueBuffer.Init();
@@ -175,7 +175,7 @@
         TempNpXmlCustomValueBuffer.Insert();
     end;
 
-    procedure GetCustomFieldValue(RecRef: RecordRef; NPXmlElement: Record "NPR NpXml Element") Value: Text
+    internal procedure GetCustomFieldValue(RecRef: RecordRef; NPXmlElement: Record "NPR NpXml Element") Value: Text
     var
         TempNpXmlCustomValueBuffer: Record "NPR NpXml Custom Val. Buffer" temporary;
         InStr: InStream;
@@ -222,7 +222,7 @@
         exit(Format(FieldRef.Value, 0, 9));
     end;
 
-    procedure GetEnumOption(Option: Integer; EnumString: Text) EnumOption: Text
+    internal procedure GetEnumOption(Option: Integer; EnumString: Text) EnumOption: Text
     var
         Position: Integer;
         i: Integer;
@@ -244,7 +244,7 @@
         exit(EnumOption);
     end;
 
-    procedure GetPrimaryKeyValue(var RecRef: RecordRef) PrimaryKeyValue: Text
+    internal procedure GetPrimaryKeyValue(var RecRef: RecordRef) PrimaryKeyValue: Text
     var
         KeyRef: KeyRef;
         FieldRef: FieldRef;

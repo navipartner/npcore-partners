@@ -106,7 +106,7 @@
     var
         SMSFilterCaption: Label 'Filters for table %1';
 
-    procedure OpenFilterPage()
+    internal procedure OpenFilterPage()
     var
         FiltersOutStream: OutStream;
         CurrentFilters: Text;
@@ -126,7 +126,7 @@
         end;
     end;
 
-    procedure GetTableFilters() Filters: Text
+    internal procedure GetTableFilters() Filters: Text
     var
         FiltersInStream: InStream;
     begin

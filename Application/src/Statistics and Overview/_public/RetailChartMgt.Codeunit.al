@@ -4,7 +4,7 @@
         MarginLbl: Label 'Margin';
         TurnoverLbl: Label 'Turnover';
 
-    procedure TurnOver_Revenue(var BusChartBuf: Record "Business Chart Buffer"; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period)
+    internal procedure TurnOver_Revenue(var BusChartBuf: Record "Business Chart Buffer"; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period)
     var
         Query1: Query "NPR Retail Sales Value Entry";
         I: Integer;

@@ -460,7 +460,7 @@ table 6014452 "NPR Shipping Provider Document"
         DeleteShippingAgentServices(Rec, false);
     end;
 
-    procedure AddEntry(RecRef: RecordRef; ShowWindow: Boolean)
+    internal procedure AddEntry(RecRef: RecordRef; ShowWindow: Boolean)
     var
         CompanyInfo: Record "Company Information";
         ShipmentDocument: Record "NPR Shipping Provider Document";
@@ -638,7 +638,7 @@ table 6014452 "NPR Shipping Provider Document"
                 PacsoftMgt.SendDocument(ShipmentDocument, false);
     end;
 
-    procedure DeleteShippingAgentServices(pShipmentDocument: Record "NPR Shipping Provider Document"; WithDialog: Boolean)
+    internal procedure DeleteShippingAgentServices(pShipmentDocument: Record "NPR Shipping Provider Document"; WithDialog: Boolean)
     var
         ShipmentDocServices: Record "NPR Pacsoft Shipm. Doc. Serv.";
         TextConfirm: Label 'The chosen Shipping Agent Services will be deleted. Continue ?';
@@ -661,7 +661,7 @@ table 6014452 "NPR Shipping Provider Document"
         ShipmentDocServices.DeleteAll(true);
     end;
 
-    procedure ShowTrackAndTrace(pShipmentDocument: Record "NPR Shipping Provider Document")
+    internal procedure ShowTrackAndTrace(pShipmentDocument: Record "NPR Shipping Provider Document")
     var
         ShippingAgent: Record "Shipping Agent";
         TrackingInternetAddr: Text[250];
@@ -682,7 +682,7 @@ table 6014452 "NPR Shipping Provider Document"
         HyperLink(TrackingInternetAddr);
     end;
 
-    procedure ReadTextFromBlob(FieldNo: Integer): Text
+    internal procedure ReadTextFromBlob(FieldNo: Integer): Text
     var
         TempBlob: Codeunit "Temp Blob";
         FileMgmt: Codeunit "File Management";

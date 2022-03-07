@@ -1733,7 +1733,7 @@
         FieldRef.Value := Value;
     end;
 
-    procedure Initialize()
+    internal procedure Initialize()
     begin
         if not Initialized then begin
             MagentoSetup.Get();

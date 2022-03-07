@@ -253,7 +253,7 @@
         LineNo := TaskLine."Line No." + 10000;
     end;
 
-    procedure SetupTaskProcessingJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Autocreated: Boolean)
+    internal procedure SetupTaskProcessingJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Autocreated: Boolean)
     var
         NcTaskProcessor: Record "NPR Nc Task Processor";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
@@ -268,7 +268,7 @@
         JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, NcTaskProcessor.Code, true, '');
     end;
 
-    procedure SetupTaskCountResetJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Autocreated: Boolean)
+    internal procedure SetupTaskCountResetJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Autocreated: Boolean)
     var
         NcTaskProcessor: Record "NPR Nc Task Processor";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
@@ -283,7 +283,7 @@
         JobQueueMgt.ScheduleNcTaskCountResetJob(JobQueueEntry, NcTaskProcessor.Code, '');
     end;
 
-    procedure SetupDefaultNcImportListProcessingJobQueue(Autocreated: Boolean)
+    internal procedure SetupDefaultNcImportListProcessingJobQueue(Autocreated: Boolean)
     var
         JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
@@ -303,12 +303,12 @@
         SetupDefaultNcImportListProcessingJobQueue(true);
     end;
 
-    procedure NaviConnectDefaultTaskProcessorCode(): Code[10]
+    internal procedure NaviConnectDefaultTaskProcessorCode(): Code[10]
     begin
         exit('NC');
     end;
 
-    procedure DefaultNCJQCategoryCode(CodeunitID: Integer): Code[10]
+    internal procedure DefaultNCJQCategoryCode(CodeunitID: Integer): Code[10]
     var
         JobQueueCategory: Record "Job Queue Category";
         ImportListJQCategoryCode: Label 'NPR-NC-IMP', MaxLength = 10, Locked = true;
@@ -335,7 +335,7 @@
         exit(Codeunit::"NPR Nc Import List Processing");
     end;
 
-    procedure TaskListProcessingCodeunit(): Integer
+    internal procedure TaskListProcessingCodeunit(): Integer
     begin
         exit(Codeunit::"NPR Nc Task List Processing");
     end;
