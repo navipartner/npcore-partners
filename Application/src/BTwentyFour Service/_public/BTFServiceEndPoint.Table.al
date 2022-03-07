@@ -122,7 +122,7 @@
         Error(RenameNotAllowedErr);
     end;
 
-    procedure GetImportListUpdateHandler(): Enum "NPR Nc IL Update Handler"
+    internal procedure GetImportListUpdateHandler(): Enum "NPR Nc IL Update Handler"
     var
         EndPoint: Interface "NPR BTF IEndPoint";
     begin
@@ -150,7 +150,7 @@
         Insert();
     end;
 
-    procedure InitServiceEndPoint(NewServiceCode: Code[20]; NewEndPointID: Text; NewPath: Text; NewServiceMethodName: Enum "NPR BTF Service Method"; NewDescription: Text;
+    internal procedure InitServiceEndPoint(NewServiceCode: Code[20]; NewEndPointID: Text; NewPath: Text; NewServiceMethodName: Enum "NPR BTF Service Method"; NewDescription: Text;
                                                                                                                           NewEnabled: Boolean;
                                                                                                                           NewSeqOrder: Integer;
                                                                                                                           NewEndPointMethod: Enum "NPR BTF EndPoint Method";
@@ -177,7 +177,7 @@
     end;
 
     [IntegrationEvent(true, false)]
-    procedure OnRegisterServiceEndPoint()
+    internal procedure OnRegisterServiceEndPoint()
     begin
     end;
 }

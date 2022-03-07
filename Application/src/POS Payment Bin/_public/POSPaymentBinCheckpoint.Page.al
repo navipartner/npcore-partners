@@ -453,7 +453,7 @@
             Rec."New Float Amount" := 0;
     end;
 
-    procedure SetTransferMode()
+    internal procedure SetTransferMode()
     begin
         ShowCountingSection := false;
         ShowClosingSection := true;
@@ -461,7 +461,7 @@
         PageMode := PageMode::TRANSFER;
     end;
 
-    procedure SetCheckpointMode(Mode: Option PRELIMINARY,FINAL,VIEW)
+    internal procedure SetCheckpointMode(Mode: Option PRELIMINARY,FINAL,VIEW)
     begin
         case Mode of
             Mode::PRELIMINARY:
@@ -614,12 +614,12 @@
         end;
     end;
 
-    procedure SetBlindCount(HideFields: Boolean)
+    internal procedure SetBlindCount(HideFields: Boolean)
     begin
         IsBlindCount := HideFields;
     end;
 
-    procedure DoOnOpenPageProcessing()
+    internal procedure DoOnOpenPageProcessing()
     var
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
@@ -670,7 +670,7 @@
         end;
     end;
 
-    procedure AutoCount(var POSPaymentBinCheckpoint2: Record "NPR POS Payment Bin Checkp.")
+    internal procedure AutoCount(var POSPaymentBinCheckpoint2: Record "NPR POS Payment Bin Checkp.")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
@@ -710,12 +710,12 @@
             until POSPaymentBinCheckpoint.Next() = 0;
     end;
 
-    procedure SetAutoCountCompleted(Set: Boolean)
+    internal procedure SetAutoCountCompleted(Set: Boolean)
     begin
         AutoCountCompleted := Set;
     end;
 
-    procedure DoOnClosePageProcessing(): Boolean
+    internal procedure DoOnClosePageProcessing(): Boolean
     var
         HaveError: Boolean;
     begin

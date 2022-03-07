@@ -115,7 +115,7 @@
     var
         Text001: Label 'The length of field %1 must not be more than 20 characters';
 
-    procedure SetupNewLine()
+    internal procedure SetupNewLine()
     var
         VRT: Record "NPR Variety";
     begin

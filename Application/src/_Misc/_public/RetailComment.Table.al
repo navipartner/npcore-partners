@@ -103,7 +103,7 @@
         }
     }
 
-    procedure SetupNewLine()
+    internal procedure SetupNewLine()
     var
         BemLinie: Record "NPR Retail Comment";
     begin
@@ -116,44 +116,6 @@
         BemLinie.SetRange("Integer 2", "Integer 2");
         if not BemLinie.Find('-') then
             Date := WorkDate();
-    end;
-
-    procedure Copylines(var from1: Record "NPR Retail Comment")
-    var
-        to1: Record "NPR Retail Comment";
-        nextline: Integer;
-        TableIDErr: Label 'You have to set table id';
-    begin
-        nextline := 10000;
-
-        to1.CopyFilters(Rec);
-        if to1.Find('+') then
-            nextline := to1."Line No." + 10000;
-
-        if from1.Find('-') then
-            repeat
-                Init();
-                TransferFields(from1, false);
-                if to1.GetFilter("Table ID") = '' then
-                    Error(TableIDErr);
-                Evaluate("Table ID", to1.GetFilter("Table ID"));
-
-                if to1.GetFilter("No.") <> '' then
-                    Evaluate("No.", to1.GetFilter("No."));
-                if to1.GetFilter("No. 2") <> '' then
-                    Evaluate("No. 2", to1.GetFilter("No. 2"));
-                if to1.GetFilter(Option) <> '' then
-                    Evaluate(Option, to1.GetFilter(Option));
-                if to1.GetFilter("Option 2") <> '' then
-                    Evaluate("Option 2", to1.GetFilter("Option 2"));
-                if to1.GetFilter(Integer) <> '' then
-                    Evaluate(Integer, to1.GetFilter(Integer));
-                if to1.GetFilter("Integer 2") <> '' then
-                    Evaluate("Integer 2", to1.GetFilter("Integer 2"));
-                "Line No." := nextline;
-                Insert(true);
-                nextline += 10000;
-            until from1.Next() = 0;
     end;
 }
 

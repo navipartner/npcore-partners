@@ -178,18 +178,18 @@
         Parameters.Insert();
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnBeforeILESendRaptorTrackingRequest(var Parameters: Record "Name/Value Buffer"; ItemLedger: Record "Item Ledger Entry"; IsMock: Boolean)
+    [IntegrationEvent(true, false)]
+    internal procedure OnBeforeILESendRaptorTrackingRequest(var Parameters: Record "Name/Value Buffer"; ItemLedger: Record "Item Ledger Entry"; IsMock: Boolean)
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnProcessDataLogEntries(var TempDataLog: Record "NPR Data Log Record"; SessionGUID: Guid)
+    [IntegrationEvent(true, false)]
+    internal procedure OnProcessDataLogEntries(var TempDataLog: Record "NPR Data Log Record"; SessionGUID: Guid)
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnCheckIfItemLedgerIsEligibleForSending(ItemLedger: Record "Item Ledger Entry"; var Eligible: Boolean; var Handled: Boolean)
+    [IntegrationEvent(true, false)]
+    internal procedure OnCheckIfItemLedgerIsEligibleForSending(ItemLedger: Record "Item Ledger Entry"; var Eligible: Boolean; var Handled: Boolean)
     begin
     end;
 }

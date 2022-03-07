@@ -233,8 +233,8 @@
     }
 
 
-    [IntegrationEvent(TRUE, FALSE)]
-    procedure GetPhoneLookupCU(var tmpAllObjWithCaption: Record AllObjWithCaption temporary)
+    [IntegrationEvent(true, false)]
+    internal procedure GetPhoneLookupCU(var tmpAllObjWithCaption: Record AllObjWithCaption temporary)
     begin
         //NPR5.23 [226819]
     end;

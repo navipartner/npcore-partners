@@ -117,7 +117,7 @@
         Window: Dialog;
         text000: Label 'Load Varieties #1#######################################';
 
-    procedure LoadMatrixRecords(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; CrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
+    internal procedure LoadMatrixRecords(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; CrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     var
         Item: Record Item;
         VRT1: Record "NPR Variety Value";
@@ -387,7 +387,7 @@
             until TempVRT1.Next() = 0;
     end;
 
-    procedure LoadAll(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; SetRecordID2ItemVar: Boolean; MasterRecordID: RecordID)
+    internal procedure LoadAll(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; SetRecordID2ItemVar: Boolean; MasterRecordID: RecordID)
     var
         Item: Record Item;
         VRT1: Record "NPR Variety Value";

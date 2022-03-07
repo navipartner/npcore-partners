@@ -84,7 +84,7 @@
             UpdateDataLogSubscriber("Task Processor Code", xRec."Task Processor Code", "Table No.");
     end;
 
-    procedure UpdateDataLogSubscriber(SubscriberCode: Code[30]; xRecSubscriberCode: Code[30]; TableNo: Integer)
+    internal procedure UpdateDataLogSubscriber(SubscriberCode: Code[30]; xRecSubscriberCode: Code[30]; TableNo: Integer)
     var
         DataLogSubscriber: Record "NPR Data Log Subscriber";
         DataLogSubscriber2: Record "NPR Data Log Subscriber";

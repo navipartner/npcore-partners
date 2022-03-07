@@ -778,12 +778,12 @@
         POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
 
-    procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20]): Boolean
+    internal procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20]): Boolean
     begin
         exit(NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode));
     end;
 
-    procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20]; Type5: Integer; No5: Code[20])
+    internal procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20]; Type5: Integer; No5: Code[20])
     var
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
@@ -812,7 +812,7 @@
         end;
     end;
 
-    procedure GetPOSSourceCode() SourceCode: Code[10]
+    internal procedure GetPOSSourceCode() SourceCode: Code[10]
     var
         NPRPOSUnit: Record "NPR Pos Unit";
         NPRPOSStore: Record "NPR POS Store";
@@ -828,7 +828,7 @@
         end;
     end;
 
-    procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    internal procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         OldDimSetID: Integer;
     begin
@@ -844,7 +844,7 @@
         end;
     end;
 
-    procedure ShowDocDim()
+    internal procedure ShowDocDim()
     var
         OldDimSetID: Integer;
         DimSetIdLbl: Label '%1 %2', Locked = true;

@@ -110,7 +110,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnBeforeDeleteSaleLinePOS(POSSaleLine: Codeunit "NPR POS Sale Line")
+    internal procedure OnBeforeDeleteSaleLinePOS(POSSaleLine: Codeunit "NPR POS Sale Line")
     begin
     end;
 }

@@ -69,18 +69,18 @@
 
     #region Setup
 
-    procedure GetPOSUnitNo(): Code[10]
+    internal procedure GetPOSUnitNo(): Code[10]
     begin
         Initialize();
         exit(POSUnitRec."No.");
     end;
 
-    procedure Salesperson(): Code[20]
+    internal procedure Salesperson(): Code[20]
     begin
         exit(SalespersonRec.Code);
     end;
 
-    procedure ShowDiscountFieldsInSaleView(): Boolean
+    internal procedure ShowDiscountFieldsInSaleView(): Boolean
     var
         POSVieWProfile: Record "NPR POS View Profile";
     begin
@@ -88,12 +88,12 @@
         exit(POSVieWProfile."POS - Show discount fields");
     end;
 
-    procedure AmountRoundingPrecision(): Decimal
+    internal procedure AmountRoundingPrecision(): Decimal
     begin
         exit(POSPostingProfile."POS Sales Amt. Rndng Precision");
     end;
 
-    procedure AmountRoundingDirection(): Text[1]
+    internal procedure AmountRoundingDirection(): Text[1]
     begin
         exit(POSPostingProfile.RoundingDirection());
     end;
@@ -105,7 +105,7 @@
         exit(POSPostingProfile."POS Sales Rounding Account");
     end;
 
-    procedure ExchangeLabelDefaultDate(): Code[10]
+    internal procedure ExchangeLabelDefaultDate(): Code[10]
     var
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
     begin
@@ -113,7 +113,7 @@
         exit(ExchangeLabelSetup."Exchange label default date");
     end;
 
-    procedure CashDrawerPassword(CashDrawerNo: Text): Text
+    internal procedure CashDrawerPassword(CashDrawerNo: Text): Text
     var
         POSSecurtyProfile: Record "NPR POS Security Profile";
     begin
@@ -121,7 +121,7 @@
         exit(POSSecurtyProfile."Unlock Password");
     end;
 
-    procedure RestaurantCode(): Code[20]
+    internal procedure RestaurantCode(): Code[20]
     begin
         exit(POSRestaurantProfile."Restaurant Code");
     end;
@@ -151,7 +151,7 @@
 
     #region "Set Record => functions"
 
-    procedure SetSalesperson(SalespersonPurchaser: Record "Salesperson/Purchaser")
+    internal procedure SetSalesperson(SalespersonPurchaser: Record "Salesperson/Purchaser")
     begin
         SalespersonRec := SalespersonPurchaser;
     end;
@@ -164,7 +164,7 @@
         FindPOSPostingProfile();
     end;
 
-    procedure SetPOSStore(POSStore: Record "NPR POS Store")
+    internal procedure SetPOSStore(POSStore: Record "NPR POS Store")
     begin
         POSStoreRec := POSStore;
         FindPOSRestaurantProfile();
@@ -174,12 +174,12 @@
 
     #region "Get Record => functions"
 
-    procedure GetUserSetupRecord(var UserSetupOut: Record "User Setup")
+    internal procedure GetUserSetupRecord(var UserSetupOut: Record "User Setup")
     begin
         UserSetup := UserSetup;
     end;
 
-    procedure GetSalespersonRecord(var SalespersonOut: Record "Salesperson/Purchaser")
+    internal procedure GetSalespersonRecord(var SalespersonOut: Record "Salesperson/Purchaser")
     begin
         SalespersonOut := SalespersonRec;
     end;
@@ -189,13 +189,13 @@
         POSUnitOut := POSUnitRec;
     end;
 
-    procedure GetPOSViewProfile(var POSViewProfile: Record "NPR POS View Profile"): Boolean
+    internal procedure GetPOSViewProfile(var POSViewProfile: Record "NPR POS View Profile"): Boolean
     begin
         POSUnitRec.TestField("No.");
         exit(POSUnitRec.GetProfile(POSViewProfile));
     end;
 
-    procedure GetPOSSecurityProfile(var POSSecurtyProfile: Record "NPR POS Security Profile"): Boolean
+    internal procedure GetPOSSecurityProfile(var POSSecurtyProfile: Record "NPR POS Security Profile"): Boolean
     begin
         POSUnitRec.TestField("No.");
         exit(POSUnitRec.GetProfile(POSSecurtyProfile));
@@ -206,12 +206,12 @@
         POSStoreOut := POSStoreRec;
     end;
 
-    procedure GetPOSRestProfile(var POSRestaurantProfileOut: Record "NPR POS NPRE Rest. Profile")
+    internal procedure GetPOSRestProfile(var POSRestaurantProfileOut: Record "NPR POS NPRE Rest. Profile")
     begin
         POSRestaurantProfileOut := POSRestaurantProfile;
     end;
 
-    procedure GetLockTimeout() LockTimeoutInSeconds: Integer
+    internal procedure GetLockTimeout() LockTimeoutInSeconds: Integer
     var
         POSSecurtyProfile: Record "NPR POS Security Profile";
         Handled: Boolean;
@@ -238,14 +238,14 @@
         end;
     end;
 
-    procedure GetKioskUnlockEnabled(): Boolean
+    internal procedure GetKioskUnlockEnabled(): Boolean
     var
         SSProfile: Record "NPR SS Profile";
     begin
         exit(POSUnitRec.GetProfile(SSProfile) and (SSProfile."Kiosk Mode Unlock PIN" <> ''));
     end;
 
-    procedure GetNamedActionSetup(var POSSetupOut: Record "NPR POS Setup")
+    internal procedure GetNamedActionSetup(var POSSetupOut: Record "NPR POS Setup")
     begin
         POSSetupOut := Setup;
     end;
@@ -254,123 +254,123 @@
 
     #region "Action Settings"
 
-    procedure Action_Login(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session")
+    internal procedure Action_Login(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session")
     begin
         InitializeSetup();
         Setup.TestField("Login Action Code");
         POSSession.RetrieveSessionAction(Setup."Login Action Code", ActionOut);
     end;
 
-    procedure Action_TextEnter(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session")
+    internal procedure Action_TextEnter(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session")
     begin
         InitializeSetup();
         Setup.TestField("Text Enter Action Code");
         POSSession.RetrieveSessionAction(Setup."Text Enter Action Code", ActionOut);
     end;
 
-    procedure Action_Item(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session")
+    internal procedure Action_Item(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session")
     begin
         InitializeSetup();
         Setup.TestField("Item Insert Action Code");
         POSSession.RetrieveSessionAction(Setup."Item Insert Action Code", ActionOut);
     end;
 
-    procedure Action_Payment(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session")
+    internal procedure Action_Payment(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session")
     begin
         InitializeSetup();
         Setup.TestField("Payment Action Code");
         POSSession.RetrieveSessionAction(Setup."Payment Action Code", ActionOut);
     end;
 
-    procedure Action_Customer(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session")
+    internal procedure Action_Customer(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session")
     begin
         InitializeSetup();
         Setup.TestField("Customer Action Code");
         POSSession.RetrieveSessionAction(Setup."Customer Action Code", ActionOut);
     end;
 
-    procedure Action_UnlockPOS(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
+    internal procedure Action_UnlockPOS(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
     begin
         Clear(ActionOut);
         InitializeSetup();
         IsConfigured := POSSession.RetrieveSessionAction(ActionCode_UnlockPOS(), ActionOut);
     end;
 
-    procedure Action_LockPOS(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
+    internal procedure Action_LockPOS(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
     begin
         Clear(ActionOut);
         InitializeSetup();
         IsConfigured := POSSession.RetrieveSessionAction(ActionCode_LockPOS(), ActionOut);
     end;
 
-    procedure Action_IdleTimeout(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
+    internal procedure Action_IdleTimeout(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
     begin
         Clear(ActionOut);
         InitializeSetup();
         IsConfigured := POSSession.RetrieveSessionAction(ActionCode_IdleTimeout(), ActionOut);
     end;
 
-    procedure Action_AdminMenu(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
+    internal procedure Action_AdminMenu(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
     begin
         Clear(ActionOut);
         InitializeSetup();
         IsConfigured := POSSession.RetrieveSessionAction(ActionCode_AdminMenu(), ActionOut);
     end;
 
-    procedure ActionCode_Login(): Code[20]
+    internal procedure ActionCode_Login(): Code[20]
     begin
         InitializeSetup();
         Setup.TestField("Login Action Code");
         exit(Setup."Login Action Code");
     end;
 
-    procedure ActionCode_TextEnter(): Code[20]
+    internal procedure ActionCode_TextEnter(): Code[20]
     begin
         InitializeSetup();
         Setup.TestField("Text Enter Action Code");
         exit(Setup."Text Enter Action Code");
     end;
 
-    procedure ActionCode_Item(): Code[20]
+    internal procedure ActionCode_Item(): Code[20]
     begin
         InitializeSetup();
         Setup.TestField("Item Insert Action Code");
         exit(Setup."Item Insert Action Code");
     end;
 
-    procedure ActionCode_Payment(): Code[20]
+    internal procedure ActionCode_Payment(): Code[20]
     begin
         InitializeSetup();
         Setup.TestField("Payment Action Code");
         exit(Setup."Payment Action Code");
     end;
 
-    procedure ActionCode_Customer(): Code[20]
+    internal procedure ActionCode_Customer(): Code[20]
     begin
         InitializeSetup();
         Setup.TestField("Customer Action Code");
         exit(Setup."Customer Action Code");
     end;
 
-    procedure ActionCode_UnlockPOS(): Code[20]
+    internal procedure ActionCode_UnlockPOS(): Code[20]
     begin
         InitializeSetup();
         exit(Setup."Unlock POS Action Code");
     end;
 
-    procedure ActionCode_LockPOS(): Code[20]
+    internal procedure ActionCode_LockPOS(): Code[20]
     begin
         InitializeSetup();
         exit(Setup."Lock POS Action Code");
     end;
 
-    procedure ActionCode_IdleTimeout(): Code[20]
+    internal procedure ActionCode_IdleTimeout(): Code[20]
     begin
         InitializeSetup();
         exit(Setup."Idle Timeout Action Code");
     end;
 
-    procedure ActionCode_AdminMenu(): Code[20]
+    internal procedure ActionCode_AdminMenu(): Code[20]
     begin
         InitializeSetup();
         exit(Setup."Admin Menu Action Code");

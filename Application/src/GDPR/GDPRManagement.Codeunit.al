@@ -150,7 +150,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnNewAgreementVersion(AgreementNo: Code[20])
+    internal procedure OnNewAgreementVersion(AgreementNo: Code[20])
     begin
     end;
 }

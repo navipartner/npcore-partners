@@ -369,7 +369,7 @@
         exit(PosInventoryProfile.Get("POS Inventory Profile"));
     end;
 
-    procedure GetCurrentPOSUnit(): Code[10]
+    internal procedure GetCurrentPOSUnit(): Code[10]
     var
         UserSetup: Record "User Setup";
         POSUnit: Record "NPR POS Unit";
@@ -387,21 +387,21 @@
         exit(POSUnitEvent.FindActiveEvent(Rec."No."));
     end;
 
-    procedure SetActiveEventForCurrPOSUnit(EventNo: Code[20])
+    internal procedure SetActiveEventForCurrPOSUnit(EventNo: Code[20])
     var
         POSUnitEvent: Record "NPR POS Unit Event";
     begin
         POSUnitEvent.SetActiveEvent(Rec."No.", EventNo);
     end;
 
-    procedure DeleteActiveEventForCurrPOSUnit()
+    internal procedure DeleteActiveEventForCurrPOSUnit()
     var
         POSUnitEvent: Record "NPR POS Unit Event";
     begin
         POSUnitEvent.DeleteActiveEvent(Rec."No.");
     end;
 
-    procedure ShowPricesIncludingVAT(): Boolean
+    internal procedure ShowPricesIncludingVAT(): Boolean
     var
         PosViewProfile: Record "NPR POS View Profile";
         ApplicationAreaMgmt: Codeunit "Application Area Mgmt.";

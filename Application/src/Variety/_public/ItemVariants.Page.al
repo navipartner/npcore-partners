@@ -96,7 +96,7 @@
         NetChange := Item."Net Change";
     end;
 
-    procedure SetLocationCodeFilter(LocationCode: Code[10])
+    internal procedure SetLocationCodeFilter(LocationCode: Code[10])
     begin
         LocationCodeFilter := LocationCode;
     end;

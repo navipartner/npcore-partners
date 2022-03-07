@@ -1,6 +1,7 @@
 ﻿codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
 {
     Access = Internal;
+
     var
         ERRNoPadForSeating: Label 'No active waiter pad exists for seating %1.';
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
@@ -787,8 +788,8 @@
         ClearSaleHdrNPREPresetFields(SalePOS, true);
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnAfterMoveSaleFromPosToWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    [IntegrationEvent(true, false)]
+    internal procedure OnAfterMoveSaleFromPosToWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
     begin
     end;
 }

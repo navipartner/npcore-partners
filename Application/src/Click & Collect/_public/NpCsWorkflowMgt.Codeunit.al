@@ -12,7 +12,7 @@
         WorkflowFunctionType: Option " ","Send Order","Order Status","Post Processing","Send Notification to Store","Send Notification to Customer";
 
     [IntegrationEvent(false, false)]
-    procedure OnInitWorkflowModules(var NpCsWorkflowModule: Record "NPR NpCs Workflow Module")
+    internal procedure OnInitWorkflowModules(var NpCsWorkflowModule: Record "NPR NpCs Workflow Module")
     begin
     end;
 
@@ -50,7 +50,7 @@
         end;
     end;
 
-    procedure RunWorkflowSendOrder(var NpCsDocument: Record "NPR NpCs Document")
+    internal procedure RunWorkflowSendOrder(var NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
     begin
@@ -69,7 +69,7 @@
             SendNotificationToStore(NpCsDocument);
     end;
 
-    procedure RunWorkflowOrderStatus(var NpCsDocument: Record "NPR NpCs Document")
+    internal procedure RunWorkflowOrderStatus(var NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         PrevStatus: Integer;
@@ -92,7 +92,7 @@
         end;
     end;
 
-    procedure RunWorkflowPostProcessing(var NpCsDocument: Record "NPR NpCs Document")
+    internal procedure RunWorkflowPostProcessing(var NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         LastErrorText: Text;
@@ -114,11 +114,11 @@
     end;
 
     [IntegrationEvent(TRUE, false)]
-    procedure SendOrder(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
+    internal procedure SendOrder(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
     begin
     end;
 
-    procedure SendNotificationToStore(NpCsDocument: Record "NPR NpCs Document")
+    internal procedure SendNotificationToStore(NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
     begin
@@ -141,7 +141,7 @@
         Commit();
     end;
 
-    procedure SendNotificationToCustomer(NpCsDocument: Record "NPR NpCs Document")
+    internal procedure SendNotificationToCustomer(NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
     begin
@@ -180,16 +180,16 @@
     end;
 
     [IntegrationEvent(TRUE, false)]
-    procedure UpdateOrderStatus(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
+    internal procedure UpdateOrderStatus(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    procedure PerformPostProcessing(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
+    internal procedure PerformPostProcessing(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
     begin
     end;
 
-    procedure RunCallback(NpCsDocument: Record "NPR NpCs Document")
+    internal procedure RunCallback(NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsStore: Record "NPR NpCs Store";
         NpCsArchDocument: Record "NPR NpCs Arch. Document";
@@ -284,7 +284,7 @@
         end;
     end;
 
-    procedure InsertLogEntry(NpCsDocument: Record "NPR NpCs Document"; NpCsWorkflowModule: Record "NPR NpCs Workflow Module"; LogMessage: Text; ErrorEntry: Boolean; ErrorMessage: Text)
+    internal procedure InsertLogEntry(NpCsDocument: Record "NPR NpCs Document"; NpCsWorkflowModule: Record "NPR NpCs Workflow Module"; LogMessage: Text; ErrorEntry: Boolean; ErrorMessage: Text)
     var
         NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
         OutStr: OutStream;
@@ -333,7 +333,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnIsComplete(NpCsDocument: Record "NPR NpCs Document"; var IsComplete: Boolean; var IsHandled: Boolean)
+    internal procedure OnIsComplete(NpCsDocument: Record "NPR NpCs Document"; var IsComplete: Boolean; var IsHandled: Boolean)
     begin
     end;
 

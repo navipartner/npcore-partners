@@ -255,7 +255,7 @@
     var
         PostingCompressionErr: Label 'There are unposted entries in POS Entry table in POS Store %1. Please post then before updating %2.';
 
-    procedure RoundingDirection(): Text[1]
+    internal procedure RoundingDirection(): Text[1]
     begin
         case "Rounding Type" of
             "Rounding Type"::Nearest:
@@ -267,7 +267,7 @@
         end;
     end;
 
-    procedure CheckPostingDateAllowed(TestDate: Date): Boolean
+    internal procedure CheckPostingDateAllowed(TestDate: Date): Boolean
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         UserSetup: Record "User Setup";
@@ -292,7 +292,7 @@
             exit(true);
     end;
 
-    procedure EditPostingDateAllowed(UserIDCode: Code[20]; Date2: Date)
+    internal procedure EditPostingDateAllowed(UserIDCode: Code[20]; Date2: Date)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         UserSetup: Record "User Setup";

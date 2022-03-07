@@ -37,7 +37,7 @@
         NcTask.Modify();
     end;
 
-    procedure EmitTelemetryDataOnError(NcTask: Record "NPR Nc Task"; ErrorMessageText: Text)
+    internal procedure EmitTelemetryDataOnError(NcTask: Record "NPR Nc Task"; ErrorMessageText: Text)
     var
         ActiveSession: Record "Active Session";
         CustomDimensions: Dictionary of [Text, Text];
@@ -73,7 +73,7 @@
         Session.LogMessage('NPR_TaskList', 'TaskList Error', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
-    procedure UpdateTasks(TaskProcessor: Record "NPR Nc Task Processor")
+    internal procedure UpdateTasks(TaskProcessor: Record "NPR Nc Task Processor")
     var
         TaskProcesLine: Record "NPR Nc Task Proces. Line";
         TempDataLogRecord: Record "NPR Data Log Record" temporary;
@@ -140,7 +140,7 @@
         end;
     end;
 
-    procedure CleanTasks()
+    internal procedure CleanTasks()
     var
         Task: Record "NPR Nc Task";
         TaskField: Record "NPR Nc Task Field";
@@ -360,7 +360,7 @@
     begin
     end;
 
-    procedure ReqisterUniqueTask(NewUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary) IsDuplicate: Boolean
+    internal procedure ReqisterUniqueTask(NewUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary) IsDuplicate: Boolean
     begin
         UniqueTaskBuffer.SetPosition(NewUniqueTaskBuffer.GetPosition(false));
         if UniqueTaskBuffer.Find() then
@@ -447,7 +447,7 @@
         end;
     end;
 
-    procedure GetRecRef(NcTask: Record "NPR Nc Task"; var RecRef: RecordRef): Boolean
+    internal procedure GetRecRef(NcTask: Record "NPR Nc Task"; var RecRef: RecordRef): Boolean
     var
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         Position: Text;
@@ -514,7 +514,7 @@
         exit(true);
     end;
 
-    procedure RestoreRecordFromDataLog(RecordEntryNo: BigInteger; RecCompanyName: Text[30]; var RecRef: RecordRef): Boolean
+    internal procedure RestoreRecordFromDataLog(RecordEntryNo: BigInteger; RecCompanyName: Text[30]; var RecRef: RecordRef): Boolean
     var
         DataLogRecord: Record "NPR Data Log Record";
         DataLogField: Record "NPR Data Log Field";
@@ -586,7 +586,7 @@
         exit(true);
     end;
 
-    procedure RunSourceCard(NaviConnectTask: Record "NPR Nc Task")
+    internal procedure RunSourceCard(NaviConnectTask: Record "NPR Nc Task")
     var
         PageMgt: Codeunit "Page Management";
         RecRef: RecordRef;
@@ -621,7 +621,7 @@
         end;
     end;
 
-    procedure RecExists(var RecRef: RecordRef; RecCompanyName: Text): Boolean
+    internal procedure RecExists(var RecRef: RecordRef; RecCompanyName: Text): Boolean
     var
         RecRefExists: RecordRef;
     begin
@@ -638,7 +638,7 @@
         exit(GuiAllowed);
     end;
 
-    procedure GetRecordPosition(NcTask: Record "NPR Nc Task") RecordPosition: Text
+    internal procedure GetRecordPosition(NcTask: Record "NPR Nc Task") RecordPosition: Text
     var
         RecordID: RecordID;
         RecRef: RecordRef;
@@ -653,7 +653,7 @@
         exit(RecordPosition);
     end;
 
-    procedure TaskResetCount(TaskProcessor: Record "NPR Nc Task Processor")
+    internal procedure TaskResetCount(TaskProcessor: Record "NPR Nc Task Processor")
     var
         NcTask: Record "NPR Nc Task";
     begin

@@ -72,7 +72,7 @@
         LogDatabaseRename(RecRef, xRecRef);
     end;
 
-    procedure LogDatabaseInsert(RecRef: RecordRef)
+    internal procedure LogDatabaseInsert(RecRef: RecordRef)
     var
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
@@ -102,7 +102,7 @@
         ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
     end;
 
-    procedure LogDatabaseModify(RecRef: RecordRef)
+    internal procedure LogDatabaseModify(RecRef: RecordRef)
     var
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
@@ -135,7 +135,7 @@
         ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
     end;
 
-    procedure LogDatabaseDelete(RecRef: RecordRef)
+    internal procedure LogDatabaseDelete(RecRef: RecordRef)
     var
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
@@ -165,7 +165,7 @@
         ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
     end;
 
-    procedure LogDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
+    internal procedure LogDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
     var
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
@@ -224,7 +224,7 @@
 
     //--- Setup ---
 
-    procedure InitializeIntegrationRecords(TableID: Integer)
+    internal procedure InitializeIntegrationRecords(TableID: Integer)
     var
         RecRef: RecordRef;
     begin

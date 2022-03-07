@@ -1,6 +1,7 @@
 ﻿codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
 {
     Access = Internal;
+
     var
         WORKFLOW_STEP: Label 'Eject Payment Bin';
 
@@ -202,7 +203,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnShowInvokeParameters(POSPaymentBin: Record "NPR POS Payment Bin")
+    internal procedure OnShowInvokeParameters(POSPaymentBin: Record "NPR POS Payment Bin")
     begin
     end;
 }

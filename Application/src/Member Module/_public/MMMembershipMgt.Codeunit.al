@@ -58,7 +58,7 @@
         AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
 
 
-    procedure CreateMembershipInteractive(var MemberInfoCapture: Record "NPR MM Member Info Capture") ExternalCardNumber: Text[100];
+    internal procedure CreateMembershipInteractive(var MemberInfoCapture: Record "NPR MM Member Info Capture") ExternalCardNumber: Text[100];
     var
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         PageAction: Action;
@@ -132,7 +132,7 @@
         exit(MembershipEntryNo);
     end;
 
-    procedure CreateMembership(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; MemberInfoCapture: Record "NPR MM Member Info Capture"; CreateMembershipLedgerEntry: Boolean) MembershipEntryNo: Integer
+    internal procedure CreateMembership(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; MemberInfoCapture: Record "NPR MM Member Info Capture"; CreateMembershipLedgerEntry: Boolean) MembershipEntryNo: Integer
     var
         MembershipSetup: Record "NPR MM Membership Setup";
     begin
@@ -163,7 +163,7 @@
         exit(MembershipEntryNo);
     end;
 
-    procedure DeleteMembership(MembershipEntryNo: Integer; Force: Boolean)
+    internal procedure DeleteMembership(MembershipEntryNo: Integer; Force: Boolean)
     var
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
@@ -289,7 +289,7 @@
 
     end;
 
-    procedure AddMemberAndCard(MembershipEntryNo: Integer; var MemberInfoCapture: Record "NPR MM Member Info Capture"; AllowBlankExternalCardNumber: Boolean; var MemberEntryNo: Integer; var ResponseMessage: Text): Boolean
+    internal procedure AddMemberAndCard(MembershipEntryNo: Integer; var MemberInfoCapture: Record "NPR MM Member Info Capture"; AllowBlankExternalCardNumber: Boolean; var MemberEntryNo: Integer; var ResponseMessage: Text): Boolean
     begin
 
         if (not AddNamedMember(MembershipEntryNo, MemberInfoCapture, MemberEntryNo, ResponseMessage)) then
@@ -301,13 +301,13 @@
         exit(true);
     end;
 
-    procedure AddAnonymousMember(MembershipInfoCapture: Record "NPR MM Member Info Capture"; NumberOfMembers: Integer)
+    internal procedure AddAnonymousMember(MembershipInfoCapture: Record "NPR MM Member Info Capture"; NumberOfMembers: Integer)
     begin
 
         AddCommunityMember(MembershipInfoCapture."Membership Entry No.", NumberOfMembers);
     end;
 
-    procedure AddNamedMember(MembershipEntryNo: Integer; var MembershipInfoCapture: Record "NPR MM Member Info Capture"; var MemberEntryNo: Integer; var ReasonText: Text): Boolean
+    internal procedure AddNamedMember(MembershipEntryNo: Integer; var MembershipInfoCapture: Record "NPR MM Member Info Capture"; var MemberEntryNo: Integer; var ReasonText: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
@@ -396,7 +396,7 @@
         exit(MemberEntryNo <> 0);
     end;
 
-    procedure DeleteMember(MemberEntryNo: Integer; ForceMemberDelete: Boolean)
+    internal procedure DeleteMember(MemberEntryNo: Integer; ForceMemberDelete: Boolean)
     var
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
@@ -446,7 +446,7 @@
 
     end;
 
-    procedure AddGuardianMember(MembershipEntryNo: Integer; GuardianExternalMemberNo: Code[20]; GdprApproval: Option): Boolean
+    internal procedure AddGuardianMember(MembershipEntryNo: Integer; GuardianExternalMemberNo: Code[20]; GdprApproval: Option): Boolean
     var
         GuardianMemberEntryNo: Integer;
         MembershipRole: Record "NPR MM Membership Role";
@@ -473,7 +473,7 @@
 
     end;
 
-    procedure PrintOffline(PrintOption: Option; EntryNo: Integer)
+    internal procedure PrintOffline(PrintOption: Option; EntryNo: Integer)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -530,7 +530,7 @@
 
     end;
 
-    procedure GetMemberImage(MemberEntryNo: Integer; var Base64StringImage: Text) Success: Boolean
+    internal procedure GetMemberImage(MemberEntryNo: Integer; var Base64StringImage: Text) Success: Boolean
     var
         Member: Record "NPR MM Member";
         Base64Convert: Codeunit "Base64 Convert";
@@ -552,7 +552,7 @@
         exit(true);
     end;
 
-    procedure UpdateMember(MembershipEntryNo: Integer; MemberEntryNo: Integer; MembershipInfoCapture: Record "NPR MM Member Info Capture") Success: Boolean
+    internal procedure UpdateMember(MembershipEntryNo: Integer; MemberEntryNo: Integer; MembershipInfoCapture: Record "NPR MM Member Info Capture") Success: Boolean
     var
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
@@ -580,7 +580,7 @@
 
     end;
 
-    procedure UpdateMemberImage(MemberEntryNo: Integer; Base64StringImage: Text) Success: Boolean
+    internal procedure UpdateMemberImage(MemberEntryNo: Integer; Base64StringImage: Text) Success: Boolean
     var
         OutStr: OutStream;
         InStr: InStream;
@@ -598,7 +598,7 @@
         exit(Member.Modify());
     end;
 
-    procedure UpdateMemberPassword(MemberEntryNo: Integer; UserLogonID: Code[50]; NewPassword: Text[50]) Success: Boolean
+    internal procedure UpdateMemberPassword(MemberEntryNo: Integer; UserLogonID: Code[50]; NewPassword: Text[50]) Success: Boolean
     var
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
@@ -616,7 +616,7 @@
         exit(MembershipRole.Modify());
     end;
 
-    procedure FindMembershipUsing(SearchMethod: Code[20]; Key1: Text[100]; Key2: Text[100]) MembershipEntryNo: Integer
+    internal procedure FindMembershipUsing(SearchMethod: Code[20]; Key1: Text[100]; Key2: Text[100]) MembershipEntryNo: Integer
     var
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
@@ -642,7 +642,7 @@
         end;
     end;
 
-    procedure GetMembershipValidDate(MembershipEntryNo: Integer; ReferenceDate: Date; var ValidFromDate: Date; var ValidUntilDate: Date) IsValid: Boolean
+    internal procedure GetMembershipValidDate(MembershipEntryNo: Integer; ReferenceDate: Date; var ValidFromDate: Date; var ValidUntilDate: Date) IsValid: Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -714,7 +714,7 @@
         exit(((ReferenceDate >= ValidFromDate) and (ReferenceDate <= ValidUntilDate)) and (not Membership.Blocked));
     end;
 
-    procedure GetMembershipMaxValidUntilDate(MembershipEntryNo: Integer; var MaxValidUntilDate: Date): Boolean
+    internal procedure GetMembershipMaxValidUntilDate(MembershipEntryNo: Integer; var MaxValidUntilDate: Date): Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -753,7 +753,7 @@
         exit(MaxValidUntilDate <> 0D);
     end;
 
-    procedure GetConsecutiveTimeFrame(MembershipEntryNo: Integer; ReferenceDate: Date; var FromDate: Date; var UntilDate: Date): Boolean;
+    internal procedure GetConsecutiveTimeFrame(MembershipEntryNo: Integer; ReferenceDate: Date; var FromDate: Date; var UntilDate: Date): Boolean;
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -820,7 +820,7 @@
 
     end;
 
-    procedure IsMembershipActive(MemberShipEntryNo: Integer; ReferenceDate: Date; WithActivate: Boolean) IsActive: Boolean
+    internal procedure IsMembershipActive(MemberShipEntryNo: Integer; ReferenceDate: Date; WithActivate: Boolean) IsActive: Boolean
     var
         ValidFromDate: Date;
         ValidUntilDate: Date;
@@ -833,7 +833,7 @@
         exit(GetMembershipValidDate(MemberShipEntryNo, ReferenceDate, ValidFromDate, ValidUntilDate));
     end;
 
-    procedure IsMemberCardActive(ExternalCardNo: Text[100]; ReferenceDate: Date): Boolean
+    internal procedure IsMemberCardActive(ExternalCardNo: Text[100]; ReferenceDate: Date): Boolean
     var
         CardEntryNo: Integer;
         MemberCard: Record "NPR MM Member Card";
@@ -863,7 +863,7 @@
 
     end;
 
-    procedure IssueMemberCard(MemberInfoCapture: Record "NPR MM Member Info Capture"; var CardEntryNo: Integer; var ResponseMessage: Text): Boolean
+    internal procedure IssueMemberCard(MemberInfoCapture: Record "NPR MM Member Info Capture"; var CardEntryNo: Integer; var ResponseMessage: Text): Boolean
     var
         Member: Record "NPR MM Member";
         TempBlob: Codeunit "Temp Blob";
@@ -888,7 +888,7 @@
         exit(CardEntryNo <> 0);
     end;
 
-    procedure CheckMemberUniqueId(CommunityCode: Code[20]; MemberInfoCapture: Record "NPR MM Member Info Capture") MemberEntryNo: Integer
+    internal procedure CheckMemberUniqueId(CommunityCode: Code[20]; MemberInfoCapture: Record "NPR MM Member Info Capture") MemberEntryNo: Integer
     var
         Community: Record "NPR MM Member Community";
         Member: Record "NPR MM Member";
@@ -969,7 +969,7 @@
         exit(0);
     end;
 
-    procedure BlockMembership(MembershipEntryNo: Integer; Block: Boolean)
+    internal procedure BlockMembership(MembershipEntryNo: Integer; Block: Boolean)
     var
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
@@ -991,7 +991,7 @@
         end;
     end;
 
-    procedure ReflectMembershipRoles(MembershipEntryNo: Integer; MemberEntryNo: Integer; Blocked: Boolean)
+    internal procedure ReflectMembershipRoles(MembershipEntryNo: Integer; MemberEntryNo: Integer; Blocked: Boolean)
     var
         MembershipRole: Record "NPR MM Membership Role";
         MembershipRole2: Record "NPR MM Membership Role";
@@ -1064,7 +1064,7 @@
         end;
     end;
 
-    procedure BlockMember(MembershipEntryNo: Integer; MemberEntryNo: Integer; Block: Boolean)
+    internal procedure BlockMember(MembershipEntryNo: Integer; MemberEntryNo: Integer; Block: Boolean)
     var
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
@@ -1095,7 +1095,7 @@
         BlockMemberCards(MembershipEntryNo, MemberEntryNo, Block);
     end;
 
-    procedure BlockMemberCards(MembershipEntryNo: Integer; MemberEntryNo: Integer; Block: Boolean)
+    internal procedure BlockMemberCards(MembershipEntryNo: Integer; MemberEntryNo: Integer; Block: Boolean)
     var
         MemberCard: Record "NPR MM Member Card";
     begin
@@ -1110,7 +1110,7 @@
         end;
     end;
 
-    procedure BlockMemberCard(CardEntryNo: Integer; Block: Boolean)
+    internal procedure BlockMemberCard(CardEntryNo: Integer; Block: Boolean)
     var
         MemberCard: Record "NPR MM Member Card";
     begin
@@ -1123,7 +1123,7 @@
         end;
     end;
 
-    procedure CreateRegretMemberInfoRequest(ExternalMemberCardNo: Text[100]; RegretWithItemNo: Code[20]) MemberInfoEntryNo: Integer
+    internal procedure CreateRegretMemberInfoRequest(ExternalMemberCardNo: Text[100]; RegretWithItemNo: Code[20]) MemberInfoEntryNo: Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -1160,7 +1160,7 @@
         exit(MemberInfoCapture."Entry No.");
     end;
 
-    procedure RegretMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal) Success: Boolean
+    internal procedure RegretMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal) Success: Boolean
     var
         ReasonText: Text;
     begin
@@ -1168,7 +1168,7 @@
         exit(RegretMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
     end;
 
-    procedure RegretMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text) Success: Boolean
+    internal procedure RegretMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text) Success: Boolean
     begin
 
         exit(RegretMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
@@ -1262,7 +1262,7 @@
         OnMembershipChangeEvent(MembershipEntry."Membership Entry No.");
     end;
 
-    procedure DoRegretTimeframe(var MembershipEntry: Record "NPR MM Membership Entry")
+    internal procedure DoRegretTimeframe(var MembershipEntry: Record "NPR MM Membership Entry")
     var
         Membership: Record "NPR MM Membership";
         MembershipAutoRenew: Codeunit "NPR MM Membership Auto Renew";
@@ -1301,7 +1301,7 @@
 
     end;
 
-    procedure CreateCancelMemberInfoRequest(ExternalMemberCardNo: Text[100]; CancelWithItemNo: Code[20]): Integer
+    internal procedure CreateCancelMemberInfoRequest(ExternalMemberCardNo: Text[100]; CancelWithItemNo: Code[20]): Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -1339,7 +1339,7 @@
         exit(MemberInfoCapture."Entry No.");
     end;
 
-    procedure CancelMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
+    internal procedure CancelMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
     var
         ReasonText: Text;
     begin
@@ -1347,7 +1347,7 @@
         exit(CancelMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
     end;
 
-    procedure CancelMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
+    internal procedure CancelMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
     begin
 
         exit(CancelMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
@@ -1451,7 +1451,7 @@
         exit(true);
     end;
 
-    procedure CreateRenewMemberInfoRequest(ExternalMemberCardNo: Text[100]; RenewWithItemNo: Code[20]): Integer
+    internal procedure CreateRenewMemberInfoRequest(ExternalMemberCardNo: Text[100]; RenewWithItemNo: Code[20]): Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -1492,7 +1492,7 @@
         exit(MemberInfoCapture."Entry No.");
     end;
 
-    procedure RenewMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
+    internal procedure RenewMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
     var
         ReasonText: Text;
     begin
@@ -1500,7 +1500,7 @@
         exit(RenewMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
     end;
 
-    procedure RenewMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
+    internal procedure RenewMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
     begin
 
         exit(RenewMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
@@ -1625,7 +1625,7 @@
         exit(true);
     end;
 
-    procedure CreateExtendMemberInfoRequest(ExternalMemberCardNo: Text[100]; RenewWithItemNo: Code[20]): Integer
+    internal procedure CreateExtendMemberInfoRequest(ExternalMemberCardNo: Text[100]; RenewWithItemNo: Code[20]): Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -1663,7 +1663,7 @@
         exit(MemberInfoCapture."Entry No.");
     end;
 
-    procedure ExtendMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
+    internal procedure ExtendMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
     var
         ReasonText: Text;
     begin
@@ -1671,7 +1671,7 @@
         exit(ExtendMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
     end;
 
-    procedure ExtendMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; ReasonText: Text): Boolean
+    internal procedure ExtendMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; ReasonText: Text): Boolean
     begin
 
         exit(ExtendMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
@@ -1827,7 +1827,7 @@
         exit(true);
     end;
 
-    procedure CreateUpgradeMemberInfoRequest(ExternalMemberCardNo: Text[100]; UpgradeWithItemNo: Code[20]): Integer
+    internal procedure CreateUpgradeMemberInfoRequest(ExternalMemberCardNo: Text[100]; UpgradeWithItemNo: Code[20]): Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -1869,7 +1869,7 @@
         exit(MemberInfoCapture."Entry No.");
     end;
 
-    procedure UpgradeMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
+    internal procedure UpgradeMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
     var
         ReasonText: Text;
     begin
@@ -1877,7 +1877,7 @@
         exit(UpgradeMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
     end;
 
-    procedure UpgradeMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
+    internal procedure UpgradeMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
     begin
 
         exit(UpgradeMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
@@ -2050,7 +2050,7 @@
             ValidUntil := GetUpgradeInitialValidUntilDate(MembershipEntry."Entry No.");
     end;
 
-    procedure CalculateRemainingAmount(MembershipEntry: Record "NPR MM Membership Entry"; var OriginalAmountLCY: Decimal; var RemainingAmountLCY: Decimal; var DueDate: Date): Boolean
+    internal procedure CalculateRemainingAmount(MembershipEntry: Record "NPR MM Membership Entry"; var OriginalAmountLCY: Decimal; var RemainingAmountLCY: Decimal; var DueDate: Date): Boolean
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
@@ -2083,7 +2083,7 @@
         exit(true);
     end;
 
-    procedure CreateAutoRenewMemberInfoRequest(MembershipEntryNo: Integer; RenewWithItemNo: Code[20]; var ReasonText: Text): Integer
+    internal procedure CreateAutoRenewMemberInfoRequest(MembershipEntryNo: Integer; RenewWithItemNo: Code[20]; var ReasonText: Text): Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -2182,7 +2182,7 @@
         exit(MemberInfoCapture."Entry No.");
     end;
 
-    procedure AutoRenewMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture"; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
+    internal procedure AutoRenewMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture"; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
     var
         ReasonText: Text;
     begin
@@ -2424,7 +2424,7 @@
         MemberInfoCapture."Item No." := MembershipSalesItemNo;
     end;
 
-    procedure AddMembershipLedgerEntry_NEW(MembershipEntryNo: Integer; DocumentDate: Date; MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; MemberInfoCapture: Record "NPR MM Member Info Capture") LedgerEntryNo: Integer
+    internal procedure AddMembershipLedgerEntry_NEW(MembershipEntryNo: Integer; DocumentDate: Date; MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; MemberInfoCapture: Record "NPR MM Member Info Capture") LedgerEntryNo: Integer
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberCard: Record "NPR MM Member Card";
@@ -2507,7 +2507,7 @@
 
     end;
 
-    procedure GetMembershipAgeConstraintDate(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; MemberInfoCapture: Record "NPR MM Member Info Capture") ConstraintDate: Date
+    internal procedure GetMembershipAgeConstraintDate(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; MemberInfoCapture: Record "NPR MM Member Info Capture") ConstraintDate: Date
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         DocumentDate: Date;
@@ -2548,7 +2548,7 @@
 
     end;
 
-    procedure SynchronizeCustomerAndContact(MembershipEntryNo: Integer)
+    internal procedure SynchronizeCustomerAndContact(MembershipEntryNo: Integer)
     var
         Community: Record "NPR MM Member Community";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -2615,7 +2615,7 @@
         end;
     end;
 
-    procedure GetMembershipChangeOptions(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary): Boolean
+    internal procedure GetMembershipChangeOptions(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary): Boolean
     var
         TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         Item: Record Item;
@@ -2687,7 +2687,7 @@
         exit(not TmpMembershipEntry.IsEmpty());
     end;
 
-    procedure GetMemberCount(MembershipEntryno: Integer; var AdminMemberCount: Integer; var MemberMemberCount: Integer; var AnonymousMemberCount: Integer)
+    internal procedure GetMemberCount(MembershipEntryno: Integer; var AdminMemberCount: Integer; var MemberMemberCount: Integer; var AnonymousMemberCount: Integer)
     var
         MembershipRole: Record "NPR MM Membership Role";
     begin
@@ -2718,7 +2718,7 @@
             AnonymousMemberCount := MembershipRole."Member Count";
     end;
 
-    procedure ApplyGracePeriodPreset(Preset: Option; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup")
+    internal procedure ApplyGracePeriodPreset(Preset: Option; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup")
     begin
 
         case Preset of
@@ -2745,7 +2745,7 @@
         end;
     end;
 
-    procedure CreateMemberCommunicationDefaultSetup(MemberEntryNo: Integer)
+    internal procedure CreateMemberCommunicationDefaultSetup(MemberEntryNo: Integer)
     var
         MembershipRole: Record "NPR MM Membership Role";
         MemberCommunication: Record "NPR MM Member Communication";
@@ -2796,7 +2796,7 @@
 
     end;
 
-    procedure GetCommunicationMethod_Welcome(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    internal procedure GetCommunicationMethod_Welcome(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
@@ -2805,7 +2805,7 @@
 
     end;
 
-    procedure GetCommunicationMethod_Renew(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    internal procedure GetCommunicationMethod_Renew(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
@@ -2814,7 +2814,7 @@
 
     end;
 
-    procedure GetCommunicationMethod_MemberCard(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    internal procedure GetCommunicationMethod_MemberCard(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
@@ -2823,7 +2823,7 @@
 
     end;
 
-    procedure GetCommunicationMethod_Ticket(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    internal procedure GetCommunicationMethod_Ticket(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
@@ -2831,7 +2831,7 @@
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::TICKETS, Method, Address, Engine));
     end;
 
-    procedure GetCommunicationMethod_Coupon(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    internal procedure GetCommunicationMethod_Coupon(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
@@ -3166,7 +3166,7 @@
 
     end;
 
-    procedure CheckAgeConstraint(ReferenceDate1: Date; ReferenceDate2: Date; ReferenceDateType: Option; ConstraintType: Option NA,LT,LTE,GT,GTE,E; Years: Integer) ConstraintOK: Boolean
+    internal procedure CheckAgeConstraint(ReferenceDate1: Date; ReferenceDate2: Date; ReferenceDateType: Option; ConstraintType: Option NA,LT,LTE,GT,GTE,E; Years: Integer) ConstraintOK: Boolean
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         LowDate: Date;
@@ -3468,7 +3468,7 @@
         exit(MembershipLedgerEntry."Entry No.");
     end;
 
-    procedure ActivateMembershipLedgerEntry(MembershipEntryNo: Integer; ActivationDate: Date)
+    internal procedure ActivateMembershipLedgerEntry(MembershipEntryNo: Integer; ActivationDate: Date)
     var
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
@@ -3502,7 +3502,7 @@
         Commit();
     end;
 
-    procedure MembershipNeedsActivation(MembershipEntryNo: Integer): Boolean
+    internal procedure MembershipNeedsActivation(MembershipEntryNo: Integer): Boolean
     var
         MembershipEntry: Record "NPR MM Membership Entry";
     begin
@@ -3795,7 +3795,7 @@
         end;
     end;
 
-    procedure UpdateContactFromMember(MembershipEntryNo: Integer; Member: Record "NPR MM Member")
+    internal procedure UpdateContactFromMember(MembershipEntryNo: Integer; Member: Record "NPR MM Member")
     var
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
@@ -3984,8 +3984,8 @@
         CountryRegion: Record "Country/Region";
         PostCode: Record "Post Code";
         TempBlob: Codeunit "Temp Blob";
-        InStr:InStream;
-        OutStr:OutStream;
+        InStr: InStream;
+        OutStr: OutStream;
         CountryName: Text;
         PlaceHolderLbl: Label '%1%2', Locked = true;
         PlaceHolder2Lbl: Label '%1 %2', Locked = true;
@@ -4052,10 +4052,10 @@
         end;
 
         if (MemberInfoCapture.Image.HasValue()) then begin
-                TempBlob.CreateOutStream(OutStr);
-                MemberInfoCapture.Image.ExportStream(OutStr);
-                TempBlob.CreateInStream(InStr);
-                Member.Image.ImportStream(InStr, Member.FieldName(Image));
+            TempBlob.CreateOutStream(OutStr);
+            MemberInfoCapture.Image.ExportStream(OutStr);
+            TempBlob.CreateInStream(InStr);
+            Member.Image.ImportStream(InStr, Member.FieldName(Image));
         end;
 
         Member."Display Name" := StrSubstNo(PlaceHolder2Lbl, Member."First Name", Member."Last Name");
@@ -4071,7 +4071,7 @@
         exit;
     end;
 
-    procedure ValidateMemberFields(MembershipEntryNo: Integer; Member: Record "NPR MM Member"; ResponseMessage: Text): Boolean
+    internal procedure ValidateMemberFields(MembershipEntryNo: Integer; Member: Record "NPR MM Member"; ResponseMessage: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
         Community: Record "NPR MM Member Community";
@@ -4480,7 +4480,7 @@
     end;
 
 #pragma warning disable AA0139
-    procedure GenerateExtCardNo(GeneratePattern: Text[30]; ExternalMemberNo: Code[20]; ExternalMembershipNo: Code[20]; NumberSeries: Code[20]) ExtCardNo: Code[50]
+    internal procedure GenerateExtCardNo(GeneratePattern: Text[30]; ExternalMemberNo: Code[20]; ExternalMembershipNo: Code[20]; NumberSeries: Code[20]) ExtCardNo: Code[50]
     var
         PosStartClause: Integer;
         PosEndClause: Integer;
@@ -4776,7 +4776,7 @@
         end;
     end;
 
-    procedure GetMembershipFromUserPassword(UserLogonId: Code[80]; Password: Text[80]) MembershipEntryNo: Integer
+    internal procedure GetMembershipFromUserPassword(UserLogonId: Code[80]; Password: Text[80]) MembershipEntryNo: Integer
     var
         MembershipRole: Record "NPR MM Membership Role";
         Membership: Record "NPR MM Membership";
@@ -4797,7 +4797,7 @@
         exit(Membership."Entry No.");
     end;
 
-    procedure GetMembershipFromExtMemberNo(ExternalMemberNo: Code[20]) MembershipEntryNo: Integer
+    internal procedure GetMembershipFromExtMemberNo(ExternalMemberNo: Code[20]) MembershipEntryNo: Integer
     var
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
@@ -4825,7 +4825,7 @@
         exit(Membership."Entry No.");
     end;
 
-    procedure GetMembershipFromExtCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var ReasonNotFound: Text) MembershipEntryNo: Integer
+    internal procedure GetMembershipFromExtCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var ReasonNotFound: Text) MembershipEntryNo: Integer
     var
         CardEntryNo: Integer;
     begin
@@ -4957,7 +4957,7 @@
         exit(Membership."Entry No.");
     end;
 
-    procedure GetMembershipFromExtMembershipNo(ExternalMembershipNo: Code[20]) MembershipEntryNo: Integer
+    internal procedure GetMembershipFromExtMembershipNo(ExternalMembershipNo: Code[20]) MembershipEntryNo: Integer
     var
         Membership: Record "NPR MM Membership";
     begin
@@ -4971,7 +4971,7 @@
         exit(Membership."Entry No.");
     end;
 
-    procedure GetMembershipFromCustomerNo(CustomerNo: Code[20]) MembershipEntryNo: Integer
+    internal procedure GetMembershipFromCustomerNo(CustomerNo: Code[20]) MembershipEntryNo: Integer
     var
         Membership: Record "NPR MM Membership";
     begin
@@ -4986,7 +4986,7 @@
 
     end;
 
-    procedure GetMemberFromExtMemberNo(ExternalMemberNo: Code[20]) MemberEntryNo: Integer
+    internal procedure GetMemberFromExtMemberNo(ExternalMemberNo: Code[20]) MemberEntryNo: Integer
     var
         Member: Record "NPR MM Member";
     begin
@@ -5000,7 +5000,7 @@
         exit(Member."Entry No.");
     end;
 
-    procedure GetMemberFromExtCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var NotFoundReasonText: Text) MemberEntryNo: Integer
+    internal procedure GetMemberFromExtCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var NotFoundReasonText: Text) MemberEntryNo: Integer
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
@@ -5036,7 +5036,7 @@
 
     end;
 
-    procedure GetMemberFromUserPassword(UserLogonId: Code[50]; Password: Text[50]) MemberEntryNo: Integer
+    internal procedure GetMemberFromUserPassword(UserLogonId: Code[50]; Password: Text[50]) MemberEntryNo: Integer
     var
         MembershipRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
@@ -5059,7 +5059,7 @@
         exit(Member."Entry No.");
     end;
 
-    procedure GetMemberCardEntryNo(MemberEntryNo: Integer; MembershipCode: Code[20]; ReferenceDate: Date) MemberCardEntryNo: Integer
+    internal procedure GetMemberCardEntryNo(MemberEntryNo: Integer; MembershipCode: Code[20]; ReferenceDate: Date) MemberCardEntryNo: Integer
     var
         MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
@@ -5086,7 +5086,7 @@
         exit(MemberCard."Entry No.");
     end;
 
-    procedure GetCardEntryNoFromExtCardNo(ExternalCardNo: Text[100]) CardEntryNo: Integer
+    internal procedure GetCardEntryNoFromExtCardNo(ExternalCardNo: Text[100]) CardEntryNo: Integer
     var
         MemberCard: Record "NPR MM Member Card";
         PrefixedCardNo: Text;
@@ -5188,7 +5188,7 @@
 
     end;
 
-    procedure DeleteCtrlChars(StringToClean: Text): Text
+    internal procedure DeleteCtrlChars(StringToClean: Text): Text
     var
         CtrlChrs: Text[32];
         i: Integer;

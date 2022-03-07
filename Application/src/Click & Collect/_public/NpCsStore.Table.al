@@ -343,7 +343,7 @@
             WebServiceAuthHelper.RemoveApiPassword("API Password Key");
     end;
 
-    procedure GetServiceName() ServiceName: Text
+    internal procedure GetServiceName() ServiceName: Text
     var
         Position: Integer;
     begin
@@ -363,7 +363,7 @@
         exit(ServiceName);
     end;
 
-    procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
+    internal procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
     var
         AuthParamsBuff: Record "NPR Auth. Param. Buffer";
         iAuth: Interface "NPR API IAuthorization";

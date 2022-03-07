@@ -5,7 +5,7 @@
         Text002: Label 'Data Source "%1" did not bind variables.';
         Text003: Label 'Extension "%1" for data source "%2" did not respond to %3 event.';
 
-    procedure SetupDefaultDataSourcesForView(View: Codeunit "NPR POS View"; Setup: Codeunit "NPR POS Setup")
+    internal procedure SetupDefaultDataSourcesForView(View: Codeunit "NPR POS View"; Setup: Codeunit "NPR POS Setup")
     var
         DataSource: Codeunit "NPR Data Source";
     begin
@@ -39,7 +39,7 @@
         OnSetupDataSourcesForView(View, Setup);
     end;
 
-    procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; Setup: Codeunit "NPR POS Setup")
+    internal procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; Setup: Codeunit "NPR POS Setup")
     var
         Extensions: List of [Text];
         ExtensionDataSource: Codeunit "NPR Data Source";
@@ -78,7 +78,7 @@
         OnAfterGetDataSource(Name, DataSource, Setup);
     end;
 
-    procedure RecordToDataSet("Record": Variant; var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    internal procedure RecordToDataSet("Record": Variant; var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         RecRef: RecordRef;
         DataRow: Codeunit "NPR Data Row";
@@ -246,12 +246,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    internal procedure OnRefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterRefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management")
+    internal procedure OnAfterRefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 
@@ -275,12 +275,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnSetPosition(DataSource: Text; Position: Text; POSSession: Codeunit "NPR POS Session"; var Handled: Boolean)
+    internal procedure OnSetPosition(DataSource: Text; Position: Text; POSSession: Codeunit "NPR POS Session"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnIsDataSourceModified(POSSession: Codeunit "NPR POS Session"; DataSource: Text; var Modified: Boolean)
+    internal procedure OnIsDataSourceModified(POSSession: Codeunit "NPR POS Session"; DataSource: Text; var Modified: Boolean)
     begin
     end;
 

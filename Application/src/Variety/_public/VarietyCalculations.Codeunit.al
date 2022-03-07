@@ -307,7 +307,7 @@
         FieldValue := Format(QtyAvailabletoPromise);
     end;
 
-    procedure UseReturnValue(CalledFrom: Option OnDrillDown,OnLookup; VrtFieldSetup: Record "NPR Variety Field Setup"): Boolean
+    internal procedure UseReturnValue(CalledFrom: Option OnDrillDown,OnLookup; VrtFieldSetup: Record "NPR Variety Field Setup"): Boolean
     begin
         exit(((CalledFrom = CalledFrom::OnDrillDown) and VrtFieldSetup."Use OnDrillDown Return Value") or
               ((CalledFrom = CalledFrom::OnLookup) and VrtFieldSetup."Use OnLookup Return Value"));

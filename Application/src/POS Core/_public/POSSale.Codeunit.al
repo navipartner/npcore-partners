@@ -29,7 +29,7 @@
         _LastSaleReturnAmount: Decimal;
         _LastReceiptNo: Text;
 
-    procedure InitializeAtLogin(POSUnitIn: Record "NPR POS Unit"; SetupIn: Codeunit "NPR POS Setup")
+    internal procedure InitializeAtLogin(POSUnitIn: Record "NPR POS Unit"; SetupIn: Codeunit "NPR POS Setup")
     begin
         POSUnit := POSUnitIn;
         Setup := SetupIn;
@@ -37,7 +37,7 @@
         OnAfterInitializeAtLogin(POSUnit);
     end;
 
-    procedure InitializeNewSale(POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
+    internal procedure InitializeNewSale(POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
     begin
         Initialized := true;
 
@@ -86,7 +86,7 @@
         Ended := false;
     end;
 
-    procedure GetNextReceiptNo(POSUnitNo: Text) ReceiptNo: Code[20]
+    internal procedure GetNextReceiptNo(POSUnitNo: Text) ReceiptNo: Code[20]
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
         POSAuditProfile: Record "NPR POS Audit Profile";
@@ -106,13 +106,13 @@
             Error(DuplicateReceiptNo, ReceiptNo);
     end;
 
-    procedure GetContext(var SaleLineOut: Codeunit "NPR POS Sale Line"; var PaymentLineOut: Codeunit "NPR POS Payment Line")
+    internal procedure GetContext(var SaleLineOut: Codeunit "NPR POS Sale Line"; var PaymentLineOut: Codeunit "NPR POS Payment Line")
     begin
         SaleLineOut := SaleLine;
         PaymentLineOut := PaymentLine;
     end;
 
-    procedure ToDataset(var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    internal procedure ToDataset(var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         TempRec: Record "NPR POS Sale" temporary;
         DataMgt: Codeunit "NPR POS Data Management";
@@ -127,7 +127,7 @@
         DataMgt.RecordToDataSet(Rec, CurrDataSet, DataSource, POSSession, FrontEnd);
     end;
 
-    procedure SetPosition(Position: Text): Boolean
+    internal procedure SetPosition(Position: Text): Boolean
     begin
         Rec.SetPosition(Position);
         exit(Rec.Find());
@@ -138,17 +138,17 @@
         SalePOS.Copy(Rec);
     end;
 
-    procedure SetLastSalePOSEntry(POSEntryIn: Record "NPR POS Entry")
+    internal procedure SetLastSalePOSEntry(POSEntryIn: Record "NPR POS Entry")
     begin
         LastSalePOSEntry := POSEntryIn;
     end;
 
-    procedure GetLastSalePOSEntry(var POSEntryOut: Record "NPR POS Entry")
+    internal procedure GetLastSalePOSEntry(var POSEntryOut: Record "NPR POS Entry")
     begin
         POSEntryOut := LastSalePOSEntry;
     end;
 
-    procedure GetLastSaleInfo(var LastSaleTotalOut: Decimal; var LastSalePaymentOut: Decimal; var LastSaleDateTextOut: Text; var LastSaleReturnAmountOut: Decimal; var LastReceiptNoOut: Text)
+    internal procedure GetLastSaleInfo(var LastSaleTotalOut: Decimal; var LastSalePaymentOut: Decimal; var LastSaleDateTextOut: Text; var LastSaleReturnAmountOut: Decimal; var LastReceiptNoOut: Text)
     var
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
@@ -217,7 +217,7 @@
     end;
 
     [Obsolete('Automatic in workflow v3')]
-    procedure GetModified() Result: Boolean
+    internal procedure GetModified() Result: Boolean
     begin
         Result := IsModified or (not Initialized);
         IsModified := false;
@@ -229,17 +229,17 @@
         IsModified := true;
     end;
 
-    procedure SetEnded(NewEnded: Boolean)
+    internal procedure SetEnded(NewEnded: Boolean)
     begin
         Ended := NewEnded;
     end;
 
-    procedure PosSaleRecMustExit(): Boolean
+    internal procedure PosSaleRecMustExit(): Boolean
     begin
         exit((Rec."Sales Ticket No." <> '') and not Ended);
     end;
 
-    procedure GetTotals(var SalesAmountOut: Decimal; var PaidAmountOut: Decimal; var ChangeAmountOut: Decimal; var RoundingAmountOut: Decimal)
+    internal procedure GetTotals(var SalesAmountOut: Decimal; var PaidAmountOut: Decimal; var ChangeAmountOut: Decimal; var RoundingAmountOut: Decimal)
     var
         ReturnAmount: Decimal;
         SubTotal: Decimal;
@@ -287,7 +287,7 @@
         Error(SaleNotFoundErr, SalePOS.FieldCaption("Sales Ticket No."), SalePOS."Sales Ticket No.", SalePOS."Register No.");
     end;
 
-    procedure SetDimension(DimCode: Code[20]; DimValueCode: Code[20])
+    internal procedure SetDimension(DimCode: Code[20]; DimValueCode: Code[20])
     var
         Dim: Record Dimension;
         DimVal: Record "Dimension Value";
@@ -324,22 +324,22 @@
         RefreshCurrent();
     end;
 
-    procedure SetShortcutDimCode1(DimensionValue: Code[20])
+    internal procedure SetShortcutDimCode1(DimensionValue: Code[20])
     begin
         Rec.Validate(Rec."Shortcut Dimension 1 Code", DimensionValue);
     end;
 
-    procedure SetShortcutDimCode2(DimensionValue: Code[20])
+    internal procedure SetShortcutDimCode2(DimensionValue: Code[20])
     begin
         Rec.Validate(Rec."Shortcut Dimension 2 Code", DimensionValue);
     end;
 
-    procedure TryEndSale(POSSession: Codeunit "NPR POS Session"): Boolean
+    internal procedure TryEndSale(POSSession: Codeunit "NPR POS Session"): Boolean
     begin
         exit(TryEndSale(POSSession, true));
     end;
 
-    procedure TryEndSale(POSSession: Codeunit "NPR POS Session"; StartNew: Boolean): Boolean
+    internal procedure TryEndSale(POSSession: Codeunit "NPR POS Session"; StartNew: Boolean): Boolean
     var
         SalesAmount: Decimal;
         PaidAmount: Decimal;
@@ -378,7 +378,7 @@
     /// <returns>
     /// True if sale ended
     /// </returns>
-    procedure TryEndDirectSaleWithBalancing(POSSession: Codeunit "NPR POS Session"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"): Boolean
+    internal procedure TryEndDirectSaleWithBalancing(POSSession: Codeunit "NPR POS Session"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
         SalesAmount: Decimal;
         PaidAmount: Decimal;
@@ -478,7 +478,7 @@
         exit(POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) = 0);
     end;
 
-    procedure SelectViewForEndOfSale(POSSession: Codeunit "NPR POS Session")
+    internal procedure SelectViewForEndOfSale(POSSession: Codeunit "NPR POS Session")
     var
         POSViewProfile: Record "NPR POS View Profile";
     begin
@@ -501,7 +501,7 @@
     end;
 
 
-    procedure ValidateSaleBeforeEnd(var Sale: Record "NPR POS Sale")
+    internal procedure ValidateSaleBeforeEnd(var Sale: Record "NPR POS Sale")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -652,7 +652,7 @@
         POSInfoManagement.PostPOSInfo(Sale);
     end;
 
-    procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR POS Sale"; POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
+    internal procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR POS Sale"; POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
     begin
         Initialized := true;
 
@@ -711,7 +711,7 @@
         POSResumeSale.LogSaleResume(Rec, SalePOS_ToResume."Sales Ticket No.");
     end;
 
-    procedure ResumeFromPOSQuote(POSQuoteNo: Integer): Boolean
+    internal procedure ResumeFromPOSQuote(POSQuoteNo: Integer): Boolean
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
@@ -779,7 +779,7 @@
         UnbindSubscription(PosItemCheckAvail);
     end;
 
-    procedure SetSkipItemAvailabilityCheck(Set: Boolean)
+    internal procedure SetSkipItemAvailabilityCheck(Set: Boolean)
     begin
         SkipItemAvailabilityCheck := Set;
     end;
@@ -817,7 +817,7 @@
     end;
 
     [IntegrationEvent(TRUE, false)]
-    procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale")
+    internal procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale")
     begin
     end;
 
@@ -827,7 +827,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRefresh(var SalePOS: Record "NPR POS Sale")
+    internal procedure OnRefresh(var SalePOS: Record "NPR POS Sale")
     begin
     end;
     #endregion
@@ -863,7 +863,7 @@
         POSAfterSaleExecution.OnRunTypeSet(OnRunType::Undefined);
     end;
 
-    procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "NPR POS Sale")
+    internal procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "NPR POS Sale")
     var
         NPRPOSUnit: Record "NPR POS Unit";
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -889,7 +889,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
+    internal procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin
     end;
 

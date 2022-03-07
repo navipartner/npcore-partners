@@ -857,7 +857,7 @@
         Text001: Label 'XML Template %1 already exist. Do you want to overwrite it with the template from Azure Blob Storage?';
 
     [NonDebuggable]
-    procedure SetApiPassword(NewPassword: Text)
+    internal procedure SetApiPassword(NewPassword: Text)
     begin
         if IsNullGuid("Api Password Key") then
             "Api Password Key" := CreateGuid();
@@ -868,24 +868,24 @@
     end;
 
     [NonDebuggable]
-    procedure GetApiPassword() PasswordValue: Text
+    internal procedure GetApiPassword() PasswordValue: Text
     begin
         if IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue) then;
     end;
 
     [NonDebuggable]
-    procedure HasApiPassword(): Boolean
+    internal procedure HasApiPassword(): Boolean
     begin
         exit(GetApiPassword() <> '');
     end;
 
-    procedure RemoveApiPassword()
+    internal procedure RemoveApiPassword()
     begin
         IsolatedStorage.Delete("Api Password Key", DataScope::Company);
         Clear("Api Password Key");
     end;
 
-    procedure GetApiUsername(): Text[250]
+    internal procedure GetApiUsername(): Text[250]
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
     begin
@@ -915,14 +915,14 @@
             SetApiPassword(CryptographyManagement.GenerateHash(Format(CurrentDateTime, 0, 9), 0));
     end;
 
-    procedure GetBasicAuthInfo(): Text
+    internal procedure GetBasicAuthInfo(): Text
     var
         Base64: Codeunit "Base64 Convert";
     begin
         exit(Base64.ToBase64(GetApiUsername() + ':' + GetApiPassword(), TextEncoding::UTF8));
     end;
 
-    procedure GetCredentialsHash(): Text
+    internal procedure GetCredentialsHash(): Text
     var
         CryptographyManagement: Codeunit "Cryptography Management";
     begin
@@ -962,7 +962,7 @@
         NpXmlTemplateMgt.ImportNpXmlTemplateUrl(CopyStr(TemplateCode, 1, 20), BaseURL);
     end;
 
-    procedure UpdateXmlEnabledFields()
+    internal procedure UpdateXmlEnabledFields()
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin

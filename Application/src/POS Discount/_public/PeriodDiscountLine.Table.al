@@ -480,7 +480,7 @@
         VATPostingSetup: Record "VAT Posting Setup";
         VATPct: Decimal;
 
-    procedure UpdatePeriodDiscount()
+    internal procedure UpdatePeriodDiscount()
     var
         PeriodDiscount: Record "NPR Period Discount";
     begin
@@ -490,7 +490,7 @@
         end;
     end;
 
-    procedure ShowComment()
+    internal procedure ShowComment()
     var
         RetailComment: Record "NPR Retail Comment";
     begin

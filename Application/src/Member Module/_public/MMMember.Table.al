@@ -287,7 +287,7 @@
             UpdateContactFromMember();
     end;
 
-    procedure UpdateContactFromMember()
+    internal procedure UpdateContactFromMember()
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipRole: Record "NPR MM Membership Role";

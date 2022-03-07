@@ -1147,18 +1147,18 @@
         UnattendedDelete := true;
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnRetrieveItemMetadata(ItemMetadata: JsonObject)
+    [IntegrationEvent(true, false)]
+    internal procedure OnRetrieveItemMetadata(ItemMetadata: JsonObject)
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnRetrieveCustomerMetadata(CustomerMetadata: JsonObject)
+    [IntegrationEvent(true, false)]
+    internal procedure OnRetrieveCustomerMetadata(CustomerMetadata: JsonObject)
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnRetrievePaymentMetadata(PaymentMetadata: JsonObject)
+    [IntegrationEvent(true, false)]
+    internal procedure OnRetrievePaymentMetadata(PaymentMetadata: JsonObject)
     begin
     end;
 }

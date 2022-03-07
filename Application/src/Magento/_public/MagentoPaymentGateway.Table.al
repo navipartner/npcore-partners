@@ -127,7 +127,7 @@
     }
 
     [NonDebuggable]
-    procedure SetApiPassword(NewPassword: Text)
+    internal procedure SetApiPassword(NewPassword: Text)
     begin
         if IsNullGuid("Api Password Key") then
             "Api Password Key" := CreateGuid();
@@ -139,18 +139,18 @@
     end;
 
     [NonDebuggable]
-    procedure GetApiPassword() PasswordValue: Text
+    internal procedure GetApiPassword() PasswordValue: Text
     begin
         IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue);
     end;
 
     [NonDebuggable]
-    procedure HasApiPassword(): Boolean
+    internal procedure HasApiPassword(): Boolean
     begin
         exit(GetApiPassword() <> '');
     end;
 
-    procedure RemoveApiPassword()
+    internal procedure RemoveApiPassword()
     begin
         IsolatedStorage.Delete("Api Password Key", DataScope::Company);
         Clear("Api Password Key");

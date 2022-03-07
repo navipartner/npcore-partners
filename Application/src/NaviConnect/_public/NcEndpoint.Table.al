@@ -62,7 +62,7 @@
         Error(RenamingNotAllwedErr, TableCaption());
     end;
 
-    procedure SetupEndpoint()
+    internal procedure SetupEndpoint()
     begin
         if "Endpoint Type" = '' then
             if not ChooseEndpoint() then

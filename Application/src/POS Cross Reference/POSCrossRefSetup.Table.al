@@ -57,7 +57,7 @@
 
 
     [IntegrationEvent(false, false)]
-    procedure OnDiscoverSetup(var Setup: Record "NPR POS Cross Ref. Setup")
+    internal procedure OnDiscoverSetup(var Setup: Record "NPR POS Cross Ref. Setup")
     begin
     end;
 

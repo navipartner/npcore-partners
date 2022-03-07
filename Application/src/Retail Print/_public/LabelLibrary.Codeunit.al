@@ -45,7 +45,7 @@
             PrintedQty := PrintItem(Item, true, 0, true, ReportType);
     end;
 
-    procedure PrintItem(var Item: Record Item; PromptForQuantity: Boolean; Quantity: Integer; IsLastLine: Boolean; ReportType: Integer): Decimal
+    internal procedure PrintItem(var Item: Record Item; PromptForQuantity: Boolean; Quantity: Integer; IsLastLine: Boolean; ReportType: Integer): Decimal
     var
         RetailJournalLine: Record "NPR Retail Journal Line";
         PrintQty: Integer;
@@ -80,7 +80,7 @@
         RetailReportSelectionMgt.RunObjects(RecRef, ReportType);
     end;
 
-    procedure PrintCustomShippingLabel(var RecRef: RecordRef; PrintLayoutID: Code[20])
+    internal procedure PrintCustomShippingLabel(var RecRef: RecordRef; PrintLayoutID: Code[20])
     var
         ShippingAgent: Record "Shipping Agent";
         SalesHeader: Record "Sales Header";
@@ -136,7 +136,7 @@
         end
     end;
 
-    procedure ToggleLine(var RecRefIn: RecordRef)
+    internal procedure ToggleLine(var RecRefIn: RecordRef)
     begin
         if not SelectionBufferOpen then begin
             TmpSelectionBuffer.Open(RecRefIn.Number, true);
@@ -149,7 +149,7 @@
             TransferSelectionFields(RecRefIn);
     end;
 
-    procedure InvertAllLines(var RecRefIn: RecordRef)
+    internal procedure InvertAllLines(var RecRefIn: RecordRef)
     var
         RecRef: RecordRef;
     begin
@@ -167,7 +167,7 @@
             until RecRefIn.Next() = 0;
     end;
 
-    procedure SelectionContains(var RecRefIn: RecordRef): Boolean
+    internal procedure SelectionContains(var RecRefIn: RecordRef): Boolean
     begin
         if not SelectionBufferOpen then begin
             TmpSelectionBuffer.Open(RecRefIn.Number, true);
@@ -206,7 +206,7 @@
         TmpSelectionBuffer.Insert();
     end;
 
-    procedure SetSelectionBuffer(RecVariant: Variant)
+    internal procedure SetSelectionBuffer(RecVariant: Variant)
     begin
         //-NPR5.53 [374290]
         TmpSelectionBuffer.GetTable(RecVariant);
@@ -214,7 +214,7 @@
         //+NPR5.53 [374290]
     end;
 
-    procedure PrintSelection(ReportType: Integer)
+    internal procedure PrintSelection(ReportType: Integer)
     var
         RetailJournalLine: Record "NPR Retail Journal Line";
         PurchaseLine: Record "Purchase Line";
@@ -365,7 +365,7 @@
         end;
     end;
 
-    procedure RunPrintPage(var RecRef: RecordRef)
+    internal procedure RunPrintPage(var RecRef: RecordRef)
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
         PurchaseLine: Record "Purchase Line";
@@ -450,11 +450,11 @@
                 begin
                     RecRef.SetTable(WarehouseActivityLine);
                     if WarehouseActivityLine.FindFirst() then;
-                    #if BC20
+#if BC20
                     RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type".AsInteger(), WarehouseActivityLine."No.", TmpRetailJnlCode);
 #else
                     RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.", TmpRetailJnlCode);
-                    #endif
+#endif
                 end;
             //+NPR5.55 [414268]
             else
@@ -497,7 +497,7 @@
         //+NPR5.51 [367416]
     end;
 
-    procedure ItemToRetailJnlLine(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; PK: Code[40]; var RetailJournalLineOut: Record "NPR Retail Journal Line")
+    internal procedure ItemToRetailJnlLine(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; PK: Code[40]; var RetailJournalLineOut: Record "NPR Retail Journal Line")
     var
         RetailJournalLine: Record "NPR Retail Journal Line";
         Item: Record Item;
@@ -531,7 +531,7 @@
         //+NPR5.37 [289725]
     end;
 
-    procedure PrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
+    internal procedure PrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
     var
         RecRef: RecordRef;
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
@@ -796,12 +796,12 @@
     begin
     end;
 
-    procedure ChooseLabel(VarRec: Variant)
+    internal procedure ChooseLabel(VarRec: Variant)
     begin
         ApplyFilterAndRun(VarRec, 0, false);
     end;
 
-    procedure PrintLabel(VarRec: Variant; ReportType: Option)
+    internal procedure PrintLabel(VarRec: Variant; ReportType: Option)
     begin
         ApplyFilterAndRun(VarRec, ReportType, true);
     end;

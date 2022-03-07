@@ -371,7 +371,7 @@
         end;
     end;
 
-    procedure IsCreditDocType(): Boolean
+    internal procedure IsCreditDocType(): Boolean
     begin
         exit("Document Type" in ["Document Type"::"Return Order", "Document Type"::"Credit Memo"]);
     end;

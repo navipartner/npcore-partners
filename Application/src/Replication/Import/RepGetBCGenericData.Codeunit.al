@@ -560,7 +560,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterRecordIsModified(var RecRef: RecordRef; ReplicationEndpoint: Record "NPR Replication Endpoint")
+    internal procedure OnAfterRecordIsModified(var RecRef: RecordRef; ReplicationEndpoint: Record "NPR Replication Endpoint")
     begin
     end;
 

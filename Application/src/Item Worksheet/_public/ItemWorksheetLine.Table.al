@@ -1850,7 +1850,7 @@
         exit(Field."Field Caption");
     end;
 
-    procedure SetUpNewLine(LastItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure SetUpNewLine(LastItemWorksheetLine: Record "NPR Item Worksheet Line")
     begin
         ItemWorksheetTemplate.Get("Worksheet Template Name");
         ItemWorksheet.Get("Worksheet Template Name", "Worksheet Name");
@@ -1876,7 +1876,7 @@
         end;
     end;
 
-    procedure GetWorksheet()
+    internal procedure GetWorksheet()
     begin
         if (ItemWorksheet."Item Template Name" <> "Worksheet Template Name") or
            (ItemWorksheet.Name <> "Worksheet Name") then begin
@@ -1897,7 +1897,7 @@
         end;
     end;
 
-    procedure UpdateItemNo()
+    internal procedure UpdateItemNo()
     var
         VarCode: Code[10];
         ItemNo: Code[20];
@@ -1909,7 +1909,7 @@
         end;
     end;
 
-    procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]) found: Boolean
+    internal procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]) found: Boolean
     var
         ItemRef: Record "Item Reference";
     begin
@@ -2025,7 +2025,7 @@
         exit('');
     end;
 
-    procedure GetNewItemNo(): Code[20]
+    internal procedure GetNewItemNo(): Code[20]
     var
         InventorySetup: Record "Inventory Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -2106,13 +2106,13 @@
         end;
     end;
 
-    procedure ConfirmRefreshVariants()
+    internal procedure ConfirmRefreshVariants()
     begin
         if Confirm(RebuildQst) then
             RefreshVariants(3, true);
     end;
 
-    procedure RefreshVariants(LinesType: Option "None",Variants,"Varieties Without Variants",All; IncludeHeaders: Boolean)
+    internal procedure RefreshVariants(LinesType: Option "None",Variants,"Varieties Without Variants",All; IncludeHeaders: Boolean)
     var
         ItemWorksheetVar: Record "NPR Item Worksh. Variant Line";
     begin
@@ -2408,7 +2408,7 @@
         end;
     end;
 
-    procedure UpdateVarietyHeadingText()
+    internal procedure UpdateVarietyHeadingText()
     var
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         CreateCounter: array[4] of Integer;
@@ -2558,7 +2558,7 @@
         ItemWorksheetVariantLine.DeleteAll(true);
     end;
 
-    procedure UpdateVarietyLines()
+    internal procedure UpdateVarietyLines()
     var
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
     begin
@@ -2610,7 +2610,7 @@
         exit(CopyStr(StrSubstNo(VarsCreateUpdateLbl, Varieties, CreateNew, UpdateExisting), 1, 50));
     end;
 
-    procedure IsCopyVariety(VrtValue: Integer): Boolean
+    internal procedure IsCopyVariety(VrtValue: Integer): Boolean
     begin
         case VrtValue of
             1:
@@ -2625,7 +2625,7 @@
         exit(false);
     end;
 
-    procedure IsLockedVariety(VrtValue: Integer): Boolean
+    internal procedure IsLockedVariety(VrtValue: Integer): Boolean
     var
         VarietyTable: Record "NPR Variety Table";
     begin
@@ -2643,7 +2643,7 @@
         exit(VarietyTable."Lock Table");
     end;
 
-    procedure IsAddedVarietyValue(VrtValue: Integer): Boolean
+    internal procedure IsAddedVarietyValue(VrtValue: Integer): Boolean
     var
         WorksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
         VarietyTable: Record "NPR Variety Table";
@@ -2721,12 +2721,12 @@
         exit(ItemWorksheetVar.FindFirst());
     end;
 
-    procedure EmptyLine(): Boolean
+    internal procedure EmptyLine(): Boolean
     begin
         exit("Worksheet Name" = '');
     end;
 
-    procedure UpdateBarcode()
+    internal procedure UpdateBarcode()
     begin
         ItemWorksheetTemplate.Get("Worksheet Template Name");
         if ("Internal Bar Code" <> '') and ("Variety 1" = '') then
@@ -2792,7 +2792,7 @@
             "Use Variant" := true;
     end;
 
-    procedure UpdateSalesPriceWithRRP()
+    internal procedure UpdateSalesPriceWithRRP()
     var
         ItemWorksheetVar: Record "NPR Item Worksh. Variant Line";
     begin
@@ -2854,7 +2854,7 @@
         end;
     end;
 
-    procedure DeleteDuplicate()
+    internal procedure DeleteDuplicate()
     var
         DuplicateItemWorksheetLine: Record "NPR Item Worksheet Line";
     begin
@@ -3063,7 +3063,7 @@
         exit(true);
     end;
 
-    procedure CheckManualValidation()
+    internal procedure CheckManualValidation()
     var
         ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
         RecRef: RecordRef;
@@ -3096,7 +3096,7 @@
         until FieldNumber = RecRef.FieldCount;
     end;
 
-    procedure CreateQueryItemInformation(OnlyNewAndUpdated: Boolean)
+    internal procedure CreateQueryItemInformation(OnlyNewAndUpdated: Boolean)
     var
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         EndpointManagement: Codeunit "NPR Endpoint Management";
@@ -3140,7 +3140,7 @@
         end;
     end;
 
-    procedure CleanupObsoleteLines()
+    internal procedure CleanupObsoleteLines()
     var
         ObsoleteWorksheetLine: Record "NPR Item Worksheet Line";
     begin

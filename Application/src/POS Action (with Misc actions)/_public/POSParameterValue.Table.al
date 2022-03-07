@@ -72,7 +72,7 @@
         OptionStringCache: JsonObject;
         ParamFilterIndicator: Boolean;
 
-    procedure InitForMenuButton(MenuButton: Record "NPR POS Menu Button")
+    internal procedure InitForMenuButton(MenuButton: Record "NPR POS Menu Button")
     begin
         Init();
         "Table No." := DATABASE::"NPR POS Menu Button";
@@ -81,7 +81,7 @@
         "Record ID" := MenuButton.RecordId;
     end;
 
-    procedure InitForField(RecordID: RecordID; FieldID: Integer)
+    internal procedure InitForField(RecordID: RecordID; FieldID: Integer)
     var
         RecRef: RecordRef;
     begin
@@ -94,7 +94,7 @@
         "Record ID" := RecordID;
     end;
 
-    procedure FilterParameters(RecordID: RecordID; FieldID: Integer): Boolean
+    internal procedure FilterParameters(RecordID: RecordID; FieldID: Integer): Boolean
     var
         RecRef: RecordRef;
     begin
@@ -106,7 +106,7 @@
         SetRange(ID, FieldID);
     end;
 
-    procedure FindSetMenuButtonParameters(MenuCode: Code[20]; ButtonID: Integer; ForModify: Boolean): Boolean
+    internal procedure FindSetMenuButtonParameters(MenuCode: Code[20]; ButtonID: Integer; ForModify: Boolean): Boolean
     begin
         Reset();
         SetRange("Table No.", DATABASE::"NPR POS Menu Button");
@@ -143,7 +143,7 @@
     /// You must invoke this function only on temporary variables. Invoking it on non-temporary variables results in error.
     /// </summary>
     /// <param name="Target">Target action to which parameters will be added.</param>
-    procedure AddParametersToAction(Target: Interface "NPR IAction")
+    internal procedure AddParametersToAction(Target: Interface "NPR IAction")
     var
         TempCopyRec: Record "NPR POS Parameter Value" temporary;
         NotTemporaryRecordErr: Label 'Attempting to invoke AddParametersToAction on non-temporary variable. This operation is not valid and indicates a programming bug.';
@@ -162,7 +162,7 @@
     /// Adds a single parameter (current value of Rec) to target action.
     /// </summary>
     /// <param name="Target">Target action to which the parameter should be added.</param>
-    procedure AddParameterToAction(Target: Interface "NPR IAction")
+    internal procedure AddParameterToAction(Target: Interface "NPR IAction")
     var
         Param: Record "NPR POS Action Parameter";
         OptionsJson: JsonObject;
@@ -216,7 +216,7 @@
         end;
     end;
 
-    procedure AddParameterToJObject(Target: JsonObject)
+    internal procedure AddParameterToJObject(Target: JsonObject)
     var
         Param: Record "NPR POS Action Parameter";
         Date: Date;
@@ -266,7 +266,7 @@
                 exit(Param.Options);
     end;
 
-    procedure LookupValue()
+    internal procedure LookupValue()
     var
         TempRetailList: Record "NPR Retail List" temporary;
         POSActionParamMgt: Codeunit "NPR POS Action Param. Mgt.";
@@ -333,7 +333,7 @@
             Validate(Value, TempRetailList.Choice);
     end;
 
-    procedure GetParameter(RecordID: RecordID; ID: Integer; Name: Text): Boolean
+    internal procedure GetParameter(RecordID: RecordID; ID: Integer; Name: Text): Boolean
     var
         ParamValue: Record "NPR POS Parameter Value";
         RecRef: RecordRef;
@@ -350,7 +350,7 @@
         end;
     end;
 
-    procedure GetTableViewString(TableID: Integer; ViewString: Text): Text
+    internal procedure GetTableViewString(TableID: Integer; ViewString: Text): Text
     var
         RecRef: RecordRef;
         PageBuilder: FilterPageBuilder;
@@ -379,31 +379,31 @@
         RecRef.SetView(FilterString);
     end;
 
-    procedure SetParamFilterIndicator()
+    internal procedure SetParamFilterIndicator()
     begin
         ParamFilterIndicator := true;
     end;
 
-    procedure GetParamFilterIndicator(): Boolean
+    internal procedure GetParamFilterIndicator(): Boolean
     begin
         exit(ParamFilterIndicator);
     end;
 
     [Obsolete('Use v3 workflow inline captions instead')]
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    internal procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
     end;
 
     [Obsolete('Use v3 workflow inline captions instead')]
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    internal procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
     end;
 
     [Obsolete('Use v3 workflow inline captions instead')]
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    internal procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
     end;
 

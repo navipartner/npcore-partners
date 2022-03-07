@@ -603,7 +603,7 @@
         "Inserted at" := CurrentDateTime;
     end;
 
-    procedure GetLastLogMessage(): Text
+    internal procedure GetLastLogMessage(): Text
     var
         NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
     begin
@@ -612,7 +612,7 @@
             exit(NpCsDocumentLogEntry."Log Message");
     end;
 
-    procedure GetLastLogErrorMessage(): Text
+    internal procedure GetLastLogErrorMessage(): Text
     var
         NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
     begin

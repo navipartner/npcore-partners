@@ -19,7 +19,7 @@
         WorkdateText: Label 'WORKDATE';
         NowText: Label 'NOW';
 
-    procedure GetAttributeCaption(Language: Integer; CaptionRef: Text[80]) Caption: Text[100]
+    internal procedure GetAttributeCaption(Language: Integer; CaptionRef: Text[80]) Caption: Text[100]
     var
         AttributeTableID: Integer;
         AttributeReference: Integer;
@@ -86,7 +86,7 @@
         end;
     end;
 
-    procedure SetEntryAttributeValue(TableID: Integer; AttributeReference: Integer; PKCode: Integer; var TextValue: Text[250])
+    internal procedure SetEntryAttributeValue(TableID: Integer; AttributeReference: Integer; PKCode: Integer; var TextValue: Text[250])
     var
         AttributeID: Record "NPR Attribute ID";
     begin
@@ -102,7 +102,7 @@
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::MASTERDATA, PKCode, 0, 0, '', 0, TextValue);
     end;
 
-    procedure SetDocumentAttributeValue(TableID: Integer; AttributeReference: Integer; PKOption: Option; PKCode: Code[20]; var TextValue: Text[250])
+    internal procedure SetDocumentAttributeValue(TableID: Integer; AttributeReference: Integer; PKOption: Option; PKCode: Code[20]; var TextValue: Text[250])
     var
         AttributeID: Record "NPR Attribute ID";
     begin
@@ -110,7 +110,7 @@
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::DOCUMENT, PKCode, 0, PKOption, '', 0, TextValue);
     end;
 
-    procedure SetDocumentLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKOption: Option; PKCode: Code[20]; PKLine: Integer; var TextValue: Text[250])
+    internal procedure SetDocumentLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKOption: Option; PKCode: Code[20]; PKLine: Integer; var TextValue: Text[250])
     var
         AttributeID: Record "NPR Attribute ID";
     begin
@@ -118,7 +118,7 @@
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::DOCUMENTLINE, PKCode, PKLine, PKOption, '', 0, TextValue);
     end;
 
-    procedure SetWorksheetLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; var TextValue: Text[250])
+    internal procedure SetWorksheetLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; var TextValue: Text[250])
     var
         AttributeID: Record "NPR Attribute ID";
     begin
@@ -126,7 +126,7 @@
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::WORKSHEETLINE, PKTemplate, PKLine, 0, PKBatch, 0, TextValue);
     end;
 
-    procedure SetWorksheetSubLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; PKSubLine: Integer; var TextValue: Text[250])
+    internal procedure SetWorksheetSubLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; PKSubLine: Integer; var TextValue: Text[250])
     var
         AttributeID: Record "NPR Attribute ID";
     begin
@@ -172,7 +172,7 @@
         end;
     end;
 
-    procedure SetAttributeValue(SetID: Integer; AttributeCode: Code[20]; var TextValue: Text[250]; var vAttributeValue: Record "NPR Attribute Value Set"): Boolean
+    internal procedure SetAttributeValue(SetID: Integer; AttributeCode: Code[20]; var TextValue: Text[250]; var vAttributeValue: Record "NPR Attribute Value Set"): Boolean
     var
         Attribute: Record "NPR Attribute";
         myDate: Date;
@@ -246,7 +246,7 @@
         exit(true);
     end;
 
-    procedure GetEntryAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKCode: Integer)
+    internal procedure GetEntryAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKCode: Integer)
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, Format(PKCode, 0, '<integer>'), 0, 0, '', 0);
@@ -258,25 +258,25 @@
         GetGenericAttributeValueWorker(TextArray, TableID, PKCode, 0, 0, '', 0);
     end;
 
-    procedure GetDocumentAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKOption: Option; PKCode: Code[20])
+    internal procedure GetDocumentAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKOption: Option; PKCode: Code[20])
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, PKCode, 0, PKOption, '', 0);
     end;
 
-    procedure GetDocumentLineAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKOption: Option; PKCode: Code[20]; PKLine: Integer)
+    internal procedure GetDocumentLineAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKOption: Option; PKCode: Code[20]; PKLine: Integer)
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, PKCode, PKLine, PKOption, '', 0);
     end;
 
-    procedure GetWorksheetLineAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer)
+    internal procedure GetWorksheetLineAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer)
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, PKTemplate, PKLine, 0, PKBatch, 0);
     end;
 
-    procedure GetWorksheetSublineaAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; PKSubline: Integer)
+    internal procedure GetWorksheetSublineaAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; PKSubline: Integer)
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, PKTemplate, PKLine, 0, PKBatch, PKSubline);
@@ -302,7 +302,7 @@
         end;
     end;
 
-    procedure GetAssignedAttributeList(TableID: Integer; var AttributeCodeArray: array[40] of Code[20])
+    internal procedure GetAssignedAttributeList(TableID: Integer; var AttributeCodeArray: array[40] of Code[20])
     var
         AttributeID: Record "NPR Attribute ID";
     begin
@@ -318,7 +318,7 @@
         end;
     end;
 
-    procedure CopyEntryAttributeValue(TableID: Integer; SourcePKCode: Integer; TargetPKCode: Integer)
+    internal procedure CopyEntryAttributeValue(TableID: Integer; SourcePKCode: Integer; TargetPKCode: Integer)
     var
         TextArray: array[40] of Text[250];
         N: Integer;
@@ -333,7 +333,7 @@
 
     end;
 
-    procedure ShowMasterDataAttributeValues(TableID: Integer; "MDR Code PK": Code[20]) AttributeCode: Code[20]
+    internal procedure ShowMasterDataAttributeValues(TableID: Integer; "MDR Code PK": Code[20]) AttributeCode: Code[20]
     var
         AttributeKey: Record "NPR Attribute Key";
         AttributeValue: Record "NPR Attribute Value Set";
@@ -346,7 +346,7 @@
         page.Run();
     end;
 
-    procedure ShowDocumentAttributeValues(TableID: Integer; "MDR Option PK": Option; "MDR Code PK": Code[20]) AttributeCode: Code[20]
+    internal procedure ShowDocumentAttributeValues(TableID: Integer; "MDR Option PK": Option; "MDR Code PK": Code[20]) AttributeCode: Code[20]
     var
         AttributeKey: Record "NPR Attribute Key";
         AttributeValue: Record "NPR Attribute Value Set";
@@ -359,7 +359,7 @@
         page.Run();
     end;
 
-    procedure ShowDocumentLineAttributeValues(TableID: Integer; "MDR Option PK": Option; "MDR Code PK": Code[20]; "MDR Line PK": Integer) AttributeCode: Code[20]
+    internal procedure ShowDocumentLineAttributeValues(TableID: Integer; "MDR Option PK": Option; "MDR Code PK": Code[20]; "MDR Line PK": Integer) AttributeCode: Code[20]
     var
         AttributeKey: Record "NPR Attribute Key";
         AttributeValue: Record "NPR Attribute Value Set";
@@ -372,7 +372,7 @@
         page.Run();
     end;
 
-    procedure ShowWorksheetLineAttributeValues(TableID: Integer; "MDR Code PK": Code[20]; "MDR Code 2 PK": Code[20]; "MDR Line PK": Integer) AttributeCode: Code[20]
+    internal procedure ShowWorksheetLineAttributeValues(TableID: Integer; "MDR Code PK": Code[20]; "MDR Code 2 PK": Code[20]; "MDR Line PK": Integer) AttributeCode: Code[20]
     var
         AttributeKey: Record "NPR Attribute Key";
         AttributeValue: Record "NPR Attribute Value Set";
@@ -385,7 +385,7 @@
         page.Run();
     end;
 
-    procedure ShowWorksheetSublineAttributeValues(TableID: Integer; "MDR Code PK": Code[20]; "MDR Code 2 PK": Code[20]; "MDR Line PK": Integer; "MDR Line 2 PK": Integer) AttributeCode: Code[20]
+    internal procedure ShowWorksheetSublineAttributeValues(TableID: Integer; "MDR Code PK": Code[20]; "MDR Code 2 PK": Code[20]; "MDR Line PK": Integer; "MDR Line 2 PK": Integer) AttributeCode: Code[20]
     var
         AttributeKey: Record "NPR Attribute Key";
         AttributeValue: Record "NPR Attribute Value Set";
@@ -516,16 +516,16 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterSetMasterDataAttributeNewValue(NPRAttributeKey: Record "NPR Attribute Key"; NPRAttributeValueSet: Record "NPR Attribute Value Set")
+    local procedure OnAfterSetMasterDataAttributeNewValue(NPRAttributeKey: Record "NPR Attribute Key"; NPRAttributeValueSet: Record "NPR Attribute Value Set")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterClientAttributeNewValue(NPRAttributeKey: Record "NPR Attribute Key"; NPRAttributeValueSet: Record "NPR Attribute Value Set")
+    local procedure OnAfterClientAttributeNewValue(NPRAttributeKey: Record "NPR Attribute Key"; NPRAttributeValueSet: Record "NPR Attribute Value Set")
     begin
     end;
 
-    procedure DeleteAttributeOwnerRecord(TableID: Integer; CodePK: Code[20]; LinePK: Integer; OptionPK: Option; Code2PK: Code[20]; Line2PK: Integer)
+    internal procedure DeleteAttributeOwnerRecord(TableID: Integer; CodePK: Code[20]; LinePK: Integer; OptionPK: Option; Code2PK: Code[20]; Line2PK: Integer)
     var
         AttributeKey: Record "NPR Attribute Key";
     begin
@@ -542,7 +542,7 @@
             AttributeKey.DeleteAll();
     end;
 
-    procedure RenameAttributeOwnerRecord(TableID: Integer; CodePK: Code[20]; LinePK: Integer; OptionPK: Option; Code2PK: Code[20]; Line2PK: Integer; xCodePK: Code[20]; xLinePK: Integer; xOptionPK: Option; xCode2PK: Code[20]; xLine2PK: Integer)
+    internal procedure RenameAttributeOwnerRecord(TableID: Integer; CodePK: Code[20]; LinePK: Integer; OptionPK: Option; Code2PK: Code[20]; Line2PK: Integer; xCodePK: Code[20]; xLinePK: Integer; xOptionPK: Option; xCode2PK: Code[20]; xLine2PK: Integer)
     var
         AttributeKey: Record "NPR Attribute Key";
         AttributeKeyNew: Record "NPR Attribute Key";
@@ -1012,7 +1012,7 @@
         exit(vAttributeID.FindFirst());
     end;
 
-    procedure GetAttributeKey(TableID: Integer; "MDR Code PK": Code[20]; "MDR Line PK": Integer; "MDR Option PK": Option; "MDR Code 2 PK": Code[20]; "MDR Line 2 PK": Integer; var vAttributeKey: Record "NPR Attribute Key"; WithInsert: Boolean) bOK: Boolean
+    internal procedure GetAttributeKey(TableID: Integer; "MDR Code PK": Code[20]; "MDR Line PK": Integer; "MDR Option PK": Option; "MDR Code 2 PK": Code[20]; "MDR Line 2 PK": Integer; var vAttributeKey: Record "NPR Attribute Key"; WithInsert: Boolean) bOK: Boolean
     begin
 
         vAttributeKey.SetCurrentKey("Table ID", "MDR Code PK");
@@ -1086,7 +1086,7 @@
         exit(true);
     end;
 
-    procedure FillValueArray(var TextArray: array[40] of Text[250]; SetID: Integer; TableID: Integer)
+    internal procedure FillValueArray(var TextArray: array[40] of Text[250]; SetID: Integer; TableID: Integer)
     var
         AttributeValueSet: Record "NPR Attribute Value Set";
         Attribute: Record "NPR Attribute";
@@ -1112,7 +1112,7 @@
         end;
     end;
 
-    procedure GetTextValue(Attribute: Record "NPR Attribute"; AttributeValueSet: Record "NPR Attribute Value Set") TextValue: Text[250]
+    internal procedure GetTextValue(Attribute: Record "NPR Attribute"; AttributeValueSet: Record "NPR Attribute Value Set") TextValue: Text[250]
     var
         AttributeCodeValue: Record "NPR Attribute Lookup Value";
         myInt: BigInteger;
@@ -1146,7 +1146,7 @@
         end;
     end;
 
-    procedure FormatToText(FormatOption: Option; AttributeValue: Variant) TextValue: Text[250]
+    internal procedure FormatToText(FormatOption: Option; AttributeValue: Variant) TextValue: Text[250]
     var
         Attribute: Record "NPR Attribute";
     begin
@@ -1174,7 +1174,7 @@
         exit(true);
     end;
 
-    procedure IGGetAttributeValue("Record": Variant; AttributeCode: Code[20]; Silent: Boolean) AttributeTextValue: Text
+    internal procedure IGGetAttributeValue("Record": Variant; AttributeCode: Code[20]; Silent: Boolean) AttributeTextValue: Text
     var
         RecRef: RecordRef;
         NPRAttribute: Record "NPR Attribute";
@@ -1240,7 +1240,7 @@
         exit(AttributeTextValue);
     end;
 
-    procedure IGSetAttributeValue("Record": Variant; AttributeCode: Code[20]; AttributeValue: Text[250])
+    internal procedure IGSetAttributeValue("Record": Variant; AttributeCode: Code[20]; AttributeValue: Text[250])
     var
         RecRef: RecordRef;
         NPRAttribute: Record "NPR Attribute";
@@ -1292,7 +1292,7 @@
         SetAttributeValue(NPRAttributeKey."Attribute Set ID", NPRAttribute.Code, AttributeValue, NPRAttributeValueSet);
     end;
 
-    procedure OnPageLookUp(TableID: Integer; AttributeReference: Integer; PKCode: Code[20]; var Value: Text[250])
+    internal procedure OnPageLookUp(TableID: Integer; AttributeReference: Integer; PKCode: Code[20]; var Value: Text[250])
     var
         Attribute: Record "NPR Attribute";
         AttributeID: Record "NPR Attribute ID";
@@ -1341,7 +1341,7 @@
         end;
     end;
 
-    procedure MakeText(VAR Text: Text[250]): Integer;
+    internal procedure MakeText(VAR Text: Text[250]): Integer;
     VAR
         StandardText: Record "Standard Text";
         PartOfText: Text[132];
@@ -1383,7 +1383,7 @@
         exit(true);
     end;
 
-    procedure MakeDateText(VAR DateText: Text[250]): Integer;
+    internal procedure MakeDateText(VAR DateText: Text[250]): Integer;
     VAR
         Date: Date;
         PartOfText: Text;
@@ -1424,7 +1424,7 @@
         exit(true);
     END;
 
-    PROCEDURE MakeDateTimeText(VAR DateTimeText: Text[250]): Integer;
+    internal PROCEDURE MakeDateTimeText(VAR DateTimeText: Text[250]): Integer;
     VAR
         Date: Date;
         Time: Time;
@@ -1439,7 +1439,7 @@
         exit(0);
     END;
 
-    PROCEDURE GetSeparateDateTime(DateTimeText: Text; VAR Date: Date; VAR Time: Time): Boolean;
+    internal PROCEDURE GetSeparateDateTime(DateTimeText: Text; VAR Date: Date; VAR Time: Time): Boolean;
     VAR
         DateText: Text[250];
         TimeText: Text;
@@ -1477,7 +1477,7 @@
             Position := Position + 1;
     END;
 
-    PROCEDURE MakeTimeText(VAR TimeText: Text): Integer;
+    internal PROCEDURE MakeTimeText(VAR TimeText: Text): Integer;
     VAR
         PartOfText: Text;
         Position: Integer;

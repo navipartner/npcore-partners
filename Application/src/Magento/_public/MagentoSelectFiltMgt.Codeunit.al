@@ -58,7 +58,7 @@
         end;
     end;
 
-    procedure GetSelectionFilterForItemGroup(var MagentoItemGroup: Record "NPR Magento Category"): Text
+    internal procedure GetSelectionFilterForItemGroup(var MagentoItemGroup: Record "NPR Magento Category"): Text
     var
         RecRef: RecordRef;
     begin
@@ -66,7 +66,7 @@
         exit(GetSelectionFilter(RecRef, MagentoItemGroup.FieldNo(Id)));
     end;
 
-    procedure GetSelectionFilterForBrand(var MagentoBrand: Record "NPR Magento Brand"): Text
+    internal procedure GetSelectionFilterForBrand(var MagentoBrand: Record "NPR Magento Brand"): Text
     var
         RecRef: RecordRef;
     begin

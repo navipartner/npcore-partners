@@ -88,12 +88,12 @@
         DecimalRounding: Option "2","3","4","5";
         Error_BoundsCheck: Label 'Number of prints too high: %1. Split into several requests';
 
-    procedure AddTextField(X: Integer; Y: Integer; Align: Integer; Text: Text)
+    internal procedure AddTextField(X: Integer; Y: Integer; Align: Integer; Text: Text)
     begin
         UpdateField(X, Y, 0, Align, 0, 0, '', CopyStr(Text, 1, 100));
     end;
 
-    procedure AddDecimalField(X: Integer; Y: Integer; Align: Integer; Decimal: Decimal)
+    internal procedure AddDecimalField(X: Integer; Y: Integer; Align: Integer; Decimal: Decimal)
     begin
         case DecimalRounding of
             DecimalRounding::"2":
@@ -107,51 +107,51 @@
         end;
     end;
 
-    procedure AddDateField(X: Integer; Y: Integer; Align: Integer; Date: Date)
+    internal procedure AddDateField(X: Integer; Y: Integer; Align: Integer; Date: Date)
     begin
         UpdateField(X, Y, 0, Align, 0, 0, '', Format(Date, 0));
     end;
 
-    procedure AddBarcode(BarcodeType: Text[30]; BarcodeValue: Text[30]; BarcodeWidth: Integer; Align: Integer)
+    internal procedure AddBarcode(BarcodeType: Text[30]; BarcodeValue: Text[30]; BarcodeWidth: Integer; Align: Integer)
     begin
         UpdateField(1, 0, BarcodeWidth, Align, 0, 0, BarcodeType, BarcodeValue);
     end;
 
-    procedure NewLine()
+    internal procedure NewLine()
     begin
         CurrentLineNo += 1;
     end;
 
-    procedure "// Global Style Modifiers"()
+    internal procedure "// Global Style Modifiers"()
     begin
     end;
 
-    procedure SetFont(FontName: Text[30])
+    internal procedure SetFont(FontName: Text[30])
     begin
         CurrentFont := FontName;
     end;
 
-    procedure SetBold(Bold: Boolean)
+    internal procedure SetBold(Bold: Boolean)
     begin
         CurrentBold := Bold;
     end;
 
-    procedure SetUnderLine(UnderLine: Boolean)
+    internal procedure SetUnderLine(UnderLine: Boolean)
     begin
         CurrentUnderLine := UnderLine;
     end;
 
-    procedure SetDoubleStrike(DoubleStrike: Boolean)
+    internal procedure SetDoubleStrike(DoubleStrike: Boolean)
     begin
         CurrentDoubleStrike := DoubleStrike;
     end;
 
-    procedure SetDecimalRounding(DecimalRoundingIn: Option "2","3","4","5")
+    internal procedure SetDecimalRounding(DecimalRoundingIn: Option "2","3","4","5")
     begin
         DecimalRounding := DecimalRoundingIn;
     end;
 
-    procedure "// Global Print Functions"()
+    internal procedure "// Global Print Functions"()
     begin
     end;
 
@@ -195,19 +195,19 @@
             CODEUNIT.Run(RPTemplateHeader."Post Processing Codeunit", Variant);
     end;
 
-    procedure ProcessBufferForCodeunit(CodeunitID: Integer; NoOfPrints: Integer)
+    internal procedure ProcessBufferForCodeunit(CodeunitID: Integer; NoOfPrints: Integer)
     begin
         PrintBuffer('', CodeunitID, 0, NoOfPrints);
         TempGlobalBuffer.DeleteAll();
     end;
 
-    procedure ProcessBufferForReport(ReportID: Integer; NoOfPrints: Integer)
+    internal procedure ProcessBufferForReport(ReportID: Integer; NoOfPrints: Integer)
     begin
         PrintBuffer('', 0, ReportID, NoOfPrints);
         TempGlobalBuffer.DeleteAll();
     end;
 
-    procedure SetPrintIterationFieldNo(FieldNo: Integer)
+    internal procedure SetPrintIterationFieldNo(FieldNo: Integer)
     begin
         PrintIterationFieldNo := FieldNo;
     end;

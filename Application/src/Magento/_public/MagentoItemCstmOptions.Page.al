@@ -135,17 +135,17 @@
         ItemCustomOption.Insert(true);
     end;
 
-    procedure SetItemNo(NewItemNo: Code[20])
+    internal procedure SetItemNo(NewItemNo: Code[20])
     begin
         ItemNo := NewItemNo;
     end;
 
-    procedure SetEnabledFilter()
+    internal procedure SetEnabledFilter()
     begin
         Rec.SetRange(Enabled, true);
     end;
 
-    procedure SetSourceTable()
+    internal procedure SetSourceTable()
     var
         CustomOption: Record "NPR Magento Custom Option";
         Item: Record Item;

@@ -7,7 +7,7 @@
         OpenPOSUnit(Rec);
     end;
 
-    procedure OpenPosUnitNo(POSUnitNo: Code[10]): Boolean
+    internal procedure OpenPosUnitNo(POSUnitNo: Code[10]): Boolean
     var
         POSUnit: Record "NPR POS Unit";
     begin
@@ -17,7 +17,7 @@
         exit(POSUnit.Status = POSUnit.Status::OPEN);
     end;
 
-    procedure OpenPosUnitNoWithPeriodEntryNo(POSUnitNo: Code[10]; OpeningEntryNo: Integer)
+    internal procedure OpenPosUnitNoWithPeriodEntryNo(POSUnitNo: Code[10]; OpeningEntryNo: Integer)
     var
         POSUnit: Record "NPR POS Unit";
     begin
@@ -67,7 +67,7 @@
         POSPeriodRegister.Insert(true);
     end;
 
-    procedure ReOpenLastPeriodRegister(POSUnitNo: Code[10])
+    internal procedure ReOpenLastPeriodRegister(POSUnitNo: Code[10])
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSUnit: Record "NPR POS Unit";
@@ -152,7 +152,7 @@
         end;
     end;
 
-    procedure SetEndOfDayPOSUnitNo(POSUnitNo: Code[10]): Boolean
+    internal procedure SetEndOfDayPOSUnitNo(POSUnitNo: Code[10]): Boolean
     var
         POSUnit: Record "NPR POS Unit";
     begin
@@ -162,7 +162,7 @@
         exit(POSUnit.Status = POSUnit.Status::EOD);
     end;
 
-    procedure SetEndOfDayPOSUnit(var POSUnit: Record "NPR POS Unit")
+    internal procedure SetEndOfDayPOSUnit(var POSUnit: Record "NPR POS Unit")
     begin
         if (POSUnit."No." = '') then
             exit;

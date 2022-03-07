@@ -142,7 +142,7 @@
     end;
 
     [TryFunction]
-    procedure TryDownloadPicture(PictureUrl: Text; var Stream: InStream)
+    internal procedure TryDownloadPicture(PictureUrl: Text; var Stream: InStream)
     var
         WebClient: HttpClient;
         Response: HttpResponseMessage;
@@ -155,7 +155,7 @@
     end;
 
     [TryFunction]
-    procedure TryCheckPicture()
+    internal procedure TryCheckPicture()
     var
         Client: HttpClient;
         Request: HttpRequestMessage;
@@ -170,7 +170,7 @@
             Error(ErrorCannotAccesUrl, PictureUrl, Response.HttpStatusCode);
     end;
 
-    procedure GetBase64() Base64: Text
+    internal procedure GetBase64() Base64: Text
     var
         TempBlob: Codeunit "Temp Blob";
         Base64Convert: Codeunit "Base64 Convert";
@@ -186,7 +186,7 @@
         Base64 := Base64Convert.ToBase64(InStr);
     end;
 
-    procedure GetMagentoType(): Text
+    internal procedure GetMagentoType(): Text
     begin
         case Type of
             Type::Item:
@@ -202,7 +202,7 @@
         exit('');
     end;
 
-    procedure GetMagentoUrl() MagentoUrl: Text
+    internal procedure GetMagentoUrl() MagentoUrl: Text
     var
         Handled: Boolean;
     begin
@@ -220,7 +220,7 @@
         exit(MagentoUrl);
     end;
 
-    procedure TestPictureSize()
+    internal procedure TestPictureSize()
     begin
         if "Size (kb)" <= 0 then
             exit;

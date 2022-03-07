@@ -22,7 +22,7 @@
         POSEntryLbl: Label 'Salesticket';
         EMailSalesReceiptLbl: Label 'E-mail Sales Receipt';
 
-    procedure RunEmailLog(RecVariant: Variant)
+    internal procedure RunEmailLog(RecVariant: Variant)
     var
         RecRef: RecordRef;
     begin
@@ -310,7 +310,7 @@
         REPORT.RunModal(REPORT::"NPR Statement E-Mail", false, false, Customer2);
     end;
 
-    procedure CreateEmailTemplates() NewEmailTemplateCount: Integer
+    internal procedure CreateEmailTemplates() NewEmailTemplateCount: Integer
     var
         TempField: Record "Field" temporary;
         i: Integer;
@@ -427,7 +427,7 @@
         exit(NewEmailTemplateCount);
     end;
 
-    procedure CreateEmailTemplate(TemplateType: Integer) NewEmailTemplateCode: Code[20]
+    internal procedure CreateEmailTemplate(TemplateType: Integer) NewEmailTemplateCode: Code[20]
     var
         EmailSetup: Record "NPR E-mail Setup";
         EmailTemplate: Record "NPR E-mail Template Header";
@@ -697,102 +697,102 @@
         exit(EmailTemplate.Code);
     end;
 
-    procedure "TemplateType.SalesQuote"(): Integer
+    internal procedure "TemplateType.SalesQuote"(): Integer
     begin
         exit(0);
     end;
 
-    procedure "TemplateType.SalesOrder"(): Integer
+    internal procedure "TemplateType.SalesOrder"(): Integer
     begin
         exit(1);
     end;
 
-    procedure "TemplateType.SalesShpt"(): Integer
+    internal procedure "TemplateType.SalesShpt"(): Integer
     begin
         exit(2);
     end;
 
-    procedure "TemplateType.SalesInv"(): Integer
+    internal procedure "TemplateType.SalesInv"(): Integer
     begin
         exit(3);
     end;
 
-    procedure "TemplateType.SalesCrMemo"(): Integer
+    internal procedure "TemplateType.SalesCrMemo"(): Integer
     begin
         exit(4);
     end;
 
-    procedure "TemplateType.PurchQuote"(): Integer
+    internal procedure "TemplateType.PurchQuote"(): Integer
     begin
         exit(5);
     end;
 
-    procedure "TemplateType.PurchOrder"(): Integer
+    internal procedure "TemplateType.PurchOrder"(): Integer
     begin
         exit(6);
     end;
 
-    procedure "TemplateType.PurchRcpt"(): Integer
+    internal procedure "TemplateType.PurchRcpt"(): Integer
     begin
         exit(7);
     end;
 
-    procedure "TemplateType.PurchInv"(): Integer
+    internal procedure "TemplateType.PurchInv"(): Integer
     begin
         exit(8);
     end;
 
-    procedure "TemplateType.PurchCrMemo"(): Integer
+    internal procedure "TemplateType.PurchCrMemo"(): Integer
     begin
         exit(9);
     end;
 
-    procedure "TemplateType.Reminder"(): Integer
+    internal procedure "TemplateType.Reminder"(): Integer
     begin
         exit(10);
     end;
 
-    procedure "TemplateType.ChargeMemo"(): Integer
+    internal procedure "TemplateType.ChargeMemo"(): Integer
     begin
         exit(11);
     end;
 
-    procedure "TemplateType.Statement"(): Integer
+    internal procedure "TemplateType.Statement"(): Integer
     begin
         exit(12);
     end;
 
-    procedure "TemplateType.ServQuote"(): Integer
+    internal procedure "TemplateType.ServQuote"(): Integer
     begin
         exit(13);
     end;
 
-    procedure "TemplateType.ServOrder"(): Integer
+    internal procedure "TemplateType.ServOrder"(): Integer
     begin
         exit(14);
     end;
 
-    procedure "TemplateType.ServShpt"(): Integer
+    internal procedure "TemplateType.ServShpt"(): Integer
     begin
         exit(15);
     end;
 
-    procedure "TemplateType.ServInv"(): Integer
+    internal procedure "TemplateType.ServInv"(): Integer
     begin
         exit(16);
     end;
 
-    procedure "TemplateType.POSEntry"(): Integer
+    internal procedure "TemplateType.POSEntry"(): Integer
     begin
         exit(17);
     end;
 
-    procedure "TemplateType.CreditVoucher"(): Integer
+    internal procedure "TemplateType.CreditVoucher"(): Integer
     begin
         exit(18);
     end;
 
-    procedure "TemplateType.GiftVoucher"(): Integer
+    internal procedure "TemplateType.GiftVoucher"(): Integer
     begin
         exit(19);
     end;
@@ -813,7 +813,7 @@
         exit(NewTemplateCode);
     end;
 
-    procedure GetMailReceipients(RecRef: RecordRef; ReportID: Integer): Text[250]
+    internal procedure GetMailReceipients(RecRef: RecordRef; ReportID: Integer): Text[250]
     var
         MailReceipients: Text[250];
     begin

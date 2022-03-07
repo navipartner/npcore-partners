@@ -9,7 +9,7 @@
         VoucherNotFoundErr: Label 'A voucher with reference no. "%1" could not be found', Comment = '%1 = Retail voucher number';
         VoucherInUseErr: Label 'The voucher is already in use.';
 
-    procedure SelectVoucherType(var NpRvVoucherType: Record "NPR NpRv Voucher Type"): Boolean
+    internal procedure SelectVoucherType(var NpRvVoucherType: Record "NPR NpRv Voucher Type"): Boolean
     var
         TempNpRvVoucherType: Record "NPR NpRv Voucher Type" temporary;
     begin
@@ -27,7 +27,7 @@
         exit(NpRvVoucherType.Get(TempNpRvVoucherType.Code));
     end;
 
-    procedure IssueVoucher(SalesHeader: Record "Sales Header"; NpRvVoucherType: Record "NPR NpRv Voucher Type") VoucherNo: Text
+    internal procedure IssueVoucher(SalesHeader: Record "Sales Header"; NpRvVoucherType: Record "NPR NpRv Voucher Type") VoucherNo: Text
     var
         SalesLine: Record "Sales Line";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -260,7 +260,7 @@
             until NpRvSalesLine.Next() = 0;
     end;
 
-    procedure InsertVoucherPaymentReturn(SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    internal procedure InsertVoucherPaymentReturn(SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
@@ -657,7 +657,7 @@
             until NpRvSalesLine.Next() = 0;
     end;
 
-    procedure IssueVoucherAction(SalesHeader: Record "Sales Header")
+    internal procedure IssueVoucherAction(SalesHeader: Record "Sales Header")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         VoucherNo: Text;
@@ -670,7 +670,7 @@
         Message(Text004, VoucherNo);
     end;
 
-    procedure RedeemVoucherAction(SalesHeader: Record "Sales Header")
+    internal procedure RedeemVoucherAction(SalesHeader: Record "Sales Header")
     var
         ReferenceNo: Text;
         DialogBox: Page "NPR Input Dialog";
@@ -764,7 +764,7 @@
         ApplyPayment(SalesHeader, NpRvSalesLine);
     end;
 
-    procedure ShowRelatedVouchersAction(SalesHeader: Record "Sales Header")
+    internal procedure ShowRelatedVouchersAction(SalesHeader: Record "Sales Header")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
     begin
@@ -815,7 +815,7 @@
             Error(NotSupportedErr);
     end;
 
-    procedure SendVoucher(NpRvVoucher: Record "NPR NpRv Voucher")
+    internal procedure SendVoucher(NpRvVoucher: Record "NPR NpRv Voucher")
     var
         LastErrorText: Text;
     begin

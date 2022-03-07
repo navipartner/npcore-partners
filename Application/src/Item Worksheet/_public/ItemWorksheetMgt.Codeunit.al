@@ -17,7 +17,7 @@
         UpdatingHeaderslbl: Label 'Updating Headers  @1@@@@@@@@@@@';
         OverwriteGeneralQst: Label 'Would you like to overwrite the general settings with the default settings? ';
 
-    procedure TemplateSelection(FormID: Integer; var ItemWorksheetLine: Record "NPR Item Worksheet Line"; var JnlSelected: Boolean)
+    internal procedure TemplateSelection(FormID: Integer; var ItemWorksheetLine: Record "NPR Item Worksheet Line"; var JnlSelected: Boolean)
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
     begin
@@ -64,7 +64,7 @@
         PAGE.Run(PAGE::"NPR Item Worksheet Page", ItemWorksheetLine);
     end;
 
-    procedure OpenJnl(var CurrentJnlBatchName: Code[10]; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure OpenJnl(var CurrentJnlBatchName: Code[10]; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     begin
         CheckTemplateName(ItemWorksheetLine.GetRangeMax("Worksheet Template Name"), CurrentJnlBatchName);
         ItemWorksheetLine.FilterGroup := 2;
@@ -72,7 +72,7 @@
         ItemWorksheetLine.FilterGroup := 0;
     end;
 
-    procedure OpenJnlBatch(var ItemWorksheet: Record "NPR Item Worksheet")
+    internal procedure OpenJnlBatch(var ItemWorksheet: Record "NPR Item Worksheet")
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
@@ -111,7 +111,7 @@
         ItemWorksheet.FilterGroup(2);
     end;
 
-    procedure CheckTemplateName(CurrentJnlTemplateName: Code[10]; var CurrentJnlName: Code[10])
+    internal procedure CheckTemplateName(CurrentJnlTemplateName: Code[10]; var CurrentJnlName: Code[10])
     var
         ItemWorksheet: Record "NPR Item Worksheet";
     begin
@@ -130,14 +130,14 @@
         end;
     end;
 
-    procedure CheckName(CurrentJnlBatchName: Code[10]; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure CheckName(CurrentJnlBatchName: Code[10]; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         ItemWorksheet: Record "NPR Item Worksheet";
     begin
         ItemWorksheet.Get(ItemWorksheetLine.GetRangeMax("Worksheet Template Name"), CurrentJnlBatchName);
     end;
 
-    procedure SetName(CurrentJnlBatchName: Code[10]; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure SetName(CurrentJnlBatchName: Code[10]; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     begin
         ItemWorksheetLine.FilterGroup := 2;
         ItemWorksheetLine.SetRange("Worksheet Name", CurrentJnlBatchName);
@@ -145,7 +145,7 @@
         if ItemWorksheetLine.FindFirst() then;
     end;
 
-    procedure LookupName(var CurrentJnlBatchName: Code[10]; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure LookupName(var CurrentJnlBatchName: Code[10]; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         ItemWorksheet: Record "NPR Item Worksheet";
     begin
@@ -161,7 +161,7 @@
         end;
     end;
 
-    procedure PrintItemWizLine(var NewItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure PrintItemWizLine(var NewItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
@@ -172,13 +172,13 @@
         ItemWorksheetTemplate.Get(ItemWorksheetLine."Worksheet Template Name");
     end;
 
-    procedure OnCloseForm(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure OnCloseForm(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     begin
         if ItemWorksheetLine.IsEmpty() then
             exit;
     end;
 
-    procedure CombineLines(ItemWorksheet: Record "NPR Item Worksheet")
+    internal procedure CombineLines(ItemWorksheet: Record "NPR Item Worksheet")
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
@@ -226,7 +226,7 @@
             Window.Close();
     end;
 
-    procedure CombineLine(ItemWorksheetLine: Record "NPR Item Worksheet Line"; CombineBy: Option All,ItemNo,VendorItemNo,VendorBarCode,InternalBarCode)
+    internal procedure CombineLine(ItemWorksheetLine: Record "NPR Item Worksheet Line"; CombineBy: Option All,ItemNo,VendorItemNo,VendorBarCode,InternalBarCode)
     var
         ItemVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemVariantLine2: Record "NPR Item Worksh. Variant Line";
@@ -344,7 +344,7 @@
         ItemWorksheetLine2.DeleteAll(true);
     end;
 
-    procedure InitializeMissingSetup(TableNo: Integer)
+    internal procedure InitializeMissingSetup(TableNo: Integer)
     var
         AllObj: Record AllObj;
         FieldRecord: Record "Field";
@@ -422,7 +422,7 @@
         end;
     end;
 
-    procedure CreateMissingSetup()
+    internal procedure CreateMissingSetup()
     var
         MissingSetupRecord: Record "NPR Missing Setup Record";
         MissingSetupTable: Record "NPR Missing Setup Table";
@@ -447,7 +447,7 @@
             until MissingSetupTable.Next() = 0;
     end;
 
-    procedure SetDefaultFieldSetupLines(ItemWorksheetLine: Record "NPR Item Worksheet Line"; SetLevel: Option All,Template,Worksheet)
+    internal procedure SetDefaultFieldSetupLines(ItemWorksheetLine: Record "NPR Item Worksheet Line"; SetLevel: Option All,Template,Worksheet)
     var
         ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
     begin
@@ -492,7 +492,7 @@
         end;
     end;
 
-    procedure InsertInitialSetupLines(ItemWorksheetLine: Record "NPR Item Worksheet Line"; SetLevel: Option All,Template,Worksheet)
+    internal procedure InsertInitialSetupLines(ItemWorksheetLine: Record "NPR Item Worksheet Line"; SetLevel: Option All,Template,Worksheet)
     var
         ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
         ItemRecRef: RecordRef;
@@ -587,7 +587,7 @@
             exit(false);
     end;
 
-    procedure IsDoNotMapField(TableNumber: Integer; FieldNumber: Integer): Boolean
+    internal procedure IsDoNotMapField(TableNumber: Integer; FieldNumber: Integer): Boolean
     var
         Item: Record Item;
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
@@ -636,7 +636,7 @@
         exit(false);
     end;
 
-    procedure CreateLookupFilter(TableNumber: Integer) FilterText: Text
+    internal procedure CreateLookupFilter(TableNumber: Integer) FilterText: Text
     var
         FieldRec: Record "Field";
     begin
@@ -654,7 +654,7 @@
             until FieldRec.Next() = 0;
     end;
 
-    procedure CopySetupLines(ItemWorksheetLine: Record "NPR Item Worksheet Line"; SetLevel: Option All,Template,Worksheet)
+    internal procedure CopySetupLines(ItemWorksheetLine: Record "NPR Item Worksheet Line"; SetLevel: Option All,Template,Worksheet)
     var
         ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
         NewItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
@@ -713,7 +713,7 @@
             end;
     end;
 
-    procedure AddMappedFieldsToExcel(ItemWorksheetTemplate: Code[10]; ItemWorksheetName: Code[10])
+    internal procedure AddMappedFieldsToExcel(ItemWorksheetTemplate: Code[10]; ItemWorksheetName: Code[10])
     var
         ItemWorksheetExcelColumn: Record "NPR Item Worksh. Excel Column";
         ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";

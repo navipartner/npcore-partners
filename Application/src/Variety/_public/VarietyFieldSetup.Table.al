@@ -513,7 +513,7 @@
         if VRTFieldsSetup.Insert() then;
     end;
 
-    procedure UpdateToLatestVersion()
+    internal procedure UpdateToLatestVersion()
     var
         VRTFieldsSetup: Record "NPR Variety Field Setup";
     begin

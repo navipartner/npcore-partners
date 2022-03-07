@@ -94,7 +94,7 @@
         TMPVRTBuffer.Modify();
     end;
 
-    procedure SetupSalesLine(var MasterSalesLine: Record "Sales Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
+    internal procedure SetupSalesLine(var MasterSalesLine: Record "Sales Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewSalesLine: Record "Sales Line";
         SalesLine2: Record "Sales Line";
@@ -134,7 +134,7 @@
         exit(Format(RecRef.RecordId));
     end;
 
-    procedure SetupPurchLine(var MasterPurchLine: Record "Purchase Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
+    internal procedure SetupPurchLine(var MasterPurchLine: Record "Purchase Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewPurchLine: Record "Purchase Line";
         PurchLine2: Record "Purchase Line";
@@ -216,7 +216,7 @@
         VRTBuffer."Variant Code" := ItemVariant.Code;
     end;
 
-    procedure SetupPriceListLine(var MasterPriceListLine: Record "Price List Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
+    internal procedure SetupPriceListLine(var MasterPriceListLine: Record "Price List Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewPriceListLine: Record "Price List Line";
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
@@ -234,7 +234,7 @@
 
     end;
 
-    procedure SetupRetailJournalLine(var MasterRetailJournalLine: Record "NPR Retail Journal Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
+    internal procedure SetupRetailJournalLine(var MasterRetailJournalLine: Record "NPR Retail Journal Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewRetailJournalLine: Record "NPR Retail Journal Line";
         RetailJournalLine2: Record "NPR Retail Journal Line";
@@ -270,7 +270,7 @@
         exit(Format(RecRef.RecordId));
     end;
 
-    procedure SetupItemReplenishment(var MasterItemReplenishment: Record "NPR Item Repl. by Store"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
+    internal procedure SetupItemReplenishment(var MasterItemReplenishment: Record "NPR Item Repl. by Store"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewItemReplenishment: Record "NPR Item Repl. by Store";
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
@@ -287,7 +287,7 @@
         exit(Format(RecRef.RecordId));
     end;
 
-    procedure SetupItemJnlLine(var MasterItemJnlLine: Record "Item Journal Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
+    internal procedure SetupItemJnlLine(var MasterItemJnlLine: Record "Item Journal Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewItemJnlLine: Record "Item Journal Line";
         ItemJnlLine2: Record "Item Journal Line";
@@ -367,7 +367,7 @@
         exit(LineNo);
     end;
 
-    procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]) NewVariantCode: Code[10]
+    internal procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]) NewVariantCode: Code[10]
     var
         VarietySetup: Record "NPR Variety Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -382,7 +382,7 @@
         exit(CopyStr(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true), 1, MaxStrLen(NewVariantCode)));
     end;
 
-    procedure FillDescription(var ItemVariant: Record "Item Variant"; Item: Record Item)
+    internal procedure FillDescription(var ItemVariant: Record "Item Variant"; Item: Record Item)
     var
         TempDesc: Text[250];
     begin
@@ -422,7 +422,7 @@
 
     end;
 
-    procedure GetVarietyDesc(Variety: Code[20]; VarietyTable: Code[40]; VarietyValue: Code[50]; var TempDesc: Text[250])
+    internal procedure GetVarietyDesc(Variety: Code[20]; VarietyTable: Code[40]; VarietyValue: Code[50]; var TempDesc: Text[250])
     var
         VRTTable: Record "NPR Variety Table";
         VRTValue: Record "NPR Variety Value";
@@ -448,7 +448,7 @@
         end;
     end;
 
-    procedure InsertDefaultBarcode(ItemNo: Code[20]; VariantCode: Code[10]; CalledFromInsert: Boolean)
+    internal procedure InsertDefaultBarcode(ItemNo: Code[20]; VariantCode: Code[10]; CalledFromInsert: Boolean)
     var
         SkipCreateDefaultBarcode: Boolean;
         Handled: Boolean;
@@ -469,7 +469,7 @@
         end;
     end;
 
-    procedure AddItemRef(ItemNo: Code[20]; VariantCode: Code[10])
+    internal procedure AddItemRef(ItemNo: Code[20]; VariantCode: Code[10])
     var
         NextCode: Code[20];
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -493,7 +493,7 @@
         end;
     end;
 
-    procedure InsertItemRef(ItemNo: Code[20]; VariantCode: Code[10]; Barcode: Code[20]; CrossRefType: Enum "Item Reference Type"; CrossRefTypeNo: Code[20])
+    internal procedure InsertItemRef(ItemNo: Code[20]; VariantCode: Code[10]; Barcode: Code[20]; CrossRefType: Enum "Item Reference Type"; CrossRefTypeNo: Code[20])
     var
         Item: Record Item;
         ItemRef: Record "Item Reference";
@@ -531,7 +531,7 @@
             ItemRef.Insert(true);
     end;
 
-    procedure CreateBarcodeEAN13(RefNo: Code[20]) Barcode: Code[13]
+    internal procedure CreateBarcodeEAN13(RefNo: Code[20]) Barcode: Code[13]
     begin
         if StrLen(RefNo) <> 12 then
             Error(Text001, 12);
@@ -539,7 +539,7 @@
         exit(CopyStr(RefNo + Format(StrCheckSum(RefNo, '131313131313')), 1, MaxStrLen(Barcode)));
     end;
 
-    procedure CreateBarcodeEAN8(RefNo: Code[20]) Barcode: Code[13]
+    internal procedure CreateBarcodeEAN8(RefNo: Code[20]) Barcode: Code[13]
     begin
         if StrLen(RefNo) <> 7 then
             Error(Text001, 7);
@@ -547,7 +547,7 @@
         exit(CopyStr(RefNo + Format(StrCheckSum(RefNo, '3131313')), 1, MaxStrLen(Barcode)));
     end;
 
-    procedure GetVRTSetup(): Boolean
+    internal procedure GetVRTSetup(): Boolean
     begin
         if VRTSetupFetched then
             exit(true);
@@ -556,7 +556,7 @@
         exit(VRTSetupFetched);
     end;
 
-    procedure CreateEAN13BarcodeNoSeries(IsInternal: Boolean)
+    internal procedure CreateEAN13BarcodeNoSeries(IsInternal: Boolean)
     var
         Prefix: Code[20];
         CompNo: Code[20];
@@ -722,7 +722,7 @@
         end;
     end;
 
-    procedure ShowEAN13BarcodeNoSetup()
+    internal procedure ShowEAN13BarcodeNoSetup()
     var
         VarietySetup: Record "NPR Variety Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -762,7 +762,7 @@
         );
     end;
 
-    procedure AssignCustomBarcode(ItemNo: Code[20])
+    internal procedure AssignCustomBarcode(ItemNo: Code[20])
     var
         InputBarcode: Page "NPR Variety Input Barcode";
         ReferenceNo: Code[50];
@@ -776,7 +776,7 @@
         InsertItemRef(ItemNo, '', CopyStr(ReferenceNo, 1, 20), Enum::"Item Reference Type"::"Bar Code", '');
     end;
 
-    procedure AssignBarcodes(Item: Record Item)
+    internal procedure AssignBarcodes(Item: Record Item)
     var
         ItemVar: Record "Item Variant";
         ItemRef: Record "Item Reference";
@@ -805,7 +805,7 @@
         end;
     end;
 
-    procedure UpdateVariantDescriptions()
+    internal procedure UpdateVariantDescriptions()
     var
         ItemVariant: Record "Item Variant";
         NoOfRecords: Integer;
@@ -839,7 +839,7 @@
             Dia.Close();
     end;
 
-    procedure UpdateItemRefDescription()
+    internal procedure UpdateItemRefDescription()
     var
         ItemRef: Record "Item Reference";
         NoOfRecords: Integer;
@@ -896,7 +896,7 @@
     end;
 
 
-    procedure SetupTransferLine(var MasterTransferLine: Record "Transfer Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
+    internal procedure SetupTransferLine(var MasterTransferLine: Record "Transfer Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewTransferLine: Record "Transfer Line";
         TransferLine2: Record "Transfer Line";
@@ -983,7 +983,7 @@
         NewVariantCode := CopyStr(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true), 1, MaxStrLen(NewVariantCode));
     end;
 
-    procedure GetUnitOfMeasure(ItemNo: Code[20]; ReturnType: Integer): Code[10]
+    internal procedure GetUnitOfMeasure(ItemNo: Code[20]; ReturnType: Integer): Code[10]
     var
         Item: Record Item;
     begin

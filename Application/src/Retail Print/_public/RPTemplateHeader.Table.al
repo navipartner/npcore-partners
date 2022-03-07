@@ -269,7 +269,7 @@
         Caption_PrintOverwrite: Label 'Specifying a print processing object will bypass the print engine completely!\Do you want to continue?';
         Caption_DeviceSettingsOverwrite: Label 'Changing printer device will delete all stored device settings!\Do you want to continue?';
 
-    procedure TemplateModified()
+    internal procedure TemplateModified()
     begin
         if IsTemporary then
             exit;
@@ -282,7 +282,7 @@
         "Last Modified By" := UserId;
     end;
 
-    procedure ArchiveTemplate()
+    internal procedure ArchiveTemplate()
     var
         RPTemplateHeader: Record "NPR RP Template Header";
         PackageHandler: Codeunit "NPR RP Package Handler";
@@ -324,7 +324,7 @@
         RPTemplateArchive.Insert();
     end;
 
-    procedure LookupDevice()
+    internal procedure LookupDevice()
     var
         LinePrinterInterface: Codeunit "NPR RP Line Printer Interf.";
         MatrixPrinterInterface: Codeunit "NPR RP Matrix Printer Interf.";

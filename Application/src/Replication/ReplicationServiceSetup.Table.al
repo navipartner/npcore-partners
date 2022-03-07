@@ -501,7 +501,7 @@
     end;
 
     [IntegrationEvent(true, false)]
-    procedure OnRegisterService()
+    internal procedure OnRegisterService()
     begin
     end;
 }

@@ -19,7 +19,7 @@
         INLINE_NOTIFICATION: Label 'Sends Inline Member Notifications on End of Sales.';
         REFRESH_NOTIFICATION: Label '';
 
-    procedure HandleBatchNotifications(ReferenceDate: Date)
+    internal procedure HandleBatchNotifications(ReferenceDate: Date)
     var
         MembershipNotification: Record "NPR MM Membership Notific.";
     begin
@@ -43,7 +43,7 @@
         end;
     end;
 
-    procedure HandleMembershipNotification(MembershipNotification: Record "NPR MM Membership Notific.")
+    internal procedure HandleMembershipNotification(MembershipNotification: Record "NPR MM Membership Notific.")
     var
         NotificationStatus: Integer;
     begin
@@ -500,7 +500,7 @@
         exit(ResponseMessage = '');
     end;
 
-    procedure AddMemberWelcomeNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer) NotificationEntryNo: Integer
+    internal procedure AddMemberWelcomeNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer) NotificationEntryNo: Integer
     var
         Membership: Record "NPR MM Membership";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
@@ -543,7 +543,7 @@
         exit(MembershipNotification."Entry No.");
     end;
 
-    procedure RefreshAllMembershipRenewalNotifications(MembershipCode: Code[20])
+    internal procedure RefreshAllMembershipRenewalNotifications(MembershipCode: Code[20])
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -657,7 +657,7 @@
         MembershipNotification.Insert();
     end;
 
-    procedure GenerateNotificationToken() Token: Text[64]
+    internal procedure GenerateNotificationToken() Token: Text[64]
     var
         n: Integer;
     begin
@@ -817,7 +817,7 @@
         exit(TokenStringValue);
     end;
 
-    procedure AssignDataToPassTemplate(var RecRef: RecordRef; Line: Text) NewLine: Text
+    internal procedure AssignDataToPassTemplate(var RecRef: RecordRef; Line: Text) NewLine: Text
     var
         FieldRef: FieldRef;
         EndPos: Integer;
@@ -884,7 +884,7 @@
         exit(NewLine);
     end;
 
-    procedure GetDefaultWalletTemplate() template: Text
+    internal procedure GetDefaultWalletTemplate() template: Text
     var
         CRLF: Text[2];
     begin
@@ -969,7 +969,7 @@
             Url := JToken.AsValue().AsText();
     end;
 
-    procedure MagentoApiPost(ApiUrl: Text; Method: Text; var Body: JsonToken; var Result: JsonToken)
+    internal procedure MagentoApiPost(ApiUrl: Text; Method: Text; var Body: JsonToken; var Result: JsonToken)
     var
         MagentoSetup: Record "NPR Magento Setup";
         WebClient: HttpClient;
@@ -1020,7 +1020,7 @@
     end;
 
     [TryFunction]
-    procedure MagentoApiPost_b2b_customer(Method: Text; var Body: JsonToken; var Result: JsonToken)
+    internal procedure MagentoApiPost_b2b_customer(Method: Text; var Body: JsonToken; var Result: JsonToken)
     var
         MagentoSetup: Record "NPR Magento Setup";
         ApiUrl: Text;
@@ -1039,7 +1039,7 @@
     end;
 
     [TryFunction]
-    procedure MagentoApiPost_Membership(Method: Text; var Body: JsonToken; var Result: JsonToken)
+    internal procedure MagentoApiPost_Membership(Method: Text; var Body: JsonToken; var Result: JsonToken)
     var
         MagentoSetup: Record "NPR Magento Setup";
         ApiUrl: Text;
@@ -1057,7 +1057,7 @@
 
     end;
 
-    procedure GetDefaultM2WelcomeEmailTemplate() Template: Text;
+    internal procedure GetDefaultM2WelcomeEmailTemplate() Template: Text;
     var
         CRLF: Text[2];
     begin
@@ -1079,7 +1079,7 @@
 
     end;
 
-    procedure CreateUpdateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
+    internal procedure CreateUpdateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
     var
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
@@ -1087,7 +1087,7 @@
         exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_UPDATE, MembershipNotification."Notification Method Source"::MEMBER, DateToSendNotification));
     end;
 
-    procedure CreateWalletSendNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
+    internal procedure CreateWalletSendNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
     var
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
@@ -1095,7 +1095,7 @@
         exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_CREATE, MembershipNotification."Notification Method Source"::MEMBER, DateToSendNotification));
     end;
 
-    procedure CreateWalletWithoutSendingNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
+    internal procedure CreateWalletWithoutSendingNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
     var
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipRole: Record "NPR MM Membership Role";
@@ -1178,7 +1178,7 @@
         exit(MembershipNotification."Entry No.");
     end;
 
-    procedure SendInlineNotifications()
+    internal procedure SendInlineNotifications()
     var
         MembershipNotification: Record "NPR MM Membership Notific.";
         SessionId: Integer;
@@ -1233,7 +1233,7 @@
     end;
 
     [TryFunction]
-    procedure NPPassServerInvokeApi(RequestMethod: Code[10]; MemberNotificationSetup: Record "NPR MM Member Notific. Setup"; PassID: Text; var ReasonText: Text; JSONIn: Text; var JSONOut: Text)
+    internal procedure NPPassServerInvokeApi(RequestMethod: Code[10]; MemberNotificationSetup: Record "NPR MM Member Notific. Setup"; PassID: Text; var ReasonText: Text; JSONIn: Text; var JSONOut: Text)
     var
         Client: HttpClient;
         Content: HttpContent;

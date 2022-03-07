@@ -69,7 +69,7 @@
             StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
     end;
 
-    procedure ScheduleNcTaskCountResetJob(var JobQueueEntry: Record "Job Queue Entry"; TaskProcessorCode: Code[20]; JobQueueCatagoryCode: Code[10])
+    internal procedure ScheduleNcTaskCountResetJob(var JobQueueEntry: Record "Job Queue Entry"; TaskProcessorCode: Code[20]; JobQueueCatagoryCode: Code[10])
     var
         NcTaskListProcessing: Codeunit "NPR Nc Task List Processing";
         NotBeforeDateTime: DateTime;
@@ -358,19 +358,19 @@
         exit(CurrentDateTime() + NoOfSeconds * 1000);
     end;
 
-    procedure GetAutoRecreateNoteTxt(): Text
+    internal procedure GetAutoRecreateNoteTxt(): Text
     var
         AutoRecreateNoteLbl: Label 'Auto-created for %1. Can be deleted if not used. Will be recreated when the feature is activated.', Comment = '%1 = initial description of Job Queue Entry';
     begin
         exit(AutoRecreateNoteLbl);
     end;
 
-    procedure SetShowAutoCreatedClause(Set: Boolean)
+    internal procedure SetShowAutoCreatedClause(Set: Boolean)
     begin
         ShowAutoCreatedClause := Set;
     end;
 
-    procedure AddPosItemPostingJobQueue()
+    internal procedure AddPosItemPostingJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueCategoryCode: Code[10];
@@ -397,7 +397,7 @@
         JobQueueEntry.Modify();
     end;
 
-    procedure AddPosPostingJobQueue()
+    internal procedure AddPosPostingJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
         DF: DateFormula;
@@ -422,7 +422,7 @@
         JobQueueEntry.Modify(true);
     end;
 
-    procedure CreateAndAssignJobQueueCategory(): Code[10]
+    internal procedure CreateAndAssignJobQueueCategory(): Code[10]
     var
         SalesSetup: Record "Sales & Receivables Setup";
         JobQueueCategory: Record "Job Queue Category";

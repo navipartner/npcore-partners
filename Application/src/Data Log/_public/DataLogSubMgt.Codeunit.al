@@ -77,7 +77,7 @@
         end;
     end;
 
-    procedure CleanDataLog()
+    internal procedure CleanDataLog()
     var
         DataLogField: Record "NPR Data Log Field";
         DataLogSetup: Record "NPR Data Log Setup (Table)";
@@ -128,7 +128,7 @@
         DataLogRecord.DeleteAll();
     end;
 
-    procedure GetNewRecords(SubscriberCode: Code[30]; ModifySubscriber: Boolean; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
+    internal procedure GetNewRecords(SubscriberCode: Code[30]; ModifySubscriber: Boolean; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
     var
         DataLogSubscriber: Record "NPR Data Log Subscriber";
         TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary;
@@ -211,7 +211,7 @@
         exit(TempDataLogRecord.FindSet());
     end;
 
-    procedure GetNewRecordsCompany(SubscriberCode: Code[30]; SubscriberCompanyName: Text[30]; ModifySubscriber: Boolean; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
+    internal procedure GetNewRecordsCompany(SubscriberCode: Code[30]; SubscriberCompanyName: Text[30]; ModifySubscriber: Boolean; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
     var
         DataLogSubscriber: Record "NPR Data Log Subscriber";
         TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary;
@@ -315,7 +315,7 @@
         //+DL9.14 [286526]
     end;
 
-    procedure ProcessRecord(DataLogSubscriber: Record "NPR Data Log Subscriber"; DataLogRecord: Record "NPR Data Log Record")
+    internal procedure ProcessRecord(DataLogSubscriber: Record "NPR Data Log Subscriber"; DataLogRecord: Record "NPR Data Log Record")
     var
         DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
     begin

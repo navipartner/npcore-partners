@@ -1,6 +1,7 @@
 ﻿codeunit 6151491 "NPR Raptor Management"
 {
     Access = Internal;
+
     var
         RaptorSetup: Record "NPR Raptor Setup";
         ActionDescrLbl_GetUserIDHistory: Label 'Browsing History Entries';
@@ -469,28 +470,28 @@
             Error(TokenNotFoundErr, TokenKey);
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnProcessRaptorDataLine(RaptorAction: Record "NPR Raptor Action"; UserIdentifier: Text; JObjectAsText: Text; var RaptorDataBuffer: Record "NPR Raptor Data Buffer"; var Handled: Boolean)
+    [IntegrationEvent(true, false)]
+    internal procedure OnProcessRaptorDataLine(RaptorAction: Record "NPR Raptor Action"; UserIdentifier: Text; JObjectAsText: Text; var RaptorDataBuffer: Record "NPR Raptor Data Buffer"; var Handled: Boolean)
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnBeforeShowRaptorBuffer(RaptorAction: Record "NPR Raptor Action"; var RaptorDataBuffer: Record "NPR Raptor Data Buffer"; var Handled: Boolean)
+    [IntegrationEvent(true, false)]
+    internal procedure OnBeforeShowRaptorBuffer(RaptorAction: Record "NPR Raptor Action"; var RaptorDataBuffer: Record "NPR Raptor Data Buffer"; var Handled: Boolean)
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnInitializeDefaultActions(Silent: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    procedure OnGetListOfTrackingServiceTypes(var ListOfTrackingServiceTypes: Record "Name/Value Buffer")
+    [IntegrationEvent(true, false)]
+    internal procedure OnInitializeDefaultActions(Silent: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetDefaultTrackingServiceType(var TrackingServiceType: Text[30]; var Handled: Boolean)
+    internal procedure OnGetListOfTrackingServiceTypes(var ListOfTrackingServiceTypes: Record "Name/Value Buffer")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnGetDefaultTrackingServiceType(var TrackingServiceType: Text[30]; var Handled: Boolean)
     begin
     end;
 }

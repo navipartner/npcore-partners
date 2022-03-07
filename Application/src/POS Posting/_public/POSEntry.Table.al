@@ -554,7 +554,7 @@
         POSEntryTaxCalc.DeleteAllLines(Rec."Entry No.");
     end;
 
-    procedure Recalculate()
+    internal procedure Recalculate()
     var
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         EntryModified: Boolean;
@@ -566,7 +566,7 @@
             Modify(true);
     end;
 
-    procedure ShowDimensions()
+    internal procedure ShowDimensions()
     var
         DimMgt: Codeunit DimensionManagement;
         DimSetIdLbl: Label '%1 %2', Locked = true;
@@ -581,7 +581,7 @@
         end;
     end;
 
-    procedure IsSaleTransaction(): Boolean
+    internal procedure IsSaleTransaction(): Boolean
     begin
         exit("Entry Type" in ["Entry Type"::"Direct Sale", "Entry Type"::"Credit Sale"]);
     end;
@@ -591,7 +591,7 @@
     begin
     end;
 
-    procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    internal procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         DimMgt: Codeunit DimensionManagement;
     begin

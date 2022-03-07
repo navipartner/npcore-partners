@@ -773,7 +773,7 @@
         ShowNew: Option All,"Only existing items","Only new items";
         ShowInventory: Option All,"In stock","Not in stock";
 
-    procedure UpdateDiscount(RetailJournalHeader: Record "NPR Retail Journal Header")
+    internal procedure UpdateDiscount(RetailJournalHeader: Record "NPR Retail Journal Header")
     var
         RetailJournalLine: Record "NPR Retail Journal Line";
         PeriodDiscountLine: Record "NPR Period Discount Line";

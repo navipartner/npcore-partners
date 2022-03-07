@@ -424,7 +424,7 @@
         PrintToDisplay.Run();
     end;
 
-    procedure Update2ndDisplayFromSalePOS(var FrontEnd: Codeunit "NPR POS Front End Management"; var SalePOS: Record "NPR POS Sale"; var POSUnit: Record "NPR POS Unit"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; NewQuantity: Decimal): Boolean
+    internal procedure Update2ndDisplayFromSalePOS(var FrontEnd: Codeunit "NPR POS Front End Management"; var SalePOS: Record "NPR POS Sale"; var POSUnit: Record "NPR POS Unit"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; NewQuantity: Decimal): Boolean
     var
         Line1: Text;
         Line2: Text;
@@ -721,7 +721,7 @@
         end;
     end;
 
-    procedure Closed(var FrontEnd: Codeunit "NPR POS Front End Management")
+    internal procedure Closed(var FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Request: Codeunit "NPR Front-End: HWC";
     begin
@@ -732,7 +732,7 @@
         FrontEnd.InvokeFrontEndMethod(Request);
     end;
 
-    procedure EndSale(var FrontEnd: Codeunit "NPR POS Front End Management"; EndSaleDescription: Text; RegisterNo: Code[10])
+    internal procedure EndSale(var FrontEnd: Codeunit "NPR POS Front End Management"; EndSaleDescription: Text; RegisterNo: Code[10])
     var
         Request: Codeunit "NPR Front-End: HWC";
     begin
@@ -746,7 +746,7 @@
         FrontEnd.InvokeFrontEndMethod(Request);
     end;
 
-    procedure Payments(var FrontEnd: Codeunit "NPR POS Front End Management"; PaymentDescription: Text)
+    internal procedure Payments(var FrontEnd: Codeunit "NPR POS Front End Management"; PaymentDescription: Text)
     var
         Request: Codeunit "NPR Front-End: HWC";
     begin
@@ -760,7 +760,7 @@
 
     end;
 
-    procedure CloseReceipt(var FrontEnd: Codeunit "NPR POS Front End Management")
+    internal procedure CloseReceipt(var FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Request: Codeunit "NPR Front-End: HWC";
     begin
@@ -787,7 +787,7 @@
         ReceiptCloseDuration := ReceiptCloseDurationIn;
     end;
 
-    procedure SetReceiptContent(ReceiptContentIn: Text)
+    internal procedure SetReceiptContent(ReceiptContentIn: Text)
     begin
         ReceiptContent := ReceiptContentIn;
     end;

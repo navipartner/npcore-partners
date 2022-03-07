@@ -28,7 +28,7 @@
         Text200: Label 'Finding first record in %1 within the filters: ';
         Text300: Label '#2##############################\Estimated Time Left:                           #3##############################\Record:  #4####################################################################';
 
-    procedure CreateXml()
+    internal procedure CreateXml()
     var
         Node: XmlNode;
         Document: XmlDocument;
@@ -76,7 +76,7 @@
         CloseDialog();
     end;
 
-    procedure ParseDataToXmlDocNode(var RecRef: RecordRef; RecordSetExists: Boolean; var Node: XmlNode) Success: Boolean
+    internal procedure ParseDataToXmlDocNode(var RecRef: RecordRef; RecordSetExists: Boolean; var Node: XmlNode) Success: Boolean
     var
         NpXmlElement: Record "NPR NpXml Element";
         RecRef2: RecordRef;
@@ -821,7 +821,7 @@
         XmlDoc.WriteTo(OutputOutStr);
     end;
 
-    procedure GetOutput(var TempBlob: Codeunit "Temp Blob") HasOutput: Boolean
+    internal procedure GetOutput(var TempBlob: Codeunit "Temp Blob") HasOutput: Boolean
     begin
         if not OutputInitialized then begin
             Clear(TempBlob);
@@ -831,7 +831,7 @@
         exit(TempBlob.HasValue());
     end;
 
-    procedure GetResponse(var TempBlob: Codeunit "Temp Blob") HasOutput: Boolean
+    internal procedure GetResponse(var TempBlob: Codeunit "Temp Blob") HasOutput: Boolean
     begin
         if not OutputInitialized then begin
             Clear(TempBlob);
@@ -841,7 +841,7 @@
         exit(TempBlob.HasValue());
     end;
 
-    procedure InitializeOutput()
+    internal procedure InitializeOutput()
     begin
         if not OutputInitialized then begin
             Clear(OutputTempBlob);
@@ -893,7 +893,7 @@
         exit(GuiAllowed and not HideDialog);
     end;
 
-    procedure GetAutomaticUsername(): Text
+    internal procedure GetAutomaticUsername(): Text
     var
         ActiveSession: Record "Active Session";
     begin
@@ -901,7 +901,7 @@
         exit(LowerCase(ReplaceSpecialChar(ActiveSession."Database Name" + '_' + CompanyName)));
     end;
 
-    procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
+    internal procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
     var
         Base64Convert: Codeunit "Base64 Convert";
     begin
@@ -1017,7 +1017,7 @@
 
     end;
 
-    procedure Xml2Json(var Document: XmlDocument; NpXmlTemplate: Record "NPR NpXml Template") JsonString: Text
+    internal procedure Xml2Json(var Document: XmlDocument; NpXmlTemplate: Record "NPR NpXml Template") JsonString: Text
     var
         Document2: XmlDocument;
         Element: XmlElement;
@@ -1044,7 +1044,7 @@
         exit(JsonString);
     end;
 
-    procedure PreviewXml(NPXmlTemplateCode: Code[20])
+    internal procedure PreviewXml(NPXmlTemplateCode: Code[20])
     var
         NpXmlElement: Record "NPR NpXml Element";
         NpXmlTemplate: Record "NPR NpXml Template";

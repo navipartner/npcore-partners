@@ -39,7 +39,7 @@
     end;
     #endregion
 
-    procedure ValidateValue(DataType: Text[50]; NewValue: Text[250]) Value: Text[250]
+    internal procedure ValidateValue(DataType: Text[50]; NewValue: Text[250]) Value: Text[250]
     var
         Decimal: Decimal;
         "Integer": Integer;

@@ -461,7 +461,7 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
+    internal procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
     var
         Json: JsonObject;
     begin
@@ -479,7 +479,7 @@
         UpdateActionBuffers();
     end;
 
-    procedure RegisterCustomJavaScriptLogicV3(Method: Text; JavaScriptCode: Text)
+    internal procedure RegisterCustomJavaScriptLogicV3(Method: Text; JavaScriptCode: Text)
     var
         Json: JsonObject;
     begin
@@ -543,7 +543,7 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    procedure RefreshWorkflow()
+    internal procedure RefreshWorkflow()
     begin
         ActionInRefresh := Code;
         OnDiscoverActions();
@@ -599,7 +599,7 @@
         Json.WriteTo(OutStr);
     end;
 
-    procedure GetCustomJavaScriptLogic() Json: JsonObject
+    internal procedure GetCustomJavaScriptLogic() Json: JsonObject
     var
         InStr: InStream;
     begin
@@ -651,24 +651,23 @@
         SetWorkflowInvocationDictionary(WorkflowInvocationParameters, Name, Value);
     end;
 
-    procedure SetWorkflowInvocationParameterUnsafe(Name: Text; Value: Variant)
+    internal procedure SetWorkflowInvocationParameterUnsafe(Name: Text; Value: Variant)
     begin
         SetWorkflowInvocationDictionary(WorkflowInvocationParameters, Name, Value);
     end;
 
-
-    procedure SetWorkflowInvocationContext(Name: Text; Value: Variant)
+    internal procedure SetWorkflowInvocationContext(Name: Text; Value: Variant)
     begin
         SetWorkflowInvocationDictionary(WorkflowInvocationContext, Name, Value);
     end;
 
-    procedure GetWorkflowInvocationContext(var WorkflowInvocationParametersOut: JsonObject; var WorkflowInvocationContextOut: JsonObject)
+    internal procedure GetWorkflowInvocationContext(var WorkflowInvocationParametersOut: JsonObject; var WorkflowInvocationContextOut: JsonObject)
     begin
         WorkflowInvocationParametersOut := WorkflowInvocationParameters;
         WorkflowInvocationContextOut := WorkflowInvocationContext;
     end;
 
-    procedure DiscoverActions()
+    internal procedure DiscoverActions()
     var
         DiscoverAllWorkflows: Codeunit "NPR POS Refresh Workflows";
     begin
@@ -713,7 +712,7 @@
     begin
     end;
 
-    procedure SetWorkflowTypeAttended()
+    internal procedure SetWorkflowTypeAttended()
     begin
         "Requires POS Type" := "Requires POS Type"::ATTENDED;
         POSSession.DiscoverSessionAction(Rec);
@@ -739,7 +738,7 @@
         end;
     end;
 
-    procedure GetWorkflowType(): Integer
+    internal procedure GetWorkflowType(): Integer
     begin
         exit("Requires POS Type");
     end;

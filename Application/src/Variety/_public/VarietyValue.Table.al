@@ -120,7 +120,7 @@
         Text002: Label 'Value %1 cannot be inserted in Variety Value for Variety table %2.  Create a copy of the table or change the Variety table manually.';
         Text003: Label 'Value %1 cannot be deleted from in Variety Value for Variety table %2.  Create a copy of the table or change the Variety table manually.';
 
-    procedure AssignSortOrder()
+    internal procedure AssignSortOrder()
     var
         VRTValue: Record "NPR Variety Value";
         Dec: Decimal;
@@ -163,7 +163,7 @@
         "Sort Order" := NewSortOrder;
     end;
 
-    procedure GetDecimalSeperator(): Text[1]
+    internal procedure GetDecimalSeperator(): Text[1]
     var
         Dec: Decimal;
     begin
@@ -174,7 +174,7 @@
             exit(',');
     end;
 
-    procedure CheckTableLocked(): Boolean
+    internal procedure CheckTableLocked(): Boolean
     var
         VRTTable: Record "NPR Variety Table";
     begin

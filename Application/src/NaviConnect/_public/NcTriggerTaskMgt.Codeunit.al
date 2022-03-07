@@ -145,12 +145,12 @@
         NcTask.Modify(true);
     end;
 
-    procedure TransferOutput(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; Output: Text; Filename: Text; Subject: Text; Body: Text)
+    internal procedure TransferOutput(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; Output: Text; Filename: Text; Subject: Text; Body: Text)
     begin
         OnAfterGetOutputTriggerTask(NcTriggerCode, Output, NcTask, Filename, Subject, Body);
     end;
 
-    procedure ManualTransferOutput(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text; var Filename: Text; var Subject: Text; var Body: Text): Boolean
+    internal procedure ManualTransferOutput(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text; var Filename: Text; var Subject: Text; var Body: Text): Boolean
     var
         TempTaskOutput: Record "NPR Nc Task Output" temporary;
         IsAssertError: Boolean;
@@ -247,7 +247,7 @@
         end;
     end;
 
-    procedure VerifyNoEndpointTriggerLinksExist(EndpointTypeCode: Code[20]; EndpointCode: Code[20])
+    internal procedure VerifyNoEndpointTriggerLinksExist(EndpointTypeCode: Code[20]; EndpointCode: Code[20])
     var
         NcEndpointTriggerLink: Record "NPR Nc Endpoint Trigger Link";
         EndpointTriggerLinkExistErr: Label '%1 records exist. Please delete these first.', Comment = '%1=Nc Endpoint Trigger Link TableCaption';
@@ -271,7 +271,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnSetupNcTriggers()
+    internal procedure OnSetupNcTriggers()
     begin
     end;
 }

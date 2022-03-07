@@ -130,7 +130,7 @@
     var
         ReportSelectionRetail2: Record "NPR Report Selection Retail";
 
-    procedure NewRecord()
+    internal procedure NewRecord()
     begin
         ReportSelectionRetail2.SetRange("Report Type", "Report Type");
         if ReportSelectionRetail2.FindLast() and (ReportSelectionRetail2.Sequence <> '') then

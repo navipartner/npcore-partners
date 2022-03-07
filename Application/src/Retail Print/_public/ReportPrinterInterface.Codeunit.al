@@ -9,10 +9,10 @@ codeunit 6014583 "NPR Report Printer Interface"
         ReportLayoutSelection: Record "Report Layout Selection";
         LastErrorText: Text;
         RecordSpecified: Boolean;
-        #if not CLOUD
+#if not CLOUD
         Err_ReportPrint: Label 'Error when printing report %1 %2';
         SuppressError: Boolean;
-        #endif
+#endif
 
     procedure RunReport(Number: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
     begin
@@ -130,6 +130,7 @@ codeunit 6014583 "NPR Report Printer Interface"
         ReportLayoutSelection.SetTempLayoutSelected('');
         exit(true);
     end;
+
     [TryFunction]
     local procedure TryPrintPDF(OutputPath: Text; var Stream: DotNet NPRNetMemoryStream; OutputType: Integer; ObjectID: Integer)
     var

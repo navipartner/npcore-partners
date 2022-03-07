@@ -217,7 +217,7 @@
             WebServiceAuthHelper.RemoveApiPassword("API Password Key");
     end;
 
-    procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
+    internal procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
     var
         AuthParamsBuff: Record "NPR Auth. Param. Buffer";
         iAuth: Interface "NPR API IAuthorization";

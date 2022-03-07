@@ -766,38 +766,38 @@
         ClearAssignedFlowStatuses(FromRecId, StatusObject);
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure OnBeforeAssignWPadLinePrintCategories(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; RemoveExisting: Boolean; var Handled: Boolean)
+    [IntegrationEvent(true, false)]
+    internal procedure OnBeforeAssignWPadLinePrintCategories(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; RemoveExisting: Boolean; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnBeforeSelectPrintCategories(AppliesToRecID: RecordID; var PrintCategory: Record "NPR NPRE Print/Prod. Cat."; var Handled: Boolean)
+    internal procedure OnBeforeSelectPrintCategories(AppliesToRecID: RecordID; var PrintCategory: Record "NPR NPRE Print/Prod. Cat."; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterSelectPrintCategories(AppliesToRecID: RecordID; var PrintCategory: Record "NPR NPRE Print/Prod. Cat."; var Handled: Boolean)
+    internal procedure OnAfterSelectPrintCategories(AppliesToRecID: RecordID; var PrintCategory: Record "NPR NPRE Print/Prod. Cat."; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnBeforeSelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Enum "NPR NPRE Status Object"; var FlowStatus: Record "NPR NPRE Flow Status"; var Handled: Boolean)
+    internal procedure OnBeforeSelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Enum "NPR NPRE Status Object"; var FlowStatus: Record "NPR NPRE Flow Status"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterSelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Enum "NPR NPRE Status Object"; var FlowStatus: Record "NPR NPRE Flow Status"; var Handled: Boolean)
+    internal procedure OnAfterSelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Enum "NPR NPRE Status Object"; var FlowStatus: Record "NPR NPRE Flow Status"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnBeforeCloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"; var ForceClose: Boolean; var Handled: Boolean)
+    internal procedure OnBeforeCloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"; var ForceClose: Boolean; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterCloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
+    internal procedure OnAfterCloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
     end;
 

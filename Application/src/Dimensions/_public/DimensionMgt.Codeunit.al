@@ -28,7 +28,7 @@
     end;
     #endregion
     #region UpdateDocDefaultDim
-    procedure UpdateNPRDefaultDim(TableID: Integer; RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date2: Date; SaleType: Option; LineNo: Integer; No: Code[20]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20])
+    internal procedure UpdateNPRDefaultDim(TableID: Integer; RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date2: Date; SaleType: Option; LineNo: Integer; No: Code[20]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20])
     var
         NPRLineDimension: Record "NPR Line Dimension";
         RecRef: RecordRef;
@@ -71,7 +71,7 @@
     end;
     #endregion
     #region GetDefaultDim
-    procedure GetDefaultDim(TableID: array[10] of Integer; No: array[10] of Code[20]; SourceCode: Code[20]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20])
+    internal procedure GetDefaultDim(TableID: array[10] of Integer; No: array[10] of Code[20]; SourceCode: Code[20]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20])
     var
         DefaultDimPriority1: Record "Default Dimension Priority";
         DefaultDimPriority2: Record "Default Dimension Priority";
@@ -159,7 +159,7 @@
     end;
     #endregion
     #region TypeToTableEksp
-    procedure TypeToTableNPR(Type: Option "G/L",Item,"Item Group",Repair,,Payment,"Open/Close",BOM,Customer,Comment): Integer
+    internal procedure TypeToTableNPR(Type: Option "G/L",Item,"Item Group",Repair,,Payment,"Open/Close",BOM,Customer,Comment): Integer
     begin
         case Type of
             Type::"G/L":
@@ -184,7 +184,7 @@
     end;
     #endregion
     #region DiscountTypeToTableNPR
-    procedure DiscountTypeToTableNPR(Type: Option " ",Period,Mix,"Multi-Piece","Sales Card",BOM,,Rounding,Combination,Customer): Integer
+    internal procedure DiscountTypeToTableNPR(Type: Option " ",Period,Mix,"Multi-Piece","Sales Card",BOM,,Rounding,Combination,Customer): Integer
     begin
         case Type of
             Type::" ":
@@ -209,7 +209,7 @@
     end;
     #endregion
     #region DeleteNPRDim
-    procedure DeleteNPRDim(TableID: Integer; RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date2: Date; SaleType: Option; LineNo: Integer; No: Code[20])
+    internal procedure DeleteNPRDim(TableID: Integer; RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date2: Date; SaleType: Option; LineNo: Integer; No: Code[20])
     var
         NPRLineDimension: Record "NPR Line Dimension";
     begin
@@ -246,19 +246,19 @@
     end;
     #endregion
     #region ValidateDimValueCode
-    procedure ValidateDimValueCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    internal procedure ValidateDimValueCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
     end;
     #endregion
     #region SaveDefaultDim
-    procedure SaveDefaultDim(TableID: Integer; No: Code[20]; FieldNumber: Integer; ShortcutDimCode: Code[20])
+    internal procedure SaveDefaultDim(TableID: Integer; No: Code[20]; FieldNumber: Integer; ShortcutDimCode: Code[20])
     begin
         DimMgt.SaveDefaultDim(TableID, No, FieldNumber, ShortcutDimCode);
     end;
     #endregion
     #region SaveEkspDim
-    procedure SaveNPRDim(TableID: Integer; RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date2: Date; SaleType: Option; LineNo: Integer; No: Code[20]; FieldNumber: Integer; ShortcutDimCode: Code[20])
+    internal procedure SaveNPRDim(TableID: Integer; RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date2: Date; SaleType: Option; LineNo: Integer; No: Code[20]; FieldNumber: Integer; ShortcutDimCode: Code[20])
     var
         NPRLineDim: Record "NPR Line Dimension";
         RecRef: RecordRef;
@@ -308,7 +308,7 @@
     end;
     #endregion
     #region SaveTempDim
-    procedure SaveTempDim(FieldNumber: Integer; ShortcutDimCode: Code[20])
+    internal procedure SaveTempDim(FieldNumber: Integer; ShortcutDimCode: Code[20])
     begin
         GetGLSetup();
         TempDimBuf2.SetRange("Dimension Code", GLSetupShortcutDimCode[FieldNumber]);

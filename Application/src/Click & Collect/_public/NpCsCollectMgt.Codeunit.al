@@ -18,7 +18,7 @@
 
     //--- Init ---
 
-    procedure InitCollectInStoreService()
+    internal procedure InitCollectInStoreService()
     var
         WebService: Record "Web Service Aggregate";
         WebServiceManagement: Codeunit "Web Service Management";
@@ -111,7 +111,7 @@
         NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
     end;
 
-    procedure ExpireProcessing(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
+    internal procedure ExpireProcessing(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
     var
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
     begin
@@ -149,7 +149,7 @@
         NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
     end;
 
-    procedure DeliverDocument(var NpCsDocument: Record "NPR NpCs Document")
+    internal procedure DeliverDocument(var NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         SalesHeader: Record "Sales Header";
@@ -196,7 +196,7 @@
         NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
     end;
 
-    procedure ExpireDelivery(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
+    internal procedure ExpireDelivery(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
     var
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
     begin
@@ -217,7 +217,7 @@
 
     //--- UI ---
 
-    procedure NewCollectOrder()
+    internal procedure NewCollectOrder()
     var
         NpCsDocument: Record "NPR NpCs Document";
         NpCsStore: Record "NPR NpCs Store";
@@ -286,7 +286,7 @@
         exit(Selected);
     end;
 
-    procedure RunDocumentCard(NpCsDocument: Record "NPR NpCs Document")
+    internal procedure RunDocumentCard(NpCsDocument: Record "NPR NpCs Document")
     var
         SalesHeader: Record "Sales Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
@@ -370,7 +370,7 @@
         PAGE.Run(CardPageId, SalesHeader);
     end;
 
-    procedure RunLog(NpCsDocument: Record "NPR NpCs Document"; WithAutoUpdate: Boolean)
+    internal procedure RunLog(NpCsDocument: Record "NPR NpCs Document"; WithAutoUpdate: Boolean)
     var
         NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
         NpCsDocumentLogEntries: Page "NPR NpCs Document Log Entries";
@@ -382,7 +382,7 @@
         NpCsDocumentLogEntries.Run();
     end;
 
-    procedure CollectInStoreEnabled(): Boolean
+    internal procedure CollectInStoreEnabled(): Boolean
     var
         NpCsStore: Record "NPR NpCs Store";
     begin
@@ -393,14 +393,14 @@
         exit(NpCsStore.FindFirst());
     end;
 
-    procedure SalesHeader2NpCsDocument(SalesHeader: Record "Sales Header"; var NpCsDocument: Record "NPR NpCs Document"): Boolean
+    internal procedure SalesHeader2NpCsDocument(SalesHeader: Record "Sales Header"; var NpCsDocument: Record "NPR NpCs Document"): Boolean
     begin
         NpCsDocument.SetRange("Document Type", SalesHeader."Document Type");
         NpCsDocument.SetRange("Document No.", SalesHeader."No.");
         exit(NpCsDocument.FindFirst());
     end;
 
-    procedure DrillDownSalesHeaderNpCsField(SalesHeader: Record "Sales Header")
+    internal procedure DrillDownSalesHeaderNpCsField(SalesHeader: Record "Sales Header")
     var
         NpCsDocument: Record "NPR NpCs Document";
         PageId: Integer;

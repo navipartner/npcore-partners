@@ -432,7 +432,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure CheckAndUpdateStatus()
+    internal procedure CheckAndUpdateStatus()
     begin
         Clear(NaviDocsEntry2);
         NaviDocsEntry2.SetCurrentKey(Status);

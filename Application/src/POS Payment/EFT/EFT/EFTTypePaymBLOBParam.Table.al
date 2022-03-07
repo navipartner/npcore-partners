@@ -100,22 +100,22 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterNameCaption(Parameter: Record "NPR EFTType Paym. BLOB Param."; var Caption: Text)
+    internal procedure OnGetParameterNameCaption(Parameter: Record "NPR EFTType Paym. BLOB Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterDescriptionCaption(Parameter: Record "NPR EFTType Paym. BLOB Param."; var Caption: Text)
+    internal procedure OnGetParameterDescriptionCaption(Parameter: Record "NPR EFTType Paym. BLOB Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnLookupParameterValue(var Parameter: Record "NPR EFTType Paym. BLOB Param.")
+    internal procedure OnLookupParameterValue(var Parameter: Record "NPR EFTType Paym. BLOB Param.")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnValidateParameterValue(var Parameter: Record "NPR EFTType Paym. BLOB Param.")
+    internal procedure OnValidateParameterValue(var Parameter: Record "NPR EFTType Paym. BLOB Param.")
     begin
     end;
 }

@@ -1,6 +1,7 @@
 ﻿codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
 {
     Access = Internal;
+
     var
         GLSetup: Record "General Ledger Setup";
         Item: Record Item;
@@ -68,7 +69,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
+    internal procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 

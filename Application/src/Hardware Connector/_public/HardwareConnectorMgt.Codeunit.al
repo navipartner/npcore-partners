@@ -19,7 +19,7 @@
         DestinationLbl: Label 'destination', Locked = true;
         ContentsLbl: Label 'contents', Locked = true;
 
-    procedure SendRawPrintRequest(PrinterName: Text; PrintBytes: Text; TargetCodepage: Integer)
+    internal procedure SendRawPrintRequest(PrinterName: Text; PrintBytes: Text; TargetCodepage: Integer)
     var
         Base64: Codeunit "Base64 Convert";
         Request: JsonObject;
@@ -37,7 +37,7 @@
             Message(GetLastErrorText);
     end;
 
-    procedure SendRawBytesPrintRequest(PrinterName: Text; var TempBlob: Codeunit "Temp Blob")
+    internal procedure SendRawBytesPrintRequest(PrinterName: Text; var TempBlob: Codeunit "Temp Blob")
     var
         Base64: Codeunit "Base64 Convert";
         InStream: InStream;
@@ -55,7 +55,7 @@
             Message(GetLastErrorText);
     end;
 
-    procedure ExistsFileRequest(Path: Text): JsonObject
+    internal procedure ExistsFileRequest(Path: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Checking if file exists...';
@@ -67,7 +67,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure CopyFileRequest(SourcePath: Text; DestinationPath: Text): JsonObject
+    internal procedure CopyFileRequest(SourcePath: Text; DestinationPath: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Copying file...';
@@ -80,7 +80,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure MoveFileRequest(SourcePath: Text; DestinationPath: Text): JsonObject
+    internal procedure MoveFileRequest(SourcePath: Text; DestinationPath: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Moving file...';
@@ -93,7 +93,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure DeleteFileRequest(Path: Text): JsonObject
+    internal procedure DeleteFileRequest(Path: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Deleting file...';
@@ -105,7 +105,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure WriteTextRequest(Path: Text; Content: Text): JsonObject
+    internal procedure WriteTextRequest(Path: Text; Content: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Writing text into file...';
@@ -118,7 +118,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure WriteLinesRequest(Path: Text; Content: JsonToken): JsonObject
+    internal procedure WriteLinesRequest(Path: Text; Content: JsonToken): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Writing lines into file...';
@@ -131,7 +131,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure WriteBinaryRequest(Path: Text; var TempBlob: Codeunit "Temp Blob"): JsonObject
+    internal procedure WriteBinaryRequest(Path: Text; var TempBlob: Codeunit "Temp Blob"): JsonObject
     var
         Base64: Codeunit "Base64 Convert";
         InStream: InStream;
@@ -149,7 +149,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure AppendTextRequest(Path: Text; Content: Text): JsonObject
+    internal procedure AppendTextRequest(Path: Text; Content: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Appending text into file...';
@@ -162,7 +162,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure AppendLinesRequest(Path: Text; Content: JsonToken): JsonObject
+    internal procedure AppendLinesRequest(Path: Text; Content: JsonToken): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Appending lines into file...';
@@ -187,7 +187,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure ReadLinesRequest(Path: Text): JsonObject
+    internal procedure ReadLinesRequest(Path: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Reading lines from file...';
@@ -199,7 +199,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure ReadBinaryRequest(Path: Text): JsonObject
+    internal procedure ReadBinaryRequest(Path: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Reading binary from file...';
@@ -211,7 +211,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure ExistsDirectoryRequest(Path: Text): JsonObject
+    internal procedure ExistsDirectoryRequest(Path: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Checking if directory exists...';
@@ -223,7 +223,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure CopyDirectoryRequest(SourcePath: Text; DestinationPath: Text): JsonObject
+    internal procedure CopyDirectoryRequest(SourcePath: Text; DestinationPath: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Copying directory...';
@@ -236,7 +236,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure MoveDirectoryRequest(SourcePath: Text; DestinationPath: Text): JsonObject
+    internal procedure MoveDirectoryRequest(SourcePath: Text; DestinationPath: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Moving directory...';
@@ -249,7 +249,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure DeleteDirectoryRequest(Path: Text; Force: Boolean): JsonObject
+    internal procedure DeleteDirectoryRequest(Path: Text; Force: Boolean): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Deleting directory...';
@@ -263,7 +263,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure GetDirectoryContentRequest(Path: Text): JsonObject
+    internal procedure GetDirectoryContentRequest(Path: Text): JsonObject
     var
         Request: JsonObject;
         Caption: Label 'Getting directory content...';
@@ -275,7 +275,7 @@
         exit(SendGenericRequest(FileLbl, Request, Caption));
     end;
 
-    procedure SendGenericRequest(RequestType: Text; Request: JsonObject; WindowCaption: Text) Response: JsonObject
+    internal procedure SendGenericRequest(RequestType: Text; Request: JsonObject; WindowCaption: Text) Response: JsonObject
     begin
         Commit();
 
@@ -334,7 +334,7 @@
         exit(Response);
     end;
 
-    procedure GetSocketClientScript(): Text
+    internal procedure GetSocketClientScript(): Text
     begin
         exit(
         'class HandlerMessage{constructor(id,context,handler,handl' +
