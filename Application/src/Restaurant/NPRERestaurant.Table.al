@@ -82,6 +82,13 @@
         {
         }
     }
+    fieldgroups
+    {
+        fieldgroup(Brick; Name, "Service Flow Profile")
+        {
+        }
+
+    }
 
     procedure ShowKitchenRequests()
     var
