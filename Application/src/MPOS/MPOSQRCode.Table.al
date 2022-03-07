@@ -82,6 +82,7 @@
         {
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
+            TableRelation = "NPR POS Unit";
         }
         field(22; "QR Image"; Media)
         {
