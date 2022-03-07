@@ -269,6 +269,9 @@
 
     fieldgroups
     {
+        fieldgroup(Brick; "POS Store Code", Name)
+        {
+        }
     }
 
     trigger OnDelete()
