@@ -3,6 +3,8 @@ table 6014632 "NPR Job Queue Notif. Profile"
     Access = Internal;
     DataClassification = CustomerContent;
     Caption = 'Job Queue Notification Profile';
+    LookupPageId = "NPR Job Queue Notif. Profiles";
+    DrillDownPageId = "NPR Job Queue Notif. Profiles";
 
     fields
     {
@@ -21,6 +23,7 @@ table 6014632 "NPR Job Queue Notif. Profile"
             Caption = 'Table No.';
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
+            InitValue = 472;
         }
         field(200; "Send E-mail"; Boolean)
         {
