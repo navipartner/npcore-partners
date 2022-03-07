@@ -3,6 +3,7 @@ page 6059842 "NPR Job Queue Notif. Profiles"
     Extensible = false;
     ApplicationArea = NPRRetail;
     Caption = 'Job Queue Notif. Profiles';
+    AdditionalSearchTerms = 'Job Queue Notification Profile';
     PageType = List;
     SourceTable = "NPR Job Queue Notif. Profile";
     UsageCategory = Administration;
@@ -28,6 +29,7 @@ page 6059842 "NPR Job Queue Notif. Profiles"
                 {
                     ToolTip = 'Specifies the table number notification profile is to be used for.';
                     ApplicationArea = NPRRetail;
+                    Editable = false;
                 }
                 field("Send E-mail"; Rec."Send E-mail")
                 {
