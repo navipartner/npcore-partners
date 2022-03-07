@@ -3364,12 +3364,6 @@ End Function
         <Field Name="dgFormat">
           <DataField>dgFormat</DataField>
         </Field>
-        <Field Name="dgTotal">
-          <DataField>dgTotal</DataField>
-        </Field>
-        <Field Name="dgTotalFormat">
-          <DataField>dgTotalFormat</DataField>
-        </Field>
         <Field Name="PurchasesLCY_Item">
           <DataField>PurchasesLCY_Item</DataField>
         </Field>
