@@ -3,7 +3,7 @@
     var
         TaxAmountPOSRenameNotAllowedErr: Label 'You can''t rename %1', Comment = '%1=TaxAmountPOS.TableCaption()';
 
-    procedure Show(SourceRecSysId: Guid)
+    internal procedure Show(SourceRecSysId: Guid)
     var
         POSSaleTax: Record "NPR POS Sale Tax";
         POSTaxCalc: Interface "NPR POS ITaxCalc";
@@ -14,7 +14,7 @@
         POSTaxCalc.Show(SourceRecSysId);
     end;
 
-    procedure Delete(SourceRecSysId: Guid)
+    internal procedure Delete(SourceRecSysId: Guid)
     var
         POSSaleTax: Record "NPR POS Sale Tax";
     begin
@@ -22,7 +22,7 @@
             POSSaleTax.Delete(true);
     end;
 
-    procedure DeleteAllLines(POSSaleTax: Record "NPR POS Sale Tax")
+    internal procedure DeleteAllLines(POSSaleTax: Record "NPR POS Sale Tax")
     var
         POSSaleTaxLine: Record "NPR POS Sale Tax Line";
     begin
@@ -31,26 +31,26 @@
             POSSaleTaxLine.DeleteAll(true);
     end;
 
-    procedure FilterLines(POSSaleTax: Record "NPR POS Sale Tax"; var POSSaleTaxLine: Record "NPR POS Sale Tax Line")
+    internal procedure FilterLines(POSSaleTax: Record "NPR POS Sale Tax"; var POSSaleTaxLine: Record "NPR POS Sale Tax Line")
     begin
         POSSaleTaxLine.Reset();
         POSSaleTaxLine.SetRange("Source Rec. System Id", POSSaleTax."Source Rec. System Id");
     end;
 
-    procedure RenameNotAllowed()
+    internal procedure RenameNotAllowed()
     var
         POSSaleTax: Record "NPR POS Sale Tax";
     begin
         Error(TaxAmountPOSRenameNotAllowedErr, POSSaleTax.TableCaption());
     end;
 
-    procedure Find(var POSSaleTax: Record "NPR POS Sale Tax"; SourceRecSysId: Guid): Boolean
+    internal procedure Find(var POSSaleTax: Record "NPR POS Sale Tax"; SourceRecSysId: Guid): Boolean
     begin
         POSSaleTax."Source Rec. System Id" := SourceRecSysId;
         exit(POSSaleTax.Find());
     end;
 
-    procedure GetCurrency(var Currency: Record Currency; CurrencyCode: Code[10])
+    internal procedure GetCurrency(var Currency: Record Currency; CurrencyCode: Code[10])
     begin
         if CurrencyCode <> '' then
             Currency.Get(CurrencyCode)
@@ -71,7 +71,7 @@
         POSSaleTaxCalc.Delete(Rec.SystemId);
     end;
 
-    procedure CalculateTax(var Rec: Record "NPR POS Sale Line"; SalePOS: Record "NPR POS Sale"; CurrencyFactor: Decimal)
+    internal procedure CalculateTax(var Rec: Record "NPR POS Sale Line"; SalePOS: Record "NPR POS Sale"; CurrencyFactor: Decimal)
     var
         POSSaleTax: Record "NPR POS Sale Tax";
         POSSaleTax2: Record "NPR POS Sale Tax";
@@ -122,7 +122,7 @@
         Rec.Modify();
     end;
 
-    procedure UpdateSourceBeforeCalculateTaxForward(var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
+    internal procedure UpdateSourceBeforeCalculateTaxForward(var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
     begin
         Rec.Amount := Rec.Quantity * Rec."Unit Price";
         if Rec."Discount %" <> 0 then
@@ -136,7 +136,7 @@
         Rec."Line Amount" := Round(Rec.Quantity * Rec."Unit Price" - Rec."Discount Amount", Currency."Amount Rounding Precision");
     end;
 
-    procedure UpdateSourceBeforeCalculateTaxBackward(var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
+    internal procedure UpdateSourceBeforeCalculateTaxBackward(var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
     begin
         Rec."Amount Including VAT" := Rec.Quantity * Rec."Unit Price";
         if Rec."Discount %" <> 0 then
@@ -150,7 +150,7 @@
         Rec."Line Amount" := Round(Rec.Quantity * Rec."Unit Price" - Rec."Discount Amount", Currency."Amount Rounding Precision");
     end;
 
-    procedure UpdateSourceTaxSetup(var Rec: Record "NPR POS Sale Line"; VATPostingSetup: Record "VAT Posting Setup"; SalePOS: Record "NPR POS Sale"; CurrencyFactor: Decimal)
+    internal procedure UpdateSourceTaxSetup(var Rec: Record "NPR POS Sale Line"; VATPostingSetup: Record "VAT Posting Setup"; SalePOS: Record "NPR POS Sale"; CurrencyFactor: Decimal)
     var
         POSSaleTax: Record "NPR POS Sale Tax";
         POSTaxCalc: Interface "NPR POS ITaxCalc";

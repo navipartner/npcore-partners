@@ -257,7 +257,7 @@
         Text000: Label 'Do you wish to delete this category with its subcategories and all the item links?';
         SilentDelete: Boolean;
 
-    procedure GetChildrenCount() ChildrenCount: Integer
+    internal procedure GetChildrenCount() ChildrenCount: Integer
     var
         MagentoCategory: Record "NPR Magento Category";
     begin
@@ -271,7 +271,7 @@
         exit(ChildrenCount);
     end;
 
-    procedure GetNewChildGroupNo() NewChildGroupNo: Code[20]
+    internal procedure GetNewChildGroupNo() NewChildGroupNo: Code[20]
     var
         MagentoCategory: Record "NPR Magento Category";
     begin
@@ -282,7 +282,7 @@
         exit(IncStr(MagentoCategory.Id));
     end;
 
-    procedure GetPath() MagentoCategoryPath: Text[250]
+    internal procedure GetPath() MagentoCategoryPath: Text[250]
     var
         MagentoCategory: Record "NPR Magento Category";
     begin
@@ -308,12 +308,12 @@
         exit('');
     end;
 
-    procedure SetSilentDelete(Value: Boolean)
+    internal procedure SetSilentDelete(Value: Boolean)
     begin
         SilentDelete := Value;
     end;
 
-    procedure UpdateChildPath()
+    internal procedure UpdateChildPath()
     var
         MagentoCategory: Record "NPR Magento Category";
         NewPath: Text;

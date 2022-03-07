@@ -375,14 +375,14 @@
         OnAfterValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode);
     end;
 
-    procedure GetProfile(POSStoreNo: Code[10]; var POSPostingProfile: Record "NPR POS Posting Profile")
+    internal procedure GetProfile(POSStoreNo: Code[10]; var POSPostingProfile: Record "NPR POS Posting Profile")
     begin
         Get(POSStoreNo);
         TestField("POS Posting Profile");
         POSPostingProfile.Get("POS Posting Profile");
     end;
 
-    procedure GetProfile(var POSPostingProfile: Record "NPR POS Posting Profile"): Boolean
+    internal procedure GetProfile(var POSPostingProfile: Record "NPR POS Posting Profile"): Boolean
     begin
         Clear(POSPostingProfile);
         if "POS Posting Profile" = '' then

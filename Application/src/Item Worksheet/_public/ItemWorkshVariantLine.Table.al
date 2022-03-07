@@ -478,12 +478,12 @@
         MapValueVarietyQst: Label 'Would you like to map the value >%1< to >%2< for all variety %3 table %4?', Comment = '%1 = Old Variety Value; %2 = Variety Value, %3 = Variety Type; %4 = Variety Table';
         StatusCommentText: Text;
 
-    procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    internal procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
     end;
 
-    procedure GetBatch()
+    internal procedure GetBatch()
     begin
         if (ItemWorksheet."Item Template Name" <> "Worksheet Template Name") or
            (ItemWorksheet.Name <> "Worksheet Name") then begin
@@ -498,7 +498,7 @@
         end;
     end;
 
-    procedure GetLine()
+    internal procedure GetLine()
     begin
         if "Worksheet Line No." = 0 then
             ItemWorksheetLine.Init()
@@ -509,12 +509,12 @@
                 ItemWorksheetLine.Get("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.");
     end;
 
-    procedure SetLine(ItemWorksheetLineParm: Record "NPR Item Worksheet Line")
+    internal procedure SetLine(ItemWorksheetLineParm: Record "NPR Item Worksheet Line")
     begin
         ItemWorksheetLine := ItemWorksheetLineParm;
     end;
 
-    procedure CheckIfDeleteIsOK(): Boolean
+    internal procedure CheckIfDeleteIsOK(): Boolean
     var
         ItemLedgEntry: Record "Item Ledger Entry";
         PurchLine: Record "Purchase Line";
@@ -544,7 +544,7 @@
         exit(true);
     end;
 
-    procedure GetUnitCost(): Decimal
+    internal procedure GetUnitCost(): Decimal
     begin
         if "Direct Unit Cost" <> 0 then
             exit("Direct Unit Cost");
@@ -553,7 +553,7 @@
         exit(ItemWorksheetLine."Direct Unit Cost");
     end;
 
-    procedure GetUnitPrice(): Decimal
+    internal procedure GetUnitPrice(): Decimal
     begin
         if "Sales Price" <> 0 then
             exit("Sales Price");
@@ -595,7 +595,7 @@
             exit(0);
     end;
 
-    procedure UpdateExistingItemAndVaraint()
+    internal procedure UpdateExistingItemAndVaraint()
     begin
         //TO BE IMPLEMENTED
     end;
@@ -728,7 +728,7 @@
         Level := CalcLevel();
     end;
 
-    procedure CalcLevel(): Integer
+    internal procedure CalcLevel(): Integer
     begin
         ItemWorksheet.Get("Worksheet Template Name", "Worksheet Name");
         case ItemWorksheet."Show Variety Level" of
@@ -767,7 +767,7 @@
         ItemWorksheetLine.UpdateVarietyHeadingText();
     end;
 
-    procedure GetExistingVariantCode(): Code[20]
+    internal procedure GetExistingVariantCode(): Code[20]
     var
         ItemVar: Record "Item Variant";
     begin
@@ -791,7 +791,7 @@
         end;
     end;
 
-    procedure UpdateBarcode()
+    internal procedure UpdateBarcode()
     begin
         ItemWorksheetTemplate.Get("Worksheet Template Name");
         if "Internal Bar Code" <> '' then
@@ -810,7 +810,7 @@
             end;
     end;
 
-    procedure FillDescription()
+    internal procedure FillDescription()
     var
         VarietyCloneData: Codeunit "NPR Variety Clone Data";
         TempDesc: Text[250];
@@ -887,7 +887,7 @@
             until ItemWorksheetVarietyMapping.Next() = 0;
     end;
 
-    procedure ApplyVarietyMapping() VariantModified: Boolean
+    internal procedure ApplyVarietyMapping() VariantModified: Boolean
     var
         ItemWorksheetVarietyMapping: Record "NPR Item Worksh. Vrty Mapping";
         I: Integer;
@@ -955,12 +955,12 @@
         until (I = 4);
     end;
 
-    procedure SetUpdateFromWorksheetLine(VarUpdateFromWorksheetLine: Boolean)
+    internal procedure SetUpdateFromWorksheetLine(VarUpdateFromWorksheetLine: Boolean)
     begin
         UpdateFromWorksheetLine := VarUpdateFromWorksheetLine;
     end;
 
-    procedure GetStatusCommentText(): Text
+    internal procedure GetStatusCommentText(): Text
     begin
         exit(StatusCommentText);
     end;

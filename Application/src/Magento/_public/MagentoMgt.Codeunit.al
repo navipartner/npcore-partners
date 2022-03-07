@@ -46,7 +46,7 @@
         exit(ConfigTemplateCode);
     end;
 
-    procedure GetCustomerConfigTemplate(TaxClass: Text) ConfigTemplateCode: Code[10]
+    internal procedure GetCustomerConfigTemplate(TaxClass: Text) ConfigTemplateCode: Code[10]
     var
         MagentoTaxClass: Record "NPR Magento Tax Class";
     begin
@@ -101,7 +101,7 @@
 
     #region Magento Api
 
-    procedure MagentoApiGet(MagentoApiUrl: Text; Method: Text; var XmlDoc: XmlDocument) Result: Boolean
+    internal procedure MagentoApiGet(MagentoApiUrl: Text; Method: Text; var XmlDoc: XmlDocument) Result: Boolean
     var
         XmlDom: Codeunit "XML DOM Management";
         HttpWebRequest: HttpRequestMessage;
@@ -142,7 +142,7 @@
         exit(true);
     end;
 
-    procedure MagentoApiPost(MagentoApiUrl: Text; Method: Text; var XmlDoc: XmlDocument) Result: Boolean
+    internal procedure MagentoApiPost(MagentoApiUrl: Text; Method: Text; var XmlDoc: XmlDocument) Result: Boolean
     var
         XmlDom: Codeunit "XML DOM Management";
         TempBlob: Codeunit "Temp Blob";
@@ -200,7 +200,7 @@
 
     #endregion
 
-    procedure InitItemSync()
+    internal procedure InitItemSync()
     var
         Item: Record Item;
         RecRef: RecordRef;

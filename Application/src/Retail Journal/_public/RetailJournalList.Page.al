@@ -41,7 +41,7 @@
     {
     }
 
-    procedure GetSelectionFilter(var RetailJournalHeader: Record "NPR Retail Journal Header")
+    internal procedure GetSelectionFilter(var RetailJournalHeader: Record "NPR Retail Journal Header")
     begin
         CurrPage.SetSelectionFilter(RetailJournalHeader);
     end;

@@ -83,7 +83,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnSetRFIDHandlerCodeunit(CodeunitID: Integer)
+    internal procedure OnSetRFIDHandlerCodeunit(CodeunitID: Integer)
     begin
     end;
 

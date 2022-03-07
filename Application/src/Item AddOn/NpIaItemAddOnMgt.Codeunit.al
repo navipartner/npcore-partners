@@ -633,12 +633,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure HasBeforeInsertSetup(NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var HasSetup: Boolean)
+    internal procedure HasBeforeInsertSetup(NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var HasSetup: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure RunBeforeInsertSetup(NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var Handled: Boolean)
+    internal procedure RunBeforeInsertSetup(NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var Handled: Boolean)
     begin
     end;
 

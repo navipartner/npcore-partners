@@ -26,7 +26,7 @@
         InsertMessageLog(PhoneNo, SenderNo, Message, DelayUntil);
     end;
 
-    procedure SendQueuedSMS(MessageLog: Record "NPR SMS Log")
+    internal procedure SendQueuedSMS(MessageLog: Record "NPR SMS Log")
     var
         Status: Enum "NPR SMS Log Status";
         MessageText: Text;
@@ -49,7 +49,7 @@
         ISendSMS.SendSMS(PhoneNo, SenderNo, Message);
     end;
 
-    procedure QueueMessages(PhoneNo: List of [Text]; SenderNo: Text; Message: Text; DelayUntil: DateTime)
+    internal procedure QueueMessages(PhoneNo: List of [Text]; SenderNo: Text; Message: Text; DelayUntil: DateTime)
     var
         i: Integer;
         SendTo: Text;
@@ -60,7 +60,7 @@
         end;
     end;
 
-    procedure SendTestSMS(var Template: Record "NPR SMS Template Header")
+    internal procedure SendTestSMS(var Template: Record "NPR SMS Template Header")
     var
         DialogPage: Page "NPR SMS Send Message";
         RecRef: RecordRef;
@@ -96,7 +96,7 @@
         QueuedNotification();
     end;
 
-    procedure SendBatchSMS(SMSTemplateHeader: Record "NPR SMS Template Header")
+    internal procedure SendBatchSMS(SMSTemplateHeader: Record "NPR SMS Template Header")
     var
         SMSSendMessage: Page "NPR SMS Send Message";
         RecRef: RecordRef;
@@ -160,7 +160,7 @@
         QueuedNotification();
     end;
 
-    procedure EditAndSendSMS(RecordToSendVariant: Variant)
+    internal procedure EditAndSendSMS(RecordToSendVariant: Variant)
     var
         RecRef: RecordRef;
         SMSTemplateHeader: Record "NPR SMS Template Header";
@@ -297,7 +297,7 @@
     end;
     #endregion
     #region Message Log
-    procedure InsertMessageLog(PhoneNo: Text; SenderNo: Text; Message: Text; SendDT: DateTime)
+    internal procedure InsertMessageLog(PhoneNo: Text; SenderNo: Text; Message: Text; SendDT: DateTime)
     var
         MessageLog: Record "NPR SMS Log";
     begin
@@ -312,7 +312,7 @@
         MessageLog.Insert();
     end;
 
-    procedure DiscardOldMessages(MessageLog: Record "NPR SMS Log") IsDiscarder: Boolean
+    internal procedure DiscardOldMessages(MessageLog: Record "NPR SMS Log") IsDiscarder: Boolean
     var
         SMSSetup: Record "NPR SMS Setup";
     begin
@@ -325,7 +325,7 @@
         end;
     end;
 
-    procedure UpdateMessageLog(MessageLog: Record "NPR SMS Log"; Status: Enum "NPR SMS Log Status"; ErrorMessage: Text)
+    internal procedure UpdateMessageLog(MessageLog: Record "NPR SMS Log"; Status: Enum "NPR SMS Log Status"; ErrorMessage: Text)
     var
         SMSSetup: Record "NPR SMS Setup";
     begin
@@ -375,7 +375,7 @@
         end;
     end;
 
-    procedure QueuedNotification()
+    internal procedure QueuedNotification()
     var
         SMSSentNotification: Notification;
         QuedMsg: Label 'SMS message/s queued for sending.';
@@ -398,7 +398,7 @@
         SMSSentNotification.Send();
     end;
 
-    procedure OpenErrorMessages(SMSSentNotification: Notification)
+    internal procedure OpenErrorMessages(SMSSentNotification: Notification)
     var
         MessageLog: Record "NPR SMS Log";
     begin
@@ -408,7 +408,7 @@
         Page.Run(0, MessageLog);
     end;
 
-    procedure OpenMessageSetup(SMSSentNotification: Notification)
+    internal procedure OpenMessageSetup(SMSSentNotification: Notification)
     var
         SMSSetup: Record "NPR SMS Setup";
     begin
@@ -671,7 +671,7 @@
         CreateMessageJob('');
     end;
 
-    procedure CreateMessageJob(JobCategory: Code[10])
+    internal procedure CreateMessageJob(JobCategory: Code[10])
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
@@ -702,7 +702,7 @@
         end;
     end;
 
-    procedure DeleteMessageJob(JobCategory: Code[10])
+    internal procedure DeleteMessageJob(JobCategory: Code[10])
     var
         JobQueueEntry: Record "Job Queue Entry";
     begin
@@ -714,7 +714,7 @@
         JobQueueEntry.DeleteAll(true);
     end;
 
-    procedure GetJobQueueCategoryCode(): Code[10]
+    internal procedure GetJobQueueCategoryCode(): Code[10]
     var
         SMSSetup: Record "NPR SMS Setup";
         JobQueueCategory: Record "Job Queue Category";
@@ -734,7 +734,7 @@
     end;
     #endregion
     #region Report Links Azure Functions
-    procedure AFReportLink(ReportId: Integer): Text
+    internal procedure AFReportLink(ReportId: Integer): Text
     begin
         if ReportId = 0 then
             exit('');

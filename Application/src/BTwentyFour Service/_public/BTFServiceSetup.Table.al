@@ -111,7 +111,7 @@
         Error(RenameNotAllowedErr);
     end;
 
-    procedure RegisterService(NewCode: Code[20]; NewServiceURL: Text; NewName: Text; NewAboutAPI: Text; NewSubscriptionKey: Text; NewEnvironment: Enum "NPR BTF Environment"; NewUsername: Text; NewPortal: Text; NewEnabled: Boolean; NewPassword: Text)
+    internal procedure RegisterService(NewCode: Code[20]; NewServiceURL: Text; NewName: Text; NewAboutAPI: Text; NewSubscriptionKey: Text; NewEnvironment: Enum "NPR BTF Environment"; NewUsername: Text; NewPortal: Text; NewEnabled: Boolean; NewPassword: Text)
     begin
         Code := NewCode;
         if Find() then
@@ -123,7 +123,7 @@
         Insert();
     end;
 
-    procedure InitService(NewServiceURL: Text; NewName: Text; NewAboutAPI: Text; NewSubscriptionKey: Text; NewEnvironment: Enum "NPR BTF Environment"; NewUsername: Text; NewPortal: Text; NewPassword: Text; NewEnabled: Boolean)
+    internal procedure InitService(NewServiceURL: Text; NewName: Text; NewAboutAPI: Text; NewSubscriptionKey: Text; NewEnvironment: Enum "NPR BTF Environment"; NewUsername: Text; NewPortal: Text; NewPassword: Text; NewEnabled: Boolean)
     begin
         "Service URL" := CopyStr(NewServiceURL, 1, MaxStrLen("Service URL"));
         Name := copystr(NewName, 1, MaxStrLen(Name));
@@ -142,7 +142,7 @@
     end;
 
     [IntegrationEvent(true, false)]
-    procedure OnRegisterService()
+    internal procedure OnRegisterService()
     begin
     end;
 }

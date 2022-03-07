@@ -3,7 +3,7 @@
     var
         Text00001: Label 'Attribute Set ID %1 and Attribute Group Name %2 already exist.';
 
-    procedure EditItemAttributes(ItemNo: Code[20]; VariantCode: Code[10])
+    internal procedure EditItemAttributes(ItemNo: Code[20]; VariantCode: Code[10])
     var
         Item: Record Item;
         MagentoItemAttributes: Page "NPR Magento Item Attr.";
@@ -60,7 +60,7 @@
             until MagentoAttributeSetValue.Next() = 0;
     end;
 
-    procedure HasProducts(RecRef: RecordRef): Boolean
+    internal procedure HasProducts(RecRef: RecordRef): Boolean
     var
         Item: Record Item;
         MagentoAttributeSet: Record "NPR Magento Attribute Set";

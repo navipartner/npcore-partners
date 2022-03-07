@@ -178,13 +178,13 @@
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         CheckingLinesLbl: Label 'Checking lines        #2######';
 
-    procedure SetupNewBatch()
+    internal procedure SetupNewBatch()
     begin
         ItemWorksheetTemplate.Get("Item Template Name");
         "No. Series" := ItemWorksheetTemplate."No. Series";
     end;
 
-    procedure ModifyLines(i: Integer)
+    internal procedure ModifyLines(i: Integer)
     begin
         ItemWorksheetLine.LockTable();
         ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
@@ -197,7 +197,7 @@
             until ItemWorksheetLine.Next() = 0;
     end;
 
-    procedure CheckLines(ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure CheckLines(ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         ItemWorksheetLine2: Record "NPR Item Worksheet Line";
         ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
@@ -233,7 +233,7 @@
             Window.Close();
     end;
 
-    procedure UpdateSalesPriceAllLinesWithRRP()
+    internal procedure UpdateSalesPriceAllLinesWithRRP()
     begin
         ItemWorksheetLine.Reset();
         ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
@@ -245,7 +245,7 @@
             until ItemWorksheetLine.Next() = 0;
     end;
 
-    procedure InsertDefaultFieldSetup()
+    internal procedure InsertDefaultFieldSetup()
     var
         ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
     begin

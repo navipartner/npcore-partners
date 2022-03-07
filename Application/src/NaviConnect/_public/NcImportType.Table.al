@@ -202,7 +202,7 @@
             UpdateWebservice();
     end;
 
-    procedure UpdateWebservice()
+    internal procedure UpdateWebservice()
     var
         WebService: Record "Web Service Aggregate";
         WebServiceManagement: Codeunit "Web Service Management";

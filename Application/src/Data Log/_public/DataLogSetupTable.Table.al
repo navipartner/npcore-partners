@@ -100,8 +100,7 @@
             DataLogSetupField.DeleteAll();
     end;
 
-
-    procedure InsertNewTable(TableID: Integer; LogInsertion: Option " ",Simple,Detailed; LogModification: Option " ",Simple,Detailed; LogDeletion: Option " ",Simple,Detailed)
+    internal procedure InsertNewTable(TableID: Integer; LogInsertion: Option " ",Simple,Detailed; LogModification: Option " ",Simple,Detailed; LogDeletion: Option " ",Simple,Detailed)
     begin
         if Get(TableID) then
             exit;

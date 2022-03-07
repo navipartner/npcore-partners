@@ -316,27 +316,27 @@
 #endif
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterNameCaption(Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Caption: Text)
+    internal procedure OnGetParameterNameCaption(Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterDescriptionCaption(Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Caption: Text)
+    internal procedure OnGetParameterDescriptionCaption(Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterOptionStringCaption(Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Caption: Text)
+    internal procedure OnGetParameterOptionStringCaption(Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnLookupParameterValue(var Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Handled: Boolean)
+    internal procedure OnLookupParameterValue(var Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnValidateParameterValue(var Parameter: Record "NPR EFTType POSUnit Gen.Param.")
+    internal procedure OnValidateParameterValue(var Parameter: Record "NPR EFTType POSUnit Gen.Param.")
     begin
     end;
 }

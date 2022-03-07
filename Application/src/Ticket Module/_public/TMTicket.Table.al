@@ -212,7 +212,7 @@
         NoSeriesMgt: Codeunit NoSeriesManagement;
         TicketMgt: Codeunit "NPR TM Ticket Management";
 
-    procedure GetTicketType()
+    internal procedure GetTicketType()
     begin
         if TicketType.Code = "Ticket Type Code" then
             exit;

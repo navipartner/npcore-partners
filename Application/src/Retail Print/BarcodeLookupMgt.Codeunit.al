@@ -1,6 +1,7 @@
 ﻿codeunit 6014403 "NPR Barcode Lookup Mgt."
 {
     Access = Internal;
+
     var
         ItemWithItemRefNoNotFoundErr: Label 'There are no items with reference: %1', Comment = '%1=TempItemRefNo';
         Text001: Label 'Status should not be %1.';
@@ -213,8 +214,8 @@
             Error(ItemWithItemRefNoNotFoundErr, EnterItemRefNo);
     end;
 
-    [IntegrationEvent(TRUE, FALSE)]
-    procedure CallItemReferenceNoLookUp(var TransferLine3: Record "Transfer Line")
+    [IntegrationEvent(true, false)]
+    internal procedure CallItemReferenceNoLookUp(var TransferLine3: Record "Transfer Line")
     begin
     end;
 
@@ -241,8 +242,8 @@
             Error(Text001, MixedDiscount.Status::Active);
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure CallItemRefNoLookupMixDiscount(var MixedDiscountLine: Record "NPR Mixed Discount Line")
+    [IntegrationEvent(true, false)]
+    internal procedure CallItemRefNoLookupMixDiscount(var MixedDiscountLine: Record "NPR Mixed Discount Line")
     begin
     end;
 
@@ -296,8 +297,8 @@
             Error(Text001, PeriodDiscount.Status::Active);
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    procedure CallItemRefNoLookupPeriodicDiscount(var PeriodDiscountLine: Record "NPR Period Discount Line")
+    [IntegrationEvent(true, false)]
+    internal procedure CallItemRefNoLookupPeriodicDiscount(var PeriodDiscountLine: Record "NPR Period Discount Line")
     begin
     end;
 

@@ -25,7 +25,7 @@
     //    and discount is removed on physical record.
     //    Since all other lines in the sale has "Discount Calculated" = false, the module immediately skips comparison for these.
 
-    procedure RecalculateAllSaleLinePOS(SalePOS: Record "NPR POS Sale")
+    internal procedure RecalculateAllSaleLinePOS(SalePOS: Record "NPR POS Sale")
     var
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
@@ -46,7 +46,7 @@
         LogStopwatch('DISCOUNT_RECALCULATE', CurrentDateTime - StartTime);
     end;
 
-    procedure OnAfterInsertSaleLinePOS(var Rec: Record "NPR POS Sale Line")
+    internal procedure OnAfterInsertSaleLinePOS(var Rec: Record "NPR POS Sale Line")
     var
         SalePOS: Record "NPR POS Sale";
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
@@ -84,7 +84,7 @@
             LogStopwatch('DISCOUNT_ON_INSERT', CurrentDateTime - StartTime);
     end;
 
-    procedure OnAfterModifySaleLinePOS(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line")
+    internal procedure OnAfterModifySaleLinePOS(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line")
     var
         SalePOS: Record "NPR POS Sale";
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
@@ -121,7 +121,7 @@
             LogStopwatch('DISCOUNT_ON_MODIFY', CurrentDateTime - StartTime);
     end;
 
-    procedure OnAfterDeleteSaleLinePOS(var Rec: Record "NPR POS Sale Line")
+    internal procedure OnAfterDeleteSaleLinePOS(var Rec: Record "NPR POS Sale Line")
     var
         SalePOS: Record "NPR POS Sale";
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
@@ -158,7 +158,7 @@
             LogStopwatch('DISCOUNT_ON_DELETE', CurrentDateTime - StartTime);
     end;
 
-    procedure OnAfterInsertSaleLinePOSCoupon(var Rec: Record "NPR NpDc SaleLinePOS Coupon")
+    internal procedure OnAfterInsertSaleLinePOSCoupon(var Rec: Record "NPR NpDc SaleLinePOS Coupon")
     var
         SalePOS: Record "NPR POS Sale";
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
@@ -296,7 +296,7 @@
         exit(Result);
     end;
 
-    procedure SetupTempSalesLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    internal procedure SetupTempSalesLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
@@ -336,17 +336,17 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure InitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
+    internal procedure InitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure ApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
+    internal procedure ApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
+    internal procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
     begin
     end;
 }

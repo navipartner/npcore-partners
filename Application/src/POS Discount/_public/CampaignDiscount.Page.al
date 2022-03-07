@@ -479,7 +479,7 @@
         [InDataSet]
         SubFormVisible: Boolean;
 
-    procedure TransferToPeriod()
+    internal procedure TransferToPeriod()
     var
         PeriodDiscountLine: Record "NPR Period Discount Line";
         InputDialog: Page "NPR Input Dialog";

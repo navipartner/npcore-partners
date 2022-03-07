@@ -35,7 +35,7 @@
             until ImportType.Next() = 0;
     end;
 
-    procedure ProcessImportEntries(var NcImportType: Record "NPR Nc Import Type")
+    internal procedure ProcessImportEntries(var NcImportType: Record "NPR Nc Import Type")
     var
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         NcImportEntry: Record "NPR Nc Import Entry";
@@ -55,7 +55,7 @@
             until NcImportEntry.Next() = 0;
     end;
 
-    procedure FilterImportType(ImportTypeParamValue: Text; var NcImportType: Record "NPR Nc Import Type"): Boolean
+    internal procedure FilterImportType(ImportTypeParamValue: Text; var NcImportType: Record "NPR Nc Import Type"): Boolean
     begin
         Clear(NcImportType);
         if ImportTypeParamValue <> '' then begin
@@ -125,7 +125,7 @@
         exit('import_type');
     end;
 
-    procedure ParamDownloadFtp(): Text
+    internal procedure ParamDownloadFtp(): Text
     begin
         exit('download_ftp');
     end;

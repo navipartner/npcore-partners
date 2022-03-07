@@ -25,7 +25,7 @@
         Text005: Label 'Error during Payment Refund:\%1';
         Text006: Label 'Document not Found';
 
-    procedure SetProcessingOptions(PaymentGatewayIn: Record "NPR Magento Payment Gateway"; PaymentEventTypeIn: Option " ",Capture,Refund)
+    internal procedure SetProcessingOptions(PaymentGatewayIn: Record "NPR Magento Payment Gateway"; PaymentEventTypeIn: Option " ",Capture,Refund)
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
     begin
@@ -307,7 +307,7 @@
         exit(TotalAmountInclVAT);
     end;
 
-    procedure ShowDocumentCard(PaymentLine: Record "NPR Magento Payment Line")
+    internal procedure ShowDocumentCard(PaymentLine: Record "NPR Magento Payment Line")
     var
         PageMgt: Codeunit "Page Management";
         RecRef: RecordRef;
@@ -377,7 +377,7 @@
         PaymentLine.Modify();
     end;
 
-    procedure CapturePaymentLine(var PaymentLine: Record "NPR Magento Payment Line")
+    internal procedure CapturePaymentLine(var PaymentLine: Record "NPR Magento Payment Line")
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
         MagentPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
@@ -414,7 +414,7 @@
     begin
     end;
 
-    procedure CaptureSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header")
+    internal procedure CaptureSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         PaymentLine: Record "NPR Magento Payment Line";
     begin
@@ -510,7 +510,7 @@
         OnAfterPostMagentoPayment(SalesInvHeader);
     end;
 
-    procedure PostPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
+    internal procedure PostPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
     var
         GenJnlLine: Record "Gen. Journal Line";
         SalesInvHeader: Record "Sales Invoice Header";
@@ -694,7 +694,7 @@
         RefundPaymentLines(SalesCrMemoHeader);
     end;
 
-    procedure RefundPaymentLine(PaymentLine: Record "NPR Magento Payment Line")
+    internal procedure RefundPaymentLine(PaymentLine: Record "NPR Magento Payment Line")
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
         MagentPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
@@ -724,7 +724,7 @@
         end;
     end;
 
-    procedure RefundPaymentLines(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    internal procedure RefundPaymentLines(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     var
         PaymentLine: Record "NPR Magento Payment Line";
         PrevRec: Text;

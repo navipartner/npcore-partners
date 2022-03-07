@@ -64,7 +64,7 @@
         gHttpHostKey := AzureKeyVaultMgt.GetAzureKeyVaultSecret('FtpAzureFunction');
     end;
 
-    procedure Destruct()
+    internal procedure Destruct()
     begin
         FtpClient.Clear();
     end;
@@ -88,7 +88,7 @@
     /// <param name="RemotePath">
     /// The full filepath on the remote server the file is downloaded from.
     /// </param>
-    procedure DownloadFile(RemotePath: Text): JsonObject
+    internal procedure DownloadFile(RemotePath: Text): JsonObject
     var
         reqContent: JsonObject;
         jsonResult: JsonObject;
@@ -176,7 +176,7 @@
     /// <param name="NewRemotePath">
     /// The full filepath on the remote server the file is moved to.
     /// </param>
-    procedure RenameFile(CurrentRemotePath: Text; NewRemotePath: Text): JsonObject
+    internal procedure RenameFile(CurrentRemotePath: Text; NewRemotePath: Text): JsonObject
     var
         reqContent: JsonObject;
         jsonTxt: Text;
@@ -215,7 +215,7 @@
     /// <param name="RemotePath">
     /// The full filepath on the remote server the file is deleted from.
     /// </param>
-    procedure DeleteFile(RemotePath: Text): JsonObject
+    internal procedure DeleteFile(RemotePath: Text): JsonObject
     var
         reqContent: JsonObject;
         jsonTxt: Text;
@@ -255,7 +255,7 @@
     /// <param name="RemotePath">
     /// The full path where the files will be downloaded from.
     /// </param>
-    procedure DeleteDirectory(RemotePath: Text): JsonObject
+    internal procedure DeleteDirectory(RemotePath: Text): JsonObject
     var
         reqContent: JsonObject;
         jsonTxt: Text;
@@ -298,7 +298,7 @@
     /// <param name="RemotePath">
     /// The full path where the files will be downloaded from.
     /// </param>
-    procedure ListDirectory(RemotePath: Text): JsonObject
+    internal procedure ListDirectory(RemotePath: Text): JsonObject
     var
         reqContent: JsonObject;
         jsonTxt: Text;
@@ -338,7 +338,7 @@
     /// <param name="RemotePath">
     /// The full path where the files will be downloaded from.
     /// </param>
-    procedure CreateDirectory(RemotePath: Text): JsonObject
+    internal procedure CreateDirectory(RemotePath: Text): JsonObject
     var
         reqContent: JsonObject;
         jsonTxt: Text;

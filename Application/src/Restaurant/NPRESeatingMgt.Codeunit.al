@@ -1,6 +1,7 @@
 ﻿codeunit 6150662 "NPR NPRE Seating Mgt."
 {
     Access = Internal;
+
     var
         AdditionalFiltersSet: Boolean;
         SeatingFiltersGlobal: Record "NPR NPRE Seating";
@@ -123,7 +124,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterChangeSeatingStatus(xSeating: Record "NPR NPRE Seating"; var Seating: Record "NPR NPRE Seating")
+    internal procedure OnAfterChangeSeatingStatus(xSeating: Record "NPR NPRE Seating"; var Seating: Record "NPR NPRE Seating")
     begin
     end;
 }

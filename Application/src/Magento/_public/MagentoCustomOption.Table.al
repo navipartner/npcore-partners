@@ -132,7 +132,7 @@
         TestField("No.");
     end;
 
-    procedure InitNoSeries(): Boolean
+    internal procedure InitNoSeries(): Boolean
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin

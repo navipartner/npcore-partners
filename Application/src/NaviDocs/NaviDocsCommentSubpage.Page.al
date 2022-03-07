@@ -54,7 +54,7 @@
         }
     }
 
-    procedure SetData(NaviDocsEntry: Record "NPR NaviDocs Entry"; UseActivityLog: Boolean)
+    internal procedure SetData(NaviDocsEntry: Record "NPR NaviDocs Entry"; UseActivityLog: Boolean)
     var
         NaviDocsEntryComment: Record "NPR NaviDocs Entry Comment";
         ActivityLog: Record "Activity Log";

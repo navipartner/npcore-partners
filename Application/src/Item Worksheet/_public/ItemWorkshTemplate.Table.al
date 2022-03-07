@@ -264,7 +264,7 @@
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         NotImplementedErr: Label 'This feature is not implemented yet.';
 
-    procedure InsertDefaultFieldSetup()
+    internal procedure InsertDefaultFieldSetup()
     var
         ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
     begin

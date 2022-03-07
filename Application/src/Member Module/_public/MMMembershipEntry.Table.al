@@ -192,7 +192,7 @@
     {
     }
 
-    procedure CalculateRemainingAmount(var OriginalAmountLCY: Decimal; var RemainingAmountLCY: Decimal; var DueDate: Date): Boolean
+    internal procedure CalculateRemainingAmount(var OriginalAmountLCY: Decimal; var RemainingAmountLCY: Decimal; var DueDate: Date): Boolean
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
     begin

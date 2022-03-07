@@ -94,7 +94,7 @@
         end;
     end;
 
-    procedure CreatePOSEntryForCreatedSalesDocument(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header"; Posted: Boolean)
+    internal procedure CreatePOSEntryForCreatedSalesDocument(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header"; Posted: Boolean)
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
@@ -245,7 +245,7 @@
                 if SaleLinePOS.Type = SaleLinePOS.Type::Customer then
                     POSSalesLine.Type := POSSalesLine.Type::Customer
                 else
-                    POSSalesLine.Type := POSSalesLine.Type::Voucher;    
+                    POSSalesLine.Type := POSSalesLine.Type::Voucher;
 
             SaleLinePOS."Sale Type"::"Out payment":
                 //This is currently the only way to see the difference between a Rounding and a Payout line!
@@ -672,7 +672,7 @@
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SIGN_IN, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
     end;
 
-    procedure InsertUnitLoginEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
+    internal procedure InsertUnitLoginEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -694,7 +694,7 @@
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Close (Balancing End)');
     end;
 
-    procedure InsertUnitLogoutEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
+    internal procedure InsertUnitLogoutEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -705,7 +705,7 @@
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SIGN_OUT, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
     end;
 
-    procedure InsertUnitLockEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
+    internal procedure InsertUnitLockEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -717,7 +717,7 @@
 
     end;
 
-    procedure InsertUnitUnlockEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
+    internal procedure InsertUnitUnlockEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -729,12 +729,12 @@
 
     end;
 
-    procedure InsertBinOpenEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20])
+    internal procedure InsertBinOpenEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20])
     begin
         CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Bin Open');
     end;
 
-    procedure InsertParkSaleEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
+    internal procedure InsertParkSaleEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -745,7 +745,7 @@
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SALE_PARK, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
     end;
 
-    procedure InsertParkedSaleRetrievalEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; ParkedSalesTicketNo: Code[20]; NewSalesTicketNo: Code[20]) EntryNo: Integer
+    internal procedure InsertParkedSaleRetrievalEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; ParkedSalesTicketNo: Code[20]; NewSalesTicketNo: Code[20]) EntryNo: Integer
     var
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
@@ -760,7 +760,7 @@
 
     end;
 
-    procedure InsertResumeSaleEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; UnfinishedTicketNo: Code[20]; NewSalesTicketNo: Code[20]) EntryNo: Integer
+    internal procedure InsertResumeSaleEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; UnfinishedTicketNo: Code[20]; NewSalesTicketNo: Code[20]) EntryNo: Integer
     var
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
@@ -775,7 +775,7 @@
           StrSubstNo(ResumeSaleMsg, UnfinishedTicketNo, NewSalesTicketNo), '');
     end;
 
-    procedure InsertTransferLocation(POSUnitNo: Code[10]; SalespersonCode: Code[20]; OldDocumentNo: Code[20]; NewDocumentNo: Code[20])
+    internal procedure InsertTransferLocation(POSUnitNo: Code[10]; SalespersonCode: Code[20]; OldDocumentNo: Code[20]; NewDocumentNo: Code[20])
     var
         POSEntry: Record "NPR POS Entry";
         SystemEventLbl: Label '[System Event] %1 transferred to location receipt %2', Locked = true;
@@ -905,7 +905,7 @@
         exit(true);
     end;
 
-    procedure CreateBalancingEntryAndLines(var SalePOS: Record "NPR POS Sale"; IntermediateEndOfDay: Boolean; WorkshiftEntryNo: Integer) EntryNo: Integer
+    internal procedure CreateBalancingEntryAndLines(var SalePOS: Record "NPR POS Sale"; IntermediateEndOfDay: Boolean; WorkshiftEntryNo: Integer) EntryNo: Integer
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
@@ -1205,7 +1205,7 @@
 
     end;
 
-    procedure ExcludeFromPosting(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    internal procedure ExcludeFromPosting(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     begin
         if SaleLinePOS.Type in [SaleLinePOS.Type::Comment] then
             exit(true);
@@ -1420,13 +1420,13 @@
         POSEntryTaxCalc.PostPOSTaxAmountCalculationReverseSign(POSEntry."Entry No.", SystemId);
     end;
 
-    procedure GetCreatedPOSEntry(var POSEntryOut: Record "NPR POS Entry")
+    internal procedure GetCreatedPOSEntry(var POSEntryOut: Record "NPR POS Entry")
     begin
         POSEntryOut := GlobalPOSEntry;
     end;
 
     #region External POS Sale
-    procedure CreatePOSEntryFromExternalPOSSale(var ExtPOSSale: Record "NPR External POS Sale")
+    internal procedure CreatePOSEntryFromExternalPOSSale(var ExtPOSSale: Record "NPR External POS Sale")
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
@@ -1794,7 +1794,7 @@
         OnAfterInsertPOSSalesLineFromExternalPOSSale(ExtSalePOS, ExtSaleLinePOS, POSEntry, POSSalesLine);
     end;
 
-    procedure ExcludeFromPostingExt(ExtSaleLinePOS: Record "NPR External POS Sale Line"): Boolean
+    internal procedure ExcludeFromPostingExt(ExtSaleLinePOS: Record "NPR External POS Sale Line"): Boolean
     begin
         if ExtSaleLinePOS.Type in [ExtSaleLinePOS.Type::Comment] then
             exit(true);

@@ -11,7 +11,7 @@
                 UpdateExpirationStatus(Rec, false);
     end;
 
-    procedure SetExpiresAt(var NpCsDocument: Record "NPR NpCs Document")
+    internal procedure SetExpiresAt(var NpCsDocument: Record "NPR NpCs Document")
     begin
         if NpCsDocument."Delivery Status" in [NpCsDocument."Delivery Status"::Delivered, NpCsDocument."Delivery Status"::Expired] then
             exit;
@@ -87,7 +87,7 @@
             until NpCsDocument.Next() = 0;
     end;
 
-    procedure UpdateExpirationStatus(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
+    internal procedure UpdateExpirationStatus(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
     begin
         if NpCsDocument."Delivery Status" in [NpCsDocument."Delivery Status"::Delivered, NpCsDocument."Delivery Status"::Expired] then
             exit;

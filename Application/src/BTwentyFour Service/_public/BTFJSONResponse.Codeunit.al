@@ -76,7 +76,7 @@
     end;
 
     [NonDebuggable]
-    procedure FoundToken(Response: Codeunit "Temp Blob"): Boolean
+    internal procedure FoundToken(Response: Codeunit "Temp Blob"): Boolean
     var
         JObject: JsonObject;
         InStr: InStream;
@@ -89,12 +89,12 @@
         exit(JObject.Contains('access_token'));
     end;
 
-    procedure GetFileExtension(): Text
+    internal procedure GetFileExtension(): Text
     begin
         exit('json');
     end;
 
-    procedure GetOrder(Content: Codeunit "Temp Blob"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"): Boolean
+    internal procedure GetOrder(Content: Codeunit "Temp Blob"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"): Boolean
     var
         Handled: Boolean;
     begin
@@ -102,7 +102,7 @@
         exit(Handled);
     end;
 
-    procedure GetInvoice(Content: Codeunit "Temp Blob"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"): Boolean
+    internal procedure GetInvoice(Content: Codeunit "Temp Blob"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"): Boolean
     var
         Handled: Boolean;
     begin
@@ -110,7 +110,7 @@
         exit(Handled);
     end;
 
-    procedure GetOrderResp(Content: Codeunit "Temp Blob"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"): Boolean
+    internal procedure GetOrderResp(Content: Codeunit "Temp Blob"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"): Boolean
     var
         Handled: Boolean;
     begin
@@ -118,7 +118,7 @@
         exit(Handled);
     end;
 
-    procedure GetPriceCat(Content: Codeunit "Temp Blob"; var ItemWrks: Record "NPR Item Worksheet"; var ItemWrksLine: Record "NPR Item Worksheet Line"): Boolean
+    internal procedure GetPriceCat(Content: Codeunit "Temp Blob"; var ItemWrks: Record "NPR Item Worksheet"; var ItemWrksLine: Record "NPR Item Worksheet Line"): Boolean
     var
         Handled: Boolean;
     begin

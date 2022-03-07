@@ -9,19 +9,19 @@
         NotUsedText: Label 'Not Used';
         FieldTypeNotSupported: Label 'FieldType Not Supported %1';
 
-    procedure SetRecord(MasterRecRef: RecordRef; ItemNo: Code[20])
+    internal procedure SetRecord(MasterRecRef: RecordRef; ItemNo: Code[20])
     begin
         MRecref := MasterRecRef;
     end;
 
-    procedure LoadMatrixData(ItemNo: Code[20]; HideInactive: Boolean)
+    internal procedure LoadMatrixData(ItemNo: Code[20]; HideInactive: Boolean)
     begin
         TempVRTBuffer.LoadCombinations(TempVRTBuffer, ItemNo, MRecref.Number = DATABASE::"Item Variant", MRecref.RecordId, HideInactive);
         if MRecref.Number <> DATABASE::"Item Variant" then
             SetRecordDefault(MRecref);
     end;
 
-    procedure GetValue(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item) TextValue: Text[1024]
+    internal procedure GetValue(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item) TextValue: Text[1024]
     var
         RecRef: RecordRef;
         FRef: FieldRef;
@@ -94,7 +94,7 @@
         end;
     end;
 
-    procedure SetValue(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; NewValue: Text[250])
+    internal procedure SetValue(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; NewValue: Text[250])
     var
         RecRef: RecordRef;
         FRef: FieldRef;
@@ -182,7 +182,7 @@
         end;
     end;
 
-    procedure SetRecordDefault(var RecRef: RecordRef)
+    internal procedure SetRecordDefault(var RecRef: RecordRef)
     var
         ItemVariant: Record "Item Variant";
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
@@ -222,7 +222,7 @@
             until RecRef2.Next() = 0;
     end;
 
-    procedure GetIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[20]; GD2: Code[20]): Text[250]
+    internal procedure GetIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[20]; GD2: Code[20]): Text[250]
     var
         ItemRef: Record "Item Reference";
     begin
@@ -256,7 +256,7 @@
         end;
     end;
 
-    procedure GetIntFunc2(VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[20]; GD2: Code[20]): Text[250]
+    internal procedure GetIntFunc2(VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[20]; GD2: Code[20]): Text[250]
     begin
         VRTFieldSetup.Type := VRTFieldSetup."Secondary Type";
         VRTFieldSetup."Table No." := VRTFieldSetup."Secondary Table No.";
@@ -268,7 +268,7 @@
         exit(CopyStr(' (' + GetIntFunc(VRTFieldSetup, LocationFilter, GD1, GD2) + ')', 1, 250));
     end;
 
-    procedure SetValueIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; NewValue: Text[250])
+    internal procedure SetValueIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; NewValue: Text[250])
     var
         VRTCloneData: Codeunit "NPR Variety Clone Data";
         ItemRef: Record "Item Reference";
@@ -312,7 +312,7 @@
         end;
     end;
 
-    procedure GetValueBool(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[10]; GD2: Code[10]): Boolean
+    internal procedure GetValueBool(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[10]; GD2: Code[10]): Boolean
     var
         RecRef: RecordRef;
         FRef: FieldRef;
@@ -346,7 +346,7 @@
         exit(false);
     end;
 
-    procedure OnDrillDown(VrtBuffer: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; var ItemFilters: Record Item)
+    internal procedure OnDrillDown(VrtBuffer: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; var ItemFilters: Record Item)
     begin
         TempVRTBuffer.Get(VrtBuffer."Variety 1 Value", VrtBuffer."Variety 2 Value", VrtBuffer."Variety 3 Value", VrtBuffer."Variety 4 Value");
         if VrtFieldSetup."OnDrillDown Subscriber" <> '' then
@@ -360,7 +360,7 @@
     begin
     end;
 
-    procedure GetTotal(RecRef: RecordRef; FieldNo: Integer): Decimal
+    internal procedure GetTotal(RecRef: RecordRef; FieldNo: Integer): Decimal
     var
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef2: RecordRef;
@@ -385,7 +385,7 @@
         exit(Total);
     end;
 
-    procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4; var MATRIX_CaptionSet: array[10] of Text; var MATRIX_CurrentNoOfColumns: Integer; var MATRIX_CaptionRange: Text; HideInactive: Boolean; var MATRIX_PrimKeyFirstCaptionInCu: Text)
+    internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4; var MATRIX_CaptionSet: array[10] of Text; var MATRIX_CurrentNoOfColumns: Integer; var MATRIX_CaptionRange: Text; HideInactive: Boolean; var MATRIX_PrimKeyFirstCaptionInCu: Text)
     var
         TempVarietyValue: Record "NPR Variety Value" temporary;
         VarietyValue: Record "NPR Variety Value";
@@ -543,7 +543,7 @@
           MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
     end;
 
-    procedure TickAllCombinations(VRTFieldSetup: Record "NPR Variety Field Setup")
+    internal procedure TickAllCombinations(VRTFieldSetup: Record "NPR Variety Field Setup")
     var
         ItemVariant: Record "Item Variant";
         VRTCloneData: Codeunit "NPR Variety Clone Data";
@@ -561,7 +561,7 @@
             until TempVRTBuffer.Next() = 0;
     end;
 
-    procedure TickCurrentRow(VRTFieldSetup: Record "NPR Variety Field Setup"; CurrVRTBuffer: Record "NPR Variety Buffer")
+    internal procedure TickCurrentRow(VRTFieldSetup: Record "NPR Variety Field Setup"; CurrVRTBuffer: Record "NPR Variety Buffer")
     var
         ItemVariant: Record "Item Variant";
         VRTCloneData: Codeunit "NPR Variety Clone Data";
@@ -601,7 +601,7 @@
         Item.Get(ItemNo);
     end;
 
-    procedure OnLookup(VrtBuffer: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; var ItemFilters: Record Item)
+    internal procedure OnLookup(VrtBuffer: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; var ItemFilters: Record Item)
     begin
         TempVRTBuffer.Get(VrtBuffer."Variety 1 Value", VrtBuffer."Variety 2 Value", VrtBuffer."Variety 3 Value", VrtBuffer."Variety 4 Value");
         OnDrillDownVarietyMatrix(TempVRTBuffer, VrtFieldSetup, FieldValue, 1, ItemFilters);

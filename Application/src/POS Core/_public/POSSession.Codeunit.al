@@ -660,7 +660,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnInitializationComplete(FrontEnd: Codeunit "NPR POS Front End Management")
+    internal procedure OnInitializationComplete(FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 

@@ -75,7 +75,7 @@
         ItemGroup.Insert(true);
     end;
 
-    procedure SetDefaultItemGroupRoots()
+    internal procedure SetDefaultItemGroupRoots()
     var
         ItemGroup: Record "NPR Magento Category";
         MagentoStore: Record "NPR Magento Store";
@@ -103,7 +103,7 @@
         until ItemGroup.Next() = 0;
     end;
 
-    procedure SetupImportTypeOrder()
+    internal procedure SetupImportTypeOrder()
     var
         NaviConnectImportType: Record "NPR Nc Import Type";
     begin
@@ -131,7 +131,7 @@
         end;
     end;
 
-    procedure SetupImportTypeReturnOrder()
+    internal procedure SetupImportTypeReturnOrder()
     var
         NcImportType: Record "NPR Nc Import Type";
         PrevRec: Text;
@@ -422,7 +422,7 @@
             until VATProductPostingGroup.Next() = 0;
     end;
 
-    procedure HasSetupCategories(): Boolean
+    internal procedure HasSetupCategories(): Boolean
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
     begin
@@ -433,7 +433,7 @@
         exit(MagentoSetupEventSub.FindFirst());
     end;
 
-    procedure HasSetupBrands(): Boolean
+    internal procedure HasSetupBrands(): Boolean
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
     begin
@@ -694,7 +694,7 @@
         end;
     end;
 
-    procedure InitCustomOptionNos(var MagentoSetup: Record "NPR Magento Setup")
+    internal procedure InitCustomOptionNos(var MagentoSetup: Record "NPR Magento Setup")
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
@@ -728,7 +728,7 @@
 
     #region UI Mapping"()
 
-    procedure CheckMappings()
+    internal procedure CheckMappings()
     begin
         CheckVATProductPostingGroups();
         CheckVATBusinessPostingGroups();
@@ -736,7 +736,7 @@
         CheckNaviConnectShipmentMethods();
     end;
 
-    procedure CheckNaviConnectPaymentMethods()
+    internal procedure CheckNaviConnectPaymentMethods()
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
@@ -749,7 +749,7 @@
             PAGE.Run(PAGE::"NPR Magento Payment Mapping");
     end;
 
-    procedure CheckNaviConnectShipmentMethods()
+    internal procedure CheckNaviConnectShipmentMethods()
     begin
         if not GuiAllowed then
             exit;
@@ -757,7 +757,7 @@
             PAGE.Run(PAGE::"NPR Magento Shipment Mapping");
     end;
 
-    procedure CheckVATBusinessPostingGroups()
+    internal procedure CheckVATBusinessPostingGroups()
     begin
         if not GuiAllowed then
             exit;
@@ -765,7 +765,7 @@
             PAGE.Run(PAGE::"NPR Magento VAT Bus. Groups");
     end;
 
-    procedure CheckVATProductPostingGroups()
+    internal procedure CheckVATProductPostingGroups()
     begin
         if not GuiAllowed then
             exit;
@@ -776,17 +776,17 @@
     #endregion
 
     #region Managed Nav Modules
-    procedure MagentoVersionId(): Text
+    internal procedure MagentoVersionId(): Text
     begin
         exit('MAG');
     end;
 
-    procedure MagentoVersionNo(): Code[20]
+    internal procedure MagentoVersionNo(): Code[20]
     begin
         exit('2.26');
     end;
 
-    procedure UpdateVersionNo(var MagentoSetup: Record "NPR Magento Setup")
+    internal procedure UpdateVersionNo(var MagentoSetup: Record "NPR Magento Setup")
     begin
         MagentoSetup."Version No." := MagentoVersionId() + MagentoVersionNo();
     end;
@@ -795,7 +795,7 @@
 
     #region Aux
 
-    procedure IsMagentoSetupEventSubscriber(SetupSubscriptionType: Enum "NPR Mag. Setup Event Sub. Type"; CodeunitId: Integer;
+    internal procedure IsMagentoSetupEventSubscriber(SetupSubscriptionType: Enum "NPR Mag. Setup Event Sub. Type"; CodeunitId: Integer;
                                                                        FunctionName: Text): Boolean
     var
         MagentoSetupSubscription: Record "NPR Magento Setup Event Sub.";

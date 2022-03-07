@@ -11,7 +11,7 @@
         Text000: Label 'Default POS Input Box Sales Setup';
 
     [IntegrationEvent(false, false)]
-    procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
+    internal procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     begin
     end;
 

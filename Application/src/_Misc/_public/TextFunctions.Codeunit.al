@@ -1,7 +1,7 @@
 ﻿codeunit 6014604 "NPR Text Functions"
 {
 #IF BC17
-    procedure Camelize(InputString: Text): Text
+    internal procedure Camelize(InputString: Text): Text
     var
         DotNetRegEx: Codeunit DotNet_Regex;
         TempString: Text;
@@ -31,7 +31,7 @@
     end;
 
 #ELSE
-    procedure Camelize(InputString: Text): Text
+    internal procedure Camelize(InputString: Text): Text
     var
         Regex: Codeunit Regex;
         TempString: Text;

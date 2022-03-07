@@ -180,7 +180,7 @@
         DimMgt: Codeunit DimensionManagement;
         Text1060003: Label 'Register %1 cannot be renamed!';
 
-    procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    internal procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR HC Register", "Register No.", FieldNumber, ShortcutDimCode);

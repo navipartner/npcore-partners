@@ -530,7 +530,7 @@
         exit(NpXmlTemplate."Template Version");
     end;
 
-    procedure GetParentLineNo() ParentLineNo: Integer
+    internal procedure GetParentLineNo() ParentLineNo: Integer
     var
         NpXmlElement: Record "NPR NpXml Element";
     begin
@@ -542,7 +542,7 @@
             exit(NpXmlElement."Line No.");
     end;
 
-    procedure IsContainer(): Boolean
+    internal procedure IsContainer(): Boolean
     begin
         CalcFields("Has Attribute");
         exit(("Field No." = 0) and (not "Has Attribute") and ("Default Value" = ''));
@@ -581,7 +581,7 @@
         end;
     end;
 
-    procedure UpdateParentInfo()
+    internal procedure UpdateParentInfo()
     var
         XMLFilter: Record "NPR NpXml Filter";
     begin
