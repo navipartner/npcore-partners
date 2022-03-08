@@ -11,12 +11,6 @@ pageextension 6014441 "NPR Shipping Agents" extends "Shipping Agents"
                 ToolTip = 'Enable choosing the Shipping Agent Demand by selecting a service or custom information.';
                 ApplicationArea = NPRRetail;
             }
-            field("NPR Pacsoft Product"; Rec."NPR Pacsoft Product")
-            {
-
-                ToolTip = 'Enable specifying if this is a Pacsoft Product.';
-                ApplicationArea = NPRRetail;
-            }
             field("NPR Custom Print Layout"; Rec."NPR Custom Print Layout")
             {
 
