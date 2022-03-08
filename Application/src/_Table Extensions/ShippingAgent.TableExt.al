@@ -3,22 +3,6 @@ tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
     Caption = 'Shipping Agent';
     fields
     {
-        modify("Code")
-        {
-            Caption = 'Code';
-        }
-        modify(Name)
-        {
-            Caption = 'Name';
-        }
-        modify("Internet Address")
-        {
-            Caption = 'Internet Address';
-        }
-        modify("Account No.")
-        {
-            Caption = 'Account No.';
-        }
         field(6014440; "NPR Shipping Agent Demand"; Option)
         {
             Caption = 'Shipping Agent Demand';
