@@ -158,7 +158,6 @@
 
         ShipmentDocument.TestField("Shipping Agent Code");
         ShippingAgent.Get(ShipmentDocument."Shipping Agent Code");
-        ShippingAgent.TestField("NPR Pacsoft Product");
         case ShippingAgent."NPR Shipping Agent Demand" of
             ShippingAgent."NPR Shipping Agent Demand"::" ":
                 ;

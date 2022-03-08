@@ -32,6 +32,8 @@ tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
             Caption = 'Pacsoft Product';
             DataClassification = CustomerContent;
             Description = 'PS1.00';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Field Not being used For Pacsoft';
         }
         field(6014442; "NPR Custom Print Layout"; Code[20])
         {
