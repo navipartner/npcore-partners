@@ -489,7 +489,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
     local procedure SetDefaultValues(var JobQueueEntry: Record "Job Queue Entry")
     begin
-        if (JobQueueEntry."Maximum No. of Attempts to Run" <= 0) or (JobQueueEntry."Maximum No. of Attempts to Run" = 3) then  //3 - default value in MS standard application
+        if JobQueueEntry."Maximum No. of Attempts to Run" = 3 then  //3 - default value in MS standard application
             JobQueueEntry."Maximum No. of Attempts to Run" := 5;
         if (JobQueueEntry."Rerun Delay (sec.)" <= 0) or (JobQueueEntry."Rerun Delay (sec.)" = 60) then  //60 - default value in MS standard application
             JobQueueEntry."Rerun Delay (sec.)" := 180;
