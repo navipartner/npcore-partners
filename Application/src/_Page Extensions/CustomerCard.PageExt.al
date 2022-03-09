@@ -200,8 +200,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
     trigger OnOpenPage()
     begin
-        // ToAnonymizeEditable := false; was previously in C/AL set in "OnInit()" but
-        // this trigger isn't available in PageExtension object so I moved it here.
+
         ToAnonymizeEditable := false;
 
         SetMagentoVersion();
