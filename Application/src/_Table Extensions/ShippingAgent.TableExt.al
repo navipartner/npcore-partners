@@ -11,14 +11,6 @@ tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
             OptionCaption = ' ,Select a Service,Customs Information';
             OptionMembers = " ","Select a Service","Customs Information";
         }
-        field(6014441; "NPR Pacsoft Product"; Boolean)
-        {
-            Caption = 'Pacsoft Product';
-            DataClassification = CustomerContent;
-            Description = 'PS1.00';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Field Not being used For Pacsoft';
-        }
         field(6014442; "NPR Custom Print Layout"; Code[20])
         {
             Caption = 'Custom Print Layout';
