@@ -91,10 +91,10 @@ codeunit 6014454 "NPR CleanCash Identity Msg." implements "NPR CleanCash XCCSP I
 
             if (Element.SelectSingleNode('cc:data', NamespaceManager, Node)) then begin
                 DataElement := Node.AsXmlElement();
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Identity/cc:Id', CleanCashResponse."CleanCash Unit Id");
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Identity/cc:Firmware', CleanCashResponse."CleanCash Firmware");
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Identity/cc:Id', CleanCashResponse."CleanCash Unit Id", MaxStrLen(CleanCashResponse."CleanCash Unit Id"));
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Identity/cc:Firmware', CleanCashResponse."CleanCash Firmware", MaxStrLen(CleanCashResponse."CleanCash Firmware"));
 
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Identity/cc:Type', EnumAsText);
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Identity/cc:Type', EnumAsText, MaxStrLen(EnumAsText));
                 evaluate(CleanCashResponse."CleanCash Type", EnumAsText);
 
             end;

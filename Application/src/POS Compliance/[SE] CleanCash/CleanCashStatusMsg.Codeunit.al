@@ -71,6 +71,7 @@ codeunit 6014461 "NPR CleanCash Status Msg." implements "NPR CleanCash XCCSP Int
         Element: XmlElement;
         NamespaceManager: XmlNamespaceManager;
         Node: XmlNode;
+        ResponseValue: Text;
     begin
 
         CleanCashResponse.SetFilter("Request Entry No.", '=%1', CleanCashTransactionRequest."Entry No.");
@@ -92,17 +93,18 @@ codeunit 6014461 "NPR CleanCash Status Msg." implements "NPR CleanCash XCCSP Int
 
             if (Element.SelectSingleNode('cc:data', NamespaceManager, Node)) then begin
                 DataElement := Node.AsXmlElement();
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:Id', CleanCashResponse."CleanCash Unit Id");
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:Firmware', CleanCashResponse."CleanCash Firmware");
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:InstalledLicenses', CleanCashResponse."Installed Licenses");
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:Id', CleanCashResponse."CleanCash Unit Id", MaxStrLen(CleanCashResponse."CleanCash Unit Id"));
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:Firmware', CleanCashResponse."CleanCash Firmware", MaxStrLen(CleanCashResponse."CleanCash Firmware"));
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:InstalledLicenses', ResponseValue, MaxStrLen(CleanCashResponse."Installed Licenses"));
+                CleanCashResponse."Installed Licenses" := ResponseValue;
 
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:MainStatus', EnumAsText);
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:MainStatus', EnumAsText, MaxStrLen(EnumAsText));
                 evaluate(CleanCashResponse."CleanCash Main Status", EnumAsText);
 
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:StorageStatus', EnumAsText);
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:StorageStatus', EnumAsText, MaxStrLen(EnumAsText));
                 evaluate(CleanCashResponse."CleanCash Storage Status", EnumAsText);
 
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:Type', EnumAsText);
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:Type', EnumAsText, MaxStrLen(EnumAsText));
                 evaluate(CleanCashResponse."CleanCash Type", EnumAsText);
 
             end;

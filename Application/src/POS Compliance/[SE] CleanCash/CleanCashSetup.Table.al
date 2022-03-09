@@ -93,7 +93,7 @@ table 6184500 "NPR CleanCash Setup"
     trigger OnInsert()
     begin
         if Rec."CleanCash Register No." = '' then
-            Rec."CleanCash Register No." := Register;
+            Rec."CleanCash Register No." := CopyStr(Register, 1, MaxStrLen(Rec."CleanCash Register No."));
     end;
 }
 
