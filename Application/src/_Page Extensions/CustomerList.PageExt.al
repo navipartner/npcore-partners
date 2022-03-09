@@ -48,6 +48,11 @@ pageextension 6014492 "NPR Customer List" extends "Customer List"
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the customer''s e-mail address. Clicking on the e-mail address opens an e-mail application.';
             }
+            field("NPR Mobile Phone No."; Rec."Mobile Phone No.")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the customer''s mobile phone no.';
+            }
         }
 
         modify(Control1)
