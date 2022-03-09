@@ -28,12 +28,6 @@
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Blocked; Rec.Blocked)
-                {
-
-                    ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NPRRetail;
-                }
             }
         }
     }
