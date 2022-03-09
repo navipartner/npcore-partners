@@ -20,15 +20,4 @@ pageextension 6014441 "NPR Shipping Agents" extends "Shipping Agents"
 
         }
     }
-    actions
-    {
-        modify("&Line")
-        {
-            Caption = '&Line';
-        }
-        modify(ShippingAgentServices)
-        {
-            Caption = 'Shipping A&gent Services';
-        }
-    }
 }
