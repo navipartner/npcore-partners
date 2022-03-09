@@ -100,7 +100,7 @@
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ToolTip = 'Specifies whether or not the button is enabled or not';
+                    ToolTip = 'Specifies if the button is visible & activated or not. If Yes is selected, the button is always visible & activated; If Auto is selected, the button is visible & activated ONLY if there is a POS sales line. If No is selected, the button is deactivated.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Secure Method Code"; Rec."Secure Method Code")
