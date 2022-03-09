@@ -2,15 +2,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
 {
     layout
     {
-        addafter(Status)
-        {
-            field("NPR PostingDescription"; Rec."Posting Description")
-            {
 
-                ToolTip = 'Specifies a posting description to appear on the resulting journal lines.';
-                ApplicationArea = NPRRetail;
-            }
-        }
         addafter(Control1906949207)
         {
             part("NPR NPAttributes"; "NPR NP Attributes FactBox")
