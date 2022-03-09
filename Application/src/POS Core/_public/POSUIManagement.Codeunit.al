@@ -187,7 +187,7 @@
         Theme: JsonArray;
         DependencyContent: Text;
     begin
-        if (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSTheme.Get(POSViewProfile."POS Theme Code")) or POSTheme.Blocked then
+        if (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSTheme.Get(POSViewProfile."POS Theme Code")) then
             exit;
 
         ThemeDep.SetRange("POS Theme Code", POSViewProfile."POS Theme Code");
