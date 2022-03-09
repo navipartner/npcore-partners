@@ -22,6 +22,8 @@
         {
             Caption = 'Blocked';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
     }
 
