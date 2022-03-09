@@ -42,11 +42,6 @@
                 Visible = false;
                 ApplicationArea = NPRRetail;
             }
-            part(MyJobQueue; "My Job Queue")
-            {
-                Caption = 'Job Queue';
-                ApplicationArea = NPRRetail;
-            }
             part("MyReports"; "NPR My Reports")
             {
                 ApplicationArea = NPRRetail;
@@ -54,6 +49,11 @@
             part(Control21; "Report Inbox Part")
             {
                 AccessByPermission = TableData "Report Inbox" = R;
+                ApplicationArea = NPRRetail;
+            }
+            part(MyJobQueue; "My Job Queue")
+            {
+                Caption = 'Job Queue';
                 ApplicationArea = NPRRetail;
             }
 

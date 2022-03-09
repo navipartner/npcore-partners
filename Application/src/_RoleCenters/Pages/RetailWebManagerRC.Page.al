@@ -14,9 +14,8 @@
                 ApplicationArea = NPRRetail;
 
             }
-            part(MyJobQueue; "My Job Queue")
+            part(Control6014400; "NPR My Reports")
             {
-                Caption = 'Job Queue';
                 ApplicationArea = NPRRetail;
             }
             part(Control21; "Report Inbox Part")
@@ -25,8 +24,9 @@
                 ApplicationArea = NPRRetail;
 
             }
-            part(Control6014400; "NPR My Reports")
+            part(MyJobQueue; "My Job Queue")
             {
+                Caption = 'Job Queue';
                 ApplicationArea = NPRRetail;
             }
             part(Control6150616; "NPR Web Manager Activ.")
