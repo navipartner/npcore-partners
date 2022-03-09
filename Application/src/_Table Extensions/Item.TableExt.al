@@ -329,10 +329,6 @@ tableextension 6014427 "NPR Item" extends Item
         key("NPR Key1"; "NPR Group sale", "NPR Item Group")
         {
             Enabled = false;
-            //Obsoleting keys generates an error when using CurrentKeyIndex with RecRef.
-            //See details: https://github.com/microsoft/AL/issues/6734
-            //ObsoleteState = Removed;
-            //ObsoleteReason = 'Not used anymore.';
         }
         key("NPR Key3"; "NPR Replication Counter")
         {
