@@ -39,25 +39,4 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
             }
         }
     }
-    actions
-    {
-        addafter(ActivityLog)
-        {
-            action("NPR Consignor Label")
-            {
-                Caption = 'Consignor Label';
-
-                ToolTip = 'Prints Consignor Label.';
-                Image = Print;
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    ConsignorEntry: Record "NPR Consignor Entry";
-                begin
-                    ConsignorEntry.InsertFromPostedInvoiceHeader(Rec."No.");
-                end;
-            }
-        }
-    }
 }

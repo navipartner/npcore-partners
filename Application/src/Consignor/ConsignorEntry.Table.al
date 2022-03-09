@@ -141,25 +141,6 @@
         InsertHeader(InCode);
     end;
 
-    procedure InsertFromPostedInvoiceHeader(InCode: Code[20])
-    var
-        SalesInvoiceLine: Record "Sales Invoice Line";
-        TempWeight: Decimal;
-    begin
-        if not CheckPostedInvoiceHeader(InCode) then
-            exit;
-        Init();
-        Type := Type::Invoice;
-        SalesInvoiceLine.SetRange("Document No.", InCode);
-        SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
-        SalesInvoiceLine.SetFilter("Net Weight", '<>0');
-        if SalesInvoiceLine.FindSet() then
-            repeat
-                TempWeight += SalesInvoiceLine."Net Weight" * SalesInvoiceLine.Quantity;
-            until SalesInvoiceLine.Next() = 0;
-        Weight := TempWeight;
-        InsertHeader(InCode);
-    end;
 
     local procedure InsertHeader(InCode: Code[20])
     var
@@ -206,16 +187,6 @@
         exit(true);
     end;
 
-    local procedure CheckPostedInvoiceHeader(InCode: Code[20]): Boolean
-    var
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-    begin
-        SalesInvoiceHeader.Get(InCode);
 
-        if SalesInvoiceHeader."Shipping Agent Code" = '' then
-            exit(false);
-
-        exit(true);
-    end;
 }
 
