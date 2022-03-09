@@ -110,7 +110,7 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         CleanCashTransaction."Receipt DateTime" := CreateDateTime(PosEntry."Document Date", PosEntry."Ending Time");
         CleanCashTransaction."Receipt Type" := ReceiptType;
 
-        CleanCashTransaction."Receipt Id" := NoSeriesManagement.GetNextNo(CleanCashSetup."CleanCash No. Series", Today, true);
+        CleanCashTransaction."Receipt Id" := CopyStr(NoSeriesManagement.GetNextNo(CleanCashSetup."CleanCash No. Series", Today, true), 1, MaxStrLen(CleanCashTransaction."Receipt Id"));
         CleanCashTransaction."Organisation No." := CleanCashSetup."Organization ID";
         CleanCashTransaction."Pos Id" := CleanCashSetup."CleanCash Register No.";
 
@@ -158,8 +158,8 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         repeat
             Vat := XmlElement.Create('Vat', XmlNs);
             Vat.Add(CleanCashXCCSPProtocol.AddElement('Class', Format(CleanCashTransactionVat."VAT Class", 0, '<Integer>'), XmlNs));
-            Vat.Add(CleanCashXCCSPProtocol.AddElement('Percentage', Format(CleanCashTransactionVat.Percentage, 0, '<Precision,2:2><Integer><Comma,,><Decimals>'), XmlNs));
-            Vat.Add(CleanCashXCCSPProtocol.AddElement('Amount', Format(CleanCashTransactionVat.Amount, 0, '<Precision,2:2><Sign><Integer><Comma,,><Decimals>'), XmlNs));
+            Vat.Add(CleanCashXCCSPProtocol.AddElement('Percentage', Format(CleanCashTransactionVat.Percentage, 0, '<Precision,2:2><Integer><Decimals><Comma,,>'), XmlNs));
+            Vat.Add(CleanCashXCCSPProtocol.AddElement('Amount', Format(CleanCashTransactionVat.Amount, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'), XmlNs));
             VatList.Add(Vat);
         until (CleanCashTransactionVat.Next() = 0);
 
@@ -174,8 +174,8 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('ReceiptId', CleanCashTransactionRequest."Receipt Id", XmlNs));
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('PosId', CleanCashTransactionRequest."Pos Id", XmlNs));
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('OrgNo', CleanCashTransactionRequest."Organisation No.", XmlNs));
-        Receipt.Add(CleanCashXCCSPProtocol.AddElement('ReceiptTotal', Format(CleanCashTransactionRequest."Receipt Total", 0, '<Precision,2:2><Sign><Integer><Comma,,><Decimals>'), XmlNs));
-        Receipt.Add(CleanCashXCCSPProtocol.AddElement('NegativeTotal', Format(CleanCashTransactionRequest."Negative Total", 0, '<Precision,2:2><Sign><Integer><Comma,,><Decimals>'), XmlNs));
+        Receipt.Add(CleanCashXCCSPProtocol.AddElement('ReceiptTotal', Format(CleanCashTransactionRequest."Receipt Total", 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'), XmlNs));
+        Receipt.Add(CleanCashXCCSPProtocol.AddElement('NegativeTotal', Format(CleanCashTransactionRequest."Negative Total", 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'), XmlNs));
         "NPR CleanCash Receipt Type".Names().Get("NPR CleanCash Receipt Type".Ordinals().IndexOf(CleanCashTransactionRequest."Receipt Type".AsInteger()), EnumName);
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('ReceiptType', EnumName, XmlNs));
 
@@ -227,14 +227,14 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
 
             if (Element.SelectSingleNode('cc:data', NamespaceManager, Node)) then begin
                 DataElement := Node.AsXmlElement();
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:Code', CleanCashResponse."CleanCash Code");
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitId', CleanCashResponse."CleanCash Unit Id");
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:Code', CleanCashResponse."CleanCash Code", MaxStrLen(CleanCashResponse."CleanCash Code"));
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitId', CleanCashResponse."CleanCash Unit Id", MaxStrLen(CleanCashResponse."CleanCash Unit Id"));
 
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitMainStatus', EnumAsText);
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitMainStatus', EnumAsText, MaxStrLen(EnumAsText));
                 if (not Evaluate(CleanCashResponse."CleanCash Main Status", EnumAsText)) then
                     CleanCashResponse."CleanCash Main Status" := CleanCashResponse."CleanCash Main Status"::NO_VALUE;
 
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitStorageStatus', EnumAsText);
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitStorageStatus', EnumAsText, MaxStrLen(EnumAsText));
                 if (not Evaluate(CleanCashResponse."CleanCash Storage Status", EnumAsText)) then
                     CleanCashResponse."CleanCash Storage Status" := CleanCashResponse."CleanCash Storage Status"::NO_VALUE;
 

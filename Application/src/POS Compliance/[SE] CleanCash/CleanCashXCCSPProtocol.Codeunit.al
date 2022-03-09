@@ -230,10 +230,10 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
     begin
         if (Element.SelectSingleNode('cc:data', NamespaceManager, Node)) then begin
             DataElement := Node.AsXmlElement();
-            GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Code', EnumAsText);
+            GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Code', EnumAsText, MaxStrLen(EnumAsText));
             evaluate(CleanCashResponse."Fault Code", EnumAsText);
-            GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:ShortMessage', CleanCashResponse."Fault Short Description");
-            GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Message', CleanCashResponse."Fault Description");
+            GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:ShortMessage', CleanCashResponse."Fault Short Description", MaxStrLen(CleanCashResponse."Fault Short Description"));
+            GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Message', CleanCashResponse."Fault Description", MaxStrLen(CleanCashResponse."Fault Description"));
         end;
     end;
 
@@ -249,14 +249,14 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
     end;
 
     // Helper function when decoding the XML response
-    procedure GetElementInnerText(NamespaceManager: XmlNamespaceManager; Element: XmlElement; XPath: Text; var InnerText: Text): Boolean
+    procedure GetElementInnerText(NamespaceManager: XmlNamespaceManager; Element: XmlElement; XPath: Text; var InnerText: Text; MaxLen: Integer): Boolean
     var
         Node: XmlNode;
     begin
         if (not Element.SelectSingleNode(XPath, NamespaceManager, Node)) then
             exit(false);
 
-        InnerText := copystr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(InnerText));
+        InnerText := copystr(Node.AsXmlElement().InnerText(), 1, MaxLen);
         exit(true);
 
     end;
