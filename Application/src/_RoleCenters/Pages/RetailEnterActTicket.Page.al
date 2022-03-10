@@ -164,13 +164,18 @@
             }
         }
     }
+
     trigger OnOpenPage()
+    var
+        ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
     begin
         Rec.Reset();
         if not Rec.Get() then begin
             Rec.Init();
             Rec.Insert();
         end;
+
+        ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent();
     end;
 
     trigger OnAfterGetCurrRecord()
