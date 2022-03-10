@@ -81,6 +81,8 @@
     }
 
     trigger OnOpenPage()
+    var
+        ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -89,6 +91,7 @@
         end;
 
         Rec.SetFilter("Date Filter", '>=%1', WorkDate());
+        ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent();
     end;
 
     local procedure DrillDownPage(FieldNo2: Integer)
