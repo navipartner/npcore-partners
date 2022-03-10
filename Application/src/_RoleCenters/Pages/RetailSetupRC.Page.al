@@ -50,12 +50,12 @@
                 ToolTip = 'Executes the POS Posting Setup action';
                 ApplicationArea = NPRRetail;
             }
-            action("Coupon Types_top")
+            action("Object Output_Selection")
             {
-                Caption = 'Coupon Types';
-                RunObject = Page "NPR NpDc Coupon Types";
+                Caption = 'Object Output Selection';
+                RunObject = Page "NPR Object Output Selection";
 
-                ToolTip = 'Executes the Coupon Types action';
+                ToolTip = 'Executes the Object Output Selection action';
                 ApplicationArea = NPRRetail;
             }
             action("RP Template List")
@@ -410,14 +410,6 @@
                     RunObject = Page "NPR Retail Report Select. List";
 
                     ToolTip = 'Runs the page for selecting retail reports';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Object Output Selection")
-                {
-                    Caption = 'Object Output Selection';
-                    RunObject = Page "NPR Object Output Selection";
-
-                    ToolTip = 'Executes the Object Output Selection action';
                     ApplicationArea = NPRRetail;
                 }
                 action("Retail Logo Setup")
