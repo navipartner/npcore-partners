@@ -10,41 +10,7 @@
     {
         area(content)
         {
-            cuegroup(Payments)
 
-            {
-                Caption = 'Purchase';
-                field("NP Purchase Quote"; PurchQuoteCount)
-                {
-                    Caption = 'Purchase Quote';
-                    ToolTip = 'Specifies the number of purchase quotes.';
-                    ApplicationArea = NPRRetail;
-                    trigger OnDrillDown()
-                    begin
-                        Page.RunModal(Page::"Purchase Quotes");
-                        CurrPage.Update(false);
-                    end;
-
-                }
-                field("NP Purchase Order"; PurchOrderCount)
-                {
-                    Caption = 'Purchase Order';
-                    ToolTip = 'Specifies the number of purchase orders.';
-                    ApplicationArea = NPRRetail;
-                    trigger OnDrillDown()
-                    begin
-                        Page.RunModal(Page::"Purchase Order List");
-                        CurrPage.Update(false);
-                    end;
-                }
-
-                field("Purchase Return Orders"; Rec."Purchase Return Orders")
-                {
-                    DrillDownPageID = "Purchase Return Order List";
-                    ToolTip = 'Specifies the number of purchase return orders that are displayed in the Finance Cue on the Role Center. The documents are filtered by today''s date.';
-                    ApplicationArea = NPRRetail;
-                }
-            }
             cuegroup("Document Approvals")
             {
                 Caption = 'Document Approvals';
@@ -97,23 +63,8 @@
         end;
 
         Rec.SetFilter("Due Date Filter", '<=%1', WorkDate());
-
-        CountPurchaseDocuments();
-    end;
-
-    local procedure CountPurchaseDocuments()
-    var
-        PurchaseHeader: Record "Purchase Header";
-    begin
-        PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Order);
-        PurchOrderCount := PurchaseHeader.Count();
-        PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Quote);
-        PurchQuoteCount := PurchaseHeader.Count();
     end;
 
     var
         UserTaskManagement: Codeunit "User Task Management";
-        PurchOrderCount: Integer;
-        PurchQuoteCount: Integer;
 }
-
