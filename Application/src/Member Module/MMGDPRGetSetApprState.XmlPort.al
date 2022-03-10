@@ -197,13 +197,13 @@ xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
     }
 
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMember.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer; MemberEntryNo: Integer)
+    internal procedure AddResponse(MembershipEntryNo: Integer; MemberEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
@@ -255,7 +255,7 @@ xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
         end;
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

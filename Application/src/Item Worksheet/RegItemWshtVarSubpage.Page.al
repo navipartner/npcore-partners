@@ -136,7 +136,7 @@
         Variety4InUse: Boolean;
         FieldCaptionNew: array[4] of Text;
 
-    procedure SetRecFromIW(RegItemWorksheetLineHere: Record "NPR Regist. Item Worksh Line")
+    internal procedure SetRecFromIW(RegItemWorksheetLineHere: Record "NPR Regist. Item Worksh Line")
     begin
         RegItemWorksheetLine := RegItemWorksheetLineHere;
 
@@ -167,7 +167,7 @@
             FieldCaptionNew[4] := RegItemWorksheetLine."Variety 4" + '; ' + RegItemWorksheetLine."Variety 4 Table (New)";
     end;
 
-    procedure UpdateSubPage()
+    internal procedure UpdateSubPage()
     begin
         CurrPage.Update(false);
     end;

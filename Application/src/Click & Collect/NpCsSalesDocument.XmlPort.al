@@ -379,7 +379,7 @@ xmlport 6151195 "NPR NpCs Sales Document"
         }
     }
 
-    procedure CopySourceTable(var TempSalesHeader2: Record "Sales Header" temporary)
+    internal procedure CopySourceTable(var TempSalesHeader2: Record "Sales Header" temporary)
     begin
         TempSalesHeader2.Copy(TempSalesHeader, true);
     end;

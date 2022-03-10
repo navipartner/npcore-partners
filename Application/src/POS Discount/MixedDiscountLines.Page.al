@@ -253,7 +253,7 @@
         exit(MixedDiscount.Description);
     end;
 
-    procedure UpdateMixedDiscountView(MixedDiscount: Record "NPR Mixed Discount")
+    internal procedure UpdateMixedDiscountView(MixedDiscount: Record "NPR Mixed Discount")
     begin
         Lot := MixedDiscount.Lot;
         MixType := MixedDiscount."Mix Type";
@@ -271,7 +271,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure GetTotalAmount(): Decimal
+    internal procedure GetTotalAmount(): Decimal
     var
         MixedDiscount: Record "NPR Mixed Discount";
     begin

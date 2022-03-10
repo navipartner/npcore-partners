@@ -148,27 +148,27 @@
         SplitList: Code[20];
         SplitOption: Option HORIZONTAL,VERTICAL,DIAGONAL_LR,DIAGONAL_RL;
 
-    procedure SetSectionTabValues(pSectionCount: Integer; pSectionNames: Text)
+    internal procedure SetSectionTabValues(pSectionCount: Integer; pSectionNames: Text)
     begin
 
         SelectedSectionCount := pSectionCount;
     end;
 
-    procedure ShowStructureTab(Show: Boolean)
+    internal procedure ShowStructureTab(Show: Boolean)
     begin
 
     end;
 
-    procedure ShowNumberingTab(Show: Boolean)
+    internal procedure ShowNumberingTab(Show: Boolean)
     begin
 
     end;
 
-    procedure ShowSplitOption()
+    internal procedure ShowSplitOption()
     begin
     end;
 
-    procedure GetStructureOptions(var vNumberOfRows: Integer; var vRowLabel: Text[80]; var vNumberOfSeats: Integer; var vSeatLabel: Text[80])
+    internal procedure GetStructureOptions(var vNumberOfRows: Integer; var vRowLabel: Text[80]; var vNumberOfSeats: Integer; var vSeatLabel: Text[80])
     begin
 
         vNumberOfRows := Rows;
@@ -178,7 +178,7 @@
         vSeatLabel := SeatLabel;
     end;
 
-    procedure GetNumberingOptions(var vRowNumberingOrder: Option; var vRowStartNumber: Code[10]; var vSeatNumberingOrder: Option; var vSeatStartNumber: Code[10]; var vContinuousSeatNumbering: Boolean; var vSeatingIncrement: Option; var vSpanSections: Boolean)
+    internal procedure GetNumberingOptions(var vRowNumberingOrder: Option; var vRowStartNumber: Code[10]; var vSeatNumberingOrder: Option; var vSeatStartNumber: Code[10]; var vContinuousSeatNumbering: Boolean; var vSeatingIncrement: Option; var vSpanSections: Boolean)
     begin
 
         vRowNumberingOrder := SeatingSetup."Row Numbering";
@@ -193,7 +193,7 @@
         vSpanSections := SpanSections;
     end;
 
-    procedure GetSplitOptions(var vSplitOption: Option; var vSplitAtList: Code[20])
+    internal procedure GetSplitOptions(var vSplitOption: Option; var vSplitAtList: Code[20])
     begin
 
         vSplitAtList := SplitList;

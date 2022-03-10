@@ -183,7 +183,7 @@
             Rec."Table Name" := PadStr('', Rec.Level * 3, ' ') + Rec."Table Name";
     end;
 
-    procedure MoveDown()
+    internal procedure MoveDown()
     var
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         TempNpXmlTemplateTrigger: Record "NPR NpXml Template Trigger" temporary;
@@ -215,7 +215,7 @@
         until TempNpXmlTemplateTrigger.Next(-1) = 0;
     end;
 
-    procedure MoveUp()
+    internal procedure MoveUp()
     var
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         TempNpXmlTemplateTrigger: Record "NPR NpXml Template Trigger" temporary;

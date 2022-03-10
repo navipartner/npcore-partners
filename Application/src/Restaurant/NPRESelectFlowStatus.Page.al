@@ -177,17 +177,17 @@
         WaiterPadMgt.SelectPrintCategories(Rec.RecordId);
     end;
 
-    procedure SetMultiSelectionMode(Set: Boolean)
+    internal procedure SetMultiSelectionMode(Set: Boolean)
     begin
         IsMultiSelectionMode := Set;
     end;
 
-    procedure SetDataset(var FlowStatus: Record "NPR NPRE Flow Status")
+    internal procedure SetDataset(var FlowStatus: Record "NPR NPRE Flow Status")
     begin
         Rec.Copy(FlowStatus);
     end;
 
-    procedure GetDataset(var FlowStatus: Record "NPR NPRE Flow Status")
+    internal procedure GetDataset(var FlowStatus: Record "NPR NPRE Flow Status")
     var
         RecRef: RecordRef;
         FldRef: FieldRef;

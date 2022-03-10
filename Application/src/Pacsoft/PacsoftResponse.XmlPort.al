@@ -55,12 +55,12 @@ xmlport 6014485 "NPR Pacsoft Response"
     var
         ShipmentDocument: Record "NPR Shipping Provider Document";
 
-    procedure SetShipmentDocument(pShipmentDocument: Record "NPR Shipping Provider Document")
+    internal procedure SetShipmentDocument(pShipmentDocument: Record "NPR Shipping Provider Document")
     begin
         ShipmentDocument := pShipmentDocument;
     end;
 
-    procedure GetShipmentDocument(var pShipmentDocument: Record "NPR Shipping Provider Document")
+    internal procedure GetShipmentDocument(var pShipmentDocument: Record "NPR Shipping Provider Document")
     begin
         pShipmentDocument := ShipmentDocument;
     end;

@@ -343,7 +343,7 @@
         NPRAttrTextArray: array[40] of Text[250];
         NPRExItemAttrTextArray: array[40] of Text[250];
 
-    procedure ShowDetails()
+    internal procedure ShowDetails()
     begin
         PAGE.Run(PAGE::"Item Card", Rec);
     end;

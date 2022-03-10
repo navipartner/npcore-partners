@@ -218,13 +218,13 @@ xmlport 6060130 "NPR MM Get Members. Members"
     var
         NOT_FOUND: Label 'Filter combination removed all results.';
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMemberInfoResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer; MemberExternalNumber: Code[20]; MemberExternalCardNo: Code[100])
+    internal procedure AddResponse(MembershipEntryNo: Integer; MemberExternalNumber: Code[20]; MemberExternalCardNo: Code[100])
     var
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
@@ -321,7 +321,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
             AddErrorResponse(NOT_FOUND);
     end;
 
-    procedure GetResponse(var TmpMemberInfoResponseOut: Record "NPR MM Member Info Capture"; var TmpAttributeValueSetOut: Record "NPR Attribute Value Set"; var ResponseMessage: Text): Boolean
+    internal procedure GetResponse(var TmpMemberInfoResponseOut: Record "NPR MM Member Info Capture"; var TmpAttributeValueSetOut: Record "NPR Attribute Value Set"; var ResponseMessage: Text): Boolean
     begin
         TmpMemberInfoResponseOut.Copy(tmpMemberInfoResponse, true);
         TmpAttributeValueSetOut.Copy(TmpAttributeValueSet, true);
@@ -330,7 +330,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
         exit(status = '1');
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

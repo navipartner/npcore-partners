@@ -31,7 +31,7 @@
         }
     }
 
-    procedure GetSelectionFilter(): Text
+    internal procedure GetSelectionFilter(): Text
     var
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SelectionFilterManagement: Codeunit SelectionFilterManagement;

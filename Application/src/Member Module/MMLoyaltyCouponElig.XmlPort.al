@@ -186,7 +186,7 @@ xmlport 6060147 "NPR MM Loyalty Coupon Elig."
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
 
-    procedure GetRequest(var TmpMemberInfoCaptureOut: Record "NPR MM Member Info Capture" temporary)
+    internal procedure GetRequest(var TmpMemberInfoCaptureOut: Record "NPR MM Member Info Capture" temporary)
     begin
 
         tmpMemberInfoCapture.FindFirst();
@@ -194,13 +194,13 @@ xmlport 6060147 "NPR MM Loyalty Coupon Elig."
         TmpMemberInfoCaptureOut.Insert();
     end;
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer; var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary; ResponseMessageIn: Text)
+    internal procedure AddResponse(MembershipEntryNo: Integer; var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary; ResponseMessageIn: Text)
     var
         Membership: Record "NPR MM Membership";
     begin
@@ -236,7 +236,7 @@ xmlport 6060147 "NPR MM Loyalty Coupon Elig."
         end;
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         responsemessage := ErrorMessage;

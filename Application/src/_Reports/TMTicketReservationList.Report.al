@@ -1,7 +1,7 @@
 report 6060121 "NPR TM Ticket Reservation List"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = '.\src\_Reports\layouts\TM Ticket Reservation List.rdlc';
@@ -266,7 +266,7 @@ report 6060121 "NPR TM Ticket Reservation List"
         Country: Text;
         PhoneNumber: Text;
 
-    procedure SetQueryFilter(var AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry")
+    internal procedure SetQueryFilter(var AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry")
     begin
 
         Admission_Code := AdmissionScheduleEntry."Admission Code";

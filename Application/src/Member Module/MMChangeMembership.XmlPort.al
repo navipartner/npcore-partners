@@ -101,13 +101,13 @@ xmlport 6060134 "NPR MM Change Membership"
         }
     }
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer)
+    internal procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
         MembershipLedgerEntry: Record "NPR MM Membership Entry";
@@ -133,7 +133,7 @@ xmlport 6060134 "NPR MM Change Membership"
         end;
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

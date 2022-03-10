@@ -51,12 +51,12 @@
     var
         DataSource: Code[50];
 
-    procedure SetCurrent(DataSourceIn: Code[50])
+    internal procedure SetCurrent(DataSourceIn: Code[50])
     begin
         DataSource := DataSourceIn;
     end;
 
-    procedure GetCurrent(): Code[50]
+    internal procedure GetCurrent(): Code[50]
     begin
         exit(Rec.Name);
     end;

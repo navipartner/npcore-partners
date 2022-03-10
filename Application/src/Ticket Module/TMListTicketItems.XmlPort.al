@@ -252,7 +252,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
         TMAdmission: Record "NPR TM Admission";
         ItemResponse: Record Item;
 
-    procedure CreateResponse()
+    internal procedure CreateResponse()
     var
         Item: Record Item;
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -297,7 +297,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
         ItemVariant.Reset();
     end;
 
-    procedure GetResponse(var TmpItemVariantOut: Record "Item Variant" temporary)
+    internal procedure GetResponse(var TmpItemVariantOut: Record "Item Variant" temporary)
     begin
         TmpItemVariantOut.Copy(TmpItemVariant, true);
     end;

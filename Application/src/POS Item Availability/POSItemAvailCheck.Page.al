@@ -26,12 +26,12 @@ page 6059851 "NPR POS Item Avail. Check"
         }
     }
 
-    procedure SetHeading(Value: Text)
+    internal procedure SetHeading(Value: Text)
     begin
         Heading := Value;
     end;
 
-    procedure SetAvailabilityCheckDetails(var PosItemAvailability: Record "NPR POS Item Availability"; ShowCurrentLineQty: Boolean)
+    internal procedure SetAvailabilityCheckDetails(var PosItemAvailability: Record "NPR POS Item Availability"; ShowCurrentLineQty: Boolean)
     begin
         CurrPage.AvailabilityCheckDetails.Page.SetDataset(PosItemAvailability);
         CurrPage.AvailabilityCheckDetails.Page.SetShowCurrentLineQtyColumn(ShowCurrentLineQty);

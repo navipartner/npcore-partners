@@ -76,7 +76,7 @@
         }
     }
 
-    procedure UsedByItemDrillDown()
+    internal procedure UsedByItemDrillDown()
     var
         Item: Record Item;
         TempItem: Record Item temporary;

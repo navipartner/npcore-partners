@@ -108,12 +108,12 @@
         NegAmountErr: Label 'Amount can''t be set as negative.';
         FloatAlreadySetErr: Label 'Float is already set for %1 %2, %3 %4.';
 
-    procedure SetPaymentBin(POSPaymentBinHere: Record "NPR POS Payment Bin")
+    internal procedure SetPaymentBin(POSPaymentBinHere: Record "NPR POS Payment Bin")
     begin
         POSPaymentBin := POSPaymentBinHere;
     end;
 
-    procedure GetAmounts(var POSPaymentMethodHere: Record "NPR POS Payment Method")
+    internal procedure GetAmounts(var POSPaymentMethodHere: Record "NPR POS Payment Method")
     begin
         if TempPOSPaymentMethod.FindSet() then
             repeat

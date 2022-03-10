@@ -1,8 +1,8 @@
 ﻿report 6014430 "NPR Item Sales Stats/Provider"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Sales StatisticsProvider.rdlc';
     Caption = 'Item Sales Statistics/Provider';
@@ -361,7 +361,7 @@
         ItemCategoryDesc: Text[200];
         ItemCategoryFooterDesc: Text[200];
 
-    procedure Calculate(DateFrom: Date; DateTo: Date): Decimal
+    internal procedure Calculate(DateFrom: Date; DateTo: Date): Decimal
     begin
         Item1.SetRange("Date Filter", DateFrom, DateTo);
         Item1.Get(Item."No.");

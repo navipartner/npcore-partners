@@ -61,7 +61,7 @@
     var
         _LookupCaption: Text;
 
-    procedure LoadEntries(LookupCaption: Text; var TmpEntry: Record "NPR MM Loyalty Point Setup" temporary)
+    internal procedure LoadEntries(LookupCaption: Text; var TmpEntry: Record "NPR MM Loyalty Point Setup" temporary)
     begin
         _LookupCaption := LookupCaption;
         Rec.Copy(TmpEntry, true);

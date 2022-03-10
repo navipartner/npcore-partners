@@ -1304,18 +1304,18 @@
         ShowExpanded: Option "Variety 1","Variety 1+2","Variety 1+2+3","Variety 1+2+3+4";
         NPRAttrTextArray: array[40] of Text;
 
-    procedure SetFieldEditable()
+    internal procedure SetFieldEditable()
     begin
         FieldsEditable := (Rec."Existing Item No." = '');
     end;
 
-    procedure GetCurrentWorksheet()
+    internal procedure GetCurrentWorksheet()
     begin
         ItemWorksheet.Get(Rec.GetRangeMax("Worksheet Template Name"), CurrentWorksheetName);
         ShowExpanded := ItemWorksheet."Show Variety Level";
     end;
 
-    procedure SetVisibleFields()
+    internal procedure SetVisibleFields()
     begin
         CurrPage.ItemWorksheetVarSubpage.PAGE.SetRecFromIW(Rec);
         CurrPage.ItemWorksheetVarSubpage.PAGE.UpdateSubPage();
@@ -1336,7 +1336,7 @@
         CurrPage.NPAttribFactBox.PAGE.Update();
     end;
 
-    procedure OpenFilteredView(var VarItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure OpenFilteredView(var VarItemWorksheetLine: Record "NPR Item Worksheet Line")
     begin
         ItemWorksheetLine.CopyFilters(VarItemWorksheetLine);
         ItemWorksheetLine.FindFirst();

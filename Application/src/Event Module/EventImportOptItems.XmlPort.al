@@ -40,7 +40,7 @@ xmlport 6060150 "NPR Event Import Opt. Items"
     var
         i: Integer;
 
-    procedure GetOptionalItems(var JobPlanningLine: Record "Job Planning Line")
+    internal procedure GetOptionalItems(var JobPlanningLine: Record "Job Planning Line")
     begin
         if "Job Planning Line".FindSet() then
             repeat

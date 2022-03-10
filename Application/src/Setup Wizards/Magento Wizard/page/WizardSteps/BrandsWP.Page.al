@@ -57,7 +57,7 @@
     var
         TempExistingMagBrands: Record "NPR Magento Brand" temporary;
 
-    procedure CopyRealAndTemp(var TempMagentoBrand: Record "NPR Magento Brand")
+    internal procedure CopyRealAndTemp(var TempMagentoBrand: Record "NPR Magento Brand")
     var
         MagentoBrand: Record "NPR Magento Brand";
     begin
@@ -76,7 +76,7 @@
             until MagentoBrand.Next() = 0;
     end;
 
-    procedure CreateMagentoBrand()
+    internal procedure CreateMagentoBrand()
     var
         MagentoBrand: Record "NPR Magento Brand";
     begin
@@ -88,7 +88,7 @@
             until Rec.Next() = 0;
     end;
 
-    procedure MagentoBrandToCreate(): Boolean
+    internal procedure MagentoBrandToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;

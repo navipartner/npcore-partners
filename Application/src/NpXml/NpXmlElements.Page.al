@@ -601,7 +601,7 @@
         until TempField.Next() = 0;
     end;
 
-    procedure MoveDown()
+    internal procedure MoveDown()
     var
         NpXmlElement: Record "NPR NpXml Element";
         TempNpXmlElement: Record "NPR NpXml Element" temporary;
@@ -633,7 +633,7 @@
         until TempNpXmlElement.Next(-1) = 0;
     end;
 
-    procedure MoveUp()
+    internal procedure MoveUp()
     var
         NpXmlElement: Record "NPR NpXml Element";
         TempNpXmlElement: Record "NPR NpXml Element" temporary;

@@ -46,7 +46,7 @@
         Limitation: Boolean;
         LastYear_W53: Boolean;
 
-    procedure SetDateFilter(FromStart: Boolean; Value: Integer)
+    internal procedure SetDateFilter(FromStart: Boolean; Value: Integer)
     var
         StartDate: Date;
         EndDate: Date;
@@ -170,7 +170,7 @@
         CalculateLastYear(DateFilterLast, DepartmentFilter);
     end;
 
-    procedure CalculateYear(DateFilter: Code[50]; DepartmentFilter: Code[50])
+    internal procedure CalculateYear(DateFilter: Code[50]; DepartmentFilter: Code[50])
     var
         AuxValueEntry: Record "NPR Aux. Value Entry";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -192,7 +192,7 @@
 
     end;
 
-    procedure CalculateLastYear(DateFilter: Code[50]; DepartmentFilter: Code[50])
+    internal procedure CalculateLastYear(DateFilter: Code[50]; DepartmentFilter: Code[50])
     var
         AuxValueEntry: Record "NPR Aux. Value Entry";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -222,7 +222,7 @@
         SetBar(Round(MidPct, 0.01));
     end;
 
-    procedure SetBar(Percent: Decimal)
+    internal procedure SetBar(Percent: Decimal)
     begin
         BarPct := Percent;
         if Abs(BarPct) > 100 then
@@ -233,7 +233,7 @@
         BarPct := Round(MidPct, 0.01);
     end;
 
-    procedure PushDay()
+    internal procedure PushDay()
     begin
         //PushDay
 
@@ -241,27 +241,27 @@
         SetDateFilter(Limitation, Int);
     end;
 
-    procedure PushWeek()
+    internal procedure PushWeek()
     begin
         //PushWeek()
         Int := 7;
         SetDateFilter(Limitation, Int);
     end;
 
-    procedure PushMonth()
+    internal procedure PushMonth()
     begin
         //PushMonth()
         Int := 31;
         SetDateFilter(Limitation, Int);
     end;
 
-    procedure PushYear()
+    internal procedure PushYear()
     begin
         Int := 12;
         SetDateFilter(Limitation, Int);
     end;
 
-    procedure SetDeptFilter("Filter": Code[20])
+    internal procedure SetDeptFilter("Filter": Code[20])
     begin
         //SetDeptFilter
 

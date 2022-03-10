@@ -42,7 +42,7 @@
             }
         }
     }
-    procedure SetRec(var TempAllObj: Record AllObj)
+    internal procedure SetRec(var TempAllObj: Record AllObj)
     begin
         Rec.DeleteAll();
 

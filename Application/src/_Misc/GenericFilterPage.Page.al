@@ -266,12 +266,12 @@ page 6059845 "NPR Generic Filter Page"
         DescendingKeyWord := ') ORDER(Descending)';
     end;
 
-    procedure SetRecRef(var RecRef2: RecordRef)
+    internal procedure SetRecRef(var RecRef2: RecordRef)
     begin
         RecRef := RecRef2;
     end;
 
-    procedure GetRecRef(var FilteredRecRef: RecordRef)
+    internal procedure GetRecRef(var FilteredRecRef: RecordRef)
     begin
         FilteredRecRef := RecRef;
     end;
@@ -366,7 +366,7 @@ page 6059845 "NPR Generic Filter Page"
             CompleteFilterText := DelStr(CompleteFilterText, StrLen(WhereKeyWord + ','), 1);
     end;
 
-    procedure ReturnRawFilter() "Filter": Text
+    internal procedure ReturnRawFilter() "Filter": Text
     begin
         filter := CompleteFilterText;
         if (CompleteFilterText <> '') and (StrPos(CompleteFilterText, WhereKeyWord) = 0) then
@@ -430,7 +430,7 @@ page 6059845 "NPR Generic Filter Page"
         Descending := StrPos(CompleteFilterText, DescendingKeyWord) <> 0;
     end;
 
-    procedure SetRawFilter(RawFilter: Text)
+    internal procedure SetRawFilter(RawFilter: Text)
     begin
         CompleteFilterText := RawFilter;
     end;

@@ -1,8 +1,8 @@
 ﻿report 6014543 "NPR Item - Loss - Top 10"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item - Loss - Top 10.rdlc';
     Caption = 'Item Shrinkage - Top 10';
@@ -252,7 +252,7 @@
         ItemCostAmountTotalCaptionLbl: Label 'Total Cost';
         ItemCostAmountTotal_TopCaptionLbl: Label 'Total Listed';
 
-    procedure ItemShrinkage()
+    internal procedure ItemShrinkage()
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
         ValueEntry: Record "Value Entry";

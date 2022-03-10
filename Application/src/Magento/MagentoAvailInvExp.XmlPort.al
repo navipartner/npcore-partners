@@ -129,7 +129,7 @@
             LocationFilter := UpperCase(NewLocationFilter);
     end;
 
-    procedure SetupTempItemVariants()
+    internal procedure SetupTempItemVariants()
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";

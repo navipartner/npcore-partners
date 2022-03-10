@@ -81,7 +81,7 @@
         Column6Visible: Boolean;
         FieldMappingARR: array[6] of Integer;
 
-    procedure SetPOSInfo(pPOSInfo: Record "NPR POS Info")
+    internal procedure SetPOSInfo(pPOSInfo: Record "NPR POS Info")
     begin
         POSInfo := pPOSInfo;
     end;

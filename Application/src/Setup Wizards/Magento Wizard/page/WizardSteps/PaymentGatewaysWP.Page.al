@@ -162,7 +162,7 @@
     var
         Password: Text[200];
 
-    procedure CreateMagentoPaymentGatewayData()
+    internal procedure CreateMagentoPaymentGatewayData()
     var
         MagentoCustomerGateway: Record "NPR Magento Payment Gateway";
     begin
@@ -174,12 +174,12 @@
             until Rec.Next() = 0;
     end;
 
-    procedure MagentoPaymentGatewayDataToCreate(): Boolean
+    internal procedure MagentoPaymentGatewayDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CopyRealAndTemp(var TempMagentoPaymentGateway: Record "NPR Magento Payment Gateway")
+    internal procedure CopyRealAndTemp(var TempMagentoPaymentGateway: Record "NPR Magento Payment Gateway")
     var
         MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
     begin

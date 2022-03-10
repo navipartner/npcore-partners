@@ -565,7 +565,7 @@
         CheckValueLbl: Label '%1%2%3', Locked = true;
         CheckValue2Lbl: Label '%1%2%3%4', Locked = true;
 
-    procedure Calc()
+    internal procedure Calc()
     var
         AuxValueEntry: Record "NPR Aux. Value Entry";
         AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
@@ -611,7 +611,7 @@
         LastYear := false;
     end;
 
-    procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry")
+    internal procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry")
     begin
         AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
@@ -641,7 +641,7 @@
             AuxItemLedgerEntry.SetRange("Item Category Code");
     end;
 
-    procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry")
+    internal procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry")
     begin
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
         if not LastYear then
@@ -665,7 +665,7 @@
             AuxValueEntry.SetRange("Item Category Code");
     end;
 
-    procedure GetCheckValue(): Text[250]
+    internal procedure GetCheckValue(): Text[250]
     begin
         case ViewPosition of
             ViewPosition::ItemGroup:
@@ -681,7 +681,7 @@
         end;
     end;
 
-    procedure UpdateHiddenLines(ViewPos: Integer; bForce: Boolean)
+    internal procedure UpdateHiddenLines(ViewPos: Integer; bForce: Boolean)
     begin
         case ViewPos of
             ViewPosition::ItemGroup:

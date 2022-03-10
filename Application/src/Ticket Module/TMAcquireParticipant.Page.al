@@ -283,14 +283,14 @@
             Rec.TestField("Notification Address");
     end;
 
-    procedure SetAdmissionCode(AdmissionCode: Code[20])
+    internal procedure SetAdmissionCode(AdmissionCode: Code[20])
     begin
 
         Admission.Get(AdmissionCode);
         RequireNotificationAddress := (Admission."Ticketholder Notification Type" = Admission."Ticketholder Notification Type"::REQUIRED);
     end;
 
-    procedure SetDefaultNotification(Method: Option NA,EMAIL,SMS; Address: Text[100])
+    internal procedure SetDefaultNotification(Method: Option NA,EMAIL,SMS; Address: Text[100])
     begin
 
         SuggestNotificationMethod := Method;

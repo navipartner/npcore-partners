@@ -1,8 +1,8 @@
 ﻿report 6014542 "NPR Item - Loss"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item - Loss.rdlc';
     Caption = 'Item - Loss';
@@ -137,7 +137,7 @@
         TotalCaptionLbl: Label 'Total';
         ItemFilters: Text;
 
-    procedure SvindCalculation()
+    internal procedure SvindCalculation()
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
         lReasonCodeRec: Record "Reason Code";

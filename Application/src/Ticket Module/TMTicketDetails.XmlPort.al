@@ -236,25 +236,25 @@ xmlport 6060120 "NPR TM Ticket Details"
         QtySum: Integer;
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
 
-    procedure GetToken(): Text[100]
+    internal procedure GetToken(): Text[100]
     begin
         exit(ReservationID);
     end;
 
-    procedure GetSummary(): Text[30]
+    internal procedure GetSummary(): Text[30]
     var
         SummaryLbl: Label '%1-%2', Locked = true;
     begin
         exit(StrSubstNo(SummaryLbl, ExternalIdCount, QtySum));
     end;
 
-    procedure GetResponse(var TmpTicketOut: Record "NPR TM Ticket")
+    internal procedure GetResponse(var TmpTicketOut: Record "NPR TM Ticket")
     var
     begin
         TmpTicketOut.Copy(TempTicket, true);
     end;
 
-    procedure CreateResponse()
+    internal procedure CreateResponse()
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";

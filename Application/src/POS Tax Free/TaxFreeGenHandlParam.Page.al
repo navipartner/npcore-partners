@@ -39,7 +39,7 @@
             }
         }
     }
-    procedure SetRec(var tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary)
+    internal procedure SetRec(var tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary)
     begin
         if not tmpHandlerParameter.IsTemporary then
             exit;
@@ -47,7 +47,7 @@
         Rec.Copy(tmpHandlerParameter, true);
     end;
 
-    procedure GetRec(var tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary)
+    internal procedure GetRec(var tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary)
     begin
         if not tmpHandlerParameter.IsTemporary then
             exit;

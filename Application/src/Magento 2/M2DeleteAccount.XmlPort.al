@@ -50,7 +50,7 @@ xmlport 6151158 "NPR M2 Delete Account"
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest() ContactNumber: Code[20]
+    internal procedure GetRequest() ContactNumber: Code[20]
     begin
 
         StartTime := Time;
@@ -61,7 +61,7 @@ xmlport 6151158 "NPR M2 Delete Account"
         exit(TmpContactRequest."No.");
     end;
 
-    procedure SetResponse()
+    internal procedure SetResponse()
     begin
 
         ResponseCode := 'OK';
@@ -69,7 +69,7 @@ xmlport 6151158 "NPR M2 Delete Account"
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    procedure SetErrorResponse(ReasonText: Text)
+    internal procedure SetErrorResponse(ReasonText: Text)
     begin
 
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));

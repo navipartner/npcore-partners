@@ -249,7 +249,7 @@
     {
     }
 
-    procedure IndentLine()
+    internal procedure IndentLine()
     var
         RPTemplateLine: Record "NPR RP Template Line";
     begin
@@ -266,7 +266,7 @@
         //+NPR5.34 [284505]
     end;
 
-    procedure UnindentLine()
+    internal procedure UnindentLine()
     var
         RPTemplateLine: Record "NPR RP Template Line";
     begin

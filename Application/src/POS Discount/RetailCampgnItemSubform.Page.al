@@ -312,7 +312,7 @@
     {
     }
 
-    procedure ShowCampaignItems(var RetailCampaignHeader: Record "NPR Retail Campaign Header")
+    internal procedure ShowCampaignItems(var RetailCampaignHeader: Record "NPR Retail Campaign Header")
     begin
         Rec.CreateDiscountItems(RetailCampaignHeader);
         CurrPage.Update(false);

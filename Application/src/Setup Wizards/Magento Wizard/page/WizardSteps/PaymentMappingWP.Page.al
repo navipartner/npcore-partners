@@ -92,7 +92,7 @@
     var
         TempAllMagentoPaymentGateway: Record "NPR Magento Payment Gateway" temporary;
 
-    procedure SetGlobals(var TempMagentoPaymentGateway: Record "NPR Magento Payment Gateway")
+    internal procedure SetGlobals(var TempMagentoPaymentGateway: Record "NPR Magento Payment Gateway")
     begin
         TempAllMagentoPaymentGateway.DeleteAll();
 
@@ -103,7 +103,7 @@
             until TempMagentoPaymentGateway.Next() = 0;
     end;
 
-    procedure CreateMagentoPaymentMapping()
+    internal procedure CreateMagentoPaymentMapping()
     var
         MagentoPaymentMapping: Record "NPR Magento Payment Mapping";
     begin
@@ -115,7 +115,7 @@
             until Rec.Next() = 0;
     end;
 
-    procedure MagentoPaymentMappingToCreate(): Boolean
+    internal procedure MagentoPaymentMappingToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;

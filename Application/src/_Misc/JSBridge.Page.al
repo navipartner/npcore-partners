@@ -40,14 +40,14 @@
         FunctionParameter: Text;
         JavaScript: Text;
 
-    procedure SetParameters(pFunctionName: Text; pFunctionParameter: Text; pJavaScript: Text)
+    internal procedure SetParameters(pFunctionName: Text; pFunctionParameter: Text; pJavaScript: Text)
     begin
         FunctionName := pFunctionName;
         FunctionParameter := pFunctionParameter;
         JavaScript := pJavaScript;
     end;
 
-    procedure GetText(): Text
+    internal procedure GetText(): Text
     begin
         exit('');
     end;

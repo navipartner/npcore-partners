@@ -99,7 +99,7 @@ xmlport 6060124 "NPR TM Send eTicket"
     var
         ReservationID: Text[100];
 
-    procedure CreateResponse(): Boolean
+    internal procedure CreateResponse(): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
@@ -188,7 +188,7 @@ xmlport 6060124 "NPR TM Send eTicket"
 
     end;
 
-    procedure GetResponse(var ResponseMessage: Text[250]): Boolean
+    internal procedure GetResponse(var ResponseMessage: Text[250]): Boolean
     begin
         tmpTicketReservationResponse.FindFirst();
         ResponseMessage := tmpTicketReservationResponse."Response Message";

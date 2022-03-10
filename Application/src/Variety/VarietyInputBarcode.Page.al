@@ -21,7 +21,7 @@
     var
         Barcode: Code[50];
 
-    procedure GetBarcode(): Code[50]
+    internal procedure GetBarcode(): Code[50]
     begin
         Exit(Barcode);
     end;

@@ -501,7 +501,7 @@
         ImportFromFile(TempBLOB, SkipFirstLine);
     end;
 
-    procedure ImportFromFile(TempBLOB: Codeunit "Temp Blob"; SkipFirstLine: Boolean)
+    internal procedure ImportFromFile(TempBLOB: Codeunit "Temp Blob"; SkipFirstLine: Boolean)
     var
         IStream: InStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";

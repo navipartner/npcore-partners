@@ -1,8 +1,8 @@
 ﻿report 6014457 "NPR Sales Stat/Analysis"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales StatAnalysis.rdlc';
     Caption = 'Sales Stat/Analysis';
@@ -795,7 +795,7 @@
         TxtDim1: Text;
         TxtLabeldim1: Text[100];
 
-    procedure Pct(Value: Decimal; Total: Decimal) Calculation: Decimal
+    internal procedure Pct(Value: Decimal; Total: Decimal) Calculation: Decimal
     begin
         if (Value <> 0) and (Total <> 0) then
             Calculation := (Value / Total) * 100

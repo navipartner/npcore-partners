@@ -258,7 +258,7 @@
         ShowInventory: Boolean;
         InStockOnly: Boolean;
 
-    procedure SetFromStoreCode(NewFromStoreCode: Code[20])
+    internal procedure SetFromStoreCode(NewFromStoreCode: Code[20])
     begin
         FromStoreCode := NewFromStoreCode;
         InitSourceTable();
@@ -284,13 +284,13 @@
         NpCsStoreMgt.InitStoresWithDistance(NpCsStore, Rec);
     end;
 
-    procedure SetSourceTables(var TempNpCsStore2: Record "NPR NpCs Store" temporary; var NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary)
+    internal procedure SetSourceTables(var TempNpCsStore2: Record "NPR NpCs Store" temporary; var NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary)
     begin
         TempNpCsStore.Copy(TempNpCsStore2, true);
         CurrPage.Lines.PAGE.SetSourceTable(NpCsStoreInventoryBuffer);
     end;
 
-    procedure SetShowInventory(NewShowInventory: Boolean)
+    internal procedure SetShowInventory(NewShowInventory: Boolean)
     begin
         ShowInventory := NewShowInventory;
     end;

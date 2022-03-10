@@ -124,12 +124,12 @@
     }
 
 
-    procedure SetPrinterJson(Json: Text)
+    internal procedure SetPrinterJson(Json: Text)
     begin
         PrinterJson := Json;
     end;
 
-    procedure GetSettings(): Text;
+    internal procedure GetSettings(): Text;
     var
         SettingsJson: Text;
         SettingsJsonLbl: Label '{%1}', Locked = true;
@@ -150,7 +150,7 @@
         exit(StrSubstNo(SettingsJsonLbl, SettingsJson));
     end;
 
-    procedure LoadExistingSettings(SettingsJson: Text)
+    internal procedure LoadExistingSettings(SettingsJson: Text)
     var
         JObject: JsonObject;
         TextValue: Text;

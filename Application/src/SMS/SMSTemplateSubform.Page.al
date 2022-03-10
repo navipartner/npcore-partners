@@ -64,7 +64,7 @@
             Rec."SMS Text" += SMSManagement.AFReportLink(SMSTemplateHeader."Report ID");
     end;
 
-    procedure SetReportLinkEnabled(Enabled: Boolean)
+    internal procedure SetReportLinkEnabled(Enabled: Boolean)
     begin
         ReportLinkEnabled := Enabled;
         CurrPage.Update(false);

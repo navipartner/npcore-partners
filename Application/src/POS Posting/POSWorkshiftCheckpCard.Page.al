@@ -533,7 +533,7 @@
         PaymentBinCheckpointPage.RunModal();
     end;
 
-    procedure SetCheckpointMode(Mode: Option PRELIMINARY,FINAL,VIEW)
+    internal procedure SetCheckpointMode(Mode: Option PRELIMINARY,FINAL,VIEW)
     begin
         PageMode := PageMode::PRELIMINARY;
         if (Mode = Mode::FINAL) then
@@ -543,7 +543,7 @@
             PageMode := PageMode::VIEW;
     end;
 
-    procedure SetBlindCount(HideFields: Boolean)
+    internal procedure SetBlindCount(HideFields: Boolean)
     begin
         IsBlindCount := HideFields;
     end;

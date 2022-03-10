@@ -60,7 +60,7 @@ page 6060078 "NPR MM Membership Kiosk"
         DATE_MASK_ERROR: Label 'Date format mask %1 is not supported.';
         VALUE_REQUIRED: Label 'A value is required for field %1.';
 
-    procedure GotoPage(CurrentPageId: Integer; DestinationPageId: Integer; EventContents: Text): Integer
+    internal procedure GotoPage(CurrentPageId: Integer; DestinationPageId: Integer; EventContents: Text): Integer
     var
         JObject: JsonObject;
         ScanCode: Text;

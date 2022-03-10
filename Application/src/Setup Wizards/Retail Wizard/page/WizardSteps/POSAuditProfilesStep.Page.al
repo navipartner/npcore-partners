@@ -180,12 +180,12 @@
     var
         TempExistingAuditProfiles: Record "NPR POS Audit Profile" temporary;
 
-    procedure GetRec(var TempPOSAuditProfile: Record "NPR POS Audit Profile")
+    internal procedure GetRec(var TempPOSAuditProfile: Record "NPR POS Audit Profile")
     begin
         TempPOSAuditProfile.Copy(Rec);
     end;
 
-    procedure CreatePOSAuditProfileData()
+    internal procedure CreatePOSAuditProfileData()
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
@@ -197,12 +197,12 @@
             until Rec.Next() = 0;
     end;
 
-    procedure POSAuditProfileDataToCreate(): Boolean
+    internal procedure POSAuditProfileDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CopyRealAndTemp(var TempPOSAuditProfile: Record "NPR POS Audit Profile")
+    internal procedure CopyRealAndTemp(var TempPOSAuditProfile: Record "NPR POS Audit Profile")
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin

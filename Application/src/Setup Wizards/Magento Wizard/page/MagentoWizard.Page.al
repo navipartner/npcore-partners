@@ -609,7 +609,7 @@
         FinishStepVisible := false;
     end;
 
-    procedure ShowStartStep();
+    internal procedure ShowStartStep();
     begin
         StartStepVisible := true;
 
@@ -617,12 +617,12 @@
         BackActionEnabled := false;
     end;
 
-    procedure ShowMagentoWebsiteStep();
+    internal procedure ShowMagentoWebsiteStep();
     begin
         MagentoWebsiteStepVisible := true;
     end;
 
-    procedure ShowMagentoStoreStep();
+    internal procedure ShowMagentoStoreStep();
     begin
         MagentoStoreStepVisible := true;
 
@@ -630,17 +630,17 @@
         CurrPage.MagentoStores.Page.SetGlobals(TempMagentoWebsiteGlobal);
     end;
 
-    procedure ShowMagentoCustomerMappingStep();
+    internal procedure ShowMagentoCustomerMappingStep();
     begin
         MagentoCustomerMappingStepVisible := true;
     end;
 
-    procedure ShowMagentoPaymentGatewayStep();
+    internal procedure ShowMagentoPaymentGatewayStep();
     begin
         MagentoPaymentGatewayStepVisible := true;
     end;
 
-    procedure ShowMagentoPaymentMappingStep();
+    internal procedure ShowMagentoPaymentMappingStep();
     begin
         MagentoPaymentMappingStepVisible := true;
 
@@ -648,24 +648,24 @@
         CurrPage.MagentoPaymentMappings.Page.SetGlobals(TempMagentPaymentGatewayGlobal);
     end;
 
-    procedure ShowMagentoShippmentMappingStep();
+    internal procedure ShowMagentoShippmentMappingStep();
     begin
         MagentoShippmentMappingStepVisible := true;
     end;
 
-    procedure ShowMagentoBrandStep();
+    internal procedure ShowMagentoBrandStep();
     begin
         MagentoBrandStepVisible := true;
     end;
 
-    procedure ShowMagentoDisplayGroupStep();
+    internal procedure ShowMagentoDisplayGroupStep();
     begin
         MagentoDisplayGroupStepVisible := true;
 
         CurrPage.MagentoBrands.Page.CopyRealAndTemp(TempMagentoBrand);
     end;
 
-    procedure ShowMagentoDisplayConfigstep();
+    internal procedure ShowMagentoDisplayConfigstep();
     begin
         MagentoDisplayConfigstepVisible := true;
 
@@ -675,7 +675,7 @@
         CurrPage.MagentoDisplayConfigs.Page.SetGlobals(TempMagentoBrand, TempMagDisplayGroup, 1);
     end;
 
-    procedure ShowFinishStep();
+    internal procedure ShowFinishStep();
     begin
         FinishStepVisible := true;
 

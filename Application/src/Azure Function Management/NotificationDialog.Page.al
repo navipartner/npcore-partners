@@ -90,7 +90,7 @@
         AFNotificationHub.Insert(true);
     end;
 
-    procedure SetRegister("POS Unit No.": Code[10])
+    internal procedure SetRegister("POS Unit No.": Code[10])
     begin
         gPOSNo := "POS Unit No.";
     end;

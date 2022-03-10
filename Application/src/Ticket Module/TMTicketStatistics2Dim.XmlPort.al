@@ -146,7 +146,7 @@ xmlport 6060111 "NPR TM Ticket Statistics 2-Dim"
         StartTime: Time;
         TempFactDimension2: Record "NPR TM Ticket Access Fact" temporary;
 
-    procedure GetRequest(var FromDate: Date; var UntilDate: Date; var Dim1: Text; var Dim2: Text)
+    internal procedure GetRequest(var FromDate: Date; var UntilDate: Date; var Dim1: Text; var Dim2: Text)
     begin
         FromDate := RequestFromDate;
         UntilDate := RequestUntilDate;
@@ -156,7 +156,7 @@ xmlport 6060111 "NPR TM Ticket Statistics 2-Dim"
         StartTime := Time;
     end;
 
-    procedure SetResponse(var TmpFactLines: Record "NPR TM Ticket Access Fact" temporary; var TmpFactCols: Record "NPR TM Ticket Access Fact" temporary; var TmpStatisticsIn: Record "NPR TM Ticket Access Stats" temporary)
+    internal procedure SetResponse(var TmpFactLines: Record "NPR TM Ticket Access Fact" temporary; var TmpFactCols: Record "NPR TM Ticket Access Fact" temporary; var TmpStatisticsIn: Record "NPR TM Ticket Access Stats" temporary)
     var
         StatisticsNotFoundLbl: Label 'No statistics found for daterange %1..%2';
     begin
@@ -202,7 +202,7 @@ xmlport 6060111 "NPR TM Ticket Statistics 2-Dim"
         ResponseMessage := '';
     end;
 
-    procedure SetErrorResponse(ReasonText: Text)
+    internal procedure SetErrorResponse(ReasonText: Text)
     var
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
     begin

@@ -90,7 +90,7 @@
         ItemUOM: Code[10];
         VariantCode: Code[10];
 
-    procedure GetValues(var ItemNoPrm: Code[20]; var VariantCodePrm: Code[10]; var ItemUOMPrm: Code[10])
+    internal procedure GetValues(var ItemNoPrm: Code[20]; var VariantCodePrm: Code[10]; var ItemUOMPrm: Code[10])
     begin
         ItemNoPrm := ItemNo;
         ItemUOMPrm := ItemUOM;

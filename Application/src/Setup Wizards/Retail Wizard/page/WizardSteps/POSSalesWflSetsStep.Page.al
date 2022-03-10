@@ -43,12 +43,12 @@
     var
         TempExistingPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set" temporary;
 
-    procedure GetRec(var TempPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set")
+    internal procedure GetRec(var TempPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set")
     begin
         TempPOSSalesWorkflowSet.Copy(Rec);
     end;
 
-    procedure CreatePOSSalesWorkflowSetData()
+    internal procedure CreatePOSSalesWorkflowSetData()
     var
         POSSalesWorkflowSet: Record "NPR POS Sales Workflow Set";
     begin
@@ -60,12 +60,12 @@
             until Rec.Next() = 0;
     end;
 
-    procedure POSSalesWorkflowSetDataToCreate(): Boolean
+    internal procedure POSSalesWorkflowSetDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CopyRealAndTemp(var TempPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set")
+    internal procedure CopyRealAndTemp(var TempPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set")
     var
         POSSalesWorkflowSet: Record "NPR POS Sales Workflow Set";
     begin

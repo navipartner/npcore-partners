@@ -107,7 +107,7 @@
         AFAPIWebService: Codeunit "NPR AF API WebService";
         gPOSNo: Code[10];
 
-    procedure SetRegister(PosNo: Code[10])
+    internal procedure SetRegister(PosNo: Code[10])
     begin
         gPOSNo := PosNo;
     end;

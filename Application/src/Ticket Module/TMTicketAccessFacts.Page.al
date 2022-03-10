@@ -43,7 +43,7 @@
     {
     }
 
-    procedure GetSelectionFilter(): Text
+    internal procedure GetSelectionFilter(): Text
     var
         Fact: Record "NPR TM Ticket Access Fact";
         FirstFact: Code[30];
@@ -97,7 +97,7 @@
         exit(SelectionFilter);
     end;
 
-    procedure SetSelection(var TicketFact: Record "NPR TM Ticket Access Fact")
+    internal procedure SetSelection(var TicketFact: Record "NPR TM Ticket Access Fact")
     begin
         CurrPage.SetSelectionFilter(TicketFact);
     end;

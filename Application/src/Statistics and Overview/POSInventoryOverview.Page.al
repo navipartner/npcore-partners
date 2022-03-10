@@ -1,13 +1,6 @@
 ﻿page 6060059 "NPR POS Inventory Overview"
 {
     Extensible = False;
-    // NPR5.34/BR  /20170726   CASE 282748 Object Created
-    // NPR5.52/ALPO/20191002 CASE 370333 New options to show inventory for current location only
-    //                                   - Function SetParameters: new call parameter: OnlyCurentLocIn [boolean]
-    // NPR5.55/ALST/20200424 CASE 400277 added "Variant Code" column
-    // NPR5.55/SARA/20200519 CASE 404868 Show negative inventory
-    // NPR5.55/ANPA/2020050  CASE 401161 Added "Description 2" from item
-
     Caption = 'POS Inventory Overview';
     DelayedInsert = false;
     DeleteAllowed = false;
@@ -203,7 +196,7 @@
         TextSelectItemFirst: Label 'Please select an item.';
         OnlyCurentLoc: Boolean;
 
-    procedure SetParameters(ItemCodeIn: Code[20]; VariantCodeIn: Code[10]; CurrentLocationIn: Code[10]; OnlyCurentLocIn: Boolean)
+    internal procedure SetParameters(ItemCodeIn: Code[20]; VariantCodeIn: Code[10]; CurrentLocationIn: Code[10]; OnlyCurentLocIn: Boolean)
     begin
         ItemCode := ItemCodeIn;
         VariantCode := VariantCodeIn;

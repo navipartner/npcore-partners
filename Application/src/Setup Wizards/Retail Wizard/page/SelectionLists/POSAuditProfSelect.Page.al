@@ -83,7 +83,7 @@
             }
         }
     }
-    procedure SetRec(var TempPOSAuditProfile: Record "NPR POS Audit Profile")
+    internal procedure SetRec(var TempPOSAuditProfile: Record "NPR POS Audit Profile")
     begin
         if TempPOSAuditProfile.FindSet() then
             repeat

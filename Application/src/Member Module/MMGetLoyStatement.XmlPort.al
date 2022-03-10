@@ -209,13 +209,13 @@ xmlport 6060145 "NPR MM Get Loy. Statement"
         }
     }
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer)
+    internal procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
     begin
@@ -237,7 +237,7 @@ xmlport 6060145 "NPR MM Get Loy. Statement"
         if (tmpMembershipResponse.Insert()) then;
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         responsemessage := ErrorMessage;

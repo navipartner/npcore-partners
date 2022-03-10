@@ -485,7 +485,7 @@
             Message(NoInputTxt);
     end;
 
-    procedure ShowFormattedDocument()
+    internal procedure ShowFormattedDocument()
     var
         NcImportType: Record "NPR Nc Import Type";
         page: Page "NPR Nc Show Html";
@@ -523,7 +523,7 @@
             Message(NoInputTxt);
     end;
 
-    procedure ShowFormattedDocByDocNo(DocNo: Text[100])
+    internal procedure ShowFormattedDocByDocNo(DocNo: Text[100])
     var
         NcImportEntry: Record "NPR Nc Import Entry";
         NcImportListPg: Page "NPR Nc Import List";

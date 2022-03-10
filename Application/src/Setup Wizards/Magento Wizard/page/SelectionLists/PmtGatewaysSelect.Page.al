@@ -96,7 +96,7 @@
     var
         Password: Text[200];
 
-    procedure SetRec(var TempPaymentGateway: Record "NPR Magento Payment Gateway")
+    internal procedure SetRec(var TempPaymentGateway: Record "NPR Magento Payment Gateway")
     begin
         if TempPaymentGateway.FindSet() then
             repeat

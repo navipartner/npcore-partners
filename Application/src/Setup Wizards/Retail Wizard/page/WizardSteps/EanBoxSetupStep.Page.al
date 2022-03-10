@@ -49,12 +49,12 @@
     var
         TempExistingEanBoxSetup: Record "NPR Ean Box Setup" temporary;
 
-    procedure GetRec(var TempEanBoxSetup: Record "NPR Ean Box Setup")
+    internal procedure GetRec(var TempEanBoxSetup: Record "NPR Ean Box Setup")
     begin
         TempEanBoxSetup.Copy(Rec);
     end;
 
-    procedure CreateEanBoxSetupData()
+    internal procedure CreateEanBoxSetupData()
     var
         EanBoxSetup: Record "NPR Ean Box Setup";
     begin
@@ -66,12 +66,12 @@
             until Rec.Next() = 0;
     end;
 
-    procedure EanBoxSetupDataToCreate(): Boolean
+    internal procedure EanBoxSetupDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CopyRealAndTemp(var TempEanBoxSetup: Record "NPR Ean Box Setup")
+    internal procedure CopyRealAndTemp(var TempEanBoxSetup: Record "NPR Ean Box Setup")
     var
         EanBoxSetup: Record "NPR Ean Box Setup";
     begin

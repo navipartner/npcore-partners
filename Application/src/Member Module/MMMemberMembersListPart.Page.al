@@ -98,7 +98,7 @@
     {
     }
 
-    procedure GetSelectedMembershipEntryNo(): Integer
+    internal procedure GetSelectedMembershipEntryNo(): Integer
     begin
 
         exit(Rec."Membership Entry No.");

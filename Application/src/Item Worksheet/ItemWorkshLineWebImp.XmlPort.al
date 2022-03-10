@@ -862,17 +862,17 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
     var
         TempLineNo: Integer;
 
-    procedure GetMessageID(): Text[50]
+    internal procedure GetMessageID(): Text[50]
     begin
         exit(messageid);
     end;
 
-    procedure GetSummary(): Text[30]
+    internal procedure GetSummary(): Text[30]
     begin
         exit('Testfile');
     end;
 
-    procedure SetItemWorksheetLineResult(ParReturnValue: Text)
+    internal procedure SetItemWorksheetLineResult(ParReturnValue: Text)
     begin
         ReturnValue := ParReturnValue;
     end;

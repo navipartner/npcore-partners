@@ -221,7 +221,7 @@
         ArrivalMandatory: Boolean;
         FinalDestinationCountryCodeMandatory: Boolean;
 
-    procedure SetModes(var GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.")
+    internal procedure SetModes(var GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.")
     begin
         //Controls visible parameter
         PassportNumberMode := GlobalBlueParameters."(Dialog) Passport Number";
@@ -315,7 +315,7 @@
                 Error(Error_MissingRequiredParam, Rec.FieldCaption("Final Destination Country"));
     end;
 
-    procedure SetRec(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary)
+    internal procedure SetRec(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary)
     begin
         if not tmpCustomerInfoCapture.IsTemporary then
             exit;
@@ -338,7 +338,7 @@
         FinalDestinationCountryCodeEditable := tmpCustomerInfoCapture."Final Destination Country Code" = 0;
     end;
 
-    procedure SetAllEditable()
+    internal procedure SetAllEditable()
     begin
         PassportNumberEditable := true;
         LastNameEditable := true;
@@ -356,7 +356,7 @@
         FinalDestinationCountryCodeEditable := true;
     end;
 
-    procedure SetAllNonMandatory()
+    internal procedure SetAllNonMandatory()
     begin
         PassportNumberMandatory := false;
         LastNameMandatory := false;
@@ -374,7 +374,7 @@
         FinalDestinationCountryCodeMandatory := false;
     end;
 
-    procedure GetRec(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary)
+    internal procedure GetRec(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary)
     begin
         if not tmpCustomerInfoCapture.IsTemporary then
             exit;

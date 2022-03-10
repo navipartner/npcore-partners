@@ -173,7 +173,7 @@
         TempAllMagDispGroup: Record "NPR Magento Display Group" temporary;
         Brands: Page "NPR Brands Select";
 
-    procedure SetGlobals(var TempBrand: Record "NPR Magento Brand" temporary; var TempMagDisplayGroup: Record "NPR Magento Display Group" temporary; Global: Option Brand,"Mag. Display Group")
+    internal procedure SetGlobals(var TempBrand: Record "NPR Magento Brand" temporary; var TempMagDisplayGroup: Record "NPR Magento Display Group" temporary; Global: Option Brand,"Mag. Display Group")
     begin
         case Global of
             Global::Brand:
@@ -199,7 +199,7 @@
         end;
     end;
 
-    procedure CreateMagentoDisplayConfig()
+    internal procedure CreateMagentoDisplayConfig()
     var
         MagentoDisplayConfig: Record "NPR Magento Display Config";
     begin
@@ -211,7 +211,7 @@
             until Rec.Next() = 0;
     end;
 
-    procedure MagentoDisplayConfigToCreate(): Boolean
+    internal procedure MagentoDisplayConfigToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;

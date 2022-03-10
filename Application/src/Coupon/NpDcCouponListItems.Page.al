@@ -404,7 +404,7 @@
         //+NPR5.45 [312991]
     end;
 
-    procedure SetValidationView(NewValidationView: Boolean)
+    internal procedure SetValidationView(NewValidationView: Boolean)
     begin
         //-NPR5.46 [327366]
         ValidationView := NewValidationView;

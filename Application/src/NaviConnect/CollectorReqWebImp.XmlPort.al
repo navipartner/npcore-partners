@@ -94,12 +94,12 @@ xmlport 6151530 "NPR Collector Req. Web Imp."
     end;
 
 
-    procedure GetMessageID(): Text[50]
+    internal procedure GetMessageID(): Text[50]
     begin
         exit(messageid);
     end;
 
-    procedure SetCollectorRequestResult(ParReturnValue: Text)
+    internal procedure SetCollectorRequestResult(ParReturnValue: Text)
     begin
         ReturnValue := ParReturnValue;
     end;

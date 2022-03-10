@@ -250,7 +250,7 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary)
+    internal procedure GetRequest(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary)
     begin
 
         StartTime := Time;
@@ -265,7 +265,7 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
         TmpCustomer.Insert();
     end;
 
-    procedure SetResponse(var TmpContact: Record Contact temporary)
+    internal procedure SetResponse(var TmpContact: Record Contact temporary)
     var
         MembershipRole: Record "NPR MM Membership Role";
     begin
@@ -295,7 +295,7 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    procedure SetErrorResponse(ErrorMessage: Text)
+    internal procedure SetErrorResponse(ErrorMessage: Text)
     begin
         ResponseCode := 'ERROR';
         ResponseMessage := ErrorMessage;

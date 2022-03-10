@@ -212,7 +212,7 @@
         OptionFilter: Text;
         TypeHelper: Codeunit "Type Helper";
 
-    procedure SetOptions(OptionStringHere: Text; OptionFilterHere: Text)
+    internal procedure SetOptions(OptionStringHere: Text; OptionFilterHere: Text)
     begin
         OptionString := OptionStringHere;
         OptionFilter := OptionFilterHere;
@@ -266,7 +266,7 @@
         end;
     end;
 
-    procedure GetSelectedOption() NewFilter: Text
+    internal procedure GetSelectedOption() NewFilter: Text
     var
         i: Integer;
     begin

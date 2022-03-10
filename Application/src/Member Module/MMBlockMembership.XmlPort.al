@@ -65,13 +65,13 @@ xmlport 6060132 "NPR MM Block Membership"
     }
 
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMemberInfoResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer; MemberExternalNumber: Code[20]; MemberExternalCardNo: Code[100])
+    internal procedure AddResponse(MembershipEntryNo: Integer; MemberExternalNumber: Code[20]; MemberExternalCardNo: Code[100])
     begin
 
         errordescription := '';
@@ -80,7 +80,7 @@ xmlport 6060132 "NPR MM Block Membership"
         tmpMemberInfoResponse.Insert();
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;
