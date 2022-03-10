@@ -69,7 +69,7 @@
     [Obsolete('Replaced with same function without SalespersonCode. Salesperson is not used anymore on Default View filtering. Case 508848.')]
     procedure FindViewByType(ViewType: Option; SalespersonCode: Code[20]; RegisterCode: Code[10]): Boolean
     begin
-       exit(FindViewByType(ViewType, RegisterCode));
+        exit(FindViewByType(ViewType, RegisterCode));
     end;
 
     procedure FindViewByType(ViewType: Option; RegisterCode: Code[10]): Boolean
@@ -88,7 +88,7 @@
             exit(false);
 
         // Register explicitly set to exact value
-        if  (RegisterCode <> '') then begin
+        if (RegisterCode <> '') then begin
             DefaultView.SetRange("Register Filter", RegisterCode);
             if FindApplicableView(DefaultView) then
                 exit(true);
@@ -97,12 +97,12 @@
         // Register set to a filter
         DefaultView.SetFilter("Register Filter", '<>%1', '');
         if FilterApplicableView(DefaultView, RegisterCode) then
-            exit(true);
+            exit(GetApplicableView(DefaultView));
 
         // Any other combination
-        DefaultView.SetRange("Register Filter");
-        if FilterApplicableView(DefaultView, RegisterCode) then
-            exit(true);
+        DefaultView.SetRange("Register Filter", '');
+        if DefaultView.FindFirst() then
+            exit(GetApplicableView(DefaultView));
 
         exit(false);
     end;
@@ -112,9 +112,7 @@
         if not DefaultView.FindFirst() then
             exit(false);
 
-        DefaultView.TestField("POS View Code");
-        Get(DefaultView."POS View Code");
-        exit(true);
+        exit(GetApplicableView(DefaultView));
     end;
 
     local procedure FilterApplicableView(var DefaultView: Record "NPR POS Default View"; UnitCode: Code[10]): Boolean
@@ -122,23 +120,25 @@
         POSUnit: Record "NPR POS Unit";
         TempPOSUnit: Record "NPR POS Unit" temporary;
     begin
-        if UnitCode <> '' then begin
-            if POSUnit.Get(UnitCode) then begin
-                TempPOSUnit := POSUnit;
-                TempPOSUnit.Insert();
-            end;
+        if POSUnit.Get(UnitCode) then begin
+            TempPOSUnit.TransferFields(POSUnit);
+            TempPOSUnit.Insert();
         end;
 
         if DefaultView.FindSet() then
             repeat
-                if DefaultView."Register Filter" <> '' then
-                    TempPOSUnit.SetFilter("No.", DefaultView."Register Filter");
-
-                if ((not TempPOSUnit.IsEmpty()) or (UnitCode = '')) then begin
-                    DefaultView.TestField("POS View Code");
-                    Get(DefaultView."POS View Code");
+                TempPOSUnit.SetFilter("No.", DefaultView."Register Filter");
+                if not TempPOSUnit.IsEmpty() then
                     exit(true);
-                end;
             until DefaultView.Next() = 0;
+
+        exit(false);
+    end;
+
+    local procedure GetApplicableView(var DefaultView: Record "NPR POS Default View"): Boolean
+    begin
+        DefaultView.TestField("POS View Code");
+        Get(DefaultView."POS View Code");
+        exit(true);
     end;
 }
