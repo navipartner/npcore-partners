@@ -193,13 +193,13 @@ xmlport 6151162 "NPR MM Register Sale"
         DocumentId: Text;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure SetDocumentId(DocumentIdIn: Text)
+    internal procedure SetDocumentId(DocumentIdIn: Text)
     begin
         // For test framework
         DocumentId := DocumentIdIn;
     end;
 
-    procedure GetRequest(var TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpSalesLine: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLine: Record "NPR MM Reg. Sales Buffer" temporary)
+    internal procedure GetRequest(var TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpSalesLine: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLine: Record "NPR MM Reg. Sales Buffer" temporary)
     begin
 
         SetErrorResponse('No response.', '-1099');
@@ -224,7 +224,7 @@ xmlport 6151162 "NPR MM Register Sale"
         end;
     end;
 
-    procedure GetResponse(var ResponseCodeOut: Code[10]; var ResponseMessageOut: Text; var DocumentIdOut: Text; var TmpPoints: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
+    internal procedure GetResponse(var ResponseCodeOut: Code[10]; var ResponseMessageOut: Text; var DocumentIdOut: Text; var TmpPoints: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
     begin
 
         // For test framework
@@ -237,7 +237,7 @@ xmlport 6151162 "NPR MM Register Sale"
         TmpPoints.Insert();
     end;
 
-    procedure SetResponse(var TmpPoints: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
+    internal procedure SetResponse(var TmpPoints: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
     begin
 
         if (not TmpPoints.FindFirst()) then begin
@@ -256,7 +256,7 @@ xmlport 6151162 "NPR MM Register Sale"
             ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    procedure SetErrorResponse(ResponseMessageIn: Text; MessageId: Text)
+    internal procedure SetErrorResponse(ResponseMessageIn: Text; MessageId: Text)
     begin
 
         ResponseCode := 'ERROR';

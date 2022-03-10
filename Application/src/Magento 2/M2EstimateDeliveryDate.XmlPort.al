@@ -94,7 +94,7 @@ xmlport 6151138 "NPR M2 Estimate Delivery Date"
     var
         M2ServiceLibrary: Codeunit "NPR M2 Service Lib.";
 
-    procedure PrepareResult()
+    internal procedure PrepareResult()
     var
         Item: Record Item;
         Customer: Record Customer;

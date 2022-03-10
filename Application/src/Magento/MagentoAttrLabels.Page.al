@@ -66,7 +66,7 @@
         MagentoFunctions: Codeunit "NPR Magento Functions";
         TextFieldVisible: Boolean;
 
-    procedure SetTextFieldVisible(NewTextFieldVisible: Boolean)
+    internal procedure SetTextFieldVisible(NewTextFieldVisible: Boolean)
     begin
         TextFieldVisible := NewTextFieldVisible;
     end;

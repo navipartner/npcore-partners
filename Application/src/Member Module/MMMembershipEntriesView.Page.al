@@ -58,7 +58,7 @@
     var
         _LookupCaption: Text;
 
-    procedure LoadEntries(LookupCaption: Text; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary)
+    internal procedure LoadEntries(LookupCaption: Text; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary)
     begin
         _LookupCaption := LookupCaption;
         Rec.Copy(TmpMembershipEntry, true);

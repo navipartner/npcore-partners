@@ -109,7 +109,7 @@ xmlport 6150905 "NPR HC Generic Request"
         }
     }
 
-    procedure GetRequest(var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary)
+    internal procedure GetRequest(var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary)
     begin
         TmpHCGenericWebRequest.TransferFields(TmpGenericWebRequest, true);
         TmpHCGenericWebRequest.Insert();
@@ -118,7 +118,7 @@ xmlport 6150905 "NPR HC Generic Request"
         responseDescription := 'No Response';
     end;
 
-    procedure SetResponse(var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary)
+    internal procedure SetResponse(var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary)
     begin
         TmpResponse.TransferFields(TmpHCGenericWebRequest, true);
         TmpResponse."Response User ID" := CopyStr(UserId, 1, 50);
@@ -129,7 +129,7 @@ xmlport 6150905 "NPR HC Generic Request"
         responseDescription := '';
     end;
 
-    procedure SetErrorResponse(ErrorDescription: Text)
+    internal procedure SetErrorResponse(ErrorDescription: Text)
     begin
         responseCode := 'ERROR';
         responseDescription := ErrorDescription;

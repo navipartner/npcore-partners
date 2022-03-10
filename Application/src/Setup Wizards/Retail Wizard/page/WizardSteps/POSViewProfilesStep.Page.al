@@ -84,12 +84,12 @@
     var
         TempExistingViewProfiles: Record "NPR POS View Profile" temporary;
 
-    procedure GetRec(var TempPOSViewProfile: Record "NPR POS View Profile")
+    internal procedure GetRec(var TempPOSViewProfile: Record "NPR POS View Profile")
     begin
         TempPOSViewProfile.Copy(Rec);
     end;
 
-    procedure CreatePOSViewProfileData()
+    internal procedure CreatePOSViewProfileData()
     var
         POSViewProfile: Record "NPR POS View Profile";
     begin
@@ -101,12 +101,12 @@
             until Rec.Next() = 0;
     end;
 
-    procedure POSViewProfileDataToCreate(): Boolean
+    internal procedure POSViewProfileDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CopyRealAndTemp(var TempPOSViewProfile: Record "NPR POS View Profile")
+    internal procedure CopyRealAndTemp(var TempPOSViewProfile: Record "NPR POS View Profile")
     var
         POSViewProfile: Record "NPR POS View Profile";
     begin

@@ -149,7 +149,7 @@
         StartingNoPaymentBin: Code[10];
         NoOfPOSPaymentBinsToCreate: Integer;
 
-    procedure SetGlobals(var POSUnitAll: Record "NPR POS Unit")
+    internal procedure SetGlobals(var POSUnitAll: Record "NPR POS Unit")
     begin
         TempAllPOSUnit.DeleteAll();
         if POSUnitAll.FindSet() then
@@ -166,7 +166,7 @@
         if TempAllPOSUnit.FindSet() then;
     end;
 
-    procedure CreateTempPOSPaymentBins(NoOfPOSPaymentBins: integer; WantedStartingNo: Code[10]; SelectedPOSStore: Code[10]; SelectedPOSPaymentBin: Code[10]; var POSPaymentBinTemp: Record "NPR POS Payment Bin")
+    internal procedure CreateTempPOSPaymentBins(NoOfPOSPaymentBins: integer; WantedStartingNo: Code[10]; SelectedPOSStore: Code[10]; SelectedPOSPaymentBin: Code[10]; var POSPaymentBinTemp: Record "NPR POS Payment Bin")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
@@ -207,7 +207,7 @@
         end;
     end;
 
-    procedure GetRec(var TempPOSPaymentBin: Record "NPR POS Payment Bin")
+    internal procedure GetRec(var TempPOSPaymentBin: Record "NPR POS Payment Bin")
     begin
         Rec.Reset();
 
@@ -219,14 +219,14 @@
             until Rec.Next() = 0;
     end;
 
-    procedure SetRec(var TempPOSPaymentBin: Record "NPR POS Payment Bin")
+    internal procedure SetRec(var TempPOSPaymentBin: Record "NPR POS Payment Bin")
     begin
         Rec.Reset();
 
         Rec.Copy(TempPOSPaymentBin, true);
     end;
 
-    procedure CopyRealAndTemp(var TempPOSPaymentBin: Record "NPR POS Payment Bin")
+    internal procedure CopyRealAndTemp(var TempPOSPaymentBin: Record "NPR POS Payment Bin")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
     begin
@@ -246,12 +246,12 @@
             until POSPaymentBin.Next() = 0;
     end;
 
-    procedure POSPaymentBinsToCreate(): Boolean
+    internal procedure POSPaymentBinsToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CreatePOSPaymentBinData(var POSPaymentBinToCreate: Record "NPR POS Payment Bin")
+    internal procedure CreatePOSPaymentBinData(var POSPaymentBinToCreate: Record "NPR POS Payment Bin")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
     begin

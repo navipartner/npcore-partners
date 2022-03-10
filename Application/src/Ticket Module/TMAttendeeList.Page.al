@@ -123,12 +123,12 @@
         }
     }
 
-    procedure LoadPageBuffer(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Integer
+    internal procedure LoadPageBuffer(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Integer
     begin
         exit(LoadPageBuffer(AdmissionScheduleEntry, 20000));
     end;
 
-    procedure LoadPageBuffer(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TopNumberOfRows: Integer): Integer
+    internal procedure LoadPageBuffer(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TopNumberOfRows: Integer): Integer
     var
         TicketReservationQuery: Query "NPR TM Attendees";
         TempAttendeeBuffer: Record "NPR TM Attendees Buffer" temporary;

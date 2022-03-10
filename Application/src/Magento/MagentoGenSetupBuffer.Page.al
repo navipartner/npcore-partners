@@ -54,12 +54,12 @@
             CurrPage.Caption(Rec."Root Element");
     end;
 
-    procedure SetEditable(IsEditable: Boolean)
+    internal procedure SetEditable(IsEditable: Boolean)
     begin
         CurrPage.Editable(IsEditable);
     end;
 
-    procedure SetSourceTable(var TempGenericSetupBuffer: Record "NPR Magento Gen. Setup Buffer" temporary)
+    internal procedure SetSourceTable(var TempGenericSetupBuffer: Record "NPR Magento Gen. Setup Buffer" temporary)
     begin
         Rec.Copy(TempGenericSetupBuffer, true);
     end;

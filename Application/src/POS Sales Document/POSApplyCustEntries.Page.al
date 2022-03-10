@@ -646,7 +646,7 @@
         [InDataSet]
         "Applies-to IDVisible": Boolean;
 
-    procedure SetGenJnlLine(NewGenJnlLine: Record "Gen. Journal Line"; ApplnTypeSelect: Integer)
+    internal procedure SetGenJnlLine(NewGenJnlLine: Record "Gen. Journal Line"; ApplnTypeSelect: Integer)
     begin
         GenJnlLine := NewGenJnlLine;
 
@@ -668,7 +668,7 @@
         SetApplyingCustLedgEntry();
     end;
 
-    procedure SetSales(NewSalesHeader: Record "Sales Header"; var NewCustLedgEntry: Record "Cust. Ledger Entry"; ApplnTypeSelect: Integer)
+    internal procedure SetSales(NewSalesHeader: Record "Sales Header"; var NewCustLedgEntry: Record "Cust. Ledger Entry"; ApplnTypeSelect: Integer)
     var
         TotalAdjCostLCY: Decimal;
     begin
@@ -701,7 +701,7 @@
         SetApplyingCustLedgEntry();
     end;
 
-    procedure SetService(NewServHeader: Record "Service Header"; var NewCustLedgEntry: Record "Cust. Ledger Entry"; ApplnTypeSelect: Integer)
+    internal procedure SetService(NewServHeader: Record "Service Header"; var NewCustLedgEntry: Record "Cust. Ledger Entry"; ApplnTypeSelect: Integer)
     var
         ServAmountsMgt: Codeunit "Serv-Amounts Mgt.";
         TotalAdjCostLCY: Decimal;
@@ -734,12 +734,12 @@
         SetApplyingCustLedgEntry();
     end;
 
-    procedure SetCustLedgEntry(NewCustLedgEntry: Record "Cust. Ledger Entry")
+    internal procedure SetCustLedgEntry(NewCustLedgEntry: Record "Cust. Ledger Entry")
     begin
         Rec := NewCustLedgEntry;
     end;
 
-    procedure SetApplyingCustLedgEntry()
+    internal procedure SetApplyingCustLedgEntry()
     var
         Customer: Record Customer;
         "CustEntry-Edit": Codeunit "Cust. Entry-Edit";
@@ -828,7 +828,7 @@
         end;
     end;
 
-    procedure SetCustApplId()
+    internal procedure SetCustApplId()
     begin
         if (CalcType = CalcType::GenJnlLine) and (TempApplyingCustLedgEntry."Posting Date" < Rec."Posting Date") then
             Error(
@@ -859,7 +859,7 @@
         end;
     end;
 
-    procedure CalcApplnAmount()
+    internal procedure CalcApplnAmount()
     var
         ExchAccGLJnlLine: Codeunit "Exchange Acc. G/L Journal Line";
     begin
@@ -1060,7 +1060,7 @@
             ApplnRounding := -((AppliedAmount - PmtDiscAmount) + ApplyingAmount);
     end;
 
-    procedure GetCustLedgEntry(var CustLedgEntry: Record "Cust. Ledger Entry")
+    internal procedure GetCustLedgEntry(var CustLedgEntry: Record "Cust. Ledger Entry")
     begin
         CustLedgEntry := Rec;
     end;
@@ -1212,7 +1212,7 @@
         OK := true;
     end;
 
-    procedure SetSalesLine(NewGenJnlLine: Record "NPR POS Sale Line"; ApplnTypeSelect: Integer)
+    internal procedure SetSalesLine(NewGenJnlLine: Record "NPR POS Sale Line"; ApplnTypeSelect: Integer)
     begin
         SaleLinePOS := NewGenJnlLine;
 

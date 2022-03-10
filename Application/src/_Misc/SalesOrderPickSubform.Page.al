@@ -1317,19 +1317,19 @@
         RefreshMessageText: Text;
         TotalAmountStyle: Text;
 
-    procedure ApproveCalcInvDisc()
+    internal procedure ApproveCalcInvDisc()
     begin
         CODEUNIT.Run(CODEUNIT::"Sales-Disc. (Yes/No)", Rec);
     end;
 
-    procedure ExplodeBOM()
+    internal procedure ExplodeBOM()
     begin
         if Rec."Prepmt. Amt. Inv." <> 0 then
             Error(ExpodeBOMErr);
         CODEUNIT.Run(CODEUNIT::"Sales-Explode BOM", Rec);
     end;
 
-    procedure OpenPurchOrderForm()
+    internal procedure OpenPurchOrderForm()
     var
         PurchHeader: Record "Purchase Header";
         PurchOrder: Page "Purchase Order";
@@ -1341,7 +1341,7 @@
         PurchOrder.Run();
     end;
 
-    procedure OpenSpecialPurchOrderForm()
+    internal procedure OpenSpecialPurchOrderForm()
     var
         PurchRcptHeader: Record "Purch. Rcpt. Header";
         PurchHeader: Record "Purchase Header";
@@ -1362,7 +1362,7 @@
         end;
     end;
 
-    procedure InsertExtendedText(Unconditionally: Boolean)
+    internal procedure InsertExtendedText(Unconditionally: Boolean)
     begin
         if TransferExtendedText.SalesCheckIfAnyExtText(Rec, Unconditionally) then begin
             CurrPage.SaveRecord();
@@ -1373,12 +1373,12 @@
             UpdateForm(true);
     end;
 
-    procedure ShowNonstockItems()
+    internal procedure ShowNonstockItems()
     begin
         Rec.ShowNonstock();
     end;
 
-    procedure ShowTracking()
+    internal procedure ShowTracking()
     var
         TrackingForm: Page "Order Tracking";
     begin
@@ -1386,30 +1386,30 @@
         TrackingForm.RunModal();
     end;
 
-    procedure ItemChargeAssgnt()
+    internal procedure ItemChargeAssgnt()
     begin
         Rec.ShowItemChargeAssgnt();
     end;
 
-    procedure UpdateForm(SetSaveRecord: Boolean)
+    internal procedure UpdateForm(SetSaveRecord: Boolean)
     begin
         CurrPage.Update(SetSaveRecord);
     end;
 
-    procedure ShowPrices()
+    internal procedure ShowPrices()
     begin
         Rec.PickPrice();
         CurrPage.Update();
     end;
 
-    procedure ShowLineDisc()
+    internal procedure ShowLineDisc()
     begin
         Rec.PickDiscount();
         CurrPage.Update();
 
     end;
 
-    procedure ShowOrderPromisingLines()
+    internal procedure ShowOrderPromisingLines()
     var
         OrderPromisingLine: Record "Order Promising Line";
         OrderPromisingLines: Page "Order Promising Lines";
@@ -1564,7 +1564,7 @@
         CurrPage.Update();
     end;
 
-    procedure UpdateQtyToShipOnLines(ItemNo: Code[20]; VariantCode: Code[10]; QtyToShip: Decimal)
+    internal procedure UpdateQtyToShipOnLines(ItemNo: Code[20]; VariantCode: Code[10]; QtyToShip: Decimal)
     begin
         Rec.SetRange(Type, Rec.Type::Item);
         if ItemNo <> '' then

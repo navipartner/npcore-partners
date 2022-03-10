@@ -1058,7 +1058,7 @@
 
     end;
 
-    procedure GetAttributeVisibility(AttributeNumber: Integer): Boolean
+    internal procedure GetAttributeVisibility(AttributeNumber: Integer): Boolean
     begin
 
         exit(NPRAttrVisibleArray[AttributeNumber]);

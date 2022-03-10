@@ -84,7 +84,7 @@
         Text000: Label 'Downloading...';
         HasSetupCategories: Boolean;
 
-    procedure GetSelectionFilter(): Text
+    internal procedure GetSelectionFilter(): Text
     var
         ItemGroup: Record "NPR Magento Category";
         MagentoSelectionFilterMgt: Codeunit "NPR Magento Select. Filt. Mgt.";

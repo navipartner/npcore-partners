@@ -69,13 +69,13 @@
         ShowBinInfo: Boolean;
         ShowUnitInfo: Boolean;
 
-    procedure SetShowUnit()
+    internal procedure SetShowUnit()
     begin
         ShowBinInfo := false;
         ShowUnitInfo := true;
     end;
 
-    procedure SetShowBin()
+    internal procedure SetShowBin()
     begin
         ShowBinInfo := true;
         ShowUnitInfo := false;

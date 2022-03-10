@@ -63,7 +63,7 @@
         Pick: Boolean;
         TagText: Text[100];
 
-    procedure ToText(): Text[100]
+    internal procedure ToText(): Text[100]
     var
         TagString: Text;
         Tagged: Boolean;
@@ -80,7 +80,7 @@
         exit(TagString);
     end;
 
-    procedure FromText(TagString: Text)
+    internal procedure FromText(TagString: Text)
     var
         StringLibrary: Codeunit "NPR String Library";
         i: Integer;
@@ -99,7 +99,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure SetTagText(TagTextIn: Text[100])
+    internal procedure SetTagText(TagTextIn: Text[100])
     begin
         TagText := TagTextIn;
     end;

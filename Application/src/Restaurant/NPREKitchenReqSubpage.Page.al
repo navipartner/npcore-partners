@@ -136,7 +136,7 @@
         ViewMode: Option Expedite,"Kitchen Station";
         IsExpediteMode: Boolean;
 
-    procedure SetViewMode(NewViewMode: Option)
+    internal procedure SetViewMode(NewViewMode: Option)
     begin
         ViewMode := NewViewMode;
     end;

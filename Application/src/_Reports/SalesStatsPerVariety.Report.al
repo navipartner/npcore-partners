@@ -1,8 +1,8 @@
 ﻿report 6014615 "NPR Sales Stats Per Variety"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Statistics Per Variety.rdlc';
     Caption = 'Sales Statistics Variant';
@@ -269,7 +269,7 @@
         TextItemFilter: Text;
         Pct1Lbl: Label '%1: %2', locked = true;
 
-    procedure CalculateVariantCost(var Item2: Record Item; ItemVariant: Record "Item Variant")
+    internal procedure CalculateVariantCost(var Item2: Record Item; ItemVariant: Record "Item Variant")
     var
         Item3: Record Item;
         ItemLedgEntry: Record "Item Ledger Entry";
@@ -315,7 +315,7 @@
         VariantUnitCost := UnitCost;
     end;
 
-    procedure CalcPerUnit(Amount: Decimal; Qty: Decimal): Decimal
+    internal procedure CalcPerUnit(Amount: Decimal; Qty: Decimal): Decimal
     begin
         if Qty <> 0 then
             exit(Round(Amount / Abs(Qty), GLSetup."Unit-Amount Rounding Precision"));

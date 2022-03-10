@@ -1,8 +1,8 @@
 ﻿report 6014545 "NPR Acc. Statement w FIK-Card"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Acc. Statement w FIK-Card.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -987,7 +987,7 @@
         TempAgingBandBuf.Modify();
     end;
 
-    procedure SkipReversedUnapplied(var DtldCustLedgEntries: Record "Detailed Cust. Ledg. Entry"): Boolean
+    internal procedure SkipReversedUnapplied(var DtldCustLedgEntries: Record "Detailed Cust. Ledg. Entry"): Boolean
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
     begin
@@ -1004,7 +1004,7 @@
         exit(false);
     end;
 
-    procedure Modulus10(TestNumber: Code[16]): Code[16]
+    internal procedure Modulus10(TestNumber: Code[16]): Code[16]
     var
         Accumulator: Integer;
         Counter: Integer;

@@ -370,7 +370,7 @@
         UpdateStatus();
     end;
 
-    procedure SetActionsEnabled()
+    internal procedure SetActionsEnabled()
     begin
         AllOrdersEnabled := (TrailingSalesOrdersSetup."Show Orders" <> TrailingSalesOrdersSetup."Show Orders"::"All Orders") and
           IsChartAddInReady;

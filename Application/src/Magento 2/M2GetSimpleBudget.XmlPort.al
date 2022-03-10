@@ -187,7 +187,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest()
+    internal procedure GetRequest()
     begin
 
         StartTime := Time;
@@ -198,7 +198,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         exit;
     end;
 
-    procedure CreateResponse()
+    internal procedure CreateResponse()
     begin
 
         TmpCustomerRequest.FindFirst();
@@ -212,7 +212,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    procedure SetErrorResponse(ReasonText: Text)
+    internal procedure SetErrorResponse(ReasonText: Text)
     begin
 
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));

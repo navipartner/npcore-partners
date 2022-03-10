@@ -194,7 +194,7 @@
     var
         POSSession: Codeunit "NPR POS Session";
 
-    procedure SetParameters(POSSessionIn: Codeunit "NPR POS Session")
+    internal procedure SetParameters(POSSessionIn: Codeunit "NPR POS Session")
     begin
         POSSession := POSSessionIn;
     end;

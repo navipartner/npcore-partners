@@ -163,7 +163,7 @@
         until (RequestMemberFieldUpdate.Next() = 0);
     end;
 
-    procedure SetMembershipAndMember(MembershipEntryNo: Integer; MemberEntryNo: Integer): Boolean
+    internal procedure SetMembershipAndMember(MembershipEntryNo: Integer; MemberEntryNo: Integer): Boolean
     var
         Member: Record "NPR MM Member";
     begin

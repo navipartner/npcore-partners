@@ -100,7 +100,7 @@
     {
     }
 
-    procedure FillPageSummary(MembershipEntryNo: Integer)
+    internal procedure FillPageSummary(MembershipEntryNo: Integer)
     var
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
     begin

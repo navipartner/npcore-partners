@@ -63,7 +63,7 @@ xmlport 6151159 "NPR M2 Delete Shipto Address"
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest(var TmpAccount: Record Contact temporary; var TmpShipToAddress: Record "Ship-to Address" temporary)
+    internal procedure GetRequest(var TmpAccount: Record Contact temporary; var TmpShipToAddress: Record "Ship-to Address" temporary)
     begin
 
         StartTime := Time;
@@ -80,7 +80,7 @@ xmlport 6151159 "NPR M2 Delete Shipto Address"
         until (TmpShipToAddressRequest.Next() = 0);
     end;
 
-    procedure SetResponse()
+    internal procedure SetResponse()
     begin
 
         ResponseCode := 'OK';
@@ -88,7 +88,7 @@ xmlport 6151159 "NPR M2 Delete Shipto Address"
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    procedure SetErrorResponse(ErrorMessage: Text)
+    internal procedure SetErrorResponse(ErrorMessage: Text)
     begin
 
         ResponseCode := 'ERROR';

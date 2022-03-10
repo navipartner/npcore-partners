@@ -98,21 +98,21 @@
         end;
     end;
 
-    procedure DeletePrefix(Text: Text[30])
+    internal procedure DeletePrefix(Text: Text[30])
     begin
         if StartsWith(Text) then begin
             _String := CopyStr(_String, StrLen(Text) + 1, MaxStrLen(_String));
         end;
     end;
 
-    procedure DeleteSuffix(Text: Text[30])
+    internal procedure DeleteSuffix(Text: Text[30])
     begin
         if EndsWith(Text) then begin
             _String := CopyStr(CopyStr(_String, 1, StrLen(_String) - StrLen(Text)), 1, MaxStrLen(_String));
         end;
     end;
 
-    procedure EndsWith(Text: Text[30]) IsSuffix: Boolean
+    internal procedure EndsWith(Text: Text[30]) IsSuffix: Boolean
     var
         SuffixLen: Integer;
         TextLen: Integer;
@@ -123,7 +123,7 @@
         exit(CopyStr(_String, TextLen - SuffixLen + 1) = Text);
     end;
 
-    procedure GetPrefixBySeq(Sequence: Text[10]; n: Integer) Prefix: Text[1024]
+    internal procedure GetPrefixBySeq(Sequence: Text[10]; n: Integer) Prefix: Text[1024]
     var
         Suffix: Text[1024];
         Index: Integer;
@@ -143,7 +143,7 @@
         Prefix := CopyStr(CopyStr(Prefix, 1, StrLen(Prefix) - 1), 1, MaxStrLen(Prefix));
     end;
 
-    procedure GetSentence("Sentence Length": Integer): Text[1024]
+    internal procedure GetSentence("Sentence Length": Integer): Text[1024]
     var
         Index: Integer;
         LastSpace: Integer;
@@ -153,7 +153,7 @@
         exit(CopyStr(CopyStr(_String, 1, LastSpace), 1, 1024));
     end;
 
-    procedure GetSuffixBySeq(Sequence: Text[10]; n: Integer) Suffix: Text[1024]
+    internal procedure GetSuffixBySeq(Sequence: Text[10]; n: Integer) Suffix: Text[1024]
     var
         Prefix: Text[1024];
         Index: Integer;
@@ -172,7 +172,7 @@
         end;
     end;
 
-    procedure Replace(_What: Text[30]; _With: Text[30])
+    internal procedure Replace(_What: Text[30]; _With: Text[30])
     var
         Index: Integer;
         Replacements: Integer;
@@ -193,7 +193,7 @@
         end;
     end;
 
-    procedure ReplaceSpecialChar()
+    internal procedure ReplaceSpecialChar()
     var
         "String Length": Integer;
         Index: Integer;
@@ -249,7 +249,7 @@
         end;
     end;
 
-    procedure ReplaceWebSpecial()
+    internal procedure ReplaceWebSpecial()
     var
         "String Length": Integer;
         Index: Integer;
@@ -304,7 +304,7 @@
         end;
     end;
 
-    procedure SelectStringSep(Index: Integer; Sep: Text[10]): Text[250]
+    internal procedure SelectStringSep(Index: Integer; Sep: Text[10]): Text[250]
     var
         Int1: Integer;
         Int2: Integer;
@@ -326,12 +326,12 @@
             exit(CopyStr(String, 1, 250));
     end;
 
-    procedure SelectString(Index: Integer): Text[250]
+    internal procedure SelectString(Index: Integer): Text[250]
     begin
         exit(SelectStringSep(Index, ','));
     end;
 
-    procedure StartsWith(Text: Text[30]) IsPrefix: Boolean
+    internal procedure StartsWith(Text: Text[30]) IsPrefix: Boolean
     var
         SuffixLen: Integer;
     begin
@@ -339,24 +339,24 @@
         exit(CopyStr(_String, 1, SuffixLen) = Text);
     end;
 
-    procedure Text(): Text[1024]
+    internal procedure Text(): Text[1024]
     begin
         exit(_String)
     end;
 
-    procedure TrimStart(Sequence: Text[10])
+    internal procedure TrimStart(Sequence: Text[10])
     begin
         while CopyStr(_String, 1, StrLen(Sequence)) = Sequence do
             _String := CopyStr(_String, 1 + StrLen(Sequence), MaxStrLen(_String));
     end;
 
-    procedure TrimEnd(Sequence: Text[10])
+    internal procedure TrimEnd(Sequence: Text[10])
     begin
         while CopyStr(_String, StrLen(_String) - StrLen(Sequence) + 1) = Sequence do
             _String := CopyStr(CopyStr(_String, 1, StrLen(_String) - StrLen(Sequence)), 1, MaxStrLen(_String));
     end;
 
-    procedure TrimWhiteSpace(StringToTrim: Text[1024]): Text[1024]
+    internal procedure TrimWhiteSpace(StringToTrim: Text[1024]): Text[1024]
     var
         Cr: Char;
         Lf: Char;
@@ -368,7 +368,7 @@
         exit(DelChr(StringToTrim, '=', Format(Tab) + Format(Lf) + Format(Cr) + ' '));
     end;
 
-    procedure PadStrLeft(String: Text[60]; TotalStrLen: Integer; PadChar: Text[30]; After: Boolean) OutStr: Text[100]
+    internal procedure PadStrLeft(String: Text[60]; TotalStrLen: Integer; PadChar: Text[30]; After: Boolean) OutStr: Text[100]
     var
         i: Integer;
     begin

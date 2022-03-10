@@ -141,7 +141,7 @@ xmlport 6151188 "NPR MM Member Comm."
         }
     }
 
-    procedure GetRequest(var MemberNumberOut: Code[20]; var MembershipNumberOut: Code[20]; var TmpMemberCommunication: Record "NPR MM Member Communication" temporary)
+    internal procedure GetRequest(var MemberNumberOut: Code[20]; var MembershipNumberOut: Code[20]; var TmpMemberCommunication: Record "NPR MM Member Communication" temporary)
     begin
 
         status := 'OK';
@@ -160,7 +160,7 @@ xmlport 6151188 "NPR MM Member Comm."
             status := 'ERROR';
     end;
 
-    procedure SetResponse(MemberNumberIn: Code[20]; MembershipNumberIn: Code[20]; var TmpMemberCommunication: Record "NPR MM Member Communication" temporary)
+    internal procedure SetResponse(MemberNumberIn: Code[20]; MembershipNumberIn: Code[20]; var TmpMemberCommunication: Record "NPR MM Member Communication" temporary)
     begin
 
         if (status <> 'OK') then
@@ -180,7 +180,7 @@ xmlport 6151188 "NPR MM Member Comm."
         TmpMemberCommunicationRequest.Reset();
     end;
 
-    procedure SetErrorResponse(ResponseText: Text)
+    internal procedure SetErrorResponse(ResponseText: Text)
     begin
 
         status := 'ERROR';

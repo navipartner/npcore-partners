@@ -78,7 +78,7 @@
     var
         ParameterIsNotDefault: Boolean;
 
-    procedure GetEditedData(var TempParam: Record "NPR POS Parameter Value" temporary)
+    internal procedure GetEditedData(var TempParam: Record "NPR POS Parameter Value" temporary)
     begin
         TempParam.DeleteAll();
         if Rec.FindSet() then
@@ -88,7 +88,7 @@
             until Rec.Next() = 0;
     end;
 
-    procedure SetDataToEdit(var TempParam: Record "NPR POS Parameter Value" temporary)
+    internal procedure SetDataToEdit(var TempParam: Record "NPR POS Parameter Value" temporary)
     begin
         Rec.DeleteAll();
         if TempParam.FindSet() then

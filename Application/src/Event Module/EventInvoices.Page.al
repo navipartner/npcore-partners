@@ -135,14 +135,14 @@
         ShowDetails: Boolean;
         EventMgt: Codeunit "NPR Event Management";
 
-    procedure SetPrJob(Job: Record Job)
+    internal procedure SetPrJob(Job: Record Job)
     begin
         DetailLevel := DetailLevel::"Per Job";
         JobNo := Job."No.";
         ShowDetails := false;
     end;
 
-    procedure SetPrJobTask(JobTask: Record "Job Task")
+    internal procedure SetPrJobTask(JobTask: Record "Job Task")
     begin
         DetailLevel := DetailLevel::"Per Job Task";
         JobNo := JobTask."Job No.";
@@ -150,7 +150,7 @@
         ShowDetails := false;
     end;
 
-    procedure SetPrJobPlanningLine(JobPlanningLine: Record "Job Planning Line")
+    internal procedure SetPrJobPlanningLine(JobPlanningLine: Record "Job Planning Line")
     begin
         DetailLevel := DetailLevel::"Per Job Planning Line";
         JobNo := JobPlanningLine."Job No.";

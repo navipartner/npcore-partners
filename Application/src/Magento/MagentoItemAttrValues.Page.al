@@ -88,7 +88,7 @@
         MagentoItemAttrValue.DeleteAll();
     end;
 
-    procedure SetSourceTable(AttributeSetId: Integer; AttributeId: Integer; ItemNo: Code[20]; VariantCode: Code[10])
+    internal procedure SetSourceTable(AttributeSetId: Integer; AttributeId: Integer; ItemNo: Code[20]; VariantCode: Code[10])
     var
         MagentoItemAttr: Record "NPR Magento Item Attr.";
         MagentoAttribute: Record "NPR Magento Attribute";

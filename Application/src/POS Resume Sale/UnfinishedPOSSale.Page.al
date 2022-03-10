@@ -115,7 +115,7 @@
             exit(CancelAndNewText);
     end;
 
-    procedure SetAllowToPostpone(Set: Boolean)
+    internal procedure SetAllowToPostpone(Set: Boolean)
     begin
         AllowToPostpone := Set;
     end;

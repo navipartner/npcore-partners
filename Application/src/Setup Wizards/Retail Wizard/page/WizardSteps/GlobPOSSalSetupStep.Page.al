@@ -65,12 +65,12 @@
     var
         TempExistingNpGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup" temporary;
 
-    procedure GetRec(var TempGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
+    internal procedure GetRec(var TempGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
     begin
         TempGlobalPOSSalesSetup.Copy(Rec);
     end;
 
-    procedure CreateNpGlobalPOSSalesSetupData()
+    internal procedure CreateNpGlobalPOSSalesSetupData()
     var
         NpGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup";
     begin
@@ -82,12 +82,12 @@
             until Rec.Next() = 0;
     end;
 
-    procedure GlobalPOSSalesSetupDataToCreate(): Boolean
+    internal procedure GlobalPOSSalesSetupDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CopyRealAndTemp(var TempGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
+    internal procedure CopyRealAndTemp(var TempGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
     var
         GlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup";
     begin

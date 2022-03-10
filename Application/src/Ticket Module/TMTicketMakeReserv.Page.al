@@ -540,7 +540,7 @@
         exit(false);
     end;
 
-    procedure LoadTicketRequest(Token: Text[100])
+    internal procedure LoadTicketRequest(Token: Text[100])
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
@@ -586,7 +586,7 @@
             Message(DIFFERENT_DATES_WARNING);
     end;
 
-    procedure SetTicketItem(ItemNo: Code[20]; VariantCode: Code[10])
+    internal procedure SetTicketItem(ItemNo: Code[20]; VariantCode: Code[10])
     var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
@@ -613,12 +613,12 @@
             gShowDeliverTo := TicketBOM.FindFirst();
     end;
 
-    procedure AllowQuantityChange(AllowQuantityChange: Boolean)
+    internal procedure AllowQuantityChange(AllowQuantityChange: Boolean)
     begin
         gAllowQuantityChange := AllowQuantityChange;
     end;
 
-    procedure FinalizeReservationRequest(FailWithError: Boolean; var ResponseMessage: Text): Integer
+    internal procedure FinalizeReservationRequest(FailWithError: Boolean; var ResponseMessage: Text): Integer
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -706,7 +706,7 @@
         exit(0);
     end;
 
-    procedure FinalizeChangeRequest(FailWithError: Boolean; var ResponseMessage: Text): Integer;
+    internal procedure FinalizeChangeRequest(FailWithError: Boolean; var ResponseMessage: Text): Integer;
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
@@ -772,7 +772,7 @@
         exit(0);
     end;
 
-    procedure GetChangedTicketQuantity(var NewQuantity: Integer) QtyChanged: Boolean
+    internal procedure GetChangedTicketQuantity(var NewQuantity: Integer) QtyChanged: Boolean
     begin
 
         if (Rec.FindFirst()) then
@@ -781,7 +781,7 @@
         exit(gQuantityChanged);
     end;
 
-    procedure SetTicketBatchMode()
+    internal procedure SetTicketBatchMode()
     begin
         gBatchTicketCreateMode := true;
     end;
@@ -834,7 +834,7 @@
 
     end;
 
-    procedure SetIgnoreScheduleSelectionFilter(IgnoreFilter: Boolean): Boolean
+    internal procedure SetIgnoreScheduleSelectionFilter(IgnoreFilter: Boolean): Boolean
     begin
 
         gIgnoreScheduleFilter := IgnoreFilter;

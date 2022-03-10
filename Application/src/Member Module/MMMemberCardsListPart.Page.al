@@ -118,7 +118,7 @@
         }
     }
 
-    procedure GetCurrentEntryNo() EntryNo: Integer
+    internal procedure GetCurrentEntryNo() EntryNo: Integer
     begin
 
         exit(Rec."Entry No.");

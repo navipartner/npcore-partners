@@ -255,7 +255,7 @@
         FilterName: Code[20];
         NoEventsInFilter: Label 'There are not events with these attribute filters.';
 
-    procedure SetAttrTemplate(TemplateName2: Code[20])
+    internal procedure SetAttrTemplate(TemplateName2: Code[20])
     begin
         TemplateName := TemplateName2;
         EventAttrTemplate.Get(TemplateName);
@@ -266,7 +266,7 @@
         Rec.FilterGroup := 0;
     end;
 
-    procedure SetJob(JobNo2: Code[20])
+    internal procedure SetJob(JobNo2: Code[20])
     begin
         JobNo := JobNo2;
         Job.Get(JobNo);
@@ -352,7 +352,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure SetFilterMode(FilterName2: Code[20])
+    internal procedure SetFilterMode(FilterName2: Code[20])
     begin
         FilterMode := true;
         FilterName := FilterName2;

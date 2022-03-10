@@ -28,7 +28,7 @@ codeunit 6014528 "NPR Barcode Font Provider Mgt."
         BarCodeSettings."Use mod 10" := UseMod10;
     end;
 
-    procedure SetBarcodeSimbiology(TextToEncode: Text) BarcodeSimbiology: Enum "Barcode Symbology"
+    internal procedure SetBarcodeSimbiology(TextToEncode: Text) BarcodeSimbiology: Enum "Barcode Symbology"
     begin
         if StrLen(TextToEncode) = 13 then
             exit(BarcodeSimbiology::"EAN-13")

@@ -178,7 +178,7 @@
         Mode: Option Test,SingleRecord,Batch;
 
     [Obsolete('New oveload procedure with Enum "NPR SMS Recipient Type"')]
-    procedure SetData(ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text)
+    internal procedure SetData(ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text)
     begin
         PhoneNo := ReceiverPhoneNo;
         SelectedRecordRef := RecRef;
@@ -189,7 +189,7 @@
         RecTypeVisible := false;
     end;
 
-    procedure SetData(RecRecipientType: Enum "NPR SMS Recipient Type"; ReceiverGroupNo: Text[10]; ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text; RecTypeVis: Boolean)
+    internal procedure SetData(RecRecipientType: Enum "NPR SMS Recipient Type"; ReceiverGroupNo: Text[10]; ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text; RecTypeVis: Boolean)
     begin
         PhoneNo := ReceiverPhoneNo;
         GroupCode := ReceiverGroupNo;
@@ -202,7 +202,7 @@
     end;
 
     [Obsolete('New oveload procedure with Enum "NPR SMS Recipient Type"')]
-    procedure GetData(var ReceiverPhoneNo: Text; var RecRef: RecordRef; var SMSBodyText: Text; var Sender: Text; var SendOption: Option; var SendDelayUntil: DateTime)
+    internal procedure GetData(var ReceiverPhoneNo: Text; var RecRef: RecordRef; var SMSBodyText: Text; var Sender: Text; var SendOption: Option; var SendDelayUntil: DateTime)
     begin
         ReceiverPhoneNo := PhoneNo;
         RecRef := SelectedRecordRef;
@@ -212,7 +212,7 @@
         SendDelayUntil := DelayUntil;
     end;
 
-    procedure GetData(var RecRecipientType: Enum "NPR SMS Recipient Type"; var ReceiverGroupNo: Code[10]; var ReceiverPhoneNo: Text; var RecRef: RecordRef; var SMSBodyText: Text; var Sender: Text; var SendDelayUntil: DateTime)
+    internal procedure GetData(var RecRecipientType: Enum "NPR SMS Recipient Type"; var ReceiverGroupNo: Code[10]; var ReceiverPhoneNo: Text; var RecRef: RecordRef; var SMSBodyText: Text; var Sender: Text; var SendDelayUntil: DateTime)
     begin
         ReceiverPhoneNo := PhoneNo;
         ReceiverGroupNo := GroupCode;

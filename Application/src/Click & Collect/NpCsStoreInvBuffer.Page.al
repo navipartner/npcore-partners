@@ -62,7 +62,7 @@
         }
     }
 
-    procedure SetSourceTable(var NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary)
+    internal procedure SetSourceTable(var NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary)
     begin
         Rec.Copy(NpCsStoreInventoryBuffer, true);
     end;

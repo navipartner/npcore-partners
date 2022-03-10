@@ -53,7 +53,7 @@
     var
         ParentTableNo: Integer;
 
-    procedure SetParentTableNo(NewParentTableNo: Integer)
+    internal procedure SetParentTableNo(NewParentTableNo: Integer)
     begin
         ParentTableNo := NewParentTableNo;
     end;

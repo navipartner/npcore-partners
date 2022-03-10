@@ -264,13 +264,13 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
         MembershipSetup: Record "NPR MM Membership Setup";
         AdmissionSetup: Record "NPR TM Admission";
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20])
+    internal procedure AddResponse(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20])
     var
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
@@ -360,7 +360,7 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
         end;
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

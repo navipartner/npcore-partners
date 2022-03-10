@@ -179,7 +179,7 @@
         MATRIX_Step: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn;
         AdmSchEntry: Record "NPR TM Admis. Schedule Entry";
 
-    procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn)
+    internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn)
     var
         MatrixMgt: Codeunit "Matrix Management";
         MATRIX_PeriodRecords: array[32] of Record Date;
@@ -284,7 +284,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure SetInitialAdmissionCode(AdmissionCode: Code[20])
+    internal procedure SetInitialAdmissionCode(AdmissionCode: Code[20])
     begin
 
         PageAdmissionCode := AdmissionCode;

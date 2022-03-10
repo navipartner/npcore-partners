@@ -1,8 +1,8 @@
 ﻿report 6014663 "NPR Retail Calc. Inv."
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     Caption = 'Retail Calculate Inventory';
     ProcessingOnly = true;
     UsageCategory = None;
@@ -296,7 +296,7 @@
         CycleSourceType: Option " ",Item,SKU;
         ColumnDim: Text[250];
 
-    procedure SetItemJnlLine(var NewItemJnlLine: Record "Item Journal Line")
+    internal procedure SetItemJnlLine(var NewItemJnlLine: Record "Item Journal Line")
     begin
         ItemJnlLine := NewItemJnlLine;
     end;
@@ -486,7 +486,7 @@
         TempQuantityOnHandBuffer.Insert(true);
     end;
 
-    procedure InitializeRequest(NewPostingDate: Date; DocNo: Code[20]; ItemsNotOnInvt: Boolean)
+    internal procedure InitializeRequest(NewPostingDate: Date; DocNo: Code[20]; ItemsNotOnInvt: Boolean)
     begin
         PostingDate := NewPostingDate;
         NextDocNo := DocNo;
@@ -598,12 +598,12 @@
         end;
     end;
 
-    procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
+    internal procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
     begin
         HideValidationDialog := NewHideValidationDialog;
     end;
 
-    procedure InitializePhysInvtCount(PhysInvtCountCode2: Code[10]; CountSourceType2: Option " ",Item,SKU)
+    internal procedure InitializePhysInvtCount(PhysInvtCountCode2: Code[10]; CountSourceType2: Option " ",Item,SKU)
     begin
         PhysInvtCountCode := PhysInvtCountCode2;
         CycleSourceType := CountSourceType2;
@@ -690,7 +690,7 @@
         exit(TempQuantityOnHandBuffer.Find('-'));
     end;
 
-    procedure SetSkipDim(NewSkipDim: Boolean)
+    internal procedure SetSkipDim(NewSkipDim: Boolean)
     begin
         SkipDim := NewSkipDim;
     end;
@@ -764,7 +764,7 @@
         end;
     end;
 
-    procedure NPR_SetReportOptions(pZeroQty: Boolean; pPostingDate: Date; pHideValidationDialog: Boolean)
+    internal procedure NPR_SetReportOptions(pZeroQty: Boolean; pPostingDate: Date; pHideValidationDialog: Boolean)
     begin
         ZeroQty := pZeroQty;
         HideValidationDialog := pHideValidationDialog;

@@ -184,7 +184,7 @@
         UserId: Text;
         SalespersonCode: Code[20];
 
-    procedure SetGlobals(var TempSalespersonAll: Record "NPR Salesperson Buffer"; var TempUserAll: Record User; var TempPOSUnit: Record "NPR POS Unit")
+    internal procedure SetGlobals(var TempSalespersonAll: Record "NPR Salesperson Buffer"; var TempUserAll: Record User; var TempPOSUnit: Record "NPR POS Unit")
     begin
         TempAllSalesperson.DeleteAll();
         if TempSalespersonAll.FindSet() then
@@ -214,12 +214,12 @@
         if TempAllPOSUnit.FindSet() then;
     end;
 
-    procedure UserSetupsToCreate(): Boolean
+    internal procedure UserSetupsToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CreateUserSetupData()
+    internal procedure CreateUserSetupData()
     var
         UserSetup: Record "User Setup";
     begin
@@ -231,7 +231,7 @@
             until Rec.Next() = 0;
     end;
 
-    procedure CopyRealAndTempUsers(var TempUserAll: Record User)
+    internal procedure CopyRealAndTempUsers(var TempUserAll: Record User)
     var
         User: Record User;
     begin

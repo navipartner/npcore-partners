@@ -84,11 +84,11 @@ xmlport 6060143 "NPR MM Create Wallet Mem. Pass"
         }
     }
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
     end;
 
-    procedure AddResponse(MemberInfoCaptureEntryNo: Integer)
+    internal procedure AddResponse(MemberInfoCaptureEntryNo: Integer)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
@@ -113,7 +113,7 @@ xmlport 6060143 "NPR MM Create Wallet Mem. Pass"
         Status := '1';
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         ErrorDescription := ErrorMessage;

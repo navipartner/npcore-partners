@@ -1,8 +1,8 @@
 ﻿report 6014424 "NPR Ret. Jnl. - Import Items"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     Caption = 'Import Items';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
@@ -122,7 +122,7 @@
         ItemReference: Record "Item Reference";
         ImportUnitCost: Option "Standard Cost","Unit Cost","Last direct cost";
 
-    procedure SetJournal(RetailJournalCodeIn: Code[40])
+    internal procedure SetJournal(RetailJournalCodeIn: Code[40])
     begin
         RetailJournalCode := RetailJournalCodeIn;
         RetailJournalHeader.Get(RetailJournalCode);

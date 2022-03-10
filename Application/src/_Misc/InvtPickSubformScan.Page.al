@@ -412,7 +412,7 @@
         BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", '')
     end;
 
-    procedure AutofillQtyToHandle()
+    internal procedure AutofillQtyToHandle()
     var
         WhseActivLine: Record "Warehouse Activity Line";
     begin
@@ -420,7 +420,7 @@
         Rec.AutofillQtyToHandle(WhseActivLine);
     end;
 
-    procedure DeleteQtyToHandle()
+    internal procedure DeleteQtyToHandle()
     var
         WhseActivLine: Record "Warehouse Activity Line";
     begin
@@ -437,7 +437,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure PostPickYesNo()
+    internal procedure PostPickYesNo()
     var
         WhseActivLine: Record "Warehouse Activity Line";
         WhseActivPostYesNo: Codeunit "Whse.-Act.-Post (Yes/No)";
@@ -447,7 +447,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure PostAndPrint()
+    internal procedure PostAndPrint()
     var
         WhseActivLine: Record "Warehouse Activity Line";
         WhseActivPostYesNo: Codeunit "Whse.-Act.-Post (Yes/No)";
@@ -458,7 +458,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure UpdateForm()
+    internal procedure UpdateForm()
     begin
         CurrPage.Update();
     end;

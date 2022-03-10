@@ -107,7 +107,7 @@
         ItemWorksheet: Record "NPR Item Worksheet";
         ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
 
-    procedure GetCurrentWorksheet()
+    internal procedure GetCurrentWorksheet()
     begin
         ItemWorksheet.Get(Rec.GetRangeMax("Worksheet Template Name"), Rec.GetRangeMax("Worksheet Name"));
     end;

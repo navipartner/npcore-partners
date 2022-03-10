@@ -164,7 +164,7 @@ xmlport 6151155 "NPR M2 Update Shipto Address"
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest(var TmpAccount: Record Contact temporary; var TmpShipToAddress: Record "Ship-to Address" temporary)
+    internal procedure GetRequest(var TmpAccount: Record Contact temporary; var TmpShipToAddress: Record "Ship-to Address" temporary)
     begin
 
         StartTime := Time;
@@ -181,7 +181,7 @@ xmlport 6151155 "NPR M2 Update Shipto Address"
         until (TmpShipToAddressRequest.Next() = 0);
     end;
 
-    procedure SetResponse(var TmpShiptoAddress: Record "Ship-to Address" temporary)
+    internal procedure SetResponse(var TmpShiptoAddress: Record "Ship-to Address" temporary)
     begin
 
         ResponseCode := 'OK';
@@ -199,7 +199,7 @@ xmlport 6151155 "NPR M2 Update Shipto Address"
         until (TmpShiptoAddress.Next() = 0);
     end;
 
-    procedure SetErrorResponse(ErrorMessage: Text)
+    internal procedure SetErrorResponse(ErrorMessage: Text)
     begin
 
         ResponseCode := 'ERROR';

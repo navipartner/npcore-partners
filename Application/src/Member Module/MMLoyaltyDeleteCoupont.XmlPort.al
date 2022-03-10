@@ -61,18 +61,18 @@ xmlport 6151189 "NPR MM Loyalty Delete Coupont"
         }
     }
 
-    procedure GetRequest(var ExternalMembershipNumberOut: Code[20]; var CouponReferenceOut: Text[30]);
+    internal procedure GetRequest(var ExternalMembershipNumberOut: Code[20]; var CouponReferenceOut: Text[30]);
     begin
         ExternalMembershipNumberOut := ExternalMembershipNumber;
         CouponReferenceOut := CouponReference;
     end;
 
-    procedure ClearResponse();
+    internal procedure ClearResponse();
     begin
         tmpMembershipResponse.DeleteALL();
     end;
 
-    procedure AddResponse(ResponseMessageIn: Text);
+    internal procedure AddResponse(ResponseMessageIn: Text);
     begin
         responsemessage := ResponseMessageIn;
         responsecode := 'OK';
@@ -80,7 +80,7 @@ xmlport 6151189 "NPR MM Loyalty Delete Coupont"
         if (tmpMembershipResponse.Insert()) then;
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text);
+    internal procedure AddErrorResponse(ErrorMessage: Text);
     begin
         responsemessage := ErrorMessage;
         responsecode := 'ERROR';

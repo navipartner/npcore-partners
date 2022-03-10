@@ -344,7 +344,7 @@
         InvalidViewByOption: Boolean;
         AmountShippedArray: array[10] of Decimal;
 
-    procedure ValidateRequest()
+    internal procedure ValidateRequest()
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";

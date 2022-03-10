@@ -105,12 +105,12 @@
         Rec."Table ID" := RepEndpoint."Table ID";
     end;
 
-    procedure SetFieldsNonEditable()
+    internal procedure SetFieldsNonEditable()
     begin
         FieldsNonEditable := true;
     end;
 
-    procedure SetReplicationEndpoint(RepEndpointIn: Record "NPR Replication Endpoint")
+    internal procedure SetReplicationEndpoint(RepEndpointIn: Record "NPR Replication Endpoint")
     begin
         RepEndpoint := RepEndpointIn;
     end;

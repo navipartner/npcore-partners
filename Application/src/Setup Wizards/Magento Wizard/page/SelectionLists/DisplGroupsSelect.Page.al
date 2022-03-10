@@ -31,7 +31,7 @@
         }
     }
 
-    procedure SetRec(var TempDisplayGroup: Record "NPR Magento Display Group")
+    internal procedure SetRec(var TempDisplayGroup: Record "NPR Magento Display Group")
     begin
         Rec.DeleteAll();
 

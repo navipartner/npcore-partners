@@ -1,8 +1,8 @@
 ﻿report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     Caption = 'Adjust Cost - Item Entries';
     Permissions = TableData "Item Ledger Entry" = rimd,
                   TableData "Item Application Entry" = r,
@@ -169,7 +169,7 @@
         ItemCategoryFilter: Text[250];
         ItemNoFilter: Text[250];
 
-    procedure InitializeRequest(NewItemNoFilter: Text[250]; NewItemCategoryFilter: Text[250])
+    internal procedure InitializeRequest(NewItemNoFilter: Text[250]; NewItemCategoryFilter: Text[250])
     begin
         ItemNoFilter := NewItemNoFilter;
         ItemCategoryFilter := NewItemCategoryFilter;

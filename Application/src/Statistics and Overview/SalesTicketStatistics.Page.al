@@ -193,7 +193,7 @@
             POSEntry.SetRange("Posting Date", 0D, Rec."Period End");
     end;
 
-    procedure CalcAverage() Result: Decimal
+    internal procedure CalcAverage() Result: Decimal
     var
         totalAmount: Decimal;
     begin
@@ -207,7 +207,7 @@
             Result := 0;
     end;
 
-    procedure SetDimensionFilters()
+    internal procedure SetDimensionFilters()
     begin
         if Dim1Filter <> '' then
             POSEntry.SetRange("Shortcut Dimension 1 Code", Dim1Filter)

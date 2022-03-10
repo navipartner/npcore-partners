@@ -204,7 +204,7 @@
         ChangesMade := true;
     end;
 
-    procedure PrepareLocalizationForRecord(LocalizeForRecordID: RecordID; var "Field": Record "Field" temporary)
+    internal procedure PrepareLocalizationForRecord(LocalizeForRecordID: RecordID; var "Field": Record "Field" temporary)
     var
         LocalizedCaption: Record "NPR POS Localized Caption";
         FieldRef: FieldRef;

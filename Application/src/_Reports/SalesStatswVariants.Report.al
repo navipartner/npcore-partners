@@ -1,8 +1,8 @@
 ﻿report 6014611 "NPR Sales Stats w/ Variants"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Statistics w Variants.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -254,7 +254,7 @@
         ItemFilter: Text;
         Pct1Lbl: Label '%1: %2', locked = true;
 
-    procedure Calculate()
+    internal procedure Calculate()
     begin
         SalesQty := -CalcInvoicedQty();
         SalesAmount := CalcSalesAmount();
@@ -306,7 +306,7 @@
         exit(ItemStatisticsBuf."Invoiced Quantity");
     end;
 
-    procedure CalcPerUnit(Amount: Decimal; Qty: Decimal): Decimal
+    internal procedure CalcPerUnit(Amount: Decimal; Qty: Decimal): Decimal
     begin
         if Qty <> 0 then
             exit(Round(Amount / Abs(Qty), GLSetup."Unit-Amount Rounding Precision"));

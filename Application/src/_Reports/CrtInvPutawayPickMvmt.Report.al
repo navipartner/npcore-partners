@@ -1,8 +1,8 @@
 ﻿report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     Caption = 'Create Invt. Put-away/Pick/Movement';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
@@ -332,7 +332,7 @@
             end;
     end;
 
-    procedure InitializeRequest(NewCreateInvtPutAway: Boolean; NewCreateInvtPick: Boolean; NewCreateInvtMovement: Boolean; NewPrintDocument: Boolean; NewShowError: Boolean)
+    internal procedure InitializeRequest(NewCreateInvtPutAway: Boolean; NewCreateInvtPick: Boolean; NewCreateInvtMovement: Boolean; NewPrintDocument: Boolean; NewShowError: Boolean)
     begin
         CreatePutAway := NewCreateInvtPutAway;
         CreatePick := NewCreateInvtPick;
@@ -347,7 +347,7 @@
         CreateMovementEditable := not CreatePick;
     end;
 
-    procedure SuppressMessages(NewState: Boolean)
+    internal procedure SuppressMessages(NewState: Boolean)
     begin
         SuppressMessagesState := NewState;
     end;
@@ -360,7 +360,7 @@
             OrigText := StrSubstNo(TextLbl, OrigText, Addendum);
     end;
 
-    procedure GetMovementCounters(var MovementsCreated: Integer; var TotalMovementsToBeCreated: Integer)
+    internal procedure GetMovementCounters(var MovementsCreated: Integer; var TotalMovementsToBeCreated: Integer)
     begin
         MovementsCreated := MovementCounter;
         TotalMovementsToBeCreated := TotalMovementCounter;

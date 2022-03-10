@@ -1,8 +1,8 @@
 ﻿report 6014550 "NPR Statement E-Mail"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     Caption = 'Statement - Paper/E-Mail';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
@@ -313,7 +313,7 @@
         Pdf2NavOutputMethod: Option "Send now","Send through NaviDocs";
         RequestPageParameters: Text;
 
-    procedure InitRequestPageDataInternal()
+    internal procedure InitRequestPageDataInternal()
     begin
         if isInitialized then
             exit;

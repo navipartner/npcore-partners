@@ -82,12 +82,12 @@ page 6059852 "NPR POS Item Avail. Check Det."
         }
     }
 
-    procedure SetDataset(var PosItemAvailability: Record "NPR POS Item Availability")
+    internal procedure SetDataset(var PosItemAvailability: Record "NPR POS Item Availability")
     begin
         Rec.Copy(PosItemAvailability, true);
     end;
 
-    procedure SetShowCurrentLineQtyColumn(Set: Boolean)
+    internal procedure SetShowCurrentLineQtyColumn(Set: Boolean)
     begin
         CurrentLineQtyColumnVisible := Set;
     end;

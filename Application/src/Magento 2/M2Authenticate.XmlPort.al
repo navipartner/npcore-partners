@@ -243,7 +243,7 @@ xmlport 6151150 "NPR M2 Authenticate"
         Customer: Record Customer;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary)
+    internal procedure GetRequest(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary)
     begin
 
         StartTime := Time;
@@ -259,7 +259,7 @@ xmlport 6151150 "NPR M2 Authenticate"
         end;
     end;
 
-    procedure SetResponse(var TmpContact: Record Contact temporary)
+    internal procedure SetResponse(var TmpContact: Record Contact temporary)
     var
         MembershipRole: Record "NPR MM Membership Role";
         ContactBusinessRelation: Record "Contact Business Relation";
@@ -300,7 +300,7 @@ xmlport 6151150 "NPR M2 Authenticate"
             SetErrorResponse('Invalid E-Mail, Password combination.');
     end;
 
-    procedure SetErrorResponse(ReasonText: Text)
+    internal procedure SetErrorResponse(ReasonText: Text)
     begin
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
         ResponseCode := 'ERROR';

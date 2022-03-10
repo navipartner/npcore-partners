@@ -91,7 +91,7 @@
         TempExistingMagStores: Record "NPR Magento Store" temporary;
         TempAllMagentoWebsite: Record "NPR Magento Website" temporary;
 
-    procedure SetGlobals(var TempMagentoWebsite: Record "NPR Magento Website")
+    internal procedure SetGlobals(var TempMagentoWebsite: Record "NPR Magento Website")
     begin
         TempAllMagentoWebsite.DeleteAll();
 
@@ -102,7 +102,7 @@
             until TempMagentoWebsite.Next() = 0;
     end;
 
-    procedure CreateMagentoStoreData()
+    internal procedure CreateMagentoStoreData()
     var
         MagentoStore: Record "NPR Magento Store";
     begin
@@ -114,7 +114,7 @@
             until Rec.Next() = 0;
     end;
 
-    procedure MagentoStoreDataToCreate(): Boolean
+    internal procedure MagentoStoreDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;

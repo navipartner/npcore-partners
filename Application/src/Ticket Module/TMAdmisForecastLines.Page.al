@@ -256,9 +256,9 @@
     end;
 
 #if BC17 or BC18
-    procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "NPR TM Admis. Schedule Entry"; CurrentNoOfMatrixColumns: Integer; pStatisticsOption: Option; pPeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period")
+    internal procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "NPR TM Admis. Schedule Entry"; CurrentNoOfMatrixColumns: Integer; pStatisticsOption: Option; pPeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period")
 #else    
-    procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "NPR TM Admis. Schedule Entry"; CurrentNoOfMatrixColumns: Integer; pStatisticsOption: Option; pPeriodType: Enum "Analysis Period Type")
+    internal procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "NPR TM Admis. Schedule Entry"; CurrentNoOfMatrixColumns: Integer; pStatisticsOption: Option; pPeriodType: Enum "Analysis Period Type")
 #endif    
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
@@ -293,7 +293,7 @@
         PagePeriodOption := pPeriodType;
     end;
 
-    procedure DisplayCellValue(ColumnOrdinal: Integer) CellValue: Text[30]
+    internal procedure DisplayCellValue(ColumnOrdinal: Integer) CellValue: Text[30]
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         CellSum: Integer;

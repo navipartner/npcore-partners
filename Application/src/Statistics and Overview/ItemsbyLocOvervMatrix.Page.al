@@ -1,8 +1,6 @@
 ﻿page 6060067 "NPR Items by Loc.Overv. Matrix"
 {
     Extensible = False;
-    // NPR5.52/JAKUBV/20191022  CASE 370333 Transport NPR5.52 - 22 October 2019
-
     Caption = 'Items by Loc. Overview Matrix';
     Editable = false;
     LinksAllowed = false;
@@ -354,7 +352,7 @@
         Field12Visible: Boolean;
         EmtpyCodeValueTxt: Label '<NO CODE>', Comment = 'Maximum length = 10';
 
-    procedure SetFilters(_ItemFilter: Code[250]; _VariantFilter: Code[250]; _VarietyValueFilter: array[4] of Code[250]; _ShowItems: Option "On Inventory","Not on Inventory",All)
+    internal procedure SetFilters(_ItemFilter: Code[250]; _VariantFilter: Code[250]; _VarietyValueFilter: array[4] of Code[250]; _ShowItems: Option "On Inventory","Not on Inventory",All)
     begin
         ItemFilter := _ItemFilter;
         VariantFilter := _VariantFilter;
@@ -362,7 +360,7 @@
         ShowItems := _ShowItems;
     end;
 
-    procedure Load(_MatrixColumns: array[32] of Text[80]; var _MatrixRecords: array[32] of Record Location; var _MatrixRecord: Record Location)
+    internal procedure Load(_MatrixColumns: array[32] of Text[80]; var _MatrixRecords: array[32] of Record Location; var _MatrixRecord: Record Location)
     begin
         Clear(MATRIX_CellData);
         CopyArray(MATRIX_CaptionSet, _MatrixColumns, 1);
@@ -447,7 +445,7 @@
         exit(Item.Inventory);
     end;
 
-    procedure MatrixMaxNoOfColumns(): Integer
+    internal procedure MatrixMaxNoOfColumns(): Integer
     begin
         exit(12);
     end;
@@ -468,7 +466,7 @@
         Field12Visible := AllVisible or (MATRIX_CaptionSet[12] <> '');
     end;
 
-    procedure EmptyCodeValue(): Code[10]
+    internal procedure EmptyCodeValue(): Code[10]
     begin
         exit(CopyStr(UpperCase(EmtpyCodeValueTxt), 1, 10));
     end;

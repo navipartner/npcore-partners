@@ -260,13 +260,13 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
         }
     }
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer)
+    internal procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -361,7 +361,7 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
 
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         responsemessage := ErrorMessage;

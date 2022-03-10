@@ -57,7 +57,7 @@
         methodGlobal: Text;
         PageCaption: Text;
 
-    procedure SetModule(htmlIn: Text; cssIn: Text; jsIn: Text; caption: Text)
+    internal procedure SetModule(htmlIn: Text; cssIn: Text; jsIn: Text; caption: Text)
     begin
         html := htmlIn;
         css := cssIn;
@@ -65,13 +65,13 @@
         PageCaption := caption;
     end;
 
-    procedure GetResponse(var methodOut: Text; var contentOut: JsonObject)
+    internal procedure GetResponse(var methodOut: Text; var contentOut: JsonObject)
     begin
         methodOut := methodGlobal;
         contentOut := contentGlobal;
     end;
 
-    procedure DidAutoClose(): Boolean
+    internal procedure DidAutoClose(): Boolean
     begin
         exit(AutoClosed);
     end;

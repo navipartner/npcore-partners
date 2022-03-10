@@ -1,8 +1,8 @@
 ﻿report 6014617 "NPR Purchase Order"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     RDLCLayout = './src/_Reports/layouts/NP Purchase Order.rdlc';
     WordLayout = './src/_Reports/layouts/NP Purchase Order.docx';
     UsageCategory = ReportsAndAnalysis;
@@ -1295,7 +1295,7 @@
         Pct1Lbl: Label '%1 %2', locked = true;
         Pct2Lbl: Label '%1, %2 %3', locked = true;
 
-    procedure InitializeRequest(NewNoOfCopies: Integer; NewShowInternalInfo: Boolean; NewArchiveDocument: Boolean; NewLogInteraction: Boolean)
+    internal procedure InitializeRequest(NewNoOfCopies: Integer; NewShowInternalInfo: Boolean; NewArchiveDocument: Boolean; NewLogInteraction: Boolean)
     begin
         NoOfCopies := NewNoOfCopies;
         ShowInternalInfo := NewShowInternalInfo;

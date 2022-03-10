@@ -322,12 +322,12 @@
         FlowStatus: Record "NPR NPRE Flow Status";
         LineIsMarked: Boolean;
 
-    procedure GetSelection(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    internal procedure GetSelection(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
     begin
         WaiterPadLine.Copy(Rec);
     end;
 
-    procedure ClearMarkedLines()
+    internal procedure ClearMarkedLines()
     begin
         Rec.ClearMarks();
     end;

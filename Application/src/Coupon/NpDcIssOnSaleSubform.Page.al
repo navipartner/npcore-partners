@@ -67,7 +67,7 @@
     var
         LotQtyVisible: Boolean;
 
-    procedure SetLotQtyVisible(Type: Integer)
+    internal procedure SetLotQtyVisible(Type: Integer)
     var
         NpDcIssueOnSaleSetup: Record "NPR NpDc Iss.OnSale Setup";
     begin

@@ -157,7 +157,7 @@
         LastYear: Boolean;
         CalcLastYear: Text[50];
 
-    procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemGroup: Code[20]; LastYearCalc: Text[50])
+    internal procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemGroup: Code[20]; LastYearCalc: Text[50])
     begin
         //SetFilter()
         if (Dim1Filter <> GlobalDim1) or (Dim2Filter <> GlobalDim2) or (Periodestart <> DatoStart) or
@@ -180,7 +180,7 @@
         CurrPage.Update();
     end;
 
-    procedure Calc()
+    internal procedure Calc()
     var
         AuxValueEntry: Record "NPR Aux. Value Entry";
         AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
@@ -220,7 +220,7 @@
         LastYear := false;
     end;
 
-    procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry")
+    internal procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry")
     begin
         //SetItemLedgerEntryFilter
         AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
@@ -248,7 +248,7 @@
             AuxItemLedgerEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry")
+    internal procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry")
     begin
         //SetValueEntryFilter
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
@@ -274,7 +274,7 @@
             AuxValueEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    procedure ChangeEmptyFilter(): Boolean
+    internal procedure ChangeEmptyFilter(): Boolean
     var
         Vendor: Record Vendor;
         AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
@@ -317,7 +317,7 @@
         exit(HideEmpty);
     end;
 
-    procedure InitForm()
+    internal procedure InitForm()
     begin
         //InitForm()
         Rec.Reset();
@@ -329,7 +329,7 @@
         HideEmpty := true;
     end;
 
-    procedure UpdateHidden()
+    internal procedure UpdateHidden()
     begin
         //UpdateHidden()
         if HideEmpty then begin
@@ -339,7 +339,7 @@
         end;
     end;
 
-    procedure ReleaseLock()
+    internal procedure ReleaseLock()
     begin
         //ReleaseLock()
         if Rec.Count() = 0 then begin
@@ -348,7 +348,7 @@
         end;
     end;
 
-    procedure ShowLastYear(Show: Boolean)
+    internal procedure ShowLastYear(Show: Boolean)
     begin
         //CurrPage."LastYear Sale Quantity".VISIBLE( Show );
         //CurrPage."LastYear Sale Amount".VISIBLE( Show );

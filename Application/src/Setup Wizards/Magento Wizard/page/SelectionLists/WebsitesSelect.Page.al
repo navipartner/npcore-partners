@@ -53,7 +53,7 @@
         }
     }
 
-    procedure SetRec(var TempMagentoWebsite: Record "NPR Magento Website")
+    internal procedure SetRec(var TempMagentoWebsite: Record "NPR Magento Website")
     begin
         if TempMagentoWebsite.FindSet() then
             repeat

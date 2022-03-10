@@ -189,7 +189,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
     actions
     {
-        #if BC17 or BC18
+#if BC17 or BC18
 #pragma warning disable AL0432
         modify("Cross Re&ferences")
         {
@@ -472,7 +472,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         TableView := Rec.GetView(false);
     end;
 
-    procedure NPR_SetMagentoEnabled()
+    internal procedure NPR_SetMagentoEnabled()
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
@@ -483,17 +483,17 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         MagentoEnabledDisplayConfig := MagentoSetup."Customers Enabled";
     end;
 
-    procedure NPR_SetVendorNo(VendorNo: Code[20])
+    internal procedure NPR_SetVendorNo(VendorNo: Code[20])
     begin
         Rec.SetFilter("Vendor No.", VendorNo);
     end;
 
-    procedure NPR_SetLocationCode(LocationCode: Code[20])
+    internal procedure NPR_SetLocationCode(LocationCode: Code[20])
     begin
         Rec.SetFilter("Location Filter", LocationCode);
     end;
 
-    procedure NPR_SetBlocked(OptBlocked: Option All,OnlyBlocked,OnlyUnblocked)
+    internal procedure NPR_SetBlocked(OptBlocked: Option All,OnlyBlocked,OnlyUnblocked)
     begin
         case OptBlocked of
             OptBlocked::All:
@@ -505,7 +505,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         end;
     end;
 
-    procedure NPR_GetViewText(): Text
+    internal procedure NPR_GetViewText(): Text
     begin
         exit(Rec.GetView(false));
     end;

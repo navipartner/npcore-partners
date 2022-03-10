@@ -75,7 +75,7 @@ xmlport 6060142 "NPR MM Member Identifier"
         }
     }
 
-    procedure CreateResult()
+    internal procedure CreateResult()
     var
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";

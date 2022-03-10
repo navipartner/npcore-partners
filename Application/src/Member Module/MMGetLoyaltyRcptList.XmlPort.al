@@ -239,7 +239,7 @@ xmlport 6060149 "NPR MM Get Loyalty Rcpt. List"
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
 
-    procedure GetRequest(var TmpMemberInfoCaptureOut: Record "NPR MM Member Info Capture" temporary)
+    internal procedure GetRequest(var TmpMemberInfoCaptureOut: Record "NPR MM Member Info Capture" temporary)
     begin
 
         tmpMemberInfoCapture.FindFirst();
@@ -247,13 +247,13 @@ xmlport 6060149 "NPR MM Get Loyalty Rcpt. List"
         TmpMemberInfoCaptureOut.Insert();
     end;
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer; ResponseMessageIn: Text)
+    internal procedure AddResponse(MembershipEntryNo: Integer; ResponseMessageIn: Text)
     var
         Membership: Record "NPR MM Membership";
         POSEntry: Record "NPR POS Entry";
@@ -294,7 +294,7 @@ xmlport 6060149 "NPR MM Get Loyalty Rcpt. List"
 
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         responsemessage := ErrorMessage;

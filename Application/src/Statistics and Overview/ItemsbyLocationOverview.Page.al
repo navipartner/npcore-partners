@@ -323,7 +323,7 @@
         RefreshMatrix(MATRIX_SetWanted::Same);
     end;
 
-    procedure SetFilters(_LocationFilter: Code[250])
+    internal procedure SetFilters(_LocationFilter: Code[250])
     begin
         LocationFilter := _LocationFilter;
     end;

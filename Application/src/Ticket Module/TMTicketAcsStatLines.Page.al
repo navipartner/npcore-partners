@@ -280,9 +280,9 @@
 
     end;
 #if BC17 or BC18
-    procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "Dimension Code Buffer"; CurrentNoOfMatrixColumns: Integer; pLineDimOption: Integer; pColumnDimOption: Integer; pDisplayOption: Option; pPeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period"; pAdmissionDefinition: Option)
+    internal procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "Dimension Code Buffer"; CurrentNoOfMatrixColumns: Integer; pLineDimOption: Integer; pColumnDimOption: Integer; pDisplayOption: Option; pPeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period"; pAdmissionDefinition: Option)
 #else
-    procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "Dimension Code Buffer"; CurrentNoOfMatrixColumns: Integer; pLineDimOption: Integer; pColumnDimOption: Integer; pDisplayOption: Option; pPeriodType: Enum "Analysis Period Type"; pAdmissionDefinition: Option)
+    internal procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "Dimension Code Buffer"; CurrentNoOfMatrixColumns: Integer; pLineDimOption: Integer; pColumnDimOption: Integer; pDisplayOption: Option; pPeriodType: Enum "Analysis Period Type"; pAdmissionDefinition: Option)
 #endif    
     var
         i: Integer;
@@ -318,7 +318,7 @@
         end;
     end;
 
-    procedure SetFilters(pItemFactFilter: Text; pTicketTypeFactFilter: Text; pAdmissionDateFactFilter: Text; pAdmissionHourFactFilter: Text; pAdmissionCodeFactFilter: Text; pVariantCodeFactFilter: Text; pBlockedItemFactFilter: Text; pBlockedTicketTypeFactFilter: Text; pBlockedDateFactFilter: Text; pBlockedHourFactFilter: Text; pBlockedAdmissionFactFilter: Text; pBlockedVariantCodeFactFilter: Text; pHideLinesWithZeroAdmitted: Boolean)
+    internal procedure SetFilters(pItemFactFilter: Text; pTicketTypeFactFilter: Text; pAdmissionDateFactFilter: Text; pAdmissionHourFactFilter: Text; pAdmissionCodeFactFilter: Text; pVariantCodeFactFilter: Text; pBlockedItemFactFilter: Text; pBlockedTicketTypeFactFilter: Text; pBlockedDateFactFilter: Text; pBlockedHourFactFilter: Text; pBlockedAdmissionFactFilter: Text; pBlockedVariantCodeFactFilter: Text; pHideLinesWithZeroAdmitted: Boolean)
     begin
         Rec.Reset();
 
@@ -362,7 +362,7 @@
         exit(newFilter);
     end;
 
-    procedure DisplayCellValue(FormatOption: Option A,B,C,D; ColumnOrdinal: Integer; IncludeColumns: Boolean) CellValue: Text
+    internal procedure DisplayCellValue(FormatOption: Option A,B,C,D; ColumnOrdinal: Integer; IncludeColumns: Boolean) CellValue: Text
     var
         MatrixPeriod: Text;
     begin

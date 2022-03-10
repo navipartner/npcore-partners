@@ -72,7 +72,7 @@
         CopySuccess: Boolean;
         ResponseMsg: Text;
 
-    procedure SetFromEvent(FromEventNoHere: Code[20]; CopyWhatHere: Option Attributes,CustTemplate,TeamTemplate)
+    internal procedure SetFromEvent(FromEventNoHere: Code[20]; CopyWhatHere: Option Attributes,CustTemplate,TeamTemplate)
     begin
         FromEventNo := FromEventNoHere;
         CopyWhat := CopyWhatHere;

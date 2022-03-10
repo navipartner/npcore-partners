@@ -1,8 +1,8 @@
 ﻿report 6059900 "NPR Analyse Task Queue Usg."
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Analyse Task Queue Usage.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -309,7 +309,7 @@
         ShowLines: Option "None",UtilizationPct,All;
         GroupBy: Option Quarter,Hour,Day;
 
-    procedure BuildGroupTable(StartDateTime: DateTime; EndDateTime: DateTime)
+    internal procedure BuildGroupTable(StartDateTime: DateTime; EndDateTime: DateTime)
     var
         PeriodStartTime: DateTime;
         Dur: Duration;
@@ -336,7 +336,7 @@
         end;
     end;
 
-    procedure InsertTmpTQ(Group: Integer; StartTime: DateTime; EndTime: DateTime; TaskLog: Record "NPR Task Log (Task)")
+    internal procedure InsertTmpTQ(Group: Integer; StartTime: DateTime; EndTime: DateTime; TaskLog: Record "NPR Task Log (Task)")
     begin
         TempTaskQueue.Company := Company.Name;
         TempTaskQueue."Task Template" := Format(Group);
@@ -352,7 +352,7 @@
         TempTaskQueue.Insert();
     end;
 
-    procedure FormatDuration(DurIn: Duration): Text[30]
+    internal procedure FormatDuration(DurIn: Duration): Text[30]
     var
         Hours: Integer;
         "Min": Integer;
@@ -378,7 +378,7 @@
         exit(Format(Hours) + ':' + MinTxt + ':' + SecTxt);
     end;
 
-    procedure CalcUtilization(TaskLog: Record "NPR Task Log (Task)"): Decimal
+    internal procedure CalcUtilization(TaskLog: Record "NPR Task Log (Task)"): Decimal
     var
         DivBy: Integer;
         Int: Integer;

@@ -1,8 +1,8 @@
 ﻿report 6014535 "NPR Sales Statistics By Dept."
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Statistics By Department.rdlc';
     Caption = 'Sales Statistics By Department';
@@ -669,7 +669,7 @@
         txtLabeldim1: Text[100];
         FilterList: Text;
 
-    procedure pct(Value: Decimal; total: Decimal) resultat: Decimal
+    internal procedure pct(Value: Decimal; total: Decimal) resultat: Decimal
     begin
         if Value <> 0 then
             if total <> 0 then
@@ -678,7 +678,7 @@
                 resultat := 0;
     end;
 
-    procedure opdaterSidsteAar(salg_dkk: Decimal; salg_antal: Decimal; forbrug: Decimal; i: Integer)
+    internal procedure opdaterSidsteAar(salg_dkk: Decimal; salg_antal: Decimal; forbrug: Decimal; i: Integer)
     var
         j: Integer;
     begin
@@ -697,7 +697,7 @@
             end;
     end;
 
-    procedure calcVareDg(Vare: Record Item; i: Integer)
+    internal procedure calcVareDg(Vare: Record Item; i: Integer)
     begin
         Clear(db);
         Clear(dg);

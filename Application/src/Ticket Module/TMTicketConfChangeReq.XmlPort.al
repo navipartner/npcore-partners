@@ -265,18 +265,18 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
         }
     }
 
-    procedure SetError(ErrorMessage: Text)
+    internal procedure SetError(ErrorMessage: Text)
     begin
         ResponseCode := 'ERROR';
         ResponseMessage := ErrorMessage;
     end;
 
-    procedure GetToken(): TExt[100]
+    internal procedure GetToken(): TExt[100]
     begin
         Exit(ChangeRequestId);
     end;
 
-    procedure SetChangeRequestId(DocumentId: Text[100])
+    internal procedure SetChangeRequestId(DocumentId: Text[100])
     var
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         ResponseLbl: Label 'Invalid token [%1]';
@@ -307,7 +307,7 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
 
     end;
 
-    procedure GetConfirmResponse(var TmpTicketReservationResponseOut: Record "NPR TM Ticket Reserv. Resp." temporary; var ErrorMessage: Text): Boolean
+    internal procedure GetConfirmResponse(var TmpTicketReservationResponseOut: Record "NPR TM Ticket Reserv. Resp." temporary; var ErrorMessage: Text): Boolean
     begin
         TmpTicketReservationResponseOut.Copy(tmpTicketReservationResponse, true);
         ErrorMessage := ResponseMessage;

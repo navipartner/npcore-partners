@@ -77,7 +77,7 @@
     var
         IsBlindCount: Boolean;
 
-    procedure SetBlindCount(HideFields: Boolean)
+    internal procedure SetBlindCount(HideFields: Boolean)
     begin
         IsBlindCount := HideFields;
     end;

@@ -275,7 +275,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
         ResponseLbl: Label 'Capacity Status Code %1 does not have a dedicated message yet.';
         _CalendarExceptionText: Text;
 
-    procedure AddResponse()
+    internal procedure AddResponse()
     begin
         if (not TmpAdmScheduleEntryRequest.FindSet()) then
             exit;
@@ -287,7 +287,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
         until (TmpAdmScheduleEntryRequest.Next() = 0);
     end;
 
-    procedure GetResponse(var TmpAdmScheduleEntryResponseOut: Record "NPR TM Admis. Schedule Entry" temporary): Boolean
+    internal procedure GetResponse(var TmpAdmScheduleEntryResponseOut: Record "NPR TM Admis. Schedule Entry" temporary): Boolean
     var
     begin
         TmpAdmScheduleEntryResponseOut.Copy(TmpAdmScheduleEntryResponse, true);

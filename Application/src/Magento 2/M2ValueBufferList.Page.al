@@ -49,32 +49,32 @@
         ShowLabel: Boolean;
         ShowPosition: Boolean;
 
-    procedure SetShowValue(NewShowValue: Boolean)
+    internal procedure SetShowValue(NewShowValue: Boolean)
     begin
         ShowValue := NewShowValue;
     end;
 
-    procedure SetShowLabel(NewShowLabel: Boolean)
+    internal procedure SetShowLabel(NewShowLabel: Boolean)
     begin
         ShowLabel := NewShowLabel;
     end;
 
-    procedure SetShowPosition(NewShowPosition: Boolean)
+    internal procedure SetShowPosition(NewShowPosition: Boolean)
     begin
         ShowPosition := NewShowPosition;
     end;
 
-    procedure SetCaption(NewCaption: Text)
+    internal procedure SetCaption(NewCaption: Text)
     begin
         CurrPage.Caption(NewCaption);
     end;
 
-    procedure GetSourceTable(var M2ValueBuffer2: Record "NPR M2 Value Buffer" temporary)
+    internal procedure GetSourceTable(var M2ValueBuffer2: Record "NPR M2 Value Buffer" temporary)
     begin
         M2ValueBuffer2.Copy(Rec, true);
     end;
 
-    procedure SetSourceTable(var M2ValueBuffer2: Record "NPR M2 Value Buffer" temporary)
+    internal procedure SetSourceTable(var M2ValueBuffer2: Record "NPR M2 Value Buffer" temporary)
     begin
         Rec.Copy(M2ValueBuffer2, true);
     end;

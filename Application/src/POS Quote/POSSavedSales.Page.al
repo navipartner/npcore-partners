@@ -147,7 +147,7 @@
         exit(true);
     end;
 
-    procedure SetIsInEndOfTheDayProcess(Set: Boolean)
+    internal procedure SetIsInEndOfTheDayProcess(Set: Boolean)
     begin
         IsInEndOfTheDayProcess := Set;
     end;

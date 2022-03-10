@@ -174,12 +174,12 @@
         CurrPage.Close();
     end;
 
-    procedure fnSetLines(var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
+    internal procedure fnSetLines(var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
     begin
         Rec.Copy(TMPWaiterPadLine, true);
     end;
 
-    procedure fnGetLines(var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
+    internal procedure fnGetLines(var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
     begin
         TMPWaiterPadLine.DeleteAll();
 
@@ -192,7 +192,7 @@
         until (0 = Rec.Next());
     end;
 
-    procedure isOKLines(): Boolean
+    internal procedure isOKLines(): Boolean
     begin
         exit(OKLines);
     end;

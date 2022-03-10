@@ -132,7 +132,7 @@
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest(var EFTShopperRecognition: Record "NPR EFT Shopper Recognition" temporary)
+    internal procedure GetRequest(var EFTShopperRecognition: Record "NPR EFT Shopper Recognition" temporary)
     begin
 
         TmpShopperRecognitionRequest.FindFirst();
@@ -140,7 +140,7 @@
         EFTShopperRecognition.Insert();
     end;
 
-    procedure SetResponse(var EFTShopperRecognition: Record "NPR EFT Shopper Recognition" temporary)
+    internal procedure SetResponse(var EFTShopperRecognition: Record "NPR EFT Shopper Recognition" temporary)
     var
         RequestLineError1Msg: Label 'Invalid Account %1 %2';
     begin
@@ -162,7 +162,7 @@
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format((Time - StartTime), 0, 9));
     end;
 
-    procedure SetErrorResponse(ResponseMessageIn: Text)
+    internal procedure SetErrorResponse(ResponseMessageIn: Text)
     begin
         ResponseCode := 'ERROR';
         ResponseMessage := ResponseMessageIn;

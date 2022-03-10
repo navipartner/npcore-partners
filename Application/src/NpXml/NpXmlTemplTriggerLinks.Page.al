@@ -120,7 +120,7 @@
         PreviousFilterValueEnabled := Rec."Link Type" = Rec."Link Type"::PreviousConstant;
     end;
 
-    procedure SetTemplateTriggerView(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger")
+    internal procedure SetTemplateTriggerView(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger")
     begin
         Rec.FilterGroup(2);
         Rec.SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");

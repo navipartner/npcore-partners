@@ -67,7 +67,7 @@
     var
         NewCaption: Text;
 
-    procedure LoadRecords(var ResultsToShow: Record "NPR Trx JSON Result"; UseCaption: Text)
+    internal procedure LoadRecords(var ResultsToShow: Record "NPR Trx JSON Result"; UseCaption: Text)
     begin
         if ResultsToShow.FindSet() then
             repeat

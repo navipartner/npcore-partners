@@ -197,7 +197,7 @@ xmlport 6151157 "NPR M2 Add Account"
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest(var TmpContact: Record Contact temporary)
+    internal procedure GetRequest(var TmpContact: Record Contact temporary)
     begin
 
         StartTime := Time;
@@ -208,7 +208,7 @@ xmlport 6151157 "NPR M2 Add Account"
         TmpContact.Insert();
     end;
 
-    procedure SetResponse(var TmpContact: Record Contact temporary)
+    internal procedure SetResponse(var TmpContact: Record Contact temporary)
     begin
 
         TmpContactResponse.TransferFields(TmpContact, true);
@@ -228,7 +228,7 @@ xmlport 6151157 "NPR M2 Add Account"
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    procedure SetErrorResponse(ErrorMessage: Text)
+    internal procedure SetErrorResponse(ErrorMessage: Text)
     begin
 
         ResponseCode := 'ERROR';

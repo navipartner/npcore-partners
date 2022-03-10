@@ -60,7 +60,7 @@
         exit(Confirm(Text000, true, Quantity, RefNoQty));
     end;
 
-    procedure SetNpRvSalesLine(NewNpRvSalesLine: Record "NPR NpRv Sales Line"; NewQuantity: Decimal)
+    internal procedure SetNpRvSalesLine(NewNpRvSalesLine: Record "NPR NpRv Sales Line"; NewQuantity: Decimal)
     begin
         NpRvSalesLine := NewNpRvSalesLine;
         Quantity := NewQuantity;

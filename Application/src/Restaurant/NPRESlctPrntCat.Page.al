@@ -97,17 +97,17 @@
         ShowApplOnServingStep: Boolean;
         ShowPrintTags: Boolean;
 
-    procedure SetMultiSelectionMode(Set: Boolean)
+    internal procedure SetMultiSelectionMode(Set: Boolean)
     begin
         IsMultiSelectionMode := Set;
     end;
 
-    procedure SetDataset(var PrintCategory: Record "NPR NPRE Print/Prod. Cat.")
+    internal procedure SetDataset(var PrintCategory: Record "NPR NPRE Print/Prod. Cat.")
     begin
         Rec.Copy(PrintCategory);
     end;
 
-    procedure GetDataset(var PrintCategory: Record "NPR NPRE Print/Prod. Cat.")
+    internal procedure GetDataset(var PrintCategory: Record "NPR NPRE Print/Prod. Cat.")
     var
         RecRef: RecordRef;
         FldRef: FieldRef;
@@ -124,7 +124,7 @@
         end;
     end;
 
-    procedure SetSourceRecID(NewSourceRecID: RecordID)
+    internal procedure SetSourceRecID(NewSourceRecID: RecordID)
     begin
         SourceRecID := NewSourceRecID;
     end;
@@ -153,12 +153,12 @@
         WaiterPadMgt.SelectFlowStatuses(AssignedPrintCategory.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow, TempAssignedFlowStatus);
     end;
 
-    procedure SetAssignedFlowStatusRecordset(var AssignedFlowStatusIn: Record "NPR NPRE Assigned Flow Status")
+    internal procedure SetAssignedFlowStatusRecordset(var AssignedFlowStatusIn: Record "NPR NPRE Assigned Flow Status")
     begin
         TempAssignedFlowStatus.Copy(AssignedFlowStatusIn, true);
     end;
 
-    procedure GetAssignedFlowStatusRecordset(var AssignedFlowStatusOut: Record "NPR NPRE Assigned Flow Status")
+    internal procedure GetAssignedFlowStatusRecordset(var AssignedFlowStatusOut: Record "NPR NPRE Assigned Flow Status")
     begin
         AssignedFlowStatusOut.Copy(TempAssignedFlowStatus, true);
     end;

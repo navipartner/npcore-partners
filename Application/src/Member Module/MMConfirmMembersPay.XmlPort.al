@@ -101,13 +101,13 @@ xmlport 6060137 "NPR MM Confirm Members. Pay."
         }
     }
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer)
+    internal procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
     begin
@@ -121,7 +121,7 @@ xmlport 6060137 "NPR MM Confirm Members. Pay."
         tmpMembershipResponse.Insert();
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

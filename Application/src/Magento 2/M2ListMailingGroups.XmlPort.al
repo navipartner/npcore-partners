@@ -40,7 +40,7 @@ xmlport 6151139 "NPR M2 List Mailing Groups"
     var
         ContactNo: Code[20];
 
-    procedure CreateListForContact(CheckContactNo: Code[20])
+    internal procedure CreateListForContact(CheckContactNo: Code[20])
     begin
 
         ContactNo := CheckContactNo;

@@ -1,8 +1,8 @@
 ﻿report 6014544 "NPR Item Loss - Ret. Reason"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Loss - Return Reason.rdlc';
     Caption = 'Item Loss - Return Reason';
@@ -243,7 +243,7 @@
         TotalCaptionLbl: Label 'Total';
         ReportFilters: Text;
 
-    procedure CalculateShrinkage()
+    internal procedure CalculateShrinkage()
     var
         lItemEntryRec: Record "Item Ledger Entry";
         lReasonCodeRec: Record "Reason Code";

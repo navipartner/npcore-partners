@@ -134,7 +134,7 @@
         Text001: Label 'The Type is: %1\\Type can not be changed after Creation\\Create Attribute?';
         TypeEditable: Boolean;
 
-    procedure UsedByAttributeSetDrillDown()
+    internal procedure UsedByAttributeSetDrillDown()
     var
         AttributeSet: Record "NPR Magento Attribute Set";
         MagentoAttributeSetValue: Record "NPR Magento Attr. Set Value";
@@ -153,7 +153,7 @@
         PAGE.Run(PAGE::"NPR Magento Attribute Set List", TempAttributeSet);
     end;
 
-    procedure UsedByItemDrillDown()
+    internal procedure UsedByItemDrillDown()
     var
         Item: Record Item;
         TempItem: Record Item temporary;
@@ -175,7 +175,7 @@
         PAGE.Run(PAGE::"Item List", TempItem);
     end;
 
-    procedure SetVisible()
+    internal procedure SetVisible()
     begin
     end;
 }

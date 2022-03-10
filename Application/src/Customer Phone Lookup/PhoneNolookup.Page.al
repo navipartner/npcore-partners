@@ -244,12 +244,12 @@
         CurrPage.Update();
     end;
 
-    procedure Getrec(var "TDC Names & Numbers Buffer": Record "NPR Phone Lookup Buffer")
+    internal procedure Getrec(var "TDC Names & Numbers Buffer": Record "NPR Phone Lookup Buffer")
     begin
         "TDC Names & Numbers Buffer" := Rec;
     end;
 
-    procedure Setrec(var "TDC Names & Numbers Buffer": Record "NPR Phone Lookup Buffer")
+    internal procedure Setrec(var "TDC Names & Numbers Buffer": Record "NPR Phone Lookup Buffer")
     begin
         Rec := "TDC Names & Numbers Buffer";
 

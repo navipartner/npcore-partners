@@ -1,8 +1,8 @@
 ﻿report 6014612 "NPR Inventory per Variant/date"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory per Variant at date.rdlc';
     Caption = 'Inventory Per Variant at Date';
@@ -514,7 +514,7 @@
         Itemfilter: Text;
 
 
-    procedure CheckInventory(var localItem: Record Item): Boolean
+    internal procedure CheckInventory(var localItem: Record Item): Boolean
     var
         localItem1: Record Item;
         localVariant: Record "Item Variant";

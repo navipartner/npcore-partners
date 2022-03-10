@@ -432,25 +432,25 @@ tableextension 6014427 "NPR Item" extends Item
         end;
     end;
 
-    procedure NPR_GetItemAdditionalFields(var ItemAdditionalFields: Record "NPR Item Additional Fields")
+    internal procedure NPR_GetItemAdditionalFields(var ItemAdditionalFields: Record "NPR Item Additional Fields")
     begin
         ReadItemAdditionalFields();
         ItemAdditionalFields := _ItemAdditionalFields;
     end;
 
-    procedure NPR_SetItemAdditionalFields(var ItemAdditionalFields: Record "NPR Item Additional Fields")
+    internal procedure NPR_SetItemAdditionalFields(var ItemAdditionalFields: Record "NPR Item Additional Fields")
     begin
         _ItemAdditionalFields := ItemAdditionalFields;
     end;
 
-    procedure NPR_SaveItemAdditionalFields()
+    internal procedure NPR_SaveItemAdditionalFields()
     begin
         if not IsNullGuid(_ItemAdditionalFields.Id) then
             if not _ItemAdditionalFields.Modify() then
                 _ItemAdditionalFields.Insert(false, true);
     end;
 
-    procedure NPR_DeleteItemAdditionalFields()
+    internal procedure NPR_DeleteItemAdditionalFields()
     begin
         ReadItemAdditionalFields();
         if _ItemAdditionalFields.Delete() then;

@@ -76,7 +76,7 @@
         }
     }
 
-    procedure GetViewText(): Text
+    internal procedure GetViewText(): Text
     begin
         //-NPR5.30 [252646]
         exit(Rec.GetView(false));

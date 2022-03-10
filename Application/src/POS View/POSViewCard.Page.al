@@ -79,7 +79,7 @@
         CurrPage.Editor.Invoke('setJson', '');
     end;
 
-    procedure RetrieveAutoCompleteOptions(OptionsType: Text);
+    internal procedure RetrieveAutoCompleteOptions(OptionsType: Text);
     var
         Menu: record "NPR POS Menu";
         TempDataSource: Record "NPR POS Data Source Discovery" temporary;

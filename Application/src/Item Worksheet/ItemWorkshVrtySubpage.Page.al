@@ -376,7 +376,7 @@
         PlaceHolder1ParenthesisLbl: Label '( %1 )', Locked = true;
         PlaceHolder1Lbl: Label '( %1 )', Locked = true;
 
-    procedure SetRecFromIW(ItemWorksheetLineHere: Record "NPR Item Worksheet Line")
+    internal procedure SetRecFromIW(ItemWorksheetLineHere: Record "NPR Item Worksheet Line")
     var
         LocRecItemWorksheet: Record "NPR Item Worksheet";
     begin
@@ -404,7 +404,7 @@
         end;
     end;
 
-    procedure UpdateSubPage()
+    internal procedure UpdateSubPage()
     begin
         CurrPage.Update(false);
     end;

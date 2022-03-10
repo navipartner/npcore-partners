@@ -95,13 +95,13 @@ xmlport 6060140 "NPR MM Confirm AutoRenew Pay."
     var
         MembershipSetup: Record "NPR MM Membership Setup";
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(RequestMemberInfoCapture: Record "NPR MM Member Info Capture")
+    internal procedure AddResponse(RequestMemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         Membership: Record "NPR MM Membership";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -150,7 +150,7 @@ xmlport 6060140 "NPR MM Confirm AutoRenew Pay."
         TmpActiveMembershipEntry."Valid Until Date" := CalcDate('<+1D>', TmpActiveMembershipEntry."Valid Until Date");
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

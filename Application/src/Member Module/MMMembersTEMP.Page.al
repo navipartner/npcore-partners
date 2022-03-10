@@ -609,7 +609,7 @@
             Membership.Get(MembershipRole."Membership Entry No.");
     end;
 
-    procedure FillPage(var TmpMember: Record "NPR MM Member" temporary)
+    internal procedure FillPage(var TmpMember: Record "NPR MM Member" temporary)
     begin
         if (not Rec.IsTemporary) then
             Error('This page must operate on a temporary copy of Member table.');

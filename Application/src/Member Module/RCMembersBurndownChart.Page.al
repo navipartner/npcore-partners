@@ -359,7 +359,7 @@
         NeedsUpdate := false;
     end;
 
-    procedure UpdateStatus()
+    internal procedure UpdateStatus()
     begin
         NeedsUpdate :=
           NeedsUpdate or
@@ -378,14 +378,14 @@
         SetActionsEnabled();
     end;
 
-    procedure RunSetup()
+    internal procedure RunSetup()
     begin
         PAGE.RunModal(PAGE::"NPR RC Members. Burndown Setup", MembershipBurndownSetup);
         MembershipBurndownSetup.Get(UserId);
         UpdateStatus();
     end;
 
-    procedure SetActionsEnabled()
+    internal procedure SetActionsEnabled()
     begin
         SalesType := (MembershipBurndownSetup."Show Memberships" <> MembershipBurndownSetup."Show Memberships"::SALES_TYPE) and IsChartAddInReady;
 

@@ -497,12 +497,12 @@ xmlport 6151401 "NPR Magento Sales Order Import"
         TempSalesLine9: Record "Sales Line" temporary;
         LineNo: Integer;
 
-    procedure GetOrderNo(): Text
+    internal procedure GetOrderNo(): Text
     begin
         exit(order_no);
     end;
 
-    procedure GetWebsiteCode(): Text
+    internal procedure GetWebsiteCode(): Text
     begin
         exit(website_code);
     end;

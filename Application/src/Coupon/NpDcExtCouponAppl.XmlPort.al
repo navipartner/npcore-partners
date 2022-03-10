@@ -214,14 +214,14 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
     var
         CouponLineNo: Integer;
 
-    procedure GetRequest(var TempSalePOSReq2: Record "NPR POS Sale" temporary; var TempSaleLinePOSReq2: Record "NPR POS Sale Line" temporary; var TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary)
+    internal procedure GetRequest(var TempSalePOSReq2: Record "NPR POS Sale" temporary; var TempSaleLinePOSReq2: Record "NPR POS Sale Line" temporary; var TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary)
     begin
         TempSalePOSReq2.Copy(TempSalePOSReq, true);
         TempSaleLinePOSReq2.Copy(TempSaleLinePOSReq, true);
         TempNpDcExtCouponBuffer2.Copy(TempNpDcExtCouponBuffer, true);
     end;
 
-    procedure SetResponse(var TempSalePOSRes2: Record "NPR POS Sale" temporary; var TempSaleLinePOSRes2: Record "NPR POS Sale Line" temporary)
+    internal procedure SetResponse(var TempSalePOSRes2: Record "NPR POS Sale" temporary; var TempSaleLinePOSRes2: Record "NPR POS Sale Line" temporary)
     begin
         TempSalePOSRes.Copy(TempSalePOSRes2, true);
         TempSaleLinePOSRes.Copy(TempSaleLinePOSRes2, true);

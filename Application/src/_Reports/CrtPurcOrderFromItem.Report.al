@@ -100,7 +100,7 @@ report 6014411 "NPR Crt. Purc. Order From Item"
         end;
     end;
 
-    procedure SetValues(Item: Record Item)
+    internal procedure SetValues(Item: Record Item)
     begin
         ItemToProcessG := Item;
         ItemToProcessG.TestField("No.");

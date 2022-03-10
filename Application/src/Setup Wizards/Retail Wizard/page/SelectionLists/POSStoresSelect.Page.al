@@ -56,7 +56,7 @@
         }
     }
 
-    procedure SetRec(var TempPOSStore: Record "NPR POS Store")
+    internal procedure SetRec(var TempPOSStore: Record "NPR POS Store")
     begin
         Rec.DeleteAll();
         if TempPOSStore.FindSet() then

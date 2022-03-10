@@ -244,7 +244,7 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
         }
     }
 
-    procedure NPRValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    internal procedure NPRValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         DimMgt: Codeunit DimensionManagement;
     begin

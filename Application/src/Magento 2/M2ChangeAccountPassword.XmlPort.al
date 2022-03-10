@@ -87,7 +87,7 @@ xmlport 6151149 "NPR M2 Change Account Password"
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary)
+    internal procedure GetRequest(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary)
     begin
 
         StartTime := Time;
@@ -103,7 +103,7 @@ xmlport 6151149 "NPR M2 Change Account Password"
         end;
     end;
 
-    procedure SetResponse(var TmpContact: Record Contact temporary)
+    internal procedure SetResponse(var TmpContact: Record Contact temporary)
     begin
 
         TmpContact.Reset();
@@ -122,7 +122,7 @@ xmlport 6151149 "NPR M2 Change Account Password"
             SetErrorResponse('Invalid E-Mail, Password combination.');
     end;
 
-    procedure SetErrorResponse(ReasonText: Text)
+    internal procedure SetErrorResponse(ReasonText: Text)
     begin
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
         ResponseCode := 'ERROR';

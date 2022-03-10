@@ -50,7 +50,7 @@ page 6014660 "NPR Generic Key List"
         CurrSortingKeyIndex: Integer;
         KeyCount: Integer;
 
-    procedure SetParameters(RecRefHere: RecordRef; CurrSortingKeyHere: Text)
+    internal procedure SetParameters(RecRefHere: RecordRef; CurrSortingKeyHere: Text)
     begin
         RecRef := RecRefHere;
         RecRefSet := true;
@@ -69,7 +69,7 @@ page 6014660 "NPR Generic Key List"
         end;
     end;
 
-    procedure GetSortingKey(KeyIndexHere: Integer): Text
+    internal procedure GetSortingKey(KeyIndexHere: Integer): Text
     begin
         exit(SortingKeyArr[KeyIndexHere]);
     end;

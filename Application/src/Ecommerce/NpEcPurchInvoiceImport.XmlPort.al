@@ -208,7 +208,7 @@ xmlport 6151306 "NPR NpEc Purch. Invoice Import"
         LineNo: Integer;
         TempPurchLine9: Record "Purchase Line" temporary;
 
-    procedure GetInvoiceNo(): Text
+    internal procedure GetInvoiceNo(): Text
     begin
         exit(invoice_no);
     end;

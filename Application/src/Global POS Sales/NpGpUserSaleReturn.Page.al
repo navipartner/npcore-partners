@@ -171,7 +171,7 @@
         QuantityReturned: Integer;
         QuantityToReturn: Integer;
 
-    procedure SetTables(pSalePOS: Record "NPR POS Sale"; var pTempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var pTempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
+    internal procedure SetTables(pSalePOS: Record "NPR POS Sale"; var pTempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var pTempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
     begin
         TempNpGpPOSSalesEntry := pTempNpGpPOSSalesEntry;
         SalePOS := pSalePOS;
@@ -185,7 +185,7 @@
         Rec.FindSet();
     end;
 
-    procedure GetLines(var pTempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
+    internal procedure GetLines(var pTempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
     begin
         pTempNpGpPOSSalesLine.Copy(Rec, true);
         pTempNpGpPOSSalesLine.FindSet();

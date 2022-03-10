@@ -113,13 +113,13 @@ xmlport 6060139 "NPR MM Get AutoRenew Product"
     var
         MembershipSetup: Record "NPR MM Membership Setup";
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer)
+    internal procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -160,7 +160,7 @@ xmlport 6060139 "NPR MM Get AutoRenew Product"
         end;
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

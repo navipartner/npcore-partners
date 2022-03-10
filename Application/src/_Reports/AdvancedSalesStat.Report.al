@@ -1,8 +1,8 @@
 ﻿report 6014490 "NPR Advanced Sales Stat."
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Advanced Sales Statistics.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -314,7 +314,7 @@
         Pct1Lbl: Label '%1..', locked = true;
         Pct2Lbl: Label '%1..%2', locked = true;
 
-    procedure setFilter(xType: Option Period,Salesperson,ItemCategory,Item,Customer,Vendor,Projectcode; xDay: Option Day,Week,Month,Quarter,Year; GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemCategory: Code[20]; LastYearCalc: Text[50]; hide: Boolean)
+    internal procedure setFilter(xType: Option Period,Salesperson,ItemCategory,Item,Customer,Vendor,Projectcode; xDay: Option Day,Week,Month,Quarter,Year; GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemCategory: Code[20]; LastYearCalc: Text[50]; hide: Boolean)
     begin
         Dim1Filter := GlobalDim1;
         Dim2Filter := GlobalDim2;
@@ -332,7 +332,7 @@
         end;
     end;
 
-    procedure fillTable()
+    internal procedure fillTable()
     var
         NoTypeErr: Label 'No Type selected';
     begin
@@ -469,7 +469,7 @@
 
     end;
 
-    procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry"; LastYear: Boolean; "Code": Code[20])
+    internal procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry"; LastYear: Boolean; "Code": Code[20])
     begin
         AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
@@ -517,7 +517,7 @@
         end;
     end;
 
-    procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry"; LastYear: Boolean; "Code": Code[20])
+    internal procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry"; LastYear: Boolean; "Code": Code[20])
     begin
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
 
@@ -564,7 +564,7 @@
         end;
     end;
 
-    procedure UpdateSortKey()
+    internal procedure UpdateSortKey()
     begin
         // UpdateSortKey
         case SortBy of

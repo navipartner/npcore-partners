@@ -224,7 +224,7 @@
         ActionVisible: Boolean;
         DynamicEditable: Boolean;
 
-    procedure UpdateStatus()
+    internal procedure UpdateStatus()
     var
         "Quantity Discount Header 2": Record "NPR Quantity Discount Header";
     begin

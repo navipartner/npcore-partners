@@ -105,7 +105,7 @@
         exit(false);
     end;
 
-    procedure SetPOSInfo(pPOSInfo: Record "NPR POS Info")
+    internal procedure SetPOSInfo(pPOSInfo: Record "NPR POS Info")
     begin
         POSInfo := pPOSInfo;
     end;

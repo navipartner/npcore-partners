@@ -99,7 +99,7 @@
         ItemCategoryCodeFilter: Text;
         Statistics: Option ,Item,"Item Category";
 
-    procedure PopulateTemp(StartDate: Date; EndDate: Date; StartTime: Time; EndTime: Time; VarStatisticsBy: Option ,Item,"Item Category"; VarItemFilter: Text; VarItemCatFilter: Text; VarDim1Filter: Text; VarDim2Filter: Text)
+    internal procedure PopulateTemp(StartDate: Date; EndDate: Date; StartTime: Time; EndTime: Time; VarStatisticsBy: Option ,Item,"Item Category"; VarItemFilter: Text; VarItemCatFilter: Text; VarDim1Filter: Text; VarDim2Filter: Text)
     var
         ItemQtyQuery: Query "NPR Sales Stat. -Item Cat Qty";
         ItemCatQtyQuery: Query "NPR Sales Stat. -Item Cat Qty";
@@ -186,7 +186,7 @@
         CurrPage.Update();
     end;
 
-    procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry"; varNo: Code[20])
+    internal procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry"; varNo: Code[20])
     begin
         //SetItemLedgerEntryFilter
         AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
@@ -210,7 +210,7 @@
             AuxItemLedgerEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry"; varNo: Code[20])
+    internal procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry"; varNo: Code[20])
     begin
         //SetValueEntryFilter
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
@@ -233,7 +233,7 @@
             AuxValueEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    procedure GetGlobals(var InStartDate: Date; var InEndDate: Date; var InStartTime: Time; var InEndTime: Time; var InVarStatisticsBy: Option; var InVarItemFilter: Text; var InVarItemCatFilter: Text; var InVarDim1Filter: Text; var InVarDim2Filter: Text)
+    internal procedure GetGlobals(var InStartDate: Date; var InEndDate: Date; var InStartTime: Time; var InEndTime: Time; var InVarStatisticsBy: Option; var InVarItemFilter: Text; var InVarItemCatFilter: Text; var InVarDim1Filter: Text; var InVarDim2Filter: Text)
     begin
         InStartDate := DT2Date(StartDateTime);
         InEndDate := DT2Date(EndDateTime);
@@ -246,7 +246,7 @@
         InVarDim2Filter := Dim2Filter;
     end;
 
-    procedure SetTempRec(var NewTempRec: Record "NPR Sales Stats Time Period")
+    internal procedure SetTempRec(var NewTempRec: Record "NPR Sales Stats Time Period")
     begin
         TempRec.Copy(NewTempRec, true);
     end;

@@ -44,7 +44,7 @@
     var
         TempExistingMagDisplayGroups: Record "NPR Magento Display Group" temporary;
 
-    procedure CopyRealAndTemp(var TempMagentoDisplayGroup: Record "NPR Magento Display Group")
+    internal procedure CopyRealAndTemp(var TempMagentoDisplayGroup: Record "NPR Magento Display Group")
     var
         MagentoDisplayGroup: Record "NPR Magento Display Group";
     begin
@@ -63,7 +63,7 @@
             until MagentoDisplayGroup.Next() = 0;
     end;
 
-    procedure CreateMagentoDisplayGroup()
+    internal procedure CreateMagentoDisplayGroup()
     var
         MagentoDisplayGroup: Record "NPR Magento Display Group";
     begin
@@ -75,7 +75,7 @@
             until Rec.Next() = 0;
     end;
 
-    procedure MagentoDisplayGroupToCreate(): Boolean
+    internal procedure MagentoDisplayGroupToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;

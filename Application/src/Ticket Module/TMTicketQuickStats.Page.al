@@ -92,7 +92,7 @@
         GlobalAdmissionScheduleEntryFilter: Record "NPR TM Admis. Schedule Entry";
         FilterIsSet: Boolean;
 
-    procedure SetFilterRecord(var AdmissionScheduleEntryFilter: Record "NPR TM Admis. Schedule Entry")
+    internal procedure SetFilterRecord(var AdmissionScheduleEntryFilter: Record "NPR TM Admis. Schedule Entry")
     begin
 
         GlobalAdmissionScheduleEntryFilter.CopyFilters(AdmissionScheduleEntryFilter);

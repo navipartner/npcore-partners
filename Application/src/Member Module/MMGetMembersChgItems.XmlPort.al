@@ -139,13 +139,13 @@ xmlport 6060135 "NPR MM Get Members. Chg. Items"
     var
         MembershipSetup: Record "NPR MM Membership Setup";
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer)
+    internal procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -177,7 +177,7 @@ xmlport 6060135 "NPR MM Get Members. Chg. Items"
         MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, MembershipAlterationSetup, TmpMembershipEntry);
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

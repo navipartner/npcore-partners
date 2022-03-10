@@ -157,7 +157,7 @@
         NO_TIMESLOTS: Label 'There are no timeslots available for sales at this time for this event.';
         WAITING_LIST: Label 'Waiting List';
 
-    procedure FillPage(var AdmissionScheduleEntryFilter: Record "NPR TM Admis. Schedule Entry"; TicketQty: Decimal; TicketItemNo: Code[20]; TicketVariantCode: Code[10]): Boolean
+    internal procedure FillPage(var AdmissionScheduleEntryFilter: Record "NPR TM Admis. Schedule Entry"; TicketQty: Decimal; TicketItemNo: Code[20]; TicketVariantCode: Code[10]): Boolean
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
     begin

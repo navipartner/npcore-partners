@@ -58,17 +58,17 @@
         IsMultiSelectionMode: Boolean;
         Selected: Boolean;
 
-    procedure SetMultiSelectionMode(Set: Boolean)
+    internal procedure SetMultiSelectionMode(Set: Boolean)
     begin
         IsMultiSelectionMode := Set;
     end;
 
-    procedure SetDataset(var Salesperson: Record "Salesperson/Purchaser")
+    internal procedure SetDataset(var Salesperson: Record "Salesperson/Purchaser")
     begin
         Rec.Copy(Salesperson, true);
     end;
 
-    procedure GetDataset(var Salesperson: Record "Salesperson/Purchaser")
+    internal procedure GetDataset(var Salesperson: Record "Salesperson/Purchaser")
     var
         RecRef: RecordRef;
         FldRef: FieldRef;

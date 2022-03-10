@@ -73,12 +73,12 @@
     var
         TempExistingPOSPostingProfiles: Record "NPR POS Posting Profile" temporary;
 
-    procedure GetRec(var TempPOSPostingProfile: Record "NPR POS Posting Profile")
+    internal procedure GetRec(var TempPOSPostingProfile: Record "NPR POS Posting Profile")
     begin
         TempPOSPostingProfile.Copy(Rec);
     end;
 
-    procedure CreatePOSPOSPostingProfileData()
+    internal procedure CreatePOSPOSPostingProfileData()
     var
         POSPOSPostingProfile: Record "NPR POS Posting Profile";
     begin
@@ -90,12 +90,12 @@
             until Rec.Next() = 0;
     end;
 
-    procedure POSPOSPostingProfileDataToCreate(): Boolean
+    internal procedure POSPOSPostingProfileDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CopyRealAndTemp(var TempPOSPostingProfile: Record "NPR POS Posting Profile")
+    internal procedure CopyRealAndTemp(var TempPOSPostingProfile: Record "NPR POS Posting Profile")
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin

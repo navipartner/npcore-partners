@@ -44,7 +44,7 @@
         }
     }
 
-    procedure SetRec(var TempBrand: Record "NPR Magento Brand")
+    internal procedure SetRec(var TempBrand: Record "NPR Magento Brand")
     begin
         Rec.DeleteAll();
 

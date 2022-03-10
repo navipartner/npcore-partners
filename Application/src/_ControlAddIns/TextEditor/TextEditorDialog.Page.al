@@ -86,22 +86,22 @@
         CurrPage.TextEditor.SetContent(EditorContent);
     end;
 
-    procedure SetContent(ContentIn: Text)
+    internal procedure SetContent(ContentIn: Text)
     begin
         EditorContent := ContentIn;
     end;
 
-    procedure GetContent(): Text
+    internal procedure GetContent(): Text
     begin
         exit(EditorContent);
     end;
 
-    procedure SetOption(Option: Text; Value: Variant)
+    internal procedure SetOption(Option: Text; Value: Variant)
     begin
         CurrPage.TextEditor.PresetOption(Option, Value);
     end;
 
-    procedure GetOKClicked(): Boolean
+    internal procedure GetOKClicked(): Boolean
     begin
         exit(OKClicked);
     end;
@@ -119,13 +119,13 @@
         end;
     end;
 
-    procedure InitTextEditorOptionKeyAndValueBuffer()
+    internal procedure InitTextEditorOptionKeyAndValueBuffer()
     begin
         TempOptionValueBuffer.Reset();
         TempOptionValueBuffer.DeleteAll();
     end;
 
-    procedure AddTextEditorOptionKeyAndValue(OptionKey: Text; OptionValue: Variant)
+    internal procedure AddTextEditorOptionKeyAndValue(OptionKey: Text; OptionValue: Variant)
     begin
         TempOptionValueBuffer.Init();
         TempOptionValueBuffer."Option Key" := OptionKey;
@@ -133,7 +133,7 @@
         TempOptionValueBuffer.Insert();
     end;
 
-    procedure SetOptionValueBuffer(var OptionValueBufferInput: Record "NPR Text Editor Dialog Option" temporary)
+    internal procedure SetOptionValueBuffer(var OptionValueBufferInput: Record "NPR Text Editor Dialog Option" temporary)
     begin
         TempOptionValueBuffer.Copy(OptionValueBufferInput, true);
     end;

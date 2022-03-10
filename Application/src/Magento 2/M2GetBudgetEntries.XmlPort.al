@@ -188,7 +188,7 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GenerateResponse()
+    internal procedure GenerateResponse()
     var
         ItemBudgetName: Record "Item Budget Name";
         Customer: Record Customer;

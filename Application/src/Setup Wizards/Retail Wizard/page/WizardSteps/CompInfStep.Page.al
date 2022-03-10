@@ -262,7 +262,7 @@
         IBANMissing := Rec.IBAN = '';
     end;
 
-    procedure MandatoryDataFilledIn(): Boolean
+    internal procedure MandatoryDataFilledIn(): Boolean
     begin
         if (Rec.Name <> '')
 and (Rec.Address <> '')
@@ -275,7 +275,7 @@ and ((Rec."Bank Account No." <> '') or (Rec.IBAN <> '')) then
             exit(true);
     end;
 
-    procedure CreateCompanyInfoData()
+    internal procedure CreateCompanyInfoData()
     var
         CompanyInfo: Record "Company Information";
     begin

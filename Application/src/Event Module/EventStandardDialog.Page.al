@@ -55,22 +55,22 @@
         ShowPassword: Boolean;
         PasswordsMatchErr: Label 'Passwords do not match.';
 
-    procedure UseForMessage()
+    internal procedure UseForMessage()
     begin
         ShowMessage := true;
     end;
 
-    procedure UseForPassword()
+    internal procedure UseForPassword()
     begin
         ShowPassword := true;
     end;
 
-    procedure GetMessage(): Text
+    internal procedure GetMessage(): Text
     begin
         exit(MessageText);
     end;
 
-    procedure GetPassword(): Text
+    internal procedure GetPassword(): Text
     begin
         exit(ConfirmPassword);
     end;

@@ -121,7 +121,7 @@
 
     end;
 
-    procedure GetSelectedMemberNumber(): Code[20]
+    internal procedure GetSelectedMemberNumber(): Code[20]
     begin
         if (TempSelectedMember.FindFirst()) then
             exit(TempSelectedMember."External Member No.");

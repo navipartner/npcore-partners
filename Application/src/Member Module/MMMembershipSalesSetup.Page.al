@@ -232,7 +232,7 @@
         Rec.SetFilter(Blocked, '=%1', false);
     end;
 
-    procedure CreateMembership(MembershipSalesSetup: Record "NPR MM Members. Sales Setup")
+    internal procedure CreateMembership(MembershipSalesSetup: Record "NPR MM Members. Sales Setup")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberCommunity: Record "NPR MM Member Community";

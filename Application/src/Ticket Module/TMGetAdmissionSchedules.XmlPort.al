@@ -120,7 +120,7 @@ xmlport 6060106 "NPR TM Get Admission Schedules"
     var
         RequestEntryNo: Integer;
 
-    procedure CreateResponse()
+    internal procedure CreateResponse()
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
     begin

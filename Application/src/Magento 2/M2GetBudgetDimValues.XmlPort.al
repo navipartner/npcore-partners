@@ -234,7 +234,7 @@ xmlport 6151141 "NPR M2 Get Budget Dim. Values"
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GenerateResponse()
+    internal procedure GenerateResponse()
     var
         ItemBudgetName: Record "Item Budget Name";
         GeneralLedgerSetup: Record "General Ledger Setup";

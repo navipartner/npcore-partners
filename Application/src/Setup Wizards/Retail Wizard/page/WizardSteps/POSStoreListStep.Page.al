@@ -204,7 +204,7 @@
         NoOfPOSStoresToCreate: Integer;
         StartingNoStore: Code[10];
 
-    procedure CreateTempPOSStores(NoOfPOSStores: Integer; StartingNo: Code[10]; var POSStoreTemp: Record "NPR POS Store")
+    internal procedure CreateTempPOSStores(NoOfPOSStores: Integer; StartingNo: Code[10]; var POSStoreTemp: Record "NPR POS Store")
     var
         POSStore: Record "NPR POS Store";
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
@@ -240,17 +240,17 @@
         end;
     end;
 
-    procedure GetRec(var TempPOSStore: Record "NPR POS Store")
+    internal procedure GetRec(var TempPOSStore: Record "NPR POS Store")
     begin
         TempPOSStore.Copy(Rec);
     end;
 
-    procedure SetRec(var TempPOSStore: Record "NPR POS Store")
+    internal procedure SetRec(var TempPOSStore: Record "NPR POS Store")
     begin
         Rec.Copy(TempPOSStore);
     end;
 
-    procedure CopyRealAndTemp(var TempPOSStore: Record "NPR POS Store")
+    internal procedure CopyRealAndTemp(var TempPOSStore: Record "NPR POS Store")
     var
         POSStore: Record "NPR POS Store";
     begin
@@ -268,12 +268,12 @@
             until POSStore.Next() = 0;
     end;
 
-    procedure POSStoresToCreate(): Boolean
+    internal procedure POSStoresToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CreatePOSStoreData()
+    internal procedure CreatePOSStoreData()
     var
         POSStore: Record "NPR POS Store";
     begin

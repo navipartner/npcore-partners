@@ -99,14 +99,14 @@ xmlport 6151160 "NPR MM Get Loyalty Config."
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure SetDocumentId(DocumentIdIn: Text)
+    internal procedure SetDocumentId(DocumentIdIn: Text)
     begin
 
         // For test framework
         DocumentId := DocumentIdIn;
     end;
 
-    procedure GetRequest(var TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
+    internal procedure GetRequest(var TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
     begin
 
         SetErrorResponse('No response.', '-1099');
@@ -117,7 +117,7 @@ xmlport 6151160 "NPR MM Get Loyalty Config."
         TmpAuthorization.Insert();
     end;
 
-    procedure GetResponse(var ResponseCodeOut: Code[10]; var ResponseMessageOut: Text; var DocumentIdOut: Text; var TmpLoyaltySetup: Record "NPR MM Loyalty Setup" temporary)
+    internal procedure GetResponse(var ResponseCodeOut: Code[10]; var ResponseMessageOut: Text; var DocumentIdOut: Text; var TmpLoyaltySetup: Record "NPR MM Loyalty Setup" temporary)
     begin
 
         // For test framework
@@ -129,7 +129,7 @@ xmlport 6151160 "NPR MM Get Loyalty Config."
         TmpLoyaltySetup.Insert();
     end;
 
-    procedure SetResponse(var TmpLoyaltySetup: Record "NPR MM Loyalty Setup" temporary)
+    internal procedure SetResponse(var TmpLoyaltySetup: Record "NPR MM Loyalty Setup" temporary)
     begin
 
         if (not TmpLoyaltySetup.FindFirst()) then begin
@@ -148,7 +148,7 @@ xmlport 6151160 "NPR MM Get Loyalty Config."
             ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    procedure SetErrorResponse(ResponseMessageIn: Text; MessageId: Text)
+    internal procedure SetErrorResponse(ResponseMessageIn: Text; MessageId: Text)
     begin
 
         ResponseCode := 'ERROR';

@@ -173,7 +173,7 @@
         TempExistingEndOfDayProfiles: Record "NPR POS End of Day Profile" temporary;
         TempAllPOSUnit: Record "NPR POS Unit" temporary;
 
-    procedure SetGlobals(var TempPOSUnit: Record "NPR POS Unit" temporary)
+    internal procedure SetGlobals(var TempPOSUnit: Record "NPR POS Unit" temporary)
     begin
         TempAllPOSUnit.DeleteAll();
 
@@ -189,12 +189,12 @@
         if TempAllPOSUnit.FindSet() then;
     end;
 
-    procedure GetRec(var TempPOSEndOfDayProfile: Record "NPR POS End of Day Profile")
+    internal procedure GetRec(var TempPOSEndOfDayProfile: Record "NPR POS End of Day Profile")
     begin
         TempPOSEndOfDayProfile.Copy(Rec);
     end;
 
-    procedure CreatePOSEndOfDayProfileData()
+    internal procedure CreatePOSEndOfDayProfileData()
     var
         POSEndOfDayProfile: Record "NPR POS End of Day Profile";
     begin
@@ -206,12 +206,12 @@
             until Rec.Next() = 0;
     end;
 
-    procedure POSEndOfDayProfileDataToCreate(): Boolean
+    internal procedure POSEndOfDayProfileDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CopyRealAndTemp(var TempPOSEndOfDayProfile: Record "NPR POS End of Day Profile")
+    internal procedure CopyRealAndTemp(var TempPOSEndOfDayProfile: Record "NPR POS End of Day Profile")
     var
         POSEndOfDayProfile: Record "NPR POS End of Day Profile";
     begin

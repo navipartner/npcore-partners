@@ -217,7 +217,7 @@ xmlport 6151156 "NPR M2 Update Account"
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary)
+    internal procedure GetRequest(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary)
     begin
 
         StartTime := Time;
@@ -234,7 +234,7 @@ xmlport 6151156 "NPR M2 Update Account"
         end;
     end;
 
-    procedure SetResponse(var TmpContact: Record Contact temporary)
+    internal procedure SetResponse(var TmpContact: Record Contact temporary)
     begin
 
         TmpContactResponse.TransferFields(TmpContact, true);
@@ -254,7 +254,7 @@ xmlport 6151156 "NPR M2 Update Account"
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    procedure SetErrorResponse(ErrorMessage: Text)
+    internal procedure SetErrorResponse(ErrorMessage: Text)
     begin
 
         ResponseCode := 'ERROR';

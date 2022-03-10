@@ -474,7 +474,7 @@ report 6014418 "NPR Sale Time Report POS"
         TextQty: Label 'Quantity';
 
 
-    procedure CalcValue()
+    internal procedure CalcValue()
     var
         MinDato: Date;
         MaxDato: Date;
@@ -527,7 +527,7 @@ report 6014418 "NPR Sale Time Report POS"
     end;
 
 
-    procedure Calculate(FilterArray: array[2] of Date)
+    internal procedure Calculate(FilterArray: array[2] of Date)
     var
         I: Integer;
     begin

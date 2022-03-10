@@ -59,7 +59,7 @@
         }
     }
 
-    procedure FillRequestTable(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
+    internal procedure FillRequestTable(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
     begin
         if TmpTicketReservationRequest.FindSet() then
             repeat
@@ -68,7 +68,7 @@
             until (TmpTicketReservationRequest.Next() = 0);
     end;
 
-    procedure GetTicketRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
+    internal procedure GetTicketRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
     begin
         Rec.Reset();
         if Rec.FindSet() then

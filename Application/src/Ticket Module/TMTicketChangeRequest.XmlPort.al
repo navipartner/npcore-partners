@@ -224,7 +224,7 @@ xmlport 6060107 "NPR TM Ticket Change Request"
         }
     }
 
-    procedure SetChangeRequestId(Token: Text[100])
+    internal procedure SetChangeRequestId(Token: Text[100])
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
@@ -250,7 +250,7 @@ xmlport 6060107 "NPR TM Ticket Change Request"
         ResponseMessage := '';
     end;
 
-    procedure GetChangeRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; ErrorMessage: Text): Boolean
+    internal procedure GetChangeRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; ErrorMessage: Text): Boolean
     begin
         ErrorMessage := ResponseMessage;
         TmpTicketReservationRequest.Copy(tmpChangeRequest, true);
@@ -258,7 +258,7 @@ xmlport 6060107 "NPR TM Ticket Change Request"
         exit(ResponseCode = 'OK');
     end;
 
-    procedure SetError(ErrorMessage: Text)
+    internal procedure SetError(ErrorMessage: Text)
     begin
         if (tmpResult.IsTemporary) then
             tmpResult.DeleteAll();

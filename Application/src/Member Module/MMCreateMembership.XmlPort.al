@@ -140,13 +140,13 @@ xmlport 6060127 "NPR MM Create Membership"
     var
         EntryNo: Integer;
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer)
+    internal procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
     begin
@@ -160,7 +160,7 @@ xmlport 6060127 "NPR MM Create Membership"
         tmpMembershipResponse.Insert();
     end;
 
-    procedure GetResponse(var MembershipEntryNo: Integer; var ResponseMessage: Text): Boolean
+    internal procedure GetResponse(var MembershipEntryNo: Integer; var ResponseMessage: Text): Boolean
     begin
         tmpmembershipresponse.FindFirst();
         MembershipEntryNo := tmpmembershipresponse."Entry No.";
@@ -168,7 +168,7 @@ xmlport 6060127 "NPR MM Create Membership"
         exit(status = '1');
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

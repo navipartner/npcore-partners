@@ -292,7 +292,7 @@
         CloseToPOSPaymentBinNo: Code[10];
 
 
-    procedure SetGlobals(var POSStoreCodeAll: Record "NPR POS Store"; var POSPaymentMethodAll: Record "NPR POS Payment Method"; var POSPaymentBinAll: Record "NPR POS Payment Bin")
+    internal procedure SetGlobals(var POSStoreCodeAll: Record "NPR POS Store"; var POSPaymentMethodAll: Record "NPR POS Payment Method"; var POSPaymentBinAll: Record "NPR POS Payment Bin")
     begin
         TempAllPOSStore.DeleteAll();
         if POSStoreCodeAll.FindSet() then
@@ -319,12 +319,12 @@
         if TempAllPOSPaymentBin.FindSet() then;
     end;
 
-    procedure POSPostingSetupToCreate(): Boolean
+    internal procedure POSPostingSetupToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CreatePOSPostingSetupData()
+    internal procedure CreatePOSPostingSetupData()
     var
         POSPostingSetup: Record "NPR POS Posting Setup";
     begin

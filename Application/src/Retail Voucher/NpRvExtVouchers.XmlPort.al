@@ -158,12 +158,12 @@ xmlport 6151011 "NPR NpRv Ext. Vouchers"
     var
         LineNo: Integer;
 
-    procedure GetSourceTable(var NpRvExtVoucherBuffer2: Record "NPR NpRv Ext. Voucher Buffer" temporary)
+    internal procedure GetSourceTable(var NpRvExtVoucherBuffer2: Record "NPR NpRv Ext. Voucher Buffer" temporary)
     begin
         NpRvExtVoucherBuffer2.Copy(NpRvExtVoucherBuffer, true);
     end;
 
-    procedure SetSourceTable(var NpRvExtVoucherBuffer2: Record "NPR NpRv Ext. Voucher Buffer" temporary)
+    internal procedure SetSourceTable(var NpRvExtVoucherBuffer2: Record "NPR NpRv Ext. Voucher Buffer" temporary)
     begin
         NpRvExtVoucherBuffer.Copy(NpRvExtVoucherBuffer2, true);
     end;

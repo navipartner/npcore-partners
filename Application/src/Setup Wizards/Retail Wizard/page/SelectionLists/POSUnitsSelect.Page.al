@@ -104,12 +104,12 @@
         end;
     end;
 
-    procedure SetPOSUnitMode(Set: Boolean)
+    internal procedure SetPOSUnitMode(Set: Boolean)
     begin
         POSUnitMode := Set;
     end;
 
-    procedure SetRec(var TempPOSUnit: Record "NPR POS Unit")
+    internal procedure SetRec(var TempPOSUnit: Record "NPR POS Unit")
     begin
         if TempPOSUnit.FindSet() then
             repeat

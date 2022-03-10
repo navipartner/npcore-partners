@@ -238,13 +238,13 @@ xmlport 6060129 "NPR MM Get Membership"
     }
 
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMembershipResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer)
+    internal procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -315,7 +315,7 @@ xmlport 6060129 "NPR MM Get Membership"
 
     end;
 
-    procedure GetResponse(var TmpMembershipOut: Record "NPR MM Membership" temporary; var TmpMembershipEntryOut: Record "NPR MM Membership Entry" temporary; var TmpAttributeValueSetOut: Record "NPR Attribute Value Set" temporary; var ResponseMessage: Text): Boolean
+    internal procedure GetResponse(var TmpMembershipOut: Record "NPR MM Membership" temporary; var TmpMembershipEntryOut: Record "NPR MM Membership Entry" temporary; var TmpAttributeValueSetOut: Record "NPR Attribute Value Set" temporary; var ResponseMessage: Text): Boolean
     begin
         TmpMembershipOut.Copy(tmpMembershipResponse, true);
         TmpMembershipEntryOut.Copy(TmpMembershipEntry, true);
@@ -324,7 +324,7 @@ xmlport 6060129 "NPR MM Get Membership"
         exit(status = '1');
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

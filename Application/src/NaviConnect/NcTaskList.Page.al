@@ -309,7 +309,7 @@
         SetPresetFilters();
     end;
 
-    procedure SetShowProcessed(ShowProcessedPar: Boolean)
+    internal procedure SetShowProcessed(ShowProcessedPar: Boolean)
     begin
         ShowProcessed := ShowProcessedPar;
     end;

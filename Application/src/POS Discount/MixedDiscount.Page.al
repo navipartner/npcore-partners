@@ -592,7 +592,7 @@
         DiscountLevelsApplicable: Boolean;
         MixedDiscountMgt: Codeunit "NPR Mixed Discount Management";
 
-    procedure TransferToMix()
+    internal procedure TransferToMix()
     var
         NPRMixedDiscountLine: Record "NPR Mixed Discount Line";
         ErrorNo1: Label 'No Items has been selected for transfer';
@@ -620,7 +620,7 @@
         Message(OkMsg, Item.Count, Rec.Code);
     end;
 
-    procedure CollapseToItemDiscGroup()
+    internal procedure CollapseToItemDiscGroup()
     var
         NPRMixedDiscountLine: Record "NPR Mixed Discount Line";
         ItemDiscGrpRec: Record "Item Discount Group";

@@ -152,13 +152,13 @@ xmlport 6060144 "NPR MM Get Member GDPR Roles"
     var
         NOT_FOUND: Label 'Filter combination removed all results.';
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         TmpMembershipRole.DeleteAll();
     end;
 
-    procedure AddResponse(MemberEntryNo: Integer)
+    internal procedure AddResponse(MemberEntryNo: Integer)
     var
         MembershipRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
@@ -189,7 +189,7 @@ xmlport 6060144 "NPR MM Get Member GDPR Roles"
             AddErrorResponse(NOT_FOUND);
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

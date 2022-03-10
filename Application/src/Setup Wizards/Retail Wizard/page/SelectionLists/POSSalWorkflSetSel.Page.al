@@ -30,7 +30,7 @@
         }
     }
 
-    procedure SetRec(var TempPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set")
+    internal procedure SetRec(var TempPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set")
     begin
         if TempPOSSalesWorkflowSet.FindSet() then
             repeat

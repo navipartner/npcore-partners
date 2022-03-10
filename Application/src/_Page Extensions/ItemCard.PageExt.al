@@ -1327,7 +1327,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         Rec.NPR_GetItemAdditionalFields(ItemAdditionalFields);
     end;
 
-    procedure NPR_SetMagentoEnabled()
+    internal procedure NPR_SetMagentoEnabled()
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin

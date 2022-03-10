@@ -275,14 +275,14 @@ xmlport 6151167 "NPR NpGp POS Entries"
     var
         EntryNo: BigInteger;
 
-    procedure GetSourceTables(var TempNpGpPOSSalesEntryTo: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLineTo: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntryTo: Record "NPR NpGp POS Info POS Entry" temporary)
+    internal procedure GetSourceTables(var TempNpGpPOSSalesEntryTo: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLineTo: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntryTo: Record "NPR NpGp POS Info POS Entry" temporary)
     begin
         TempNpGpPOSSalesEntryTo.Copy(TempNpGpPOSSalesEntry, true);
         TempNpGpPOSSalesLineTo.Copy(TempNpGpPOSSalesLine, true);
         TempNpGpPOSInfoPOSEntryTo.Copy(TempNpGpPOSInfoPOSEntry, true);
     end;
 
-    procedure SetSourceTables(var TempNpGpPOSSalesEntryFrom: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLineFrom: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntryFrom: Record "NPR NpGp POS Info POS Entry" temporary)
+    internal procedure SetSourceTables(var TempNpGpPOSSalesEntryFrom: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLineFrom: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntryFrom: Record "NPR NpGp POS Info POS Entry" temporary)
     begin
         TempNpGpPOSSalesEntry.Copy(TempNpGpPOSSalesEntryFrom, true);
         TempNpGpPOSSalesLine.Copy(TempNpGpPOSSalesLineFrom, true);

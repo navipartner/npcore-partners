@@ -594,7 +594,7 @@
         end;
     end;
 
-    procedure ShowTicketSalesTransaction(Ticket: Record "NPR TM Ticket")
+    internal procedure ShowTicketSalesTransaction(Ticket: Record "NPR TM Ticket")
     var
         SalesInvHeader: Record "Sales Invoice Header";
         PosEntry: Record "NPR Pos Entry";

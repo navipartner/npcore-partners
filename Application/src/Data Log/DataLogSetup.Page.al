@@ -225,7 +225,7 @@
         Window.Close();
     end;
 
-    procedure CleanDataLog()
+    internal procedure CleanDataLog()
     begin
         if Confirm(Text001, false) then
             DataLogSubscriberMgt.CleanDataLog();

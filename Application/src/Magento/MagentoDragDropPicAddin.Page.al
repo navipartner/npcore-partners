@@ -243,7 +243,7 @@
         end;
     end;
 
-    procedure DisplayPicture()
+    internal procedure DisplayPicture()
     begin
         if not ControlAddInReady then
             exit;
@@ -260,7 +260,7 @@
         CurrPage.DragDropAddin.DisplayData(Rec.GetMagentoUrl());
     end;
 
-    procedure GetDataUri() DataUri: Text
+    internal procedure GetDataUri() DataUri: Text
     var
         Convert: Codeunit "Base64 Convert";
         ImageHelpers: Codeunit "Image Helpers";
@@ -294,47 +294,47 @@
         NewPictureType := StrMenu(Text004) - 1;
     end;
 
-    procedure SetAutoOverwrite(NewAutoOverwrite: Boolean)
+    internal procedure SetAutoOverwrite(NewAutoOverwrite: Boolean)
     begin
         AutoOverwrite := NewAutoOverwrite;
     end;
 
-    procedure SetHidePicture(NewHidePicture: Boolean)
+    internal procedure SetHidePicture(NewHidePicture: Boolean)
     begin
         HidePicture := NewHidePicture;
     end;
 
-    procedure SetItemNo(ItemNo: Code[20])
+    internal procedure SetItemNo(ItemNo: Code[20])
     begin
         PictureType := Rec.Type::Item.AsInteger();
         PictureLinkNo := ItemNo;
     end;
 
-    procedure SetItemGroupNo(ItemGroupNo: Code[20]; NewIsIconPicture: Boolean)
+    internal procedure SetItemGroupNo(ItemGroupNo: Code[20]; NewIsIconPicture: Boolean)
     begin
         PictureType := Rec.Type::"Item Group".AsInteger();
         PictureLinkNo := ItemGroupNo;
         IsIconPicture := NewIsIconPicture;
     end;
 
-    procedure SetBrandCode(BrandCode: Code[20]; NewIsLogoPicture: Boolean)
+    internal procedure SetBrandCode(BrandCode: Code[20]; NewIsLogoPicture: Boolean)
     begin
         PictureType := Rec.Type::Brand.AsInteger();
         PictureLinkNo := BrandCode;
         IsLogoPicture := NewIsLogoPicture;
     end;
 
-    procedure SetRecordPosition(PictureType: Integer; PictureName: Text)
+    internal procedure SetRecordPosition(PictureType: Integer; PictureName: Text)
     begin
         if Rec.Get(PictureType, PictureName) then;
     end;
 
-    procedure SetVariantValueCode(NewVariantValueCode: Code[20])
+    internal procedure SetVariantValueCode(NewVariantValueCode: Code[20])
     begin
         PictureLinkVariantValueCode := NewVariantValueCode;
     end;
 
-    procedure SetVarietyFilters(NewVarietyTypeCode: Code[10]; NewVarietyTableCode: Code[40]; NewVarietyValueCode: Code[50])
+    internal procedure SetVarietyFilters(NewVarietyTypeCode: Code[10]; NewVarietyTableCode: Code[40]; NewVarietyValueCode: Code[50])
     begin
         VarietyTypeCode := NewVarietyTypeCode;
         VarietyTableCode := NewVarietyTableCode;
@@ -346,7 +346,7 @@
         SaveTempPicture();
     end;
 
-    procedure EndDataTransfer()
+    internal procedure EndDataTransfer()
     begin
         PictureName := '';
         PictureDataUri := '';
@@ -371,7 +371,7 @@
         PictureSize := Filesize;
     end;
 
-    procedure InitDataTransfer()
+    internal procedure InitDataTransfer()
     begin
         PictureName := '';
         PictureDataUri := '';
@@ -379,7 +379,7 @@
         Initialized := true;
     end;
 
-    procedure SaveTempPicture()
+    internal procedure SaveTempPicture()
     var
         DataUri: Text;
         NpRegEx: Codeunit "NPR RegEx";

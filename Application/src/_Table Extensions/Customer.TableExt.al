@@ -159,7 +159,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             Error(DeleteCustActiveCashErr, Rec."No.");
     end;
 
-    procedure NPR_IsRestrictedOnPOS(CheckFieldNo: Integer): Boolean
+    internal procedure NPR_IsRestrictedOnPOS(CheckFieldNo: Integer): Boolean
     var
         GenBusPostingGroup: Record "Gen. Business Posting Group";
         VatBusPostingGroup: Record "VAT Business Posting Group";

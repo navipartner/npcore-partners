@@ -340,7 +340,7 @@
         end;
     end;
 
-    procedure SetFromJob(SourceJob2: Record Job)
+    internal procedure SetFromJob(SourceJob2: Record Job)
     begin
         SourceJob := SourceJob2;
         SourceJobNo := SourceJob."No.";
@@ -348,13 +348,13 @@
         TargetBillToCustomerNo := SourceJob."Bill-to Customer No.";
     end;
 
-    procedure GetTargetJob(var NewJob: Record Job)
+    internal procedure GetTargetJob(var NewJob: Record Job)
     begin
         NewJob.Get(TargetJobNo);
         NewJob.SetRecFilter();
     end;
 
-    procedure GetConfirmAnswer(): Boolean
+    internal procedure GetConfirmAnswer(): Boolean
     begin
         exit(ConfirmAnswer);
     end;

@@ -193,7 +193,7 @@
         }
     }
 
-    procedure CreateMagentoShipmentMapping()
+    internal procedure CreateMagentoShipmentMapping()
     var
         MagentoShipmentMapping: Record "NPR Magento Shipment Mapping";
     begin
@@ -205,7 +205,7 @@
             until Rec.Next() = 0;
     end;
 
-    procedure MagentoShipmentMappingToCreate(): Boolean
+    internal procedure MagentoShipmentMappingToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;

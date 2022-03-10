@@ -58,13 +58,13 @@ xmlport 6060136 "NPR MM Anonymous Member"
     }
 
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMember.DeleteAll();
     end;
 
-    procedure AddResponse()
+    internal procedure AddResponse()
     begin
 
         errordescription := '';
@@ -73,7 +73,7 @@ xmlport 6060136 "NPR MM Anonymous Member"
         tmpMember.Insert();
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

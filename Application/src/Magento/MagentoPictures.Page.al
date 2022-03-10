@@ -138,7 +138,7 @@
         MiniatureSinglePicture: Boolean;
         Text000: Label 'Checking Pictures: @1@@@@@@@@@@@@@@@';
 
-    procedure CountRelations()
+    internal procedure CountRelations()
     var
         MagentoPictureLink: Record "NPR Magento Picture Link";
         MagentoItemGroup: Record "NPR Magento Category";
@@ -170,7 +170,7 @@
         end;
     end;
 
-    procedure DrillDownCounter()
+    internal procedure DrillDownCounter()
     var
         Item: Record Item;
         MagentoPictureLink: Record "NPR Magento Picture Link";

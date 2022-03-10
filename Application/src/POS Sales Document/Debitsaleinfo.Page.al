@@ -310,12 +310,12 @@
     }
 
 
-    procedure SetCustomer(Text: Text[30])
+    internal procedure SetCustomer(Text: Text[30])
     begin
         Rec."Your Reference" := Text;
     end;
 
-    procedure GetCustomer(var Text: Text[35])
+    internal procedure GetCustomer(var Text: Text[35])
     begin
         Text := Rec."Your Reference";
     end;
