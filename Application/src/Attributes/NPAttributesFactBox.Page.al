@@ -213,7 +213,7 @@
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
 
-    procedure ShowDetails()
+    internal procedure ShowDetails()
     begin
         PAGE.Run(PAGE::"Item Card", Rec);
     end;

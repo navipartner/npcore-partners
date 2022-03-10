@@ -515,7 +515,7 @@
         QtyAvailable: Decimal;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure CalculateAvailability()
+    internal procedure CalculateAvailability()
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";

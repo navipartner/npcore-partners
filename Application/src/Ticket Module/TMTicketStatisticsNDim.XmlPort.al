@@ -142,14 +142,14 @@ xmlport 6060110 "NPR TM Ticket Statistics N-Dim"
         RequestFromDate: Date;
         StartTime: Time;
 
-    procedure GetRequest(var FromDate: Date; var UntilDate: Date)
+    internal procedure GetRequest(var FromDate: Date; var UntilDate: Date)
     begin
         FromDate := RequestFromDate;
         UntilDate := RequestUntilDate;
         StartTime := Time;
     end;
 
-    procedure SetResponse(var TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary)
+    internal procedure SetResponse(var TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary)
     var
         StatisticsNotFoundLbl: Label 'No statistics found for daterange %1..%2';
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;

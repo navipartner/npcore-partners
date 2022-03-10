@@ -88,7 +88,7 @@
             }
         }
     }
-    procedure CreateMagentoWebsiteData()
+    internal procedure CreateMagentoWebsiteData()
     var
         MagentoWebsite: Record "NPR Magento Website";
     begin
@@ -100,12 +100,12 @@
             until Rec.Next() = 0;
     end;
 
-    procedure MagentoWebsiteDataToCreate(): Boolean
+    internal procedure MagentoWebsiteDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CopyRealAndTemp(var TempMagentoWebsite: Record "NPR Magento Website")
+    internal procedure CopyRealAndTemp(var TempMagentoWebsite: Record "NPR Magento Website")
     var
         MagentoWebsite: Record "NPR Magento Website";
     begin

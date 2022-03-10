@@ -444,7 +444,7 @@
         Text0003: Label 'Last Year';
         PeriodNameLbl: Label '%1', Locked = true;
 
-    procedure UpdateDiagram()
+    internal procedure UpdateDiagram()
     var
         Itt: Integer;
     begin
@@ -631,36 +631,36 @@
             AuxValueEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    procedure "-- Public Functions"()
+    internal procedure "-- Public Functions"()
     begin
     end;
 
-    procedure SetDim1Filter(Dim1FilterIn: Code[20])
+    internal procedure SetDim1Filter(Dim1FilterIn: Code[20])
     begin
         Dim1Filter := Dim1FilterIn;
     end;
 
-    procedure SetDim2Filter(Dim2FilterIn: Code[20])
+    internal procedure SetDim2Filter(Dim2FilterIn: Code[20])
     begin
         Dim2Filter := Dim2FilterIn;
     end;
 
-    procedure SetItemGroupFilter(ItemGroupFilterIn: Code[20])
+    internal procedure SetItemGroupFilter(ItemGroupFilterIn: Code[20])
     begin
         ItemCategoryFilter := ItemGroupFilterIn;
     end;
 
-    procedure SetDateFilter(DateFilterIn: Text[50])
+    internal procedure SetDateFilter(DateFilterIn: Text[50])
     begin
         DateFilter := DateFilterIn;
     end;
 
-    procedure SetPeriodType(PeriodTypeIn: Integer)
+    internal procedure SetPeriodType(PeriodTypeIn: Integer)
     begin
         PeriodType := PeriodTypeIn;
     end;
 
-    procedure SetFigureToDisplay(FigureToDisplayIn: Integer)
+    internal procedure SetFigureToDisplay(FigureToDisplayIn: Integer)
     begin
         FigureToDisplay := FigureToDisplayIn;
     end;

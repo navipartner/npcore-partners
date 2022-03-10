@@ -90,7 +90,7 @@
         }
     }
 
-    procedure SetRec(var TempPOSEndOfDayProfile: Record "NPR POS End of Day Profile")
+    internal procedure SetRec(var TempPOSEndOfDayProfile: Record "NPR POS End of Day Profile")
     begin
         if TempPOSEndOfDayProfile.FindSet() then
             repeat

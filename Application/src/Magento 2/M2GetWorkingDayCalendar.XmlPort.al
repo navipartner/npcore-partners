@@ -90,7 +90,7 @@ xmlport 6151137 "NPR M2 Get WorkingDay Calendar"
         }
     }
 
-    procedure PrepareResponse()
+    internal procedure PrepareResponse()
     var
         CompanyInformation: Record "Company Information";
         Customer: Record Customer;

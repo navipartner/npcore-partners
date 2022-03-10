@@ -1,8 +1,8 @@
 ﻿report 6060137 "NPR MM Membership Batch Renew"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     Caption = 'Membership Batch Renew';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
@@ -301,7 +301,7 @@
         MemberInfoCapture.Insert();
     end;
 
-    procedure LaunchAlterationJnlPage(LaunchPage: Boolean): Boolean
+    internal procedure LaunchAlterationJnlPage(LaunchPage: Boolean): Boolean
     begin
         LaunchAltJnlPage := LaunchPage;
     end;

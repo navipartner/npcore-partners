@@ -69,7 +69,7 @@ page 6059808 "NPR .NET Assemblies"
         }
     }
 
-    procedure ImportAssembly()
+    internal procedure ImportAssembly()
     var
         TempBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";

@@ -36,7 +36,7 @@
         }
     }
 
-    procedure SetRec(var TempEanBoxSetups: Record "NPR Ean Box Setup")
+    internal procedure SetRec(var TempEanBoxSetups: Record "NPR Ean Box Setup")
     begin
         if TempEanBoxSetups.FindSet() then
             repeat

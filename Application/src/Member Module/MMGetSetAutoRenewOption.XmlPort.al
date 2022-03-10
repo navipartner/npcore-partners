@@ -87,7 +87,7 @@ xmlport 6060146 "NPR MM GetSet AutoRenew Option"
         }
     }
 
-    procedure createResponse()
+    internal procedure createResponse()
     var
         Membership: Record "NPR MM Membership";
     begin
@@ -145,7 +145,7 @@ xmlport 6060146 "NPR MM GetSet AutoRenew Option"
         errordescription := '';
     end;
 
-    procedure setError(ReasonText: Text)
+    internal procedure setError(ReasonText: Text)
     begin
         status := 'ERROR';
         errordescription := ReasonText;

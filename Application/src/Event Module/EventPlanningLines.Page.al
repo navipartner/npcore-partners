@@ -1216,12 +1216,12 @@
         "Unit CostEditable" := Edit;
     end;
 
-    procedure SetJobNo(No: Code[20])
+    internal procedure SetJobNo(No: Code[20])
     begin
         JobNo := No;
     end;
 
-    procedure SetJobTaskNoVisible(JobTaskNoVisible: Boolean)
+    internal procedure SetJobTaskNoVisible(JobTaskNoVisible: Boolean)
     begin
         "Job Task No.Visible" := JobTaskNoVisible;
     end;

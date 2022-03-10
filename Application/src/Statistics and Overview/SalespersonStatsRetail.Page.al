@@ -149,7 +149,7 @@
         [InDataSet]
         "LP%": Boolean;
 
-    procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemCategory: Code[20]; LastYearCalc: Text[50]; ItemFilter: Code[20])
+    internal procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemCategory: Code[20]; LastYearCalc: Text[50]; ItemFilter: Code[20])
     begin
         Rec."NPR Global Dimension 1 Filter" := GlobalDim1;
         "Global Dimension 2 Filter" := GlobalDim2;
@@ -162,7 +162,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure Calc()
+    internal procedure Calc()
     var
         AuxValueEntry: Record "NPR Aux. Value Entry";
         AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
@@ -201,7 +201,7 @@
         LastYear := false;
     end;
 
-    procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry")
+    internal procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry")
     begin
         AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
@@ -232,7 +232,7 @@
             AuxItemLedgerEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry")
+    internal procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry")
     begin
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
         AuxValueEntry.SetRange("Salespers./Purch. Code", Rec.Code);
@@ -262,7 +262,7 @@
             AuxValueEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    procedure InitForm()
+    internal procedure InitForm()
     begin
         Rec.Reset();
         Rec."NPR Global Dimension 1 Filter" := '';
@@ -272,7 +272,7 @@
         ItemCategoryFilter := '';
     end;
 
-    procedure ShowLastYear(Show: Boolean)
+    internal procedure ShowLastYear(Show: Boolean)
     begin
         LSQty := Show;
         LSAmount := Show;
@@ -280,7 +280,7 @@
         "LP%" := Show;
     end;
 
-    procedure ChangeEmptyFilter(): Boolean
+    internal procedure ChangeEmptyFilter(): Boolean
     var
         Current: Record "Salesperson/Purchaser";
         "Count": Integer;

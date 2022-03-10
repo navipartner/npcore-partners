@@ -84,7 +84,7 @@
     var
         ShowImportMemberAction: Boolean;
 
-    procedure SetShowImportAction()
+    internal procedure SetShowImportAction()
     begin
         ShowImportMemberAction := true;
     end;

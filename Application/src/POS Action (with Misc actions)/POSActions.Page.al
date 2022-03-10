@@ -185,13 +185,13 @@
         end;
     end;
 
-    procedure SetAction(POSActionCodeIn: Code[20])
+    internal procedure SetAction(POSActionCodeIn: Code[20])
     begin
         POSActionCode := POSActionCodeIn;
         ActionSpecified := true;
     end;
 
-    procedure SetSkipDiscovery(SkipDiscoveryIn: Boolean)
+    internal procedure SetSkipDiscovery(SkipDiscoveryIn: Boolean)
     begin
         SkipDiscovery := SkipDiscoveryIn;
     end;

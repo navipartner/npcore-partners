@@ -145,7 +145,7 @@ xmlport 6150903 "NPR HC Customer Price Request"
         }
     }
 
-    procedure GetRequest(var TmpSalesHeader: Record "Sales Header" temporary; var TmpSalesLine: Record "Sales Line" temporary)
+    internal procedure GetRequest(var TmpSalesHeader: Record "Sales Header" temporary; var TmpSalesLine: Record "Sales Line" temporary)
     begin
         TmpSalesHeader.TransferFields(TmpSalesHeaderRequest, true);
         TmpSalesHeader.Insert();
@@ -161,7 +161,7 @@ xmlport 6150903 "NPR HC Customer Price Request"
         responseDescription := 'No Response';
     end;
 
-    procedure SetResponse(var TmpSalesHeader: Record "Sales Header" temporary; var TmpSalesLine: Record "Sales Line" temporary)
+    internal procedure SetResponse(var TmpSalesHeader: Record "Sales Header" temporary; var TmpSalesLine: Record "Sales Line" temporary)
     begin
         TmpSalesHeaderResponse.TransferFields(TmpSalesHeader, true);
         TmpSalesHeaderResponse.Insert();
@@ -177,7 +177,7 @@ xmlport 6150903 "NPR HC Customer Price Request"
         end;
     end;
 
-    procedure SetErrorResponse(ErrorDescription: Text)
+    internal procedure SetErrorResponse(ErrorDescription: Text)
     begin
         responseCode := 'ERROR';
         responseDescription := ErrorDescription;

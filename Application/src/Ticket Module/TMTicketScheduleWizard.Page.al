@@ -116,7 +116,7 @@
     var
         ScheduleCode: Code[10];
 
-    procedure GetSchedules(var AdmissionSchedule: Record "NPR TM Admis. Schedule" temporary)
+    internal procedure GetSchedules(var AdmissionSchedule: Record "NPR TM Admis. Schedule" temporary)
     begin
 
         Rec.Reset();
@@ -128,7 +128,7 @@
         end;
     end;
 
-    procedure SetSchedules(var AdmissionSchedule: Record "NPR TM Admis. Schedule" temporary)
+    internal procedure SetSchedules(var AdmissionSchedule: Record "NPR TM Admis. Schedule" temporary)
     begin
     end;
 }

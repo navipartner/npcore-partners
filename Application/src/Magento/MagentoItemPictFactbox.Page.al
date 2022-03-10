@@ -36,7 +36,7 @@
         Initialized: Boolean;
         HasPicture: Boolean;
 
-    procedure LoadPicture()
+    internal procedure LoadPicture()
     var
         MagentoPicture: Record "NPR Magento Picture";
         MagentoPictureLink: Record "NPR Magento Picture Link";

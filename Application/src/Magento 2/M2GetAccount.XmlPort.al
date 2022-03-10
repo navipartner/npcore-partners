@@ -505,7 +505,7 @@ xmlport 6151152 "NPR M2 Get Account"
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure GetRequest() ContactNumber: Code[20]
+    internal procedure GetRequest() ContactNumber: Code[20]
     begin
 
         StartTime := Time;
@@ -516,7 +516,7 @@ xmlport 6151152 "NPR M2 Get Account"
         exit(TmpContactRequest."No.");
     end;
 
-    procedure SetResponse(var TmpContactIn: Record Contact temporary; var TmpSellToCustomerIn: Record Customer temporary; var TmpBillToCustomerIn: Record Customer temporary; var TmpShipToAddressIn: Record "Ship-to Address" temporary)
+    internal procedure SetResponse(var TmpContactIn: Record Contact temporary; var TmpSellToCustomerIn: Record Customer temporary; var TmpBillToCustomerIn: Record Customer temporary; var TmpShipToAddressIn: Record "Ship-to Address" temporary)
     var
         ContactBusinessRelation: Record "Contact Business Relation";
         ContactRec: Record Contact;
@@ -583,7 +583,7 @@ xmlport 6151152 "NPR M2 Get Account"
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    procedure SetErrorResponse(ReasonText: Text)
+    internal procedure SetErrorResponse(ReasonText: Text)
     begin
 
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));

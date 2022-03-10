@@ -1,8 +1,8 @@
 ﻿report 6014427 "NPR Turnover Rate"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Turnover Rate.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -248,7 +248,7 @@
         ValueMethod: Option "sidste koebspris","kostpris (gns.)";
         DateFilter: Text[250];
 
-    procedure Calculate("ItemNo.": Code[20]; FromDate: Date; ToDate: Date) ValueAmt: Decimal
+    internal procedure Calculate("ItemNo.": Code[20]; FromDate: Date; ToDate: Date) ValueAmt: Decimal
     begin
         Item3.SetRange("Date Filter", FromDate, ToDate);
         if PrintSupplier then

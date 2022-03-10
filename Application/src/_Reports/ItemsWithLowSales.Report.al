@@ -1,8 +1,8 @@
 ﻿report 6014540 "NPR Items With Low Sales"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Items With Low Sales.rdlc';
     Caption = 'Items With Low Sales';
@@ -249,7 +249,7 @@
         Vendors_item_no_CaptionLbl: Label 'Vendors item no.';
         ItemDateFilter: Text;
 
-    procedure Pct(Number1: Decimal; Number2: Decimal): Decimal
+    internal procedure Pct(Number1: Decimal; Number2: Decimal): Decimal
     begin
         if Number2 = 0 then
             exit(0);

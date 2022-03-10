@@ -71,19 +71,19 @@ xmlport 6060116 "NPR TM Ticket Cancel"
         ExternalIdCount: Integer;
         QtySum: Integer;
 
-    procedure GetToken(): Text[100]
+    internal procedure GetToken(): Text[100]
     begin
         exit(ReservationID);
     end;
 
-    procedure GetSummary(): Text[30]
+    internal procedure GetSummary(): Text[30]
     var
         SummaryLbl: Label '%1-%2', Locked = true;
     begin
         exit(StrSubstNo(SummaryLbl, ExternalIdCount, QtySum));
     end;
 
-    procedure SetReservationResult(DocumentID: Text[100]; Success: Boolean)
+    internal procedure SetReservationResult(DocumentID: Text[100]; Success: Boolean)
     begin
         tmpTicketReservationResponse.DeleteAll();
 

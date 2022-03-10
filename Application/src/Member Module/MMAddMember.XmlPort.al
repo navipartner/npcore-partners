@@ -191,13 +191,13 @@ xmlport 6060128 "NPR MM Add Member"
     var
         EntryNo: Integer;
 
-    procedure ClearResponse()
+    internal procedure ClearResponse()
     begin
 
         tmpMember.DeleteAll();
     end;
 
-    procedure AddResponse(MemberEntryNo: Integer)
+    internal procedure AddResponse(MemberEntryNo: Integer)
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
@@ -220,7 +220,7 @@ xmlport 6060128 "NPR MM Add Member"
         end;
     end;
 
-    procedure GetResponse(var MemberEntryNo: Integer; var ResponseMessage: Text): Boolean
+    internal procedure GetResponse(var MemberEntryNo: Integer; var ResponseMessage: Text): Boolean
     begin
         tmpMember.FindFirst();
         MemberEntryNo := tmpMember."Entry No.";
@@ -228,7 +228,7 @@ xmlport 6060128 "NPR MM Add Member"
         exit(status = '1');
     end;
 
-    procedure AddErrorResponse(ErrorMessage: Text)
+    internal procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
         errordescription := ErrorMessage;

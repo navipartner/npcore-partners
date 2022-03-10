@@ -120,7 +120,7 @@
         HasSetupBrands: Boolean;
         Text000: Label 'Downloading...';
 
-    procedure GetSelectionFilter(): Text
+    internal procedure GetSelectionFilter(): Text
     var
         Brand: Record "NPR Magento Brand";
         MagentoSelectionFilterMgt: Codeunit "NPR Magento Select. Filt. Mgt.";

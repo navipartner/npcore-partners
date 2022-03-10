@@ -166,19 +166,19 @@ xmlport 6060114 "NPR TM Ticket Reservation"
         ExternalIdCount: Integer;
         QtySum: Integer;
 
-    procedure GetToken(): Text[100]
+    internal procedure GetToken(): Text[100]
     begin
         exit(ReservationID);
     end;
 
-    procedure GetSummary(): Text[30]
+    internal procedure GetSummary(): Text[30]
     var
         SummaryLbl: Label '%1-%2', Locked = true;
     begin
         exit(StrSubstNo(SummaryLbl, ExternalIdCount, QtySum));
     end;
 
-    procedure SetReservationResult(DocumentID: Text[100])
+    internal procedure SetReservationResult(DocumentID: Text[100])
     var
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -225,7 +225,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
         Commit();
     end;
 
-    procedure SetErrorResult(DocumentID: Text[100]; ReasonText: Text)
+    internal procedure SetErrorResult(DocumentID: Text[100]; ReasonText: Text)
     begin
 
         tmpTicketReservationResponse.DeleteAll();
@@ -236,7 +236,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
         tmpTicketReservationResponse.Insert();
     end;
 
-    procedure GetResult(var TokenId: Text[100]; var ResponseMessage: Text): Boolean
+    internal procedure GetResult(var TokenId: Text[100]; var ResponseMessage: Text): Boolean
     begin
 
         TokenId := tmpTicketReservationResponse."Session Token ID";

@@ -57,7 +57,7 @@ page 6184515 "NPR EFT NETSCloud POSUnitSetup"
     var
         GlobalEFTSetup: Record "NPR EFT Setup";
 
-    procedure SetEFTSetup(EFTSetup: Record "NPR EFT Setup")
+    internal procedure SetEFTSetup(EFTSetup: Record "NPR EFT Setup")
     begin
         GlobalEFTSetup := EFTSetup;
     end;

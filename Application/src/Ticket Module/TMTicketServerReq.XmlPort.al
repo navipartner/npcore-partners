@@ -168,7 +168,7 @@ xmlport 6060123 "NPR TM Ticket Server Req."
         DateTimeLbl: Label '%1 %2', Locked = true;
         TicketUidLbl: Label '%1-%2', Locked = true;
 
-    procedure SetRequestEntryNo(Token: Text[100]; MarkTicketAsPrinted: Boolean; var FailureReason: Text): Boolean
+    internal procedure SetRequestEntryNo(Token: Text[100]; MarkTicketAsPrinted: Boolean; var FailureReason: Text): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketType: Record "NPR TM Ticket Type";

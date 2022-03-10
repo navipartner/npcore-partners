@@ -23,22 +23,22 @@
         OKClicked: Boolean;
 
 
-    procedure SetContent(ContentIn: Text)
+    internal procedure SetContent(ContentIn: Text)
     begin
         EditorContent := ContentIn;
     end;
 
-    procedure GetContent(): Text
+    internal procedure GetContent(): Text
     begin
         exit(EditorContent);
     end;
 
-    procedure GetOKClicked(): Boolean
+    internal procedure GetOKClicked(): Boolean
     begin
         exit(OKClicked);
     end;
 
-    procedure EditText(var Content: Text): Boolean
+    internal procedure EditText(var Content: Text): Boolean
     var
         TextEditor: Page "NPR E-mail Txt Editor Dlg";
     begin

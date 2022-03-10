@@ -44,7 +44,7 @@
         }
     }
 
-    procedure CopyRealAndTemp(var TempSalesperson: Record "NPR Salesperson Buffer")
+    internal procedure CopyRealAndTemp(var TempSalesperson: Record "NPR Salesperson Buffer")
     var
         Salesperson: Record "Salesperson/Purchaser";
     begin
@@ -63,7 +63,7 @@
             until Salesperson.Next() = 0;
     end;
 
-    procedure CheckIfNoAvailableInSalespersonPurchaser(var SalespersonPurchaser: Record "NPR Salesperson Buffer"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]
+    internal procedure CheckIfNoAvailableInSalespersonPurchaser(var SalespersonPurchaser: Record "NPR Salesperson Buffer"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]
     var
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
     begin
@@ -78,12 +78,12 @@
         end;
     end;
 
-    procedure SalespersonsToCreate(): Boolean
+    internal procedure SalespersonsToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CreateSalespersonData()
+    internal procedure CreateSalespersonData()
     var
         Salesperson: Record "Salesperson/Purchaser";
     begin

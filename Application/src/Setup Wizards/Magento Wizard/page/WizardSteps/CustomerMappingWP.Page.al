@@ -142,7 +142,7 @@
         CountryRegionName: Text;
         CityName: Text;
 
-    procedure CreateMagentoCustomerMappingData()
+    internal procedure CreateMagentoCustomerMappingData()
     var
         MagentoCustomerMapping: Record "NPR Magento Customer Mapping";
     begin
@@ -154,7 +154,7 @@
             until Rec.Next() = 0;
     end;
 
-    procedure MagentoCustomerMappingDataToCreate(): Boolean
+    internal procedure MagentoCustomerMappingDataToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;

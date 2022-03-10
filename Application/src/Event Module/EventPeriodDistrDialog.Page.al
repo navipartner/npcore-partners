@@ -174,12 +174,12 @@
         TimeError: Label '%1 must be earlier than %2.';
         EventPlanLineGroupingMgt: Codeunit "NPR Event Plan.Line Group. Mgt";
 
-    procedure SetParameters(JobPlanningLine: Record "Job Planning Line")
+    internal procedure SetParameters(JobPlanningLine: Record "Job Planning Line")
     begin
         TempJobPlanningLine := JobPlanningLine;
     end;
 
-    procedure GetParameters(var JobPlanningLine2: Record "Job Planning Line"; var DaysOfWeek2: array[7] of Boolean)
+    internal procedure GetParameters(var JobPlanningLine2: Record "Job Planning Line"; var DaysOfWeek2: array[7] of Boolean)
     begin
         JobPlanningLine2 := TempJobPlanningLine;
         CopyArray(DaysOfWeek2, DaysOfWeek, 1);

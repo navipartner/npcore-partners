@@ -130,7 +130,7 @@
         Error_AlreadySelected: Label 'You have already added receipt %1 to the consolidation list';
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
 
-    procedure SetRec(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary)
+    internal procedure SetRec(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary)
     begin
         if not tmpTaxFreeConsolidation.IsTemporary then
             exit;
@@ -138,7 +138,7 @@
         Rec.Copy(tmpTaxFreeConsolidation, true);
     end;
 
-    procedure GetRec(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary)
+    internal procedure GetRec(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary)
     begin
         if not tmpTaxFreeConsolidation.IsTemporary then
             exit;
@@ -146,7 +146,7 @@
         tmpTaxFreeConsolidation.Copy(Rec, true);
     end;
 
-    procedure SetTaxFreeUnit(TaxFreeUnitIn: Record "NPR Tax Free POS Unit")
+    internal procedure SetTaxFreeUnit(TaxFreeUnitIn: Record "NPR Tax Free POS Unit")
     begin
         TaxFreeUnit := TaxFreeUnitIn;
         TaxFreeUnit.SetRecFilter();

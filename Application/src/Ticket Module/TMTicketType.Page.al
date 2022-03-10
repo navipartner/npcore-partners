@@ -276,7 +276,7 @@
     var
         IMPORT_FILE: Label 'Import File';
 
-    procedure HideTickets()
+    internal procedure HideTickets()
     begin
         Rec.SetRange("Is Ticket", false);
     end;

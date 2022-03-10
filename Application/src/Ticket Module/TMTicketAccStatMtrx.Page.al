@@ -533,7 +533,7 @@
         BlockedVariantFactFilter: Text;
         AdmissionDefinition: Option ADMITTED_COUNT,ADMITTED_REVOKED_COUNT,ADMITTED_REVIST;
 
-    procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn)
+    internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn)
     var
         MatrixMgt: Codeunit "Matrix Management";
         MATRIX_PeriodRecords: array[32] of Record Date;
@@ -718,7 +718,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure FactLookup(FactOption: Option; var FactFilter: Text): Boolean
+    internal procedure FactLookup(FactOption: Option; var FactFilter: Text): Boolean
     var
         FactList: Page "NPR TM Ticket Access Facts";
         TicketFact: Record "NPR TM Ticket Access Fact";

@@ -212,7 +212,7 @@ xmlport 6151146 "NPR M2 Item Price Request"
         DuplicateReqIdLbl: Label 'Skipping duplicate Request Id %1;', Locked = true;
         DuplicateReqLbl: Label 'Skipping duplicate request %1;', Locked = true;
 
-    procedure GetSalesPriceRequest(var TmpM2PriceCalculationBuffer: Record "NPR M2 Price Calc. Buffer" temporary)
+    internal procedure GetSalesPriceRequest(var TmpM2PriceCalculationBuffer: Record "NPR M2 Price Calc. Buffer" temporary)
     begin
 
         if (SalesPriceRequest.FindSet()) then begin
@@ -227,7 +227,7 @@ xmlport 6151146 "NPR M2 Item Price Request"
         ResponseMessage := 'Did not complete.';
     end;
 
-    procedure SetSalesPriceResponse(var TmpPricePoint: Record "NPR M2 Price Calc. Buffer" temporary; var TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary; ResponseMessageIn: Text; ResponseCodeIn: Code[10])
+    internal procedure SetSalesPriceResponse(var TmpPricePoint: Record "NPR M2 Price Calc. Buffer" temporary; var TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary; ResponseMessageIn: Text; ResponseCodeIn: Code[10])
     var
         PlaceHolder2Lbl: Label '%1; %2', Locked = true;
     begin
@@ -259,7 +259,7 @@ xmlport 6151146 "NPR M2 Item Price Request"
             ResponseCode := 'WARNING';
     end;
 
-    procedure SetErrorResponse(ReasonText: Text)
+    internal procedure SetErrorResponse(ReasonText: Text)
     begin
 
         ResponseCode := 'ERROR';

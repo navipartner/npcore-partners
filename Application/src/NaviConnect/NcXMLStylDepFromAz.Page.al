@@ -78,7 +78,7 @@
             Error(Response.ReasonPhrase);
     end;
 
-    procedure Initialize(SetImportyTypeCode: Code[20])
+    internal procedure Initialize(SetImportyTypeCode: Code[20])
     begin
         ImportyTypeCode := SetImportyTypeCode;
     end;

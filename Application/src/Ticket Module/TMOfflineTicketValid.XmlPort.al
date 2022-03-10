@@ -99,7 +99,7 @@
         EntryNo: Integer;
         ImportRefNo: Integer;
 
-    procedure ProcessImportedRecords()
+    internal procedure ProcessImportedRecords()
     var
         OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
         OfflineTicketValidationMgr: Codeunit "NPR TM Offline Ticket Valid.";

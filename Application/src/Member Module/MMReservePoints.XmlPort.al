@@ -137,13 +137,13 @@ xmlport 6151163 "NPR MM Reserve Points"
         DocumentId: Text;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure SetDocumentId(DocumentIdIn: Text)
+    internal procedure SetDocumentId(DocumentIdIn: Text)
     begin
         // For test framework
         DocumentId := DocumentIdIn;
     end;
 
-    procedure GetRequest(var TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpPaymentLine: Record "NPR MM Reg. Sales Buffer" temporary)
+    internal procedure GetRequest(var TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpPaymentLine: Record "NPR MM Reg. Sales Buffer" temporary)
     begin
 
         SetErrorResponse('No response.', '-1099');
@@ -161,7 +161,7 @@ xmlport 6151163 "NPR MM Reserve Points"
         end;
     end;
 
-    procedure GetRespons(var ResponseCodeOut: Code[10]; var ResponseMessageOut: Text; var DocumentIdOut: Text; var TmpPoints: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
+    internal procedure GetRespons(var ResponseCodeOut: Code[10]; var ResponseMessageOut: Text; var DocumentIdOut: Text; var TmpPoints: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
     begin
 
         // For test framework
@@ -174,7 +174,7 @@ xmlport 6151163 "NPR MM Reserve Points"
         TmpPoints.Insert();
     end;
 
-    procedure SetResponse(var TmpPoints: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
+    internal procedure SetResponse(var TmpPoints: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
     begin
 
         if (not TmpPoints.FindFirst()) then begin
@@ -193,7 +193,7 @@ xmlport 6151163 "NPR MM Reserve Points"
             ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    procedure SetErrorResponse(ResponseMessageIn: Text; MessageId: Text)
+    internal procedure SetErrorResponse(ResponseMessageIn: Text; MessageId: Text)
     begin
 
         ResponseCode := 'ERROR';

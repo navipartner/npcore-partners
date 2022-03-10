@@ -793,7 +793,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure UpdateAllowed(): Boolean
+    internal procedure UpdateAllowed(): Boolean
     begin
         if CurrPage.Editable = false then
             Error(ViewModeErr);

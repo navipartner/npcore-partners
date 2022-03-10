@@ -64,7 +64,7 @@
     var
         RootNo: Code[20];
 
-    procedure SetRootNo(NewRootNo: Code[20])
+    internal procedure SetRootNo(NewRootNo: Code[20])
     begin
         RootNo := NewRootNo;
         Rec.FilterGroup(2);

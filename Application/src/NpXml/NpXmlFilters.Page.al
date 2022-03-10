@@ -93,12 +93,12 @@
         FilterValueEnabled := not ParentFieldNoEnabled;
     end;
 
-    procedure SetParentTableNo(NewParentTableNo: Integer)
+    internal procedure SetParentTableNo(NewParentTableNo: Integer)
     begin
         ParentTableNo := NewParentTableNo;
     end;
 
-    procedure SetTableNo(NewTableNo: Integer)
+    internal procedure SetTableNo(NewTableNo: Integer)
     begin
         TableNo := NewTableNo;
     end;

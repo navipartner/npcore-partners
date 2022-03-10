@@ -92,12 +92,12 @@
         ShowCreatedDateTime: Boolean;
         ShowPriority: Boolean;
 
-    procedure SetRaptorAction(_Action: Record "NPR Raptor Action")
+    internal procedure SetRaptorAction(_Action: Record "NPR Raptor Action")
     begin
         RaptorAction := _Action;
     end;
 
-    procedure SetRecordSet(var RaptorDataBuffer: Record "NPR Raptor Data Buffer")
+    internal procedure SetRecordSet(var RaptorDataBuffer: Record "NPR Raptor Data Buffer")
     begin
         Rec.Copy(RaptorDataBuffer, true);
     end;
@@ -107,7 +107,7 @@
         exit(RaptorAction."Data Type Description");
     end;
 
-    procedure GetRaptorAction(var _Action: Record "NPR Raptor Action")
+    internal procedure GetRaptorAction(var _Action: Record "NPR Raptor Action")
     begin
         _Action := RaptorAction;
     end;

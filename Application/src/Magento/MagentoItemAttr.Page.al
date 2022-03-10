@@ -62,7 +62,7 @@
         AttributeSetID: Integer;
         VariantCode: Code[10];
 
-    procedure GetValue() Value: Text
+    internal procedure GetValue() Value: Text
     var
         MagentoItemAttributeValue: Record "NPR Magento Item Attr. Value";
     begin
@@ -103,14 +103,14 @@
         MagentoItemAttr.Insert(true);
     end;
 
-    procedure SetValues(NewItemNo: Code[20]; NewAttributeSetID: Integer; NewVariantCode: Code[10])
+    internal procedure SetValues(NewItemNo: Code[20]; NewAttributeSetID: Integer; NewVariantCode: Code[10])
     begin
         ItemNo := NewItemNo;
         AttributeSetID := NewAttributeSetID;
         VariantCode := NewVariantCode;
     end;
 
-    procedure SetSourceTable()
+    internal procedure SetSourceTable()
     var
         MagentoAttributeSetValue: Record "NPR Magento Attr. Set Value";
         MagentoAttribute: Record "NPR Magento Attribute";

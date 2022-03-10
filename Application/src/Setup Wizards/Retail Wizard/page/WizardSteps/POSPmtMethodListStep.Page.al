@@ -89,7 +89,7 @@
         }
     }
 
-    procedure CopyRealAndTemp(var TempPOSPaymentMethod: Record "NPR POS Payment Method")
+    internal procedure CopyRealAndTemp(var TempPOSPaymentMethod: Record "NPR POS Payment Method")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
@@ -107,12 +107,12 @@
             until POSPaymentMethod.Next() = 0;
     end;
 
-    procedure POSPaymentMethodsToCreate(): Boolean
+    internal procedure POSPaymentMethodsToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CreatePOSPaymentMethodData()
+    internal procedure CreatePOSPaymentMethodData()
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin

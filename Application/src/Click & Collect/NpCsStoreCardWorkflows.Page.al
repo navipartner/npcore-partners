@@ -161,7 +161,7 @@
     var
         StoreCodeVisible: Boolean;
 
-    procedure SetStoreCodeVisible(NewStoreCodeVisible: Boolean)
+    internal procedure SetStoreCodeVisible(NewStoreCodeVisible: Boolean)
     begin
         StoreCodeVisible := NewStoreCodeVisible;
     end;

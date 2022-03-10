@@ -111,18 +111,18 @@ xmlport 6014674 "NPR Endpoint Query Web Import"
     end;
 
 
-    procedure GetMessageID(): Text[50]
+    internal procedure GetMessageID(): Text[50]
     begin
         exit(messageid);
     end;
 
-    procedure GetSummary(): Text[30]
+    internal procedure GetSummary(): Text[30]
     begin
         //EXIT (STRSUBSTNO ('%1-%2', Testfile, QtySum));
         exit('Testfile');
     end;
 
-    procedure SetEndpointQueryResult(ParReturnValue: Text)
+    internal procedure SetEndpointQueryResult(ParReturnValue: Text)
     begin
         //tmpTicketReservationResponse.DELETEALL ();
         //TicketReservationResponse.SETFILTER ("Session Token ID", '=%1', DocumentID);

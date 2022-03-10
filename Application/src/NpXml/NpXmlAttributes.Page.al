@@ -70,12 +70,12 @@
         TableNo: Integer;
         NamespacesEnabled: Boolean;
 
-    procedure SetEnabledFilters(NpXmlTemplate: Record "NPR NpXml Template")
+    internal procedure SetEnabledFilters(NpXmlTemplate: Record "NPR NpXml Template")
     begin
         NamespacesEnabled := NpXmlTemplate."Namespaces Enabled";
     end;
 
-    procedure SetTableNo(NewTableNo: Integer)
+    internal procedure SetTableNo(NewTableNo: Integer)
     begin
         TableNo := NewTableNo;
     end;

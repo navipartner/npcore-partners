@@ -1,18 +1,6 @@
 ﻿page 6059974 "NPR Variety Matrix"
 {
     Extensible = False;
-    // VRT1.10/JDH /20151202 CASE 201022 create table copy added as an action
-    // VRT1.11/MHA /20160411 CASE 236840 Increased column count from 32 to 100 and added HideInactive filter and Changed parameter Item2 to VAR in function SetRecordRef() in order to parse filters
-    // VRT1.11/TS  /20160509 CASE 238348  Added SETCURRENTKEY
-    // NPR5.28/JDH /20161128 CASE 255961 Added OnDrillDown
-    // VRT1.20/JDH /20161214 CASE 260545 Total Quantity added (on for field 15) moved code from onlookup to ondrilldown, due to web client failure
-    // NPR5.31/JDH /20170502 CASE 271133 Support for next set and previous set, and thereby support for unlimited no of columns
-    // NPR5.32/JDH /20170510 CASE 274170 Variable Cleanup
-    // NPR5.36/JDH /20170921 CASE 288696 Added Fieldvalue to event publisher
-    // NPR5.36/NPKNAV/20171003  CASE 285733 Transport NPR5.36 - 3 October 2017
-    // NPR5.41/TS  /20180105 CASE 300893 Removed BalnkZero
-    // NPR5.47/NPKNAV/20181026  CASE 324997-01 Transport NPR5.47 - 26 October 2018
-
     Caption = 'Variety Matrix';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -1099,7 +1087,7 @@
         Initialized := true;
     end;
 
-    procedure Load(MatrixColumns1: array[100] of Text[1024]; var MatrixRecords1: array[100] of Record "NPR Variety Buffer"; CurrentNoOfMatrixColumns: Integer)
+    internal procedure Load(MatrixColumns1: array[100] of Text[1024]; var MatrixRecords1: array[100] of Record "NPR Variety Buffer"; CurrentNoOfMatrixColumns: Integer)
     var
         i: Integer;
     begin
@@ -1183,7 +1171,7 @@
                                                  CurrVRTField, ItemFilters);
     end;
 
-    procedure UpdateMatrix(ReloadMatrixData: Boolean)
+    internal procedure UpdateMatrix(ReloadMatrixData: Boolean)
     begin
         Clear(Rec);
 
@@ -1218,7 +1206,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure SetRecordRef(RecRef2: RecordRef; var Item2: Record Item; ShowFieldNo: Integer)
+    internal procedure SetRecordRef(RecRef2: RecordRef; var Item2: Record Item; ShowFieldNo: Integer)
     begin
         RecRef := RecRef2;
         Item := Item2;
@@ -1243,7 +1231,7 @@
         CurrVRTField.SetRange("Is Table Default");
     end;
 
-    procedure SetValue(FieldNumber: Integer): Text[250]
+    internal procedure SetValue(FieldNumber: Integer): Text[250]
     var
         VRT1Value: Code[50];
         VRT2Value: Code[50];
@@ -1273,7 +1261,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
+    internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     begin
         Clear(MATRIX_MatrixRecords);
         VRTMatrixMgt.MATRIX_GenerateColumnCaptions(MATRIX_SetWanted, Item, ShowCrossVRTNo, MATRIX_CaptionSet, MATRIX_CurrentNoOfColumns, MATRIX_CaptionRange, HideInactive, MATRIX_PrimKeyFirstCaptionInCu);

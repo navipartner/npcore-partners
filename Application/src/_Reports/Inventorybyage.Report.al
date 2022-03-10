@@ -1,8 +1,8 @@
 ﻿report 6014400 "NPR Inventory by age"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory by age.rdlc';
     Caption = 'Inventory By Age';
@@ -820,7 +820,7 @@
         ExistItemGrpSub: array[5] of Boolean;
         PeriodRange: array[6] of Text;
 
-    procedure Calculation("Count": Integer; ItemNo: Code[21]; LastDirectCost: Decimal)
+    internal procedure Calculation("Count": Integer; ItemNo: Code[21]; LastDirectCost: Decimal)
     begin
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Purchase);
         ItemLedgerEntry.SetRange("Item No.", ItemNo);

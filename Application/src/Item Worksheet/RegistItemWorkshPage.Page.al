@@ -504,16 +504,16 @@
         ShowAllInfo: Boolean;
         CurrentWorksheetName: Code[10];
 
-    procedure SetFieldEditable()
+    internal procedure SetFieldEditable()
     begin
     end;
 
-    procedure GetCurrentWorksheet()
+    internal procedure GetCurrentWorksheet()
     begin
         RegItemWorksheet.Get(Rec.GetRangeMax("Registered Worksheet No."), CurrentWorksheetName);
     end;
 
-    procedure SetVisibleFields()
+    internal procedure SetVisibleFields()
     begin
         FieldsVisible := ShowAllInfo;
         CurrPage.ItemWorksheetVarSubpage.PAGE.SetRecFromIW(Rec);

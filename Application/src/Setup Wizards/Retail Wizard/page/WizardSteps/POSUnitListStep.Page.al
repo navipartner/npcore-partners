@@ -358,7 +358,7 @@
         StartingNoUnit: Code[10];
         SelectedPOSStore: Code[10];
 
-    procedure SetGlobals(var POSStoreAll: Record "NPR POS Store";
+    internal procedure SetGlobals(var POSStoreAll: Record "NPR POS Store";
                          var POSAuditProfile: Record "NPR POS Audit Profile";
                          var POSViewProfile: Record "NPR POS View Profile";
                          var POSEndOfDayProfile: Record "NPR POS End of Day Profile";
@@ -432,7 +432,7 @@
         if TempAllGlobalPOSSalesSetup.FindSet() then;
     end;
 
-    procedure CreateTempPOSUnits(NoOfPOSUnits: integer; WantedStartingNo: Code[10]; SelectedPOSStore: Code[10]; var POSUnitTemp: Record "NPR POS Unit")
+    internal procedure CreateTempPOSUnits(NoOfPOSUnits: integer; WantedStartingNo: Code[10]; SelectedPOSStore: Code[10]; var POSUnitTemp: Record "NPR POS Unit")
     var
         POSUnit: Record "NPR POS Unit";
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
@@ -473,7 +473,7 @@
         end;
     end;
 
-    procedure GetRec(var TempPOSUnit: Record "NPR POS Unit")
+    internal procedure GetRec(var TempPOSUnit: Record "NPR POS Unit")
     begin
         Rec.Reset();
 
@@ -489,7 +489,7 @@
             until Rec.Next() = 0;
     end;
 
-    procedure SetRec(var TempPOSUnit: Record "NPR POS Unit")
+    internal procedure SetRec(var TempPOSUnit: Record "NPR POS Unit")
     begin
         Rec.Reset();
 
@@ -505,7 +505,7 @@
             until TempPOSUnit.Next() = 0;
     end;
 
-    procedure CopyRealAndTemp(var TempPOSUnit: Record "NPR POS Unit")
+    internal procedure CopyRealAndTemp(var TempPOSUnit: Record "NPR POS Unit")
     var
         POSUnit: Record "NPR POS Unit";
     begin
@@ -531,12 +531,12 @@
         Commit();
     end;
 
-    procedure POSUnitsToCreate(): Boolean
+    internal procedure POSUnitsToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
-    procedure CreatePOSUnitData(var POSUnitToCreate: Record "NPR POS Unit")
+    internal procedure CreatePOSUnitData(var POSUnitToCreate: Record "NPR POS Unit")
     var
         POSUnit: Record "NPR POS Unit";
     begin

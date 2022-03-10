@@ -307,7 +307,7 @@
         end;
     end;
 
-    procedure GetItemInformation(var ItemNumberOut: Code[20]; var DescriptionOut: Text[30]; var ItemCategoryOut: Code[20]; var UnitPriceOut: Decimal; var TicketBomTemplateOut: Code[10])
+    internal procedure GetItemInformation(var ItemNumberOut: Code[20]; var DescriptionOut: Text[30]; var ItemCategoryOut: Code[20]; var UnitPriceOut: Decimal; var TicketBomTemplateOut: Code[10])
     begin
 
         ItemNumberOut := TmpItemNo;
@@ -317,7 +317,7 @@
         TicketBomTemplateOut := TmpTicketBomTemplate;
     end;
 
-    procedure GetScheduleInformation(var StartDateOut: Date; var UntilDateOut: Date; var AdmissionScheduleOut: Record "NPR TM Admis. Schedule" temporary)
+    internal procedure GetScheduleInformation(var StartDateOut: Date; var UntilDateOut: Date; var AdmissionScheduleOut: Record "NPR TM Admis. Schedule" temporary)
     begin
 
         StartDateOut := TmpStartDate;
@@ -325,7 +325,7 @@
         CurrPage.Schedules.PAGE.GetSchedules(AdmissionScheduleOut);
     end;
 
-    procedure GetAdmissionInformation(var AdmissionCodeOut: Code[20]; var DescriptionOut: Text[50]; var AdmissionTemplateCodeOut: Code[10])
+    internal procedure GetAdmissionInformation(var AdmissionCodeOut: Code[20]; var DescriptionOut: Text[50]; var AdmissionTemplateCodeOut: Code[10])
     begin
 
         AdmissionCodeOut := TmpAdmissionCode;
@@ -333,7 +333,7 @@
         AdmissionTemplateCodeOut := TmpAdmissionTemplate;
     end;
 
-    procedure GetTicketTypeInformation(var TicketTypeOut: Code[10]; var DescriptionOut: Text[30]; var TicketTypeTemplateOut: Code[10])
+    internal procedure GetTicketTypeInformation(var TicketTypeOut: Code[10]; var DescriptionOut: Text[30]; var TicketTypeTemplateOut: Code[10])
     begin
 
         TicketTypeOut := TmpTicketTypeCode;

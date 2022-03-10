@@ -326,7 +326,7 @@
         // CurrPage.Update();
     end;
 
-    procedure Load(var DistributionHeaders: Record "NPR Distribution Headers")
+    internal procedure Load(var DistributionHeaders: Record "NPR Distribution Headers")
     var
         DistributionGroupMembers: Record "NPR Distrib. Group Members";
     begin
@@ -355,12 +355,12 @@
         // MESSAGE(FORMAT(NewLastColumnShown));
     end;
 
-    procedure SetLastColumnShown(ColumnNo: Integer)
+    internal procedure SetLastColumnShown(ColumnNo: Integer)
     begin
         LastColumnShown := ColumnNo;
     end;
 
-    procedure GetLastColumnShown(): Integer
+    internal procedure GetLastColumnShown(): Integer
     begin
         exit(LastColumnShown);
     end;

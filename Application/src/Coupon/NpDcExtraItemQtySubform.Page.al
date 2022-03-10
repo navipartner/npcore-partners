@@ -182,7 +182,7 @@
         exit(Item.FindFirst());
     end;
 
-    procedure SetLotValidation(NewLotValidation: Boolean)
+    internal procedure SetLotValidation(NewLotValidation: Boolean)
     begin
         LotValidation := NewLotValidation;
     end;

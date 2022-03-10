@@ -64,12 +64,12 @@
         [InDataSet]
         FormulaLookupMode: Boolean;
 
-    procedure SetVisibility()
+    internal procedure SetVisibility()
     begin
         FormulaLookupMode := true;
     end;
 
-    procedure SetSelection(var EventAttributeRowValue: Record "NPR Event Attr. Row Value")
+    internal procedure SetSelection(var EventAttributeRowValue: Record "NPR Event Attr. Row Value")
     begin
         CurrPage.SetSelectionFilter(EventAttributeRowValue);
     end;

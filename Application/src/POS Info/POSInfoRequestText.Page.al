@@ -52,7 +52,7 @@
         exit(Confirmed);
     end;
 
-    procedure GetUserInput(): Text
+    internal procedure GetUserInput(): Text
     begin
         exit(UserInputString);
     end;

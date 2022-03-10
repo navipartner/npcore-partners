@@ -252,7 +252,7 @@
         EarnRatio := 1;
     end;
 
-    procedure SetDefaults(pCommunityCode: Code[20]; pPrefix: Code[10])
+    internal procedure SetDefaults(pCommunityCode: Code[20]; pPrefix: Code[10])
     begin
 
         CommunityCode := pCommunityCode;
@@ -260,7 +260,7 @@
         IsEditable := false;
     end;
 
-    procedure GetUserSetup(var vCommunityCode: Code[20]; var vMembershipCode: Code[20]; var vSystemPrefix: Code[10]; var vPaymentTypeCode: Code[10]; var vPaymentGLAccount: Code[20]; var vBaseUrl: Text; var vAuthType: Enum "NPR API Auth. Type"; var vUsername: Text[50]; var vPassword: Text[30]; var vOAuthSetupCode: Code[20]; var vDescription: Text; var vAuthCode: Text[40]; var vLoyaltyServerCompanyName: Text[80]; var vEarnFactor: Decimal; var vBurnFactor: Decimal; var vTenant: Text)
+    internal procedure GetUserSetup(var vCommunityCode: Code[20]; var vMembershipCode: Code[20]; var vSystemPrefix: Code[10]; var vPaymentTypeCode: Code[10]; var vPaymentGLAccount: Code[20]; var vBaseUrl: Text; var vAuthType: Enum "NPR API Auth. Type"; var vUsername: Text[50]; var vPassword: Text[30]; var vOAuthSetupCode: Code[20]; var vDescription: Text; var vAuthCode: Text[40]; var vLoyaltyServerCompanyName: Text[80]; var vEarnFactor: Decimal; var vBurnFactor: Decimal; var vTenant: Text)
     begin
 
         vCommunityCode := CommunityCode;

@@ -64,12 +64,12 @@ xmlport 6151591 "NPR NpDc Ext. Coupon"
     var
         LineNo: Integer;
 
-    procedure GetCoupons(var TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary)
+    internal procedure GetCoupons(var TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary)
     begin
         TempNpDcExtCouponBuffer2.Copy(TempNpDcExtCouponBuffer, true);
     end;
 
-    procedure SetCoupons(var TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary)
+    internal procedure SetCoupons(var TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary)
     begin
         TempNpDcExtCouponBuffer.Copy(TempNpDcExtCouponBuffer2, true);
     end;

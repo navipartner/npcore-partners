@@ -86,7 +86,7 @@
         PeriodDiscount: Boolean;
         MultipleUnitPrice: Boolean;
 
-    procedure HasDiscounts()
+    internal procedure HasDiscounts()
     var
         PeriodDiscountLine: Record "NPR Period Discount Line";
         MixDiscountLine: Record "NPR Mixed Discount Line";

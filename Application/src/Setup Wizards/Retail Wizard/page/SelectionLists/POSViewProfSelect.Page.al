@@ -53,7 +53,7 @@
             }
         }
     }
-    procedure SetRec(var TempPOSViewProfile: Record "NPR POS View Profile")
+    internal procedure SetRec(var TempPOSViewProfile: Record "NPR POS View Profile")
     begin
         if TempPOSViewProfile.FindSet() then
             repeat

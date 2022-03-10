@@ -124,7 +124,7 @@
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text000: Label 'Api Url OK';
 
-    procedure TestApi()
+    internal procedure TestApi()
     var
         Item: Record Item;
         MagentoInventoryNpXmlValue: Codeunit "NPR Magento Inv. NpXml Value";

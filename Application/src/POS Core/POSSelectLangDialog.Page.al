@@ -39,7 +39,7 @@
     var
         LanguageCode: Code[10];
 
-    procedure GetLanguageCode(): Code[10]
+    internal procedure GetLanguageCode(): Code[10]
     begin
         exit(LanguageCode);
     end;

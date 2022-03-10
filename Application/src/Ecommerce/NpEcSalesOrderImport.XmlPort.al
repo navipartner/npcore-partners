@@ -332,7 +332,7 @@ xmlport 6151300 "NPR NpEc Sales Order Import"
         LineNo: Integer;
         TempSalesLine9: Record "Sales Line" temporary;
 
-    procedure GetOrderNo(): Text
+    internal procedure GetOrderNo(): Text
     begin
         exit(order_no);
     end;

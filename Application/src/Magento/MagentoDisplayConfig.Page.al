@@ -156,7 +156,7 @@
         NumberFilter: Text[250];
         NumberFilterCtrlEnabled: Boolean;
 
-    procedure GetRecFilters()
+    internal procedure GetRecFilters()
     var
         TempTypeFilter: Text;
     begin
@@ -172,7 +172,7 @@
         end;
     end;
 
-    procedure SetRecFilters()
+    internal procedure SetRecFilters()
     begin
         NumberFilterCtrlEnabled := true;
 
@@ -193,7 +193,7 @@
         CurrPage.Update(false);
     end;
 
-    procedure GetCaption(): Text[250]
+    internal procedure GetCaption(): Text[250]
     var
         ObjTransl: Record "Object Translation";
         SourceTableName: Text[100];

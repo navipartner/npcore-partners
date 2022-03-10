@@ -54,17 +54,17 @@
         Username: Text;
         Password: Text;
 
-    procedure GetPassword(): Text
+    internal procedure GetPassword(): Text
     begin
         exit(Password);
     end;
 
-    procedure GetUsername(): Text
+    internal procedure GetUsername(): Text
     begin
         exit(Username);
     end;
 
-    procedure GetWSDLPath(): Text
+    internal procedure GetWSDLPath(): Text
     begin
         exit(Wsdl);
     end;

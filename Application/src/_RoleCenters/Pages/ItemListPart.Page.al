@@ -349,7 +349,7 @@
         [InDataSet]
         IsNonInventoriable: Boolean;
 
-    procedure SelectInItemList(var Item: Record Item): Text
+    internal procedure SelectInItemList(var Item: Record Item): Text
     var
         ItemListPage: Page "Item List";
     begin

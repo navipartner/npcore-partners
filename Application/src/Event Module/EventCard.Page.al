@@ -2168,7 +2168,7 @@
         end;
     end;
 
-    procedure GetArrayLen(Dimension: Integer): Integer
+    internal procedure GetArrayLen(Dimension: Integer): Integer
     begin
         exit(ArrayLen(AttributeValue, Dimension));
     end;

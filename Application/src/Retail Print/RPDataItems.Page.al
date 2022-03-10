@@ -150,7 +150,7 @@
         }
     }
 
-    procedure IndentLine()
+    internal procedure IndentLine()
     var
         DataItem: Record "NPR RP Data Items";
     begin
@@ -168,7 +168,7 @@
         //+NPR5.34 [284505]
     end;
 
-    procedure UnindentLine()
+    internal procedure UnindentLine()
     var
         DataItem: Record "NPR RP Data Items";
     begin
@@ -189,7 +189,7 @@
         //+NPR5.34 [284505]
     end;
 
-    procedure ShowItemDataLinks()
+    internal procedure ShowItemDataLinks()
     var
         DataItemLinks: Page "NPR RP Data Item Links";
         DataItemLink: Record "NPR RP Data Item Links";

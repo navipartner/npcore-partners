@@ -268,7 +268,7 @@
         exit(Script);
     end;
 
-    procedure ApproveItemAddOns(ItemAddOns: Text)
+    internal procedure ApproveItemAddOns(ItemAddOns: Text)
     begin
         Message(ItemAddOns);
         CurrPage.Close();
