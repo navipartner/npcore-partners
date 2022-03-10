@@ -294,7 +294,7 @@
         SetPaymentMethod(Element, SalesHeader);
 
         if Element.SelectSingleNode('.//currency_code', Node) then
-            SalesHeader."Currency Code" := copystr(Node.AsXmlElement().InnerText(), maxstrlen(SalesHeader."Currency Code"));
+            SalesHeader."Currency Code" := copystr(Node.AsXmlElement().InnerText(), 1, maxstrlen(SalesHeader."Currency Code"));
         SalesHeader.Validate("Currency Code", GetCurrencyCode(SalesHeader."Currency Code"));
         SalesHeader.Validate("Salesperson Code", NpEcStore."Salesperson/Purchaser Code");
         if NpEcStore."Global Dimension 1 Code" <> '' then
