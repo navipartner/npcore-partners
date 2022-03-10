@@ -58,12 +58,12 @@
                 ToolTip = 'Executes the Coupon Types action';
                 ApplicationArea = NPRRetail;
             }
-            action("E-mail Templates_top")
+            action("RP Template List")
             {
-                Caption = 'E-mail Templates';
-                RunObject = Page "NPR E-mail Templates";
+                Caption = 'RP Template List';
+                RunObject = Page "NPR RP Template List";
 
-                ToolTip = 'Executes the E-mail Templates action';
+                ToolTip = 'Executes the RP Template List';
                 ApplicationArea = NPRRetail;
             }
         }
