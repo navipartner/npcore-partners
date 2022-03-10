@@ -1,6 +1,7 @@
 ﻿codeunit 6150827 "NPR POS Action: Item Card"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This built in function opens the item card page for a selected sales line in the POS';
 
@@ -46,6 +47,7 @@
     local procedure OpenItemPage(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
+        POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         LinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
@@ -56,6 +58,7 @@
         POSSession.GetCurrentView(CurrentView);
 
         if (CurrentView.Type() = CurrentView.Type() ::Sale) then begin
+            POSSession.GetSale(POSSale);  //Ensure the sale still exists (haven't been seized and finished/cancelled by another session)
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(LinePOS);
             if LinePOS.Type = LinePOS.Type::Item then begin
