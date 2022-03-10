@@ -115,21 +115,8 @@
                         DrillDownSalesOrderList(Rec.FieldNo("Shipped Sales Orders"));
                     end;
                 }
-                field(SalesReturnOrders; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Sales Return Orders"))))
-                {
-                    Caption = 'Sales Return Orders';
-                    ToolTip = 'Specifies the value of the Sales Return Orders field';
-                    ApplicationArea = NPRRetail;
 
-                    trigger OnDrillDown()
-                    begin
-                        Page.RunModal(Page::"Sales Return Order List");
-                        CurrPage.Update(false);
-                    end;
-                }
             }
-
-
 
         }
     }
