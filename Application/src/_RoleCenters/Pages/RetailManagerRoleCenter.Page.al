@@ -820,6 +820,16 @@
                 ToolTip = 'Create Transfer Order.';
                 ApplicationArea = NPRRetail;
             }
+            action("&Purchase Quote")
+            {
+                Caption = '&Purchase Quote';
+                Image = PurchaseInvoice;
+                RunObject = page "Purchase Quote";
+                RunPageMode = Create;
+
+                ToolTip = 'Create Purchase Quote.';
+                ApplicationArea = NPRetail;
+            }
             action("&Purchase Order")
             {
                 Caption = '&Purchase Order';
