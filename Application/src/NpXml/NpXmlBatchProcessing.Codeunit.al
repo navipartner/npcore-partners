@@ -6,11 +6,21 @@
     trigger OnRun()
     var
         NpXmlTemplate: Record "NPR NpXml Template";
+        TotalProcessed: Integer;
+        TotalWithError: Integer;
+        NotCompletedBatchError: Label '%1 of %2 batches not completed!', Comment = '%1-uncompleted batches count, %2-all processing batches/xml templates';
     begin
         if FindNpXmlTemplate(Rec, NpXmlTemplate) then
             ProcessNpXmlBatch(NpXmlTemplate)
         else
             ProcessNpXmlBatches();
+
+        TempProcessedXmlTemplate.Reset();
+        TotalProcessed := TempProcessedXmlTemplate.Count;
+        TempProcessedXmlTemplate.SetFilter("Last Error Message", '<>%1', '');
+        TotalWithError := TempProcessedXmlTemplate.Count;
+        if TotalWithError > 0 then
+            Error(NotCompletedBatchError, TotalWithError, TotalProcessed);
     end;
 
     var
@@ -33,9 +43,12 @@
     begin
         if not Codeunit.run(Codeunit::"NPR NpXml Process Single Batch", NpXmlTemplate) then begin
             NpXmlTemplate."Runtime Error" := true;
-            NpXmlTemplate."Last Error Message" := CopyStr(GetLastErrorText, 1, MaxStrLen(NpXmlTemplate.Code));
+            NpXmlTemplate."Last Error Message" := CopyStr(GetLastErrorText, 1, MaxStrLen(NpXmlTemplate."Last Error Message"));
             NpXmlTemplate.Modify(true);
         end;
+        TempProcessedXmlTemplate := NpXmlTemplate;
+        TempProcessedXmlTemplate.Insert();
+
         Commit();
     end;
 
@@ -154,4 +167,7 @@
         JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
         JobQueueEntry.Insert(true);
     end;
+
+    var
+        TempProcessedXmlTemplate: Record "NPR NpXml Template" temporary;
 }
