@@ -1,9 +1,10 @@
 ﻿codeunit 6150724 "NPR POS Action - Change View"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'Changes the current view.';
-        RemainingLines: Label 'All lines could not be automatically deleted before selecting Login View. You need to cancel sales manually.';
+        CancelSaleLbl: Label 'There is an active sale. If you continue the sale will be automatically cancelled. Are you sure you want to continue?';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -26,7 +27,6 @@
             Sender."Subscriber Instances Allowed"::Single)
         then begin
             Sender.RegisterWorkflow(false);
-
             Sender.RegisterOptionParameter('ViewType', 'Login,Sale,Payment,Balance,Locked', '');
             Sender.RegisterTextParameter('ViewCode', '');
         end;
@@ -41,6 +41,7 @@
         ChangeView(Context, POSSession, FrontEnd);
 
         Handled := true;
+
     end;
 
     local procedure ChangeView(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -53,6 +54,10 @@
         ViewType: Option Login,Sale,Payment,Balance,Locked;
         CurrentView: Codeunit "NPR POS View";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSTryCancelSale: Codeunit "NPR POS Resume Sale Mgt.";
+        SalePOS: Record "NPR POS Sale";
+        POSSale: Codeunit "NPR POS Sale";
+
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
@@ -66,15 +71,21 @@
         case ViewType of
             ViewType::Login:
                 begin
-                    POSCreateEntry.InsertUnitLogoutEntry(POSUnit."No.", POSSetup.Salesperson());
 
                     if (CurrentView.Type() = CurrentView.Type() ::Sale) or (CurrentView.Type() = CurrentView.Type() ::Payment) then begin
                         POSSession.GetSaleLine(POSSaleLine);
 
                         // if there are lines to delete
                         if (POSSaleLine.RefreshCurrent()) then
-                            Error(RemainingLines)
+                            if not Confirm(CancelSaleLbl, true) then
+                                Error('');
+
+                        POSSession.GetSale(POSSale);
+                        POSSale.GetCurrentSale(SalePOS);
+                        POSTryCancelSale.DoCancelSale(SalePOS, POSSession);
                     end;
+
+                    POSCreateEntry.InsertUnitLogoutEntry(POSUnit."No.", POSSetup.Salesperson());
                     POSSession.StartPOSSession();
 
                 end;
