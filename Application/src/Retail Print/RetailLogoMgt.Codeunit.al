@@ -43,15 +43,15 @@
         InStr: InStream;
         ImageHelper: Codeunit "Image Helpers";
         OutStr: OutStream;
-#if BC20
-        Image: Codeunit Image;
-#else
+#if BC17 or BC18 or BC19 
         Base64Converter: Codeunit "Base64 Convert";
         DotNetImage: Codeunit DotNet_Image;
         DotNetImageFormat: Codeunit DotNet_ImageFormat;
         Width: Integer;
         Height: Integer;
         ImageHandler: Codeunit "Image Handler Management";
+#else
+        Image: Codeunit Image;
 #endif
     begin
         if not CtrlAddInInitialized then
@@ -62,12 +62,7 @@
 
         if not ImportLogo(TempBlob) then
             exit;
-#if BC20
-        Image.FromStream(InStr);
-        Image.SetFormat(Enum::"Image Format"::Bmp);
-        Image.Save(OutStr);
-        Base64Img := Image.ToBase64();
-#else
+#if BC17 or BC18 or BC19 
         ImageHandler.GetImageSize(InStr, Width, Height);
         Clear(DotNetImage);
         DotNetImage.FromStream(InStr);
@@ -75,6 +70,11 @@
         DotNetImageFormat.Bmp();
         DotNetImage.Save(OutStr, DotNetImageFormat);
         Base64Img := Base64Converter.ToBase64(InStr);
+#else
+        Image.FromStream(InStr);
+        Image.SetFormat(Enum::"Image Format"::Bmp);
+        Image.Save(OutStr);
+        Base64Img := Image.ToBase64();
 #endif
         Clear(InStr);
         TempBlob.CreateInStream(InStr);
