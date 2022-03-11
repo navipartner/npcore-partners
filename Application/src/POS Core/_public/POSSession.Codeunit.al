@@ -28,7 +28,9 @@
         _POSPageId: Guid;
         _Framework: Interface "NPR Framework Interface";
         _ACTION_STATE_ERROR: Label 'Action %1 has attempted to store an object into action state, which failed due to following error:\\%2';
+#if not CLOUD
         _Stargate: Codeunit "NPR POS Stargate Management";
+#endif
         TempSessionActions: Record "NPR POS Action" temporary;
 
     //#region Initialization
@@ -44,7 +46,9 @@
         _FrontEnd := FrontEndIn;
         _Framework := FrameworkIn;
         _Setup := SetupIn;
+#if not CLOUD
         Clear(_Stargate);
+#endif
         _Setup.Initialize();
         JavaScriptInterface.Initialize(FrontEndIn);
 
@@ -527,11 +531,13 @@
         DataStoreOut := _DataStore;
     end;
 
+#if not CLOUD
     [Obsolete('Remove when stargate is gone')]
     procedure GetStargate(var StargateOut: Codeunit "NPR POS Stargate Management")
     begin
         StargateOut := _Stargate;
     end;
+#endif
 
     [Obsolete('Remove when obsolete references are gone. Workflow v3 only supports nesting on frontend inside the javascript')]
     procedure IsInAction(): Boolean
