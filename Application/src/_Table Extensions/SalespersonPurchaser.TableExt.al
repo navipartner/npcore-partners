@@ -83,6 +83,16 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
         }
+        field(6014408; "NPR Reverse Sales Ticket"; Option)
+        {
+            Caption = 'Reverse Sales Ticket';
+            DataClassification = CustomerContent;
+            Description = 'NPR7.100.000';
+            OptionCaption = 'Yes,No';
+            OptionMembers = Yes,No;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Won''t be used anymore';
+        }
         field(6014410; "NPR Register Filter"; Code[10])
         {
             Caption = 'Register Filter';
@@ -127,6 +137,15 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             Caption = 'Maximum Cash Returnsale';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
+        }
+        field(6014421; "NPR Picture"; BLOB)
+        {
+            Caption = 'Picture';
+            DataClassification = CustomerContent;
+            Description = 'NPR5.26';
+            SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Standard field used instead.';
         }
         field(6014422; "NPR Supervisor POS"; Boolean)
         {
