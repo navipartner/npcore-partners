@@ -17,6 +17,11 @@ stages:
         # Then we will probably remove this requirement as it will alwyas TRUE.
         - Agent.OS -equals Windows_NT
         - Agent.OSVersion -equals 10.0.17763
+      containerDefinitions:
+        - Auto
+        - BC1804
+        - BC1905
+        - BC1905_CLOUD        
       analyzers: 'AppSourceCop,UICop,CodeCop'
       keyVaultCert:
         certPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
