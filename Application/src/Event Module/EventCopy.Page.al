@@ -383,10 +383,10 @@
             CopyJob.SetCopyOptions(CopyJobPrices, CopyQuantity, CopyDimensions, Source, PlanningLineType, LedgerEntryType);
             CopyJob.SetJobTaskRange(FromJobTaskNo, ToJobTaskNo);
             CopyJob.SetJobTaskDateRange(FromDate, ToDate);
-#if BC20
-            CopyJob.CopyJob(SourceJob, TargetJobNo, TargetJobDescription, '', TargetBillToCustomerNo);
-#else
+#if BC17 or BC18 or BC19 
             CopyJob.CopyJob(SourceJob, TargetJobNo, TargetJobDescription, TargetBillToCustomerNo);
+#else
+            CopyJob.CopyJob(SourceJob, TargetJobNo, TargetJobDescription, '', TargetBillToCustomerNo);
 #endif
             TargetJob.Get(TargetJobNo);
             TargetJob."Starting Date" := 0D;
