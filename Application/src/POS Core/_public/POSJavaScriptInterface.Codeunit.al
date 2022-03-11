@@ -369,6 +369,7 @@
         ActionName := JSON.GetStringOrFail('action', ReadingDeviceResponseErr);
         Step := JSON.GetStringOrFail('step', ReadingDeviceResponseErr);
 
+        POSSession.GetStargate(Stargate);
         if Success then
             Stargate.DeviceResponse(Method, Response, POSSession, FrontEnd, ActionName, Step)
         else
@@ -388,6 +389,7 @@
         Forced: Boolean;
         ReadingFromProtocolMethodErr: Label 'reading from Protocol method context';
     begin
+        POSSession.GetStargate(Stargate);
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         SerializedArguments := JSON.GetStringOrFail('arguments', ReadingFromProtocolMethodErr);
