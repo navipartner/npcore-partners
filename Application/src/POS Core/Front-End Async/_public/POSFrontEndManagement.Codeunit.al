@@ -725,9 +725,11 @@
         Stargate: Codeunit "NPR POS Stargate Management";
         DeviceRequest: Codeunit "NPR Front-End: InvokeDevice";
         Envelope: DotNet NPRNetRequestEnvelope0;
+        POSSession: Codeunit "NPR POS Session";
     begin
         MakeSureFrameworkIsAvailable(true);
 
+        POSSession.GetStargate(Stargate);
         Stargate.ResetRequestState(ActionName);
         Stargate.StoreRequest(Request, ActionName, Step);
 
@@ -743,12 +745,14 @@
         Stargate: Codeunit "NPR POS Stargate Management";
         DeviceRequest: Codeunit "NPR Front-End: InvokeDevice";
         Envelope: DotNet NPRNetRequestEnvelope0;
+        POSSession: Codeunit "NPR POS Session";
     begin
         // Do not invoke this function from action codeunits. This function is intended to be used only from Stargate infrastructure code.
 
         MakeSureFrameworkIsAvailable(true);
 
         if Repeating then begin
+            POSSession.GetStargate(Stargate);
             Stargate.StoreRequest(Request, ActionName, Step);
         end;
 
