@@ -18,7 +18,7 @@ tableextension 6014421 "NPR Resource" extends Resource
         }
         field(6060152; "NPR Qty. Planned (Job)"; Decimal)
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Flowfields should not be used on the TableExt.';
             Caption = 'Qty. Planned (Job)';
             Description = 'NPR5.40';

@@ -25,6 +25,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Credit Voucher"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Bitmap 2 Media"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Azure Functions Data"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Salesperson Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS Tax Free Data Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG FR Audit Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Payment Type POS Upgrade"));
@@ -120,6 +121,8 @@
                 exit('NPRBitmap2Media');
             Codeunit::"NPR UPG Azure Functions Data":
                 exit('NPR_UPG_Azure_Functions_Data');
+            Codeunit::"NPR Salesperson Upgrade":
+                exit('NPRSalespersonUpgrade-20210414-01');
             Codeunit::"NPR POS Tax Free Data Upgrade":
                 exit('NPR_POS_Tax_Free_Data_Upgrade');
             Codeunit::"NPR UPG FR Audit Setup":

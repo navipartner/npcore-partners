@@ -41,6 +41,7 @@
         UpgradeRPTemplateMediaInfo();
         UpgradeNpRvArchVoucher();
         UpgradeNpRvVoucher();
+        UpgradeResponsibilityCenter();
     end;
 
     local procedure UpgradeAFArgsSpireBarcode()
@@ -293,6 +294,35 @@
                     MigrationRec2.CalcFields(Barcode);
                     MigrationRec2.Barcode.CreateInStream(InStr);
                     WithError := IsNullGuid(MigrationRec2."Barcode Image".ImportStream(InStr, MigrationRec2.FieldName("Barcode Image")));
+                    if not WithError then begin
+                        DataLogMgt.DisableDataLog(true);
+                        MigrationRec2.Modify();
+                        DataLogMgt.DisableDataLog(false);
+                    end else
+                        LogMessageStopwatch.SetError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
+                    Clear(InStr);
+                end;
+            until MigrationRec.Next() = 0;
+    end;
+
+    local procedure UpgradeResponsibilityCenter()
+    var
+        MigrationRec: Record "Responsibility Center";
+        MigrationRec2: Record "Responsibility Center";
+        InStr: InStream;
+        WithError: Boolean;
+    begin
+        if MigrationRec.IsEmpty() then
+            exit;
+
+        MigrationRec.SetLoadFields(SystemId, "NPR Picture");
+        if MigrationRec.FindSet() then
+            repeat
+                MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                if MigrationRec2."NPR Picture".HasValue() then begin
+                    MigrationRec2.CalcFields("NPR Picture");
+                    MigrationRec2."NPR Picture".CreateInStream(InStr);
+                    WithError := IsNullGuid(MigrationRec2."NPR Image".ImportStream(InStr, MigrationRec2.FieldName("NPR Image")));
                     if not WithError then begin
                         DataLogMgt.DisableDataLog(true);
                         MigrationRec2.Modify();
