@@ -36,6 +36,7 @@
             Seating.SetFilter("Seating Location", SeatingLocationFilter);
         SeatingList.SetTableView(Seating);
         SeatingList.LookupMode := true;
+        SeatingList.SetCalledFromPOSAction(true);
         if SeatingList.RunModal() = ACTION::LookupOK then begin
             SeatingList.GetRecord(Seating);
             SeatingCode := Seating.Code;
