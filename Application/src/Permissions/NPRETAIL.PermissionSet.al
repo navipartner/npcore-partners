@@ -83,12 +83,15 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR Distribution Map Ev. Su." = X,
          codeunit "NPR Distribution Mgmt" = X,
          codeunit "NPR Document Send. Profile Sub" = X,
+#if not CLOUD
          codeunit "NPR DotNet Assembly Resolver" = X,
+#endif
          codeunit "NPR E-mail Doc. Mgt." = X,
          codeunit "NPR E-mail Management" = X,
          codeunit "NPR E-mail NaviDocs Mgt.Wrap." = X,
          codeunit "NPR E-mail Retail Mgt." = X,
          codeunit "NPR E-mail Templ. Mgt." = X,
+#if not CLOUD
          codeunit "NPR EFT Adyen Abort Unfin. Trx" = X,
          codeunit "NPR EFT Adyen Backgnd. Resp." = X,
          codeunit "NPR EFT Adyen Bgd. Lookup Req." = X,
@@ -130,6 +133,7 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR EFT Verifone Vim Integ." = X,
          codeunit "NPR EFT Verifone Vim Prot." = X,
          codeunit "NPR EFT VerifoneVim Resp.Parse" = X,
+#endif
          codeunit "NPR Email Sending Handler" = X,
 #if BC18
          codeunit "NPR Enable Item Ref. Install" = X,
@@ -316,7 +320,9 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR Magento Setup Mgt." = X,
          codeunit "NPR Magento Webservice" = X,
          codeunit "NPR Mail Task Status" = X,
+#if not CLOUD
          codeunit "NPR Managed Dependency Mgt." = X,
+#endif
          codeunit "NPR Managed Package Builder" = X,
          codeunit "NPR Managed Package Mgt." = X,
          codeunit "NPR Mandrill Trans. Email Mgt" = X,
@@ -337,7 +343,9 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR MM Loy. Point Mgr (Client)" = X,
          codeunit "NPR MM Loy. Point Mgr (Server)" = X,
          codeunit "NPR MM Loy. Point PSP (Client)" = X,
+#if not CLOUD
          codeunit "NPR MM Loy. Point UI (Client)" = X,
+#endif
          codeunit "NPR MM Loyalty Coupon Mgr" = X,
          codeunit "NPR MM Loyalty Point Mgt." = X,
          codeunit "NPR MM Loyalty WebService" = X,
@@ -366,11 +374,12 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR MM Request Member Upd Mgr" = X,
          codeunit "NPR MM Smart Search" = X,
          codeunit "NPR MM Sponsorship Ticket Mgt" = X,
+#if not CLOUD
          codeunit "NPR Mobile Print Mgt." = X,
          codeunit "NPR MobilePayV10 Auth" = X,
-         codeunit "NPR MobilePayV10 Call Thrtl." = X,
          codeunit "NPR MobilePayV10 Can. Refund" = X,
          codeunit "NPR MobilePayV10 Can.Payment" = X,
+         codeunit "NPR MobilePayV10 Call Thrtl." = X,
          codeunit "NPR MobilePayV10 CancelDead" = X,
          codeunit "NPR MobilePayV10 Capt. Payment" = X,
          codeunit "NPR MobilePayV10 Capt. Refund" = X,
@@ -397,6 +406,7 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR MobilePayV10 Start Refund" = X,
          codeunit "NPR MobilePayV10 Token" = X,
          codeunit "NPR MobilePayV10 Upgrade" = X,
+#endif
          codeunit "NPR MPOS Admission API" = X,
          codeunit "NPR MPOS Helper Functions" = X,
          codeunit "NPR MPOS Report handler" = X,
@@ -565,6 +575,7 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR Payment Type POS Upgrade" = X,
          codeunit "NPR Pckge Table Name Modifier" = X,
          codeunit "NPR PDF2NAV Subscribers" = X,
+#if not CLOUD
          codeunit "NPR Pepper Aux Func. TSD" = X,
          codeunit "NPR Pepper Begin Workshift TSD" = X,
          codeunit "NPR Pepper Config. Mgt." = X,
@@ -574,11 +585,14 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR Pepper Term. Captions TSD" = X,
          codeunit "NPR Pepper Terminal Captions" = X,
          codeunit "NPR Pepper Transaction TSD" = X,
+#endif
          codeunit "NPR Period Discount Management" = X,
          codeunit "NPR Phone Lookup" = X,
          codeunit "NPR Popup Menu Action" = X,
          codeunit "NPR POS Action - Change View" = X,
+#if not CLOUD
          codeunit "NPR POS Action - CK Mgt." = X,
+#endif
          codeunit "NPR POS Action - Discount" = X,
          codeunit "NPR POS Action - Hyperlink" = X,
          codeunit "NPR POS Action - Insert Comm." = X,
@@ -721,7 +735,9 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR POS Normal Tax Forward" = X,
          codeunit "NPR POS Package Handler" = X,
          codeunit "NPR POS Paym. View Event Mgt." = X,
+#if not CLOUD
          codeunit "NPR POS Paym.Bin Eject: OPOS" = X,
+#endif
          codeunit "NPR POS Paym.Bin Eject: Templ." = X,
          codeunit "NPR POS Payment Bin Checkpoint" = X,
          codeunit "NPR POS Payment Bin Eject Mgt." = X,
@@ -735,8 +751,10 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR POS Prepayment Mgt." = X,
          codeunit "NPR POS PreSearch Method" = X,
          codeunit "NPR POS Proxy - Display" = X,
+#if not CLOUD
          codeunit "NPR POS Proxy: File Print" = X,
          codeunit "NPR POS Proxy: Raw Print" = X,
+#endif
          codeunit "NPR POS Refresh Workflows" = X,
          codeunit "NPR POS Resume Sale Mgt." = X,
          codeunit "NPR POS Rounding" = X,
@@ -758,7 +776,9 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR POS Session Finalizer" = X,
          codeunit "NPR POS Setup" = X,
          codeunit "NPR POS Setup Safety Check" = X,
+#if not CLOUD
          codeunit "NPR POS Stargate Management" = X,
+#endif
          codeunit "NPR POS Tax Free Data Upgrade" = X,
          codeunit "NPR POS Try Resume&CancelSale" = X,
          codeunit "NPR POS UI Management" = X,
@@ -785,7 +805,9 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR POSMethod: Set Dragonglass" = X,
          codeunit "NPR Pre-map Incoming Purch Doc" = X,
          codeunit "NPR Premap Incom. Item Lines" = X,
+#if not CLOUD
          codeunit "NPR Print Method Mgt." = X,
+#endif
          codeunit "NPR Print To Display" = X,
          codeunit "NPR PrintNode API Mgt." = X,
          codeunit "NPR PrintNode Mgt." = X,
@@ -867,7 +889,9 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR Shipmondo Mgnt." = X,
          codeunit "NPR Smart Search" = X,
          codeunit "NPR SMS Management" = X,
+#if not CLOUD
          codeunit "NPR SS Action - Adyen Unatt." = X,
+#endif
          codeunit "NPR SS Action - Item AddOn" = X,
          codeunit "NPR SS Action - Qty Decrease" = X,
          codeunit "NPR SS Action - Qty Increase" = X,
@@ -983,7 +1007,9 @@ permissionset 6014400 "NPR NP RETAIL"
          codeunit "NPR Workflow Action" = X,
          codeunit "NPR Workflow Caption Buffer" = X,
          codeunit "NPR Workflow Step" = X,
+#if not CLOUD
          page "NPR .NET Assemblies" = X,
+#endif
          page "NPR Acc. Payables Act" = X,
          page "NPR Accessory List" = X,
          page "NPR Accessory List - Register" = X,
@@ -1098,7 +1124,9 @@ permissionset 6014400 "NPR NP RETAIL"
          page "NPR DE POS Audit Log Aux. Info" = X,
          page "NPR DE POS Unit Aux. Info List" = X,
          page "NPR Debit sale info" = X,
+#if not CLOUD
          page "NPR Dependency Mgt. Setup" = X,
+#endif
          page "NPR Dim. Select.Mul.w.Filter" = X,
          page "NPR Discount Activities" = X,
          page "NPR Discount FactBox" = X,
@@ -1136,6 +1164,7 @@ permissionset 6014400 "NPR NP RETAIL"
          page "NPR E-mail Txt Editor Dlg" = X,
          page "NPR Ean Box Setup Step" = X,
          page "NPR Ean Box Setups Select" = X,
+#if not CLOUD
          page "NPR EFT Adyen Paym. Type Setup" = X,
          page "NPR EFT Auxiliary Operations" = X,
          page "NPR EFT BIN Group Card" = X,
@@ -1172,6 +1201,7 @@ permissionset 6014400 "NPR NP RETAIL"
          page "NPR EFT Verifone Unit Param." = X,
          page "NPR EFTType POSUnit BLOB Param" = X,
          page "NPR EFTType POSUnit Gen.Param." = X,
+#endif
          page "NPR Endpoint Card" = X,
          page "NPR Endpoint Filters" = X,
          page "NPR Endpoint List" = X,
@@ -1445,7 +1475,9 @@ permissionset 6014400 "NPR NP RETAIL"
          page "NPR MobilePayV10 Payment Setup" = X,
          page "NPR MobilePayV10 POS" = X,
          page "NPR MobilePayV10 Stores" = X,
+#if not CLOUD
          page "NPR MobilePayV10 Unit Setup" = X,
+#endif
          page "NPR MPOS EOD Receipts" = X,
          page "NPR MPOS QR Code FactBox" = X,
          page "NPR MPOS QR Code List" = X,
@@ -1788,8 +1820,10 @@ permissionset 6014400 "NPR NP RETAIL"
          page "NPR POS Security Profile" = X,
          page "NPR POS Security Profiles" = X,
          page "NPR POS Select Lang. Dialog" = X,
+#if not CLOUD
          page "NPR POS Stargate Packages" = X,
          page "NPR POS Stargate Pckg Method" = X,
+#endif
          page "NPR POS Store Card" = X,
          page "NPR POS Store List" = X,
          page "NPR POS Store List Step" = X,
@@ -2346,7 +2380,9 @@ permissionset 6014400 "NPR NP RETAIL"
          table "NPR DE Audit Setup" = X,
          table "NPR DE POS Audit Log Aux. Info" = X,
          table "NPR DE POS Unit Aux. Info" = X,
+#if not CLOUD
          table "NPR Dependency Mgt. Setup" = X,
+#endif
          table "NPR Description Control" = X,
          table "NPR Discount Cue" = X,
          table "NPR Discount Priority" = X,
@@ -2363,7 +2399,9 @@ permissionset 6014400 "NPR NP RETAIL"
          table "NPR Doc. Exch. Cue" = X,
          table "NPR Doc. Exch. Setup" = X,
          table "NPR Doc. Exchange Path" = X,
+#if not CLOUD
          table "NPR DotNet Assembly" = X,
+#endif
          table "NPR DropBox API Setup" = X,
          table "NPR DropBox Overview" = X,
          table "NPR DSFINVK Closing" = X,
@@ -2381,6 +2419,7 @@ permissionset 6014400 "NPR NP RETAIL"
          table "NPR Ean Box Setup" = X,
          table "NPR Ean Box Setup Event" = X,
          table "NPR EAN Prefix per Country" = X,
+#if not CLOUD
          table "NPR EFT Adyen Paym. Type Setup" = X,
          table "NPR EFT Aux Operation" = X,
          table "NPR EFT BIN Group" = X,
@@ -2411,6 +2450,7 @@ permissionset 6014400 "NPR NP RETAIL"
          table "NPR EFTType Paym. BLOB Param." = X,
          table "NPR EFTType POSUnit BLOBParam." = X,
          table "NPR EFTType POSUnit Gen.Param." = X,
+#endif
          table "NPR Embedded Video Buffer" = X,
          table "NPR Endpoint" = X,
          table "NPR Endpoint Filter" = X,
@@ -2621,7 +2661,9 @@ permissionset 6014400 "NPR NP RETAIL"
          table "NPR MobilePayV10 POS" = X,
          table "NPR MobilePayV10 Refund" = X,
          table "NPR MobilePayV10 Store" = X,
+#if not CLOUD
          table "NPR MobilePayV10 Unit Setup" = X,
+#endif
          table "NPR MPOS Adyen Transactions" = X,
          table "NPR MPOS App Setup" = X,
          table "NPR MPOS EOD Recipts" = X,
@@ -2889,9 +2931,11 @@ permissionset 6014400 "NPR NP RETAIL"
          table "NPR POS Secure Method" = X,
          table "NPR POS Security Profile" = X,
          table "NPR POS Setup" = X,
+#if not CLOUD
          table "NPR POS Stargate Assem. Map" = X,
          table "NPR POS Stargate Package" = X,
          table "NPR POS Stargate Pckg. Method" = X,
+#endif
          table "NPR POS Store" = X,
          table "NPR POS Theme" = X,
          table "NPR POS Theme Dependency" = X,
@@ -3227,7 +3271,9 @@ permissionset 6014400 "NPR NP RETAIL"
          tabledata "NPR DE Audit Setup" = RIMD,
          tabledata "NPR DE POS Audit Log Aux. Info" = RIMD,
          tabledata "NPR DE POS Unit Aux. Info" = RIMD,
+#if not CLOUD
          tabledata "NPR Dependency Mgt. Setup" = RIMD,
+#endif
          tabledata "NPR Description Control" = RIMD,
          tabledata "NPR Discount Cue" = RIMD,
          tabledata "NPR Discount Priority" = RIMD,
@@ -3244,7 +3290,9 @@ permissionset 6014400 "NPR NP RETAIL"
          tabledata "NPR Doc. Exch. Cue" = RIMD,
          tabledata "NPR Doc. Exch. Setup" = RIMD,
          tabledata "NPR Doc. Exchange Path" = RIMD,
+#if not CLOUD
          tabledata "NPR DotNet Assembly" = RIMD,
+#endif
          tabledata "NPR DropBox API Setup" = RIMD,
          tabledata "NPR DropBox Overview" = RIMD,
          tabledata "NPR DSFINVK Closing" = RIMD,
@@ -3262,6 +3310,7 @@ permissionset 6014400 "NPR NP RETAIL"
          tabledata "NPR Ean Box Setup" = RIMD,
          tabledata "NPR Ean Box Setup Event" = RIMD,
          tabledata "NPR EAN Prefix per Country" = RIMD,
+#if not CLOUD
          tabledata "NPR EFT Adyen Paym. Type Setup" = RIMD,
          tabledata "NPR EFT Aux Operation" = RIMD,
          tabledata "NPR EFT BIN Group" = RIMD,
@@ -3292,6 +3341,7 @@ permissionset 6014400 "NPR NP RETAIL"
          tabledata "NPR EFTType Paym. BLOB Param." = RIMD,
          tabledata "NPR EFTType POSUnit BLOBParam." = RIMD,
          tabledata "NPR EFTType POSUnit Gen.Param." = RIMD,
+#endif
          tabledata "NPR Embedded Video Buffer" = RIMD,
          tabledata "NPR Endpoint" = RIMD,
          tabledata "NPR Endpoint Filter" = RIMD,
@@ -3502,7 +3552,9 @@ permissionset 6014400 "NPR NP RETAIL"
          tabledata "NPR MobilePayV10 POS" = RIMD,
          tabledata "NPR MobilePayV10 Refund" = RIMD,
          tabledata "NPR MobilePayV10 Store" = RIMD,
+#if not CLOUD
          tabledata "NPR MobilePayV10 Unit Setup" = RIMD,
+#endif
          tabledata "NPR MPOS Adyen Transactions" = RIMD,
          tabledata "NPR MPOS App Setup" = RIMD,
          tabledata "NPR MPOS EOD Recipts" = RIMD,
@@ -3770,9 +3822,11 @@ permissionset 6014400 "NPR NP RETAIL"
          tabledata "NPR POS Secure Method" = RIMD,
          tabledata "NPR POS Security Profile" = RIMD,
          tabledata "NPR POS Setup" = RIMD,
+#if not CLOUD
          tabledata "NPR POS Stargate Assem. Map" = RIMD,
          tabledata "NPR POS Stargate Package" = RIMD,
          tabledata "NPR POS Stargate Pckg. Method" = RIMD,
+#endif
          tabledata "NPR POS Store" = RIMD,
          tabledata "NPR POS Theme" = RIMD,
          tabledata "NPR POS Theme Dependency" = RIMD,
