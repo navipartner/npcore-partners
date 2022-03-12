@@ -120,6 +120,7 @@
     internal procedure LoadMatrixRecords(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; CrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
         VRT1: Record "NPR Variety Value";
         VRT2: Record "NPR Variety Value";
         VRT3: Record "NPR Variety Value";
@@ -141,6 +142,7 @@
         TMPVRTBuffer.DeleteAll();
 
         Item.Get(ItemNo);
+        Item.NPR_GetAuxItem(AuxItem);
         case CrossVRTNo of
             CrossVRTNo::VRT1:
                 begin
@@ -148,13 +150,13 @@
                     TempVRT1.Table := '';
                     TempVRT1.Insert();
 
-                    if Item."NPR Variety 2" = '' then begin
+                    if AuxItem."Variety 2" = '' then begin
                         TempVRT2.Type := '';
                         TempVRT2.Table := '';
                         TempVRT2.Insert();
                     end else begin
-                        VRT2.SetRange(Type, Item."NPR Variety 2");
-                        VRT2.SetRange(Table, Item."NPR Variety 2 Table");
+                        VRT2.SetRange(Type, AuxItem."Variety 2");
+                        VRT2.SetRange(Table, AuxItem."Variety 2 Table");
                         if VRT2.FindSet() then
                             repeat
                                 TempVRT2 := VRT2;
@@ -162,13 +164,13 @@
                             until VRT2.Next() = 0;
                     end;
 
-                    if Item."NPR Variety 3" = '' then begin
+                    if AuxItem."Variety 3" = '' then begin
                         TempVRT3.Type := '';
                         TempVRT3.Table := '';
                         TempVRT3.Insert();
                     end else begin
-                        VRT3.SetRange(Type, Item."NPR Variety 3");
-                        VRT3.SetRange(Table, Item."NPR Variety 3 Table");
+                        VRT3.SetRange(Type, AuxItem."Variety 3");
+                        VRT3.SetRange(Table, AuxItem."Variety 3 Table");
                         if VRT3.FindSet() then
                             repeat
                                 TempVRT3 := VRT3;
@@ -176,13 +178,13 @@
                             until VRT3.Next() = 0;
                     end;
 
-                    if Item."NPR Variety 4" = '' then begin
+                    if AuxItem."Variety 4" = '' then begin
                         TempVRT4.Type := '';
                         TempVRT4.Table := '';
                         TempVRT4.Insert();
                     end else begin
-                        VRT4.SetRange(Type, Item."NPR Variety 4");
-                        VRT4.SetRange(Table, Item."NPR Variety 4 Table");
+                        VRT4.SetRange(Type, AuxItem."Variety 4");
+                        VRT4.SetRange(Table, AuxItem."Variety 4 Table");
                         if VRT4.FindSet() then
                             repeat
                                 TempVRT4 := VRT4;
@@ -192,13 +194,13 @@
                 end;
             CrossVRTNo::VRT2:
                 begin
-                    if Item."NPR Variety 1" = '' then begin
+                    if AuxItem."Variety 1" = '' then begin
                         TempVRT1.Type := '';
                         TempVRT1.Table := '';
                         TempVRT1.Insert();
                     end else begin
-                        VRT1.SetRange(Type, Item."NPR Variety 1");
-                        VRT1.SetRange(Table, Item."NPR Variety 1 Table");
+                        VRT1.SetRange(Type, AuxItem."Variety 1");
+                        VRT1.SetRange(Table, AuxItem."Variety 1 Table");
                         if VRT1.FindSet() then
                             repeat
                                 TempVRT1 := VRT1;
@@ -210,13 +212,13 @@
                     TempVRT2.Table := '';
                     TempVRT2.Insert();
 
-                    if Item."NPR Variety 3" = '' then begin
+                    if AuxItem."Variety 3" = '' then begin
                         TempVRT3.Type := '';
                         TempVRT3.Table := '';
                         TempVRT3.Insert();
                     end else begin
-                        VRT3.SetRange(Type, Item."NPR Variety 3");
-                        VRT3.SetRange(Table, Item."NPR Variety 3 Table");
+                        VRT3.SetRange(Type, AuxItem."Variety 3");
+                        VRT3.SetRange(Table, AuxItem."Variety 3 Table");
                         if VRT3.FindSet() then
                             repeat
                                 TempVRT3 := VRT3;
@@ -224,13 +226,13 @@
                             until VRT3.Next() = 0;
                     end;
 
-                    if Item."NPR Variety 4" = '' then begin
+                    if AuxItem."Variety 4" = '' then begin
                         TempVRT4.Type := '';
                         TempVRT4.Table := '';
                         TempVRT4.Insert();
                     end else begin
-                        VRT4.SetRange(Type, Item."NPR Variety 4");
-                        VRT4.SetRange(Table, Item."NPR Variety 4 Table");
+                        VRT4.SetRange(Type, AuxItem."Variety 4");
+                        VRT4.SetRange(Table, AuxItem."Variety 4 Table");
                         if VRT4.FindSet() then
                             repeat
                                 TempVRT4 := VRT4;
@@ -240,13 +242,13 @@
                 end;
             CrossVRTNo::VRT3:
                 begin
-                    if Item."NPR Variety 1" = '' then begin
+                    if AuxItem."Variety 1" = '' then begin
                         TempVRT1.Type := '';
                         TempVRT1.Table := '';
                         TempVRT1.Insert();
                     end else begin
-                        VRT1.SetRange(Type, Item."NPR Variety 1");
-                        VRT1.SetRange(Table, Item."NPR Variety 1 Table");
+                        VRT1.SetRange(Type, AuxItem."Variety 1");
+                        VRT1.SetRange(Table, AuxItem."Variety 1 Table");
                         if VRT1.FindSet() then
                             repeat
                                 TempVRT1 := VRT1;
@@ -254,13 +256,13 @@
                             until VRT1.Next() = 0;
                     end;
 
-                    if Item."NPR Variety 2" = '' then begin
+                    if AuxItem."Variety 2" = '' then begin
                         TempVRT2.Type := '';
                         TempVRT2.Table := '';
                         TempVRT2.Insert();
                     end else begin
-                        VRT2.SetRange(Type, Item."NPR Variety 2");
-                        VRT2.SetRange(Table, Item."NPR Variety 2 Table");
+                        VRT2.SetRange(Type, AuxItem."Variety 2");
+                        VRT2.SetRange(Table, AuxItem."Variety 2 Table");
                         if VRT2.FindSet() then
                             repeat
                                 TempVRT2 := VRT2;
@@ -272,13 +274,13 @@
                     TempVRT3.Table := '';
                     TempVRT3.Insert();
 
-                    if Item."NPR Variety 4" = '' then begin
+                    if AuxItem."Variety 4" = '' then begin
                         TempVRT4.Type := '';
                         TempVRT4.Table := '';
                         TempVRT4.Insert();
                     end else begin
-                        VRT4.SetRange(Type, Item."NPR Variety 4");
-                        VRT4.SetRange(Table, Item."NPR Variety 4 Table");
+                        VRT4.SetRange(Type, AuxItem."Variety 4");
+                        VRT4.SetRange(Table, AuxItem."Variety 4 Table");
                         if VRT4.FindSet() then
                             repeat
                                 TempVRT4 := VRT4;
@@ -288,13 +290,13 @@
                 end;
             CrossVRTNo::VRT4:
                 begin
-                    if Item."NPR Variety 1" = '' then begin
+                    if AuxItem."Variety 1" = '' then begin
                         TempVRT1.Type := '';
                         TempVRT1.Table := '';
                         TempVRT1.Insert();
                     end else begin
-                        VRT1.SetRange(Type, Item."NPR Variety 1");
-                        VRT1.SetRange(Table, Item."NPR Variety 1 Table");
+                        VRT1.SetRange(Type, AuxItem."Variety 1");
+                        VRT1.SetRange(Table, AuxItem."Variety 1 Table");
                         if VRT1.FindSet() then
                             repeat
                                 TempVRT1 := VRT1;
@@ -302,13 +304,13 @@
                             until VRT1.Next() = 0;
                     end;
 
-                    if Item."NPR Variety 2" = '' then begin
+                    if AuxItem."Variety 2" = '' then begin
                         TempVRT2.Type := '';
                         TempVRT2.Table := '';
                         TempVRT2.Insert();
                     end else begin
-                        VRT2.SetRange(Type, Item."NPR Variety 2");
-                        VRT2.SetRange(Table, Item."NPR Variety 2 Table");
+                        VRT2.SetRange(Type, AuxItem."Variety 2");
+                        VRT2.SetRange(Table, AuxItem."Variety 2 Table");
                         if VRT2.FindSet() then
                             repeat
                                 TempVRT2 := VRT2;
@@ -316,13 +318,13 @@
                             until VRT2.Next() = 0;
                     end;
 
-                    if Item."NPR Variety 3" = '' then begin
+                    if AuxItem."Variety 3" = '' then begin
                         TempVRT3.Type := '';
                         TempVRT3.Table := '';
                         TempVRT3.Insert();
                     end else begin
-                        VRT3.SetRange(Type, Item."NPR Variety 3");
-                        VRT3.SetRange(Table, Item."NPR Variety 3 Table");
+                        VRT3.SetRange(Type, AuxItem."Variety 3");
+                        VRT3.SetRange(Table, AuxItem."Variety 3 Table");
                         if VRT3.FindSet() then
                             repeat
                                 TempVRT3 := VRT3;
@@ -390,6 +392,7 @@
     internal procedure LoadAll(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; SetRecordID2ItemVar: Boolean; MasterRecordID: RecordID)
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
         VRT1: Record "NPR Variety Value";
         VRT2: Record "NPR Variety Value";
         VRT3: Record "NPR Variety Value";
@@ -406,13 +409,14 @@
         TMPVRTBuffer.DeleteAll();
 
         Item.Get(ItemNo);
-        if Item."NPR Variety 1" = '' then begin
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Variety 1" = '' then begin
             TempVRT1.Type := '';
             TempVRT1.Table := '';
             TempVRT1.Insert();
         end else begin
-            VRT1.SetRange(Type, Item."NPR Variety 1");
-            VRT1.SetRange(Table, Item."NPR Variety 1 Table");
+            VRT1.SetRange(Type, AuxItem."Variety 1");
+            VRT1.SetRange(Table, AuxItem."Variety 1 Table");
             if VRT1.FindSet() then
                 repeat
                     TempVRT1 := VRT1;
@@ -420,13 +424,13 @@
                 until VRT1.Next() = 0;
         end;
 
-        if Item."NPR Variety 2" = '' then begin
+        if AuxItem."Variety 2" = '' then begin
             TempVRT2.Type := '';
             TempVRT2.Table := '';
             TempVRT2.Insert();
         end else begin
-            VRT2.SetRange(Type, Item."NPR Variety 2");
-            VRT2.SetRange(Table, Item."NPR Variety 2 Table");
+            VRT2.SetRange(Type, AuxItem."Variety 2");
+            VRT2.SetRange(Table, AuxItem."Variety 2 Table");
             if VRT2.FindSet() then
                 repeat
                     TempVRT2 := VRT2;
@@ -434,13 +438,13 @@
                 until VRT2.Next() = 0;
         end;
 
-        if Item."NPR Variety 3" = '' then begin
+        if AuxItem."Variety 3" = '' then begin
             TempVRT3.Type := '';
             TempVRT3.Table := '';
             TempVRT3.Insert();
         end else begin
-            VRT3.SetRange(Type, Item."NPR Variety 3");
-            VRT3.SetRange(Table, Item."NPR Variety 3 Table");
+            VRT3.SetRange(Type, AuxItem."Variety 3");
+            VRT3.SetRange(Table, AuxItem."Variety 3 Table");
             if VRT3.FindSet() then
                 repeat
                     TempVRT3 := VRT3;
@@ -448,13 +452,13 @@
                 until VRT3.Next() = 0;
         end;
 
-        if Item."NPR Variety 4" = '' then begin
+        if AuxItem."Variety 4" = '' then begin
             TempVRT4.Type := '';
             TempVRT4.Table := '';
             TempVRT4.Insert();
         end else begin
-            VRT4.SetRange(Type, Item."NPR Variety 4");
-            VRT4.SetRange(Table, Item."NPR Variety 4 Table");
+            VRT4.SetRange(Type, AuxItem."Variety 4");
+            VRT4.SetRange(Table, AuxItem."Variety 4 Table");
             if VRT4.FindSet() then
                 repeat
                     TempVRT4 := VRT4;
@@ -531,6 +535,7 @@
     procedure LoadCombinations(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; SetRecordID2ItemVar: Boolean; MasterRecordID: RecordID; HideInactive: Boolean)
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
         TempVRT1: Record "NPR Variety Value" temporary;
         TempVRT2: Record "NPR Variety Value" temporary;
         TempVRT3: Record "NPR Variety Value" temporary;
@@ -556,10 +561,10 @@
             LoadUsedValuesVRT3(Item, TempVRT3);
             LoadUsedValuesVRT4(Item, TempVRT4);
         end else begin
-            InsertAllValuesInTmpTable(Item."NPR Variety 1", Item."NPR Variety 1 Table", TempVRT1);
-            InsertAllValuesInTmpTable(Item."NPR Variety 2", Item."NPR Variety 2 Table", TempVRT2);
-            InsertAllValuesInTmpTable(Item."NPR Variety 3", Item."NPR Variety 3 Table", TempVRT3);
-            InsertAllValuesInTmpTable(Item."NPR Variety 4", Item."NPR Variety 4 Table", TempVRT4);
+            InsertAllValuesInTmpTable(AuxItem."Variety 1", AuxItem."Variety 1 Table", TempVRT1);
+            InsertAllValuesInTmpTable(AuxItem."Variety 2", AuxItem."Variety 2 Table", TempVRT2);
+            InsertAllValuesInTmpTable(AuxItem."Variety 3", AuxItem."Variety 3 Table", TempVRT3);
+            InsertAllValuesInTmpTable(AuxItem."Variety 4", AuxItem."Variety 4 Table", TempVRT4);
         end;
 
         TempVRT1.SetCurrentKey(Type, Table, "Sort Order");
@@ -650,6 +655,7 @@
 
     local procedure LoadAllRows(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item; CrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     var
+        AuxItem: Record "NPR Aux Item";
         TempVRT1: Record "NPR Variety Value" temporary;
         TempVRT2: Record "NPR Variety Value" temporary;
         TempVRT3: Record "NPR Variety Value" temporary;
@@ -659,11 +665,12 @@
         VRT3Desc: Text[30];
         VRT4Desc: Text[30];
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         //-NPR5.36 [285733]
-        LoadTmpValue(TempVRT1, Item."NPR Variety 1", Item."NPR Variety 1 Table", CrossVRTNo = CrossVRTNo::VRT1);
-        LoadTmpValue(TempVRT2, Item."NPR Variety 2", Item."NPR Variety 2 Table", CrossVRTNo = CrossVRTNo::VRT2);
-        LoadTmpValue(TempVRT3, Item."NPR Variety 3", Item."NPR Variety 3 Table", CrossVRTNo = CrossVRTNo::VRT3);
-        LoadTmpValue(TempVRT4, Item."NPR Variety 4", Item."NPR Variety 4 Table", CrossVRTNo = CrossVRTNo::VRT4);
+        LoadTmpValue(TempVRT1, AuxItem."Variety 1", AuxItem."Variety 1 Table", CrossVRTNo = CrossVRTNo::VRT1);
+        LoadTmpValue(TempVRT2, AuxItem."Variety 2", AuxItem."Variety 2 Table", CrossVRTNo = CrossVRTNo::VRT2);
+        LoadTmpValue(TempVRT3, AuxItem."Variety 3", AuxItem."Variety 3 Table", CrossVRTNo = CrossVRTNo::VRT3);
+        LoadTmpValue(TempVRT4, AuxItem."Variety 4", AuxItem."Variety 4 Table", CrossVRTNo = CrossVRTNo::VRT4);
 
         TempVRT1.SetCurrentKey(Type, Table, "Sort Order");
         TempVRT2.SetCurrentKey(Type, Table, "Sort Order");
@@ -719,16 +726,18 @@
 
     local procedure LoadUsedRowsCrossVRT1(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
     var
+        AuxItem: Record "NPR Aux Item";
         GetRowsCrossVariety1: Query "NPR Get Rows - Cross Variety 1";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         //-NPR5.36 [285733]
         GetRowsCrossVariety1.SetRange(Item_No, Item."No.");
-        GetRowsCrossVariety1.SetRange(Variety_2, Item."NPR Variety 2");
-        GetRowsCrossVariety1.SetRange(Variety_2_Table, Item."NPR Variety 2 Table");
-        GetRowsCrossVariety1.SetRange(Variety_3, Item."NPR Variety 3");
-        GetRowsCrossVariety1.SetRange(Variety_3_Table, Item."NPR Variety 3 Table");
-        GetRowsCrossVariety1.SetRange(Variety_4, Item."NPR Variety 4");
-        GetRowsCrossVariety1.SetRange(Variety_4_Table, Item."NPR Variety 4 Table");
+        GetRowsCrossVariety1.SetRange(Variety_2, AuxItem."Variety 2");
+        GetRowsCrossVariety1.SetRange(Variety_2_Table, AuxItem."Variety 2 Table");
+        GetRowsCrossVariety1.SetRange(Variety_3, AuxItem."Variety 3");
+        GetRowsCrossVariety1.SetRange(Variety_3_Table, AuxItem."Variety 3 Table");
+        GetRowsCrossVariety1.SetRange(Variety_4, AuxItem."Variety 4");
+        GetRowsCrossVariety1.SetRange(Variety_4_Table, AuxItem."Variety 4 Table");
         GetRowsCrossVariety1.Open();
 
         while GetRowsCrossVariety1.Read() do begin
@@ -748,16 +757,18 @@
 
     local procedure LoadUsedRowsCrossVRT2(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
     var
+        AuxItem: Record "NPR Aux Item";
         GetRowsCrossVariety2: Query "NPR Get Rows - Cross Variety 2";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         //-NPR5.36 [285733]
         GetRowsCrossVariety2.SetRange(Item_No, Item."No.");
-        GetRowsCrossVariety2.SetRange(Variety_1, Item."NPR Variety 1");
-        GetRowsCrossVariety2.SetRange(Variety_1_Table, Item."NPR Variety 1 Table");
-        GetRowsCrossVariety2.SetRange(Variety_3, Item."NPR Variety 3");
-        GetRowsCrossVariety2.SetRange(Variety_3_Table, Item."NPR Variety 3 Table");
-        GetRowsCrossVariety2.SetRange(Variety_4, Item."NPR Variety 4");
-        GetRowsCrossVariety2.SetRange(Variety_4_Table, Item."NPR Variety 4 Table");
+        GetRowsCrossVariety2.SetRange(Variety_1, AuxItem."Variety 1");
+        GetRowsCrossVariety2.SetRange(Variety_1_Table, AuxItem."Variety 1 Table");
+        GetRowsCrossVariety2.SetRange(Variety_3, AuxItem."Variety 3");
+        GetRowsCrossVariety2.SetRange(Variety_3_Table, AuxItem."Variety 3 Table");
+        GetRowsCrossVariety2.SetRange(Variety_4, AuxItem."Variety 4");
+        GetRowsCrossVariety2.SetRange(Variety_4_Table, AuxItem."Variety 4 Table");
 
         GetRowsCrossVariety2.Open();
 
@@ -778,16 +789,18 @@
 
     local procedure LoadUsedRowsCrossVRT3(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
     var
+        AuxItem: Record "NPR Aux Item";
         GetRowsCrossVariety3: Query "NPR Get Rows - Cross Variety 3";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         //-NPR5.36 [285733]
         GetRowsCrossVariety3.SetRange(Item_No, Item."No.");
-        GetRowsCrossVariety3.SetRange(Variety_1, Item."NPR Variety 1");
-        GetRowsCrossVariety3.SetRange(Variety_1_Table, Item."NPR Variety 1 Table");
-        GetRowsCrossVariety3.SetRange(Variety_2, Item."NPR Variety 2");
-        GetRowsCrossVariety3.SetRange(Variety_2_Table, Item."NPR Variety 2 Table");
-        GetRowsCrossVariety3.SetRange(Variety_4, Item."NPR Variety 4");
-        GetRowsCrossVariety3.SetRange(Variety_4_Table, Item."NPR Variety 4 Table");
+        GetRowsCrossVariety3.SetRange(Variety_1, AuxItem."Variety 1");
+        GetRowsCrossVariety3.SetRange(Variety_1_Table, AuxItem."Variety 1 Table");
+        GetRowsCrossVariety3.SetRange(Variety_2, AuxItem."Variety 2");
+        GetRowsCrossVariety3.SetRange(Variety_2_Table, AuxItem."Variety 2 Table");
+        GetRowsCrossVariety3.SetRange(Variety_4, AuxItem."Variety 4");
+        GetRowsCrossVariety3.SetRange(Variety_4_Table, AuxItem."Variety 4 Table");
 
         GetRowsCrossVariety3.Open();
 
@@ -808,16 +821,18 @@
 
     local procedure LoadUsedRowsCrossVRT4(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
     var
+        AuxItem: Record "NPR Aux Item";
         GetRowsCrossVariety4: Query "NPR Get Rows - Cross Variety 4";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         //-NPR5.36 [285733]
         GetRowsCrossVariety4.SetRange(Item_No, Item."No.");
-        GetRowsCrossVariety4.SetRange(Variety_1, Item."NPR Variety 1");
-        GetRowsCrossVariety4.SetRange(Variety_1_Table, Item."NPR Variety 1 Table");
-        GetRowsCrossVariety4.SetRange(Variety_2, Item."NPR Variety 2");
-        GetRowsCrossVariety4.SetRange(Variety_2_Table, Item."NPR Variety 2 Table");
-        GetRowsCrossVariety4.SetRange(Variety_3, Item."NPR Variety 3");
-        GetRowsCrossVariety4.SetRange(Variety_3_Table, Item."NPR Variety 3 Table");
+        GetRowsCrossVariety4.SetRange(Variety_1, AuxItem."Variety 1");
+        GetRowsCrossVariety4.SetRange(Variety_1_Table, AuxItem."Variety 1 Table");
+        GetRowsCrossVariety4.SetRange(Variety_2, AuxItem."Variety 2");
+        GetRowsCrossVariety4.SetRange(Variety_2_Table, AuxItem."Variety 2 Table");
+        GetRowsCrossVariety4.SetRange(Variety_3, AuxItem."Variety 3");
+        GetRowsCrossVariety4.SetRange(Variety_3_Table, AuxItem."Variety 3 Table");
 
         GetRowsCrossVariety4.Open();
 
@@ -860,11 +875,13 @@
 
     local procedure LoadUsedValuesVRT1(Item: Record Item; var TMPVRTValue: Record "NPR Variety Value" temporary)
     var
+        AuxItem: Record "NPR Aux Item";
         Variety1UsedValues: Query "NPR Variety 1 Used Values";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         Variety1UsedValues.SetRange(Item_No, Item."No.");
-        Variety1UsedValues.SetRange(Variety_1, Item."NPR Variety 1");
-        Variety1UsedValues.SetRange(Variety_1_Table, Item."NPR Variety 1 Table");
+        Variety1UsedValues.SetRange(Variety_1, AuxItem."Variety 1");
+        Variety1UsedValues.SetRange(Variety_1_Table, AuxItem."Variety 1 Table");
         Variety1UsedValues.Open();
 
         while Variety1UsedValues.Read() do begin
@@ -878,11 +895,13 @@
 
     local procedure LoadUsedValuesVRT2(Item: Record Item; var TMPVRTValue: Record "NPR Variety Value" temporary)
     var
+        AuxItem: Record "NPR Aux Item";
         Variety2UsedValues: Query "NPR Variety 2 Used Values";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         Variety2UsedValues.SetRange(Item_No, Item."No.");
-        Variety2UsedValues.SetRange(Variety_2, Item."NPR Variety 2");
-        Variety2UsedValues.SetRange(Variety_2_Table, Item."NPR Variety 2 Table");
+        Variety2UsedValues.SetRange(Variety_2, AuxItem."Variety 2");
+        Variety2UsedValues.SetRange(Variety_2_Table, AuxItem."Variety 2 Table");
         Variety2UsedValues.Open();
 
         while Variety2UsedValues.Read() do begin
@@ -896,11 +915,13 @@
 
     local procedure LoadUsedValuesVRT3(Item: Record Item; var TMPVRTValue: Record "NPR Variety Value" temporary)
     var
+        AuxItem: Record "NPR Aux Item";
         Variety3UsedValues: Query "NPR Variety 3 Used Values";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         Variety3UsedValues.SetRange(Item_No, Item."No.");
-        Variety3UsedValues.SetRange(Variety_3, Item."NPR Variety 3");
-        Variety3UsedValues.SetRange(Variety_3_Table, Item."NPR Variety 3 Table");
+        Variety3UsedValues.SetRange(Variety_3, AuxItem."Variety 3");
+        Variety3UsedValues.SetRange(Variety_3_Table, AuxItem."Variety 3 Table");
         Variety3UsedValues.Open();
 
         while Variety3UsedValues.Read() do begin
@@ -914,11 +935,13 @@
 
     local procedure LoadUsedValuesVRT4(Item: Record Item; var TMPVRTValue: Record "NPR Variety Value" temporary)
     var
+        AuxItem: Record "NPR Aux Item";
         Variety4UsedValues: Query "NPR Variety 4 Used Values";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         Variety4UsedValues.SetRange(Item_No, Item."No.");
-        Variety4UsedValues.SetRange(Variety_4, Item."NPR Variety 4");
-        Variety4UsedValues.SetRange(Variety_4_Table, Item."NPR Variety 4 Table");
+        Variety4UsedValues.SetRange(Variety_4, AuxItem."Variety 4");
+        Variety4UsedValues.SetRange(Variety_4_Table, AuxItem."Variety 4 Table");
 
         Variety4UsedValues.Open();
 

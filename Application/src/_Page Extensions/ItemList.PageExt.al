@@ -81,7 +81,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
         addafter("Price/Profit Calculation")
         {
-            field("NPR Ticket Type"; Rec."NPR Ticket Type")
+            field("NPR Ticket Type"; AuxItem."TM Ticket Type")
             {
 
                 ToolTip = 'Specifies the ticket type.';
@@ -98,7 +98,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 ApplicationArea = NPRRetail;
             }
 
-            field("NPR Item Status"; Rec."NPR Item Status")
+            field("NPR Item Status"; AuxItem."Item Status")
             {
 
                 ToolTip = 'Specifies if the item is active or not as a Magento Item.';
@@ -472,6 +472,11 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         TableView := Rec.GetView(false);
     end;
 
+    trigger OnAfterGetCurrRecord()
+    begin
+        Rec.NPR_GetAuxItem(AuxItem);
+    end;
+
     internal procedure NPR_SetMagentoEnabled()
     var
         MagentoSetup: Record "NPR Magento Setup";
@@ -512,6 +517,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
     var
         ItemAvlByLocation: Decimal;
+        AuxItem: Record "NPR Aux Item";
         ItemFilter: Record Item;
         MagentoEnabled: Boolean;
         MagentoEnabledDisplayConfig: Boolean;

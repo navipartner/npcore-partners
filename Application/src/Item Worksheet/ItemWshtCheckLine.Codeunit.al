@@ -1,6 +1,7 @@
 ﻿codeunit 6060045 "NPR Item Wsht.-Check Line"
 {
     Access = Internal;
+
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
@@ -38,6 +39,7 @@
     procedure RunCheck(ItemWkshtLine: Record "NPR Item Worksheet Line"; StopOnError: Boolean; CalledFromRegister: Boolean)
     var
         RecItem: Record Item;
+        RecAuxItem: Record "NPR Aux Item";
         ItemCategory: Record "Item Category";
         NoSeries: Record "No. Series";
         ItemWorksheetVariantLineToCreate: Record "NPR Item Worksh. Variant Line";
@@ -122,21 +124,22 @@
                         if ItemWkshtLine.Description = '' then
                             ProcessError(ItemWkshtLine, StrSubstNo(Text113), StopOnError);
                     if RecItem.Get(ItemWkshtLine."Existing Item No.") then begin
-                        if ItemWkshtLine."Variety 1" <> RecItem."NPR Variety 1" then
+                        RecItem.NPR_GetAuxItem(RecAuxItem);
+                        if ItemWkshtLine."Variety 1" <> RecAuxItem."Variety 1" then
                             ProcessError(ItemWkshtLine, StrSubstNo(Text124, 1), StopOnError);
-                        if ItemWkshtLine."Variety 2" <> RecItem."NPR Variety 2" then
+                        if ItemWkshtLine."Variety 2" <> RecAuxItem."Variety 2" then
                             ProcessError(ItemWkshtLine, StrSubstNo(Text124, 1), StopOnError);
-                        if ItemWkshtLine."Variety 3" <> RecItem."NPR Variety 3" then
+                        if ItemWkshtLine."Variety 3" <> RecAuxItem."Variety 3" then
                             ProcessError(ItemWkshtLine, StrSubstNo(Text124, 1), StopOnError);
-                        if ItemWkshtLine."Variety 4" <> RecItem."NPR Variety 4" then
+                        if ItemWkshtLine."Variety 4" <> RecAuxItem."Variety 4" then
                             ProcessError(ItemWkshtLine, StrSubstNo(Text124, 1), StopOnError);
-                        if ItemWkshtLine."Variety 1 Table (Base)" <> RecItem."NPR Variety 1 Table" then
+                        if ItemWkshtLine."Variety 1 Table (Base)" <> RecAuxItem."Variety 1 Table" then
                             ProcessError(ItemWkshtLine, StrSubstNo(Text125, 1), StopOnError);
-                        if ItemWkshtLine."Variety 2 Table (Base)" <> RecItem."NPR Variety 2 Table" then
+                        if ItemWkshtLine."Variety 2 Table (Base)" <> RecAuxItem."Variety 2 Table" then
                             ProcessError(ItemWkshtLine, StrSubstNo(Text125, 1), StopOnError);
-                        if ItemWkshtLine."Variety 3 Table (Base)" <> RecItem."NPR Variety 3 Table" then
+                        if ItemWkshtLine."Variety 3 Table (Base)" <> RecAuxItem."Variety 3 Table" then
                             ProcessError(ItemWkshtLine, StrSubstNo(Text125, 1), StopOnError);
-                        if ItemWkshtLine."Variety 4 Table (Base)" <> RecItem."NPR Variety 4 Table" then
+                        if ItemWkshtLine."Variety 4 Table (Base)" <> RecAuxItem."Variety 4 Table" then
                             ProcessError(ItemWkshtLine, StrSubstNo(Text125, 1), StopOnError);
                         if ItemWkshtLine."Create Copy of Variety 1 Table" or
                            ItemWkshtLine."Create Copy of Variety 2 Table" or

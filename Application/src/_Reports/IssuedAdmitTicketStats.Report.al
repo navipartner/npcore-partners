@@ -1,8 +1,8 @@
 ﻿report 6014422 "NPR Issued/Admit. Ticket Stats"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     RDLCLayout = './src/_Reports/layouts/IssuedAdmitted Ticket Stats.rdlc';
     Caption = 'Issued/Admitted Ticket Statistics';
     PreviewMode = PrintLayout;
@@ -47,168 +47,171 @@
             column(AdmissionCode; AdmissionCodeFilter)
             {
             }
-            dataitem(Item; Item)
+            dataitem(AuxItem; "NPR Aux Item")
             {
-                DataItemLink = "NPR Ticket Type" = FIELD(Code);
-                DataItemTableView = SORTING("No.");
-                RequestFilterFields = "No.";
-                column(No_Item; "No.")
+                DataItemLink = "TM Ticket Type" = FIELD(Code);
+                dataitem(Item; Item)
                 {
-                }
-                column(Description_Item; Description)
-                {
-                }
-                column(VariantCode; VariantCode)
-                {
-                }
-                dataitem(CalcTicketAmount; "Integer")
-                {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
-                    column(TotalIssuedTicketPerItem; TotalIssuedTicketPerItem)
+                    DataItemLink = "No." = FIELD("Item No.");
+                    RequestFilterFields = "No.";
+                    column(No_Item; "No.")
                     {
                     }
-                    column(TotalAdmittedTicketPerItem; TotalAdmittedTicketPerItem)
+                    column(Description_Item; Description)
                     {
                     }
-                    column(TicketTypeAvailable; TicketTypeAvailable)
+                    column(VariantCode; VariantCode)
                     {
+                    }
+                    dataitem(CalcTicketAmount; "Integer")
+                    {
+                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        column(TotalIssuedTicketPerItem; TotalIssuedTicketPerItem)
+                        {
+                        }
+                        column(TotalAdmittedTicketPerItem; TotalAdmittedTicketPerItem)
+                        {
+                        }
+                        column(TicketTypeAvailable; TicketTypeAvailable)
+                        {
+                        }
+
+                        trigger OnAfterGetRecord()
+                        var
+                            TMTicket: Record "NPR TM Ticket";
+                            TMTicketAccessStatistics: Record "NPR TM Ticket Access Stats";
+                            AdmittedTicket: Decimal;
+                            IssuedTicket: Decimal;
+                        begin
+                            TMTicket.SetRange(Blocked, false);
+                            TMTicket.SetRange("Item No.", Item."No.");
+                            TMTicketAccessStatistics.SetRange("Item No.", Item."No.");
+
+                            if (StartDate <> 0D) and (EndDate <> 0D) then begin
+                                TMTicket.SetFilter("Valid From Date", '%1..%2', InitialStartDate, EndDate);
+                                TMTicketAccessStatistics.SetFilter("Admission Date", '%1..%2', StartDate, EndDate);
+                            end;
+
+                            if EndDate = 0D then begin
+                                TMTicket.SetFilter("Valid From Date", '%1..%2', InitialStartDate, StartDate);
+                                TMTicketAccessStatistics.SetFilter("Admission Date", '%1', StartDate);
+                            end;
+
+                            if CustomerFilter <> '' then
+                                TMTicket.SetFilter("Customer No.", CustomerFilter);
+                            if AdmissionCode <> '' then
+                                TMTicketAccessStatistics.SetFilter("Admission Code", '%1', AdmissionCode);
+                            if TMTicket.FindSet() then
+                                repeat
+                                    Clear(IssuedTicket);
+                                    if TMTicket."Valid From Date" in [StartDate .. EndDate] then
+                                        GetIssuedTicket(TMTicket, IssuedTicket);
+                                    TotalIssuedTicketPerItem += IssuedTicket;
+                                    Clear(AdmittedTicket);
+                                    GetAdmittedTicket(TMTicket, AdmittedTicket);
+                                    TotalAdmittedTicketPerItem += AdmittedTicket;
+                                until TMTicket.Next() = 0;
+
+                            if SkipLineWithZero then
+                                if (IssuedTicket = 0) and (AdmittedTicket = 0) then
+                                    CurrReport.Skip();
+                            TicketTypeAvailable := true;
+
+                            TotalIssuedTicketType += TotalIssuedTicketPerItem;
+                            TotalAdmittedTicketType += TotalAdmittedTicketPerItem;
+                        end;
+                    }
+                    dataitem("TM Ticket Access Statistics"; "NPR TM Ticket Access Stats")
+                    {
+                        DataItemTableView = SORTING("Entry No.");
+                        column(Variant; "TM Ticket Access Statistics"."Variant Code" + '  ' + VariantDesc)
+                        {
+                        }
+                        column(TotalIssuedTicketPerVariant; TotalIssuedTicketPervariant)
+                        {
+                        }
+                        column(TotalAdmittedTicketPerVariant; TotalAdmittedTicketPerVariant)
+                        {
+                        }
+
+                        trigger OnAfterGetRecord()
+                        var
+                            TMTicket: Record "NPR TM Ticket";
+                            TMTicketAccessStatistics: Record "NPR TM Ticket Access Stats";
+                            AdmittedTicket: Decimal;
+                            IssuedTicket: Decimal;
+                        begin
+                            TMTicket.SetRange(Blocked, false);
+                            TMTicket.SetRange("Item No.", Item."No.");
+                            TMTicketAccessStatistics.SetRange("Item No.", Item."No.");
+                            TotalIssuedTicketPervariant := 0;
+                            TotalAdmittedTicketPerVariant := 0;
+                            Clear(VariantDesc);
+                            if "Variant Code" <> '' then begin
+                                if Itemvariant.Get("TM Ticket Access Statistics"."Item No.", "TM Ticket Access Statistics"."Variant Code") then
+                                    VariantDesc := Itemvariant.Description
+                            end;
+                            TMTicket.SetRange("Variant Code", "TM Ticket Access Statistics"."Variant Code");
+
+                            if (StartDate <> 0D) and (EndDate <> 0D) then begin
+                                TMTicket.SetFilter("Valid From Date", '%1..%2', StartDate, EndDate);
+                                TMTicketAccessStatistics.SetFilter("Admission Date", '%1..%2', StartDate, EndDate);
+                            end;
+
+                            if EndDate = 0D then begin
+                                TMTicket.SetFilter("Valid From Date", '%1', StartDate);
+                                TMTicketAccessStatistics.SetFilter("Admission Date", '%1', StartDate);
+                            end;
+                            if AdmissionCode <> '' then
+                                TMTicketAccessStatistics.SetFilter("Admission Code", '%1', AdmissionCode);
+                            if CustomerFilter <> '' then
+                                TMTicket.SetFilter("Customer No.", CustomerFilter);
+                            if TMTicket.FindSet() then
+                                repeat
+                                    Clear(IssuedTicket);
+                                    Clear(AdmittedTicket);
+                                    GetIssuedTicketVariant(TMTicket, IssuedTicket);
+                                    TotalIssuedTicketPervariant += IssuedTicket;
+                                    GetAdmittedTicketVariant(TMTicket, AdmittedTicket);
+                                    TotalAdmittedTicketPerVariant += AdmittedTicket;
+                                until TMTicket.Next() = 0;
+
+                            if SkipLineWithZero then
+                                if (IssuedTicket = 0) and (AdmittedTicket = 0) then
+                                    CurrReport.Skip();
+                            TicketTypeAvailable := true;
+                        end;
+
+                        trigger OnPreDataItem()
+                        begin
+                            "TM Ticket Access Statistics".SetRange("Item No.", Item."No.");
+                            "TM Ticket Access Statistics".SetFilter("Admission Date", '%1..%2', StartDate, EndDate);
+                            "TM Ticket Access Statistics".SetFilter("Variant Code", '<>%1', '');
+                            if AdmissionCode <> '' then
+                                "TM Ticket Access Statistics".SetFilter("Admission Code", '%1', AdmissionCode);
+                            Clear(VariantDesc);
+                        end;
                     }
 
                     trigger OnAfterGetRecord()
-                    var
-                        TMTicket: Record "NPR TM Ticket";
-                        TMTicketAccessStatistics: Record "NPR TM Ticket Access Stats";
-                        AdmittedTicket: Decimal;
-                        IssuedTicket: Decimal;
                     begin
-                        TMTicket.SetRange(Blocked, false);
-                        TMTicket.SetRange("Item No.", Item."No.");
-                        TMTicketAccessStatistics.SetRange("Item No.", Item."No.");
-
-                        if (StartDate <> 0D) and (EndDate <> 0D) then begin
-                            TMTicket.SetFilter("Valid From Date", '%1..%2', InitialStartDate, EndDate);
-                            TMTicketAccessStatistics.SetFilter("Admission Date", '%1..%2', StartDate, EndDate);
-                        end;
-
-                        if EndDate = 0D then begin
-                            TMTicket.SetFilter("Valid From Date", '%1..%2', InitialStartDate, StartDate);
-                            TMTicketAccessStatistics.SetFilter("Admission Date", '%1', StartDate);
-                        end;
-
-                        if CustomerFilter <> '' then
-                            TMTicket.SetFilter("Customer No.", CustomerFilter);
-                        if AdmissionCode <> '' then
-                            TMTicketAccessStatistics.SetFilter("Admission Code", '%1', AdmissionCode);
-                        if TMTicket.FindSet() then
-                            repeat
-                                Clear(IssuedTicket);
-                                if TMTicket."Valid From Date" in [StartDate .. EndDate] then
-                                    GetIssuedTicket(TMTicket, IssuedTicket);
-                                TotalIssuedTicketPerItem += IssuedTicket;
-                                Clear(AdmittedTicket);
-                                GetAdmittedTicket(TMTicket, AdmittedTicket);
-                                TotalAdmittedTicketPerItem += AdmittedTicket;
-                            until TMTicket.Next() = 0;
-
-                        if SkipLineWithZero then
-                            if (IssuedTicket = 0) and (AdmittedTicket = 0) then
-                                CurrReport.Skip();
-                        TicketTypeAvailable := true;
-
-                        TotalIssuedTicketType += TotalIssuedTicketPerItem;
-                        TotalAdmittedTicketType += TotalAdmittedTicketPerItem;
-                    end;
-                }
-                dataitem("TM Ticket Access Statistics"; "NPR TM Ticket Access Stats")
-                {
-                    DataItemTableView = SORTING("Entry No.");
-                    column(Variant; "TM Ticket Access Statistics"."Variant Code" + '  ' + VariantDesc)
-                    {
-                    }
-                    column(TotalIssuedTicketPerVariant; TotalIssuedTicketPervariant)
-                    {
-                    }
-                    column(TotalAdmittedTicketPerVariant; TotalAdmittedTicketPerVariant)
-                    {
-                    }
-
-                    trigger OnAfterGetRecord()
-                    var
-                        TMTicket: Record "NPR TM Ticket";
-                        TMTicketAccessStatistics: Record "NPR TM Ticket Access Stats";
-                        AdmittedTicket: Decimal;
-                        IssuedTicket: Decimal;
-                    begin
-                        TMTicket.SetRange(Blocked, false);
-                        TMTicket.SetRange("Item No.", Item."No.");
-                        TMTicketAccessStatistics.SetRange("Item No.", Item."No.");
-                        TotalIssuedTicketPervariant := 0;
-                        TotalAdmittedTicketPerVariant := 0;
-                        Clear(VariantDesc);
-                        if "Variant Code" <> '' then begin
-                            if Itemvariant.Get("TM Ticket Access Statistics"."Item No.", "TM Ticket Access Statistics"."Variant Code") then
-                                VariantDesc := Itemvariant.Description
-                        end;
-                        TMTicket.SetRange("Variant Code", "TM Ticket Access Statistics"."Variant Code");
-
-                        if (StartDate <> 0D) and (EndDate <> 0D) then begin
-                            TMTicket.SetFilter("Valid From Date", '%1..%2', StartDate, EndDate);
-                            TMTicketAccessStatistics.SetFilter("Admission Date", '%1..%2', StartDate, EndDate);
-                        end;
-
-                        if EndDate = 0D then begin
-                            TMTicket.SetFilter("Valid From Date", '%1', StartDate);
-                            TMTicketAccessStatistics.SetFilter("Admission Date", '%1', StartDate);
-                        end;
-                        if AdmissionCode <> '' then
-                            TMTicketAccessStatistics.SetFilter("Admission Code", '%1', AdmissionCode);
-                        if CustomerFilter <> '' then
-                            TMTicket.SetFilter("Customer No.", CustomerFilter);
-                        if TMTicket.FindSet() then
-                            repeat
-                                Clear(IssuedTicket);
-                                Clear(AdmittedTicket);
-                                GetIssuedTicketVariant(TMTicket, IssuedTicket);
-                                TotalIssuedTicketPervariant += IssuedTicket;
-                                GetAdmittedTicketVariant(TMTicket, AdmittedTicket);
-                                TotalAdmittedTicketPerVariant += AdmittedTicket;
-                            until TMTicket.Next() = 0;
-
-                        if SkipLineWithZero then
-                            if (IssuedTicket = 0) and (AdmittedTicket = 0) then
-                                CurrReport.Skip();
-                        TicketTypeAvailable := true;
+                        Clear(TotalIssuedTicketPerItem);
+                        Clear(TotalAdmittedTicketPerItem);
                     end;
 
                     trigger OnPreDataItem()
                     begin
-                        "TM Ticket Access Statistics".SetRange("Item No.", Item."No.");
-                        "TM Ticket Access Statistics".SetFilter("Admission Date", '%1..%2', StartDate, EndDate);
-                        "TM Ticket Access Statistics".SetFilter("Variant Code", '<>%1', '');
-                        if AdmissionCode <> '' then
-                            "TM Ticket Access Statistics".SetFilter("Admission Code", '%1', AdmissionCode);
-                        Clear(VariantDesc);
+                        Clear(VariantCode);
                     end;
                 }
-
-                trigger OnAfterGetRecord()
-                begin
-                    Clear(TotalIssuedTicketPerItem);
-                    Clear(TotalAdmittedTicketPerItem);
-                end;
-
-                trigger OnPreDataItem()
-                begin
-                    Clear(VariantCode);
-                end;
             }
 
             trigger OnAfterGetRecord()
             var
-                ItemCheck: Record Item;
+                AuxItem: Record "NPR Aux Item";
             begin
-                ItemCheck.SetRange("NPR Ticket Type", Code);
-                if not ItemCheck.FindFirst() then
+                AuxItem.SetRange("TM Ticket Type", Code);
+                if not AuxItem.FindFirst() then
                     CurrReport.Skip();
 
                 Clear(TicketTypeAvailable);

@@ -1,6 +1,7 @@
 ﻿codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
 {
     Access = Internal;
+
     var
         ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
         TICKET_NUMBER: Label 'Ticket Number';
@@ -1358,15 +1359,17 @@
     var
         TicketType: Record "NPR TM Ticket Type";
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
     begin
 
         if (not Item.Get(SaleLinePOS."No.")) then
             exit(false);
 
-        if (Item."NPR Ticket Type" = '') then
+        Item.NPR_GetAuxItem(AuxItem);
+        if (AuxItem."TM Ticket Type" = '') then
             exit(false);
 
-        if (not TicketType.Get(Item."NPR Ticket Type")) then
+        if (not TicketType.Get(AuxItem."TM Ticket Type")) then
             exit(false);
 
         exit(true);

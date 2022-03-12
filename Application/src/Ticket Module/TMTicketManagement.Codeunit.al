@@ -1,6 +1,7 @@
 ﻿codeunit 6059784 "NPR TM Ticket Management"
 {
     Access = Internal;
+
     var
         Text6059776: Label 'This value must be an integer between 1 and 4.';
 
@@ -720,6 +721,7 @@
     var
         AdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        AuxItem: Record "NPR Aux Item";
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         Admission: Record "NPR TM Admission";
@@ -731,7 +733,8 @@
         AdmissionBOM.FindSet();
         repeat
             Item.Get(Ticket."Item No.");
-            TicketType.Get(Item."NPR Ticket Type");
+            Item.NPR_GetAuxItem(AuxItem);
+            TicketType.Get(AuxItem."TM Ticket Type");
             Admission.Get(AdmissionBOM."Admission Code");
             TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
             TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
@@ -2116,6 +2119,7 @@
     var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
+        AuxItem: Record "NPR Aux Item";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
         MaxCapacity: Integer;
@@ -2135,7 +2139,8 @@
         // Should this time slot be listed? 
         ActivateOnSales := false;
         if (Item.Get(TicketItemNo)) then begin
-            if (TicketType.Get(Item."NPR Ticket Type")) then begin
+            Item.NPR_GetAuxItem(AuxItem);
+            if (TicketType.Get(AuxItem."TM Ticket Type")) then begin
                 if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
                     DurationFormula := TicketBOM."Duration Formula";
                     ActivateOnSales := (TicketBOM."Activation Method" = TicketBOM."Activation Method"::POS);

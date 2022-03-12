@@ -6,7 +6,7 @@ pageextension 6014408 "NPR Purch.Return Order Subform" extends "Purchase Return 
         {
             trigger OnAfterValidate()
             var
-                Item: Record Item;
+                ItemVariant: Record "Item Variant";
                 NPRVarietySetup: Record "NPR Variety Setup";
                 VRTWrapper: Codeunit "NPR Variety Wrapper";
             begin
@@ -14,9 +14,9 @@ pageextension 6014408 "NPR Purch.Return Order Subform" extends "Purchase Return 
                     exit;
                 if not NPRVarietySetup."Pop up Variety Matrix" then
                     exit;
-                if (Rec.Type = Rec.Type::Item) and Item.Get(Rec."No.") then begin
-                    Item.CalcFields("NPR Has Variants");
-                    if Item."NPR Has Variants" then
+                if Rec.Type = Rec.Type::Item then begin
+                    ItemVariant.SetRange("Item No.", Rec."No.");
+                    if not ItemVariant.IsEmpty() then
                         VRTWrapper.PurchLineShowVariety(Rec, 0);
                 end;
             end;

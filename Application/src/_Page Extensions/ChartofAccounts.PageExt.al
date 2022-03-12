@@ -14,7 +14,8 @@ pageextension 6014421 "NPR Chart of Accounts" extends "Chart of Accounts"
                 trigger OnValidate()
                 begin
                     NPRAuxGLAccount.Validate("Retail Payment");
-                    AuxTablesMgt.NPRSetGLAccAdditionalFields(NPRAuxGLAccount);
+                    Rec.NPRSetGLAccAdditionalFields(NPRAuxGLAccount);
+                    Rec.NPRSaveGLAccAdditionalFields();
                 end;
             }
         }
@@ -22,12 +23,10 @@ pageextension 6014421 "NPR Chart of Accounts" extends "Chart of Accounts"
 
     var
         NPRAuxGLAccount: Record "NPR Aux. G/L Account";
-        AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
-
 
     trigger OnAfterGetRecord()
     begin
-        AuxTablesMgt.NPRGetGLAccAdditionalFields(NPRAuxGLAccount, Rec."No.");
+        Rec.NPRGetGLAccAdditionalFields(NPRAuxGLAccount);
     end;
 }
 

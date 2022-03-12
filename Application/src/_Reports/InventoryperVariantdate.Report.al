@@ -78,7 +78,7 @@
         }
         dataitem(Item; Item)
         {
-            CalcFields = "Net Change", "NPR Has Variants";
+            CalcFields = "Net Change";
             DataItemTableView = SORTING("No.");
             RequestFilterFields = "No.", "Vendor No.", "Item Category Code", "NPR Group sale", "Location Filter", "Date Filter";
             column(ShowLocation; ShowLocation)
@@ -210,7 +210,7 @@
                         if not ShowBlankLocation then
                             Item1.SetFilter("Location Filter", '<>%1', '');
                     END;
-                    Item1.CalcFields("NPR Has Variants", "Net Change");
+                    Item1.CalcFields("Net Change");
                     if Varermedbeholdning then begin
                         if Item1."Net Change" = 0 then
                             CurrReport.Skip();
@@ -295,6 +295,7 @@
             trigger OnAfterGetRecord()
             var
                 ChooseErr: Label 'Choose either';
+                lItemVariant: Record "Item Variant";
             begin
 
                 if Negativbeh and not NegativVolumeShow then begin
@@ -311,7 +312,8 @@
                             Error(ChooseErr);
 
                 if Varermedbeholdning then begin
-                    if not "NPR Has Variants" then begin
+                    lItemVariant.SetRange("Item No.", "No.");
+                    if lItemVariant.IsEmpty() then begin
                         if "Net Change" = 0 then
                             CurrReport.Skip();
                     end else begin
@@ -524,7 +526,7 @@
             localItem1.Get(localItem."No.");
             localItem1.CopyFilters(localItem);
             localItem1.SetRange("Variant Filter", localVariant.Code);
-            localItem1.CalcFields("NPR Has Variants", "Net Change");
+            localItem1.CalcFields("Net Change");
             if Varermedbeholdning then begin
                 if (localItem1."Net Change" <> 0) then
                     exit(true);

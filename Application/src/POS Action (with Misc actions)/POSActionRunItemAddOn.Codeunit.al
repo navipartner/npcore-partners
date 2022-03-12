@@ -54,7 +54,7 @@
     local procedure GenerateItemAddonConfig(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management")
     var
         Item: Record Item;
-        ItemAdditionalFields: Record "NPR Item Additional Fields";
+        AuxItem: Record "NPR Aux Item";
         ItemAddOn: Record "NPR NpIa Item AddOn";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -85,8 +85,8 @@
         AddOnNo := CopyStr(Context.GetStringParameter('ItemAddOnNo'), 1, MaxStrLen(AddOnNo));
         if AddOnNo = '' then begin
             Item.Get(SaleLinePOS."No.");
-            Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
-            AddOnNo := ItemAdditionalFields."Item Addon No.";
+            Item.NPR_GetAuxItem(AuxItem);
+            AddOnNo := AuxItem."Item Addon No.";
             Context.SetContext('CompulsoryAddOn', not ItemAddOnMgt.AttachedIteamAddonLinesExist(SaleLinePOS));
         end;
         if AddOnNo = '' then

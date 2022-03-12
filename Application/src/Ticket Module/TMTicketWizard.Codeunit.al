@@ -382,6 +382,7 @@
     var
         TicketSetup: Record "NPR TM Ticket Setup";
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
     begin
 
         if (Item.Get(ItemNo)) then
@@ -397,11 +398,14 @@
         Item.Validate(Description, ItemDescription);
         Item.Validate("Item Category Code", ItemCategory);
         Item.Validate("Unit Price", UnitPrice);
-        Item.Validate("NPR Ticket Type", TicketType);
+        Item.NPR_GetAuxItem(AuxItem);
+        AuxItem.Validate("TM Ticket Type", TicketType);
+        Item.NPR_SetAuxItem(AuxItem);
+        Item.NPR_SaveAuxItem();
 
         Item.TestField(Description);
         Item.TestField("Item Category Code");
-        Item.TestField("NPR Ticket Type");
+        AuxItem.TestField("TM Ticket Type");
 
         Item.Modify(true);
     end;

@@ -83,7 +83,7 @@
                 field("Variety 1 Value"; Rec."Variety 1 Value")
                 {
 
-                    CaptionClass = '3,' + Item."NPR Variety 1";
+                    CaptionClass = '3,' + AuxItem."Variety 1";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety1;
@@ -93,7 +93,7 @@
                 field("Variety 2 Value"; Rec."Variety 2 Value")
                 {
 
-                    CaptionClass = '3,' + Item."NPR Variety 2";
+                    CaptionClass = '3,' + AuxItem."Variety 2";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety2;
@@ -103,7 +103,7 @@
                 field("Variety 3 Value"; Rec."Variety 3 Value")
                 {
 
-                    CaptionClass = '3,' + Item."NPR Variety 3";
+                    CaptionClass = '3,' + AuxItem."Variety 3";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety3;
@@ -113,7 +113,7 @@
                 field("Variety 4 Value"; Rec."Variety 4 Value")
                 {
 
-                    CaptionClass = '3,' + Item."NPR Variety 4";
+                    CaptionClass = '3,' + AuxItem."Variety 4";
                     Editable = false;
                     Visible = showvariety4;
                     ToolTip = 'Specifies the value of the Variety 4 Value field';
@@ -848,19 +848,30 @@
                     group("Variety 1")
                     {
                         Caption = 'Variety 1';
-                        field(Variety1; Item."NPR Variety 1")
+                        field(Variety1; AuxItem."Variety 1")
                         {
-
-                            ShowCaption = false;
-                            ToolTip = 'Specifies the value of the Item.NPR Variety 1 field';
+                            Caption = 'Variety 1';
+                            ToolTip = 'Specifies the value of the Variety 1.';
                             ApplicationArea = NPRRetail;
+                            TableRelation = "NPR Variety";
+                            trigger OnValidate()
+                            begin
+                                AuxItem.Validate("Variety 1");
+                                Item.NPR_SetAuxItem(AuxItem);
+                            end;
                         }
-                        field(Variety1Table; Item."NPR Variety 1 Table")
+                        field(Variety1Table; AuxItem."Variety 1 Table")
                         {
 
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 1 Table field';
                             ApplicationArea = NPRRetail;
+                            TableRelation = "NPR Variety Table".Code WHERE(Type = Field("Variety 1 Value"));
+                            trigger OnValidate()
+                            begin
+                                AuxItem.Validate("Variety 1 Table");
+                                Item.NPR_SetAuxItem(AuxItem);
+                            end;
 
                             trigger OnDrillDown()
                             var
@@ -876,19 +887,30 @@
                     group("Variety 2")
                     {
                         Caption = 'Variety 2';
-                        field(Variety2; Item."NPR Variety 2")
+                        field(Variety2; AuxItem."Variety 2")
                         {
-
-                            ShowCaption = false;
-                            ToolTip = 'Specifies the value of the Item.NPR Variety 2 field';
+                            Caption = 'Variety 2';
+                            ToolTip = 'Specifies the value of the Variety 2.';
                             ApplicationArea = NPRRetail;
+                            TableRelation = "NPR Variety";
+                            trigger OnValidate()
+                            begin
+                                AuxItem.Validate("Variety 2");
+                                Item.NPR_SetAuxItem(AuxItem);
+                            end;
                         }
-                        field(Variety2Table; Item."NPR Variety 2 Table")
+                        field(Variety2Table; AuxItem."Variety 2 Table")
                         {
 
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 2 Table field';
                             ApplicationArea = NPRRetail;
+                            TableRelation = "NPR Variety Table".Code WHERE(Type = Field("Variety 2 Value"));
+                            trigger OnValidate()
+                            begin
+                                AuxItem.Validate("Variety 2 Table");
+                                Item.NPR_SetAuxItem(AuxItem);
+                            end;
 
                             trigger OnDrillDown()
                             var
@@ -905,19 +927,30 @@
                     group("Variety 3")
                     {
                         Caption = 'Variety 3';
-                        field(Variety3; Item."NPR Variety 3")
+                        field(Variety3; AuxItem."Variety 3")
                         {
-
-                            ShowCaption = false;
-                            ToolTip = 'Specifies the value of the Item.NPR Variety 3 field';
+                            Caption = 'Variety 3';
+                            ToolTip = 'Specifies the value of the Variety 3.';
                             ApplicationArea = NPRRetail;
+                            TableRelation = "NPR Variety";
+                            trigger OnValidate()
+                            begin
+                                AuxItem.Validate("Variety 3");
+                                Item.NPR_SetAuxItem(AuxItem);
+                            end;
                         }
-                        field(Variety3Table; Item."NPR Variety 3 Table")
+                        field(Variety3Table; AuxItem."Variety 3 Table")
                         {
 
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 3 Table field';
                             ApplicationArea = NPRRetail;
+                            TableRelation = "NPR Variety Table".Code WHERE(Type = Field("Variety 3 Value"));
+                            trigger OnValidate()
+                            begin
+                                AuxItem.Validate("Variety 3 Table");
+                                Item.NPR_SetAuxItem(AuxItem);
+                            end;
 
                             trigger OnDrillDown()
                             var
@@ -934,19 +967,30 @@
                     group("Variety 4")
                     {
                         Caption = 'Variety 4';
-                        field(Variety4; Item."NPR Variety 4")
+                        field(Variety4; AuxItem."Variety 4")
                         {
-
-                            ShowCaption = false;
-                            ToolTip = 'Specifies the value of the Item.NPR Variety 4 field';
+                            Caption = 'Variety 4';
+                            ToolTip = 'Specifies the value of the Variety 4.';
                             ApplicationArea = NPRRetail;
+                            TableRelation = "NPR Variety";
+                            trigger OnValidate()
+                            begin
+                                AuxItem.Validate("Variety 4");
+                                Item.NPR_SetAuxItem(AuxItem);
+                            end;
                         }
-                        field(Variety4Table; Item."NPR Variety 4 Table")
+                        field(Variety4Table; AuxItem."Variety 4 Table")
                         {
 
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 4 Table field';
                             ApplicationArea = NPRRetail;
+                            TableRelation = "NPR Variety Table".Code WHERE(Type = Field("Variety 4 Value"));
+                            trigger OnValidate()
+                            begin
+                                AuxItem.Validate("Variety 4 Table");
+                                Item.NPR_SetAuxItem(AuxItem);
+                            end;
 
                             trigger OnDrillDown()
                             var
@@ -1030,6 +1074,25 @@
             }
         }
     }
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    begin
+        Item.NPR_SaveAuxItem();
+    end;
+
+    trigger OnModifyRecord(): Boolean
+    begin
+        Item.NPR_SaveAuxItem();
+    end;
+
+    trigger OnClosePage()
+    begin
+        Item.NPR_SaveAuxItem();
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        Item.NPR_GetAuxItem(AuxItem);
+    end;
 
     trigger OnAfterGetRecord()
     var
@@ -1056,6 +1119,7 @@
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[30] of Text[1024];
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
         ShowAsCrossVRT: Option Variety1,Variety2,Variety3,Variety4;
         RecRef: RecordRef;
         VRTMatrixMgt: Codeunit "NPR Variety Matrix Management";
@@ -1192,10 +1256,10 @@
                 Rec.SetCurrentKey("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
         end;
 
-        ShowVariety1 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety1) and (Item."NPR Variety 1" <> ''));
-        ShowVariety2 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety2) and (Item."NPR Variety 2" <> ''));
-        ShowVariety3 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety3) and (Item."NPR Variety 3" <> ''));
-        ShowVariety4 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety4) and (Item."NPR Variety 4" <> ''));
+        ShowVariety1 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety1) and (AuxItem."Variety 1" <> ''));
+        ShowVariety2 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety2) and (AuxItem."Variety 2" <> ''));
+        ShowVariety3 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety3) and (AuxItem."Variety 3" <> ''));
+        ShowVariety4 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety4) and (AuxItem."Variety 4" <> ''));
 
         ShowTotal := CurrVRTField."Field No." = 15;
         if ShowTotal then

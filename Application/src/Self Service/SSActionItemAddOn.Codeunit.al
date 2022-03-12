@@ -59,7 +59,7 @@
     procedure GetAddonConfigJson(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management") JsonText: Text
     var
         Item: Record Item;
-        ItemAdditionalFields: Record "NPR Item Additional Fields";
+        AuxItem: Record "NPR Aux Item";
         ItemAddOn: Record "NPR NpIa Item AddOn";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -78,8 +78,8 @@
                 exit;
             if (not Item.Get(SaleLinePOS."No.")) then
                 exit;
-            Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
-            if (not ItemAddOn.Get(ItemAdditionalFields."Item AddOn No.")) then
+            Item.NPR_GetAuxItem(AuxItem);
+            if (not ItemAddOn.Get(AuxItem."Item AddOn No.")) then
                 exit;
         end;
 
@@ -200,7 +200,7 @@
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
-        ItemAdditionalFields: Record "NPR Item Additional Fields";
+        AuxItem: Record "NPR Aux Item";
         UserValue: Text;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -221,8 +221,8 @@
                 exit;
             if (not Item.Get(SaleLinePOS."No.")) then
                 exit;
-            Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
-            if (not ItemAddOn.Get(ItemAdditionalFields."Item AddOn No.")) then
+            Item.NPR_GetAuxItem(AuxItem);
+            if (not ItemAddOn.Get(AuxItem."Item AddOn No.")) then
                 exit;
             MasterLineNumber := SaleLinePOS."Line No.";
         end;

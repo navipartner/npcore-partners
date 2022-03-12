@@ -545,7 +545,7 @@
     var
         FlowStatus: Record "NPR NPRE Flow Status";
         Item: Record Item;
-        ItemAdditionalFields: Record "NPR Item Additional Fields";
+        AuxItem: Record "NPR Aux Item";
         ItemRoutingProfile: Record "NPR NPRE Item Routing Profile";
         NewAssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
         PrintCategory: Record "NPR NPRE Print/Prod. Cat.";
@@ -580,10 +580,10 @@
                 begin
                     if not Item.Get(WaiterPadLine."No.") then
                         exit;
-                    Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
-                    if ItemAdditionalFields."NPRE Item Routing Profile" = '' then
+                    Item.NPR_GetAuxItem(AuxItem);
+                    if AuxItem."NPRE Item Routing Profile" = '' then
                         exit;
-                    ItemRoutingProfile.Get(ItemAdditionalFields."NPRE Item Routing Profile");
+                    ItemRoutingProfile.Get(AuxItem."NPRE Item Routing Profile");
                     CopyAssignedPrintCategories(ItemRoutingProfile.RecordId, WaiterPadLine.RecordId);
                     CopyAssignedFlowStatuses(ItemRoutingProfile.RecordId, WaiterPadLine.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow);
                 end;

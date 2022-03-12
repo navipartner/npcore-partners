@@ -36,6 +36,7 @@
         ItemGroup: Record "NPR Item Group";
         ItemCategory: Record "Item Category";
         TempItem: Record Item temporary;
+        TempAuxItem: Record "NPR Aux Item" temporary;
         ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
     begin
         Database.SelectLatestVersion();
@@ -69,12 +70,15 @@
             TempItem."Tax Group Code" := ItemGroup."Tax Group Code";
             TempItem."Tariff No." := ItemGroup."Tarif No.";
             TempItem."Reordering Policy" := "Reordering Policy".FromInteger(ItemGroup."Reordering Policy");
-            TempItem."NPR Variety Group" := ItemGroup."Variety Group";
             TempItem."Gen. Prod. Posting Group" := ItemGroup."Gen. Prod. Posting Group";
             TempItem."VAT Prod. Posting Group" := ItemGroup."VAT Prod. Posting Group";
             TempItem."VAT Bus. Posting Gr. (Price)" := ItemGroup."VAT Bus. Posting Group";
             TempItem."Inventory Posting Group" := ItemGroup."Inventory Posting Group";
             TempItem."Item Category Code" := ItemCategory.Code;
+            TempItem.NPR_GetAuxItem(TempAuxItem);
+            TempAuxItem."Variety Group" := ItemGroup."Variety Group";
+            TempItem.NPR_SetAuxItem(TempAuxItem);
+            TempItem.NPR_SaveAuxItem();
 
             ItemCategory."NPR Item Template Code" := ItemCategoryMgt.CreateItemTemplate(ItemCategory, TempItem);
 

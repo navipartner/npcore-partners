@@ -694,7 +694,7 @@
         Item: Record Item;
         SaleLinePOS2: Record "NPR POS Sale Line";
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
-        ItemAdditionalFields: Record "NPR Item Additional Fields";
+        AuxItem: Record "NPR Aux Item";
     begin
         Clear(ItemAddOn);
 
@@ -730,10 +730,10 @@
         if not Item.Get(SaleLinePOS2."No.") then
             exit(false);
 
-        Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
-        if ItemAdditionalFields."Item AddOn No." = '' then
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Item AddOn No." = '' then
             exit(false);
-        if not ItemAddOn.Get(ItemAdditionalFields."Item AddOn No.") then
+        if not ItemAddOn.Get(AuxItem."Item AddOn No.") then
             exit(false);
 
         exit(ItemAddOn.Enabled);

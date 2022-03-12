@@ -6,19 +6,18 @@ query 6014408 "NPR APIV1 - TM Item Query"
     APIVersion = 'v1.0';
     EntityName = 'tmItemRead';
     EntitySetName = 'tmItemsRead';
-    //OrderBy = ascending(replicationCounter);
     QueryType = API;
     ReadState = ReadShared;
 
     elements
     {
-        dataitem(item; Item)
+        dataitem(auxItem; "NPR Aux Item")
         {
-            column(no; "No.")
+            column(no; "Item No.")
             {
                 Caption = 'No.', Locked = true;
             }
-            column(ticketType; "NPR Ticket Type")
+            column(ticketType; "TM Ticket Type")
             {
                 Caption = 'Ticket Type', Locked = true;
             }

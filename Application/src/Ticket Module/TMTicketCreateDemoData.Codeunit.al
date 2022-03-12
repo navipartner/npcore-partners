@@ -327,6 +327,7 @@
     procedure CreateItem(No: Code[20]; VariantCode: Code[10]; TicketTypeCode: Code[10]; Description: Text[100]; UnitPrice: Decimal): Code[20]
     var
         TicketItem: Record "Item";
+        AuxItem: Record "NPR Aux Item";
         ItemVariant: Record "Item Variant";
         ItemReference: Record "Item Reference";
         CreateItemLbl: Label 'IXRF-%1', Locked = true;
@@ -341,7 +342,10 @@
 
         TicketItem.Description := Description;
         TicketItem."Unit Price" := UnitPrice;
-        TicketItem.VALIDATE("NPR Ticket Type", TicketTypeCode);
+        TicketItem.NPR_GetAuxItem(AuxItem);
+        AuxItem.VALIDATE("TM Ticket Type", TicketTypeCode);
+        TicketItem.NPR_SetAuxItem(AuxItem);
+        TicketItem.NPR_SaveAuxItem();
 
         TicketItem.Blocked := FALSE;
         TicketItem."NPR Group sale" := FALSE;

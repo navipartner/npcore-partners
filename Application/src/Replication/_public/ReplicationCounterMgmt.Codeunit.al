@@ -750,6 +750,51 @@
         end;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR Aux Item", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertAuxItem(var Rec: Record "NPR Aux Item"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Aux Item", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyAuxItem(var Rec: Record "NPR Aux Item"; var xRec: Record "NPR Aux Item"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Aux Item", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameAuxItem(var Rec: Record "NPR Aux Item"; var xRec: Record "NPR Aux Item"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
     #endregion
 
     #region TableExtensions
@@ -844,48 +889,47 @@
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeInsertEvent', '', false, false)]
-    local procedure UpdateReplicationCounterOnBeforeInsertItem(var Rec: Record "Item"; RunTrigger: Boolean)
+    local procedure UpdateReplicationCounterOnBeforeInsertItem(var Rec: Record Item; RunTrigger: Boolean)
     var
-        DataTypeMgmt: Codeunit "Data Type Management";
-        RecRef: RecordRef;
+        AuxItem: Record "NPR Aux Item";
     begin
         if Rec.IsTemporary() then
             exit;
 
-        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
-            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
-            RecRef.SetTable(Rec);
-        end;
+        if not AuxItem.Get(Rec."No.") then begin
+            AuxItem."Item No." := Rec."No.";
+            AuxItem.Insert();
+        end else
+            AuxItem.Modify(); // triggers updateReplicationCounter for the Aux Table.
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Item", 'OnBeforeModifyEvent', '', false, false)]
-    local procedure UpdateReplicationCounterOnBeforeModifyItem(var Rec: Record "Item"; var xRec: Record "Item"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyItem(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
-        DataTypeMgmt: Codeunit "Data Type Management";
-        RecRef: RecordRef;
+        AuxItem: Record "NPR Aux Item";
     begin
         if Rec.IsTemporary() then
             exit;
 
-        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
-            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
-            RecRef.SetTable(Rec);
-        end;
+        if not AuxItem.Get(Rec."No.") then begin
+            AuxItem."Item No." := Rec."No.";
+            AuxItem.Insert();
+        end else
+            AuxItem.Modify(); // triggers updateReplicationCounter for the Aux Table.
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Item", 'OnBeforeRenameEvent', '', false, false)]
-    local procedure UpdateReplicationCounterOnBeforeRenameItem(var Rec: Record "Item"; var xRec: Record "Item"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameItem(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
-        DataTypeMgmt: Codeunit "Data Type Management";
-        RecRef: RecordRef;
+        AuxItem: Record "NPR Aux Item";
     begin
         if Rec.IsTemporary() then
             exit;
 
-        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
-            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
-            RecRef.SetTable(Rec);
-        end;
+        if not AuxItem.Get(xRec."No.") then begin
+            AuxItem."Item No." := xRec."No.";
+            AuxItem.Insert();
+        end; // modify/rename not needed because it is handled in codeuninit 6014460 "NPR Aux. Tables Event Subs." function --> ItemOnAfterRename 
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item Category", 'OnBeforeInsertEvent', '', false, false)]
