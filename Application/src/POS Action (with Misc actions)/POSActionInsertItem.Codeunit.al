@@ -471,10 +471,10 @@
     local procedure AddItemAddOns(POSFrontEnd: Codeunit "NPR POS Front End Management"; Item: Record Item; BaseLineNo: Integer)
     var
         POSAction: Record "NPR POS Action";
-        ItemAdditionalFields: Record "NPR Item Additional Fields";
+        AuxItem: Record "NPR Aux Item";
     begin
-        Item.NPR_GetItemAdditionalFields(ItemAdditionalFields);
-        if ItemAdditionalFields."Item AddOn No." = '' then
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Item AddOn No." = '' then
             exit;
 
         POSAction.Get('RUN_ITEM_ADDONS');

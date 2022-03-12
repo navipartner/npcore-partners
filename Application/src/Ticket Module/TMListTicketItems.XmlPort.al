@@ -255,32 +255,34 @@ xmlport 6060112 "NPR TM List Ticket Items"
     internal procedure CreateResponse()
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
     begin
 
         GeneralLedgerSetup.Get();
         currency_code := GeneralLedgerSetup."LCY Code";
 
-        Item.SetFilter("NPR Ticket Type", '<>%1', '');
-        Item.SetFilter(Blocked, '=%1', false);
-        if (not Item.FindSet()) then
+        AuxItem.SetFilter("TM Ticket Type", '<>%1', '');
+        if not AuxItem.FindSet() then
             exit;
-
         repeat
-            TmpItemVariant."Item No." := Item."No.";
+            Item.SetRange("No.", AuxItem."Item No.");
+            Item.SetFilter(Blocked, '=%1', false);
+            if Item.FindFirst() then begin
+                TmpItemVariant."Item No." := Item."No.";
 
-            ItemVariant.SetFilter("Item No.", '=%1', Item."No.");
-            if (ItemVariant.FindSet()) then begin
-                repeat
-                    TmpItemVariant.Code := ItemVariant.Code;
+                ItemVariant.SetFilter("Item No.", '=%1', Item."No.");
+                if (ItemVariant.FindSet()) then begin
+                    repeat
+                        TmpItemVariant.Code := ItemVariant.Code;
+                        if (TmpItemVariant.Insert()) then;
+                    until (ItemVariant.Next() = 0);
+                end else begin
+                    TmpItemVariant.Code := '';
                     if (TmpItemVariant.Insert()) then;
-                until (ItemVariant.Next() = 0);
-            end else begin
-                TmpItemVariant.Code := '';
-                if (TmpItemVariant.Insert()) then;
+                end;
             end;
-
-        until (Item.Next() = 0);
+        until AuxItem.Next() = 0;
 
         TmpItemVariant.Reset();
         if (TmpItemVariant.FindSet()) then begin

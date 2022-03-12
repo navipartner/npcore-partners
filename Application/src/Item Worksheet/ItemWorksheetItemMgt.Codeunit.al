@@ -1,6 +1,7 @@
 ﻿codeunit 6060041 "NPR Item Worksheet Item Mgt."
 {
     Access = Internal;
+
     var
         ItemNumberManagement: Codeunit "NPR Item Number Mgt.";
 
@@ -150,10 +151,12 @@
     procedure ItemVariantExists(ItemNo: Code[20]): Boolean
     var
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
     begin
+        Item.SetLoadFields("No.");
         if Item.Get(ItemNo) then begin
-            Item.CalcFields("NPR Has Variants");
-            exit(Item."NPR Has Variants");
+            ItemVariant.SetRange("Item No.", Item."No.");
+            exit(not ItemVariant.IsEmpty());
         end else
             exit(false);
     end;
@@ -161,12 +164,14 @@
     procedure ItemVarietyExists(ItemNo: Code[20]): Boolean
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
     begin
         if Item.Get(ItemNo) then begin
-            if (Item."NPR Variety 1" <> '') or
-               (Item."NPR Variety 2" <> '') or
-               (Item."NPR Variety 3" <> '') or
-               (Item."NPR Variety 4" <> '') then
+            Item.NPR_GetAuxItem(AuxItem);
+            if (AuxItem."Variety 1" <> '') or
+               (AuxItem."Variety 2" <> '') or
+               (AuxItem."Variety 3" <> '') or
+               (AuxItem."Variety 4" <> '') then
                 exit(true);
         end else
             exit(false);

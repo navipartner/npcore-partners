@@ -45,4 +45,39 @@ tableextension 6014419 "NPR G/L Account" extends "G/L Account"
         }
 
     }
+    var
+        _AuxGLAccount: Record "NPR Aux. G/L Account";
+
+    procedure NPRGetGLAccAdditionalFields(var AuxGLAccount: Record "NPR Aux. G/L Account")
+    begin
+        ReadGLAccAdditionalFields();
+        AuxGLAccount := _AuxGLAccount;
+    end;
+
+    procedure NPRSetGLAccAdditionalFields(var AuxGLAccount: Record "NPR Aux. G/L Account")
+    begin
+        _AuxGLAccount := AuxGLAccount;
+    end;
+
+    procedure NPRSaveGLAccAdditionalFields()
+    begin
+        if _AuxGLAccount."No." <> '' then
+            if not _AuxGLAccount.Modify() then
+                _AuxGLAccount.Insert();
+    end;
+
+    procedure NPRDeleteGLAccAdditionalFields()
+    begin
+        ReadGLAccAdditionalFields();
+        if _AuxGLAccount.Delete() then;
+    end;
+
+    local procedure ReadGLAccAdditionalFields()
+    begin
+        if _AuxGLAccount."No." <> Rec."No." then
+            if not _AuxGLAccount.Get(Rec."No.") then begin
+                _AuxGLAccount.Init();
+                _AuxGLAccount."No." := Rec."No.";
+            end;
+    end;
 }

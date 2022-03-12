@@ -86,14 +86,11 @@
 
     [EventSubscriber(ObjectType::Table, Database::"G/L Account", 'OnAfterDeleteEvent', '', false, false)]
     local procedure GLAccountOnAfterOnDelete(var Rec: Record "G/L Account")
-    var
-        AuxGLAccount: Record "NPR Aux. G/L Account";
     begin
         if Rec.IsTemporary() then
             exit;
 
-        if AuxGLAccount.Get(Rec."No.") then
-            AuxGLAccount.Delete();
+        Rec.NPRDeleteGLAccAdditionalFields();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"G/L Account", 'OnAfterRenameEvent', '', false, false)]
@@ -146,5 +143,60 @@
         if AuxGLEntry.Get(xRec."Entry No.") then
             AuxGLEntry.Rename(Rec."Entry No.");
     end;
+    #endregion
+
+    #region Item
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterDeleteEvent', '', false, false)]
+    local procedure Item_OnAfterDeleteEvent(var Rec: Record Item)
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        Rec.NPR_DeleteAuxItem();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterRenameEvent', '', false, false)]
+    local procedure Item_OnAfterRenameEvent(var Rec: Record Item; var xRec: Record Item)
+    var
+        AuxItem: Record "NPR Aux Item";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if AuxItem.Get(xRec."No.") then
+            AuxItem.Rename(Rec."No.");
+    end;
+    #endregion
+
+
+    #region Config. Template Line
+    [EventSubscriber(ObjectType::Table, Database::"Config. Template Line", 'OnAfterInsertEvent', '', false, false)]
+    local procedure ConfigTemplateLine_OnAfterInsertEvent(var Rec: Record "Config. Template Line"; RunTrigger: Boolean)
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if Rec."NPR Aux Table ID" = 0 then
+            exit;
+        Rec.Validate("Table ID", Rec."NPR Aux Table ID");
+        Rec.Modify(false);
+    end;
+    #endregion
+
+    #region Config. Template Management
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Config. Template Management", 'OnBeforeInsertTemplate', '', false, false)]
+    local procedure ConfigTemplateManagement_OnBeforeInsertTemplate(var ConfigTemplateLine: Record "Config. Template Line"; var ConfigTemplateHeader: Record "Config. Template Header");
+    begin
+        ConfigTemplateLine.SetRange("Table ID", ConfigTemplateHeader."Table ID");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Config. Template Management", 'OnAfterUpdateRecordWithSkipFields', '', false, false)]
+    local procedure OnAfterUpdateRecordWithSkipFields(ConfigTemplateHeader: Record "Config. Template Header"; var RecRef: RecordRef; SkipFields: Boolean; var TempSkipFields: Record Field);
+    var
+        AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
+    begin
+        AuxTablesMgt.InsertTemplateValuesFromAuxFields(ConfigTemplateHeader, RecRef, SkipFields, TempSkipFields);
+    end;
+
     #endregion
 }

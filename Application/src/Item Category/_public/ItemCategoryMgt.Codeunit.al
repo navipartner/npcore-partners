@@ -288,11 +288,12 @@
 
     procedure CreateItemTemplate(ItemCategory: Record "Item Category"; TempItem: Record Item temporary): Code[10]
     var
+        TempAuxItem: Record "NPR Aux Item" temporary;
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateLine: Record "Config. Template Line";
         Fields: Record Field;
-        ConfigTemplateMgt: Codeunit "Config. Template Management";
         TemplateFields: Array[20] of FieldRef;
+        TableIds: Array[20] of Integer;
         ConfigTemplateCode: Code[10];
     begin
         if ItemCategory.IsTemporary() then
@@ -303,29 +304,31 @@
 
         ConfigTemplateCode := GetNextItemTemplateCode();
 
-        SetFieldRef(TemplateFields[1], TempItem, TempItem.FieldNo(Type));
-        SetFieldRef(TemplateFields[2], TempItem, TempItem.FieldNo("Item Disc. Group"));
-        SetFieldRef(TemplateFields[3], TempItem, TempItem.FieldNo("No. Series"));
-        SetFieldRef(TemplateFields[4], TempItem, TempItem.FieldNo("Costing Method"));
-        SetFieldRef(TemplateFields[5], TempItem, TempItem.FieldNo("Base Unit of Measure")); // Base unit of Measure must be first
-        SetFieldRef(TemplateFields[6], TempItem, TempItem.FieldNo("Sales Unit of Measure"));
-        SetFieldRef(TemplateFields[7], TempItem, TempItem.FieldNo("Purch. Unit of Measure"));
-        SetFieldRef(TemplateFields[8], TempItem, TempItem.FieldNo("NPR Guarantee voucher"));
-        SetFieldRef(TemplateFields[9], TempItem, TempItem.FieldNo("Tax Group Code"));
-        SetFieldRef(TemplateFields[10], TempItem, TempItem.FieldNo("Tariff No."));
-        SetFieldRef(TemplateFields[11], TempItem, TempItem.FieldNo("Reordering Policy"));
-        SetFieldRef(TemplateFields[12], TempItem, TempItem.FieldNo("NPR Variety Group"));
-        SetFieldRef(TemplateFields[13], TempItem, TempItem.FieldNo("Gen. Prod. Posting Group"));
-        SetFieldRef(TemplateFields[14], TempItem, TempItem.FieldNo("VAT Prod. Posting Group"));
-        SetFieldRef(TemplateFields[15], TempItem, TempItem.FieldNo("VAT Bus. Posting Gr. (Price)"));
-        SetFieldRef(TemplateFields[16], TempItem, TempItem.FieldNo("Inventory Posting Group"));
-        SetFieldRef(TemplateFields[17], TempItem, TempItem.FieldNo("NPR Group sale"));
-        SetFieldRef(TemplateFields[18], TempItem, TempItem.FieldNo("Price Includes VAT"));
-        SetFieldRef(TemplateFields[19], TempItem, TempItem.FieldNo("Price/Profit Calculation"));
-        SetFieldRef(TemplateFields[20], TempItem, TempItem.FieldNo("Item Category Code"));
+        TempItem.NPR_GetAuxItem(TempAuxItem);
 
-        ConfigTemplateMgt.CreateConfigTemplateAndLines(
-            ConfigTemplateCode, ItemCategory.Description, Database::Item, TemplateFields);
+        SetFieldRef(TemplateFields[1], TableIds[1], TempItem, TempItem.FieldNo(Type));
+        SetFieldRef(TemplateFields[2], TableIds[2], TempItem, TempItem.FieldNo("Item Disc. Group"));
+        SetFieldRef(TemplateFields[3], TableIds[3], TempItem, TempItem.FieldNo("No. Series"));
+        SetFieldRef(TemplateFields[4], TableIds[4], TempItem, TempItem.FieldNo("Costing Method"));
+        SetFieldRef(TemplateFields[5], TableIds[5], TempItem, TempItem.FieldNo("Base Unit of Measure")); // Base unit of Measure must be first
+        SetFieldRef(TemplateFields[6], TableIds[6], TempItem, TempItem.FieldNo("Sales Unit of Measure"));
+        SetFieldRef(TemplateFields[7], TableIds[7], TempItem, TempItem.FieldNo("Purch. Unit of Measure"));
+        SetFieldRef(TemplateFields[8], TableIds[8], TempItem, TempItem.FieldNo("NPR Guarantee voucher"));
+        SetFieldRef(TemplateFields[9], TableIds[9], TempItem, TempItem.FieldNo("Tax Group Code"));
+        SetFieldRef(TemplateFields[10], TableIds[10], TempItem, TempItem.FieldNo("Tariff No."));
+        SetFieldRef(TemplateFields[11], TableIds[11], TempItem, TempItem.FieldNo("Reordering Policy"));
+        SetFieldRef(TemplateFields[12], TableIds[12], TempAuxItem, TempAuxItem.FieldNo("Variety Group"));
+        SetFieldRef(TemplateFields[13], TableIds[13], TempItem, TempItem.FieldNo("Gen. Prod. Posting Group"));
+        SetFieldRef(TemplateFields[14], TableIds[14], TempItem, TempItem.FieldNo("VAT Prod. Posting Group"));
+        SetFieldRef(TemplateFields[15], TableIds[15], TempItem, TempItem.FieldNo("VAT Bus. Posting Gr. (Price)"));
+        SetFieldRef(TemplateFields[16], TableIds[16], TempItem, TempItem.FieldNo("Inventory Posting Group"));
+        SetFieldRef(TemplateFields[17], TableIds[17], TempItem, TempItem.FieldNo("NPR Group sale"));
+        SetFieldRef(TemplateFields[18], TableIds[18], TempItem, TempItem.FieldNo("Price Includes VAT"));
+        SetFieldRef(TemplateFields[19], TableIds[19], TempItem, TempItem.FieldNo("Price/Profit Calculation"));
+        SetFieldRef(TemplateFields[20], TableIds[20], TempItem, TempItem.FieldNo("Item Category Code"));
+
+        CreateConfigTemplateAndLines(
+            ConfigTemplateCode, ItemCategory.Description, Database::Item, TemplateFields, TableIds);
 
         if TempItem."No. Series" <> '' then begin
             ConfigTemplateHeader.Get(ConfigTemplateCode);
@@ -344,6 +347,29 @@
             until ConfigTemplateLine.Next() = 0;
 
         exit(ConfigTemplateCode);
+    end;
+
+    local procedure CreateConfigTemplateAndLines(var "Code": Code[10]; Description: Text[100]; TableID: Integer; DefaultValuesFieldRefArray: array[100] of FieldRef; TableIds: Array[100] of Integer)
+    var
+        ConfigTemplateHeader: Record "Config. Template Header";
+        ConfigTemplateMgt: Codeunit "Config. Template Management";
+        FieldRef: FieldRef;
+        I: Integer;
+    begin
+        ConfigTemplateHeader.Init();
+
+        if Code = '' then
+            Code := ConfigTemplateMgt.GetNextAvailableCode(TableID);
+
+        ConfigTemplateHeader.Code := Code;
+        ConfigTemplateHeader.Description := Description;
+        ConfigTemplateHeader."Table ID" := TableID;
+        ConfigTemplateHeader.Insert(true);
+
+        for I := 1 to ArrayLen(DefaultValuesFieldRefArray) do begin
+            FieldRef := DefaultValuesFieldRefArray[I];
+            ConfigTemplateMgt.InsertConfigTemplateLineFromField(Code, FieldRef, TableIds[I]);
+        end;
     end;
 
     internal procedure CopyItemTemplate(FromItemCategory: Record "Item Category"; ToItemCategory: Record "Item Category"): Code[10]
@@ -390,12 +416,15 @@
         exit(ConfigTemplateCode);
     end;
 
-    local procedure SetFieldRef(var FR: FieldRef; var Item: Record Item; FieldId: Integer)
+    local procedure SetFieldRef(var FR: FieldRef; var TableID: Integer; TableVariant: Variant; FieldId: Integer)
     var
         RR: RecordRef;
     begin
-        RR.GetTable(Item);
+        if not TableVariant.IsRecord() then
+            exit;
+        RR.GetTable(TableVariant);
         FR := RR.Field(FieldId);
+        TableID := RR.Number();
     end;
 
     local procedure GetNextItemTemplateCode() TemplateCode: Code[10]

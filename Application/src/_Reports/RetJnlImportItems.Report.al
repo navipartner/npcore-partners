@@ -14,8 +14,9 @@
             RequestFilterFields = "No.", "Vendor No.", "Item Category Code", "NPR Group sale", "Last Date Modified", Description, "Search Description";
 
             trigger OnAfterGetRecord()
+            var
+                ItemVariant: Record "Item Variant";
             begin
-                CalcFields("NPR Has Variants");
                 if (Inventory <= 0) and OnlyInventory then
                     CurrReport.Skip();
 
@@ -26,7 +27,8 @@
                 else
                     LastLineNo := 0;
 
-                if not Item."NPR Has Variants" then begin
+                ItemVariant.SetRange("Item No.", Item."No.");
+                if ItemVariant.IsEmpty() then begin
                     CalcFields(Inventory);
                     RetailJournalLine.Init();
                     RetailJournalLine.Validate("Line No.", LastLineNo + 10000);

@@ -1,6 +1,7 @@
 ﻿codeunit 6059974 "NPR Variety Check"
 {
     Access = Internal;
+
     var
         Text001: Label 'There is open %1 for %2 %3.\These entries must be closed before you can change the Variations';
         Text002: Label 'There is %1 for %2 %3.\These entries must be deleted before you can change the Variations';
@@ -9,6 +10,8 @@
 
     procedure ChangeItemVariety(Item: Record Item; XRecItem: Record Item)
     var
+        AuxItem: Record "NPR Aux Item";
+        xAuxItem: Record "NPR Aux Item";
         ItemVar: Record "Item Variant";
         ItemLedgEntry: Record "Item Ledger Entry";
         SalesLine: Record "Sales Line";
@@ -17,6 +20,8 @@
         POSSalesLine: Record "NPR POS Entry Sales Line";
         p: Record "NPR POS Entry";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
+        XRecItem.NPR_GetAuxItem(xAuxItem);
         p."Amount Incl. Tax" := 1;
         //no variants created. Do what you want
         ItemVar.SetRange("Item No.", Item."No.");
@@ -24,14 +29,14 @@
             exit;
 
         //No change in table setup. Do what you want
-        if (Item."NPR Variety 1" = XRecItem."NPR Variety 1") and
-           (Item."NPR Variety 2" = XRecItem."NPR Variety 2") and
-           (Item."NPR Variety 3" = XRecItem."NPR Variety 3") and
-           (Item."NPR Variety 4" = XRecItem."NPR Variety 4") and
-           (Item."NPR Variety 1 Table" = XRecItem."NPR Variety 1 Table") and
-           (Item."NPR Variety 2 Table" = XRecItem."NPR Variety 2 Table") and
-           (Item."NPR Variety 3 Table" = XRecItem."NPR Variety 3 Table") and
-           (Item."NPR Variety 4 Table" = XRecItem."NPR Variety 4 Table") then
+        if (AuxItem."Variety 1" = xAuxItem."Variety 1") and
+           (AuxItem."Variety 2" = xAuxItem."Variety 2") and
+           (AuxItem."Variety 3" = xAuxItem."Variety 3") and
+           (AuxItem."Variety 4" = xAuxItem."Variety 4") and
+           (AuxItem."Variety 1 Table" = xAuxItem."Variety 1 Table") and
+           (AuxItem."Variety 2 Table" = XAuxItem."Variety 2 Table") and
+           (AuxItem."Variety 3 Table" = XAuxItem."Variety 3 Table") and
+           (AuxItem."Variety 4 Table" = XAuxItem."Variety 4 Table") then
             exit;
 
         //if we are here, an update of the variants is required.
@@ -177,65 +182,69 @@
 
     local procedure CheckModifyAlloved(Item: Record Item; XRecItem: Record Item): Boolean
     var
+        AuxItem: Record "NPR Aux Item";
+        xAuxItem: Record "NPR Aux Item";
         ItemVar: Record "Item Variant";
         Variety: Record "NPR Variety";
         VarietyTable: Record "NPR Variety Table";
         VarietyValue: Record "NPR Variety Value";
     begin
-        if (Item."NPR Variety 1" <> '') and (XRecItem."NPR Variety 1" = '') then
+        Item.NPR_GetAuxItem(AuxItem);
+        xRecItem.NPR_GetAuxItem(xAuxItem);
+        if (AuxItem."Variety 1" <> '') and (xAuxItem."Variety 1" = '') then
             exit(false);
-        if (Item."NPR Variety 2" <> '') and (XRecItem."NPR Variety 2" = '') then
+        if (AuxItem."Variety 2" <> '') and (xAuxItem."Variety 2" = '') then
             exit(false);
-        if (Item."NPR Variety 3" <> '') and (XRecItem."NPR Variety 3" = '') then
+        if (AuxItem."Variety 3" <> '') and (xAuxItem."Variety 3" = '') then
             exit(false);
-        if (Item."NPR Variety 4" <> '') and (XRecItem."NPR Variety 4" = '') then
+        if (AuxItem."Variety 4" <> '') and (xAuxItem."Variety 4" = '') then
             exit(false);
 
-        if (Item."NPR Variety 1" = '') and (XRecItem."NPR Variety 1" <> '') then
+        if (AuxItem."Variety 1" = '') and (xAuxItem."Variety 1" <> '') then
             exit(false);
-        if (Item."NPR Variety 2" = '') and (XRecItem."NPR Variety 2" <> '') then
+        if (AuxItem."Variety 2" = '') and (xAuxItem."Variety 2" <> '') then
             exit(false);
-        if (Item."NPR Variety 3" = '') and (XRecItem."NPR Variety 3" <> '') then
+        if (AuxItem."Variety 3" = '') and (xAuxItem."Variety 3" <> '') then
             exit(false);
-        if (Item."NPR Variety 4" = '') and (XRecItem."NPR Variety 4" <> '') then
+        if (AuxItem."Variety 4" = '') and (xAuxItem."Variety 4" <> '') then
             exit(false);
 
         ItemVar.SetRange("Item No.", Item."No.");
         if ItemVar.FindSet() then
             repeat
-                if (Item."NPR Variety 1" <> XRecItem."NPR Variety 1") or (Item."NPR Variety 1 Table" <> XRecItem."NPR Variety 1 Table") then begin
-                    if not Variety.Get(Item."NPR Variety 1") then
+                if (AuxItem."Variety 1" <> xAuxItem."Variety 1") or (AuxItem."Variety 1 Table" <> xAuxItem."Variety 1 Table") then begin
+                    if not Variety.Get(AuxItem."Variety 1") then
                         exit(false);
-                    if not VarietyTable.Get(Item."NPR Variety 1", Item."NPR Variety 1 Table") then
+                    if not VarietyTable.Get(AuxItem."Variety 1", AuxItem."Variety 1 Table") then
                         exit(false);
-                    if not VarietyValue.Get(Item."NPR Variety 1", Item."NPR Variety 1 Table", ItemVar."NPR Variety 1 Value") then
-                        exit(false);
-                end;
-
-                if (Item."NPR Variety 2" <> XRecItem."NPR Variety 2") or (Item."NPR Variety 2 Table" <> XRecItem."NPR Variety 2 Table") then begin
-                    if not Variety.Get(Item."NPR Variety 2") then
-                        exit(false);
-                    if not VarietyTable.Get(Item."NPR Variety 2", Item."NPR Variety 2 Table") then
-                        exit(false);
-                    if not VarietyValue.Get(Item."NPR Variety 2", Item."NPR Variety 2 Table", ItemVar."NPR Variety 2 Value") then
+                    if not VarietyValue.Get(AuxItem."Variety 1", AuxItem."Variety 1 Table", ItemVar."NPR Variety 1 Value") then
                         exit(false);
                 end;
 
-                if (Item."NPR Variety 3" <> XRecItem."NPR Variety 3") or (Item."NPR Variety 3 Table" <> XRecItem."NPR Variety 3 Table") then begin
-                    if not Variety.Get(Item."NPR Variety 3") then
+                if (AuxItem."Variety 2" <> xAuxItem."Variety 2") or (AuxItem."Variety 2 Table" <> xAuxItem."Variety 2 Table") then begin
+                    if not Variety.Get(AuxItem."Variety 2") then
                         exit(false);
-                    if not VarietyTable.Get(Item."NPR Variety 3", Item."NPR Variety 3 Table") then
+                    if not VarietyTable.Get(AuxItem."Variety 2", AuxItem."Variety 2 Table") then
                         exit(false);
-                    if not VarietyValue.Get(Item."NPR Variety 3", Item."NPR Variety 3 Table", ItemVar."NPR Variety 3 Value") then
+                    if not VarietyValue.Get(AuxItem."Variety 2", AuxItem."Variety 2 Table", ItemVar."NPR Variety 2 Value") then
                         exit(false);
                 end;
 
-                if (Item."NPR Variety 4" <> XRecItem."NPR Variety 4") or (Item."NPR Variety 4 Table" <> XRecItem."NPR Variety 4 Table") then begin
-                    if not Variety.Get(Item."NPR Variety 4") then
+                if (AuxItem."Variety 3" <> xAuxItem."Variety 3") or (AuxItem."Variety 3 Table" <> xAuxItem."Variety 3 Table") then begin
+                    if not Variety.Get(AuxItem."Variety 3") then
                         exit(false);
-                    if not VarietyTable.Get(Item."NPR Variety 4", Item."NPR Variety 4 Table") then
+                    if not VarietyTable.Get(AuxItem."Variety 3", AuxItem."Variety 3 Table") then
                         exit(false);
-                    if not VarietyValue.Get(Item."NPR Variety 4", Item."NPR Variety 4 Table", ItemVar."NPR Variety 4 Value") then
+                    if not VarietyValue.Get(AuxItem."Variety 3", AuxItem."Variety 3 Table", ItemVar."NPR Variety 3 Value") then
+                        exit(false);
+                end;
+
+                if (AuxItem."Variety 4" <> xAuxItem."Variety 4") or (AuxItem."Variety 4 Table" <> xAuxItem."Variety 4 Table") then begin
+                    if not Variety.Get(AuxItem."Variety 4") then
+                        exit(false);
+                    if not VarietyTable.Get(AuxItem."Variety 4", AuxItem."Variety 4 Table") then
+                        exit(false);
+                    if not VarietyValue.Get(AuxItem."Variety 4", AuxItem."Variety 4 Table", ItemVar."NPR Variety 4 Value") then
                         exit(false);
                 end;
             until ItemVar.Next() = 0;
@@ -244,37 +253,39 @@
 
     local procedure UpdateVariants(Item: Record Item)
     var
+        AuxItem: Record "NPR Aux Item";
         ItemVar: Record "Item Variant";
         VarValue: Record "NPR Variety Value";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         ItemVar.SetRange("Item No.", Item."No.");
         if ItemVar.FindSet() then
             repeat
-                if ItemVar."NPR Variety 1" <> Item."NPR Variety 1" then
-                    ItemVar."NPR Variety 1" := Item."NPR Variety 1";
-                if ItemVar."NPR Variety 1 Table" <> Item."NPR Variety 1 Table" then
-                    ItemVar."NPR Variety 1 Table" := Item."NPR Variety 1 Table";
+                if ItemVar."NPR Variety 1" <> AuxItem."Variety 1" then
+                    ItemVar."NPR Variety 1" := AuxItem."Variety 1";
+                if ItemVar."NPR Variety 1 Table" <> AuxItem."Variety 1 Table" then
+                    ItemVar."NPR Variety 1 Table" := AuxItem."Variety 1 Table";
                 if ItemVar."NPR Variety 1" <> '' then
                     VarValue.Get(ItemVar."NPR Variety 1", ItemVar."NPR Variety 1 Table", ItemVar."NPR Variety 1 Value");
 
-                if ItemVar."NPR Variety 2" <> Item."NPR Variety 2" then
-                    ItemVar."NPR Variety 2" := Item."NPR Variety 2";
-                if ItemVar."NPR Variety 2 Table" <> Item."NPR Variety 2 Table" then
-                    ItemVar."NPR Variety 2 Table" := Item."NPR Variety 2 Table";
+                if ItemVar."NPR Variety 2" <> AuxItem."Variety 2" then
+                    ItemVar."NPR Variety 2" := AuxItem."Variety 2";
+                if ItemVar."NPR Variety 2 Table" <> AuxItem."Variety 2 Table" then
+                    ItemVar."NPR Variety 2 Table" := AuxItem."Variety 2 Table";
                 if ItemVar."NPR Variety 2" <> '' then
                     VarValue.Get(ItemVar."NPR Variety 2", ItemVar."NPR Variety 2 Table", ItemVar."NPR Variety 2 Value");
 
-                if ItemVar."NPR Variety 3" <> Item."NPR Variety 3" then
-                    ItemVar."NPR Variety 3" := Item."NPR Variety 3";
-                if ItemVar."NPR Variety 3 Table" <> Item."NPR Variety 3 Table" then
-                    ItemVar."NPR Variety 3 Table" := Item."NPR Variety 3 Table";
+                if ItemVar."NPR Variety 3" <> AuxItem."Variety 3" then
+                    ItemVar."NPR Variety 3" := AuxItem."Variety 3";
+                if ItemVar."NPR Variety 3 Table" <> AuxItem."Variety 3 Table" then
+                    ItemVar."NPR Variety 3 Table" := AuxItem."Variety 3 Table";
                 if ItemVar."NPR Variety 3" <> '' then
                     VarValue.Get(ItemVar."NPR Variety 3", ItemVar."NPR Variety 3 Table", ItemVar."NPR Variety 3 Value");
 
-                if ItemVar."NPR Variety 4" <> Item."NPR Variety 4" then
-                    ItemVar."NPR Variety 4" := Item."NPR Variety 4";
-                if ItemVar."NPR Variety 4 Table" <> Item."NPR Variety 4 Table" then
-                    ItemVar."NPR Variety 4 Table" := Item."NPR Variety 4 Table";
+                if ItemVar."NPR Variety 4" <> AuxItem."Variety 4" then
+                    ItemVar."NPR Variety 4" := AuxItem."Variety 4";
+                if ItemVar."NPR Variety 4 Table" <> AuxItem."Variety 4 Table" then
+                    ItemVar."NPR Variety 4 Table" := AuxItem."Variety 4 Table";
                 if ItemVar."NPR Variety 4" <> '' then
                     VarValue.Get(ItemVar."NPR Variety 4", ItemVar."NPR Variety 4 Table", ItemVar."NPR Variety 4 Value");
                 ItemVar.Modify(true);

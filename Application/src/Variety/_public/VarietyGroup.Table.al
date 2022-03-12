@@ -396,15 +396,18 @@
     end;
 
     internal procedure CopyTableData(Item: Record Item)
+    var
+        AuxItem: Record "NPR Aux Item";
     begin
+        Item.NPR_GetAuxItem(AuxItem);
         if "Create Copy of Variety 1 Table" then
-            CopyTable2NewTable("Variety 1", "Variety 1 Table", Item."NPR Variety 1 Table");
+            CopyTable2NewTable("Variety 1", "Variety 1 Table", AuxItem."Variety 1 Table");
         if "Create Copy of Variety 2 Table" then
-            CopyTable2NewTable("Variety 2", "Variety 2 Table", Item."NPR Variety 2 Table");
+            CopyTable2NewTable("Variety 2", "Variety 2 Table", AuxItem."Variety 2 Table");
         if "Create Copy of Variety 3 Table" then
-            CopyTable2NewTable("Variety 3", "Variety 3 Table", Item."NPR Variety 3 Table");
+            CopyTable2NewTable("Variety 3", "Variety 3 Table", AuxItem."Variety 3 Table");
         if "Create Copy of Variety 4 Table" then
-            CopyTable2NewTable("Variety 4", "Variety 4 Table", Item."NPR Variety 4 Table");
+            CopyTable2NewTable("Variety 4", "Variety 4 Table", AuxItem."Variety 4 Table");
     end;
 
     internal procedure CopyTable2NewTable(Type: Code[10]; FromTable: Code[40]; ToTable: Code[40])

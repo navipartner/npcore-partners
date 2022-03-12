@@ -819,12 +819,12 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'Item Brand', Locked = true;
                 }
 
-                field(nprTicketType; Rec."NPR Ticket Type")
+                field(nprTicketType; AuxItem."TM Ticket Type")
                 {
                     Caption = 'Ticket Type', Locked = true;
                 }
 
-                field(nprItemAddonNo; ItemAdditionalFields."Item Addon No.")
+                field(nprItemAddonNo; AuxItem."Item Addon No.")
                 {
                     Caption = 'Item AddOn No.', Locked = true;
                 }
@@ -839,7 +839,7 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'Magento Status', Locked = true;
                 }
 
-                field(nprAttributeSetID; Rec."NPR Attribute Set ID")
+                field(nprAttributeSetID; AuxItem."Attribute Set ID")
                 {
                     Caption = 'NPR Attribute Set ID', Locked = true;
                 }
@@ -858,7 +858,7 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'Magento Short Description', Locked = true;
                 }
 
-                field(nprMagentoBrand; Rec."NPR Magento Brand")
+                field(nprMagentoBrand; AuxItem."Magento Brand")
                 {
                     Caption = 'Magento Brand', Locked = true;
                 }
@@ -911,47 +911,47 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'Display Only', Locked = true;
                 }
 
-                field(nprVarietyGroup; Rec."NPR Variety Group")
+                field(nprVarietyGroup; AuxItem."Variety Group")
                 {
                     Caption = 'Variety Group', Locked = true;
                 }
 
-                field(nprVariety1; Rec."NPR Variety 1")
+                field(nprVariety1; AuxItem."Variety 1")
                 {
                     Caption = 'Variety 1', Locked = true;
                 }
 
-                field(nprVariety1Table; Rec."NPR Variety 1 Table")
+                field(nprVariety1Table; AuxItem."Variety 1 Table")
                 {
                     Caption = 'Variety 1 Table', Locked = true;
                 }
 
-                field(nprVariety2; Rec."NPR Variety 2")
+                field(nprVariety2; AuxItem."Variety 2")
                 {
                     Caption = 'Variety 2', Locked = true;
                 }
 
-                field(nprVariety2Table; Rec."NPR Variety 2 Table")
+                field(nprVariety2Table; AuxItem."Variety 2 Table")
                 {
                     Caption = 'Variety 2 Table', Locked = true;
                 }
 
-                field(nprVariety3; Rec."NPR Variety 3")
+                field(nprVariety3; AuxItem."Variety 3")
                 {
                     Caption = 'Variety 3', Locked = true;
                 }
 
-                field(nprVariety3Table; Rec."NPR Variety 3 Table")
+                field(nprVariety3Table; AuxItem."Variety 3 Table")
                 {
                     Caption = 'Variety 3 Table', Locked = true;
                 }
 
-                field(nprVariety4; Rec."NPR Variety 4")
+                field(nprVariety4; AuxItem."Variety 4")
                 {
                     Caption = 'Variety 4', Locked = true;
                 }
 
-                field(nprVariety4Table; Rec."NPR Variety 4 Table")
+                field(nprVariety4Table; AuxItem."Variety 4 Table")
                 {
                     Caption = 'Variety  4 Table', Locked = true;
                 }
@@ -966,7 +966,7 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'Print Tags', Locked = true;
                 }
 
-                field(nprNpreItemRoutingProfile; ItemAdditionalFields."NPRE Item Routing Profile")
+                field(nprNpreItemRoutingProfile; AuxItem."NPRE Item Routing Profile")
                 {
                     Caption = 'NPRE Item Routing Profile', Locked = true;
                 }
@@ -981,7 +981,7 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'Cross Variety No.', Locked = true;
                 }
 
-                field(nprItemStatus; Rec."NPR Item Status")
+                field(nprItemStatus; AuxItem."Item Status")
                 {
                     Caption = 'Item Status', Locked = true;
                 }
@@ -1041,11 +1041,6 @@ page 6014501 "NPR APIV1 - Items"
                     Caption = 'Last Modified Date', Locked = true;
                     Editable = false;
                 }
-
-                field(replicationCounter; Rec."NPR Replication Counter")
-                {
-                    Caption = 'replicationCounter', Locked = true;
-                }
             }
         }
     }
@@ -1076,7 +1071,7 @@ page 6014501 "NPR APIV1 - Items"
             GetTenantMedia(Rec."NPR Magento Short Desc.".MediaId, OStr);
         end;
 
-        Rec.NPR_GetItemAdditionalFields(ItemAdditionalFields);
+        Rec.NPR_GetAuxItem(AuxItem);
     end;
 
     local procedure GetTenantMedia(MediaId: Guid; var OStr: OutStream)
@@ -1136,7 +1131,7 @@ page 6014501 "NPR APIV1 - Items"
 
     var
         TempFieldSet: Record Field temporary;
-        ItemAdditionalFields: Record "NPR Item Additional Fields";
+        AuxItem: Record "NPR Aux Item";
         ItemCategory: Record "Item Category";
         TaxGroup: Record "Tax Group";
         GraphCollectionMgtItem: Codeunit "Graph Collection Mgt - Item";

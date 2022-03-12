@@ -83,31 +83,90 @@
         AuxGLEntry.Insert();
     end;
 
-    #region Table - G/L Account
-    procedure NPRGetGLAccAdditionalFields(var AuxGLAccount: Record "NPR Aux. G/L Account"; GLAccountNo: Code[20])
-    var
-        _AuxGLAccount: Record "NPR Aux. G/L Account";
+    procedure GetAuxTableIdFromParentTable(IncomingTableId: Integer): Integer
     begin
-        ReadGLAccAdditionalFields(GLAccountNo, _AuxGLAccount);
-        AuxGLAccount := _AuxGLAccount;
-    end;
-
-    procedure NPRSetGLAccAdditionalFields(var AuxGLAccount: Record "NPR Aux. G/L Account")
-    var
-        _AuxGLAccount: Record "NPR Aux. G/L Account";
-    begin
-        _AuxGLAccount := AuxGLAccount;
-        if _AuxGLAccount."No." <> '' then
-            if not _AuxGLAccount.Modify() then
-                _AuxGLAccount.Insert();
-    end;
-
-    local procedure ReadGLAccAdditionalFields(GLAccountNo: Code[20]; var _AuxGLAccount: Record "NPR Aux. G/L Account")
-    begin
-        if not _AuxGLAccount.Get(GLAccountNo) then begin
-            _AuxGLAccount.Init();
-            _AuxGLAccount."No." := GLAccountNo;
+        case IncomingTableId of
+            Database::Item:
+                exit(Database::"NPR Aux Item");
+            else
+                exit(0);
         end;
     end;
-    #endregion
+
+    procedure InsertTemplateValuesFromAuxFields(var ConfigTemplateHeader: Record "Config. Template Header"; var RecRef: RecordRef; SkipFields: Boolean; var TempSkipFields: Record Field)
+    var
+        ConfigTemplateLine: Record "Config. Template Line";
+        Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
+        AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
+        FieldRef: FieldRef;
+        AuxRecRef: RecordRef;
+        SkipCurrentField: Boolean;
+    begin
+        case AuxTablesMgt.GetAuxTableIdFromParentTable(ConfigTemplateHeader."Table ID") of
+            Database::"NPR Aux Item":
+                begin
+                    RecRef.SetTable(Item);
+                    Item.NPR_GetAuxItem(AuxItem);
+                    AuxRecRef.GetTable(AuxItem);
+                    ConfigTemplateLine.SetRange("Table ID", AuxTablesMgt.GetAuxTableIdFromParentTable(Database::Item));
+                end;
+            else
+                exit;
+        end;
+        ConfigTemplateLine.SetRange("Data Template Code", ConfigTemplateHeader.Code);
+        if ConfigTemplateLine.FindSet() then
+            repeat
+                case ConfigTemplateLine.Type of
+                    ConfigTemplateLine.Type::Field:
+                        if ConfigTemplateLine."Field ID" <> 0 then begin
+                            if SkipFields then
+                                SkipCurrentField := ShouldSkipField(TempSkipFields, ConfigTemplateLine."Field ID", ConfigTemplateLine."Table ID")
+                            else
+                                SkipCurrentField := false;
+
+                            if not SkipCurrentField then begin
+                                FieldRef := AuxRecRef.Field(ConfigTemplateLine."Field ID");
+                                ModifyRecordWithField(AuxRecRef, FieldRef, ConfigTemplateLine."Default Value", ConfigTemplateLine."Language ID");
+                            end;
+                        end;
+                end;
+            until ConfigTemplateLine.Next() = 0;
+    end;
+
+    local procedure ModifyRecordWithField(var RecRef: RecordRef; FieldRef: FieldRef; Value: Text[250]; LanguageID: Integer)
+    var
+        ConfigValidateMgt: Codeunit "Config. Validate Management";
+    begin
+        ConfigValidateMgt.ValidateFieldValue(RecRef, FieldRef, Value, false, LanguageID);
+        RecRef.Modify(true);
+    end;
+
+    local procedure ShouldSkipField(var TempSkipField: Record "Field"; CurrentFieldNo: Integer; CurrentTableNo: Integer): Boolean
+    begin
+        TempSkipField.Reset();
+        exit(TempSkipField.Get(CurrentTableNo, CurrentFieldNo));
+    end;
+
+    procedure CreateAuxItemAccessoryLink(ItemNo: Code[20]; LastItemNo: Code[20]; HasAccessories: Boolean)
+    var
+        Item: Record Item;
+        xItem: Record Item;
+        AuxItem: Record "NPR Aux Item";
+        xAuxItem: Record "NPR Aux Item";
+    begin
+        if xItem.Get(LastItemNo) then begin
+            xItem.NPR_GetAuxItem(xAuxItem);
+            xAuxItem."Has Accessories" := HasAccessories;
+            xItem.NPR_SetAuxItem(xAuxItem);
+            xItem.NPR_SaveAuxItem();
+        end;
+        if not Item.Get(ItemNo) then
+            exit;
+        Item.NPR_GetAuxItem(AuxItem);
+        AuxItem."Has Accessories" := HasAccessories;
+        Item.NPR_SetAuxItem(AuxItem);
+        Item.NPR_SaveAuxItem();
+    end;
+
 }
