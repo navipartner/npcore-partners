@@ -31,9 +31,11 @@ codeunit 6059786 "NPR POS Workflow Config"
     begin
         ValueToHash.Append('<actioncode>' + _ActionCode + '</actioncode>');
 
-        if TempParameter.FindSet() then
-            ValueToHash.Append('<parameter>' + TempParameter.Name + '||' + Format(TempParameter."Data Type") + '||' + TempParameter.Options + '</parameter>');
-        repeat until TempParameter.Next() = 0;
+        if TempParameter.FindSet() then begin
+            repeat
+                ValueToHash.Append('<parameter>' + TempParameter.Name + '||' + Format(TempParameter."Data Type") + '||' + TempParameter.Options + '</parameter>');
+            until TempParameter.Next() = 0;
+        end;
 
         ValueToHash.Append('<js>' + _Javascript + '</js>');
         ValueToHash.Append('<unattended>' + format(_Unattended) + '</unattended>');
@@ -92,11 +94,15 @@ codeunit 6059786 "NPR POS Workflow Config"
     end;
 
     local procedure AddParameter(Name: Text[30]; DataType: Option; DefaultValue: Text[250]; Options: Text[250]; CaptionName: Text; CaptionDescription: Text; CaptionOptions: Text)
+    var
+        MissingNameLbl: Label 'Action %1, Workflow parameter %2 is missing a name caption';
+        MissingDescriptionLbl: Label 'Action %1, Workflow parameter %2 is missing a description caption';
+        MissingOptionsLbl: Label 'Action %1, Workflow parameter %2 is missing an options caption';
     begin
         if CaptionName = '' then
-            Error('Action %1, Workflow parameter %2 is missing a name caption', _ActionCode, Name);
+            Error(MissingNameLbl, _ActionCode, Name);
         if CaptionDescription = '' then
-            Error('Action %1, Workflow parameter %2 is missing a description caption', _ActionCode, Name);
+            Error(MissingDescriptionLbl, _ActionCode, Name);
 
         _ParameterNameCaption.Add(Name, CaptionName);
         _ParameterDescriptionCaption.Add(Name, CaptionDescription);
@@ -109,7 +115,7 @@ codeunit 6059786 "NPR POS Workflow Config"
         if DataType = TempParameter."Data Type"::Option then begin
             TempParameter.Options := Options;
             if CaptionOptions = '' then
-                Error('Action %1, Workflow parameter %2 is missing an options caption', _ActionCode, Name);
+                Error(MissingOptionsLbl, _ActionCode, Name);
             _ParameterOptionCaption.Add(Name, CaptionOptions);
         end;
 
