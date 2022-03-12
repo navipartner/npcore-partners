@@ -1,5 +1,14 @@
 tableextension 6014439 "NPR Config. Template Line" extends "Config. Template Line"
 {
+    fields
+    {
+        field(6014400; "NPR Aux Table ID"; Integer)
+        {
+            Caption = 'Aux Table ID';
+            DataClassification = CustomerContent;
+        }
+    }
+
     trigger OnAfterModify()
     var
         Item: Record Item;

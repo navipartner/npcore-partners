@@ -15,28 +15,34 @@
     local procedure OnInsertItemSetInitalStatus(var Rec: Record Item; RunTrigger: Boolean)
     var
         ItemStatus: Record "NPR Item Status";
+        AuxItem: Record "NPR Aux Item";
     begin
-        if Rec."NPR Item Status" <> '' then
+        Rec.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Item Status" <> '' then
             exit;
         ItemStatus.Reset();
         ItemStatus.SetRange(Initial, true);
         if ItemStatus.FindFirst() then
-            Rec.Validate("NPR Item Status", ItemStatus.Code)
+            AuxItem.Validate("Item Status", ItemStatus.Code)
         else
-            Rec.Validate("NPR Item Status", CreateInitialStatus());
+            AuxItem.Validate("Item Status", CreateInitialStatus());
+        Rec.NPR_SetAuxItem(AuxItem);
+        Rec.NPR_SaveAuxItem();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Check Line", 'OnAfterCheckItemJnlLine', '', true, true)]
     local procedure OnAfterCheckItemJnlLineCheckIfAllowed(var ItemJnlLine: Record "Item Journal Line")
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
         ItemStatus: Record "NPR Item Status";
     begin
         if not Item.Get(ItemJnlLine."Item No.") then
             exit;
-        if Item."NPR Item Status" = '' then
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Item Status" = '' then
             exit;
-        if not ItemStatus.Get(Item."NPR Item Status") then
+        if not ItemStatus.Get(AuxItem."Item Status") then
             exit;
         if ItemStatus.Description = '' then
             ItemStatus.Description := ItemStatus.Code;
@@ -53,11 +59,13 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteItemCheckIfAllowed(var Rec: Record Item; RunTrigger: Boolean)
     var
+        AuxItem: Record "NPR Aux Item";
         ItemStatus: Record "NPR Item Status";
     begin
-        if Rec."NPR Item Status" = '' then
+        Rec.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Item Status" = '' then
             exit;
-        if not ItemStatus.Get(Rec."NPR Item Status") then
+        if not ItemStatus.Get(AuxItem."Item Status") then
             exit;
         if ItemStatus.Description = '' then
             ItemStatus.Description := ItemStatus.Code;
@@ -68,11 +76,13 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeRenameEvent', '', true, true)]
     local procedure OnBeforeRenameItemCheckIfAllowed(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
+        AuxItem: Record "NPR Aux Item";
         ItemStatus: Record "NPR Item Status";
     begin
-        if Rec."NPR Item Status" = '' then
+        Rec.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Item Status" = '' then
             exit;
-        if not ItemStatus.Get(Rec."NPR Item Status") then
+        if not ItemStatus.Get(AuxItem."Item Status") then
             exit;
         if ItemStatus.Description = '' then
             ItemStatus.Description := ItemStatus.Code;
@@ -84,15 +94,17 @@
     local procedure OnBeforeValidateNoSalesLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
         ItemStatus: Record "NPR Item Status";
     begin
         if Rec.Type <> Rec.Type::Item then
             exit;
         if not Item.Get(Rec."No.") then
             exit;
-        if Item."NPR Item Status" = '' then
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Item Status" = '' then
             exit;
-        if not ItemStatus.Get(Item."NPR Item Status") then
+        if not ItemStatus.Get(AuxItem."Item Status") then
             exit;
         if ItemStatus.Description = '' then
             ItemStatus.Description := ItemStatus.Code;
@@ -104,15 +116,17 @@
     local procedure OnBeforeValidateNoPurchaseLine(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
         ItemStatus: Record "NPR Item Status";
     begin
         if Rec.Type <> Rec.Type::Item then
             exit;
         if not Item.Get(Rec."No.") then
             exit;
-        if Item."NPR Item Status" = '' then
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Item Status" = '' then
             exit;
-        if not ItemStatus.Get(Item."NPR Item Status") then
+        if not ItemStatus.Get(AuxItem."Item Status") then
             exit;
         if ItemStatus.Description = '' then
             ItemStatus.Description := ItemStatus.Code;

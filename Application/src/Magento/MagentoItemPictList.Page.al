@@ -215,24 +215,27 @@
     end;
 
     local procedure SetupVarietyFixed()
+    var
+        AuxItem: Record "NPR Aux Item";
     begin
         if MagentoSetup."Variant Picture Dimension" = '' then
             exit;
 
+        Item.NPR_GetAuxItem(AuxItem);
         case MagentoSetup."Variant Picture Dimension" of
-            Item."NPR Variety 1":
+            AuxItem."Variety 1":
                 begin
                     SetupVariety1();
                 end;
-            Item."NPR Variety 2":
+            AuxItem."Variety 2":
                 begin
                     SetupVariety2();
                 end;
-            Item."NPR Variety 3":
+            AuxItem."Variety 3":
                 begin
                     SetupVariety3();
                 end;
-            Item."NPR Variety 4":
+            AuxItem."Variety 4":
                 begin
                     SetupVariety4();
                 end;
@@ -263,16 +266,18 @@
 
     local procedure SetupVariety1()
     var
+        AuxItem: Record "NPR Aux Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
-        if Item."NPR Variety 1" = '' then
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Variety 1" = '' then
             exit;
-        if Item."NPR Variety 1 Table" = '' then
+        if AuxItem."Variety 1 Table" = '' then
             exit;
 
-        VarietyValue.SetRange(Type, Item."NPR Variety 1");
-        VarietyValue.SetRange(Table, Item."NPR Variety 1 Table");
+        VarietyValue.SetRange(Type, AuxItem."Variety 1");
+        VarietyValue.SetRange(Table, AuxItem."Variety 1 Table");
         if not VarietyValue.FindSet() then
             exit;
 
@@ -299,16 +304,18 @@
 
     local procedure SetupVariety2()
     var
+        AuxItem: Record "NPR Aux Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
-        if Item."NPR Variety 2" = '' then
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Variety 2" = '' then
             exit;
-        if Item."NPR Variety 2 Table" = '' then
+        if AuxItem."Variety 2 Table" = '' then
             exit;
 
-        VarietyValue.SetRange(Type, Item."NPR Variety 2");
-        VarietyValue.SetRange(Table, Item."NPR Variety 2 Table");
+        VarietyValue.SetRange(Type, AuxItem."Variety 2");
+        VarietyValue.SetRange(Table, AuxItem."Variety 2 Table");
         if not VarietyValue.FindSet() then
             exit;
 
@@ -335,16 +342,18 @@
 
     local procedure SetupVariety3()
     var
+        AuxItem: Record "NPR Aux Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
-        if Item."NPR Variety 3" = '' then
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Variety 3" = '' then
             exit;
-        if Item."NPR Variety 3 Table" = '' then
+        if AuxItem."Variety 3 Table" = '' then
             exit;
 
-        VarietyValue.SetRange(Type, Item."NPR Variety 3");
-        VarietyValue.SetRange(Table, Item."NPR Variety 3 Table");
+        VarietyValue.SetRange(Type, AuxItem."Variety 3");
+        VarietyValue.SetRange(Table, AuxItem."Variety 3 Table");
         if not VarietyValue.FindSet() then
             exit;
 
@@ -371,16 +380,18 @@
 
     local procedure SetupVariety4()
     var
+        AuxItem: Record "NPR Aux Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
-        if Item."NPR Variety 4" = '' then
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Variety 4" = '' then
             exit;
-        if Item."NPR Variety 4 Table" = '' then
+        if AuxItem."Variety 4 Table" = '' then
             exit;
 
-        VarietyValue.SetRange(Type, Item."NPR Variety 4");
-        VarietyValue.SetRange(Table, Item."NPR Variety 4 Table");
+        VarietyValue.SetRange(Type, AuxItem."Variety 4");
+        VarietyValue.SetRange(Table, AuxItem."Variety 4 Table");
         if not VarietyValue.FindSet() then
             exit;
 

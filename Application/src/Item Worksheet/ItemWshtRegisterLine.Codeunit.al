@@ -146,8 +146,11 @@
     end;
 
     local procedure CreateItem()
+    var
+        AuxItem: Record "NPR Aux Item";
     begin
         GetItem(ItemWkshLine."Item No.");
+        Item.NPR_GetAuxItem(AuxItem);
         Item.Validate(Item."Vendor Item No.", ItemWkshLine."Vendor Item No.");
         if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Vendor No.")) then
             Item.Validate(Item."Vendor No.", ItemWkshLine."Vendor No.");
@@ -182,16 +185,16 @@
         ItemWkshLine."Variety 2 Table (New)" := FindNewVarietyNames(ItemWkshLine, 2, ItemWkshLine."Variety 2", ItemWkshLine."Variety 2 Table (Base)", ItemWkshLine."Variety 2 Table (New)", ItemWkshLine."Create Copy of Variety 2 Table");
         ItemWkshLine."Variety 3 Table (New)" := FindNewVarietyNames(ItemWkshLine, 3, ItemWkshLine."Variety 3", ItemWkshLine."Variety 3 Table (Base)", ItemWkshLine."Variety 3 Table (New)", ItemWkshLine."Create Copy of Variety 3 Table");
         ItemWkshLine."Variety 4 Table (New)" := FindNewVarietyNames(ItemWkshLine, 4, ItemWkshLine."Variety 4", ItemWkshLine."Variety 4 Table (Base)", ItemWkshLine."Variety 4 Table (New)", ItemWkshLine."Create Copy of Variety 4 Table");
-        Item."NPR Variety 1" := ItemWkshLine."Variety 1";
-        Item."NPR Variety 1 Table" := ItemWkshLine."Variety 1 Table (New)";
-        Item."NPR Variety 2" := ItemWkshLine."Variety 2";
-        Item."NPR Variety 2 Table" := ItemWkshLine."Variety 2 Table (New)";
-        Item."NPR Variety 3" := ItemWkshLine."Variety 3";
-        Item."NPR Variety 3 Table" := ItemWkshLine."Variety 3 Table (New)";
-        Item."NPR Variety 4" := ItemWkshLine."Variety 4";
-        Item."NPR Variety 4 Table" := ItemWkshLine."Variety 4 Table (New)";
+        AuxItem."Variety 1" := ItemWkshLine."Variety 1";
+        AuxItem."Variety 1 Table" := ItemWkshLine."Variety 1 Table (New)";
+        AuxItem."Variety 2" := ItemWkshLine."Variety 2";
+        AuxItem."Variety 2 Table" := ItemWkshLine."Variety 2 Table (New)";
+        AuxItem."Variety 3" := ItemWkshLine."Variety 3";
+        AuxItem."Variety 3 Table" := ItemWkshLine."Variety 3 Table (New)";
+        AuxItem."Variety 4" := ItemWkshLine."Variety 4";
+        AuxItem."Variety 4 Table" := ItemWkshLine."Variety 4 Table (New)";
         Item."NPR Cross Variety No." := ItemWkshLine."Cross Variety No.";
-        Item."NPR Variety Group" := ItemWkshLine."Variety Group";
+        AuxItem."Variety Group" := ItemWkshLine."Variety Group";
         if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Sales Unit of Measure")) then
             Item.Validate(Item."Sales Unit of Measure", ItemWkshLine."Sales Unit of Measure");
         if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Sales Unit of Measure")) then
@@ -205,6 +208,8 @@
         if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Tariff No.")) then
             Item.Validate(Item."Tariff No.", ItemWkshLine."Tariff No.");
         ValidateFields(Item, ItemWkshLine, true, false);
+        Item.NPR_SetAuxItem(AuxItem);
+        Item.NPR_SaveAuxItem();
         Item.Modify(true);
 
 

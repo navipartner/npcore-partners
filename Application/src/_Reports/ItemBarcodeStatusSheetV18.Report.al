@@ -1,9 +1,9 @@
 ﻿#if not BC17
 report 6014455 "NPR Item Barcode Status Sheet"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Barcode Status SheetV18.rdl';
     Caption = 'Item Barcode Status Sheet';
@@ -14,7 +14,6 @@ report 6014455 "NPR Item Barcode Status Sheet"
     {
         dataitem(Item; Item)
         {
-            CalcFields = "NPR Has Variants";
             column(CompanyName; CompanyName)
             {
             }
@@ -40,8 +39,11 @@ report 6014455 "NPR Item Barcode Status Sheet"
             }
 
             trigger OnAfterGetRecord()
+            var
+                ItemVariant: Record "Item Variant";
             begin
-                if not "NPR Has Variants" then
+                ItemVariant.SetRange("Item No.", "No.");
+                if ItemVariant.IsEmpty() then
                     AddToBuffer("No.", '');
             end;
         }

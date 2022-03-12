@@ -73,12 +73,12 @@
 
     local procedure RemoveBrand(var MagentoBrand: Record "NPR Magento Brand")
     var
-        Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
     begin
         if MagentoBrand.Id <> '' then begin
-            Item.SetRange("NPR Magento Brand", MagentoBrand.Id);
-            if Item.FindFirst() then begin
-                Item.ModifyAll("NPR Magento Brand", '', false);
+            AuxItem.SetRange("Magento Brand", MagentoBrand.Id);
+            if AuxItem.FindFirst() then begin
+                AuxItem.ModifyAll("Magento Brand", '', false);
                 Commit();
             end;
         end;

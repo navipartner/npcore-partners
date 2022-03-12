@@ -291,6 +291,7 @@
     local procedure ValidateItemNo()
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
     begin
         if (TmpItemNo = '') then begin
             TmpItemNo := '<GENERATE>';
@@ -302,7 +303,8 @@
             TmpItemCategory := Item."Item Category Code";
             TmpUnitPrice := Item."Unit Price";
 
-            TmpTicketTypeCode := Item."NPR Ticket Type";
+            Item.NPR_GetAuxItem(AuxItem);
+            TmpTicketTypeCode := AuxItem."TM Ticket Type";
             ValidateTicketTypeCode();
         end;
     end;

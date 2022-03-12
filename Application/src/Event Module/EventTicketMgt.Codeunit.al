@@ -1,6 +1,7 @@
 ﻿codeunit 6060154 "NPR Event Ticket Mgt."
 {
     Access = Internal;
+
     var
         TicketContext: Label 'TICKET';
         EventMgt: Codeunit "NPR Event Management";
@@ -146,6 +147,7 @@
     local procedure IsValidTicket(JobPlanningLine: Record "Job Planning Line"; ShowError: Boolean): Boolean
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
         TicketType: Record "NPR TM Ticket Type";
     begin
         if JobPlanningLine.Type <> JobPlanningLine.Type::Item then
@@ -154,12 +156,13 @@
             else
                 exit(false);
         if Item.Get(JobPlanningLine."No.") then begin
-            if Item."NPR Ticket Type" = '' then
+            Item.NPR_GetAuxItem(AuxItem);
+            if AuxItem."TM Ticket Type" = '' then
                 if ShowError then
-                    Item.TestField("NPR Ticket Type")
+                    AuxItem.TestField("TM Ticket Type")
                 else
                     exit(false);
-            TicketType.Get(Item."NPR Ticket Type");
+            TicketType.Get(AuxItem."TM Ticket Type");
             if (not TicketType."Is Ticket") then
                 if ShowError then
                     TicketType.TestField("Is Ticket")

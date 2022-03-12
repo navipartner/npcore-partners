@@ -1693,6 +1693,7 @@
 
     var
         Item: Record Item;
+        AuxItem: Record "NPR Aux Item";
         POSUnitGlobal: Record "NPR POS Unit";
         CustomerGlobal: Record Customer;
         SalePOS: Record "NPR POS Sale";
@@ -2176,6 +2177,8 @@
 
         TestItem();
         GetItem();
+        GetAuxItem();
+
         "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
         "Item Category Code" := Item."Item Category Code";
@@ -2188,7 +2191,7 @@
 
         Description := Item.Description;
         "Description 2" := Item."Description 2";
-        "Magento Brand" := Item."NPR Magento Brand";
+        "Magento Brand" := AuxItem."Magento Brand";
 
         if NPRVarietySetup.Get() then
             if not NPRVarietySetup."Custom Descriptions" then
@@ -2364,6 +2367,11 @@
                 SaleLinePOS.SetSkipCalcDiscount(true);
                 SaleLinePOS.Modify();
             until SaleLinePOS.Next() = 0;
+    end;
+
+    local procedure GetAuxItem()
+    begin
+        Item.NPR_GetAuxItem(AuxItem);
     end;
 
     procedure SetSkipUpdateDependantQuantity(Skip: Boolean)
