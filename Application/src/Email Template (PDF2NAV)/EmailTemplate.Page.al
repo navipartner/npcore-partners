@@ -285,6 +285,21 @@
                     EmailTemplateMgt.DeleteHtmlTemplate(Rec);
                 end;
             }
+            action(SendTestEmail)
+            {
+                Caption = 'Send E-mail';
+                Image = Delete;
+                Visible = true;
+                ToolTip = 'Send Test E-mail';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
+                begin
+                    EmailTemplateMgt.SendTestEmail(Rec);
+                end;
+            }
         }
         area(navigation)
         {
