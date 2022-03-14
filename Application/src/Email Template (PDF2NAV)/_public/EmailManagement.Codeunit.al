@@ -1,7 +1,6 @@
 ﻿codeunit 6014450 "NPR E-mail Management"
 {
     var
-
         Text001: Label 'Enter recipient''s e-mail address';
         Text002: Label 'E-mail has been sent.';
         Text003: Label 'The email may not be empty.';
@@ -23,6 +22,49 @@
         AttachmentNoData: Label 'No data in %1';
         NoOutputFromReport: Label 'No output from report.';
         EmailTemplateErr: Label 'Email template doesn''t support email adresses longer than 250 characters';
+
+
+    procedure MakeMessage(Template: Record "NPR E-mail Template Header"; RecordVariant: Variant) EmailMessage: Text
+    var
+        RecRef: RecordRef;
+        EmailTemplateLine: Record "NPR E-mail Templ. Line";
+        DataTypeManagement: Codeunit "Data Type Management";
+        EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
+        MergeRecord: Boolean;
+        Char13: Char;
+        Char10: Char;
+    begin
+        EmailMessage := '';
+        Char13 := 13;
+        Char10 := 10;
+        if DataTypeManagement.GetRecordRef(RecordVariant, RecRef) then
+            MergeRecord := not IsRecRefEmpty(RecRef);
+
+        EmailTemplateLine.SetRange("E-mail Template Code", Template.Code);
+        if EmailTemplateLine.FindSet() then
+            repeat
+                if EmailMessage <> '' then
+                    EmailMessage += Format(Char13) + Format(Char10);
+                if MergeRecord then
+                    EmailMessage += EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateLine."Mail Body Line", Template."Fieldnumber Start Tag", Template."Fieldnumber End Tag")
+                else
+                    EmailMessage += EmailTemplateLine."Mail Body Line";
+
+            until EmailTemplateLine.Next() = 0;
+        exit(EmailMessage);
+    end;
+
+    local procedure IsRecRefEmpty(var RecRef: RecordRef): Boolean
+    var
+        EmptyRecRef: RecordRef;
+    begin
+        if RecRef.Number = 0 then
+            exit(true);
+        EmptyRecRef.Open(RecRef.Number);
+        if RecRef.RecordId = EmptyRecRef.RecordId then
+            exit(true);
+        exit(RecRef.IsEmpty());
+    end;
 
     procedure SendEmail(var RecRef: RecordRef; RecipientEmail: Text; Silent: Boolean) ErrorMessage: Text
     var

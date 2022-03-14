@@ -1,11 +1,14 @@
 ﻿codeunit 6014452 "NPR E-mail Templ. Mgt."
 {
     Access = Internal;
+
     var
         Text000: Label 'Export failed';
         Text001: Label 'All values on %1 will be replaced with values from %2';
         Text002: Label 'Do you want to delete the HTML Template?';
         Text003: Label 'No End-Tag (%1) found for Start-Tag (%2) in %3';
+
+        Text004Lbl: Label 'Warning: The Recipient E-mail might be overwritten by the template or chosen record. Do you want to send the test e-mail ?';
 
     #region Email Content
 
@@ -39,6 +42,38 @@
         end;
 
         exit(NewLine);
+    end;
+
+    procedure SendTestEmail(var Template: Record "NPR E-mail Template Header")
+    var
+        EmailSendMessage: Page "NPR Email Send Message";
+        RecRefTemplate: RecordRef;
+        SenderEmailDialog: Text;
+        RecRefDialog: RecordRef;
+        MessageDialog: Text;
+        ReceiverDialog: Text;
+        EmailManagement: Codeunit "NPR E-mail Management";
+    begin
+        EmailSendMessage.SetRecord(Template);
+        if Template."Transactional E-mail" = Template."Transactional E-mail"::" " then
+            EmailSendMessage.SetData(Template."From E-mail Address", RecRefTemplate, Template."Use HTML Template", false)
+        else
+            EmailSendMessage.SetData(Template."From E-mail Address", RecRefTemplate, Template."Use HTML Template", true);
+        if EmailSendMessage.RunModal() <> Action::OK then
+            exit;
+
+        if Template."Transactional E-mail" <> Template."Transactional E-mail"::" " then
+            if not (Confirm(Text004Lbl, true)) then
+                exit;
+
+
+        EmailSendMessage.GetData(SenderEmailDialog, RecRefDialog, ReceiverDialog, MessageDialog);
+
+        if Template."Report ID" > 0 then
+            EmailManagement.SendReportTemplate(Template."Report ID", RecRefDialog, Template, ReceiverDialog, false)
+        else
+            EmailManagement.SendEmailTemplate(RecRefDialog, Template, ReceiverDialog, false);
+
     end;
 
     local procedure GetFieldValue(var RecRef: RecordRef; FieldNo: Integer) FieldValue: Text
