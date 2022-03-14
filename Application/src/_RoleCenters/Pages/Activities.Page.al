@@ -15,18 +15,6 @@
             {
                 Caption = 'Integration';
                 ShowCaption = true;
-                field(ImportUnprocessed; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Import Pending"))))
-                {
-                    Caption = 'Import Unprocessed';
-                    ToolTip = 'Specifies the value of the Import Unprocessed field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnDrillDown()
-                    begin
-                        Page.Run(Page::"NPR Nc Import List");
-                        CurrPage.Update(false);
-                    end;
-                }
                 field(TaskList; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Task List"))))
                 {
                     Caption = 'Task List';
