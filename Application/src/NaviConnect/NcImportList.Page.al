@@ -157,18 +157,7 @@
                 }
 
             }
-            group(Control6014407)
-            {
-                ShowCaption = false;
-                field("COUNT"; Rec.Count)
-                {
 
-                    Caption = 'Quantity';
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Quantity field';
-                    ApplicationArea = NPRNaviConnect;
-                }
-            }
         }
     }
 
