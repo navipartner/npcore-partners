@@ -108,13 +108,17 @@
     procedure SetDefaults(var MPOSQRCode: Record "NPR MPOS QR Code")
     begin
         MPOSQRCode.TestField("User ID");
-
+        if not MPOSQRCode.Find() then
+            MPOSQRCode.Insert(true);
         if MPOSQRCode.Url = '' then
             MPOSQRCode.Url := StringReplace(GetUrl(CLIENTTYPE::Windows));
         if MPOSQRCode.Tenant = '' then
             MPOSQRCode.Tenant := TenantId();
-        if MPOSQRCode.Company = '' then
-            MPOSQRCode.Company := CompanyName;
+        if MPOSQRCode.Company = '' then begin
+            if MPOSQRCode.Get(MPOSQRCode."User ID", CompanyName, MPOSQRCode."Cash Register Id") then
+                Error('%1: %2', RecordExistsErrorText, Rec.GetPosition(true));
+            MPOSQRCode.Rename(MPOSQRCode."User ID", CompanyName, MPOSQRCode."Cash Register Id");
+        end;
         if MPOSQRCode."Webservice Url" = '' then
             MPOSQRCode."Webservice Url" := GetUrl(CLIENTTYPE::SOAP);
         MPOSQRCode.Modify(true);
@@ -247,6 +251,8 @@
         Base64Convert.FromBase64(Base64Image, OutStr);
     end;
 #endif
+    var
+        RecordExistsErrorText: Label 'Cannot set default values as record with same primary key already exists';
 
 }
 
