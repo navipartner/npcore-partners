@@ -59,15 +59,15 @@
                 }
                 field("From E-mail Name"; Rec."From E-mail Name")
                 {
-
                     ToolTip = 'Specifies the value of the From E-mail Name field';
                     ApplicationArea = NPRRetail;
+                    ShowMandatory = true;
                 }
                 field("From E-mail Address"; Rec."From E-mail Address")
                 {
-
                     ToolTip = 'Specifies the value of the From E-mail Address field';
                     ApplicationArea = NPRRetail;
+                    ShowMandatory = true;
                 }
                 field("Default Recipient Address"; Rec."Default Recipient Address")
                 {

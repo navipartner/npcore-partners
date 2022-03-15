@@ -156,5 +156,11 @@
         EmailAttachment.SetRange("Primary Key", GetPosition(false));
         EmailAttachment.DeleteAll();
     end;
+
+    trigger OnModify()
+    begin
+        TestField("From E-mail Address");
+        TestField("From E-mail Name");
+    end;
 }
 
