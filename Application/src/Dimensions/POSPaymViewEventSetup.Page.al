@@ -18,55 +18,55 @@
                 field("Dimension Popup Enabled"; Rec."Dimension Popup Enabled")
                 {
 
-                    ToolTip = 'Specifies the value of the Dimension Popup Enabled field';
+                    ToolTip = 'Enable the Dimension Popup option when going to the Payment View in the POS. The Dimension popup is an invocation of the POS action SALE_DIMENSION.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Dimension Code"; Rec."Dimension Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Dimension Code field';
+                    ToolTip = 'Specifies the Dimension which will be used.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Popup per"; Rec."Popup per")
                 {
 
-                    ToolTip = 'Specifies the value of the Popup per field';
+                    ToolTip = 'Specifies whether the popup will be triggered per a POS Store, POS Unit, or in all cases.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Popup every"; Rec."Popup every")
                 {
 
-                    ToolTip = 'Specifies the value of the Popup every field';
+                    ToolTip = 'Specifies after how many sales the popup will reoccur.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Popup Start Time"; Rec."Popup Start Time")
                 {
 
-                    ToolTip = 'Specifies the value of the Popup Start Time field';
+                    ToolTip = 'Specifies the starting time for the popup.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Popup End Time"; Rec."Popup End Time")
                 {
 
-                    ToolTip = 'Specifies the value of the Popup End Time field';
+                    ToolTip = 'Specifies the ending time for the popup.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Popup Mode"; Rec."Popup Mode")
                 {
 
-                    ToolTip = 'Specifies the value of the Dimension Popup Mode field';
+                    ToolTip = 'Specifies whether to use the List, Numpad or Input mode for the popup.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Create New Dimension Values"; Rec."Create New Dimension Values")
                 {
 
-                    ToolTip = 'Specifies the value of the Create New Dimension Values field';
+                    ToolTip = 'Specifies whether the new dimension will be automatically created if it doesn''t exist in the dimension values list when the user provides the value in the dimension popup.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Skip Popup on Dimension Value"; Rec."Skip Popup on Dimension Value")
                 {
 
-                    ToolTip = 'Specifies the value of the Skip Popup on Dimension Value field';
+                    ToolTip = 'Specifies whether the popup will be skipped or not.';
                     ApplicationArea = NPRRetail;
                 }
             }
