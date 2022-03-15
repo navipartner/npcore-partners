@@ -624,6 +624,7 @@
     var
         Attr: XmlAttribute;
         FieldNode: XmlNode;
+        NodeFound: Boolean;
     begin
         if not TempField.FindSet() then
             exit;
@@ -632,7 +633,10 @@
             exit;
 
         repeat
-            if Element.SelectSingleNode('Fields/field[@field_no = ' + Format(TempField."No.", 0, 9) + ']', FieldNode) then
+            NodeFound := Element.SelectSingleNode('Fields/field[@field_no = ' + Format(TempField."No.", 0, 9) + ']', FieldNode);
+            if not NodeFound then
+                NodeFound := Element.SelectSingleNode('fields/field[@field_no = ' + Format(TempField."No.", 0, 9) + ']', FieldNode);
+            if NodeFound then
                 Xml2Field(FieldNode.AsXmlElement(), TempField, RecRef);
         until TempField.Next() = 0;
     end;
