@@ -456,4 +456,35 @@
 
         SetNewMasterLineT6014422(xRec);
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Variant Code', true, false)]
+    local procedure OnAfterValidateVariantCodeSalesLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
+    var
+        ItemVariant: record "Item Variant";
+    begin
+        if Rec."Variant Code" <> '' then
+            if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
+                ItemVariant.TestField("NPR Blocked", false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnAfterValidateEvent', 'Variant Code', true, false)]
+    local procedure OnAfterValidateVariantCodePurchaseLine(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
+    var
+        ItemVariant: record "Item Variant";
+    begin
+        if Rec."Variant Code" <> '' then
+            if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
+                ItemVariant.TestField("NPR Blocked", false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Transfer Line", 'OnAfterValidateEvent', 'Variant Code', true, false)]
+    local procedure OnAfterValidateVariantCodeTransferLine(var Rec: Record "Transfer Line"; var xRec: Record "Transfer Line"; CurrFieldNo: Integer)
+    var
+        ItemVariant: record "Item Variant";
+    begin
+        if Rec."Variant Code" <> '' then
+            if ItemVariant.Get(Rec."Item No.", Rec."Variant Code") then
+                ItemVariant.TestField("NPR Blocked", false);
+    end;
+
 }

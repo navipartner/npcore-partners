@@ -35,9 +35,14 @@
     local procedure CopyToReportLayout(EventWordLayout: Record "NPR Event Word Layout")
     var
         CustomReportLayout: Record "Custom Report Layout";
+        Job: Record Job;
     begin
         if not EventWordLayout.Layout.HasValue() then
             exit;
+
+        if not EventWordLayout.GetJobFromRecID(Job) then
+            exit;
+
         CreateReportLayout(CustomReportLayout, EventWordLayout);
         CreateEventReportLayout(CustomReportLayout, EventWordLayout);
     end;
