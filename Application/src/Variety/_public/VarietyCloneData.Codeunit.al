@@ -41,6 +41,7 @@
         //if the variant cant be found, its not created, and none of the functions below makes sence to call
         if ItemVariant.Code = '' then
             Error(ItemVariantDontExisit);
+        ItemVariant.TestField("NPR Blocked", false);
 
         case MRecref.Number of
             DATABASE::"Item Variant":
