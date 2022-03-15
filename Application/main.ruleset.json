@@ -308,11 +308,6 @@
             "justification": "Excluding Codecop rules to have few included."
         },
         {
-            "id": "AL0296",
-            "action":"Warning",
-            "justification": "The type or method cannot be used for 'Cloud' development."
-        },
-        {
             "id": "AL0604",
             "action":"Error",
             "justification": "The 'with' statement is deprecated."
@@ -321,146 +316,11 @@
             "id": "AL0606",
             "action":"Error",
             "justification": "The 'with' statement is deprecated."
-        },
-        {
-            "id": "AS0004",
-            "action": "Warning",
-            "justification": "Temporarily disabled for PR 9185."
-        },  
-        {
-            "id": "AS0006",
-            "action": "Warning",
-            "justification": "Temporarily disabled for PR 53324."
-        },       
-        {
-            "id": "AS0018",
-            "action":"Hidden",
-            "justification": "A procedure belonging to the public API should not be removed."
-        },
-        {
-            "id": "AS0019",
-            "action":"Hidden",
-            "justification": "Event attributes should not be removed."
-        },
-        {
-            "id": "AS0020",
-            "action":"Hidden",
-            "justification": "The type of events should not be changed."
-        },
-        {
-            "id": "AS0021",
-            "action":"Hidden",
-            "justification": "An argument in an event attribute should not be changed to false."
-        },        
-        {
-            "id": "AS0022",
-            "action":"Hidden",
-            "justification": "An external scope should not be removed."
-        },
-        {
-            "id": "AS0023",
-            "action":"Hidden",
-            "justification": "A return type should not be modified in external procedures."
-        },        
-        {
-            "id": "AS0024",
-            "action":"Hidden",
-            "justification": "Parameters should not be removed or added in external procedures."
-        },        
-        {
-            "id": "AS0025",
-            "action":"Hidden",
-            "justification": "Parameters should not be modified, renamed, or removed from events.."
-        },
-        {
-            "id": "AS0026",
-            "action":"Hidden",
-            "justification": "The type and subtype of parameters should not be modified in events and external procedures."
-        },
-        {
-            "id": "AS0027",
-            "action":"Hidden",
-            "justification": "Modifying the array size of a parameter in events and external procedures should not be performed."
-        },
-        {
-            "id": "AS0028",
-            "action":"Hidden",
-            "justification": "Reducing the array size of a parameter in events and external procedures should not be performed."
-        },
-        {
-            "id": "AS0029",
-            "action":"Hidden",
-            "justification": "Pages and PageExtensions that have been published should not be deleted, since dependent extensions may break."
-        },
-        {
-            "id": "AS0030",
-            "action":"Hidden",
-            "justification": "Pages that have been published should not be renamed."
-        },                
-        {
-            "id": "AS0031",
-            "action":"Hidden",
-            "justification": "Actions that have been published should not be deleted."
-        },          
-        {
-            "id": "AS0032",
-            "action":"Hidden",
-            "justification": "Controls that have been published should not be deleted"
-        },
-        {
-            "id": "AS0034",
-            "action":"Warning",
-            "justification": "Unsupported table property change"
-        },         
-        {
-            "id": "AS0053",
-            "action":"Hidden",
-            "justification": "The compilation target of an application must be a value that is allowed in a multi-tenant SaaS environment."
-        },
-        {
-            "id": "AS0063",
-            "action":"Hidden",
-            "justification": "Removing a var modifier in events is not allowed."
-        },
-        {
-            "id": "AS0064",
-            "action":"Hidden",
-            "justification": "Interface implementations that have been published must not be deleted."
-        },
-        {
-            "id": "AS0065",
-            "action":"Hidden",
-            "justification": "Interfaces that have been published must not be deleted."
-        },
-        {
-            "id": "AS0066",
-            "action":"Hidden",
-            "justification": "A new method to an interface that has been published must not be added."
-        },
-        {
-            "id": "AS0067",
-            "action":"Hidden",
-            "justification": "Adding an interface to an enum that has been published must have a default implementation."
-        },
-        {
-            "id": "AS0068",
-            "action":"Hidden",
-            "justification": "Changing a table extension's target is not allowed."
-        },
+        }, 
         {
             "id":"AS0075",
             "action": "Error",
             "justification": "Obsolete Reason must be set."
-        },
-        {
-            "id": "AS0078",
-            "action":"Hidden",
-            "justification": "Adding or removing a var modifier in public procedures is not allowed as it might break the runtime behavior of extensions calling it."
-        },
-        {
-            "id": "AS0080",
-            "action":"Hidden",
-            "justification": "Decreasing the length of a field is not allowed. This might break the upgrade of existing installations and dependent extensions. If the field part of the primary key, the field length cannot change."
         },
         {
             "id": "AS0081",
@@ -468,40 +328,10 @@
             "justification": "The InternalsVisibleTo setting will expose your internal objects to any extension with the given name, publisher, and ID. Access modifiers are not designed to be used as a security boundary, but for API development."
         },
         {
-            "id": "AS0082",
-            "action":"Hidden",
-            "justification": "It is not allowed to rename an enum value."
-        },
-        {
-            "id": "AS0083",
-            "action":"Hidden",
-            "justification": "It is not allowed to delete a value from an enum."
-        },
-        {
             "id": "AS0086",
             "action":"Hidden",
             "justification": "Fields must not increase in length."
         }, 
-        {
-            "id": "AS0088",
-            "action":"Hidden",
-            "justification": "Objects with an ID that can be referenced and which have been published must not be deleted."
-        },
-        {
-            "id": "AS0089",
-            "action":"Hidden",
-            "justification": "Objects that can be referenced and which have been published must not be deleted."
-        },
-        {
-            "id": "AS0090",
-            "action":"Hidden",
-            "justification": "Objects that can be referenced and which have been published must not be renamed."
-        },
-        {
-            "id": "AS0091",
-            "action":"Hidden",
-            "justification": "One or more dependencies of the previous version of the extension could not be found."
-        },
         {
             "id": "AS0094",
             "action":"Hidden",
@@ -528,11 +358,6 @@
             "justification": "Pages and reports must use the UsageCategory and ApplicationArea properties to be searchable."
         },
         {
-            "id": "AW0007",
-            "action":"Warning",
-            "justification": "The Web client does not support displaying Repeater controls that contain FlowFilter fields!"
-        },
-        {
             "id": "AW0008",
             "action":"Error",
             "justification": "The Web client does not support displaying Repeater controls in pages of type Card, Document, and ListPlus."
@@ -548,14 +373,14 @@
             "justification": "Skip 'Using Blob with subtype Bitmap is deprecated' warnings. Sticking with Blobs for now."
         },
         {
-            "id": "AS0049",
-            "action":"Warning",
-            "justification": "Error was trown for new codeunits with Internal access"
-        },
-        {
             "id": "AL0697",
             "action": "Hidden",
             "justification": "Skip 'Argument {0}: The argument should be a valid Field type.' because there is no good solution"
+        },
+        {
+            "id": "AS0053",
+            "action":"Warning",
+            "justification": "The compilation target of an application must be a value that is allowed in a multi-tenant SaaS environment."
         }
     ]
 }
