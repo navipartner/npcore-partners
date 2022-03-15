@@ -96,6 +96,7 @@
     end;
 
 
+    [TryFunction]
     procedure GetJobFromRecID(var Job: Record Job)
     var
         RecRef: RecordRef;
