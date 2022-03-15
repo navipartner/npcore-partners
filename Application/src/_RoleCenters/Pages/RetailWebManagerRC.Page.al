@@ -93,6 +93,14 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Magento Brands action';
                 }
+                action("Magento Setup")
+                {
+                    Caption = 'Magento Setup';
+                    Image = List;
+                    RunObject = page "NPR Magento Setup";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Setup action';
+                }
 
             }
             group("Magento Orders")
