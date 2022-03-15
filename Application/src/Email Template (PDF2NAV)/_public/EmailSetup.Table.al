@@ -2,6 +2,8 @@
 {
     Caption = 'E-mail Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not needed anymore. Use E-mail Template instead.';
 
     fields
     {

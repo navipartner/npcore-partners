@@ -405,8 +405,6 @@
             if Silent then
                 EmailTemplateHeader."Verify Recipient" := false;
             EmailTemplateHeader."Default Recipient Address" := GetEmailRecepientAddress(EmailTemplateHeader, RecipientEmail);
-            EmailTemplateHeader."From E-mail Address" := CopyStr(GetEmailFromAddress(EmailTemplateHeader), 1, MaxStrLen(EmailTemplateHeader."From E-mail Address"));
-            EmailTemplateHeader."From E-mail Name" := CopyStr(GetEmailFromName(EmailTemplateHeader), 1, MaxStrLen(EmailTemplateHeader."From E-mail Name"));
             OnAfterSetFromEmail(EmailTemplateHeader.Code, RecRef, RecipientEmail, Silent, EmailTemplateHeader."From E-mail Address", EmailTemplateHeader."From E-mail Name");
         end else
             ErrorMessage := Text011;
@@ -451,28 +449,6 @@
     end;
     #endregion
     #region Get
-
-    local procedure GetEmailFromAddress(EmailTemplateHeader: Record "NPR E-mail Template Header"): Text[250]
-    var
-        EmailSetup: Record "NPR E-mail Setup";
-
-    begin
-        if EmailTemplateHeader."From E-mail Address" <> '' then
-            exit(EmailTemplateHeader."From E-mail Address");
-        EMailSetup.Get();
-        exit(EmailSetup."From E-mail Address");
-    end;
-
-    local procedure GetEmailFromName(EmailTemplateHeader: Record "NPR E-mail Template Header"): Text[250]
-    var
-        EmailSetup: Record "NPR E-mail Setup";
-    begin
-        if EmailTemplateHeader."From E-mail Name" <> '' then
-            exit(EmailTemplateHeader."From E-mail Name");
-        EMailSetup.Get();
-        exit(EmailSetup."From Name");
-    end;
-
     local procedure GetEmailRecepientAddress(EmailTemplateHeader: Record "NPR E-mail Template Header"; EmailRecipientAddress: Text[250]) NewEmailRecipientAddress: Text[250]
     begin
         NewEmailRecipientAddress := EmailRecipientAddress;

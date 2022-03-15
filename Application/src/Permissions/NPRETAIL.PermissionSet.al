@@ -1168,7 +1168,6 @@ permissionset 6014400 "NPR NP RETAIL"
          page "NPR E-mail Attachments" = X,
          page "NPR E-mail Field List" = X,
          page "NPR E-mail Log" = X,
-         page "NPR E-mail Setup" = X,
          page "NPR E-mail Templ. Choice List" = X,
          page "NPR E-mail Templ. Filters" = X,
          page "NPR E-mail Templ. Reports" = X,

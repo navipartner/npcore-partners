@@ -28,20 +28,29 @@
                 Caption = 'Processing';
                 field("Max Retry Qty"; Rec."Max Retry Qty")
                 {
-
                     ToolTip = 'Specifies the value of the Max Retry Qty field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Send Warming E-mail"; Rec."Send Warming E-mail")
                 {
-
                     ToolTip = 'Specifies the value of the Send Warming E-mail field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Warning E-mail"; Rec."Warning E-mail")
                 {
-
                     ToolTip = 'Specifies the value of the Warning E-mail field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("From E-mail Address"; Rec."From E-mail Address")
+                {
+                    ShowMandatory = Rec."Send Warming E-mail";
+                    ToolTip = 'Specifies the value of the From E-mail Address field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("From E-mail Name"; Rec."From E-mail Name")
+                {
+                    ShowMandatory = Rec."Send Warming E-mail";
+                    ToolTip = 'Specifies the value of the From E-mail Name field';
                     ApplicationArea = NPRRetail;
                 }
             }

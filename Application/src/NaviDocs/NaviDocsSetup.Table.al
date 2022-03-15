@@ -50,6 +50,16 @@
             Caption = 'Keep Log for';
             DataClassification = CustomerContent;
         }
+        field(100; "From E-mail Address"; Text[80])
+        {
+            Caption = 'From E-mail Address';
+            DataClassification = CustomerContent;
+        }
+        field(101; "From E-mail Name"; Text[80])
+        {
+            Caption = 'From E-mail Name';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Enable NAS"; Boolean)
         {
             Caption = 'Enable NAS';
@@ -94,5 +104,13 @@
         {
         }
     }
+
+    trigger OnModify()
+    begin
+        if "Send Warming E-mail" then begin
+            TestField("From E-mail Name");
+            TestField("From E-mail Address");
+        end;
+    end;
 }
 

@@ -1114,7 +1114,6 @@
     procedure SendWarningMail(NaviDocsEntry: Record "NPR NaviDocs Entry"; var ErrorMessage: Record "Error Message"; var EmailItem: Record "Email Item")
     var
         NaviDocsEntryComment: Record "NPR NaviDocs Entry Comment";
-        EmailSetup: Record "NPR E-mail Setup";
         MailSeparators: List of [Text];
         NaviDocsErr: Label 'NaviDocs Error %1 - %2';
         MailManagement: Codeunit "Mail Management";
@@ -1131,7 +1130,7 @@
         MailSeparators.Add(',');
 
 
-        EmailSenderHandler.CreateEmailItem(EmailItem, EmailSetup."From Name", EmailSetup."From E-mail Address",
+        EmailSenderHandler.CreateEmailItem(EmailItem, NaviDocsSetup."From E-mail Name", NaviDocsSetup."From E-mail Address",
                                             NaviDocsSetup."Warning E-mail".Split(MailSeparators),
                                             StrSubstNo(NaviDocsErr, NaviDocsEntry."Document Description", NaviDocsEntry."No."), '', true);
 
