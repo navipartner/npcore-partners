@@ -62,6 +62,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'SalesDocExpPaymentMethodCode'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Fix POS Entry SystemId"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG E-Mail Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Aux Tables"));
     end;
 
@@ -215,6 +216,8 @@
 
             Codeunit::"NPR Upgrade Shipping Provider":
                 Exit('NPRShippingProvider');
+            Codeunit::"NPR UPG E-Mail Setup":
+                Exit('NPRUPGUPGEMailSetup-20220312');
             Codeunit::"NPR UPG Aux Tables":
                 Exit('NPRUPGAuxTables');
         end;
