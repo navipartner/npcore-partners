@@ -191,7 +191,7 @@
                     end;
 
                     MagentoPaymentGateway.Get(Rec."Payment Gateway Code");
-                    MagentoPaymentGateway.TestField("Capture Codeunit Id");
+                    MagentoPaymentGateway.TestField("Refund Codeunit Id");
 
                     MagentoPmtMgt.RefundPaymentLine(Rec);
                     if Rec."Date Refunded" <> 0D then
