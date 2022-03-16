@@ -373,11 +373,6 @@
             "justification": "Skip 'Using Blob with subtype Bitmap is deprecated' warnings. Sticking with Blobs for now."
         },
         {
-            "id": "AL0697",
-            "action": "Hidden",
-            "justification": "Skip 'Argument {0}: The argument should be a valid Field type.' because there is no good solution"
-        },
-        {
             "id": "AS0053",
             "action":"Warning",
             "justification": "The compilation target of an application must be a value that is allowed in a multi-tenant SaaS environment."

@@ -120,7 +120,7 @@
             DATABASE::"NPR Magento Custom Optn. Value":
                 begin
                     RecRef.SetTable(MagentoCustomOptionValue);
-                    if not MagentoCustomOption.Get(MagentoCustomOptionValue) then
+                    if not MagentoCustomOption.Get(MagentoCustomOptionValue."Custom Option No.") then
                         exit(false);
                     RecRefRelated.GetTable(MagentoCustomOption);
                     exit(true);
