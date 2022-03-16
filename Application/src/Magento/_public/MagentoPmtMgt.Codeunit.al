@@ -4,14 +4,13 @@
 
     trigger OnRun()
     var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
         NotInitialized: Label 'Codeunit 6151416 wasn''t initialized properly. This is a programming bug, not a user error. Please contact system vendor.';
     begin
-        case PaymentEventType of
-            PaymentEventType::Capture:
-                CapturePaymentEvent(PaymentGateway, Rec);
-            PaymentEventType::Refund:
-                RefundPaymentEvent(PaymentGateway, Rec);
+        case _PaymentEventType of
+            _PaymentEventType::Capture:
+                CapturePaymentEvent(_PaymentGateway, Rec);
+            _PaymentEventType::Refund:
+                RefundPaymentEvent(_PaymentGateway, Rec);
             else
                 Error(NotInitialized);
         end;
@@ -19,18 +18,17 @@
 
     var
 
-        PaymentEventType: Option " ",Capture,Refund;
+        _PaymentGateway: Record "NPR Magento Payment Gateway";
+        _PaymentEventType: Option " ",Capture,Refund;
         Text000: Label 'Error during Payment Capture:\%1';
         Text004: Label 'You may not invoice more than the paid amount %1.';
         Text005: Label 'Error during Payment Refund:\%1';
         Text006: Label 'Document not Found';
 
     internal procedure SetProcessingOptions(PaymentGatewayIn: Record "NPR Magento Payment Gateway"; PaymentEventTypeIn: Option " ",Capture,Refund)
-    var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
     begin
-        PaymentGateway := PaymentGatewayIn;
-        PaymentEventType := PaymentEventTypeIn;
+        _PaymentGateway := PaymentGatewayIn;
+        _PaymentEventType := PaymentEventTypeIn;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnAfterCopySalesDocument', '', true, true)]
@@ -401,7 +399,7 @@
 
         Commit();
         Clear(MagentPmtMgt);
-        MagentPmtMgt.SetProcessingOptions(PaymentGateway, PaymentEventType::Capture);
+        MagentPmtMgt.SetProcessingOptions(PaymentGateway, _PaymentEventType::Capture);
         if not MagentPmtMgt.Run(PaymentLine) then begin
             ErrorText := GetLastErrorText;
             if ErrorText <> '' then
@@ -716,7 +714,7 @@
 
         Commit();
         Clear(MagentPmtMgt);
-        MagentPmtMgt.SetProcessingOptions(PaymentGateway, PaymentEventType::Refund);
+        MagentPmtMgt.SetProcessingOptions(PaymentGateway, _PaymentEventType::Refund);
         if not MagentPmtMgt.Run(PaymentLine) then begin
             ErrorText := GetLastErrorText;
             if ErrorText <> '' then

@@ -105,28 +105,6 @@
                 }
 
             }
-            cuegroup(Activities)
-            {
-                field("Pending Inc. Documents"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Pending Inc. Documents"))))
-                {
-                    Caption = 'Pending Inc. Documents';
-                    Image = "Document";
-                    ToolTip = 'Specifies the value of the Pending Inc. Documents field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnDrillDown()
-                    var
-                        IncDocument: Record "Incoming Document";
-                    begin
-                        IncDocument.Reset();
-                        IncDocument.SetFilter("Document Type", '= %1', IncDocument."Document Type"::" ");
-                        IncDocument.SetFilter("Document No.", '= %1', '');
-                        Page.RunModal(Page::"Incoming Documents", IncDocument);
-                        CurrPage.Update(false);
-                    end;
-                }
-            }
-
         }
     }
 
