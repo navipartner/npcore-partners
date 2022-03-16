@@ -116,7 +116,7 @@
         AllObjWithCaption: Record AllObjWithCaption;
     begin
         if tmpAllObjWithCaption.IsTemporary() then begin
-            AllObjWithCaption.Get(OBJECTTYPE::Codeunit, 6184550);
+            AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Codeunit, 6184550);
             tmpAllObjWithCaption.Init();
             tmpAllObjWithCaption."Object Type" := AllObjWithCaption."Object Type";
             tmpAllObjWithCaption."Object ID" := AllObjWithCaption."Object ID";
