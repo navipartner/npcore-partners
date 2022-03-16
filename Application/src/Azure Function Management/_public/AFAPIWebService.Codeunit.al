@@ -343,7 +343,7 @@
         if not Evaluate(RecID, AFHelperFunctions.GetValueAsText(JsonObj, 'recordID'), 9) then
             exit;
 
-        if not AllObjWithCaption.Get(OBJECTTYPE::Report, ReportID) then
+        if not AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Report, ReportID) then
             exit;
 
         RecRef := RecID.GetRecord();
