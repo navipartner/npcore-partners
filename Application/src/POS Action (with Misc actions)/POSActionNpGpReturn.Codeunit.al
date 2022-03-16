@@ -1,6 +1,7 @@
 ﻿codeunit 6151169 "NPR POS Action: NpGp Return"
 {
     Access = Internal;
+
     var
         TitleCaption: Label 'Return Item by Reference';
         RefNoPromptCaption: Label 'Cross Reference No.';
@@ -173,6 +174,7 @@
         FullSale: Boolean;
         InterCompSetup: Boolean;
         Client: HttpClient;
+        Content: HttpContent;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
         RequestHeaders: HttpHeaders;
@@ -200,12 +202,13 @@
 
         InitRequestBody(ServiceName, ReferenceNo, FullSale, XmlDoc);
         XmlDoc.WriteTo(ContextXMLText);
-        RequestMessage.Content.WriteFrom(ContextXMLText);
-        RequestMessage.Content.GetHeaders(ContentHeaders);
+        Content.WriteFrom(ContextXMLText);
+        Content.GetHeaders(ContentHeaders);
         if ContentHeaders.Contains('Content-Type') then
             ContentHeaders.Remove('Content-Type');
         ContentHeaders.Add('Content-Type', 'text/xml; charset=utf-8');
         ContentHeaders.Add('SOAPAction', 'GetGlobalSale');
+        RequestMessage.Content := Content;
 
         RequestMessage.Method := 'POST';
         RequestMessage.SetRequestUri(NpGpPOSSalesSetup."Service Url");
