@@ -122,7 +122,7 @@
             Caption = 'Last Posting No.';
             DataClassification = CustomerContent;
         }
-        field(210; "Charge ID"; Code[20])
+        field(210; "Charge ID"; Code[100])
         {
             Caption = 'Charge ID';
             DataClassification = CustomerContent;
