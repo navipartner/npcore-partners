@@ -25,19 +25,19 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique identifier of the EFT Integration Type.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the Description of EFT Integration Type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Codeunit ID"; Rec."Codeunit ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Codeunit ID field';
+                    ToolTip = 'Specifies which Codeunit ID is used with the selected integration.';
                     ApplicationArea = NPRRetail;
                 }
             }
