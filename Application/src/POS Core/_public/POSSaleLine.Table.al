@@ -1780,8 +1780,10 @@
         TempSaleLinePOS."Currency Code" := '';
         POSSalesPriceCalcMgt.FindItemPrice(SalePOS, TempSaleLinePOS);
         "Allow Line Discount" := TempSaleLinePOS."Allow Line Discount";
-        if not "Allow Line Discount" then
+        if not "Allow Line Discount" then begin
             "Discount %" := 0;
+            "Discount Amount" := 0;
+        end;
         exit(TempSaleLinePOS."Unit Price");
     end;
 
