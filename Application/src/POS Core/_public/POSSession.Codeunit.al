@@ -641,8 +641,12 @@
     var
         SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';
     begin
-        if not _Initialized then
-            Error(SESSION_MISSING);
+        if not _Initialized then begin
+            if WithError then
+                Error(SESSION_MISSING)
+            else
+                exit(false);
+        end;
         exit(true);
     end;
 
