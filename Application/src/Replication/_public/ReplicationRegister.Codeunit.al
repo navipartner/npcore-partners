@@ -202,7 +202,7 @@ codeunit 6014608 "NPR Replication Register"
     local procedure RegisterServiceWithEndPoints(sender: Record "NPR Replication Service Setup")
     var
         ReplicationAPI: Codeunit "NPR Replication API";
-        BaseURLAPI: Text[100];
+        BaseURLAPI: Text[250];
         Tenant: Text[50];
     begin
         BaseURLAPI := GetAPIServiceURL();
