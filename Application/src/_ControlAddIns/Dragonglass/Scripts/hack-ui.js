@@ -147,6 +147,14 @@ function preventEscInTopWindow() {
   window.top.document.addEventListener("keydown", handleEsc, true);
 }
 
+// Hides BC modal for App Source
+function hideBussinesCentralTopBar() {
+  const topBar = window.top.document.body.querySelector("div#shell-container");
+  if (topBar) {
+    topBar.style.setProperty("display", "none", "important");
+  }
+}
+
 /**
  * Hacks Business Central and Microsoft Dynamics NAV web client UI by hijacking the entire page content and
  * hiding any BC/NAV UI elements.
@@ -163,6 +171,7 @@ ready(() => {
   hideBusinessCentralGutter();
   hideBusinessCentralAppBar();
   hideBusinessCentralProductMenuBar();
+  hideBussinesCentralTopBar();
   fixBC170DefualtClientBottomPadding();
   expandControlAddIn();
   fixIOSKeyboardFocusZoom();
