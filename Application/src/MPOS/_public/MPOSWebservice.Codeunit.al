@@ -63,5 +63,25 @@
         exit(Result);
     end;
 
+    procedure InitMPOSWebService()
+    var
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        if not WebService.ReadPermission then
+            exit;
+
+        if not WebService.WritePermission then
+            exit;
+
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, MPOSWebServiceCodeunitId(), 'mpos_web_service', true);
+    end;
+
+
+    procedure MPOSWebServiceCodeunitId(): Integer
+    begin
+        exit(CODEUNIT::"NPR MPOS Webservice");
+    end;
+
 }
 
