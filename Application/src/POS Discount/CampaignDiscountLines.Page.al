@@ -56,12 +56,6 @@
                     ToolTip = 'Specifies the value of the Campaign Profit field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Control1160330002; Rec.Comment)
-                {
-                    Caption = 'Comment';
-                    ToolTip = 'Specifies the value of the Comment field';
-                    ApplicationArea = NPRRetail;
-                }
                 field(Inventory; Rec.Inventory)
                 {
                     Caption = 'Inventory';

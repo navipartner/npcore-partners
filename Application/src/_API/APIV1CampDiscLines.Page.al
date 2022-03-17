@@ -68,10 +68,6 @@ page 6014476 "NPR APIV1 - Camp. Disc. Lines"
                 {
                     Caption = 'campaignUnitPrice', Locked = true;
                 }
-                field(comment; Rec.Comment)
-                {
-                    Caption = 'comment', Locked = true;
-                }
                 field(crossReferenceNo; Rec."Cross-Reference No.")
                 {
                     Caption = 'crossReferenceNo', Locked = true;

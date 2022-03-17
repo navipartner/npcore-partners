@@ -169,6 +169,8 @@
         }
         field(20; Comment; Boolean)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
             CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6014414),
                                                         "No." = FIELD(Code),
                                                         "No. 2" = FIELD("Item No.")));
