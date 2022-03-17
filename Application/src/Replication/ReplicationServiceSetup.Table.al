@@ -22,7 +22,7 @@
                 Rec.TestField(Enabled, false);
             end;
         }
-        field(10; "Service URL"; Text[100])
+        field(10; "Service URL"; Text[250])
         {
             Caption = 'Service Base URL';
             DataClassification = CustomerContent;
@@ -275,7 +275,7 @@
         Error(RenameNotAllowedErr);
     end;
 
-    procedure RegisterService(pAPIVersion: Code[20]; pServiceUrl: Text[100]; pName: Text[100]; pEnabled: Boolean; pAuthType: Enum "NPR API Auth. Type"; pTenant: Text[50])
+    procedure RegisterService(pAPIVersion: Code[20]; pServiceUrl: Text[250]; pName: Text[100]; pEnabled: Boolean; pAuthType: Enum "NPR API Auth. Type"; pTenant: Text[50])
     begin
         Rec."API Version" := pAPIVersion;
         if Rec.FIND() then
