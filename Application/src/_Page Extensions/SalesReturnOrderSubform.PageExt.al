@@ -16,8 +16,10 @@
                     exit;
                 if Rec.Type = Rec.Type::Item then begin
                     ItemVariant.SetRange("Item No.", Rec."No.");
-                    if not ItemVariant.IsEmpty() then
+                    if not ItemVariant.IsEmpty() then begin
+                        CurrPage.SaveRecord();
                         VRTWrapper.SalesLineShowVariety(Rec, 0);
+                    end;
                 end;
             end;
         }
