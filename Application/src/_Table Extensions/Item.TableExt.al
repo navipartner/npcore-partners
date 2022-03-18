@@ -614,7 +614,7 @@ tableextension 6014427 "NPR Item" extends Item
         end;
     end;
 
-    internal procedure NPR_GetAuxItem(var AuxItem: Record "NPR Aux Item")
+    procedure NPR_GetAuxItem(var AuxItem: Record "NPR Aux Item")
     begin
         NPR_ReadAuxItem();
         AuxItem := _AuxItem;
