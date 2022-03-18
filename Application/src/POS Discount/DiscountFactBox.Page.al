@@ -7,6 +7,7 @@
     UsageCategory = None;
     SourceTable = Item;
 
+
     layout
     {
         area(content)
@@ -17,8 +18,9 @@
                 Caption = 'Mix Discount';
                 ToolTip = 'Specifies the value of the Mix Discount field';
                 ApplicationArea = NPRRetail;
+                DrillDown = true;
 
-                trigger OnAssistEdit()
+                trigger OnDrillDown()
                 var
                     MixedDiscountLines: Page "NPR Mixed Discount Lines";
                     MixedDiscountLine: Record "NPR Mixed Discount Line";
@@ -36,8 +38,9 @@
                 Caption = 'Period Discount';
                 ToolTip = 'Specifies the value of the Period Discount field';
                 ApplicationArea = NPRRetail;
+                DrillDown = true;
 
-                trigger OnAssistEdit()
+                trigger OnDrillDown()
                 var
                     CampaignDiscountLines: Page "NPR Campaign Discount Lines";
                     PeriodDiscountLine: Record "NPR Period Discount Line";
@@ -55,8 +58,9 @@
                 Caption = 'Multiple Unit Price';
                 ToolTip = 'Specifies the value of the Multiple Unit Price field';
                 ApplicationArea = NPRRetail;
+                DrillDown = true;
 
-                trigger OnAssistEdit()
+                trigger OnDrillDown()
                 var
                     QuantityDiscountHeader: Record "NPR Quantity Discount Header";
                     QuantityDiscountCard: Page "NPR Quantity Discount Card";
