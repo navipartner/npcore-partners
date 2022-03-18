@@ -1,6 +1,6 @@
 table 6014635 "NPR Aux Item"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Aux Item';
     DataClassification = CustomerContent;
 
