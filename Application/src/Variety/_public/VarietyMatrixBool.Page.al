@@ -1841,7 +1841,7 @@
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[100] of Boolean;
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ShowAsCrossVRT: Option Variety1,Variety2,Variety3,Variety4;
         RecRef: RecordRef;
         VRTMatrixMgt: Codeunit "NPR Variety Matrix Management";

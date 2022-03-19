@@ -6,7 +6,7 @@
     internal procedure EditItemAttributes(ItemNo: Code[20]; VariantCode: Code[10])
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         MagentoItemAttributes: Page "NPR Magento Item Attr.";
     begin
         Item.Get(ItemNo);
@@ -18,7 +18,7 @@
 
     procedure SetupItemAttributes(var Item: Record Item; VariantCode: Code[10])
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         MagentoAttribute: Record "NPR Magento Attribute";
         MagentoAttributeSetValue: Record "NPR Magento Attr. Set Value";
         MagentoAttributeLabel: Record "NPR Magento Attr. Label";
@@ -66,7 +66,7 @@
 
     internal procedure HasProducts(RecRef: RecordRef): Boolean
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         MagentoAttributeSet: Record "NPR Magento Attribute Set";
     begin
         case RecRef.Number of

@@ -721,7 +721,7 @@
     var
         AdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         Admission: Record "NPR TM Admission";
@@ -2119,7 +2119,7 @@
     var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
         MaxCapacity: Integer;

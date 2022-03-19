@@ -1131,7 +1131,7 @@ page 6014501 "NPR APIV1 - Items"
 
     var
         TempFieldSet: Record Field temporary;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemCategory: Record "Item Category";
         TaxGroup: Record "Tax Group";
         GraphCollectionMgtItem: Codeunit "Graph Collection Mgt - Item";

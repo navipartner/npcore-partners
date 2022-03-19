@@ -208,7 +208,7 @@
     var
         Location: Record Location;
         ItemVariant: Record "Item Variant";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         HasVariants: Boolean;
         POSInventoryOverview: Page "NPR POS Inventory Overview";
     begin
@@ -299,7 +299,7 @@
     local procedure LookupField(FieldType: Option ItemNo,VariantCode,Variety1,Variety2,Variety3,Variety4): Code[20]
     var
         LookupItem: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
         VarietyValuePage: Page "NPR Variety Value";

@@ -694,7 +694,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                         trigger OnAssistEdit()
                         var
-                            AuxItem: Record "NPR Aux Item";
+                            AuxItem: Record "NPR Auxiliary Item";
                             MagentoAttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
                         begin
                             Rec.NPR_GetAuxItem(AuxItem);
@@ -1417,7 +1417,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         HasVariants: Boolean;
         OriginalRec: Record Item;
         AccessorySparePart: Record "NPR Accessory/Spare Part";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemCostMgt: Codeunit ItemCostManagement;
         NPRCustomOptionCount: Integer;
         AverageCostACY: Decimal;

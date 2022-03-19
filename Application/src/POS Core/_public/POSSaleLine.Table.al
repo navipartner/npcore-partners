@@ -1693,7 +1693,7 @@
 
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         POSUnitGlobal: Record "NPR POS Unit";
         CustomerGlobal: Record Customer;
         SalePOS: Record "NPR POS Sale";

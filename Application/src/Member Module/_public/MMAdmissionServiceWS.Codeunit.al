@@ -34,7 +34,7 @@
         MMMemberWebService: Codeunit "NPR MM Member WebService";
         MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TMTicketWebService: Codeunit "NPR TM Ticket WebService";
         MMAdmissionServiceEntry: Record "NPR MM Admis. Service Entry";
         DataError: Boolean;
@@ -587,7 +587,7 @@
         MMMemberWebService: Codeunit "NPR MM Member WebService";
         MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TMTicketWebService: Codeunit "NPR TM Ticket WebService";
         MMAdmissionServiceEntry: Record "NPR MM Admis. Service Entry";
         DataError: Boolean;

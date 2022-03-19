@@ -291,7 +291,7 @@
     local procedure ValidateItemNo()
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         if (TmpItemNo = '') then begin
             TmpItemNo := '<GENERATE>';

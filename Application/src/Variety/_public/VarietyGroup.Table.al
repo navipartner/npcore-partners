@@ -397,7 +397,7 @@
 
     internal procedure CopyTableData(Item: Record Item)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         Item.NPR_GetAuxItem(AuxItem);
         if "Create Copy of Variety 1 Table" then

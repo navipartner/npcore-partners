@@ -477,7 +477,7 @@
     var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Token: Text[100];
     begin

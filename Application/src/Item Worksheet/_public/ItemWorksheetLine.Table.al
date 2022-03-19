@@ -79,7 +79,7 @@
 
             trigger OnValidate()
             var
-                AuxItem: Record "NPR Aux Item";
+                AuxItem: Record "NPR Auxiliary Item";
                 ItemWorksheetTemplate2: Record "NPR Item Worksh. Template";
             begin
                 TestField("Line No.");
@@ -1280,7 +1280,7 @@
             trigger OnValidate()
             var
                 ItemCategory: Record "Item Category";
-                AuxItem: Record "NPR Aux Item";
+                AuxItem: Record "NPR Auxiliary Item";
                 TempItem: Record Item temporary;
                 ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
             begin

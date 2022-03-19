@@ -120,7 +120,7 @@
     internal procedure LoadMatrixRecords(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; CrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         VRT1: Record "NPR Variety Value";
         VRT2: Record "NPR Variety Value";
         VRT3: Record "NPR Variety Value";
@@ -392,7 +392,7 @@
     internal procedure LoadAll(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; SetRecordID2ItemVar: Boolean; MasterRecordID: RecordID)
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         VRT1: Record "NPR Variety Value";
         VRT2: Record "NPR Variety Value";
         VRT3: Record "NPR Variety Value";
@@ -535,7 +535,7 @@
     procedure LoadCombinations(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; SetRecordID2ItemVar: Boolean; MasterRecordID: RecordID; HideInactive: Boolean)
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TempVRT1: Record "NPR Variety Value" temporary;
         TempVRT2: Record "NPR Variety Value" temporary;
         TempVRT3: Record "NPR Variety Value" temporary;
@@ -655,7 +655,7 @@
 
     local procedure LoadAllRows(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item; CrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TempVRT1: Record "NPR Variety Value" temporary;
         TempVRT2: Record "NPR Variety Value" temporary;
         TempVRT3: Record "NPR Variety Value" temporary;
@@ -726,7 +726,7 @@
 
     local procedure LoadUsedRowsCrossVRT1(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         GetRowsCrossVariety1: Query "NPR Get Rows - Cross Variety 1";
     begin
         Item.NPR_GetAuxItem(AuxItem);
@@ -757,7 +757,7 @@
 
     local procedure LoadUsedRowsCrossVRT2(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         GetRowsCrossVariety2: Query "NPR Get Rows - Cross Variety 2";
     begin
         Item.NPR_GetAuxItem(AuxItem);
@@ -789,7 +789,7 @@
 
     local procedure LoadUsedRowsCrossVRT3(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         GetRowsCrossVariety3: Query "NPR Get Rows - Cross Variety 3";
     begin
         Item.NPR_GetAuxItem(AuxItem);
@@ -821,7 +821,7 @@
 
     local procedure LoadUsedRowsCrossVRT4(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         GetRowsCrossVariety4: Query "NPR Get Rows - Cross Variety 4";
     begin
         Item.NPR_GetAuxItem(AuxItem);
@@ -875,7 +875,7 @@
 
     local procedure LoadUsedValuesVRT1(Item: Record Item; var TMPVRTValue: Record "NPR Variety Value" temporary)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         Variety1UsedValues: Query "NPR Variety 1 Used Values";
     begin
         Item.NPR_GetAuxItem(AuxItem);
@@ -895,7 +895,7 @@
 
     local procedure LoadUsedValuesVRT2(Item: Record Item; var TMPVRTValue: Record "NPR Variety Value" temporary)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         Variety2UsedValues: Query "NPR Variety 2 Used Values";
     begin
         Item.NPR_GetAuxItem(AuxItem);
@@ -915,7 +915,7 @@
 
     local procedure LoadUsedValuesVRT3(Item: Record Item; var TMPVRTValue: Record "NPR Variety Value" temporary)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         Variety3UsedValues: Query "NPR Variety 3 Used Values";
     begin
         Item.NPR_GetAuxItem(AuxItem);
@@ -935,7 +935,7 @@
 
     local procedure LoadUsedValuesVRT4(Item: Record Item; var TMPVRTValue: Record "NPR Variety Value" temporary)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         Variety4UsedValues: Query "NPR Variety 4 Used Values";
     begin
         Item.NPR_GetAuxItem(AuxItem);

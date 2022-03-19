@@ -589,7 +589,7 @@
     internal procedure SetTicketItem(ItemNo: Code[20]; VariantCode: Code[10])
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TicketType: Record "NPR TM Ticket Type";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
     begin
