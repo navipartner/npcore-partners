@@ -302,8 +302,8 @@
             VRTCheck.PostingCheck(ItemJnlLine);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Aux Item", 'OnAfterValidateEvent', 'Variety Group', true, false)]
-    local procedure T27OnAfterValVarietyGroup(var Rec: Record "NPR Aux Item"; var xRec: Record "NPR Aux Item"; CurrFieldNo: Integer)
+    [EventSubscriber(ObjectType::Table, Database::"NPR Auxiliary Item", 'OnAfterValidateEvent', 'Variety Group', true, false)]
+    local procedure T27OnAfterValVarietyGroup(var Rec: Record "NPR Auxiliary Item"; var xRec: Record "NPR Auxiliary Item"; CurrFieldNo: Integer)
     var
         Item: Record Item;
         xItem: Record Item;

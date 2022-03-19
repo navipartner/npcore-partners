@@ -85,7 +85,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                         trigger OnBeforeInsertRecord()
                         var
                             Item: Record Item;
-                            AuxItem: Record "NPR Aux Item";
+                            AuxItem: Record "NPR Auxiliary Item";
                             ItemVariant: Record "Item Variant";
                         begin
                             if TempSaleLinePOSReq.Description = '' then begin

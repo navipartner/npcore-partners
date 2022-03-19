@@ -36,7 +36,7 @@
         ItemGroup: Record "NPR Item Group";
         ItemCategory: Record "Item Category";
         TempItem: Record Item temporary;
-        TempAuxItem: Record "NPR Aux Item" temporary;
+        TempAuxItem: Record "NPR Auxiliary Item" temporary;
         ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
     begin
         Database.SelectLatestVersion();

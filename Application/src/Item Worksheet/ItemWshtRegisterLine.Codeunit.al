@@ -147,7 +147,7 @@
 
     local procedure CreateItem()
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         GetItem(ItemWkshLine."Item No.");
         Item.NPR_GetAuxItem(AuxItem);

@@ -382,7 +382,7 @@
     var
         TicketSetup: Record "NPR TM Ticket Setup";
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
 
         if (Item.Get(ItemNo)) then

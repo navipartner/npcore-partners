@@ -54,7 +54,7 @@
     local procedure GenerateItemAddonConfig(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management")
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemAddOn: Record "NPR NpIa Item AddOn";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";

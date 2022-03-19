@@ -216,7 +216,7 @@
 
     local procedure SetupVarietyFixed()
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         if MagentoSetup."Variant Picture Dimension" = '' then
             exit;
@@ -266,7 +266,7 @@
 
     local procedure SetupVariety1()
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
@@ -304,7 +304,7 @@
 
     local procedure SetupVariety2()
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
@@ -342,7 +342,7 @@
 
     local procedure SetupVariety3()
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
@@ -380,7 +380,7 @@
 
     local procedure SetupVariety4()
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin

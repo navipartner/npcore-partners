@@ -288,7 +288,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeItemAddOnNoToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -307,7 +307,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeVarietyGroupToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -326,7 +326,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeItemStatusToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -345,7 +345,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeMagentoBrandToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -364,7 +364,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeAttributeSetIDToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -383,7 +383,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeRestItemRoutingProfileToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -402,7 +402,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeTicketTypeToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -421,7 +421,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeVariety1ToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -440,7 +440,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeVariety2ToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -459,7 +459,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeVariety3ToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -478,7 +478,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeVariety4ToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -497,7 +497,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeVariety1TableToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -516,7 +516,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeVariety2TableToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -535,7 +535,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeVariety3TableToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;
@@ -554,7 +554,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
     local procedure UpgradeVariety4TableToRelationTable()
     var
         FromMigrationRec: Record Item;
-        ToMigrationRec: Record "NPR Aux Item";
+        ToMigrationRec: Record "NPR Auxiliary Item";
     begin
         if FromMigrationRec.IsEmpty() then
             exit;

@@ -116,7 +116,7 @@
         MagentoAttribute: Record "NPR Magento Attribute";
         MagentoItemAttribute: Record "NPR Magento Item Attr.";
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         MagentoItemAttr: Record "NPR Magento Item Attr.";
         RecRef: RecordRef;
     begin

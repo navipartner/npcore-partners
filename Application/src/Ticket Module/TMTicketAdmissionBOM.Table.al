@@ -171,7 +171,7 @@
             trigger OnValidate()
             var
                 Item: Record Item;
-                AuxItem: Record "NPR Aux Item";
+                AuxItem: Record "NPR Auxiliary Item";
                 TicketType: Record "NPR TM Ticket Type";
                 Admission: Record "NPR TM Admission";
             begin
@@ -209,7 +209,7 @@
             trigger OnValidate()
             var
                 Item: Record Item;
-                AuxItem: Record "NPR Aux Item";
+                AuxItem: Record "NPR Auxiliary Item";
                 TicketType: Record "NPR TM Ticket Type";
             begin
 

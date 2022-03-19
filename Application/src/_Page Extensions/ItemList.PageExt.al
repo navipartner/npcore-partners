@@ -517,7 +517,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
     var
         ItemAvlByLocation: Decimal;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemFilter: Record Item;
         MagentoEnabled: Boolean;
         MagentoEnabledDisplayConfig: Boolean;

@@ -575,7 +575,7 @@ query 6014410 "NPR APIV1 - Items Read"
                 Caption = 'Last Modified Date', Locked = true;
             }
 
-            dataitem(auxItem; "NPR Aux Item")
+            dataitem(auxItem; "NPR Auxiliary Item")
             {
                 DataItemLink = "Item No." = item."No.";
                 SqlJoinType = InnerJoin;

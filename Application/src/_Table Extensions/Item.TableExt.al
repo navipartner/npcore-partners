@@ -578,7 +578,7 @@ tableextension 6014427 "NPR Item" extends Item
 
     var
         SalesSetup: Record "Sales & Receivables Setup";
-        _AuxItem: Record "NPR Aux Item";
+        _AuxItem: Record "NPR Auxiliary Item";
 
     local procedure UpdateVendorItemRef(var Item: Record Item; xItem: Record Item)
     var
@@ -614,13 +614,13 @@ tableextension 6014427 "NPR Item" extends Item
         end;
     end;
 
-    procedure NPR_GetAuxItem(var AuxItem: Record "NPR Aux Item")
+    procedure NPR_GetAuxItem(var AuxItem: Record "NPR Auxiliary Item")
     begin
         NPR_ReadAuxItem();
         AuxItem := _AuxItem;
     end;
 
-    internal procedure NPR_SetAuxItem(var AuxItem: Record "NPR Aux Item")
+    internal procedure NPR_SetAuxItem(var AuxItem: Record "NPR Auxiliary Item")
     begin
         _AuxItem := AuxItem;
     end;

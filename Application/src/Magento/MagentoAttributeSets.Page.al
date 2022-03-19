@@ -79,7 +79,7 @@
     internal procedure UsedByItemDrillDown()
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TempItem: Record Item temporary;
     begin
         TempItem.DeleteAll();

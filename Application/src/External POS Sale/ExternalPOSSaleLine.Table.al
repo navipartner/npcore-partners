@@ -632,7 +632,7 @@
 
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ExtSalePOS: Record "NPR External POS Sale";
         Currency: Record Currency;
 

@@ -10,7 +10,7 @@ page 6059858 "NPR APIV1 - Aux Item"
     Extensible = false;
     ODataKeyFields = SystemId;
     PageType = API;
-    SourceTable = "NPR Aux Item";
+    SourceTable = "NPR Auxiliary Item";
 
     layout
     {

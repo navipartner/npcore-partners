@@ -694,7 +694,7 @@
         Item: Record Item;
         SaleLinePOS2: Record "NPR POS Sale Line";
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         Clear(ItemAddOn);
 

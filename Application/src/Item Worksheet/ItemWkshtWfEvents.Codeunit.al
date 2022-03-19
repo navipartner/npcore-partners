@@ -37,8 +37,8 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', true, true)]
     local procedure RunWorkflowOnAfterModifyItemStatus(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
-        AuxItem: Record "NPR Aux Item";
-        xAuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
+        xAuxItem: Record "NPR Auxiliary Item";
         WorkflowManagement: Codeunit "Workflow Management";
     begin
         Rec.NPR_GetAuxItem(AuxItem);

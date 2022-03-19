@@ -10,8 +10,8 @@
 
     procedure ChangeItemVariety(Item: Record Item; XRecItem: Record Item)
     var
-        AuxItem: Record "NPR Aux Item";
-        xAuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
+        xAuxItem: Record "NPR Auxiliary Item";
         ItemVar: Record "Item Variant";
         ItemLedgEntry: Record "Item Ledger Entry";
         SalesLine: Record "Sales Line";
@@ -182,8 +182,8 @@
 
     local procedure CheckModifyAlloved(Item: Record Item; XRecItem: Record Item): Boolean
     var
-        AuxItem: Record "NPR Aux Item";
-        xAuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
+        xAuxItem: Record "NPR Auxiliary Item";
         ItemVar: Record "Item Variant";
         Variety: Record "NPR Variety";
         VarietyTable: Record "NPR Variety Table";
@@ -253,7 +253,7 @@
 
     local procedure UpdateVariants(Item: Record Item)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemVar: Record "Item Variant";
         VarValue: Record "NPR Variety Value";
     begin
