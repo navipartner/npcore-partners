@@ -130,6 +130,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                     VarietyWrapper: Codeunit "NPR Variety Wrapper";
                 begin
                     VarietyWrapper.PurchLineShowVariety(Rec, 0);
+                    ForceTotalsCalculation();
                 end;
             }
         }
@@ -161,6 +162,24 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
             Clear(ExchangeLabelTableMap);
     end;
 
-    var
+#if BC17
+    trigger OnAfterGetCurrRecord()
+    begin
+        if TotalsCalculationForced then begin
+            UnbindSubscription(VarietyTotals);
+            TotalsCalculationForced := false;
+        end;
+    end;
+
+    local procedure ForceTotalsCalculation()
+    begin
+        TotalsCalculationForced := BindSubscription(VarietyTotals);
+    end;
+#endif
+      var
         ExchangeLabelTableMap: Record "NPR Exchange Label Map";
+#if BC17
+        VarietyTotals: Codeunit "NPR Variety Totals Calculation";
+        TotalsCalculationForced: Boolean;
+#endif
 }

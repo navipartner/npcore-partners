@@ -39,8 +39,27 @@ pageextension 6014408 "NPR Purch.Return Order Subform" extends "Purchase Return 
                     VarietyWrapper: Codeunit "NPR Variety Wrapper";
                 begin
                     VarietyWrapper.PurchLineShowVariety(Rec, 0);
+                    ForceTotalsCalculation();
                 end;
             }
         }
     }
+#if BC17
+    trigger OnAfterGetCurrRecord()
+    begin
+        if TotalsCalculationForced then begin
+            UnbindSubscription(VarietyTotals);
+            TotalsCalculationForced := false;
+        end;
+    end;
+
+    local procedure ForceTotalsCalculation()
+    begin
+        TotalsCalculationForced := BindSubscription(VarietyTotals);
+    end;
+
+    var
+        VarietyTotals: Codeunit "NPR Variety Totals Calculation";
+        TotalsCalculationForced: Boolean;
+#endif
 }
