@@ -1,6 +1,6 @@
 table 6014635 "NPR Aux Item"
 {
-    Access = Public;
+    Access = Internal;
     Caption = 'Aux Item';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
