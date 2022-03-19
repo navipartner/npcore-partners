@@ -41,9 +41,10 @@
                     case true of
                         (Format(TempVRTBuffer."Record ID (TMP)") <> ''):
                             begin
-                                RecRef.Get(TempVRTBuffer."Record ID (TMP)");
-                                FRef := RecRef.Field(VRTFieldSetup."Field No.");
-                                TextValue := Format(FRef.Value);
+                                if RecRef.Get(TempVRTBuffer."Record ID (TMP)") then begin
+                                    FRef := RecRef.Field(VRTFieldSetup."Field No.");
+                                    TextValue := Format(FRef.Value);
+                                end;
                             end;
                         VRTFieldSetup."Table No." in [7002, 7012]:
                             begin
@@ -103,6 +104,7 @@
         Dec: Decimal;
         "Code": Code[50];
         Bool: Boolean;
+        OldValue: Text;
         VRTCloneData: Codeunit "NPR Variety Clone Data";
     begin
         TempVRTBuffer.Get(VRT1Value, VRT2Value, VRT3Value, VRT4Value);
@@ -121,7 +123,7 @@
 
                     RecRef.Get(TempVRTBuffer."Record ID (TMP)");
                     FRef := RecRef.Field(VRTFieldSetup."Field No.");
-
+                    OldValue := Format(FRef.Value);
                     case UpperCase(Format(FRef.Type)) of
                         'DATE':
                             begin
@@ -141,6 +143,7 @@
                             end;
                         'DECIMAL':
                             begin
+
                                 Evaluate(Dec, NewValue);
                                 if VRTFieldSetup."Validate Field" then
                                     FRef.Validate(Dec)
@@ -174,11 +177,49 @@
                             Error(FieldTypeNotSupported, Format(FRef.Type));
                     end;
                     RecRef.Modify();
+
+                    DeleteLinesQuantityZero(RecRef, FRef, TempVRTBuffer, OldValue, Dec);
                 end;
             VRTFieldSetup.Type::Internal:
                 begin
                     SetValueIntFunc(VRTFieldSetup, NewValue);
                 end;
+        end;
+    end;
+
+    internal procedure DeleteLinesQuantityZero(var RecRef: RecordRef; FRef: FieldRef; var TempVRTBuffer: Record "NPR Variety Buffer" temporary; OldVal: Text; Qty: decimal)
+    var
+        RecID: RecordId;
+    begin
+        if (Qty <> 0) or (OldVal = '0') or (TempVRTBuffer."Record ID (TMP)" = TempVRTBuffer."Master Record ID") then
+            exit;
+        if CheckTablesandFieldNosQtyZero(RecRef, FRef) then begin
+            RecRef.Delete(true);
+            TempVRTBuffer."Record ID (TMP)" := RecID;
+            TempVRTBuffer.Modify();
+        end;
+    end;
+
+    internal procedure CheckTablesandFieldNosQtyZero(var RecRef: RecordRef; FRef: FieldRef): Boolean
+    var
+        SalesLine: Record "Sales Line";
+        PurchaseLine: Record "Purchase Line";
+        TransferLine: Record "Transfer Line";
+        ItemJournalLine: Record "Item Journal Line";
+    begin
+        case RecRef.Number of
+            Database::"Sales Line":
+                exit(FRef.Number = SalesLine.FieldNo(Quantity));
+
+            Database::"Purchase Line":
+                exit(FRef.Number = PurchaseLine.FieldNo(Quantity));
+
+            Database::"Transfer Line":
+                exit(FRef.Number = TransferLine.FieldNo(Quantity));
+            Database::"Item Journal Line":
+                exit(FRef.Number = ItemJournalLine.FieldNo(Quantity));
+            else
+                exit(false);
         end;
     end;
 
