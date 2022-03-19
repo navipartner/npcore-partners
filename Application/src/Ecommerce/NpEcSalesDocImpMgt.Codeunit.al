@@ -202,8 +202,9 @@
         if not Element.Attributes().Get('code', Attribute) then
             Error(XmlAttributeIsMissingInElementErr, 'code', Element.Name());
         ExternalPaymentCode := copystr(Attribute.Value(), 1, MaxStrLen(PaymentMapping."External Payment Method Code"));
-        if Element.Attributes().Get('card_type', Attribute) then
-            ExternalPaymentType := copystr(Attribute.Value(), 1, MaxStrLen(PaymentMapping."External Payment Type"));
+
+        if Element.SelectSingleNode('.//card_type', Node) then
+            ExternalPaymentType := copystr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(PaymentMapping."External Payment Type"));
 
         PaymentMapping.SetRange("External Payment Method Code", ExternalPaymentCode);
         PaymentMapping.SetRange("External Payment Type", ExternalPaymentType);
@@ -830,13 +831,15 @@
 
         if not Element2.SelectNodes('.//payment', NodeList) then
             exit;
+
         foreach Node in NodeList do begin
             Element2 := Node.AsXmlElement();
             if not Element2.Attributes().Get('code', Attribute) then
                 Error(XmlAttributeIsMissingInElementErr, 'code', Element2.Name());
             ExternalPaymentMethodCode := copystr(Attribute.Value(), 1, MaxStrLen(PaymentMapping."External Payment Method Code"));
-            if Element2.Attributes().Get('card_type', Attribute) then
-                ExternalPaymentType := copystr(Attribute.Value(), 1, MaxStrLen(PaymentMapping."External Payment Type"));
+
+            if Element2.SelectSingleNode('.//card_type', Node) then
+                ExternalPaymentType := copystr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(PaymentMapping."External Payment Type"));
 
             PaymentMapping.SetRange("External Payment Method Code", ExternalPaymentMethodCode);
             PaymentMapping.SetRange("External Payment Type", ExternalPaymentType);
