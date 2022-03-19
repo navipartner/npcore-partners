@@ -38,6 +38,7 @@
     begin
         //Fetch base data
         SalesLine.TestField(SalesLine.Type, SalesLine.Type::Item);
+        SalesLine.TestField("No.");
         Item.Get(SalesLine."No.");
         //check its a Variety item
         TestItemIsVariety(Item);
@@ -76,6 +77,7 @@
     begin
         //Fetch base data
         PurchLine.TestField(PurchLine.Type, PurchLine.Type::Item);
+        PurchLine.TestField("No.");
         Item.Get(PurchLine."No.");
         //check its a Variety item
         TestItemIsVariety(Item);

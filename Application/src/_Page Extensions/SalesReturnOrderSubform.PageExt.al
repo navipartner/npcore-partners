@@ -19,9 +19,28 @@
                     if not ItemVariant.IsEmpty() then begin
                         CurrPage.SaveRecord();
                         VRTWrapper.SalesLineShowVariety(Rec, 0);
+                        ForceTotalsCalculation();
                     end;
                 end;
             end;
         }
     }
+#if BC17
+    trigger OnAfterGetCurrRecord()
+    begin
+        if TotalsCalculationForced then begin
+            UnbindSubscription(VarietyTotals);
+            TotalsCalculationForced := false;
+        end;
+    end;
+
+    local procedure ForceTotalsCalculation()
+    begin
+        TotalsCalculationForced := BindSubscription(VarietyTotals);
+    end;
+
+    var
+        VarietyTotals: Codeunit "NPR Variety Totals Calculation";
+        TotalsCalculationForced: Boolean;
+#endif
 }
