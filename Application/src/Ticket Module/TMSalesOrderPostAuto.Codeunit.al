@@ -63,7 +63,7 @@
     local procedure HasTicketItem(SalesHeader: Record "Sales Header"): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         SalesLine: Record "Sales Line";
     begin
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -85,7 +85,7 @@
     local procedure HasNonTicketItem(SalesHeader: Record "Sales Header"): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         SalesLine: Record "Sales Line";
     begin
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");

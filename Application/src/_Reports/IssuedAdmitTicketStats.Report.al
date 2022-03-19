@@ -47,7 +47,7 @@
             column(AdmissionCode; AdmissionCodeFilter)
             {
             }
-            dataitem(AuxItem; "NPR Aux Item")
+            dataitem(AuxItem; "NPR Auxiliary Item")
             {
                 DataItemLink = "TM Ticket Type" = FIELD(Code);
                 dataitem(Item; Item)
@@ -208,7 +208,7 @@
 
             trigger OnAfterGetRecord()
             var
-                AuxItem: Record "NPR Aux Item";
+                AuxItem: Record "NPR Auxiliary Item";
             begin
                 AuxItem.SetRange("TM Ticket Type", Code);
                 if not AuxItem.FindFirst() then

@@ -288,7 +288,7 @@
 
     procedure CreateItemTemplate(ItemCategory: Record "Item Category"; TempItem: Record Item temporary): Code[10]
     var
-        TempAuxItem: Record "NPR Aux Item" temporary;
+        TempAuxItem: Record "NPR Auxiliary Item" temporary;
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateLine: Record "Config. Template Line";
         Fields: Record Field;

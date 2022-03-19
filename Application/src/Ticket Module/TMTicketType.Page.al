@@ -152,7 +152,7 @@
                 trigger OnAction()
                 var
                     Item: Record Item;
-                    AuxItem: Record "NPR Aux Item";
+                    AuxItem: Record "NPR Auxiliary Item";
                     ItemList: Page "Item List";
                 begin
                     AuxItem.SetRange("TM Ticket Type", Rec.Code);

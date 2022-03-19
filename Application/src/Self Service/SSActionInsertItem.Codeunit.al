@@ -586,7 +586,7 @@
     local procedure AddItemAddOns(POSFrontEnd: Codeunit "NPR POS Front End Management"; Item: Record Item)
     var
         POSAction: Record "NPR POS Action";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         Item.NPR_GetAuxItem(AuxItem);
         if AuxItem."Item AddOn No." = '' then

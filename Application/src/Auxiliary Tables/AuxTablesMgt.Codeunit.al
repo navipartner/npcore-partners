@@ -87,7 +87,7 @@
     begin
         case IncomingTableId of
             Database::Item:
-                exit(Database::"NPR Aux Item");
+                exit(Database::"NPR Auxiliary Item");
             else
                 exit(0);
         end;
@@ -97,14 +97,14 @@
     var
         ConfigTemplateLine: Record "Config. Template Line";
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
         FieldRef: FieldRef;
         AuxRecRef: RecordRef;
         SkipCurrentField: Boolean;
     begin
         case AuxTablesMgt.GetAuxTableIdFromParentTable(ConfigTemplateHeader."Table ID") of
-            Database::"NPR Aux Item":
+            Database::"NPR Auxiliary Item":
                 begin
                     RecRef.SetTable(Item);
                     Item.NPR_GetAuxItem(AuxItem);
@@ -152,8 +152,8 @@
     var
         Item: Record Item;
         xItem: Record Item;
-        AuxItem: Record "NPR Aux Item";
-        xAuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
+        xAuxItem: Record "NPR Auxiliary Item";
     begin
         if xItem.Get(LastItemNo) then begin
             xItem.NPR_GetAuxItem(xAuxItem);

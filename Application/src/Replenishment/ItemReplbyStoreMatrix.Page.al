@@ -634,7 +634,7 @@
         VarietyWrapper: Codeunit "NPR Variety Wrapper";
         ItemReplenishByStore: Record "NPR Item Repl. by Store";
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         VarietyExists: Boolean;
     begin
         //this block of code can be removed when TestItemIsVariety function in VarietyWrapper is finished

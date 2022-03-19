@@ -178,7 +178,7 @@
 
     procedure SetupVariant(Item: Record Item; var VRTBuffer: Record "NPR Variety Buffer"; Value: Text[50]) RecordID: Text[250]
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         CreateVariant: Boolean;
         RecRef: RecordRef;
@@ -615,7 +615,7 @@
 
     procedure CreateTableCopy(var Item: Record Item; VarietyNo: Option Ask,Variety1,Variety2,Variety3,Variety4; ExcludeLockedTables: Boolean)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         VRTTable: Record "NPR Variety Table";
         TempVRTTable: Record "NPR Variety Table" temporary;
         VRTGroup: Record "NPR Variety Group";

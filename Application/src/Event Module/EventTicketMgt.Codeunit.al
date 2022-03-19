@@ -147,7 +147,7 @@
     local procedure IsValidTicket(JobPlanningLine: Record "Job Planning Line"; ShowError: Boolean): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TicketType: Record "NPR TM Ticket Type";
     begin
         if JobPlanningLine.Type <> JobPlanningLine.Type::Item then

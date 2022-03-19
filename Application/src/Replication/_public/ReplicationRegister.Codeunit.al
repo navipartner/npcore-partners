@@ -493,7 +493,7 @@ codeunit 6014608 "NPR Replication Register"
     [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
     local procedure RegisterAuxItemSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
     var
-        Rec: Record "NPR Aux Item";
+        Rec: Record "NPR Auxiliary Item";
         Mapping: Record "NPR Rep. Special Field Mapping";
         AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
     begin

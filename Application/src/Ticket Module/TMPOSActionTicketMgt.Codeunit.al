@@ -1359,7 +1359,7 @@
     var
         TicketType: Record "NPR TM Ticket Type";
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
 
         if (not Item.Get(SaleLinePOS."No.")) then

@@ -387,7 +387,7 @@
 
     internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4; var MATRIX_CaptionSet: array[10] of Text; var MATRIX_CurrentNoOfColumns: Integer; var MATRIX_CaptionRange: Text; HideInactive: Boolean; var MATRIX_PrimKeyFirstCaptionInCu: Text)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TempVarietyValue: Record "NPR Variety Value" temporary;
         VarietyValue: Record "NPR Variety Value";
         MatrixMgt: Codeunit "Matrix Management";

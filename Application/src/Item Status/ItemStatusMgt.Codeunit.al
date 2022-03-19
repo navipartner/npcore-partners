@@ -15,7 +15,7 @@
     local procedure OnInsertItemSetInitalStatus(var Rec: Record Item; RunTrigger: Boolean)
     var
         ItemStatus: Record "NPR Item Status";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         Rec.NPR_GetAuxItem(AuxItem);
         if AuxItem."Item Status" <> '' then
@@ -34,7 +34,7 @@
     local procedure OnAfterCheckItemJnlLineCheckIfAllowed(var ItemJnlLine: Record "Item Journal Line")
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemStatus: Record "NPR Item Status";
     begin
         if not Item.Get(ItemJnlLine."Item No.") then
@@ -59,7 +59,7 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteItemCheckIfAllowed(var Rec: Record Item; RunTrigger: Boolean)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemStatus: Record "NPR Item Status";
     begin
         Rec.NPR_GetAuxItem(AuxItem);
@@ -76,7 +76,7 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeRenameEvent', '', true, true)]
     local procedure OnBeforeRenameItemCheckIfAllowed(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemStatus: Record "NPR Item Status";
     begin
         Rec.NPR_GetAuxItem(AuxItem);
@@ -94,7 +94,7 @@
     local procedure OnBeforeValidateNoSalesLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemStatus: Record "NPR Item Status";
     begin
         if Rec.Type <> Rec.Type::Item then
@@ -116,7 +116,7 @@
     local procedure OnBeforeValidateNoPurchaseLine(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemStatus: Record "NPR Item Status";
     begin
         if Rec.Type <> Rec.Type::Item then

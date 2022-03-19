@@ -1482,7 +1482,7 @@
     local procedure IsTicketLine(SalesLine: Record "Sales Line"): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
 
         if SalesLine.Type <> SalesLine.Type::Item then

@@ -327,7 +327,7 @@
     procedure CreateItem(No: Code[20]; VariantCode: Code[10]; TicketTypeCode: Code[10]; Description: Text[100]; UnitPrice: Decimal): Code[20]
     var
         TicketItem: Record "Item";
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         ItemReference: Record "Item Reference";
         CreateItemLbl: Label 'IXRF-%1', Locked = true;

@@ -37,7 +37,7 @@
 
     procedure LookupVarietyValues(Item: Record Item; VarietyNo: Option Variety1,Variety2,Variety3,Variety4)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         VarietyValue: Record "NPR Variety Value";
     begin
         Item.NPR_GetAuxItem(AuxItem);

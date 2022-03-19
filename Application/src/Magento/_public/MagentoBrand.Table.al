@@ -107,7 +107,7 @@
 
     trigger OnDelete()
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         AuxItem.SetRange("Magento Brand", Id);
         AuxItem.ModifyAll("Magento Brand", '', false);

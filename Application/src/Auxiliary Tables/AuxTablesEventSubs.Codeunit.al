@@ -158,7 +158,7 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterRenameEvent', '', false, false)]
     local procedure Item_OnAfterRenameEvent(var Rec: Record Item; var xRec: Record Item)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         if Rec.IsTemporary() then
             exit;

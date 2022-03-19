@@ -228,7 +228,7 @@
     local procedure _IssueNewTickets(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; RequestEntryNo: Integer; AdditionCost: Decimal)
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TicketType: Record "NPR TM Ticket Type";
         TicketSetup: Record "NPR TM Ticket Setup";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";

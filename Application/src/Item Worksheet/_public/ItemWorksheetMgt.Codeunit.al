@@ -560,7 +560,7 @@
     local procedure IsWarnAndIgnoreField(ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup"): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
     begin
         case ItemWorksheetFieldSetup."Target Table No. Update" of

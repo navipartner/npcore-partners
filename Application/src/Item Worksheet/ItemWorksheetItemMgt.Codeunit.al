@@ -164,7 +164,7 @@
     procedure ItemVarietyExists(ItemNo: Code[20]): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         if Item.Get(ItemNo) then begin
             Item.NPR_GetAuxItem(AuxItem);

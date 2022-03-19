@@ -39,7 +39,7 @@
     procedure RunCheck(ItemWkshtLine: Record "NPR Item Worksheet Line"; StopOnError: Boolean; CalledFromRegister: Boolean)
     var
         RecItem: Record Item;
-        RecAuxItem: Record "NPR Aux Item";
+        RecAuxItem: Record "NPR Auxiliary Item";
         ItemCategory: Record "Item Category";
         NoSeries: Record "No. Series";
         ItemWorksheetVariantLineToCreate: Record "NPR Item Worksh. Variant Line";

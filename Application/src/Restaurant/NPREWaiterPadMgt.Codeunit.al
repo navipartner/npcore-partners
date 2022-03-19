@@ -545,7 +545,7 @@
     var
         FlowStatus: Record "NPR NPRE Flow Status";
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         ItemRoutingProfile: Record "NPR NPRE Item Routing Profile";
         NewAssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
         PrintCategory: Record "NPR NPRE Print/Prod. Cat.";

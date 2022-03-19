@@ -11,7 +11,7 @@ query 6014408 "NPR APIV1 - TM Item Query"
 
     elements
     {
-        dataitem(auxItem; "NPR Aux Item")
+        dataitem(auxItem; "NPR Auxiliary Item")
         {
             column(no; "Item No.")
             {

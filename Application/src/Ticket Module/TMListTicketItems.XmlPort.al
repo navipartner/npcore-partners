@@ -255,7 +255,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
     internal procedure CreateResponse()
     var
         Item: Record Item;
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
     begin
 

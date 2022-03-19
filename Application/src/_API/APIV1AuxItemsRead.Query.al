@@ -12,7 +12,7 @@ query 6014409 "NPR APIV1 - Aux Items Read"
 
     elements
     {
-        dataitem(auxItem; "NPR Aux Item")
+        dataitem(auxItem; "NPR Auxiliary Item")
         {
             column(id; SystemID)
             {

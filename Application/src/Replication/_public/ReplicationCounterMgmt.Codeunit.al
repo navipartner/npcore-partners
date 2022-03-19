@@ -750,8 +750,8 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Aux Item", 'OnBeforeInsertEvent', '', false, false)]
-    local procedure UpdateReplicationCounterOnBeforeInsertAuxItem(var Rec: Record "NPR Aux Item"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"NPR Auxiliary Item", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertAuxItem(var Rec: Record "NPR Auxiliary Item"; RunTrigger: Boolean)
     var
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
@@ -765,8 +765,8 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Aux Item", 'OnBeforeModifyEvent', '', false, false)]
-    local procedure UpdateReplicationCounterOnBeforeModifyAuxItem(var Rec: Record "NPR Aux Item"; var xRec: Record "NPR Aux Item"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"NPR Auxiliary Item", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyAuxItem(var Rec: Record "NPR Auxiliary Item"; var xRec: Record "NPR Auxiliary Item"; RunTrigger: Boolean)
     var
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
@@ -780,8 +780,8 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Aux Item", 'OnBeforeRenameEvent', '', false, false)]
-    local procedure UpdateReplicationCounterOnBeforeRenameAuxItem(var Rec: Record "NPR Aux Item"; var xRec: Record "NPR Aux Item"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"NPR Auxiliary Item", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameAuxItem(var Rec: Record "NPR Auxiliary Item"; var xRec: Record "NPR Auxiliary Item"; RunTrigger: Boolean)
     var
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
@@ -891,7 +891,7 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeInsertEvent', '', false, false)]
     local procedure UpdateReplicationCounterOnBeforeInsertItem(var Rec: Record Item; RunTrigger: Boolean)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         if Rec.IsTemporary() then
             exit;
@@ -906,7 +906,7 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeModifyEvent', '', false, false)]
     local procedure UpdateReplicationCounterOnBeforeModifyItem(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         if Rec.IsTemporary() then
             exit;
@@ -921,7 +921,7 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeRenameEvent', '', false, false)]
     local procedure UpdateReplicationCounterOnBeforeRenameItem(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
-        AuxItem: Record "NPR Aux Item";
+        AuxItem: Record "NPR Auxiliary Item";
     begin
         if Rec.IsTemporary() then
             exit;

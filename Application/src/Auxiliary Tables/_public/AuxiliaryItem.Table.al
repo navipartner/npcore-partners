@@ -1,4 +1,4 @@
-table 6014635 "NPR Aux Item"
+table 6014659 "NPR Auxiliary Item"
 {
     Access = Public;
     Caption = 'Aux Item';
