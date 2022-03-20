@@ -1,7 +1,5 @@
 codeunit 6059774 "NPR Rep. WS Functions"
 {
-
-    Access = Internal;
     procedure GetLastReplicationCounter(tableId: Integer): BigInteger
     var
         RecRef: RecordRef;
@@ -38,6 +36,20 @@ codeunit 6059774 "NPR Rep. WS Functions"
                         exit(i);
                 end;
         end;
+    end;
+
+    internal procedure InitRepWSFunctions()
+    var
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        if not WebService.ReadPermission then
+            exit;
+
+        if not WebService.WritePermission then
+            exit;
+
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR Rep. WS Functions", 'ReplicationFunctions', true);
     end;
 
     var

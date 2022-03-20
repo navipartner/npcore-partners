@@ -1454,6 +1454,20 @@
         NpRvSalesLine.Insert(true);
     end;
 
+    internal procedure InitNpRvExtVoucherWS()
+    var
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        if not WebService.ReadPermission then
+            exit;
+
+        if not WebService.WritePermission then
+            exit;
+
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR NpRv Ext. Voucher WS", 'external_voucher_services', true);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertIssuedVoucher(var Voucher: Record "NPR NpRv Voucher"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
     begin
