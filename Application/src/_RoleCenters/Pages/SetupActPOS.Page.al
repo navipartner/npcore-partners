@@ -74,7 +74,7 @@
 
                         trigger OnAction()
                         begin
-                            System.Hyperlink('https://clickonce.dynamics-retail.com/ClickOnce/Majortom/6.3/install.html');
+                            System.Hyperlink('https://npminortom.blob.core.windows.net/prod/Setup.exe');
                         end;
                     }
                     action("Download HW Connector")
