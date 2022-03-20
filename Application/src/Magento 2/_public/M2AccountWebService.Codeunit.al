@@ -398,4 +398,18 @@
     #region Testers
 
     #endregion
+
+    internal procedure InitM2AccountWebService()
+    var
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        if not WebService.ReadPermission then
+            exit;
+
+        if not WebService.WritePermission then
+            exit;
+
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR M2 Account WebService", 'm2_account_services', true);
+    end;
 }

@@ -781,6 +781,20 @@
         exit(ImportType."Webservice Function");
     end;
 
+    internal procedure InitTMTicketWebService()
+    var
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        if not WebService.ReadPermission then
+            exit;
+
+        if not WebService.WritePermission then
+            exit;
+
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR TM Ticket WebService", 'ticket_services', true);
+    end;
+
 #pragma warning disable AA0139
     local procedure GetXmlText10(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[10]
     begin

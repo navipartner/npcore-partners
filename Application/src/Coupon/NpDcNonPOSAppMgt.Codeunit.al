@@ -296,4 +296,18 @@
         TempNpDcExtCouponBuffer."Remaining Quantity" := NpDcCoupon."Remaining Quantity";
         TempNpDcExtCouponBuffer."In-use Quantity" := NpDcCoupon.CalcInUseQty();
     end;
+
+    internal procedure InitNpDcNonPOSCouponWS()
+    var
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        if not WebService.ReadPermission then
+            exit;
+
+        if not WebService.WritePermission then
+            exit;
+
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR NpDc Non-POS Coupon WS", 'discount_coupon_service', true);
+    end;
 }
