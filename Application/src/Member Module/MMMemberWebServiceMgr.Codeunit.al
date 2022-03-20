@@ -1266,6 +1266,20 @@
         NPRAttributeManagement.SetEntryAttributeValue(TableId, NPRAttributeID."Shortcut Attribute ID", MemberInfoCaptureEntryNo, AttributeValue);
 
     end;
+
+    internal procedure InitMMMemberWebService()
+    var
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        if not WebService.ReadPermission then
+            exit;
+
+        if not WebService.WritePermission then
+            exit;
+
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR MM Member WebService", 'member_services', true);
+    end;
 #pragma warning disable AA0139
     local procedure GetXmlText20(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[20]
     begin
