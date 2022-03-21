@@ -1352,9 +1352,6 @@
             TravellerInfoCapture.GetRec(tmpCustomerInfoCapture);
             exit(true);
         end;
-
-        //TODO?: When full manual customer entry (LookupCompleted=FALSE), suggest pulling from NAV customer/contact if any is present on sale.
-        //Requires mapping between standard NAV table data formats and Global blue data formats.
     end;
 
     local procedure IsAllRequiredCustomerInfoCaptured(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary): Boolean
