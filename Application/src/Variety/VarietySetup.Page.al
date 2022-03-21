@@ -140,8 +140,12 @@
                 Caption = 'View';
                 field("Hide Inactive Values"; Rec."Hide Inactive Values")
                 {
-
                     ToolTip = 'Whether Inactive Values should be hidden in the Variant Matrix by default';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Show Column Names"; Rec."Show Column Names")
+                {
+                    ToolTip = 'Specifies whether you want variety value names to be used as column names in the Variant Matrix by default. If disabled, variety value codes will be used as column names in the matrix.';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -549,6 +549,7 @@
         TMPVRTBuffer.DeleteAll();
 
         Item.Get(ItemNo);
+        Item.NPR_GetAuxItem(AuxItem);
 
         //-NPR5.50 [348210]
         Window.Open(text000);
