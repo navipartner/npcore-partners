@@ -91,7 +91,7 @@
             Caption = 'Error Code';
             DataClassification = CustomerContent;
         }
-        field(21; "Error Message"; Text[250])
+        field(21; "Error Message"; Text[2048])
         {
             Caption = 'Error Message';
             DataClassification = CustomerContent;

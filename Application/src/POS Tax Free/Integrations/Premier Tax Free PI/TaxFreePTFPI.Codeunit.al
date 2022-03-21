@@ -1,6 +1,7 @@
 ﻿codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interface"
 {
     Access = Internal;
+
     var
         POSUnitNo: Code[10];
         MinimumAmountLimit: Decimal;
@@ -173,6 +174,7 @@
         if not TryGetFirstNodeContent(XMLDoc, 'voucher_lines', true, PrintXML) then //Thermal print data
             if TryGetFirstNodeContent(XMLDoc, 'VoucherForm', true, PrintXML) then //PDF print data
                 TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::PDF;
+        PrintXML := '<?xml version="1.0" encoding="UTF-8"?>' + PrintXML; //Make it a parseable XML document for later, by adding a header
 
         if not GetBarcodeFromPrintXML(PrintXML, VoucherBarcode) then
             if TryGetFirstNodeContent(XMLDoc, 'Barcode', true, VoucherBarcode) then;
@@ -284,7 +286,7 @@
                     Database::"NPR POS Entry Sales Line":
                         begin
                             POSSalesLine.CalcFields("Entry Date");
-                            exit(Format(POSSalesLine."Entry Date"));
+                            exit(Format(POSSalesLine."Entry Date", 0, 9));
                         end;
 
                 end;
@@ -525,6 +527,8 @@
         XMLDoc: XmlDocument;
         XMLNode: XmlNode;
         PrintLines: XmlNodeList;
+        PrintXmlChunk: Text;
+        PrintXml: Text;
     begin
         //See page 55 of doc. for print line prefix explanations.
         Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Tax Free Receipt");
@@ -534,7 +538,12 @@
 
         TaxFreeRequest.Print.CreateInStream(InStream, TEXTENCODING::UTF8);
 
-        XmlDocument.ReadFrom(InStream, XMLDoc);
+        while (not InStream.EOS) do begin
+            InStream.Read(PrintXmlChunk);
+            PrintXml += PrintXmlChunk;
+        end;
+
+        XmlDocument.ReadFrom(PrintXml, XMLDoc);
 
         PrintLines := XMLDoc.GetDescendantElements('print_line');//Thermal Receipt Data
         if PrintLines.Count() < 1 then
@@ -569,7 +578,7 @@
                     PrintThermalLine(Printer, CopyStr(Line, 3), 'B21', true, 'CENTER', true, false);
                 '11':
                     if StrLen(CopyStr(Line, 3)) < 30 then
-                        PrintThermalLine(Printer, CopyStr(Line, 3), 'BARCODE6', false, 'LEFT', true, false) //Barcode type: Interleaved 2-of-5
+                        PrintThermalLine(Printer, CopyStr(Line, 3), 'CODE128', false, 'LEFT', true, false)
                     else
                         PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', false, 'LEFT', true, false);
                 '12':
@@ -578,6 +587,8 @@
                     PrintThermalLine(Printer, 'P', 'Control', false, 'LEFT', true, false);
                 '14':
                     PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', false, 'LEFT', false, false);
+                '21': //URL for phone scan of voucher encoded as QR
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'QR', false, 'LEFT', true, false);
                 '50':
                     ; //Load another voucher
                 '51':
@@ -603,23 +614,27 @@
 
     local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print Mgt."; Value: Text; Font: Text; Bold: Boolean; Alignment: Text; CR: Boolean; Underline: Boolean)
     begin
-        if Font in ['A11', 'B21', 'Control'] then begin
-            Printer.SetFont(Font);
-            Printer.SetBold(Bold);
-            Printer.SetUnderLine(Underline);
+        case true of
+            (Font in ['A11', 'B21', 'Control']):
+                begin
+                    Printer.SetFont(Font);
+                    Printer.SetBold(Bold);
+                    Printer.SetUnderLine(Underline);
 
-            case Alignment of
-                'LEFT':
-                    Printer.AddTextField(1, 0, Value);
-                'CENTER':
-                    Printer.AddTextField(2, 1, Value);
-                'RIGHT':
-                    Printer.AddTextField(3, 2, Value);
-            end;
+                    case Alignment of
+                        'LEFT':
+                            Printer.AddTextField(1, 0, Value);
+                        'CENTER':
+                            Printer.AddTextField(2, 1, Value);
+                        'RIGHT':
+                            Printer.AddTextField(3, 2, Value);
+                    end;
+                end;
+            (Font in ['CODE128']):
+                Printer.AddBarcode(Font, Value, 2);
+            (Font in ['QR']):
+                Printer.AddBarcode(Font, Value, 6);
         end;
-
-        if Font = 'BARCODE6' then
-            Printer.AddBarcode(Font, Value, 2);
 
         if CR then
             Printer.NewLine();
@@ -649,7 +664,7 @@
         if Output = '' then
             Error(Error_MissingPrintSetup);
 
-        TaxFreeRequest.Print.CreateInStream(InStream);
+        TaxFreeRequest.Print.CreateInStream(InStream, TextEncoding::Utf8);
         MemoryStream := MemoryStream.MemoryStream();
         CopyStream(MemoryStream, InStream);
         MemoryStream.Position := 0;
@@ -860,7 +875,7 @@
         Clear(TaxFreeRequest.Request);
         Clear(TaxFreeRequest.Response);
 
-        TaxFreeRequest.Request.CreateOutStream(OutStream);
+        TaxFreeRequest.Request.CreateOutStream(OutStream, TextEncoding::Utf8);
         OutStream.Write(RequestMessage);
 
         HttpClient.DefaultRequestHeaders.Clear();
@@ -898,7 +913,7 @@
         XMLMessage: Text;
         XMLDOMManagement: Codeunit "XML DOM Management";
     begin
-        TaxFreeRequest.Response.CreateInStream(InStream);
+        TaxFreeRequest.Response.CreateInStream(InStream, TextEncoding::UTF8);
         InStream.Read(XMLMessage);
 
         XMLMessage := XMLDOMManagement.RemoveNamespaces(XMLMessage);
