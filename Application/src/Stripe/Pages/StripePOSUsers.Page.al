@@ -1,11 +1,13 @@
 page 6059856 "NPR Stripe POS Users"
 {
-    ApplicationArea = NPRRetail;
+    // temporary fix until we build a way to block Stripe for certain users from case system
+    // ApplicationArea = NPRRetail;
     Caption = 'POS Users';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR Stripe POS User";
-    UsageCategory = Administration;
+    // UsageCategory = Administration;
+    UsageCategory = None;
 
     layout
     {

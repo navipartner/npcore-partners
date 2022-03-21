@@ -37,10 +37,11 @@ table 6014649 "NPR Stripe Setup"
         end;
     end;
 
-    internal procedure RefreshData(): Boolean
-    var
-        StripeRefreshData: Codeunit "NPR Stripe Refresh Data";
-    begin
-        exit(StripeRefreshData.RefreshData(Rec));
-    end;
+    // temporary fix until we build a way to block Stripe for certain users from case system
+    // internal procedure RefreshData(): Boolean
+    // var
+    //     StripeRefreshData: Codeunit "NPR Stripe Refresh Data";
+    // begin
+    //     exit(StripeRefreshData.RefreshData(Rec));
+    // end;
 }
