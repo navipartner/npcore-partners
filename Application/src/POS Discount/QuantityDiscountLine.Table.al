@@ -18,7 +18,7 @@
         {
             Caption = 'Quantity';
             DecimalPlaces = 2 : 2;
-            MaxValue = 9.999;
+            MaxValue = 9999;
             MinValue = 2;
             NotBlank = true;
             DataClassification = CustomerContent;
