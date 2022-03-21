@@ -61,6 +61,18 @@
                         UpdateMatrix(true);
                     end;
                 }
+                field(ShowColumnNames; ShowColumnNames)
+                {
+                    Caption = 'Show Column Names';
+                    ToolTip = 'Specifies whether you want variety value names to be used as column names. If disabled, variety value codes will be used as matrix column names.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnValidate()
+                    begin
+                        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+                        UpdateMatrix(false);
+                    end;
+                }
             }
             repeater(Control1)
             {
@@ -1854,11 +1866,13 @@
         ShowVariety3: Boolean;
         ShowVariety4: Boolean;
         MATRIX_MatrixRecords: array[100] of Record "NPR Variety Buffer" temporary;
+        MATRIX_CodeSet: array[100] of Text[1024];
         MATRIX_CaptionSet: array[100] of Text[1024];
         MATRIX_CaptionRange: Text;
         MATRIX_PrimKeyFirstCaptionInCu: Text;
         MATRIX_CurrentNoOfColumns: Integer;
         HideInactive: Boolean;
+        ShowColumnNames: Boolean;
         Initialized: Boolean;
         [InDataSet]
         Visible1: Boolean;
@@ -2070,6 +2084,7 @@
         VarietySetup.TestField("Variety Enabled", true);
 
         HideInactive := VarietySetup."Hide Inactive Values";
+        ShowColumnNames := VarietySetup."Show Column Names";
         Initialized := true;
     end;
 
@@ -2094,13 +2109,13 @@
         TempVRTBuffer := Rec;
         case ShowAsCrossVRT of
             ShowAsCrossVRT::Variety1:
-                TempVRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 1 Value" := MATRIX_CodeSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety2:
-                TempVRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 2 Value" := MATRIX_CodeSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety3:
-                TempVRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 3 Value" := MATRIX_CodeSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety4:
-                TempVRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 4 Value" := MATRIX_CodeSet[MATRIX_ColumnOrdinal];
         end;
         TMPBool := VRTMatrixMgt.GetValueBool(TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value",
                                                 TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value",
@@ -2181,13 +2196,13 @@
         VRT4Value := Rec."Variety 4 Value";
         case ShowAsCrossVRT of
             ShowAsCrossVRT::Variety1:
-                VRT1Value := MATRIX_CaptionSet[FieldNo];
+                VRT1Value := MATRIX_CodeSet[FieldNo];
             ShowAsCrossVRT::Variety2:
-                VRT2Value := MATRIX_CaptionSet[FieldNo];
+                VRT2Value := MATRIX_CodeSet[FieldNo];
             ShowAsCrossVRT::Variety3:
-                VRT3Value := MATRIX_CaptionSet[FieldNo];
+                VRT3Value := MATRIX_CodeSet[FieldNo];
             ShowAsCrossVRT::Variety4:
-                VRT4Value := MATRIX_CaptionSet[FieldNo];
+                VRT4Value := MATRIX_CodeSet[FieldNo];
         end;
 
         VRTMatrixMgt.SetValue(VRT1Value, VRT2Value, VRT3Value, VRT4Value, CurrVRTField, Format(MATRIX_CellData[FieldNo]));
@@ -2197,7 +2212,7 @@
     internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     begin
         Clear(MATRIX_MatrixRecords);
-        VRTMatrixMgt.MATRIX_GenerateColumnCaptions(MATRIX_SetWanted, Item, ShowCrossVRTNo, MATRIX_CaptionSet, MATRIX_CurrentNoOfColumns, MATRIX_CaptionRange, HideInactive, MATRIX_PrimKeyFirstCaptionInCu);
+        VRTMatrixMgt.MATRIX_GenerateColumnCaptions(MATRIX_SetWanted, Item, ShowCrossVRTNo, MATRIX_CodeSet, MATRIX_CaptionSet, MATRIX_CurrentNoOfColumns, MATRIX_CaptionRange, HideInactive, ShowColumnNames, MATRIX_PrimKeyFirstCaptionInCu);
 
         if MATRIX_CurrentNoOfMatrixColumn > MATRIX_CurrentNoOfColumns then begin
             Clear(MATRIX_CellData);

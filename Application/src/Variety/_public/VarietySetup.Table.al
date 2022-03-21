@@ -97,6 +97,11 @@
             DataClassification = CustomerContent;
             Description = 'VRT1.11';
         }
+        field(45; "Show Column Names"; Boolean)
+        {
+            Caption = 'Show Column Names';
+            DataClassification = CustomerContent;
+        }
         field(53; "Internal EAN No. Series"; Code[20])
         {
             Caption = 'Internal EAN No. Series';

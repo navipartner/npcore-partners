@@ -426,7 +426,7 @@
         exit(Total);
     end;
 
-    internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4; var MATRIX_CaptionSet: array[10] of Text; var MATRIX_CurrentNoOfColumns: Integer; var MATRIX_CaptionRange: Text; HideInactive: Boolean; var MATRIX_PrimKeyFirstCaptionInCu: Text)
+    internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4; var MATRIX_CodeSet: array[30] of Text; var MATRIX_CaptionSet: array[30] of Text; var MATRIX_CurrentNoOfColumns: Integer; var MATRIX_CaptionRange: Text; HideInactive: Boolean; ShowColumnNames: Boolean; var MATRIX_PrimKeyFirstCaptionInCu: Text)
     var
         AuxItem: Record "NPR Auxiliary Item";
         TempVarietyValue: Record "NPR Variety Value" temporary;
@@ -437,8 +437,10 @@
         Variety2UsedValues: Query "NPR Variety 2 Used Values";
         Variety3UsedValues: Query "NPR Variety 3 Used Values";
         Variety4UsedValues: Query "NPR Variety 4 Used Values";
+        CaptionFieldNo: Integer;
         VarietyNotUsed: Boolean;
     begin
+        Clear(MATRIX_CodeSet);
         Clear(MATRIX_CaptionSet);
         MATRIX_CurrentNoOfColumns := ArrayLen(MATRIX_CaptionSet);
         Item.NPR_GetAuxItem(AuxItem);
@@ -458,6 +460,8 @@
                             if VarietyValue.Get(Variety1UsedValues.Variety_1, Variety1UsedValues.Variety_1_Table, Variety1UsedValues.Variety_1_Value) then begin
                                 TempVarietyValue.Init();
                                 TempVarietyValue := VarietyValue;
+                                if ShowColumnNames and (TempVarietyValue.Description = '') then
+                                    TempVarietyValue.Description := CopyStr(TempVarietyValue.Value, 1, MaxStrLen(TempVarietyValue.Description));
                                 TempVarietyValue.Insert();
                             end else
                                 VarietyNotUsed := Variety1UsedValues.Variety_1 = '';
@@ -475,6 +479,8 @@
                             if VarietyValue.Get(Variety2UsedValues.Variety_2, Variety2UsedValues.Variety_2_Table, Variety2UsedValues.Variety_2_Value) then begin
                                 TempVarietyValue.Init();
                                 TempVarietyValue := VarietyValue;
+                                if ShowColumnNames and (TempVarietyValue.Description = '') then
+                                    TempVarietyValue.Description := CopyStr(TempVarietyValue.Value, 1, MaxStrLen(TempVarietyValue.Description));
                                 TempVarietyValue.Insert();
                             end else
                                 VarietyNotUsed := Variety2UsedValues.Variety_2 = '';
@@ -492,6 +498,8 @@
                             if VarietyValue.Get(Variety3UsedValues.Variety_3, Variety3UsedValues.Variety_3_Table, Variety3UsedValues.Variety_3_Value) then begin
                                 TempVarietyValue.Init();
                                 TempVarietyValue := VarietyValue;
+                                if ShowColumnNames and (TempVarietyValue.Description = '') then
+                                    TempVarietyValue.Description := CopyStr(TempVarietyValue.Value, 1, MaxStrLen(TempVarietyValue.Description));
                                 TempVarietyValue.Insert();
                             end;
                         end;
@@ -507,6 +515,8 @@
                             if VarietyValue.Get(Variety4UsedValues.Variety_4, Variety4UsedValues.Variety_4_Table, Variety4UsedValues.Variety_4_Value) then begin
                                 TempVarietyValue.Init();
                                 TempVarietyValue := VarietyValue;
+                                if ShowColumnNames and (TempVarietyValue.Description = '') then
+                                    TempVarietyValue.Description := CopyStr(TempVarietyValue.Value, 1, MaxStrLen(TempVarietyValue.Description));
                                 TempVarietyValue.Insert();
                             end;
                         end;
@@ -582,8 +592,18 @@
             RecRef.SetTable(TempVarietyValue);
         end;
 
-        MatrixMgt.GenerateMatrixData(RecRef, MATRIX_SetWanted, ArrayLen(MATRIX_CaptionSet), 3,
-          MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
+        MatrixMgt.GenerateMatrixData(
+            RecRef, MATRIX_SetWanted, ArrayLen(MATRIX_CodeSet), VarietyValue.FieldNo(Value),
+            MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CodeSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
+
+        if ShowColumnNames then
+            CaptionFieldNo := VarietyValue.FieldNo(Description)
+        else
+            CaptionFieldNo := VarietyValue.FieldNo(Value);
+
+        MatrixMgt.GenerateMatrixData(
+            RecRef, MATRIX_SetWanted, ArrayLen(MATRIX_CaptionSet), CaptionFieldNo,
+            MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
     end;
 
     internal procedure TickAllCombinations(VRTFieldSetup: Record "NPR Variety Field Setup")
