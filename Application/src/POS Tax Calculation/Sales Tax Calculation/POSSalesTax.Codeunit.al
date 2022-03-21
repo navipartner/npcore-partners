@@ -213,6 +213,7 @@
         POSEntryTaxLine.Setrange("Tax Area Code for Key", POSSaleTaxLine."Tax Area Code for Key");
         POSEntryTaxLine.Setrange("Entry Date", POSSaleTaxLine."Posting Date");
         POSEntryTaxLine.Setrange("Tax Liable", POSSaleTaxLine."Tax Liable");
+        POSEntryTaxLine.SetRange("Tax %", POSSaleTaxLine."Tax %");
         if not POSEntryTaxLine.FindFirst() then begin
             Clear(POSEntryTaxLine);
 
@@ -236,6 +237,7 @@
             POSEntryTaxLine."Calculation Order" := POSSaleTaxLine."Calculation Order";
             POSEntryTaxLine."Round Tax" := POSSaleTaxLine."Round Tax";
             POSEntryTaxLine."Is Report-to Jurisdiction" := POSSaleTaxLine."Is Report-to Jurisdiction";
+            POSEntryTaxLine."Tax %" := POSSaleTaxLine."Tax %";
 
             OnAfterInitPOSPostedTaxAmtLine(POSEntryTaxLine, POSSaleTaxLine, POSSaleTax);
 
