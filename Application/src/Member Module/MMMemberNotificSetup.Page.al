@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM Member Notific. Setup";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -19,97 +19,97 @@
                 {
 
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Type; Rec.Type)
                 {
 
                     ToolTip = 'Specifies the value of the Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Days Before"; Rec."Days Before")
                 {
 
                     ToolTip = 'Specifies the value of the Days Before field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Days Past"; Rec."Days Past")
                 {
 
                     ToolTip = 'Specifies the value of the Days Past field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Cancel Overdue Notif. (Days)"; Rec."Cancel Overdue Notif. (Days)")
                 {
 
                     ToolTip = 'Specifies the value of the Cancel Overdue Notif. (Days) field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Processing Method"; Rec."Processing Method")
                 {
 
                     ToolTip = 'Specifies the value of the Processing Method field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Template Filter Value"; Rec."Template Filter Value")
                 {
 
                     ToolTip = 'Specifies the value of the Template Filter Value field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Community Code"; Rec."Community Code")
                 {
 
                     ToolTip = 'Specifies the value of the Community Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
 
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Next Notification Code"; Rec."Next Notification Code")
                 {
 
                     ToolTip = 'Specifies the value of the Next Notification Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Target Member Role"; Rec."Target Member Role")
                 {
 
                     ToolTip = 'Specifies the value of the Target Member Role field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Include NP Pass"; Rec."Include NP Pass")
                 {
 
                     ToolTip = 'Specifies the value of the Include NP Pass field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("NP Pass Server Base URL"; Rec."NP Pass Server Base URL")
                 {
 
                     ToolTip = 'Specifies the value of the NP Pass Server Base URL field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Pass Notification Method"; Rec."Pass Notification Method")
                 {
 
                     ToolTip = 'Specifies the value of the Pass Notification Method field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Passes API"; Rec."Passes API")
                 {
 
                     ToolTip = 'Specifies the value of the Passes API field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("PUT Passes Template"; Rec."PUT Passes Template".HasValue())
                 {
@@ -117,31 +117,31 @@
                     Caption = 'Have Template';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Have Template field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Pass Token"; Rec."Pass Token")
                 {
 
                     ToolTip = 'Specifies the value of the Pass Token field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Pass Type Code"; Rec."Pass Type Code")
                 {
 
                     ToolTip = 'Specifies the value of the Pass Type Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Generate Magento PW URL"; Rec."Generate Magento PW URL")
                 {
 
                     ToolTip = 'Specifies the value of the Generate Magento PW URL field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Fallback Magento PW URL"; Rec."Fallback Magento PW URL")
                 {
 
                     ToolTip = 'Specifies the value of the Fallback Magento PW URL field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -163,7 +163,7 @@
                 RunPageView = WHERE("Table No." = CONST(6060139));
 
                 ToolTip = 'Executes the E-Mail Templates action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action(SMSTemplate)
             {
@@ -176,7 +176,7 @@
                 RunPageView = WHERE("Table No." = CONST(6060139));
 
                 ToolTip = 'Executes the SMS Template action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
 
             action(RenewNotificationsList)
@@ -191,7 +191,7 @@
                 RunPageLink = "Notification Trigger" = CONST(RENEWAL);
 
                 ToolTip = 'Executes the Renewal Notification List action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
         area(processing)
@@ -202,7 +202,7 @@
                 Caption = 'Export Wallet Template File';
                 ToolTip = 'Exports the default or current template used to send information to wallet.';
                 Image = ExportAttachment;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
 
                 trigger OnAction()
@@ -240,7 +240,7 @@
                 Caption = 'Import Wallet Template File';
                 ToolTip = 'Define information sent to wallet.';
                 Image = ImportCodes;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
 
                 trigger OnAction()
@@ -273,7 +273,7 @@
                 PromotedCategory = Process;
 
                 ToolTip = 'Executes the Refresh Renew Notification action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var

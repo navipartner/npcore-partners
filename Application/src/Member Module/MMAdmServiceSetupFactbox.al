@@ -19,7 +19,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Guest Avatar Image field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
             group(DefaultTurnstileImageGroup)
@@ -29,7 +29,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Default Turnstile Image field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
             group(ErrorImageofTurnstileGroup)
@@ -39,7 +39,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Turnstile Error Image field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -62,7 +62,7 @@
                     Caption = 'Import guest avatar image';
                     Image = Import;
                     ToolTip = 'Executes the Import guest avatar image action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnAction()
                     begin
@@ -80,7 +80,7 @@
                     Caption = 'Delete guest avatar image';
                     Image = Delete;
                     ToolTip = 'Executes the Delete guest avatar image action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     trigger OnAction()
                     begin
                         MMAdmissionServiceWS.DeleteGuestAvatarImageToSetup(Rec);
@@ -100,7 +100,7 @@
                     Caption = 'Import default turnstile image';
                     Image = Import;
                     ToolTip = 'Executes the Import default turnstile image action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnAction()
                     begin
@@ -118,7 +118,7 @@
                     Caption = 'Delete default turnstile image';
                     Image = Delete;
                     ToolTip = 'Executes the Delete default turnstile image action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     trigger OnAction()
                     begin
                         MMAdmissionServiceWS.DeleteDefaultTurnstileImageToSetup(Rec);
@@ -139,7 +139,7 @@
                     Caption = 'Import turnstile error image';
                     Image = Import;
                     ToolTip = 'Executes the Import turnstile error image action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnAction()
                     begin
@@ -157,7 +157,7 @@
                     Caption = 'Delete turnstile error image';
                     Image = Delete;
                     ToolTip = 'Executes the Delete turnstile error image action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     trigger OnAction()
                     begin
                         MMAdmissionServiceWS.DeleteTurnstileErrorImageToSetup(Rec);

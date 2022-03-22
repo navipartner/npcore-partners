@@ -21,63 +21,63 @@
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Activate On First Use field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Valid From Date"; Rec."Valid From Date")
                 {
 
                     ToolTip = 'Specifies the value of the Valid From Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Valid Until Date"; Rec."Valid Until Date")
                 {
 
                     ToolTip = 'Specifies the value of the Valid Until Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Created At"; Rec."Created At")
                 {
 
                     ToolTip = 'Specifies the value of the Created At field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Context; Rec.Context)
                 {
 
                     ToolTip = 'Specifies the value of the Context field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Receipt No."; Rec."Receipt No.")
                 {
 
                     ToolTip = 'Specifies the value of the Receipt No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Document No."; Rec."Document No.")
                 {
 
                     ToolTip = 'Specifies the value of the Document No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Item No."; Rec."Item No.")
                 {
 
                     ToolTip = 'Specifies the value of the Item No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Auto-Renew Entry No."; Rec."Auto-Renew Entry No.")
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Auto-Renew Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(RemainingAmountLCY; RemainingAmountLCY)
                 {
@@ -87,25 +87,25 @@
                     Style = Unfavorable;
                     StyleExpr = AccentuateAmount;
                     ToolTip = 'Specifies the value of the Remaining Amount (LCY) field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Blocked; Rec.Blocked)
                 {
 
                     ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
 
                     ToolTip = 'Specifies the value of the Blocked At field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Blocked By"; Rec."Blocked By")
                 {
 
                     ToolTip = 'Specifies the value of the Blocked By field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -119,7 +119,7 @@
             {
                 Caption = 'Membership Ledger Entries';
                 ToolTip = 'Opens a list for the entries.';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Image = EditLines;
                 RunObject = Page "NPR MM Edit Membership Entries";
                 RunPageMode = Edit;

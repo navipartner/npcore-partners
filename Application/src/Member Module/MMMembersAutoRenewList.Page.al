@@ -7,7 +7,7 @@
     PageType = List;
     SourceTable = "NPR MM Membership Auto Renew";
     UsageCategory = Tasks;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
 
     layout
@@ -20,109 +20,109 @@
                 {
 
                     ToolTip = 'Specifies the value of the Community Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
 
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Valid Until Date"; Rec."Valid Until Date")
                 {
 
                     ToolTip = 'Specifies the value of the Valid Until Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Document Date"; Rec."Document Date")
                 {
 
                     ToolTip = 'Specifies the value of the Document Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Payment Terms Code"; Rec."Payment Terms Code")
                 {
 
                     ToolTip = 'Specifies the value of the Payment Terms Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
 
                     ToolTip = 'Specifies the value of the Payment Method Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Post Invoice"; Rec."Post Invoice")
                 {
 
                     ToolTip = 'Specifies the value of the Post Invoice field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
 
                     ToolTip = 'Specifies the value of the Posting Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Started At"; Rec."Started At")
                 {
 
                     ToolTip = 'Specifies the value of the Started At field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Completed At"; Rec."Completed At")
                 {
 
                     ToolTip = 'Specifies the value of the Completed At field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Started By"; Rec."Started By")
                 {
 
                     ToolTip = 'Specifies the value of the Started By field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Selected Membership Count"; Rec."Selected Membership Count")
                 {
 
                     ToolTip = 'Specifies the value of the Selected Membership Count field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Auto-Renew Success Count"; Rec."Auto-Renew Success Count")
                 {
 
                     ToolTip = 'Specifies the value of the Auto-Renew Success Count field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Auto-Renew Fail Count"; Rec."Auto-Renew Fail Count")
                 {
 
                     ToolTip = 'Specifies the value of the Auto-Renew Fail Count field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Invoice Create Fail Count"; Rec."Invoice Create Fail Count")
                 {
 
                     ToolTip = 'Specifies the value of the Invoice Create Fail Count field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Invoice Posting Fail Count"; Rec."Invoice Posting Fail Count")
                 {
 
                     ToolTip = 'Specifies the value of the Invoice Posting Fail Count field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("First Invoice No."; Rec."First Invoice No.")
                 {
 
                     ToolTip = 'Specifies the value of the First Invoice No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Last Invoice No."; Rec."Last Invoice No.")
                 {
 
                     ToolTip = 'Specifies the value of the Last Invoice No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -142,7 +142,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Start Auto-Renew action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin
@@ -164,7 +164,7 @@
                 RunPageLink = "Auto-Renew Entry No." = FIELD("Entry No.");
 
                 ToolTip = 'Executes the Auto-Renew Log action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }

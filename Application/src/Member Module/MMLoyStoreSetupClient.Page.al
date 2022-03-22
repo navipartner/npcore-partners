@@ -8,7 +8,7 @@
 
     SourceTable = "NPR MM Loyalty Store Setup";
     SourceTableView = WHERE(Setup = CONST(CLIENT));
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -20,49 +20,49 @@
                 {
 
                     ToolTip = 'Specifies the value of the Store Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Unit Code"; Rec."Unit Code")
                 {
 
                     ToolTip = 'Specifies the value of the Unit Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Setup; Rec.Setup)
                 {
 
                     ToolTip = 'Specifies the value of the Setup field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Authorization Code"; Rec."Authorization Code")
                 {
 
                     ToolTip = 'Specifies the value of the Authorization Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Accept Client Transactions"; Rec."Accept Client Transactions")
                 {
 
                     ToolTip = 'Specifies the value of the Accept Client Transactions field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
 
                     ToolTip = 'Specifies the value of the POS Payment Method Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Store Endpoint Code"; Rec."Store Endpoint Code")
                 {
 
                     ToolTip = 'Specifies the value of the Store Endpoint Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -84,7 +84,7 @@
                 RunPageLink = "POS Store Code" = FIELD("Store Code");
 
                 ToolTip = 'Executes the Transaction Log action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }

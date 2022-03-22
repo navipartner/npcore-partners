@@ -8,7 +8,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM Sponsors. Ticket Setup";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -20,75 +20,75 @@
                 {
 
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Membership No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Event Type"; Rec."Event Type")
                 {
 
                     ToolTip = 'Specifies the value of the Event Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Line No."; Rec."Line No.")
                 {
 
                     ToolTip = 'Specifies the value of the Line No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Item No."; Rec."Item No.")
                 {
 
                     ToolTip = 'Specifies the value of the Item No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
 
                     ToolTip = 'Specifies the value of the Variant Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Quantity; Rec.Quantity)
                 {
 
                     ToolTip = 'Specifies the value of the Quantity field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Blocked; Rec.Blocked)
                 {
 
                     ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Delivery Method"; Rec."Delivery Method")
                 {
 
                     ToolTip = 'Specifies the value of the Delivery Method field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Distribution Mode"; Rec."Distribution Mode")
                 {
 
                     ToolTip = 'Specifies the value of the Distribution Mode field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Once Per Period (On Demand)"; Rec."Once Per Period (On Demand)")
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Once Per Period (On Demand) field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -111,7 +111,7 @@
                 RunPageView = WHERE("Table No." = CONST(6151186));
 
                 ToolTip = 'Executes the E-Mail Templates action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("SMS Template")
             {
@@ -126,7 +126,7 @@
                 RunPageView = WHERE("Table No." = CONST(6151186));
 
                 ToolTip = 'Executes the SMS Template action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
         area(processing)
@@ -142,7 +142,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Send Pending Notifications action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var

@@ -18,37 +18,37 @@
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("R_PhoneNo"; Rec."Phone No.")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field("R_FirstName"; Rec."First Name")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the First Name field';
                 }
                 field("R_LastName"; Rec."Last Name")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Last Name field';
 
                 }
                 field("R_Email"; Rec."E-Mail Address")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                 }
                 field("R_ExternalCardNo"; Rec."External Card No.")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the External Card No. field';
                 }
             }
@@ -70,7 +70,7 @@
                 Visible = ShowImportMemberAction;
 
                 ToolTip = 'Executes the Import Members action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin

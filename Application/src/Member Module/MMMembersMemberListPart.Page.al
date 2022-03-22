@@ -18,7 +18,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Member Role field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
@@ -26,19 +26,19 @@
                     DrillDownPageID = "NPR MM Member Card";
                     LookupPageID = "NPR MM Member Card";
                     ToolTip = 'Specifies the value of the External Member No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Member Display Name"; Rec."Member Display Name")
                 {
 
                     ToolTip = 'Specifies the value of the Member Display Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("GDPR Approval"; Rec."GDPR Approval")
                 {
 
                     ToolTip = 'Specifies the value of the GDPR Approval field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -58,32 +58,32 @@
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the User Logon ID field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Password Hash"; Rec."Password Hash")
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Password field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Blocked; Rec.Blocked)
                 {
 
                     ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
 
                     ToolTip = 'Specifies the value of the Blocked At field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Member Count"; Rec."Member Count")
                 {
 
                     ToolTip = 'Specifies the value of the Member Count field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("GDPR Agreement No."; Rec."GDPR Agreement No.")
                 {
@@ -91,7 +91,7 @@
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the GDPR Agreement No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("GDPR Data Subject Id"; Rec."GDPR Data Subject Id")
                 {
@@ -99,7 +99,7 @@
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the GDPR Data Subject Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }

@@ -15,32 +15,32 @@
                 field("External Card No."; Rec."External Card No.")
                 {
                     ToolTip = 'Specifies the value of the External Card No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
                     ToolTip = 'Specifies the value of the Valid Until field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Card Is Temporary"; Rec."Card Is Temporary")
                 {
                     ToolTip = 'Specifies the value of the Card Is Temporary field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Document ID"; Rec."Document ID")
                 {
                     ToolTip = 'Specifies the value of the Document ID field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Pin Code"; Rec."Pin Code")
                 {
                     ToolTip = 'Specifies the value of the Pin Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Card Type"; Rec."Card Type")
                 {
                     ToolTip = 'Specifies the value of the Card Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
 
             }
@@ -52,25 +52,25 @@
                 field("Display Name"; Rec."Display Name")
                 {
                     ToolTip = 'Specifies the value of the Display Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     ToolTip = 'Specifies the value of the E-Mail Address field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
                     ToolTip = 'Specifies the value of the External Member No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }
                 field("Member Blocked"; Rec."Member Blocked")
                 {
                     ToolTip = 'Specifies the value of the Member Blocked field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }
             }
@@ -82,25 +82,25 @@
                 field("External Membership No."; Rec."External Membership No.")
                 {
                     ToolTip = 'Specifies the value of the External Membership No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("Company Name"; Rec."Company Name")
                 {
                     ToolTip = 'Specifies the value of the Company Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("Membership Blocked"; Rec."Membership Blocked")
                 {
                     ToolTip = 'Specifies the value of the Membership Blocked field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Membership Card";
                 }
 
@@ -113,48 +113,48 @@
                 field("Block Reason"; Rec."Block Reason")
                 {
                     ToolTip = 'Specifies the value of the Block Reason field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Blocked; Rec.Blocked)
                 {
                     ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
                     ToolTip = 'Specifies the value of the Blocked At field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Blocked By"; Rec."Blocked By")
                 {
                     ToolTip = 'Specifies the value of the Blocked By field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
 
                 field("Membership Entry No."; Rec."Membership Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Member Entry No."; Rec."Member Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Member Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(SystemCreatedAt; Rec.SystemCreatedAt)
                 {
                     ToolTip = 'Specifies the value of the SystemCreatedAt field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(SystemModifiedAt; Rec.SystemModifiedAt)
                 {
                     ToolTip = 'Specifies the value of the SystemModifiedAt field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }

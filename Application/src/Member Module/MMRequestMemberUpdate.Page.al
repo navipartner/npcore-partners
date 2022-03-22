@@ -18,52 +18,52 @@
                 field("Entry No."; Rec."Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Entry No. field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Member Entry No."; Rec."Member Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Member Entry No. field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Member No."; Rec."Member No.")
                 {
                     ToolTip = 'Specifies the value of the Member No. field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Handled; Rec.Handled)
                 {
                     ToolTip = 'Specifies the value of the Handled field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Field No."; Rec."Field No.")
                 {
                     ToolTip = 'Specifies the value of the Field No. field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Caption; Rec.Caption)
                 {
                     ToolTip = 'Specifies the value of the Caption field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Current Value"; Rec."Current Value")
                 {
                     ToolTip = 'Specifies the value of the Current Value field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("New Value"; Rec."New Value")
                 {
                     ToolTip = 'Specifies the value of the New Value field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Request Datetime"; Rec."Request Datetime")
                 {
                     ToolTip = 'Specifies the value of the Request Datetime field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Response Datetime"; Rec."Response Datetime")
                 {
                     ToolTip = 'Specifies the value of the Response Datetime field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -75,7 +75,7 @@
         {
             action(UpdateEmail)
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Caption = 'Request E-Mail Update';
 
                 Image = MailSetup;
@@ -100,7 +100,7 @@
 
             action(UpdateAll)
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Caption = 'Request Update';
 
                 Image = UpdateDescription;

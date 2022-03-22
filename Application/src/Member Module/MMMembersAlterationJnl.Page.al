@@ -7,7 +7,7 @@
     SourceTable = "NPR MM Member Info Capture";
     SourceTableView = WHERE("Source Type" = CONST(ALTERATION_JNL));
     UsageCategory = Tasks;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
 
     layout
@@ -22,20 +22,20 @@
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Type; AlterationOption)
                 {
 
                     OptionCaption = ' ,Regret,Renew,Upgrade,Extend,Cancel';
                     ToolTip = 'Specifies the value of the AlterationOption field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
 
                     ToolTip = 'Specifies the value of the External Membership No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -58,13 +58,13 @@
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Item No."; Rec."Item No.")
                 {
 
                     ToolTip = 'Specifies the value of the Item No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -82,19 +82,19 @@
                 {
 
                     ToolTip = 'Specifies the value of the Document Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Response Status"; Rec."Response Status")
                 {
 
                     ToolTip = 'Specifies the value of the Response Status field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -107,7 +107,7 @@
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Response Message field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -127,7 +127,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Check action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin
@@ -146,7 +146,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Check and Execute action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin
@@ -161,7 +161,7 @@
                 Image = CalculatePlan;
 
                 ToolTip = 'Executes the Batch Renew action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -184,7 +184,7 @@
                 Image = Import;
 
                 ToolTip = 'Executes the Import From File action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -215,7 +215,7 @@
                 RunPageLink = Code = FIELD("Membership Code");
 
                 ToolTip = 'Executes the Membership Setup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("Membership Card")
             {
@@ -228,7 +228,7 @@
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
 
                 ToolTip = 'Executes the Membership Card action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }

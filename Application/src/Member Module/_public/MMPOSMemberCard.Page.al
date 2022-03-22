@@ -19,53 +19,53 @@
                 {
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Member No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Display Name"; Rec."Display Name")
                 {
                     ToolTip = 'Specifies the value of the Display Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("First Name"; Rec."First Name")
                 {
                     ToolTip = 'Specifies the value of the First Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
                     ToolTip = 'Specifies the value of the Last Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Blocked; Rec.Blocked)
                 {
                     Style = Unfavorable;
                     StyleExpr = IsInvalid;
                     ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
                     Style = Unfavorable;
                     StyleExpr = IsInvalid;
                     ToolTip = 'Specifies the value of the Blocked At field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
                     ToolTip = 'Specifies the value of the Phone No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     ToolTip = 'Specifies the value of the E-Mail Address field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("GDPR Approval"; MembershipRoleDisplay."GDPR Approval")
                 {
                     Caption = 'GDPR Approval';
                     Editable = false;
                     ToolTip = 'Specifies the value of the GDPR Approval field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
             group(CRM)
@@ -73,29 +73,29 @@
                 field(Picture; Rec.Image)
                 {
                     ToolTip = 'Specifies the value of the Picture field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Gender; Rec.Gender)
                 {
                     ToolTip = 'Specifies the value of the Gender field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Birthday; Rec.Birthday)
                 {
                     Style = Favorable;
                     StyleExpr = IsBirthday;
                     ToolTip = 'Specifies the value of the Birthday field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("E-Mail News Letter"; Rec."E-Mail News Letter")
                 {
                     ToolTip = 'Specifies the value of the E-Mail News Letter field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Notification Method"; Rec."Notification Method")
                 {
                     ToolTip = 'Specifies the value of the Notification Method field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
             group(Membership)
@@ -106,19 +106,19 @@
                 {
                     Caption = 'External Membership No.';
                     ToolTip = 'Specifies the value of the External Membership No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Membership Code"; Membership."Membership Code")
                 {
                     Caption = 'Membership Code';
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Company Name"; Membership."Company Name")
                 {
                     Caption = 'Company Name';
                     ToolTip = 'Specifies the value of the Company Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 group(Control6014407)
                 {
@@ -128,14 +128,14 @@
                         Caption = 'Remaining Points';
                         Editable = false;
                         ToolTip = 'Specifies the value of the Remaining Points field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field("Valid From Date"; ValidFromDate)
                     {
                         Caption = 'Valid From Date';
                         Visible = false;
                         ToolTip = 'Specifies the value of the Valid From Date field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field("Valid Until Date"; ValidUntilDate)
                     {
@@ -143,7 +143,7 @@
                         Style = Unfavorable;
                         StyleExpr = UntilDateAttentionAccent;
                         ToolTip = 'Specifies the value of the Valid Until Date field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field("Remaining Amount Text"; RemainingAmountText)
                     {
@@ -151,7 +151,7 @@
                         Style = Unfavorable;
                         StyleExpr = AccentuateDueAmount;
                         ToolTip = 'Specifies the value of the Open / Due Amount. field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                 }
             }
@@ -161,14 +161,14 @@
                 SubPageView = SORTING("Membership Entry No.", "Relative Period") ORDER(Descending);
                 ShowFilter = false;
                 UpdatePropagation = Both;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
 
             part("Member Cards Subpage"; "NPR MM Member Cards ListPart")
             {
                 SubPageLink = "Member Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Entry No.") ORDER(Descending);
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
             }
         }
@@ -176,7 +176,7 @@
         {
             systempart(Control6014400; Notes)
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }
@@ -197,7 +197,7 @@
                 RunPageLink = "Entry No." = FIELD("Entry No.");
 
                 ToolTip = 'Executes the Member Card action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("Register Arrival")
             {
@@ -209,7 +209,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Register Arrival action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var
@@ -234,7 +234,7 @@
                 PromotedCategory = Process;
 
                 ToolTip = 'Executes the Activate Membership action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin
@@ -253,7 +253,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Add Guardian action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin
@@ -269,7 +269,7 @@
                 PromotedOnly = true;
 
                 ToolTip = 'Executes the Profiles action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin
@@ -287,7 +287,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Print Member Card action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var
@@ -316,7 +316,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Executes the Ledger Entries action';
 
                     trigger OnAction()
@@ -347,7 +347,7 @@
                     PromotedCategory = Category4;
 
                     ToolTip = 'Executes the Item Ledger Entries action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnAction()
                     var
@@ -378,7 +378,7 @@
                     ShortCutKey = 'F7';
 
                     ToolTip = 'Executes the Statistics action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnAction()
                     var
@@ -411,7 +411,7 @@
                     Visible = RaptorEnabled;
 
                     ToolTip = 'Executes the Browsing History action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnAction()
                     var
@@ -437,7 +437,7 @@
                     Visible = RaptorEnabled;
 
                     ToolTip = 'Executes the Recommendations action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnAction()
                     var

@@ -8,7 +8,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM Admis. Service Log";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -20,109 +20,109 @@
                 {
 
                     ToolTip = 'Specifies the value of the Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("No."; Rec."No.")
                 {
 
                     ToolTip = 'Specifies the value of the No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Action"; Rec.Action)
                 {
 
                     ToolTip = 'Specifies the value of the Action field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Created Date"; Rec."Created Date")
                 {
 
                     ToolTip = 'Specifies the value of the Created Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Token; Rec.Token)
                 {
 
                     ToolTip = 'Specifies the value of the Token field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Key"; Rec.Key)
                 {
 
                     ToolTip = 'Specifies the value of the Key field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Scanner Station Id"; Rec."Scanner Station Id")
                 {
 
                     ToolTip = 'Specifies the value of the Scanner Station Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Request Barcode"; Rec."Request Barcode")
                 {
 
                     ToolTip = 'Specifies the value of the Request Barcode field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Request Scanner Station Id"; Rec."Request Scanner Station Id")
                 {
 
                     ToolTip = 'Specifies the value of the Request Scanner Station Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Request No"; Rec."Request No")
                 {
 
                     ToolTip = 'Specifies the value of the Request No field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Request Token"; Rec."Request Token")
                 {
 
                     ToolTip = 'Specifies the value of the Request Token field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Response No"; Rec."Response No")
                 {
 
                     ToolTip = 'Specifies the value of the Response No field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Response Token"; Rec."Response Token")
                 {
 
                     ToolTip = 'Specifies the value of the Response Token field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Response Name"; Rec."Response Name")
                 {
 
                     ToolTip = 'Specifies the value of the Response Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Response PictureBase64"; Rec."Response PictureBase64")
                 {
 
                     ToolTip = 'Specifies the value of the Response PictureBase64 field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Error Number"; Rec."Error Number")
                 {
 
                     ToolTip = 'Specifies the value of the Error Number field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Error Description"; Rec."Error Description")
                 {
 
                     ToolTip = 'Specifies the value of the Error Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Return Value"; Rec."Return Value")
                 {
 
                     ToolTip = 'Specifies the value of the Return Value field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -142,7 +142,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Test action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var

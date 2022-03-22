@@ -10,7 +10,7 @@
     SourceTableView = SORTING("Entry No.")
                       WHERE("Source Type" = CONST(PRINT_JNL));
     UsageCategory = Tasks;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
 
     layout
@@ -24,95 +24,95 @@
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Member Entry No"; Rec."Member Entry No")
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Member Entry No field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Membership Entry No."; Rec."Membership Entry No.")
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Card Entry No."; Rec."Card Entry No.")
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Card Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Information Context"; Rec."Information Context")
                 {
 
                     ToolTip = 'Specifies the value of the Information Context field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
 
                     ToolTip = 'Specifies the value of the External Membership No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
 
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("External Member No"; Rec."External Member No")
                 {
 
                     ToolTip = 'Specifies the value of the External Member No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("First Name"; Rec."First Name")
                 {
 
                     ToolTip = 'Specifies the value of the First Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
 
                     ToolTip = 'Specifies the value of the Last Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
 
                     ToolTip = 'Specifies the value of the E-Mail Address field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
 
                     ToolTip = 'Specifies the value of the Phone No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("External Card No."; Rec."External Card No.")
                 {
 
                     ToolTip = 'Specifies the value of the External Card No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("External Card No. Last 4"; Rec."External Card No. Last 4")
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Card No. Last 4 field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Document No."; Rec."Document No.")
                 {
 
                     ToolTip = 'Specifies the value of the Document No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -132,7 +132,7 @@
                 PromotedCategory = "Report";
 
                 ToolTip = 'Executes the Member Account Card action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var
@@ -158,7 +158,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Member Card action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var
@@ -183,7 +183,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Card Owner action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var
@@ -213,7 +213,7 @@
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
 
                 ToolTip = 'Executes the Membership action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action(OpenMembershipSetup)
             {
@@ -224,7 +224,7 @@
                 RunObject = Page "NPR MM Membership Setup";
 
                 ToolTip = 'Executes the MembershipSetup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action(Shipment)
             {
@@ -236,7 +236,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Shipment action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var
