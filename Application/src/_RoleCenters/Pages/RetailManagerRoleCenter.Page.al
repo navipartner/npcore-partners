@@ -587,7 +587,8 @@
 
                 action(ShopperRecognition)
                 {
-
+                    Visible = false;
+                    Enabled = false;
                     Caption = 'EFT Shopper Recognition';
                     Image = Customer;
                     RunObject = page "NPR EFT Shopper Recognition";
