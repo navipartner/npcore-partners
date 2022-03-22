@@ -65,6 +65,18 @@
                 Caption = 'Downloads';
                 actions
                 {
+                    action("Download Minor Tom +")
+                    {
+                        Caption = 'Download Minor Tom +';
+                        ToolTip = 'Open URL to download version compatible with both 32-bit or 64-bit systems.';
+                        Image = TileCloud;
+                        ApplicationArea = NPRRetail;
+
+                        trigger OnAction()
+                        begin
+                            System.Hyperlink('https://npminortom.blob.core.windows.net/prod/Setup.exe');
+                        end;
+                    }
                     action("Download Major Tom")
                     {
                         Caption = 'Download Major Tom';
@@ -74,7 +86,7 @@
 
                         trigger OnAction()
                         begin
-                            System.Hyperlink('https://npminortom.blob.core.windows.net/prod/Setup.exe');
+                            System.Hyperlink('https://clickonce.dynamics-retail.com/ClickOnce/Majortom/6.3/install.html');
                         end;
                     }
                     action("Download HW Connector")
