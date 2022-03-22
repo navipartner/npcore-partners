@@ -4,14 +4,23 @@
   items:
   - name: Set up tickets with the Ticket Wizard
     href: tutorial/ticket_tutorial.md  
+  - name: Ticket Designer
+    href: tutorial/TicketDesigner.md  
 - name: How-To
   items:
   - name: Issue tickets from Business Central
     href: howto/issue_ticket.md
+  - name: Set up DIY Printed Ticket
+    href: howto/SetUpDIYPrintedTicket.md
   - name: Create a ticket notification profile
     href: howto/CreateNotificationProfile.md
   - name: Change Ticket Reservation 
     href: howto/ChangeTicketReservation.md
+  - name: Set Up Ticket Refund Policy
+    href: howto/SetUpRefundPolicy.md
+  - name: Refunding Tickets
+    href: howto/RefundingTickets.md
+
 - name: Explanation
   items:
   - name: Ticket
@@ -22,3 +31,5 @@
     href: explanation/TicketHolderNotification.md
   - name: Reservation Vs Location
     href: explanation/LocationVsReservation.md
+  - name: Authorization Code
+    href: explanation/AuthorizationCode.md
