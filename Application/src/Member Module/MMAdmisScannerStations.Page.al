@@ -18,37 +18,37 @@
                 {
 
                     ToolTip = 'Specifies the value of the Scanner Station Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Guest Avatar"; Rec."Guest Avatar Image")
                 {
 
                     ToolTip = 'Specifies the value of the Guest Avatar field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Turnstile Default Image"; Rec."Default Turnstile Image")
                 {
 
                     ToolTip = 'Specifies the value of the Turnstile Default Image field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Turnstile Error Image"; Rec."Error Image of Turnstile")
                 {
 
                     ToolTip = 'Specifies the value of the Turnstile Error Image field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
 
                     ToolTip = 'Specifies the value of the Admission Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Activated; Rec.Activated)
                 {
 
                     ToolTip = 'Specifies the value of the Activated field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }

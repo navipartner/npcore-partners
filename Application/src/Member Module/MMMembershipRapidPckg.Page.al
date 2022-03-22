@@ -5,7 +5,7 @@
 
     UsageCategory = Administration;
     Caption = 'Membership Rapid Packages Deploy from Azure';
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -22,7 +22,7 @@
 
                 Lookup = true;
                 ToolTip = 'Specifies the value of the package field';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 trigger OnLookup(var SelectedValues: Text): Boolean
                 begin
                     exit(OnLookupPackage(SelectedValues));
@@ -34,14 +34,14 @@
 
                 Caption = 'Configuration Package name';
                 ToolTip = 'Specifies Configuration Package name(s) which will be used. It is generated from the file name(s) from Azure Blob storage. If filename containis sufix "_ver" then it will be truncated, else it will be the same as file name.';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             field("Adjust Table Names"; AdjustTableNames)
             {
 
                 Caption = 'Adjust Table Names';
                 ToolTip = 'Specifies whether table names in the package should be adjusted. The option should be enabled if the package contains NPRetail tables, and it was created in NAV/BC version prior to BC16';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }
@@ -55,7 +55,7 @@
 
                 ToolTip = 'Executes the ActionName action';
                 Image = Action;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin
@@ -70,7 +70,7 @@
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
                 Image = PreviousRecord;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
 
             action(ActionNext)
@@ -80,7 +80,7 @@
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
                 Image = NextRecord;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
 
             action(ActionFinish)
@@ -90,7 +90,7 @@
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
                 Image = Action;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin

@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM Loy. LedgerEntry (Srvr)";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -19,91 +19,91 @@
                 {
 
                     ToolTip = 'Specifies the value of the Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
 
                     ToolTip = 'Specifies the value of the Entry Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
 
                     ToolTip = 'Specifies the value of the Company Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
 
                     ToolTip = 'Specifies the value of the POS Store Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("POS Unit Code"; Rec."POS Unit Code")
                 {
 
                     ToolTip = 'Specifies the value of the POS Unit Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Card Number"; Rec."Card Number")
                 {
 
                     ToolTip = 'Specifies the value of the Card Number field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Reference Number"; Rec."Reference Number")
                 {
 
                     ToolTip = 'Specifies the value of the Reference Number field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Foreign Transaction Id"; Rec."Foreign Transaction Id")
                 {
 
                     ToolTip = 'Specifies the value of the Foreign Transaction Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Transaction Date"; Rec."Transaction Date")
                 {
 
                     ToolTip = 'Specifies the value of the Transaction Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Transaction Time"; Rec."Transaction Time")
                 {
 
                     ToolTip = 'Specifies the value of the Transaction Time field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Authorization Code"; Rec."Authorization Code")
                 {
 
                     ToolTip = 'Specifies the value of the Authorization Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Earned Points"; Rec."Earned Points")
                 {
 
                     ToolTip = 'Specifies the value of the Earned Points field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Burned Points"; Rec."Burned Points")
                 {
 
                     ToolTip = 'Specifies the value of the Burned Points field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Balance; Rec.Balance)
                 {
 
                     ToolTip = 'Specifies the value of the Balance field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Reservation is Captured"; Rec."Reservation is Captured")
                 {
 
                     ToolTip = 'Specifies the value of the Reservation is Captured field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -123,7 +123,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the &Navigate action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var

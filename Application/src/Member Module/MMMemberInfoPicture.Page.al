@@ -18,7 +18,7 @@
 
                 ShowCaption = false;
                 ToolTip = 'Specifies the picture that has been inserted for the item.';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }
@@ -33,7 +33,7 @@
                 Caption = 'Import';
                 Image = Import;
                 ToolTip = 'Import a picture file.';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var
@@ -58,7 +58,7 @@
             }
             action(ExportPicture)
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Caption = 'Export';
                 Enabled = DeleteExportEnabled;
                 Image = Export;
@@ -86,7 +86,7 @@
                 Enabled = DeleteExportEnabled;
                 Image = Delete;
                 ToolTip = 'Delete the record.';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin

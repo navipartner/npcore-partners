@@ -8,7 +8,7 @@
 
     SourceTable = "NPR MM Loyalty Store Setup";
     SourceTableView = WHERE(Setup = CONST(SERVER));
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -20,103 +20,103 @@
                 {
 
                     ToolTip = 'Specifies the value of the Setup field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Client Company Name"; Rec."Client Company Name")
                 {
 
                     ToolTip = 'Specifies the value of the Client Company Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Store Code"; Rec."Store Code")
                 {
 
                     ToolTip = 'Specifies the value of the Store Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Unit Code"; Rec."Unit Code")
                 {
 
                     ToolTip = 'Specifies the value of the Unit Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Authorization Code"; Rec."Authorization Code")
                 {
 
                     ToolTip = 'Specifies the value of the Authorization Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Accept Client Transactions"; Rec."Accept Client Transactions")
                 {
 
                     ToolTip = 'Specifies the value of the Accept Client Transactions field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
 
                     ToolTip = 'Specifies the value of the Customer No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Customer Name"; Rec."Customer Name")
                 {
 
                     ToolTip = 'Specifies the value of the Customer Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Posting Model"; Rec."Posting Model")
                 {
 
                     ToolTip = 'Specifies the value of the Posting Model field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Loyalty Setup Code"; Rec."Loyalty Setup Code")
                 {
 
                     ToolTip = 'Specifies the value of the Loyalty Setup Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Burn Points Currency Code"; Rec."Burn Points Currency Code")
                 {
 
                     ToolTip = 'Specifies the value of the Burn Points LCY Currency Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("G/L Account No."; Rec."G/L Account No.")
                 {
 
                     ToolTip = 'Specifies the value of the G/L Account No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Invoice No. Series"; Rec."Invoice No. Series")
                 {
 
                     ToolTip = 'Specifies the value of the Invoice No. Series field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Reconciliation Period"; Rec."Reconciliation Period")
                 {
 
                     ToolTip = 'Specifies the value of the Reconciliation Period field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Outstanding Earn Points"; Rec."Outstanding Earn Points")
                 {
 
                     ToolTip = 'Specifies the value of the Outstanding Earn Points field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Outstanding Burn Points"; Rec."Outstanding Burn Points")
                 {
 
                     ToolTip = 'Specifies the value of the Outstanding Burn Points field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -140,7 +140,7 @@
                               "POS Unit Code" = FIELD("Unit Code");
 
                 ToolTip = 'Executes the Transaction Entries action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
         area(processing)
@@ -155,7 +155,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Reconcile All Stores action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var
@@ -175,7 +175,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Reconcile Selected Store action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var

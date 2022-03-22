@@ -1,14 +1,14 @@
 ﻿#if BC17
 report 6060127 "NPR MM Member Card Print QR"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Print QR.rdlc';
     Caption = 'Member Card Print';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     DataAccessIntent = ReadOnly;
 
     dataset

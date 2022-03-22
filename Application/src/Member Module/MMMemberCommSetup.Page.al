@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM Member Comm. Setup";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -19,25 +19,25 @@
                 {
 
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Message Type"; Rec."Message Type")
                 {
 
                     ToolTip = 'Specifies the value of the Message Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Preferred Method"; Rec."Preferred Method")
                 {
 
                     ToolTip = 'Specifies the value of the Preferred Method field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Notification Engine"; Rec."Notification Engine")
                 {
 
                     ToolTip = 'Specifies the value of the Notification Engine field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -52,7 +52,7 @@
                 Caption = 'Export Sender Template File';
                 ToolTip = 'Exports the default or current template used to send information to wallet.';
                 Image = ExportAttachment;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
 
                 trigger OnAction()
@@ -98,7 +98,7 @@
                 Caption = 'Import Sender Template File';
                 ToolTip = 'Define information sent to wallet.';
                 Image = ImportCodes;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
 
                 trigger OnAction()

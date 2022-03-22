@@ -19,7 +19,7 @@ page 6060078 "NPR MM Membership Kiosk"
         {
             usercontrol(Bridge; "NPR Bridge")
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
 
                 trigger OnFrameworkReady()

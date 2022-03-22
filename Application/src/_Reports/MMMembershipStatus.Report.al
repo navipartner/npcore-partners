@@ -1,13 +1,13 @@
 ﻿report 6060132 "NPR MM Membership Status"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Status.rdlc';
     Caption = 'Membership Status';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     DataAccessIntent = ReadOnly;
 
     dataset
@@ -228,7 +228,7 @@
 
                         Caption = 'Reference Date';
                         ToolTip = 'Specifies the value of the Reference Date field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field("Membership Status"; MembershipStatus)
                     {
@@ -236,7 +236,7 @@
                         Caption = 'Membership Status On Reference Date';
                         OptionCaption = 'Active,Active and Renewed,Active and Not Renewed,Not Active';
                         ToolTip = 'Specifies the value of the Membership Status On Reference Date field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field("Expires Within Date formula"; ExpiresWithinDateformula)
                     {
@@ -244,7 +244,7 @@
                         Caption = 'Expires Within (Active)';
                         Editable = (MembershipStatus < 3);
                         ToolTip = 'Specifies the value of the Expires Within (Active) field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field("Renewed Within"; RenewedWithin)
                     {
@@ -252,7 +252,7 @@
                         Caption = 'Renewed Within (Active)';
                         Editable = (MembershipStatus < 3);
                         ToolTip = 'Specifies the value of the Renewed Within (Active) field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                 }
             }

@@ -21,22 +21,22 @@
                 field("First Name"; Rec."First Name")
                 {
                     ToolTip = 'Specifies the value of the First Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
                     ToolTip = 'Specifies the value of the Last Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     ToolTip = 'Specifies the value of the E-Mail Address field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
                     ToolTip = 'Specifies the value of the Phone No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
 
             }
@@ -46,7 +46,7 @@
                 {
                     Caption = 'Limit ResultSet to Max Lines';
                     ToolTip = 'Specifies the value of the Limit ResultSet to Max Lines field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
 

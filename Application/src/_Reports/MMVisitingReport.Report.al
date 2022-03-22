@@ -1,13 +1,13 @@
 ﻿report 6060133 "NPR MM Visiting Report"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Visiting Report.rdlc';
     Caption = 'MM Visiting Report';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     DataAccessIntent = ReadOnly;
 
     dataset

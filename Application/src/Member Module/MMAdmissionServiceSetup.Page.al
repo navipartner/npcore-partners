@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM Admis. Service Setup";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -20,44 +20,44 @@
                 {
 
                     ToolTip = 'Specifies the value of the Validate Members field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Validate Tickes"; Rec."Validate Tickes")
                 {
 
                     ToolTip = 'Specifies the value of the Validate Tickes field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Validate Re-Scan"; Rec."Validate Re-Scan")
                 {
 
                     ToolTip = 'Specifies the value of the Validate Re-Scan field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Validate Scanner Station"; Rec."Validate Scanner Station")
                 {
 
                     ToolTip = 'Specifies the value of the Validate Scanner Station field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Allowed Re-Scan Interval"; Rec."Allowed Re-Scan Interval")
                 {
 
                     ToolTip = 'Specifies the value of the Allowed Re-Scan Interval field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(WebServiceIsPublished; WebServiceIsPublished)
                 {
                     Caption = 'Web Service Is Published';
                     ToolTip = 'Specifies the value of the Web Service Is Published field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
             part(Turnstiles; "NPR MM Admis. Scanner Stations")
             {
                 Caption = 'Turnstiles';
                 ShowFilter = false;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
             }
         }
@@ -68,7 +68,7 @@
                 Caption = 'Images';
 
                 SubPageLink = "No." = FIELD("No.");
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }
@@ -87,7 +87,7 @@
                 RunObject = Codeunit "NPR MM Admission Service WS";
 
                 ToolTip = 'Executes the Published Webservice action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action(Entries)
             {
@@ -99,7 +99,7 @@
                 RunObject = Page "NPR MM Admis. Service Entries";
 
                 ToolTip = 'Executes the Entries action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }

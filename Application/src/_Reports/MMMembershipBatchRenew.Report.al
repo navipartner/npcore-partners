@@ -6,7 +6,7 @@
     Caption = 'Membership Batch Renew';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     dataset
     {
         dataitem(ReportMembership; "NPR MM Membership")
@@ -119,7 +119,7 @@
                     ShowMandatory = true;
 
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -146,7 +146,7 @@
                     ShowMandatory = true;
 
                     ToolTip = 'Specifies the value of the Active On Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Type Of Active"; TypeOfActive)
                 {
@@ -154,7 +154,7 @@
                     OptionCaption = 'Active,Last Period';
 
                     ToolTip = 'Specifies the value of the Active Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Renew Using Item"; RenewUsingItem)
                 {
@@ -162,7 +162,7 @@
                     ShowMandatory = true;
 
                     ToolTip = 'Specifies the value of the Renew Using Item field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -192,7 +192,7 @@
                     Caption = 'Verbose';
 
                     ToolTip = 'Specifies the value of the Verbose field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
