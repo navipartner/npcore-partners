@@ -18,7 +18,7 @@
                     Caption = 'Community Code';
                     Editable = IsEditable;
                     ToolTip = 'Specifies the value of the Community Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(SystemPrefix; FS_Prefix)
                 {
@@ -26,28 +26,28 @@
                     Caption = 'System Prefix';
                     Editable = IsEditable;
                     ToolTip = 'Specifies the value of the System Prefix field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(PaymentMethodCode; PaymentMethodCode)
                 {
 
                     Caption = 'Payment Method Code';
                     ToolTip = 'Specifies the value of the Payment Method Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(GLAccount; GLAccount)
                 {
 
                     Caption = 'Payment G/L Account';
                     ToolTip = 'Specifies the value of the Payment G/L Account field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Description)
                 {
 
                     Caption = 'Description';
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
             group("Server Communication")
@@ -58,7 +58,7 @@
                 {
                     Caption = 'Authorization Type';
                     ToolTip = 'Specifies the value of the Authorization Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     trigger OnValidate()
                     begin
                         CurrPage.Update();
@@ -74,14 +74,14 @@
 
                         Caption = 'Username';
                         ToolTip = 'Specifies the value of the Username field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field(ServicePassword; ServicePassword)
                     {
 
                         Caption = 'Password';
                         ToolTip = 'Specifies the value of the Password field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                 }
 
@@ -91,7 +91,7 @@
                     Visible = IsOAuth2Visible;
                     field(OAuth2SetupCode; OAuth2SetupCode)
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                         Caption = 'OAuth2 Setup Code';
                         Editable = false;
                         ToolTip = 'Specifies the OAuth2.0 Setup Code.';
@@ -113,7 +113,7 @@
 
                     Caption = 'Base URL';
                     ToolTip = 'Specifies the value of the Base URL field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -134,14 +134,14 @@
 
                     Caption = 'Tenant';
                     ToolTip = 'Specifies the value of the Tenant field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(MembershipCode; MembershipCode)
                 {
 
                     Caption = 'Membership Code';
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
             group(Setup)
@@ -153,14 +153,14 @@
                     Caption = 'Server Company Name';
                     TableRelation = Company;
                     ToolTip = 'Specifies the value of the Server Company Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(LoyaltyAuth; LoyaltyAuth)
                 {
 
                     Caption = 'Loyalty Authorization Code';
                     ToolTip = 'Specifies the value of the Loyalty Authorization Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(EarnFactor; EarnRatio)
                 {
@@ -169,7 +169,7 @@
                     DecimalPlaces = 2 : 5;
                     MinValue = 0;
                     ToolTip = 'Specifies the value of the Earn Factor field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(BurnFactor; BurnRation)
                 {
@@ -178,7 +178,7 @@
                     DecimalPlaces = 2 : 5;
                     MinValue = 0;
                     ToolTip = 'Specifies the value of the Burn Factor field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }

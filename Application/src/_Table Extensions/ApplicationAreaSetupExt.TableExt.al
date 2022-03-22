@@ -32,5 +32,15 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NPR NaviConnect';
             DataClassification = CustomerContent;
         }
+        field(6060106; "NPR Membership Essential"; Boolean)
+        {
+            Caption = 'NPR Membership Essential';
+            DataClassification = CustomerContent;
+        }
+        field(6060107; "NPR Membership Advanced"; Boolean)
+        {
+            Caption = 'NPR Membership Advanced';
+            DataClassification = CustomerContent;
+        }
     }
 }

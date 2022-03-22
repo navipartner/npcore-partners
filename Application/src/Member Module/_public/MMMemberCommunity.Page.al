@@ -5,7 +5,7 @@
     PageType = List;
     SourceTable = "NPR MM Member Community";
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
 
     layout
@@ -18,80 +18,80 @@
                 {
 
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("External No. Search Order"; Rec."External No. Search Order")
                 {
 
                     ToolTip = 'Specifies the value of the External No. Search Order field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("External Membership No. Series"; Rec."External Membership No. Series")
                 {
 
                     ToolTip = 'Specifies the value of the External Membership No. Series field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("External Member No. Series"; Rec."External Member No. Series")
                 {
 
                     ToolTip = 'Specifies the value of the External Member No. Series field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Customer No. Series"; Rec."Customer No. Series")
                 {
 
                     ToolTip = 'Specifies the value of the Customer No. Series field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Member Unique Identity"; Rec."Member Unique Identity")
                 {
 
                     ToolTip = 'Specifies the value of the Member Unique Identity field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Create Member UI Violation"; Rec."Create Member UI Violation")
                 {
 
                     ToolTip = 'Specifies the value of the Create Member UI Violation field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Member Logon Credentials"; Rec."Member Logon Credentials")
                 {
 
                     ToolTip = 'Specifies the value of the Member Logon Credentials field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Membership to Cust. Rel."; Rec."Membership to Cust. Rel.")
                 {
 
                     ToolTip = 'Specifies the value of the Membership to Cust. Rel. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Create Renewal Notifications"; Rec."Create Renewal Notifications")
                 {
 
                     ToolTip = 'Specifies the value of the Create Renewal Notifications field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Activate Loyalty Program"; Rec."Activate Loyalty Program")
                 {
 
                     ToolTip = 'Specifies the value of the Activate Loyalty Program field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Foreign Membership"; Rec."Foreign Membership")
                 {
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Foreign Membership field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -109,7 +109,7 @@
                 RunPageLink = "Community Code" = FIELD(Code);
 
                 ToolTip = 'Executes the Membership Setup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("Loyalty Setup")
             {
@@ -121,7 +121,7 @@
                 RunObject = Page "NPR MM Loyalty Setup";
 
                 ToolTip = 'Executes the Loyalty Setup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("Notification Setup")
             {
@@ -131,7 +131,7 @@
                 RunPageLink = "Community Code" = FIELD(Code);
 
                 ToolTip = 'Executes the Notification Setup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             separator(Separator6150626)
             {
@@ -145,7 +145,7 @@
                 RunPageLink = "Community Code" = FIELD(Code);
 
                 ToolTip = 'Executes the Auto Renew Process action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             separator(Separator6014406)
             {
@@ -158,7 +158,7 @@
                 RunPageLink = "Community Code" = FIELD(Code);
 
                 ToolTip = 'Executes the Memberships action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             separator(Separator6014405)
             {
@@ -170,7 +170,7 @@
                 RunObject = Page "NPR MM Membership Notific.";
 
                 ToolTip = 'Executes the Notifications action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("Foreign Membership Setup")
             {
@@ -181,7 +181,7 @@
                 RunPageLink = "Community Code" = FIELD(Code);
 
                 ToolTip = 'Executes the Foreign Membership Setup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
         area(processing)
@@ -193,7 +193,7 @@
                 RunObject = Report "NPR MM Sync. Community Cust.";
 
                 ToolTip = 'Executes the Update Memberships Customer action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
 
             action(CreateDemoData)
@@ -202,7 +202,7 @@
 
                 ToolTip = 'Executes the Create Demo Data action';
                 Image = Action;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var

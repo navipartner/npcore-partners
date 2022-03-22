@@ -19,37 +19,37 @@
                 {
 
                     ToolTip = 'Specifies the value of the Item No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Valid From Date"; Rec."Valid From Date")
                 {
 
                     ToolTip = 'Specifies the value of the Valid From Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Valid Until Date"; Rec."Valid Until Date")
                 {
 
                     ToolTip = 'Specifies the value of the Valid Until Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
 
                     ToolTip = 'Specifies the value of the Unit Price field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Amount Incl VAT"; Rec."Amount Incl VAT")
                 {
 
                     ToolTip = 'Specifies the value of the Amount Incl VAT field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }

@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM Loyalty Setup";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -19,19 +19,19 @@
                 {
 
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Collection Period"; Rec."Collection Period")
                 {
 
                     ToolTip = 'Specifies the value of the Collection Period field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -46,7 +46,7 @@
                     Style = Attention;
                     StyleExpr = PeriodCalculationIssue;
                     ToolTip = 'Specifies the value of the Fixed Period Start field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -61,7 +61,7 @@
                     Style = Attention;
                     StyleExpr = PeriodCalculationIssue;
                     ToolTip = 'Specifies the value of the Collection Period Length field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -74,7 +74,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Expire Uncollected Points field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -87,7 +87,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Expire Uncollected After field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -102,7 +102,7 @@
                     Caption = 'Period Test Date';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Period Test Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnValidate()
                     var
@@ -120,7 +120,7 @@
                     Caption = 'Earn Period Start';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Earn Period Start field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(CollectionPeriodEnd; CollectionPeriodEnd)
                 {
@@ -128,7 +128,7 @@
                     Caption = 'Earn Period End';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Earn Period End field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(ExpirePointsAt; ExpirePointsAt)
                 {
@@ -136,66 +136,66 @@
                     Caption = 'Expire Points At';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Expire Points At field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Voucher Point Source"; Rec."Voucher Point Source")
                 {
 
                     ToolTip = 'Specifies the value of the Voucher Point Source field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Voucher Point Threshold"; Rec."Voucher Point Threshold")
                 {
 
                     ToolTip = 'Specifies the value of the Voucher Point Threshold field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Voucher Creation"; Rec."Voucher Creation")
                 {
 
                     ToolTip = 'Specifies the value of the Voucher Creation field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Point Base"; Rec."Point Base")
                 {
 
                     ToolTip = 'Specifies the value of the Point Base field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Amount Base"; Rec."Amount Base")
                 {
 
                     ToolTip = 'Specifies the value of the Amount Base field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Points On Discounted Sales"; Rec."Points On Discounted Sales")
                 {
 
                     ToolTip = 'Specifies the value of the Points On Discounted Sales field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Amount Factor"; Rec."Amount Factor")
                 {
 
                     ToolTip = 'Specifies the value of the Amount Factor field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Rounding on Earning"; Rec."Rounding on Earning")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies how the price * amount factor is rounded when earning points.';
                 }
                 field("Point Rate"; Rec."Point Rate")
                 {
 
                     ToolTip = 'Specifies the value of the Point Rate field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Auto Upgrade Point Source"; Rec."Auto Upgrade Point Source")
                 {
 
                     ToolTip = 'Specifies the value of the Auto Upgrade Point Source field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(ReasonText; ReasonText)
                 {
@@ -206,7 +206,7 @@
                     StyleExpr = PeriodCalculationIssue;
                     Visible = false;
                     ToolTip = 'Specifies the value of the ReasonText field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -228,7 +228,7 @@
                 RunPageLink = Code = FIELD(Code);
 
                 ToolTip = 'Executes the Points to Amount Setup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("Item Points Setup")
             {
@@ -242,7 +242,7 @@
                 RunPageLink = Code = FIELD(Code);
 
                 ToolTip = 'Executes the Item Points Setup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             separator(Separator6014432)
             {
@@ -258,7 +258,7 @@
                 RunPageLink = "Loyalty Code" = FIELD(Code);
 
                 ToolTip = 'Executes the Auto Upgrade Threshold action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             group("Cross Company Loyalty")
             {
@@ -270,7 +270,7 @@
                     RunObject = Page "NPR MM Loy. Store Setup Server";
 
                     ToolTip = 'Executes the (Server) Loyalty Server - Store Setup action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 action("(Client) Loyalty Server Endpoints")
                 {
@@ -279,7 +279,7 @@
                     RunObject = Page "NPR MM NPR Endpoint Setup";
 
                     ToolTip = 'Executes the (Client) Loyalty Server Endpoints action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 action("(Client) Loyalty Server - Store Setup")
                 {
@@ -288,7 +288,7 @@
                     RunObject = Page "NPR MM Loy. Store Setup Client";
 
                     ToolTip = 'Executes the (Client) Loyalty Server - Store Setup action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -301,7 +301,7 @@
                 Image = Excise;
 
                 ToolTip = 'Executes the Expire Points action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'

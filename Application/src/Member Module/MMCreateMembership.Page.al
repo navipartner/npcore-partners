@@ -9,7 +9,7 @@
     PageType = List;
     SourceTable = "NPR MM Members. Sales Setup";
     UsageCategory = Tasks;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
 
     layout
@@ -23,61 +23,61 @@
                 {
 
                     ToolTip = 'Specifies the value of the Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("No."; Rec."No.")
                 {
 
                     ToolTip = 'Specifies the value of the No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
 
                     ToolTip = 'Specifies the value of the Membership Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Blocked; Rec.Blocked)
                 {
 
                     ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
 
                     ToolTip = 'Specifies the value of the Blocked At field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Valid From Base"; Rec."Valid From Base")
                 {
 
                     ToolTip = 'Specifies the value of the Valid From Base field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Sales Cut-Off Date Calculation"; Rec."Sales Cut-Off Date Calculation")
                 {
 
                     ToolTip = 'Specifies the value of the Sales Cut-Off Date Calculation field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Valid From Date Calculation"; Rec."Valid From Date Calculation")
                 {
 
                     ToolTip = 'Specifies the value of the Valid From Date Calculation field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Valid Until Calculation"; Rec."Valid Until Calculation")
                 {
 
                     ToolTip = 'Specifies the value of the Valid Until Calculation field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Duration Formula"; Rec."Duration Formula")
                 {
 
                     ToolTip = 'Specifies the value of the Duration Formula field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -98,7 +98,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Create Membership action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin
@@ -115,7 +115,7 @@
                 RunObject = Page "NPR MM Membership Setup";
 
                 ToolTip = 'Executes the Membership Setup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("Item List")
             {
@@ -124,7 +124,7 @@
                 RunObject = Page "Item List";
 
                 ToolTip = 'Executes the Item List action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action(Memberships)
             {
@@ -134,7 +134,7 @@
                 RunPageLink = "Membership Code" = FIELD("Membership Code");
 
                 ToolTip = 'Executes the Memberships action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("Community Setup")
             {
@@ -143,7 +143,7 @@
                 RunObject = Page "NPR MM Member Community";
 
                 ToolTip = 'Executes the Community Setup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }

@@ -1,12 +1,12 @@
 ﻿report 6060128 "NPR MM Sync. Community Cust."
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     Caption = 'Sync. Community Customers';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     dataset
     {

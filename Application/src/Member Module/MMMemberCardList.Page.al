@@ -11,7 +11,7 @@
     PageType = Worksheet;
     SourceTable = "NPR MM Member Card";
     UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     CardPageId = "NPR MM Member Card Card";
     layout
     {
@@ -21,7 +21,7 @@
             {
                 Editable = true;
                 Caption = 'Smart Search';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 ToolTip = 'This search is optimized to search relevant columns only.';
                 trigger OnValidate()
                 var
@@ -50,7 +50,7 @@
                 field("External Card No."; Rec."External Card No.")
                 {
                     ToolTip = 'Specifies the value of the External Card No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     trigger OnDrillDown()
                     var
                         MemberCard: Page "NPR MM Member Card";
@@ -71,35 +71,35 @@
                 field("Valid Until"; Rec."Valid Until")
                 {
                     ToolTip = 'Specifies the value of the Valid Until field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
 
                 field("External Membership No."; Rec."External Membership No.")
                 {
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Membership No.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Member No.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }
                 field("Display Name"; Rec."Display Name")
                 {
                     Editable = false;
                     ToolTip = 'Specifies the value of the Display Name.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     Editable = false;
                     ToolTip = 'Specifies the value of the member E-Mail Address';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }
             }
@@ -109,7 +109,7 @@
             part(MemberCard; "NPR MM Member Card FactBox")
             {
                 Caption = 'Member Card Details';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 SubPageLink = "Entry No." = FIELD("Entry No.");
             }
         }
@@ -132,7 +132,7 @@
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
                 Scope = Repeater;
                 ToolTip = 'Opens Membership Card';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action(Members)
             {
@@ -147,7 +147,7 @@
                 RunPageLink = "Entry No." = FIELD("Member Entry No.");
                 Scope = Repeater;
                 ToolTip = 'Opens Members Card';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             separator(Separator6014401)
             {
@@ -161,7 +161,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Executes the Register Arrival action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Scope = Repeater;
 
                 trigger OnAction()
@@ -190,7 +190,7 @@
                 RunPageLink = "External Card No." = FIELD("External Card No.");
                 Scope = Repeater;
                 ToolTip = 'Opens Arrival Log List';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
         area(Processing)
@@ -204,7 +204,7 @@
                 PromotedOnly = true;
                 Scope = Repeater;
                 ToolTip = 'Executes the Print Card action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 var

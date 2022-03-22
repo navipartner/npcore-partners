@@ -1,14 +1,14 @@
 ﻿#if not BC17
 report 6060123 "NPR MM Member Card Std Print"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Std PrintV18.rdl';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     Caption = 'MM Member Card Std Print';
     DataAccessIntent = ReadOnly;
 

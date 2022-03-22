@@ -20,39 +20,39 @@
                 {
 
                     ToolTip = 'Specifies the value of the Coupon Type Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Points Threshold"; Rec."Points Threshold")
                 {
                     Caption = 'Points to Deduct';
 
                     ToolTip = 'Specifies the value of the Points to Deduct field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Discount %"; Rec."Discount %")
                 {
 
                     ToolTip = 'Specifies the value of the Discount % field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
 
                     ToolTip = 'Specifies the value of the Discount Amount field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Amount LCY"; Rec."Amount LCY")
                 {
                     Caption = 'Discount';
 
                     ToolTip = 'Specifies the value of the Discount field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }

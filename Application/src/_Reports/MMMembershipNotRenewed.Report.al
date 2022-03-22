@@ -1,13 +1,13 @@
 ﻿report 6060136 "NPR MM Membership Not Renewed"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Not Renewed.rdlc';
     Caption = 'Membership Not Renewed';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     DataAccessIntent = ReadOnly;
 
     dataset
@@ -231,7 +231,7 @@
 
                         Caption = 'Reference Date 1';
                         ToolTip = 'Specifies the value of the Reference Date 1 field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field("Membership Status"; MembershipStatus)
                     {
@@ -239,14 +239,14 @@
                         Caption = 'Membership Status (Reference Date 1)';
                         OptionCaption = 'Active,Not Active,New,Renew,Upgrade,Extend';
                         ToolTip = 'Specifies the value of the Membership Status (Reference Date 1) field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field("Reference Date 2"; ReferenceDate2)
                     {
 
                         Caption = 'Reference Date 2';
                         ToolTip = 'Specifies the value of the Reference Date 2 field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field("Membership Status 2"; MembershipStatus2)
                     {
@@ -254,7 +254,7 @@
                         Caption = 'Membership Status (Reference Date 2)';
                         OptionCaption = ' ,Active,Not Active,New,Renew,Upgrade,Extend';
                         ToolTip = 'Specifies the value of the Membership Status (Reference Date 2) field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                 }
             }

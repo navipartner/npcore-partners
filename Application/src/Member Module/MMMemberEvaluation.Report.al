@@ -1,11 +1,11 @@
 ﻿report 6014494 "NPR MM Member Evaluation"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     Caption = 'Member Evaluation';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM_MemberEvaluation.rdl';
 
@@ -217,21 +217,21 @@
                         Caption = 'From Date';
 
                         ToolTip = 'Select memberships that was active after this date.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field(EndDate; ToDate)
                     {
                         Caption = 'Until Date';
 
                         ToolTip = 'Select memberships that was active before this date.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                     field(CompleteHistory; FullHistory)
                     {
                         Caption = 'Include Full History';
 
                         ToolTip = 'Ignore dates when calculating metrics for member activity.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                 }
             }

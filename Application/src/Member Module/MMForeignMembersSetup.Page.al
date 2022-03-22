@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM Foreign Members. Setup";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -19,55 +19,55 @@
                 {
 
                     ToolTip = 'Specifies the value of the Community Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Manager Code"; Rec."Manager Code")
                 {
 
                     ToolTip = 'Specifies the value of the Manager Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Invokation Priority"; Rec."Invokation Priority")
                 {
 
                     ToolTip = 'Specifies the value of the Invokation Priority field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Disabled; Rec.Disabled)
                 {
 
                     ToolTip = 'Specifies the value of the Disabled field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Append Local Prefix"; Rec."Append Local Prefix")
                 {
 
                     ToolTip = 'Specifies the value of the Append Local Prefix field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Remove Local Prefix"; Rec."Remove Local Prefix")
                 {
 
                     ToolTip = 'Specifies the value of the Remove Local Prefix field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Append Local Suffix"; Rec."Append Local Suffix")
                 {
 
                     ToolTip = 'Specifies the value of the Append Local Suffix field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Remove Local Suffix"; Rec."Remove Local Suffix")
                 {
 
                     ToolTip = 'Specifies the value of the Remove Local Suffix field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -87,7 +87,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Show Setup action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin
@@ -105,7 +105,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Show Dashboard action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()
                 begin

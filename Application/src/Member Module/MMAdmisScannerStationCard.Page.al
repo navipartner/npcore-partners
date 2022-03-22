@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM Admis. Scanner Stations";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -19,19 +19,19 @@
                 {
 
                     ToolTip = 'Specifies the value of the Scanner Station Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Activated; Rec.Activated)
                 {
 
                     ToolTip = 'Specifies the value of the Activated field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
 
                     ToolTip = 'Specifies the value of the Admission Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }
@@ -42,7 +42,7 @@
                 Caption = 'Images';
 
                 SubPageLink = "Scanner Station Id" = FIELD("Scanner Station Id");
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }

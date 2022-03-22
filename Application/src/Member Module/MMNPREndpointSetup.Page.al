@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM NPR Remote Endp. Setup";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
@@ -19,29 +19,29 @@
                 {
 
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Type; Rec.Type)
                 {
 
                     ToolTip = 'Specifies the value of the Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Community Code"; Rec."Community Code")
                 {
 
                     ToolTip = 'Specifies the value of the Community Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(AuthType; Rec.AuthType)
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Tooltip = 'Specifies the Authorization Type.';
 
                     trigger OnValidate()
@@ -53,7 +53,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the User Account field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Visible = IsBasicAuthVisible;
                 }
 
@@ -61,7 +61,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the User Password field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Caption = 'User Password';
                     ExtendedDatatype = Masked;
                     Visible = IsBasicAuthVisible;
@@ -77,7 +77,7 @@
                 }
                 field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the OAuth2.0 Setup Code.';
                     Visible = IsOAuth2Visible;
                 }
@@ -85,18 +85,18 @@
                 {
 
                     ToolTip = 'Specifies the value of the Endpoint URI field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Disabled; Rec.Disabled)
                 {
 
                     ToolTip = 'Specifies the value of the Disabled field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Connection Timeout (ms)"; Rec."Connection Timeout (ms)")
                 {
                     ToolTip = 'Specifies the value of the Connection Timeout (ms) field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
         }

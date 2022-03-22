@@ -19,31 +19,31 @@
                 field("First Name"; Rec."First Name")
                 {
                     ToolTip = 'Specifies the value of the First Name field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateFirstName;
                 }
                 field("Middle Name"; Rec."Middle Name")
                 {
                     ToolTip = 'Specifies the value of the Middle Name field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateMiddleName;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
                     ToolTip = 'Specifies the value of the Last Name field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateLastName;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
                     ToolTip = 'Specifies the value of the Phone No. field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdatePhoneNo;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     ToolTip = 'Specifies the value of the E-Mail Address field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateEmail;
                 }
             }
@@ -54,43 +54,43 @@
                 field(Address; Rec.Address)
                 {
                     ToolTip = 'Specifies the value of the Address field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateAddress;
                 }
                 field("Post Code Code"; Rec."Post Code Code")
                 {
                     ToolTip = 'Specifies the value of the ZIP Code field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateZipCode;
                 }
                 field(City; Rec.City)
                 {
                     ToolTip = 'Specifies the value of the City field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateCity;
                 }
                 field("Country Code"; Rec."Country Code")
                 {
                     ToolTip = 'Specifies the value of the Country Code field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateCountryCode;
                 }
                 field(Gender; Rec.Gender)
                 {
                     ToolTip = 'Specifies the value of the Gender field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateGender;
                 }
                 field(Birthday; Rec.Birthday)
                 {
                     ToolTip = 'Specifies the value of the Birthday field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateBirthday;
                 }
                 field("Store Code"; Rec."Store Code")
                 {
                     ToolTip = 'Specifies the value of the Store Code field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _UpdateStoreCode;
                 }
             }
