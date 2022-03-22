@@ -2,3 +2,5 @@
   href: intro.md
 - name: Ticket module
   href: ticket/toc.yml
+- name: Restaurant module
+  href: restaurant/toc.yml
