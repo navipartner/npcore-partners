@@ -1,30 +1,73 @@
 codeunit 6059867 "NPR ReportSelectionMgt"
 {
     Access = Internal;
+    SingleInstance = true;
 
-    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnPrintDocumentsOnAfterSelectTempReportSelectionsToPrint', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnFindReportSelections', '', false, false)]
+    local procedure OnFindReportSelections(var FilterReportSelections: Record "Report Selections"; var IsHandled: Boolean; var ReturnReportSelections: Record "Report Selections"; AccountNo: Code[20]; TableNo: Integer)
+    begin
+        FilterReportSelectionsRespCenter(RespCenter, ReturnReportSelections);
+    end;
 
-    local procedure OnPrintDocumentsOnAfterSelectTempReportSelectionsToPrint(RecordVariant: Variant; var TempReportSelections: Record "Report Selections" temporary; var TempNameValueBuffer: Record "Name/Value Buffer" temporary; WithCheck: Boolean; ReportUsage: Integer; TableNo: Integer)
+    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnBeforeSetReportLayout', '', false, false)]
+    local procedure OnBeforeSetReportLayout(RecordVariant: Variant; ReportUsage: Integer)
     var
-        FieldRec: Record Field;
         RecordReference: RecordRef;
-        FieldReference: FieldRef;
         ReportUsageEnum: Enum "Report Selection Usage";
     begin
         if (ReportUsage in [ReportUsageEnum::"S.Quote".AsInteger(), ReportUsageEnum::"S.Order".AsInteger(), ReportUsageEnum::"S.Invoice".AsInteger(), ReportUsageEnum::"S.Cr.Memo".AsInteger()]) then begin
-
             RecordReference.GetTable(RecordVariant);
-            FieldRec.setrange(TableNo, RecordReference.Number);
-            FieldRec.SetRange(FieldName, 'Responsibility Center');
-            if (FieldRec.FindFirst()) then begin
-                FieldReference := RecordReference.Field(FieldRec."No.");
-                if (Format(FieldReference.Value) <> '') then begin
-                    TempReportSelections.SetRange("NPR Responsibility Center", FieldReference.Value);
-                    if (TempReportSelections.Count = 0) then
-                        TempReportSelections.SetFilter("NPR Responsibility Center", '=%1', '');
-                end else
-                    TempReportSelections.SetFilter("NPR Responsibility Center", '=%1', '');
-            end;
+            RespCenter := GetRespCenter(RecordReference);
         end;
     end;
+
+
+    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure OnBeforeInsert(var Rec: Record "Report Selections"; RunTrigger: Boolean)
+    begin
+        FormatSequence(Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure OnBeforeRename(var Rec: Record "Report Selections"; RunTrigger: Boolean)
+    begin
+        FormatSequence(Rec);
+    end;
+
+    local procedure FormatSequence(var Rec: Record "Report Selections")
+    begin
+        if not Rec.IsTemporary() then
+            exit;
+        if Strlen(Rec.Sequence) < 3 then
+            Rec.Sequence := Format(Rec.Sequence).PadLeft(3, '0');
+    end;
+
+    local procedure FilterReportSelectionsRespCenter(ResponsibilityCenter: Code[20]; var ReportSelections: Record "Report Selections")
+    begin
+        ReportSelections.FilterGroup(81);
+        ReportSelections.SetRange("NPR Responsibility Center");
+        if (ResponsibilityCenter <> '') then begin
+            ReportSelections.SetRange("NPR Responsibility Center", ResponsibilityCenter);
+            if (ReportSelections.Count = 0) then
+                ReportSelections.SetFilter("NPR Responsibility Center", '=%1', '');
+        end else
+            ReportSelections.SetFilter("NPR Responsibility Center", '=%1', '');
+        ReportSelections.FilterGroup(0);
+    end;
+
+    local procedure GetRespCenter(RecordReference: RecordRef): Code[20]
+    var
+        FieldRec: Record Field;
+        FieldReference: FieldRef;
+    begin
+        FieldRec.setrange(TableNo, RecordReference.Number);
+        FieldRec.SetRange(FieldName, 'Responsibility Center');
+        if (FieldRec.FindFirst()) then begin
+            FieldReference := RecordReference.Field(FieldRec."No.");
+            Exit(Format(FieldReference.Value));
+        end;
+    end;
+
+    var
+        RespCenter: Code[20];
 }
