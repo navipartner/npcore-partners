@@ -36,11 +36,10 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Rec.SetLoadFields();
 #else
                     Item.MarkedOnly(true);
-                    if Item.FindSet() then
-                        repeat
-                            if Rec.Get(Item."No.") then
-                                Rec.Mark(true);
-                        until Item.Next() = 0;
+                    repeat
+                        if Rec.Get(Item."No.") then
+                            Rec.Mark(true);
+                    until Item.Next() = 0;
 #endif
                     Rec.MarkedOnly(true);
                     CurrPage.Update(false);
