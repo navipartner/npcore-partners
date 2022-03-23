@@ -8,11 +8,78 @@
 
         RegisterMagentoSetup(ServiceConnection);
         RegisterRaptorSetup(ServiceConnection);
+        RegisterSMSSetup(ServiceConnection);
+        RegisterNpGpPOSSalesSetup(ServiceConnection);
+        RegisterPrintNodeSetup(ServiceConnection);
+        RegisterMMLoyStoreSetupServer(ServiceConnection);
 #if not CLOUD
         RegisterDependencyMgtSetup(ServiceConnection);
 #endif
     end;
 
+    local procedure RegisterSMSSetup(var ServiceConnection: Record "Service Connection")
+    var
+        SMSSetup: Record "NPR SMS Setup";
+        ServiceNameSMSLbl: Label 'SMS Setup';
+        HostName: Text;
+    begin
+        HostName := '';
+        if not SMSSetup.Get() then begin
+            SMSSetup.Init();
+            SMSSetup.Insert();
+        end;
+        ServiceConnection.InsertServiceConnection(
+            ServiceConnection, SMSSetup.RecordId,
+            ServiceNameSMSLbl, HostName, PAGE::"NPR SMS Setup");
+    end;
+
+    local procedure RegisterNpGpPOSSalesSetup(var ServiceConnection: Record "Service Connection")
+    var
+        NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup";
+        ServiceNameNpGpPOSSalesLbl: Label 'Global POS Sales Setup';
+        HostName: Text;
+    begin
+        HostName := '';
+        if not NpGpPOSSalesSetup.Get() then begin
+            NpGpPOSSalesSetup.Init();
+            NpGpPOSSalesSetup.Insert();
+        end;
+        ServiceConnection.InsertServiceConnection(
+            ServiceConnection, NpGpPOSSalesSetup.RecordId,
+            ServiceNameNpGpPOSSalesLbl, HostName, PAGE::"NPR NpGp POS Sales Setup Card");
+    end;
+
+    local procedure RegisterPrintNodeSetup(var ServiceConnection: Record "Service Connection")
+    var
+        PrintNodeSetup: Record "NPR PrintNode Setup";
+        ServiceNamePrintNodeLbl: Label 'PrintNode Setup';
+        HostName: Text;
+    begin
+        HostName := '';
+        if not PrintNodeSetup.Get() then begin
+            PrintNodeSetup.Init();
+            PrintNodeSetup.Insert();
+        end;
+        ServiceConnection.InsertServiceConnection(
+            ServiceConnection, PrintNodeSetup.RecordId,
+            ServiceNamePrintNodeLbl, HostName, PAGE::"NPR PrintNode Setup");
+    end;
+
+    local procedure RegisterMMLoyStoreSetupServer(var ServiceConnection: Record "Service Connection")
+    var
+        MMLoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
+        ServiceNameMMLoyaltyStoreSetupLbl: Label 'Loyalty Store Setup (Server)';
+        HostName: Text;
+    begin
+        HostName := '';
+        if not MMLoyaltyStoreSetup.Get() then begin
+            MMLoyaltyStoreSetup.Init();
+            MMLoyaltyStoreSetup.Insert();
+        end;
+        ServiceConnection.InsertServiceConnection(
+            ServiceConnection, MMLoyaltyStoreSetup.RecordId,
+            ServiceNameMMLoyaltyStoreSetupLbl, HostName, PAGE::"NPR MM Loy. Store Setup Server");
+    end;
 
     local procedure RegisterMagentoSetup(var ServiceConnection: Record "Service Connection")
     var
