@@ -608,7 +608,7 @@
 
                 action("Period Discounts")
                 {
-                    Caption = 'Period Discounts List';
+                    Caption = 'Campaign Discounts List';
                     RunObject = page "NPR Campaign Discount List";
 
                     ToolTip = 'Executes the Period Discounts List action';
