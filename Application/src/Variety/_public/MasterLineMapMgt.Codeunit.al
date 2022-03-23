@@ -62,8 +62,10 @@
         if not OldMasterLineMap.Get(TableId, TableRecordId) then
             exit;
 
-        if not OldMasterLineMap."Is Master" then
+        if not OldMasterLineMap."Is Master" then begin
+            OldMasterLineMap.Delete();
             exit;
+        end;
 
         OldMasterLineMap.Delete();
 
