@@ -102,17 +102,28 @@
         XS00001Tok: Label 'S00001', Locked = true;
         XS99999Tok: Label 'S99999', Locked = true;
     begin
-        SalesReceivablesSetup.Get();
+        if not SalesReceivablesSetup.Get() then begin
+            SalesReceivablesSetup.Init();
+            SalesReceivablesSetup.Insert();
+        end;
         if SalesReceivablesSetup."Price List Nos." = '' then begin
             SalesReceivablesSetup."Price List Nos." := GetPriceListNoSeries(XSPLTok, XSalesPriceListLbl, XS00001Tok, XS99999Tok);
             SalesReceivablesSetup.Modify();
         end;
-        PurchasesPayablesSetup.Get();
+
+        if not PurchasesPayablesSetup.Get() then begin
+            PurchasesPayablesSetup.Init();
+            PurchasesPayablesSetup.Insert();
+        end;
         if PurchasesPayablesSetup."Price List Nos." = '' then begin
             PurchasesPayablesSetup."Price List Nos." := GetPriceListNoSeries(XPPLTok, XPurchasePriceListLbl, XP00001Tok, XP99999Tok);
             PurchasesPayablesSetup.Modify();
         end;
-        JobsSetup.Get();
+
+        if not JobsSetup.Get() then begin
+            JobsSetup.Init();
+            JobsSetup.Insert();
+        end;
         if JobsSetup."Price List Nos." = '' then begin
             JobsSetup."Price List Nos." := GetPriceListNoSeries(XJPLTok, XJobPriceListLbl, XJ00001Tok, XJ99999Tok);
             JobsSetup.Modify();
