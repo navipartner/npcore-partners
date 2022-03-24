@@ -12,4 +12,7 @@ If you however wish for tickets, created back office (e.g. Pre paid tickets), to
 2.	Add the new ticket design name to the cell in the **Ticket Layout Code**.
 3.	When you create new tickets back office these will now be provided with the design defined in **Ticket Layout Code** instead of the ticket type design. 
 
-[For a guide on the **Ticket Designer**](../tutorial/TicketDesigner.md)
+
+### Related links
+
+- [Ticket Designer](../tutorial/TicketDesigner.md)
