@@ -14,94 +14,84 @@
     {
         area(content)
         {
-            grid(Attributes)
+            group(Control6150627)
             {
-                Caption = 'Attributes';
-                group(Control6150627)
+                ShowCaption = false;
+                repeater(Control6150613)
                 {
                     ShowCaption = false;
-                    repeater(Control6150613)
+                    field(Description; Rec.Description)
                     {
-                        ShowCaption = false;
-                        field(Description; Rec.Description)
-                        {
 
-                            ToolTip = 'Specifies the value of the Description field';
-                            ApplicationArea = NPRRetail;
-                        }
-                        field(Type; Rec.Type)
-                        {
-
-                            Editable = TypeEditable;
-                            ToolTip = 'Specifies the value of the Type field';
-                            ApplicationArea = NPRRetail;
-                        }
-                        field(Position; Rec.Position)
-                        {
-
-                            ToolTip = 'Specifies the value of the Position field';
-                            ApplicationArea = NPRRetail;
-                        }
-                        field(Filterable; Rec.Filterable)
-                        {
-
-                            ToolTip = 'Specifies the value of the Filterable field';
-                            ApplicationArea = NPRRetail;
-                        }
-                        field("Use in Product Listing"; Rec."Use in Product Listing")
-                        {
-
-                            ToolTip = 'Specifies the value of the Use in Product Listing field';
-                            ApplicationArea = NPRRetail;
-                        }
-                        field("Used by Attribute Set"; Rec."Used by Attribute Set")
-                        {
-
-                            ToolTip = 'Specifies the value of the Used by Attribute Set field';
-                            ApplicationArea = NPRRetail;
-
-                            trigger OnDrillDown()
-                            begin
-                                UsedByAttributeSetDrillDown();
-                            end;
-                        }
-                        field("Used by Items"; Rec."Used by Items")
-                        {
-
-                            ToolTip = 'Specifies the value of the Used by Items field';
-                            ApplicationArea = NPRRetail;
-
-                            trigger OnDrillDown()
-                            begin
-                                UsedByItemDrillDown();
-                            end;
-                        }
-                        field(Visible; Rec.Visible)
-                        {
-
-                            ToolTip = 'Specifies the value of the Visible field';
-                            ApplicationArea = NPRRetail;
-                        }
+                        ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
                     }
-                    field(WidthControl; '')
+                    field(Type; Rec.Type)
                     {
 
-                        Caption = '                                                                                                                                                             ';
-                        ToolTip = 'Specifies the value of the '''' field';
+                        Editable = TypeEditable;
+                        ToolTip = 'Specifies the value of the Type field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field(Position; Rec.Position)
+                    {
+
+                        ToolTip = 'Specifies the value of the Position field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field(Filterable; Rec.Filterable)
+                    {
+
+                        ToolTip = 'Specifies the value of the Filterable field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Use in Product Listing"; Rec."Use in Product Listing")
+                    {
+
+                        ToolTip = 'Specifies the value of the Use in Product Listing field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Used by Attribute Set"; Rec."Used by Attribute Set")
+                    {
+
+                        ToolTip = 'Specifies the value of the Used by Attribute Set field';
+                        ApplicationArea = NPRRetail;
+
+                        trigger OnDrillDown()
+                        begin
+                            UsedByAttributeSetDrillDown();
+                        end;
+                    }
+                    field("Used by Items"; Rec."Used by Items")
+                    {
+
+                        ToolTip = 'Specifies the value of the Used by Items field';
+                        ApplicationArea = NPRRetail;
+
+                        trigger OnDrillDown()
+                        begin
+                            UsedByItemDrillDown();
+                        end;
+                    }
+                    field(Visible; Rec.Visible)
+                    {
+
+                        ToolTip = 'Specifies the value of the Visible field';
                         ApplicationArea = NPRRetail;
                     }
                 }
-                group(Control6150623)
-                {
-                    ShowCaption = false;
-                    part(AttributeLabels; "NPR Magento Attr. Labels")
-                    {
-                        Caption = 'Labels';
-                        ShowFilter = false;
-                        SubPageLink = "Attribute ID" = FIELD("Attribute ID");
-                        ApplicationArea = NPRRetail;
 
-                    }
+            }
+            group(Control6150623)
+            {
+                ShowCaption = false;
+                part(AttributeLabels; "NPR Magento Attr. Labels")
+                {
+                    Caption = 'Labels';
+                    ShowFilter = false;
+                    SubPageLink = "Attribute ID" = FIELD("Attribute ID");
+                    ApplicationArea = NPRRetail;
+
                 }
             }
         }
