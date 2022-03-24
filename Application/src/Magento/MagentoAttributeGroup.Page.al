@@ -5,7 +5,7 @@
     Caption = 'Attribute Group';
     DelayedInsert = true;
     Editable = false;
-    PageType = CardPart;
+    PageType = ListPart;
     SourceTable = "NPR Magento Attribute Group";
     SourceTableView = SORTING("Attribute Group ID")
                       ORDER(Ascending);
