@@ -23,13 +23,13 @@
 
 - name: Explanation
   items:
-  - name: Ticket
+  - name: Tickets
     href: explanation/ticket.md
   - name: Ticket Admission
     href: explanation/admission.md
   - name: Ticket-holder Notifications
     href: explanation/TicketHolderNotification.md
-  - name: Reservation Vs Location
+  - name: Reservation Vs. Location
     href: explanation/LocationVsReservation.md
   - name: Authorization Code for Ticket Rescheduling
     href: explanation/AuthorizationCode.md

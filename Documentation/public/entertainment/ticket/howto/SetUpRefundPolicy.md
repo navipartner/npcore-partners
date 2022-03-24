@@ -2,9 +2,14 @@
 
 Ticket refund policy is set up in the **Ticket BOM** page. By default, only unused admissions are refunded.
 
-Go to the **Ticket BOM** and then go to the **Revoke Policy** column.
+Navigate to the **Ticket BOM**, and then to the **Revoke Policy** column.
 
 Here you can pick between three options for the refund policy:
--	**Unused Admission;** default option (until used)
--	**Never Allow;** it is not possible to revoke the ticket
--	**Always Allow;** you can always revoke the ticket
+
+- **Unused Admission** - default option (until used).
+- **Never Allow** - makes it impossible to revoke the ticket.
+- **Always Allow** - makes it always possible to revoke the ticket.
+
+### Related links
+- [Refunding tickets](./RefundingTickets.md)
+- [Set up tickets using the Ticket Setup Wizard](../tutorial/ticket_tutorial.md)]
