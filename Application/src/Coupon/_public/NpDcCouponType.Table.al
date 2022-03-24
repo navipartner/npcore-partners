@@ -182,6 +182,11 @@
     {
         fieldgroup(DropDown; "Code", Description)
         {
+
+        }
+        fieldgroup(Brick; "Code", "Description", "Discount Type", "Discount Amount", "Discount %")
+        {
+
         }
     }
 
