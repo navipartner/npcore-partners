@@ -120,7 +120,7 @@
     [NonDebuggable]
     local procedure SetSecret(SecretKey: Text; NewSecretValue: Text)
     begin
-        if not EncryptionEnabled() then
+        if not EncryptionEnabled() or (StrLen(NewSecretValue) > 150) then
             IsolatedStorage.Set(SecretKey, NewSecretValue, DataScope::Company)
         else
             IsolatedStorage.SetEncrypted(SecretKey, NewSecretValue, DataScope::Company);
@@ -190,9 +190,9 @@
         APIResult: Text;
         RequestBody: Text;
         ErrorTxt: text;
-        ClientId:Text;
-        ClientSecret:Text;
-        LocScope:Text;
+        ClientId: Text;
+        ClientSecret: Text;
+        LocScope: Text;
     begin
         if CheckExistingTokenIsValid() then // if existing token is not expired use it
             exit(Rec.GetSecret(Rec.FieldNo("Access Token")));
