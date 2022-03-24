@@ -74,14 +74,114 @@
         if not WebService.WritePermission then
             exit;
 
-        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, MPOSWebServiceCodeunitId(), 'mpos_web_service', true);
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, MPOSWebServiceCodeunitId(), 'mpos_service', true);
     end;
-
 
     procedure MPOSWebServiceCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR MPOS Webservice");
     end;
 
+    procedure GetItemInfoByBarcode(Barcode: Code[20]): Text
+    var
+        Item: Record Item;
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        PurchaseLine: Record "Purchase Line";
+        BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
+        VariantCode: Code[10];
+        ItemNo: Code[20];
+        ResolvingTable: Integer;
+        Placeholder5Lbl: Label '%1\n%2\n%3', Comment = '%1 - placeholder 1, %2 - placeholder 2, %3 - placeholder 3';
+        PlaceholderLbl: Label '%1#%2', Comment = '%1 - placeholder 1, %2 - placeholder 2';
+        Placeholder3Lbl: Label 'Exp.: %1', Comment = '%1 - placeholder 1';
+        Placeholder4Lbl: Label 'Last: %1', Comment = '%1 - placeholder 1';
+        Placeholder2Lbl: Label 'Stock: %1', Comment = '%1 - placeholder 1';
+        NotApplicableLbl: Label 'N/A', Locked = true;
+        DetailTxt: Text;
+        ItemInventoryTxt: Text;
+        ItemLedgerEntryPostingDateTxt: Text;
+        MasterTxt: Text;
+        PurchaseLineExpectedReceiptDateTxt: Text;
+    begin
+        MasterTxt := NotApplicableLbl;
+        DetailTxt := NotApplicableLbl;
+
+        if Barcode = '' then
+            exit(StrSubstNo(PlaceholderLbl, MasterTxt, DetailTxt));
+
+        if not BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, ItemNo, VariantCode, ResolvingTable, true) then
+            exit(StrSubstNo(PlaceholderLbl, MasterTxt, DetailTxt));
+
+        if not Item.Get(ItemNo) then
+            exit(StrSubstNo(PlaceholderLbl, MasterTxt, DetailTxt));
+
+        if VariantCode <> '' then
+            Item.SetFilter("Variant Filter", VariantCode);
+
+        Item.CalcFields(Inventory, "Qty. on Purch. Order");
+
+        DetailTxt := Format(Item.Inventory);
+        ItemInventoryTxt := StrSubstNo(Placeholder2Lbl, Item.Inventory);
+
+        if Item."Qty. on Purch. Order" > 0 then begin
+            Clear(PurchaseLine);
+            PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
+            PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
+            PurchaseLine.SetRange("No.", Item."No.");
+            if VariantCode <> '' then
+                PurchaseLine.SetRange("Variant Code", VariantCode);
+            if PurchaseLine.FindLast() then
+                PurchaseLineExpectedReceiptDateTxt := StrSubstNo(Placeholder3Lbl, PurchaseLine."Expected Receipt Date")
+            else
+                PurchaseLineExpectedReceiptDateTxt := StrSubstNo(Placeholder3Lbl, NotApplicableLbl);
+        end else
+            PurchaseLineExpectedReceiptDateTxt := StrSubstNo(Placeholder3Lbl, NotApplicableLbl);
+
+        Clear(ItemLedgerEntry);
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
+        ItemLedgerEntry.SetRange("Item No.", Item."No.");
+        if VariantCode <> '' then
+            ItemLedgerEntry.SetRange("Variant Code", VariantCode);
+        if ItemLedgerEntry.FindLast() then
+            ItemLedgerEntryPostingDateTxt := StrSubstNo(Placeholder4Lbl, ItemLedgerEntry."Posting Date")
+        else
+            ItemLedgerEntryPostingDateTxt := StrSubstNo(Placeholder4Lbl, NotApplicableLbl);
+
+        MasterTxt := StrSubstNo(Placeholder5Lbl, ItemInventoryTxt, PurchaseLineExpectedReceiptDateTxt, ItemLedgerEntryPostingDateTxt);
+
+        exit(StrSubstNo(PlaceholderLbl, DetailTxt, MasterTxt));
+    end;
+
+    procedure ValidateBarcode(Barcode: Code[20]): Text;
+    var
+        Item: Record Item;
+        ItemCategory: Record "Item Category";
+        ItemVariant: Record "Item Variant";
+        BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
+        VariantCode: Code[10];
+        ItemNo: Code[20];
+        ResolvingTable: Integer;
+        InvalidBarcodeErr: Label 'ERROR: INVALID BARCODE';
+        UnknownBarcodeErr: Label 'ERROR: UNKNOWN BARCODE';
+        UnknownItemErr: Label 'ERROR: UNKNOWN ITEM';
+        ResultTxt: Label '%1: %2#%3: %4#%5: %6';
+    begin
+        if Barcode = '' then
+            exit(InvalidBarcodeErr);
+
+        if not BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, ItemNo, VariantCode, ResolvingTable, true) then
+            exit(UnknownBarcodeErr);
+
+        if not Item.Get(ItemNo) then
+            exit(UnknownItemErr);
+
+        if VariantCode <> '' then
+            ItemVariant.Get(Item."No.", VariantCode);
+
+        if Item."Item Category Code" <> '' then
+            ItemCategory.Get(Item."Item Category Code");
+
+        exit(StrSubstNo(ResultTxt, Item."No.", Item.Description, ItemVariant.Code, ItemVariant.Description, Item."Item Category Code", ItemCategory.Description));
+    end;
 }
 
