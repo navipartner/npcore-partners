@@ -17,4 +17,6 @@ There are different types of reminders to target the three use-cases:
 It is also possible to state a detention time for each notification rule that can be either meant specifically for the profile or shared for all notifications of the same type. This feature prevents similar notification be sent to the same notification address for the duration of the detention time. For example, if ticket-holder bought and then revoked 5 tickets, it would be unnecessary to send 5 revoke follow-up notifications to the same **Notification Address**.
 
 ### Related links
- - [Create a ticket notification profile](../howto/CreateNotificationProfile.md)
+
+- [Create a ticket notification profile](../howto/CreateNotificationProfile.md)
+- [Set up tickets using the Ticket Setup Wizard](../tutorial/ticket_tutorial.md)

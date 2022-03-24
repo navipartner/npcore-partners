@@ -6,14 +6,14 @@ This is done by a [web setup](../howto/ChangeTicketReservation.md) and adding an
 
 The maximum length for the produced **Authorization Code** is 10 characters. The template can be specified on the **Ticket Setup** page, and is characterized by the following:  
 
-- The template starts with the **["** character and ends with the **]** character.  
-- The first characters after **[** determines what type of random characters or digits to generate;  
+- The template starts with the **[** character and ends with the **]** character.  
+- The first character after **[** determines what type of random characters or digits to generate;  
     - N for digits 0–9  
     - A for uppercase letters A-Z        
     - X is a combination of N and A  
 
 > [!NOTE]
-> A number will repeat the random character. Characters outside of the **[** and **]** will be copied verbatim. The [ ] characters may not be used.     
+> A number will repeat the random character. Characters outside of the **[** and **]** will be copied verbatim. The **[ ]** characters may not be used.     
        **Examples:**     
 [N*4]-[N*4] will produce a code similar to "1234-5678" (this is the implied default value).  
 NP-[X*3] will produce a code similar to "NP-X2Y".  

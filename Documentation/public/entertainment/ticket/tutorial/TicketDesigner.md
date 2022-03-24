@@ -1,6 +1,6 @@
 # Ticket Designer
 
-This article will go though the **Ticket Designers** functionalities and the procedure for creating a new ticket.
+This article will go though the **Ticket Designer** functionalities and the procedure for creating a new ticket.
 
 ## Shortcut Keys and Tools  
   
@@ -69,22 +69,27 @@ Once clicked, you will be prompted if you want to proceed. Clicking **OK** will 
 >You can always right-click on the existing elements and choose to **Edit** or **Delete** the element.  
 
 ### Design Toolbar
+
 The design toolbar contains all the design options.       
 ![toolbar](../images/toolbar.png)      
 Please refer to the shortcut keys section in the beginning of the article for a full list of shortcut keys to use within the ticket designer.
 
 ### Text
+
 The **Text** tool allows you to customize the text **Font Size**, **Font (Type)**, and the **Font Color**.  
 
 
 ### Field
+
 The **Field** tool allows you to add fields that will be dynamically replaced with the actual content when the ticket is generated (E.g. Customer name, Ticket price, visit date, etc.).  
 This tool also allows you to define the **Font Size**, **Font (Type)**, and **Font Color** of the fields that are displayed on the ticket.
 
 ### QrCode
+
 Using the **QRCode** tool you can add QR Codes on your ticket. You can chose from 4 different sizes for the QRCode: *Small**, **Medium**, **Large**, and **X-Large**.
 
 ### Bar Code
+
 Using the **Bar Code** tool you can add and customize Bar Codes on your ticket. You can chose from 2 different sizes; **Small** and **Medium**.
 
 ### Image
