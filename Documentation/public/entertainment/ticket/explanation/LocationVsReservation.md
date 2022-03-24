@@ -1,4 +1,4 @@
-# Location vs. reservation/Event:
+# Location vs. reservation/event:
 
 Admission objects define what tickets are valid for. 
 Admission objects can be either a type **location** or an **event** and are defined in **Ticket Admission**:
@@ -8,6 +8,9 @@ With a few exceptions they work the same.
 
 You also have to set **Schedule type** in **Ticket Schedule** where you define when a location is accessible or when an event occurs:
 
-**Location** does not have any capacity control and do not require reservation.
+- **Location** does not have any capacity control and do not require reservation.
 
-**Event** creates a reservation entry which is relevant for capacity control.
+- **Event** creates a reservation entry which is relevant for capacity control.
+
+### Related links
+- [Ticket admission](./admission.md)
