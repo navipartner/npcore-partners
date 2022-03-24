@@ -14,63 +14,48 @@
     {
         area(content)
         {
-            grid("Attribute Sets")
+            group(Control6150620)
             {
-                Caption = 'Attribute Sets';
-                group(Control6150620)
+                ShowCaption = false;
+                repeater(Control6150613)
                 {
                     ShowCaption = false;
-                    repeater(Control6150613)
+                    field(Description; Rec.Description)
                     {
-                        ShowCaption = false;
-                        field(Description; Rec.Description)
-                        {
-
-                            ToolTip = 'Specifies the value of the Description field';
-                            ApplicationArea = NPRRetail;
-                        }
-                        field("Used by Items"; Rec."Used by Items")
-                        {
-
-                            ToolTip = 'Specifies the value of the Used by Items field';
-                            ApplicationArea = NPRRetail;
-
-                            trigger OnDrillDown()
-                            begin
-                                UsedByItemDrillDown();
-                            end;
-                        }
-                    }
-                    field(WidthControl; '')
-                    {
-
-                        Caption = '                                                                                                                                                             ';
-                        ToolTip = 'Specifies the value of the '''' field';
+                        ToolTip = 'Specifies the value of the Description field';
                         ApplicationArea = NPRRetail;
                     }
-                }
-                group(Control6151400)
-                {
-                    ShowCaption = false;
-                    part(Control6151401; "NPR Magento Attribute Group")
+                    field("Used by Items"; Rec."Used by Items")
                     {
-                        SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID");
+                        ToolTip = 'Specifies the value of the Used by Items field';
                         ApplicationArea = NPRRetail;
 
+                        trigger OnDrillDown()
+                        begin
+                            UsedByItemDrillDown();
+                        end;
                     }
                 }
-                group(Control6150619)
+            }
+            group(Control6151400)
+            {
+                ShowCaption = false;
+                part(Control6151401; "NPR Magento Attribute Group")
                 {
-                    ShowCaption = false;
-                    part(Attributes; "NPR Magento Attr. Set Values")
-                    {
-                        Caption = 'Attributes';
-                        Provider = Control6151401;
-                        SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID"),
+                    SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID");
+                    ApplicationArea = NPRRetail;
+                }
+            }
+            group(Control6150619)
+            {
+                ShowCaption = false;
+                part(Attributes; "NPR Magento Attr. Set Values")
+                {
+                    Caption = 'Attributes';
+                    Provider = Control6151401;
+                    SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID"),
                                       "Attribute Group ID" = FIELD("Attribute Group ID");
-                        ApplicationArea = NPRRetail;
-
-                    }
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
