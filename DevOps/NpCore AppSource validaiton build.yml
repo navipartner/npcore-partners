@@ -27,11 +27,12 @@ jobs:
 - template: YAML/Templates/Build/AppSourceValidationBuild.yml@scriptsRepo
   parameters:
     appNuGetSource:
-      source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
-      id: NaviPartner.NPCore.BC$(majorVersion)
+      source: 'https://navipartner.pkgs.visualstudio.com/_packaging/NaviPartner.NavApps/nuget/v3/index.json'
+      id: NaviPartner.NPRetail
       download:
+        version: 10.4.10001
         enabled: true
-        deployApp: true
+        deployApp: false
     dependencies:
     - package:
         source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
