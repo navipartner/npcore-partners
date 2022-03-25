@@ -1,10 +1,10 @@
 #if not BC17
 permissionset 6014400 "NPR NP RETAIL"
 {
-Access = Internal;
-Assignable = true;
-Caption = 'NP Retail', Locked = true;
-Permissions =
+    Access = Internal;
+    Assignable = true;
+    Caption = 'NP Retail', Locked = true;
+    Permissions =
 codeunit "NPR Accessory Unfold Mgt." = X,
 codeunit "NPR Att. Item Search" = X,
 codeunit "NPR Attribute Management" = X,
@@ -2384,30 +2384,6 @@ report "NPR MM Visiting Report" = X,
 report "NPR NpDc Request Coupon Qty." = X,
 report "NPR NpDc Request Priority" = X,
 report "NPR NPRE: Rest. Daily Turnover" = X,
-#if BC17
-report "NPR NpRv Voucher" = X,
-#endif
-#IF not BC17
-report "NPR NpRv Voucher" = X,
-#endif
-#if BC17
-report "NPR NpRv Voucher 2" = X,
-#endif
-#if not BC17
-report "NPR NpRv Voucher 2" = X,
-#endif
-#if BC17
-report "NPR NpRv Voucher 3" = X,
-#endif
-#if not BC17
-report "NPR NpRv Voucher 3" = X,
-#endif
-#if BC17
-report "NPR NpRv Voucher 4" = X,
-#endif
-#if not BC17
-report "NPR NpRv Voucher 4" = X,
-#endif
 report "NPR Open/Archive Coupon Stat." = X,
 report "NPR Period Discount Stat." = X,
 report "NPR POS Entry Overview" = X,
