@@ -23,6 +23,7 @@ stages:
         - BC1905
         - BC1905_CLOUD        
       analyzers: 'AppSourceCop,UICop,CodeCop'
+      specificCompareAppVersion: 10.4.10001 #read from piepelineDefinition
       keyVaultCert:
         certPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
         certPassword: 498eH$??nhxUSSFS
