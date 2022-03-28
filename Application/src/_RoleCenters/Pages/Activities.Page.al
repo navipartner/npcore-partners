@@ -105,6 +105,15 @@
                 }
 
             }
+            cuegroup("Incoming Documents")
+            {
+                Caption = 'Incoming Documents';
+                field("My Incoming Documents"; Rec."My Incoming Documents")
+                {
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies incoming documents that are assigned to you.';
+                }
+            }
         }
     }
 
@@ -164,6 +173,7 @@
     end;
 
     var
+
         BackgroundTaskResults: Dictionary of [Text, Text];
         BackgroundTaskId: Integer;
 

@@ -153,6 +153,12 @@
             CalcFormula = count("NPR Nc Import Entry" where("Runtime Error" = const(true)));
             Editable = false;
         }
+        field(108; "My Incoming Documents"; Integer)
+        {
+            CalcFormula = Count("Incoming Document" WHERE(Processed = CONST(false)));
+            Caption = 'My Incoming Documents';
+            FieldClass = FlowField;
+        }
 
     }
 
