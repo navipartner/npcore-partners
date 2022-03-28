@@ -173,6 +173,7 @@
         ItemJnlLine."Lot No." := '';
         ItemJnlLine."NPR Discount Type" := POSSalesLine."Discount Type";
         ItemJnlLine."NPR Discount Code" := POSSalesLine."Discount Code";
+        ItemJnlLine."NPR Register Number" := POSEntry."POS Unit No.";
         if Item.Get(POSSalesLine."No.") then
             ItemJnlLine."NPR Vendor No." := Item."Vendor No.";
 

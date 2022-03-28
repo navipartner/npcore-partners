@@ -1,18 +1,18 @@
-﻿query 6014400 "NPR POS Turnover"
+query 6014412 "NPR POS Credit Sales Invoice"
 {
     Access = Internal;
     QueryType = Normal;
-    Caption = 'POS Turnover';
+    Caption = 'POS Credit Sales Invoice';
 
     elements
     {
         dataitem(POS_Entry; "NPR POS Entry")
         {
-            column(POS_Store_Code; "POS Store Code")
+            filter(POS_Store_Code; "POS Store Code")
             {
 
             }
-            column(POS_Unit_No; "POS Unit No.")
+            filter(POS_Unit_No; "POS Unit No.")
             {
 
             }
@@ -20,14 +20,22 @@
             {
 
             }
-            dataitem(POS_Sales_Line; "NPR POS Entry Sales Line")
+            filter(Sales_Document_Type; "Sales Document Type")
             {
-                DataItemLink = "POS Entry No." = POS_Entry."Entry No.";
+
+            }
+            filter(Sales_Document_No_; "Sales Document No.")
+            {
+
+            }
+            dataitem(Sales_Invoice_Header; "Sales Invoice Header")
+            {
+                DataItemLink = "Pre-Assigned No." = POS_Entry."Sales Document No.";
                 SqlJoinType = InnerJoin;
 
                 dataitem(Value_Entry; "Value Entry")
                 {
-                    DataItemLink = "Item Ledger Entry No." = POS_Sales_Line."Item Entry No.";
+                    DataItemLink = "Document No." = Sales_Invoice_Header."No.";
                     SqlJoinType = InnerJoin;
 
                     column(Cost_Amount_Actual; "Cost Amount (Actual)")

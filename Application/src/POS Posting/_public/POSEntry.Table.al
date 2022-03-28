@@ -527,8 +527,10 @@
         { }
         key(Key11; "POS Period Register No.")
         { }
-
-        key(Key12; "Customer No.", "Sales Document Type", "Document Date") { }
+        key(Key12; "Customer No.", "Sales Document Type", "Document Date")
+        { }
+        key(Key13; "Posting Date", "Sales Document Type", "Sales Document No.")
+        { }
     }
 
     fieldgroups
