@@ -52,6 +52,13 @@ table 6014645 "NPR Stripe Plan"
             Caption = 'Active';
             DataClassification = CustomerContent;
         }
+        field(10; "Billing Scheme"; Option)
+        {
+            Caption = 'Billing Scheme';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Per Unit,Tiered';
+            OptionMembers = per_unit,tiered;
+        }
         field(20; "Product Name"; Text[50])
         {
             CalcFormula = lookup("NPR Stripe Product".Name where(Id = field("Product Id")));
@@ -95,12 +102,32 @@ table 6014645 "NPR Stripe Plan"
     var
         StripeProduct: Record "NPR Stripe Product";
         StripeJSONHelper: Codeunit "NPR Stripe JSON Helper";
-        TrialPeriondDays: JsonValue;
+        UnitAmount, TrialPeriondDays : JsonValue;
     begin
         StripeJSONHelper.SetJsonObject(Data);
         Id := CopyStr(StripeJSONHelper.GetJsonValue('id').AsText(), 1, MaxStrLen(Id));
-        Active := StripeJSONHelper.GetJsonValue('active').AsBoolean();
         "Product Id" := CopyStr(StripeJSONHelper.GetJsonValue('product').AsText(), 1, MaxStrLen("Product Id"));
+        if not StripeProduct.Get("Product Id") then
+            exit(false);
+
+        Active := StripeJSONHelper.GetJsonValue('active').AsBoolean();
+
+        Evaluate("Billing Scheme", StripeJSONHelper.GetJsonValue('billing_scheme').AsText());
+        case "Billing Scheme" of
+            "Billing Scheme"::per_unit:
+                begin
+                    UnitAmount := StripeJSONHelper.SelectJsonValue('amount');
+                    if not UnitAmount.IsNull() then
+                        Amount := UnitAmount.AsDecimal();
+                end;
+            "Billing Scheme"::tiered:
+                begin
+                    UnitAmount := StripeJSONHelper.SelectJsonValue('tiers[0].unit_amount');
+                    if not UnitAmount.IsNull() then
+                        Amount := UnitAmount.AsDecimal();
+                end;
+        end;
+
         Amount := StripeJSONHelper.SelectJsonValue('tiers[0].unit_amount').AsDecimal();
         "Currency Code" := CopyStr(StripeJSONHelper.GetJsonValue('currency').AsCode(), 1, MaxStrLen("Currency Code"));
         Evaluate(Interval, StripeJSONHelper.GetJsonValue('interval').AsText());
@@ -110,7 +137,7 @@ table 6014645 "NPR Stripe Plan"
         if not TrialPeriondDays.IsNull() then
             "Trial Period Days" := TrialPeriondDays.AsInteger();
 
-        exit(StripeProduct.Get("Product Id"));
+        exit(true);
     end;
 
     internal procedure ToJSON(): Text

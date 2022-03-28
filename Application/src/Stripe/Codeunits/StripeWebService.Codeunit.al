@@ -103,8 +103,9 @@ codeunit 6059810 "NPR Stripe Web Service"
         Response: JsonObject;
         JToken: JsonToken;
         GetProductsFailedErr: Label 'Could not get available products.';
+        ProductsLbl: Label 'products?active=true', Locked = true;
     begin
-        InitArguments(TempStripeRESTWSArgument, 'products');
+        InitArguments(TempStripeRESTWSArgument, ProductsLbl);
         TempStripeRESTWSArgument."Rest Method" := TempStripeRESTWSArgument."Rest Method"::get;
         if not CallWebService(TempStripeRESTWSArgument, HttpStatusCode) then
             if not IsServerError(HttpStatusCode) then
@@ -137,8 +138,9 @@ codeunit 6059810 "NPR Stripe Web Service"
         Response: JsonObject;
         JToken: JsonToken;
         GetPlansFailedErr: Label 'Could not get available plans.';
+        PlansLbl: Label 'plans?active=true&expand[]=data.tiers', Locked = true;
     begin
-        InitArguments(TempStripeRESTWSArgument, 'plans?expand[]=data.tiers');
+        InitArguments(TempStripeRESTWSArgument, PlansLbl);
         TempStripeRESTWSArgument."Rest Method" := TempStripeRESTWSArgument."Rest Method"::get;
         if not CallWebService(TempStripeRESTWSArgument, HttpStatusCode) then
             if not IsServerError(HttpStatusCode) then
@@ -158,7 +160,8 @@ codeunit 6059810 "NPR Stripe Web Service"
             StripePlan.Init();
             if StripePlan.PopulateFromJson(Data) then begin
                 StripePlan.Insert();
-                GetPlanTiers(StripePlan, JToken);
+                if StripePlan."Billing Scheme" = StripePlan."Billing Scheme"::tiered then
+                    GetPlanTiers(StripePlan, JToken);
             end;
         end;
         exit(true);
