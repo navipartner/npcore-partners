@@ -19,7 +19,7 @@
         }
         field(1000; "Used by Items"; Integer)
         {
-            CalcFormula = Count("NPR Aux Item" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
+            CalcFormula = Count("NPR Auxiliary Item" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
             Caption = 'Used by Items';
             Editable = false;
             FieldClass = FlowField;
