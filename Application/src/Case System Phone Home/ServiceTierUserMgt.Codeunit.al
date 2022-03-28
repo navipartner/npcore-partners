@@ -28,6 +28,19 @@
         end;
     end;
 
+    local procedure ValidateBCOnlineTenant()
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        ResponseMessage: Text;
+    begin
+        if not EnvironmentInformation.IsSaaS() then
+            exit;
+
+        if not TrySendRequest('ValidateBCOnlineTenant', ResponseMessage) then
+            exit;
+    end;
+
+
     local procedure TestUserExpired()
     var
         ExpirationMessage: Text;
@@ -39,7 +52,6 @@
 
         if LowerCase(ExpirationMessage) <> 'false' then
             Message(ExpirationMessage);
-
         UpdateExpirationDate();
     end;
 
@@ -150,6 +162,7 @@
     local procedure OnBeforeLogInStart()
     var
         EnvironmentHandler: Codeunit "NPR Environment Handler";
+        EnvironmentInformation: Codeunit "Environment Information";
     begin
         if NavApp.IsInstalling() then
             exit;
@@ -157,8 +170,12 @@
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
             exit;
 
+        if EnvironmentInformation.IsSandbox() then
+            exit;
+
         EnvironmentHandler.EnableAllowHttpInSandbox();
 
+        ValidateBCOnlineTenant();
         TestUserExpired();
         TestUserLocked();
     end;
