@@ -9,7 +9,7 @@
         RuleType: Option INCLUDE,EXCLUDE,NO_RULE;
         NO_COUPON_AVAILABLE: Label 'No coupons are available. Remaining points %1, threshold %2.';
         SELECT_COUPON: Label 'Select Discount Coupon';
-        POINT_ASSIGNMENT: Label 'Point assignment on finish sale as opposed to point assignment during posting.';
+        POINT_ASSIGNMENT: Label 'Point assignment on finish sale as opposed to point assignment during posting.', MaxLength = 100;
         LoyaltyPostingSourceEnum: Option VALUE_ENTRY,MEMBERSHIP_ENTRY,POS_ENDOFSALE;
         PERIOD_SETUP_ERROR: Label 'The collection period data formulas are setup correctly.';
         CONFIRM_EXPIRE_POINTS: Label 'Points earned until %1 will be expired on transaction date %2.';
@@ -492,7 +492,7 @@
                     ValidUntilDate := ReferenceDate;
                     ValidFromDate := 0D;
                     if (Format(LoyaltySetup."Expire Uncollected After") <> '') and (LoyaltySetup."Expire Uncollected Points") then
-                        ValidFromDate := CALCDATE('<+1D>', CALCDATE(LoyaltySetup."Expire Uncollected After", ReferenceDate));
+                        ValidFromDate := CalcDate('<+1D>', CalcDate(LoyaltySetup."Expire Uncollected After", ReferenceDate));
                 end;
 
             LoyaltySetup."Collection Period"::FIXED:
@@ -1925,4 +1925,3 @@
 
     end;
 }
-
