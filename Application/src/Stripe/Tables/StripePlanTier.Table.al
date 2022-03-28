@@ -43,10 +43,12 @@ table 6014646 "NPR Stripe Plan Tier"
     internal procedure PopulateFromJson(Data: JsonObject)
     var
         StripeJSONHelper: Codeunit "NPR Stripe JSON Helper";
-        UpTo: JsonValue;
+        UnitAmount, UpTo : JsonValue;
     begin
         StripeJSONHelper.SetJsonObject(Data);
-        Amount := StripeJSONHelper.SelectJsonValue('unit_amount').AsDecimal();
+        UnitAmount := StripeJSONHelper.SelectJsonValue('unit_amount');
+        if not UnitAmount.IsNull() then
+            Amount := UnitAmount.AsDecimal();
         UpTo := StripeJSONHelper.GetJsonValue('up_to');
         if not UpTo.IsNull() then
             "Up To" := UpTo.AsInteger();
