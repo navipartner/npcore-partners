@@ -94,6 +94,7 @@
     var
         User: Record User;
         IComm: Record "NPR I-Comm";
+        EnvironmentInformation: Codeunit "Environment Information";
         XmlElementLoginInfo: XmlElement;
         UserLoginType: Text[10];
     begin
@@ -116,6 +117,7 @@
         XmlElementLoginInfo.Add(AddElement('windows_security_id', Format(User."Windows Security ID"), MethodNS));
         XmlElementLoginInfo.Add(AddElement('user_login_type', UserLoginType, MethodNS));
         XmlElementLoginInfo.Add(AddElement('application_version', GetRetailVersion() + ' ' + GetBaseAppVersion(), MethodNS));
+        XmlElementLoginInfo.Add(AddElement('environment_name', EnvironmentInformation.GetEnvironmentName(), MethodNS));
 
         Element.Add(XmlElementLoginInfo);
     end;
