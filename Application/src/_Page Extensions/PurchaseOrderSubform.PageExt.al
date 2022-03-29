@@ -162,7 +162,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
             Clear(ExchangeLabelTableMap);
     end;
 
-#if BC17
+#if BC17 or BC18
     trigger OnAfterGetCurrRecord()
     begin
         if TotalsCalculationForced then begin
@@ -176,9 +176,9 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
         TotalsCalculationForced := BindSubscription(VarietyTotals);
     end;
 #endif
-      var
+    var
         ExchangeLabelTableMap: Record "NPR Exchange Label Map";
-#if BC17
+#if BC17 or BC18
         VarietyTotals: Codeunit "NPR Variety Totals Calculation";
         TotalsCalculationForced: Boolean;
 #endif

@@ -24,7 +24,7 @@ pageextension 6014488 "NPR Sales Quote Subform" extends "Sales Quote Subform"
             }
         }
     }
-#if BC17
+#if BC17 or BC18
     trigger OnAfterGetCurrRecord()
     begin
         if TotalsCalculationForced then begin

@@ -44,7 +44,7 @@ pageextension 6014408 "NPR Purch.Return Order Subform" extends "Purchase Return 
             }
         }
     }
-#if BC17
+#if BC17 or BC18
     trigger OnAfterGetCurrRecord()
     begin
         if TotalsCalculationForced then begin

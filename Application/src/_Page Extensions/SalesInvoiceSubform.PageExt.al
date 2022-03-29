@@ -27,7 +27,7 @@ pageextension 6014449 "NPR Sales Invoice Subform" extends "Sales Invoice Subform
             }
         }
     }
-#if BC17
+#if BC17 or BC18
     trigger OnAfterGetCurrRecord()
     begin
         if TotalsCalculationForced then begin
