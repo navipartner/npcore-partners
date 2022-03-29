@@ -80,7 +80,7 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
         }
     }
 
-#if BC17
+#if BC17 or BC18
     trigger OnAfterGetCurrRecord()
     begin
         if TotalsCalculationForced then begin
