@@ -56,6 +56,9 @@
             }
             cuegroup("Posted Documents")
             {
+                Caption = 'Posted Documents';
+                ShowCaption = true;
+
                 field("Posted Sales Invoices"; Rec."Posted Sales Invoices")
                 {
 
