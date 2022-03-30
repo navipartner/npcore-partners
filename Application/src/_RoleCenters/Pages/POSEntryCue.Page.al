@@ -86,6 +86,9 @@
             }
             cuegroup("EFT Errors")
             {
+                Caption = 'EFT Errors';
+                ShowCaption = true;
+
                 field(EFTReconcErrors; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("EFT Reconciliation Errors"))))
                 {
                     Caption = 'EFT Reconciliation Errors';
@@ -140,6 +143,9 @@
             }
             cuegroup("Active Discounts, Coupons & Vouchers")
             {
+                Caption = 'Active Discounts, Coupons & Vouchers';
+                ShowCaption = true;
+
                 field(CampaignDiscounts; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Campaign Discount List"))))
                 {
                     Caption = 'Campaign Discounts';

@@ -12,7 +12,7 @@
         {
             cuegroup(Cue)
             {
-
+                Caption = 'Activities';
                 ShowCaption = false;
 
                 field("Pending Inc. Documents"; Rec."Pending Inc. Documents")
