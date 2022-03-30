@@ -36,16 +36,15 @@
         if not EnvironmentInformation.IsSaaS() then
             exit;
 
-        if not TrySendRequest('ValidateBCOnlineTenant', ResponseMessage) then
+        if not TrySendRequest('ValidateBCOnlineTenant', '', '', TenantId(), ResponseMessage) then
             exit;
     end;
-
 
     local procedure TestUserExpired()
     var
         ExpirationMessage: Text;
     begin
-        if not TrySendRequest('GetUserExpirationMessage', ExpirationMessage) then
+        if not TrySendRequest('GetUserExpirationMessage', UserId(), GetDatabaseName(), TenantId(), ExpirationMessage) then
             exit;
         if ExpirationMessage = '' then
             exit;
@@ -75,7 +74,7 @@
         Second: Text[2];
         ExpirationTime: Time;
     begin
-        if not TrySendRequest('GetUserExpirationDate', ExpirationDate) then
+        if not TrySendRequest('GetUserExpirationDate', UserId(), GetDatabaseName(), TenantId(), ExpirationDate) then
             exit(0DT);
         if (ExpirationDate = '') OR (ExpirationDate = '0001-01-01T00:00:00') then
             exit(0DT);
@@ -96,7 +95,7 @@
     var
         LockedMessage: Text;
     begin
-        if not TrySendRequest('GetUserLockedMessage', LockedMessage) then
+        if not TrySendRequest('GetUserLockedMessage', UserId(), GetDatabaseName(), TenantId(), LockedMessage) then
             exit;
         if LockedMessage = '' then
             exit;
@@ -105,9 +104,23 @@
             Error(LockedMessage);
     end;
 
+    /*
+    local procedure GetTenantUseRegularInvoicing(): Text
+    var
+        UseRegularInvoicing: Text;
+    begin
+        if not TrySendRequest('GetTenantUseRegularInvoicing', '', '', 'np505315', UseRegularInvoicing) then
+            exit;
+        if UseRegularInvoicing = '' then
+            exit;
+
+        exit(UseRegularInvoicing);
+    end;
+    */
+
     [NonDebuggable]
     [TryFunction]
-    local procedure TrySendRequest(serviceMethod: text; var responseMessage: Text)
+    local procedure TrySendRequest(serviceMethod: text; UserId: Text; DatabaseName: Text; TenantId: Text; var responseMessage: Text)
     var
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Client: HttpClient;
@@ -115,18 +128,7 @@
         ContentHeaders: HttpHeaders;
         Content: HttpContent;
     begin
-        Content.WriteFrom(
-          '<?xml version="1.0" encoding="UTF-8"?>' +
-          '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" >' +
-              '<soapenv:Header/>' +
-              '<soapenv:Body>' +
-                  '<' + serviceMethod + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser">' +
-                      '<usernameIn>' + UserId + '</usernameIn>' +
-                      '<databaseNameIn>' + GetDatabaseName() + '</databaseNameIn>' +
-                      '<tenantIDIn>' + TenantId() + '</tenantIDIn>' +
-                  '</' + serviceMethod + '>' +
-              '</soapenv:Body>' +
-          '</soapenv:Envelope>');
+        Content.WriteFrom(InitRequestContent(serviceMethod, UserId, DatabaseName, TenantId));
 
         Content.GetHeaders(contentHeaders);
         ContentHeaders.Clear();
@@ -143,6 +145,32 @@
 
         Response.Content().ReadAs(responseMessage);
         responseMessage := GetWebResponseResult(responseMessage);
+    end;
+
+    local procedure InitRequestContent(serviceMethod: text; UserId: Text; DatabaseName: Text; TenantId: Text): Text
+    var
+        Builder: TextBuilder;
+    begin
+        Builder.Append('<?xml version="1.0" encoding="UTF-8"?>');
+        Builder.Append('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" >');
+        Builder.Append('  <soapenv:Header/>');
+        Builder.Append('  <soapenv:Body>');
+        Builder.Append('    <' + serviceMethod + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser">');
+
+        if UserId <> '' then
+            Builder.Append('      <usernameIn>' + UserId + '</usernameIn>');
+
+        if DatabaseName <> '' then
+            Builder.Append('      <databaseNameIn>' + DatabaseName + '</databaseNameIn>');
+
+        if TenantId <> '' then
+            Builder.Append('      <tenantIDIn>' + TenantId + '</tenantIDIn>');
+
+        Builder.Append('    </' + serviceMethod + '>');
+        Builder.Append('  </soapenv:Body>');
+        Builder.Append('</soapenv:Envelope>');
+
+        exit(Builder.ToText());
     end;
 
     local procedure GetWebResponseResult(response: Text) ResponseText: Text
