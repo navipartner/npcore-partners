@@ -32,6 +32,9 @@
             }
             cuegroup("Get Started")
             {
+                Caption = 'Get Started';
+                ShowCaption = true;
+
                 actions
                 {
                     action(GetStartedVideo)
