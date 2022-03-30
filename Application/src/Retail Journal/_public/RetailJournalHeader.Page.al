@@ -43,6 +43,18 @@
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Customer Disc. Group field';
                     }
+                    field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
+                    {
+                        Importance = Additional;
+                        ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
+                    {
+                        Importance = Additional;
+                        ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                        ApplicationArea = NPRRetail;
+                    }
 
                 }
                 group(Control6150619)
@@ -83,22 +95,17 @@
             }
             group(Dimensions)
             {
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Not used';
                 Caption = 'Dimensions';
                 group(Control6150625)
                 {
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Not used';
+
                     ShowCaption = false;
-                    field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
-                    {
-
-                        ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
-                    {
-
-                        ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
-                        ApplicationArea = NPRRetail;
-                    }
                 }
             }
             part(SubLine; "NPR Retail Journal Line")
