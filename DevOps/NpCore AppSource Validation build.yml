@@ -25,6 +25,7 @@ pool:
 stages:
 - template: /YAML/ZAL Build Definitions/AppSourceValidationBuild.yml@scriptsRepo
   parameters:
+    pool: NP Core Pipelines
     containerDefinitions:
     - BC1905_CLOUD
     - vNext_CLOUD
