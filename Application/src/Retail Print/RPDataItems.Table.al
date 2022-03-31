@@ -1,12 +1,6 @@
-﻿table 6014561 "NPR RP Data Items"
+table 6014561 "NPR RP Data Items"
 {
     Access = Internal;
-    // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
-    // NPR5.34/MMV /20170724 CASE 284505 TESTFIELD on critical fields.
-    // NPR5.40/MMV /20180208 CASE 304639 Added new fields 30,31 for more overall template control
-    // NPR5.50/MMV /20190502 CASE 353588 Added support for distinct iteration.
-    // NPR5.51/MMV /20190712 CASE 354694 Added type in field 13
-
     Caption = 'Data Items';
     DataClassification = CustomerContent;
 
@@ -41,19 +35,15 @@
         {
             Caption = 'Table ID';
             DataClassification = CustomerContent;
-        }
-        field(11; "Data Source"; Text[50])
-        {
-            Caption = 'Data Source';
-            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
                 AllObj: Record AllObj;
-                AllObjects: Page "All Objects";
+                AllObjects: Page "All Objects with Caption";
             begin
                 AllObj.FilterGroup(2);
-                AllObj.SetRange("Object Type", AllObj."Object Type");
+                AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
+                AllObj.FilterGroup(0);
                 AllObjects.SetTableView(AllObj);
                 AllObjects.LookupMode(true);
                 if AllObjects.RunModal() = ACTION::LookupOK then begin
@@ -69,6 +59,44 @@
             var
                 AllObj: Record AllObj;
             begin
+                AllObj.Get(AllObj."Object Type"::Table, Rec."Table ID");
+                "Data Source" := AllObj."Object Name";
+                "Table ID" := AllObj."Object ID";
+                Name := "Data Source";
+
+                if "Data Source" <> xRec."Data Source" then
+                    CheckLinks();
+            end;
+        }
+        field(11; "Data Source"; Text[50])
+        {
+            Caption = 'Data Source';
+            DataClassification = CustomerContent;
+
+            trigger OnLookup()
+            var
+                AllObj: Record AllObj;
+                AllObjects: Page "All Objects with Caption";
+            begin
+                AllObj.FilterGroup(2);
+                AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
+                AllObj.FilterGroup(0);
+                AllObjects.SetTableView(AllObj);
+                AllObjects.LookupMode(true);
+                if AllObjects.RunModal() = ACTION::LookupOK then begin
+                    AllObjects.GetRecord(AllObj);
+                    "Data Source" := AllObj."Object Name";
+                    "Table ID" := AllObj."Object ID";
+                    Name := "Data Source";
+                end;
+                FindParentItem();
+            end;
+
+            trigger OnValidate()
+            var
+                AllObj: Record AllObj;
+            begin
+                AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
                 AllObj.SetFilter("Object Name", '@' + "Data Source");
                 if not AllObj.FindFirst() then
                     AllObj.SetFilter("Object Name", '@' + "Data Source" + '*');
@@ -115,10 +143,8 @@
                 if "Iteration Type" <> "Iteration Type"::Total then
                     Clear("Total Fields");
 
-                //-NPR5.50 [353588]
                 if "Iteration Type" <> "Iteration Type"::"Distinct Values" then
                     Clear("Field ID");
-                //+NPR5.50 [353588]
             end;
         }
         field(14; "Key ID"; Integer)
@@ -225,7 +251,6 @@
                 "Field": Record "Field";
                 FieldLookup: Page "NPR Field Lookup";
             begin
-                //-NPR5.50 [353588]
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, "Table ID");
                 FieldLookup.SetTableView(Field);
@@ -235,16 +260,13 @@
                     FieldLookup.GetRecord(Field);
                     "Field ID" := Field."No.";
                 end;
-                //+NPR5.50 [353588]
             end;
 
             trigger OnValidate()
             var
                 "Field": Record "Field";
             begin
-                //-NPR5.50 [353588]
                 Field.Get("Table ID", "Field ID");
-                //+NPR5.50 [353588]
             end;
         }
         field(20; Level; Integer)
@@ -268,6 +290,15 @@
             Caption = 'Skip Template If Not Empty';
             DataClassification = CustomerContent;
         }
+        field(1000; "Has Constraints"; Boolean)
+        {
+            Caption = 'Has Constraints';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR RP Data Item Constr." where("Data Item Code" = field(Code),
+                                                                 "Data Item Line No." = field("Line No.")));
+        }
+
     }
 
     keys
@@ -321,10 +352,8 @@
 
     trigger OnInsert()
     begin
-        //-NPR5.34 [284505]
         TestField("Data Source");
         TestField(Name);
-        //+NPR5.34 [284505]
 
         ModifiedRec();
         FindParentItem();

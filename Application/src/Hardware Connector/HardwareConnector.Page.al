@@ -12,7 +12,7 @@
     {
         area(content)
         {
-            field(PageCaption; PageCaption)
+            field(PageCaption; _Caption)
             {
 
                 Caption = 'Page Caption';
@@ -21,59 +21,58 @@
                 ToolTip = 'Specifies the value of the PageCaption field';
                 ApplicationArea = NPRRetail;
             }
-            usercontrol(Bridge; "NPR Bridge")
+            usercontrol(HardwareConnector; "NPR HardwareConnector")
             {
                 ApplicationArea = NPRRetail;
 
 
-                trigger OnFrameworkReady()
+                trigger ControlAddInReady()
                 begin
-                    JavaScriptBridgeManagement.Initialize(CurrPage.Bridge);
-                    JavaScriptBridgeManagement.SetSize('100%', '100%');
-                    JavaScriptBridgeManagement.RegisterAdHocModule('HardwareConnector', html, css, js);
+                    CurrPage.HardwareConnector.SendRequest(_Handler, _Request);
                 end;
 
-                trigger OnInvokeMethod(method: Text; eventContent: JsonObject)
+                trigger ExceptionCaught(ErrorMessage: Text)
                 begin
-                    if not (method in ['error', 'result']) then
-                        exit;
-
-                    methodGlobal := method;
-                    contentGlobal := eventContent;
-                    AutoClosed := true;
+                    _AutoClosed := true;
+                    _ErrorMessage := ErrorMessage;
+                    _ExceptionCaught := true;
                     CurrPage.Close();
                 end;
+
+                trigger ResponseReceived(Response: JsonObject)
+                begin
+                    _AutoClosed := true;
+                    _Response := Response;
+                    CurrPage.Close();
+                end;
+
+
             }
         }
     }
 
     var
-        JavaScriptBridgeManagement: Codeunit "NPR JavaScript Bridge Mgt.";
-        AutoClosed: Boolean;
-        contentGlobal: JsonObject;
-        css: Text;
-        html: Text;
-        js: Text;
-        methodGlobal: Text;
-        PageCaption: Text;
+        _AutoClosed: Boolean;
+        _Response: JsonObject;
+        _Caption: Text;
+        _Handler: Text;
+        _Request: JsonObject;
+        _ErrorMessage: Text;
+        _ExceptionCaught: Boolean;
 
-    internal procedure SetModule(htmlIn: Text; cssIn: Text; jsIn: Text; caption: Text)
+    procedure SetInput(Caption: Text; Handler: Text; Request: JsonObject)
     begin
-        html := htmlIn;
-        css := cssIn;
-        js := jsIn;
-        PageCaption := caption;
+        _Handler := Handler;
+        _Request := Request;
+        _Caption := Caption;
     end;
 
-    internal procedure GetResponse(var methodOut: Text; var contentOut: JsonObject)
+    procedure GetOutput(var ErrorMessageOut: Text; var ExceptionCaughtOut: Boolean; var ResponseOut: JsonObject; var DidAutoCloseOut: Boolean)
     begin
-        methodOut := methodGlobal;
-        contentOut := contentGlobal;
-    end;
-
-    internal procedure DidAutoClose(): Boolean
-    begin
-        exit(AutoClosed);
+        ResponseOut := _Response;
+        DidAutoCloseOut := _AutoClosed;
+        ErrorMessageOut := _ErrorMessage;
+        ExceptionCaughtOut := _ExceptionCaught;
     end;
 }
 

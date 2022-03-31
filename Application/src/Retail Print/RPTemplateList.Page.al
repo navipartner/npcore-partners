@@ -29,10 +29,10 @@
                     ToolTip = 'Specifies the value of the Printer Type field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Printer Device"; Rec."Printer Device")
+                field(DeviceType; DeviceType)
                 {
-
-                    ToolTip = 'Specifies the value of the Printer Device field';
+                    Caption = 'Device Type';
+                    ToolTip = 'Specifies the value of the Printer Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
@@ -153,5 +153,18 @@
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        case Rec."Printer Type" of
+            Rec."Printer Type"::Line:
+                DeviceType := Format(Rec."Line Device");
+            Rec."Printer Type"::Matrix:
+                DeviceType := Format(Rec."Matrix Device");
+        end
+    end;
+
+    var
+        DeviceType: Text;
 }
 

@@ -560,10 +560,8 @@
         case TaxFreeRequest."Print Type" of
             TaxFreeRequest."Print Type"::Thermal:
                 PrintThermal(TaxFreeRequest);
-#if not CLOUD
             TaxFreeRequest."Print Type"::PDF:
                 PrintPDF(TaxFreeRequest);
-#endif
         end;
     end;
 
@@ -590,7 +588,7 @@
 
         PrintThermalLine(Printer, '<TearOff>'); //A final cut is not included in the printjob from I2 server.
 
-        Printer.ProcessBufferForCodeunit(CODEUNIT::"NPR Tax Free Receipt", ''); //Use the object output selection of old object so no new setup is needed.
+        Printer.ProcessBuffer(Codeunit::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson);
     end;
 
     local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print Mgt."; Line: Text)
@@ -698,21 +696,16 @@
         end;
     end;
 
-#if not CLOUD
-    [Obsolete('Need to refractor "NPR Print Method Mgt."')]
     local procedure PrintPDF(TaxFreeRequest: Record "NPR Tax Free Request")
     var
         ObjectOutputSelection: Record "NPR Object Output Selection";
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        MemoryStream: DotNet NPRNetMemoryStream;
         InStream: InStream;
         OutputType: Integer;
         Output: Text;
     begin
-        MemoryStream := MemoryStream.MemoryStream();
         TaxFreeRequest.Print.CreateInStream(InStream);
-        CopyStream(MemoryStream, InStream);
 
         Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Tax Free Receipt");
         OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"NPR Tax Free Receipt");
@@ -721,13 +714,10 @@
             Error(Error_MissingPrintSetup);
 
         case OutputType of
-            ObjectOutputSelection."Output Type"::"E-mail":
-                PrintMethodMgt.PrintViaEmail(Output, MemoryStream);
-            ObjectOutputSelection."Output Type"::"Printer Name":
-                PrintMethodMgt.PrintFileLocal(Output, MemoryStream, 'pdf');
+            ObjectOutputSelection."Output Type"::"Printer Name".AsInteger():
+                PrintMethodMgt.PrintFileLocal(Output, InStream, 'pdf');
         end;
     end;
-#endif
 
     local procedure Base64ToBlob(base64: Text; var TempBlobOut: Codeunit "Temp Blob")
     var

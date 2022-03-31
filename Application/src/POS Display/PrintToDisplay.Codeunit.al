@@ -4,11 +4,11 @@
     trigger OnRun()
     begin
         PrintLines();
-        LinePrintBuffer.ProcessBufferForCodeunit(CODEUNIT::"NPR Print To Display", '');
+        LinePrintMgt.ProcessBuffer(Codeunit::"NPR Print To Display", Enum::"NPR Line Printer Device"::BixolonDisplay);
     end;
 
     var
-        LinePrintBuffer: Codeunit "NPR RP Line Print Mgt.";
+        LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
         Lines: array[2] of Text;
 
     procedure PrintLines()
@@ -16,7 +16,7 @@
         Line: Integer;
     begin
         for Line := 1 to 2 do
-            LinePrintBuffer.AddLine(Lines[Line]);
+            LinePrintMgt.AddLine(Lines[Line]);
     end;
 
     procedure SetLine(Line1: Text; Line2: Text)

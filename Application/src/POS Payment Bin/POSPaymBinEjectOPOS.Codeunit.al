@@ -1,19 +1,6 @@
-﻿#if not CLOUD
-codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
+﻿codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
 {
     Access = Internal;
-    // NPR5.40/MMV /20180228 CASE 300660 Created object
-    // NPR5.41/MMV /20180425 CASE 312990 Renamed object
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    var
-        NameDevice: Label 'Device Name';
-        DescriptionDevice: Label 'Name of OPOS device to send request to';
-        ErrorEject: Label 'OPOS Drawer Eject for %1 failed with error:\ %2';
 
     local procedure InvokeMethodCode(): Text
     begin
@@ -27,21 +14,21 @@ codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
         DeviceName: Text;
-        OPOSEjectDrawerRequest: DotNet NPRNetEjectDrawerRequest;
+        HWCRequest: Codeunit "NPR Front-End: HWC";
+        RequestBody: JsonObject;
     begin
         if POSPaymentBin."Eject Method" <> InvokeMethodCode() then
             exit;
 
-        if not POSSession.IsActiveSession(POSFrontEnd) then
-            exit; //This method is only supported via transcendence.
+        POSSession.GetFrontEnd(POSFrontEnd, true);
 
         DeviceName := POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", 'device_name', '');
 
-        OPOSEjectDrawerRequest := OPOSEjectDrawerRequest.EjectDrawerRequest();
-        OPOSEjectDrawerRequest.DeviceName := DeviceName;
-        OPOSEjectDrawerRequest.Timeout := 2000;
-
-        POSFrontEnd.InvokeDevice(OPOSEjectDrawerRequest, InvokeMethodCode(), InvokeMethodCode());
+        RequestBody.Add('DeviceName', DeviceName);
+        RequestBody.Add('TimeoutMs', 2000);
+        HWCRequest.SetHandler('OPOSCashDrawer');
+        HWCRequest.SetRequest(RequestBody);
+        POSFrontEnd.InvokeFrontEndMethod(HWCRequest);
 
         Ejected := true;
     end;
@@ -72,6 +59,7 @@ codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
     local procedure OnGetParameterNameCaption(PaymentBinInvokeParameter: Record "NPR POS Paym. Bin Eject Param."; var Caption: Text)
     var
         PaymentBin: Record "NPR POS Payment Bin";
+        NameDevice: Label 'Device Name';
     begin
         if not PaymentBin.Get(PaymentBinInvokeParameter."Bin No.") then
             exit;
@@ -88,6 +76,7 @@ codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
     local procedure OnGetParameterDescriptionCaption(PaymentBinInvokeParameter: Record "NPR POS Paym. Bin Eject Param."; var Caption: Text)
     var
         PaymentBin: Record "NPR POS Payment Bin";
+        DescriptionDevice: Label 'Name of OPOS device to send request to';
     begin
         if not PaymentBin.Get(PaymentBinInvokeParameter."Bin No.") then
             exit;
@@ -99,23 +88,4 @@ codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
                 Caption := DescriptionDevice;
         end;
     end;
-    
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnDeviceResponse', '', false, false)]
-    local procedure OnOPOSEjectResponse(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        Stargate: Codeunit "NPR POS Stargate Management";
-        ErrorMessage: Text;
-        OPOSEjectDrawerResponse: DotNet NPRNetEjectDrawerResponse;
-    begin
-        if ActionName <> InvokeMethodCode() then
-            exit;
-
-        Stargate.DeserializeEnvelope(Envelope, OPOSEjectDrawerResponse, FrontEnd);
-
-        ErrorMessage := OPOSEjectDrawerResponse.ErrorMessage;
-        if (not OPOSEjectDrawerResponse.Success) and (ErrorMessage <> '') then
-            Message(ErrorEject, OPOSEjectDrawerResponse.DeviceName, ErrorMessage);
-    end;
 }
-#endif
-

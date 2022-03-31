@@ -1,74 +1,74 @@
-﻿#if not CLOUD
 codeunit 6014582 "NPR Print Method Mgt."
 {
     Access = Internal;
-    procedure PrintBytesLocal(PrinterName: Text; PrintBytes: Text; TargetEncoding: Text)
-    var
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSProxyRawPrint: Codeunit "NPR POS Proxy: Raw Print";
-        POSSession: Codeunit "NPR POS Session";
-        HardwareConnectorMgt: Codeunit "NPR Hardware Connector Mgt.";
-        Encoding: Codeunit "NPR Text Encoding Mapper";
-    begin
-        case CurrentClientType of
-            CLIENTTYPE::Web,
-          CLIENTTYPE::Tablet,
-          CLIENTTYPE::Phone:
-                if (POSSession.IsActiveSession(POSFrontEnd)) then
-                    POSProxyRawPrint.Print(POSFrontEnd, PrinterName, TargetEncoding, PrintBytes, false)
-                else
-                    HardwareConnectorMgt.SendRawPrintRequest(PrinterName, PrintBytes, Encoding.EncodingNameToCodePageNumber(TargetEncoding));
-        end;
-    end;
 
-    procedure PrintFileLocal(PrinterName: Text; var Stream: DotNet NPRNetMemoryStream; FileExtension: Text)
+    procedure PrintBytesLocal(PrinterName: Text; PrintJobBase64: Text)
     var
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSProxyFilePrint: Codeunit "NPR POS Proxy: File Print";
-        POSSession: Codeunit "NPR POS Session";
         HardwareConnectorMgt: Codeunit "NPR Hardware Connector Mgt.";
-        TempBlob: Codeunit "Temp Blob";
-        OutStr: OutStream;
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        HWCPOSRequest: Codeunit "NPR Front-End: HWC";
+        Request: JsonObject;
     begin
-        if Stream.Length < 1 then
+        if not GuiAllowed then
             exit;
 
+        if POSSession.IsInitialized() then begin
+            //print to hardware connector via POS page
+            Request.Add('PrinterName', PrinterName);
+            Request.Add('PrintJob', PrintJobBase64);
+
+            HWCPOSRequest.SetHandler('RawPrint');
+            HWCPOSRequest.SetRequest(Request);
+            POSSession.GetFrontEnd(POSFrontEnd, true);
+            POSFrontEnd.InvokeFrontEndMethod(HWCPOSRequest);
+        end else begin
+            //print to hardware connector via modal page
+            HardwareConnectorMgt.SendRawPrintRequest(PrinterName, PrintJobBase64);
+        end;
+
+    end;
+
+    procedure PrintFileLocal(PrinterName: Text; var Stream: InStream; FileExtension: Text)
+    var
+        HardwareConnectorMgt: Codeunit "NPR Hardware Connector Mgt.";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        HWCPOSRequest: Codeunit "NPR Front-End: HWC";
+        Request: JsonObject;
+        Base64Convert: Codeunit "Base64 Convert";
+        AzureKeyVault: Codeunit "App Key Vault Secret Provider";
+        licenseKey: Text;
+    begin
+        if not GuiAllowed then
+            exit;
         if StrLen(FileExtension) = 0 then
             exit;
-
-        TempBlob.CreateOutStream(OutStr);
-        CopyStream(OutStr, Stream);
-
-        case CurrentClientType of
-            CLIENTTYPE::Web,
-          CLIENTTYPE::Tablet,
-          CLIENTTYPE::Phone:
-                if (POSSession.IsActiveSession(POSFrontEnd)) then
-                    POSProxyFilePrint.Print(POSFrontEnd, PrinterName, Stream, FileExtension, false, false)
-                else
-                    HardwareConnectorMgt.SendRawBytesPrintRequest(PrinterName, TempBlob);
-        end;
-    end;
-
-    [Obsolete('Use the overload without DotNet. This method can be deleted when there are 0 references left')]
-    procedure PrintViaEmail(PrinterName: Text; var Stream: DotNet NPRNetMemoryStream)
-    var
-        InStream: InStream;
-        Separators: List of [Text];
-        TempEmailItem: Record "Email Item" temporary;
-        TempErrorMessage: Record "Error Message" temporary;
-        EmailSenderHandler: Codeunit "NPR Email Sending Handler";
-    begin
-        if Stream.Length < 1 then
+        if Stream.EOS() then
             exit;
-        Separators.Add(';');
-        Separators.Add(',');
 
-        EmailSenderHandler.CreateEmailItem(TempEmailItem, 'NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
-        EmailSenderHandler.AddAttachmentFromStream(TempEmailItem, Stream, 'Document.pdf');
-        EmailSenderHandler.Send(TempEmailItem, TempErrorMessage);
-        if not TempErrorMessage.IsEmpty() then
-            TempErrorMessage.ShowErrors();
+        if POSSession.IsInitialized() then begin
+            //print to hardware connector via POS page
+            Request.Add('PrinterName', PrinterName);
+            Request.Add('FileData', Base64Convert.ToBase64(Stream));
+            Request.Add('FileExtension', FileExtension);
+
+            if UpperCase(FileExtension) = 'PDF' then begin
+                Request.Add('PrintMethod', 'Spire');
+                AzureKeyVault.GetSecret('SpirePDFLicenseKey', licenseKey);
+                Request.Add('ExternalLibLicenseKey', licenseKey)
+            end else begin
+                Request.Add('PrintMethod', 'OSFileHandler');
+            end;
+
+            HWCPOSRequest.SetHandler('FilePrint');
+            HWCPOSRequest.SetRequest(Request);
+            POSSession.GetFrontEnd(POSFrontEnd, true);
+            POSFrontend.InvokeFrontEndMethod(HWCPOSRequest);
+        end else begin
+            //print to hardware connector via modal page
+            HardwareConnectorMgt.SendFilePrintRequest(PrinterName, Stream, FileExtension);
+        end;
     end;
 
     procedure PrintViaEmail(PrinterName: Text; var Stream: InStream)
@@ -90,7 +90,7 @@ codeunit 6014582 "NPR Print Method Mgt."
             TempErrorMessage.ShowErrors();
     end;
 
-    procedure PrintViaPrintNodePdf(PrinterID: Text; var PdfStream: DotNet NPRNetMemoryStream; DocumentDescription: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)
+    procedure PrintViaPrintNodePdf(PrinterID: Text; var PdfStream: InStream; DocumentDescription: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)
     var
         PrintNodeAPIMgt: Codeunit "NPR PrintNode API Mgt.";
         PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
@@ -102,28 +102,26 @@ codeunit 6014582 "NPR Print Method Mgt."
 
         PrintNodeAPIMgt.SendPDFStream(PrinterID, TempBlob, DocumentDescription, '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
     end;
-    
-    procedure PrintViaPrintNodeRaw(PrinterID: Text; PrintBytes: Text; TargetEncoding: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)
+
+    procedure PrintViaPrintNodeRaw(PrinterID: Text; PrintJobBase64: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)
     var
         PrintNodeAPIMgt: Codeunit "NPR PrintNode API Mgt.";
         PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
-        TextEncodingMapper: Codeunit "NPR Text Encoding Mapper";
     begin
-        PrintNodeAPIMgt.SendRawText(PrinterID, PrintBytes, TextEncodingMapper.EncodingNameToCodePageNumber(TargetEncoding), '', '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
+        PrintNodeAPIMgt.SendRawText(PrinterID, PrintJobBase64, '', '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
     end;
 
-    procedure PrintBytesHTTP(URL: Text; Endpoint: Text; PrintBytes: Text; TargetEncoding: Text)
+    procedure PrintBytesHTTP(URL: Text; Endpoint: Text; PrintJobBase64: Text)
     var
         MobilePrintMgt: Codeunit "NPR Mobile Print Mgt.";
     begin
-        MobilePrintMgt.PrintJobHTTP(URL, Endpoint, PrintBytes, TargetEncoding);
+        MobilePrintMgt.PrintJobHTTP(URL, Endpoint, PrintJobBase64);
     end;
 
-    procedure PrintBytesBluetooth(DeviceName: Text; PrintBytes: Text; TargetEncoding: Text)
+    procedure PrintBytesBluetooth(DeviceName: Text; PrintJobBase64: Text)
     var
         MobilePrintMgt: Codeunit "NPR Mobile Print Mgt.";
     begin
-        MobilePrintMgt.PrintJobBluetooth(DeviceName, PrintBytes, TargetEncoding);
+        MobilePrintMgt.PrintJobBluetooth(DeviceName, PrintJobBase64);
     end;
 }
-#endif

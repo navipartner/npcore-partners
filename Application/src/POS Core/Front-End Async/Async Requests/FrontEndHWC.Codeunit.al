@@ -28,7 +28,7 @@
 /// RequestID := Request.AwaitResponse();
 /// ```
 /// 
-/// Then, you must listen to `OnHardwareConnectorResponse` event method of the `codeunit 6014575 "NPR HWC Response Method"`.
+/// Then, you must listen to `OnHardwareConnectorResponse` event method of the `codeunit "NPR HWC Response Method"`.
 /// The subscriber must compare the received `RequestId` argument to the expected one obtained by `AwaitResponse`.
 /// 
 /// The direct invocation of Hardware Connector from AL does not (currently) support the `hwc.sendRequestAsync()` method.

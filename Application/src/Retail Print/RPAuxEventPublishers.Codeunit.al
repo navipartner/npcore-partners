@@ -1,14 +1,6 @@
-﻿codeunit 6014534 "NPR RP Aux: Event Publishers"
+codeunit 6014534 "NPR RP Aux: Event Publishers"
 {
     Access = Internal;
-    // NPR5.40/MMV /20180208 CASE 304639 Changed events to use receipt no. instead of audit roll to make it independent of specific table.
-    // NPR5.41/MMV /20180411 CASE 308701 Added FIND to retrieve record data.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ERROR_UNKNOWNTABLE: Label 'Template line has unknown table selected. Must be %1';
 
@@ -20,16 +12,16 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSalesReceiptHeader(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text)
+    local procedure OnSalesReceiptHeader(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text; LinePrintMgt: Codeunit "NPR RP Line Print Mgt.")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSalesReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text)
+    local procedure OnSalesReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text; LinePrintMgt: Codeunit "NPR RP Line Print Mgt.")
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnBuildFunctionCodeunitList', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnBuildFunctionCodeunitList', '', false, false)]
     local procedure OnBuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
     var
         AllObj: Record AllObj;
@@ -40,7 +32,7 @@
         tmpAllObj.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnBuildFunctionList', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnBuildFunctionList', '', false, false)]
     local procedure OnBuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         if CodeunitID <> CODEUNIT::"NPR RP Aux: Event Publishers" then
@@ -50,8 +42,8 @@
         AddFunction(tmpRetailList, 'RECEIPT_FOOTER');
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnFunction', '', false, false)]
-    local procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnFunction', '', false, false)]
+    local procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean; sender: Codeunit "NPR RP Line Print Mgt.")
     var
         RecRef: RecordRef;
         ReceiptNo: Text;
@@ -76,9 +68,9 @@
 
         case FunctionName of
             'RECEIPT_HEADER':
-                OnSalesReceiptHeader(TemplateLine, ReceiptNo);
+                OnSalesReceiptHeader(TemplateLine, ReceiptNo, sender);
             'RECEIPT_FOOTER':
-                OnSalesReceiptFooter(TemplateLine, ReceiptNo);
+                OnSalesReceiptFooter(TemplateLine, ReceiptNo, sender);
         end;
 
         Skip := true; //The actual template line does not need to print anything. The event subscribers might.

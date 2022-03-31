@@ -443,9 +443,6 @@
 
     local procedure PrintTicket(MembershipSetup: Record "NPR MM Membership Setup"; var Ticket: Record "NPR TM Ticket")
     var
-        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
-        LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
-        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         PrintTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
 
@@ -454,13 +451,10 @@
                 exit;
 
             MembershipSetup."Ticket Print Object Type"::CODEUNIT:
-                if (ObjectOutputMgt.GetCodeunitOutputPath(MembershipSetup."Ticket Print Object ID") <> '') then
-                    LinePrintMgt.ProcessCodeunit(MembershipSetup."Ticket Print Object ID", Ticket)
-                else
-                    CODEUNIT.Run(MembershipSetup."Ticket Print Object ID", Ticket);
+                Codeunit.Run(MembershipSetup."Ticket Print Object ID", Ticket);
 
             MembershipSetup."Ticket Print Object Type"::REPORT:
-                ReportPrinterInterface.RunReport(MembershipSetup."Ticket Print Object ID", false, false, Ticket);
+                Report.Run(MembershipSetup."Ticket Print Object ID", false, false, Ticket);
 
             MembershipSetup."Ticket Print Object Type"::TEMPLATE:
                 PrintTemplateMgt.PrintTemplate(MembershipSetup."Ticket Print Template Code", Ticket, 0);

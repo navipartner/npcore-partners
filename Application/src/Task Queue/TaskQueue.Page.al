@@ -15,24 +15,6 @@
     {
         area(content)
         {
-#if not CLOUD
-            usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
-            {
-                ApplicationArea = NPRRetail;
-
-
-                trigger AddInReady()
-                begin
-                    CurrPage.PingPong.Ping(500);
-                end;
-
-                trigger Pong()
-                begin
-                    CurrPage.PingPong.Ping(1000);
-                    CurrPage.Update(false);
-                end;
-            }
-#endif
             repeater(Group)
             {
                 field(Company; Rec.Company)

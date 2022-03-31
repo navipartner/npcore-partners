@@ -854,12 +854,15 @@
     local procedure InvokeOnFinishSaleSubscribers_OnRun(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
     var
         POSAfterSaleExecution: Codeunit "NPR POS After Sale Execution";
+        FinishSaleWorkflowErr: Label 'Sale successfully completed, but an error in the post processing occurred:\\%1\\%2';
     begin
         POSAfterSaleExecution.OnRunTypeSet(OnRunType::OnFinishSale);
         POSAfterSaleExecution.OnRunPOSSalesWorkflowStepSet(POSSalesWorkflowStep);
         POSAfterSaleExecution.RecSet(Rec);
         POSAfterSaleExecution.PosSaleCodeunitSet(This);
-        if POSAfterSaleExecution.Run() then;
+        ClearLastError();
+        if not POSAfterSaleExecution.Run() then
+            Message(FinishSaleWorkflowErr, POSSalesWorkflowStep.Description, GetLastErrorText());
         POSAfterSaleExecution.OnRunTypeSet(OnRunType::Undefined);
     end;
 

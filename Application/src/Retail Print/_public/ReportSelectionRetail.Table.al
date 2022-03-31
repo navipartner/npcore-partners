@@ -1,16 +1,14 @@
-﻿table 6014404 "NPR Report Selection Retail"
+table 6014404 "NPR Report Selection Retail"
 {
-    Caption = 'Usage - Retail';
+    Caption = 'Report Selection - Retail';
     DataClassification = CustomerContent;
 
     fields
     {
-        field(1; "Report Type"; Option)
+        field(1; "Report Type"; Enum "NPR Report Selection Type")
         {
             Caption = 'Report Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Sales Receipt,Register Balancing,Price Label,Signature Receipt,Gift Voucher,,Credit Voucher,,Terminal Receipt,Large Sales Receipt,,,Exchange Label,,Customer Sales Receipt,Rental,Tailor,Order,Photo Label,,,,Warranty Certificate,Shelf Label,,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,Bin Label,Sales Receipt (POS Entry),Large Sales Receipt (POS Entry),Balancing (POS Entry),Sales Doc. Confirmation (POS Entry),Large Balancing (POS Entry),Begin Workshift (POS Entry),Transfer Order,Inv.PutAway Label';
-            OptionMembers = "Sales Receipt","Register Balancing","Price Label","Signature Receipt","Gift Voucher",,"Credit Voucher",,"Terminal Receipt","Large Sales Receipt",,,"Exchange Label",,"Customer Sales Receipt",Rental,Tailor,"Order","Photo Label",,,,"Warranty Certificate","Shelf Label",,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,"Bin Label","Sales Receipt (POS Entry)","Large Sales Receipt (POS Entry)","Balancing (POS Entry)","Sales Doc. Confirmation (POS Entry)","Large Balancing (POS Entry)","Begin Workshift (POS Entry)","Transfer Order","Inv.PutAway Label";
         }
         field(2; Sequence; Code[10])
         {
@@ -42,19 +40,16 @@
             Caption = 'XML Port ID';
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(XMLport));
-
-            trigger OnValidate()
-            begin
-                CalcFields("XML Port Name");
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'No longer supported';
         }
         field(6; "XML Port Name"; Text[249])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(XMLport),
-                                                                           "Object ID" = FIELD("XML Port ID")));
             Caption = 'XML Port Name';
             Editable = false;
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'No longer supported';
         }
         field(7; "Register No."; Code[10])
         {
@@ -91,20 +86,15 @@
         {
             Caption = 'Filter Object ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use print template filters instead.';
         }
         field(13; "Record Filter"; TableFilter)
         {
             Caption = 'Record Filter';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                //-NPR4.18
-                if Format("Record Filter") <> '' then
-                    TestField("Filter Object ID");
-                //+NPR4.18
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use print template filters instead.';
         }
         field(15; Optional; Boolean)
         {

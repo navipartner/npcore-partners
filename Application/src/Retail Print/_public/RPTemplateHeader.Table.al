@@ -1,4 +1,4 @@
-﻿table 6014446 "NPR RP Template Header"
+table 6014446 "NPR RP Template Header"
 {
     Caption = 'RP Template Header';
     DrillDownPageID = "NPR RP Template List";
@@ -23,26 +23,30 @@
         {
             Caption = 'Printer Device';
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-                LookupDevice();
-            end;
+            ObsoleteState = Pending; //If set to removed, it'll block import of templates exported from previous customers
+            ObsoleteReason = 'Replaced by "Matrix Device" and "Line Device" enums';
+        }
+        field(42; "Matrix Device"; Enum "NPR Matrix Printer Device")
+        {
+            Caption = 'Matrix Device';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                DeviceSettings: Record "NPR RP Device Settings";
             begin
-                if "Printer Device" <> xRec."Printer Device" then begin
-                    DeviceSettings.SetRange(Template, Code);
-                    if DeviceSettings.IsEmpty then
-                        exit;
+                if Rec."Matrix Device" <> xRec."Matrix Device" then begin
+                    ClearDeviceSettings();
+                end;
+            end;
+        }
+        field(43; "Line Device"; Enum "NPR Line Printer Device")
+        {
+            Caption = 'Line Device';
+            DataClassification = CustomerContent;
 
-                    if not Confirm(Caption_DeviceSettingsOverwrite) then
-                        Error('');
-
-                    TemplateModified();
-                    DeviceSettings.DeleteAll();
+            trigger OnValidate()
+            begin
+                if Rec."Line Device" <> xRec."Line Device" then begin
+                    ClearDeviceSettings();
                 end;
             end;
         }
@@ -79,7 +83,7 @@
         field(64; "Last Modified By"; Code[50])
         {
             Caption = 'Last Modified By';
-            DataClassification = EndUserIdentifiableInformation;
+            DataClassification = CustomerContent;
         }
         field(70; "Pre Processing Codeunit"; Integer)
         {
@@ -203,7 +207,7 @@
 
     fieldgroups
     {
-        fieldgroup(DropDown; "Code", "Printer Type", "Printer Device", Description)
+        fieldgroup(DropDown; "Code", "Printer Type", Description)
         {
         }
     }
@@ -269,6 +273,21 @@
         Caption_PrintOverwrite: Label 'Specifying a print processing object will bypass the print engine completely!\Do you want to continue?';
         Caption_DeviceSettingsOverwrite: Label 'Changing printer device will delete all stored device settings!\Do you want to continue?';
 
+    local procedure ClearDeviceSettings()
+    var
+        DeviceSettings: Record "NPR RP Device Settings";
+    begin
+        DeviceSettings.SetRange(Template, Code);
+        if DeviceSettings.IsEmpty then
+            exit;
+
+        if not Confirm(Caption_DeviceSettingsOverwrite) then
+            Error('');
+
+        TemplateModified();
+        DeviceSettings.DeleteAll();
+    end;
+
     internal procedure TemplateModified()
     begin
         if IsTemporary then
@@ -322,26 +341,6 @@
         RecRef.SetTable(RPTemplateArchive);
 
         RPTemplateArchive.Insert();
-    end;
-
-    internal procedure LookupDevice()
-    var
-        LinePrinterInterface: Codeunit "NPR RP Line Printer Interf.";
-        MatrixPrinterInterface: Codeunit "NPR RP Matrix Printer Interf.";
-        TempRetailList: Record "NPR Retail List" temporary;
-    begin
-        case "Printer Type" of
-            "Printer Type"::Line:
-                LinePrinterInterface.GetDeviceList(TempRetailList);
-            "Printer Type"::Matrix:
-                MatrixPrinterInterface.GetDeviceList(TempRetailList);
-        end;
-
-        if TempRetailList.IsEmpty then
-            exit;
-
-        if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then
-            Validate("Printer Device", TempRetailList.Choice);
     end;
 }
 
