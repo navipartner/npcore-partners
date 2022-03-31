@@ -519,11 +519,15 @@
     end;
 
     local procedure PrintDoc(ReportID: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant): Text
-    var
-        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
     begin
-        ReportPrinterInterface.RunReport(ReportID, ReqWindow, SystemPrinter, Record);
-        exit(ReportPrinterInterface.GetLastError());
+        if not TryPrintDoc(ReportID, ReqWindow, SystemPrinter, Record) then
+            exit(GetLastErrorText());
+    end;
+
+    [TryFunction]
+    local procedure TryPrintDoc(ReportID: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
+    begin
+        Report.Run(ReportID, ReqWindow, SystemPrinter, Record);
     end;
 
     procedure CreateHandlingProfileLibrary()

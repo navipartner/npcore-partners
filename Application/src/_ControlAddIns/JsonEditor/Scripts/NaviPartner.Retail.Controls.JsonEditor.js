@@ -1,7 +1,3 @@
-/*
- * All code in this file is IE11 compatible at the time of writing. If editing this, please make sure it stays so!
- */
-
 if (typeof Array.isArray === 'undefined') {
     Array.isArray = function (obj) {
         return Object.prototype.toString.call(obj) === '[object Array]';

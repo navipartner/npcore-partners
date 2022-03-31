@@ -15,26 +15,6 @@
         CtrlAddInInitialized := true;
     end;
 
-    procedure GetRetailLogo(KeywordIn: Code[20]; RegisterNo: Code[10]; var RetailLogo: Record "NPR Retail Logo"): Boolean
-    var
-        POSUnit: Record "NPR POS Unit";
-    begin
-        //Use RetailLogo.SETAUTOCALCFIELDS() on the blobs you need, before you call this function.
-
-        if RegisterNo = '' then
-            RegisterNo := POSUnit.GetCurrentPOSUnit();
-
-        RetailLogo.SetRange(Keyword, KeywordIn);
-        RetailLogo.SetRange("Register No.", RegisterNo);
-        if RetailLogo.IsEmpty then
-            RetailLogo.SetRange("Register No.", '');
-
-        RetailLogo.SetFilter("Start Date", '<=%1|=%2', Today, 0D);
-        RetailLogo.SetFilter("End Date", '>=%1|=%2', Today, 0D);
-
-        exit(RetailLogo.FindSet());
-    end;
-
     procedure UploadLogo()
     var
         NotInitializedErr: Label 'Control Add-In not initialized.';
@@ -142,8 +122,6 @@
             DotNetBinarwWriter.WriteChar(ESCPOS[i]);
 
         Clear(OutStr);
-        Clear(InStr);
-        RetailLogo.OneBitLogo.CreateInStream(InStr);
         RetailLogo.OneBitLogo.CreateOutStream(OutStr);
         ConvertBase64.FromBase64(sourceBase64, OutStr);
 

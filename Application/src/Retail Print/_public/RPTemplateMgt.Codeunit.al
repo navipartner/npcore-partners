@@ -301,27 +301,22 @@
 
     internal procedure UpgradeField(TableId: Integer; FromFieldId: Integer; ToFieldId: Integer)
     begin
-        //-NPR5.39 [304745]
         UpgradeDataItemConstraintLink(TableId, FromFieldId, ToFieldId);
         UpgradeDataItemLink(TableId, FromFieldId, ToFieldId);
         UpgradeTemplateLine(TableId, FromFieldId, ToFieldId);
-        //+NPR5.39 [304745]
     end;
 
     internal procedure RemoveField(TableId: Integer; FieldId: Integer)
     begin
-        //-NPR5.39 [304745]
         DeleteDataItemConstraintLink(TableId, FieldId);
         DeleteDataItemLink(TableId, FieldId);
         DeleteTemplateLine(TableId, FieldId);
-        //+NPR5.39 [304745]
     end;
 
     local procedure UpgradeTemplateLine(TableId: Integer; FromFieldId: Integer; ToFieldId: Integer)
     var
         RPTemplateLine: Record "NPR RP Template Line";
     begin
-        //-NPR5.39 [304745]
         RPTemplateLine.SetRange("Data Item Table", TableId);
         RPTemplateLine.SetRange(Field, FromFieldId);
         if RPTemplateLine.FindSet() then
@@ -341,14 +336,12 @@
                 RPTemplateLine.Validate("Field 2", ToFieldId);
                 RPTemplateLine.Modify();
             until RPTemplateLine.Next() = 0;
-        //+NPR5.39 [304745]
     end;
 
     local procedure UpgradeDataItemLink(TableId: Integer; FromFieldId: Integer; ToFieldId: Integer)
     var
         RPDataItemLinks: Record "NPR RP Data Item Links";
     begin
-        //-NPR5.39 [304745]
         RPDataItemLinks.SetRange("Table ID", TableId);
         RPDataItemLinks.SetRange("Field ID", FromFieldId);
         if RPDataItemLinks.FindSet() then
@@ -367,7 +360,6 @@
                 RPDataItemLinks.Validate("Parent Field ID", ToFieldId);
                 RPDataItemLinks.Modify();
             until RPDataItemLinks.Next() = 0;
-        //+NPR5.39 [304745]
     end;
 
     local procedure UpgradeDataItemConstraintLink(TableId: Integer; FromFieldId: Integer; ToFieldId: Integer)
@@ -375,7 +367,6 @@
         RPDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links";
         RPDataItemConstraint: Record "NPR RP Data Item Constr.";
     begin
-        //-NPR5.39 [304745]
         RPDataItemConstraintLinks.SetRange("Data Item Table ID", TableId);
         RPDataItemConstraintLinks.SetRange("Data Item Field ID", FromFieldId);
         if RPDataItemConstraintLinks.FindSet() then
@@ -395,14 +386,12 @@
                 RPDataItemConstraintLinks.SetRange("Field ID", FromFieldId);
                 RPDataItemConstraintLinks.ModifyAll("Field ID", ToFieldId, true);
             until RPDataItemConstraint.Next() = 0;
-        //+NPR5.39 [304745]
     end;
 
     local procedure DeleteTemplateLine(TableId: Integer; FieldId: Integer)
     var
         RPTemplateLine: Record "NPR RP Template Line";
     begin
-        //-NPR5.39 [304745]
         RPTemplateLine.SetRange("Data Item Table", TableId);
         RPTemplateLine.SetRange(Field, FieldId);
         if RPTemplateLine.FindSet() then
@@ -418,14 +407,12 @@
                 IncreaseVersionIfNecessary(RPTemplateLine."Template Code");
                 RPTemplateLine.Delete();
             until RPTemplateLine.Next() = 0;
-        //+NPR5.39 [304745]
     end;
 
     local procedure DeleteDataItemLink(TableId: Integer; FieldId: Integer)
     var
         RPDataItemLinks: Record "NPR RP Data Item Links";
     begin
-        //-NPR5.39 [304745]
         RPDataItemLinks.SetRange("Table ID", TableId);
         RPDataItemLinks.SetRange("Field ID", FieldId);
         if RPDataItemLinks.FindSet() then
@@ -442,7 +429,6 @@
                 IncreaseVersionIfNecessary(RPDataItemLinks."Data Item Code");
                 RPDataItemLinks.Delete();
             until RPDataItemLinks.Next() = 0;
-        //+NPR5.39 [304745]
     end;
 
     local procedure DeleteDataItemConstraintLink(TableId: Integer; FieldId: Integer)
@@ -450,7 +436,6 @@
         RPDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links";
         RPDataItemConstraint: Record "NPR RP Data Item Constr.";
     begin
-        //-NPR5.39 [304745]
         RPDataItemConstraintLinks.SetRange("Data Item Table ID", TableId);
         RPDataItemConstraintLinks.SetRange("Data Item Field ID", FieldId);
         if RPDataItemConstraintLinks.FindSet() then
@@ -469,7 +454,6 @@
                 RPDataItemConstraintLinks.SetRange("Field ID", FieldId);
                 RPDataItemConstraintLinks.DeleteAll();
             until RPDataItemConstraint.Next() = 0;
-        //+NPR5.39 [304745]
     end;
 
     local procedure IncreaseVersionIfNecessary(Template: Text)
@@ -477,14 +461,12 @@
         RPTemplateHeader: Record "NPR RP Template Header";
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
-        //-NPR5.39 [304745]
         if RPTemplateHeader.Get(Template) then
             if RPTemplateHeader.Archived then begin
                 TemplateMgt.CreateNewVersion(RPTemplateHeader);
                 RPTemplateHeader."Version Comments" := 'Auto created version for field upgrade';
                 RPTemplateHeader.Modify();
             end;
-        //+NPR5.39 [304745]
     end;
 }
 

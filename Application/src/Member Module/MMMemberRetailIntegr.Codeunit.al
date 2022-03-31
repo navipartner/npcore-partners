@@ -311,9 +311,6 @@
 
     procedure PrintMembershipSalesReceiptWorker(var Membership: Record "NPR MM Membership"; var MembershipSetup: Record "NPR MM Membership Setup")
     var
-        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
-        LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
-        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         PrintTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
 
@@ -322,13 +319,10 @@
                 ;
 
             MembershipSetup."Receipt Print Object Type"::CODEUNIT:
-                if (ObjectOutputMgt.GetCodeunitOutputPath(MembershipSetup."Receipt Print Object ID") <> '') then
-                    LinePrintMgt.ProcessCodeunit(MembershipSetup."Receipt Print Object ID", Membership)
-                else
-                    CODEUNIT.Run(MembershipSetup."Receipt Print Object ID", Membership);
+                Codeunit.Run(MembershipSetup."Receipt Print Object ID", Membership);
 
             MembershipSetup."Receipt Print Object Type"::REPORT:
-                ReportPrinterInterface.RunReport(MembershipSetup."Receipt Print Object ID", false, false, Membership);
+                Report.Run(MembershipSetup."Receipt Print Object ID", false, false, Membership);
 
             MembershipSetup."Receipt Print Object Type"::TEMPLATE:
                 PrintTemplateMgt.PrintTemplate(MembershipSetup."Receipt Print Template Code", Membership, 0);
@@ -367,9 +361,6 @@
 
     procedure PrintMemberAccountCardWorker(var Member: Record "NPR MM Member"; var MembershipSetup: Record "NPR MM Membership Setup")
     var
-        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
-        LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
-        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         PrintTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
 
@@ -378,13 +369,10 @@
                 Error(NO_PRINTOUT, MembershipSetup.Code);
 
             MembershipSetup."Account Print Object Type"::CODEUNIT:
-                if (ObjectOutputMgt.GetCodeunitOutputPath(MembershipSetup."Account Print Object ID") <> '') then
-                    LinePrintMgt.ProcessCodeunit(MembershipSetup."Account Print Object ID", Member)
-                else
-                    CODEUNIT.Run(MembershipSetup."Account Print Object ID", Member);
+                CODEUNIT.Run(MembershipSetup."Account Print Object ID", Member);
 
             MembershipSetup."Account Print Object Type"::REPORT:
-                ReportPrinterInterface.RunReport(MembershipSetup."Account Print Object ID", false, false, Member);
+                Report.Run(MembershipSetup."Account Print Object ID", false, false, Member);
 
             MembershipSetup."Account Print Object Type"::TEMPLATE:
                 PrintTemplateMgt.PrintTemplate(MembershipSetup."Account Print Template Code", Member, 0);
@@ -433,9 +421,6 @@
 
     procedure PrintMemberCardWorker(var MemberCard: Record "NPR MM Member Card"; var MembershipSetup: Record "NPR MM Membership Setup")
     var
-        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
-        LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
-        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         PrintTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
 
@@ -444,13 +429,10 @@
                 Error(NO_PRINTOUT, MembershipSetup.Code);
 
             MembershipSetup."Card Print Object Type"::CODEUNIT:
-                if (ObjectOutputMgt.GetCodeunitOutputPath(MembershipSetup."Card Print Object ID") <> '') then
-                    LinePrintMgt.ProcessCodeunit(MembershipSetup."Card Print Object ID", MemberCard)
-                else
-                    CODEUNIT.Run(MembershipSetup."Card Print Object ID", MemberCard);
+                CODEUNIT.Run(MembershipSetup."Card Print Object ID", MemberCard);
 
             MembershipSetup."Card Print Object Type"::REPORT:
-                ReportPrinterInterface.RunReport(MembershipSetup."Card Print Object ID", false, false, MemberCard);
+                Report.Run(MembershipSetup."Card Print Object ID", false, false, MemberCard);
 
             MembershipSetup."Receipt Print Object Type"::TEMPLATE:
                 PrintTemplateMgt.PrintTemplate(MembershipSetup."Card Print Template Code", MemberCard, 0);

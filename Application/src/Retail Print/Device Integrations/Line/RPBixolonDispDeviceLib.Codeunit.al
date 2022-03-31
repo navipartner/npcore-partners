@@ -1,121 +1,74 @@
-﻿codeunit 6014541 "NPR RP BixolonDisp Device Lib."
+codeunit 6014541 "NPR RP BixolonDisp Device Lib." implements "NPR ILine Printer"
 {
     Access = Internal;
-    // Bixolon Disp. Command Library Library.
-    //  Work started by Nicolai Esbensen.
-    //  Contributions providing function interfaces for valid
-    //  Bixolon Display escape sequences are welcome. Functionality
-    //  for other displays should be put in a library on its own.
-    // 
-    //  All functions write ESC code to a string buffer which can
-    //  be sent to a display or stored to a file.
-    // 
-    //  Current functions and their purpose are listed below.
-    // --------------------------------------------------------
-    // 
-    // ShortHandFunctions
-    //  "PrintText(Text : Text[100];FontType : Text[10];Bold : Boolean;UnderLine : Boolean;DoubleStrike : Boolean;Align : Integer)"
-    //   Adds the text variable to the buffer, applying the font style given as arguments.
-    // 
-    // ---------------------------------------------------------------------------------
-    // Base Functions
-    //  Writes standard functional sequences to the buffer. All with reference to the
-    //  manual.
-    // 
-    // ---------------------------------------------------------------------------------
-    // Test Functions
-    //  Functions for testing the functionality implemented in this library.
-    // 
-    // NPR4.15/MMV/20150731 CASE 218278 Encode print with codepage 437 (Bixolon BCD-1100 default)
-    // NPR4.15/MMV/20151005 CASE 223893 Added methods:
-    //                                    GetPrintBuffer()
-    //                                    SetPrintBuffer()
-    // NPR5.20/MMV/20160225 CASE 233229 Moved print method logic away from device codeunits.
-    //                                  Also removed old case comments, along with small cleanup/renaming.
-    // NPR5.23/MMV/20160503 CASE 237189 Clear PrintBuffer on Init.
-    // NPR5.32/MMV /20170324 CASE 241995 Retail Print 2.0
-
-    EventSubscriberInstance = Manual;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
-        TempPattern: Text[50];
-        ESC: Codeunit "NPR RP Escape Code Library";
-        PrintBuffer: Text;
+        _PrintBuffer: Codeunit "Temp Blob";
+        _DotNetStream: Codeunit DotNet_Stream;
+        _DotNetEncoding: Codeunit DotNet_Encoding;
 
-    local procedure DeviceCode(): Text
+    procedure InitJob(var DeviceSettings: Record "NPR RP Device Settings")
+    var
+        OStream: OutStream;
     begin
-        exit('DISPLAYBIXOLON');
+        Clear(OStream);
+        Clear(_PrintBuffer);
+        Clear(_DotNetStream);
+        Clear(_DotNetEncoding);
+        _PrintBuffer.CreateOutStream(OStream);
+        _DotNetEncoding.Encoding(437);
+        _DotNetStream.FromOutStream(OStream);
+
+        InitializePrinter();
     end;
 
-    procedure IsThisDevice(Text: Text): Boolean
+    local procedure AddStringToBuffer(String: Text)
+    var
+        DotNetCharArray: Codeunit "DotNet_Array";
+        DotNetByteArray: Codeunit "DotNet_Array";
+        DotNetString: Codeunit "DotNet_String";
     begin
-        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
+        //This function over allocates and is verbose, all because of the beautiful DotNet wrapper codeunits.
+
+        DotNetString.Set(String);
+        DotNetString.ToCharArray(0, DotNetString.Length(), DotNetCharArray);
+        _DotNetEncoding.GetBytes(DotNetCharArray, 0, DotNetCharArray.Length(), DotNetByteArray);
+        _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnInitJob', '', false, false)]
-    local procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
+    procedure PrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     begin
-        Init();
+        AddStringToBuffer(POSPrintBuffer.Text);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnPrintData', '', false, false)]
-    local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
-    begin
-        PrintText(POSPrintBuffer.Text);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnGetPageWidth', '', false, false)]
-    local procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
+    procedure GetPageWidth(FontFace: Text[30]; var Width: Integer)
     begin
         Width := GetPageWidth(FontFace);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnGetTargetEncoding', '', false, false)]
-    local procedure OnGetTargetEncoding(var TargetEncoding: Text)
+    procedure EndJob()
     begin
-        TargetEncoding := 'IBM437';
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnGetPrintBytes', '', false, false)]
-    local procedure OnGetPrintBytes(var PrintBytes: Text)
+    procedure LookupFont(var Font: Text): Boolean
     begin
-        PrintBytes := PrintBuffer;
+        Font := '';
+        Exit(false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnSetPrintBytes', '', false, false)]
-    local procedure OnSetPrintBytes(var PrintBytes: Text)
+    procedure LookupCommand(var Command: Text): Boolean
     begin
-        PrintBuffer := PrintBytes;
+        Command := '';
+        Exit(false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnBuildDeviceList', '', false, false)]
-    local procedure OnBuildDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)
+    procedure GetPrintBufferAsBase64(): Text
+    var
+        base64: Codeunit "Base64 Convert";
+        IStream: InStream;
     begin
-        tmpRetailList.Number += 1;
-        tmpRetailList.Value := DeviceCode();
-        tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert();
-    end;
-
-    procedure Init()
-    begin
-        Clear(PrintBuffer);
-        InitializePrinter();
-    end;
-
-    procedure PrintText(Text: Text)
-    begin
-        AddTextToBuffer(Text);
-    end;
-
-    local procedure InitializePrinter()
-    begin
-        TempPattern := 'ESC @ ESC = 02 ESC R EOT';
-        AddToBuffer(TempPattern);
+        _PrintBuffer.CreateInStream(IStream);
+        exit(base64.ToBase64(IStream));
     end;
 
     procedure GetPageWidth(FontFace: Text[30]) Width: Integer
@@ -123,14 +76,34 @@
         Width := 20;
     end;
 
-    local procedure AddToBuffer(Text: Text)
+    local procedure InitializePrinter()
     begin
-        ESC.WriteSequenceToBuffer(Text, PrintBuffer);
+        _DotNetStream.WriteByte(27); //ESC
+        AddStringToBuffer('@');
+        _DotNetStream.WriteByte(27);
+        AddStringToBuffer('=');
+        _DotNetStream.WriteByte(2);
+        _DotNetStream.WriteByte(27);
+        AddStringToBuffer('R');
+        _DotNetStream.WriteByte(4); //EOT        
     end;
 
-    local procedure AddTextToBuffer(Text: Text)
+    procedure LineFeed();
     begin
-        PrintBuffer := PrintBuffer + Text;
+    end;
+
+    procedure LookupDeviceSetting(var tmpDeviceSetting: Record "NPR RP Device Settings" temporary): Boolean;
+    begin
+    end;
+
+    procedure PrepareJobForHTTP(var HTTPEndpoint: Text): Boolean;
+    begin
+        HTTPEndpoint := '';
+        exit(false);
+    end;
+
+    procedure PrepareJobForBluetooth(): Boolean;
+    begin
     end;
 }
 

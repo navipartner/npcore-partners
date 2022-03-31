@@ -29,8 +29,7 @@
         tmpRetailList.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnBuildFunctionCodeunitList', '', false, false)]
-    local procedure OnBuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
+    local procedure BuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
     var
         AllObj: Record AllObj;
     begin
@@ -40,8 +39,7 @@
         tmpAllObj.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnBuildFunctionList', '', false, false)]
-    local procedure OnBuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List" temporary)
+    local procedure BuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         if CodeunitID <> CODEUNIT::"NPR RP Aux: Captions" then
             exit;
@@ -64,19 +62,12 @@
         AddFunction(tmpRetailList, 'CAPTION_CREDITVOUCHER');
         AddFunction(tmpRetailList, 'CAPTION_ADDRESS');
         AddFunction(tmpRetailList, 'CAPTION_CUSTOMERSIGNATURE');
-        //-NPR5.36 [289514]
         AddFunction(tmpRetailList, 'CAPTION_LINEDISCOUNT');
-        //+NPR5.36 [289514]
-        //-NPR5.38 [294044]
         AddFunction(tmpRetailList, 'CAPTION_WARRANTYPROOF');
-        //+NPR5.38 [294044]
-        //-NPR5.43 [316833]
         AddFunction(tmpRetailList, 'CAPTION_TESTENVIRONMENT');
-        //+NPR5.43 [316833]
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnFunction', '', false, false)]
-    local procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
+    local procedure DoFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; var Handled: Boolean)
     begin
         if CodeunitID <> CODEUNIT::"NPR RP Aux: Captions" then
             exit;
@@ -116,19 +107,49 @@
                 TemplateLine."Processing Value" := Caption_Address;
             'CAPTION_CUSTOMERSIGNATURE':
                 TemplateLine."Processing Value" := Caption_CustomerSignature;
-            //-NPR5.36 [289514]
             'CAPTION_LINEDISCOUNT':
                 TemplateLine."Processing Value" := Caption_LineDisc;
-            //+NPR5.36 [289514]
-            //-NPR5.38 [294044]
             'CAPTION_WARRANTYPROOF':
                 TemplateLine."Processing Value" := Caption_WarrantyProof;
-            //+NPR5.38 [294044]
-            //-NPR5.43 [316833]
             'CAPTION_TESTENVIRONMENT':
                 TemplateLine."Processing Value" := Caption_TestEnvironment;
-        //+NPR5.43 [316833]
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnBuildFunctionCodeunitList', '', false, false)]
+    local procedure OnMatrixBuildFunctionCodeunitList(var tmpAllObj: Record AllObj)
+    begin
+        BuildFunctionCodeunitList(tmpAllObj);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnBuildFunctionList', '', false, false)]
+    local procedure OnMatrixBuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List")
+    begin
+        BuildFunctionList(CodeunitID, tmpRetailList);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnFunction', '', false, false)]
+    local procedure OnMatrixFunction(CodeunitID: Integer; FunctionName: Text; RecID: RecordId; var Handled: Boolean; var Skip: Boolean; var TemplateLine: Record "NPR RP Template Line")
+    begin
+        DoFunction(CodeunitID, FunctionName, TemplateLine, Handled);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnBuildFunctionCodeunitList', '', false, false)]
+    local procedure OnLineBuildFunctionCodeunitList(var tmpAllObj: Record AllObj)
+    begin
+        BuildFunctionCodeunitList(tmpAllObj);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnBuildFunctionList', '', false, false)]
+    local procedure OnLineBuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List")
+    begin
+        BuildFunctionList(CodeunitID, tmpRetailList);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnFunction', '', false, false)]
+    local procedure OnLineFunction(CodeunitID: Integer; FunctionName: Text; RecID: RecordId; var Handled: Boolean; var Skip: Boolean; var TemplateLine: Record "NPR RP Template Line")
+    begin
+        DoFunction(CodeunitID, FunctionName, TemplateLine, Handled);
     end;
 }
 

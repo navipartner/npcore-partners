@@ -148,7 +148,12 @@
         Base64Convert: Codeunit "Base64 Convert";
     begin
         PrintBytes := Base64Convert.ToBase64(PrintBytes, TextEncoding::Windows, TargetCodePage);
-        SendPrintJob(PrinterId, 3, PrintBytes, Title, SourceDescription, Options, '');
+        SendRawText(PrinterId, PrintBytes, Title, SourceDescription, Options);
+    end;
+
+    procedure SendRawText(PrinterId: Code[20]; PrintBytesBase64: Text; Title: Text; SourceDescription: Text; Options: Text)
+    begin
+        SendPrintJob(PrinterId, 3, PrintBytesBase64, Title, SourceDescription, Options, '');
     end;
 
     local procedure BaseUrl(): Text

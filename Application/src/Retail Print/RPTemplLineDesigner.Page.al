@@ -1,10 +1,6 @@
-﻿page 6014630 "NPR RP Templ. Line Designer"
+page 6014630 "NPR RP Templ. Line Designer"
 {
     Extensible = False;
-    // NPR5.32/MMV /20170424 CASE 241995 Retail Print 2.0
-    // NPR5.34/MMV /20170724 CASE 284505 Indent multiple lines at once.
-    // NPR5.51/MMV /20190712 CASE 360972 Added field 70
-
     AutoSplitKey = true;
     Caption = 'Template Line Designer';
     PageType = ListPart;
@@ -21,6 +17,7 @@
                 IndentationColumn = Rec.Level;
                 IndentationControls = Type;
                 ShowCaption = false;
+                ShowAsTree = true;
                 field(Type; Rec.Type)
                 {
 
@@ -229,6 +226,11 @@
                     ToolTip = 'Specifies the value of the Processing Codeunit field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Processing Codeunit Name"; Rec."Processing Codeunit Name")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Name of the selected processing codeunit';
+                }
                 field("Processing Function ID"; Rec."Processing Function ID")
                 {
 
@@ -253,29 +255,18 @@
     var
         RPTemplateLine: Record "NPR RP Template Line";
     begin
-        //-NPR5.34 [284505]
-        // FIND;
-        // VALIDATE(Level,Level+1);
-        // MODIFY(TRUE);
         CurrPage.SetSelectionFilter(RPTemplateLine);
         if RPTemplateLine.FindSet() then
             repeat
                 RPTemplateLine.Validate(Level, RPTemplateLine.Level + 1);
                 RPTemplateLine.Modify(true);
             until RPTemplateLine.Next() = 0;
-        //+NPR5.34 [284505]
     end;
 
     internal procedure UnindentLine()
     var
         RPTemplateLine: Record "NPR RP Template Line";
     begin
-        //-NPR5.34 [284505]
-        // FIND;
-        // IF Level > 0 THEN
-        //  VALIDATE(Level,Level-1);
-        // MODIFY(TRUE);
-
         CurrPage.SetSelectionFilter(RPTemplateLine);
         if RPTemplateLine.FindSet() then
             repeat
@@ -284,7 +275,6 @@
                     RPTemplateLine.Modify(true);
                 end;
             until RPTemplateLine.Next() = 0;
-        //+NPR5.34 [284505]
     end;
 }
 

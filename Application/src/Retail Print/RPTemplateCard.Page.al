@@ -24,18 +24,6 @@
                     ToolTip = 'Specifies the value of the Printer Type field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Printer Device"; Rec."Printer Device")
-                {
-
-                    AssistEdit = true;
-                    ToolTip = 'Blank = Decide based on printername keyword match.';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnAssistEdit()
-                    begin
-                        Rec.LookupDevice();
-                    end;
-                }
                 field(Description; Rec.Description)
                 {
 
@@ -103,6 +91,12 @@
                 Caption = 'Line Settings';
                 Editable = NOT Rec.Archived;
                 Visible = Rec."Printer Type" = 1;
+
+                field("Line Device"; Rec."Line Device")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Select the device the template is built for';
+                }
                 group("Two Column Distribution")
                 {
                     Caption = 'Two Column Distribution';
@@ -168,6 +162,18 @@
                         ToolTip = 'Specifies the value of the Four Column Width 4 field';
                         ApplicationArea = NPRRetail;
                     }
+                }
+            }
+            group(MatrixSettings)
+            {
+                Caption = 'Matrix Settings';
+                Editable = NOT Rec.Archived;
+                Visible = Rec."Printer Type" = 0;
+
+                field("Matrix Device"; Rec."Matrix Device")
+                {
+                    ToolTip = 'Select the device the template is built for';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Processing)

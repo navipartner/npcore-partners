@@ -78,11 +78,9 @@
     end;
 
     local procedure RunReport(ReportId: Integer; RunRequestPage: Boolean; "Record": Variant)
-    var
-        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
     begin
         if ReportId = 0 then
             exit;
-        ReportPrinterInterface.RunReport(ReportId, RunRequestPage, false, Record);
+        Report.Run(ReportId, RunRequestPage, false, Record);
     end;
 }

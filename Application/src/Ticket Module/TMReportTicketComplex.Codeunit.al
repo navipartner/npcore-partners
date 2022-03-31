@@ -20,6 +20,8 @@
                     PrintOne(Ticket);
 
             until Ticket.Next() = 0;
+
+        Printer.ProcessBuffer(Codeunit::"NPR TM Report - Ticket", Enum::"NPR Line Printer Device"::Epson);
     end;
 
     var

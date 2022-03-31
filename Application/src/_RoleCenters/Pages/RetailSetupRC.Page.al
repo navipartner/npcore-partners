@@ -1,4 +1,4 @@
-﻿page 6151245 "NPR Retail Setup RC"
+page 6151245 "NPR Retail Setup RC"
 {
     Extensible = False;
     Caption = 'NP Retail Setup';
@@ -407,7 +407,7 @@
                 action("Report Selection Retail")
                 {
                     Caption = 'Report Selection - Retail';
-                    RunObject = Page "NPR Retail Report Select. List";
+                    RunObject = Page "NPR Report Selection: Retail";
 
                     ToolTip = 'Runs the page for selecting retail reports';
                     ApplicationArea = NPRRetail;

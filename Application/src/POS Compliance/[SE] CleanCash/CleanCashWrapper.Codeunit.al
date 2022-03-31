@@ -37,9 +37,8 @@
 
     // Subscriber to Footer Event in printing
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Aux: Event Publishers", 'OnSalesReceiptFooter', '', true, false)]
-    local procedure OnReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text)
+    local procedure OnReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text; LinePrintMgt: Codeunit "NPR RP Line Print Mgt.")
     var
-        LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
         PosEntry: Record "NPR POS Entry";
     begin
         LinePrintMgt.SetFont(TemplateLine."Type Option");

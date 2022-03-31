@@ -1,4 +1,4 @@
-﻿codeunit 6014601 "NPR RP Boca FGL Device Lib."
+codeunit 6014601 "NPR RP Boca FGL Device Lib." implements "NPR ILine Printer"
 {
     Access = Internal;
     // Line print..
@@ -80,142 +80,33 @@
     //   <BI>: printed as font1, size depends on the barcode size (Automatically adjusted).
     // 
     // Note:
-    //   Rotations will affect barcodes.
-    // 
-    // ----------------------------------------------------------------------------------
-    // 
-    // Graphics/Logo information:
-    // 
-    // ----------------------------------------------------------------------------------
-    // NPR5.54/JAKUBV/20200408  CASE 369235 Transport NPR5.54 - 8 April 2020
-    // NPR5.55/MITH/20200511  CASE 403786 Added centering of barcode functionality
-    // NPR5.55/MITH/20200511  CASE 404276 Added print of bitmap from Retail logo functionality
-
-    EventSubscriberInstance = Manual;
-
-    trigger OnRun()
-    begin
-        //PrintMethodMgt.PrintBytesLocal('Boca (redirected 28)','<SP200,60><RC600,280><RL><F8><HW1,1>ab æÆ bc ¢¥ cd åÅ - $£<p>','ibm850');
-    end;
+    //   Rotations will affect barcodes.    
 
     var
-        SETTING_MEDIAWIDTH: Label 'Width of media.';
-        MediaWidth: Option "80mm","58mm";
-        SETTING_ENCODING: Label 'Text encoding.';
-        SETTING_DPI: Label 'DPI of device.';
-        Error_InvalidDeviceSetting: Label 'Invalid device setting: %1';
-        Encoding: Option ibm850;
-        PrintBuffer: Codeunit "Temp Blob";
-        PrintBufferOutStream: OutStream;
-        FontHeight: Integer;
-        FontWidth: Integer;
-        HeightModifier: Integer;
-        WidthModifier: Integer;
-        PageWidth: Integer;
-        DotSize: Decimal;
-        DPI: Option "200","300","600";
-        PrintMargin: Integer;
-        yCoord: Integer;
-        ySpace: Integer;
+        _MediaWidth: Option "80mm","58mm";
+        _PrintBuffer: Codeunit "Temp Blob";
+        _FontHeight: Integer;
+        _FontWidth: Integer;
+        _HeightModifier: Integer;
+        _WidthModifier: Integer;
+        _PageWidth: Integer;
+        _DotSize: Decimal;
+        _DPI: Option "200","300","600";
+        _PrintMargin: Integer;
+        _yCoord: Integer;
+        _ySpace: Integer;
+        SettingMediawidthLbl: Label 'Width of media.';
+        SettingEncodingLbl: Label 'Text encoding.';
+        SettingDpiLbl: Label 'DPI of device.';
+        InvalidDeviceSettingErr: Label 'Invalid device setting: %1';
+        _DotNetStream: Codeunit DotNet_Stream;
+        _DotNetEncoding: Codeunit DotNet_Encoding;
 
-    local procedure DeviceCode(): Text
+    procedure InitJob(var DeviceSettings: Record "NPR RP Device Settings")
     begin
-        exit('BOCA');
-    end;
-
-    procedure IsThisDevice(Text: Text): Boolean
-    begin
-        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnInitJob', '', false, false)]
-    local procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
-    begin
-        Init(DeviceSettings);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnLineFeed', '', false, false)]
-    local procedure OnLineFeed()
-    begin
-        LineFeed();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnPrintData', '', false, false)]
-    local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
-    begin
-        PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Bold, POSPrintBuffer.Underline, POSPrintBuffer.DoubleStrike, POSPrintBuffer.Align, POSPrintBuffer.Width, POSPrintBuffer.Height, POSPrintBuffer."Column No.");
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnEndJob', '', false, false)]
-    local procedure OnEndJob()
-    begin
-        AddTextToBuffer('<p>');
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnLookupFont', '', false, false)]
-    local procedure OnLookupFont(var LookupOK: Boolean; var Value: Text)
-    begin
-        LookupOK := SelectFont(Value);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnLookupCommand', '', false, false)]
-    local procedure OnLookupCommand(var LookupOK: Boolean; var Value: Text)
-    begin
-        LookupOK := SelectCommand(Value);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnLookupDeviceSetting', '', false, false)]
-    local procedure OnLookupDeviceSetting(var LookupOK: Boolean; var tmpDeviceSetting: Record "NPR RP Device Settings" temporary)
-    begin
-        LookupOK := SelectDeviceSetting(tmpDeviceSetting);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnGetPageWidth', '', false, false)]
-    local procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
-    begin
-        Width := GetPageWidth(FontFace);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnGetTargetEncoding', '', false, false)]
-    local procedure OnGetTargetEncoding(var TargetEncoding: Text)
-    begin
-        TargetEncoding := 'ibm850';
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnGetPrintBytes', '', false, false)]
-    local procedure OnGetPrintBytes(var PrintBytes: Text)
-    begin
-        PrintBytes := GetPrintBytes();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnSetPrintBytes', '', false, false)]
-    local procedure OnSetPrintBytes(var PrintBytes: Text)
-    begin
-        SetPrintBytes(PrintBytes);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnBuildDeviceList', '', false, false)]
-    local procedure OnBuildDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)
-    begin
-        tmpRetailList.Number += 1;
-        tmpRetailList.Value := DeviceCode();
-        tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert();
-    end;
-
-    procedure "// ShortHandFunctions"()
-    begin
-    end;
-
-    procedure Init(var DeviceSettings: Record "NPR RP Device Settings")
-    begin
-        //-NPR5.40 [284505]
-        //CLEAR(PrintBuffer);
         InitBuffer();
-        //+NPR5.40 [284505]
-        Clear(MediaWidth);
-        Clear(Encoding);
-        Clear(DPI);
+        Clear(_MediaWidth);
+        Clear(_DPI);
 
         if DeviceSettings.FindSet() then
             repeat
@@ -223,96 +114,241 @@
                     'MEDIA_WIDTH':
                         case DeviceSettings.Value of
                             '80mm':
-                                MediaWidth := MediaWidth::"80mm";
+                                _MediaWidth := _MediaWidth::"80mm";
                             '58mm':
-                                MediaWidth := MediaWidth::"58mm";
+                                _MediaWidth := _MediaWidth::"58mm";
                         end;
                     'ENCODING':
-                        Encoding := Encoding::ibm850;
+                        ;
                     'DPI':
                         case DeviceSettings.Value of
                             '200':
-                                DPI := DPI::"200";
+                                _DPI := _DPI::"200";
                             '300':
-                                DPI := DPI::"300";
+                                _DPI := _DPI::"300";
                             '600':
-                                DPI := DPI::"600";
+                                _DPI := _DPI::"600";
                         end;
                     else
-                        Error(Error_InvalidDeviceSetting, DeviceSettings.Value);
+                        Error(InvalidDeviceSettingErr, DeviceSettings.Value);
                 end;
             until DeviceSettings.Next() = 0;
 
         //InitializePrinter;
-        case DPI of
-            DPI::"200":
-                DotSize := 0.00492;
-            DPI::"300":
-                DotSize := 0.00328;
-            DPI::"600":
-                DotSize := 0.0015;
+        case _DPI of
+            _DPI::"200":
+                _DotSize := 0.00492;
+            _DPI::"300":
+                _DotSize := 0.00328;
+            _DPI::"600":
+                _DotSize := 0.0015;
         end;
 
-        PrintMargin := Mm2In(1.25) div DotSize;
+        _PrintMargin := Mm2In(1.25) div _DotSize;
 
-        case MediaWidth of
-            //MediaWidth::"80mm" : PageWidth := (Mm2In(79) DIV DotSize) - PrintMargin;
-            MediaWidth::"80mm":
-                PageWidth := (Mm2In(78) div DotSize) - PrintMargin; // this looks nicer, due to added margin
-            MediaWidth::"58mm":
-                PageWidth := (Mm2In(57) div DotSize) - PrintMargin;
+        case _MediaWidth of
+            _MediaWidth::"80mm":
+                _PageWidth := (Mm2In(78) div _DotSize) - _PrintMargin; // this looks nicer, due to added margin
+            _MediaWidth::"58mm":
+                _PageWidth := (Mm2In(57) div _DotSize) - _PrintMargin;
         end;
-
-
-        yCoord := 0; // start position
+        _yCoord := 0; // start position
     end;
 
-    procedure PrintData(Data: Text[100]; FontType: Text[30]; Bold: Boolean; UnderLine: Boolean; DoubleStrike: Boolean; Align: Integer; Width: Integer; Height: Integer; Column: Integer)
+    procedure LineFeed()
+    begin
+        _yCoord += _ySpace;
+    end;
+
+    procedure PrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     var
         StringLib: Codeunit "NPR String Library";
         PrintDataLbl: Label '<RC%1,%2>', Locked = true;
         PrintData2Lbl: Label '<HW%1,%2>', Locked = true;
         PrintData3Lbl: Label '<CTR%1>~', Locked = true;
     begin
-        if UpperCase(FontType) = 'COMMAND' then
-            SendCommand(Data)
+        if UpperCase(POSPrintBuffer.Font) = 'COMMAND' then
+            SendCommand(POSPrintBuffer.Text)
         else
-            if IsBarcodeFont(FontType) then
-                PrintBarcode(FontType, Data, Width, 10, Align)
+            if IsBarcodeFont(POSPrintBuffer.Font) then
+                PrintBarcode(POSPrintBuffer.Font, POSPrintBuffer.Text, POSPrintBuffer.Width, 10, POSPrintBuffer.Align)
             else
-                if FontType = 'Logo' then
-                    PrintBitmapFromKeyword(Data, '')
+                if POSPrintBuffer.Font = 'Logo' then
+                    PrintBitmapFromKeyword(POSPrintBuffer.Text)
                 else begin
-                    if Column = 1 then begin
-                        AddTextToBuffer(StrSubstNo(PrintDataLbl, PageWidth, yCoord));
-                        AddTextToBuffer('<RL>'); // Orientation, perhaps set this as an option later?
+                    if POSPrintBuffer."Column No." = 1 then begin
+                        AddStringToBuffer(StrSubstNo(PrintDataLbl, _PageWidth, _yCoord));
+                        AddStringToBuffer('<RL>'); // Orientation, perhaps set this as an option later?
                     end;
-                    StringLib.Construct(FontType);
-                    AddTextToBuffer('<' + StringLib.SelectStringSep(1, ' ') + '>');
+                    StringLib.Construct(POSPrintBuffer.Font);
+                    AddStringToBuffer('<' + StringLib.SelectStringSep(1, ' ') + '>');
 
-                    AddTextToBuffer(StrSubstNo(PrintData2Lbl, HeightModifier, WidthModifier)); // text modifier
+                    AddStringToBuffer(StrSubstNo(PrintData2Lbl, _HeightModifier, _WidthModifier)); // text modifier
 
-                    if Column = 1 then begin
-                        case Align of
+                    if POSPrintBuffer."Column No." = 1 then begin
+                        case POSPrintBuffer.Align of
                             1:
-                                AddTextToBuffer(StrSubstNo(PrintData3Lbl, PageWidth));
+                                AddStringToBuffer(StrSubstNo(PrintData3Lbl, _PageWidth));
                         end;
                     end;
 
-                    AddTextToBuffer(Data);
+                    AddStringToBuffer(POSPrintBuffer.Text);
 
-                    if Column = 1 then begin
-                        case Align of
+                    if POSPrintBuffer."Column No." = 1 then begin
+                        case POSPrintBuffer.Align of
                             1:
-                                AddTextToBuffer('~');
+                                AddStringToBuffer('~');
                         end;
                     end;
 
-                    if Data <> '' then
-                        ySpace := FontHeight
+                    if POSPrintBuffer.Text <> '' then
+                        _ySpace := _FontHeight
                     else
-                        ySpace := 0;
+                        _ySpace := 0;
                 end;
+    end;
+
+    procedure EndJob()
+    begin
+        AddStringToBuffer('<p>');
+    end;
+
+    procedure LookupFont(var Value: Text): Boolean
+    begin
+        exit(SelectFont(Value));
+    end;
+
+    procedure LookupCommand(var Value: Text): Boolean
+    begin
+        exit(SelectCommand(Value));
+    end;
+
+    procedure LookupDeviceSetting(var tmpDeviceSetting: Record "NPR RP Device Settings" temporary): Boolean
+    begin
+        exit(SelectDeviceSetting(tmpDeviceSetting));
+    end;
+
+    procedure GetPageWidth(FontFace: Text[30]) Width: Integer
+    var
+        StringLib: Codeunit "NPR String Library";
+        TextModifierW: Integer;
+        TextModifierH: Integer;
+    begin
+        // Set default font modifier
+        SetFontStretch(1, 1);
+
+        // Check if a font modifier has been added
+        StringLib.Construct(FontFace);
+        if StringLib.CountOccurences(' ') > 0 then begin
+            FontFace := StringLib.SelectStringSep(1, ' ');
+            StringLib.Construct(StringLib.SelectStringSep(2, ' '));
+            if StringLib.CountOccurences(',') > 0 then begin
+                if (Evaluate(TextModifierH, StringLib.SelectStringSep(1, ',')) and Evaluate(TextModifierW, StringLib.SelectStringSep(2, ','))) then
+                    SetFontStretch(TextModifierH, TextModifierW);
+            end;
+        end;
+
+        // Calculate receipt width
+        case FontFace of
+            'F1':
+                begin
+                    _FontHeight := 8 * _HeightModifier;
+                    _FontWidth := 7 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F2':
+                begin
+                    _FontHeight := 18 * _HeightModifier;
+                    _FontWidth := 10 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F3':
+                begin
+                    _FontHeight := 33 * _HeightModifier;
+                    _FontWidth := 20 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F4':
+                begin
+                    _FontHeight := 11 * _HeightModifier;
+                    _FontWidth := 7 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F5':
+                begin
+                    _FontHeight := 18 * _HeightModifier;
+                    _FontWidth := 10 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F6':
+                begin
+                    _FontHeight := 56 * _HeightModifier;
+                    _FontWidth := 34 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F7':
+                begin
+                    _FontHeight := 31 * _HeightModifier;
+                    _FontWidth := 20 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F8':
+                begin
+                    _FontHeight := 30 * _HeightModifier;
+                    _FontWidth := 20 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F9':
+                begin
+                    _FontHeight := 22 * _HeightModifier;
+                    _FontWidth := 13 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F10':
+                begin
+                    _FontHeight := 41 * _HeightModifier;
+                    _FontWidth := 28 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F11':
+                begin
+                    _FontHeight := 49 * _HeightModifier;
+                    _FontWidth := 26 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F12':
+                begin
+                    _FontHeight := 91 * _HeightModifier;
+                    _FontWidth := 47 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+            'F13':
+                begin
+                    _FontHeight := 42 * _HeightModifier;
+                    _FontWidth := 20 * _WidthModifier;
+                    exit(_PageWidth div _FontWidth);
+                end;
+        end;
+    end;
+
+    procedure PrepareJobForHTTP(var HTTPEndpoint: Text): Boolean
+    begin
+        HTTPEndpoint := '';
+        exit(false);
+    end;
+
+    procedure PrepareJobForBluetooth(): Boolean
+    begin
+        exit(false);
+    end;
+
+    procedure GetPrintBufferAsBase64(): Text
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        IStream: InStream;
+    begin
+        _PrintBuffer.CreateInStream(IStream);
+        exit(Base64Convert.ToBase64(IStream));
     end;
 
     procedure PrintBarcode(BarcodeType: Text[30]; Text: Text; Width: Integer; Height: Integer; Alignment: Integer)
@@ -343,49 +379,48 @@
 
         if CopyStr(BarcodeType, 1, 2) <> 'QR' then begin
             // Probably need to check if negative
-            if PageWidth > BarcodeXCoord then
-                BarcodeXCoord := PageWidth - BarcodeXCoord // Position of the barcode is starting from the righthand side.
+        if _PageWidth > BarcodeXCoord then
+            BarcodeXCoord := _PageWidth - BarcodeXCoord // Position of the barcode is starting from the righthand side.
             else
-                BarcodeXCoord := PageWidth;
+            BarcodeXCoord := _PageWidth;
             // TEMP
-            AddTextToBuffer(StrSubstNo(PrintBarcodeLbl, BarcodeXCoord, yCoord));
+            AddStringToBuffer(StrSubstNo(PrintBarcodeLbl, BarcodeXCoord, _yCoord));
             // Alignment, will only work on new firmware 150+
             case Alignment of
                 1:
-                    AddTextToBuffer(StrSubstNo(PrintBarcode2Lbl, PageWidth));
+                    AddStringToBuffer(StrSubstNo(PrintBarcode2Lbl, _PageWidth));
             end;
             //+NPR5.55 [403786]
-
-            AddTextToBuffer('<BI>');
+            AddStringToBuffer('<BI>');
 
             if Width > 1 then
-                AddTextToBuffer(StrSubstNo(PrintBarcode3Lbl, Width)); // set after DPI?
+                AddStringToBuffer(StrSubstNo(PrintBarcode3Lbl, Width)); // set after DPI?
 
-            AddTextToBuffer('<RL>'); // Orientation
+            AddStringToBuffer('<RL>'); // Orientation
 
             case BarcodeType of
                 'EAN13':
                     begin
                         if Height > 1 then
-                            AddTextToBuffer(StrSubstNo(PrintBarcode4Lbl, Height))
+                            AddStringToBuffer(StrSubstNo(PrintBarcode4Lbl, Height))
                         else
-                            AddTextToBuffer('<eL>');
-                        AddTextToBuffer(StrSubstNo(PrintBarcode5Lbl, CopyStr(Text, 1, 1), CopyStr(Text, 2, 6), CopyStr(Text, 8, 6)));
+                            AddStringToBuffer('<eL>');
+                        AddStringToBuffer(StrSubstNo(PrintBarcode5Lbl, CopyStr(Text, 1, 1), CopyStr(Text, 2, 6), CopyStr(Text, 8, 6)));
                     end;
                 'CODE128':
                     begin
                         if Height > 1 then
-                            AddTextToBuffer(StrSubstNo(PrintBarcode6Lbl, Height))
+                            AddStringToBuffer(StrSubstNo(PrintBarcode6Lbl, Height))
                         else
-                            AddTextToBuffer('<oL>');
-                        AddTextToBuffer(StrSubstNo(PrintBarcode7Lbl, Text));
+                            AddStringToBuffer('<oL>');
+                        AddStringToBuffer(StrSubstNo(PrintBarcode7Lbl, Text));
                     end;
             end;
 
             if Height > 1 then
-                ySpace := Height * 10
+            _ySpace := Height * 10
             else
-                ySpace := 40;
+            _ySpace := 40;
 
         end else begin // QR
             if StrPos(BarcodeType, '7') > 0 then
@@ -415,50 +450,50 @@
             if StrLen(Text) > QRMaxLength then
                 Error('The value of the QR code exceeds the max limit for current QR settings. Try Lowering the Error Correction Level or increasing the QR version.')
             else begin
-                AddTextToBuffer(StrSubstNo(QRPrintVersionLbl, QRBarcodeVers));
+                AddStringToBuffer(StrSubstNo(QRPrintVersionLbl, QRBarcodeVers));
 
                 if (Width >= 3) and (Width <= 16) then
                     QRWidth := Width
                 else
                     QRWidth := 6; // default
 
-                AddTextToBuffer('<RL>'); // Orientation
+                AddStringToBuffer('<RL>'); // Orientation
 
                 // Overrule width to center
                 case QRBarcodeVers of
                     2:
                         begin
-                            ySpace := (QRWidth * 25);
-                            QRCenter := (PageWidth + ySpace) DIV 2
+                            _ySpace := (QRWidth * 25);
+                            QRCenter := (_PageWidth + _ySpace) DIV 2
                         end;
                     7:
                         begin
-                            ySpace := (QRWidth * 45);
-                            QRCenter := (PageWidth + ySpace) DIV 2
+                            _ySpace := (QRWidth * 45);
+                            QRCenter := (_PageWidth + _ySpace) DIV 2
                         end;
                     11:
                         begin
-                            ySpace := (QRWidth * 61);
-                            QRCenter := (PageWidth + ySpace) DIV 2
+                            _ySpace := (QRWidth * 61);
+                            QRCenter := (_PageWidth + _ySpace) DIV 2
                         end;
                     15:
                         begin
-                            ySpace := (QRWidth * 77);
-                            QRCenter := (PageWidth + ySpace) DIV 2
+                            _ySpace := (QRWidth * 77);
+                            QRCenter := (_PageWidth + _ySpace) DIV 2
                         end;
                 end;
 
-                AddTextToBuffer(StrSubstNo(PrintBarcodeLbl, QRCenter, yCoord));
-                AddTextToBuffer(StrSubstNo(QRPrintBarcodeLbl, QRWidth, 0, 0, QRBarcodeErrLvl, Text));
+                AddStringToBuffer(StrSubstNo(PrintBarcodeLbl, QRCenter, _yCoord));
+                AddStringToBuffer(StrSubstNo(QRPrintBarcodeLbl, QRWidth, 0, 0, QRBarcodeErrLvl, Text));
 
-                yCoord += ySpace + 10;
+                _yCoord += _ySpace + 10;
 
-                AddTextToBuffer('<RL>');
-                AddTextToBuffer(StrSubstNo(PrintBarcodeLbl, PageWidth, yCoord));
-                AddTextToBuffer('<F8>');
-                AddTextToBuffer(StrSubstNo(PrintBarcode2Lbl, PageWidth));
-                AddTextToBuffer('~' + Text + '~');
-                ySpace := 40;
+                AddStringToBuffer('<RL>');
+                AddStringToBuffer(StrSubstNo(PrintBarcodeLbl, _PageWidth, _yCoord));
+                AddStringToBuffer('<F8>');
+                AddStringToBuffer(StrSubstNo(PrintBarcode2Lbl, _PageWidth));
+                AddStringToBuffer('~' + Text + '~');
+                _ySpace := 40;
             end;
         end;
     end;
@@ -469,18 +504,18 @@
         PrintStoredLogo2Lbl: Label '<LD%1>', Locked = true;
     begin
         // 200dpi
-        AddTextToBuffer(StrSubstNo(PrintStoredLogoLbl, 570, yCoord));
-        AddTextToBuffer('<RL>');
-        AddTextToBuffer(StrSubstNo(PrintStoredLogo2Lbl, ID));
+        AddStringToBuffer(StrSubstNo(PrintStoredLogoLbl, 570, _yCoord));
+        AddStringToBuffer('<RL>');
+        AddStringToBuffer(StrSubstNo(PrintStoredLogo2Lbl, ID));
         if Height > 0 then
-            ySpace := Height
+            _ySpace := Height
         else
-            ySpace := 100;
+            _ySpace := 100;
     end;
 
     local procedure PrintVerticalSpace(Height: Integer)
     begin
-        ySpace := Height;
+        _ySpace := Height;
     end;
 
     local procedure SendCommand(Command: Text)
@@ -515,184 +550,36 @@
         if Width > 16 then
             Width := 16;
 
-        HeightModifier := Height;
-        WidthModifier := Width;
+        _HeightModifier := Height;
+        _WidthModifier := Width;
     end;
 
-    procedure SetFontFace(FontFace: Text[30])
-    begin
-    end;
-
-    procedure SetPrintBytes(PrintBytes: Text)
-    begin
-        InitBuffer();
-        PrintBufferOutStream.Write(PrintBytes);
-    end;
-
-    procedure GetPrintBytes(): Text
+    local procedure PrintBitmapFromKeyword(Keyword: Code[20])
     var
-        PrintBufferInStream: InStream;
-#if not CLOUD
-        MemoryStream: DotNet NPRNetMemoryStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        NetEncoding: DotNet NPRNetEncoding;
-#else
-        TextInStream: Text;
-#endif
-    begin
-        PrintBuffer.CreateInStream(PrintBufferInStream, TEXTENCODING::UTF8);
-#if not CLOUD
-        MemoryStream := PrintBufferInStream;
-        MemoryStream.Position := 0;
-        StreamReader := StreamReader.StreamReader(MemoryStream, NetEncoding.UTF8);
-        exit(StreamReader.ReadToEnd());
-#else
-        PrintBufferInStream.ReadText(TextInStream);
-        exit(TextInStream);
-#endif
-    end;
-
-    local procedure LineFeed()
-    begin
-        yCoord += ySpace;
-    end;
-
-    local procedure PrintBitmapFromKeyword(Keyword: Code[20]; RegisterNo: Code[10])
-    var
-        RetailLogo: Record "NPR Retail Logo";
-        RetailLogoMgt: Codeunit "NPR Retail Logo Mgt.";
         LogoAsText: Text;
         InStream: InStream;
-#if not CLOUD
-        MemoryStream: DotNet NPRNetMemoryStream;
-        NetEncoding: DotNet NPRNetEncoding;
-        StreamReader: DotNet NPRNetStreamReader;
-#endif
+        Encoding: Codeunit "DotNet_Encoding";
+        RetailLogo: Record "NPR Retail Logo";
+        StreamReader: Codeunit "DotNet_StreamReader";
         PrintBitmapFromKeywordLbl: Label '<SP%1,%2><RL><bmp><G%3>%4', Locked = true;
     begin
         RetailLogo.SetAutoCalcFields(OneBitLogo);
-
-        if RetailLogoMgt.GetRetailLogo(Keyword, RegisterNo, RetailLogo) then
+        RetailLogo.SetRange(Keyword, Keyword);
+        RetailLogo.SetFilter("Start Date", '<=%1|=%2', Today, 0D);
+        RetailLogo.SetFilter("End Date", '>=%1|=%2', Today, 0D);
+        if RetailLogo.FindSet() then
             repeat
                 if RetailLogo.OneBitLogo.HasValue() then begin
                     RetailLogo.OneBitLogo.CreateInStream(InStream);
-#if not CLOUD
-                    MemoryStream := InStream;
-                    MemoryStream.Position := 0;
-                    StreamReader := StreamReader.StreamReader(MemoryStream, NetEncoding.GetEncoding('ibm850'));
+                    Encoding.Encoding(850);
+                    StreamReader.StreamReader(InStream, Encoding);
                     LogoAsText := StreamReader.ReadToEnd();
-#else
-                    InStream.ReadText(LogoAsText);
-#endif
-
-                    AddTextToBuffer(StrSubstNo(PrintBitmapFromKeywordLbl, (PageWidth div 1.077), yCoord, RetailLogo.OneBitLogoByteSize, LogoAsText)); // Might need to update placement of logo in the future
-                    yCoord += RetailLogo.Height + 30; // Might need to make this dynamic in the future
+                    AddStringToBuffer(StrSubstNo(PrintBitmapFromKeywordLbl, (_PageWidth div 1.077), _yCoord, RetailLogo.OneBitLogoByteSize, LogoAsText)); // Might need to update placement of logo in the future
+                    _yCoord += RetailLogo.Height + 30; // Might need to make this dynamic in the future
                 end;
             until RetailLogo.Next() = 0;
     end;
 
-    procedure GetPageWidth(FontFace: Text[30]) Width: Integer
-    var
-        StringLib: Codeunit "NPR String Library";
-        TextModifierW: Integer;
-        TextModifierH: Integer;
-    begin
-        // Set default font modifier
-        SetFontStretch(1, 1);
-
-        // Check if a font modifier has been added
-        StringLib.Construct(FontFace);
-        if StringLib.CountOccurences(' ') > 0 then begin
-            FontFace := StringLib.SelectStringSep(1, ' ');
-            StringLib.Construct(StringLib.SelectStringSep(2, ' '));
-            if StringLib.CountOccurences(',') > 0 then begin
-                if (Evaluate(TextModifierH, StringLib.SelectStringSep(1, ',')) and Evaluate(TextModifierW, StringLib.SelectStringSep(2, ','))) then
-                    SetFontStretch(TextModifierH, TextModifierW);
-            end;
-        end;
-
-        // Calculate receipt width
-        case FontFace of
-            'F1':
-                begin
-                    FontHeight := 8 * HeightModifier;
-                    FontWidth := 7 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F2':
-                begin
-                    FontHeight := 18 * HeightModifier;
-                    FontWidth := 10 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F3':
-                begin
-                    FontHeight := 33 * HeightModifier;
-                    FontWidth := 20 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F4':
-                begin
-                    FontHeight := 11 * HeightModifier;
-                    FontWidth := 7 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F5':
-                begin
-                    FontHeight := 18 * HeightModifier;
-                    FontWidth := 10 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F6':
-                begin
-                    FontHeight := 56 * HeightModifier;
-                    FontWidth := 34 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F7':
-                begin
-                    FontHeight := 31 * HeightModifier;
-                    FontWidth := 20 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F8':
-                begin
-                    FontHeight := 30 * HeightModifier;
-                    FontWidth := 20 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F9':
-                begin
-                    FontHeight := 22 * HeightModifier;
-                    FontWidth := 13 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F10':
-                begin
-                    FontHeight := 41 * HeightModifier;
-                    FontWidth := 28 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F11':
-                begin
-                    FontHeight := 49 * HeightModifier;
-                    FontWidth := 26 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F12':
-                begin
-                    FontHeight := 91 * HeightModifier;
-                    FontWidth := 47 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-            'F13':
-                begin
-                    FontHeight := 42 * HeightModifier;
-                    FontWidth := 20 * WidthModifier;
-                    exit(PageWidth div FontWidth);
-                end;
-        end;
-    end;
 
     local procedure IsBarcodeFont(Font: Text): Boolean
     var
@@ -709,24 +596,30 @@
     end;
 
     local procedure InitBuffer()
+    var
+        OStream: OutStream;
     begin
-        //-NPR5.40 [284505]
-        Clear(PrintBufferOutStream);
-        Clear(PrintBuffer);
-        PrintBuffer.CreateOutStream(PrintBufferOutStream, TEXTENCODING::UTF8);
-        //+NPR5.40 [284505]
+        Clear(OStream);
+        Clear(_PrintBuffer);
+        Clear(_DotNetStream);
+        Clear(_DotNetEncoding);
+        _PrintBuffer.CreateOutStream(OStream);
+        _DotNetEncoding.Encoding(850);
+        _DotNetStream.FromOutStream(OStream);
     end;
 
-    local procedure AddTextToBuffer(Text: Text)
+    local procedure AddStringToBuffer(String: Text)
+    var
+        DotNetCharArray: Codeunit "DotNet_Array";
+        DotNetByteArray: Codeunit "DotNet_Array";
+        DotNetString: Codeunit "DotNet_String";
     begin
-        //-NPR5.40 [284505]
-        //PrintBuffer += Text;
-        PrintBufferOutStream.WriteText(Text);
-        //+NPR5.40 [284505]
-    end;
+        //This function over allocates and is verbose, all because of the beautiful DotNet wrapper codeunits.
 
-    procedure "// Lookup Functions"()
-    begin
+        DotNetString.Set(String);
+        DotNetString.ToCharArray(0, DotNetString.Length(), DotNetCharArray);
+        _DotNetEncoding.GetBytes(DotNetCharArray, 0, DotNetCharArray.Length(), DotNetByteArray);
+        _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());
     end;
 
     procedure SelectFont(var Value: Text): Boolean
@@ -850,16 +743,13 @@
         AddOption(RetailList, 'STOREDLOGO_2', '');
         AddOption(RetailList, 'STOREDLOGO_2 150', '');
         AddOption(RetailList, 'VERTICAL_SPACE 10', '');
-
-        //AddOption(RetailList, 'OPENDRAWER', '');
-        //AddOption(RetailList, 'PAPERCUT', '');
     end;
 
     local procedure ConstructDeviceSettingList(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
-        AddOption(tmpRetailList, SETTING_MEDIAWIDTH, 'MEDIA_WIDTH');
-        AddOption(tmpRetailList, SETTING_ENCODING, 'ENCODING');
-        AddOption(tmpRetailList, SETTING_DPI, 'DPI');
+        AddOption(tmpRetailList, SettingMediawidthLbl, 'MEDIA_WIDTH');
+        AddOption(tmpRetailList, SettingEncodingLbl, 'ENCODING');
+        AddOption(tmpRetailList, SettingDpiLbl, 'DPI');
     end;
 
     procedure AddOption(var RetailList: Record "NPR Retail List" temporary; Choice: Text; Value: Text)

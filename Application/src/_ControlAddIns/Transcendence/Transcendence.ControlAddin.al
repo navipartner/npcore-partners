@@ -1,5 +1,10 @@
 controladdin "NPR Transcendence"
 {
+#if not BC17
+    ObsoleteState = Pending;
+    ObsoleteReason = 'No longer used';
+#endif
+
     Scripts =
         'src/_ControlAddins/Transcendence/Scripts/jquery-2.1.1.min.js',
         'src/_ControlAddins/Transcendence/Scripts/jquery-ui.min.js',

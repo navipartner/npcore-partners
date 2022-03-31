@@ -1,104 +1,7 @@
 ﻿codeunit 6014549 "NPR RP Line Print Mgt."
 {
-    // 
-    // Line Print Buffer Mgt.
-    //  Work started by Nicolai Esbensen.
-    // 
-    //  Provides functionality for building and formatting
-    //  a line base print buffer.
-    // 
-    //  Exposes methods for printing the formatted buffer, using the
-    //  "Line Printer Interface".
-    // 
-    //  Current functions and their purpose are listed below.
-    // --------------------------------------------------------
-    //  All integer arguments with name align follow the convention;
-    //  0 = Left, 1 = Center and 2 = Right.
-    // 
-    //  "AddTextField(Column : Integer;Align : Integer;Text : Text[50])"
-    //   Adds the text to the buffer on the current line, at the given column.
-    // 
-    //  "AddDecimalField(Column : Integer;Align : Integer;Decimal : Decimal)"
-    //   Adds the decimal to the buffer on the current line, at the given column,
-    //   using a formatting of two decimals.
-    // 
-    //  "AddDateField(Column : Integer;Align : Integer;Date : Date)"
-    //   Adds the date to the buffer on the current line, at the given column, using default
-    //   system formatting.
-    // 
-    //  "AddBarcode(BarcodeType : Text[30];BarcodeValue : Text[30];BarcodeWidth : Integer)"
-    //   Adds a barcode print to the buffer. All barcodes are printer by themselves.
-    // 
-    //  "AddLine(Text : Text[50])"
-    //   Adds a line with the given text, left aligned an moves cursor to new line.
-    // 
-    //  "NewLine()"
-    //   Increments the line count. Can be used to manually go to new line. Note
-    //   multiple repetitive calls will only generate 1 linebreak. For multiple
-    //   linebreaks use AddLine with an empty argument.
-    // 
-    // -----------------------------------------------------------------------------
-    // Global Style Modifiers
-    // 
-    //  "SetFont(FontName : Text[10])"
-    //   Sets font to the fontname specified.
-    // 
-    //  "SetAutoLineBreak(AutoLineBreakIn : Boolean)"
-    //   Automatically invokes newline, when a column, with an
-    //   index lower than the last addressed, is acessed.
-    // 
-    //  "SetBold(Bold : Boolean)"
-    //   Request a bold print until disabled.
-    // 
-    //  "SetUnderLine(UnderLine : Boolean)"
-    //   Request a undelined print until disabled.
-    // 
-    //  "SetDoubleStrike(DoubleStrike : Boolean)"
-    //   Request a double-striked print until disabled.
-    // 
-    //  "SetPadChar(Char : Text[1])"
-    //   Changes the padding char from space to the one given,
-    // 
-    //  "SetTwoColumnDistribution(Col1Factor : Decimal;Col2Factor : Decimal)"
-    //  "SetThreeColumnDistribution(Col1Factor : Decimal..Col3Factor : Decimal)"
-    //  "SetFourColumnDistribution(Col1Factor : Decimal..Col4Factor : Decimal)"
-    //   Sets the column distribution width for the columns in the print. The alteration
-    //   is global for the print, and can not be altered more than once. Column
-    //   factors should sum to 1.0.
-    // 
-    // -----------------------------------------------------------------------------
-    // 
-    // This object can either be used directly programmatically via the AddX and ProcessBufferForCodeunit()/ProcessBufferForReport() functions or via template setup.
-    // The latter is recommended.
-    // 
-    // NPR4.15/MMV/20151002 CASE 223893 Added support for Master/Slave printing
-    // NPR4.16/MMV/20151020 CASE 225257 Added check on printer name with error if no match.
-    // NPR4.16/MMV/20151020 CASE 223893 Added support for Master/Slave printing
-    // NPR4.18/MMV/20160119 CASE 230218 Support for RecordRef
-    // NPR4.18/MMV/20160128 CASE 224257 Allow custom width for barcodes
-    // NPR5.20/MMV/20160225 CASE 233229 Moved print method logic away from device codeunits.
-    //                                  Also removed old case comments, along with small cleanup/renaming.
-    // NPR5.20/MMV/20160317 CASE 237229 Removed error on text overflow.
-    // NPR5.26/MMV /20160905 CASE 250407 Added function ClearBuffer()
-    //                                   Removed old in-line comments.
-    // NPR5.32/MMV /20170324 CASE 241995 Retail Print 2.0
-    // NPR5.33/MMV /20170602 CASE 278792 Added function ProcessBufferOnReportOutput();
-    //                                   Made some local functions really local.
-    // NPR5.33/MMV /20170608 CASE 279696 Skip attribute print when blank.
-    // NPR5.34/MMV /20170724 CASE 284505 Expose all column distributions for custom setup.
-    // NPR5.37/MMV /20171002 CASE 269767 Implemented commands properly.
-    // NPR5.40/MMV /20180209 CASE 304639 Skip if empty data buffer.
-    // NPR5.41/MMV /20180416 CASE 311633 Added support for more than 2 decimals.
-    // NPR5.44/MMV /20180706 CASE 315362 Changed function signatuer in data join buffer.
-    //                                   Cleanup and refactoring.
-    // NPR5.54/MITH/20200207 CASE 369235 Changed length of FontName(input) in SetFont and CurrentFont(var) from 10 to 30.
-    // NPR5.55/MMV /20200220 CASE 391841 Added support for skipping remaining columns on a line if blank.
-
-    SingleInstance = true;
-
     var
         TempBuffer: Record "NPR RP Print Buffer" temporary;
-        LinePrinter: Codeunit "NPR RP Line Printer Interf.";
         CurrentLineNo: Integer;
         CurrentFont: Text[30];
         PadChar: Text[1];
@@ -110,13 +13,13 @@
         TwoColumnDistribution: array[2] of Decimal;
         ThreeColumnDistribution: array[3] of Decimal;
         FourColumnDistribution: array[4] of Decimal;
-        Error_MissingDevice: Label 'Missing printer device type for: (template %1, codeunit %2, report %3)';
         Error_InvalidTableAttribute: Label 'Cannot print attributes from table %1';
         LineBuffer: Text;
         DecimalRounding: Option "2","3","4","5";
         SkipColumnsAboveNo: Integer;
         SkipRemainingColumns: Boolean;
 
+    #region Programmatic Printing, instead of user configured.        
     internal procedure AddTextField(Column: Integer; Align: Integer; Text: Text)
     begin
         UpdateField(Column, Align, 0, '', CopyStr(Text, 1, 100));
@@ -155,10 +58,6 @@
     internal procedure NewLine()
     begin
         CurrentLineNo += 1;
-    end;
-
-    internal procedure "// Global Style Modifiers"()
-    begin
     end;
 
     internal procedure SetFont(FontName: Text[30])
@@ -217,93 +116,42 @@
         DecimalRounding := DecimalRoundingIn;
     end;
 
-    internal procedure "// Global Print Functions"()
+    /// <summary>
+    /// Process the buffered print job programmatically with the codeunit ID carrying the output setup.
+    /// </summary>
+    /// <param name="CodeunitID">Parameter is only to have an object that users can setup output config for. It can be empty.</param>
+    /// <param name="PrinterDevice">Which driver to use for job generation</param>
+    procedure ProcessBuffer(CodeunitID: Integer; PrinterDevice: Enum "NPR Line Printer Device")
     begin
+        PrintBuffer('', CodeunitId, 0, PrinterDevice);
     end;
-
-    procedure ProcessTemplate("Code": Code[20]; "Table": Variant)
+    #endregion
+    procedure ProcessTemplate("Code": Code[20]; RecordVariant: Variant)
+    var
+        DataTypeManagement: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        DataTypeManagement.GetRecordRef(RecordVariant, RecRef);
+        ProcessTemplate(Code, RecRef);
+    end;
+    procedure ProcessTemplate("Code": Code[20]; RecRef: RecordRef)
     var
         RPTemplateHeader: Record "NPR RP Template Header";
+        RecRefVariant: Variant;
     begin
-        ClearState();
-
         RPTemplateHeader.Get(Code);
         RPTemplateHeader.TestField("Printer Type", RPTemplateHeader."Printer Type"::Line);
+        RecRefVariant := RecRef;
 
         if RPTemplateHeader."Pre Processing Codeunit" > 0 then begin
-            if not CODEUNIT.Run(RPTemplateHeader."Pre Processing Codeunit", Table) then
+            if not CODEUNIT.Run(RPTemplateHeader."Pre Processing Codeunit", RecRefVariant) then
                 exit;
-            ClearState();
         end;
 
-        if RPTemplateHeader."Print Processing Object ID" = 0 then
-            RunPrintEngine(RPTemplateHeader, Table)
-        else
-            case RPTemplateHeader."Print Processing Object Type" of
-                RPTemplateHeader."Print Processing Object Type"::Codeunit:
-                    CODEUNIT.Run(RPTemplateHeader."Print Processing Object ID", Table);
-                RPTemplateHeader."Print Processing Object Type"::Report:
-                    REPORT.Run(RPTemplateHeader."Print Processing Object ID", GuiAllowed, false, Table);
-            end;
+        RunPrintEngine(RPTemplateHeader, RecRef);
 
         if RPTemplateHeader."Post Processing Codeunit" > 0 then
-            CODEUNIT.Run(RPTemplateHeader."Post Processing Codeunit", Table);
-
-        ClearState();
-    end;
-
-    internal procedure ProcessBufferForCodeunit(CodeunitID: Integer; TemplateCode: Code[20])
-    begin
-        PrintBuffer(TemplateCode, CodeunitID, 0);
-        ClearState();
-    end;
-
-    internal procedure ProcessBufferForReport(ReportID: Integer; TemplateCode: Code[20])
-    begin
-        PrintBuffer(TemplateCode, 0, ReportID);
-        ClearState();
-    end;
-
-    internal procedure ClearBuffer()
-    begin
-        TempBuffer.DeleteAll();
-    end;
-
-    internal procedure ProcessCodeunit(CodeunitID: Integer; "Table": Variant)
-    begin
-        // DEPRECATED FUNCTION - DO NOT USE.
-        // This function takes advantage of the fact that this codeunit is single instance, which will be removed eventually.
-        // Use the AddX functions and end with ProcessBufferForCodeunit() instead for new functionality if you need to hardcode printing.
-
-        ClearState();
-        SetDefaultDistributions();
-
-        if Table.IsRecord or Table.IsRecordRef then
-            CODEUNIT.Run(CodeunitID, Table)
-        else
-            CODEUNIT.Run(CodeunitID);
-
-        PrintBuffer('', CodeunitID, 0);
-
-        ClearState();
-    end;
-
-    local procedure GetDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer): Text
-    var
-        DeviceType: Text;
-        RPTemplateHeader: Record "NPR RP Template Header";
-    begin
-        if TemplateCode <> '' then begin
-            RPTemplateHeader.Get(TemplateCode);
-            if RPTemplateHeader."Printer Device" <> '' then
-                exit(RPTemplateHeader."Printer Device");
-        end;
-
-        OnGetDeviceType(TemplateCode, CodeunitId, ReportId, DeviceType);
-        if DeviceType = '' then
-            Error(Error_MissingDevice, RPTemplateHeader.Code, CodeunitId, ReportId);
-
-        exit(DeviceType);
+            CODEUNIT.Run(RPTemplateHeader."Post Processing Codeunit", RecRefVariant);
     end;
 
     local procedure ProcessLayout(DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt."; TemplateCode: Text)
@@ -334,40 +182,38 @@
 
         ParseColumnDistribution(TemplateHeader);
         DataJoinBuffer.SetDecimalRounding(TemplateHeader."Default Decimal Rounding");
-        DataJoinBuffer.ProcessDataJoin(RecRef, TemplateHeader.Code); //Pulls data from tables and joins on the linked fields.
-        if DataJoinBuffer.IsEmpty() then
+        if not DataJoinBuffer.ProcessDataJoin(RecRef, TemplateHeader.Code) then //Pulls data from tables and joins on the linked fields.        
             exit;
         ProcessLayout(DataJoinBuffer, TemplateHeader.Code); //Merges layout with data join buffer
-        PrintBuffer(TemplateHeader.Code, CODEUNIT::"NPR RP Line Print Mgt.", 0); //Converts generic print buffer to device specific data.
+        PrintBuffer(TemplateHeader.Code, CODEUNIT::"NPR RP Line Print Mgt.", 0, TemplateHeader."Line Device"); //Converts generic print buffer to device specific data.
     end;
 
-    local procedure PrintBuffer(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer)
+    local procedure PrintBuffer(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; LinePrinter: Interface "NPR ILine Printer")
     var
         CurrentLine: Integer;
-        DeviceType: Text;
         DeviceSettings: Record "NPR RP Device Settings";
+        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
+        OutputLogging: Codeunit "NPR RP Templ. Output Log Mgt.";
     begin
-        DeviceType := GetDeviceType(TemplateCode, CodeunitId, ReportId);
         DeviceSettings.SetRange(Template, TemplateCode);
-
-        LinePrinter.Construct(DeviceType);
-        LinePrinter.OnInitJob(DeviceSettings);
+        LinePrinter.InitJob(DeviceSettings);
 
         if TempBuffer.FindSet() then
             repeat
                 if CurrentLine <> TempBuffer."Line No." then
-                    LinePrinter.OnLineFeed();
-                PadBuffer();
-                LinePrinter.OnPrintData(TempBuffer);
+                    LinePrinter.LineFeed();
+                PadBuffer(LinePrinter);
+                LinePrinter.PrintData(TempBuffer);
                 CurrentLine := TempBuffer."Line No.";
             until TempBuffer.Next() = 0;
 
-        LinePrinter.OnEndJob();
-        OnSendPrintJob(TemplateCode, CodeunitId, ReportId, LinePrinter, 1);
-        LinePrinter.Dispose();
+        LinePrinter.EndJob();
+
+        ObjectOutputMgt.PrintLineJob(TemplateCode, CodeunitId, ReportId, LinePrinter, 1);
+        OutputLogging.LogLinePrintJob(TemplateCode, CodeunitId, ReportId, LinePrinter, 1);
     end;
 
-    local procedure GetColumnCount(var PrintBufferIn: Record "NPR RP Print Buffer" temporary) Columns: Integer
+    procedure GetColumnCount(var PrintBufferIn: Record "NPR RP Print Buffer" temporary) Columns: Integer
     begin
         PrintBufferIn.SetRange("Line No.", PrintBufferIn."Line No.");
         Columns := PrintBufferIn.Count();
@@ -412,6 +258,19 @@
                         begin
                             SetFont('COMMAND');
                             AddLine(TemplateLine."Type Option");
+                        end;
+
+                    TemplateLine.Type::IfDataFound:
+                        begin
+                            if DataJoinBuffer.FindBufferSet(TemplateLine."Data Item Name", CurrentRecNo) then begin
+                                RPTemplateLineChildren.SetCurrentKey("Template Code", Level, "Parent Line No.", "Line No.");
+                                RPTemplateLineChildren.SetRange("Template Code", TemplateLine."Template Code");
+                                RPTemplateLineChildren.SetRange(Level, TemplateLine.Level + 1);
+                                RPTemplateLineChildren.SetRange("Parent Line No.", TemplateLine."Line No.");
+                                UpperBound := DataJoinBuffer.FindSubset(CurrentRecNo, UpperBoundIn);
+                                MergeBuffer(RPTemplateLineChildren, DataJoinBuffer, CurrentRecNo, UpperBound);
+                                DataJoinBuffer.SetBounds(LowerBoundIn, UpperBoundIn);
+                            end;
                         end;
                 end;
             until TemplateLine.Next() = 0;
@@ -474,7 +333,6 @@
         Handled: Boolean;
         Skip: Boolean;
         DecimalBuffer: Decimal;
-        TmplLineLbl: Label '%1%2', Locked = true;
     begin
         if TemplateLine."Template Column No." < 1 then begin
             TemplateLine."Template Column No." := 1;
@@ -542,13 +400,11 @@
         if TemplateLine."Processing Codeunit" > 0 then begin
             if StrLen(TemplateLine."Data Item Name") > 0 then
                 DataJoinBuffer.GetRecID(TemplateLine."Data Item Name", RecID);
-            TemplateLine.OnFunction(TemplateLine."Processing Codeunit", TemplateLine."Processing Function ID", TemplateLine, RecID, Skip, Handled);
+            OnFunction(TemplateLine."Processing Codeunit", TemplateLine."Processing Function ID", TemplateLine, RecID, Skip, Handled);
             if Skip then begin
                 Clear(LineBuffer);
                 exit;
             end;
-            if not Handled then
-                CODEUNIT.Run(TemplateLine."Processing Codeunit", TemplateLine);
         end;
 
         if TemplateLine."Start Char" > 0 then
@@ -582,10 +438,10 @@
         end;
 
         if TemplateLine.Prefix <> '' then
-            TemplateLine."Processing Value" := StrSubstNo(TmplLineLbl, TemplateLine.Prefix, TemplateLine."Processing Value");
+            TemplateLine."Processing Value" := TemplateLine.Prefix + TemplateLine."Processing Value";
 
         if TemplateLine.Postfix <> '' then
-            TemplateLine."Processing Value" := StrSubstNo(TmplLineLbl, TemplateLine."Processing Value", TemplateLine.Postfix);
+            TemplateLine."Processing Value" := TemplateLine."Processing Value" + TemplateLine.Postfix;
 
         if TemplateLine."Type Option" <> '' then
             Font := TemplateLine."Type Option";
@@ -620,7 +476,7 @@
         end;
     end;
 
-    local procedure PadBuffer()
+    local procedure PadBuffer(LinePrinter: Interface "NPR ILine Printer")
     var
         FieldWidth: Decimal;
         PageWidth: Integer;
@@ -628,7 +484,7 @@
         if (UpperCase(TempBuffer.Font) in ['CONTROL', 'LOGO', 'COMMAND']) or (TempBuffer.Width <> 0) then
             exit;
 
-        LinePrinter.OnGetPageWidth(TempBuffer.Font, PageWidth);
+        PageWidth := LinePrinter.GetPageWidth(TempBuffer.Font);
 
         case GetColumnCount(TempBuffer) of
             1:
@@ -748,38 +604,30 @@
         PadChar := ' ';
     end;
 
-    local procedure ClearState()
-    begin
-        //Can be deleted when this CU is no longer single instance.
-        TempBuffer.DeleteAll();
-        Clear(TempBuffer);
-        Clear(LinePrinter);
-        Clear(CurrentLineNo);
-        Clear(CurrentFont);
-        Clear(PadChar);
-        Clear(AutoLineBreak);
-        Clear(CurrentBold);
-        Clear(CurrentUnderLine);
-        Clear(CurrentDoubleStrike);
-        Clear(LastColumnNo);
-        Clear(TwoColumnDistribution);
-        Clear(ThreeColumnDistribution);
-        Clear(FourColumnDistribution);
-        Clear(LineBuffer);
-        Clear(DecimalRounding);
-        //-NPR5.55 [391841]
-        Clear(SkipColumnsAboveNo);
-        Clear(SkipRemainingColumns);
-        //+NPR5.55 [391841]
-    end;
-
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced with explicit enum usage')]
     local procedure OnGetDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var DeviceType: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced with interface for line printers')]
     local procedure OnSendPrintJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Line Printer Interf."; NoOfPrints: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
     begin
     end;
 }

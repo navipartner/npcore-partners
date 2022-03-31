@@ -211,7 +211,7 @@
 
     procedure PrintReportSelection(var ReportSelections: Record "Report Selections"; var RecordVariant: Variant)
     var
-        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
+        ReportLayoutSelection: Record "Report Layout Selection";
     begin
         if not RecordVariant.IsRecord then
             exit;
@@ -220,7 +220,14 @@
             exit;
 
         repeat
-            ReportPrinterInterface.RunReport(ReportSelections."Report ID", ReportSelections."Custom Report Layout Code", false, false, RecordVariant);
+            if ReportSelections."Custom Report Layout Code" <> '' then
+                ReportLayoutSelection.SetTempLayoutSelected(ReportSelections."Custom Report Layout Code")
+            else
+                ReportLayoutSelection.SetTempLayoutSelected('');
+
+            Report.Run(ReportSelections."Report ID", false, false, RecordVariant);
+
+            ReportLayoutSelection.SetTempLayoutSelected('');
         until ReportSelections.Next() = 0;
     end;
 

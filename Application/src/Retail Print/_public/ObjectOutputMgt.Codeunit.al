@@ -1,14 +1,8 @@
-﻿codeunit 6014580 "NPR Object Output Mgt."
+codeunit 6014580 "NPR Object Output Mgt."
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ErrNoOutputFound: Label 'No output found for\Object: %1 %2\Template: %3';
-#if not CLOUD
         Error_UnsupportedOutput: Label 'Output Type %1 is not supported for %2';
-#endif
 
     internal procedure GetCodeunitOutputPath(ObjectID: Integer) Path: Text[250]
     var
@@ -22,20 +16,6 @@
         ObjectOutputSelection: Record "NPR Object Output Selection";
     begin
         Path := GetOutputPath(ObjectOutputSelection."Object Type"::Codeunit, ObjectID, PrintCode);
-    end;
-
-    internal procedure GetReportOutputPath(ObjectID: Integer) Path: Text[250]
-    var
-        ObjectOutputSelection: Record "NPR Object Output Selection";
-    begin
-        Path := GetOutputPath(ObjectOutputSelection."Object Type"::Report, ObjectID, '');
-    end;
-
-    internal procedure GetXMLOutputPath(ObjectID: Integer) Path: Text[250]
-    var
-        ObjectOutputSelection: Record "NPR Object Output Selection";
-    begin
-        Path := GetOutputPath(ObjectOutputSelection."Object Type"::XMLPort, ObjectID, '');
     end;
 
     internal procedure GetOutputPath(ObjectType: Integer; ObjectID: Integer; PrintCode: Code[20]) Path: Text[250]
@@ -62,20 +42,6 @@
         ObjectOutputSelection: Record "NPR Object Output Selection";
     begin
         exit(GetOutputType(ObjectOutputSelection."Object Type"::Codeunit, ObjectID, PrintCode));
-    end;
-
-    internal procedure GetReportOutputType(ObjectID: Integer): Integer
-    var
-        ObjectOutputSelection: Record "NPR Object Output Selection";
-    begin
-        exit(GetOutputType(ObjectOutputSelection."Object Type"::Report, ObjectID, ''));
-    end;
-
-    internal procedure GetXMLOutputType(ObjectID: Integer): Integer
-    var
-        ObjectOutputSelection: Record "NPR Object Output Selection";
-    begin
-        exit(GetOutputType(ObjectOutputSelection."Object Type"::XMLPort, ObjectID, ''));
     end;
 
     internal procedure GetOutputType(ObjectType: Integer; ObjectID: Integer; PrintCode: Code[20]): Integer
@@ -130,16 +96,13 @@
 
         exit(true);
     end;
-#if not CLOUD
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnSendPrintJob', '', false, false)]
-    local procedure OnSendMatrixPrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer)
+
+    internal procedure PrintMatrixJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Interface "NPR IMatrix Printer"; NoOfPrints: Integer)
     var
         ObjectOutput: Record "NPR Object Output Selection";
         PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        PrintBytes: Text;
-        TargetEncoding: Text;
+        PrintJob: Text;
         HTTPEndpoint: Text;
-        Supported: Boolean;
         Skip: Boolean;
         i: Integer;
     begin
@@ -155,53 +118,44 @@
         case ObjectOutput."Output Type" of
             ObjectOutput."Output Type"::"Printer Name":
                 begin
-                    Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
+                    PrintJob := Printer.GetPrintBufferAsBase64();
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesLocal(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintBytesLocal(ObjectOutput."Output Path", PrintJob);
                 end;
 
             ObjectOutput."Output Type"::HTTP:
                 begin
-                    Printer.OnPrepareJobForHTTP(TargetEncoding, HTTPEndpoint, Supported);
-                    if not Supported then
+                    if not Printer.PrepareJobForHTTP(HTTPEndpoint) then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::HTTP), TemplateCode);
-                    Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
+                    PrintJob := Printer.GetPrintBufferAsBase64();
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintJob);
                 end;
 
             ObjectOutput."Output Type"::Bluetooth:
                 begin
-                    Printer.OnPrepareJobForBluetooth(TargetEncoding, Supported);
-                    if not Supported then
+                    if not Printer.PrepareJobForBluetooth() then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::Bluetooth), TemplateCode);
-                    Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
+                    PrintJob := Printer.GetPrintBufferAsBase64();
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintJob);
                 end;
             ObjectOutput."Output Type"::"PrintNode Raw":
                 begin
-                    Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
+                    PrintJob := Printer.GetPrintBufferAsBase64();
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintViaPrintNodeRaw(ObjectOutput."Output Path", PrintBytes, TargetEncoding, 1, CodeunitId);
+                        PrintMethodMgt.PrintViaPrintNodeRaw(ObjectOutput."Output Path", PrintJob, 1, CodeunitId);
                 end;
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnSendPrintJob', '', false, false)]
-    local procedure OnSendLinePrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Line Printer Interf."; NoOfPrints: Integer)
+    internal procedure PrintLineJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Interface "NPR ILine Printer"; NoOfPrints: Integer)
     var
         ObjectOutput: Record "NPR Object Output Selection";
         PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        PrintBytes: Text;
-        TargetEncoding: Text;
+        PrintJob: Text;
         HTTPEndpoint: Text;
         Skip: Boolean;
-        Supported: Boolean;
         i: Integer;
     begin
         if NoOfPrints < 1 then
@@ -216,76 +170,46 @@
         case ObjectOutput."Output Type" of
             ObjectOutput."Output Type"::"Printer Name":
                 begin
-                    Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
+                    PrintJob := Printer.GetPrintBufferAsBase64();
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesLocal(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintBytesLocal(ObjectOutput."Output Path", PrintJob);
                 end;
 
             ObjectOutput."Output Type"::HTTP:
                 begin
-                    Printer.OnPrepareJobForHTTP(TargetEncoding, HTTPEndpoint, Supported);
-                    if not Supported then
+                    if not Printer.PrepareJobForHTTP(HTTPEndpoint) then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::HTTP), TemplateCode);
-                    Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
+                    PrintJob := Printer.GetPrintBufferAsBase64();
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintJob);
                 end;
 
             ObjectOutput."Output Type"::Bluetooth:
                 begin
-                    Printer.OnPrepareJobForBluetooth(TargetEncoding, Supported);
-                    if not Supported then
+                    if not Printer.PrepareJobForBluetooth() then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::Bluetooth), TemplateCode);
-                    Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
+                    PrintJob := Printer.GetPrintBufferAsBase64();
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintJob);
                 end;
+
             ObjectOutput."Output Type"::"PrintNode Raw":
                 begin
-                    Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
+                    PrintJob := Printer.GetPrintBufferAsBase64();
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintViaPrintNodeRaw(ObjectOutput."Output Path", PrintBytes, TargetEncoding, 1, CodeunitId);
+                        PrintMethodMgt.PrintViaPrintNodeRaw(ObjectOutput."Output Path", PrintJob, 1, CodeunitId);
                 end;
         end;
     end;
-#endif
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnGetDeviceType', '', false, false)]
-    local procedure OnGetMatrixDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var DeviceType: Text)
-    var
-        ObjectOutput: Record "NPR Object Output Selection";
-    begin
-        if not TryGetPrintOutput(TemplateCode, CodeunitId, ReportId, ObjectOutput) then
-            exit;
-        if ObjectOutput."Output Type" in [ObjectOutput."Output Type"::"Printer Name", ObjectOutput."Output Type"::Bluetooth] then
-            DeviceType := ObjectOutput."Output Path";
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnGetDeviceType', '', false, false)]
-    local procedure OnGetLineDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var DeviceType: Text)
-    var
-        ObjectOutput: Record "NPR Object Output Selection";
-    begin
-        if not TryGetPrintOutput(TemplateCode, CodeunitId, ReportId, ObjectOutput) then
-            exit;
-        if ObjectOutput."Output Type" in [ObjectOutput."Output Type"::"Printer Name", ObjectOutput."Output Type"::Bluetooth] then
-            DeviceType := ObjectOutput."Output Path";
-    end;
-
-#if not CLOUD
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSendMatrixPrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer; var Skip: Boolean)
+    local procedure OnBeforeSendMatrixPrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Interface "NPR IMatrix Printer"; NoOfPrints: Integer; var Skip: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSendLinePrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Line Printer Interf."; NoOfPrints: Integer; var Skip: Boolean)
+    local procedure OnBeforeSendLinePrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Interface "NPR ILine Printer"; NoOfPrints: Integer; var Skip: Boolean)
     begin
     end;
-#endif
 }
 

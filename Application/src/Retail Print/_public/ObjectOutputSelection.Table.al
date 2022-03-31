@@ -1,4 +1,4 @@
-﻿table 6014580 "NPR Object Output Selection"
+table 6014580 "NPR Object Output Selection"
 {
     Caption = 'Object Output Selection';
     DataClassification = CustomerContent;
@@ -22,29 +22,22 @@
         field(2; "Object Type"; Option)
         {
             Caption = 'Object Type';
-            OptionCaption = 'Codeunit,Report,XMLPort';
+            OptionCaption = 'Codeunit,,';
             OptionMembers = "Codeunit","Report","XMLPort";
             DataClassification = CustomerContent;
         }
         field(3; "Object ID"; Integer)
         {
-            Caption = 'Object ID';
-            TableRelation = IF ("Object Type" = CONST(Codeunit)) AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit))
-            ELSE
-            IF ("Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = CONST(Report))
-            ELSE
-            IF ("Object Type" = CONST(XMLPort)) AllObj."Object ID" WHERE("Object Type" = CONST(XMLport));
+            Caption = 'Codeunit ID';
+            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                GetObjectName();
-            end;
         }
         field(5; "Object Name"; Text[80])
         {
             Caption = 'Object Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to a flowfield';
         }
         field(8; "Print Template"; Code[20])
         {
@@ -52,11 +45,9 @@
             TableRelation = "NPR RP Template Header".Code;
             DataClassification = CustomerContent;
         }
-        field(10; "Output Type"; Option)
+        field(10; "Output Type"; Enum "NPR Object Output Type")
         {
             Caption = 'Output Type';
-            OptionCaption = 'Printer Name,File,Epson Web,E-mail,Google Print,HTTP,Bluetooth,PrintNode PDF,PrintNode Raw';
-            OptionMembers = "Printer Name",File,"Epson Web","E-mail","Google Print",HTTP,Bluetooth,"PrintNode PDF","PrintNode Raw";
             DataClassification = CustomerContent;
         }
         field(11; "Output Path"; Text[250])
@@ -65,26 +56,16 @@
             DataClassification = CustomerContent;
 
             trigger OnLookup()
-            var
-                Printer: Record "Printer Selection";
-                PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
-                ID: Text;
             begin
-                case "Output Type" of
-                    "Output Type"::"Printer Name":
-                        begin
-                            if PAGE.RunModal(PAGE::"Printer Selections", Printer) = ACTION::LookupOK then
-                                "Output Path" := Printer."Printer Name";
-                        end;
-                    "Output Type"::"PrintNode PDF",
-                    "Output Type"::"PrintNode Raw":
-                        begin
-                            if PrintNodeMgt.LookupPrinter(ID) then
-                                "Output Path" := ID;
-                        end;
-
-                end;
+                OnLookupOutputPath(Rec);
             end;
+        }
+        field(20; "Codeunit Name"; Text[249])
+        {
+            Caption = 'Codeunit Name';
+            FieldClass = FlowField;
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
+                                                                           "Object ID" = FIELD("Object ID")));
         }
     }
 
@@ -95,37 +76,9 @@
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnInsert()
+    [IntegrationEvent(false, false)]
+    local procedure OnLookupOutputPath(var ObjectOutputSelection: Record "NPR Object Output Selection")
     begin
-        GetObjectName();
-    end;
-
-    trigger OnModify()
-    begin
-        GetObjectName();
-    end;
-
-    internal procedure GetObjectName()
-    var
-        AllObj: Record AllObj;
-    begin
-        case "Object Type" of
-            "Object Type"::Codeunit:
-                AllObj.SetRange("Object Type", AllObj."Object Type"::Codeunit);
-            "Object Type"::Report:
-                AllObj.SetRange("Object Type", AllObj."Object Type"::Report);
-            "Object Type"::XMLPort:
-                AllObj.SetRange("Object Type", AllObj."Object Type"::XMLport);
-        end;
-
-        AllObj.SetRange("Object ID", "Object ID");
-
-        if AllObj.FindFirst() then
-            "Object Name" := AllObj."Object Name";
     end;
 }
 

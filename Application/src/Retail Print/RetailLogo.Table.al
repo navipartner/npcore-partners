@@ -1,4 +1,4 @@
-﻿table 6014478 "NPR Retail Logo"
+table 6014478 "NPR Retail Logo"
 {
     Access = Internal;
     Caption = 'Retail Logo';
@@ -14,10 +14,9 @@
         field(2; "Register No."; Code[10])
         {
             Caption = 'POS Unit No.';
-            TableRelation = "NPR POS Unit"."No.";
-
-            ValidateTableRelation = false;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'No longer used.';
         }
         field(3; Keyword; Code[20])
         {

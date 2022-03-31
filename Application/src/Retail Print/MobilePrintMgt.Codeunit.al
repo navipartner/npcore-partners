@@ -1,110 +1,57 @@
-﻿// TODO: Case 430713
-//       This dialog does not really need Model UI. The only thing it does is that it runs some JavaScript. It should never have been
-//       built with Model UI. This can be done easily with a Workflows 2.0 action that runs the exact same JavaScript code.
-#if not CLOUD
 codeunit 6014584 "NPR Mobile Print Mgt."
 {
     Access = Internal;
     var
-        Err_PrintFailed: Label 'Print failed';
-        Err_InvalidClientType: Label 'Can not print through mobile add-in on %1';
-        ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved.';
+        PrintFailedErr: Label 'Print failed';
+        InvalidClientTypeErr: Label 'Can not print through mobile add-in on %1';
+        PrintingLbl: Label 'Printing...';
+        ClosedPageErr: Label 'The MPOS Connector page does not work if you manually close it. Please try again and keep it open.';
 
-    procedure PrintJobHTTP(Address: Text; Endpoint: Text; PrintBytes: Text; TargetEncoding: Text)
-    var
-        Convert: Codeunit "Base64 Convert";
-        TextEncodingMapper: Codeunit "NPR Text Encoding Mapper";
-        Base64: Text;
-    begin
-        Base64 := Convert.ToBase64(PrintBytes, TextEncoding::Windows, TextEncodingMapper.EncodingNameToCodePageNumber(TargetEncoding));
-        PrintJobHTTPInternal(Address, Endpoint, Base64);
-    end;
 
-    local procedure PrintJobHTTPInternal(Address: Text; Endpoint: Text; Base64: Text)
+    procedure PrintJobHTTP(Address: Text; Endpoint: Text; PrintJob: Text)
     var
-        JSON: Text;
-        Model: DotNet NPRNetModel;
-        JSString: Text;
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSSession: Codeunit "NPR POS Session";
-        ActiveModelID: Guid;
+        JSON: JsonObject;
+        MPOSConnector: Page "NPR MPOS Connector";
+        AutoClosed: Boolean;
     begin
-        if not (CurrentClientType in [CLIENTTYPE::Web, CLIENTTYPE::Phone, CLIENTTYPE::Tablet]) then
-            Error(Err_InvalidClientType, Format(CurrentClientType));
+        if not (GuiAllowed) then
+            Error(InvalidClientTypeErr, Format(CurrentClientType));
 
         if StrPos(Address, 'http') <> 1 then
             Address := 'http://' + Address;
 
-        JSON := BuildJSONParams(Address, Endpoint, Base64, 'POST', Err_PrintFailed);
-
-        if not POSSession.IsActiveSession(POSFrontEnd) then
-            Error(ERROR_SESSION);
-
-        Model := Model.Model();
-        JSString := 'function CallNativeFunction(jsonobject) { ';
-        JSString += 'debugger; ';
-        JSString += 'var userAgent = navigator.userAgent || navigator.vendor || window.opera; if (/android/i.test(userAgent)) { ';
-        JSString += 'window.top.mpos.handleBackendMessage(jsonobject); } ';
-        JSString += 'if (/iPad|iPhone|iPod|Macintosh/.test(userAgent) && !window.MSStream) { ';
-        JSString += 'window.webkit.messageHandlers.invokeAction.postMessage(jsonobject);}}';
-        Model.AddScript(JSString);
-        Model.AddScript('CallNativeFunction(' + JSON + ');');
-        ActiveModelID := POSFrontEnd.ShowModel(Model);
-        POSFrontEnd.CloseModel(ActiveModelID);
-        Clear(ActiveModelID);
+        JSON := BuildJSONParams(Address, Endpoint, PrintJob, 'POST', PrintFailedErr);
+        MPOSConnector.SetInput(PrintingLbl, JSON);
+        MPOSConnector.RunModal();
+        MPOSConnector.GetOutput(AutoClosed);
+        if not AutoClosed then
+            Message(ClosedPageErr);
     end;
 
-    procedure PrintJobBluetooth(DeviceName: Text; PrintBytes: Text; TargetEncoding: Text)
+    procedure PrintJobBluetooth(DeviceName: Text; PrintJob: Text)
     var
-        Convert: Codeunit "Base64 Convert";
-        TextEncodingMapper: Codeunit "NPR Text Encoding Mapper";
-        Base64: Text;
+        JSON: JsonObject;
+        MPOSConnector: Page "NPR MPOS Connector";
+        AutoClosed: Boolean;
     begin
-        Base64 := Convert.ToBase64(PrintBytes, TextEncoding::Windows, TextEncodingMapper.EncodingNameToCodePageNumber(TargetEncoding));
-        PrintJobBluetoothInternal(DeviceName, Base64);
+        if not (GuiAllowed) then
+            Error(InvalidClientTypeErr, Format(CurrentClientType));
+
+        JSON := BuildJSONParams(DeviceName, '', PrintJob, 'BLUETOOTH', PrintFailedErr);
+        MPOSConnector.SetInput(PrintingLbl, JSON);
+        MPOSConnector.RunModal();
+        MPOSConnector.GetOutput(AutoClosed);
+        if not AutoClosed then
+            Message(ClosedPageErr);
     end;
 
-    local procedure PrintJobBluetoothInternal(DeviceName: Text; Base64: Text)
-    var
-        JSON: Text;
-        Model: DotNet NPRNetModel;
-        JSString: Text;
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSSession: Codeunit "NPR POS Session";
-        ActiveModelID: Guid;
+    local procedure BuildJSONParams(BaseAddress: Text; Endpoint: Text; PrintJob: Text; RequestType: Text; ErrorCaption: Text) JSON: JsonObject
     begin
-        if not (CurrentClientType in [CLIENTTYPE::Web, CLIENTTYPE::Phone, CLIENTTYPE::Tablet]) then
-            Error(Err_InvalidClientType, Format(CurrentClientType));
-
-        JSON := BuildJSONParams(DeviceName, '', Base64, 'BLUETOOTH', Err_PrintFailed);
-
-        if not POSSession.IsActiveSession(POSFrontEnd) then
-            Error(ERROR_SESSION);
-
-        Model := Model.Model();
-        JSString := 'function CallNativeFunction(jsonobject) { ';
-        JSString += 'debugger; ';
-        JSString += 'var userAgent = navigator.userAgent || navigator.vendor || window.opera; if (/android/i.test(userAgent)) { ';
-        JSString += 'window.top.mpos.handleBackendMessage(jsonobject); } ';
-        JSString += 'if (/iPad|iPhone|iPod|Macintosh/.test(userAgent) && !window.MSStream) { ';
-        JSString += 'window.webkit.messageHandlers.invokeAction.postMessage(jsonobject);}}';
-        Model.AddScript(JSString);
-        Model.AddScript('CallNativeFunction(' + JSON + ');');
-        ActiveModelID := POSFrontEnd.ShowModel(Model);
-        POSFrontEnd.CloseModel(ActiveModelID);
-        Clear(ActiveModelID);
-    end;
-
-    local procedure BuildJSONParams(BaseAddress: Text; Endpoint: Text; PrintJob: Text; RequestType: Text; ErrorCaption: Text) JSON: Text
-    begin
-        JSON := '{';
-        JSON += '"RequestMethod": "PRINT",';
-        JSON += '"BaseAddress": "' + BaseAddress + '",';
-        JSON += '"Endpoint": "' + Endpoint + '",';
-        JSON += '"PrintJob": "' + PrintJob + '",';
-        JSON += '"RequestType": "' + RequestType + '",';
-        JSON += '"ErrorCaption": "' + ErrorCaption + '"';
-        JSON += '}';
+        JSON.Add('RequestMethod', 'PRINT');
+        JSON.Add('BaseAddress', BaseAddress);
+        JSON.Add('Endpoint', Endpoint);
+        JSON.Add('PrintJob', PrintJob);
+        JSON.Add('RequestType', RequestType);
+        JSON.Add('ErrorCaption', ErrorCaption);
     end;
 }
-#endif

@@ -191,7 +191,6 @@
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
-        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         FilterCount: Integer;
     begin
         POSMenuFilter.TestField(Active, true);
@@ -253,7 +252,7 @@
                         if (FilterCount = 1) then REPORT.RunModal(POSMenuFilter."Object Id", false, false, FilterRecVariant);
                         if (FilterCount = 0) then REPORT.RunModal(POSMenuFilter."Object Id", false, false);
                     end else begin
-                        ReportPrinterInterface.RunReport(POSMenuFilter."Object Id", false, false, FilterRecVariant);
+                        Report.Run(POSMenuFilter."Object Id", false, false, FilterRecVariant);
                     end;
                 end;
             POSMenuFilter."Object Type"::Codeunit:

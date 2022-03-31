@@ -1,8 +1,6 @@
-﻿table 6014564 "NPR RP Data Item Constr. Links"
+table 6014564 "NPR RP Data Item Constr. Links"
 {
     Access = Internal;
-    // NPR5.47/MMV /20181017 CASE 318084 Added field 12
-
     Caption = 'Data Item Constraint Links';
     DataClassification = CustomerContent;
 
@@ -24,58 +22,6 @@
         {
             Caption = 'Data Item Name';
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-                // DataItemConstraint.SETRANGE("Data Item Code", "Data Item Code");
-                // DataItemConstraint.SETRANGE("Line No.", "Constraint Line No.");
-                // DataItemConstraint.FindFirst();
-                //
-                // DataItem.SETRANGE(Code, "Data Item Code");
-                // DataItem.SETRANGE("Line No.", DataItemConstraint."Data Item Line No.");
-                // DataItem.FindFirst();
-                //
-                // tmpRetailList.Choice := DataItem.Name;
-                // tmpRetailList.Value := FORMAT(DataItem."Table ID");
-                // tmpRetailList.Insert();
-                //
-                // DataItem.SETRANGE("Line No.", DataItem."Parent Item Line No.");
-                // IF DataItem.FindFirst() THEN BEGIN
-                //  tmpRetailList.Number += 1;
-                //  tmpRetailList.Choice := DataItem.Name;
-                //  tmpRetailList.Value := FORMAT(DataItem."Table ID");
-                //  tmpRetailList.Insert();
-                // END;
-                //
-                // IF PAGE.RUNMODAL(PAGE::"Retail List", tmpRetailList) = ACTION::LookupOK THEN
-                //  VALIDATE("Data Item Name",tmpRetailList.Choice);
-            end;
-
-            trigger OnValidate()
-            begin
-                // DataItemConstraint.SETRANGE("Data Item Code", "Data Item Code");
-                // DataItemConstraint.SETRANGE("Line No.", "Constraint Line No.");
-                // DataItemConstraint.FindFirst();
-                //
-                // DataItem.SETRANGE(Code, "Data Item Code");
-                // DataItem.SETRANGE("Line No.", DataItemConstraint."Data Item Line No.");
-                // DataItem.SETFILTER(Name,'@' + "Data Item Name" + '*');
-                // IF DataItem.FindFirst() THEN BEGIN
-                //  "Data Item Name" := DataItem.Name;
-                //  "Data Item Table ID" := DataItem."Table ID";
-                //  EXIT;
-                // END;
-                //
-                // DataItem.SETRANGE(Name);
-                // DataItem.FindFirst();
-                //
-                // DataItem.SETRANGE("Line No.", DataItem."Parent Item Line No.");
-                // DataItem.SETFILTER(Name,'@' + "Data Item Name" + '*');
-                // DataItem.FindFirst();
-                //
-                // "Data Item Name" := DataItem.Name;
-                // "Data Item Table ID" := DataItem."Table ID";
-            end;
         }
         field(4; "Data Item Table ID"; Integer)
         {
@@ -101,7 +47,6 @@
 
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, DataItem."Table ID");
-                //Field.SETRANGE(TableNo,"Data Item Table ID");
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
@@ -123,7 +68,6 @@
                 DataItemConstraint.FindFirst();
                 DataItem.Get("Data Item Code", DataItemConstraint."Data Item Line No.");
 
-                //Field.SETRANGE(TableNo,"Data Item Table ID");
                 Field.SetRange(TableNo, DataItem."Table ID");
                 Field.SetRange("No.", "Data Item Field ID");
                 Field.FindFirst();
@@ -149,7 +93,6 @@
 
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, DataItem."Table ID");
-                //Field.SETRANGE(TableNo,"Data Item Table ID");
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
@@ -171,7 +114,6 @@
                 DataItemConstraint.FindFirst();
                 DataItem.Get("Data Item Code", DataItemConstraint."Data Item Line No.");
 
-                //Field.SETRANGE(TableNo,"Data Item Table ID");
                 Field.SetRange(TableNo, DataItem."Table ID");
                 Field.SetRange(FieldName, "Data Item Field Name");
                 if not Field.FindFirst() then
@@ -389,6 +331,7 @@
     trigger OnInsert()
     begin
         ModifiedRec();
+        TestField("Data Item Code");
     end;
 
     trigger OnModify()

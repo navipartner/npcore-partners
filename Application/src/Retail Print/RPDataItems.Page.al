@@ -22,20 +22,23 @@
             {
                 FreezeColumn = Name;
                 IndentationColumn = Rec.Level;
-                IndentationControls = "Data Source";
-                field("Data Source"; Rec."Data Source")
+                IndentationControls = "Table ID";
+                ShowAsTree = true;
+
+                field("Table ID"; Rec."Table ID")
                 {
 
                     Style = Strong;
                     StyleExpr = Rec.Level = 0;
-                    ToolTip = 'Specifies the value of the Data Source field';
+                    ToolTip = 'The table ID of the data item';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-
-                    ToolTip = 'Specifies the value of the Name field';
                     ApplicationArea = NPRRetail;
+                    Style = Strong;
+                    StyleExpr = Rec.Level = 0;
+                    ToolTip = 'The unique name of the data item';
                 }
                 field("Iteration Type"; Rec."Iteration Type")
                 {
@@ -78,6 +81,11 @@
 
                     ToolTip = 'Specifies the value of the Skip Template If Not Empty field';
                     ApplicationArea = NPRRetail;
+                }
+                field("Has Constraints"; Rec."Has Constraints")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Checked if the data item line has any constraints applied to it.';
                 }
             }
             part(Control6014404; "NPR RP Data Item Links")
@@ -154,30 +162,18 @@
     var
         DataItem: Record "NPR RP Data Items";
     begin
-        //-NPR5.34 [284505]
-        // FIND;
-        // VALIDATE(Level, Level+1);
-        // MODIFY(TRUE);
-
         CurrPage.SetSelectionFilter(DataItem);
         if DataItem.FindSet() then
             repeat
                 DataItem.Validate(Level, DataItem.Level + 1);
                 DataItem.Modify(true);
             until DataItem.Next() = 0;
-        //+NPR5.34 [284505]
     end;
 
     internal procedure UnindentLine()
     var
         DataItem: Record "NPR RP Data Items";
     begin
-        //-NPR5.34 [284505]
-        // FIND;
-        // IF Level > 0 THEN
-        //  VALIDATE(Level, Level-1);
-        // MODIFY(TRUE);
-
         CurrPage.SetSelectionFilter(DataItem);
         if DataItem.FindSet() then
             repeat
@@ -186,7 +182,6 @@
                     DataItem.Modify(true);
                 end;
             until DataItem.Next() = 0;
-        //+NPR5.34 [284505]
     end;
 
     internal procedure ShowItemDataLinks()
