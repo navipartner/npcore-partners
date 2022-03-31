@@ -47,8 +47,10 @@
     begin
         ItemReference.SetCurrentKey("Reference No.");
         ItemReference.SetRange("Reference No.", TagValue);
-        if not ItemReference.IsEmpty() then
+        if not ItemReference.IsEmpty() then begin
+            ItemReference.FindFirst();
             ItemReference.FieldError("Reference No.", ERR_RFID_CLASH);
+        end;
     end;
 
     procedure InsertItemReference(ItemNo: Text; VariantCode: Text; TagValue: Text)

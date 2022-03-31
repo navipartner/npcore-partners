@@ -108,10 +108,8 @@
     local procedure TryPrintVoucher(var TaxFreeRequest: Record "NPR Tax Free Request")
     begin
         case TaxFreeRequest."Print Type" of
-        #if not CLOUD
             TaxFreeRequest."Print Type"::PDF:
                 PrintPDF(TaxFreeRequest);
-                #endif
             TaxFreeRequest."Print Type"::Thermal:
                 PrintThermalReceipt(TaxFreeRequest);
         end;
@@ -609,7 +607,7 @@
             end;
         end;
 
-        Printer.ProcessBufferForCodeunit(CODEUNIT::"NPR Tax Free Receipt", ''); //Use the object output selection of old object so no new setup is needed.
+        Printer.ProcessBuffer(Codeunit::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson);
     end;
 
     local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print Mgt."; Value: Text; Font: Text; Bold: Boolean; Alignment: Text; CR: Boolean; Underline: Boolean)
@@ -640,23 +638,21 @@
             Printer.NewLine();
     end;
 
-#if not CLOUD
-    [Obsolete('PrintMethodMgt: Codeunit "NPR Print Method Mgt." needs to be refractored ')]
     local procedure PrintPDF(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
-        XMLNode: DotNet NPRNetXmlNode;
         base64: Text;
         ObjectOutputSelection: Record "NPR Object Output Selection";
         PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        MemoryStream: DotNet NPRNetMemoryStream;
-        ErrorText: Text;
-        Convert: DotNet NPRNetConvert;
         Output: Text;
         OutputType: Integer;
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
-        PrintLines: DotNet NPRNetXmlNodeList;
-        XMLDoc: DotNet "NPRNetXmlDocument";
         InStream: InStream;
+        OuStream: OutStream;
+        Base64Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+        Xml: XmlDocument;
+        XmlNode: XmlNode;
+        XmlNodeList: XmlNodeList;
     begin
         Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Tax Free Receipt");
         OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"NPR Tax Free Receipt");
@@ -665,29 +661,24 @@
             Error(Error_MissingPrintSetup);
 
         TaxFreeRequest.Print.CreateInStream(InStream, TextEncoding::Utf8);
-        MemoryStream := MemoryStream.MemoryStream();
-        CopyStream(MemoryStream, InStream);
-        MemoryStream.Position := 0;
-
-        XMLDoc := XMLDoc.XmlDocument();
-        XMLDoc.Load(MemoryStream);
-
-        PrintLines := XMLDoc.GetElementsByTagName('FormData'); //Base64 pdf data
-        if PrintLines.Count() <> 1 then
+        XmlDocument.ReadFrom(InStream, Xml);
+        XmlNodeList := Xml.GetDescendantElements('FormData');
+        if XmlNodeList.Count <> 1 then
             Error(Error_PrintData);
 
-        XMLNode := PrintLines.ItemOf(0);
-        base64 := XMLNode.InnerText;
-        MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(base64));
+        XmlNodeList.Get(0, XmlNode);
+        base64 := XmlNode.AsXmlElement().InnerText; //base64 pdf data
+
+        TempBlob.CreateOutStream(OuStream, TextEncoding::UTF8);
+        Base64Convert.FromBase64(base64, OuStream);
+        Clear(InStream);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
 
         case OutputType of
-            ObjectOutputSelection."Output Type"::"E-mail":
-                PrintMethodMgt.PrintViaEmail(Output, MemoryStream);
-            ObjectOutputSelection."Output Type"::"Printer Name":
-                PrintMethodMgt.PrintFileLocal(Output, MemoryStream, 'pdf');
+            ObjectOutputSelection."Output Type"::"Printer Name".AsInteger():
+                PrintMethodMgt.PrintFileLocal(Output, InStream, 'pdf');
         end;
     end;
-#endif
     #endregion
     #region Web Service Request functions
 

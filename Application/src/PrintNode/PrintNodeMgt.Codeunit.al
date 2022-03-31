@@ -239,5 +239,17 @@
         EmailNaviDocsMgtWrapper.GetCustomReportLayoutVariant(CustomReportSelection, BlankVariant);
         ReportLayoutSelection.SetTempLayoutSelected(BlankVariant);
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Object Output Selection", 'OnLookupOutputPath', '', false, false)]
+    local procedure OnLookupObjectOutputPath(var ObjectOutputSelection: Record "NPR Object Output Selection")
+    var
+        ID: Text;
+    begin
+        if ObjectOutputSelection."Output Type" <> ObjectOutputSelection."Output Type"::"PrintNode Raw" then
+            exit;
+
+        if LookupPrinter(ID) then
+            ObjectOutputSelection."Output Path" := ID;
+    end;
 }
 

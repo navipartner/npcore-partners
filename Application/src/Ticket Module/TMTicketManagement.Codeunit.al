@@ -213,23 +213,15 @@
     local procedure PrintTicketUsingFormatter(var Ticket: Record "NPR TM Ticket"; PrintObjectType: Option; PrintObjectId: Integer; PrintTemplateCode: Code[20]): Boolean
     var
         TicketType: Record "NPR TM Ticket Type";
-        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
-        LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
-        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         PrintTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
 
         case PrintObjectType of
             TicketType."Print Object Type"::Codeunit:
-                begin
-                    if (ObjectOutputMgt.GetCodeunitOutputPath(PrintObjectId) <> '') then
-                        LinePrintMgt.ProcessCodeunit(PrintObjectId, Ticket)
-                    else
-                        Codeunit.Run(PrintObjectId, Ticket);
-                end;
+                Codeunit.Run(PrintObjectId, Ticket);
 
             TicketType."Print Object Type"::Report:
-                ReportPrinterInterface.RunReport(PrintObjectId, false, false, Ticket);
+                Report.Run(PrintObjectId, false, false, Ticket);
 
             TicketType."Print Object Type"::TEMPLATE:
                 PrintTemplateMgt.PrintTemplate(PrintTemplateCode, Ticket, 0);

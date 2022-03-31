@@ -1,77 +1,5 @@
-﻿codeunit 6014547 "NPR RP Matrix Print Mgt."
+codeunit 6014547 "NPR RP Matrix Print Mgt."
 {
-    // Matrix Print Mgt.
-    //  Work started by Nicolai Esbensen.
-    // 
-    //  Provides functionality for building and formatting
-    //  a matrix based print buffer.
-    // 
-    //  Exposes methods for printing the formatted buffer, using the
-    //  "Matrix Printer Interface".
-    // 
-    //  Current functions and their purpose are listed below.
-    // --------------------------------------------------------
-    //  All integer arguments with name align follow the convention;
-    //  0 = Left, 1 = Center and 2 = Right.
-    // 
-    //  "AddTextField(Column : Integer;Align : Integer;Text : Text[50])"
-    //   Adds the text to the buffer on the current line, at the given column.
-    // 
-    //  "AddDecimalField(Column : Integer;Align : Integer;Decimal : Decimal)"
-    //   Adds the decimal to the buffer on the current line, at the given column,
-    //   using a formatting of two decimals.
-    // 
-    //  "AddDateField(Column : Integer;Align : Integer;Date : Date)"
-    //   Adds the date to the buffer on the current line, at the given column, using default
-    //   system formatting.
-    // 
-    //  "AddBarcode(BarcodeType : Text[30];BarcodeValue : Text[30];BarcodeWidth : Integer)"
-    //   Adds a barcode print to the buffer. All barcodes are printer by themselves.
-    // 
-    //  "AddLine(Text : Text[50])"
-    //   Adds a line with the given text, left aligned an moves cursor to new line.
-    // 
-    //  "NewLine()"
-    //   Increments the line count. Can be used to manually go to new line. Note
-    //   multiple repetitive calls will only generate 1 linebreak. For multiple
-    //   linebreaks use AddLine with an empty argument.
-    // 
-    // -----------------------------------------------------------------------------
-    // Global Style Modifiers
-    // 
-    //  "SetFont(FontName : Text[10])"
-    //   Sets font to the fontname specified.
-    // 
-    //  "SetBold(Bold : Boolean)"
-    //   Request a bold print until disabled.
-    // 
-    //  "SetUnderLine(UnderLine : Boolean)"
-    //   Request a undelined print until disabled.
-    // 
-    //  "SetDoubleStrike(DoubleStrike : Boolean)"
-    //   Request a double-striked print until disabled.
-    // 
-    // -----------------------------------------------------------------------------
-    // 
-    // This object can either be used directly programmatically via the AddX and ProcessBufferForCodeunit()/ProcessBufferForReport() functions or via template setup.
-    // The latter is recommended.
-    // 
-    // 
-    // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
-    // NPR5.32/ANEN/20170427 CASE 273989 Extending to 40 attributes
-    // NPR5.33/MMV /20170608 CASE 279696 Skip attribute print when blank.
-    // NPR5.41/MMV /20180416 CASE 311633 Added support for more than 2 decimals.
-    // NPR5.44/MMV /20180706 CASE 315362 Cleanup and refactoring.
-    // NPR5.46/MMV /20180911 CASE 314067 Added support for only printing default value when data is found.
-    // NPR5.48/MMV /20181205 CASE 327107 Added new event publishers.
-    // NPR5.50/MMV /20190510 CASE 354821 Iterate buffer without upperbound to support several root data elements.
-    // NPR5.51/MMV /20190627 CASE 359771 Rolled back 354821 change.
-    // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         TempGlobalBuffer: Record "NPR RP Print Buffer" temporary;
@@ -83,11 +11,11 @@
         LineBuffer: Text[1024];
         HighestRootRecNo: Integer;
         PrintIterationFieldNo: Integer;
-        Error_MissingDevice: Label 'Missing printer device type for: (template %1, codeunit %2, report %3)';
         Error_InvalidTableAttribute: Label 'Cannot print attributes from table %1';
         DecimalRounding: Option "2","3","4","5";
         Error_BoundsCheck: Label 'Number of prints too high: %1. Split into several requests';
 
+    #region Programmatic Printing, instead of user configured.
     internal procedure AddTextField(X: Integer; Y: Integer; Align: Integer; Text: Text)
     begin
         UpdateField(X, Y, 0, Align, 0, 0, '', CopyStr(Text, 1, 100));
@@ -122,10 +50,6 @@
         CurrentLineNo += 1;
     end;
 
-    internal procedure "// Global Style Modifiers"()
-    begin
-    end;
-
     internal procedure SetFont(FontName: Text[30])
     begin
         CurrentFont := FontName;
@@ -151,9 +75,16 @@
         DecimalRounding := DecimalRoundingIn;
     end;
 
-    internal procedure "// Global Print Functions"()
+    /// <summary>
+    /// Process the buffered print job programmatically, via a dummy codeunit that carries output setup.
+    /// </summary>
+    /// <param name="CodeunitID">Parameter is only to have an object that users can setup output config for. It can be empty.</param>
+    /// <param name="PrinterDevice">Which driver to use for job generation</param>
+    internal procedure ProcessBuffer(CodeunitID: Integer; PrinterDevice: Enum "NPR Matrix Printer Device")
     begin
+        PrintBuffer('', CodeunitId, 0, 1, PrinterDevice);
     end;
+    #endregion    
 
     procedure ProcessTemplate(Template: Code[20]; var RecRef: RecordRef)
     var
@@ -161,73 +92,29 @@
         Variant: Variant;
         Skip: Boolean;
     begin
-        // For printing via template setup
-
         RPTemplateHeader.Get(Template);
         RPTemplateHeader.TestField("Printer Type", RPTemplateHeader."Printer Type"::Matrix);
 
-        //-NPR5.48 [327107]
         OnBeforePrintMatrix(RecRef, RPTemplateHeader, Skip);
         if Skip then
             exit;
-        //+NPR5.48 [327107]
 
         Variant := RecRef;
         if RPTemplateHeader."Pre Processing Codeunit" > 0 then
             if not CODEUNIT.Run(RPTemplateHeader."Pre Processing Codeunit", Variant) then
                 exit;
 
-        if RPTemplateHeader."Print Processing Object ID" = 0 then
-            RunPrintEngine(RPTemplateHeader, RecRef)
-        else
-            case RPTemplateHeader."Print Processing Object Type" of
-                RPTemplateHeader."Print Processing Object Type"::Codeunit:
-                    CODEUNIT.Run(RPTemplateHeader."Print Processing Object ID", Variant);
-                RPTemplateHeader."Print Processing Object Type"::Report:
-                    REPORT.Run(RPTemplateHeader."Print Processing Object ID", GuiAllowed, false, Variant);
-            end;
+        RunPrintEngine(RPTemplateHeader, RecRef);
 
-        //-NPR5.48 [327107]
         OnAfterPrintMatrix(RecRef, RPTemplateHeader);
-        //+NPR5.48 [327107]
 
         if RPTemplateHeader."Post Processing Codeunit" > 0 then
             CODEUNIT.Run(RPTemplateHeader."Post Processing Codeunit", Variant);
     end;
 
-    internal procedure ProcessBufferForCodeunit(CodeunitID: Integer; NoOfPrints: Integer)
-    begin
-        PrintBuffer('', CodeunitID, 0, NoOfPrints);
-        TempGlobalBuffer.DeleteAll();
-    end;
-
-    internal procedure ProcessBufferForReport(ReportID: Integer; NoOfPrints: Integer)
-    begin
-        PrintBuffer('', 0, ReportID, NoOfPrints);
-        TempGlobalBuffer.DeleteAll();
-    end;
-
-    internal procedure SetPrintIterationFieldNo(FieldNo: Integer)
+    procedure SetPrintIterationFieldNo(FieldNo: Integer)
     begin
         PrintIterationFieldNo := FieldNo;
-    end;
-
-    local procedure GetDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer): Text
-    var
-        DeviceType: Text;
-        RPTemplateHeader: Record "NPR RP Template Header";
-    begin
-        if TemplateCode <> '' then begin
-            RPTemplateHeader.Get(TemplateCode);
-            if RPTemplateHeader."Printer Device" <> '' then
-                exit(RPTemplateHeader."Printer Device");
-        end;
-
-        OnGetDeviceType(TemplateCode, CodeunitId, ReportId, DeviceType);
-        if DeviceType = '' then
-            Error(Error_MissingDevice, RPTemplateHeader.Code, CodeunitId, ReportId);
-
-        exit(DeviceType);
     end;
 
     local procedure ProcessLayout(DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt."; DataItems: Record "NPR RP Data Items"; TemplateHeader: Record "NPR RP Template Header")
@@ -239,16 +126,14 @@
         CurrentRecNo: Integer;
         Next: Boolean;
         UpperBound: Integer;
-        MatrixPrinter: Codeunit "NPR RP Matrix Printer Interf.";
-        DeviceType: Text;
+        MatrixPrinter: Interface "NPR IMatrix Printer";
         DeviceSettings: Record "NPR RP Device Settings";
+        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
+        OutputLogging: Codeunit "NPR RP Templ. Output Log Mgt.";
     begin
-        //-NPR5.51 [360975]
-        DeviceType := GetDeviceType(TemplateHeader.Code, CODEUNIT::"NPR RP Matrix Print Mgt.", 0);
         DeviceSettings.SetRange(Template, TemplateHeader.Code);
 
-        MatrixPrinter.Construct(DeviceType);
-        //+NPR5.51 [360975]
+        MatrixPrinter := TemplateHeader."Matrix Device";
 
         if not DataJoinBuffer.FindBufferSet(DataItems.Name, CurrentRecNo) then
             exit;
@@ -256,11 +141,8 @@
         repeat
             TempGlobalBuffer.DeleteAll();
 
-            //-NPR5.51 [359771]
             UpperBound := DataJoinBuffer.FindSubset(CurrentRecNo, 0);
             DataJoinBuffer.SetBounds(CurrentRecNo, UpperBound);
-            //    DataJoinBuffer.FindSubset(CurrentRecNo, 0);
-            //+NPR5.51 [359771]
 
             RPTemplateLine.SetRange("Template Code", TemplateHeader.Code);
             RPTemplateLine.SetRange(Type, RPTemplateLine.Type::Data);
@@ -276,24 +158,19 @@
                     Itt := Integer;
             end;
 
-            //-NPR5.51 [360975]
-            //    IF Itt > 0 THEN
-            //      PrintBuffer(TemplateHeader.Code, CODEUNIT::"RP Matrix Print Mgt.", 0, Itt);
             if Itt > 2000 then
                 Error(Error_BoundsCheck, Itt);
 
             for i := 1 to Itt do begin
-                MatrixPrinter.OnInitJob(DeviceSettings);
+                MatrixPrinter.InitJob(DeviceSettings);
                 if TempGlobalBuffer.FindSet() then
                     repeat
-                        MatrixPrinter.OnPrintData(TempGlobalBuffer);
+                        MatrixPrinter.PrintData(TempGlobalBuffer);
                     until TempGlobalBuffer.Next() = 0;
-                MatrixPrinter.OnEndJob();
+                MatrixPrinter.EndJob();
             end;
-            //+NPR5.51 [360975]
 
             if HighestRootRecNo > 0 then begin
-                //Delete the roots we passed over in the join buffer.
                 Clear(i);
                 repeat
                     Next := DataJoinBuffer.NextRecord(DataItems.Name, CurrentRecNo, 0);
@@ -309,10 +186,8 @@
 
         until not Next;
 
-        //-NPR5.51 [360975]
-        OnSendPrintJob(TemplateHeader.Code, CODEUNIT::"NPR RP Matrix Print Mgt.", 0, MatrixPrinter, 1);
-        MatrixPrinter.Dispose();
-        //+NPR5.51 [360975]
+        ObjectOutputMgt.PrintMatrixJob(TemplateHeader.Code, CODEUNIT::"NPR RP Matrix Print Mgt.", 0, MatrixPrinter, 1);
+        OutputLogging.LogMatrixPrintJob(TemplateHeader.Code, CODEUNIT::"NPR RP Matrix Print Mgt.", MatrixPrinter, 1);
     end;
 
     local procedure RunPrintEngine(TemplateHeader: Record "NPR RP Template Header"; var RecRef: RecordRef)
@@ -328,30 +203,29 @@
         DataItems.FindFirst();
         DataJoinBuffer.AddFieldToMap(DataItems.Name, PrintIterationFieldNo);
         DataJoinBuffer.SetDecimalRounding(TemplateHeader."Default Decimal Rounding");
-        DataJoinBuffer.ProcessDataJoin(RecRef, TemplateHeader.Code);
+        if not DataJoinBuffer.ProcessDataJoin(RecRef, TemplateHeader.Code) then
+            exit;
         ProcessLayout(DataJoinBuffer, DataItems, TemplateHeader);
     end;
 
-    local procedure PrintBuffer(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; NoOfPrints: Integer)
+    local procedure PrintBuffer(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; NoOfPrints: Integer; MatrixPrinter: Interface "NPR IMatrix Printer")
     var
-        MatrixPrinter: Codeunit "NPR RP Matrix Printer Interf.";
-        DeviceType: Text;
         DeviceSettings: Record "NPR RP Device Settings";
+        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
+        OutputLogging: Codeunit "NPR RP Templ. Output Log Mgt.";
     begin
-        DeviceType := GetDeviceType(TemplateCode, CodeunitId, ReportId);
         DeviceSettings.SetRange(Template, TemplateCode);
-
-        MatrixPrinter.Construct(DeviceType);
-        MatrixPrinter.OnInitJob(DeviceSettings);
+        MatrixPrinter.InitJob(DeviceSettings);
 
         if TempGlobalBuffer.FindSet() then
             repeat
-                MatrixPrinter.OnPrintData(TempGlobalBuffer);
+                MatrixPrinter.PrintData(TempGlobalBuffer);
             until TempGlobalBuffer.Next() = 0;
 
-        MatrixPrinter.OnEndJob();
-        OnSendPrintJob(TemplateCode, CodeunitId, ReportId, MatrixPrinter, NoOfPrints);
-        MatrixPrinter.Dispose();
+        MatrixPrinter.EndJob();
+
+        ObjectOutputMgt.PrintMatrixJob(TemplateCode, CodeunitId, ReportId, MatrixPrinter, NoOfPrints);
+        OutputLogging.LogMatrixPrintJob(TemplateCode, CodeunitId, MatrixPrinter, NoOfPrints);
     end;
 
     local procedure EvaluateFields(var TemplateLine: Record "NPR RP Template Line"; var DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt."): Text[30]
@@ -427,13 +301,11 @@
             if TemplateLine."Data Item Name" <> '' then
                 GetRecID(TemplateLine, DataJoinBuffer, RecID);
 
-            TemplateLine.OnFunction(TemplateLine."Processing Codeunit", TemplateLine."Processing Function ID", TemplateLine, RecID, Skip, Handled);
+            OnFunction(TemplateLine."Processing Codeunit", TemplateLine."Processing Function ID", TemplateLine, RecID, Skip, Handled);
             if Skip then begin
                 Clear(LineBuffer);
                 exit;
             end;
-            if not Handled then //Legacy
-                CODEUNIT.Run(TemplateLine."Processing Codeunit", TemplateLine);
         end;
 
         if TemplateLine."Start Char" > 0 then
@@ -522,7 +394,6 @@
 
     local procedure GetFieldValue(TemplateLine: Record "NPR RP Template Line"; DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt."): Text
     begin
-        //-NPR5.46 [314067]
         if TemplateLine."Field 2" = 0 then
             if TemplateLine."Root Record No." > 0 then
                 exit(DataJoinBuffer.GetFieldFromRecordRootNo(TemplateLine.Field, TemplateLine."Root Record No.", TemplateLine."Data Item Name"))
@@ -533,12 +404,10 @@
                     exit(DataJoinBuffer.GetField(TemplateLine.Field, TemplateLine."Data Item Name"))
         else
             exit(EvaluateFields(TemplateLine, DataJoinBuffer));
-        //+NPR5.46 [314067]
     end;
 
     local procedure GetRecID(TemplateLine: Record "NPR RP Template Line"; DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt."; var RecordID: RecordID)
     begin
-        //-NPR5.46 [314067]
         if TemplateLine."Root Record No." > 0 then
             DataJoinBuffer.GetRecIDFromRecordRootNo(TemplateLine."Root Record No.", TemplateLine."Data Item Name", RecordID)
         else
@@ -546,7 +415,6 @@
                 DataJoinBuffer.GetRecIDFromRecordIterationNo(TemplateLine."Data Item Record No.", TemplateLine."Data Item Name", RecordID)
             else
                 DataJoinBuffer.GetRecID(TemplateLine."Data Item Name", RecordID);
-        //+NPR5.46 [314067]
     end;
 
     local procedure GetAttributeValue(TemplateLine: Record "NPR RP Template Line"; DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt."): Text
@@ -559,7 +427,6 @@
         KeyRef: KeyRef;
         FieldRef: FieldRef;
     begin
-        //-NPR5.46 [314067]
         AttributeID.SetRange(AttributeID."Table ID", TemplateLine."Data Item Table");
         AttributeID.SetRange(AttributeID."Attribute Code", TemplateLine.Attribute);
         if not AttributeID.FindSet() then
@@ -575,17 +442,6 @@
             AttributeManagement.GetMasterDataAttributeValue(AttributeArray, TemplateLine."Data Item Table", PKValue);
             exit(AttributeArray[AttributeID."Shortcut Attribute ID"]);
         end;
-        //+NPR5.46 [314067]
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var DeviceType: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSendPrintJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer)
-    begin
     end;
 
     [IntegrationEvent(false, false)]
@@ -595,6 +451,33 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterPrintMatrix(var RecRef: RecordRef; TemplateHeader: Record "NPR RP Template Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    [Obsolete('Replaced with explicit enum usage')]
+    local procedure OnGetDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var DeviceType: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    [Obsolete('Replaced with interface for matrix printers')]
+    local procedure OnSendPrintJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer)
     begin
     end;
 }

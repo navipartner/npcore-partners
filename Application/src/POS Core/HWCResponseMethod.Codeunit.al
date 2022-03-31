@@ -1,5 +1,8 @@
 ﻿codeunit 6014575 "NPR HWC Response Method"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Once all v1 workflows are moved to v3, any call to HWC from the POS should go via a workflow instead of this object.';
+
     Access = Internal;
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
     local procedure OnPreSearch(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);

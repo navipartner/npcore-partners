@@ -1,31 +1,10 @@
-﻿page 6014423 "NPR Report Selection: Retail"
+page 6014423 "NPR Report Selection: Retail"
 {
     Extensible = False;
-    // NPR4.15/JDH/20150909 CASE 222525 Translated to English + changed caption values
-    // NPR4.18/MMV/20151217 CASE 225584 Added fields 12, 13.
-    // NPR4.18/MMV/20151230 CASE 229221 Blanked "Report Type" options: Label (Single) & Byttemærke (Single) - They are deprecated.
-    // NPR5.22/MMV/20160408 CASE 232067 Added "Report Type" options: "CustomerLocationOnSave" & "CustomerLocationOnTrigger"
-    //                                  Added missing "Report Type" option captions.
-    //                                  Renamed english page caption to match other report selection pages.
-    // NPR5.23/MMV/20160510 CASE 240211 Added field 15.
-    //                                  Added "Report Type" option: "Sign"
-    // NPR5.29/MMV /20161215 CASE 253966 Added "Report Type" option: "Bin Label".
-    // NPR5.29/MMV /20161215 CASE 241549 Deprecated several options and fields.
-    //                                   Set Data Port fields to visible = FALSE as default.
-    //                                   Changed default field ordering to match Object Output page.
-    // NPR5.32/MMV /20170501 CASE 241995 Renamed option in report type.
-    // NPR5.39/MMV /20180208 CASE 304165 New types for POS Entry prints.
-    // NPR5.40/MMV /20180328 CASE 276562 Renamed option
-    // NPR5.42/ZESO/20180517 CASE 312186 Added new option Large Balancing (POS Entry) to variable ReportType2.
-    // NPR5.50/TSA /20190423 CASE 352483 Added Report Type "Begin Workshift (POS Entry)"
-    // NPR5.55/YAHA/20191127 CASE 362312 Added Report Type "Transfer Order"
-    // NPR5.55/BHR /202020713 CASE 414268 Add Report type ,Inv.PutAway Label
-
     Caption = 'Report Selection - Retail';
     DelayedInsert = true;
     Editable = true;
     PageType = Worksheet;
-    SaveValues = true;
     SourceTable = "NPR Report Selection Retail";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
@@ -38,18 +17,17 @@
             group(Control6150624)
             {
                 ShowCaption = false;
-                field(ReportType2; ReportType2)
+                field(ReportType2; ReportTypeEnum)
                 {
 
-                    OptionCaption = 'Sales Receipt,Register Balancing,Price Label,Signature Receipt,Gift Voucher,,Credit Voucher,,Terminal Receipt,Large Sales Receipt,,,Exchange Label,,Customer Sales Receipt,Rental,Tailor,Order,Photo Label,,,,Warranty Certificate,Shelf Label,,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,Bin Label,Sales Receipt (POS Entry),Large Sales Receipt (POS Entry),Balancing (POS Entry),Sales Doc. Confirmation (POS Entry),Large Balancing (POS Entry),Begin Workshift (POS Entry),Transfer Order,Inv.PutAway Label';
-                    ShowCaption = false;
-                    ToolTip = 'Specifies the value of the ReportType2 field';
+                    ToolTip = 'Specifies the value of the Report Type field';
+                    Caption = 'Report Type';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
-                        SetUsageFilter();
-                        ReportUsage2OnAfterValidate();
+                        SetReportTypeFilter();
+                        CurrPage.Update();
                     end;
                 }
             }
@@ -80,20 +58,6 @@
                     ToolTip = 'Specifies the value of the Report Name field';
                     ApplicationArea = NPRRetail;
                 }
-                field("XML Port ID"; Rec."XML Port ID")
-                {
-
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the XML Port ID field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("XML Port Name"; Rec."XML Port Name")
-                {
-
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the XML Port Name field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Codeunit ID"; Rec."Codeunit ID")
                 {
 
@@ -113,72 +77,10 @@
                     ToolTip = 'Specifies the value of the Print Template field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Filter Object ID"; Rec."Filter Object ID")
-                {
-
-                    ToolTip = 'Specifies the value of the Filter Object ID field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Record Filter"; Rec."Record Filter")
-                {
-
-                    AssistEdit = true;
-                    ToolTip = 'Specifies the value of the Record Filter field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnAssistEdit()
-                    var
-                        TableFilter: Record "Table Filter";
-                        TableFilterPage: Page "Table Filter";
-                        AllObjWithCaption: Record AllObjWithCaption;
-                        TableCaption: Text;
-                    begin
-                        //-NPR4.18
-                        AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
-                        AllObjWithCaption.SetRange("Object ID", Rec."Filter Object ID");
-                        if AllObjWithCaption.FindFirst() then
-                            TableCaption := AllObjWithCaption."Object Caption";
-
-
-                        TableFilter.FilterGroup(2);
-                        TableFilter.SetRange("Table Number", Rec."Filter Object ID");
-                        TableFilter.FilterGroup(0);
-                        TableFilterPage.SetTableView(TableFilter);
-                        TableFilterPage.SetSourceTable(Format(Rec."Record Filter"), Rec."Filter Object ID", TableCaption);
-                        if ACTION::OK = TableFilterPage.RunModal() then
-                            Evaluate(Rec."Record Filter", TableFilterPage.CreateTextTableFilter(false));
-                        //+NPR4.18
-                    end;
-                }
                 field(Optional; Rec.Optional)
                 {
 
                     ToolTip = 'Specifies the value of the Optional field';
-                    ApplicationArea = NPRRetail;
-                }
-            }
-        }
-    }
-
-    actions
-    {
-        area(processing)
-        {
-            group(Function)
-            {
-                Caption = 'Functions';
-                action(List)
-                {
-                    Caption = '&List';
-                    Image = Report2;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-                    RunObject = Page "NPR Retail Report Select. List";
-                    ShortCutKey = 'F5';
-
-                    ToolTip = 'Executes the &List action';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -192,22 +94,18 @@
 
     trigger OnOpenPage()
     begin
-        SetUsageFilter();
+        ReportTypeEnum := ReportTypeEnum::"Price Label";
+        SetReportTypeFilter();
     end;
 
-    var
-        ReportType2: Option "Sales Receipt","Register Balancing","Price Label","Signature Receipt","Gift Voucher",,"Credit Voucher",,"Terminal Receipt","Large Sales Receipt",,,"Exchange Label",,"Customer Sales Receipt",Rental,Tailor,"Order","Photo Label",,,,"Warranty Certificate","Shelf Label",,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,"Bin Label","Sales Receipt (POS Entry)","Large Sales Receipt (POS Entry)","Balancing (POS Entry)","Sales Doc. Confirmation (POS Entry)","Large Balancing (POS Entry)","Begin Workshift (POS Entry)","Transfer Order","Inv.PutAway Label";
-
-    local procedure SetUsageFilter()
+    local procedure SetReportTypeFilter()
     begin
         Rec.FilterGroup(2);
-        Rec.SetRange("Report Type", ReportType2);
+        Rec.SetRange(Rec."Report Type", ReportTypeEnum);
         Rec.FilterGroup(0);
     end;
 
-    local procedure ReportUsage2OnAfterValidate()
-    begin
-        CurrPage.Update();
-    end;
+    var
+        ReportTypeEnum: Enum "NPR Report Selection Type";
 }
 

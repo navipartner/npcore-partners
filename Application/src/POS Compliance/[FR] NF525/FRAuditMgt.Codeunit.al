@@ -1104,9 +1104,8 @@ codeunit 6184850 "NPR FR Audit Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Aux: Event Publishers", 'OnSalesReceiptFooter', '', true, true)]
-    local procedure OnReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text)
+    local procedure OnReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text; LinePrintMgt: Codeunit "NPR RP Line Print Mgt.")
     var
-        LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
         POSEntry: Record "NPR POS Entry";
         AuditLog: Record "NPR POS Audit Log";
         PrintSignature: Text;

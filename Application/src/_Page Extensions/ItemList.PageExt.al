@@ -192,7 +192,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 #pragma warning disable AL0432
         modify("Cross Re&ferences")
         {
-            Visible = not ItemReferenceVisible;
+            Visible = false; //we force item reference everywhere now.
         }
 #pragma warning restore
 #endif

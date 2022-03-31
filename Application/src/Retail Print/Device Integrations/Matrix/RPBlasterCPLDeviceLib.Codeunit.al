@@ -1,122 +1,20 @@
-﻿codeunit 6014545 "NPR RP Blaster CPL Device Lib."
+codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printer"
 {
     Access = Internal;
-    // Blaster CPL Command Library.
-    //  Work started by Nicolai Esbensen.
-    //  Contributions providing function interfaces for valid
-    //  the CPL language functional sequences are welcome. Functionality
-    //  for other printer languages should be put in a library on its own.
-    // 
-    //  All functions write CPL code to a string buffer which can
-    //  be sent to a printer or stored to a file.
-    // 
-    //  Functionality of this library is build
-    //  with reference to
-    //    - Cognitive Programming Language (CPL)
-    //      Programmers Guide
-    //      105-008-02 Revision C2 - 3/17/2006
-    // 
-    //  Manual is located at
-    //  "N:\UDV\POS Devices\Tutorials\CLP programming reference\105-008-02_ProgrammingManual_REVC2"
-    // 
-    // NPR5.32/MMV /20170410 CASE 241995 Retail Print 2.0
-    // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
-
-    EventSubscriberInstance = Manual;
-
     var
-        TempPattern: Text[50];
-        ESC: Codeunit "NPR RP Escape Code Library";
-        PrintBuffer: Text;
-        Initialized: Boolean;
-        MediaSizeSettingMsg: Label 'Dimensions of media - syntax: width[0-500],height[0-500]';
+        _PrintBuffer: Codeunit "Temp Blob";
+        _Initialized: Boolean;
+        MediaSizeSettingLbl: Label 'Dimensions of media - syntax: width[0-500],height[0-500]';
         InvalidDeviceSettingErr: Label 'Invalid device setting: %1';
+        _DotNetStream: Codeunit DotNet_Stream;
+        _DotNetEncoding: Codeunit DotNet_Encoding;
 
     #region Interface Implementation
-    local procedure DeviceCode(): Text
-    begin
-        exit('BLASTER');
-    end;
 
-    procedure IsThisDevice(Text: Text): Boolean
-    begin
-        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnInitJob', '', false, false)]
-    local procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
-    begin
-        InitJob(DeviceSettings);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnEndJob', '', false, false)]
-    local procedure OnEndJob()
-    begin
-        EndJob();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnPrintData', '', false, false)]
-    local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
-    begin
-        PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.Height, POSPrintBuffer.Width, POSPrintBuffer.X, POSPrintBuffer.Y);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnLookupFont', '', false, false)]
-    local procedure OnLookupFont(var LookupOK: Boolean; var Value: Text)
-    begin
-        LookupOK := SelectFont(Value);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnLookupCommand', '', false, false)]
-    local procedure OnLookupCommand(var LookupOK: Boolean; var Value: Text)
-    begin
-        LookupOK := SelectCommand(Value);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnLookupDeviceSetting', '', false, false)]
-    local procedure OnLookupDeviceSetting(var LookupOK: Boolean; var tmpDeviceSetting: Record "NPR RP Device Settings" temporary)
-    begin
-        LookupOK := SelectDeviceSetting(tmpDeviceSetting);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetPageWidth', '', false, false)]
-    local procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
-    begin
-        Width := GetPageWidth(FontFace);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetTargetEncoding', '', false, false)]
-    local procedure OnGetTargetEncoding(var TargetEncoding: Text)
-    begin
-        TargetEncoding := 'IBM00858';
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetPrintBytes', '', false, false)]
-    local procedure OnGetPrintBytes(var PrintBytes: Text)
-    begin
-        PrintBytes := PrintBuffer;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnSetPrintBytes', '', false, false)]
-    local procedure OnSetPrintBytes(var PrintBytes: Text)
-    begin
-        PrintBuffer := PrintBytes;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnBuildDeviceList', '', false, false)]
-    local procedure OnBuildDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)
-    begin
-        tmpRetailList.Number += 1;
-        tmpRetailList.Value := DeviceCode();
-        tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert();
-    end;
-    #endregion
-
-    #region ShortHandFunctions
     procedure InitJob(var DeviceSettings: Record "NPR RP Device Settings")
     begin
-        Initialized := false;
+        _Initialized := false;
+        InitBuffer();
 
         if DeviceSettings.FindSet() then
             repeat
@@ -128,6 +26,102 @@
                 end;
             until DeviceSettings.Next() = 0;
     end;
+
+    procedure PrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
+    var
+        StringLib: Codeunit "NPR String Library";
+        FontParam: Code[10];
+    begin
+        if not _Initialized then //Legacy support for when the template lines contained setup commands.
+            InitializePrinter(POSPrintBuffer.Font);
+
+        if POSPrintBuffer.Align > 0 then
+            case POSPrintBuffer.Align of
+                1:
+                    Justify('CENTER');
+                2:
+                    Justify('RIGHT');
+            end;
+
+        if UpperCase(CopyStr(POSPrintBuffer.Font, 1, 6)) = 'CODE39' then
+            Barcode('CODE39', POSPrintBuffer.X, POSPrintBuffer.Y, 50, POSPrintBuffer.Text)
+        else
+            if CopyStr(POSPrintBuffer.Font, 1, 5) = 'EAN13' then
+                Barcode('EAN13', POSPrintBuffer.X, POSPrintBuffer.Y, 50, POSPrintBuffer.Text)
+            else
+                if CopyStr(POSPrintBuffer.Font, 1, 4) = 'UPCA' then
+                    Barcode('UPCA', POSPrintBuffer.X, POSPrintBuffer.Y, 50, POSPrintBuffer.Text)
+                else
+                    if CopyStr(POSPrintBuffer.Font, 1, 7) = 'BARCODE' then begin
+                        PrintBarcode(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.Height, POSPrintBuffer.X, POSPrintBuffer.Y)
+                    end else
+                        if CopyStr(POSPrintBuffer.Font, 1, 6) = 'STRING' then begin
+                            StringLib.Construct(POSPrintBuffer.Font);
+                            FontParam := StringLib.SelectStringSep(2, ' ');
+                            String(FontParam, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text)
+                        end else
+                            if CopyStr(POSPrintBuffer.Font, 1, 4) = 'TEXT' then begin
+                                StringLib.Construct(POSPrintBuffer.Font);
+                                FontParam := StringLib.SelectStringSep(2, ' ');
+                                Text(FontParam, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text)
+                            end else
+                                if CopyStr(POSPrintBuffer.Font, 1, 9) = 'ULTRAFONT' then begin
+                                    PrintUltraFont(POSPrintBuffer.Font, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text)
+                                end else
+                                    if CopyStr(POSPrintBuffer.Font, 1, 4) = 'LINE' then begin
+                                        DrawLine(POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Width);
+                                    end else
+                                        if CopyStr(POSPrintBuffer.Font, 1, 5) = 'SETUP' then begin
+                                            //Do nothing - Only Setup possible atm is 'SETUP HEIGHT' which is handled by InitializePrinter()
+                                            exit;
+                                        end else begin
+                                            Error('Unsupported Font');
+                                        end;
+
+        if POSPrintBuffer.Align > 0 then
+            Justify('LEFT');
+    end;
+
+    procedure EndJob()
+    begin
+        AddStringToBuffer('END');
+    end;
+
+    procedure LookupFont(var Value: Text): Boolean
+    begin
+        exit(SelectFont(Value));
+    end;
+
+    procedure LookupCommand(var Value: Text): Boolean
+    begin
+        exit(SelectCommand(Value));
+    end;
+
+    procedure LookupDeviceSetting(var tmpDeviceSetting: Record "NPR RP Device Settings" temporary): Boolean
+    begin
+        exit(SelectDeviceSetting(tmpDeviceSetting));
+    end;
+
+    procedure PrepareJobForHTTP(var HTTPEndpoint: Text): Boolean
+    begin
+        HTTPEndpoint := '';
+        exit(false);
+    end;
+
+    procedure PrepareJobForBluetooth(): Boolean
+    begin
+        exit(false);
+    end;
+
+    procedure GetPrintBufferAsBase64(): Text
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        IStream: InStream;
+    begin
+        _PrintBuffer.CreateInStream(IStream);
+        exit(Base64Convert.ToBase64(IStream));
+    end;
+    #endregion
 
     local procedure InitializePrinter(SizeCommand: Text)
     var
@@ -144,69 +138,7 @@
                 HeaderLine('!', 0, Width, Height, 1);
         end else
             HeaderLine('!', 0, 100, 225, 1);
-        Initialized := true;
-    end;
-
-    procedure EndJob()
-    begin
-        // Ref sheet 42
-        TempPattern := 'END';
-        AddToBuffer(TempPattern);
-    end;
-
-    procedure PrintData(TextIn: Text[100]; FontType: Text[30]; Align: Integer; Rotation: Integer; Height: Integer; Width: Integer; X: Integer; Y: Integer)
-    var
-        StringLib: Codeunit "NPR String Library";
-        FontParam: Code[10];
-    begin
-        if not Initialized then //Legacy support for when the template lines contained setup commands.
-            InitializePrinter(FontType);
-
-        if Align > 0 then
-            case Align of
-                1:
-                    Justify('CENTER');
-                2:
-                    Justify('RIGHT');
-            end;
-
-        if UpperCase(CopyStr(FontType, 1, 6)) = 'CODE39' then
-            Barcode('CODE39', X, Y, 50, TextIn)
-        else
-            if CopyStr(FontType, 1, 5) = 'EAN13' then
-                Barcode('EAN13', X, Y, 50, TextIn)
-            else
-                if CopyStr(FontType, 1, 4) = 'UPCA' then
-                    Barcode('UPCA', X, Y, 50, TextIn)
-                else
-                    if CopyStr(FontType, 1, 7) = 'BARCODE' then begin
-                        PrintBarcode(TextIn, FontType, Align, Rotation, Height, X, Y)
-                    end else
-                        if CopyStr(FontType, 1, 6) = 'STRING' then begin
-                            StringLib.Construct(FontType);
-                            FontParam := StringLib.SelectStringSep(2, ' ');
-                            String(FontParam, X, Y, TextIn)
-                        end else
-                            if CopyStr(FontType, 1, 4) = 'TEXT' then begin
-                                StringLib.Construct(FontType);
-                                FontParam := StringLib.SelectStringSep(2, ' ');
-                                Text(FontParam, X, Y, TextIn)
-                            end else
-                                if CopyStr(FontType, 1, 9) = 'ULTRAFONT' then begin
-                                    PrintUltraFont(FontType, X, Y, TextIn)
-                                end else
-                                    if CopyStr(FontType, 1, 4) = 'LINE' then begin
-                                        DrawLine(X, Y, Width);
-                                    end else
-                                        if CopyStr(FontType, 1, 5) = 'SETUP' then begin
-                                            //Do nothing - Only Setup possible atm is 'SETUP HEIGHT' which is handled by InitializePrinter()
-                                            exit;
-                                        end else begin
-                                            Error('Unsupported Font');
-                                        end;
-
-        if Align > 0 then
-            Justify('LEFT');
+        _Initialized := true;
     end;
 
     procedure PrintBarcode(TextIn: Text[100]; FontType: Text[30]; Align: Integer; Rotation: Integer; Height: Integer; X: Integer; Y: Integer)
@@ -268,16 +200,32 @@
         end;
     end;
 
-    procedure GetPrintBytes(): Text
+    local procedure InitBuffer()
+    var
+        OStream: OutStream;
     begin
-        exit(PrintBuffer);
+        Clear(OStream);
+        Clear(_PrintBuffer);
+        Clear(_DotNetStream);
+        Clear(_DotNetEncoding);
+        _PrintBuffer.CreateOutStream(OStream);
+        _DotNetEncoding.Encoding(858);
+        _DotNetStream.FromOutStream(OStream);
     end;
 
-    procedure SetPrintBytes(PrintBytes: Text)
+    local procedure AddStringToBuffer(String: Text)
+    var
+        DotNetCharArray: Codeunit "DotNet_Array";
+        DotNetByteArray: Codeunit "DotNet_Array";
+        DotNetString: Codeunit "DotNet_String";
     begin
-        PrintBuffer := PrintBytes;
+        //This function over allocates and is verbose, all because of the beautiful DotNet wrapper codeunits.
+
+        DotNetString.Set(String);
+        DotNetString.ToCharArray(0, DotNetString.Length(), DotNetCharArray);
+        _DotNetEncoding.GetBytes(DotNetCharArray, 0, DotNetCharArray.Length(), DotNetByteArray);
+        _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());
     end;
-    #endregion
 
     #region Info Functions
     procedure IsBarcodeFont(FontCode: Text): Boolean
@@ -286,15 +234,9 @@
                            'I2OF5', 'S2OF5', 'D2OF5', 'CODE128A', 'CODE128B', 'CODE128C', 'CODABAR', 'PLESSEY', 'MSI', 'MSI1', 'CODE93', 'POSTNET',
                            'CODE16K', 'MAXICODE', 'PDF417'])
     end;
-
-    procedure GetPageWidth(FontFace: Text[30]) Width: Integer
-    begin
-        exit(0);
-    end;
     #endregion
 
     #region Advanced Functions
-
     local procedure Barcode(type: Text[30]; x: Integer; y: Integer; h: Integer; characters: Text[30])
     begin
         // Ref sheet 22-26
@@ -303,8 +245,7 @@
         //          I2OF5,S2OF5,D2OF5,CODE128A,CODE128B,CODE128C,CODABAR,PLESSEY,MSI,MSI1,CODE93,POSTNET,
         //          CODE16K,MAXICODE,PDF417]
         // h in [1:256]
-        TempPattern := 'BARCODE %1 %2 %3 %4 %5';
-        AddToBuffer(StrSubstNo(TempPattern, type, x, y, h, characters));
+        AddStringToBuffer(StrSubstNo('BARCODE %1 %2 %3 %4 %5', type, x, y, h, characters));
     end;
 
     local procedure Barcode2(Rnnn: Integer; type: Text[30]; modifiers: Text[30]; x: Integer; y: Integer; h: Integer; characters: Text[30])
@@ -315,60 +256,47 @@
         //          I2OF5,S2OF5,D2OF5,CODE128A,CODE128B,CODE128C,CODABAR,PLESSEY,MSI,MSI1,CODE93,POSTNET,
         //          CODE16K,MAXICODE,PDF417]
         // modifiers in [+,-,(n:w),W,X]
-        // h in [1:256]
-        TempPattern := 'BARCODE[%1] %2%3 %4 %5 %6 %7';
-        AddToBuffer(StrSubstNo(TempPattern, Rnnn, type, modifiers, x, y, h, characters));
+        // h in [1:256]        
+        AddStringToBuffer(StrSubstNo('BARCODE[%1] %2%3 %4 %5 %6 %7', Rnnn, type, modifiers, x, y, h, characters));
     end;
-
     local procedure DrawLine(x: Integer; y: Integer; w: Integer)
     begin
         // Not in ref sheet
         // Command syntax: DRAW_LINE x1 y1 x2 y2 Thickness Color
         // Thickness and Color are optional
         // Hardcoded y2 so the lines can only be horizontal
-        TempPattern := 'DRAW_LINE %1 %2 %3 %4 %5';
-        AddToBuffer(StrSubstNo(TempPattern, x, y, x + w, y, 2));
+        AddStringToBuffer(StrSubstNo('DRAW_LINE %1 %2 %3 %4 %5', x, y, x + w, y, 2));
     end;
-
     local procedure HeaderLine(mode: Text[2]; x: Integer; dottime: Integer; maxY: Integer; numlbls: Integer)
     begin
         // Ref sheet 51-54
         // mode in [!,@,!#,#,!*,!+,!A]
-        TempPattern := '%1 %2 %3 %4 %5';
-        AddToBuffer(StrSubstNo(TempPattern, mode, x, dottime, maxY, numlbls));
+        AddStringToBuffer(StrSubstNo('%1 %2 %3 %4 %5', mode, x, dottime, maxY, numlbls));
     end;
-
     local procedure Justify(alignment: Text[6])
     begin
         // Ref sheet 56-57
         // Alignment in [LEFT,RIGHT,CENTER]
-        TempPattern := 'JUSTIFY %1';
-        AddToBuffer(StrSubstNo(TempPattern, alignment));
+        AddStringToBuffer(StrSubstNo('JUSTIFY %1', alignment));
     end;
-
     local procedure String(type: Text[10]; x: Integer; y: Integer; characters: Text[250])
     begin
         // Ref sheet 74-77
         // type in [3X5,5X7,8X8,9X12,12X16,18X23,24X31]
-        TempPattern := 'STRING %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, type, x, y, characters));
+        AddStringToBuffer(StrSubstNo('STRING %1 %2 %3 %4', type, x, y, characters));
     end;
-
     local procedure Text(fontID: Text[1]; x: Integer; y: Integer; characters: Text[250])
     begin
         // Ref sheet 78-80
         // fontID in [1:6]
-        TempPattern := 'TEXT %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, fontID, x, y, characters));
+        AddStringToBuffer(StrSubstNo('TEXT %1 %2 %3 %4', fontID, x, y, characters));
     end;
-
     local procedure UltraFont(T: Text[1]; nnn: Text[10]; x: Integer; y: Integer; char: Text[250])
     begin
         // Ref sheet 74-77
         // T in [A,B,C]
         // nnn in IntXInt (HeightXWidth)
-        TempPattern := 'ULTRA_FONT %1%2 %3 %4 %5';
-        AddToBuffer(StrSubstNo(TempPattern, T, nnn, x, y, char));
+        AddStringToBuffer(StrSubstNo('ULTRA_FONT %1%2 %3 %4 %5', T, nnn, x, y, char));
     end;
 
     local procedure UltraFont2(T: Text[1]; nnn: Text[10]; Italic: Boolean; Bold: Text[3]; Space: Text[3]; x: Integer; y: Integer; char: Text[250])
@@ -379,37 +307,7 @@
         // type in [3X5,5X7,8X8,9X12,12X16,18X23,24X31]'
         if Italic then ItalicText := 'I';
 
-        TempPattern := 'ULTRA_FONT %1%2 %3G2(%4,%5,0) %6 %7 %8';
-        AddToBuffer(StrSubstNo(TempPattern, T, nnn, ItalicText, Bold, Space, x, y, char));
-    end;
-
-    // Case 462311 function not used - local procedure Width(nnn: Integer)
-    // begin
-    //     // Ref sheet 92-93
-    //     TempPattern := 'WIDTH %1';
-    //     AddToBuffer(StrSubstNo(TempPattern, nnn));
-    // end;
-    #endregion
-
-    #region Aux Functions
-    local procedure AddToBuffer(Text: Text[1024])
-    begin
-        AddTextToBuffer(Text);
-    end;
-
-    local procedure AddTextToBuffer(Text: Text[1024])
-    begin
-        PrintBuffer += Text + ESC.CR() + ESC.LF();
-    end;
-
-    procedure LatinConvert(Input: Text[1024]) Output: Text[1024]
-    var
-        ToTxt: Text;
-        FromTxt: Text;
-    begin
-        FromTxt := '‘›†’«Ž™š‚ÔŠ';
-        ToTxt := 'ÈÛ¹ÉßÄ®ÃÙÚ²â¿';
-        Output := ConvertStr(Input, FromTxt, ToTxt);
+        AddStringToBuffer(StrSubstNo('ULTRA_FONT %1%2 %3G2(%4,%5,0) %6 %7 %8', T, nnn, ItalicText, Bold, Space, x, y, char));
     end;
     #endregion
 
@@ -493,7 +391,7 @@
 
     local procedure ConstructDeviceSettingList(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
-        AddOption(tmpRetailList, MediaSizeSettingMsg, 'MEDIA_SIZE');
+        AddOption(tmpRetailList, MediaSizeSettingLbl, 'MEDIA_SIZE');
     end;
 
     procedure AddOption(var RetailList: Record "NPR Retail List" temporary; Choice: Text; Value: Text)

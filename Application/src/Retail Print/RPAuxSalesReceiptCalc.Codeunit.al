@@ -1,13 +1,6 @@
 ﻿codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
 {
     Access = Internal;
-    // NPR5.43/MMV /20180628 CASE 315937 Created object
-
-
-    trigger OnRun()
-    begin
-    end;
-
     local procedure AddFunction(var tmpRetailList: Record "NPR Retail List" temporary; Choice: Text)
     begin
         tmpRetailList.Number += 1;
@@ -22,7 +15,7 @@
         exit((POSSalesLine."Amount Incl. VAT" + POSSalesLine."Line Discount Amount Incl. VAT") / POSSalesLine.Quantity);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnBuildFunctionCodeunitList', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnBuildFunctionCodeunitList', '', false, false)]
     local procedure OnBuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
     var
         AllObj: Record AllObj;
@@ -33,7 +26,7 @@
         tmpAllObj.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnBuildFunctionList', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnBuildFunctionList', '', false, false)]
     local procedure OnBuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         if CodeunitID <> CODEUNIT::"NPR RP Aux: SalesReceipt Calc." then
@@ -43,7 +36,7 @@
         AddFunction(tmpRetailList, 'UNITPRICEINCLVATEXCLDISC_0_2');
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnFunction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnFunction', '', false, false)]
     local procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
     var
         RecRef: RecordRef;

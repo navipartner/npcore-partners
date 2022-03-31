@@ -1,11 +1,6 @@
 ﻿table 6014445 "NPR RP Template Line"
 {
     Access = Internal;
-    // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
-    // NPR5.44/MMV /20180706 CASE 315362 Added field 60, renamed field 44
-    // NPR5.46/MMV /20180911 CASE 314067 Added field 52
-    // NPR5.51/MMV /20190712 CASE 360972 Added field 70
-
     Caption = 'RP Template Line';
     DataClassification = CustomerContent;
 
@@ -30,14 +25,13 @@
             trigger OnLookup()
             var
                 RPTemplateHeader: Record "NPR RP Template Header";
-                MatrixInterface: Codeunit "NPR RP Matrix Printer Interf.";
-                LineInterface: Codeunit "NPR RP Line Printer Interf.";
+                MatrixPrinter: Interface "NPR IMatrix Printer";
+                LinePrinter: Interface "NPR ILine Printer";
                 LookupOK: Boolean;
                 Value: Text;
                 RetailLogo: Record "NPR Retail Logo";
             begin
                 RPTemplateHeader.Get("Template Code");
-                RPTemplateHeader.TestField("Printer Device");
 
                 case Type of
                     Type::Data,
@@ -46,15 +40,13 @@
                             case RPTemplateHeader."Printer Type" of
                                 RPTemplateHeader."Printer Type"::Line:
                                     begin
-                                        LineInterface.Construct(RPTemplateHeader."Printer Device");
-                                        LineInterface.OnLookupFont(LookupOK, Value);
-                                        LineInterface.Dispose();
+                                        LinePrinter := RPTemplateHeader."Line Device";
+                                        LookupOK := LinePrinter.LookupFont(Value);
                                     end;
                                 RPTemplateHeader."Printer Type"::Matrix:
                                     begin
-                                        MatrixInterface.Construct(RPTemplateHeader."Printer Device");
-                                        MatrixInterface.OnLookupFont(LookupOK, Value);
-                                        MatrixInterface.Dispose();
+                                        MatrixPrinter := RPTemplateHeader."Matrix Device";
+                                        LookupOK := MatrixPrinter.LookupFont(Value);
                                     end;
                             end;
                             if LookupOK then
@@ -66,15 +58,13 @@
                             case RPTemplateHeader."Printer Type" of
                                 RPTemplateHeader."Printer Type"::Line:
                                     begin
-                                        LineInterface.Construct(RPTemplateHeader."Printer Device");
-                                        LineInterface.OnLookupCommand(LookupOK, Value);
-                                        LineInterface.Dispose();
+                                        LinePrinter := RPTemplateHeader."Line Device";
+                                        LookupOK := LinePrinter.LookupCommand(Value);
                                     end;
                                 RPTemplateHeader."Printer Type"::Matrix:
                                     begin
-                                        MatrixInterface.Construct(RPTemplateHeader."Printer Device");
-                                        MatrixInterface.OnLookupCommand(LookupOK, Value);
-                                        MatrixInterface.Dispose();
+                                        MatrixPrinter := RPTemplateHeader."Matrix Device";
+                                        LookupOK := MatrixPrinter.LookupCommand(Value);
                                     end;
                             end;
                             if LookupOK then
@@ -247,8 +237,8 @@
         field(25; Type; Option)
         {
             Caption = 'Type';
-            OptionCaption = 'Data,Loop,Command,Logo,FieldCaption';
-            OptionMembers = Data,Loop,Command,Logo,FieldCaption;
+            OptionCaption = 'Data,Loop,Command,Logo,Field Caption,If Data Found';
+            OptionMembers = Data,Loop,Command,Logo,FieldCaption,IfDataFound;
             DataClassification = CustomerContent;
         }
         field(26; "Parent Line No."; Integer)
@@ -336,10 +326,19 @@
             trigger OnLookup()
             var
                 TempAllObj: Record AllObj temporary;
+                PrintTemplateHeader: Record "NPR RP Template Header";
+                MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
+                LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
             begin
-                OnBuildFunctionCodeunitList(TempAllObj);
-                if PAGE.RunModal(PAGE::"All Objects", TempAllObj) = ACTION::LookupOK then
-                    "Processing Codeunit" := TempAllObj."Object ID";
+                PrintTemplateHeader.Get(Rec."Template Code");
+
+                case PrintTemplateHeader."Printer Type" of
+                    PrintTemplateHeader."Printer Type"::Line:
+                        LinePrintMgt.OnBuildFunctionCodeunitList(TempAllObj);
+                    PrintTemplateHeader."Printer Type"::Matrix:
+                        MatrixPrintMgt.OnBuildFunctionCodeunitList(TempAllObj);
+                end;
+
             end;
         }
         field(36; "Processing Function ID"; Code[30])
@@ -350,16 +349,33 @@
             trigger OnLookup()
             var
                 TempRetailList: Record "NPR Retail List" temporary;
+                PrintTemplateHeader: Record "NPR RP Template Header";
+                MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
+                LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
             begin
-                OnBuildFunctionList("Processing Codeunit", TempRetailList);
-                if PAGE.RunModal(0, TempRetailList) = ACTION::LookupOK then
-                    "Processing Function ID" := TempRetailList.Choice;
+                PrintTemplateHeader.Get(Rec."Template Code");
+
+                case PrintTemplateHeader."Printer Type" of
+                    PrintTemplateHeader."Printer Type"::Line:
+                        LinePrintMgt.OnBuildFunctionList(Rec."Processing Codeunit", TempRetailList);
+                    PrintTemplateHeader."Printer Type"::Matrix:
+                        MatrixPrintMgt.OnBuildFunctionList(Rec."Processing Codeunit", TempRetailList);
+                end;
+
             end;
         }
         field(37; "Processing Value"; Text[250])
         {
             Caption = 'Proccesing Value';
             DataClassification = CustomerContent;
+        }
+        field(38; "Processing Codeunit Name"; Text[249])
+        {
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
+                                                                           "Object ID" = FIELD("Processing Codeunit")));
+            Caption = 'Processing Codeunit Name';
+            Editable = false;
+            FieldClass = FlowField;
         }
         field(40; "Start Char"; Integer)
         {
@@ -444,6 +460,9 @@
         key(Key2; "Template Code", Level, "Parent Line No.", "Line No.")
         {
         }
+        key(Key3; "Template Code", Type, "Data Item Name")
+        {
+        }
     }
 
     fieldgroups
@@ -513,21 +532,6 @@
             Validate("Data Item Table", Integer);
             Validate("Data Item Name", TempRetailList.Choice);
         end;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
-    begin
     end;
 }
 

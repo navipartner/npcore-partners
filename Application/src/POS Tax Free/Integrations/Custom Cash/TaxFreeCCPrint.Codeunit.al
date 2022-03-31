@@ -87,7 +87,7 @@
         end;
         Printer.SetFont('Control');
         Printer.AddLine('P');
-        Printer.ProcessBufferForCodeunit(CODEUNIT::"NPR Tax Free Receipt", '');
+        Printer.ProcessBuffer(CODEUNIT::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson);
     end;
 
     local procedure ClearPrinterVar(var Font: Text; var Center: Boolean; var Bold: Boolean; var ContenText: Text; var LinkText: Text; var RecNumText: Text)

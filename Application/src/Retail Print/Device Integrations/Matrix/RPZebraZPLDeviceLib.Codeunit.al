@@ -1,146 +1,35 @@
-﻿codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
+codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
 {
     Access = Internal;
-    // NPR5.32/MMV /20170410 CASE 241995 Retail Print 2.0
-    // NPR5.34/MMV /20170707 CASE 269396 Support for aligning while rotating.
-    // NPR5.48/MMV /20181126 CASE 327107 Added QR support
-    //                                   Added RFID support
-    //                                   Added utf-8 support (not default to guarantee backwards comp. with older zebra printers).
-    // NPR5.50/MMV /20190417 CASE 351975 Barcode parameter parse fix.
-    // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
-    // NPR5.52/MMV /20191017 CASE 371935 Added inverse color and graphic box support.
-    // NPR5.53/MMV /20200113 CASE 381166 Added support for sensor select command
-
-    EventSubscriberInstance = Manual;
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        TempPattern: Text[50];
-        ESC: Codeunit "NPR RP Escape Code Library";
-        TempHashTable: Record "NPR TEMP Buffer" temporary;
-        PrintBuffer: Text;
-        err0002: Label 'Barcode does not exist.';
-        Error_InvalidDeviceSetting: Label 'Invalid device setting: %1';
-        SETTING_LABELHOME: Label 'Set label home position - syntax: x[0-32000],y[0-32000]';
-        SETTING_LABELLENGTH: Label 'Set label length - value between 0 and 32000';
-        SETTING_MEDIADARKNESS: Label 'Set print darkness - value between -30 and 30';
-        SETTING_MEDIATYPE: Label 'Set media type. T = Thermal transfer, D = Direct Thermal';
-        SETTING_PRINTORIENTATION: Label 'Set print orientation. N = Normal, I = Invert';
-        SETTING_PRINTRATE: Label 'Set print rate - syntax: Print[1-14],Slew[2-14],Backfeed[2-14]';
-        SETTING_PRINTWIDTH: Label 'Set print width - value between 2 and label width';
-        SETTING_SETDARKNESS: Label 'Set darkness - value between 00 and 30';
-        SETTING_RFID_EPC_MEM: Label 'Set EPC memory structure - Comma separated integers';
-        SETTING_ENCODING: Label 'Set encoding for data.';
-        SETTING_LABELREVERSE: Label 'Reverse print colors. Y = Yes, N = No';
-        SETTING_SENSOR_SELECT: Label 'Sensor Select. A = Auto, R = Reflective, T = Transmissive';
-        ERR_FONT: Label 'Unsupported print font: %1';
-        ERR_INVALID_COMMAND: Label 'Invalid command: %1';
-        Encoding: Option "Windows-1252","UTF-8";
-        ERR_ENCODING: Label 'Unknown encoding: %1';
+        _Encoding: Option "Windows-1252","UTF-8";
+        _PrintBuffer: Codeunit "Temp Blob";
+        _DotNetStream: Codeunit DotNet_Stream;
+        _DotNetEncoding: Codeunit DotNet_Encoding;
+        BarcodeMissingErr: Label 'Unknown barcode type %1';
+        InvalidDeviceSettingErr: Label 'Invalid device setting: %1';
+        SettingLabelHomeLbl: Label 'Set label home position - syntax: x[0-32000],y[0-32000]';
+        SettingLabelLengthLbl: Label 'Set label length - value between 0 and 32000';
+        SettingMediaDarknessLbl: Label 'Set print darkness - value between -30 and 30';
+        SettingMediaTypeLbl: Label 'Set media type. T = Thermal transfer, D = Direct Thermal';
+        SettingPrintOrientationLbl: Label 'Set print orientation. N = Normal, I = Invert';
+        SettingPrintRateLbl: Label 'Set print rate - syntax: Print[1-14],Slew[2-14],Backfeed[2-14]';
+        SettingPrintWidthLbl: Label 'Set print width - value between 2 and label width';
+        SettingSetDarknessLbl: Label 'Set darkness - value between 00 and 30';
+        SettingRfidEpcMemLbl: Label 'Set EPC memory structure - Comma separated integers';
+        SettingEncodingLbl: Label 'Set encoding for data.';
+        SettingLabelReverseLbl: Label 'Reverse print colors. Y = Yes, N = No';
+        SettingSensorSelectLbl: Label 'Sensor Select. A = Auto, R = Reflective, T = Transmissive';
+        FontErr: Label 'Unsupported print font: %1';
+        InvalidCommandErr: Label 'Invalid command: %1';
+        EncodingErr: Label 'Unknown encoding: %1';
 
-    local procedure DeviceCode(): Text
+
+    procedure InitJob(var DeviceSettings: Record "NPR RP Device Settings")
     begin
-        exit('ZEBRA');
-    end;
+        SetEncodingAndInitBuffer(DeviceSettings);
 
-    procedure IsThisDevice(Text: Text): Boolean
-    begin
-        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnInitJob', '', false, false)]
-    local procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
-    begin
-        Init(DeviceSettings);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnEndJob', '', false, false)]
-    local procedure OnEndJob()
-    begin
-        EndJob();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnPrintData', '', false, false)]
-    local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
-    begin
-        PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.Height, POSPrintBuffer.Width, POSPrintBuffer.X, POSPrintBuffer.Y);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnLookupFont', '', false, false)]
-    local procedure OnLookupFont(var LookupOK: Boolean; var Value: Text)
-    begin
-        LookupOK := SelectFont(Value);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnLookupDeviceSetting', '', false, false)]
-    local procedure OnLookupDeviceSetting(var LookupOK: Boolean; var tmpDeviceSetting: Record "NPR RP Device Settings" temporary)
-    begin
-        LookupOK := SelectDeviceSetting(tmpDeviceSetting);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetPageWidth', '', false, false)]
-    local procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
-    begin
-        Width := GetPageWidth(FontFace);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetTargetEncoding', '', false, false)]
-    local procedure OnGetTargetEncoding(var TargetEncoding: Text)
-    begin
-        TargetEncoding := GetEncoding();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnPrepareJobForHTTP', '', false, false)]
-    local procedure OnPrepareJobForHTTP(var FormattedTargetEncoding: Text; var HTTPEndpoint: Text; var Supported: Boolean)
-    begin
-        FormattedTargetEncoding := GetEncoding();
-        HTTPEndpoint := '/pstprnt';
-        Supported := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnPrepareJobForBluetooth', '', false, false)]
-    local procedure OnPrepareJobForBluetooth(var FormattedTargetEncoding: Text; var Supported: Boolean)
-    begin
-        FormattedTargetEncoding := GetEncoding();
-        Supported := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetPrintBytes', '', false, false)]
-    local procedure OnGetPrintBytes(var PrintBytes: Text)
-    begin
-        PrintBytes := PrintBuffer;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnSetPrintBytes', '', false, false)]
-    local procedure OnSetPrintBytes(var PrintBytes: Text)
-    begin
-        PrintBuffer := PrintBytes;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnBuildDeviceList', '', false, false)]
-    local procedure OnBuildDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)
-    begin
-        tmpRetailList.Number += 1;
-        tmpRetailList.Value := DeviceCode();
-        tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert();
-    end;
-
-    procedure "// ShortHandFunctions"()
-    begin
-    end;
-
-    procedure Init(var DeviceSettings: Record "NPR RP Device Settings")
-    var
-        CustomEncoding: Text;
-    begin
-        if TempHashTable.IsEmpty then
-            ConstructHashTable();
-
-        AddToBuffer('^XA'); // Ref sheet 372
+        AddStringToBuffer('^XA');
 
         if DeviceSettings.FindSet() then
             repeat
@@ -163,78 +52,126 @@
                         Setup('LH', DeviceSettings.Value);
                     'RFID_EPC_MEMORY':
                         Setup('RB', DeviceSettings.Value);
-                    //-NPR5.52 [371935]
                     'LABEL_REVERSE':
                         Setup('LR', DeviceSettings.Value);
-                    //+NPR5.52 [371935]
-                    //-NPR5.53 [381166]
                     'SENSOR_SELECT':
                         Setup('JS', DeviceSettings.Value);
-                    //+NPR5.53 [381166]
-                    'ENCODING':
-                        CustomEncoding := DeviceSettings.Value;
                     else
-                        Error(Error_InvalidDeviceSetting, DeviceSettings.Name);
+                        Error(InvalidDeviceSettingErr, DeviceSettings.Name);
                 end;
             until DeviceSettings.Next() = 0;
-
-        SetEncoding(CustomEncoding);
     end;
 
     procedure EndJob()
     begin
-        // Ref sheet 377
-        TempPattern := '^XZ';
-        AddToBuffer(TempPattern);
+        AddStringToBuffer('^XZ');
     end;
 
-    procedure PrintData(TextIn: Text[100]; FontType: Text[30]; Align: Integer; Rotation: Integer; Height: Integer; Width: Integer; X: Integer; Y: Integer)
+    procedure PrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     var
         StringLib: Codeunit "NPR String Library";
         FontParam: Code[10];
-        FontParam2: Code[10];
     begin
         case true of
-            (UpperCase(CopyStr(FontType, 1, 6)) = 'CODE39'):
-                PrintBarcodeLegacy(Rotation, '3', Height, 'Y', 'N', 'N', X, Y, TextIn);
-            (CopyStr(FontType, 1, 5) = 'EAN13'):
-                PrintBarcodeLegacy(Rotation, 'E', Height, 'Y', 'N', 'N', X, Y, TextIn);
-            (CopyStr(FontType, 1, 4) = 'UPCA'):
-                PrintBarcodeLegacy(Rotation, 'U', Height, 'Y', 'N', 'N', X, Y, TextIn);
-            (CopyStr(FontType, 1, 7) = 'BARCODE'):
-                ParseBarcodeParameters(TextIn, FontType, Rotation, Height, Width, X, Y);
-            //-NPR5.52 [371935]
-            (UpperCase(CopyStr(FontType, 1, 4)) = 'LINE'):
-                GraphicBox(Width, Height, 1, 'B', 0, X, Y);
-            (UpperCase(CopyStr(FontType, 1, 3)) = 'BOX'):
-                ParseGraphicBox(FontType, Width, Height, X, Y);
-            //+NPR5.52 [371935]
-            (CopyStr(FontType, 1, 4) = 'Font'):
+            (UpperCase(CopyStr(POSPrintBuffer.Font, 1, 6)) = 'CODE39'):
+                PrintBarcodeLegacy(POSPrintBuffer.Rotation, '3', POSPrintBuffer.Height, 'Y', 'N', 'N', POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
+            (CopyStr(POSPrintBuffer.Font, 1, 5) = 'EAN13'):
+                PrintBarcodeLegacy(POSPrintBuffer.Rotation, 'E', POSPrintBuffer.Height, 'Y', 'N', 'N', POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
+            (CopyStr(POSPrintBuffer.Font, 1, 4) = 'UPCA'):
+                PrintBarcodeLegacy(POSPrintBuffer.Rotation, 'U', POSPrintBuffer.Height, 'Y', 'N', 'N', POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
+            (CopyStr(POSPrintBuffer.Font, 1, 7) = 'BARCODE'):
+                ParseBarcodeParameters(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Rotation, POSPrintBuffer.Height, POSPrintBuffer.Width, POSPrintBuffer.X, POSPrintBuffer.Y);
+            (UpperCase(CopyStr(POSPrintBuffer.Font, 1, 4)) = 'LINE'):
+                GraphicBox(POSPrintBuffer.Width, POSPrintBuffer.Height, 1, 'B', 0, POSPrintBuffer.X, POSPrintBuffer.Y);
+            (UpperCase(CopyStr(POSPrintBuffer.Font, 1, 3)) = 'BOX'):
+                ParseGraphicBox(POSPrintBuffer.Font, POSPrintBuffer.Width, POSPrintBuffer.Height, POSPrintBuffer.X, POSPrintBuffer.Y);
+            (CopyStr(POSPrintBuffer.Font, 1, 4) = 'Font'):
                 begin
-                    StringLib.Construct(FontType);
+                    StringLib.Construct(POSPrintBuffer.Font);
                     FontParam := StringLib.SelectStringSep(2, ' ');
-                    Text(FontParam, Align, Rotation, X, Y, TextIn);
+                    Text(FontParam, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
                 end;
-            (CopyStr(FontType, 1, 10) = 'Scale Font'):
+            (CopyStr(POSPrintBuffer.Font, 1, 10) = 'Scale Font'):
                 begin
-                    StringLib.Construct(FontType);
+                    StringLib.Construct(POSPrintBuffer.Font);
                     FontParam := StringLib.SelectStringSep(3, ' ');
-                    ScaleText(FontParam, Align, Rotation, X, Y, TextIn);
+                    ScaleText(FontParam, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
                 end;
-            (CopyStr(FontType, 1, 4) = 'RFID'):
+            (CopyStr(POSPrintBuffer.Font, 1, 4) = 'RFID'):
                 begin
-                    ParseRFIDParameters(TextIn, FontType);
-                end;
-            (CopyStr(FontType, 1, 5) = 'Setup'): //Legacy support for when the template lines contained setup commands.
-                begin
-                    StringLib.Construct(FontType);
-                    FontParam := StringLib.SelectStringSep(2, ' ');
-                    FontParam2 := StringLib.SelectStringSep(3, ' ');
-                    Setup(FontParam, FontParam2);
+                    ParseRFIDParameters(POSPrintBuffer.Text, POSPrintBuffer.Font);
                 end;
             else
-                Error(ERR_FONT, FontType);
+                Error(FontErr, POSPrintBuffer.Font);
         end;
+    end;
+
+    procedure LookupFont(var Value: Text): Boolean
+    begin
+        exit(SelectFont(Value));
+    end;
+
+    procedure LookupDeviceSetting(var tmpDeviceSetting: Record "NPR RP Device Settings" temporary): Boolean
+    begin
+        exit(SelectDeviceSetting(tmpDeviceSetting));
+    end;
+
+    procedure PrepareJobForHTTP(var HTTPEndpoint: Text): Boolean
+    begin
+        HTTPEndpoint := '/pstprnt';
+        exit(true);
+    end;
+
+    procedure PrepareJobForBluetooth(): Boolean
+    begin
+        exit(true);
+    end;
+
+    procedure LookupCommand(var Value: Text): Boolean;
+    begin
+        Value := '';
+        exit(false);
+    end;
+
+    procedure GetPrintBufferAsBase64(): Text;
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        IStream: InStream;
+    begin
+        _PrintBuffer.CreateInStream(IStream);
+        exit(Base64Convert.ToBase64(IStream));
+    end;
+
+    local procedure InitBuffer()
+    var
+        OStream: OutStream;
+    begin
+        Clear(OStream);
+        Clear(_PrintBuffer);
+        Clear(_DotNetStream);
+        Clear(_DotNetEncoding);
+        _PrintBuffer.CreateOutStream(OStream);
+        case _Encoding of
+            _Encoding::"Windows-1252":
+                _DotNetEncoding.Encoding(1252);
+            _Encoding::"UTF-8":
+                _DotNetEncoding.UTF8();
+        end;
+        _DotNetStream.FromOutStream(OStream);
+    end;
+
+    local procedure AddStringToBuffer(String: Text)
+    var
+        DotNetCharArray: Codeunit "DotNet_Array";
+        DotNetByteArray: Codeunit "DotNet_Array";
+        DotNetString: Codeunit "DotNet_String";
+    begin
+        //This function over allocates and is verbose, all because of the beautiful DotNet wrapper codeunits.
+
+        DotNetString.Set(String);
+        DotNetString.ToCharArray(0, DotNetString.Length(), DotNetCharArray);
+        _DotNetEncoding.GetBytes(DotNetCharArray, 0, DotNetCharArray.Length(), DotNetByteArray);
+        _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());
     end;
 
     procedure ParseBarcodeParameters(TextIn: Text[100]; FontType: Text[30]; Rotation: Integer; Height: Integer; Width: Integer; X: Integer; Y: Integer)
@@ -265,7 +202,7 @@
         if SpaceCount > 0 then begin
             AfterSpace := StringLib.SelectStringSep(2, ' ');
             if IsBarcodeFont(AfterSpace) then begin
-                FontCode := GetLineHashTable(AfterSpace);
+                FontCode := GetBarcodeFont(AfterSpace);
                 if SpaceCount = 2 then begin
                     StringLib.Construct(StringLib.SelectStringSep(3, ' '));
                     FirstParam := StringLib.SelectStringSep(1, ',');
@@ -294,45 +231,25 @@
         case AfterSpace of
             'EPC_HEX':
                 begin
-                    AddToBuffer('^RFW,H,,,A^FD' + TextIn + '^FS');
+                    AddStringToBuffer('^RFW,H,,,A^FD' + TextIn + '^FS');
                 end;
             'EPC_ASCII':
                 begin
-                    AddToBuffer('^RFW,A,,,A^FD' + TextIn + '^FS');
+                    AddStringToBuffer('^RFW,A,,,A^FD' + TextIn + '^FS');
                 end;
             'EPC_STD':
                 begin
-                    AddToBuffer('^RFW,E,,,A^FD' + TextIn + '^FS');
+                    AddStringToBuffer('^RFW,E,,,A^FD' + TextIn + '^FS');
                 end;
             else
-                Error(ERR_INVALID_COMMAND, FontType);
+                Error(InvalidCommandErr, FontType);
         end;
-    end;
-
-    procedure GetPrintBytes(): Text
-    begin
-        exit(PrintBuffer);
-    end;
-
-    procedure SetPrintBytes(PrintBytes: Text)
-    begin
-        PrintBuffer := PrintBytes;
-    end;
-
-    procedure "-- Info Functions"()
-    begin
     end;
 
     procedure IsBarcodeFont(FontCode: Text): Boolean
     begin
-        // Ref sheet 59 - 147
         exit(FontCode in ['Aztec', 'CODE11', 'INTER2OF5', 'CODE39', 'CODE49', 'PLANETCODE', 'PDF417', 'EAN8', 'UPCE', 'CODE93', 'CODABLOCK', 'CODE128', 'MAXICODE', 'EAN13', 'MICROPDF417',
                            'INDUS2OF5', 'STD2OF5', 'CODABAR', 'LOGMARS', 'MSI', 'PLESSEY', 'QR', 'GS1DATA', 'UPCEXTEND', 'TLC39', 'UPCA', 'MATRIX', 'POSTAL']);
-    end;
-
-    procedure GetPageWidth(FontFace: Text[30]) Width: Integer
-    begin
-        exit(0);
     end;
 
     procedure GetFontWidth(Font: Text[2]) Width: Integer
@@ -354,12 +271,10 @@
                 exit(12);
             Font = 'D':
                 exit(12);
-            //Font = 'E'  : EXIT(20);
             Font = 'F':
                 exit(16);
             Font = 'G':
                 exit(48);
-            //Font = 'H'  : EXIT(19);
             Font = 'GS':
                 exit(48);
             Font = 'P':
@@ -381,13 +296,10 @@
         end;
     end;
 
-    procedure "-- Advanced Functions"()
-    begin
-    end;
-
     procedure PrintBarcodeLegacy(Rotate: Integer; Type: Text[1]; Height: Integer; Line: Text[1]; LineAbove: Text[1]; Check: Text[1]; X: Integer; Y: Integer; Data: Text[100])
     var
         Rotation: Text[1];
+        TempPattern: Text;
     begin
         // Ref sheet 65, 105, 138, 144
         // Type      :   Barcode type,               All barcodes use a ^BX command where X is the barcode type.
@@ -423,7 +335,7 @@
                 Rotation := 'B';
         end;
 
-        AddToBuffer(StrSubstNo(TempPattern, Type, Rotation, Height, Line, LineAbove, Check));
+        AddStringToBuffer(StrSubstNo(TempPattern, Type, Rotation, Height, Line, LineAbove, Check));
 
         FieldData(Data);
 
@@ -444,26 +356,26 @@
             '3': //CODE39
                 begin
                     BarcodeFieldDefault(Width, FirstParam, Height);
-                    AddToBuffer(StrSubstNo(PrintBarcodeLbl, Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
+                    AddStringToBuffer(StrSubstNo(PrintBarcodeLbl, Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
                 end;
             'E': //EAN13
                 begin
                     BarcodeFieldDefault(Width, FirstParam, Height);
-                    AddToBuffer(StrSubstNo(PrintBarcode2Lbl, Type, Format(Rotation), Height, SecondParam, LineAbove));
+                    AddStringToBuffer(StrSubstNo(PrintBarcode2Lbl, Type, Format(Rotation), Height, SecondParam, LineAbove));
                 end;
             'U': //UPC-A
                 begin
                     BarcodeFieldDefault(Width, FirstParam, Height);
-                    AddToBuffer(StrSubstNo(PrintBarcode3Lbl, Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
+                    AddStringToBuffer(StrSubstNo(PrintBarcode3Lbl, Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
                 end;
             'C': //CODE128 in automatic subset mode
                 begin
                     BarcodeFieldDefault(Width, FirstParam, Height);
-                    AddToBuffer(StrSubstNo(PrintBarcode4Lbl, Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
+                    AddStringToBuffer(StrSubstNo(PrintBarcode4Lbl, Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
                 end;
             'Q': //QR, model 2, alphanumeric input - FirstParam: Magnification, SecondParam: Error correction
                 begin
-                    AddToBuffer(StrSubstNo(PrintBarcode5Lbl, Format(Rotation), '2', FirstParam));
+                    AddStringToBuffer(StrSubstNo(PrintBarcode5Lbl, Format(Rotation), '2', FirstParam));
                     Data := SecondParam + 'M,A' + DelChr(UpperCase(Data), '=', DelChr(UpperCase(Data), '=', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$%*+-./:'));
                 end;
         end;
@@ -474,94 +386,73 @@
 
     procedure BarcodeFieldDefault(Width: Integer; WideNarrowRatio: Code[3]; Height: Integer)
     begin
-        // Ref sheet 144
-        TempPattern := '^BY%1,%2,%3';
-        AddToBuffer(StrSubstNo(TempPattern, Width, WideNarrowRatio, Height));
+        AddStringToBuffer(StrSubstNo('^BY%1,%2,%3', Width, WideNarrowRatio, Height));
     end;
 
     procedure ChangeDefaultFont(Font: Code[2]; Height: Integer; Width: Integer)
     begin
-        // Ref sheet 150
-        TempPattern := '^CF%1,%2,%3';
-        AddToBuffer(StrSubstNo(TempPattern, Font, Height, Width));
+        AddStringToBuffer(StrSubstNo('^CF%1,%2,%3', Font, Height, Width));
     end;
 
     procedure FieldBlock(Width: Integer; Lines: Integer; Spacing: Integer; Justification: Text[1]; Indent: Integer)
     begin
-        // Ref sheet 183
-        TempPattern := '^FB%1,%2,%3,%4,%5';
-        AddToBuffer(StrSubstNo(TempPattern, Width, Lines, Spacing, Justification, Indent));
+        AddStringToBuffer(StrSubstNo('^FB%1,%2,%3,%4,%5', Width, Lines, Spacing, Justification, Indent));
     end;
 
     procedure FieldData(Data: Text[100])
     begin
-        // Ref sheet 187
-        AddToBuffer('^FD' + DelChr(Data, '=', '^~'));
+        AddStringToBuffer('^FD' + DelChr(Data, '=', '^~'));
     end;
 
     procedure FieldOrigin(x: Integer; y: Integer)
     begin
-        // Ref sheet 197
-        TempPattern := '^FO%1,%2';
-        AddToBuffer(StrSubstNo(TempPattern, x, y));
+        AddStringToBuffer(StrSubstNo('^FO%1,%2', x, y));
     end;
 
     procedure FieldSeparator()
     begin
-        // Ref sheet 200
-        AddToBuffer('^FS');
+        AddStringToBuffer('^FS');
     end;
 
     procedure GraphicBox(Width: Integer; Height: Integer; Thickness: Integer; Color: Text[1]; Rounding: Integer; X: Integer; Y: Integer)
     begin
-        // Ref sheet 207
-
         FieldOrigin(X, Y);
 
-        TempPattern := '^GB%1,%2,%3,%4,%5';
-        AddToBuffer(StrSubstNo(TempPattern, Width, Height, Thickness, Color, Rounding));
+        AddStringToBuffer(StrSubstNo('^GB%1,%2,%3,%4,%5', Width, Height, Thickness, Color, Rounding));
 
         FieldSeparator();
     end;
 
     procedure LabelLength(Length: Integer)
     begin
-        // Ref sheet 290
-        TempPattern := '^LL%1';
-        AddToBuffer(StrSubstNo(TempPattern, Length));
+        AddStringToBuffer(StrSubstNo('^LL%1', Length));
     end;
 
     procedure LabelHome(X: Integer; Y: Integer)
     begin
-        // Ref sheet 289
-        TempPattern := '^LH%1,%2';
-        AddToBuffer(StrSubstNo(TempPattern, X, Y));
+        AddStringToBuffer(StrSubstNo('^LH%1,%2', X, Y));
     end;
 
     local procedure LabelReverse(Active: Text)
     begin
-        //-NPR5.52 [371935]
         case Active of
             'Y':
-                AddToBuffer('^LRY');
+                AddStringToBuffer('^LRY');
             'N':
-                AddToBuffer('^LRN');
+                AddStringToBuffer('^LRN');
         end;
-        //+NPR5.52 [371935]
     end;
 
     local procedure SensorSelect(Value: Text)
     begin
-        //-NPR5.53 [381166]
         case Value of
             'A':
-                AddToBuffer('^JSA');
+                AddStringToBuffer('^JSA');
             'R':
-                AddToBuffer('^JSR');
+                AddStringToBuffer('^JSR');
             'T':
-                AddToBuffer('^JST');
+                AddStringToBuffer('^JST');
         end;
-        //+NPR5.53 [381166]
     end;
 
     local procedure ParseGraphicBox(FontType: Text; Width: Integer; Height: Integer; X: Integer; Y: Integer)
@@ -572,7 +463,6 @@
         Color: Text;
         Rounding: Integer;
     begin
-        //-NPR5.52 [371935]
         StringLib.Construct(FontType);
         AfterSpace := StringLib.SelectStringSep(2, ' ');
         StringLib.Construct(AfterSpace);
@@ -582,42 +472,31 @@
         Evaluate(Rounding, StringLib.SelectStringSep(3, ','));
 
         GraphicBox(Width, Height, Thickness, Color, Rounding, X, Y);
-        //+NPR5.52 [371935]
     end;
 
     procedure MediaDarkness(Darkness: Integer)
     begin
-        // Ref sheet 297
-        TempPattern := '^MD%1';
-        AddToBuffer(StrSubstNo(TempPattern, Darkness));
+        AddStringToBuffer(StrSubstNo('^MD%1', Darkness));
     end;
 
     procedure MediaType(Type: Text[1])
     begin
-        // Ref sheet 306
-        TempPattern := '^MT%1';
-        AddToBuffer(StrSubstNo(TempPattern, Type));
+        AddStringToBuffer(StrSubstNo('^MT%1', Type));
     end;
 
     procedure PrintRate(PrintSpeed: Code[2]; SlewSpeed: Code[2]; BackSpeed: Code[2])
     begin
-        // Ref sheet 328
-        TempPattern := '^PR%1,%2,%3';
-        AddToBuffer(StrSubstNo(TempPattern, PrintSpeed, SlewSpeed, BackSpeed));
+        AddStringToBuffer(StrSubstNo('^PR%1,%2,%3', PrintSpeed, SlewSpeed, BackSpeed));
     end;
 
     procedure PrintWidth(Width: Integer)
     begin
-        // Ref sheet 332
-        TempPattern := '^PW%1';
-        AddToBuffer(StrSubstNo(TempPattern, Width));
+        AddStringToBuffer(StrSubstNo('^PW%1', Width));
     end;
 
     procedure PrintOrientation(Orientation: Text[1])
     begin
-        // Ref sheet 325
-        TempPattern := '^PO%1';
-        AddToBuffer(StrSubstNo(TempPattern, Orientation));
+        AddStringToBuffer(StrSubstNo('^PO%1', Orientation));
     end;
 
     procedure ScaleText(ScaleSize: Code[10]; Align: Integer; Rotate: Integer; X: Integer; Y: Integer; TextIn: Text[100])
@@ -647,7 +526,7 @@
         HeightText := StringLib.SelectStringSep(1, ',');
         WidthText := StringLib.SelectStringSep(2, ',');
         if not Evaluate(Height, HeightText) or not Evaluate(Width, WidthText) then
-            Error(ERR_FONT, HeightText + WidthText);
+            Error(FontErr, HeightText + WidthText);
 
         if Align > 0 then begin
             StrLength := Round(((GetFontWidth('0') / 10) * Width * StrLen(TextIn)), 1, '=') div 1;
@@ -696,8 +575,7 @@
         FieldOrigin(X, Y);
 
         //^A
-        TempPattern := '^A%1%2,%3,%4';
-        AddToBuffer(StrSubstNo(TempPattern, '0', Rotation, Height, Width));
+        AddStringToBuffer(StrSubstNo('^A%1%2,%3,%4', '0', Rotation, Height, Width));
 
         //^FB
         case Align of
@@ -768,9 +646,7 @@
 
     procedure SetDarkness(Darkness: Integer)
     begin
-        // Ref sheet 336
-        TempPattern := '~SD%1';
-        AddToBuffer(StrSubstNo(TempPattern, Darkness));
+        AddStringToBuffer(StrSubstNo('~SD%1', Darkness));
     end;
 
     procedure Text(Type: Text[2]; Align: Integer; Rotate: Integer; X: Integer; Y: Integer; TextIn: Text[100])
@@ -865,8 +741,7 @@
         FieldOrigin(X, Y);
 
         //^A
-        TempPattern := '^A%1%2';
-        AddToBuffer(StrSubstNo(TempPattern, Type, Rotation));
+        AddStringToBuffer(StrSubstNo('^A%1%2', Type, Rotation));
 
         //^FB
         case Align of
@@ -886,43 +761,34 @@
         FieldSeparator();
     end;
 
-    local procedure SetEncoding(CustomEncoding: Text)
+    local procedure SetEncodingAndInitBuffer(var DeviceSettings: Record "NPR RP Device Settings")
+    var
+        Encoding: Text;
     begin
-        //-NPR5.48 [327107]
-        if CustomEncoding = '' then
-            CustomEncoding := 'Windows-1252'; //Legacy default
+        DeviceSettings.SetRange(Name, 'ENCODING');
+        if DeviceSettings.FindFirst() then begin
+            Encoding := DeviceSettings.Value;
+        end else begin
+            Encoding := 'Windows-1252' //default
+        end;
+        DeviceSettings.SetRange(Name);
 
-        case CustomEncoding of
+        case Encoding of
             'utf-8':
                 begin
-                    AddToBuffer('^CI28');
-                    Encoding := Encoding::"UTF-8";
+                    _Encoding := _Encoding::"UTF-8";
+                    InitBuffer();
+                    AddStringToBuffer('^CI28');
                 end;
             'Windows-1252':
                 begin
-                    AddToBuffer('^CI27');
-                    Encoding := Encoding::"Windows-1252";
+                    _Encoding := _Encoding::"Windows-1252";
+                    InitBuffer();
+                    AddStringToBuffer('^CI27');
                 end;
             else
-                Error(ERR_ENCODING, CustomEncoding);
+                Error(EncodingErr, Encoding);
         end;
-        //+NPR5.48 [327107]
-    end;
-
-    local procedure GetEncoding(): Text
-    begin
-        //-NPR5.48 [327107]
-        case Encoding of
-            Encoding::"Windows-1252":
-                exit('Windows-1252');
-            Encoding::"UTF-8":
-                exit('utf-8');
-        end;
-        //+NPR5.48 [327107]
-    end;
-
-    procedure "-- Lookup Functions"()
-    begin
     end;
 
     procedure SelectFont(var Value: Text): Boolean
@@ -971,7 +837,6 @@
                     tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Integer;
                 'SET_DARKNESS':
                     tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Integer;
-                //-NPR5.48 [327107]
                 'RFID_EPC_MEMORY':
                     tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Text;
                 'ENCODING':
@@ -979,21 +844,16 @@
                         tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
                         tmpDeviceSetting.Options := 'Windows-1252,utf-8';
                     end;
-                //+NPR5.48 [327107]
-                //-NPR5.52 [371935]
                 'LABEL_REVERSE':
                     begin
                         tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
                         tmpDeviceSetting.Options := 'N,Y';
                     end;
-                //+NPR5.52 [371935]
-                //-NPR5.53 [381166]
                 'SENSOR_SELECT':
                     begin
                         tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
                         tmpDeviceSetting.Options := 'A,R,T';
                     end;
-            //+NPR5.53 [381166]
             end;
             exit(tmpDeviceSetting.Insert());
         end;
@@ -1034,7 +894,6 @@
         AddOption(RetailList, 'BARCODE CODE128 2.0,Y', '');
         AddOption(RetailList, 'BARCODE CODE128 3.0,N', '');
         AddOption(RetailList, 'BARCODE CODE128 3.0,Y', '');
-        //-NPR5.48 [327107]
         AddOption(RetailList, 'BARCODE QR 1,H', '');
         AddOption(RetailList, 'BARCODE QR 9,H', '');
         AddOption(RetailList, 'BARCODE QR 1,Q', '');
@@ -1046,33 +905,24 @@
         AddOption(RetailList, 'RFID EPC_HEX', '');
         AddOption(RetailList, 'RFID EPC_ASCII', '');
         AddOption(RetailList, 'RFID EPC_STD', '');
-        //-NPR5.52 [371935]
         AddOption(RetailList, 'LINE', '');
         AddOption(RetailList, 'BOX 1,B,0', '');
-        //+NPR5.52 [371935]
-        //+NPR5.48 [327107]
     end;
 
     local procedure ConstructDeviceSettingList(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
-        AddOption(tmpRetailList, SETTING_LABELHOME, 'LABEL_HOME');
-        AddOption(tmpRetailList, SETTING_LABELLENGTH, 'LABEL_LENGTH');
-        AddOption(tmpRetailList, SETTING_MEDIADARKNESS, 'MEDIA_DARKNESS');
-        AddOption(tmpRetailList, SETTING_MEDIATYPE, 'MEDIA_TYPE');
-        AddOption(tmpRetailList, SETTING_PRINTORIENTATION, 'PRINT_ORIENTATION');
-        AddOption(tmpRetailList, SETTING_PRINTRATE, 'PRINT_RATE');
-        AddOption(tmpRetailList, SETTING_PRINTWIDTH, 'PRINT_WIDTH');
-        AddOption(tmpRetailList, SETTING_SETDARKNESS, 'SET_DARKNESS');
-        //-NPR5.48 [327107]
-        AddOption(tmpRetailList, SETTING_RFID_EPC_MEM, 'RFID_EPC_MEMORY');
-        AddOption(tmpRetailList, SETTING_ENCODING, 'ENCODING');
-        //+NPR5.48 [327107]
-        //-NPR5.52 [371935]
-        AddOption(tmpRetailList, SETTING_LABELREVERSE, 'LABEL_REVERSE');
-        //+NPR5.52 [371935]
-        //-NPR5.53 [381166]
-        AddOption(tmpRetailList, SETTING_SENSOR_SELECT, 'SENSOR_SELECT');
-        //+NPR5.53 [381166]
+        AddOption(tmpRetailList, SettingLabelHomeLbl, 'LABEL_HOME');
+        AddOption(tmpRetailList, SettingLabelLengthLbl, 'LABEL_LENGTH');
+        AddOption(tmpRetailList, SettingMediaDarknessLbl, 'MEDIA_DARKNESS');
+        AddOption(tmpRetailList, SettingMediaTypeLbl, 'MEDIA_TYPE');
+        AddOption(tmpRetailList, SettingPrintOrientationLbl, 'PRINT_ORIENTATION');
+        AddOption(tmpRetailList, SettingPrintRateLbl, 'PRINT_RATE');
+        AddOption(tmpRetailList, SettingPrintWidthLbl, 'PRINT_WIDTH');
+        AddOption(tmpRetailList, SettingSetDarknessLbl, 'SET_DARKNESS');
+        AddOption(tmpRetailList, SettingRfidEpcMemLbl, 'RFID_EPC_MEMORY');
+        AddOption(tmpRetailList, SettingEncodingLbl, 'ENCODING');
+        AddOption(tmpRetailList, SettingLabelReverseLbl, 'LABEL_REVERSE');
+        AddOption(tmpRetailList, SettingSensorSelectLbl, 'SENSOR_SELECT');
     end;
 
     procedure AddOption(var RetailList: Record "NPR Retail List" temporary; Choice: Text; Value: Text)
@@ -1083,62 +933,69 @@
         RetailList.Insert();
     end;
 
-    procedure ConstructHashTable()
+    local procedure GetBarcodeFont(Barcode: Text): Text
     begin
-        AddLineHashTable('AZTEC', '0');
-        AddLineHashTable('CODE11', '1');
-        AddLineHashTable('INTER2OF5', '2');
-        AddLineHashTable('CODE39', '3');
-        AddLineHashTable('CODE49', '4');
-        AddLineHashTable('PLANETCODE', '5');
-        AddLineHashTable('PDF417', '7');
-        AddLineHashTable('EAN8', '8');
-        AddLineHashTable('UPCE', '9');
-        AddLineHashTable('CODE93', 'A');
-        AddLineHashTable('CODABLOCK', 'B');
-        AddLineHashTable('CODE128', 'C');
-        AddLineHashTable('MAXICODE', 'D');
-        AddLineHashTable('EAN13', 'E');
-        AddLineHashTable('MICOPDF417', 'F');
-        AddLineHashTable('INDUS2OF5', 'I');
-        AddLineHashTable('STD2OF5', 'J');
-        AddLineHashTable('CODABAR', 'K');
-        AddLineHashTable('LOGMARS', 'L');
-        AddLineHashTable('MSI', 'M');
-        AddLineHashTable('PLESSEY', 'P');
-        AddLineHashTable('QR', 'Q');
-        AddLineHashTable('GS1DATA', 'R');
-        AddLineHashTable('UPCEXTEND', 'S');
-        AddLineHashTable('TLC39', 'T');
-        AddLineHashTable('UPCA', 'U');
-        AddLineHashTable('MATRIX', 'X');
-        AddLineHashTable('POSTAL', 'Z');
+        case Barcode of
+            'AZTEC':
+                exit('0');
+            'CODE11':
+                exit('1');
+            'INTER2OF5':
+                exit('2');
+            'CODE39':
+                exit('3');
+            'CODE49':
+                exit('4');
+            'PLANETCODE':
+                exit('5');
+            'PDF417':
+                exit('7');
+            'EAN8':
+                exit('8');
+            'UPCE':
+                exit('9');
+            'CODE93':
+                exit('A');
+            'CODABLOCK':
+                exit('B');
+            'CODE128':
+                exit('C');
+            'MAXICODE':
+                exit('D');
+            'EAN13':
+                exit('E');
+            'MICOPDF417':
+                exit('F');
+            'INDUS2OF5':
+                exit('I');
+            'STD2OF5':
+                exit('J');
+            'CODABAR':
+                exit('K');
+            'LOGMARS':
+                exit('L');
+            'MSI':
+                exit('M');
+            'PLESSEY':
+                exit('P');
+            'QR':
+                exit('Q');
+            'GS1DATA':
+                exit('R');
+            'UPCEXTEND':
+                exit('S');
+            'TLC39':
+                exit('T');
+            'UPCA':
+                exit('U');
+            'MATRIX':
+                exit('X');
+            'POSTAL':
+                exit('Z');
+            else
+                Error(BarcodeMissingErr, Barcode);
+        end
     end;
 
-    procedure AddLineHashTable(Name: Code[50]; Value: Code[50])
-    begin
-        TempHashTable.Template := Name;
-        TempHashTable."Code 1" := Value;
-        TempHashTable.Insert();
-    end;
-
-    procedure GetLineHashTable(Name: Code[50]) Value: Code[50]
-    begin
-        TempHashTable.SetRange(TempHashTable.Template, Name);
-        if TempHashTable.FindFirst() then
-            exit(TempHashTable."Code 1")
-        else
-            Error(err0002);
-    end;
-
-    local procedure AddToBuffer(Text: Text)
-    begin
-        AddTextToBuffer(Text);
-    end;
-
-    local procedure AddTextToBuffer(Text: Text)
-    begin
-        PrintBuffer += Text + ESC.CR() + ESC.LF();
-    end;
 }
 

@@ -1,198 +1,130 @@
-﻿codeunit 6014537 "NPR RP Epson Label Device Lib."
+codeunit 6014537 "NPR RP Epson Label Device Lib." implements "NPR IMatrix Printer"
 {
     Access = Internal;
-    // Epson Label Command Library.
-    //  Work started by Mikkel Vilhelmsen.
-    //  Contributions providing function interfaces for valid
-    //  Epson TM-L90 escape sequences are welcome. Functionality
-    //  for other printers should be put in a library on its own.
-    // 
-    //  All functions write ESC code to a string buffer which can
-    //  be sent to a printer or stored to a file.
-    // 
-    //  Functionality of this library is build
-    //  with reference to
-    //      https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=76
-    // 
-    //  Current functions and their purpose are listed below.
-    // --------------------------------------------------------
-    // 
-    // ShortHandFunctions
-    //  "PrintText(Text : Text[100];FontType : Text[10];Bold : Boolean;UnderLine : Boolean;DoubleStrike : Boolean;Align : Integer)"
-    //   Adds the text variable to the buffer, applying the font style given as arguments.
-    // 
-    //  "PrintBarcode(BarcodeType : Text[30];Text : Text[30];Width : Integer;Height : Integer)"
-    //   Prints a barcode corresponding to the Text argument.
-    //   BarcodeType in ['UPC-A','UPC-1','EAN13','JAN8','CODE39','ITF','CODABAR']
-    //   Width in [2-7], Height in [1-255].
-    // 
-    //  "PrintBold(Text : Text[250])"
-    //   Adds the Text to buffer formatting it as bold.
-    // 
-    //  "PrintUnderLine(Text : Text[250])"
-    //   Adds the Text to buffer formatting it as underlined.
-    // 
-    //  "PrintDefaultLogo()"
-    //   Prints the logo stored in the printer at index 0.
-    // 
-    //  "PrintControlChar(Char : Text[1])"
-    //   Performs an action equavalent as when writing the Char using the
-    //   control font of the Epson V driver.
-    // 
-    //  "PrintJob("Printer Name" : Text[250])"
-    //   Sends the buffer data to the printer of the specified name.
-    // 
-    //  "SetFontStretch(Height : Integer;Width : Integer)"
-    //   Mulplies the font stretch equal to the arguments. Both arguments
-    //   is in the range of [1-8].
-    // 
-    //  "SetFontFace(FontFace : Text[30])"
-    //   Writes an ESC seqence to the buffer, telling the printer to change
-    //   the font used for printing. Valid font face pattern are [A|B][1..8][1..8]
-    // 
-    // NPR5.32/MMV /20170410 CASE 241995 Retail Print 2.0
-    // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
-
-    EventSubscriberInstance = Manual;
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        TempPattern: Text[50];
-        ESC: Codeunit "NPR RP Escape Code Library";
-        PrintBuffer: Text;
-        PrinterInitialized: Boolean;
-        LabelHeight: Integer;
+        _PrintBuffer: Codeunit "Temp Blob";
+        _PrinterInitialized: Boolean;
+        _LabelHeight: Integer;
+        _DotNetStream: Codeunit DotNet_Stream;
+        _DotNetEncoding: Codeunit DotNet_Encoding;
 
-    local procedure DeviceCode(): Text
+    procedure InitJob(var DeviceSettings: Record "NPR RP Device Settings")
     begin
-        exit('EPSON');
-    end;
-
-    procedure IsThisDevice(Text: Text): Boolean
-    begin
-        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnInitJob', '', false, false)]
-    local procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
-    begin
-        InitJob();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnEndJob', '', false, false)]
-    local procedure OnEndJob()
-    begin
-        EndJob();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnPrintData', '', false, false)]
-    local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
-    begin
-        PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.Height, POSPrintBuffer.Width, POSPrintBuffer.X, POSPrintBuffer.Y);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnLookupFont', '', false, false)]
-    local procedure OnLookupFont(var LookupOK: Boolean; var Value: Text)
-    begin
-        LookupOK := SelectFont(Value);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnLookupCommand', '', false, false)]
-    local procedure OnLookupCommand(var LookupOK: Boolean; var Value: Text)
-    begin
-        //LookupOK := SelectCommand(Value);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetPageWidth', '', false, false)]
-    local procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
-    begin
-        Width := GetPageWidth(FontFace);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetPrintBytes', '', false, false)]
-    local procedure OnGetPrintBytes(var PrintBytes: Text)
-    begin
-        PrintBytes := PrintBuffer;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnSetPrintBytes', '', false, false)]
-    local procedure OnSetPrintBytes(var PrintBytes: Text)
-    begin
-        PrintBuffer := PrintBytes;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnBuildDeviceList', '', false, false)]
-    local procedure OnBuildDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)
-    begin
-        tmpRetailList.Number += 1;
-        tmpRetailList.Value := DeviceCode();
-        tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert();
-    end;
-
-    procedure InitJob()
-    begin
-        //-NPR5.51 [360975]
-        //PrintBuffer := '';
-        //+NPR5.51 [360975]
-        PrinterInitialized := false;
+        _PrinterInitialized := false;
+        InitBuffer();
     end;
 
     procedure EndJob()
     begin
         PrintDataInPageMode();
         FeedLabelToPosition(2, 0, 65, 49); //Feed to label peeling position - This command also makes the next print backfeed to begin with.
-        //FeedLabelToPosition(2,0,67,49); //Feed to print start on next label
-        //FeedLabelToPosition(2,0,67,50); //Feed to print start on current label
-        //FeedLabelToPosition(2,0,66,49); //Feed to cutting position
-        //SelectCutModeAndCutPaper(1,0); //Cut at current position
     end;
 
-    procedure PrintData(TextIn: Text[100]; FontType: Text[100]; Align: Integer; Rotation: Integer; Height: Integer; Width: Integer; X: Integer; Y: Integer)
+    procedure PrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     var
         Err00001: Label 'Font ''%1'' is not supported';
         FontParam: Text;
         StringLib: Codeunit "NPR String Library";
     begin
-        if not PrinterInitialized then
-            InitializePrinter(FontType);
+        if not _PrinterInitialized then
+            InitializePrinter(POSPrintBuffer.Font);
 
-        if UpperCase(CopyStr(FontType, 1, 6)) = 'CODE39' then
-            PrintBarcode(FontType, Width, Height, Align, Rotation, X, Y, TextIn)
+        if UpperCase(CopyStr(POSPrintBuffer.Font, 1, 6)) = 'CODE39' then
+            PrintBarcode(POSPrintBuffer.Font, POSPrintBuffer.Width, POSPrintBuffer.Height, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text)
         else
-            if CopyStr(FontType, 1, 5) = 'EAN13' then
-                PrintBarcode(FontType, Width, Height, Align, Rotation, X, Y, TextIn)
+            if CopyStr(POSPrintBuffer.Font, 1, 5) = 'EAN13' then
+                PrintBarcode(POSPrintBuffer.Font, POSPrintBuffer.Width, POSPrintBuffer.Height, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text)
             else
-                if CopyStr(FontType, 1, 4) = 'UPC-A' then
-                    PrintBarcode(FontType, Width, Height, Align, Rotation, X, Y, TextIn)
+                if CopyStr(POSPrintBuffer.Font, 1, 4) = 'UPC-A' then
+                    PrintBarcode(POSPrintBuffer.Font, POSPrintBuffer.Width, POSPrintBuffer.Height, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text)
                 else
-                    if UpperCase(CopyStr(FontType, 1, 7)) = 'BARCODE' then begin
+                    if UpperCase(CopyStr(POSPrintBuffer.Font, 1, 7)) = 'BARCODE' then begin
                         case true of
-                            StrLen(TextIn) = 13:
-                                PrintBarcode('EAN13', Width, Height, Align, Rotation, X, Y, TextIn);
-                            StrLen(TextIn) = 12:
-                                PrintBarcode('UPC-A', Width, Height, Align, Rotation, X, Y, TextIn);
-                            StrLen(TextIn) < 12:
-                                PrintBarcode('CODE39', Width, Height, Align, Rotation, X, Y, TextIn);
+                            StrLen(POSPrintBuffer.Text) = 13:
+                                PrintBarcode('EAN13', POSPrintBuffer.Width, POSPrintBuffer.Height, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
+                            StrLen(POSPrintBuffer.Text) = 12:
+                                PrintBarcode('UPC-A', POSPrintBuffer.Width, POSPrintBuffer.Height, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
+                            StrLen(POSPrintBuffer.Text) < 12:
+                                PrintBarcode('CODE39', POSPrintBuffer.Width, POSPrintBuffer.Height, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
                         end;
                     end else
-                        if CopyStr(FontType, 1, 4) = 'Font' then begin
-                            StringLib.Construct(FontType);
+                        if CopyStr(POSPrintBuffer.Font, 1, 4) = 'Font' then begin
+                            StringLib.Construct(POSPrintBuffer.Font);
                             FontParam := StringLib.SelectStringSep(2, ' ');
-                            Text(FontParam, Rotation, X, Y, Height, false, TextIn);
+                            PrintText(FontParam, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Height, false, POSPrintBuffer.Text);
                         end else
-                            if CopyStr(FontType, 1, 9) = 'Bold Font' then begin
-                                StringLib.Construct(FontType);
+                            if CopyStr(POSPrintBuffer.Font, 1, 9) = 'Bold Font' then begin
+                                StringLib.Construct(POSPrintBuffer.Font);
                                 FontParam := StringLib.SelectStringSep(3, ' ');
-                                Text(FontParam, Rotation, X, Y, Height, true, TextIn);
+                                PrintText(FontParam, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Height, true, POSPrintBuffer.Text);
                             end else
-                                if CopyStr(FontType, 1, 5) = 'SETUP' then
+                                if CopyStr(POSPrintBuffer.Font, 1, 5) = 'SETUP' then
                                     exit
                                 else
-                                    Error(Err00001, FontType);
+                                    Error(Err00001, POSPrintBuffer.Font);
+    end;
+
+    procedure LookupFont(var Value: Text): Boolean
+    begin
+        exit(SelectFont(Value));
+    end;
+
+    procedure LookupCommand(var Value: Text): Boolean
+    begin
+        Value := '';
+        exit(False);
+    end;
+
+    procedure LookupDeviceSetting(var tmpDeviceSetting: Record "NPR RP Device Settings" temporary): Boolean;
+    begin
+        exit(false);
+    end;
+
+    procedure PrepareJobForHTTP(var HTTPEndpoint: Text): Boolean;
+    begin
+        HTTPEndpoint := '';
+        exit(false);
+    end;
+
+    procedure PrepareJobForBluetooth(): Boolean;
+    begin
+        exit(False);
+    end;
+
+    procedure GetPrintBufferAsBase64(): Text;
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        IStream: InStream;
+    begin
+        _PrintBuffer.CreateInStream(IStream);
+        exit(Base64Convert.ToBase64(IStream));
+    end;
+
+    local procedure InitBuffer()
+    var
+        OStream: OutStream;
+    begin
+        Clear(OStream);
+        Clear(_PrintBuffer);
+        Clear(_DotNetStream);
+        Clear(_DotNetEncoding);
+        _PrintBuffer.CreateOutStream(OStream);
+        _DotNetEncoding.Encoding(1252);
+        _DotNetStream.FromOutStream(OStream);
+    end;
+
+    local procedure AddStringToBuffer(String: Text)
+    var
+        DotNetCharArray: Codeunit "DotNet_Array";
+        DotNetByteArray: Codeunit "DotNet_Array";
+        DotNetString: Codeunit "DotNet_String";
+    begin
+        //This function over allocates and is verbose, all because of the beautiful DotNet wrapper codeunits.
+
+        DotNetString.Set(String);
+        DotNetString.ToCharArray(0, DotNetString.Length(), DotNetCharArray);
+        _DotNetEncoding.GetBytes(DotNetCharArray, 0, DotNetCharArray.Length(), DotNetByteArray);
+        _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());
     end;
 
     procedure PrintBarcode(BarcodeType: Text[30]; Width: Integer; Height: Integer; Align: Integer; Rotation: Integer; X: Integer; Y: Integer; Text: Text[30])
@@ -228,10 +160,10 @@
 
         SelectPrintDirectInPageMode(Rotation);
 
-        if (LabelHeight - Y) > 0 then
-            AreaHeight := LabelHeight - Y
+        if (_LabelHeight - Y) > 0 then
+            AreaHeight := _LabelHeight - Y
         else
-            AreaHeight := LabelHeight - 1;
+            AreaHeight := _LabelHeight - 1;
 
         lowX := TypeHelper.BitwiseAnd(X, 255);
         highX := (X - lowX) / 256;
@@ -262,20 +194,6 @@
             SelectPrintDirectInPageMode(0);
     end;
 
-    procedure PrintBold(Text: Text[250])
-    begin
-        TurnExphasizedModeOnOff(1);
-        AddTextToBuffer(Text);
-        TurnExphasizedModeOnOff(0);
-    end;
-
-    procedure PrintUnderLine(Text: Text[250])
-    begin
-        TurnUnderlineModeOnOff(1);
-        AddTextToBuffer(Text);
-        TurnUnderlineModeOnOff(0);
-    end;
-
     procedure PrintDefaultLogo()
     begin
         PrintNVGraphicsData(1, 0);
@@ -283,20 +201,17 @@
 
     procedure PrintAltDefaultLogo()
     begin
-        // if placed on "h"
-        //PrintNVGraphicsDataNew(6,0,48,69,48,48,1,1);
-
-        // default value.
         PrintNVGraphicsDataNew(6, 0, 48, 69, 48, 48, 1, 1);
     end;
 
     procedure SetFontStretch(Height: Integer; Width: Integer)
-    var
-        n: Char;
     begin
-        TempPattern := '0' + ESC.GetBitPatternAndPad(Width, 3) + '0' + ESC.GetBitPatternAndPad(Height, 3);
-        n := ESC.TranslateBitPattern(TempPattern);
-        SelectCharacterSize(n);
+        if (Height > 7) or (Height < 0) then
+            Height := 0;
+        if (Width > 7) or (Width < 0) then
+            Width := 0;
+
+        SelectCharacterSize(Power(2, 4) * Width + Height); //Width is packed into upper half of 8-bit byte.
     end;
 
     procedure SetFontFace(FontFace: Text[30])
@@ -319,199 +234,148 @@
         SelectCharacterFont(FontType);
     end;
 
-    procedure GetPrintBytes(): Text
-    begin
-        exit(PrintBuffer);
-    end;
-
-    procedure SetPrintBytes(PrintBytes: Text)
-    begin
-        PrintBuffer := PrintBytes;
-    end;
-
-    procedure "// Base Functions"()
-    begin
-    end;
-
-    procedure HorizontalTab()
-    begin
-        // Ref sheet 103, Horizontal Tab
-        AddToBuffer('HT');
-    end;
-
     procedure LineFeed()
     begin
         // Ref sheet 103, Print And Line Feed
-        AddToBuffer('LF');
-    end;
-
-    procedure FormFeed()
-    begin
-        // Ref sheet 103, Print and return to standard mode (in page mode)
-        AddToBuffer('FF');
-    end;
-
-    procedure CarriageReturn()
-    begin
-        // Ref sheet 103, Print and carriage return
-        AddToBuffer('CR');
-    end;
-
-    procedure Cancel()
-    begin
-        // Ref sheet 104, Cancel print in data in page mode
-        AddToBuffer('CAN');
+        _DotNetStream.WriteByte(10); //LF
     end;
 
     local procedure FeedLabelToPosition(pL: Char; pH: Char; fn: Char; m: Char)
     begin
-        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=48
-        TempPattern := 'FS ( L %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(pL), ESC.C2ESC(pH), ESC.C2ESC(fn), ESC.C2ESC(m)));
+        _DotNetStream.WriteByte(28); //FS
+        AddStringToBuffer(StrSubstNo('(L%1%2%3%4', pL, pH, fn, m));
     end;
 
     local procedure InitializePrinter(FontType: Text)
     var
         StringLib: Codeunit "NPR String Library";
     begin
-        TempPattern := 'ESC @';
-        AddToBuffer(TempPattern);
+        _DotNetStream.WriteByte(27);
+        AddStringToBuffer('@');
 
         StringLib.Construct(FontType);
         if (CopyStr(FontType, 1, 12) = 'SETUP HEIGHT') then //Syntax: SETUP HEIGHT y
-            Evaluate(LabelHeight, StringLib.SelectStringSep(3, ' '))
+            Evaluate(_LabelHeight, StringLib.SelectStringSep(3, ' '))
         else
-            LabelHeight := 330;
+            _LabelHeight := 330;
 
         SelectPageMode();
         SelectCharacterCodeTable(16);
         SetHorzAndVertMotionUnits(0, 0);
         SelectDefaultLineSpacing();
-        //SetLineSpacing(150);
-
-        PrinterInitialized := true;
+        _PrinterInitialized := true;
     end;
-
-    procedure GeneratePulse(m: Integer; t1: Char; t2: Char)
-    begin
-        // Ref sheet 124
-        TempPattern := 'ESC p %1 %2 %3';
-        AddToBuffer(StrSubstNo(TempPattern, m, ESC.C2ESC(t1), ESC.C2ESC(t2)));
-    end;
-
     local procedure PrintBarCodeA(m: Char; "d1..dk": Text[30])
     begin
-        // Ref sheet 190 m in [0-6]
-        // 0; UPC-A, 1: UPC-1, 2; EAN13, 3; JAN8, 4; CODE39
-        // 5; ITF, 6; CODABAR(NW-7)
-        TempPattern := 'GS k %1 %2 NUL';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(m), "d1..dk"));
+        // GS k %1 %2 NUL
+        _DotNetStream.WriteByte(29); //GS
+        AddStringToBuffer('k');
+        AddStringToBuffer(Format(m) + "d1..dk");
+        _DotNetStream.WriteByte(0);
     end;
 
     local procedure PrintDataInPageMode()
     begin
-        // Ref sheet 110
-        AddToBuffer('ESC FF');
+        _DotNetStream.WriteByte(27); //ESC
+        _DotNetStream.WriteByte(12);
     end;
 
     procedure PrintNVGraphicsData(n: Char; m: Char)
     begin
-        // Ref sheet 198 n in [1-255], m in [0-3]
-        //
-        TempPattern := 'FS p %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n), ESC.C2ESC(m)));
+        // FS p %1 %2
+        _DotNetStream.WriteByte(28); //FS
+        AddStringToBuffer('p' + Format(n) + Format(m));
     end;
 
     procedure PrintNVGraphicsDataNew(pL: Char; pH: Char; m: Char; fn: Char; kc1: Char; kc2: Char; x: Char; y: Char)
     begin
-        // Ref sheet 191 m in [A-N]
-        //
-        TempPattern := 'GS ( L %1 %2 %3 %4 %5 %6 %7 %8';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(pL), ESC.C2ESC(pH), ESC.C2ESC(m), ESC.C2ESC(fn), ESC.C2ESC(kc1), ESC.C2ESC(kc2), ESC.C2ESC(x), ESC.C2ESC(y)));
+        //GS ( L %1 %2 %3 %4 %5 %6 %7 %8
+        _DotNetStream.WriteByte(29);
+        AddStringToBuffer('(L' + format(pL) + format(pH) + format(m) + format(fn) + format(kc1) + format(kc2) + format(x) + format(y));
     end;
-
     local procedure SelectCharacterCodeTable(n: Char)
     begin
-        // Ref sheet 125, 16 = Windows-1252, NAV danish superset.
-        TempPattern := 'ESC t %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)))
+        // ESC t %1
+        _DotNetStream.WriteByte(27); //ESC 
+        AddStringToBuffer('t' + Format(n));
     end;
 
     local procedure SelectCharacterFont(n: Char)
     begin
-        // Ref sheet 118 (n in [0,1])
-        TempPattern := 'ESC M %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
+        // ESC M %1
+        _DotNetStream.WriteByte(27); //ESC 
+        AddStringToBuffer('M' + format(n));
     end;
 
     local procedure SelectCharacterSize(n: Char)
     begin
-        // Ref sheet 134
         // Bit 0-2 Height Magnification
         // Bit 3 Reserved
         // Bit 4-6 Width Magnification
         // Bit 7 reserved
-        TempPattern := 'GS ! %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
+        // GS ! %1
+        _DotNetStream.WriteByte(29); //GS
+        AddStringToBuffer('!' + Format(n));
     end;
-
     local procedure SelectDefaultLineSpacing()
     begin
-        // Ref sheet 115
-        TempPattern := 'ESC 2';
-        AddToBuffer(TempPattern);
+        //ESC 2        
+        _DotNetStream.WriteByte(27);
+        AddStringToBuffer('2');
     end;
 
     local procedure SelectPageMode()
     begin
-        // Ref sheet 111
-        TempPattern := 'ESC L';
-        AddToBuffer(TempPattern);
+        //ESC L
+        _DotNetStream.WriteByte(27);
+        AddStringToBuffer('L');
     end;
 
     local procedure SelectPrintDirectInPageMode(n: Integer)
     begin
-        // Ref sheet 120  (n in[0,1,2,3])
-        TempPattern := 'ESC T %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
+        //ESC T %1
+        _DotNetStream.WriteByte(27);
+        AddStringToBuffer('T' + format(n));
     end;
 
     local procedure SetBarCodeHeight(n: Char)
     begin
-        // Ref sheet 189
-        TempPattern := 'GS h %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
+        // GS h %1
+        _DotNetStream.WriteByte(29); //GS
+        AddStringToBuffer('h');
+        AddStringToBuffer(Format(n));
     end;
 
     local procedure SetBarCodeWidth(n: Char)
     begin
-        // Ref sheet 193
-        TempPattern := 'GS w %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
+        // GS w %1
+        _DotNetStream.WriteByte(29); //GS
+        AddStringToBuffer('w');
+        AddStringToBuffer(Format(n));
     end;
 
     local procedure SetHorzAndVertMotionUnits(x: Char; y: Char)
     begin
-        // Ref sheet 183
-        TempPattern := 'GS P %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(x), ESC.C2ESC(y)));
+        //GS P %1 %2
+        _DotNetStream.WriteByte(29);
+        AddStringToBuffer('P' + format(x) + format(y));
     end;
 
     local procedure SetPrintAreaInPageMode(xL: Char; xH: Char; yL: Char; yH: Char; dxL: Char; dxH: Char; dyL: Char; dyH: Char)
     begin
-        // Ref sheet 121
-        AddToBuffer('ESC W');
-        AddTextToBuffer(Format(xL) + Format(xH) + Format(yL) + Format(yH) + Format(dxL) + Format(dxH) + Format(dyL) + Format(dyH));
+        //ESC W        
+        _DotNetStream.WriteByte(27);
+        AddStringToBuffer('W' + format(xL) + format(xH) + format(yL) + format(yH) + format(dxL) + format(dxH) + format(dyL) + format(dyH));
     end;
 
     local procedure SetRelativeVerticalPrintPos(nL: Char; nH: Char)
     begin
-        // Ref sheet 184
-        TempPattern := 'GS \ %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
+        //GS \ %1 %2        
+        _DotNetStream.WriteByte(29);
+        AddStringToBuffer('\' + format(nL) + format(nH));
     end;
 
-    local procedure Text(Type: Text; Rotation: Integer; X: Integer; Y: Integer; Height: Integer; Bold: Boolean; TextIn: Text)
+    local procedure PrintText(Type: Text; Rotation: Integer; X: Integer; Y: Integer; Height: Integer; Bold: Boolean; TextIn: Text)
     var
         TypeHelper: Codeunit "Type Helper";
         highY: Integer;
@@ -536,10 +400,10 @@
         if Bold then
             TurnExphasizedModeOnOff(1);
 
-        if (LabelHeight - Y) > 0 then
-            AreaHeight := LabelHeight - Y
+        if (_LabelHeight - Y) > 0 then
+            AreaHeight := _LabelHeight - Y
         else
-            AreaHeight := LabelHeight - 1;
+            AreaHeight := _LabelHeight - 1;
 
         lowX := TypeHelper.BitwiseAnd(X, 255);
         highX := (X - lowX) / 256;
@@ -563,7 +427,7 @@
             SetRelativeVerticalPrintPos(lowP, highP);
         end;
 
-        AddTextToBuffer(TextIn);
+        AddStringToBuffer(TextIn);
         LineFeed();
 
         if Bold then
@@ -575,64 +439,9 @@
 
     local procedure TurnExphasizedModeOnOff(n: Integer)
     begin
-        // Ref sheet 117 (n in [0,1])
-        TempPattern := 'ESC E %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
-    local procedure TurnUnderlineModeOnOff(n: Integer)
-    begin
-        // Ref sheet 117
-        TempPattern := 'ESC - %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
-    procedure "// Info Functions"()
-    begin
-    end;
-
-    procedure GetPageWidth(FontFace: Text[30]) Width: Integer
-    begin
-        case FontFace[1] of
-            'A':
-                case FontFace[2] of
-                    '1':
-                        exit(42);
-                    '2':
-                        exit(21);
-                    '3':
-                        exit(14);
-                    '4':
-                        exit(10);
-                    '5':
-                        exit(8);
-                    '6':
-                        exit(7);
-                    '7':
-                        exit(6);
-                    '8':
-                        exit(5);
-                end;
-            'B':
-                case FontFace[2] of
-                    '1':
-                        exit(56);
-                    '2':
-                        exit(28);
-                    '3':
-                        exit(18);
-                    '4':
-                        exit(14);
-                    '5':
-                        exit(11);
-                    '6':
-                        exit(9);
-                    '7':
-                        exit(8);
-                    '8':
-                        exit(7);
-                end;
-        end;
+        // Ref sheet 117 (n in [0,1])        
+        _DotNetStream.WriteByte(27);
+        AddStringToBuffer('E' + format(n));
     end;
 
     procedure SelectFont(var Value: Text): Boolean
@@ -717,15 +526,5 @@
         RetailList.Number += 1;
         RetailList.Choice := Value;
         RetailList.Insert();
-    end;
-
-    local procedure AddToBuffer(Text: Text[1024])
-    begin
-        ESC.WriteSequenceToBuffer(Text, PrintBuffer);
-    end;
-
-    local procedure AddTextToBuffer(Text: Text[1024])
-    begin
-        PrintBuffer += Text;
     end;
 }

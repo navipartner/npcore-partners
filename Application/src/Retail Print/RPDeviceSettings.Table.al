@@ -1,8 +1,6 @@
 ﻿table 6014560 "NPR RP Device Settings"
 {
     Access = Internal;
-    // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
-
     Caption = 'Device Settings';
     DataClassification = CustomerContent;
 
@@ -22,23 +20,22 @@
             trigger OnLookup()
             var
                 RPTemplateHeader: Record "NPR RP Template Header";
-                LinePrinterInterface: Codeunit "NPR RP Line Printer Interf.";
-                MatrixPrinterInterface: Codeunit "NPR RP Matrix Printer Interf.";
+                LinePrinter: Interface "NPR ILine Printer";
+                MatrixPrinter: Interface "NPR IMatrix Printer";
                 LookupOK: Boolean;
                 TempDeviceSetting: Record "NPR RP Device Settings" temporary;
             begin
                 RPTemplateHeader.Get(GetFilter(Template));
-                RPTemplateHeader.TestField("Printer Device");
                 case RPTemplateHeader."Printer Type" of
                     RPTemplateHeader."Printer Type"::Line:
                         begin
-                            LinePrinterInterface.Construct(RPTemplateHeader."Printer Device");
-                            LinePrinterInterface.OnLookupDeviceSetting(LookupOK, TempDeviceSetting);
+                            LinePrinter := RPTemplateHeader."Line Device";
+                            LookupOK := LinePrinter.LookupDeviceSetting(TempDeviceSetting);
                         end;
                     RPTemplateHeader."Printer Type"::Matrix:
                         begin
-                            MatrixPrinterInterface.Construct(RPTemplateHeader."Printer Device");
-                            MatrixPrinterInterface.OnLookupDeviceSetting(LookupOK, TempDeviceSetting);
+                            MatrixPrinter := RPTemplateHeader."Matrix Device";
+                            LookupOK := MatrixPrinter.LookupDeviceSetting(TempDeviceSetting);
                         end;
                 end;
 

@@ -51,12 +51,6 @@
                     ToolTip = 'Specifies the value of the Keyword field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Register No."; Rec."Register No.")
-                {
-
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Start Date"; Rec."Start Date")
                 {
 
