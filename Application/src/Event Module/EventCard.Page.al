@@ -1254,6 +1254,13 @@
         }
         area(factboxes)
         {
+            part("Attached Documents"; "Document Attachment Factbox")
+            {
+                ApplicationArea = All;
+                Caption = 'Attachments';
+                SubPageLink = "Table ID" = CONST(167),
+                              "No." = FIELD("No.");
+            }
             part(Control6014404; "NPR Event Comment Sheet")
             {
                 SubPageLink = "Table Name" = CONST(Job), "No." = FIELD("No.");
@@ -1345,6 +1352,7 @@
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to journal lines to distribute costs and analyze transaction history.';
                     ApplicationArea = NPRRetail;
                 }
+
                 action("&Statistics")
                 {
                     Caption = '&Statistics';
@@ -1488,6 +1496,24 @@
                         EventEWSMgt.ShowExchIntSummary(Rec);
                     end;
                 }
+                action(Attachments)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Attachments';
+                    Image = Attach;
+                    ToolTip = 'Add a file as an attachment. You can attach images as well as documents.';
+
+                    trigger OnAction()
+                    var
+                        DocumentAttachmentDetails: Page "Document Attachment Details";
+                        RecRef: RecordRef;
+                    begin
+                        RecRef.GetTable(Rec);
+                        DocumentAttachmentDetails.OpenForRecRef(RecRef);
+                        DocumentAttachmentDetails.RunModal();
+                    end;
+                }
+
             }
             group(Prices)
             {
