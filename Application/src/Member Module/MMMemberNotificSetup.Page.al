@@ -302,6 +302,49 @@
 
                 end;
             }
+            action(SetJobQueueEntry)
+            {
+                Caption = 'Create Job Queue Entry for Member Notification';
+                ToolTip = 'Create Job Queue Entry for processing notifications with processing method - batch';
+                Image = ResetStatus;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    JobQueueEntry: Record "Job Queue Entry";
+                    JobQueueManagement: Codeunit "NPR Job Queue Management";
+                    JobQueueDescriptionLbl: Label 'Member Notifications - AutoCreated';
+                    JobQueueCreatedMsg: Label 'Member Notifications job successfully created';
+                begin
+                    JobQueueManagement.InitRecurringJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MM Member Notification", '', JobQueueDescriptionLbl, CurrentDateTime, 15, '', JobQueueEntry);
+                    JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+                    Message(JobQueueCreatedMsg);
+                end;
+            }
+            action(RemoveJobQueueEntry)
+            {
+                Caption = 'Remove Job Queue Entry for Member Notification';
+                ToolTip = 'Remove all Job Queue Entries for processing notifications with processing method - batch from the list of jobs';
+                Image = ReopenCancelled;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    JobQueueEntry: Record "Job Queue Entry";
+                    JobQueueRemovedMsg: Label 'Member Notifications job successfully removed';
+                begin
+                    JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+                    JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Member Notification");
+                    JobQueueEntry.DeleteTasks();
+                    Message(JobQueueRemovedMsg);
+                end;
+            }
         }
     }
 
