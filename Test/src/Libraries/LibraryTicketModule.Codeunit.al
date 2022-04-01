@@ -31,62 +31,64 @@ codeunit 85011 "NPR Library - Ticket Module"
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
-        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-        CreateScheduleLine(AdmissionCode, ScheduleCode, 1, FALSE, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
 
         ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
-        CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, TRUE, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
         ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
 
         exit(ItemNo)
     end;
 
-
     procedure CreateItem(VariantCode: Code[10]; TicketTypeCode: Code[10]; UnitPrice: Decimal) ItemNo: Code[20]
     var
         TicketItem: Record "Item";
         ItemVariant: Record "Item Variant";
         ItemReference: Record "Item Reference";
+        NprItem: Record "NPR Auxiliary Item";
         LibraryInventory: Codeunit "NPR Library - Inventory";
     begin
         LibraryInventory.CreateItem(TicketItem);
 
         TicketItem."Unit Price" := UnitPrice;
-        TicketItem.VALIDATE("NPR Ticket Type", TicketTypeCode);
+        TicketItem.Blocked := false;
+        TicketItem."NPR Group sale" := false;
+        TicketItem.Modify();
 
-        TicketItem.Blocked := FALSE;
-        TicketItem."NPR Group sale" := FALSE;
-
-        TicketItem.MODIFY();
+        TicketItem.NPR_GetAuxItem(NprItem);
+        NprItem.VALIDATE("TM Ticket Type", TicketTypeCode);
+        TicketItem.NPR_SetAuxItem(NprItem);
+        TicketItem.NPR_SaveAuxItem();
 
         if (VariantCode <> '') then begin
             ItemVariant.INIT();
-            if (NOT ItemVariant.GET(TicketItem."No.", VariantCode)) then begin
+            if (not ItemVariant.Get(TicketItem."No.", VariantCode)) then begin
                 ItemVariant."Item No." := TicketItem."No.";
                 ItemVariant.Code := VariantCode;
-                ItemVariant.INSERT();
+                ItemVariant.Insert();
             end;
             ItemVariant.Description := TicketItem.Description;
-            ItemVariant.MODIFY();
+            ItemVariant.Modify();
         end;
 
         ItemReference.INIT();
-        ItemReference.SETFILTER("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
-        ItemReference.SETFILTER("Reference No.", '=%1', STRSUBSTNO('IXRF-%1', TicketItem."No."));
+        ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetFilter("Reference No.", '=%1', StrSubstNo('IXRF-%1', TicketItem."No."));
         if (VariantCode <> '') then
-            ItemReference.SETFILTER("Reference No.", '=%1', STRSUBSTNO('IXRF-%1-%2', TicketItem."No.", VariantCode));
+            ItemReference.SetFilter("Reference No.", '=%1', StrSubstNo('IXRF-%1-%2', TicketItem."No.", VariantCode));
 
-        if (NOT ItemReference.FINDFIRST()) then begin
+        if (not ItemReference.FindFirst()) then begin
             ItemReference."Item No." := TicketItem."No.";
             ItemReference."Variant Code" := VariantCode;
             ItemReference."Unit of Measure" := TicketItem."Sales Unit of Measure";
             ItemReference."Reference Type" := ItemReference."Reference Type"::"Bar Code";
-            ItemReference."Reference No." := STRSUBSTNO('IXRF-%1', TicketItem."No.");
+            ItemReference."Reference No." := StrSubstNo('IXRF-%1', TicketItem."No.");
             if (VariantCode <> '') then
-                ItemReference."Reference No." := STRSUBSTNO('IXRF-%1-%2', TicketItem."No.", VariantCode);
+                ItemReference."Reference No." := StrSubstNo('IXRF-%1-%2', TicketItem."No.", VariantCode);
             ItemReference.Description := TicketItem.Description;
-            ItemReference.INSERT();
+            ItemReference.Insert();
         end;
 
         exit(TicketItem."No.");
@@ -97,9 +99,9 @@ codeunit 85011 "NPR Library - Ticket Module"
         Admission: Record "NPR TM Admission";
     begin
         Admission.INIT();
-        if (NOT Admission.GET(AdmissionCode)) then begin
+        if (not Admission.Get(AdmissionCode)) then begin
             Admission."Admission Code" := AdmissionCode;
-            Admission.INSERT();
+            Admission.Insert();
         end;
 
         Admission.Type := AdmissionType;
@@ -107,7 +109,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         Admission."Capacity Limits By" := CapacityLimit;
         Admission."Default Schedule" := DefaultSchedule;
 
-        Admission.MODIFY();
+        Admission.Modify();
 
         exit(AdmissionCode);
     end;
@@ -117,25 +119,25 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketType: Record "NPR TM Ticket Type";
     begin
         TicketType.INIT();
-        if (NOT TicketType.GET(TicketTypeCode)) then begin
+        if (not TicketType.Get(TicketTypeCode)) then begin
             TicketType.Code := TicketTypeCode;
-            TicketType.INSERT();
+            TicketType.Insert();
         end;
 
         TicketType.Description := TicketTypeCode;
-        TicketType."Print Ticket" := FALSE;
+        TicketType."Print Ticket" := false;
         TicketType.VALIDATE("No. Series", 'ATF-TM-TICKET');
         TicketType."External Ticket Pattern" := 'ATF-[S][A*1]-[N]';
-        TicketType."Is Ticket" := TRUE;
-        TicketType."Defer Revenue" := FALSE;
+        TicketType."Is Ticket" := true;
+        TicketType."Defer Revenue" := false;
 
-        EVALUATE(TicketType."Duration Formula", DurationFormula);
+        Evaluate(TicketType."Duration Formula", DurationFormula);
         TicketType."Max No. Of Entries" := MaxNumberOfEntries;
         TicketType."Admission Registration" := AdmissionRegistration;
         TicketType."Activation Method" := ActivationMethod;
         TicketType."Ticket Entry Validation" := EntryValidation;
         TicketType."Ticket Configuration Source" := ConfigurationSource;
-        TicketType.MODIFY();
+        TicketType.Modify();
 
         exit(TicketTypeCode);
     end;
@@ -145,22 +147,22 @@ codeunit 85011 "NPR Library - Ticket Module"
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
     begin
-        if (NOT NoSeries.GET(NoSerieCode)) then begin
+        if (not NoSeries.Get(NoSerieCode)) then begin
             NoSeries.Code := NoSerieCode;
-            NoSeries.INSERT();
+            NoSeries.Insert();
         end;
 
         NoSeries.Description := NoSerieCode;
-        NoSeries."Default Nos." := TRUE;
-        NoSeries.MODIFY();
+        NoSeries."Default Nos." := true;
+        NoSeries.Modify();
 
-        if (NOT NoSeriesLine.GET(NoSerieCode, 10000)) then begin
+        if (not NoSeriesLine.Get(NoSerieCode, 10000)) then begin
             NoSeriesLine."Series Code" := NoSerieCode;
             NoSeriesLine."Line No." := 10000;
             NoSeriesLine."Starting Date" := DMY2Date(1, 1, 2020);
             NoSeriesLine."Starting No." := StartNumber;
             NoSeriesLine."Increment-by No." := 1;
-            NoSeriesLine.INSERT();
+            NoSeriesLine.Insert();
         end;
     end;
 
@@ -169,9 +171,9 @@ codeunit 85011 "NPR Library - Ticket Module"
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
     begin
         AdmissionSchedule.INIT();
-        if (NOT AdmissionSchedule.GET(ScehduleCode)) then begin
+        if (not AdmissionSchedule.Get(ScehduleCode)) then begin
             AdmissionSchedule."Schedule Code" := ScehduleCode;
-            AdmissionSchedule.INSERT();
+            AdmissionSchedule.Insert();
         end;
 
         AdmissionSchedule."Schedule Type" := ScheduleType;
@@ -189,7 +191,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         AdmissionSchedule.Saturday := Saturday;
         AdmissionSchedule.Sunday := Sunday;
 
-        AdmissionSchedule.MODIFY();
+        AdmissionSchedule.Modify();
 
         exit(ScehduleCode);
     end;
@@ -199,16 +201,16 @@ codeunit 85011 "NPR Library - Ticket Module"
         ScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
         ScheduleLines.INIT();
-        if (NOT ScheduleLines.GET(AdmissionCode, ScheduleCode)) then begin
+        if (not ScheduleLines.Get(AdmissionCode, ScheduleCode)) then begin
             ScheduleLines."Admission Code" := AdmissionCode;
             ScheduleLines."Schedule Code" := ScheduleCode;
-            ScheduleLines.INSERT();
+            ScheduleLines.Insert();
         end;
 
         ScheduleLines."Process Order" := ProcessOrder;
-        ScheduleLines.Blocked := FALSE;
+        ScheduleLines.Blocked := false;
         ScheduleLines."Prebook Is Required" := PreBookRequired;
-        EVALUATE(ScheduleLines."Prebook From", PrebookFromFormula);
+        Evaluate(ScheduleLines."Prebook From", PrebookFromFormula);
 
         if (ScheduleLines."Prebook Is Required") then begin
             ScheduleLines.CALCFIELDS("Scheduled Start Time", "Scheduled Stop Time");
@@ -221,12 +223,10 @@ codeunit 85011 "NPR Library - Ticket Module"
             if (AllowAdmissionPassedStart_Minutes >= 0) then
                 ScheduleLines."Event Arrival Until Time" := ScheduleLines."Scheduled Start Time" + AllowAdmissionPassedStart_Minutes * 60 * 1000; // millis
 
-
         end;
         ScheduleLines."Max Capacity Per Sch. Entry" := MaxCapacity;
         ScheduleLines."Capacity Control" := CapacityControl;
-        ScheduleLines.MODIFY();
-
+        ScheduleLines.Modify();
     end;
 
     procedure CreateTicketBOM(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Option; EntryValidation: Option)
@@ -236,15 +236,15 @@ codeunit 85011 "NPR Library - Ticket Module"
         Admission: Record "NPR TM Admission";
     begin
         TicketBom.INIT();
-        if (NOT TicketBom.GET(ItemNo, VariantCode, AdmissionCode)) then begin
+        if (not TicketBom.Get(ItemNo, VariantCode, AdmissionCode)) then begin
             TicketBom."Item No." := ItemNo;
             TicketBom."Variant Code" := VariantCode;
             TicketBom."Admission Code" := AdmissionCode;
-            TicketBom.INSERT();
+            TicketBom.Insert();
         end;
 
-        Item.GET(ItemNo);
-        Admission.GET(AdmissionCode);
+        Item.Get(ItemNo);
+        Admission.Get(AdmissionCode);
 
         TicketBom.Quantity := Quantity;
         TicketBom.Description := Item.Description;
@@ -252,13 +252,13 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketBom."Admission Description" := Admission.Description;
         TicketBom."Prefered Sales Display Method" := TicketBom."Prefered Sales Display Method"::DEFAULT;
 
-        EVALUATE(TicketBom."Duration Formula", DurationFormula);
+        Evaluate(TicketBom."Duration Formula", DurationFormula);
         TicketBom."Max No. Of Entries" := MaxNoOfEntries;
         TicketBom."Activation Method" := ActivationMethod;
         TicketBom."Admission Entry Validation" := EntryValidation;
         TicketBom."Ticket Base Calendar Code" := TicketBaseCalendarCode;
 
-        TicketBom.MODIFY();
+        TicketBom.Modify();
     end;
 
     procedure CreateAttribute(CodePrefix: Code[10]; AttributeNumber: Integer; BaseDescription: Text): Code[20]
@@ -328,15 +328,14 @@ codeunit 85011 "NPR Library - Ticket Module"
     begin
         case FromSeries OF
             'TM':
-                exit(NoSeriesManagement.GetNextNo('ATF-TM-ATF001', TODAY, TRUE));
+                exit(NoSeriesManagement.GetNextNo('ATF-TM-ATF001', TODAY, true));
             'C1':
-                exit(NoSeriesManagement.GetNextNo('ATF-TM-PK10', TODAY, TRUE));
+                exit(NoSeriesManagement.GetNextNo('ATF-TM-PK10', TODAY, true));
             'C2':
-                exit(NoSeriesManagement.GetNextNo('ATF-TM-PK20', TODAY, TRUE));
-            ELSE
-                ERROR('Get Next No %1 from number series is not configured.', FromSeries);
+                exit(NoSeriesManagement.GetNextNo('ATF-TM-PK20', TODAY, true));
+            else
+                Error('Get Next No %1 from number series is not configured.', FromSeries);
         end;
     end;
-
 
 }
