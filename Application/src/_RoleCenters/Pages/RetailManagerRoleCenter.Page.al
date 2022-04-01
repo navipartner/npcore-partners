@@ -311,11 +311,11 @@
                         {
                             Caption = 'Reports and Analysis';
                             Image = AnalysisView;
-                            action("NPR Sales per Week Year/Last Year")
+                            action("NPR Sales per month year/Last")
                             {
-                                Caption = 'Sales per Week Year/Last Year';
+                                Caption = 'Sales Per Month Current Year/Last Year';
                                 Image = Report2;
-                                RunObject = Report "NPR Sales per week year/Last";
+                                RunObject = Report "NPR Sales per month year";
                                 ToolTip = 'View the report of sales for a specified month, along with the comparison with the last year''s report for the same month.';
                                 ApplicationArea = NPRRetail;
                             }
