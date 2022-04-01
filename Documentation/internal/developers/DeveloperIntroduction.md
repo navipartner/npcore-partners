@@ -117,45 +117,26 @@ For anything not deemed to fit a specific module and/or not big enough to warran
 Usually one-object scoped functionality that is independent from other functionality.
 
 # Internal access modifiers and _public folders
-Access modifiers are used to set accessibility of tables, table fields, codeunits, and queries, which controls whether the object can be used from other code in your module or other modules. Access modifiers in AL are designed to create solid APIs, by limiting the symbols that dependant modules can take a reference on. Limiting the API surface can hide implementation details and allow for later refactoring of code without breaking external code.
+Just like Microsoft with their BaseApp, we need to be careful about what AL methods and objects we expose publicly in our ISV modules. 
+The reason is that we risk breaking a PTE, both our own and from partners, if we later refactor something public, plus we have to deal with slowly obsoleting objects in multiple steps to comply with appsource cops when we touch public code.
 
-You set the object accessibility by using the Access Property. If the Access property is not specified; default is Public.
+For those reasons, we have defined a structure where public objects must be placed inside a folder with the name _public. 
+There can be an infinite number of _public folders, so we recommend that they are placed inside module folders in appropriate areas. 
+The reason we did this, is because objects in AL are public by default instead of private by default. So the only way we can be sure that someone truly meant for something to be public, instead of just forgetting to mark it as internal, 
+is by doing something like this. 
+Our pipelines will fail if you have a public object outside of a _public folder, allowing us to catch these errors early.
 
-Access modifier - **internal** - The object or field can be accessed only by code in the same module, but not from another module.
+Note that you will see a lot of older verbose code marked as public for backward compatibility reasons, however **for all new code you should strive to comply with the approach Microsoft uses for their system apps.** 
+This approach entails using small public codeunits that carry tiny functions and event publishers. Those tiny functions can then call into internal objects. This is to have proper contract/API codeunits.
+Tip: You should avoid exposing tables as public unless it is very explicitly a part of your API design - the reason is that tables have so many built-in events that if you group together all the field validations, OnBeforeX, OnAfterX, OnDelete events
+together, any external .app will be able to depend on a TON of implementation details. Whereas with an explicitly designed codeunit API, everything has to be done and invoked in the designed manner, from the outside.
 
->**Important**<br>
-Access modifiers are only taken into consideration at compile time. For example, at compile time, a table with *Access = Internal* cannot be used from other modules that do not have access to the internals of the module where the table is defined, but at runtime, any module can access the table by using reflection-based mechanisms such as *RecordRef*, or *TransferFields*. And the *OnRun* trigger can be run on internal codeunits by using *Codeunit.Run*. Setting the object accessibility level as *Access = Internal*; cannot be used as a security boundary.
+Look at Microsofts system app for inspiration. For example, this little module shows how they structure this: 
+https://github.com/microsoft/ALAppExtensions/tree/main/Modules/System/Azure%20Key%20Vault/src
 
-### _public folder
+They also have some additional notes on these ideas on their docs portal here: 
+https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-blueprint#object-accessibility
 
-On NP Retail and WMS new folder is introduced and that is **_public**.
-
-**_public** - folder contains **ONLY** objects which **doesn't have** Access = Internal or Extendable = False in case of Pages.
-
-When developing, developer should think if object should be accessible outside NP Retail or WMS Module. In case of codeunits, queries and pages which will be used as Web services (SOAP codeunits and OData pages) they will be always put in _public so external application could use those for integration.
-
-### Pull Request Validation
-
-Same as folder _public which is introduced on NP Retail and WMS, also additional Pull Request Validation is introduced. 
-
-Additional Pull Request Validation will run when Pull Request is created and will check following:
-
-- If all objects which have Access = Internal or Extensible = False are placed outside _public folder
-- If all objects inside _public folder have Access = Public, are missing access modifier (as said before default is Public) or is Extensible = true
-
-**In case that AL object is not placed correctly Pull Request Validation will Fail!**
-
-Script scans all .al files in /src/ and checks if they are placed in _public folder correctly, as per either the "Access" property or "Extensible" property.
-The purpose is to always make it opt-in when we want to expose internals of the NPRetail to 3rd party dependencies, either our own customer extensions or partner extensions.
-
-### Breaking changes?
-One of the feature which we will accomplish with this change is also not having too much breaking changes to handle.
-
-Why? 
-
-Objects marked as Internal or Extensible = false will not be used by third app so change which would usually cause breaking change would not be in this case. 
-
-Handling of breaking changes for objects which are not marked as Internal or Extensible = false is still a must do with marking as Obsolete.
 
 # Code Review
 Do not be afraid to write feedback on a colleagues pull request - we all have to learn and improve :)
