@@ -1,17 +1,16 @@
-﻿report 6014456 "NPR Sales per week year/Last"
+report 6014429 "NPR Sales per month year"
 {
 #IF NOT BC17
     Extensible = False; 
 #ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales per week yearLast year.rdlc';
-    Caption = 'Sales Per Week Current Year/Last Year';
+    RDLCLayout = './src/_Reports/layouts/Sales per month yearLast year.rdlc';
+    Caption = 'Sales Per Month Current Year/Last Year';
     PreviewMode = PrintLayout;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
-    UsageCategory = None;
     DataAccessIntent = ReadOnly;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Table renamed to NPR Sales Month Year/Last ';
 
     dataset
     {
