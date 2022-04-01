@@ -52,7 +52,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalesDocumentExportMgt.SetDocumentTypeOrder();
-        SalesDocumentExportMgt.ProcessPOSSale(SalePOS);
+        SalesDocumentExportMgt.ProcessPOSSale(POSSale);
 
         // [Then] POS entry created as credit sale, POS sale ended and sales document is created, open and linked to POS entry.
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
@@ -115,7 +115,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         SalesDocumentExportMgt.SetDocumentTypeOrder();
         SalesDocumentExportMgt.SetInvoice(true);
         SalesDocumentExportMgt.SetShip(true);
-        SalesDocumentExportMgt.ProcessPOSSale(SalePOS);
+        SalesDocumentExportMgt.ProcessPOSSale(POSSale);
 
         // [Then] POS entry as credit sale is created, sale ended and order was posted
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");

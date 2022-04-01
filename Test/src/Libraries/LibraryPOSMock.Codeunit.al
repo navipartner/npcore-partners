@@ -19,10 +19,9 @@ codeunit 85003 "NPR Library - POS Mock"
             UserSetup.Modify();
 
         POSMockFramework.Constructor();
-        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, POSSession);
+        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid());
         POSSession.StartPOSSession();
 
-        POSAction.SetSession(POSSession);
         POSAction.DiscoverActions();
     end;
 
@@ -62,7 +61,7 @@ codeunit 85003 "NPR Library - POS Mock"
             UserSetup.Modify();
 
         POSMockFramework.Constructor();
-        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, POSSession);
+        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid());
         POSSession.StartPOSSession();
         POSSession.StartTransaction();
         POSSession.GetSale(POSSale);
@@ -95,8 +94,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
         Item.Get(ItemNo);
-
-        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, false, '', '', false, '', POSSale); //Insert step of item action
+        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, false, '', '', false, '', POSSession, FrontEnd); //Insert step of item action
     end;
 
     procedure EndSale(POSSession: Codeunit "NPR POS Session"): Boolean
