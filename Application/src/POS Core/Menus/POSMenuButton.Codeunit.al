@@ -1,6 +1,7 @@
 ﻿codeunit 6150889 "NPR POS Menu Button" implements "NPR IJsonSerializable", "NPR ISubMenu"
 {
     Access = Internal;
+
     var
         _caption: Text;
         _tooltip: Text;
@@ -57,11 +58,13 @@
         _backgroundColor := NewBackgroundColor;
     end;
 
+    [Obsolete('Not used. Removed in case 516268.')]
     procedure Color(): Text;
     begin
         exit(_color);
     end;
 
+    [Obsolete('Not used. Removed in case 516268.')]
     procedure SetColor(NewColor: Text);
     begin
         _color := NewColor;

@@ -151,7 +151,6 @@
         MenuButtonObj.SetCaption(MenuButton.GetLocalizedCaption(MenuButton.FieldNo(Caption)));
         MenuButtonObj.SetTooltip(MenuButton.Tooltip);
         MenuButtonObj.SetBackgroundColor(MenuButton."Background Color");
-        MenuButtonObj.SetColor(MenuButton."Foreground Color");
         MenuButtonObj.SetIconClass(MenuButton."Icon Class");
         MenuButtonObj.SetClass(MenuButton."Custom Class Attribute");
         MenuButtonObj.SetRow(MenuButton."Position Y");

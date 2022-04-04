@@ -63,11 +63,6 @@
                     ToolTip = 'Specifies the background color that is displayed on the button';
                     ApplicationArea = NPRRetail;
                 }
-                field("Foreground Color"; Rec."Foreground Color")
-                {
-                    ToolTip = 'Specifies the foreground color that is displayed on the button';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Icon Class"; Rec."Icon Class")
                 {
                     ToolTip = 'Specifies the logo that is used on the button';
