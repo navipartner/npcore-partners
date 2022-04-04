@@ -1,13 +1,11 @@
 page 6059856 "NPR Stripe POS Users"
 {
-    // temporary fix until we build a way to block Stripe for certain users from case system
-    // ApplicationArea = NPRRetail;
+    ApplicationArea = NPRRetail;
     Caption = 'POS Users';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR Stripe POS User";
-    // UsageCategory = Administration;
-    UsageCategory = None;
+    UsageCategory = Administration;
 
     layout
     {
@@ -61,13 +59,11 @@ page 6059856 "NPR Stripe POS Users"
 
     local procedure IsMonetizationEnabled(): Boolean
     var
+        StripeSetup: Record "NPR Stripe Setup";
         StripeCustomer: Record "NPR Stripe Customer";
-        EnvironmentInformation: Codeunit "Environment Information";
     begin
-        // Only work in production SaaS environment. Apps in sandbox do not integrate with Stripe in this case.
-        // Note: if need to test this in own container comment the code below
-        if not EnvironmentInformation.IsProduction() or not EnvironmentInformation.IsSaaS() then
-            exit;
+        if not StripeSetup.IsStripeActive() then
+            exit(false);
 
         exit(not StripeCustomer.IsEmpty());
     end;
