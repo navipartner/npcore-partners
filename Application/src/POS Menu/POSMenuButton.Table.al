@@ -128,6 +128,8 @@
         {
             Caption = 'Foreground Color';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used. Removed in case 516268.';
         }
         field(23; "Icon Class"; Text[30])
         {

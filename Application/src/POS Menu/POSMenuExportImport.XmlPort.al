@@ -73,9 +73,6 @@ xmlport 6150701 "NPR POS Menu Export/Import"
                     fieldelement(BackgroundColor; "POS Menu Button"."Background Color")
                     {
                     }
-                    fieldelement(ForegroundColor; "POS Menu Button"."Foreground Color")
-                    {
-                    }
                     fieldelement(IconClass; "POS Menu Button"."Icon Class")
                     {
                     }
