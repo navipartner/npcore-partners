@@ -1,31 +1,32 @@
 ﻿codeunit 6014590 "NPR Service Tier User Mgt."
 {
     Access = Internal;
-    local procedure GetDatabaseName(): Text
-    var
-        activeSession: Record "Active Session";
-    begin
-        FindMySession(activeSession);
-        exit(activeSession."Database Name")
-    end;
 
-    local procedure FindMySession(var activeSession: Record "Active Session")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
+    local procedure OnBeforeLogInStart()
     var
-        Itt: Integer;
+        EnvironmentHandler: Codeunit "NPR Environment Handler";
+        EnvironmentInformation: Codeunit "Environment Information";
+        Handled: Boolean;
     begin
-        if (activeSession."Server Instance ID" = ServiceInstanceId()) and
-           (activeSession."Session ID" = SessionId()) then
+        if NavApp.IsInstalling() then
             exit;
 
-        while (not activeSession.Get(ServiceInstanceId(), SessionId())) do begin
-            Sleep(10);
-            Itt += 1;
-            if Itt > 50 then begin
-                if not GuiAllowed then
-                    exit;
-                activeSession.Get(ServiceInstanceId(), SessionId());
-            end;
-        end;
+        if not (CurrentClientType in [ClientType::Windows, ClientType::Web, ClientType::Tablet, ClientType::Phone, ClientType::Desktop]) then
+            exit;
+
+        if EnvironmentInformation.IsSandbox() then
+            exit;
+
+        EnvironmentHandler.EnableAllowHttpInSandbox();
+
+        ValidateBCOnlineTenant();
+
+        OnBeforTestUser(IsUsingRegularInvoicing(), Handled);
+        if Handled then
+            exit;
+
+        TestUser();
     end;
 
     local procedure ValidateBCOnlineTenant()
@@ -38,6 +39,29 @@
 
         if not TrySendRequest('ValidateBCOnlineTenant', '', '', TenantId(), ResponseMessage) then
             exit;
+    end;
+
+    local procedure IsUsingRegularInvoicing(): Boolean
+    var
+        UsingRegularInvoicing: Boolean;
+        UseRegularInvoicing: Text;
+    begin
+        if not TrySendRequest('GetTenantUseRegularInvoicing', '', '', TenantId(), UseRegularInvoicing) then
+            exit;
+
+        if UseRegularInvoicing = '' then
+            exit(false);
+
+        if not Evaluate(UsingRegularInvoicing, UseRegularInvoicing) then
+            exit(false);
+
+        exit(UsingRegularInvoicing);
+    end;
+
+    local procedure TestUser()
+    begin
+        TestUserExpired();
+        TestUserLocked();
     end;
 
     local procedure TestUserExpired()
@@ -76,7 +100,7 @@
     begin
         if not TrySendRequest('GetUserExpirationDate', UserId(), GetDatabaseName(), TenantId(), ExpirationDate) then
             exit(0DT);
-        if (ExpirationDate = '') OR (ExpirationDate = '0001-01-01T00:00:00') then
+        if (ExpirationDate = '') or (ExpirationDate = '0001-01-01T00:00:00') then
             exit(0DT);
 
         Evaluate(Day, CopyStr(ExpirationDate, 9, 2));
@@ -104,23 +128,9 @@
             Error(LockedMessage);
     end;
 
-    /*
-    local procedure GetTenantUseRegularInvoicing(): Text
-    var
-        UseRegularInvoicing: Text;
-    begin
-        if not TrySendRequest('GetTenantUseRegularInvoicing', '', '', 'np505315', UseRegularInvoicing) then
-            exit;
-        if UseRegularInvoicing = '' then
-            exit;
-
-        exit(UseRegularInvoicing);
-    end;
-    */
-
     [NonDebuggable]
     [TryFunction]
-    local procedure TrySendRequest(serviceMethod: text; UserId: Text; DatabaseName: Text; TenantId: Text; var responseMessage: Text)
+    local procedure TrySendRequest(serviceMethod: Text; ThisUserId: Text; DatabaseName: Text; ThisTenantId: Text; var responseMessage: Text)
     var
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Client: HttpClient;
@@ -128,9 +138,9 @@
         ContentHeaders: HttpHeaders;
         Content: HttpContent;
     begin
-        Content.WriteFrom(InitRequestContent(serviceMethod, UserId, DatabaseName, TenantId));
+        Content.WriteFrom(InitRequestContent(serviceMethod, ThisUserId, DatabaseName, ThisTenantId));
 
-        Content.GetHeaders(contentHeaders);
+        Content.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'text/xml; charset=utf-8');
         ContentHeaders.Add('SOAPAction', 'urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser:' + serviceMethod);
@@ -140,14 +150,14 @@
         if not Client.Post('https://api.navipartner.dk/ServiceTierUser', Content, Response) then
             Error(GetLastErrorText);
 
-        if not response.IsSuccessStatusCode then
-            Error(format(response.HttpStatusCode));
+        if not Response.IsSuccessStatusCode then
+            Error(Format(Response.HttpStatusCode));
 
         Response.Content().ReadAs(responseMessage);
         responseMessage := GetWebResponseResult(responseMessage);
     end;
 
-    local procedure InitRequestContent(serviceMethod: text; UserId: Text; DatabaseName: Text; TenantId: Text): Text
+    local procedure InitRequestContent(serviceMethod: Text; ThisUserId: Text; DatabaseName: Text; ThisTenantId: Text): Text
     var
         Builder: TextBuilder;
     begin
@@ -157,14 +167,14 @@
         Builder.Append('  <soapenv:Body>');
         Builder.Append('    <' + serviceMethod + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser">');
 
-        if UserId <> '' then
-            Builder.Append('      <usernameIn>' + UserId + '</usernameIn>');
+        if ThisUserId <> '' then
+            Builder.Append('      <usernameIn>' + ThisUserId + '</usernameIn>');
 
         if DatabaseName <> '' then
             Builder.Append('      <databaseNameIn>' + DatabaseName + '</databaseNameIn>');
 
-        if TenantId <> '' then
-            Builder.Append('      <tenantIDIn>' + TenantId + '</tenantIDIn>');
+        if ThisTenantId <> '' then
+            Builder.Append('      <tenantIDIn>' + ThisTenantId + '</tenantIDIn>');
 
         Builder.Append('    </' + serviceMethod + '>');
         Builder.Append('  </soapenv:Body>');
@@ -176,7 +186,7 @@
     local procedure GetWebResponseResult(response: Text) ResponseText: Text
     var
         XmlDoc: XmlDocument;
-        XmlNode: XMLNode;
+        XmlNode: XmlNode;
         XmlNamespace: XmlNamespaceManager;
     begin
         XmlDocument.ReadFrom(response, XmlDoc);
@@ -186,27 +196,36 @@
         exit(ResponseText);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
-    local procedure OnBeforeLogInStart()
+    local procedure GetDatabaseName(): Text
     var
-        EnvironmentHandler: Codeunit "NPR Environment Handler";
-        EnvironmentInformation: Codeunit "Environment Information";
+        activeSession: Record "Active Session";
     begin
-        if NavApp.IsInstalling() then
-            exit;
-
-        if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
-            exit;
-
-        if EnvironmentInformation.IsSandbox() then
-            exit;
-
-        EnvironmentHandler.EnableAllowHttpInSandbox();
-
-        ValidateBCOnlineTenant();
-        TestUserExpired();
-        TestUserLocked();
+        FindMySession(activeSession);
+        exit(activeSession."Database Name")
     end;
 
+    local procedure FindMySession(var activeSession: Record "Active Session")
+    var
+        Itt: Integer;
+    begin
+        if (activeSession."Server Instance ID" = ServiceInstanceId()) and
+           (activeSession."Session ID" = SessionId())
+        then
+            exit;
 
+        while (not activeSession.Get(ServiceInstanceId(), SessionId())) do begin
+            Sleep(10);
+            Itt += 1;
+            if Itt > 50 then begin
+                if not GuiAllowed then
+                    exit;
+                activeSession.Get(ServiceInstanceId(), SessionId());
+            end;
+        end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforTestUser(UsingRegularInvoicing: Boolean; var Handled: Boolean)
+    begin
+    end;
 }
