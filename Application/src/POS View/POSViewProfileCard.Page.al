@@ -37,11 +37,6 @@
                     ToolTip = 'Specifies the value of the POS Theme Code field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Line Order on Screen"; Rec."Line Order on Screen")
-                {
-                    ToolTip = 'Specifies the value of the Line Order on Screen field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("POS - Show discount fields"; Rec."POS - Show discount fields")
                 {
                     ToolTip = 'Specifies the value of the Show Discount field';
