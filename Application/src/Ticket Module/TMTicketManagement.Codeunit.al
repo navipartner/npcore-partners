@@ -2107,6 +2107,7 @@
         exit(true);
     end;
 
+
     procedure ValidateAdmSchEntryForSales(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketItemNo: Code[20]; TicketVariantCode: Code[10]; ReferenceDate: Date; ReferenceTime: Time; var ReasonCode: Enum "NPR TM Sch. Block Sales Reason"; var RemainingQuantityOut: Integer): Boolean
     var
         Item: Record Item;

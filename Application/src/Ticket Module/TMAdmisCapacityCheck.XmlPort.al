@@ -180,7 +180,8 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                     var
                         TicketManagement: Codeunit "NPR TM Ticket Management";
                         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-                        AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
+                        TicketPrice: Codeunit "NPR TM Dynamic Price";
+                        PriceRule: Record "NPR TM Dynamic Price Rule";
                         ReasonCode: Enum "NPR TM Sch. Block Sales Reason";
                         ItemNumber: Code[20];
                         VariantCode: Code[10];
@@ -232,22 +233,20 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         Amount := '';
                         Percentage := '';
                         IncludesVAT := '';
-                        if (AdmissionScheduleLines.Get(TmpAdmScheduleEntryResponse."Admission Code", TmpAdmScheduleEntryResponse."Schedule Code")) then begin
-                            if (AdmissionScheduleLines."Price Scope" in [AdmissionScheduleLines."Price Scope"::API, AdmissionScheduleLines."Price Scope"::API_POS_M2]) then begin
-                                case AdmissionScheduleLines."Pricing Option" of
-                                    AdmissionScheduleLines."Pricing Option"::NA:
-                                        PriceOption := '';
-                                    AdmissionScheduleLines."Pricing Option"::FIXED:
-                                        PriceOption := 'fixed_amount';
-                                    AdmissionScheduleLines."Pricing Option"::RELATIVE:
-                                        PriceOption := 'relative_amount';
-                                    AdmissionScheduleLines."Pricing Option"::PERCENT:
-                                        PriceOption := 'percentage'
-                                end;
-                                Amount := Format(AdmissionScheduleLines.Amount, 0, 9);
-                                Percentage := Format(AdmissionScheduleLines.Percentage, 0, 9);
-                                IncludesVAT := Format(AdmissionScheduleLines."Amount Includes VAT", 0, 9);
+                        if (TicketPrice.SelectPriceRule(TmpAdmScheduleEntryResponse, Today(), 0T, PriceRule)) then begin
+                            case (PriceRule.PricingOption) of
+                                PriceRule.PricingOption::NA:
+                                    PriceOption := '';
+                                PriceRule.PricingOption::FIXED:
+                                    PriceOption := 'fixed_amount';
+                                PriceRule.PricingOption::RELATIVE:
+                                    PriceOption := 'relative_amount';
+                                PriceRule.PricingOption::PERCENT:
+                                    PriceOption := 'percentage';
                             end;
+                            Amount := Format(PriceRule.Amount, 0, 9);
+                            Percentage := Format(PriceRule.Percentage, 0, 9);
+                            IncludesVAT := Format(PriceRule.AmountIncludesVAT, 0, 9);
                         end;
                     end;
                 }

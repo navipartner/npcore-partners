@@ -1,6 +1,47 @@
 codeunit 85011 "NPR Library - Ticket Module"
 {
 
+    procedure CreateScenario_DynamicPrice() SalesItemNo: Code[20]
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        AdmissionSchedule: Record "NPR TM Admis. Schedule";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        TicketSetup: Record "NPR TM Ticket Setup";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        NprMasterData: Codeunit "NPR Library - POS Master Data";
+        ScheduleManager: Codeunit "NPR TM Admission Sch. Mgt.";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+    begin
+
+        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+        WorkDate(Today);
+
+        // Used for testing dynamic prices
+
+        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
+        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
+        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
+        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
+
+        TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
+        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
+        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        CreateScheduleLinePriceProfile(AdmissionCode, ScheduleCode, 1, true, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+7D>', 0, 0);
+
+
+        ItemNo := CreateItem('', TicketTypeCode, 100);
+        CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+
+        ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
+
+        exit(ItemNo)
+    end;
+
     procedure CreateScenario_SmokeTest() SalesItemNo: Code[20]
     var
         TicketType: Record "NPR TM Ticket Type";
@@ -196,6 +237,16 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(ScehduleCode);
     end;
 
+    procedure CreateScheduleLinePriceProfile(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ProcessOrder: Integer; PreBookRequired: Boolean; MaxCapacity: Integer; CapacityControl: Option; PrebookFromFormula: Text[30]; AllowAdmissionBeforeStart_Minutes: Integer; AllowAdmissionPassedStart_Minutes: Integer)
+    var
+        ScheduleLines: Record "NPR TM Admis. Schedule Lines";
+    begin
+        CreateScheduleLine(AdmissionCode, ScheduleCode, ProcessOrder, PreBookRequired, MaxCapacity, CapacityControl, PrebookFromFormula, AllowAdmissionBeforeStart_Minutes, AllowAdmissionPassedStart_Minutes);
+        ScheduleLines.Get(AdmissionCode, ScheduleCode);
+        ScheduleLines."Dynamic Price Profile Code" := CreatePriceProfile(GenerateCode10());
+        ScheduleLines.Modify();
+    end;
+
     procedure CreateScheduleLine(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ProcessOrder: Integer; PreBookRequired: Boolean; MaxCapacity: Integer; CapacityControl: Option; PrebookFromFormula: Text[30]; AllowAdmissionBeforeStart_Minutes: Integer; AllowAdmissionPassedStart_Minutes: Integer)
     var
         ScheduleLines: Record "NPR TM Admis. Schedule Lines";
@@ -227,6 +278,19 @@ codeunit 85011 "NPR Library - Ticket Module"
         ScheduleLines."Max Capacity Per Sch. Entry" := MaxCapacity;
         ScheduleLines."Capacity Control" := CapacityControl;
         ScheduleLines.Modify();
+    end;
+
+    procedure CreatePriceProfile(ProfileCode: Code[10]): Code[10]
+    var
+        PriceProfile: Record "NPR TM Dynamic Price Profile";
+    begin
+        PriceProfile.Init();
+        if (not PriceProfile.Get(ProfileCode)) then begin
+            PriceProfile.ProfileCode := ProfileCode;
+            PriceProfile.Insert();
+        end;
+        PriceProfile.Modify();
+        exit(PriceProfile.ProfileCode);
     end;
 
     procedure CreateTicketBOM(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Option; EntryValidation: Option)

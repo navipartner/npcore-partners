@@ -1,26 +1,11 @@
 ﻿table 6060122 "NPR TM Admis. Schedule Entry"
 {
     Access = Internal;
-    // NPR4.16/TSA/20150803 CASE219658 Ticket Initial Version
-    // TM1.00/TSA/20151217  CASE 224225 NaviPartner Ticket Management
-    // TM1.04/TSA/20160115  CASE 231834 Changed flowfields to sum quantity rather than count lines
-    // TM1.11/TSA/20160325  CASE 237486 End date and end time on entries for web
-    // TM1.11/TSA/20160404  CASE 232250 Added field 47 and 48
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.17/TSA/20161024  CASE 256205 Added key for startdate and starttime, added field 41"Max Capacity Per Sch. Entry"Integer
-    // TM1.20/TSA/20170324  CASE 269171 Added Initial Entry Flowfield
-    // TM1.23/TSA/20170623  CASE 280612 Added "Regeneration Mode" option Auto / Manual
-    // TM1.24/TSA /20170921 CASE 289293 Regfactored OnDelete trigger
-    // TM1.28/TSA /20180221 CASE 306039 Added "Visibility On Web"
-    // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
-    // TM1.45/TSA /20191120 CASE 378212 Added the sales cut-off date and time
-    // TM1.45/TSA /20191203 CASE 380754 Added field Allocation By option
 
     Caption = 'Admission Schedule Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR TM Admis. Schedule Entry";
     LookupPageID = "NPR TM Admis. Schedule Entry";
-
     fields
     {
         field(1; "Entry No."; Integer)
@@ -107,11 +92,15 @@
         {
             Caption = 'Unbookable Before Start (Secs)';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use "Event Arrival From Time"';
         }
         field(48; "Bookable Passed Start (Secs)"; Integer)
         {
             Caption = 'Bookable Passed Start (Secs)';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use "Event Arrival Until Time"';
         }
         field(50; "Regenerate With"; Option)
         {
@@ -127,6 +116,17 @@
             Description = '//-TM1.28 [306039]';
             OptionCaption = 'Visible,Hidden';
             OptionMembers = VISIBLE,HIDDEN;
+
+            trigger OnValidate()
+            begin
+                "Regenerate With" := "Regenerate With"::MANUAL;
+            end;
+        }
+        field(86; "Dynamic Price Profile Code"; Code[10])
+        {
+            Caption = 'Dynamic Price Profile Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR TM Dynamic Price Profile".ProfileCode;
 
             trigger OnValidate()
             begin

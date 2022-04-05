@@ -1,6 +1,7 @@
 ﻿codeunit 6060117 "NPR TM Ticket Retail Mgt."
 {
     Access = Internal;
+
     var
         ABORTED: Label 'Aborted.';
         SCHEDULE_ERROR: Label 'There was an error changing the reservation \\%1\\Do you want to try again?';
@@ -24,7 +25,7 @@
             if (ResponseCode = 0) then begin
 
                 Commit();
-                AquireTicketParticipant(Token, ExternalMemberNo);
+                AcquireTicketParticipant(Token, ExternalMemberNo);
 
                 Commit();
                 exit(true); // nothing to confirm;
@@ -34,7 +35,7 @@
         Commit();
         ResponseCode := -1;
         ResponseMessage := ABORTED;
-        if (AquireTicketAdmissionSchedule(Token, SaleLinePOS, UpdateSalesLine, ResponseMessage)) then begin
+        if (AcquireTicketAdmissionSchedule(Token, SaleLinePOS, UpdateSalesLine, ResponseMessage)) then begin
             ResponseMessage := '';
             ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage);
         end;
@@ -42,7 +43,7 @@
         if (ResponseCode = 0) then begin
 
             Commit();
-            AquireTicketParticipant(Token, ExternalMemberNo);
+            AcquireTicketParticipant(Token, ExternalMemberNo);
 
             Commit();
             exit(true);
@@ -51,7 +52,7 @@
         exit(false);
     end;
 
-    procedure AquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "NPR POS Sale Line"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
+    procedure AcquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "NPR POS Sale Line"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
     var
         PageAction: Action;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -121,7 +122,7 @@
         exit(true);
     end;
 
-    procedure AquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]): Boolean
+    procedure AcquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]): Boolean
     var
         TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
         MemberManagement: Codeunit "NPR MM Membership Mgt.";

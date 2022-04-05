@@ -59,7 +59,6 @@
                     (AdmissionScheduleLines."Schedule Generated Until" > Today)) then
                     GenerateFromDate := AdmissionScheduleLines."Schedule Generated Until";
             end;
-            //MESSAGE ('%1 from %2 until %3', AdmissionScheduleLines."Schedule Code", GenerateFromDate, GenerateUntilDate);
 
             // Start generating entries
             DateRecord.Reset();
@@ -309,9 +308,6 @@
             TmpAdmissionScheduleEntry."Event Duration" := Schedule."Event Duration";
         end;
 
-        // will be deprecated
-        TmpAdmissionScheduleEntry."Unbookable Before Start (Secs)" := AdmissionScheduleLines."Unbookable Before Start (Secs)";
-        TmpAdmissionScheduleEntry."Bookable Passed Start (Secs)" := AdmissionScheduleLines."Bookable Passed Start (Secs)";
         // new fields
         TmpAdmissionScheduleEntry."Event Arrival From Time" := AdmissionScheduleLines."Event Arrival From Time";
         TmpAdmissionScheduleEntry."Event Arrival Until Time" := AdmissionScheduleLines."Event Arrival Until Time";
@@ -338,10 +334,9 @@
 
 
         TmpAdmissionScheduleEntry."Max Capacity Per Sch. Entry" := AdmissionScheduleLines."Max Capacity Per Sch. Entry";
-
         TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is";
-
         TmpAdmissionScheduleEntry."Visibility On Web" := AdmissionScheduleLines."Visibility On Web";
+        TmpAdmissionScheduleEntry."Dynamic Price Profile Code" := AdmissionScheduleLines."Dynamic Price Profile Code";
 
         if ((Admission."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then begin
             TempCustomizedCalendarChange.Init();

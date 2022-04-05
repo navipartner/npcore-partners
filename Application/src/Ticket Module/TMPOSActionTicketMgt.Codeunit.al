@@ -439,11 +439,6 @@
     local procedure UpdateTicketOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        Ticket: Record "NPR TM Ticket";
-        UnitPrice: Decimal;
-        Token: Text[100];
-        TicketCount: Integer;
-        RevokeQuantity: Integer;
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
@@ -456,50 +451,14 @@
 
         // This is a ticket event
         TicketRequestManager.LockResources();
-
         TicketRequestManager.ExpireReservationRequests();
 
         if (SaleLinePOS.Quantity > 0) then
             NewTicketSales(SaleLinePOS);
 
-        if (SaleLinePOS.Quantity < 0) then begin
+        if (SaleLinePOS.Quantity < 0) then
+            RevokeTicketSales(SaleLinePOS);
 
-            if (SaleLinePOS."Return Sale Sales Ticket No." = '') then
-                exit;
-
-            Ticket.SetFilter("Sales Receipt No.", '=%1', SaleLinePOS."Return Sale Sales Ticket No.");
-            Ticket.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
-
-            if (Ticket.FindSet()) then begin
-                Token := '';
-
-                repeat
-
-                    UnitPrice := SaleLinePOS."Unit Price";
-                    // IF (TicketRequestManager.POS_CreateRevokeRequest (Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice)) THEN
-                    //   TicketCount -= 1;
-
-                    if (TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice, RevokeQuantity)) then
-                        TicketCount -= RevokeQuantity;
-
-                until (Ticket.Next() = 0);
-
-                // on partial refunds unit price will become altered and qty should be one.
-                if (UnitPrice <> SaleLinePOS."Unit Price") then begin
-                    SaleLinePOS.Validate("Unit Price", UnitPrice);
-                    SaleLinePOS.Modify();
-                end;
-
-                if (TicketCount <> SaleLinePOS.Quantity) then begin
-                    SaleLinePOS.Quantity := TicketCount;
-
-                    SaleLinePOS.UpdateAmounts(SaleLinePOS);
-
-                    SaleLinePOS.Modify();
-                end;
-
-            end;
-        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeDeletePOSSaleLine', '', true, true)]
@@ -612,6 +571,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Price Calc. Mgt.", 'OnAfterFindSalesLinePrice', '', true, true)]
     local procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
         TicketUnitPrice: Decimal;
         Token: Text[100];
     begin
@@ -623,9 +583,9 @@
             exit;
 
         if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)) then begin
-            if (GetTicketUnitPrice(Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then begin
+
+            if (TicketPrice.GetTicketUnitPrice(Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
                 SaleLinePOS."Unit Price" := TicketUnitPrice;
-            end;
         end;
     end;
 
@@ -641,6 +601,7 @@
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
         SeatingUI: Codeunit "NPR TM Seating UI";
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
     begin
 
         if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)) then begin
@@ -650,7 +611,6 @@
             TicketRequestManager.DeleteReservationRequest(Token, true);
         end;
 
-        //ExternalMemberNo := SaleLinePOS."Serial No.";
         Token := TicketRequestManager.POS_CreateReservationRequest(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS.Quantity, ExternalMemberNo);
         Commit();
 
@@ -667,10 +627,9 @@
             if (ResponseCode = 0) then begin
                 Commit();
 
-                //AquireTicketParticipant (Token, ExternalMemberNo);
-                AquireTicketParticipant(Token, ExternalMemberNo, false);
+                AcquireTicketParticipant(Token, ExternalMemberNo, false);
 
-                if (GetTicketUnitPrice(Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then begin
+                if (TicketPrice.GetTicketUnitPrice(Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then begin
                     SaleLinePOS.Validate("Unit Price", TicketUnitPrice);
                     SaleLinePOS.UpdateAmounts(SaleLinePOS);
                     SaleLinePOS."Eksp. Salgspris" := false;
@@ -680,14 +639,8 @@
 
                 Commit();
 
-                //    IF (USERID = 'TSA') THEN BEGIN
-                //      IF (SaleLinePOS."No." = '32010') THEN BEGIN
-                //        IF (POSSession.IsActiveSession (FrontEnd)) THEN
-                //          SeatingUI.ShowUI (FrontEnd);
-                //      END;
-                //    END;
-                if (POSSession.IsActiveSession(FrontEnd)) then
-                    SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false);
+                POSSession.GetFrontEnd(FrontEnd);
+                SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false);
 
                 exit(1); // nothing to confirm;
             end;
@@ -696,34 +649,17 @@
         Commit();
         ResponseCode := -1;
         ResponseMessage := ABORTED;
-        if (AquireTicketAdmissionSchedule(Token, SaleLinePOS, true, ResponseMessage)) then //-+TM1.45 [380754]
+        if (AcquireTicketAdmissionSchedule(Token, SaleLinePOS, true, ResponseMessage)) then //-+TM1.45 [380754]
             ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage);
 
         if (ResponseCode = 0) then begin
             Commit();
 
-            //AquireTicketParticipant (Token, ExternalMemberNo);
-            AquireTicketParticipant(Token, ExternalMemberNo, false);
-
-
-            //  IF (GetTicketUnitPrice (Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) THEN BEGIN
-            //    SaleLinePOS.VALIDATE ("Unit Price", TicketUnitPrice);
-            //    SaleLinePOS.UpdateAmounts (SaleLinePOS);
-            //    SaleLinePOS."Eksp. Salgspris" := FALSE;
-            //    SaleLinePOS."Custom Price" := FALSE;
-            //    SaleLinePOS.MODIFY ();
-            //  END;
-
+            AcquireTicketParticipant(Token, ExternalMemberNo, false);
             Commit();
 
-            //    IF (USERID = 'TSA') THEN BEGIN
-            //      IF (SaleLinePOS."No." = '32010') THEN BEGIN
-            //        IF (POSSession.IsActiveSession (FrontEnd)) THEN
-            //          SeatingUI.ShowUI (FrontEnd);
-            //      END;
-            //    END;
-            if (POSSession.IsActiveSession(FrontEnd)) then
-                SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false);
+            POSSession.GetFrontEnd(FrontEnd);
+            SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false);
 
             exit(1);
         end;
@@ -732,6 +668,45 @@
         TicketRequestManager.DeleteReservationRequest(Token, true);
         Commit();
         Error(ResponseMessage);
+    end;
+
+    local procedure RevokeTicketSales(var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        UnitPrice: Decimal;
+        Token: Text[100];
+        TicketCount: Integer;
+        RevokeQuantity: Integer;
+
+    begin
+        if (SaleLinePOS."Return Sale Sales Ticket No." = '') then
+            exit;
+
+        Ticket.SetFilter("Sales Receipt No.", '=%1', SaleLinePOS."Return Sale Sales Ticket No.");
+        Ticket.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
+
+        if (Ticket.FindSet()) then begin
+            Token := '';
+
+            repeat
+                UnitPrice := SaleLinePOS."Unit Price";
+                if (TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice, RevokeQuantity)) then
+                    TicketCount -= RevokeQuantity;
+            until (Ticket.Next() = 0);
+
+            // on partial refunds unit price will become altered and qty should be one.
+            if (UnitPrice <> SaleLinePOS."Unit Price") then begin
+                SaleLinePOS.Validate("Unit Price", UnitPrice);
+                SaleLinePOS.Modify();
+            end;
+
+            if (TicketCount <> SaleLinePOS.Quantity) then begin
+                SaleLinePOS.Quantity := TicketCount;
+                SaleLinePOS.UpdateAmounts(SaleLinePOS);
+                SaleLinePOS.Modify();
+            end;
+        end;
     end;
 
     local procedure RegisterArrival(ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; WithPrint: Boolean)
@@ -890,7 +865,7 @@
         end;
 
         if (Token <> '') then
-            AquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesTicket, ResponseMessage); //-+TM1.45 [380754]
+            AcquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesTicket, ResponseMessage); //-+TM1.45 [380754]
     end;
 
     local procedure ReconfirmReservation(POSSession: Codeunit "NPR POS Session")
@@ -913,7 +888,7 @@
                 if (ResponseCode <> 0) then
                     Error(ResponseMessage);
 
-                AquireTicketAdmissionSchedule(Token, SaleLinePOS, true, ResponseMessage); //-+TM1.45 [380754]
+                AcquireTicketAdmissionSchedule(Token, SaleLinePOS, true, ResponseMessage); //-+TM1.45 [380754]
             end;
         end;
     end;
@@ -944,7 +919,7 @@
         end;
 
         if (Token <> '') then
-            AquireTicketParticipant(Token, Ticket."External Member Card No.", true);
+            AcquireTicketParticipant(Token, Ticket."External Member Card No.", true);
     end;
 
     local procedure GetGroupTicketQuantity(JSON: Codeunit "NPR POS JSON Management"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; FunctionId: Integer; var ShowQtyDialogOut: Boolean) TicketMaxQty: Integer
@@ -1073,8 +1048,6 @@
 
             SaleLinePos.Type := SaleLinePos.Type::Item;
 
-            // IF (NOT BarcodeLibrary.TranslateBarcodeToItemVariant (TicketReservationRequest."External Item Code", SaleLinePos."No.", SaleLinePos."Variant Code", Resolver, FALSE)) THEN
-            //  ERROR (ILLEGAL_VALUE, TicketReservationRequest."External Item Code", 'Barcode or Item');
             SaleLinePos."No." := TicketReservationRequest."Item No.";
             SaleLinePos."Variant Code" := TicketReservationRequest."Variant Code";
 
@@ -1116,113 +1089,23 @@
 
         if (not TicketManagement.CheckIfCanBeConsumed(Ticket."No.", AdmissionCode, TicketType."Membership Sales Item No.", ReasonText)) then
             Error(ReasonText);
-        //POSActionTextEnter.ScanBarcode (Context, POSSession, FrontEnd, TicketType."Membership Sales Item No.");
+
         EanBoxEventHandler.InvokeEanBox(TicketType."Membership Sales Item No.", Context, POSSession, FrontEnd);
 
         if (not TicketManagement.CheckAndConsumeItem(Ticket."No.", AdmissionCode, TicketType."Membership Sales Item No.", ReasonText)) then
             Error(ReasonText);
     end;
 
-    local procedure GetTicketUnitPrice(Token: Text[100]; OriginalUnitPrice: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal; var NewTicketPrice: Decimal): Boolean
-    var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
-        TotalRelativeChange: Decimal;
-    begin
-
-        NewTicketPrice := OriginalUnitPrice;
-        TotalRelativeChange := 0;
-
-        TicketReservationRequest.Reset();
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.SetFilter("External Adm. Sch. Entry No.", '>%1', 0);
-        if (TicketReservationRequest.FindSet()) then begin
-
-            // First get the lowest fixed price.
-            repeat
-                AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
-                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                if (AdmissionScheduleEntry.FindLast()) then begin
-                    AdmissionScheduleLines.Get(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code");
-                    if (AdmissionScheduleLines."Price Scope" in [AdmissionScheduleLines."Price Scope"::API_POS_M2, AdmissionScheduleLines."Price Scope"::POS_M2]) then begin
-                        case AdmissionScheduleLines."Pricing Option" of
-                            AdmissionScheduleLines."Pricing Option"::NA:
-                                ;
-                            AdmissionScheduleLines."Pricing Option"::FIXED:
-                                begin
-                                    if (PriceIncludesVAT = AdmissionScheduleLines."Amount Includes VAT") then begin
-                                        if (AdmissionScheduleLines.Amount < NewTicketPrice) then NewTicketPrice := AdmissionScheduleLines.Amount;
-                                    end else begin
-                                        if (PriceIncludesVAT) and not (AdmissionScheduleLines."Amount Includes VAT") then begin
-                                            if (AdmissionScheduleLines.Amount * ((100 + VatPercentage) / 100) < NewTicketPrice) then NewTicketPrice := AdmissionScheduleLines.Amount * ((100 + VatPercentage) / 100);
-                                        end else begin
-                                            if (AdmissionScheduleLines.Amount / ((100 + VatPercentage) / 100) < NewTicketPrice) then NewTicketPrice := AdmissionScheduleLines.Amount / ((100 + VatPercentage) / 100);
-                                        end;
-                                    end;
-                                end;
-                        end;
-                    end;
-                end;
-            until (TicketReservationRequest.Next() = 0);
-
-            // Then apply relative price changes.
-            TicketReservationRequest.FindSet();
-            repeat
-                AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
-                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                if (AdmissionScheduleEntry.FindLast()) then begin
-                    AdmissionScheduleLines.Get(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code");
-                    if (AdmissionScheduleLines."Price Scope" in [AdmissionScheduleLines."Price Scope"::API_POS_M2, AdmissionScheduleLines."Price Scope"::POS_M2]) then begin
-                        case AdmissionScheduleLines."Pricing Option" of
-                            AdmissionScheduleLines."Pricing Option"::RELATIVE:
-                                begin
-                                    if (PriceIncludesVAT = AdmissionScheduleLines."Amount Includes VAT") then begin
-                                        TotalRelativeChange += AdmissionScheduleLines.Amount;
-                                    end else begin
-                                        if (PriceIncludesVAT) and not (AdmissionScheduleLines."Amount Includes VAT") then begin
-                                            TotalRelativeChange += AdmissionScheduleLines.Amount * ((100 + VatPercentage) / 100);
-                                        end else begin
-                                            TotalRelativeChange += AdmissionScheduleLines.Amount / ((100 + VatPercentage) / 100);
-                                        end;
-                                    end;
-                                end;
-                            AdmissionScheduleLines."Pricing Option"::PERCENT:
-                                begin
-                                    if (PriceIncludesVAT = AdmissionScheduleLines."Amount Includes VAT") then begin
-                                        TotalRelativeChange += NewTicketPrice * AdmissionScheduleLines.Percentage / 100;
-                                    end else begin
-                                        if (PriceIncludesVAT) and not (AdmissionScheduleLines."Amount Includes VAT") then begin
-                                            TotalRelativeChange += NewTicketPrice * ((100 + VatPercentage) / 100) * AdmissionScheduleLines.Percentage;
-                                        end else begin
-                                            TotalRelativeChange += NewTicketPrice / ((100 + VatPercentage) / 100) * AdmissionScheduleLines.Percentage;
-                                        end;
-                                    end;
-                                end;
-                        end;
-                    end;
-                end;
-            until (TicketReservationRequest.Next() = 0);
-
-        end;
-
-        NewTicketPrice += TotalRelativeChange;
-        NewTicketPrice := Round(NewTicketPrice, 0.01);
-
-        exit((OriginalUnitPrice <> NewTicketPrice) and (NewTicketPrice >= 0));
-    end;
-
-    local procedure AquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "NPR POS Sale Line"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
+    local procedure AcquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "NPR POS Sale Line"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
     var
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
     begin
 
-        LookupOK := TicketRetailManagement.AquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesLine, ResponseMessage); //-+TM1.45 [380754]
+        LookupOK := TicketRetailManagement.AcquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesLine, ResponseMessage); //-+TM1.45 [380754]
         exit(LookupOK);
     end;
 
-    local procedure AquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]; ForceDialog: Boolean): Boolean
+    local procedure AcquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]; ForceDialog: Boolean): Boolean
     var
         TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
         MemberManagement: Codeunit "NPR MM Membership Mgt.";
@@ -1260,7 +1143,6 @@
             end;
         end;
 
-        //EXIT (TicketNotifyParticipant.AquireTicketParticipant (Token, SuggestMethod, SuggestAddress));
         exit(TicketNotifyParticipant.AcquireTicketParticipantForce(Token, SuggestMethod, SuggestAddress, ForceDialog));
     end;
 
@@ -1445,4 +1327,5 @@
     begin
         exit(Codeunit::"NPR TM POS Action: Ticket Mgt.");
     end;
+
 }
