@@ -61,18 +61,6 @@
                     Visible = false;
                     ToolTip = 'Specifies the value of the Reserved For Members field';
                 }
-                field("Unbookable Before Start (Secs)"; Rec."Unbookable Before Start (Secs)")
-                {
-                    ApplicationArea = NPRTicketAdvanced;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Unbookable Before Start (Secs) field';
-                }
-                field("Bookable Passed Start (Secs)"; Rec."Bookable Passed Start (Secs)")
-                {
-                    ApplicationArea = NPRTicketAdvanced;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Bookable Passed Start (Secs) field';
-                }
                 field("Capacity Control"; Rec."Capacity Control")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -152,31 +140,12 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Until Time field';
                 }
-                field("Pricing Option"; Rec."Pricing Option")
+                field("Dynamic Price Profile Code"; Rec."Dynamic Price Profile Code")
                 {
+                    ToolTip = 'Specifies the value of the Dynamic Price Profile Code field.';
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Pricing Option field';
                 }
-                field("Price Scope"; Rec."Price Scope")
-                {
-                    ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Price Scope field';
-                }
-                field(Amount; Rec.Amount)
-                {
-                    ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Amount field';
-                }
-                field(Percentage; Rec.Percentage)
-                {
-                    ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Percentage field';
-                }
-                field("Amount Includes VAT"; Rec."Amount Includes VAT")
-                {
-                    ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Amount Includes VAT field';
-                }
+
             }
         }
     }
@@ -263,6 +232,32 @@
                 RunPageLink = "Admission Code" = FIELD("Admission Code"),
                               "Schedule Code" = FIELD("Schedule Code");
 
+            }
+        }
+        area(Processing)
+        {
+            action(ActionName)
+            {
+                ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
+                Caption = 'Price Simulation';
+                ToolTip = 'Show the price simulator view.';
+                Image = Simulate;
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    SimulatorPage: Page "NPR TM Price Adm. Sch. Sim.";
+                    ScheduleEntries: Record "NPR TM Admis. Schedule Entry";
+                begin
+                    ScheduleEntries.SetFilter("Admission Code", '=%1', Rec."Admission Code");
+                    ScheduleEntries.SetFilter("Admission Start Date", '%1..', Today());
+                    ScheduleEntries.SetFilter(Cancelled, '=%1', false);
+                    SimulatorPage.SetTableView(ScheduleEntries);
+                    SimulatorPage.Run();
+                end;
             }
         }
     }

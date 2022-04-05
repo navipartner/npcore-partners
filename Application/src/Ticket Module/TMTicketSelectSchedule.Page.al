@@ -81,6 +81,15 @@
                     Visible = false;
                     ToolTip = 'Specifies the value of the Calendar Exception field';
                 }
+                field(UnitPrice; _UnitPrice)
+                {
+                    ApplicationArea = NPRTicketAdvanced, NPRTicketDynamicPrice;
+                    Caption = 'Unit Price';
+                    Editable = false;
+                    Style = Unfavorable;
+                    StyleExpr = CalendarExceptionText <> '';
+                    ToolTip = 'Specifies the value of the admission unit price.';
+                }
             }
             group(Control6014401)
             {
@@ -102,17 +111,19 @@
 
     trigger OnAfterGetRecord()
     var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
         NonWorking: Boolean;
         DateTimeLbl: Label '%1 %2', Locked = true;
         RemainingLbl: Label '%1', Locked = true;
         Remaining2Lbl: Label '%1 (%2)', Locked = true;
         ReasonCode: Enum "NPR TM Sch. Block Sales Reason";
+        BasePrice, AddonPrice : Decimal;
+        FormatLabel: Label '<Sign><Integer><Decimals>', Locked = true;
     begin
 
         LocalDateTimeText := StrSubstNo(DateTimeLbl, Format(Today()), Format(Time()));
 
         TicketManagement.ValidateAdmSchEntryForSales(Rec, gTicketItemNo, gTicketVariantCode, Today, Time, ReasonCode, Remaining);
-
         RemainingText := Format(Remaining);
         if (Rec."Allocation By" = Rec."Allocation By"::WAITINGLIST) then begin
             Rec.CalcFields("Waiting List Queue");
@@ -127,6 +138,12 @@
 
         if (NonWorking) then
             RemainingText := CalendarExceptionText;
+
+        TicketPrice.CalculateScheduleEntryPrice(gTicketItemNo, gTicketVariantCode, Rec."Admission Code", Rec."External Schedule Entry No.", Today, Time, BasePrice, AddonPrice);
+        _UnitPrice := StrSubstNo('%1', Format(BasePrice, 0, FormatLabel));
+        if (BasePrice <> 0) or (AddonPrice <> 0) then
+            _UnitPrice := StrSubstNo('%1 [%2 / %3]', Format(BasePrice + AddonPrice, 0, FormatLabel), Format(BasePrice, 0, FormatLabel), Format(AddonPrice, 0, FormatLabel));
+
     end;
 
     trigger OnInit()
@@ -156,6 +173,8 @@
         LocalDateTimeText: Text;
         NO_TIMESLOTS: Label 'There are no timeslots available for sales at this time for this event.';
         WAITING_LIST: Label 'Waiting List';
+        _UnitPrice: Text;
+
 
     internal procedure FillPage(var AdmissionScheduleEntryFilter: Record "NPR TM Admis. Schedule Entry"; TicketQty: Decimal; TicketItemNo: Code[20]; TicketVariantCode: Code[10]): Boolean
     var

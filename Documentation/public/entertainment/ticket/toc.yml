@@ -14,6 +14,8 @@
     href: howto/SetUpDIYPrintedTicket.md
   - name: Create a ticket notification profile
     href: howto/CreateNotificationProfile.md
+  - name: Create a ticket price profile
+    href: howto/CreatePriceProfile.md
   - name: Change Ticket Reservation 
     href: howto/ChangeTicketReservation.md
   - name: Set Up Ticket Refund Policy
@@ -29,6 +31,8 @@
     href: explanation/admission.md
   - name: Ticket-holder Notifications
     href: explanation/TicketHolderNotification.md
+  - name: Ticket Pricing
+    href: explanation/TicketPricing.md
   - name: Reservation Vs. Location
     href: explanation/LocationVsReservation.md
   - name: Authorization Code for Ticket Rescheduling

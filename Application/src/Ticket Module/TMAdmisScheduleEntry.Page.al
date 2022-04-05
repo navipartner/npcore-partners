@@ -168,6 +168,11 @@
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Allocation By field';
                 }
+                field(DynamicPriceProfileCode; Rec."Dynamic Price Profile Code")
+                {
+                    ApplicationArea = NPRTicketDynamicPrices, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Dynamic Price Profile Code field';
+                }
                 field("Waiting List Queue"; Rec."Waiting List Queue")
                 {
                     ApplicationArea = NPRTicketAdvanced;
