@@ -206,14 +206,12 @@
             {
                 field("Periode start"; Periodestart)
                 {
-
                     Caption = 'Period Start';
                     ToolTip = 'Specifies the value of the Period Start field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sort By"; SortBy)
                 {
-
                     Caption = 'Sort By';
                     OptionCaption = 'No.,Description,Period Start,Sales qty.,Sales qty. last year,Sales LCY,Sales LCY last year,Profit LCY,Profit LCY last year,Profit %,Profit % last year';
                     ToolTip = 'Specifies the value of the Sort by field';
@@ -221,9 +219,29 @@
                 }
                 field("Lines field"; Lines)
                 {
-
                     Caption = 'Lines';
                     ToolTip = 'Specifies the value of the Lines field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Global Dimension 1"; Dim1Filter)
+                {
+                    Caption = 'Global Dimension 1';
+                    ToolTip = 'Specifies the default Global Dimension 1 Code';
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+                    ApplicationArea = NPRRetail;
+                }
+                field("Global Dimension 2"; Dim2Filter)
+                {
+                    Caption = 'Global Dimension 2';
+                    ToolTip = 'Specifies the default Global Dimension 2 Code';
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+                    ApplicationArea = NPRRetail;
+                }
+                field("Item Category"; ItemCategoryFilter)
+                {
+                    Caption = 'Item Category';
+                    ToolTip = 'Specifies the default Item Category';
+                    TableRelation = "Item Category".Code;
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -244,10 +262,10 @@
         SalesQty_LastYr_Caption = 'Last year\Sales qty.';
         SalesLCY_Caption = 'Sales LCY';
         SalesLCY_LastYr_Caption = 'Last year\Sales LCY';
-        AvanceLCY_Caption = 'Avance LCY';
-        AvanceLCY_LastYr_Caption = 'Last year\Avance LCY';
-        AvancePct_Caption = 'Avance %';
-        AvancePct_LastYr_Caption = 'Last year\Avance %';
+        ProfitLCY_Caption = 'Profit LCY';
+        ProfitLCY_LastYr_Caption = 'Last year\Profit LCY';
+        ProfitPct_Caption = 'Profit %';
+        ProfitPct_LastYr_Caption = 'Last year\Profit %';
         CarriedOver_Caption = 'Carried over';
         CarriedThrough_Caption = 'Carried through';
         Total_Caption = 'Total';
