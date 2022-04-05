@@ -9,6 +9,11 @@ Always write code in English, this includes any comments and variables.
 Keep an eye on developer’s team channel and yammer for any tips & tricks or coding suggestions
 
 ## Coding
+### AL or C/AL?
+In versions older than BC17 this is not easy to detect since we have every combination possible. In some cases apps were created where C/AL was supposed to be used and now it shows up in DevOps and developers think it's correct choice. Although the best approach is to ask the developers that are often working with specific customers, you can use these general guidelines:
+ - Check the latest changes in C/AL and on DevOps. If there were more changes made on C/AL, it's most likely C/AL
+ - On multitenant it's most likely AL, but on versions NAV2018 and older it's probably pure C/AL or combination of both
+
 ### AL
 
 Before you start making changes to a customer app, please make sure repo has the same app version as is installed on live.
@@ -17,6 +22,32 @@ Compare repo with Version mentioned in Extension Management on live environment 
 ![checking customer app version](../.attachments/CheckingCustomerAppVersion.png)
 
 This gives us enough confidence that repo has the latest source code.
+
+Please be aware of following when working on NAV2018 customers:
+ - you need to have AL Language extension installed specifically for version 2018. AL Language for Dynamics 365 Business Central will not work. You can try to find one the market or install it from vsix file. As an example, version 0.12.25327 works fine. Don't forget to disable other AL Language extension and Reload Window. 
+ -  DotNet data type is not supported so if you need to have one, combine your app with C/AL in which you'll handle DotNet
+
+#### Known issues when working with NAV2018 apps in VSCode
+
+---
+Process: Downloading symbols
+
+Error: **No Server has been chosen**
+
+Solution: Usually means you opened the repo as a workspace. Try opening Application folder directly
+
+Solution Source: https://community.dynamics.com/nav/f/microsoft-dynamics-nav-forum/307997/nav2018-extensions-no-server-has-been-chosen/894950
+
+---
+Process: Running the app with F5 or Ctrl+F5
+
+Error: **Couldn't find a debug adapter descriptor for debug type 'al' (extension might have failed to activate)**
+
+Solution: Since app has been successfully created, install it through Triskelion. Other solution found in the Solution Source.
+
+Solution Source: https://www.dynamicsuser.net/t/vs-code-error-on-publishing-couldnt-find-a-debug-adapter-descriptor-for-debug-type-al-extension-might-have-failed-to-activate/68244
+
+---
 
 ### C/AL
 
@@ -49,6 +80,24 @@ For example:
 ![app version increase](../.attachments/AppVersionIncrease.png)
 
 If you're doing changes to core please read core documentation for [versioning logic and flows](../Versioning-logic-and-flows.md)
+
+Some of our customer projects (ZAL) are alligned with our standard NP Core development protocols. This means:
+ - No need to update app.json
+ - Use releases/ and topic/ folders for branches
+ - Create pull requests
+ - Do not locally compile and publish new app versions
+ - Workitems mandatory
+
+List of ZAL projects enabled:
+ - Sport24
+ - MaxiZoo
+ - AliceButik
+ - Blaafarveværket
+ - Enigma-MuseumForTele
+ - FunSport
+ - Hartmanns
+ - ImageHolte
+ - Nasjonalmuseet
 
 ### C/AL
 There are several types of versions tags you may come across:

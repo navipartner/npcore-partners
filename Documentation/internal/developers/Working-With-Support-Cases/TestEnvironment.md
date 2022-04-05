@@ -111,6 +111,10 @@ Find the exact server/database/tenant information on Triskilion and set the info
 
 ![open test environment database](../.attachments/OpenTestEnvironmentDatabase.png)
 
+Please note that in case of multitenant restores, Database Server points to a server where tenant is located, not where application database is (although they may be same). To find application server, use the info obtained in column Server Instance, and set it as a filter on the Server Instances page, column Server Instance. Database Server is shown in the App. Database Server:
+
+![case system server instances](../.attachments/CaseSystem-ServerInstances-AppDatabaseServer.png)
+
 Set the service (File -> Database -> Information):
 
 ![test environment service](../.attachments/TestEnvironmentService.png)
