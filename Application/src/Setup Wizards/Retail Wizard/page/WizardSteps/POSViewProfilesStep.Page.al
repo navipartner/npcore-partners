@@ -66,12 +66,6 @@
                         end;
                     end;
                 }
-                field("Line Order on Screen"; Rec."Line Order on Screen")
-                {
-
-                    ToolTip = 'Specifies the value of the Line Order on Screen field';
-                    ApplicationArea = NPRRetail;
-                }
             }
         }
     }

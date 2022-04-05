@@ -1,6 +1,7 @@
 ﻿codeunit 6150852 "NPR POS Action - Item Price"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This action prompts for a numeric item number, and shows the price';
         Title: Label 'We need more information.';
@@ -61,8 +62,6 @@
         LineNumber: Integer;
         ItemIdentifyerType: Text;
         PriceExclVat: Boolean;
-        POSUnit: Record "NPR POS Unit";
-        POSViewProfile: Record "NPR POS View Profile";
         HtmlTagLbl: Label '%1<br><h4>%2</h4>', Locked = true;
     begin
         if not Action.IsThisAction(ActionCode()) then
@@ -85,9 +84,6 @@
                         SaleLinePOS."Line No." := -1;
 
                     // Make sure add lines to the "end"
-                    if POSUnit.Get(SalePOS."Register No.") and POSViewProfile.Get(POSUnit."POS View Profile") then
-                        POSViewProfile.TestField("Line Order on Screen", POSViewProfile."Line Order on Screen"::Normal);
-
                     JSON.SetContext('LastSaleLineNoBeforeAddItem', SaleLinePOS."Line No.");
                     FrontEnd.SetActionContext(ActionCode(), JSON);
 

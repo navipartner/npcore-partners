@@ -724,7 +724,7 @@
         Options.Add('nprVersion', GetDisplayVersion());
         Setup.GetPOSViewProfile(POSViewProfile);
         Options.Add('taxationType', GetTaxEnvironmentType());
-        Options.Add('lineOrderOnScreen', POSViewProfile."Line Order on Screen");
+        Options.Add('lineOrderOnScreen', 0);
 
         OnSetOptions(Setup, Options);
 
