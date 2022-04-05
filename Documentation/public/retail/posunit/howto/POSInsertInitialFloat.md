@@ -5,11 +5,12 @@ The float is the amount in the payment bin when opening the POS unit. Each payme
 To insert an initial float, follow the provided steps.
 
 
-### Prerequisites:
+## Prerequisites
 
  - Have at least one existing POS unit in the system.
  - Have the POS payment methods configured.
 
+## Procedure
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List** and choose the related link.     
    A list of all existing POS units is displayed.  
@@ -18,13 +19,18 @@ To insert an initial float, follow the provided steps.
 4. Click on the function **Insert Initial Float** found in the menu. This opens the page **POS Payment Bin Set Float**.
 5. Click **Edit List**.
 6. Find the payment methods that need a float, select the field **Amount**, and input the floats.
+
 > [!NOTE]
 > Use foreign currencies in their own denomination. Do not convert foreign currencies into the local currency value in the **Amount** field.
-7. Ensure that all floats are set correctly. This action can not be reversed or re-done once the function is concluded.
-8. Click OK. The float is now set for this payment bin.
+
+7. Ensure that all floats are set correctly.    
+   This action can not be reversed or re-done once the function is concluded.
+8. Click **OK**.   
+   The float is now set for this payment bin.
 
 
 ### Related links
+
 - [**POS units**](../explanation/POSUnit.md)
 - [**Create a new POS unit (by using the existing one for reference)**](./createnew.md)   
 - [**Configure an opening mechanism for a POS unit cash drawer**](./ConfigureCashDrawerOpening.md)
