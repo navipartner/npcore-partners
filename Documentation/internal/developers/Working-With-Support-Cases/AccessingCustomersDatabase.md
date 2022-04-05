@@ -50,6 +50,10 @@ For versions BC17 and higher, you can create a web client on your own by finding
 
 Don't forget to add port 444 at the end of URL as that will direct you to NAS service.
 
+If you're not able to construct url with this information, you can also check the WebClientURL-NP-Employees column located in the case system's Database Overview page:
+
+![case system database overview](../.attachments/CaseSystem-DatabaseOverview-WebClientURL-NP-Employees.png)
+
 For customers hosted by third parties, on npkcenter remote go to folder: R:\Magento\Navision Shortcuts
 
 For example,

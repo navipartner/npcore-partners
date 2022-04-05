@@ -4,7 +4,7 @@ Regardless of how deployment is performed (fob, txt or app), always ask the cust
 It’s important to do deployment at time when no users are working in the system, or if not possible, when a small number of them is active. We usually don’t deploy on Fridays since some customers tend to have more traffic on weekends, so we don’t want to create problems if deployed code has issues. Also, not all colleagues work on weekends, so you may find it harder to get help if you need it.
 
 ## AL
-Always deploy customer apps through Triskilion. Find a NAS service and initiate publishing steps from it.
+Usually, we deploy customer apps through Triskilion. Find a NAS service and initiate publishing steps from it.
 
 ![publish customer app triskilion 2018](../.attachments/PublishCustomerAppTriskilion2018.png)
 
