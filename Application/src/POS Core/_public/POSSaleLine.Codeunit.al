@@ -13,7 +13,6 @@
         FrontEnd: Codeunit "NPR POS Front End Management";
         ITEM_REQUIRES_VARIANT: Label 'Variant is required for item %1.';
         TEXTDEPOSIT: Label 'Deposit';
-        InsertLineWithAutoSplitKey: Boolean;
         AUTOSPLIT_ERROR: Label 'Autosplit key can''t insert the new line %1 as it already exists. Highlight a different line before selling next item.';
         Text000: Label 'Before Sale Line POS is inserted';
         Text001: Label 'After Sale Line POS is inserted';
@@ -45,7 +44,6 @@
         FrontEnd := FrontEndIn;
 
         Setup.GetPOSViewProfile(POSViewProfile);
-        InsertLineWithAutoSplitKey := (POSViewProfile."Line Order on Screen" = POSViewProfile."Line Order on Screen"::AutoSplitKey);
 
         Initialized := true;
     end;
@@ -80,7 +78,7 @@
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         IsAutoSplitKeyRecord := false;
-        if (InsertLineWithAutoSplitKey or InsertWithAutoSplitKeyForced) and (Rec."Line No." <> 0) then begin
+        if InsertWithAutoSplitKeyForced and (Rec."Line No." <> 0) then begin
             SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
             SaleLinePOS.SetFilter("Register No.", '=%1', Sale."Register No.");
             SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', Sale."Sales Ticket No.");

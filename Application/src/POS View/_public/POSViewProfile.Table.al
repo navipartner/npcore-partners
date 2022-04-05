@@ -101,6 +101,8 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Normal (new at the end),Reverse (new on top),After Selected Line';
             OptionMembers = Normal,Reverse,AutoSplitKey;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Field is not needed anymore since, values will be hardcoded into code.';
         }
         field(50; "Initial Sales View"; Option)
         {
