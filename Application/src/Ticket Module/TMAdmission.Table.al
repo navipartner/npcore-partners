@@ -1,22 +1,6 @@
 ﻿table 6060120 "NPR TM Admission"
 {
     Access = Internal;
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.04/TSA/20160104  CASE 230600 Caption Change Occation -> Event
-    // TM1.08/TSA/20160262  CASE 232262 Dependant admission objects
-    // TM80.1.09/TSA/20160229  CASE 235795 Default Schedule option on Admission Code
-    // TM80.1.09/TSA/20160310  CASE 236689 Change field from percentage to absolute
-    // TM1.11/BR/20160331  CASE 237850 Changed recurrance calculation, Addded check to OnDelete
-    // TM1.11/TSA/20160404  CASE 232250 Added field 47 and 48
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.16/TSA/20160622  CASE 245004 Added field Prompt For Email
-    // TM1.21/ANEN /20170406 CASE 271150 Added field "POS Schedule Selection To Date" (to be used for by fcn. [SelectSchedule] in page [TM Ticket Make reservation] filtering adm. sch. entries to be shown in scheudle selection page on POs)
-    // TM1.28/TSA /20180131 CASE 303925 Added Admission Base Calendar Code to establish "non-working" days.
-    // TM1.28/TSA /20180219 CASE 305707 Added Ticket Base Calendar functionality
-    // TM1.38/TSA /20181012 CASE 332109 Added eTicket
-    // TM1.43/TSA /20190903 CASE 357359 Added option to Capacity Control (SEATING)
-    // TM1.45/TSA /20191101 CASE 374620 Added "Stakeholder (E-Mail/Phone No.)"
-    // TM1.45/TSA /20191203 CASE 380754 Added Waiting List Setup Code
 
     Caption = 'Admission';
     DataClassification = CustomerContent;
@@ -97,11 +81,15 @@
         {
             Caption = 'Unbookable Before Start (Secs)';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use "Event Arrival From Time"';
         }
         field(48; "Bookable Passed Start (Secs)"; Integer)
         {
             Caption = 'Bookable Passed Start (Secs)';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use "Event Arrival Until Time"';
         }
         field(50; "Dependent Admission Code"; Code[20])
         {
@@ -173,6 +161,7 @@
             DataClassification = CustomerContent;
             Description = '//-TM1.38 [332109]';
         }
+
     }
 
     keys

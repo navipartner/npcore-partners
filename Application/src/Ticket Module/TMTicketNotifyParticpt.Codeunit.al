@@ -69,8 +69,6 @@
                 TicketParticipantWks2.Modify();
                 Commit();
 
-
-
                 case TicketParticipantWks."Notification Method" of
                     TicketParticipantWks."Notification Method"::NA:
                         begin

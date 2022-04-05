@@ -1,22 +1,6 @@
 ﻿table 6060119 "NPR TM Admis. Schedule Lines"
 {
     Access = Internal;
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM80.1.09/TSA/20160310  CASE 236689 Change field from percentage to absolute
-    // TM1.11/BR/20160331  CASE 237850 Addded check to OnDelete
-    // TM1.11/TSA/20160404  CASE 232250 Added field 47 and 48
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM#1.17/NPKNAV/20161026  CASE 256205 Transport TM1.17
-    // TM1.21/TSA/20170515  CASE 267611 Added a new date field "Schedule Generated At" determin when the schedule line was last examined for an entry
-    // TM1.24/TSA /20170921 CASE 289293 Changed OnDelete behaviour
-    // TM1.28/TSA /20180221 CASE 306039 Adding field "Visibility On Web"
-    // TM1.28/TSA /20180131 CASE 303925 Added Admission Base Calendar Code to establish "non-working" days.
-    // TM1.36/TSA /20180827 CASE 322432 Added Seating Template Code
-    // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
-    // TM1.41/TSA /20190503 CASE 353981 Dynamic Pricing
-    // TM1.43/TSA /20190903 CASE 357359 Added option to Capacity Control (SEATING)
-    // TM1.45/TSA /20191120 CASE 378212 Added Sales cut-off dates, inheritence of values from schedule
-    // TM1.45/TSA /20200116 CASE 385922 Added Concurrency Code lookup field
 
     Caption = 'Admission Schedule Lines';
     DataClassification = CustomerContent;
@@ -116,11 +100,15 @@
         {
             Caption = 'Unbookable Before Start (Secs)';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use "Event Arrival From Time"';
         }
         field(48; "Bookable Passed Start (Secs)"; Integer)
         {
             Caption = 'Bookable Passed Start (Secs)';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use "Event Arrival Until Time"';
         }
         field(50; "Schedule Generated At"; Date)
         {
@@ -152,6 +140,8 @@
             DataClassification = CustomerContent;
             OptionCaption = ' ,Fixed Amount,Relative Amount,Percentage';
             OptionMembers = NA,"FIXED",RELATIVE,PERCENT;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Moved to profile  table, used the field Dynamic Price Profile to specify dynamic pricing.';
         }
         field(81; "Price Scope"; Option)
         {
@@ -159,22 +149,36 @@
             DataClassification = CustomerContent;
             OptionCaption = ' ,API,POS & M2,All';
             OptionMembers = NA,API,POS_M2,API_POS_M2;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Moved to profile  table, used the field Dynamic Price Profile to specify dynamic pricing.';
         }
         field(82; Amount; Decimal)
         {
             Caption = 'Amount';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Moved to profile  table, used the field Dynamic Price Profile to specify dynamic pricing.';
         }
         field(83; Percentage; Decimal)
         {
             Caption = 'Percentage';
             DataClassification = CustomerContent;
             MinValue = -100;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Moved to profile  table, used the field Dynamic Price Profile to specify dynamic pricing.';
         }
         field(85; "Amount Includes VAT"; Boolean)
         {
             Caption = 'Amount Includes VAT';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Moved to profile  table, used the field Dynamic Price Profile to specify dynamic pricing.';
+        }
+        field(86; "Dynamic Price Profile Code"; Code[10])
+        {
+            Caption = 'Dynamic Price Profile Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR TM Dynamic Price Profile".ProfileCode;
         }
         field(100; "Admission Base Calendar Code"; Code[10])
         {
@@ -318,10 +322,6 @@
             "Reserved For Members" := Admission."Reserved For Members";
             "Capacity Control" := Admission."Capacity Control";
             "Prebook From" := Admission."Prebook From";
-            //-TM1.11
-            "Unbookable Before Start (Secs)" := Admission."Unbookable Before Start (Secs)";
-            "Bookable Passed Start (Secs)" := Admission."Bookable Passed Start (Secs)";
-            //+TM1.11
         end;
     end;
 
@@ -339,24 +339,15 @@
             "Reserved For Members" := AdmissionSchedule."Reserved For Members";
             "Capacity Control" := AdmissionSchedule."Capacity Control";
             "Prebook From" := AdmissionSchedule."Prebook From";
-            //-TM1.11
-            "Unbookable Before Start (Secs)" := AdmissionSchedule."Unbookable Before Start (Secs)";
-            "Bookable Passed Start (Secs)" := AdmissionSchedule."Bookable Passed Start (Secs)";
-            //+TM1.11
-
         end;
 
-        //-TM1.37 [327324]
         "Event Arrival From Time" := AdmissionSchedule."Event Arrival From Time";
         "Event Arrival Until Time" := AdmissionSchedule."Event Arrival Until Time";
-        //-TM1.37 [327324]
 
-        //-TM1.45 [378212]
         "Sales From Date (Rel.)" := AdmissionSchedule."Sales From Date (Rel.)";
         "Sales From Time" := AdmissionSchedule."Sales From Time";
         "Sales Until Date (Rel.)" := AdmissionSchedule."Sales Until Date (Rel.)";
         "Sales Until Time" := AdmissionSchedule."Sales Until Time";
-        //+TM1.45 [378212]
     end;
 
     local procedure IfAllowOverride()
