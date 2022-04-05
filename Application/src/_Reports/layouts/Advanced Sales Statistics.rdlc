@@ -1407,7 +1407,7 @@
             <Top>0.13758cm</Top>
             <Left>0.53975cm</Left>
             <Height>0.6526cm</Height>
-            <Width>25.94205cm</Width>
+            <Width>25.94207cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1553,6 +1553,7 @@
                                   <Value>=Parameters!Total_Caption.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -2127,7 +2128,7 @@
             <Top>0.93458cm</Top>
             <Left>0.53975cm</Left>
             <Height>0.42301cm</Height>
-            <Width>25.94205cm</Width>
+            <Width>25.94206cm</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
@@ -2139,7 +2140,7 @@
         <Height>1.43609cm</Height>
         <Style />
       </Body>
-      <Width>27.92299cm</Width>
+      <Width>26.49424cm</Width>
       <Page>
         <PageHeader>
           <Height>4.42065cm</Height>
@@ -2489,7 +2490,7 @@
               </Paragraphs>
               <Top>2.46185cm</Top>
               <Left>9.79224cm</Left>
-              <Height>0.423cm</Height>
+              <Height>0.68758cm</Height>
               <Width>2.20834cm</Width>
               <ZIndex>12</ZIndex>
               <Style>
@@ -2587,6 +2588,7 @@
                       <Value>=Parameters!No_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2594,8 +2596,8 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.6957cm</Top>
-              <Left>0.53975cm</Left>
+              <Top>3.56952cm</Top>
+              <Left>0.5715cm</Left>
               <Height>0.6cm</Height>
               <Width>2.50585cm</Width>
               <ZIndex>16</ZIndex>
@@ -2619,6 +2621,7 @@
                       <Value>=Parameters!Description_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2626,8 +2629,8 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.6957cm</Top>
-              <Left>3.20831cm</Left>
+              <Top>3.56952cm</Top>
+              <Left>3.29921cm</Left>
               <Height>0.6cm</Height>
               <Width>6.48437cm</Width>
               <ZIndex>17</ZIndex>
@@ -2651,6 +2654,7 @@
                       <Value>=Parameters!SalesQty_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2685,6 +2689,7 @@
                       <Value>=Parameters!SalesQty_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2719,6 +2724,7 @@
                       <Value>=Parameters!SalesLCY_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2753,6 +2759,7 @@
                       <Value>=Parameters!SalesLCY_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2784,9 +2791,10 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!AvanceLCY_Caption.Value</Value>
+                      <Value>=Parameters!ProfitLCY_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2818,9 +2826,10 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!AvanceLCY_Caption.Value</Value>
+                      <Value>=Parameters!ProfitLCY_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2831,7 +2840,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
               <Top>3.56952cm</Top>
-              <Left>20.74701cm</Left>
+              <Left>20.76552cm</Left>
               <Height>0.6cm</Height>
               <Width>2.00606cm</Width>
               <ZIndex>23</ZIndex>
@@ -2852,9 +2861,10 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!AvancePct_Caption.Value</Value>
+                      <Value>=Parameters!ProfitPct_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2864,8 +2874,8 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.51512cm</Top>
-              <Left>22.87741cm</Left>
+              <Top>3.60217cm</Top>
+              <Left>22.91269cm</Left>
               <Height>0.6cm</Height>
               <Width>1.9083cm</Width>
               <ZIndex>24</ZIndex>
@@ -2886,9 +2896,10 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!AvancePct_Caption.Value</Value>
+                      <Value>=Parameters!ProfitPct_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2898,8 +2909,8 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.51512cm</Top>
-              <Left>24.9621cm</Left>
+              <Top>3.60217cm</Top>
+              <Left>24.94635cm</Left>
               <Height>0.6cm</Height>
               <Width>1.5197cm</Width>
               <ZIndex>25</ZIndex>
@@ -2923,6 +2934,7 @@
                       <Value>=Parameters!LastYear_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2957,6 +2969,7 @@
                       <Value>=Parameters!LastYear_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2991,6 +3004,7 @@
                       <Value>=Parameters!LastYear_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -3025,6 +3039,7 @@
                       <Value>=Parameters!LastYear_Caption.Value</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -3049,6 +3064,24 @@
                 <PaddingBottom>2pt</PaddingBottom>
               </Style>
             </Textbox>
+            <Rectangle Name="Rectangle1">
+              <KeepTogether>true</KeepTogether>
+              <Top>4.04314cm</Top>
+              <Left>0.5715cm</Left>
+              <Height>0.20112cm</Height>
+              <Width>25.9103cm</Width>
+              <ZIndex>30</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <BottomBorder>
+                  <Color>Black</Color>
+                  <Style>Solid</Style>
+                  <Width>1pt</Width>
+                </BottomBorder>
+              </Style>
+            </Rectangle>
           </ReportItems>
           <Style>
             <Border>
@@ -3056,6 +3089,19 @@
             </Border>
           </Style>
         </PageHeader>
+        <PageFooter>
+          <Height>1.00542cm</Height>
+          <PrintOnFirstPage>true</PrintOnFirstPage>
+          <PrintOnLastPage>true</PrintOnLastPage>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+            <TopBorder>
+              <Style>Solid</Style>
+            </TopBorder>
+          </Style>
+        </PageFooter>
         <PageHeight>21cm</PageHeight>
         <PageWidth>29.7cm</PageWidth>
         <LeftMargin>1.5cm</LeftMargin>
@@ -3175,41 +3221,41 @@
       </DefaultValue>
       <Prompt>SalesLCY_LastYr_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="AvanceLCY_Caption">
+    <ReportParameter Name="ProfitLCY_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>AvanceLCY_Caption</Value>
+          <Value>ProfitLCY_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>AvanceLCY_Caption</Prompt>
+      <Prompt>ProfitLCY_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="AvanceLCY_LastYr_Caption">
+    <ReportParameter Name="ProfitLCY_LastYr_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>AvanceLCY_LastYr_Caption</Value>
+          <Value>ProfitLCY_LastYr_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>AvanceLCY_LastYr_Caption</Prompt>
+      <Prompt>ProfitLCY_LastYr_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="AvancePct_Caption">
+    <ReportParameter Name="ProfitPct_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>AvancePct_Caption</Value>
+          <Value>ProfitPct_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>AvancePct_Caption</Prompt>
+      <Prompt>ProfitPct_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="AvancePct_LastYr_Caption">
+    <ReportParameter Name="ProfitPct_LastYr_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>AvancePct_LastYr_Caption</Value>
+          <Value>ProfitPct_LastYr_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>AvancePct_LastYr_Caption</Prompt>
+      <Prompt>ProfitPct_LastYr_Caption</Prompt>
     </ReportParameter>
     <ReportParameter Name="CarriedOver_Caption">
       <DataType>String</DataType>
@@ -3316,22 +3362,22 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>12</RowIndex>
-          <ParameterName>AvanceLCY_Caption</ParameterName>
+          <ParameterName>ProfitLCY_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>13</RowIndex>
-          <ParameterName>AvanceLCY_LastYr_Caption</ParameterName>
+          <ParameterName>ProfitLCY_LastYr_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>14</RowIndex>
-          <ParameterName>AvancePct_Caption</ParameterName>
+          <ParameterName>ProfitPct_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>15</RowIndex>
-          <ParameterName>AvancePct_LastYr_Caption</ParameterName>
+          <ParameterName>ProfitPct_LastYr_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
