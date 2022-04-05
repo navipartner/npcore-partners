@@ -138,7 +138,7 @@
                     {
 
                         Editable = false;
-                        ToolTip = 'Specifies the value of the Float Amount field';
+                        ToolTip = 'Specifies the opening count of this POS period.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Counted Amount Incl. Float"; Rec."Counted Amount Incl. Float")
@@ -181,14 +181,14 @@
                         ApplicationArea = NPRRetail;
                         Caption = 'Transferred Amount';
                         Editable = false;
-                        ToolTip = 'Specifies the value of the Transferred Amount field';
+                        ToolTip = 'Specifies the total amount that has been transferred into this Payment Bin from another one (such as from another register or from a safe).';
                     }
                     field("Calculated Amount Incl. Float"; Rec."Calculated Amount Incl. Float")
                     {
 
                         Editable = false;
                         Visible = not IsBlindCount;
-                        ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
+                        ToolTip = 'Specifies the value of the Calculated Amount Incl. Float. It contains the same information as in the Counting tab.';
                         ApplicationArea = NPRRetail;
                     }
                     field("New Float Amount"; Rec."New Float Amount")
@@ -198,7 +198,7 @@
                         MinValue = 0;
                         Style = Strong;
                         StyleExpr = true;
-                        ToolTip = 'Specifies the value of the New Float Amount field';
+                        ToolTip = 'Specifies the opening balance of the Payment Bin.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -218,7 +218,7 @@
 
                         Style = Unfavorable;
                         StyleExpr = InvalidDistribution;
-                        ToolTip = 'Specifies the value of the Bank Deposit Amount field';
+                        ToolTip = 'Specifies the amount that should be transferred to the bank.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -232,14 +232,14 @@
                     {
 
                         ShowMandatory = Rec."Bank Deposit Amount" <> 0;
-                        ToolTip = 'Specifies the value of the Bank Deposit Bin Code field';
+                        ToolTip = 'This field is automatically populated according to the value provided in the Bank Deposit Amount field.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Bank Deposit Reference"; Rec."Bank Deposit Reference")
                     {
 
                         ShowMandatory = Rec."Bank Deposit Amount" <> 0;
-                        ToolTip = 'Specifies the value of the Bank Deposit Reference field';
+                        ToolTip = 'This field is automatically populated according to the value provided in the Bank Deposit Amount field, but it can be changed later.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Move to Bin Amount"; Rec."Move to Bin Amount")

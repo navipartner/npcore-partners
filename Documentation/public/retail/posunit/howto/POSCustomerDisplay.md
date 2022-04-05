@@ -1,4 +1,4 @@
-# How to set up the POS Customer Display
+# Set up the POS Customer Display
 
 You can set up the content of customer display in **Display Setup**. Here, it is possible to:
 
@@ -7,12 +7,12 @@ You can set up the content of customer display in **Display Setup**. Here, it is
 - change the place in which the receipt is located.
 - set up whether any media is downloaded.
 
-### Prerequisites:
+## Prerequisites
 
  - Have at least one existing POS unit in the system set up for sales.
  - Have dedicated customer display hardware attached to the POS units that will receive this setup.
 
- 
+## Procedure 
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List** and choose the related link. 
    A list of all existing POS units is displayed. 
@@ -28,3 +28,9 @@ You can set up the content of customer display in **Display Setup**. Here, it is
 
 > [!NOTE]
 > The fields in the panel **Receipt** are used to customize the display of sales lines to the customer.
+
+### Related links
+
+- [**POS units**](../explanation/POSUnit.md)
+- [**Create a new POS unit (by using the existing one for reference)**](./createnew.md)   
+- [**Configure an opening mechanism for a POS unit cash drawer**](./ConfigureCashDrawerOpening.md)
