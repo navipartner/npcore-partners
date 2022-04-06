@@ -6,6 +6,7 @@
     SourceTable = "NPR POS Default View";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
+    DelayedInsert = true;
 
 
     layout
