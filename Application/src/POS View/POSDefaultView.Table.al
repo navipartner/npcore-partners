@@ -64,7 +64,7 @@
             Caption = 'Monday';
             DataClassification = CustomerContent;
             InitValue = true;
-                        ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
+            ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
         }
         field(8; Tuesday; Boolean)
@@ -72,7 +72,7 @@
             Caption = 'Tuesday';
             DataClassification = CustomerContent;
             InitValue = true;
-                        ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
+            ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
         }
         field(9; Wednesday; Boolean)
@@ -80,7 +80,7 @@
             Caption = 'Wednesday';
             DataClassification = CustomerContent;
             InitValue = true;
-                        ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
+            ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
         }
         field(10; Thursday; Boolean)
@@ -88,7 +88,7 @@
             Caption = 'Thursday';
             DataClassification = CustomerContent;
             InitValue = true;
-                        ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
+            ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
         }
         field(11; Friday; Boolean)
@@ -96,7 +96,7 @@
             Caption = 'Friday';
             DataClassification = CustomerContent;
             InitValue = true;
-                        ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
+            ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
         }
         field(12; Saturday; Boolean)
@@ -104,7 +104,7 @@
             Caption = 'Saturday';
             DataClassification = CustomerContent;
             InitValue = true;
-                        ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
+            ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
         }
         field(13; Sunday; Boolean)
@@ -112,7 +112,7 @@
             Caption = 'Sunday';
             DataClassification = CustomerContent;
             InitValue = true;
-                        ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
+            ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
         }
         field(21; "POS View Code"; Code[10])
@@ -121,7 +121,9 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS View";
         }
+
     }
+
 
     keys
     {
@@ -129,4 +131,17 @@
         {
         }
     }
+
+    trigger OnInsert()
+
+    begin
+        Rec.TestField("POS View Code");
+    end;
+
+    trigger OnModify()
+
+    begin
+        Rec.TestField("POS View Code");
+    end;
+
 }
