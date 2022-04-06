@@ -30,6 +30,8 @@
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo(Name), false);
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo(Sale.Date), false);
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Contact No."), false);
+        DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Customer Price Group"), false);
+        DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Customer Disc. Group"), false);
 
         DataSource.AddColumn(GetRegisterNameText(), Caption_RegisterName, DataType::String, false);
         DataSource.AddColumn(GetCustomerNameText(), Caption_CustomerName, DataType::String, false);
@@ -41,6 +43,7 @@
         DataSource.AddColumn(GetLastSaleDateText(), '', DataType::String, false);
         DataSource.AddColumn(GetCompanyNameText(), Caption_CompanyName, DataType::String, false);
         DataSource.AddColumn(GetSalespersonNameText(), '', DataType::String, false);
+        DataSource.AddColumn(GetCustomerType(), '', DataType::String, false);
 
         Handled := true;
     end;
@@ -87,6 +90,7 @@
         Contact: Record Contact;
         POSUnit: Record "NPR POS Unit";
         ContactBusinessRelation: Record "Contact Business Relation";
+
     begin
         if DataSource <> GetSourceNameText() then
             exit;
@@ -125,6 +129,7 @@
         DataRow.Add(GetRegisterNameText(), POSUnit.Name);
         DataRow.Add(GetCustomerNameText(), Customer.Name);
         DataRow.Add(GetContactNameText(), Contact.Name);
+        DataRow.Add(GetCustomerType(), GetCustomerTypeString(SalePOS));
 
         Handled := true;
     end;
@@ -200,5 +205,19 @@
     local procedure GetContactNameText(): Text
     begin
         exit('ContactName');
+    end;
+
+    local procedure GetCustomerType(): Text
+    begin
+        exit('CustomerType');
+    end;
+
+
+    local procedure GetCustomerTypeString(SalePOS: Record "NPR POS Sale"): Text
+    begin
+        if SalePOS."Customer No." = '' then
+            exit('')
+        else
+            exit(Format(SalePOS."Customer Type"))
     end;
 }
