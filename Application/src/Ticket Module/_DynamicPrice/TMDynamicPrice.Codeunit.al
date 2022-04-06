@@ -153,15 +153,12 @@ codeunit 6014559 "NPR TM Dynamic Price"
         end;
         */
 
-        if (TicketBOM.Default) then
-            BasePrice := OriginalUnitPrice;
-
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalScheduleEntryNo);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (AdmissionScheduleEntry.FindLast()) then begin
             HavePriceRule := SelectPriceRule(AdmissionScheduleEntry, BookingDateDate, BookingTime, PriceRule);
             if (HavePriceRule) then
-                EvaluatePriceRule(PriceRule, OriginalUnitPrice, UnitPriceIncludesVAT, UnitPriceVatPercentage, BasePrice, AddonPrice);
+                EvaluatePriceRule(PriceRule, OriginalUnitPrice, UnitPriceIncludesVAT, UnitPriceVatPercentage, TicketBOM.Default, BasePrice, AddonPrice);
         end;
 
         exit(HavePriceRule);
@@ -183,41 +180,48 @@ codeunit 6014559 "NPR TM Dynamic Price"
         exit(VATPostingSetup."VAT %");
     end;
 
-    internal procedure EvaluatePriceRule(PriceRule: Record "NPR TM Dynamic Price Rule"; UnitPrice: Decimal; UnitPriceIncludesVAT: Boolean; UnitPriceVatPercentage: Decimal; var BasePrice: Decimal; var AddonPrice: Decimal);
+    internal procedure EvaluatePriceRule(PriceRule: Record "NPR TM Dynamic Price Rule"; UnitPrice: Decimal; UnitPriceIncludesVAT: Boolean; UnitPriceVatPercentage: Decimal; UnitPriceIsDefaultBasePrice: Boolean; var BasePrice: Decimal; var AddonPrice: Decimal);
     var
-        P1, P2 : Decimal;
+        UnitPriceExVat, RuleAmountExVat : Decimal;
     begin
+        BasePrice := 0;
+        AddonPrice := 0;
+
+        UnitPriceExVat := UnitPrice;
+        if (UnitPriceIncludesVAT) then
+            UnitPriceExVat := RemoveVat(UnitPrice, UnitPriceVatPercentage);
+
+        RuleAmountExVat := PriceRule.Amount;
+        if (PriceRule.AmountIncludesVAT) then
+            RuleAmountExVat := RemoveVat(PriceRule.Amount, PriceRule.VatPercentage);
+
+        if (UnitPriceIsDefaultBasePrice) then
+            BasePrice := UnitPriceExVat;
+
+
         case (PriceRule.PricingOption) of
             PriceRule.PricingOption::NA:
                 ;
             PriceRule.PricingOption::FIXED: // final price is base
-                P1 := PriceRule.Amount;
+                BasePrice := RuleAmountExVat;
 
             PriceRule.PricingOption::PERCENT: // final price is unit price +/- a percentage
-                P2 := (UnitPrice * PriceRule.Percentage / 100);
+                AddonPrice := (UnitPriceExVat * PriceRule.Percentage / 100);
 
             PriceRule.PricingOption::RELATIVE: // final price is base + addon
-                P2 := PriceRule.Amount;
+                AddonPrice := RuleAmountExVat;
         end;
+
 
         // VAT Adjust
-        if (UnitPriceIncludesVAT = PriceRule.AmountIncludesVAT) then begin
-            BasePrice := P1;
-            AddonPrice := P2;
-        end;
-
-        if (UnitPriceIncludesVAT and not PriceRule.AmountIncludesVAT) then begin
-            BasePrice := AddVat(P1, UnitPriceVatPercentage);
-            AddonPrice := AddVat(P2, UnitPriceVatPercentage);
-        end;
-
-        if (not UnitPriceIncludesVAT and PriceRule.AmountIncludesVAT) then begin
-            BasePrice := RemoveVat(P1, PriceRule.VatPercentage);
-            AddonPrice := RemoveVat(P2, PriceRule.VatPercentage);
+        if (UnitPriceIncludesVAT) then begin
+            BasePrice := AddVat(BasePrice, UnitPriceVatPercentage);
+            AddonPrice := AddVat(AddonPrice, UnitPriceVatPercentage);
         end;
 
         BasePrice := Round(BasePrice, 0.01);
         AddonPrice := Round(AddonPrice, 0.01);
+
 
     end;
 
