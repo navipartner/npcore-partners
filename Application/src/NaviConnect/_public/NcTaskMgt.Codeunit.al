@@ -32,12 +32,12 @@
             Clear(NcTask.Response);
             NcTask.Response.CreateOutStream(OutStr, TEXTENCODING::UTF8);
             OutStr.Write(LastErrorText);
-            EmitTelemetryDataOnError(NcTask, LastErrorText)
+            EmitTelemetryDataOnError(NcTask, LastErrorText, Verbosity::Warning)
         end;
         NcTask.Modify();
     end;
 
-    internal procedure EmitTelemetryDataOnError(NcTask: Record "NPR Nc Task"; ErrorMessageText: Text)
+    internal procedure EmitTelemetryDataOnError(NcTask: Record "NPR Nc Task"; ErrorMessageText: Text; VerbosityLevel: Verbosity)
     var
         ActiveSession: Record "Active Session";
         CustomDimensions: Dictionary of [Text, Text];
@@ -70,7 +70,7 @@
         CustomDimensions.Add('NPR_TL_ProcessError', Format(NcTask."Process Error"));
         CustomDimensions.Add('NPR_TL_Response', ErrorMessageText);
 
-        Session.LogMessage('NPR_TaskList', 'TaskList Error', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+        Session.LogMessage('NPR_TaskList', 'TaskList Error', VerbosityLevel, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     internal procedure UpdateTasks(TaskProcessor: Record "NPR Nc Task Processor")

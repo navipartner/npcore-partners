@@ -12,6 +12,8 @@
         RecRef2: RecordRef;
         PrevRecRef: RecordRef;
         ProcessComplete: Boolean;
+        InStr: InStream;
+        ResponseText: Text;
     begin
         TaskProcessor.Get(Rec."Task Processor Code");
         NpXmlTriggerMgt.ResetOutput();
@@ -60,8 +62,13 @@
 
         CommitOutput(Rec);
         CommitResponse(Rec);
-        if not ProcessComplete then
+        if not ProcessComplete then begin
+            Rec.CalcFields(Response);
+            Rec.Response.CreateInStream(InStr, TextEncoding::UTF8);
+            InStr.Read(ResponseText);
+            NcTaskMgt.EmitTelemetryDataOnError(Rec, ResponseText, Verbosity::Warning);
             Error(GetLastErrorText);
+        end;
     end;
 
     var

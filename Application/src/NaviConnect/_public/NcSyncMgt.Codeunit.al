@@ -292,7 +292,7 @@
             if not SkipErrorClearing then
                 ClearLastError();
 
-            NcTaskMgt.EmitTelemetryDataOnError(NaviConnectTask, ErrorText);
+            NcTaskMgt.EmitTelemetryDataOnError(NaviConnectTask, ErrorText, Verbosity::Error);
         end;
 
         NaviConnectTask.Modify(true);
