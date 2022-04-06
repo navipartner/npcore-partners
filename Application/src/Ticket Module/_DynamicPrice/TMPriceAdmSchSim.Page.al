@@ -130,7 +130,7 @@ page 6059930 "NPR TM Price Adm. Sch. Sim."
         _UnitPrice := StrSubstNo('%1 [-.-- / -.--]', _OriginalUnitPrice);
         _RuleLineNo := 0;
         if (TicketPrice.SelectPriceRule(Rec, _BookingDate, 0T, PriceRule)) then begin
-            TicketPrice.EvaluatePriceRule(PriceRule, _OriginalUnitPrice, _UnitPriceIncludesVAT, _UnitPriceVatPercentage, BasePrice, AddonPrice);
+            TicketPrice.EvaluatePriceRule(PriceRule, _OriginalUnitPrice, _UnitPriceIncludesVAT, _UnitPriceVatPercentage, true, BasePrice, AddonPrice);
             Total := _OriginalUnitPrice + AddonPrice;
             if (BasePrice <> 0) then
                 Total := BasePrice + AddonPrice;

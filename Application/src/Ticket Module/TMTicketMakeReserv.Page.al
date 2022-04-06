@@ -261,11 +261,12 @@
                         CalcVisualQueueUnfavorable(Rec);
                     end;
                 }
-                field(SuggestedPrice; _SuggestedPrice)
+                field(UnitPrice; _UnitPrice)
                 {
                     ApplicationArea = NPRTicketAdvanced, NPRTicketDynamicPrice;
-                    ToolTip = 'Specifies the value for the Suggested Price';
-                    Caption = 'Suggest Price';
+                    ToolTip = 'Specifies the value for the Unit Price field.';
+                    Caption = 'Unit Price';
+                    Editable = false;
                 }
             }
             group(Control6014406)
@@ -354,9 +355,9 @@
         gDisallowReschedule := not IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.");
 
         TicketPrice.CalculateScheduleEntryPrice(Rec."Item No.", Rec."Variant Code", Rec."Admission Code", Rec."External Adm. Sch. Entry No.", Today, Time, BasePrice, AddonPrice);
-        _SuggestedPrice := StrSubstNo('%1', Format(BasePrice, 0, FormatLabel));
+        _UnitPrice := StrSubstNo('%1', Format(BasePrice, 0, FormatLabel));
         if (BasePrice <> 0) or (AddonPrice <> 0) then
-            _SuggestedPrice := StrSubstNo('%1 [%2 / %3]', Format(BasePrice + AddonPrice, 0, FormatLabel), Format(BasePrice, 0, FormatLabel), Format(AddonPrice, 0, FormatLabel));
+            _UnitPrice := StrSubstNo('%1 [%2 / %3]', Format(BasePrice + AddonPrice, 0, FormatLabel), Format(BasePrice, 0, FormatLabel), Format(AddonPrice, 0, FormatLabel));
 
     end;
 
@@ -411,7 +412,7 @@
         gDisallowReschedule: Boolean;
         gTicketRequestEntryNo: Integer;
         RESCHEDULE_NOT_ALLOWED: Label 'The reschedule policy disallows change at this time.';
-        _SuggestedPrice: Text;
+        _UnitPrice: Text;
 
     local procedure ChangeQuantity(NewQuantity: Integer)
     var

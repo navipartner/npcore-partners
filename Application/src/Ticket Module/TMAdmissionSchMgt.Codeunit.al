@@ -69,7 +69,6 @@
                     AdmissionScheduleLines.FindSet();
                     repeat
                         GenerateScheduleEntry(AdmissionScheduleLines, DateRecord."Period Start", TempAdmissionScheduleEntry);
-
                     until (AdmissionScheduleLines.Next() = 0);
 
                     if (not TempAdmissionScheduleEntry.IsEmpty) then begin
