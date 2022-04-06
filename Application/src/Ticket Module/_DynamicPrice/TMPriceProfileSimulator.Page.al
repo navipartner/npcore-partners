@@ -123,7 +123,7 @@ page 6059867 "NPR TM Price Profile Simulator"
         _SuggestedAmount := StrSubstNo('%1 [-.-- / -.--]', _OriginalUnitPrice);
         _RuleLineNo := 0;
         if (TicketPrice.SelectPriceRule(TempAdmScheduleEntryResponseOut, _BookingDate, 0T, PriceRule)) then begin
-            TicketPrice.EvaluatePriceRule(PriceRule, _OriginalUnitPrice, _UnitPriceIncludesVAT, _UnitPriceVatPercentage, BasePrice, AddonPrice);
+            TicketPrice.EvaluatePriceRule(PriceRule, _OriginalUnitPrice, _UnitPriceIncludesVAT, _UnitPriceVatPercentage, true, BasePrice, AddonPrice);
             Total := _OriginalUnitPrice + AddonPrice;
             if (BasePrice <> 0) then
                 Total := BasePrice + AddonPrice;
