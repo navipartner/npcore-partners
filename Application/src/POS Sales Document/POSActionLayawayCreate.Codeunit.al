@@ -25,6 +25,7 @@
         DescOrderPaymentTerms: Label 'Payment Terms to use for the created order. Is used for filtering';
         DescPrepayPaymentTerms: Label 'Payment Terms to use for each prepayment invoice. Is used for due date calculation and filtering';
         ReadingErr: Label 'reading in %1';
+        DescOpenSalesOrder: Label 'Opens Sales Order after posting.';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -33,7 +34,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.0');
+        exit('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -56,6 +57,7 @@
             Sender.RegisterIntegerParameter('Instalments', 0);
             Sender.RegisterTextParameter('OrderPaymentTerms', '');
             Sender.RegisterTextParameter('PrepaymentPaymentTerms', '');
+            Sender.RegisterBooleanParameter('OpenSalesOrder', false);
         end;
     end;
 
@@ -83,6 +85,8 @@
         OrderPaymentTerms: Text;
         PrepaymentPaymentTerms: Text;
         ReserveItems: Boolean;
+        OpenSalesOrder: Boolean;
+        SalesOrder: Page "Sales Order";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -97,6 +101,7 @@
         Instalments := JSON.GetIntegerParameterOrFail('Instalments', ActionCode());
         OrderPaymentTerms := JSON.GetStringParameterOrFail('OrderPaymentTerms', ActionCode());
         PrepaymentPaymentTerms := JSON.GetStringParameterOrFail('PrepaymentPaymentTerms', ActionCode());
+        OpenSalesOrder := JSON.GetBooleanParameterOrFail('OpenSalesOrder', ActionCode());
 
         if Instalments < 1 then
             Error(ErrorNoInstalments);
@@ -128,6 +133,10 @@
         if POSLayawayMgt.Run(SalesHeader) then begin
             DownpaymentInvoiceNo := POSLayawayMgt.GetDownpaymentInvoiceNo();
             Commit();
+            if OpenSalesOrder then begin
+                SalesOrder.SetRecord(SalesHeader);
+                SalesOrder.Run();
+            end;
         end else
             Message(ErrorLayaway, GetLastErrorText);
 
@@ -304,6 +313,8 @@
                 Caption := DescOrderPaymentTerms;
             'PrepaymentPaymentTerms':
                 Caption := DescPrepayPaymentTerms;
+            'OpenSalesOrder':
+                Caption := DescOpenSalesOrder;
         end;
     end;
 
