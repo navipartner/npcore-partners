@@ -386,10 +386,12 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
 
     local procedure PrintBitmapFromKeyword(Keyword: Text)
     var
-        ESCPOSChunk: Text;
         ESCPOS: Text;
         InStream: InStream;
         RetailLogo: Record "NPR Retail Logo";
+        DotNetByteArray: Codeunit "DotNet_Array";
+        DotNetStream: Codeunit "DotNet_Stream";
+        DotNetEncoding: Codeunit "DotNet_Encoding";
     begin
         RetailLogo.SetAutoCalcFields(ESCPOSLogo);
         RetailLogo.SetRange(Keyword, Keyword);
@@ -399,10 +401,12 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
             repeat
                 if RetailLogo.ESCPOSLogo.HasValue() then begin
                     RetailLogo.ESCPOSLogo.CreateInStream(InStream, TextEncoding::UTF8);
-                    while (not InStream.EOS) do begin
-                        InStream.Read(ESCPOSChunk);
-                        ESCPOS += ESCPOSChunk;
-                    end;
+                    DotNetStream.FromInStream(InStream);
+                    DotNetByteArray.ByteArray(DotNetStream.Length());
+                    DotNetStream.Read(DotNetByteArray, 0, DotNetStream.Length());
+                    DotNetEncoding.UTF8();
+                    ESCPOS := DotNetEncoding.GetString(DotNetByteArray, 0, DotNetByteArray.Length());
+
                     PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
                 end;
             until RetailLogo.Next() = 0;
@@ -546,16 +550,14 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
     begin
         // ESC p %1 %2 %3
         _DotNetStream.WriteByte(27); //ESC 
-        AddStringToBuffer('p');
-        AddStringToBuffer(Format(m) + Format(t1) + Format(t2));
+        AddStringToBuffer('p' + Format(m) + Format(t1) + Format(t2));
     end;
 
     local procedure PrintBarCodeA(m: Char; "d1..dk": Text[30])
     begin
         // GS k %1 %2 NUL
         _DotNetStream.WriteByte(29); //GS
-        AddStringToBuffer('k');
-        AddStringToBuffer(Format(m) + "d1..dk");
+        AddStringToBuffer('k' + Format(m) + "d1..dk");
         _DotNetStream.WriteByte(0);
     end;
 
@@ -563,8 +565,7 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
     begin
         // GS k m n d1..dn
         _DotNetStream.WriteByte(29); //GS
-        AddStringToBuffer('k');
-        AddStringToBuffer(Format(m) + Format(n) + "d1..dn");
+        AddStringToBuffer('k' + Format(m) + Format(n) + "d1..dn");
     end;
 
     local procedure QRSelectModel(pL: Char; pH: Char; cn: Char; fn: Char; n1: Char; n2: Char)
@@ -600,8 +601,7 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
     begin
         // GS ( L %1 %2 %3 %4        
         _DotNetStream.WriteByte(29); //GS
-        AddStringToBuffer('(');
-        AddStringToBuffer('L');
+        AddStringToBuffer('(L');
         _DotNetStream.WriteByte(2);
         _DotNetStream.WriteByte(0);
         _DotNetStream.WriteByte(48);
@@ -612,17 +612,14 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
     begin
         // FS p %1 %2
         _DotNetStream.WriteByte(28); //FS
-        AddStringToBuffer('p');
-        AddStringToBuffer(Format(n) + Format(m));
+        AddStringToBuffer('p' + Format(n) + Format(m));
     end;
 
     procedure PrintNVGraphicsDataNew(pL: Char; pH: Char; m: Char; fn: Char; kc1: Char; kc2: Char; x: Char; y: Char)
     begin
         // GS ( L %1 %2 %3 %4 %5 %6 %7 %8
         _DotNetStream.WriteByte(29); //GS
-        AddStringToBuffer('(');
-        AddStringToBuffer('L');
-        AddStringToBuffer(Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(kc1) + Format(kc2) + Format(x) + Format(y));
+        AddStringToBuffer('(L' + Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(kc1) + Format(kc2) + Format(x) + Format(y));
     end;
 
     local procedure SelectCharacterCodeTable(n: Char)
@@ -661,57 +658,49 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
     begin
         // ESC a %1
         _DotNetStream.WriteByte(27); //ESC 
-        AddStringToBuffer('a');
-        AddStringToBuffer(Format(n));
+        AddStringToBuffer('a' + Format(n));
     end;
 
     local procedure SetBarCodeHeight(n: Char)
     begin
         // GS h %1
         _DotNetStream.WriteByte(29); //GS
-        AddStringToBuffer('h');
-        AddStringToBuffer(Format(n));
+        AddStringToBuffer('h' + Format(n));
     end;
 
     local procedure SetBarCodeWidth(n: Char)
     begin
         // GS w %1
         _DotNetStream.WriteByte(29); //GS
-        AddStringToBuffer('w');
-        AddStringToBuffer(Format(n));
+        AddStringToBuffer('w' + Format(n));
     end;
 
     local procedure StoreGraphicsInBuffer(pL: Char; pH: Char; m: Char; fn: Char; a: Char; bx: Char; by: Char; c: Char; xL: Char; xH: Char; yL: Char; yH: Char; Image: Text)
     begin
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=99
         _DotNetStream.WriteByte(29); //GS
-        AddStringToBuffer('(');
-        AddStringToBuffer('L');
-        AddStringToBuffer(Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(a) + Format(bx) + Format(by) + Format(c) + Format(xL) + Format(xH) + Format(yL) + Format(yH) + Image);
+        AddStringToBuffer('(L' + Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(a) + Format(bx) + Format(by) + Format(c) + Format(xL) + Format(xH) + Format(yL) + Format(yH) + Image);
     end;
 
     local procedure TurnDoubleStrikeModeOnOff(n: Integer)
     begin
         // ESC G %1
         _DotNetStream.WriteByte(27); //ESC 
-        AddStringToBuffer('G');
-        AddStringToBuffer(Format(n));
+        AddStringToBuffer('G' + Format(n));
     end;
 
     local procedure TurnExphasizedModeOnOff(n: Integer)
     begin
         // ESC E %1
         _DotNetStream.WriteByte(27); //ESC 
-        AddStringToBuffer('E');
-        AddStringToBuffer(Format(n));
+        AddStringToBuffer('E' + Format(n));
     end;
 
     local procedure TurnUnderlineModeOnOff(n: Integer)
     begin
         // ESC - %1
         _DotNetStream.WriteByte(27); //ESC 
-        AddStringToBuffer('-');
-        AddStringToBuffer(Format(n));
+        AddStringToBuffer('-' + Format(n));
     end;
 
     local procedure InitBuffer()
