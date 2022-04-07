@@ -16,9 +16,10 @@
                 Caption = 'Date Range';
                 ShowCaption = true;
                 Style = Strong;
-                StyleExpr = TRUE;
+                StyleExpr = true;
                 ToolTip = 'Specifies the value of the StatusText field';
                 ApplicationArea = NPRRetail;
+                Editable = false;
             }
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {

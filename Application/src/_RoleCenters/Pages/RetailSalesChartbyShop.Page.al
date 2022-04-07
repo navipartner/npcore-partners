@@ -19,6 +19,7 @@
                 StyleExpr = true;
                 ToolTip = 'Specifies the value of the Date Range field';
                 ApplicationArea = NPRRetail;
+                Editable = false;
             }
             field(ChartType; ChartType)
             {
