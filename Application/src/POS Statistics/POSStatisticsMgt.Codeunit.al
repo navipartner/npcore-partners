@@ -350,6 +350,35 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         exit(Format(Value, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'))
     end;
 
+    local procedure CalculatePercentAmount(Amount: Decimal; Total: Decimal): Decimal
+    begin
+        if (Amount = 0) and (Total = 0) then
+            exit(0);
+
+        exit(Amount / Total * 100);
+    end;
+
+    procedure FillSalePersonTop20(var SalespersonStatsBuffer: Record "NPR POS Salesperson St Buffer" temporary; FromDate: Date; ToDate: Date)
+    var
+        POSSalespersonStatsQuery: Query "NPR POS Salesperson Stats";
+    begin
+        SalespersonStatsBuffer.DeleteAll();
+
+        POSSalespersonStatsQuery.SetRange(Posting_Date, FromDate, ToDate);
+        POSSalespersonStatsQuery.Open();
+        while POSSalespersonStatsQuery.Read() do begin
+            SalespersonStatsBuffer.Init();
+            SalespersonStatsBuffer."Entry No." += 1;
+            SalespersonStatsBuffer.Name := POSSalespersonStatsQuery.Name;
+            SalespersonStatsBuffer."Sales (LCY)" := POSSalespersonStatsQuery.Sales_Amount_Actual;
+            SalespersonStatsBuffer."Discount Amount" := -POSSalespersonStatsQuery.Discount_Amount;
+            SalespersonStatsBuffer."Discount %" := CalculatePercentAmount(SalespersonStatsBuffer."Discount Amount", SalespersonStatsBuffer."Discount Amount" + SalespersonStatsBuffer."Sales (LCY)");
+            SalespersonStatsBuffer."Profit (LCY)" := POSSalespersonStatsQuery.Sales_Amount_Actual + POSSalespersonStatsQuery.Cost_Amount_Actual;
+            SalespersonStatsBuffer."Profit %" := CalculatePercentAmount(SalespersonStatsBuffer."Profit (LCY)", SalespersonStatsBuffer."Sales (LCY)");
+            SalespersonStatsBuffer.Insert();
+        end;
+    end;
+
     var
         POSStoreCode: Code[10];
         POSUnitNo: Code[10];
