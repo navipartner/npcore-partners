@@ -44,6 +44,7 @@
         DataSource.AddColumn(GetCompanyNameText(), Caption_CompanyName, DataType::String, false);
         DataSource.AddColumn(GetSalespersonNameText(), '', DataType::String, false);
         DataSource.AddColumn(GetCustomerType(), '', DataType::String, false);
+        DataSource.AddColumn(GetCustomerPostingGroup(), '', DataType::String, false);
 
         Handled := true;
     end;
@@ -128,6 +129,7 @@
 
         DataRow.Add(GetRegisterNameText(), POSUnit.Name);
         DataRow.Add(GetCustomerNameText(), Customer.Name);
+        DataRow.Add(GetCustomerPostingGroup(), Customer."Customer Posting Group");
         DataRow.Add(GetContactNameText(), Contact.Name);
         DataRow.Add(GetCustomerType(), GetCustomerTypeString(SalePOS));
 
@@ -210,6 +212,11 @@
     local procedure GetCustomerType(): Text
     begin
         exit('CustomerType');
+    end;
+
+    local procedure GetCustomerPostingGroup(): Text
+    begin
+        exit('CustomerPostingGroup');
     end;
 
 
