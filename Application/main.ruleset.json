@@ -316,7 +316,12 @@
             "id": "AL0606",
             "action":"Error",
             "justification": "The 'with' statement is deprecated."
-        }, 
+        },
+        {
+            "id":"AS0029",
+            "action": "Error",
+            "justification": "Pages and PageExtensions must not be deleted."
+        },
         {
             "id":"AS0075",
             "action": "Error",
