@@ -21,6 +21,10 @@
                 begin
                     FrameworkDragonGlass.Constructor(CurrPage.Framework);
                     _POSSession.Constructor(FrameworkDragonGlass, _FrontEnd, _Setup, _PageId);
+                    if _POSSession.GetErrorOnInitialize() then begin
+                        CurrPage.Close();
+                        Error(GetLastErrorText());
+                    end;
                     _POSSession.DebugWithTimestamp('OnFrameworkReady');
                 end;
 
