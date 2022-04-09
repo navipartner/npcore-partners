@@ -13,8 +13,21 @@
     // For example, a payment button is the best place to validate correct pos payment method
     // field setup. It will feel more logical to the user than erroring if a single
     // pos payment method is missing account no. when POS launches, etc.
+    trigger OnRun()
+    begin
+        ValidateSetup();
+    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Session", 'OnInitialize', '', false, false)]
+    local procedure OnInitialize()
+    var
+        POSSetupSafetyCheck: Codeunit "NPR POS Setup Safety Check";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        if not POSSetupSafetyCheck.Run() then
+            POSSession.SetErrorOnInitialize(true);
+    end;
+
     local procedure ValidateSetup()
     begin
         //Receipt Number should always be non-blocking. In the past we had commit immediately after pulling 
@@ -26,6 +39,9 @@
         //as the trigger blocking the POS in the process.
         //Both should always be via job queue, report 795 and 1002
         ValidateNotAutoCostMgt();
+
+        //Field "POS Sales Rounding Account" is mandatory in some processes and it must be checked on POS Initialization
+        CheckPostingProfile();
 
         OnAfterValidateSetup();
     end;
@@ -62,6 +78,23 @@
             InventorySetup.TestField("Automatic Cost Posting", false);
             InventorySetup.TestField("Automatic Cost Adjustment", InventorySetup."Automatic Cost Adjustment"::Never);
         end
+    end;
+
+    local procedure CheckPostingProfile()
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        POSSession.GetSetup(POSSetup);
+        POSUnit.Get(POSSetup.GetPOSUnitNo());
+        if not POSStore.Get(POSUnit."POS Store Code") then
+            exit;
+        if not POSPostingProfile.Get(POSStore."POS Posting Profile") then
+            exit;
+        POSPostingProfile.TestField("POS Sales Rounding Account");
     end;
 
     [InternalEvent(false)]

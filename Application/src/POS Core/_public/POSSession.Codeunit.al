@@ -23,6 +23,7 @@
         _Initialized: Boolean;
         _InitializedUI: Boolean;
         _ActionsDiscovered: Boolean;
+        _ErrorOnInitialize: Boolean;
         _DebugTrace: Text;
         _ServerStopwatch: Text;
         _POSPageId: Guid;
@@ -78,6 +79,7 @@
         Clear(_Initialized);
         Clear(_InitializedUI);
         Clear(_ActionsDiscovered);
+        Clear(_ErrorOnInitialize);
         Clear(_DebugTrace);
         Clear(_ServerStopwatch);
         Clear(_POSPageId);
@@ -461,6 +463,16 @@
             TempSessionActions."Custom JavaScript Logic" := ActionIn."Custom JavaScript Logic";
             TempSessionActions.Modify();
         end;
+    end;
+
+    internal procedure SetErrorOnInitialize(ErrorOnInitialize: Boolean)
+    begin
+        _ErrorOnInitialize := ErrorOnInitialize;
+    end;
+
+    internal procedure GetErrorOnInitialize(): Boolean
+    begin
+        exit(_ErrorOnInitialize);
     end;
 
     procedure RetrieveSessionAction(ActionCode: Code[20]; var ActionOut: Record "NPR POS Action"): Boolean
