@@ -13,21 +13,17 @@
     // For example, a payment button is the best place to validate correct pos payment method
     // field setup. It will feel more logical to the user than erroring if a single
     // pos payment method is missing account no. when POS launches, etc.
-    trigger OnRun()
-    begin
-        ValidateSetup();
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Session", 'OnInitialize', '', false, false)]
     local procedure OnInitialize()
     var
-        POSSetupSafetyCheck: Codeunit "NPR POS Setup Safety Check";
         POSSession: Codeunit "NPR POS Session";
     begin
-        if not POSSetupSafetyCheck.Run() then
+        if not ValidateSetup() then
             POSSession.SetErrorOnInitialize(true);
     end;
 
+    [TryFunction]
     local procedure ValidateSetup()
     begin
         //Receipt Number should always be non-blocking. In the past we had commit immediately after pulling 
