@@ -1,8 +1,8 @@
 ﻿report 6014402 "NPR Discount Statistics"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Discount Statistics.rdlc';
     Caption = 'Discount Statistics';
@@ -146,7 +146,14 @@
                     column(GroupSale; "Group Sale")
                     {
                     }
-
+                    dataitem("Value Entry"; "Value Entry")
+                    {
+                        DataItemLink = "Entry No." = FIELD("Entry No.");
+                        DataItemLinkReference = AuxValueEntry;
+                        column(Document_No_; "Document No.")
+                        {
+                        }
+                    }
                     trigger OnAfterGetRecord()
                     begin
                         Total_VE_Qty += -(AuxValueEntry."Invoiced Quantity");
@@ -176,41 +183,6 @@
 
             trigger OnPreDataItem()
             begin
-            end;
-        }
-        dataitem("Salesperson/Purchaser 2"; "Salesperson/Purchaser")
-        {
-            DataItemTableView = SORTING(Code);
-            PrintOnlyIfDetail = false;
-            column(Code_Salesperson_Purchaser_2; "Salesperson/Purchaser 2".Code)
-            {
-            }
-            column(Name_Salesperson_Purchaser_2; "Salesperson/Purchaser 2".Name)
-            {
-            }
-            column(Sales_LCY_Salesperson_Purchaser_2; SalesLCY)
-            {
-            }
-            column(Discount_Amount_Salesperson_Purchaser_2; "Salesperson/Purchaser 2"."NPR Discount Amount")
-            {
-            }
-            column(Salesperson_Caption; Salesperson_Caption_Lbl)
-            {
-            }
-            column(Total_Salesperson_Caption; Total_Salesperson_Caption_Lbl)
-            {
-            }
-
-            trigger OnPreDataItem()
-            var
-                ValueEntry2: Record "Value Entry";
-            begin
-                ValueEntry2.SetCurrentKey("Item Ledger Entry Type", "Posting Date");
-                Item.CopyFilter("Date Filter", ValueEntry2."Posting Date");
-                ValueEntry2.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser 2".Code);
-                ValueEntry2.SetRange("Item Ledger Entry Type", ValueEntry2."Item Ledger Entry Type"::Sale);
-                ValueEntry2.CalcSums("Sales Amount (Actual)");
-                SalesLCY := ValueEntry2."Sales Amount (Actual)";
             end;
         }
     }
@@ -266,7 +238,6 @@
         POSUnitFilter: Text;
         SalesPersonFilter: Text;
         SupplierFilter: Text;
-        SalesLCY: Decimal;
         Total_VE_Discount_Amt: Decimal;
         Total_VE_Qty: Decimal;
         Total_VE_Sales_Amt: Decimal;
@@ -283,9 +254,7 @@
         Register_Filter_Caption_Lbl: Label 'Register Filter';
         Sales_Amount_Caption_Lbl: Label 'Sales Amount';
         Salesperson_Filter_Caption_Lbl: Label 'Salesperson/purchaser';
-        Salesperson_Caption_Lbl: Label 'Salesperson:';
         Total_Caption_Lbl: Label 'Total';
-        Total_Salesperson_Caption_Lbl: Label 'Total for Salesperson';
         Vendor_Filter_Caption_Lbl: Label 'Vendor filter';
 }
 
