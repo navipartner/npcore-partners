@@ -5,7 +5,6 @@
 
     trigger OnRun()
     begin
-
         Code(Rec);
     end;
 
@@ -13,7 +12,6 @@
     var
         POSPostItemEntries: Codeunit "NPR POS Post Item Entries";
     begin
-
         POSEntry.Validate("Post Item Entry Status", POSEntry."Post Item Entry Status"::"Error while Posting");
         POSEntry.Modify();
         Commit();

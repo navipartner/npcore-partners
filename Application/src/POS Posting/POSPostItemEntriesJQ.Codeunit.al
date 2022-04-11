@@ -16,6 +16,8 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
         POSPostEntries.SetStopOnError(false);
         POSPostEntries.SetPostPOSEntries(false);
         POSPostEntries.SetPostItemEntries(true);
+        POSPostEntries.SetPostPerPeriodRegister(true);
+        POSPostEntries.SetJobQueuePosting(true);
 
         POSEntry.SetFilter("Post Item Entry Status", '<%1', 2);
         POSEntry.SetCurrentKey("Post Item Entry Status");

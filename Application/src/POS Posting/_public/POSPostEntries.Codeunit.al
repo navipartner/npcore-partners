@@ -28,7 +28,8 @@
         PreparingGenJournalLinesLbl: Label 'Preparing Gen. Journal Lines       #4###### @5@@@@@@@@@@@@@\';
         PostingGenJournalLinesLbl: Label 'Posting Gen Journal lines         #8###### @9@@@@@@@@@@@@@\';
         PostingItemLinesLbl: Label 'Posting Item Lines         #10###### @11@@@@@@@@@@@@@\';
-        POSPostingLogEntryNo: Integer;
+        POSPostingLogEntryNo, POSItemPostingLogEntryNo : Integer;
+        PostingPerPeriodRegister, JobQueuePosting : Boolean;
         ErrorText: Text;
         PostingPOSEntriesOpenDialogLbl: Label 'Posting POS Entries individually\#1######\@2@@@@@@@@@@@@@\';
         TextPostingSetupMissing: Label '%1 is missing for %2 in %3 %4.\\Values [%5].';
@@ -71,7 +72,7 @@
 
         if PostPOSEntriesVar then begin
             //POS Entries must belong to the same POS Legder Register Entry
-            POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry);
+            POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry, 0);
 
             Commit();
 
@@ -167,6 +168,7 @@
             SetPostingDate(POSPostingLog."Parameter Replace Posting Date", POSPostingLog."Parameter Replace Doc. Date", POSPostingLog."Parameter Posting Date");
         SetPostItemEntries(POSPostingLog."Parameter Post Item Entries");
         SetPostPOSEntries(POSPostingLog."Parameter Post POS Entries");
+        SetPostPerPeriodRegister(POSPostingLog."Posting Per" = POSPostingLog."Posting Per"::"POS Period Register");
         SetStopOnError(true);
         Code(POSEntry);
     end;
@@ -490,8 +492,9 @@
         POSEntryToPost: Record "NPR POS Entry";
         POSPostItemEntries: Codeunit "NPR POS Post Item Entries";
         POSPostItemTransaction: Codeunit "NPR POS Post Item Transaction";
-        LineCount: Integer;
+        LineCount, LineToProcessCount : Integer;
         NoOfRecords: Integer;
+        ItemPostingErrorMsg: Label '%1 error/s occurred. Successfully processed %2.', Comment = '%1-Errors count, %2-Successfully posted count';
     begin
 
         if ShowProgressDialog then begin
@@ -499,9 +502,9 @@
             ProgressWindow.Update(10, NoOfRecords);
         end;
 
-        Commit();
-
         Clear(_ItemPostingErrorEntries);
+        POSItemPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry, 1);
+        Commit();
 
         if POSEntry.FindSet() then
             repeat
@@ -510,19 +513,29 @@
                     ProgressWindow.Update(11, Round(LineCount / NoOfRecords * 10000, 1));
                 end;
                 if (POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::Unposted, POSEntry."Post Item Entry Status"::"Error while Posting"]) then begin
-                    if PostingDateExists then
-                        POSPostItemEntries.SetPostingDate(ReplaceDocumentDate, ReplaceDocumentDate, PostingDate);
+                    if JobQueuePosting then
+                        if not SkipProcessing(2, POSEntry."Entry No.", 1) then begin
+                            if PostingDateExists then
+                                POSPostItemEntries.SetPostingDate(ReplaceDocumentDate, ReplaceDocumentDate, PostingDate);
 
-                    POSEntryToPost.Get(POSEntry."Entry No.");
-                    if StopOnErrorVar then begin
-                        POSPostItemTransaction.Run(POSEntryToPost);
-                    end else begin
-                        if (not POSPostItemTransaction.Run(POSEntryToPost)) then begin
-                            _ItemPostingErrorEntries.Add(POSEntryToPost."Entry No.");
+                            POSEntryToPost.Get(POSEntry."Entry No.");
+                            LineToProcessCount += 1;
+                            if StopOnErrorVar then begin
+                                POSPostItemTransaction.Run(POSEntryToPost);
+                            end else begin
+                                if (not POSPostItemTransaction.Run(POSEntryToPost)) then begin
+                                    _ItemPostingErrorEntries.Add(POSEntryToPost."Entry No.");
+                                    CreateErrorPOSPostingLogEntry(POSEntryToPost, 1, GetLastErrorText(), true);
+                                end;
+                            end;
                         end;
-                    end;
                 end;
             until POSEntry.Next() = 0;
+
+        Commit();
+        ErrorText := StrSubstNo(ItemPostingErrorMsg, _ItemPostingErrorEntries.Count, LineToProcessCount - _ItemPostingErrorEntries.Count);
+        UpdatePOSPostingLogEntry(POSItemPostingLogEntryNo, _ItemPostingErrorEntries.Count > 0);
+        ErrorText := '';
     end;
 
     local procedure CheckandPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"): Boolean
@@ -685,6 +698,16 @@
     procedure SetStopOnError(StopOnErrorIn: Boolean)
     begin
         StopOnErrorVar := StopOnErrorIn;
+    end;
+
+    procedure SetPostPerPeriodRegister(PostingPerPeriodRegisterIn: Boolean)
+    begin
+        PostingPerPeriodRegister := PostingPerPeriodRegisterIn;
+    end;
+
+    procedure SetJobQueuePosting(IsJobQueuePosting: Boolean)
+    begin
+        JobQueuePosting := IsJobQueuePosting;
     end;
 
     local procedure CreatePostingBufferLinesFromPOSSalesLines(var POSSalesLineToBeCompressed: Record "NPR POS Entry Sales Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer")
@@ -940,7 +963,7 @@
             until POSPaymentLineToBeCompressed.Next() = 0;
     end;
 
-    local procedure CreatePOSPostingLogEntry(var POSEntry: Record "NPR POS Entry"): Integer
+    local procedure CreatePOSPostingLogEntry(var POSEntry: Record "NPR POS Entry"; PostingType: Integer): Integer
     var
         POSPostingLog: Record "NPR POS Posting Log";
         LastPOSEntry: Record "NPR POS Entry";
@@ -955,6 +978,7 @@
         POSPostingLog."Error Description" := TextUnknownError;
         POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView(), 1, MaxStrLen(POSPostingLog."POS Entry View"));
         POSPostingLog."Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
+        POSPostingLog."Posting Type" := PostingType;
         POSPostingLog."Parameter Posting Date" := PostingDate;
         POSPostingLog."Parameter Replace Posting Date" := ReplacePostingDate;
         POSPostingLog."Parameter Replace Doc. Date" := ReplaceDocumentDate;
@@ -962,6 +986,10 @@
         POSPostingLog."Parameter Post POS Entries" := PostPOSEntriesVar;
         POSPostingLog."Parameter Post Compressed" := PostCompressedVar;
         POSPostingLog."Parameter Stop On Error" := StopOnErrorVar;
+        if PostingPerPeriodRegister then begin
+            POSPostingLog."Posting Per" := POSPostingLog."Posting Per"::"POS Period Register";
+            POSPostingLog."Posting Per Entry No." := POSEntry."POS Period Register No.";
+        end;
         POSPostingLog.Insert(true);
         exit(POSPostingLog."Entry No.");
     end;
@@ -980,6 +1008,32 @@
         end;
         POSPostingLog."Posting Duration" := CurrentDateTime - POSPostingLog."Posting Timestamp";
         POSPostingLog.Modify(true);
+    end;
+
+    local procedure CreateErrorPOSPostingLogEntry(POSEntry: Record "NPR POS Entry"; PostingType: Integer; PostingErrorTxt: Text; DoCommit: Boolean)
+    var
+        POSPostingLog: Record "NPR POS Posting Log";
+    begin
+        POSPostingLog.Init();
+        POSPostingLog."Entry No." := 0;
+        POSPostingLog."User ID" := UserId;
+        POSPostingLog."Posting Timestamp" := CurrentDateTime;
+        POSPostingLog."With Error" := true;
+        POSPostingLog."Error Description" := copystr(PostingErrorTxt, 1, MaxStrLen(POSPostingLog."Error Description"));
+        POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView(), 1, MaxStrLen(POSPostingLog."POS Entry View"));
+        POSPostingLog."Posting Type" := PostingType;
+        POSPostingLog."Parameter Posting Date" := PostingDate;
+        POSPostingLog."Parameter Replace Posting Date" := ReplacePostingDate;
+        POSPostingLog."Parameter Replace Doc. Date" := ReplaceDocumentDate;
+        POSPostingLog."Parameter Post Item Entries" := PostItemEntriesVar;
+        POSPostingLog."Parameter Post POS Entries" := PostPOSEntriesVar;
+        POSPostingLog."Parameter Post Compressed" := PostCompressedVar;
+        POSPostingLog."Parameter Stop On Error" := StopOnErrorVar;
+        POSPostingLog."Posting Per" := POSPostingLog."Posting Per"::"POS Entry";
+        POSPostingLog."Posting Per Entry No." := POSEntry."Entry No.";
+        POSPostingLog.Insert(true);
+        if DoCommit then
+            Commit();
     end;
 
     local procedure GetCompressionMethod(POSPeriodRegister: Record "NPR POS Period Register"; PostCompressed: Boolean): Integer
@@ -1148,7 +1202,10 @@
             until POSEntry.Next() = 0;
     end;
 
-    local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer"; AmountIn: Decimal; AmountInLCY: Decimal; PostingType: Enum "General Posting Type"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; VATAmountIn: Decimal; VATAmountInLCY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer"; AmountIn: Decimal; AmountInLCY: Decimal; PostingType: Enum "General Posting Type"; AccountType: Enum "Gen. Journal Account Type";
+                                                                                                                                                                    AccountNo: Code[20];
+                                                                                                                                                                    VATAmountIn: Decimal;
+                                                                                                                                                                    VATAmountInLCY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
     var
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -1191,7 +1248,8 @@
         OnAfterInsertPOSPostingBufferToGenJnl(POSPostingBuffer, GenJournalLine, false);
     end;
 
-    local procedure MakeGenJournalFromPOSBalancingLine(POSBalancingLine: Record "NPR POS Balancing Line"; Amount: Decimal; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalFromPOSBalancingLine(POSBalancingLine: Record "NPR POS Balancing Line"; Amount: Decimal; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
+                                                                                                                                            PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line")
     var
         POSEntry: Record "NPR POS Entry";
         POSStore: Record "NPR POS Store";
@@ -1235,7 +1293,31 @@
         OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine, GenJournalLine, false);
     end;
 
-    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[20]; GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[20]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; POSPostingProfile: Record "NPR POS Posting Profile"; TaxCalcType: Enum "Tax Calculation Type"; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
+                                                        GenPostingType: Enum "General Posting Type";
+                                                        PostingDate: Date;
+                                                        DocumentNo: Code[20];
+                                                        PostingDescription: Text;
+                                                        VATPerc: Decimal;
+                                                        PostingCurrencyCode: Code[10];
+                                                        PostingAmount: Decimal;
+                                                        PostingAmountLCY: Decimal;
+                                                        PostingGroup: Code[20];
+                                                        GenBusPostingGroup: Code[20];
+                                                        GenProdPostingGroup: Code[20];
+                                                        VATBusPostingGroup: Code[20];
+                                                        VATProdPostingGroup: Code[20];
+                                                        ShortcutDim1: Code[20];
+                                                        ShortcutDim2: Code[20];
+                                                        DimSetID: Integer;
+                                                        SalespersonCode: Code[20];
+                                                        ReasonCode: Code[10];
+                                                        ExternalDocNo: Code[35];
+                                                        Usetax: Boolean;
+                                                        VATAmount: Decimal;
+                                                        VATAmountLCY: Decimal;
+                                                        POSPostingProfile: Record "NPR POS Posting Profile";
+                                                        TaxCalcType: Enum "Tax Calculation Type"; var GenJournalLine: Record "Gen. Journal Line")
     begin
         LineNumber := LineNumber + 10000;
         GenJournalLine.Init();
@@ -1343,6 +1425,25 @@
                 DifferenceAmount := DifferenceAmount + GenJournalLine."Amount (LCY)" + GenJournalLine."VAT Amount (LCY)";
             until GenJournalLine.Next() = 0;
         exit(DifferenceAmount);
+    end;
+
+    internal procedure SkipProcessing(PostingPerType: Integer; PostingPerEntryNo: Integer; PostingType: Integer): Boolean
+    var
+        POSPostingLog: Record "NPR POS Posting Log";
+        PostingErrorCount: Integer;
+    begin
+        POSPostingLog.SetCurrentKey("Posting Per Entry No.", "Posting Per", "Posting Type");
+        POSPostingLog.SetRange("Posting Per Entry No.", PostingPerEntryNo);
+        POSPostingLog.SetRange("Posting Per", PostingPerType);
+        POSPostingLog.SetRange("Posting Type", PostingType);
+        POSPostingLog.SetRange("With Error", true);
+
+        PostingErrorCount := POSPostingLog.Count;
+        if PostingErrorCount <= 1 then
+            exit;
+
+        POSPostingLog.FindLast();
+        exit(CurrentDateTime < POSPostingLog."Posting Timestamp" + Power(2, PostingErrorCount) * 60000)
     end;
 
     [IntegrationEvent(false, false)]
