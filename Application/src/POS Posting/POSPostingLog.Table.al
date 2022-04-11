@@ -59,6 +59,32 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(95; "Posting Type"; Option)
+        {
+            Caption = 'Posting Type';
+            DataClassification = CustomerContent;
+            OptionMembers = Finance,Inventory;
+            OptionCaption = 'Finance,Inventory';
+            Editable = false;
+        }
+        field(96; "Posting Per"; Option)
+        {
+            Caption = 'Posting Per';
+            DataClassification = CustomerContent;
+            OptionMembers = " ","POS Period Register","POS Entry";
+            OptionCaption = ' ,POS Period Register,POS Entry';
+            Editable = false;
+        }
+        field(97; "Posting Per Entry No."; Integer)
+        {
+            Caption = 'Posting Per Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Posting Per" = const("POS Entry")) "NPR POS Entry"
+            else
+            if ("Posting Per" = const("POS Period Register")) "NPR POS Period Register";
+            ValidateTableRelation = false;
+            Editable = false;
+        }
         field(200; "Parameter Posting Date"; Date)
         {
             Caption = 'Parameter Posting Date';
@@ -101,10 +127,90 @@
         key(Key1; "Entry No.")
         {
         }
+        key(Key2; "Posting Per Entry No.", "Posting Per", "Posting Type")
+        {
+
+        }
     }
 
     fieldgroups
     {
     }
+
+    internal procedure OpenPOSPostingLog(POSEntry: Record "NPR POS Entry"; AllLogEntries: Boolean)
+    var
+        POSPostingLog: Record "NPR POS Posting Log";
+        LogEntryNoFilter: Text;
+    begin
+        POSPostingLog.SetRange("Entry No.", POSEntry."POS Posting Log Entry No.");
+        if POSPostingLog.FindLast() then
+            LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+
+        POSPostingLog.SetRange("Entry No.");
+        if POSEntry."Post Item Entry Status" <> POSEntry."Post Item Entry Status"::Posted then begin
+            POSPostingLog.SetRange("Posting Per", POSPostingLog."Posting Per"::"POS Entry");
+            POSPostingLog.SetRange("Posting Per Entry No.", POSEntry."Entry No.");
+            POSPostingLog.SetRange("Posting Type", POSPostingLog."Posting Type"::Inventory);
+            if AllLogEntries then begin
+                if POSPostingLog.FindSet() then
+                    repeat
+                        LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+                    until POSPostingLog.Next() = 0;
+            end
+            else begin
+                if POSPostingLog.FindLast() then
+                    LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+            end;
+        end;
+
+        if POSEntry."Post Entry Status" <> POSEntry."Post Entry Status"::Posted then begin
+            if POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Posted then begin
+                POSPostingLog.SetRange("Posting Per", POSPostingLog."Posting Per"::"POS Entry");
+                POSPostingLog.SetRange("Posting Per Entry No.", POSEntry."Entry No.");
+            end;
+            POSPostingLog.SetRange("Posting Type", POSPostingLog."Posting Type"::Finance);
+            if AllLogEntries then begin
+                if POSPostingLog.FindSet() then
+                    repeat
+                        LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+                    until POSPostingLog.Next() = 0;
+            end
+            else begin
+                if POSPostingLog.FindLast() then
+                    LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+            end;
+        end;
+
+        POSPostingLog.SetRange("Posting Per", POSPostingLog."Posting Per"::"POS Period Register");
+        POSPostingLog.SetRange("Posting Per Entry No.", POSEntry."POS Period Register No.");
+        POSPostingLog.SetRange("Posting Type", POSPostingLog."Posting Type"::Finance);
+        if AllLogEntries then begin
+            if POSPostingLog.FindSet() then
+                repeat
+                    LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+                until POSPostingLog.Next() = 0;
+        end
+        else begin
+            if POSPostingLog.FindLast() then
+                LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+        end;
+
+        POSPostingLog.SetRange("Posting Type", POSPostingLog."Posting Type"::Inventory);
+        if AllLogEntries then begin
+            if POSPostingLog.FindSet() then
+                repeat
+                    LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+                until POSPostingLog.Next() = 0;
+        end
+        else begin
+            if POSPostingLog.FindLast() then
+                LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+        end;
+
+        LogEntryNoFilter := DelChr(LogEntryNoFilter, '<', '|');
+        POSPostingLog.Reset();
+        POSPostingLog.SetFilter("Entry No.", LogEntryNoFilter);
+        Page.Run(0, POSPostingLog);
+    end;
 }
 

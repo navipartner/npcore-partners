@@ -144,6 +144,7 @@
                     POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
                     POSPostEntries.SetPostCompressed(false);
+                    POSPostEntries.SetPostPerPeriodRegister(true);
                     POSPostEntries.Run(POSEntryToPost);
                     CurrPage.Update(false);
                 end;
