@@ -275,10 +275,14 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                RunObject = Page "NPR POS Posting Log";
-                RunPageLink = "Entry No." = FIELD("POS Posting Log Entry No.");
                 ToolTip = 'Executes the POS Posting Log action';
                 ApplicationArea = NPRRetail;
+                trigger OnAction()
+                var
+                    POSPostingLog: Record "NPR POS Posting Log";
+                begin
+                    POSPostingLog.OpenPOSPostingLog(Rec, false);
+                end;
             }
             action("Sales Lines")
             {
@@ -768,55 +772,11 @@
 
                 trigger OnAction()
                 var
-                    POSEntryToPost: Record "NPR POS Entry";
-                    POSPostEntries: Codeunit "NPR POS Post Entries";
-                    ErrorDuringPosting: Boolean;
-                    ItemPosting: Boolean;
-                    POSPosting: Boolean;
+                    POSPostingAction: Report "NPR POS Posting Action";
                 begin
-                    ItemPosting := Confirm(TextPostItemEntries);
-                    POSPosting := Confirm(TextPostPosEntries);
-
-                    POSPostEntries.SetPostCompressed(Confirm(TextPostCompressed));
-                    POSPostEntries.SetStopOnError(true);
-
-                    if (ItemPosting) then begin
-                        POSEntryToPost.Reset();
-                        POSEntryToPost.CopyFilters(Rec);
-                        POSPostEntries.SetPostItemEntries(true);
-                        POSPostEntries.SetPostPOSEntries(false);
-                        repeat
-
-                            if (POSEntryToPost.FindLast()) then
-                                POSEntryToPost.SetFilter("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
-
-                            POSPostEntries.Run(POSEntryToPost);
-                            Commit();
-
-                            ErrorDuringPosting := not POSEntryToPost.IsEmpty();
-                            POSEntryToPost.SetFilter("POS Period Register No.", Rec.GetFilter("POS Period Register No."));
-
-                        until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
-                    end;
-
-                    if (POSPosting) then begin
-                        POSEntryToPost.Reset();
-                        POSEntryToPost.CopyFilters(Rec);
-                        POSPostEntries.SetPostItemEntries(false);
-                        POSPostEntries.SetPostPOSEntries(true);
-                        repeat
-
-                            if (POSEntryToPost.FindLast()) then
-                                POSEntryToPost.SetFilter("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
-
-                            POSPostEntries.Run(POSEntryToPost);
-                            Commit();
-
-                            ErrorDuringPosting := not POSEntryToPost.IsEmpty();
-                            POSEntryToPost.SetFilter("POS Period Register No.", Rec.GetFilter("POS Period Register No."));
-
-                        until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
-                    end;
+                    POSPostingAction.SetPOSEntries(Rec);
+                    POSPostingAction.SetGlobalValues(false, false, true, false, false, true);
+                    POSPostingAction.RunModal();
                     CurrPage.Update(false);
                 end;
             }
@@ -1014,9 +974,6 @@
     end;
 
     var
-        TextPostCompressed: Label 'Post Compressed?';
-        TextPostItemEntries: Label 'Post Item Entries?';
-        TextPostPosEntries: Label 'Post all other Entries?';
         TextSalesDocNotFound: Label 'Sales Document %1 %2 not found.';
         LastOpenSalesDocumentNo: Code[20];
         LastPostedSalesDocumentNo: Code[20];

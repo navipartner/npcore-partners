@@ -150,7 +150,7 @@
         }
         field(54; "POS Posting Log Entry No."; Integer)
         {
-            Caption = 'POS Posting Log Entry No.';
+            Caption = 'POS Finance Posting Log Entry No.';
             Editable = false;
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Posting Log";

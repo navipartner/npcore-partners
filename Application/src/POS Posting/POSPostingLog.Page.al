@@ -45,6 +45,21 @@
                     ToolTip = 'Specifies the value of the Error Description field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Posting Type"; Rec."Posting Type")
+                {
+                    ToolTip = 'Specifies the value of the Posting Type field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Posting Per"; Rec."Posting Per")
+                {
+                    ToolTip = 'Specifies the value of the Posting Per field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Posting Per Entry No."; Rec."Posting Per Entry No.")
+                {
+                    ToolTip = 'Specifies the value of the Posting Per Entry No. field.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("POS Entry View"; Rec."POS Entry View")
                 {
 

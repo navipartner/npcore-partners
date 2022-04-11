@@ -327,6 +327,7 @@
         // Commit the item posting for POS Sale, before attempting to post assembly order - note: there are commits in the AssemblyPost.RUN ();
         Commit();
 
+        AssemblyPost.SetSuppressCommit(true);
         if (AssemblyPost.Run(AssemblyHeader)) then begin
             POSEntrySalesDocLink.Delete();
             POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::POSTED_ASSEMBLY_ORDER;
@@ -339,6 +340,8 @@
 
         if (FailOnError) then
             Error(GetLastErrorText);
+
+
 
         exit(false);
     end;
