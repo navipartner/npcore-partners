@@ -153,6 +153,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
         end;
         */
 
+        HavePriceRule := false;
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalScheduleEntryNo);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (AdmissionScheduleEntry.FindLast()) then begin
@@ -160,6 +161,9 @@ codeunit 6014559 "NPR TM Dynamic Price"
             if (HavePriceRule) then
                 EvaluatePriceRule(PriceRule, OriginalUnitPrice, UnitPriceIncludesVAT, UnitPriceVatPercentage, TicketBOM.Default, BasePrice, AddonPrice);
         end;
+
+        if (not HavePriceRule) then
+            BasePrice := OriginalUnitPrice;
 
         exit(HavePriceRule);
     end;
