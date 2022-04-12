@@ -151,9 +151,9 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         MonthLastText: Label 'Month - Last';
     begin
         FromDateCurrent := CalcDate('<CM><-2M><+1D>', BaseDate);
-        ToDateCurrent := CalcDate('<CM><-2M>', BaseDate);
+        ToDateCurrent := CalcDate('<-CM><-1D>', BaseDate);
         FromDateLast := CalcDate('<CM><-2M><+1D><-1Y>', BaseDate);
-        ToDateLast := CalcDate('<CM><-2M><-1Y>', BaseDate);
+        ToDateLast := CalcDate('<-CM><-1D><-1Y>', BaseDate);
         CreateHeaderRow(POSTurnoverCalcBuffer, MonthLastText, Format(FromDateCurrent) + '...' + Format(ToDateCurrent), Format(FromDateLast) + '...' + Format(ToDateLast));
         CreateDataBlock(POSTurnoverCalcBuffer, FromDateCurrent, ToDateCurrent, FromDateLast, ToDateLast);
     end;
