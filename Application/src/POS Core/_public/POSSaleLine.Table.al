@@ -2170,9 +2170,6 @@
     end;
 
     local procedure InitFromItem()
-    var
-        ItemVariant: Record "Item Variant";
-        NPRVarietySetup: Record "NPR Variety Setup";
     begin
         if "No." = '' then
             exit;
@@ -2191,18 +2188,8 @@
         if "Unit of Measure Code" = '' then
             "Unit of Measure Code" := Item."Base Unit of Measure";
 
-        Description := Item.Description;
-        "Description 2" := Item."Description 2";
+        GetDescription();
         "Magento Brand" := AuxItem."Magento Brand";
-
-        if NPRVarietySetup.Get() then
-            if not NPRVarietySetup."Custom Descriptions" then
-                exit;
-
-        if "Variant Code" <> '' then begin
-            ItemVariant.Get(Item."No.", "Variant Code");
-            "Description 2" := ItemVariant.Description;
-        end;
     end;
 
     local procedure InitFromItemCategory()
@@ -2374,6 +2361,27 @@
     local procedure GetAuxItem()
     begin
         Item.NPR_GetAuxItem(AuxItem);
+    end;
+
+    local procedure GetDescription()
+    var
+        NPRVarietySetup: Record "NPR Variety Setup";
+        ItemVariant: Record "Item Variant";
+    begin
+        if "Variant Code" <> '' then begin
+            ItemVariant.Get(Item."No.", "Variant Code");
+            Description := ItemVariant.Description;
+            "Description 2" := ItemVariant."Description 2";
+        end else begin
+            Description := Item.Description;
+            "Description 2" := Item."Description 2";
+        end;
+
+        if NPRVarietySetup.Get() then
+            if NPRVarietySetup."Custom Descriptions" then begin
+                Description := Item.Description;
+                "Description 2" := ItemVariant.Description;
+            end;
     end;
 
     procedure SetSkipUpdateDependantQuantity(Skip: Boolean)
