@@ -174,10 +174,9 @@ table 6014650 "NPR Stripe Subscription"
         exit(StripeTaxRate.Id)
     end;
 
-    internal procedure GetFormDataForUpdateSubscriptionUsage(Quantity: Integer; Timestamp: BigInteger) Data: Text
+    internal procedure GetFormDataForUpdateSubscriptionUsage(Quantity: Integer) Data: Text
     begin
-        Data := 'quantity=' + Format(Quantity) +
-                '&timestamp=' + Format(Timestamp);
+        Data := 'quantity=' + Format(Quantity);
     end;
 
     internal procedure PopulateFromJson(Data: JsonObject)
