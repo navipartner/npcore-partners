@@ -108,7 +108,7 @@
                                 Rec."Phone No." := TempMember."Phone No.";
 
                                 SetExternalMemberNo(TempMember."External Member No.");
-
+                                SetDefaultValues();
                                 CurrPage.Update(true);
                             end;
                         end;
@@ -117,11 +117,13 @@
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         MembershipMemberLookup();
+                        SetDefaultValues();
                     end;
 
                     trigger OnValidate()
                     begin
                         SetExternalMemberNo(Rec."External Member No");
+                        SetDefaultValues();
                     end;
                 }
             }
@@ -1131,8 +1133,8 @@
                 end;
 
                 ExternalCardNoMandatory := (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL);
-
-                CardValidUntilMandatory := not (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::NA);
+                CardValidUntilMandatory := ((MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL) and
+                                            not (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::NA));
 
                 case MembershipSalesSetup."Valid From Base" of
                     MembershipSalesSetup."Valid From Base"::FIRST_USE:
@@ -1161,6 +1163,7 @@
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberCommunity: Record "NPR MM Member Community";
         MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipEntry: Record "NPR MM Membership Entry";
         ValidUntilBaseDate: Date;
     begin
 
@@ -1270,7 +1273,15 @@
                     MembershipSetup."Card Expire Date Calculation"::DATEFORMULA:
                         Rec."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", ValidUntilBaseDate);
                     MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED:
-                        Rec."Valid Until" := CalcDate(MembershipSalesSetup."Duration Formula", ValidUntilBaseDate);
+                        begin
+                            //Rec."Valid Until" := CalcDate(MembershipSalesSetup."Duration Formula", ValidUntilBaseDate);
+                            MembershipEntry.SetFilter("Membership Entry No.", '=%1', Rec."Membership Entry No.");
+                            MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+                            MembershipEntry.SetFilter(Blocked, '=%1', false);
+                            if (MembershipEntry.FindLast()) then
+                                if (not MembershipEntry."Activate On First Use") then
+                                    Rec."Valid Until" := MembershipEntry."Valid Until Date";
+                        end;
                     else
                         Rec."Valid Until" := 0D;
                 end;
@@ -1394,6 +1405,7 @@
         Rec."Middle Name" := Member."Middle Name";
         Rec."Last Name" := Member."Last Name";
         Rec."E-Mail Address" := Member."E-Mail Address";
+        Rec."Valid Until" := 0D;
 
         Membership.Get(MembershipManagement.GetMembershipFromExtMemberNo(pExternalMemberNo));
         SetExternalMembershipNo(Membership."External Membership No.");

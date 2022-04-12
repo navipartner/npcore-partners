@@ -4296,6 +4296,7 @@
     local procedure IssueMemberCardWorker(MembershipEntryNo: Integer; MemberEntryNo: Integer; var MemberInfoCapture: Record "NPR MM Member Info Capture"; AllowBlankNumber: Boolean; var CardEntryNo: Integer; var ReasonMessage: Text; ForceValidUntilDate: Boolean): Boolean
     var
         MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
@@ -4344,12 +4345,9 @@
         MemberInfoCapture."External Member No" := Member."External Member No.";
         MemberInfoCapture."External Membership No." := Membership."External Membership No.";
 
-        // Override ValidUntil specified on MembershipSetup for card scheme GENERATED
-        CardValidUntil := MemberInfoCapture."Valid Until";
-
-        if (MemberInfoCapture."External Card No." = '') then
-            if (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::GENERATED) then
-                GenerateExtCardNoSimple(MembershipEntryNo, MembershipSetup.Code, MemberInfoCapture);
+        if (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::GENERATED) then
+            if (MemberInfoCapture."External Card No." = '') then
+                GenerateExtCardNoSimple(MembershipSetup.Code, MemberInfoCapture);
 
         if (not AllowBlankNumber) and (MemberInfoCapture."External Card No." = '') then begin
             RaiseError(ReasonMessage, MEMBERCARD_BLANK, MEMBERCARD_BLANK_NO);
@@ -4367,8 +4365,27 @@
             end;
         end;
 
+        // Override ValidUntil when f.ex. memberships is new and there is no membership entry to sync with
+        CardValidUntil := MemberInfoCapture."Valid Until";
+        if ((MemberInfoCapture."Valid Until" = 0D) or (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::GENERATED)) then begin
+            if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::"DATEFORMULA") then
+                MemberInfoCapture."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", Today);
+
+            if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED) then begin
+                MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+                MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+                MembershipEntry.SetFilter(Blocked, '=%1', false);
+                if (MembershipEntry.FindLast()) then
+                    if (not MembershipEntry."Activate On First Use") then
+                        MemberInfoCapture."Valid Until" := MembershipEntry."Valid Until Date";
+            end;
+        end;
+
         MemberCard."External Card No." := MemberInfoCapture."External Card No.";
-        MemberCard."External Card No. Last 4" := MemberInfoCapture."External Card No. Last 4";
+#pragma warning disable AA0139
+        if (StrLen(MemberCard."External Card No.") > 4) then
+            MemberCard."External Card No. Last 4" := CopyStr(MemberCard."External Card No.", StrLen(MemberCard."External Card No.") - 4 + 1);
+#pragma warning restore
         MemberCard."Pin Code" := MemberInfoCapture."Pin Code";
         MemberCard."Valid Until" := MemberInfoCapture."Valid Until";
 
@@ -4415,10 +4432,9 @@
         ExternalNo := NoSeriesManagement.GetNextNo(Community."External Member No. Series", Today, true);
     end;
 
-    local procedure GenerateExtCardNoSimple(MembershipEntryNo: Integer; MembershipCode: Code[20]; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    local procedure GenerateExtCardNoSimple(MembershipCode: Code[20]; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         MembershipSetup: Record "NPR MM Membership Setup";
-        MembershipEntry: Record "NPR MM Membership Entry";
         BaseNumberPadding: Code[100];
         PAN: Code[100];
         PanLength: Integer;
@@ -4460,22 +4476,7 @@
             Error(PAN_TO_LONG, MaxStrLen(MemberInfoCapture."External Card No."), MembershipSetup."Card Number Pattern");
 
         MemberInfoCapture."External Card No." := PAN;
-#pragma warning disable AA0139
-        MemberInfoCapture."External Card No. Last 4" := CopyStr(PAN, StrLen(PAN) - 4 + 1);
-#pragma warning restore
         MemberInfoCapture."Pin Code" := '1234';
-
-        if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::DateFormula) then
-            MemberInfoCapture."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", Today);
-
-        if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED) then begin
-            MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-            MembershipEntry.SetFilter(Blocked, '=%1', false);
-            if (MembershipEntry.FindLast()) then begin
-                if (not MembershipEntry."Activate On First Use") then
-                    MemberInfoCapture."Valid Until" := MembershipEntry."Valid Until Date";
-            end;
-        end;
 
     end;
 
