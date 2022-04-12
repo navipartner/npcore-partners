@@ -113,10 +113,10 @@
                 Caption = 'Actions';
                 actions
                 {
-                    action(Navigate)
+                    action("Navi&gate")
                     {
 
-                        Caption = 'Navigate';
+                        Caption = 'Find entries...';
                         RunObject = Page Navigate;
                         Image = TileHelp;
                         ToolTip = 'Find all entries and documents that exist for the document number and posting date on the selected entry or document.';

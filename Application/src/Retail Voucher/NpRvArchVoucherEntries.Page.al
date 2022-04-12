@@ -121,14 +121,14 @@
         {
             action("Navi&gate")
             {
-                Caption = 'Navi&gate';
+                Caption = 'Find entries...';
                 Image = Navigate;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Navi&gate action';
+                ToolTip = 'Executes the Find entries action';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

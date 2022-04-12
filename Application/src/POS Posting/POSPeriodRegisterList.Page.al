@@ -149,15 +149,15 @@
                     CurrPage.Update(false);
                 end;
             }
-            action("&Navigate")
+            action("Navi&gate")
             {
-                Caption = '&Navigate';
+                Caption = 'Find entries...';
                 Image = Navigate;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
 
-                ToolTip = 'Executes the &Navigate action';
+                ToolTip = 'Executes the Find entries action';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
