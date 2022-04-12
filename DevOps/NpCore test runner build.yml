@@ -33,6 +33,7 @@ jobs:
   parameters:
     timeoutInMinutes: 900
     containerImageName: mcr.microsoft.com/businesscentral:10.0.17763.1757
+    endpoint: 'npretail_ACR'
     pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig.json'
     containerName: $(containerName)
     serverInstanceName: $(serverInstanceName)
