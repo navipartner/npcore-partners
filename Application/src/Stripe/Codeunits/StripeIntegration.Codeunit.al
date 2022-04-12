@@ -16,8 +16,8 @@ codeunit 6059807 "NPR Stripe Integration"
         OnCheckSubscriptionStatus(false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Stripe Subs Usage Handler", 'OnBeforeUpdateSubscriptionUsage', '', false, false)]
-    local procedure CheckSubscriptionStatus_OnBeforeUpdateSubscriptionUsage()
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Stripe Subs Usage Check", 'OnAfterRunCheck', '', false, false)]
+    local procedure CheckSubscriptionStatus_OnAfterRunCheck()
     begin
         OnCheckSubscriptionStatus(true);
     end;
