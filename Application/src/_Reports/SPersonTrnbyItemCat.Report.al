@@ -1,11 +1,11 @@
 report 6014431 "NPR S.Person Trn by Item Cat."
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Person Trn. by Item Cat..rdlc';
-    Caption = 'Sales Person Transactions By Item Category';
+    Caption = 'Salesperson Turnover per Item Category';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
