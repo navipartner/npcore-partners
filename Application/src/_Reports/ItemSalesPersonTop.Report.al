@@ -1,13 +1,13 @@
 ﻿report 6014474 "NPR Item/Sales Person Top"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/ItemSales Person Top.rdlc';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-    Caption = 'Item/Sales Person Top';
+    Caption = 'Item/Salesperson Top';
     DataAccessIntent = ReadOnly;
 
     dataset
