@@ -113,16 +113,16 @@
     {
         area(navigation)
         {
-            action(Navigate)
+            action("Navi&gate")
             {
-                Caption = '&Navigate';
+                Caption = 'Find entries...';
                 Image = Navigate;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the &Navigate action';
+                ToolTip = 'Executes the Find entries action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()

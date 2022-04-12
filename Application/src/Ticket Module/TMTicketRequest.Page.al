@@ -213,7 +213,7 @@
                     RunPageLink = "Ticket Reservation Entry No." = FIELD("Entry No.");
 
                 }
-                action(Navigate)
+                action("Navi&gate")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Find Sales Transaction';

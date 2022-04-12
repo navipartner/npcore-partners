@@ -172,14 +172,14 @@
         {
             action("&Navigate")
             {
-                Caption = '&Navigate';
+                Caption = 'Find entries...';
                 Image = Navigate;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the &Navigate action';
+                ToolTip = 'Executes the Find entries action';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
