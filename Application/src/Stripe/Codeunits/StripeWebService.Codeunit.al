@@ -338,7 +338,7 @@ codeunit 6059810 "NPR Stripe Web Service"
         InitArguments(TempStripeRESTWSArgument, StrSubstNo(SubscriptionItemIdLbl, StripeSubscription."Subscription Item Id"));
         TempStripeRESTWSArgument."Rest Method" := TempStripeRESTWSArgument."Rest Method"::post;
 
-        RequestContent.WriteFrom(StripeSubscription.GetFormDataForUpdateSubscriptionUsage(Quantity, GetCurrUTCTimestamp()));
+        RequestContent.WriteFrom(StripeSubscription.GetFormDataForUpdateSubscriptionUsage(Quantity));
 
         RequestContent.GetHeaders(RequestHeaders);
         RequestHeaders.Remove('Content-Type');
@@ -416,13 +416,6 @@ codeunit 6059810 "NPR Stripe Web Service"
 
         if EnvironmentInformation.IsSaaS() then
             exit(AzureKeyVaultMgt.GetAzureKeyVaultSecret('LiveStripeSecretKey'));
-    end;
-
-    local procedure GetCurrUTCTimestamp(): BigInteger
-    var
-        TypeHelper: Codeunit "Type Helper";
-    begin
-        exit(Round((TypeHelper.GetCurrUTCDateTime() - CreateDateTime(DMY2Date(1, 1, 1970), 0T)) / 1000, 1));
     end;
 
     [IntegrationEvent(false, false)]

@@ -17,34 +17,20 @@ codeunit 6059813 "NPR Stripe Subs Usage Handler"
         if not StripeSetup.IsStripeActive() then
             exit;
 
-        CheckIsCurrUserPOSUser();
-
         StripeSubscription.SetCurrentKey(SystemCreatedAt);
         if StripeSubscription.FindLast() then begin
             if not StripeSubscription.RefreshSubscription() then
                 exit;
 
             StripeSubscription.UpdateLastSubscriptionPeriodStartOnStripeSetup();
-
-            OnBeforeUpdateSubscriptionUsage();
-            StripePOSUser.FindSet();
-
-            repeat
-                if ShouldUpdateSubscriptionUsage(StripeSubscription, StripePOSUser) then begin
-                    InserSubscriptionUsage(StripeSubscription, StripePOSUser);
-                    StripeSubscription.UpdateSubscriptionUsage(1);
-                end;
-            until StripePOSUser.Next() = 0;
+            if StripePOSUser.FindSet() then
+                repeat
+                    if ShouldUpdateSubscriptionUsage(StripeSubscription, StripePOSUser) then begin
+                        InserSubscriptionUsage(StripeSubscription, StripePOSUser);
+                        StripeSubscription.UpdateSubscriptionUsage(1);
+                    end;
+                until StripePOSUser.Next() = 0;
         end;
-    end;
-
-    local procedure CheckIsCurrUserPOSUser()
-    var
-        StripePOSUser: Record "NPR Stripe POS User";
-        POSUserDoesNotExistErr: Label 'User %1 must be defined as %2.', Comment = '%1 - current User Id, %2 - Stripe POS User table caption';
-    begin
-        if not StripePOSUser.Get(UserId) then
-            Error(POSUserDoesNotExistErr, UserId, StripePOSUser.TableCaption);
     end;
 
     local procedure ShouldUpdateSubscriptionUsage(StripeSubscription: Record "NPR Stripe Subscription"; StripePOSUser: Record "NPR Stripe POS User") ShouldUpdate: Boolean
@@ -70,11 +56,6 @@ codeunit 6059813 "NPR Stripe Subs Usage Handler"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShouldUpdateSubscriptionUsage(StripeSubscription: Record "NPR Stripe Subscription"; StripePOSUser: Record "NPR Stripe POS User"; var ShouldUpdate: Boolean; var Handled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateSubscriptionUsage()
     begin
     end;
 }
