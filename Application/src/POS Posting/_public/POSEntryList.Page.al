@@ -667,13 +667,13 @@
                 Caption = 'Posting Entries';
                 action("&Navigate")
                 {
-                    Caption = '&Navigate';
+                    Caption = 'Find entries...';
                     Image = Navigate;
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category6;
 
-                    ToolTip = 'Executes the &Navigate action';
+                    ToolTip = 'Executes the Find entries action';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

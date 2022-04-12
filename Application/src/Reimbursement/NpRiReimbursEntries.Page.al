@@ -234,16 +234,16 @@
                     NpRiSetupMgt.ShowEntrySource(Rec);
                 end;
             }
-            action(Navigate)
+            action("Find entries")
             {
-                Caption = '&Navigate';
+                Caption = 'Find entries...';
                 Image = Navigate;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 Scope = Repeater;
 
-                ToolTip = 'Executes the &Navigate action';
+                ToolTip = 'Executes the Find entries action';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

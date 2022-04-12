@@ -223,9 +223,9 @@
         }
         area(navigation)
         {
-            action(Navigate)
+            action("Navi&gate")
             {
-                Caption = '&Navigate';
+                Caption = 'Find entries...';
                 Image = Navigate;
                 Promoted = true;
                 PromotedOnly = true;
@@ -233,7 +233,7 @@
                 PromotedIsBig = true;
                 Visible = (Rec."Document Table No." = 112) OR (Rec."Document Table No." = 114);
 
-                ToolTip = 'Executes the &Navigate action';
+                ToolTip = 'Executes the Find entries action';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
