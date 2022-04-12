@@ -1,8 +1,8 @@
 ﻿report 6014405 "NPR Salesp./Item Cat Top 20"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Salesperson Item Category Top 20.rdlc';
     Caption = 'Salesperson/Item Category Top';
@@ -301,15 +301,16 @@
                         trigger OnValidate()
                         begin
                             sortSalesPerson := false;
-                            sortSalesPersonVisible := false;
                             ShowQtyVisible := false;
                             RequestOptionsPage.Update();
                         end;
                     }
                     field("sort Sales Person"; sortSalesPerson)
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'not needed';
                         Caption = 'Sort Salespersons';
-                        Visible = SortSalesPersonVisible;
+                        Visible = false;
 
                         ToolTip = 'Specifies the value of the Sort Salespersons field';
                         ApplicationArea = NPRRetail;
@@ -349,7 +350,6 @@
         ShowMainTotal := false;
         ShowMainTotalVisible := true;
         sortSalesPerson := true;
-        sortSalesPersonVisible := true;
         ShowQtyVisible := true;
         ShowQty := 25;
     end;
@@ -365,7 +365,6 @@
         ShowQtyVisible: Boolean;
         sortSalesPerson: Boolean;
         [InDataSet]
-        sortSalesPersonVisible: Boolean;
         CogsLCY: Decimal;
         CogsLCYGP: Decimal;
         CogsLCYGPINT: Decimal;
