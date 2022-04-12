@@ -112,6 +112,8 @@
                 end;
             "Data Type"::Integer:
                 case true of
+                    "Default Value" = '':
+                        "Default Value" := Format(0, 0, 9);
                     Evaluate(Integer, "Default Value", 9):
                         "Default Value" := Format(Integer, 0, 9);
                     Evaluate(Integer, "Default Value"):
@@ -121,6 +123,8 @@
                 end;
             "Data Type"::Decimal:
                 case true of
+                    "Default Value" = '':
+                        "Default Value" := Format(0, 0, 9);
                     Evaluate(Decimal, "Default Value", 9):
                         "Default Value" := Format(Decimal, 0, 9);
                     Evaluate(Decimal, "Default Value"):

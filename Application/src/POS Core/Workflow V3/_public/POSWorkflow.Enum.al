@@ -51,18 +51,24 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_GENERIC_AUX', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action HWC Gen. Aux";
     }
-
     value(9; PAYMENT_PAYIN_PAYOUT)
     {
         Caption = 'PAYMENT_PAYIN_PAYOUT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Pay-in Payout";
     }
-
     value(10; PAYMENT_CHECK)
     {
         Caption = 'PAYMENT_CHECK', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Check Payment";
     }
-
-
+    value(11; CUSTOMER_SELECT)
+    {
+        Caption = 'CUSTOMER_SELECT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Cust. Select";
+    }
+    value(12; CUSTOMER_INFO)
+    {
+        Caption = 'CUSTOMER_INFO', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Cust.Info-I";
+    }
 }
