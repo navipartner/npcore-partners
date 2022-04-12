@@ -1,157 +1,75 @@
-﻿codeunit 6150865 "NPR POS Action: Cust. Select"
+codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
     var
-        ActionDescription: Label 'Attach or remove customer from POS sale.';
-        CAPTION_OPERATION: Label 'Operation';
-        CAPTION_TABLEVIEW: Label 'Customer Table View';
-        CAPTION_CUSTOMERPAGE: Label 'Customer Lookup Page';
-        DESC_OPERATION: Label 'Operation to perform';
-        DESC_TABLEVIEW: Label 'Pre-filtered customer list';
-        DESC_CUSTOMERPAGE: Label 'Custom customer lookup page';
-        OPTION_OPERATION: Label 'Attach,Remove';
+        ParameterOperation_OptionsLbl: Label 'Attach,Remove', Locked = true;
 
     local procedure ActionCode(): Code[20]
-    begin
-        exit('CUSTOMER_SELECT');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.1');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-  ActionCode(),
-  ActionDescription,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple) then begin
-            Sender.RegisterWorkflowStep('Select', 'respond();');
-            Sender.RegisterWorkflow(false);
-
-            Sender.RegisterOptionParameter('Operation', 'Attach,Remove', 'Attach');
-            Sender.RegisterTextParameter('CustomerTableView', '');
-            Sender.RegisterIntegerParameter('CustomerLookupPage', 0);
-            Sender.RegisterTextParameter('customerNo', '');
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        OrdinalIndex: Integer;
+        EnumValueName: Text;
+    begin
+        OrdinalIndex := Enum::"NPR POS Workflow".Ordinals().IndexOf(Enum::"NPR POS Workflow"::CUSTOMER_SELECT.AsInteger());
+        Enum::"NPR POS Workflow".Names().Get(OrdinalIndex, EnumValueName);
+        exit(UpperCase(CopyStr(EnumValueName, 1, 20)));
+    end;
+
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
+    var
+        ActionDescription: Label 'This is a built-in action to attach or remove customer from POS sale.';
+        ParameterCustomerLookupPage_NameCaptionLbl: Label 'Customer Lookup Page';
+        ParameterCustomerLookupPage_NameDescriptionLbl: Label 'Custom customer lookup page';
+        ParameterCustomerNo_NameCaptionLbl: Label 'Customer No.';
+        ParameterCustomerNo_NameDescriptionLbl: Label 'Pre-defined customer number';
+        ParameterCustomerTableView_NameCaptionLbl: Label 'Customer Table View';
+        ParameterCustomerTableView_NameDescriptionLbl: Label 'Pre-filtered customer list';
+        ParameterOperation_NameCaptionLbl: Label 'Operation';
+        ParameterOperation_NameDescriptionLbl: Label 'Operation to perform';
+        ParameterOperation_OptionCaptionsLbl: Label 'Attach,Remove';
+    begin
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddOptionParameter(
+            ParameterOperation_Name(),
+            ParameterOperation_OptionsLbl,
+            SelectStr(1, ParameterOperation_OptionsLbl),
+            ParameterOperation_NameCaptionLbl,
+            ParameterOperation_NameDescriptionLbl,
+            ParameterOperation_OptionCaptionsLbl);
+        WorkflowConfig.AddTextParameter(ParameterCustomerTableView_Name(), '', ParameterCustomerTableView_NameCaptionLbl, ParameterCustomerTableView_NameDescriptionLbl);
+        WorkflowConfig.AddIntegerParameter(ParameterCustomerLookupPage_Name(), 0, ParameterCustomerLookupPage_NameCaptionLbl, ParameterCustomerLookupPage_NameDescriptionLbl);
+        WorkflowConfig.AddTextParameter(ParameterCustomerNo_Name(), '', ParameterCustomerNo_NameCaptionLbl, ParameterCustomerNo_NameDescriptionLbl);
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+            //###NPR_INJECT_FROM_FILE:POSActionCustSelect.js###
+            'let main=async({})=>await workflow.respond();'
+        );
+    end;
+
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    var
+        SalePOS: Record "NPR POS Sale";
+        PosActionBusinessLogic: Codeunit "NPR POS Action: Cust. Select-B";
         Operation: Option Attach,Remove;
-        JSON: Codeunit "NPR POS JSON Management";
-        CustomerTableView: Text;
         CustomerLookupPage: Integer;
+        CustomerTableView: Text;
         SpecificCustomerNo: Text;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
+        CustomerTableView := Context.GetStringParameter(ParameterCustomerTableView_Name());
+        CustomerLookupPage := Context.GetIntegerParameter(ParameterCustomerLookupPage_Name());
+        Operation := Context.GetIntegerParameter(ParameterOperation_Name());
+        SpecificCustomerNo := Context.GetStringParameter(ParameterCustomerNo_Name());
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-
-        CustomerTableView := JSON.GetStringParameterOrFail('CustomerTableView', ActionCode());
-        CustomerLookupPage := JSON.GetIntegerParameterOrFail('CustomerLookupPage', ActionCode());
-        Operation := JSON.GetIntegerParameterOrFail('Operation', ActionCode());
-        SpecificCustomerNo := JSON.GetStringParameterOrFail('customerNo', ActionCode());
-
+        Sale.GetCurrentSale(SalePOS);
         case Operation of
             Operation::Attach:
-                AttachCustomer(POSSession, CustomerTableView, CustomerLookupPage, SpecificCustomerNo);
+                PosActionBusinessLogic.AttachCustomer(SalePOS, CustomerTableView, CustomerLookupPage, SpecificCustomerNo);
             Operation::Remove:
-                RemoveCustomer(POSSession);
-        end;
-
-        POSSession.RequestRefreshData();
-    end;
-
-    procedure AttachCustomer(var POSSession: Codeunit "NPR POS Session"; CustomerTableView: Text; CustomerLookupPage: Integer; SpecificCustomerNo: Text)
-    var
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        Customer: Record Customer;
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        if SpecificCustomerNo = '' then begin
-            if CustomerTableView <> '' then
-                Customer.SetView(CustomerTableView);
-
-            if PAGE.RunModal(CustomerLookupPage, Customer) <> ACTION::LookupOK then
-                exit;
-        end else begin
-            Customer."No." := CopyStr(SpecificCustomerNo, 1, MaxStrLen(Customer."No."));
-        end;
-
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-        SalePOS.Validate("Customer No.", Customer."No.");
-        SalePOS.Modify(true);
-        POSSale.SetModified();
-        POSSale.RefreshCurrent();
-    end;
-
-    local procedure RemoveCustomer(var POSSession: Codeunit "NPR POS Session")
-    var
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-        SalePOS.Validate("Customer No.", '');
-        SalePOS.Modify(true);
-        POSSale.SetModified();
-        POSSale.RefreshCurrent();
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
-    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'Operation':
-                Caption := CAPTION_OPERATION;
-            'CustomerLookupPage':
-                Caption := CAPTION_CUSTOMERPAGE;
-            'CustomerTableView':
-                Caption := CAPTION_TABLEVIEW;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
-    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'Operation':
-                Caption := DESC_OPERATION;
-            'CustomerLookupPage':
-                Caption := DESC_CUSTOMERPAGE;
-            'CustomerTableView':
-                Caption := DESC_TABLEVIEW;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', false, false)]
-    local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'Operation':
-                Caption := OPTION_OPERATION;
+                PosActionBusinessLogic.RemoveCustomer(SalePOS);
         end;
     end;
 
@@ -159,13 +77,15 @@
     local procedure OnLookupParameter(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         FilterPageBuilder: FilterPageBuilder;
+        AllObjwithCap: Record AllObjWithCaption;
         Customer: Record Customer;
+        PageMetadata: Record "Page Metadata";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
-            'CustomerTableView':
+            ParameterCustomerTableView_Name():
                 begin
                     FilterPageBuilder.AddRecord(Customer.TableCaption, Customer);
                     if POSParameterValue.Value <> '' then begin
@@ -174,6 +94,38 @@
                     end;
                     if FilterPageBuilder.RunModal() then
                         POSParameterValue.Value := CopyStr(FilterPageBuilder.GetView(Customer.TableCaption, false), 1, MaxStrLen(POSParameterValue.Value));
+                end;
+
+            ParameterCustomerNo_Name():
+                begin
+                    if POSParameterValue.Value <> '' then begin
+                        Customer."No." := CopyStr(POSParameterValue.Value, 1, MaxStrLen(Customer."No."));
+                        if Customer.Find('=><') then;
+                    end;
+                    if Page.RunModal(0, Customer) = Action::LookupOK then
+                        POSParameterValue.Value := Customer."No.";
+                end;
+
+            ParameterCustomerLookupPage_Name():
+                begin
+                    PageMetadata.SetRange(SourceTable, DATABASE::Customer);
+                    PageMetadata.SetFilter(PageType, '%1|%2', PageMetadata.PageType::List, PageMetadata.PageType::ListPlus);
+                    if PageMetadata.FindSet() then
+                        repeat
+                            AllObjwithCap."Object Type" := AllObjwithCap."Object Type"::Page;
+                            AllObjwithCap."Object ID" := PageMetadata.ID;
+                            if AllObjwithCap.Find() then
+                                AllObjwithCap.Mark(true);
+                        until PageMetadata.Next() = 0;
+                    AllObjwithCap.MarkedOnly(true);
+
+                    if POSParameterValue.Value <> '' then
+                        if Evaluate(AllObjwithCap."Object ID", POSParameterValue.Value) then begin
+                            AllObjwithCap."Object Type" := AllObjwithCap."Object Type"::Page;
+                            if AllObjwithCap.Find('=><') then;
+                        end;
+                    if Page.RunModal(Page::Objects, AllObjwithCap) = Action::LookupOK then
+                        POSParameterValue.Value := Format(AllObjwithCap."Object ID");
                 end;
         end;
     end;
@@ -189,7 +141,7 @@
             exit;
 
         case POSParameterValue.Name of
-            'CustomerLookupPage':
+            ParameterCustomerLookupPage_Name():
                 begin
                     if (POSParameterValue.Value in ['', '0']) then
                         exit;
@@ -198,7 +150,8 @@
                     PageMetadata.SetRange(SourceTable, DATABASE::Customer);
                     PageMetadata.FindFirst();
                 end;
-            'CustomerTableView':
+
+            ParameterCustomerTableView_Name():
                 begin
                     if POSParameterValue.Value <> '' then
                         Customer.SetView(POSParameterValue.Value);
@@ -230,8 +183,8 @@
         case EanBoxEvent.Code of
             EventCodeCustNo():
                 begin
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'customerNo', true, '');
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'Operation', false, 'Attach');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, ParameterCustomerNo_Name(), true, '');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, ParameterOperation_Name(), false, SelectStr(1, ParameterOperation_OptionsLbl));
                 end;
         end;
     end;
@@ -253,5 +206,25 @@
     local procedure EventCodeCustNo(): Code[20]
     begin
         exit('CUSTOMERNO');
+    end;
+
+    local procedure ParameterOperation_Name(): Text[30]
+    begin
+        exit('Operation');
+    end;
+
+    local procedure ParameterCustomerNo_Name(): Text[30]
+    begin
+        exit('CustomerNo');
+    end;
+
+    local procedure ParameterCustomerTableView_Name(): Text[30]
+    begin
+        exit('CustomerTableView');
+    end;
+
+    local procedure ParameterCustomerLookupPage_Name(): Text[30]
+    begin
+        exit('CustomerLookupPage');
     end;
 }
