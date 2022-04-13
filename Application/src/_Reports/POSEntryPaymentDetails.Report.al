@@ -35,7 +35,6 @@ report 6014423 "NPR POS Entry Payment Details"
             column(EntryDate_POS_Entry; format("Entry Date"))
             {
             }
-
             dataitem(NPRPOSEntryPaymentLine; "NPR POS Entry Payment Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
@@ -48,8 +47,8 @@ report 6014423 "NPR POS Entry Payment Details"
                 column(CurrencyCode_POS_EntryPaymentLine; "Currency Code")
                 {
                     IncludeCaption = true;
-                }
-                column(AmountSalesCurrency_POS_EntryPaymentLine; "Amount (Sales Currency)")
+                }      
+                column(AmountSalesCurrency_POS_EntryPaymentLine; "Amount")
                 {
                     IncludeCaption = true;
                 }
@@ -57,17 +56,12 @@ report 6014423 "NPR POS Entry Payment Details"
                 {
                     IncludeCaption = true;
                 }
-
             }
-
-
         }
 
     }
-
     requestpage
     {
-
         layout
         {
             area(content)
@@ -92,6 +86,4 @@ report 6014423 "NPR POS Entry Payment Details"
         EntryDateLabel = 'Entry Date';
 
     }
-    var
-
 }
