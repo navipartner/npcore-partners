@@ -37,3 +37,5 @@
     href: explanation/LocationVsReservation.md
   - name: Authorization Code for Ticket Rescheduling
     href: explanation/AuthorizationCode.md
+  - name: Ticket Statistics and Forecast
+    href: explanation/TicketStatandForecast.md
