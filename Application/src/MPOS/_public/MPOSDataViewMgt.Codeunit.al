@@ -1,0 +1,83 @@
+codeunit 6059827 "NPR MPOS Data View Mgt."
+{
+
+    procedure LookupDataViewCode(var DataView: Record "NPR MPOS Data View"; var DataViewCode: Text): Boolean
+    var
+        IDataViewType: Interface "NPR MPOS IDataViewType";
+    begin
+        IDataViewType := DataView."Data View Type";
+        exit(IDataViewType.LookupCode(DataViewCode));
+    end;
+
+    procedure GetViews(DataViewType: Enum "NPR MPOS Data View Type"): JsonToken
+    var
+        IDataViewType: Interface "NPR MPOS IDataViewType";
+    begin
+        IDataViewType := DataViewType;
+        exit(IDataViewType.GetViews());
+    end;
+
+    procedure GetViews(DataViewType: Enum "NPR MPOS Data View Type"; DataViewCategory: Enum "NPR MPOS Data View Category"): JsonToken
+    var
+        IDataViewCategory: Interface "NPR MPOS IDataViewCategory";
+    begin
+        IDataViewCategory := DataViewCategory;
+        exit(IDataViewCategory.GetViews(DataViewType, DataViewCategory));
+    end;
+
+    procedure GetView(DataViewType: Enum "NPR MPOS Data View Type"; DataViewCategory: Enum "NPR MPOS Data View Category"; DataViewCode: Code[20]; Request: JsonToken): JsonToken
+    var
+        IDataViewCategory: Interface "NPR MPOS IDataViewCategory";
+    begin
+        IDataViewCategory := DataViewCategory;
+        exit(IDataViewCategory.GetView(DataViewType, DataViewCategory, DataViewCode, Request));
+    end;
+
+    procedure Preview(Rec: Record "NPR MPOS Data View")
+    var
+        IDataViewCategory: Interface "NPR MPOS IDataViewCategory";
+    begin
+        IDataViewCategory := Rec."Data View Category";
+        IDataViewCategory.Preveiw(Rec.SystemId);
+    end;
+
+    procedure FormatResultAsText(DataViews: JsonToken): Text
+    var
+        Result: Text;
+    begin
+        case true of
+            DataViews.IsObject():
+                begin
+                    DataViews.AsObject().WriteTo(Result);
+                end;
+            DataViews.IsArray():
+                begin
+                    DataViews.AsArray().WriteTo(Result);
+                end;
+        end;
+        exit(Result);
+    end;
+
+    procedure DeleteLevels(var Rec: Record "NPR MPOS Data View")
+    var
+        DataView: Record "NPR MPOS Data View";
+    begin
+        case Rec.Indent of
+            0:
+                begin
+                    DataView.SetRange("Data View Type", Rec."Data View Type");
+                    DataView.SetRange(Indent, 1);
+                    if not DataView.IsEmpty() then
+                        DataView.DeleteAll(true);
+                end;
+            1:
+                begin
+                    DataView.SetRange("Data View Type", Rec."Data View Type");
+                    DataView.SetRange("Data View Category", Rec."Data View Category");
+                    DataView.SetRange(Indent, 2);
+                    if not DataView.IsEmpty() then
+                        DataView.DeleteAll(true);
+                end;
+        end;
+    end;
+}
