@@ -76,6 +76,54 @@
         CloseDialog();
     end;
 
+    internal procedure CreateXml(var Result: Codeunit "Temp Blob")
+    var
+        Node: XmlNode;
+        Document: XmlDocument;
+        Counter: Integer;
+        XmlEntityCount: Integer;
+        Total: Integer;
+        StartTime: Time;
+        RecordSetExists: Boolean;
+    begin
+        if not Initialized then
+            exit;
+
+        Initialized := false;
+        StartTime := Time;
+        Counter := 0;
+        Total := RecRef.Count();
+        OpenDialog(StrSubstNo(Text002, NpXmlTemplate2.Code) + Text003);
+
+        if NpXmlTemplate2."Max Records per File" <= 0 then
+            NpXmlTemplate2."Max Records per File" := 10000000;
+
+        XmlEntityCount := 0;
+        NpXmlDomMgt.InitDoc(Document, Node, NpXmlTemplate2."Xml Root Name", NpXmlTemplate2."Custom Namespace for XMLNS");
+        NpXmlDomMgt.AddRootAttributes(Node, NpXmlTemplate2);
+        RecordSetExists := RecRef.FindSet();
+        repeat
+            Counter += 1;
+            UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition());
+
+            if ParseDataToXmlDocNode(RecRef, RecordSetExists, Node) then
+                XmlEntityCount += 1;
+
+            if XmlEntityCount >= NpXmlTemplate2."Max Records per File" then begin
+                FinalizeDoc(Document, NpXmlTemplate2, Result);
+                XmlEntityCount := 0;
+                NpXmlDomMgt.InitDoc(Document, Node, NpXmlTemplate2."Xml Root Name", NpXmlTemplate2."Custom Namespace for XMLNS");
+                NpXmlDomMgt.AddRootAttributes(Node, NpXmlTemplate2);
+            end;
+        until RecRef.Next() = 0;
+
+        if XmlEntityCount > 0 then
+            FinalizeDoc(Document, NpXmlTemplate2, Result);
+
+        Clear(Document);
+        CloseDialog();
+    end;
+
     internal procedure ParseDataToXmlDocNode(var RecRef: RecordRef; RecordSetExists: Boolean; var Node: XmlNode) Success: Boolean
     var
         NpXmlElement: Record "NPR NpXml Element";
@@ -392,6 +440,19 @@
 
         TempFile := FileMgt.BLOBExport(TempBlob, Filename, false);
         HardwareConnectorMgt.MoveFileRequest(TempFile, Filepath + Filename);
+    end;
+
+    local procedure FinalizeDoc(var XmlDoc: XmlDocument; NPXmlTemplate: Record "NPR NpXml Template"; var Request: Codeunit "Temp Blob")
+    var
+        RequestText: Text;
+    begin
+        if NpXmlTemplate."API Type" = NpXmlTemplate."API Type"::"REST (Json)" then begin
+            RequestText := Xml2Json(XmlDoc, NpXmlTemplate);
+        end else begin
+            XmlDoc.WriteTo(RequestText);
+        end;
+
+        Text2Request(RequestText, Request);
     end;
 
     local procedure FinalizeDoc(var XmlDoc: XmlDocument; NPXmlTemplate: Record "NPR NpXml Template"; Filename: Text[1024])
@@ -807,6 +868,15 @@
             OutputOutStr.WriteText(GetChar(13) + GetChar(10) + GetChar(13) + GetChar(10));
 
         OutputOutStr.Write(OutputText);
+    end;
+
+    local procedure Text2Request(RequestText: Text; var Request: Codeunit "Temp Blob")
+    var
+        OutStr: OutStream;
+    begin
+        Clear(Request);
+        Request.CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.Write(RequestText);
     end;
 
     local procedure AddXmlToOutputTempBlob(var XmlDoc: XmlDocument; Comment: Text; DoNotAddComment: Boolean)

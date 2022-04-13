@@ -82,6 +82,35 @@
         exit(CODEUNIT::"NPR MPOS Webservice");
     end;
 
+    procedure GetNaviConnectViews(): Text
+    var
+        DataViewMgt: Codeunit "NPR MPOS Data View Mgt.";
+        DataViews: JsonToken;
+    begin
+        DataViews := DataViewMgt.GetViews("NPR MPOS Data View Type"::NaviConnect);
+        exit(DataViewMgt.FormatResultAsText(DataViews));
+    end;
+
+    procedure GetBarcodeInventoryViews(): Text
+    var
+        DataViewMgt: Codeunit "NPR MPOS Data View Mgt.";
+        DataViews: JsonToken;
+    begin
+        DataViews := DataViewMgt.GetViews("NPR MPOS Data View Type"::NaviConnect, "NPR MPOS Data View Category"::"Barcode Inventory");
+        exit(DataViewMgt.FormatResultAsText(DataViews));
+    end;
+
+    procedure GetBarcodeInventoryView(DataViewCode: Code[20]; Barcode: Code[20]): Text
+    var
+        DataViewMgt: Codeunit "NPR MPOS Data View Mgt.";
+        DataView: JsonToken;
+        Request: JsonValue;
+    begin
+        Request.ReadFrom(Barcode);
+        DataView := DataViewMgt.GetView("NPR MPOS Data View Type"::NaviConnect, "NPR MPOS Data View Category"::"Barcode Inventory", DataViewCode, Request.AsToken());
+        exit(DataViewMgt.FormatResultAsText(DataView));
+    end;
+
     procedure GetItemInfoByBarcode(Barcode: Code[20]): Text
     var
         Item: Record Item;
