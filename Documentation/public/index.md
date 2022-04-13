@@ -98,11 +98,19 @@
   <div class="descriptiontext">        
     <section> </br>
       <p>NaviPartner delivers unified solutions for vertical retail businesses, museums and attractions. This documentation is intended to assist you in using all of these solutions.</p> </br>
-      <p>NP Retail is an extension for Microsoft Business Central that adds Point of Sale capabilities to the ERP system along with auxiliary features such as RFID warehousing, Member & Ticket management, Replenishment, Receipt/Label printing, Webshop integration and much more.</p>
-      <p>The NP E-commerce solution helps our customers build a foundation for a successful omnichannel online business.</p>
-      <p>NP Entertainment is all-in-one ticketing and membership management system that streamlines sales and validation of tickets and memberships.</p>
-      <p>NP WMS connects your inventory management in Business Central with your POS solution and your online store, and makes every item visible across the supply chain, distribution centers, and sales channels.</p>
-      <p>The API documentation comprises technical webservice references and a sandbox for testing purposes.</p>
+
+    <br>
+    <p> Our product documentation consists of three distinct groups of articles - explanations, how-to guides, and tutorials. Since our new documentation portal (the one you're reading right now) is still under construction, each feature will have at least one of these article types associated with them in the table of contents, although this isn't yet the case. </p>
+    <p>
+    Explanations - contain high-level information about functionalities. Refer to them if you wish to know more about usage and capabilities of each functionality.
+    How-to guides - provide you with a series of steps that need to be completed in order to perform a certain task.
+    Tutorials - provide instructions for completing certain tasks intended for beginners who don't have prior knowledge of Business Central. </br>
+
+      <p> The <a href="https://docs.navipartner.com/retail/gettingstarted/intro.html">NP Retail</a> is an extension for Microsoft Business Central that adds Point of Sale capabilities to the ERP system along with auxiliary features such as RFID warehousing, Member & Ticket management, Replenishment, Receipt/Label printing, Webshop integration and much more.</p>
+      <p> The <a href="https://docs.navipartner.com/ecommerce/intro.html">NP E-commerce</a> solution helps our customers build a foundation for a successful omnichannel online business.</p>
+      <p> The <a href="https://docs.navipartner.com/entertainment/intro.html">NP Entertainment</a> is all-in-one ticketing and membership management system that streamlines sales and validation of tickets and memberships.</p>
+      <p> The <a href="https://docs.navipartner.com/wms/intro.html">NP WMS</a> connects your inventory management in Business Central with your POS solution and your online store, and makes every item visible across the supply chain, distribution centers, and sales channels.</p>
+      <p>The <a href="https://docs.navipartner.com/api/gettingstarted/intro.html">API documentation</a> comprises technical webservice references and a sandbox for testing purposes.</p>
       <p>The <a href="https://support.navipartner.com/">Old Documentation</a> section contains articles that have not yet been migrated to this format. As soon as all articles are rewritten and migrated here, the old documentation portal will be obsoleted</p>                           
     </section>
   </div>
