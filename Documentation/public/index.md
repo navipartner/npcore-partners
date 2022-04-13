@@ -99,12 +99,10 @@
     <section> </br>
       <p>NaviPartner delivers unified solutions for vertical retail businesses, museums and attractions. This documentation is intended to assist you in using all of these solutions.</p> </br>
 
-    <br>
-    <p> Our product documentation consists of three distinct groups of articles - explanations, how-to guides, and tutorials. Since our new documentation portal (the one you're reading right now) is still under construction, each feature will have at least one of these article types associated with them in the table of contents, although this isn't yet the case. </p>
-    <p>
-    Explanations - contain high-level information about functionalities. Refer to them if you wish to know more about usage and capabilities of each functionality.
-    How-to guides - provide you with a series of steps that need to be completed in order to perform a certain task.
-    Tutorials - provide instructions for completing certain tasks intended for beginners who don't have prior knowledge of Business Central. </br>
+      <p> Our product documentation consists of three distinct groups of articles - explanations, how-to guides, and tutorials. Since our new documentation portal (the one you're reading right now) is still under construction, each feature will have at least one of these article types associated with them in the table of contents, although this isn't yet the case. </p>
+      <p> Explanations - contain high-level information about functionalities. Refer to them if you wish to know more about usage and capabilities of each functionality. </p>
+      <p> How-to guides - provide you with a series of steps that need to be completed in order to perform a certain task. </p>
+      <p> Tutorials - provide instructions for completing certain tasks intended for beginners who don't have prior knowledge of Business Central. </p>
 
       <p> The <a href="https://docs.navipartner.com/retail/gettingstarted/intro.html">NP Retail</a> is an extension for Microsoft Business Central that adds Point of Sale capabilities to the ERP system along with auxiliary features such as RFID warehousing, Member & Ticket management, Replenishment, Receipt/Label printing, Webshop integration and much more.</p>
       <p> The <a href="https://docs.navipartner.com/ecommerce/intro.html">NP E-commerce</a> solution helps our customers build a foundation for a successful omnichannel online business.</p>
