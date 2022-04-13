@@ -126,7 +126,7 @@ I use the following tools for capturing and editing screenshots:
 
 ## Defining tooltips
 
-Tooltips are user-targeted messages that provide descriptions or explanations of fields and action in the GUI. 
+[Tooltips](https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/administration/onboarding-teaching-tips-tours) are user-targeted messages that provide descriptions or explanations of fields and action in the GUI. 
 When constructing tooltips, we're going to strive for the model defined by the Business central style guide. This model includes the following:
 
 - If the control is a field, begin the tooltip with "Specifies".
