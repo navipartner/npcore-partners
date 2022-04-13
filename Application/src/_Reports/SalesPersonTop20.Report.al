@@ -1,11 +1,11 @@
 ﻿report 6014406 "NPR Sales Person Top 20"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Person Top 20.rdlc';
-    Caption = 'Sales Person Top 20';
+    RDLCLayout = './src/_Reports/layouts/Salesperson Top 20.rdlc';
+    Caption = 'Salesperson Top 20';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
@@ -36,6 +36,7 @@
 
                 if "Salesperson/Purchaser"."NPR Sales (LCY)" <> 0 then
                     Dg := (Db / "Salesperson/Purchaser"."NPR Sales (LCY)") * 100
+
                 else
                     Dg := 0;
 
@@ -273,7 +274,7 @@
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         ProfitPctCaptionLbl: Label 'Profit %';
         ProfitCaptionLbl: Label 'Profit (LCY)';
-        Report_Caption_Lbl: Label 'Sales Person Top 20';
+        Report_Caption_Lbl: Label 'Salesperson Top 20';
         TurnoverCaptionLbl: Label 'Turnover (LCY)';
         TextSort1: Label 'Turnover,Discount,Contribution Margin,Contribution Ratio';
         SortOrder: Option Largest,Smallest;

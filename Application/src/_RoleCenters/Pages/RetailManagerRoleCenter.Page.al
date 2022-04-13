@@ -245,7 +245,7 @@
                         {
                             Caption = 'Sales Person Top 20';
                             Image = Report2;
-                            RunObject = Report "NPR Sales Person Top 20";
+                            RunObject = Report "NPR Sales person Top 20";
 
                             ToolTip = 'View the report which measures the salespeoples'' effectiveness.';
                             ApplicationArea = NPRRetail;
