@@ -200,7 +200,7 @@
                     field("Show Item Ledger"; ShowItemLedger)
                     {
                         Caption = 'Show Value Entries';
-                        ToolTip = 'Specifies the value of the Show Value Entries field';
+                        ToolTip = 'Specifies whether the value entries per item no. will be displayed in the report.';
                         ApplicationArea = NPRRetail;
                     }
                 }

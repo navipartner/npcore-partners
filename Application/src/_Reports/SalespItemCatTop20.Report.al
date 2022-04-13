@@ -295,7 +295,7 @@
                         Caption = 'Show Only Mainfigures';
                         Visible = ShowMainTotalVisible;
 
-                        ToolTip = 'Specifies the value of the Show Only Mainfigures field';
+                        ToolTip = 'Specifies whether only the summed-up turnover values per a salesperson will be displayed in the report.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -312,7 +312,7 @@
                         Caption = 'Sort Salespersons';
                         Visible = false;
 
-                        ToolTip = 'Specifies the value of the Sort Salespersons field';
+                        ToolTip = 'Specifies whether the item group details will be displayed in the descending order of the turnover in the report.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -333,7 +333,7 @@
                         Caption = 'Show Quantity for Item Category';
                         Visible = ShowQtyVisible;
 
-                        ToolTip = 'Specifies the value of the Show Quantity for Item Category field';
+                        ToolTip = 'Specifies how many item groups will be included in the top list if Sort Salesperson is active. I.e. the top 25 item groups.';
                         ApplicationArea = NPRRetail;
                     }
                 }

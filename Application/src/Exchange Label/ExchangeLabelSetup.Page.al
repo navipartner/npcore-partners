@@ -18,31 +18,31 @@
                 field("EAN Prefix Exhange Label"; Rec."EAN Prefix Exhange Label")
                 {
 
-                    ToolTip = 'Specifies the value of the EAN Prefix Exhange Label field';
+                    ToolTip = 'Specifies the prefix used in the EAN code for exchange labels.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Exchange Label  No. Series"; Rec."Exchange Label  No. Series")
                 {
 
-                    ToolTip = 'Specifies the value of the Exchange Label Nos. field';
+                    ToolTip = 'Specifies which number series is used for exchange label entries.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Purchace Price Code"; Rec."Purchace Price Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Purchase Price Code field';
+                    ToolTip = 'Specifies the alphabetical code used to substitute numbers when displaying prices on the exchange label. A unique letter is chosen for each number from 0-9.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Exchange Label Exchange Period"; Rec."Exchange Label Exchange Period")
                 {
 
-                    ToolTip = 'Specifies the value of the Exchange Label Exchange Period field';
+                    ToolTip = 'Specifies the period length that the exchange labels should be valid for.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Exchange Label Default Date"; Rec."Exchange Label Default Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Exchange Label Default Date field';
+                    ToolTip = 'Specifies a date to use as the default "valid from"-date. Leave blank to use the date of creation (ie. "today''s date").';
                     ApplicationArea = NPRRetail;
                 }
             }
