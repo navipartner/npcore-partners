@@ -116,13 +116,6 @@ table 6014670 "NPR TM Dynamic Price Rule"
             if (DynamicPriceRule.FindLast()) then
                 LineNo := DynamicPriceRule.LineNo + 10000;
         end;
-
-        RuleRangeSize();
-    end;
-
-    trigger OnModify()
-    begin
-        RuleRangeSize();
     end;
 
     internal procedure RuleRangeSize() Length: Integer

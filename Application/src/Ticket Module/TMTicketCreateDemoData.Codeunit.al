@@ -26,7 +26,6 @@
 
     end;
 
-
     procedure CreateTicketDemoData(DeleteCurrentSetup: Boolean)
     var
         TicketType: Record "NPR TM Ticket Type";
@@ -41,6 +40,8 @@
         BaseCalendarChange: Record "Base Calendar Change";
         AllowAdmissionBeforeStart: Integer;
         AllowAdmissionAfterStart: Integer;
+        PriceProfileCodeList: array[10] of Code[10];
+        i: Integer;
     begin
 
         CreateNoSerie('TM-ATF001', 'TMATF0000001');
@@ -63,56 +64,64 @@
         AdmissionList[6] := (CreateAdmissionCode('TOUR03', 'Event Tour', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY));
         AdmissionList[7] := (CreateAdmissionCode('TOUR04', 'Event Tour', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY));
 
-        CreateSchedule('M-WEEKDAYS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-        CreateSchedule('M-WEEKENDS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
+        CreateSchedule('M-WEEKDAYS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, true, true, true, true, true, false, false);
+        CreateSchedule('M-WEEKENDS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, false, false, false, false, false, true, true);
 
-        CreateSchedule('E-WEEKDAYS-01', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 100000T, 120000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-        CreateSchedule('E-WEEKDAYS-02', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 140000T, 160000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+        CreateSchedule('E-WEEKDAYS-01', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 100000T, 120000T, true, true, true, true, true, false, false);
+        CreateSchedule('E-WEEKDAYS-02', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 140000T, 160000T, true, true, true, true, true, false, false);
 
-        CreateSchedule('E-WEEKENDS-01', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 103000T, 123000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
-        CreateSchedule('E-WEEKENDS-02', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 150000T, 170000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
+        CreateSchedule('E-WEEKENDS-01', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 103000T, 123000T, false, false, false, false, false, true, true);
+        CreateSchedule('E-WEEKENDS-02', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 150000T, 170000T, false, false, false, false, false, true, true);
 
-        CreateSchedule('TS-08-01', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 100000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-        CreateSchedule('TS-08-02', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 100000T, 120000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-        CreateSchedule('TS-08-03', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 120000T, 140000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-        CreateSchedule('TS-08-04', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 140000T, 160000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-
+        CreateSchedule('TS-08-01', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 100000T, true, true, true, true, true, false, false);
+        CreateSchedule('TS-08-02', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 100000T, 120000T, true, true, true, true, true, false, false);
+        CreateSchedule('TS-08-03', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 120000T, 140000T, true, true, true, true, true, false, false);
+        CreateSchedule('TS-08-04', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 140000T, 160000T, true, true, true, true, true, false, false);
 
         AllowAdmissionBeforeStart := 15;
         AllowAdmissionAfterStart := 5;
 
-        CreateScheduleLine('CASTLE', 'M-WEEKDAYS', 1, FALSE, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine('CASTLE', 'M-WEEKENDS', 1, FALSE, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('CASTLE', 'M-WEEKDAYS', 1, false, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('CASTLE', 'M-WEEKENDS', 1, false, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-        CreateScheduleLine('TREASURE', 'E-WEEKDAYS-01', 1, TRUE, 7, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine('TREASURE', 'E-WEEKDAYS-02', 1, FALSE, 9, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine('TREASURE', 'E-WEEKENDS-01', 1, FALSE, 11, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine('TREASURE', 'E-WEEKENDS-02', 1, FALSE, 5, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('TREASURE', 'E-WEEKDAYS-01', 1, true, 7, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('TREASURE', 'E-WEEKDAYS-02', 1, false, 9, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('TREASURE', 'E-WEEKENDS-01', 1, false, 11, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('TREASURE', 'E-WEEKENDS-02', 1, false, 5, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-        CreateScheduleLine('DUNGEON', 'E-WEEKDAYS-01', 1, FALSE, 7, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine('DUNGEON', 'E-WEEKDAYS-02', 1, FALSE, 9, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine('DUNGEON', 'E-WEEKENDS-01', 1, FALSE, 11, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine('DUNGEON', 'E-WEEKENDS-02', 1, FALSE, 5, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('DUNGEON', 'E-WEEKDAYS-01', 1, false, 7, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('DUNGEON', 'E-WEEKDAYS-02', 1, false, 9, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('DUNGEON', 'E-WEEKENDS-01', 1, false, 11, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('DUNGEON', 'E-WEEKENDS-02', 1, false, 5, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-        CreateScheduleLine(AdmissionList[4], 'TS-08-01', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[4], 'TS-08-02', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[4], 'TS-08-03', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[4], 'TS-08-04', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        PriceProfileCodeList[1] := CreatePriceProfile('SPL', 'Sliding Price Ladder, progressively cheaper.');
+        for i := 0 to 6 do
+            CreatePriceRule(PriceProfileCodeList[1], StrSubstNo('%1 days out, %1 cheaper.', i), 0D, 0D, '', 0D, 0D, '', StrSubstNo('<+%1D>', i), 2, (0 - i), true, 25, 0);
 
-        CreateScheduleLine(AdmissionList[5], 'TS-08-01', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[5], 'TS-08-02', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[5], 'TS-08-03', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[5], 'TS-08-04', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        PriceProfileCodeList[2] := CreatePriceProfile('DPW', 'Differentiate Price based on Weekday');
+        CreatePriceRule(PriceProfileCodeList[2], 'Book a Monday event and get 10 knocked off regular price.', 0D, 0D, '', 0D, 0D, '<WD1>', '', 2, -10, true, 25, 0);
+        CreatePriceRule(PriceProfileCodeList[2], 'Book a Wednesday event and get 20 knocked off regular price.', 0D, 0D, '', 0D, 0D, '<WD3>', '', 2, -20, true, 25, 0);
+        CreatePriceRule(PriceProfileCodeList[2], 'Book a Friday event and add 10 to regular price.', 0D, 0D, '', 0D, 0D, '<WD5>', '', 2, 10, true, 25, 0);
 
-        CreateScheduleLine(AdmissionList[6], 'TS-08-01', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[6], 'TS-08-02', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[6], 'TS-08-03', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[6], 'TS-08-04', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[4], 'TS-08-01', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart, PriceProfileCodeList[1]);
+        CreateScheduleLine(AdmissionList[4], 'TS-08-02', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart, PriceProfileCodeList[2]);
+        CreateScheduleLine(AdmissionList[4], 'TS-08-03', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[4], 'TS-08-04', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-        CreateScheduleLine(AdmissionList[7], 'TS-08-01', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[7], 'TS-08-02', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[7], 'TS-08-03', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        CreateScheduleLine(AdmissionList[7], 'TS-08-04', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[5], 'TS-08-01', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[5], 'TS-08-02', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[5], 'TS-08-03', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[5], 'TS-08-04', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+
+        CreateScheduleLine(AdmissionList[6], 'TS-08-01', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[6], 'TS-08-02', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[6], 'TS-08-03', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[6], 'TS-08-04', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+
+        CreateScheduleLine(AdmissionList[7], 'TS-08-01', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[7], 'TS-08-02', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[7], 'TS-08-03', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[7], 'TS-08-04', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
         CreateConcurrencyLimit('MAX3', 'Max 3 tours at the same time', 3, AdmissionGroupConcurrency."Capacity Control"::SALES, AdmissionGroupConcurrency."Concurrency Type"::SCHEDULE);
 
@@ -123,9 +132,9 @@
 
         CreateStakeholder('TREASURE', 'E-WEEKDAYS-01', 'tsa@navipartner.dk', AdmissionSchedule."Notify Stakeholder"::ALL);
 
-        TicketType.GET(CreateTicketType('POS-MSCAN', 'Manual Scan', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
-        TicketType.GET(CreateTicketType('POS-AUTO', 'Auto Admit on Sale', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
-        TicketType.GET(CreateTicketType('GROUP', 'Group Ticket', '<+7D>', 0, TicketType."Admission Registration"::GROUP, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
+        TicketType.Get(CreateTicketType('POS-MSCAN', 'Manual Scan', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
+        TicketType.Get(CreateTicketType('POS-AUTO', 'Auto Admit on Sale', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
+        TicketType.Get(CreateTicketType('GROUP', 'Group Ticket', '<+7D>', 0, TicketType."Admission Registration"::GROUP, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
 
         // Single ticket same day
         CreateItem('31001', '', 'POS-AUTO', 'Adult Ticket', 157);
@@ -152,38 +161,38 @@
         CreateItem('31043', '', 'POS-MSCAN', 'Tour 3 Ticket with Concurrency', 107);
         CreateItem('31044', '', 'POS-MSCAN', 'Tour 4 Ticket with Concurrency', 107);
 
-        CreateTicketBOM('31001', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31002', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31003', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31004', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31001', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31002', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31003', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31004', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        CreateTicketBOM('31006', '', AdmissionList[1], SeasonBaseCalendar, 1, TRUE, '<CY>', 4, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE);
+        CreateTicketBOM('31006', '', AdmissionList[1], SeasonBaseCalendar, 1, true, '<CY>', 4, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE);
 
-        CreateTicketBOM('31008', '', AdmissionList[1], '', 4, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31008', '', AdmissionList[1], '', 4, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        CreateTicketBOM('31009', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY);
-        CreateTicketBOM('31009', '', AdmissionList[2], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31009', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY);
+        CreateTicketBOM('31009', '', AdmissionList[2], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        CreateTicketBOM('31010', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY);
-        CreateTicketBOM('31010', '', AdmissionList[2], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31010', '', AdmissionList[3], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31010', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY);
+        CreateTicketBOM('31010', '', AdmissionList[2], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31010', '', AdmissionList[3], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        CreateTicketBOM('32001', '', AdmissionList[1], '', 10, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('32001', '', AdmissionList[1], '', 10, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        CreateTicketBOM('31031', 'ADULT', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31031', 'CHILD', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31031', 'ADULT', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31031', 'CHILD', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        CreateTicketBOM('31041', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31041', '', AdmissionList[4], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31041', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31041', '', AdmissionList[4], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        CreateTicketBOM('31042', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31042', '', AdmissionList[5], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31042', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31042', '', AdmissionList[5], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        CreateTicketBOM('31043', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31043', '', AdmissionList[6], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31043', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31043', '', AdmissionList[6], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        CreateTicketBOM('31044', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31044', '', AdmissionList[7], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31044', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31044', '', AdmissionList[7], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
         TicketSetup."Print Server Generator URL" := 'http://test.ticket.navipartner.dk/import/api/rest/v1/ticket/orders';
         TicketSetup."Timeout (ms)" := 30000;
@@ -198,13 +207,11 @@
         TicketSetup."NP-Pass API" := '/passes/%1/%2';
         TicketSetup."NP-Pass Token" := 'eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MjIyNDQyNjEsIm5iZiI6MTUyMjI0NDI2MSwidWlkIjo2fQ.yWeKjD8hDGhDNn8KLf345v7tYBZ-bA20DzS07bgHRxo';
 
-        IF (NOT TicketSetup.INSERT()) THEN TicketSetup.MODIFY();
-
+        if (not TicketSetup.Insert()) then TicketSetup.Modify();
 
         MESSAGE('Setup of DEMO data for ticketing, completed.');
 
     end;
-
 
     procedure SetupMembershipGuestTicket(AdmissionCode: Code[20]; AdmissionDescription: text[50]; ItemCode: Code[20]; ItemDescription: text[100]): code[20]
     var
@@ -221,18 +228,18 @@
         if (not Admission.get(AdmissionCode)) then begin
             CreateAdmissionCode(AdmissionCode, AdmissionDescription, Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY);
 
-            CreateSchedule(StrSubstNo(MembershipGuestTicketLbl, AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-            CreateSchedule(StrSubstNo(MembershipGuestTicket2Lbl, AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
+            CreateSchedule(StrSubstNo(MembershipGuestTicketLbl, AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, true, true, true, true, true, false, false);
+            CreateSchedule(StrSubstNo(MembershipGuestTicket2Lbl, AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, false, false, false, false, false, true, true);
 
-            CreateScheduleLine(AdmissionCode, StrSubstNo(MembershipGuestTicketLbl, AdmissionCode), 1, FALSE, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
-            CreateScheduleLine(AdmissionCode, StrSubstNo(MembershipGuestTicket2Lbl, AdmissionCode), 1, FALSE, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+            CreateScheduleLine(AdmissionCode, StrSubstNo(MembershipGuestTicketLbl, AdmissionCode), 1, false, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+            CreateScheduleLine(AdmissionCode, StrSubstNo(MembershipGuestTicket2Lbl, AdmissionCode), 1, false, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
         end;
 
         CreateTicketType('MM-AUTO', 'Members and Member Guests', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
 
         CreateItem(ItemCode, '', 'MM-AUTO', ItemDescription, 0);
 
-        CreateTicketBOM(ItemCode, '', AdmissionCode, '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM(ItemCode, '', AdmissionCode, '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
         exit(StrSubstNo(MembershipGuestTicket3Lbl, ItemCode));
     end;
@@ -242,26 +249,24 @@
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         AdmissionGroupConcurrency: Record "NPR TM Concurrent Admis. Setup";
     begin
-        AdmissionScheduleLines.SETFILTER("Admission Code", AdmissionCodeFilter);
+        AdmissionScheduleLines.SetFilter("Admission Code", AdmissionCodeFilter);
 
-
-        AdmissionScheduleLines.SETFILTER("Schedule Code", ScheduleCodeFilter);
+        AdmissionScheduleLines.SetFilter("Schedule Code", ScheduleCodeFilter);
 
         if (ConcurrencyCode <> '') then
-            AdmissionGroupConcurrency.GET(ConcurrencyCode);
+            AdmissionGroupConcurrency.Get(ConcurrencyCode);
 
         AdmissionScheduleLines.MODIFYALL("Concurrency Code", ConcurrencyCode);
     end;
-
 
     procedure CreateAdmissionCode(AdmissionCode: Code[20]; Description: text[50]; AdmissionType: Option; CapacityLimit: Option; DefaultSchedule: Option): code[20]
     var
         Admission: Record "NPR TM Admission";
     begin
-        Admission.INIT();
-        if (NOT Admission.GET(AdmissionCode)) then begin
+        Admission.Init();
+        if (not Admission.Get(AdmissionCode)) then begin
             Admission."Admission Code" := AdmissionCode;
-            Admission.INSERT();
+            Admission.Insert();
         end;
 
         Admission.Type := AdmissionType;
@@ -270,7 +275,7 @@
         Admission."Default Schedule" := DefaultSchedule;
 
         Admission."Admission Base Calendar Code" := CreateBaseCalendar('', AdmissionCode);
-        Admission.MODIFY();
+        Admission.Modify();
 
         exit(AdmissionCode);
     end;
@@ -280,16 +285,15 @@
         BaseCalendar: Record "Base Calendar";
     begin
 
-
         if (CalendarCode <> '') then
-            if (NOT BaseCalendar.GET(CalendarCode)) then begin
+            if (not BaseCalendar.Get(CalendarCode)) then begin
                 BaseCalendar.Code := CalendarCode;
-                BaseCalendar.INSERT();
+                BaseCalendar.Insert();
             end;
 
         if (CalendarCode = '') then begin
             BaseCalendar.Code := GenerateCode10();
-            BaseCalendar.INSERT();
+            BaseCalendar.Insert();
         end;
 
         BaseCalendar.Init();
@@ -297,11 +301,66 @@
         if (Desc <> '') then
             BaseCalendar.Name := Desc;
 
-        BaseCalendar.MODIFY();
+        BaseCalendar.Modify();
 
         exit(BaseCalendar.Code);
     end;
 
+    local procedure CreatePriceProfile(ProfileCode: Code[10]; Description: Text): Code[10]
+    var
+        PriceProfile: Record "NPR TM Dynamic Price Profile";
+    begin
+        if (ProfileCode = '') then
+            ProfileCode := GenerateCode10();
+
+        if (not (PriceProfile.Get(ProfileCode))) then begin
+            PriceProfile.ProfileCode := ProfileCode;
+            PriceProfile.Insert();
+        end;
+
+        PriceProfile.Description := CopyStr(Description, 1, MaxStrLen(PriceProfile.Description));
+        PriceProfile.Modify();
+
+        exit(ProfileCode);
+    end;
+
+    local procedure CreatePriceRule(var ProfileCode: Code[10]; Description: Text;
+                                        BookingFrom: Date; BookingUntil: Date; RelativeBookingDateFormula: Text;
+                                        EventFrom: Date; EventUntil: Date; RelativeEventDateFormula: Text;
+                                        RelativeUntilDateFormula: Text;
+                                        PricingOption: Option; Amount: Decimal; AmountIncludesVat: Boolean; VatPercentage: Decimal; AddonPercentage: Decimal
+                                    ): Integer
+    var
+        PriceRule: Record "NPR TM Dynamic Price Rule";
+    begin
+        if (ProfileCode = '') then
+            ProfileCode := CreatePriceProfile('', Description);
+
+        PriceRule.ProfileCode := ProfileCode;
+        PriceRule.Insert(true);
+
+        PriceRule.Description := Description;
+
+        // Rule selection properties
+        PriceRule.BookingDateFrom := BookingFrom;
+        PriceRule.BookingDateUntil := BookingUntil;
+        Evaluate(PriceRule.RelativeBookingDateFormula, RelativeBookingDateFormula, 9);
+
+        PriceRule.EventDateFrom := EventFrom;
+        PriceRule.EventDateUntil := EventUntil;
+        Evaluate(PriceRule.RelativeEventDateFormula, RelativeEventDateFormula, 9);
+
+        Evaluate(PriceRule.RelativeUntilEventDate, RelativeUntilDateFormula, 9);
+
+        // Price Properties
+        PriceRule.PricingOption := PricingOption;
+        PriceRule.Amount := Amount;
+        PriceRule.AmountIncludesVAT := AmountIncludesVat;
+        PriceRule.VatPercentage := VatPercentage;
+        PriceRule.Percentage := AddonPercentage;
+
+        PriceRule.Modify();
+    end;
 
     local procedure CreateConcurrencyLimit(Code: Code[20]; Description: Text; Limit: Integer; CapacityOption: Option; ConcurrencyOption: Option): Code[20]
     var
@@ -310,16 +369,16 @@
         if (Code = '') then
             Code := GenerateCode20();
 
-        if (NOT AdmissionGroupConcurrency.GET(Code)) then begin
+        if (not AdmissionGroupConcurrency.Get(Code)) then begin
             AdmissionGroupConcurrency.Code := Code;
-            AdmissionGroupConcurrency.INSERT();
+            AdmissionGroupConcurrency.Insert();
         end;
 
         AdmissionGroupConcurrency.Description := CopyStr(Description, 1, MaxStrLen(AdmissionGroupConcurrency.Description));
         AdmissionGroupConcurrency."Total Capacity" := Limit;
         AdmissionGroupConcurrency."Capacity Control" := CapacityOption;
         AdmissionGroupConcurrency."Concurrency Type" := ConcurrencyOption;
-        AdmissionGroupConcurrency.MODIFY();
+        AdmissionGroupConcurrency.Modify();
 
         exit(AdmissionGroupConcurrency.Code);
     end;
@@ -333,11 +392,11 @@
         CreateItemLbl: Label 'IXRF-%1', Locked = true;
         CreateItem2Lbl: Label 'IXRF-%1-%2', Locked = true;
     begin
-        TicketItem.INIT();
-        if (NOT (TicketItem.GET(No))) then begin
-            TicketItem.GET('70000');
+        TicketItem.Init();
+        if (not (TicketItem.Get(No))) then begin
+            TicketItem.Get('70000');
             TicketItem."No." := No;
-            TicketItem.INSERT();
+            TicketItem.Insert();
         end;
 
         TicketItem.Description := Description;
@@ -347,76 +406,75 @@
         TicketItem.NPR_SetAuxItem(AuxItem);
         TicketItem.NPR_SaveAuxItem();
 
-        TicketItem.Blocked := FALSE;
-        TicketItem."NPR Group sale" := FALSE;
+        TicketItem.Blocked := false;
+        TicketItem."NPR Group sale" := false;
 
-        TicketItem.MODIFY();
+        TicketItem.Modify();
 
         if (VariantCode <> '') then begin
-            ItemVariant.INIT();
-            if (NOT ItemVariant.GET(No, VariantCode)) then begin
+            ItemVariant.Init();
+            if (not ItemVariant.Get(No, VariantCode)) then begin
                 ItemVariant."Item No." := No;
                 ItemVariant.Code := VariantCode;
-                ItemVariant.INSERT();
+                ItemVariant.Insert();
             end;
             ItemVariant.Description := Description;
-            ItemVariant.MODIFY();
+            ItemVariant.Modify();
         end;
 
-        ItemReference.INIT();
-        ItemReference.SETFILTER("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
-        ItemReference.SETFILTER("Reference No.", '=%1', STRSUBSTNO(CreateItemLbl, TicketItem."No."));
+        ItemReference.Init();
+        ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetFilter("Reference No.", '=%1', StrSubstNo(CreateItemLbl, TicketItem."No."));
         if (VariantCode <> '') then
-            ItemReference.SETFILTER("Reference No.", '=%1', STRSUBSTNO(CreateItem2Lbl, TicketItem."No.", VariantCode));
+            ItemReference.SetFilter("Reference No.", '=%1', StrSubstNo(CreateItem2Lbl, TicketItem."No.", VariantCode));
 
-        if (NOT ItemReference.FINDFIRST()) then begin
+        if (not ItemReference.FindFirst()) then begin
             ItemReference."Item No." := TicketItem."No.";
             ItemReference."Variant Code" := VariantCode;
             ItemReference."Unit of Measure" := TicketItem."Sales Unit of Measure";
             ItemReference."Reference Type" := ItemReference."Reference Type"::"Bar Code";
-            ItemReference."Reference No." := STRSUBSTNO(CreateItemLbl, TicketItem."No.");
+            ItemReference."Reference No." := StrSubstNo(CreateItemLbl, TicketItem."No.");
             if (VariantCode <> '') then
-                ItemReference."Reference No." := STRSUBSTNO(CreateItem2Lbl, TicketItem."No.", VariantCode);
+                ItemReference."Reference No." := StrSubstNo(CreateItem2Lbl, TicketItem."No.", VariantCode);
             ItemReference.Description := TicketItem.Description;
-            ItemReference.INSERT();
+            ItemReference.Insert();
         end;
 
         exit(No);
     end;
-
 
     local procedure CreateNoSerie(NoSerieCode: Code[20]; StartNumber: Code[20])
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
     begin
-        if (NOT NoSeries.GET(NoSerieCode)) then begin
+        if (not NoSeries.Get(NoSerieCode)) then begin
             NoSeries.Code := NoSerieCode;
-            NoSeries.INSERT();
+            NoSeries.Insert();
         end;
 
         NoSeries.Description := 'Ticket Automated Test Framework';
-        NoSeries."Default Nos." := TRUE;
-        NoSeries.MODIFY();
+        NoSeries."Default Nos." := true;
+        NoSeries.Modify();
 
-        if (NOT NoSeriesLine.GET(NoSerieCode, 10000)) then begin
+        if (not NoSeriesLine.Get(NoSerieCode, 10000)) then begin
             NoSeriesLine."Series Code" := NoSerieCode;
             NoSeriesLine."Line No." := 10000;
             NoSeriesLine."Starting Date" := DMY2Date(1, 1, 2020);
             NoSeriesLine."Starting No." := StartNumber;
             NoSeriesLine."Increment-by No." := 1;
-            NoSeriesLine.INSERT();
+            NoSeriesLine.Insert();
         end;
     end;
 
-    procedure CreateSchedule(ScehduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean): Code[20]
+    procedure CreateSchedule(ScheduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean): Code[20]
     var
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
     begin
-        AdmissionSchedule.INIT();
-        if (NOT AdmissionSchedule.GET(ScehduleCode)) then begin
-            AdmissionSchedule."Schedule Code" := ScehduleCode;
-            AdmissionSchedule.INSERT();
+        AdmissionSchedule.Init();
+        if (not AdmissionSchedule.Get(ScheduleCode)) then begin
+            AdmissionSchedule."Schedule Code" := ScheduleCode;
+            AdmissionSchedule.Insert();
         end;
 
         AdmissionSchedule."Schedule Type" := ScheduleType;
@@ -434,44 +492,56 @@
         AdmissionSchedule.Saturday := Saturday;
         AdmissionSchedule.Sunday := Sunday;
 
-        AdmissionSchedule.MODIFY();
+        AdmissionSchedule.Modify();
 
-        exit(ScehduleCode);
+        exit(ScheduleCode);
     end;
 
-    procedure CreateSchedule(ScehduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; EndAfter: Date; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean): Code[20]
+    procedure CreateSchedule(ScheduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; EndAfter: Date; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean): Code[20]
     var
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
     begin
         AdmissionSchedule.get(
-            CreateSchedule(ScehduleCode, ScheduleType, AdmissionIs, StartFrom, RecurrencePattern, StartTime, EndTime, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
+            CreateSchedule(ScheduleCode, ScheduleType, AdmissionIs, StartFrom, RecurrencePattern, StartTime, EndTime, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
         );
 
         AdmissionSchedule."End After Date" := EndAfter;
-        AdmissionSchedule.MODIFY();
+        AdmissionSchedule.Modify();
 
-        exit(ScehduleCode);
+        exit(ScheduleCode);
     end;
 
+    procedure CreateScheduleLine(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ProcessOrder: Integer; PreBookRequired: Boolean; MaxCapacity: Integer; CapacityControl: Option; PrebookFromFormula: Text[30]; AllowAdmissionBeforeStart_Minutes: Integer; AllowAdmissionPassedStart_Minutes: Integer; PriceProfileCode: Code[10])
+    var
+        ScheduleLines: Record "NPR TM Admis. Schedule Lines";
+    begin
+        CreateScheduleLine(AdmissionCode, ScheduleCode,
+            ProcessOrder, PrebookRequired, MaxCapacity, CapacityControl,
+            PrebookFromFormula, AllowAdmissionBeforeStart_Minutes, AllowAdmissionPassedStart_Minutes);
+
+        ScheduleLines.Get(AdmissionCode, ScheduleCode);
+        ScheduleLines."Dynamic Price Profile Code" := PriceProfileCode;
+        ScheduleLines.Modify();
+    end;
 
     procedure CreateScheduleLine(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ProcessOrder: Integer; PreBookRequired: Boolean; MaxCapacity: Integer; CapacityControl: Option; PrebookFromFormula: Text[30]; AllowAdmissionBeforeStart_Minutes: Integer; AllowAdmissionPassedStart_Minutes: Integer)
     var
         ScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
-        ScheduleLines.INIT();
-        if (NOT ScheduleLines.GET(AdmissionCode, ScheduleCode)) then begin
+        ScheduleLines.Init();
+        if (not ScheduleLines.Get(AdmissionCode, ScheduleCode)) then begin
             ScheduleLines."Admission Code" := AdmissionCode;
             ScheduleLines."Schedule Code" := ScheduleCode;
-            ScheduleLines.INSERT();
+            ScheduleLines.Insert();
         end;
 
         ScheduleLines."Process Order" := ProcessOrder;
-        ScheduleLines.Blocked := FALSE;
+        ScheduleLines.Blocked := false;
         ScheduleLines."Prebook Is Required" := PreBookRequired;
-        EVALUATE(ScheduleLines."Prebook From", PrebookFromFormula);
+        Evaluate(ScheduleLines."Prebook From", PrebookFromFormula);
 
         if (ScheduleLines."Prebook Is Required") then begin
-            ScheduleLines.CALCFIELDS("Scheduled Start Time", "Scheduled Stop Time");
+            ScheduleLines.CalcFields("Scheduled Start Time", "Scheduled Stop Time");
 
             ScheduleLines."Event Arrival From Time" := ScheduleLines."Scheduled Start Time";
             if (AllowAdmissionBeforeStart_Minutes > 0) then
@@ -481,14 +551,11 @@
             if (AllowAdmissionPassedStart_Minutes >= 0) then
                 ScheduleLines."Event Arrival Until Time" := ScheduleLines."Scheduled Start Time" + AllowAdmissionPassedStart_Minutes * 60 * 1000; // millis
 
-
         end;
         ScheduleLines."Max Capacity Per Sch. Entry" := MaxCapacity;
         ScheduleLines."Capacity Control" := CapacityControl;
-        ScheduleLines.MODIFY();
-
+        ScheduleLines.Modify();
     end;
-
 
     local procedure CreateStakeholder(AdmissionCode: Code[20]; ScheduleCode: Code[20]; Stakeholder: Text[30]; NotificationModel: Option)
     var
@@ -496,13 +563,13 @@
         Schedule: Record "NPR TM Admis. Schedule";
     begin
 
-        Admission.GET(AdmissionCode);
+        Admission.Get(AdmissionCode);
         Admission."Stakeholder (E-Mail/Phone No.)" := Stakeholder;
-        Admission.MODIFY();
+        Admission.Modify();
 
-        Schedule.GET(ScheduleCode);
+        Schedule.Get(ScheduleCode);
         Schedule."Notify Stakeholder" := NotificationModel;
-        Schedule.MODIFY();
+        Schedule.Modify();
     end;
 
     procedure CreateTicketBOM(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Option; EntryValidation: Option)
@@ -511,16 +578,16 @@
         Item: Record Item;
         Admission: Record "NPR TM Admission";
     begin
-        TicketBom.INIT();
-        if (NOT TicketBom.GET(ItemNo, VariantCode, AdmissionCode)) then begin
+        TicketBom.Init();
+        if (not TicketBom.Get(ItemNo, VariantCode, AdmissionCode)) then begin
             TicketBom."Item No." := ItemNo;
             TicketBom."Variant Code" := VariantCode;
             TicketBom."Admission Code" := AdmissionCode;
-            TicketBom.INSERT();
+            TicketBom.Insert();
         end;
 
-        Item.GET(ItemNo);
-        Admission.GET(AdmissionCode);
+        Item.Get(ItemNo);
+        Admission.Get(AdmissionCode);
 
         TicketBom.Quantity := Quantity;
         TicketBom.Description := Item.Description;
@@ -528,39 +595,39 @@
         TicketBom."Admission Description" := Admission.Description;
         TicketBom."Prefered Sales Display Method" := TicketBom."Prefered Sales Display Method"::DEFAULT;
 
-        EVALUATE(TicketBom."Duration Formula", DurationFormula);
+        Evaluate(TicketBom."Duration Formula", DurationFormula);
         TicketBom."Max No. Of Entries" := MaxNoOfEntries;
         TicketBom."Activation Method" := ActivationMethod;
         TicketBom."Admission Entry Validation" := EntryValidation;
         TicketBom."Ticket Base Calendar Code" := TicketBaseCalendarCode;
 
-        TicketBom.MODIFY();
+        TicketBom.Modify();
     end;
 
     procedure CreateTicketType(TicketTypeCode: Code[10]; Description: text; DurationFormula: Text[30]; MaxNumberOfEntries: Integer; AdmissionRegistration: Option; ActivationMethod: Option; EntryValidation: Option; ConfigurationSource: Option): Code[10]
     var
         TicketType: Record "NPR TM Ticket Type";
     begin
-        TicketType.INIT();
-        if (NOT TicketType.GET(TicketTypeCode)) then begin
+        TicketType.Init();
+        if (not TicketType.Get(TicketTypeCode)) then begin
             TicketType.Code := TicketTypeCode;
-            TicketType.INSERT();
+            TicketType.Insert();
         end;
 
         TicketType.Description := CopyStr(Description, 1, MaxStrLen(TicketType.Description));
-        TicketType."Print Ticket" := FALSE;
+        TicketType."Print Ticket" := false;
         TicketType.VALIDATE("No. Series", 'NPR-TICKET');
         TicketType."External Ticket Pattern" := 'ATF-[S][A*1]-[N]';
-        TicketType."Is Ticket" := TRUE;
-        TicketType."Defer Revenue" := FALSE;
+        TicketType."Is Ticket" := true;
+        TicketType."Defer Revenue" := false;
 
-        EVALUATE(TicketType."Duration Formula", DurationFormula);
+        Evaluate(TicketType."Duration Formula", DurationFormula);
         TicketType."Max No. Of Entries" := MaxNumberOfEntries;
         TicketType."Admission Registration" := AdmissionRegistration;
         TicketType."Activation Method" := ActivationMethod;
         TicketType."Ticket Entry Validation" := EntryValidation;
         TicketType."Ticket Configuration Source" := ConfigurationSource;
-        TicketType.MODIFY();
+        TicketType.Modify();
 
         exit(TicketTypeCode);
     end;
@@ -581,13 +648,13 @@
     begin
         case FromSeries OF
             'TM':
-                exit(NoSeriesManagement.GetNextNo('TM-ATF001', TODAY, TRUE));
+                exit(NoSeriesManagement.GetNextNo('TM-ATF001', TODAY, true));
             'C1':
-                exit(NoSeriesManagement.GetNextNo('TM-PK10', TODAY, TRUE));
+                exit(NoSeriesManagement.GetNextNo('TM-PK10', TODAY, true));
             'C2':
-                exit(NoSeriesManagement.GetNextNo('TM-PK20', TODAY, TRUE));
-            ELSE
-                ERROR('Get Next No %1 from number series is not configured.', FromSeries);
+                exit(NoSeriesManagement.GetNextNo('TM-PK20', TODAY, true));
+            else
+                Error('Get Next No %1 from number series is not configured.', FromSeries);
         end;
     end;
 
@@ -597,7 +664,7 @@
     begin
         BaseCalendarChange."Base Calendar Code" := Code;
         BaseCalendarChange.Description := Description;
-        BaseCalendarChange.Nonworking := TRUE;
+        BaseCalendarChange.Nonworking := true;
 
         BaseCalendarChange."Recurring System" := RecurringPattern;
         case BaseCalendarChange."Recurring System" OF
@@ -605,11 +672,9 @@
                 BaseCalendarChange.Date := Date;
             BaseCalendarChange."Recurring System"::"Weekly Recurring":
                 BaseCalendarChange.Day := Day;
-        END;
+        end;
 
-        IF (BaseCalendarChange.INSERT()) THEN;
+        if (BaseCalendarChange.Insert()) then;
     end;
-
-
 
 }
