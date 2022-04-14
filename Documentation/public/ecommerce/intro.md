@@ -1,4 +1,4 @@
-# E-commerce
+# Welcome to the NP E-commerce product documentation
 
 E-commerce refers to a business model that allows companies to buy and sell goods and services online. 
 
