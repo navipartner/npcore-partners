@@ -10,7 +10,12 @@ Release notes are intended to provide customers with brief and concise informati
 
 ## How to write release notes
 
-- **Each update to our solutions should be described briefly, in one or two sentences.** All additional details should be relegated to the help portal and in-app tooltips (in case of new field descriptions).
+- **Release notes will be written in Feature and User Story work item titles**. The title of each User Story work item will be used as a release note/change log entry. 
+
+> [!Note]
+> Even though User Story was the default format for all work items up until now, it's necessary to start using them only for new features and updates for now on. All other work items can be Bugs or Tasks.
+
+- **Each update to our solutions should be described briefly, in one or two sentences**. All additional details should be relegated to the help portal and in-app tooltips (in case of new field descriptions).
 
 - Use the following structures for describing the new features and updates:
   - Customers can now __________.
@@ -18,7 +23,8 @@ Release notes are intended to provide customers with brief and concise informati
   - _________ has been improved in the following ways: __________.
   - Added ___________ which gives customers an option to __________.
 
-- **State how the updates impact customer's work in BC.**
+- **If necessary, state how the updates impact customer's work in BC.**
+  - Use the work item description for this.
   - Do they have to take certain steps to make the new features visible? Are there some prerequisites or setup?
   - Which BC version is the update supported on?
 
@@ -35,7 +41,7 @@ The second proposed solution was to "strongly encourage" developers to populate 
 
 So, at last, we are left the following solution (again, not ideal, but probably the best option for the initial stage):
 
-We insist on developers using the correct work item types (I don't see how we can avoid this), and increase the number of mandatory characters in the User Story work item titles/descriptions to 80, which would be enough for a really short feature summary. That way we would have release note entries like (in the example of newly introduced Dynamic Pricing written by Tim):
+We insist on developers using the correct work item types (I don't see how we can avoid this), and increasing the number of mandatory characters in the Feature and User Story work item titles/descriptions to 80, which would be enough for a really short feature summary. That way we would have release note entries like (in the example of newly introduced Dynamic Pricing written by Tim):
 
 - Added dynamic ticket pricing which gives you full control of a ticket price over time.
 
