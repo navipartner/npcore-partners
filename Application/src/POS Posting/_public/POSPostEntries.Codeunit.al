@@ -495,6 +495,7 @@
         LineCount, LineToProcessCount : Integer;
         NoOfRecords: Integer;
         ItemPostingErrorMsg: Label '%1 error/s occurred. Successfully processed %2.', Comment = '%1-Errors count, %2-Successfully posted count';
+        DoSkipProcessing: Boolean;
     begin
 
         if ShowProgressDialog then begin
@@ -513,22 +514,24 @@
                     ProgressWindow.Update(11, Round(LineCount / NoOfRecords * 10000, 1));
                 end;
                 if (POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::Unposted, POSEntry."Post Item Entry Status"::"Error while Posting"]) then begin
+                    DoSkipProcessing := JobQueuePosting;
                     if JobQueuePosting then
-                        if not SkipProcessing(2, POSEntry."Entry No.", 1) then begin
-                            if PostingDateExists then
-                                POSPostItemEntries.SetPostingDate(ReplaceDocumentDate, ReplaceDocumentDate, PostingDate);
+                        DoSkipProcessing := SkipProcessing(2, POSEntry."Entry No.", 1);
+                    if not DoSkipProcessing then begin
+                        if PostingDateExists then
+                            POSPostItemEntries.SetPostingDate(ReplaceDocumentDate, ReplaceDocumentDate, PostingDate);
 
-                            POSEntryToPost.Get(POSEntry."Entry No.");
-                            LineToProcessCount += 1;
-                            if StopOnErrorVar then begin
-                                POSPostItemTransaction.Run(POSEntryToPost);
-                            end else begin
-                                if (not POSPostItemTransaction.Run(POSEntryToPost)) then begin
-                                    _ItemPostingErrorEntries.Add(POSEntryToPost."Entry No.");
-                                    CreateErrorPOSPostingLogEntry(POSEntryToPost, 1, GetLastErrorText(), true);
-                                end;
+                        POSEntryToPost.Get(POSEntry."Entry No.");
+                        LineToProcessCount += 1;
+                        if StopOnErrorVar then begin
+                            POSPostItemTransaction.Run(POSEntryToPost);
+                        end else begin
+                            if (not POSPostItemTransaction.Run(POSEntryToPost)) then begin
+                                _ItemPostingErrorEntries.Add(POSEntryToPost."Entry No.");
+                                CreateErrorPOSPostingLogEntry(POSEntryToPost, 1, GetLastErrorText(), true);
                             end;
                         end;
+                    end;
                 end;
             until POSEntry.Next() = 0;
 
