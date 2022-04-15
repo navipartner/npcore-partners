@@ -1,6 +1,7 @@
 ﻿codeunit 6014416 "NPR Mixed Discount Management"
 {
     Access = Internal;
+
     var
         TempCustDiscGroup: Record "Customer Discount Group" temporary;
         GLSetup: Record "General Ledger Setup";
@@ -628,11 +629,11 @@
             TotalDiscAmount := ApplylMultiLevelMixDiscountOnLines(TempSaleLinePOSApply, TempMixedDiscount, TempMixedDiscountLine, LastLineNo, InvQtyDict)
         else
             TotalDiscAmount := ApplyMixDiscountOnLines(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply, InvQtyDict);
-        if ( CalculateOnly) then begin
+        if (CalculateOnly) then begin
             TempSaleLinePOS.Validate(Quantity, TempSaleLinePOSApply."MR Anvendt antal");
             TempSaleLinePOS."Discount Type" := TempSaleLinePOSApply."Discount Type";
             TempSaleLinePOS."Discount Code" := TempSaleLinePOSApply."Discount Code";
-            TempSaleLinePOS."Discount %" := 0;
+            TempSaleLinePOS."Discount %" := TempSaleLinePOSApply."Discount %";
             TempSaleLinePOS."Discount Amount" := TempSaleLinePOSApply."Discount Amount";
             TempSaleLinePOS."Custom Disc Blocked" := TempSaleLinePOSApply."Custom Disc Blocked";
             TempSaleLinePOS.Modify();
@@ -670,6 +671,8 @@
                 TempSaleLinePOSApply."Discount Amount" := LineDiscAmount * (1 + TempSaleLinePOSApply."VAT %" / 100)
             else
                 TempSaleLinePOSApply."Discount Amount" := LineDiscAmount;
+            if TempMixedDiscount."Discount Type" = TempMixedDiscount."Discount Type"::"Total Discount %" then
+                TempSaleLinePOSApply."Discount %" := TempMixedDiscount."Total Discount %";
             TempSaleLinePOSApply.Modify();
             AppliedDiscAmount += LineDiscAmount;
         until TempSaleLinePOSApply.Next() = 0;
@@ -1033,7 +1036,7 @@
             end;
             TempSaleLinePOS."Discount Type" := TempSaleLinePOSApply."Discount Type";
             TempSaleLinePOS."Discount Code" := TempSaleLinePOSApply."Discount Code";
-            TempSaleLinePOS."Discount %" := 0;
+            TempSaleLinePOS."Discount %" := TempSaleLinePOSApply."Discount %";
             TempSaleLinePOS."Discount Amount" := TempSaleLinePOSApply."Discount Amount";
             TempSaleLinePOS."Custom Disc Blocked" := TempSaleLinePOSApply."Custom Disc Blocked";
             TempSaleLinePOS.Modify();
@@ -1062,7 +1065,6 @@
         SaleLinePOS.Insert();
         SaleLinePOS."Discount Type" := DiscountType;
         SaleLinePOS."Discount Code" := DiscountCode;
-        SaleLinePOS."Discount %" := 0;
         SaleLinePOS."Discount Amount" := 0;
         SaleLinePOS."Custom Disc Blocked" := false;
         SaleLinePOS.Validate(Quantity, Qty);
