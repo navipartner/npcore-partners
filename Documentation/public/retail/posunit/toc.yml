@@ -4,6 +4,8 @@
   items:
   - name: POS (Point of Sale) units
     href: explanation/POSUnit.md
+  - name: POS self-service actions
+    href: explanation/POS_Self_Service_Actions.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
