@@ -1,13 +1,13 @@
 ﻿report 6014412 "NPR Sold Items by Sales Person"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sold Items by Sales Person.rdlc';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-    Caption = 'Sold Items By Sales Person';
+    Caption = 'Sold Items By Salesperson';
     DataAccessIntent = ReadOnly;
 
     dataset
@@ -83,11 +83,11 @@
     }
     labels
     {
-        Report_Caption = 'Sold Items by Sales Person';
+        Report_Caption = 'Sold Items by Salesperson';
         No_Caption = 'No.';
         Description_Caption = 'Description';
         Sales_Qty_Caption = 'Sales (Qty.)';
-        Sales_LCY_Caption = 'Sales (LCY)';
+        Sales_LCY_Caption = 'Sales Excl. VAT (LCY)';
         Name_Caption = 'Name';
         Qty_Caption = 'Qty.';
         Sales_Caption = 'Sales';
@@ -95,6 +95,8 @@
         DB_Caption = 'Margin';
         DG_Pct_Caption = 'Cov. %';
         SalesPerson_Code_Caption = 'Salesperson Code';
+        Total_Caption = 'Total:';
+        Page_Lbl = 'Page: ';
     }
 
     var
