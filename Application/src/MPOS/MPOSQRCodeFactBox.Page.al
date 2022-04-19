@@ -5,7 +5,7 @@
     PageType = CardPart;
     UsageCategory = None;
     ShowFilter = false;
-    SourceTable = "NPR MPOS QR Code";
+    SourceTable = "NPR MPOS QR Codes";
 
     layout
     {
