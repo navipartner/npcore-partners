@@ -231,7 +231,29 @@
         PaymentLine.Amount := PaymentAmount;
         PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
         PaymentLine."Payment Gateway Code" := PaymentMapping."Payment Gateway Code";
-        PaymentLine.Insert(true);
+        if not PaymentLine.Insert(true) then begin
+            if PaymentLineNoWasUsed(SalesHeader, LineNo) then
+                PaymentLine."Line No." := LineNo;
+
+            PaymentLine.Insert(true);
+        end;
+    end;
+
+    local procedure PaymentLineNoWasUsed(SalesHeader: Record "Sales Header"; var LineNo: Integer): Boolean
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LastUsedLineNo: Integer;
+    begin
+        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        if PaymentLine.FindLast() then
+            LastUsedLineNo := PaymentLine."Line No.";
+
+        if LastUsedLineNo = LineNo then begin
+            LineNo := LastUsedLineNo + 10000;
+            exit(true);
+        end
     end;
 
     procedure InsertPaymentLines(Element: XmlElement; var SalesHeader: Record "Sales Header")
@@ -368,7 +390,7 @@
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := LineNo;
-        SalesLine.Insert(true);
+        InsertSalesLine(SalesLine, SalesHeader, LineNo);
         SalesLine.Validate(Type, SalesLine.Type::" ");
 
         if not Element.SelectSingleNode('.//description', Node) then
@@ -433,7 +455,7 @@
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := LineNo;
-        SalesLine.Insert(true);
+        InsertSalesLine(SalesLine, SalesHeader, LineNo);
 
         SalesLine.Validate(Type, SalesLine.Type::Item);
         SalesLine.Validate("No.", Item."No.");
@@ -497,7 +519,7 @@
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := LineNo;
-        SalesLine.Insert(true);
+        InsertSalesLine(SalesLine, SalesHeader, LineNo);
 
         SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
         SalesLine.Validate("No.", AccountNo);
@@ -546,7 +568,7 @@
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := LineNo;
-        SalesLine.Insert(true);
+        InsertSalesLine(SalesLine, SalesHeader, LineNo);
 
         case ShipmentMapping."Shipment Fee Type" of
             ShipmentMapping."Shipment Fee Type"::"G/L Account":
@@ -574,6 +596,33 @@
         SalesLine.Validate("Unit Price", ShipmentFee);
         SalesLine.Validate(Quantity, 1);
         SalesLine.Modify(true);
+    end;
+
+    local procedure InsertSalesLine(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    begin
+        if SalesLine.Insert(true) then
+            exit;
+
+        if SalesLineNoWasUsed(SalesHeader, LineNo) then
+            SalesLine."Line No." := LineNo;
+
+        SalesLine.Insert(true);
+    end;
+
+    local procedure SalesLineNoWasUsed(SalesHeader: Record "Sales Header"; var LineNo: Integer): Boolean
+    var
+        SalesLine: Record "Sales Line";
+        LastUsedLineNo: Integer;
+    begin
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        if SalesLine.FindLast() then
+            LastUsedLineNo := SalesLine."Line No.";
+
+        if LastUsedLineNo = LineNo then begin
+            LineNo := LastUsedLineNo + 10000;
+            exit(true);
+        end
     end;
 
     procedure UpdateOrderHeader(Element: XmlElement; var SalesHeader: Record "Sales Header")
