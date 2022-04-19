@@ -6,7 +6,7 @@
     UsageCategory = Administration;
 
     ShowFilter = false;
-    SourceTable = "NPR MPOS QR Code";
+    SourceTable = "NPR MPOS QR Codes";
     ApplicationArea = NPRRetail;
 
     layout
@@ -40,18 +40,6 @@
                     ToolTip = 'Specifies the value of the Tenant field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Payment Gateway"; Rec."Payment Gateway")
-                {
-
-                    ToolTip = 'Specifies the value of the Payment Gateway field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("POS Unit No."; Rec."Cash Register Id")
-                {
-
-                    ToolTip = 'Specifies assigned POS Unit';
-                    ApplicationArea = NPRRetail;
-                }
                 field(Url; Rec.Url)
                 {
 
@@ -71,8 +59,7 @@
             part(Control6014419; "NPR MPOS QR Code FactBox")
             {
                 SubPageLink = "User ID" = FIELD("User ID"),
-                              Company = FIELD(Company),
-                              "Cash Register Id" = FIELD("Cash Register Id");
+                              Company = FIELD(Company);
                 ApplicationArea = NPRRetail;
 
             }

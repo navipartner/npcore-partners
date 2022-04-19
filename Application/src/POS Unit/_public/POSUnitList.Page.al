@@ -166,7 +166,6 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR MPOS QR Code List";
-                    RunPageLink = "Cash Register Id" = FIELD("No.");
                     ToolTip = 'Displays a page showing list of related MPOS QR Code setups';
                     ApplicationArea = NPRRetail;
                 }

@@ -131,7 +131,7 @@
             until MigrationRec.Next() = 0;
     end;
 
-    local procedure UpgradeMPOSQRCode()
+    procedure UpgradeMPOSQRCode()
     var
         MigrationRec: Record "NPR MPOS QR Code";
         MigrationRec2: Record "NPR MPOS QR Code";
