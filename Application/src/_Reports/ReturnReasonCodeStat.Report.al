@@ -1,8 +1,8 @@
 ﻿report 6014404 "NPR Return Reason Code Stat."
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Return Reason Code Statistics.rdlc';
     Caption = 'Return Reason Code Statistics';
@@ -17,6 +17,7 @@
         {
             DataItemTableView = SORTING(Code);
             RequestFilterFields = "Code";
+            PrintOnlyIfDetail = true;
             column(ReturnReason_GetFilters; ReturnReasonFilters)
             {
             }
@@ -89,7 +90,6 @@
                 }
                 column(ExternalDocumentNo_ItemLedgerEntry; GlobItemLedgerentry."External Document No.")
                 {
-                    IncludeCaption = true;
                 }
                 column(LocationCode_ItemLedgerEntry; "Location Code")
                 {
@@ -104,7 +104,6 @@
                 }
                 column(SalespersonCode_ItemLedgerEntry; "Salespers./Purch. Code")
                 {
-                    IncludeCaption = true;
                 }
                 column(UnitofMeasureCode_ItemLedgerEntry; GlobItemLedgerentry."Unit of Measure Code")
                 {
@@ -157,6 +156,14 @@
     requestpage
     {
         SaveValues = true;
+    }
+
+    labels
+    {
+        ExternalDocumentNo_ItemLedgerEntry_Caption = 'External Document No.';
+        TotalPerReturnReason_Caption = 'Total For Return Reason';
+        Total_Caption = 'Total';
+        SalespersonPurchCodeCaption = 'S.Person Code';
     }
 
     trigger OnPreReport()
