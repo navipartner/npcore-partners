@@ -11,9 +11,7 @@ codeunit 6059825 "NPR MPOS Data View - Bar. Inv." implements "NPR MPOS IDataView
     var
         Rec: Record "NPR MPOS Data View";
         InputDialog: Page "NPR Input Dialog";
-        DataViewMgt: Codeunit "NPR MPOS Data View Mgt.";
-        Response: JsonToken;
-        Request: JsonValue;
+        MPOSWebservice: codeunit "NPR MPOS Webservice";
         EnterBarcodeLbl: Label 'Enter barcode';
         Barcode: Code[20];
     begin
@@ -21,13 +19,11 @@ codeunit 6059825 "NPR MPOS Data View - Bar. Inv." implements "NPR MPOS IDataView
         case Rec.Indent of
             0:
                 begin
-                    Response := DataViewMgt.GetViews(Rec."Data View Type");
-                    Message(DataViewMgt.FormatResultAsText(Response));
+                    Message(MPOSWebservice.GetNaviConnectViews());
                 end;
             1:
                 begin
-                    Response := GetViews(Rec."Data View Type", Rec."Data View Category");
-                    Message(DataViewMgt.FormatResultAsText(Response));
+                    Message(MPOSWebservice.GetBarcodeInventoryViews());
                 end;
             2:
                 begin
@@ -37,9 +33,7 @@ codeunit 6059825 "NPR MPOS Data View - Bar. Inv." implements "NPR MPOS IDataView
                         exit;
                     InputDialog.InputCode(1, Barcode);
 
-                    Request.ReadFrom('"' + Barcode + '"');
-                    Response := GetView(Rec."Data View Type", Rec."Data View Category", Rec."Data View Code", Request.AsToken());
-                    Message(DataViewMgt.FormatResultAsText(Response));
+                    Message(MPOSWebservice.GetBarcodeInventoryView(Rec."Data View Code", Barcode));
                 end;
         end;
     end;
