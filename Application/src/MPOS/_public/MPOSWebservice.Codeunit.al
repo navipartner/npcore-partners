@@ -106,7 +106,7 @@
         DataView: JsonToken;
         Request: JsonValue;
     begin
-        Request.ReadFrom(Barcode);
+        Request.ReadFrom('"' + Barcode + '"');
         DataView := DataViewMgt.GetView("NPR MPOS Data View Type"::NaviConnect, "NPR MPOS Data View Category"::"Barcode Inventory", DataViewCode, Request.AsToken());
         exit(DataViewMgt.FormatResultAsText(DataView));
     end;
