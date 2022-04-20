@@ -5,6 +5,7 @@
     var
         ActionDescription: Label 'This built in function sets the item addon values';
         CommentCaption: Label 'Comment';
+        PopupTitle: Label 'Select your options...';
 
     local procedure ActionCode(): Text[20]
     begin
@@ -83,32 +84,25 @@
                 exit;
         end;
 
-        JsonText := GenerateAddonConfigJson(POSSale, SaleLinePOS, ItemAddOn);
+        JsonText := FORMAT(GenerateAddonConfigJson(POSSale, SaleLinePOS, ItemAddOn));
+
 
         exit(JsonText);
     end;
 
-    local procedure GenerateAddonConfigJson(POSSale: Codeunit "NPR POS Sale"; MasterSaleLinePOS: Record "NPR POS Sale Line"; ItemAddOn: Record "NPR NpIa Item AddOn") JsonString: Text
+    local procedure GenerateAddonConfigJson(POSSale: Codeunit "NPR POS Sale"; MasterSaleLinePOS: Record "NPR POS Sale Line"; ItemAddOn: Record "NPR NpIa Item AddOn") ConfigJObject: JsonObject
     var
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
         SaleLinePOS: Record "NPR POS Sale Line";
         CommentText: Text;
         Quantity: Decimal;
-        Value: Text;
-        JsonLbl: Label '{"caption":"%1","title":"%2","settings":[', Locked = true;
-        Json2Lbl: Label '{"caption":"%1", "type":"group", "expanded":%2, "settings":[', Locked = true;
-        Json3Lbl: Label '{"type":"plusminus","id":"%1","caption":"%2","value":%3}', Locked = true;
-        Json4Lbl: Label '{"type":"switch","id":"%1","caption":"%2","value":%3}', Locked = true;
-        Json5Lbl: Label '{"type":"text","id":"%1_text","caption":"%2","value":"%3"}', Locked = true;
-        Json6Lbl: Label '{"caption":"%1", "type":"group", "expanded":%2, "settings":[', Locked = true;
-        Json7Lbl: Label '{\"item\":\"%1\",\"variant\":\"%2\"}', Locked = true;
-        Json8Lbl: Label '{"type":"radio", "id":"%1", "caption":"%2", "value":"%3", "options":[', Locked = true;
-        Json9Lbl: Label '{"caption":"%1","value":"%2"}', Locked = true;
-        Json10Lbl: Label '{"type":"text","id":"%1_text","caption":"%2","value":"%3"}', Locked = true;
+        ItemAddOn_LinesJArray: JsonArray;
+        ItemAddOn_GroupLineSettingsJArray: JsonArray;
+        ItemAddOn_GroupLineJObject: JsonObject;
+        ItemAddOn_LineJObject: JsonObject;
+        ValueJObject: JsonObject;
     begin
-
-        JsonString := StrSubstNo(JsonLbl, FormatJson(), FormatJson());
 
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         if (ItemAddOnLine.FindSet()) then begin
@@ -121,76 +115,101 @@
 
                     CommentText := '';
                     if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then
-                        Append(JsonString, StrSubstNo(Json2Lbl, FormatJson(), 'true'));
+                        ItemAddOn_LineJObject.Add('caption', ItemAddOnLine."Description 2");
+
 
                     Quantity := SaleLinePOS.Quantity;
                     if (Quantity = 0) then
                         Quantity := ItemAddOnLine.Quantity;
                     case (ItemAddOnLine."Fixed Quantity") of
                         false:
-                            Append(JsonString, StrSubstNo(Json3Lbl, ItemAddOnLine."Line No.", FormatJson(), Quantity));
+                            begin
+                                Clear(ItemAddOn_GroupLineJObject);
+                                ItemAddOn_GroupLineJObject.Add('id', ItemAddOnLine."Line No.");
+                                ItemAddOn_GroupLineJObject.Add('caption', ItemAddOnLine.Description);
+                                ItemAddOn_GroupLineJObject.Add('type', 'plusminus');
+                                ItemAddOn_GroupLineJObject.Add('value', Quantity);
+                                ItemAddOn_LinesJArray.Add(ItemAddOn_GroupLineJObject);
+                            end;
                         true:
-                            Append(JsonString, StrSubstNo(Json4Lbl, ItemAddOnLine."Line No.", FormatJson(), 'false'));
+                            begin
+                                Clear(ItemAddOn_GroupLineJObject);
+                                ItemAddOn_GroupLineJObject.Add('id', ItemAddOnLine."Line No.");
+                                ItemAddOn_GroupLineJObject.Add('caption', ItemAddOnLine.Description);
+                                ItemAddOn_GroupLineJObject.Add('type', 'switch');
+                                ItemAddOn_LinesJArray.Add(ItemAddOn_GroupLineJObject);
+                            end;
+
                     end;
 
                     if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then begin
-                        Append(JsonString, StrSubstNo(Json5Lbl, ItemAddOnLine."Line No.", CommentCaption, CommentText));
-                        JsonString += ']}';
+
+                        Clear(ItemAddOn_LineJObject);
+                        ItemAddOn_LineJObject.Add('type', 'text');
+                        ItemAddOn_LineJObject.Add('id', ItemAddOnLine."Line No.");
+                        ItemAddOn_LineJObject.Add('caption', CommentCaption);
+                        ItemAddOn_LineJObject.Add('value', CommentText);
+                        ItemAddOn_GroupLineSettingsJArray.Add(ItemAddOn_LineJObject);
+
                     end;
 
                 end;
 
                 if (ItemAddOnLine.Type = ItemAddOnLine.Type::Select) then begin
-                    ItemAddOnLineOption.SetFilter("AddOn No.", '=%1', ItemAddOnLine."AddOn No.");
-                    ItemAddOnLineOption.SetFilter("AddOn Line No.", '=%1', ItemAddOnLine."Line No.");
+                    ItemAddOnLineOption.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
+                    ItemAddOnLineOption.SetRange("AddOn Line No.", ItemAddOnLine."Line No.");
                     ItemAddOnLineOption.SetFilter(Description, '<>%1', '');
                     if (ItemAddOnLineOption.FindSet()) then begin
                         CommentText := '';
-                        if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then
-                            Append(JsonString, StrSubstNo(Json6Lbl, FormatJson(), 'true'));
-
-                        Value := StrSubstNo(Json7Lbl, FormatJson(), FormatJson());
-                        if ((SaleLinePOS."No." = '') and (SaleLinePOS."Variant Code" = '')) then
-                            Value := StrSubstNo(Json7Lbl, FormatJson(), FormatJson());
-                        Append(JsonString, StrSubstNo(Json8Lbl, ItemAddOnLine."Line No.", FormatJson(), Value));
-
-                        repeat
-                            Value := StrSubstNo(Json7Lbl, FormatJson(), FormatJson());
-                            Append(JsonString, StrSubstNo(Json9Lbl, FormatJson(), Value));
-
-                        until (ItemAddOnLineOption.Next() = 0);
-                        JsonString += ']}';
-
                         if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then begin
-                            Append(JsonString, StrSubstNo(Json10Lbl, ItemAddOnLine."Line No.", CommentCaption, CommentText));
-                            JsonString += ']}';
+                            ItemAddOn_LineJObject.Add('caption', ItemAddOnLineOption."Description 2");
+                            ItemAddOn_LineJObject.Add('type', 'group');
+                            ItemAddOn_LineJObject.Add('expanded', 'true');
                         end;
 
+                        ItemAddOn_LineJObject.Add('type', 'radio');
+
+                        Clear(ValueJObject);
+                        ValueJObject.Add('item', SaleLinePOS."No.");
+                        ValueJObject.Add('variant', SaleLinePOS."Variant Code");
+                        ItemAddOn_LineJObject.Add('value', ValueJObject);
+
+                        if ((SaleLinePOS."No." = '') and (SaleLinePOS."Variant Code" = '')) then begin
+                            Clear(ValueJObject);
+                            ValueJObject.Add('item', SaleLinePOS."No.");
+                            ValueJObject.Add('variant', SaleLinePOS."Variant Code");
+                            ItemAddOn_LineJObject.Add('value', ValueJObject);
+                        end;
+                        ItemAddOn_LineJObject.Add('id', ItemAddOnLine."Line No.");
+                        ItemAddOn_LineJObject.Add('caption', ItemAddOnLine.Description);
+                        ItemAddOn_LineJObject.Add('value', ValueJObject);
+
+                        repeat
+                            Clear(ValueJObject);
+                            ValueJObject.Add('item', SaleLinePOS."No.");
+                            ValueJObject.Add('variant', SaleLinePOS."Variant Code");
+                            ItemAddOn_LineJObject.Add('value', ValueJObject);
+
+                            ItemAddOn_GroupLineJObject.Add('caption', ItemAddOnLine.Description);
+                            ItemAddOn_GroupLineJObject.Add('value', ItemAddOn_LineJObject);
+                        until (ItemAddOnLineOption.Next() = 0);
+
+                        if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then begin
+                            Clear(ItemAddOn_GroupLineJObject);
+                            ItemAddOn_GroupLineJObject.Add('type', 'text');
+                            ItemAddOn_GroupLineJObject.Add('id', ItemAddOnLine."Line No.");
+                            ItemAddOn_GroupLineJObject.Add('caption', CommentCaption);
+                            ItemAddOn_GroupLineJObject.Add('value', CommentText);
+                            ItemAddOn_LinesJArray.Add(ItemAddOn_GroupLineJObject);
+                        end;
                     end;
                 end;
 
             until (ItemAddOnLine.Next() = 0);
         end;
-        JsonString += ']}';
-    end;
-
-    local procedure FormatJson() JsonValue: Text
-    var
-        JsonVal: JsonValue;
-    begin
-        JsonVal.SetValue(JsonValue);
-        JsonValue := Format(JsonVal);
-        JsonValue := CopyStr(JsonValue, 2, StrLen(JsonValue) - 2);
-        exit(JsonValue);
-    end;
-
-    local procedure Append(var Text: Text; AppendText: Text)
-    begin
-
-        if (Text[StrLen(Text)] = '}') then
-            Text += ',';
-
-        Text += AppendText;
+        ConfigJObject.Add('caption', ItemAddOn.Description);
+        ConfigJObject.Add('title', PopupTitle);
+        ConfigJObject.Add('settings', ItemAddOn_LinesJArray)
     end;
 
     procedure UpdateOrder(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management")
