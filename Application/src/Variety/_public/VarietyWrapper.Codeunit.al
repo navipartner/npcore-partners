@@ -286,6 +286,54 @@
             VRTCloneData.InsertDefaultBarcode(Rec."Item No.", Rec.Code, true);
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnAfterValidateEvent', 'Description', false, false)]
+    local procedure ItemVariantsOnAfterValidateDescription(var Rec: Record "Item Variant"; var xRec: Record "Item Variant"; CurrFieldNo: Integer)
+    var
+        ItemReference: Record "Item Reference";
+        VRTSetup: Record "NPR Variety Setup";
+        Item: Record Item;
+    begin
+        if Item.Get(Rec."Item No.") then;
+        VRTSetup.Get();
+        if (VRTSetup."Create Item Cross Ref. auto.") and
+           (VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::VariantDescription1) then begin
+            ItemReference.Reset();
+            ItemReference.SetRange("Item No.", Rec."Item No.");
+            ItemReference.SetRange("Variant Code", Rec.Code);
+            ItemReference.SetRange("Unit of Measure", Item."Base Unit of Measure");
+            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+            if ItemReference.FindFirst() then begin
+                ItemReference.Description := Rec.Description;
+                ItemReference.Modify();
+            end;
+        end;
+
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnAfterValidateEvent', 'Description 2', false, false)]
+    local procedure ItemVariantsOnAfterValidateDescription2(var Rec: Record "Item Variant"; var xRec: Record "Item Variant"; CurrFieldNo: Integer)
+    var
+        ItemReference: Record "Item Reference";
+        VRTSetup: Record "NPR Variety Setup";
+        Item: Record Item;
+    begin
+        if Item.Get(Rec."Item No.") then;
+        VRTSetup.Get();
+        if (VRTSetup."Create Item Cross Ref. auto.") and
+           (VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::VariantDescription2) then begin
+            ItemReference.Reset();
+            ItemReference.SetRange("Item No.", Rec."Item No.");
+            ItemReference.SetRange("Variant Code", Rec.Code);
+            ItemReference.SetRange("Unit of Measure", Item."Base Unit of Measure");
+            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+            if ItemReference.FindFirst() then begin
+                ItemReference.Description := Rec."Description 2";
+                ItemReference.Modify();
+            end;
+
+        end;
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnBeforeDeleteEvent', '', false, false)]
     local procedure ItemVariantsnBeforeDeleteEvent(var Rec: Record "Item Variant"; RunTrigger: Boolean)
     var
