@@ -145,25 +145,25 @@ table 6150901 "NPR HC Audit Roll"
             MaxValue = 100;
             MinValue = 0;
         }
-        field(48; "Gen. Bus. Posting Group"; Code[10])
+        field(48; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
         }
-        field(49; "Gen. Prod. Posting Group"; Code[10])
+        field(49; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
         }
-        field(50; "VAT Bus. Posting Group"; Code[10])
+        field(50; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
-        field(51; "VAT Prod. Posting Group"; Code[10])
+        field(51; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -224,7 +224,7 @@ table 6150901 "NPR HC Audit Roll"
             DataClassification = CustomerContent;
             Description = '248534';
         }
-        field(87; "Tax Group Code"; Code[10])
+        field(87; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;

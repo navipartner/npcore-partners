@@ -528,7 +528,7 @@ table 6060042 "NPR Item Worksheet Line"
             OptionCaption = 'No,Yes,Undefined';
             OptionMembers = No,Yes,Undefined;
         }
-        field(89; "VAT Bus. Posting Group"; Code[10])
+        field(89; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -540,21 +540,21 @@ table 6060042 "NPR Item Worksheet Line"
                 Validate("VAT Prod. Posting Group");
             end;
         }
-        field(90; "VAT Bus. Posting Gr. (Price)"; Code[10])
+        field(90; "VAT Bus. Posting Gr. (Price)"; Code[20])
         {
             Caption = 'VAT Bus. Posting Gr. (Price)';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
             ValidateTableRelation = false;
         }
-        field(91; "Gen. Prod. Posting Group"; Code[10])
+        field(91; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
             ValidateTableRelation = false;
         }
-        field(95; "Country/Region of Origin Code"; Code[10])
+        field(95; "Country/Region of Origin Code"; Code[20])
         {
             Caption = 'Country/Region of Origin Code';
             DataClassification = CustomerContent;
@@ -578,14 +578,14 @@ table 6060042 "NPR Item Worksheet Line"
             TableRelation = "No. Series";
             ValidateTableRelation = false;
         }
-        field(98; "Tax Group Code"; Code[10])
+        field(98; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
             TableRelation = "Tax Group";
             ValidateTableRelation = false;
         }
-        field(99; "VAT Prod. Posting Group"; Code[10])
+        field(99; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;

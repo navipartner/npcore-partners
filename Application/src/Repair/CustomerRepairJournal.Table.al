@@ -181,7 +181,7 @@ table 6014505 "NPR Customer Repair Journal"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(41; "VAT Bus. Posting Group"; Code[10])
+        field(41; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -194,7 +194,7 @@ table 6014505 "NPR Customer Repair Journal"
                 //+NPR5.30 [262923]
             end;
         }
-        field(42; "VAT Prod. Posting Group"; Code[10])
+        field(42; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;

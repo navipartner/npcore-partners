@@ -73,7 +73,7 @@ table 6014419 "NPR Archive Sale Line POS"
             TableRelation = Location;
             DataClassification = CustomerContent;
         }
-        field(8; "Posting Group"; Code[10])
+        field(8; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
             Editable = false;
@@ -244,7 +244,7 @@ table 6014419 "NPR Archive Sale Line POS"
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR Sale Line POS"."Amount Including VAT");
+            CalcFormula = Sum("NPR Sale Line POS"."Amount Including VAT");
             Caption = 'Sales Order Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -263,25 +263,25 @@ table 6014419 "NPR Archive Sale Line POS"
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
         }
-        field(48; "Gen. Bus. Posting Group"; Code[10])
+        field(48; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             TableRelation = "Gen. Business Posting Group";
             DataClassification = CustomerContent;
         }
-        field(49; "Gen. Prod. Posting Group"; Code[10])
+        field(49; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             TableRelation = "Gen. Product Posting Group";
             DataClassification = CustomerContent;
         }
-        field(50; "VAT Bus. Posting Group"; Code[10])
+        field(50; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             TableRelation = "VAT Business Posting Group";
             DataClassification = CustomerContent;
         }
-        field(51; "VAT Prod. Posting Group"; Code[10])
+        field(51; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             TableRelation = "VAT Product Posting Group";
@@ -376,7 +376,7 @@ table 6014419 "NPR Archive Sale Line POS"
             Caption = 'Tax Liable';
             DataClassification = CustomerContent;
         }
-        field(87; "Tax Group Code"; Code[10])
+        field(87; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             TableRelation = "Tax Group";
@@ -636,7 +636,7 @@ table 6014419 "NPR Archive Sale Line POS"
         }
         field(420; "Coupon Qty."; Integer)
         {
-            CalcFormula = Count ("NPR NpDc SaleLinePOS Coupon" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Count("NPR NpDc SaleLinePOS Coupon" WHERE("Register No." = FIELD("Register No."),
                                                                    "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                    "Sale Type" = FIELD("Sale Type"),
                                                                    "Sale Date" = FIELD(Date),
@@ -649,7 +649,7 @@ table 6014419 "NPR Archive Sale Line POS"
         field(425; "Coupon Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR NpDc SaleLinePOS Coupon"."Discount Amount" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR NpDc SaleLinePOS Coupon"."Discount Amount" WHERE("Register No." = FIELD("Register No."),
                                                                                    "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                                    "Sale Type" = FIELD("Sale Type"),
                                                                                    "Sale Date" = FIELD(Date),

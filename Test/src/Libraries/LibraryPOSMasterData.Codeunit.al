@@ -272,7 +272,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSAuditProfile.Insert;
     end;
 
-    procedure CreateGeneralPostingSetupForSaleItem(GenBusPostGrp: Code[10]; GenProdPostGrp: Code[10]; LocationCode: Code[20]; InvPostingGroup: Code[10])
+    procedure CreateGeneralPostingSetupForSaleItem(GenBusPostGrp: Code[20]; GenProdPostGrp: Code[20]; LocationCode: Code[20]; InvPostingGroup: Code[20])
     var
         LibraryERM: Codeunit "Library - ERM";
         GeneralPostingSetup: Record "General Posting Setup";
@@ -306,7 +306,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         CreateGeneralPostingSetupForSaleItem(POSStore."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group", Register."Location Code", Item."Inventory Posting Group");
     end;
 
-    procedure CreateVATPostingSetupForSaleItem(VATBusPostGrp: Code[10]; VATProdPostGrp: Code[10])
+    procedure CreateVATPostingSetupForSaleItem(VATBusPostGrp: Code[20]; VATProdPostGrp: Code[20])
     var
         VATPostingSetup: Record "VAT Posting Setup";
         LibraryUtility: Codeunit "Library - Utility";

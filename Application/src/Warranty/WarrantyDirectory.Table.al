@@ -573,7 +573,7 @@ table 6014509 "NPR Warranty Directory"
         }
         field(6014500; Comment; Boolean)
         {
-            CalcFormula = Exist ("NPR Retail Comment" WHERE("Table ID" = CONST(6014514),
+            CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6014514),
                                                         "No." = FIELD("No.")));
             Caption = 'Comment';
             FieldClass = FlowField;

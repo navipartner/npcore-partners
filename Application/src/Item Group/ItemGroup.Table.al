@@ -120,19 +120,19 @@ table 6014410 "NPR Item Group"
                     FieldError(Type);
             end;
         }
-        field(12; "VAT Prod. Posting Group"; Code[10])
+        field(12; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Product Posting Group";
         }
-        field(14; "VAT Bus. Posting Group"; Code[10])
+        field(14; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
-        field(15; "Gen. Bus. Posting Group"; Code[10])
+        field(15; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -151,7 +151,7 @@ table 6014410 "NPR Item Group"
                 CheckItemGroup(FieldNo("Gen. Bus. Posting Group"));
             end;
         }
-        field(16; "Gen. Prod. Posting Group"; Code[10])
+        field(16; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -413,7 +413,7 @@ table 6014410 "NPR Item Group"
             Description = 'Lagerværdi';
             FieldClass = FlowField;
         }
-        field(98; "Tax Group Code"; Code[10])
+        field(98; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
