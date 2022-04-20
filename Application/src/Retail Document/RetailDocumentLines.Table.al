@@ -512,7 +512,7 @@ table 6014426 "NPR Retail Document Lines"
             Editable = false;
             DataClassification = CustomerContent;
         }
-        field(89; "VAT Bus. Posting Group"; Code[10])
+        field(89; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             TableRelation = "VAT Business Posting Group";
@@ -523,7 +523,7 @@ table 6014426 "NPR Retail Document Lines"
                 Validate("VAT Prod. Posting Group");
             end;
         }
-        field(90; "VAT Prod. Posting Group"; Code[10])
+        field(90; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             TableRelation = "VAT Product Posting Group";

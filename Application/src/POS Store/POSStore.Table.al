@@ -194,7 +194,7 @@ table 6150614 "NPR POS Store"
                 ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
-        field(50; "Gen. Bus. Posting Group"; Code[10])
+        field(50; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -220,7 +220,7 @@ table 6150614 "NPR POS Store"
             Caption = 'Tax Liable';
             DataClassification = CustomerContent;
         }
-        field(53; "VAT Bus. Posting Group"; Code[10])
+        field(53; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;

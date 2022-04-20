@@ -96,7 +96,7 @@ table 6150904 "NPR HC Retail Setup"
             OptionCaption = 'PER REGISTER,TOTAL';
             OptionMembers = "PER KASSE",SAMLET;
         }
-        field(4018; "Vat Bus. Posting Group"; Code[10])
+        field(4018; "Vat Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
