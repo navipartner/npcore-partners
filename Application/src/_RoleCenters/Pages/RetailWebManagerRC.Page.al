@@ -124,12 +124,11 @@
                     ToolTip = 'Executes the Contacts action';
                 }
 
-
                 action("Sales Orders")
                 {
                     Caption = 'Sales Orders';
                     Image = List;
-                    RunObject = page "Sales Orders";
+                    RunObject = page "Sales Order List";
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Sales Orders action';
                 }
@@ -158,8 +157,6 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Sales Credit Memos action';
                 }
-
-
             }
 
             group("Retail Vouchers")
@@ -203,9 +200,9 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Archived Coupons action';
                 }
-
             }
         }
+
         area(Creation)
         {
             action(Items)
@@ -237,6 +234,7 @@
                 ApplicationArea = NPRRetail;
             }
         }
+
         area(processing)
         {
             group(Tasks)
@@ -283,7 +281,6 @@
                     ToolTip = 'Plan supply orders order by order to fulfill new demand.';
                 }
             }
-
         }
     }
 }
