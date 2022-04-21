@@ -577,6 +577,90 @@
         POSInfoTransaction.SetRange("Sales Line No.", LineNo);
     end;
 
+    procedure GetPOSInfo(POSInfoCode: Code[20]; RegisterNo: Code[10]; SalesTicketNo: Code[20]; LineNo: Integer): Text[250]
+    var
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+    begin
+        POSInfoTransaction.Reset();
+        POSInfoTransaction.SetRange("POS Info Code", POSInfoCode);
+        POSInfoTransaction.SetRange("Register No.", RegisterNo);
+        POSInfoTransaction.SetRange("Sales Ticket No.", SalesTicketNo);
+        POSInfoTransaction.SetRange("Sales Line No.", LineNo);
+        POSInfoTransaction.SetFilter("POS Info", '<>%1', '');
+        if POSInfoTransaction.FindFirst() then
+            exit(POSInfoTransaction."POS Info")
+        else
+            exit('');
+
+    end;
+
+    procedure GetPOSInfo(POSInfoCode: Code[20]; RegisterNo: Code[10]; SalesTicketNo: Code[20]): Text[250]
+    var
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+    begin
+        POSInfoTransaction.Reset();
+        POSInfoTransaction.SetRange("POS Info Code", POSInfoCode);
+        POSInfoTransaction.SetRange("Register No.", RegisterNo);
+        POSInfoTransaction.SetRange("Sales Ticket No.", SalesTicketNo);
+        POSInfoTransaction.SetFilter("POS Info", '<>%1', '');
+        if POSInfoTransaction.FindFirst() then
+            exit(POSInfoTransaction."POS Info")
+        else
+            exit('');
+
+    end;
+
+    procedure UpsertPOSInfo(POSInfoCode: Code[20]; SalePOSLine: Record "NPR POS Sale Line"; POSInfoText: Text)
+    var
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+    begin
+        POSInfoTransaction.Reset();
+        POSInfoTransaction.SetRange("POS Info Code", POSInfoCode);
+        POSInfoTransaction.SetRange("Register No.", SalePOSLine."Register No.");
+        POSInfoTransaction.SetRange("Sales Ticket No.", SalePOSLine."Sales Ticket No.");
+        POSInfoTransaction.SetRange("Sales Line No.", SalePOSLine."Line No.");
+        if POSInfoTransaction.FindFirst() then begin
+            POSInfoTransaction."POS Info" := CopyStr(POSInfoText, 1, MaxStrLen(POSInfoTransaction."POS Info"));
+            POSInfoTransaction.Modify(true);
+        end else begin
+            POSInfoTransaction.Init();
+            POSInfoTransaction."POS Info Code" := POSInfoCode;
+            POSInfoTransaction."Register No." := SalePOSLine."Register No.";
+            POSInfoTransaction."Sales Ticket No." := SalePOSLine."Sales Ticket No.";
+            POSInfoTransaction."Sales Line No." := SalePOSLine."Line No.";
+            POSInfoTransaction."Sale Date" := SalePOSLine.Date;
+            POSInfoTransaction."Receipt Type" := POSInfoTransaction."Receipt Type"::Customer;
+            POSInfoTransaction."POS Info" := CopyStr(POSInfoText, 1, MaxStrLen(POSInfoTransaction."POS Info"));
+            POSInfoTransaction.Insert(true);
+        end;
+    end;
+
+
+    procedure UpsertPOSInfo(POSInfoCode: Code[20]; SalePOS: Record "NPR POS Sale"; POSInfoText: Text)
+    var
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+    begin
+        POSInfoTransaction.Reset();
+        POSInfoTransaction.SetRange("POS Info Code", POSInfoCode);
+        POSInfoTransaction.SetRange("Register No.", SalePOS."Register No.");
+        POSInfoTransaction.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        if POSInfoTransaction.FindFirst() then begin
+            POSInfoTransaction."POS Info" := CopyStr(POSInfoText, 1, MaxStrLen(POSInfoTransaction."POS Info"));
+            POSInfoTransaction.Modify(true);
+        end else begin
+            POSInfoTransaction.Init();
+            POSInfoTransaction."POS Info Code" := POSInfoCode;
+            POSInfoTransaction."Register No." := SalePOS."Register No.";
+            POSInfoTransaction."Sales Ticket No." := SalePOS."Sales Ticket No.";
+            POSInfoTransaction."Sale Date" := SalePOS.Date;
+            POSInfoTransaction."Receipt Type" := POSInfoTransaction."Receipt Type"::Customer;
+            POSInfoTransaction."POS Info" := CopyStr(POSInfoText, 1, MaxStrLen(POSInfoTransaction."POS Info"));
+            POSInfoTransaction.Insert(true);
+        end;
+    end;
+
+
+
     #region DataSource Extension
     local procedure BuiltInSale_DataSource(): Text
     begin
