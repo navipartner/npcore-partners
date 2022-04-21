@@ -118,11 +118,6 @@
             "justification": "Changing a table extension's target is not allowed."
         },
         {
-            "id": "AS0080",
-            "action":"Warning",
-            "justification": "It is not allowed to rename an enum value."
-        },
-        {
             "id": "AS0082",
             "action":"Hidden",
             "justification": "It is not allowed to rename an enum value."
