@@ -1,6 +1,7 @@
 ﻿codeunit 6014693 "NPR Environment Handler"
 {
     Access = Internal;
+
     var
         IssueDetectedNotificationTxt: Label 'Something went wrong and Allow HTTP for extension ''%1'' won''t be enabled.';
         AllowHttpEnabledTxt: Label 'Allow HTTP has been successfully enabled for extension ''%1''';
@@ -9,11 +10,19 @@
     begin
     end;
 
+#if BC20
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, false)]
+    local procedure OnAfterLogin()
+    begin
+        EnableAllowHttpInSandbox();
+    end;
+#else
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, true)]
     local procedure OnBeforeLoginStart()
     begin
         EnableAllowHttpInSandbox();
     end;
+#endif
 
     internal procedure EnableAllowHttpInSandbox()
     var

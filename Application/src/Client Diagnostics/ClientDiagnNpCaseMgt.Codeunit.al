@@ -81,7 +81,7 @@
         XmlDoc.SelectSingleNode('.//*[local-name()="NAVServiceTierUser"]', Node);
         NpXmlDomMgt.AddAttribute(Node, 'username', CopyStr(UserId, 1, 260));
         NpXmlDomMgt.AddAttribute(Node, 'database_name', ActiveSession."Database Name");
-        NpXmlDomMgt.AddAttribute(Node, 'tenant_id', CopyStr(Database.TenantId(), 1, 260));
+        NpXmlDomMgt.AddAttribute(Node, 'tenant_id', CopyStr(TenantId(), 1, 260));
 
         Element := Node.AsXmlElement();
         MethodNS := Element.NamespaceUri();
