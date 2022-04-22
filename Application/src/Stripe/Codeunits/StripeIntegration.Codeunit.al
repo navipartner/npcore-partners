@@ -2,8 +2,15 @@ codeunit 6059807 "NPR Stripe Integration"
 {
     Access = Internal;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Service Tier User Mgt.", 'OnBeforTestUser', '', false, false)]
-    local procedure HandleOnBeforTestUser(UsingRegularInvoicing: Boolean; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Service Tier User Mgt.", 'OnBeforeTestUserOnLogin', '', false, false)]
+    local procedure HandleOnBeforeTestUserOnLogin(UsingRegularInvoicing: Boolean; var Handled: Boolean)
+    begin
+        UpdateStripeSetup(UsingRegularInvoicing);
+        Handled := not UsingRegularInvoicing;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Service Tier User Mgt.", 'OnBeforeTestUserOnPOSSessionInitialize', '', false, false)]
+    local procedure HandleOnBeforeTestUserOnPOSSessionInitialize(UsingRegularInvoicing: Boolean; var Handled: Boolean)
     begin
         UpdateStripeSetup(UsingRegularInvoicing);
         Handled := not UsingRegularInvoicing;

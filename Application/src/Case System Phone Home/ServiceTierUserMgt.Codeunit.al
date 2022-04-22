@@ -2,12 +2,11 @@
 {
     Access = Internal;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
-    local procedure OnBeforeLogInStart()
+#if BC20
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, false)]
+    local procedure HandleOnAfterLogin()
     var
-        EnvironmentHandler: Codeunit "NPR Environment Handler";
         EnvironmentInformation: Codeunit "Environment Information";
-        Handled: Boolean;
     begin
         if NavApp.IsInstalling() then
             exit;
@@ -18,15 +17,41 @@
         if EnvironmentInformation.IsSandbox() then
             exit;
 
-        EnvironmentHandler.EnableAllowHttpInSandbox();
-
         ValidateBCOnlineTenant();
-
-        OnBeforTestUser(IsUsingRegularInvoicing(), Handled);
-        if Handled then
+        TestUserOnLogin();
+    end;
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
+    local procedure HandleOnBeforeLogInStart()
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        if NavApp.IsInstalling() then
             exit;
 
-        TestUser();
+        if not (CurrentClientType in [ClientType::Windows, ClientType::Web, ClientType::Tablet, ClientType::Phone, ClientType::Desktop]) then
+            exit;
+
+        if EnvironmentInformation.IsSandbox() then
+            exit;
+
+        ValidateBCOnlineTenant();
+        TestUserOnLogin();
+    end;
+#endif
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Session", 'OnInitialize', '', false, false)]
+    local procedure HandleOnInitialize()
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        if not (CurrentClientType in [ClientType::Windows, ClientType::Web, ClientType::Tablet, ClientType::Phone, ClientType::Desktop]) then
+            exit;
+
+        if EnvironmentInformation.IsSandbox() then
+            exit;
+
+        TestUserOnPOSSessionInitialize();
     end;
 
     local procedure ValidateBCOnlineTenant()
@@ -39,6 +64,32 @@
 
         if not TrySendRequest('ValidateBCOnlineTenant', '', '', TenantId(), ResponseMessage) then
             exit;
+    end;
+
+    local procedure TestUserOnLogin()
+    var
+        Handled: Boolean;
+    begin
+        OnBeforeTestUserOnLogin(IsUsingRegularInvoicing(), Handled);
+        if Handled then
+            exit;
+
+        TestUserExpired();
+        TestUserLocked(false);
+    end;
+
+    local procedure TestUserOnPOSSessionInitialize()
+    var
+        POSSession: Codeunit "NPR POS Session";
+        Handled: Boolean;
+    begin
+        OnBeforeTestUserOnPOSSessionInitialize(IsUsingRegularInvoicing(), Handled);
+        if Handled then
+            exit;
+
+        TestUserExpired();
+        if not TryTestUserLocked() then
+            POSSession.SetErrorOnInitialize(true);
     end;
 
     local procedure IsUsingRegularInvoicing(): Boolean
@@ -56,12 +107,6 @@
             exit(false);
 
         exit(UsingRegularInvoicing);
-    end;
-
-    local procedure TestUser()
-    begin
-        TestUserExpired();
-        TestUserLocked();
     end;
 
     local procedure TestUserExpired()
@@ -115,7 +160,7 @@
         exit(CreateDateTime(DMY2Date(Day, Month, Year), ExpirationTime));
     end;
 
-    local procedure TestUserLocked()
+    local procedure TestUserLocked(ThrowAnError: Boolean)
     var
         LockedMessage: Text;
     begin
@@ -125,7 +170,16 @@
             exit;
 
         if LowerCase(LockedMessage) <> 'false' then
-            Error(LockedMessage);
+            if ThrowAnError then
+                Error(LockedMessage)
+            else
+                Message(LockedMessage);
+    end;
+
+    [TryFunction]
+    local procedure TryTestUserLocked()
+    begin
+        TestUserLocked(true);
     end;
 
     [NonDebuggable]
@@ -225,7 +279,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforTestUser(UsingRegularInvoicing: Boolean; var Handled: Boolean)
+    local procedure OnBeforeTestUserOnLogin(UsingRegularInvoicing: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestUserOnPOSSessionInitialize(UsingRegularInvoicing: Boolean; var Handled: Boolean)
     begin
     end;
 }
