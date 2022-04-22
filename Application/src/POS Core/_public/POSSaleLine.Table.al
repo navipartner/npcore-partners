@@ -2372,16 +2372,15 @@
             ItemVariant.Get(Item."No.", "Variant Code");
             Description := ItemVariant.Description;
             "Description 2" := ItemVariant."Description 2";
+            if NPRVarietySetup.Get() then
+                if NPRVarietySetup."Custom Descriptions" then begin
+                    Description := Item.Description;
+                    "Description 2" := ItemVariant.Description;
+                end;
         end else begin
             Description := Item.Description;
             "Description 2" := Item."Description 2";
         end;
-
-        if NPRVarietySetup.Get() then
-            if NPRVarietySetup."Custom Descriptions" then begin
-                Description := Item.Description;
-                "Description 2" := ItemVariant.Description;
-            end;
     end;
 
     procedure SetSkipUpdateDependantQuantity(Skip: Boolean)
