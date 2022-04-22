@@ -689,9 +689,6 @@
     local procedure InsertArchivedVoucher(var Voucher: Record "NPR NpRv Voucher")
     var
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
-        TempBlob: Codeunit "Temp Blob";
-        InStr: InStream;
-        OutStr: OutStream;
     begin
         ArchVoucher.Init();
         ArchVoucher."No." := Voucher."Arch. No.";
@@ -726,12 +723,7 @@
         ArchVoucher."Send via Print" := Voucher."Send via Print";
         ArchVoucher."Send via E-mail" := Voucher."Send via E-mail";
         ArchVoucher."Send via SMS" := Voucher."Send via SMS";
-        if Voucher."Barcode Image".HasValue() then begin
-            TempBlob.CreateOutStream(OutStr);
-            Voucher."Barcode Image".ExportStream(OutStr);
-            TempBlob.CreateInStream(InStr);
-            ArchVoucher."Barcode Image".ImportStream(InStr, ArchVoucher.FieldName("Barcode Image"));
-        end;
+        ArchVoucher."Barcode Image" := Voucher."Barcode Image";
         ArchVoucher.Insert();
     end;
 
@@ -793,9 +785,6 @@
     var
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
         Voucher: Record "NPR NpRv Voucher";
-        TempBlob: Codeunit "Temp Blob";
-        InStr: InStream;
-        OutStr: OutStream;
     begin
         ArchVoucher.Get(ArchVoucherCode);
 
@@ -804,10 +793,7 @@
         Voucher."No." := ArchVoucher."Arch. No.";
         if Voucher."No." = '' then
             Voucher."No." := ArchVoucher."No.";
-        TempBlob.CreateOutStream(OutStr);
-        ArchVoucher."Barcode Image".ExportStream(OutStr);
-        TempBlob.CreateInStream(InStr);
-        Voucher."Barcode Image".ImportStream(InStr, Voucher.FieldName("Barcode Image"));
+        Voucher."Barcode Image" := ArchVoucher."Barcode Image";
         Voucher.Insert();
 
         UnarchiveVoucherEntries(ArchVoucher."No.", Voucher."No.", RemoveLastEntry);
