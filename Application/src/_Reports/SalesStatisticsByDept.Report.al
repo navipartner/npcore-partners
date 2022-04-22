@@ -381,7 +381,7 @@
 
                     VELastYearTotalSalesPerc := pct(VELastYearTotalSales, VELastYearTotalSales);
                     VELastYearTotalProfit := VELastYearTotalSales - VELastYearTotalCost;
-                    VELastYearTotalProfitSalesPerc := pct(VELastYearTotalProfit, VELastYearTotalSales);
+                    VELastYearTotalProfitSalesPerc := pct(VELastYearTotalProfit, VELastYearTotalSales);//
                     VELastYearTotalProfitPerc := pct(VELastYearTotalProfit, VELastYearTotalGlobalProfit);
 
                 end;
@@ -464,7 +464,7 @@
 
     labels
     {
-        Report_Caption = 'Salesstatistics';
+        Report_Caption = 'Sales Statistics By Department';
         QuantitySale_Caption = 'Quantity (sale)';
         CostExcVAT_Caption = 'Cost excl. VAT';
         TurnoverExcVAT_Caption = 'Turnover excl. VAT';
@@ -475,6 +475,8 @@
         Total_Caption = 'Total';
         Page_Caption = 'Page';
         Footer_Caption = 'ˆNAVIPARTNER K¢benhavn 2002';
+        Turnover_Caption = 'Turnover';
+        Profit_Caption = 'Profit';
     }
 
     trigger OnInitReport()
