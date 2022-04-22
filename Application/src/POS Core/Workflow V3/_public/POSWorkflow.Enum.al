@@ -76,4 +76,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ADD_BARCODE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Add Barcode";
     }
+    value(14; ADJUST_INVENTORY)
+    {
+        Caption = 'ADJUST_INVENTORY', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Adjust Inv.";
+    }
 }
