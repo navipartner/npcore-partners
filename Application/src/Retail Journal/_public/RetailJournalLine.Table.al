@@ -543,13 +543,6 @@
     {
     }
 
-    trigger OnInsert()
-    var
-        POSUnit: Record "NPR POS Unit";
-    begin
-        "Register No." := POSUnit.GetCurrentPOSUnit();
-    end;
-
     var
         RetailJournalHeader: Record "NPR Retail Journal Header";
         LineNo: Integer;
@@ -579,14 +572,8 @@
         POSSalesPriceCalcMgt.InitTempPOSItemSale(TempSaleLinePOS, TempSalePOS);
         if "Register No." <> '' then
 #pragma warning disable AA0139
-            TempSalePOS."Register No." := "Register No."
+            TempSalePOS."Register No." := "Register No.";
 #pragma warning restore
-        else
-            TempSalePOS."Register No." := POSUnit.GetCurrentPOSUnit();
-
-        if not POSUnit.Get(TempSalePOS."Register No.") then
-            POSUnit.Init();
-
         if not POSUnit.Get(TempSalePOS."Register No.") then
             POSUnit.Init();
 
@@ -665,12 +652,10 @@
     internal procedure SelectRetailJournal(RetailJournalCode: Code[40]) JournalSelected: Boolean
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
-        POSUnit: Record "NPR POS Unit";
     begin
         if not RetailJournalHeader.Get(RetailJournalCode) then begin
             RetailJournalHeader.Init();
             RetailJournalHeader."No." := RetailJournalCode;
-            RetailJournalHeader."Register No." := POSUnit.GetCurrentPOSUnit();
         end;
         RetailJournalHeader.TestField("No.");
 
@@ -697,8 +682,6 @@
     end;
 
     internal procedure InitLine()
-    var
-        POSUnit: Record "NPR POS Unit";
     begin
         RetailJournalHeader.TestField("No.");
 
@@ -714,10 +697,7 @@
         "Customer Price Group" := RetailJournalHeader."Customer Price Group";
         "Customer Disc. Group" := RetailJournalHeader."Customer Disc. Group";
 
-        if RetailJournalHeader."Register No." = '' then
-            "Register No." := POSUnit.GetCurrentPOSUnit()
-        else
-            "Register No." := RetailJournalHeader."Register No.";
+        "Register No." := RetailJournalHeader."Register No.";
     end;
 
     internal procedure SetItem(ItemNo: Code[20]; VariantCode: Code[10]; BarcodeValue: Code[50])
@@ -775,7 +755,6 @@
     internal procedure SetupNewLine(var LastRetailJnlLine: Record "NPR Retail Journal Line")
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
-        POSUnit: Record "NPR POS Unit";
     begin
         LastRetailJnlLine.FilterGroup(4);
         if not RetailJnlHeader.Get(LastRetailJnlLine.GetFilter("No.")) then begin
@@ -783,11 +762,7 @@
             RetailJnlHeader."Date of creation" := Today();
         end;
         LastRetailJnlLine.FilterGroup(0);
-        if RetailJnlHeader."Register No." = '' then
-            "Register No." := POSUnit.GetCurrentPOSUnit()
-        else
-            "Register No." := RetailJnlHeader."Register No.";
-
+        "Register No." := RetailJnlHeader."Register No.";
         "Calculation Date" := RetailJnlHeader."Date of creation";
         "Customer Price Group" := RetailJnlHeader."Customer Price Group";
         "Customer Disc. Group" := RetailJnlHeader."Customer Disc. Group";
