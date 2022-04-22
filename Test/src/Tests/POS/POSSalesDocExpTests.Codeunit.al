@@ -26,7 +26,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         Assert: Codeunit "Assert";
         POSEntry: Record "NPR POS Entry";
         SalesHeader: Record "Sales Header";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         SalesDocumentExportMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
     begin
@@ -46,7 +46,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(_POSSession, '', 0, _Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.");
 
         // [When] Exporting to sales order without posting                
         _POSSession.GetSale(POSSale);
@@ -85,7 +85,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         Assert: Codeunit "Assert";
         POSEntry: Record "NPR POS Entry";
         SalesHeader: Record "Sales Header";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         SalesDocumentExportMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
@@ -107,7 +107,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(_POSSession, '', 0, _Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.");
 
         // [When] Exporting to sales order with posting                
         _POSSession.GetSale(POSSale);

@@ -77,7 +77,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Item: Record Item;
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SalePOS: Record "NPR POS Sale";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -102,7 +103,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -174,7 +176,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Item: Record Item;
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SalePOS: Record "NPR POS Sale";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -203,7 +206,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -279,7 +283,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         TaxArea: Record "Tax Area";
         TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SalePOS: Record "NPR POS Sale";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -312,7 +317,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -385,7 +391,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         TaxArea: Record "Tax Area";
         TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SalePOS: Record "NPR POS Sale";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -416,7 +423,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -490,7 +498,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         TaxArea: Record "Tax Area";
         TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SalePOS: Record "NPR POS Sale";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -519,7 +528,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -625,10 +635,11 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: Record "NPR POS Sale Tax Line";
         TempPOSActiveTaxAmountLine: Record "NPR POS Sale Tax Line" temporary;
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -662,7 +673,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -790,7 +802,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: Record "NPR POS Sale Tax Line";
         TempPOSActiveTaxAmountLine: Record "NPR POS Sale Tax Line" temporary;
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SalePOS: Record "NPR POS Sale";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -828,7 +841,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -955,7 +969,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: Record "NPR POS Sale Tax Line";
         TempPOSActiveTaxAmountLine: Record "NPR POS Sale Tax Line" temporary;
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalePOS: Record "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -993,7 +1008,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -1120,7 +1136,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: Record "NPR POS Sale Tax Line";
         TempPOSActiveTaxAmountLine: Record "NPR POS Sale Tax Line" temporary;
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SalePOS: Record "NPR POS Sale";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -1158,7 +1175,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -1282,10 +1300,11 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
         POSActiveTaxAmountLine: Record "NPR POS Sale Tax Line";
         TempPOSActiveTaxAmountLine: Record "NPR POS Sale Tax Line" temporary;
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -1323,7 +1342,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -1500,7 +1520,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry: Record "NPR POS Entry";
         SalePOS: Record "NPR POS Sale";
         TaxJurisdiction: Record "Tax Jurisdiction";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -1546,8 +1566,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
-        // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
 
         // [GIVEN] Item with unit price        
         CreateItem(Item[1], VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -1575,6 +1593,9 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Get amount to pay for active sale
         POSSale.GetCurrentSale(SalePOS);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         //First Debit Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -1756,7 +1777,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry: Record "NPR POS Entry";
         SalePOS: Record "NPR POS Sale";
         TaxJurisdiction: Record "Tax Jurisdiction";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -1803,9 +1824,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
-        // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
-
         // [GIVEN] Item with unit price        
         CreateItem(Item[1], VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
         Item[1]."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
@@ -1832,6 +1850,9 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Get amount to pay for active sale
         POSSale.GetCurrentSale(SalePOS);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         //First Debit Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -2007,7 +2028,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry: Record "NPR POS Entry";
         SalePOS: Record "NPR POS Sale";
         TaxJurisdiction: Record "Tax Jurisdiction";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -2049,9 +2070,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
-        // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
-
         // [GIVEN] Item with unit price        
         CreateItem(Item[1], VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
         Item[1]."Unit Price" := LibraryRandom.RandDecInRange(2, 100, 5);
@@ -2082,6 +2100,9 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Get amount to pay for active sale
         POSSale.GetCurrentSale(SalePOS);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         //First Debit Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");

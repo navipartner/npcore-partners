@@ -102,7 +102,8 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalePOS: Record "NPR POS Sale";
     begin
         // [SCENARIO] POS Tax Amount calculation is terminated for full vat
 
@@ -122,7 +123,8 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -144,7 +146,8 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalePOS: Record "NPR POS Sale";
     begin
         // [SCENARIO] POS Tax Amount calculation is terminated for full vat
 
@@ -164,7 +167,8 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);

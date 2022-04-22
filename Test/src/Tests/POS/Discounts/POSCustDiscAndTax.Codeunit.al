@@ -232,7 +232,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -277,7 +277,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -305,7 +305,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -352,7 +352,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -380,7 +380,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -423,7 +423,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -451,7 +451,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -496,7 +496,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -720,7 +720,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -764,9 +764,6 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
-        // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
-
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
 
@@ -778,6 +775,9 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
 
         POSSession.GetSale(POSSaleUnit);
         POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
@@ -824,7 +824,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -871,7 +871,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -930,7 +930,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -975,10 +975,10 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -1037,7 +1037,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -1084,10 +1084,10 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1274,7 +1274,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -1322,7 +1322,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -1350,7 +1350,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -1400,7 +1400,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1428,7 +1428,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -1474,7 +1474,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -1502,7 +1502,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -1550,7 +1550,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1780,7 +1780,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -1828,7 +1828,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -1887,7 +1887,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -1937,7 +1937,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1996,7 +1996,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -2044,10 +2044,10 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -2106,7 +2106,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -2156,10 +2156,10 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -2385,7 +2385,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         TaxDetail: Record "Tax Detail";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -2452,7 +2452,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -2483,7 +2483,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         TaxDetail: Record "Tax Detail";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -2550,7 +2550,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -2822,7 +2822,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         POSPostingProfile: Record "NPR POS Posting Profile";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineAmtInclTax: Decimal;
@@ -2895,7 +2895,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -2950,7 +2950,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         POSPostingProfile: Record "NPR POS Posting Profile";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineAmtInclTax: Decimal;
@@ -3023,7 +3023,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -3260,7 +3260,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -3301,7 +3301,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -3341,7 +3341,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -3382,7 +3382,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -3422,7 +3422,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -3462,7 +3462,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -3501,7 +3501,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -3541,7 +3541,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -3790,7 +3790,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -3832,7 +3832,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -3902,7 +3902,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -3944,7 +3944,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4014,7 +4014,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -4056,7 +4056,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4126,7 +4126,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -4168,7 +4168,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4380,7 +4380,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -4421,7 +4421,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4464,7 +4464,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -4505,7 +4505,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4548,7 +4548,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -4588,7 +4588,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4630,7 +4630,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -4670,7 +4670,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4928,7 +4928,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -4970,7 +4970,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -5043,7 +5043,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -5085,7 +5085,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -5158,7 +5158,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -5200,7 +5200,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -5273,7 +5273,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GeneralPostingSetup: Record "General Posting Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -5315,7 +5315,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -5567,7 +5567,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         TaxDetail: Record "Tax Detail";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -5625,7 +5625,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -5671,7 +5671,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         TaxDetail: Record "Tax Detail";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -5729,7 +5729,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -6023,7 +6023,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         POSPostingProfile: Record "NPR POS Posting Profile";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -6090,7 +6090,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -6158,7 +6158,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         POSPostingProfile: Record "NPR POS Posting Profile";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -6225,7 +6225,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -6394,7 +6394,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         Qty: Decimal;
     begin
@@ -6430,7 +6430,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -6463,7 +6463,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         Qty: Decimal;
     begin
@@ -6499,7 +6499,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -6592,7 +6592,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         Qty: Decimal;
     begin
@@ -6628,7 +6628,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -6661,7 +6661,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer: Record Customer;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         Qty: Decimal;
     begin
@@ -6697,7 +6697,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -6807,7 +6807,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         TaxDetail: Record "Tax Detail";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         CityTaxRate: Decimal;
         CountyTaxRate: Decimal;
@@ -6859,7 +6859,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSession, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
