@@ -6,11 +6,6 @@ resources:
     type: git
     name:  'NpCore/NpDevOps'
 
-  - repository: translations
-    type: git
-    name: 'NpCore/NpCore-Translations'
-    ref: 'refs/heads/i10n_master'   
-
 stages:
   - template: /YAML/ZAL Build Definitions/Release build.yml@scriptsRepo
     parameters:
@@ -38,7 +33,8 @@ stages:
         azureADtenantID: ec3af438-38fc-4d9b-b8be-058101411d3a
         azureKeyVaultClientId: b38b8bef-17d2-4368-84ce-f9880a45eed0
       translations:
-        translationsRepo: translations
-        translationsTargetRepoName: NpCore-Translations
+        translationsRepoUrl: https://gitlab.com/navipartner1/npcore/npcore-translations.git
+        translationRepoUser: AzureDevOpsCI
+        translationsRepoBranchName: i10n_master
         translationsTargetRepoBranchName: master
       combinedAppsNuGetSourceUri: https://pkgs.dev.azure.com/navipartner/_packaging/NaviPartner.NavApps/nuget/v3/index.json
