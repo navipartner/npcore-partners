@@ -1178,6 +1178,7 @@
         exit(MembershipNotification."Entry No.");
     end;
 
+    [TryFunction]
     internal procedure SendInlineNotifications()
     var
         MembershipNotification: Record "NPR MM Membership Notific.";
@@ -1229,7 +1230,8 @@
         if (POSSalesWorkflowStep."Subscriber Function" <> 'SendMemberNotificationOnSales') then
             exit;
 
-        SendInlineNotifications();
+        if (not SendInlineNotifications()) then
+            ; // Do nothing, the test framework can not start session to send notifications
     end;
 
     [TryFunction]

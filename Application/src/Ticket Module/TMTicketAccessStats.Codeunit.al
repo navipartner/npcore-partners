@@ -501,6 +501,13 @@
     end;
 
     procedure BuildCompressedStatistics(SuggestedMaxDate: Date)
+    begin
+
+        BuildCompressedStatistics(SuggestedMaxDate, true);
+
+    end;
+
+    procedure BuildCompressedStatistics(SuggestedMaxDate: Date; Verbose: Boolean)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TempTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary;
@@ -512,25 +519,27 @@
     begin
 
         if (not TicketAccessEntry.FindLast()) then
-            Message(Text004);
+            if (Verbose) then
+                Message(Text004);
 
         if (SelectEntries(FirstEntryNo, LastEntryNo, StartDate, MaxDate) = -1) then
-            SelectEntriesOnDateTime(FirstEntryNo, LastEntryNo, StartDate, MaxDate); // Handles upgradeded data without "Highest Entry No."
+            SelectEntriesOnDateTime(FirstEntryNo, LastEntryNo, StartDate, MaxDate); // Handles upgraded data without "Highest Entry No."
 
         // Compress and save to DB
         if ((LastEntryNo >= FirstEntryNo) and (LastEntryNo > 0)) then begin
 
-            if (not Confirm(Text003, true, StrSubstNo(FromToLbl, StartDate, MaxDate))) then
-                exit;
+            if (Verbose) then
+                if (not Confirm(Text003, true, StrSubstNo(FromToLbl, StartDate, MaxDate))) then
+                    exit;
 
             LockResource();
             if (SelectEntries(FirstEntryNo, LastEntryNo, StartDate, MaxDate) = -1) then
-                SelectEntriesOnDateTime(FirstEntryNo, LastEntryNo, StartDate, MaxDate); // Handles upgradeded data without "Highest Entry No."
+                SelectEntriesOnDateTime(FirstEntryNo, LastEntryNo, StartDate, MaxDate); // Handles upgraded data without "Highest Entry No."
 
             if (FirstEntryNo = 0) then
                 exit; // Done, someone else did all work already.
 
-            BuildCompressedStatisticsWorker(FirstEntryNo, LastEntryNo, false, TempTicketStatisticsResult);
+            BuildCompressedStatisticsWorker(FirstEntryNo, LastEntryNo, false, TempTicketStatisticsResult, Verbose);
 
         end;
     end;
@@ -554,7 +563,7 @@
         DetailAccessEntry.FindLast();
         LastEntryNo := DetailAccessEntry."Entry No.";
 
-        BuildCompressedStatisticsWorker(FirstEntryNo, LastEntryNo, true, TmpTicketStatisticsResult);
+        BuildCompressedStatisticsWorker(FirstEntryNo, LastEntryNo, true, TmpTicketStatisticsResult, true);
 
         // The date span when translated to an entry number range might find transaction that belong outside the date range (time travel).
         TmpTicketStatisticsResult.SetFilter("Admission Date", '<%1|>%2', FromDate, UntilDate);
@@ -562,7 +571,7 @@
 
     end;
 
-    local procedure BuildCompressedStatisticsWorker(FirstEntryNo: Integer; LastEntryNo: Integer; AdHoc: Boolean; var TmpTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary)
+    local procedure BuildCompressedStatisticsWorker(FirstEntryNo: Integer; LastEntryNo: Integer; AdHoc: Boolean; var TmpTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary; Verbose: Boolean)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetailAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -584,7 +593,7 @@
         ProgressMaxCount := DetailAccessEntry.Count();
         ProgressCurrentCount := 0;
         EntryNoIndex := 0;
-        if (GuiAllowed) then begin
+        if (GuiAllowed and Verbose) then begin
             Window.Open(Dialog001);
             Window.Update(1, StrSubstNo(Text001, ProgressMaxCount));
             Window.Update(2, 0);
@@ -608,7 +617,7 @@
                     if (not AdHoc) then
                         AddAccessFact(TicketAccessEntry);
 
-                    if (GuiAllowed) then begin
+                    if (GuiAllowed and Verbose) then begin
                         if (ProgressCurrentCount mod 100 = 0) then begin
                             Window.Update(1, StrSubstNo(Text001, ProgressMaxCount - ProgressCurrentCount));
                             Window.Update(2, Round(ProgressCurrentCount / ProgressMaxCount * 10000, 1));
@@ -618,7 +627,7 @@
 
                     if (PreviousAdmissionDate <> DT2Date(DetailAccessEntry."Created Datetime")) then begin
                         if (PreviousAdmissionDate <> 0D) then begin
-                            SaveStatistics(TempTicketStatistics, AdHoc, TmpTicketStatisticsResult);
+                            SaveStatistics(TempTicketStatistics, AdHoc, TmpTicketStatisticsResult, Verbose);
                             TempTicketStatistics.DeleteAll();
                             TempRecBuf.DeleteAll();
                             Commit();
@@ -644,9 +653,9 @@
             end;
         until ((DetailAccessEntry.Next() = 0) or (DoneAggregating));
 
-        SaveStatistics(TempTicketStatistics, AdHoc, TmpTicketStatisticsResult);
+        SaveStatistics(TempTicketStatistics, AdHoc, TmpTicketStatisticsResult, Verbose);
 
-        if (GuiAllowed) then
+        if (GuiAllowed and Verbose) then
             Window.Close();
     end;
 
@@ -851,7 +860,7 @@
         end;
     end;
 
-    procedure SaveStatistics(var tmpTicketStatistics: Record "NPR TM Ticket Access Stats" temporary; AdHoc: Boolean; var TmpAdHocTicketStatistics: Record "NPR TM Ticket Access Stats")
+    procedure SaveStatistics(var tmpTicketStatistics: Record "NPR TM Ticket Access Stats" temporary; AdHoc: Boolean; var TmpAdHocTicketStatistics: Record "NPR TM Ticket Access Stats"; Verbose: Boolean)
     var
         TicketStatistics: Record "NPR TM Ticket Access Stats";
     begin
@@ -860,7 +869,7 @@
         tmpTicketStatistics.Reset();
         if (tmpTicketStatistics.FindSet()) then begin
 
-            if (GuiAllowed) then
+            if (GuiAllowed and Verbose) then
                 Window.Update(1, Text002);
 
             repeat
