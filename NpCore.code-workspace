@@ -23,9 +23,7 @@
 			"${UICop}",
 			"${CodeCop}"
 		],
-		"al.enableCodeAnalysis": true,
 		"al.enableCodeActions": true,
-		"al.backgroundCodeAnalysis": false, //if your machine is powerful enough for this, just enable it in user config. Most dev laptops are not.
 		"al.ruleSetPath": "main.ruleset.json",
 		"al.useLegacyRuntime": false,
 		"al.assemblyProbingPaths": [
@@ -83,7 +81,6 @@
 					"panel": "shared",
 					"showReuseMessage": true,
 					"clear": true,
-					"revealProblems": "always"
 				},
 				"problemMatcher": []
 			},
@@ -97,8 +94,21 @@
 					"reveal": "always",
 					"panel": "shared",
 					"showReuseMessage": true,
-					"clear": true,
-					"revealProblems": "always"
+					"clear": true,					
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Compile with analyzers",
+				"detail": "Compile with all analyzers enabled and ContinueBuildOnError for pipeline equivalent full & slow compilation.",
+				"type": "shell",
+				"command": "${workspaceFolder}/.scripts/compile_with_analyzers -workspaceFolder ${workspaceFolder}",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "dedicated",
+					"showReuseMessage": true,
+					"clear": true,					
 				},
 				"problemMatcher": []
 			}
