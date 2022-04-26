@@ -521,7 +521,6 @@
         // Dont do what I dont mean!
         if (StrLen(Format(Abs(NewQuantity))) > 14) then
             Error('Is that a serial number?');
-
         if (StrLen(Format(Abs(NewQuantity))) in [12, 13, 14]) then
             Error('Oopsy woopsy, it looks like you scanned a barcode! Its a bit large to use as a quantity.');
 
