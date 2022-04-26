@@ -171,6 +171,16 @@
         "Next EndPoint ID" := CopyStr(NewNextEndPointKey, 1, MaxStrlen("Next EndPoint ID"));
     end;
 
+    procedure GetServiceMethodValueName(): Text
+    var
+        Index: Integer;
+        ValueName: Text;
+    begin
+        Index := Rec."Service Method Name".Ordinals().IndexOf(Rec."Service Method Name".AsInteger());
+        Rec."Service Method Name".Names().Get(Index, ValueName);
+        Exit(ValueName);
+    end;
+
     [IntegrationEvent(true, false)]
     local procedure OnAfterInit()
     begin

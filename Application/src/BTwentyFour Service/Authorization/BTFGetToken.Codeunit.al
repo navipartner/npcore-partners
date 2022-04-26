@@ -1,6 +1,7 @@
 ﻿codeunit 6014643 "NPR BTF GetToken" implements "NPR BTF IEndPoint"
 {
     Access = Internal;
+
     var
         RequestNotSentLbl: Label 'Failed to send request to %1', Comment = '%1=Request URI';
         ServiceEndPointNotEnabledLbl: Label 'Service EndPoint %1 is not enabled. To be able to consume resource from this enpoint, first enable it (%2 -> %3)', Comment = '%1=ServiceEndPoint."EndPoint ID";%2=ServiceSetup.TableCaption();%3=ServiceEndPoint.TableCaption()';
@@ -39,7 +40,7 @@
         OrdinalValue: Integer;
         Index: Integer;
     begin
-        RequestMessage.Method := Format(ServiceEndPoint."Service Method Name");
+        RequestMessage.Method := ServiceEndPoint.GetServiceMethodValueName();
         URI := ServiceSetup."Service URL" + ServiceEndPoint.Path;
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);

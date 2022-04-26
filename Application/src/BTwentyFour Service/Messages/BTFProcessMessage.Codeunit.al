@@ -1,6 +1,7 @@
 ﻿codeunit 6014651 "NPR BTF ProcessMessage" implements "NPR BTF IEndPoint"
 {
     Access = Internal;
+
     var
         EndPointKeyNotSetLbl: Label 'Endpoint-Key is not set for endpoint %1 (%2 -> %3)', Comment = '%1=Service EndPoint ID;%2=ServiceSetup.TableCaption();%3=ServiceEndPoint.TableCaption()';
         AuthMethodIDNotSetLbl: Label 'Authorization Method ID is not set in %1 or it''s not found in related table %2', Comment = '%1=Service Setup Table Caption;%2=Service EndPoint Table Caption';
@@ -54,7 +55,7 @@
         InStr.ReadText(MessageId);
 
         ClearLastError();
-        RequestMessage.Method := Format(ServiceEndPoint."Service Method Name");
+        RequestMessage.Method := ServiceEndPoint.GetServiceMethodValueName();
         URI := StrSubstNo(ServiceSetup."Service URL" + ServiceEndPoint.Path, MessageId, "NPR BTF Messages Status"::Delivered.AsInteger());
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
