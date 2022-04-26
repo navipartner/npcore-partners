@@ -20,7 +20,7 @@ stages:
       containerDefinitions:
         - Auto
         - BC1700
-        #- BC1704 failing
+        - BC1704
         - BC1711 
         - BC1802
         - BC1804
