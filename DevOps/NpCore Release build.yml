@@ -35,6 +35,7 @@ stages:
       translations:
         translationsRepoUrl: https://gitlab.com/navipartner1/npcore/npcore-translations.git
         translationRepoUser: AzureDevOpsCI
+        translationRepoPassword: $(GitLab-TranslationRepositoryAccessToken)
         translationsRepoBranchName: i10n_master
         translationsTargetRepoBranchName: master
       combinedAppsNuGetSourceUri: https://pkgs.dev.azure.com/navipartner/_packaging/NaviPartner.NavApps/nuget/v3/index.json
