@@ -19,26 +19,26 @@
                     {
 
                         ShowMandatory = true;
-                        ToolTip = 'Specifies the value of the No. field';
+                        ToolTip = 'Specifies the number of the voucher.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Voucher Type"; Rec."Voucher Type")
                     {
 
-                        ToolTip = 'Specifies the value of the Voucher Type field';
+                        ToolTip = 'Specifies the type of the voucher. Credit and gift vouchers are default, but additional ones can be defined as well.';
                         ApplicationArea = NPRRetail;
                     }
                     field(Description; Rec.Description)
                     {
 
-                        ToolTip = 'Specifies the value of the Description field';
+                        ToolTip = 'Specifies the description of the voucher.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Account No."; Rec."Account No.")
                     {
 
                         ShowMandatory = true;
-                        ToolTip = 'Specifies the value of the Account No. field';
+                        ToolTip = 'Specifies the number of the account associated with the voucher.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Issue Register No."; Rec."Issue Register No.")
@@ -325,7 +325,7 @@
                 field("Apply Payment Module"; Rec."Apply Payment Module")
                 {
 
-                    ToolTip = 'Specifies the value of the Apply Payment Module field';
+                    ToolTip = 'Specifies whether the payment module application is DEFAULT or PARTIAL. DEFAULT implies that the retail voucher amount will be accepted in total when redeeming. PARTIAL implies the retail voucher amount is accepted partially when redeeming. The difference remains on the voucher and can be used later.';
                     ApplicationArea = NPRRetail;
                 }
             }
