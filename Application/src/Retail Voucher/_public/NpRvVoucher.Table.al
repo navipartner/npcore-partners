@@ -359,6 +359,8 @@
         {
             Caption = 'Barcode';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'We don''t need to store barcode image.';
         }
         field(1000; "Issue Date"; Date)
         {
@@ -557,11 +559,8 @@
 
     procedure GetImageContent(var TenantMedia: Record "Tenant Media")
     begin
-        TenantMedia.Init();
-        if not Rec."Barcode Image".HasValue() then
-            exit;
-        if TenantMedia.Get(Rec."Barcode Image".MediaId()) then
-            TenantMedia.CalcFields(Content);
+
     end;
+
 }
 
