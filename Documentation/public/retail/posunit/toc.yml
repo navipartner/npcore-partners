@@ -6,6 +6,8 @@
     href: explanation/POSUnit.md
   - name: POS self-service actions
     href: explanation/POS_Self_Service_Actions.md
+  - name: Retail vouchers
+    href: explanation/Retail_Vouchers.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
