@@ -247,7 +247,7 @@
         if (not POSWorkshiftCheckpoint.FindLast()) then
             exit(-1); // Never been balanced
 
-        POSEntry.SETRANGE("POS Unit No.", '=%1', PosUnitNo);
+        POSEntry.SETFILTER("POS Unit No.", '=%1', PosUnitNo);
         POSEntry.SETFILTER("Entry No.", '>%1', POSWorkshiftCheckpoint."POS Entry No.");
         POSEntry.SETRANGE("System Entry", FALSE);
         POSEntry.SETFILTER("Entry Type", '<>%1', POSEntry."Entry Type"::"Cancelled Sale");
