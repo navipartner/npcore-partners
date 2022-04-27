@@ -257,6 +257,8 @@
         {
             Caption = 'Barcode';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'We don''t need to store barcode image.';
         }
         field(1000; "Issue Date"; Date)
         {
