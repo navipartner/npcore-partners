@@ -6,3 +6,5 @@
     href: howto/anonymize-customer-data.md
   - name: Automatically anonymize customer data after a certain period
     href: howto/anonymize-customers-after-period.md
+  - name: GDPR test
+    href: howto/onboarding_test.md
