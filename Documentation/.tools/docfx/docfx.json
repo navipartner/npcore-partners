@@ -12,7 +12,9 @@
           "retail/**.md",
           "retail/**/toc.yml",    
           "wms/**.md",
-          "wms/**/toc.yml",   
+          "wms/**/toc.yml",
+          "partner/**.md", 
+          "partner/**/toc.yml",  
           "toc.yml",
           "*.md"          
         ],
