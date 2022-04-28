@@ -19,7 +19,8 @@ Open the Job Card for the case.
 In the ribbon, click Actions, then "Request and View Containers".
 What you see on screen now is the Crane Containers List page. It shows the containers that exist for the case.
 Create a new record here, using lookup on the first column "Container Template Code" as a shortcut to fill out everything.
- If you are [unsure which template](./Crane-Containers/Crane-Features/Crane-Templates.md) to use then **CORE-DATA-18** (or higher BC version in the future) is a good default as it will preinstall latest npcore .app from the master branch along with a .rapidstart package that contains some POS test data.
+ If you are [unsure which template](./Crane-Containers/Crane-Features/Crane-Templates.md) to use then **CORE-DATA-20** (or higher BC version in the future) is a good default as it will preinstall latest npcore .app from the master branch along with a .rapidstart package that contains some POS test data.
+ For cloud development, you can find [**CLOUD** versions of the templates](./Crane-Containers/Crane-Features/Crane-Templates.md) (**CORE-CLOUD**, **CORE-WMS**).
 
 Then click action "Create Container" to kick off the creation flow.
 Keep in mind - creating a container takes time. This may take anywhere between 5 and 15 minutes.

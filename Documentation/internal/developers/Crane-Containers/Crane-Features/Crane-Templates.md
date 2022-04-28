@@ -42,6 +42,8 @@ Currently, we have these templates (I will omit BC version number to make the li
    - You need to test or present fully functional **NpCore** with **POS**.
    - You need to develop and test (and you need the data). Of course, you will upload your changes via *VS Code* but thanks to the initial **NpCore** installation and the data import you will have a functional environment ready for testing of your changes even before you will deploy your own modifications.
  - **CORE-DATA-AAD** - Everything mentioned above but also with (currently experimental feature) **AAD integration**.
+ - **CORE-CLOUD** - The latest Cloud version of **NpCore** (pre-release, by default) on the latest **Sandbox** version. Again, **w1** is used by default.
+ - **WMS-CLOUD** - The latest Cloud version of **NpWMS** (pre-release, by default) on the latest **Sandbox** version. Again, **w1** is used by default.
  - **INSIDER** - BC insider program. This will contain an empty container as we can't probably preinstall **NpCore** or **WMS** due to possible incompatibilities. Use cases:
    - The preparations of the products for the next official release of BC.
  - **PUBPREV** - Public (Microsoft) preview of the next release. There is no custom NP product being pre-installed. We can expect these will appear approx. 1 month before official releases. Use case:
