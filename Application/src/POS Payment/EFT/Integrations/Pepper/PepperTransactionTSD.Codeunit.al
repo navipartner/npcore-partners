@@ -4,7 +4,8 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
     Access = Internal;
     // NPR5.30/TSA/20170123  CASE 263458 Refactored for Transcendence
     // NPR5.35/BR /20170815  CASE 284379 Added support for Cashback
-
+    ObsoleteReason = 'Use HWC';
+    ObsoleteState = Pending;
 
     trigger OnRun()
     begin

@@ -4,6 +4,8 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
     Access = Internal;
     // NPR5.30/TSA/20170123  CASE 263458 Refactored for Transcendence
 
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Migrating to HWC';
 
     trigger OnRun()
     begin
@@ -36,7 +38,7 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
         InitializedRequest := true;
     end;
 
-    procedure SetReceiptEncoding(PepperEncodingName: Code[20]; NavisionEncodingName: Code[20])
+    procedure SetReceiptEncoding(PepperEncodingName: Code[20]; BCEncodingName: Code[20])
     begin
 
         if not InitializedRequest then
@@ -47,8 +49,8 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
             AuxRequest.PepperReceiptEncoding := PepperEncodingName;
 
         // Default value is ISO-8859-1
-        if (NavisionEncodingName <> '') then
-            AuxRequest.NavisionReceiptEncoding := NavisionEncodingName;
+        if (BCEncodingName <> '') then
+            AuxRequest.NavisionReceiptEncoding := BCEncodingName;
     end;
 
     procedure SetTimout(TimeoutMillies: Integer)

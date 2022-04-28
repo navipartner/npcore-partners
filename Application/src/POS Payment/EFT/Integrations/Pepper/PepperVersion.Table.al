@@ -1,10 +1,6 @@
 ﻿table 6184494 "NPR Pepper Version"
 {
     Access = Internal;
-    // NPR5.22\BR\20160316  CASE 231481 Object Created
-    // NPR5.22\BR\20160415  CASE 231481 Added Install Zip File BLOB field, dll version
-    // NPR5.22\BR\20160422  CASE 231481 Added the Installation Codeunit fields
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -fields 100..245
 
     Caption = 'Pepper Version';
     DataClassification = CustomerContent;
@@ -18,6 +14,7 @@
         {
             Caption = 'Code';
             DataClassification = CustomerContent;
+            NotBlank = true;
         }
         field(20; Description; Text[50])
         {
@@ -29,81 +26,112 @@
             Caption = 'XMLport Configuration';
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(XMLport));
+            InitValue = 6184490;
         }
         field(105; "XMLport Configuration Name"; Text[30])
         {
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
-                                                             "Object ID" = FIELD("XMLport Configuration")));
+                                                             "Object ID" = Field("XMLport Configuration")));
             Caption = 'XMLport Configuration Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(200; "Codeunit Begin Workshift"; Integer)
         {
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Pending;
+
             Caption = 'Codeunit Begin Workshift';
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(205; "Codeunit Begin Workshift Name"; Text[30])
         {
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Pending;
+
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
-                                                             "Object ID" = FIELD("Codeunit Begin Workshift")));
+                                                             "Object ID" = Field("Codeunit Begin Workshift")));
             Caption = 'Codeunit Begin Workshift Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(210; "Codeunit Transaction"; Integer)
         {
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Pending;
+
             Caption = 'Codeunit Transaction';
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(215; "Codeunit Transaction Name"; Text[30])
         {
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Pending;
+
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
-                                                             "Object ID" = FIELD("Codeunit Transaction")));
+                                                             "Object ID" = Field("Codeunit Transaction")));
             Caption = 'Codeunit Transaction Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(220; "Codeunit End Workshift"; Integer)
         {
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Pending;
+
             Caption = 'Codeunit End Workshift';
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(225; "Codeunit End Workshift Name"; Text[30])
         {
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Pending;
+
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
-                                                             "Object ID" = FIELD("Codeunit End Workshift")));
+                                                             "Object ID" = Field("Codeunit End Workshift")));
             Caption = 'Codeunit End Workshift Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(230; "Codeunit Auxiliary Functions"; Integer)
         {
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Pending;
+
             Caption = 'Codeunit Auxiliary Functions';
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(235; "Codeunit Auxiliary Name"; Text[30])
         {
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Pending;
+
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
-                                                             "Object ID" = FIELD("Codeunit Auxiliary Functions")));
+                                                             "Object ID" = Field("Codeunit Auxiliary Functions")));
             Caption = 'Codeunit Auxiliary Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(240; "Codeunit Install"; Integer)
         {
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Pending;
+
             Caption = 'Codeunit Install';
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(245; "Codeunit Install Name"; Text[30])
         {
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Pending;
+
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
-                                                             "Object ID" = FIELD("Codeunit Install")));
+                                                             "Object ID" = Field("Codeunit Install")));
             Caption = 'Codeunit Install Name';
             Editable = false;
             FieldClass = FlowField;
@@ -143,7 +171,7 @@
         TextConfigsFound: Label 'There is at least one Pepper Configuration linked to this version. Remove the link on the Pepper Configuration Card before deleteing this record.';
     begin
         PepperConfiguration.SetRange(Version, Code);
-        if not PepperConfiguration.IsEmpty then
+        if (not PepperConfiguration.IsEmpty) then
             Error(TextConfigsFound);
     end;
 
@@ -160,9 +188,9 @@
         TxtZipfileDescription: Label 'ZIP Files (*.zip)|*.zip';
         RecRef: RecordRef;
     begin
-        //-NPR5.22
+
         UploadResult := FileManagement.BLOBImportWithFilter(TempBlob, TxtCaption, '', TxtZipfileDescription, TxtZipfilefilter);
-        if UploadResult = '' then
+        if (UploadResult = '') then
             Error(TxtNotUploaded);
         Message(StrSubstNo(TxtSuccess, UploadResult));
         case FileType of
@@ -179,11 +207,11 @@
 
                     "Pepper DLL Version" := '';
                     Modify();
-                    if not "Install Zip File".HasValue() then
+                    if (not "Install Zip File".HasValue()) then
                         Error(TxtNotStored);
                 end;
         end;
-        //+NPR5.22
+
     end;
 
     procedure ClearZipFile(FileType: Option InstallFile)
@@ -192,14 +220,14 @@
         TxtConfirmClearFile: Label 'Are you sure you want to delete the file?';
         TxtFileCleared: Label 'File deleted.';
     begin
-        //-NPR5.22
+
         case FileType of
             FileType::InstallFile:
                 begin
                     CalcFields("Install Zip File");
-                    if not "Install Zip File".HasValue() then
+                    if (not "Install Zip File".HasValue()) then
                         Error(TxtNoFile);
-                    if not Confirm(TxtConfirmClearFile) then
+                    if (not Confirm(TxtConfirmClearFile)) then
                         exit;
                     Clear("Install Zip File");
                     "Pepper DLL Version" := '';
@@ -207,7 +235,7 @@
                     Message(TxtFileCleared);
                 end;
         end;
-        //+NPR5.22
+
     end;
 
     procedure ExportZipFile(FileType: Option InstallFile)
@@ -219,19 +247,20 @@
         TxtTitle: Label 'ZIP File Export';
         TxtZIPFileFilter: Label 'ZIP Files (*.zip)|*.zip';
     begin
-        //-NPR5.22
+
         case FileType of
             FileType::InstallFile:
                 begin
                     CalcFields("Install Zip File");
-                    if not "Install Zip File".HasValue() then
+                    if (not "Install Zip File".HasValue()) then
                         Error(TxtNoFile);
                     ExportName := TxtFileName;
                     "Install Zip File".CreateInStream(StreamIn);
                     DownloadFromStream(StreamIn, TxtTitle, '', TxtZIPFileFilter, ExportName);
                 end;
         end;
-        //+NPR5.22
+
     end;
 }
+
 
