@@ -2,13 +2,8 @@
 codeunit 6184498 "NPR Pepper Term. Captions TSD"
 {
     Access = Internal;
-    // NPR5.26/TSA/20160809 CASE 248452 Assembly Version Up - JBAXI Support, General Improvements
-    // NPR5.38/MHA /20180105  CASE 301053 Renamed Parameter Labels to ProcssLabels in GetLabels as labels is a reserved word in V2
-
-
-    trigger OnRun()
-    begin
-    end;
+    ObsoleteReason = 'Use HWC';
+    ObsoleteState = Pending;
 
     var
         LblTrx_0: Label 'Recovering Last Transaction...';
@@ -46,45 +41,10 @@ codeunit 6184498 "NPR Pepper Term. Captions TSD"
         PepperEftStatus_7: Label 'Terminal busy, no active transaction';
         PepperEftStatus_8: Label '- - -';
 
+#if not CLOUD
+    [Obsolete('Use HWC')]
     procedure GetLabels(var ProcessLabels: DotNet NPRNetProcessLabels0)
     begin
-        //-NPR5.38 [301053]
-        // Labels := Labels.ProcessLabels ();
-        //
-        // Labels.ButtonCloseCaption := ButtonCloseCaption;
-        // Labels.ConfirmAbandonTransaction := ConfirmAbandonTransaction;
-        // Labels.ConfirmContinueWaitOnTimeout := ConfirmContinueWaitOnTimeout;
-        // Labels.EftInitialDisplayText := EftInitialDisplayText;
-        // Labels.LblAuxiliaryFunction := LblAuxiliaryFunction;
-        // Labels.LblCleanupDriver := LblCleanupDriver;
-        // Labels.LblClose := LblClose;
-        // Labels.LblConfigDriver := LblConfigDriver;
-        // Labels.LblEndOfDayReceipt := LblEndOfDayReceipt;
-        // Labels.LblError := LblError;
-        // Labels.LblHeaderFooterFiles := LblHeaderFooterFiles;
-        // Labels.LblInitializeLibrary := LblInitializeLibrary;
-        // Labels.LblOpen := LblOpen;
-        // Labels.LblPleaseWait := LblPleaseWait;
-        // Labels.LblRegisterCallback := LblRegisterCallback;
-        // Labels.LblSuccess := LblSuccess;
-        // Labels.LblTrx_0 := LblTrx_0;
-        // Labels.LblTrx_10 := LblTrx_10;
-        // Labels.LblTrx_20 := LblTrx_20;
-        // Labels.LblTrx_60 := LblTrx_60;
-        // Labels.LblTrx_200 := LblTrx_200;
-        // Labels.LblUnloadLibrary := LblUnloadLibrary;
-        // Labels.LblWaitingEndOfDayReceipt := LblWaitingEndOfDayReceipt;
-        // Labels.LblWaitingForReceipt := LblWaitingForReceipt;
-        // Labels.WindowTitle := WindowTitle;
-        // Labels.PepperEftStatus_0 := PepperEftStatus_0;
-        // Labels.PepperEftStatus_1 := PepperEftStatus_1;
-        // Labels.PepperEftStatus_2 := PepperEftStatus_2;
-        // Labels.PepperEftStatus_3 := PepperEftStatus_3;
-        // Labels.PepperEftStatus_4 := PepperEftStatus_4;
-        // Labels.PepperEftStatus_5 := PepperEftStatus_5;
-        // Labels.PepperEftStatus_6 := PepperEftStatus_6;
-        // Labels.PepperEftStatus_7 := PepperEftStatus_7;
-        // Labels.PepperEftStatus_8 := PepperEftStatus_8;
         ProcessLabels := ProcessLabels.ProcessLabels();
 
         ProcessLabels.ButtonCloseCaption := ButtonCloseCaption;
@@ -121,7 +81,8 @@ codeunit 6184498 "NPR Pepper Term. Captions TSD"
         ProcessLabels.PepperEftStatus_6 := PepperEftStatus_6;
         ProcessLabels.PepperEftStatus_7 := PepperEftStatus_7;
         ProcessLabels.PepperEftStatus_8 := PepperEftStatus_8;
-        //+NPR5.38 [301053]
     end;
+#endif
+
 }
 #endif

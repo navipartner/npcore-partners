@@ -126,7 +126,7 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         HwcRequest: JsonObject;
     begin
 
-        EFTTransactionMgt.StartBeginWorkshift(EFTSetup, SalePOS, HwcRequest);
+        EFTTransactionMgt.PrepareBeginWorkshift(EFTSetup, SalePOS, HwcRequest);
         WorkflowContext.Add('hwcRequest', HwcRequest);
     end;
 
@@ -136,7 +136,7 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         HwcRequest: JsonObject;
     begin
 
-        EFTTransactionMgt.StartEndWorkshift(EFTSetup, SalePOS, HwcRequest);
+        EFTTransactionMgt.PrepareEndWorkshift(EFTSetup, SalePOS, HwcRequest);
         WorkflowContext.Add('hwcRequest', HwcRequest);
     end;
 
@@ -150,7 +150,7 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         if not VoidConfirm(LastEFTTransactionRequest) then
             Error('');
 
-        EFTTransactionMgt.StartVoid(EFTSetup, SalePOS, LastEFTTransactionRequest."Entry No.", true, HwcRequest);
+        EFTTransactionMgt.PrepareVoid(EFTSetup, SalePOS, LastEFTTransactionRequest."Entry No.", true, HwcRequest);
         WorkflowContext.Add('hwcRequest', HwcRequest);
     end;
 
@@ -165,7 +165,7 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         if not VoidConfirm(EFTTransactionRequest) then
             Error('');
 
-        EFTTransactionMgt.StartVoid(EFTSetup, SalePOS, EFTTransactionRequest."Entry No.", true, HwcRequest);
+        EFTTransactionMgt.PrepareVoid(EFTSetup, SalePOS, EFTTransactionRequest."Entry No.", true, HwcRequest);
         WorkflowContext.Add('hwcRequest', HwcRequest);
     end;
 
@@ -174,7 +174,7 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         HwcRequest: JsonObject;
     begin
-        EFTTransactionMgt.StartVerifySetup(EFTSetup, SalePOS, HwcRequest);
+        EFTTransactionMgt.PrepareVerifySetup(EFTSetup, SalePOS, HwcRequest);
         WorkflowContext.Add('hwcRequest', HwcRequest);
     end;
 
@@ -188,7 +188,7 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         if not SelectTransaction(EFTTransactionRequest) then
             exit;
 
-        EFTTransactionMgt.StartReferencedRefund(EFTSetup, SalePOS, '', 0, EFTTransactionRequest."Entry No.", HwcRequest);
+        EFTTransactionMgt.PrepareReferencedRefund(EFTSetup, SalePOS, '', 0, EFTTransactionRequest."Entry No.", HwcRequest);
         WorkflowContext.Add('hwcRequest', HwcRequest);
     end;
 
@@ -197,7 +197,7 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         HwcRequest: JsonObject;
     begin
-        EFTTransactionMgt.StartAuxOperation(EFTSetup, SalePOS, AuxId, HwcRequest);
+        EFTTransactionMgt.PrepareAuxOperation(EFTSetup, SalePOS, AuxId, HwcRequest);
         WorkflowContext.Add('hwcRequest', HwcRequest);
     end;
 
@@ -231,7 +231,7 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         HwcRequest: JsonObject;
     begin
-        EFTTransactionMgt.StartLookup(EFTSetup, SalePOS, EntryNo, HwcRequest);
+        EFTTransactionMgt.PrepareLookup(EFTSetup, SalePOS, EntryNo, HwcRequest);
         WorkflowContext.Add('hwcRequest', HwcRequest);
     end;
 

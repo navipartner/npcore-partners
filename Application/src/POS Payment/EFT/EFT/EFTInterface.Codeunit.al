@@ -1,11 +1,6 @@
 ﻿codeunit 6184479 "NPR EFT Interface"
 {
     Access = Internal;
-    // NPR5.46/MMV /20181008 CASE 290734 Created object
-    // NPR5.48/MMV /20190123 CASE 341237 Added new events for skipping pause/unpause of front end.
-    // NPR5.51/MMV /20190626 CASE 359385 Added gift card event
-    // NPR5.55/MMV /20200420 CASE 386254 Added event for retrieving integration workflow
-
 
     trigger OnRun()
     begin
@@ -77,7 +72,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnCreateHwcEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; EftHwcRequest: JsonObject; var Handled: Boolean)
+    procedure OnCreateHwcEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var EftHwcRequest: JsonObject; var Handled: Boolean)
     begin
     end;
 

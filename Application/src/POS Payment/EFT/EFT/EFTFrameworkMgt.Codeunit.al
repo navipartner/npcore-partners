@@ -218,7 +218,7 @@
         CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD), Handled);
     end;
 
-    procedure CreateHwcRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; EftRequest: JsonObject)
+    procedure CreateHwcRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; var EftRequest: JsonObject)
     var
         EFTInterface: Codeunit "NPR EFT Interface";
         Handled: Boolean;

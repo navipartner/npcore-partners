@@ -26,6 +26,7 @@
 
     #region Workflow V1
 
+    [Obsolete('Use HWC Version')]
     procedure StartPayment(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -47,7 +48,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC')]
+    [Obsolete('Use HWC Version')]
     procedure StartVoid(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; RequestEntryNoToVoid: Integer; IsManualVoid: Boolean): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -67,8 +68,151 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
+    [Obsolete('Use HWC Version')]
+    procedure StartReferencedRefund(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; CurrencyCode: Code[10]; AmountToRefund: Decimal; OriginalRequestEntryNo: Integer): Integer
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request";
+    begin
 
-    procedure StartVoid(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; RequestEntryNoToVoid: Integer; IsManualVoid: Boolean; EftRequest: JsonObject): Integer
+        if PerformRecoveryInstead(SalePOS, EFTSetup."EFT Integration Type", EFTTransactionRequestToRecover) then begin
+            EFTFrameworkMgt.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EFTTransactionRequestToRecover."Entry No.");
+        end else begin
+            EFTFrameworkMgt.CreateRefundRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", CurrencyCode, Abs(AmountToRefund), OriginalRequestEntryNo);
+        end;
+        Commit();
+        SendRequest(EFTTransactionRequest);
+        exit(EFTTransactionRequest."Entry No.");
+    end;
+
+    [Obsolete('Use HWC Version')]
+    procedure StartGiftCardLoad(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"): Integer
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request";
+    begin
+
+        if PerformRecoveryInstead(SalePOS, EFTSetup."EFT Integration Type", EFTTransactionRequestToRecover) then begin
+            EFTFrameworkMgt.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EFTTransactionRequestToRecover."Entry No.");
+        end else begin
+            EFTFrameworkMgt.CreateGiftcardLoadRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", CurrencyCode, Amount);
+        end;
+        Commit();
+        SendRequest(EFTTransactionRequest);
+        exit(EFTTransactionRequest."Entry No.");
+    end;
+
+    [Obsolete('Use HWC Version')]
+    procedure StartLookup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; EntryNoToLookup: Integer): Integer
+    var
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        CheckIfTrxResultAlreadyKnown(EntryNoToLookup);
+
+        EFTFrameworkMgt.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EntryNoToLookup);
+        Commit();
+        SendRequest(EFTTransactionRequest);
+        exit(EFTTransactionRequest."Entry No.");
+    end;
+
+    [Obsolete('Use HWC Version')]
+    procedure StartBeginWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
+    var
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTFrameworkMgt.CreateBeginWorkshiftRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
+        Commit();
+        SendRequest(EFTTransactionRequest);
+        exit(EFTTransactionRequest."Entry No.");
+    end;
+
+    [Obsolete('Use HWC Version')]
+    procedure StartEndWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
+    var
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTFrameworkMgt.CreateEndWorkshiftRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
+        Commit();
+        SendRequest(EFTTransactionRequest);
+        exit(EFTTransactionRequest."Entry No.");
+    end;
+
+
+    [Obsolete('Use HWC Version')]
+    procedure StartVerifySetup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
+    var
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTFrameworkMgt.CreateVerifySetupRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
+        Commit();
+        SendRequest(EFTTransactionRequest);
+        exit(EFTTransactionRequest."Entry No.");
+    end;
+
+    [Obsolete('Use HWC Version')]
+    procedure StartAuxOperation(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; AuxFunction: Integer): Integer
+    var
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTFrameworkMgt.CreateAuxRequest(EFTTransactionRequest, EFTSetup, AuxFunction, SalePOS."Register No.", SalePOS."Sales Ticket No.");
+        Commit();
+        SendRequest(EFTTransactionRequest);
+        exit(EFTTransactionRequest."Entry No.");
+    end;
+    #endregion
+
+    #region HWC
+    procedure PreparePayment(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"; var IntegrationWorkflowOut: Text; var EftRequest: JsonObject): Integer
+    var
+        EntryNo: Integer;
+        JToken: JsonToken;
+    begin
+
+        EntryNo := PreparePayment(EFTSetup, Amount, CurrencyCode, SalePOS, EftRequest);
+
+        if (not EftRequest.Get('WorkflowName', JToken)) then
+            Error('Payment has no default workflow.');
+
+        if ((JToken.AsValue().IsNull) or (JToken.AsValue().AsText() = '')) then
+            Error('Payment has no default workflow.');
+
+        IntegrationWorkflowOut := JToken.AsValue().AsText();
+        exit(EntryNo);
+
+    end;
+
+    procedure PreparePayment(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"; var EftRequest: JsonObject): Integer
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request";
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+    begin
+        EftRequest.ReadFrom('{}');
+
+        if PerformRecoveryInstead(SalePOS, EFTSetup."EFT Integration Type", EFTTransactionRequestToRecover) then begin
+            EFTFrameworkMgt.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EFTTransactionRequestToRecover."Entry No.");
+
+        end else begin
+            if (Amount >= 0) then
+                EFTFrameworkMgt.CreatePaymentOfGoodsRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", CurrencyCode, Amount)
+            else
+                EFTFrameworkMgt.CreateRefundRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", CurrencyCode, Abs(Amount), 0);
+        end;
+
+        EFTFrameworkMgt.CreateHwcRequest(EFTTransactionRequest, EftRequest);
+        Commit(); // Save the request record data regardless of any later errors when invoking.
+
+        exit(EFTTransactionRequest."Entry No.");
+    end;
+
+    procedure PrepareVoid(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; RequestEntryNoToVoid: Integer; IsManualVoid: Boolean; var EftRequest: JsonObject): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -88,25 +232,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC')]
-    procedure StartReferencedRefund(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; CurrencyCode: Code[10]; AmountToRefund: Decimal; OriginalRequestEntryNo: Integer): Integer
-    var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request";
-    begin
-
-        if PerformRecoveryInstead(SalePOS, EFTSetup."EFT Integration Type", EFTTransactionRequestToRecover) then begin
-            EFTFrameworkMgt.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EFTTransactionRequestToRecover."Entry No.");
-        end else begin
-            EFTFrameworkMgt.CreateRefundRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", CurrencyCode, Abs(AmountToRefund), OriginalRequestEntryNo);
-        end;
-        Commit();
-        SendRequest(EFTTransactionRequest);
-        exit(EFTTransactionRequest."Entry No.");
-    end;
-
-    procedure StartReferencedRefund(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; CurrencyCode: Code[10]; AmountToRefund: Decimal; OriginalRequestEntryNo: Integer; EftRequest: JsonObject): Integer
+    procedure PrepareReferencedRefund(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; CurrencyCode: Code[10]; AmountToRefund: Decimal; OriginalRequestEntryNo: Integer; var EftRequest: JsonObject): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -124,38 +250,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    procedure StartGiftCardLoad(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"): Integer
-    var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request";
-    begin
-
-        if PerformRecoveryInstead(SalePOS, EFTSetup."EFT Integration Type", EFTTransactionRequestToRecover) then begin
-            EFTFrameworkMgt.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EFTTransactionRequestToRecover."Entry No.");
-        end else begin
-            EFTFrameworkMgt.CreateGiftcardLoadRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", CurrencyCode, Amount);
-        end;
-        Commit();
-        SendRequest(EFTTransactionRequest);
-        exit(EFTTransactionRequest."Entry No.");
-    end;
-
-    [Obsolete('Use HWC')]
-    procedure StartLookup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; EntryNoToLookup: Integer): Integer
-    var
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-    begin
-        CheckIfTrxResultAlreadyKnown(EntryNoToLookup);
-
-        EFTFrameworkMgt.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EntryNoToLookup);
-        Commit();
-        SendRequest(EFTTransactionRequest);
-        exit(EFTTransactionRequest."Entry No.");
-    end;
-
-    procedure StartLookup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; EntryNoToLookup: Integer; EftRequest: JsonObject): Integer
+    procedure PrepareLookup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; EntryNoToLookup: Integer; var EftRequest: JsonObject): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -168,19 +263,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC')]
-    procedure StartBeginWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
-    var
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-    begin
-        EFTFrameworkMgt.CreateBeginWorkshiftRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
-        Commit();
-        SendRequest(EFTTransactionRequest);
-        exit(EFTTransactionRequest."Entry No.");
-    end;
-
-    procedure StartBeginWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; EftRequest: JsonObject): Integer
+    procedure PrepareBeginWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; var EftRequest: JsonObject): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -191,19 +274,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC')]
-    procedure StartEndWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
-    var
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-    begin
-        EFTFrameworkMgt.CreateEndWorkshiftRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
-        Commit();
-        SendRequest(EFTTransactionRequest);
-        exit(EFTTransactionRequest."Entry No.");
-    end;
-
-    procedure StartEndWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; EftRequest: JsonObject): Integer
+    procedure PrepareEndWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; var EftRequest: JsonObject): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -214,42 +285,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC')]
-    procedure StartVerifySetup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
-    var
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-    begin
-        EFTFrameworkMgt.CreateVerifySetupRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
-        Commit();
-        SendRequest(EFTTransactionRequest);
-        exit(EFTTransactionRequest."Entry No.");
-    end;
-
-    procedure StartVerifySetup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; EftRequest: JsonObject): Integer
-    var
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-    begin
-        EFTFrameworkMgt.CreateVerifySetupRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
-        Commit();
-        EFTFrameworkMgt.CreateHwcRequest(EFTTransactionRequest, EftRequest);
-        exit(EFTTransactionRequest."Entry No.");
-    end;
-
-    [Obsolete('Use HWC')]
-    procedure StartAuxOperation(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; AuxFunction: Integer): Integer
-    var
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-    begin
-        EFTFrameworkMgt.CreateAuxRequest(EFTTransactionRequest, EFTSetup, AuxFunction, SalePOS."Register No.", SalePOS."Sales Ticket No.");
-        Commit();
-        SendRequest(EFTTransactionRequest);
-        exit(EFTTransactionRequest."Entry No.");
-    end;
-
-    procedure StartAuxOperation(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; AuxFunction: Integer; EftRequest: JsonObject): Integer
+    procedure PrepareAuxOperation(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; AuxFunction: Integer; var EftRequest: JsonObject): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -260,41 +296,14 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    #endregion
-
-
-    #region Workflow V2
-    procedure PreparePayment(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"; var IntegrationWorkflowOut: Text; EftRequest: JsonObject): Integer
+    procedure PrepareVerifySetup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; var EftRequest: JsonObject): Integer
     var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request";
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        JToken: JsonToken;
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-
-        EftRequest.ReadFrom('{}');
-
-        if PerformRecoveryInstead(SalePOS, EFTSetup."EFT Integration Type", EFTTransactionRequestToRecover) then begin
-            EFTFrameworkMgt.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EFTTransactionRequestToRecover."Entry No.");
-
-        end else begin
-            if (Amount >= 0) then
-                EFTFrameworkMgt.CreatePaymentOfGoodsRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", CurrencyCode, Amount)
-            else
-                EFTFrameworkMgt.CreateRefundRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", CurrencyCode, Abs(Amount), 0);
-        end;
-
+        EFTFrameworkMgt.CreateVerifySetupRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
+        Commit();
         EFTFrameworkMgt.CreateHwcRequest(EFTTransactionRequest, EftRequest);
-
-        if (not EftRequest.Get('WorkflowName', JToken)) then
-            Error('Payment has no default workflow.');
-
-        if ((JToken.AsValue().IsNull) or (JToken.AsValue().AsText() = '')) then
-            Error('Payment has no default workflow.');
-
-        IntegrationWorkflowOut := JToken.AsValue().AsText();
-        Commit(); // Save the request record data regardless of any later errors when invoking.
-
         exit(EFTTransactionRequest."Entry No.");
     end;
     #endregion
@@ -356,9 +365,11 @@
         Commit(); // This commit should handle both the sale line(s) insertion and trx record "Result Processed" := true in the same transaction. On failure, lookup of trx result is needed.
 
         EFTInterface.OnAfterFinancialCommit(EftTransactionRequest);
-
+        // Note:
+        // Signature decline must now be handled in the workflow, by not committing the transaction
     end;
 
+    [Obsolete('Use HWC Version')]
     local procedure EftPaymentResponseReceived(EftTransactionRequest: Record "NPR EFT Transaction Request"; POSFrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
         EFTInterface: Codeunit "NPR EFT Interface";

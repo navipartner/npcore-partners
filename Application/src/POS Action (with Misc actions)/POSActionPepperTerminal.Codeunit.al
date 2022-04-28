@@ -1,5 +1,8 @@
 ﻿codeunit 6150779 "NPR POS Action: PepperTerminal"
 {
+    ObsoleteReason = 'Use HWC';
+    ObsoleteState = Pending;
+
     Access = Internal;
 
     var

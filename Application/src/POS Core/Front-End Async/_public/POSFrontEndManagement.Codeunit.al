@@ -480,7 +480,7 @@
             Request.SetInvalidCustomMethod(Method);
             InvokeFrontEndAsync(Request);
 
-            // It is mandatory that rrror be thrown now, and transaction aborted and rolled back.
+            // It is mandatory that error be thrown now, and transaction aborted and rolled back.
             // DO NOT change this behavior.
             Error('');
         end else

@@ -67,6 +67,8 @@
 
                     ToolTip = 'Specifies the value of the NAV Receipt Encoding field';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Will be removed when Pepper TSD is removed.';
                 }
                 field("Com Port"; Rec."Com Port")
                 {
@@ -236,7 +238,7 @@
     {
         area(processing)
         {
-            #if not CLOUD
+#if not CLOUD
             group(Import)
             {
                 action(ImportLicense)
@@ -268,7 +270,7 @@
                     end;
                 }
             }
-            #endif
+#endif
             group(Show)
             {
                 action(ShowLicense)
