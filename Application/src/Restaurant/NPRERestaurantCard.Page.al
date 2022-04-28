@@ -17,25 +17,25 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code for the Restaurant.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the name of the Restaurant.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Name 2"; Rec."Name 2")
                 {
 
-                    ToolTip = 'Specifies the value of the Name 2 field';
+                    ToolTip = 'Specifies optional additional information about the Restaurant name.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Service Flow Profile"; Rec."Service Flow Profile")
                 {
 
-                    ToolTip = 'Specifies the value of the Service Flow Profile field';
+                    ToolTip = 'Specifies the selected Service Flow Profile. A new profile can be created if needed.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -45,13 +45,13 @@
                 field("Auto Send Kitchen Order"; Rec."Auto Send Kitchen Order")
                 {
 
-                    ToolTip = 'Specifies the value of the Auto Send Kitchen Order field';
+                    ToolTip = 'Specifies whether the order will be automatically sent to the kitchen once captured.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Resend All On New Lines"; Rec."Resend All On New Lines")
                 {
 
-                    ToolTip = 'Specifies the value of the Resend All On New Lines field';
+                    ToolTip = 'Specifies whether all lines on the waiter pad are sent to the kitchen when new lines are added to the waiter pad.';
                     ApplicationArea = NPRRetail;
                 }
                 group(Print)
@@ -60,7 +60,7 @@
                     field("Kitchen Printing Active"; Rec."Kitchen Printing Active")
                     {
 
-                        ToolTip = 'Specifies the value of the Kitchen Printing Active field';
+                        ToolTip = 'Specifies whether the kitchen printing is active.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -71,19 +71,19 @@
                     field("KDS Active"; Rec."KDS Active")
                     {
 
-                        ToolTip = 'Specifies the value of the KDS Active field';
+                        ToolTip = 'Specifies whether the KDS is active.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Order ID Assign. Method"; Rec."Order ID Assign. Method")
                     {
 
-                        ToolTip = 'Specifies the value of the Order ID Assign. Method field';
+                        ToolTip = 'Specifies the assignment method of the order ID.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Station Req. Handl. On Serving"; Rec."Station Req. Handl. On Serving")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies how kitchen station production requests should be handled, if product has been served prior to finishing production';
+                        ToolTip = 'Specifies how kitchen station production requests should be handled, if the product has been served prior to finishing production.';
                     }
                 }
             }
