@@ -45,10 +45,10 @@
             column(TurnoverRate_Item; TurnoverRate)
             {
             }
-            column(Column3_Item; 'Salg i perioden ' + DateFilter)
+            column(Column3_Item; StrSubstNo('%1 %2', PeriodSalesLabel, DateFilter))
             {
             }
-            column(Column5_Item; 'Lagervaerdi pr. ' + Format(ValueDate))
+            column(Column5_Item; StrSubstNo('%1 %2', ValuationDateLabel, Format(ValueDate)))
             {
             }
             column(IncludeItemWithNoVATSales; IncludeItemWithNoVATSales)
@@ -247,6 +247,8 @@
         Text10600003: Label 'M';
         ValueMethod: Option "sidste koebspris","kostpris (gns.)";
         DateFilter: Text[250];
+        PeriodSalesLabel: Label 'Sales during the period';
+        ValuationDateLabel: Label 'Stock Value on Date';
 
     internal procedure Calculate("ItemNo.": Code[20]; FromDate: Date; ToDate: Date) ValueAmt: Decimal
     begin
