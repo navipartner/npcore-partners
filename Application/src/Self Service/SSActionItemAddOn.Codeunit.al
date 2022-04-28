@@ -16,7 +16,7 @@
     local procedure ActionVersion(): Text[30]
     begin
 
-        exit('2.3');
+        exit('2.4');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -84,8 +84,7 @@
                 exit;
         end;
 
-        JsonText := FORMAT(GenerateAddonConfigJson(POSSale, SaleLinePOS, ItemAddOn));
-
+        GenerateAddonConfigJson(POSSale, SaleLinePOS, ItemAddOn).WriteTo(JsonText);
 
         exit(JsonText);
     end;
@@ -108,7 +107,7 @@
         if (ItemAddOnLine.FindSet()) then begin
             repeat
 
-                if (FindSaleLine(POSSale, MasterSaleLinePOS."Line No.", ItemAddOnLine, SaleLinePOS)) then
+                if (FindSaleLine(POSSale, MasterSaleLinePOS."Main Line No.", ItemAddOnLine, SaleLinePOS)) then
                     CommentText := '';
 
                 if (ItemAddOnLine.Type = ItemAddOnLine.Type::Quantity) then begin
@@ -288,7 +287,7 @@
                 DecVal := 1;
         end;
 
-        if (DecVal <= 0) then
+        if (DecVal < 0) then
             exit;
 
         if (not FindSaleLine(POSSale, MasterLineNumber, ItemAddOnLine, SaleLinePOS)) then begin
@@ -416,11 +415,14 @@
         end;
     end;
 
+
     local procedure FindSaleLine(POSSale: Codeunit "NPR POS Sale"; AppliesToLineNo: Integer; NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+
     begin
+        Clear(SaleLinePOS);
 
         POSSale.GetCurrentSale(SalePOS);
 
@@ -432,11 +434,14 @@
         if not SaleLinePOSAddOn.FindFirst() then
             exit(false);
 
-        exit(SaleLinePOS.Get(SaleLinePOSAddOn."Register No.",
-                               SaleLinePOSAddOn."Sales Ticket No.",
-                               SaleLinePOSAddOn."Sale Date",
-                               SaleLinePOSAddOn."Sale Type",
-                               SaleLinePOSAddOn."Sale Line No."));
+        SaleLinePOS.SetRange("Register No.", SaleLinePOSAddOn."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOSAddOn."Sales Ticket No.");
+        SaleLinePOS.SetRange(Date, SaleLinePOSAddOn."Sale Date");
+        SaleLinePOS.SetRange("Sale Type", SaleLinePOSAddOn."Sale Type");
+        SaleLinePOS.SetRange("Line No.", SaleLinePOSAddOn."Sale Line No.");
+        SaleLinePOS.SetRange("No.", NpIaItemAddOnLine."Item No.");
+        exit(SaleLinePOS.FindFirst());
+
     end;
 
     local procedure InsertAddOn(SaleLinePOS: Record "NPR POS Sale Line"; NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; AppliesToLineNo: Integer)
@@ -478,5 +483,96 @@
 
         exit(Format(JToken.AsValue().AsText()));
     end;
+
+    local procedure LookupItemAddOn(var AddOnNo: Code[20]): Boolean
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+    begin
+        ItemAddOn.FilterGroup(2);
+        ItemAddOn.SetRange(Enabled, true);
+        ItemAddOn.FilterGroup(0);
+        if AddOnNo <> '' then begin
+            ItemAddOn."No." := AddOnNo;
+            if ItemAddOn.find('=><') then;
+        end;
+        if Page.RunModal(0, ItemAddOn) = Action::LookupOK then begin
+            AddOnNo := ItemAddOn."No.";
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, false)]
+    local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean);
+    var
+        AddOnNo: Code[20];
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ItemAddOnNo':
+                begin
+                    AddOnNo := CopyStr(POSParameterValue.Value, 1, MaxStrLen(AddOnNo));
+                    if LookupItemAddOn(AddOnNo) then
+                        POSParameterValue.Value := AddOnNo;
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, false)]
+    local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLbl: Label '@%1*', Locked = true;
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ItemAddOnNo':
+                begin
+                    if POSParameterValue.Value = '' then
+                        exit;
+
+                    ItemAddOn.SetRange(Enabled, true);
+                    ItemAddOn."No." := CopyStr(POSParameterValue.Value, 1, MaxStrLen(ItemAddOn."No."));
+                    if not ItemAddOn.Find() then begin
+                        ItemAddOn.SetFilter("No.", CopyStr(StrSubstNo(ItemAddOnLbl, POSParameterValue.Value), 1, MaxStrLen(ItemAddOn."No.")));
+                        ItemAddOn.FindFirst();
+                    end;
+                    POSParameterValue.Value := ItemAddOn."No.";
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
+    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        CaptionItemAddOnNo: Label 'Item AddOn No.';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ItemAddOnNo':
+                Caption := CaptionItemAddOnNo;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
+    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        DescItemAddOnNo: Label 'Specifies Item AddOn No.';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ItemAddOnNo':
+                Caption := DescItemAddOnNo;
+        end;
+    end;
+
 }
 
