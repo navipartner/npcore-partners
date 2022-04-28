@@ -16,7 +16,7 @@ $packageCache = "/packagecachepath:""$(Join-Path $WorkspaceFolder '.alpackages')
 $alzrCodeCop = "/analyzer:""$(Join-Path -Path $alExtensionFolder.FullName -ChildPath "\bin\Analyzers\Microsoft.Dynamics.Nav.CodeCop.dll")""";
 $alzrAppSourceCop = "/analyzer:""$(Join-Path -Path $alExtensionFolder.FullName -ChildPath "\bin\Analyzers\Microsoft.Dynamics.Nav.AppSourceCop.dll")""";
 $alzrUICop = "/analyzer:""$(Join-Path -Path $alExtensionFolder.FullName -ChildPath "\bin\Analyzers\Microsoft.Dynamics.Nav.UICop.dll")""";
-$contOnError = "/continuebuildonerror:true";
+$contOnError = "/continuebuildonerror:false";
 $ruleSet = "/ruleset:""$(Join-Path $WorkspaceFolder 'main.ruleset.json')""";
 
 Write-Host "Invoking compiler with parameters:" $compilerPath $project $probingPath $packageCache $alzrCodeCop $alzrAppSourceCop $alzrUICop $contOnError $ruleSet
