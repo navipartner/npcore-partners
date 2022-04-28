@@ -4,6 +4,8 @@ codeunit 6184491 "NPR Pepper Begin Workshift TSD"
     Access = Internal;
     // NPR5.30/TSA/20170123  CASE 263458 Refactored for Transcendence
 
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Migrating to HWC';
 
     trigger OnRun()
     begin
@@ -287,6 +289,8 @@ codeunit 6184491 "NPR Pepper Begin Workshift TSD"
         // Pepper has a VOID response. Actual Return Data is on the CloseForm Event
     end;
 
+
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', false, false)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
@@ -315,5 +319,6 @@ codeunit 6184491 "NPR Pepper Begin Workshift TSD"
     local procedure OnBeginWorkshiftReponse(EFTPaymentRequestID: Integer)
     begin
     end;
+
 }
 #endif

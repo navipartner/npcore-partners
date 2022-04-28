@@ -47,21 +47,21 @@
 
             trigger OnValidate()
             begin
-                if Mode <> xRec.Mode then begin
+                if (Mode <> xRec.Mode) then begin
                     case Mode of
                         Mode::Production:
                             begin
-                                if Confirm(TxtProductionmode) then
+                                if (Confirm(TxtProductionMode)) then
                                     exit;
                             end;
                         Mode::"TEST Local":
                             begin
-                                if Confirm(TxtLocaltestmode) then
+                                if (Confirm(TxtLocalTestMode)) then
                                     exit;
                             end;
                         Mode::"TEST Remote":
                             begin
-                                if Confirm(TxtRemotetestmode) then
+                                if (Confirm(TxtRemoteTestMode)) then
                                     exit;
                             end;
                     end;
@@ -91,7 +91,7 @@
         {
             Caption = 'Logging Level';
             DataClassification = CustomerContent;
-            OptionCaption = 'Nolog,Error,Warning,Info,Debug';
+            OptionCaption = 'No log,Error,Warning,Info,Debug';
             OptionMembers = nolog,error,warning,info,debug;
             InitValue = "warning";
         }
@@ -207,7 +207,7 @@
         }
         field(550; "Transaction Type Auxilary Code"; Code[10])
         {
-            Caption = 'Transaction Type Auxilary Code';
+            Caption = 'Transaction Type Auxiliary Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Pepper EFT Trx Type".Code WHERE("Processing Type" = CONST(Auxiliary),
                                                                       "Integration Type" = FILTER('PEPPER'));
@@ -312,16 +312,16 @@
         TextInstanceFound: Label 'There is at least one Pepper Instance linked to this version. Remove the link on the Pepper Instance before deleteing this record.';
     begin
         PepperInstance.SetRange(PepperInstance."Configuration Code", Code);
-        if not PepperInstance.IsEmpty then
+        if (not PepperInstance.IsEmpty) then
             Error(TextInstanceFound);
     end;
 
     var
-        TxtLocaltestmode: Label 'WARNING: switching on Local test mode will cut communication with the terminal and simulate succesful transactions. Are you sure want to continue? ';
-        TxtRemotetestmode: Label 'WARNING: switching on Remote test mode process transactions to the terminal as normal but log them as test. You must set the terminal to test manually! Are you sure want to continue? ';
-        TxtProductionmode: Label 'WARNING: this will mark this configuration as production and process all transactons normally.';
+        TxtLocalTestMode: Label 'WARNING: switching on Local test mode will cut communication with the terminal and simulate successful transactions. Are you sure want to continue? ';
+        TxtRemoteTestMode: Label 'WARNING: switching on Remote test mode process transactions to the terminal as normal but log them as test. You must set the terminal to test manually! Are you sure want to continue? ';
+        TxtProductionMode: Label 'WARNING: this will mark this configuration as production and process all transactions normally.';
         Txt001: Label '%1 cannot be greater than %2.';
-#if not CLOUD
+
     procedure UploadFile(FileType: Option License,AdditionalParameters)
     var
         FileManagement: Codeunit "File Management";
@@ -332,21 +332,21 @@
         TxtNotStored: Label 'File was not stored.';
         TxtCaptionLicense: Label 'Pepper License file';
         TxtCaptionAdditionalParameters: Label 'Pepper Additional Parameters';
-        TxtXMLfilefilter: Label '*.xml';
-        TxtXMLfileDescription: Label 'XML Files (*.xml)|*.xml';
+        TxtXmlFileFilter: Label '*.xml';
+        TxtXmlFileDescription: Label 'XML Files (*.xml)|*.xml';
         PepperConfigManagement: Codeunit "NPR Pepper Config. Mgt.";
-        PepperLibrary: Codeunit "NPR Pepper Library TSD";
+        PepperLibrary: Codeunit "NPR Pepper Library HWC";
         RecRef: RecordRef;
     begin
 
         case FileType of
             FileType::License:
-                UploadResult := FileManagement.BLOBImportWithFilter(TempBlob, TxtCaptionLicense, '', TxtXMLfileDescription, TxtXMLfilefilter);
+                UploadResult := FileManagement.BLOBImportWithFilter(TempBlob, TxtCaptionLicense, '', TxtXmlFileDescription, TxtXmlFileFilter);
             FileType::AdditionalParameters:
-                UploadResult := FileManagement.BLOBImportWithFilter(TempBlob, TxtCaptionAdditionalParameters, '', TxtXMLfileDescription, TxtXMLfilefilter);
+                UploadResult := FileManagement.BLOBImportWithFilter(TempBlob, TxtCaptionAdditionalParameters, '', TxtXmlFileDescription, TxtXmlFileFilter);
         end;
 
-        if UploadResult = '' then
+        if (UploadResult = '') then
             Error(TxtNotUploaded);
         Message(StrSubstNo(TxtSuccess, UploadResult));
         case FileType of
@@ -365,7 +365,7 @@
                     "License ID" := PepperLibrary.GetKeyFromLicenseText(PepperConfigManagement.GetConfigurationText(Rec, 0));
                     Modify();
 
-                    if not "License File".HasValue() then
+                    if (not "License File".HasValue()) then
                         Error(TxtNotStored);
                 end;
             FileType::AdditionalParameters:
@@ -381,16 +381,16 @@
                     RecRef.SetTable(Rec);
 
                     Modify();
-                    if not "Additional Parameters".HasValue() then
+                    if (not "Additional Parameters".HasValue()) then
                         Error(TxtNotStored);
                 end;
         end;
     end;
-#endif
+
     procedure ClearFile(FileType: Option License,AdditionalParameters)
     var
         TxtNoLicense: Label 'No license file is configured.';
-        TxtNoAdditionalParameters: Label 'No addtional parameters are configured.';
+        TxtNoAdditionalParameters: Label 'No additional parameters are configured.';
         TxtConfirmClearLicense: Label 'Are you sure you want to delete the license?';
         TxtConfirmClearAdditionalParameters: Label 'Are you sure you want to delete the additional parameters?';
         TxtLicenseCleared: Label 'License deleted.';
@@ -400,9 +400,9 @@
             FileType::License:
                 begin
                     CalcFields("License File");
-                    if not "License File".HasValue() then
+                    if (not "License File".HasValue()) then
                         Error(TxtNoLicense);
-                    if not Confirm(TxtConfirmClearLicense) then
+                    if (not Confirm(TxtConfirmClearLicense)) then
                         exit;
                     Clear("License File");
                     Modify();
@@ -411,9 +411,9 @@
             FileType::AdditionalParameters:
                 begin
                     CalcFields("Additional Parameters");
-                    if not "Additional Parameters".HasValue() then
+                    if (not "Additional Parameters".HasValue()) then
                         Error(TxtNoAdditionalParameters);
-                    if not Confirm(TxtConfirmClearAdditionalParameters) then
+                    if (not Confirm(TxtConfirmClearAdditionalParameters)) then
                         exit;
                     Clear("Additional Parameters");
                     Modify();
@@ -425,7 +425,7 @@
     procedure ExportFile(FileType: Option License,Configuration,AdditionalParameters)
     var
         TxtNoLicense: Label 'No license file is configured.';
-        TxtNoAdditionalParameters: Label 'No addtional parameters are configured.';
+        TxtNoAdditionalParameters: Label 'No additional parameters are configured.';
         PepperVersion: Record "NPR Pepper Version";
         TempBlob: Codeunit "Temp Blob";
         StreamIn: InStream;
@@ -442,7 +442,7 @@
             FileType::License:
                 begin
                     CalcFields("License File");
-                    if not "License File".HasValue() then
+                    if (not "License File".HasValue()) then
                         Error(TxtNoLicense);
                     ExportName := TxtFileNameLicense;
                     "License File".CreateInStream(StreamIn);
@@ -462,7 +462,7 @@
             FileType::AdditionalParameters:
                 begin
                     CalcFields("Additional Parameters");
-                    if not "Additional Parameters".HasValue() then
+                    if (not "Additional Parameters".HasValue()) then
                         Error(TxtNoAdditionalParameters);
                     ExportName := TxtFilenameAddPar;
                     "Additional Parameters".CreateInStream(StreamIn);
@@ -484,9 +484,9 @@
         PepperVersion: Record "NPR Pepper Version";
         TxtUseInstallAsDefault: Label 'Would you like to use the Install directory of this Pepper Version (%1) as the default directory for this Configuration?';
     begin
-        if PepperVersion.Get(Version) then begin
-            if PepperVersion."Install Directory" <> '' then begin
-                if Confirm(StrSubstNo(TxtUseInstallAsDefault, PepperVersion."Install Directory"), false) then begin
+        if (PepperVersion.Get(Version)) then begin
+            if (PepperVersion."Install Directory" <> '') then begin
+                if (Confirm(StrSubstNo(TxtUseInstallAsDefault, PepperVersion."Install Directory"), false)) then begin
                     "Logging Directory" := PepperVersion."Install Directory";
                     "Logging Archive Directory" := PepperVersion."Install Directory";
                     "Ticket Directory" := PepperVersion."Install Directory";
@@ -512,7 +512,7 @@
         i: Integer;
     begin
         for i := 1 to StrLen(FullPathText) - 1 do begin
-            if FullPathText[StrLen(FullPathText) - i] = '\' then
+            if (FullPathText[StrLen(FullPathText) - i] = '\') then
                 exit(StrLen(FullPathText) - i + 1);
         end;
         exit(1);
@@ -521,8 +521,9 @@
     local procedure CheckMinMaxLengthAuthorisationNo()
     begin
         if ("Min. Length Authorisation No." <> 0) and ("Max. Length Authorisation No." <> 0) then
-            if "Min. Length Authorisation No." > "Max. Length Authorisation No." then
+            if ("Min. Length Authorisation No." > "Max. Length Authorisation No.") then
                 Error(Txt001, FieldCaption("Min. Length Authorisation No."), FieldCaption("Max. Length Authorisation No."));
     end;
 }
+
 
