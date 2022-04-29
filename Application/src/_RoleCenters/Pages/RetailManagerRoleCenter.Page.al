@@ -230,6 +230,7 @@
                     ApplicationArea = NPRRetail;
                 }
             }
+
             group(Reports)
             {
                 Caption = 'List & Reports';
@@ -849,6 +850,18 @@
                 RunObject = Page "Purchase Return Order";
 
                 ToolTip = 'Executes the Purchase Return Order action.';
+                ApplicationArea = NPRRetail;
+            }
+
+        }
+        area(Processing)
+        {
+            action("Find Entries")
+            {
+                Caption = 'Find Entries';
+                RunObject = page Navigate;
+                image = Entries;
+                ToolTip = 'Find entries and documents according to the document number and posting date.';
                 ApplicationArea = NPRRetail;
             }
         }
