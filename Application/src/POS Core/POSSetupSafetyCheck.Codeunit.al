@@ -39,6 +39,9 @@
         //Field "POS Sales Rounding Account" is mandatory in some processes and it must be checked on POS Initialization
         CheckPostingProfile();
 
+        //Field "Return Payment Method" is mandatory
+        CheckPOSPaymentMethods();
+
         OnAfterValidateSetup();
     end;
 
@@ -96,5 +99,22 @@
     [InternalEvent(false)]
     local procedure OnAfterValidateSetup()
     begin
+    end;
+
+    local procedure CheckPOSPaymentMethods()
+    var
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        LocVersion: Version;
+    begin
+        if POSPaymentMethod.IsEmpty() then
+            exit;
+        POSPaymentMethod.FindSet();
+        repeat
+            if POSPaymentMethod."Created by Version" <> '' then begin
+                LocVersion := Version.Create(POSPaymentMethod."Created by Version");
+                if (LocVersion.Minor >= 10) and (LocVersion.Build >= 0) then //Compare with version 10.0
+                    POSPaymentMethod.TestField("Return Payment Method Code");
+            end;
+        until POSPaymentMethod.Next() = 0;
     end;
 }
