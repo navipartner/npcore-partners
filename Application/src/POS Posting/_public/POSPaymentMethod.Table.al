@@ -220,6 +220,12 @@
             Caption = 'Block POS Payment';
             DataClassification = CustomerContent;
         }
+        field(600; "Created by Version"; Text[100])
+        {
+            Caption = 'Created by Version';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
     }
 
     keys
