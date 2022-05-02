@@ -97,7 +97,7 @@
         IsCheckedBySubscriber: Boolean;
         IsValid: Boolean;
     begin
-        TicketRequestManager.LockResources();
+        TicketRequestManager.LockResources('IssueTicketsFromToken');
 
         if (TicketRequestManager.IsReservationRequest(Token)) then begin
             TicketRequestManager.ConfirmReservationRequestWithValidate(Token);

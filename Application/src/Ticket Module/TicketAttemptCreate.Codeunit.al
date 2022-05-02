@@ -200,7 +200,7 @@
         TicketRequest: Codeunit "NPR TM Ticket Request Manager";
     begin
 
-        TicketRequest.LockResources();
+        TicketRequest.LockResources('DoIssueTicketFromReservation');
         TicketRequest.IssueTicketFromReservation(TicketReservationRequest);
 
     end;

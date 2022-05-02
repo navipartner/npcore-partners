@@ -471,7 +471,7 @@
         if (not TicketType."Is Ticket") then
             exit;
 
-        TicketRequestManager.LockResources();
+        TicketRequestManager.LockResources('IssueTicketFromMemberScan');
 
         Token := TicketRequestManager.CreateReservationRequest(ItemNo, VariantCode, 1, Member."External Member No.");
         TicketRequestManager.SetReservationRequestExtraInfo(Token, Member."E-Mail Address", Member."External Member No.");
