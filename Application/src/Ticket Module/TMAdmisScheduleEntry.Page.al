@@ -80,16 +80,53 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Is field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewAdmissionIs: Option;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewAdmissionIs := Rec."Admission Is";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Admission Is", NewAdmissionIs);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Visibility On Web"; Rec."Visibility On Web")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Visibility On Web field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewVisibilityOnWeb: Option;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewVisibilityOnWeb := Rec."Visibility On Web";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Visibility On Web", NewVisibilityOnWeb);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Regenerate With"; Rec."Regenerate With")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Regenerate With field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewRegenerateWith: Option;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewRegenerateWith := Rec."Regenerate With";
+                        if (AdmissionScheduleEntry.FindSet(true)) then
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", NewRegenerateWith);
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Reason Code"; Rec."Reason Code")
                 {
@@ -125,6 +162,19 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Max Capacity Per Sch. Entry field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewCapacity: Integer;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewCapacity := Rec."Max Capacity Per Sch. Entry";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Max Capacity Per Sch. Entry", NewCapacity);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field(ConcurrentCapacityText; ConcurrentCapacityText)
                 {
@@ -137,41 +187,145 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Event Arrival From Time field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewFromTime: Time;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewFromTime := Rec."Event Arrival From Time";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Event Arrival From Time", NewFromTime);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Event Arrival Until Time"; Rec."Event Arrival Until Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Event Arrival Until Time field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewUntilTime: Time;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewUntilTime := Rec."Event Arrival Until Time";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Event Arrival Until Time", NewUntilTime);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Sales From Date"; Rec."Sales From Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales From Date field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewFromDate: Date;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewFromDate := Rec."Sales From Date";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Sales From Date", NewFromDate);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Sales From Time"; Rec."Sales From Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales From Time field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewFromTime: Time;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewFromTime := Rec."Sales From Time";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Sales From Time", NewFromTime);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Sales Until Date"; Rec."Sales Until Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Until Date field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewFromDate: Date;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewFromDate := Rec."Sales Until Date";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Sales Until Date", NewFromDate);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Sales Until Time"; Rec."Sales Until Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Until Time field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewUntilTime: Time;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewUntilTime := Rec."Sales Until Time";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Sales Until Time", NewUntilTime);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Allocation By"; Rec."Allocation By")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Allocation By field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewAllocationBy: Option;
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewAllocationBy := Rec."Allocation By";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Allocation By", NewAllocationBy);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field(DynamicPriceProfileCode; Rec."Dynamic Price Profile Code")
                 {
                     ApplicationArea = NPRTicketDynamicPrices, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Dynamic Price Profile Code field';
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        NewDynamicPriceProfileCode: Code[10];
+                    begin
+                        CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                        NewDynamicPriceProfileCode := Rec."Dynamic Price Profile Code";
+                        if (AdmissionScheduleEntry.FindSet(true)) then begin
+                            AdmissionScheduleEntry.ModifyAll("Dynamic Price Profile Code", NewDynamicPriceProfileCode);
+                            AdmissionScheduleEntry.ModifyAll("Regenerate With", AdmissionScheduleEntry."Regenerate With"::MANUAL);
+                        end;
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Waiting List Queue"; Rec."Waiting List Queue")
                 {
