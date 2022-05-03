@@ -25,7 +25,7 @@
             exit(true);
         end;
 #else
-        Regex.Match(Input, Pattern, 1, TempMatch);
+        Regex.Match(Input, Pattern, 0, TempMatch);
         TempMatch.SetRange(Success, true);
         if TempMatch.FindFirst() then begin
             Output := TempMatch.ReadValue();
