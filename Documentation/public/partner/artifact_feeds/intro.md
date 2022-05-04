@@ -6,5 +6,3 @@ Artifact feeds are among the options for using, interacting and/or delivering Na
 ### Related Links
 
  - [How to access NaviPartner Artifact Feeds](./howto/AccessNaviPartnerArtifactFeedsBasic.md)
- - [What to do with the packages on your local machine](./howto/WorkingWithNuGetPackageOnLocalMachine.md)
- - [Access to the feeds via nuget.exe or PowerShell Package Management](./howto/AccessNaviPartnerArtifactFeedsAdvanced.md)
