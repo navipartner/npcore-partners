@@ -7,20 +7,20 @@
    The previous link is also accessible from [the main NaviPartner`s DevOps site](https://navipartner.visualstudio.com/).
 
 3. From the **NaviPartner.NavApps**, feed, you have to decide which one of our core apps (currently two) you need to use and click on it.     
-   Each item in the list is called, in NuGet words, a package).
+   Each item in the list is called, in NuGet words, a package).         
    
-   <img src="./../images/artifacts_feeds_packages.png" width="600">
+   ![](./../images/artifacts_feeds_packages.png)
 
-   Once select a core app, and click on it, you will see the latest (pre)release for the specific app or a package.
-   <img src="./../images/artifact_feeds_package_detail.png" width="550">
+   Once select a core app, and click on it, you will see the latest (pre)release for the specific app or a package.           
+   ![](./../images/artifact_feeds_package_detail.png)
 
-4. From here, you can easily download the package by clicking **Download**.
+4. From here, you can easily download the package by clicking **Download**.     
 
-   If you need a specific version, you can find it using **Versions** tab (right next to **Overview** tab). This will provide a list of all available versions. Just be careful, as on the top there will be very likely prereleases of the upcoming version and official releases will be listed below.
+   If you need a specific version, you can find it using **Versions** tab (right next to **Overview** tab). This will provide a list of all available versions. Just be careful, as on the top there will be very likely prereleases of the upcoming version and official releases will be listed below.        
 
    ![](./../images/artifacts_feeds_version_list.png)
 
-5. Click on any of the provided versions, and you will see the card (overview) for the selected versions instead of the `latest` one. Alternatively, you can select multiple and download the selected versions directly.
+5. Click on any of the provided versions, and you will see the card (overview) for the selected versions instead of the `latest` one. Alternatively, you can select multiple and download the selected versions directly.        
 
    ![](./../images/artifact_feeds_select_download_multiple.png)
 
