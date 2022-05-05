@@ -11,8 +11,6 @@ report 6151013 "NPR NpRv Voucher"
     Caption = 'NpRv Voucher';
     DataAccessIntent = ReadOnly;
     DefaultLayout = Word;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Will be removed in the next version.';
 
     dataset
     {
@@ -159,7 +157,13 @@ report 6151013 "NPR NpRv Voucher"
             column(IssuedDate_DateFormat; IssuedDate)
             {
             }
-
+            dataitem("Voucher Type"; "NPR NpRv Voucher Type")
+            {
+                DataItemLink = code = field("Voucher Type");
+                column(VoucherTypeDescription; Description)
+                {
+                }
+            }
             trigger OnAfterGetRecord()
             var
                 Language: Codeunit Language;
@@ -168,15 +172,25 @@ report 6151013 "NPR NpRv Voucher"
                 TempBlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
 
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
-                Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
+                Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date"), 4));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));
-                Evaluate(IssuedDate, Format("NpRv Voucher"."Issue Date"));
+                Evaluate(IssuedDate, Format("NpRv Voucher"."Issue Date"), 4);
             end;
         }
     }
+
     requestpage
     {
         SaveValues = true;
+    }
+    labels
+    {
+        AmountLbl = 'Amount:';
+        IssueDateLbl = 'Issued at:';
+        ExpireDateLbl = 'Expires at:';
+        VoucherTypeLbl = 'Voucher Type:';
+        DescriptionLbl = 'Description';
+        ReferenceNoLbl = 'Reference No.';
     }
 
     var
