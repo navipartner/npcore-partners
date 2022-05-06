@@ -11,10 +11,10 @@
     begin
 
         Commit();
-        TicketRequestManager.LockResources();
 
         if (Rec.LoadXmlDoc(XmlDoc)) then begin
             FunctionName := GetWebServiceFunction(Rec."Import Type");
+            TicketRequestManager.LockResources(FunctionName);
             case FunctionName of
                 'MakeTicketReservation':
                     ImportTicketReservations(XmlDoc, Rec."Document ID");

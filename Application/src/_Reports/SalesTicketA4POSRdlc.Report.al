@@ -1,37 +1,53 @@
 ﻿report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Rdlc.rdlc';
+    WordLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Word.docx';
     Caption = 'Sales Ticket A4 - POS';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-    DefaultLayout = RDLC;
+    DefaultLayout = Word;
     PreviewMode = PrintLayout;
     DataAccessIntent = ReadOnly;
 
     dataset
     {
-        dataitem(POS_Entry; "NPR POS Entry")
+        dataitem(CompanyInformation; "Company Information")
         {
-            DataItemTableView = SORTING("Entry No.");
-            RequestFilterFields = "Entry No.";
-            column(EntryNo_POS_Entry; "Entry No.")
-            {
-            }
-            column(EntryDate_POS_Entry; "Entry Date")
-            {
-            }
-            column(DocumentNo_POS_Entry; "Document No.")
+            column(Picture_CompanyInformation; CompanyInformation.Picture)
             {
                 IncludeCaption = true;
             }
-            column(POSUnitNo_POS_Entry; "POS Unit No.")
+
+            column(Phone_No_CompanyInformation; CompanyInformation."Phone No.")
+            {
+                IncludeCaption = true;
+            }
+            column(E_Mail_CompanyInformation; CompanyInformation."E-Mail")
+            {
+                IncludeCaption = true;
+            }
+            column(Home_Page_CompanyInformation; CompanyInformation."Home Page")
+            {
+                IncludeCaption = true;
+            }
+            column(VAT_Registration_No_CompanyInformation; CompanyInformation."VAT Registration No.")
+            {
+                IncludeCaption = true;
+            }
+        }
+        dataitem("NPR POS Entry"; "NPR POS Entry")
+        {
+            DataItemTableView = SORTING("Entry No.");
+            RequestFilterFields = "Entry No.";
+            column(Entry_Date_POS_Entry; Format("Entry Date", 0, 0))
             {
             }
-            column(EndingTime_POS_Entry; "Ending Time")
+            column(Document_No_POS_Entry; "Document No.")
             {
+                IncludeCaption = true;
             }
             column(DiscountAmount_POS_Entry; "Discount Amount")
             {
@@ -45,506 +61,283 @@
             column(TotalAmountInclTax_POS_Entry; "Amount Incl. Tax")
             {
             }
-            column(TotalTaxText; TotalTaxText)
+            column(StoreAddress_POS_Entry; StoreAddress)
             {
             }
-            column(Picture_Company_Information; CompanyInformation.Picture)
+            column(CustomerAddress_POS_Entry; CustomerAddress)
             {
             }
-            dataitem(General_Ledger_Setup; "General Ledger Setup")
+            column(TotalAmountLabel_POS_Entry; StrSubstNo(TotalAmountLabel, GeneralLedgerSetup."LCY Code"))
             {
-                DataItemTableView = SORTING("Primary Key");
-                column(PrimaryKey_General_Ledger_Setup; "Primary Key")
-                {
-                }
-                column(LCYCode_General_Ledger_Setup; "LCY Code")
-                {
-                }
-
-                trigger OnPreDataItem()
-                begin
-                    Get();
-                end;
             }
-            dataitem(POS_Store; "NPR POS Store")
+            column(TotalAmountInclVATLabel_POS_Entry; StrSubstNo(TotalAmountInclVATLabel, GeneralLedgerSetup."LCY Code"))
             {
-                DataItemLink = Code = FIELD("POS Store Code");
-                DataItemTableView = SORTING(Code);
-                column(Code_POS_Store; Code)
-                {
-                }
-                column(Name_POS_Store; Name)
-                {
-                }
-                column(Name2_POS_Store; "Name 2")
-                {
-                }
-                column(Address_POS_Store; Address)
-                {
-                }
-                column(Address2_POS_Store; "Address 2")
-                {
-                }
-                column(PostCode_POS_Store; "Post Code")
-                {
-                }
-                column(City_POS_Store; City)
-                {
-                }
-                column(PhoneNo_POS_Store; "Phone No.")
-                {
-                    IncludeCaption = true;
-                }
-                column(VATRegistrationNo_POS_Store; "VAT Registration No.")
-                {
-                    IncludeCaption = true;
-                }
-                column(EMail_POS_Store; "E-Mail")
-                {
-                    IncludeCaption = true;
-                }
-                column(HomePage_POS_Store; "Home Page")
-                {
-                    IncludeCaption = true;
-                }
-                column(StoreAddr1; StoreAddr[1])
-                {
-                }
-                column(StoreAddr2; StoreAddr[2])
-                {
-                }
-                column(StoreAddr3; StoreAddr[3])
-                {
-                }
-                column(StoreAddr4; StoreAddr[4])
-                {
-                }
-                column(StoreAddr5; StoreAddr[5])
-                {
-                }
-
-                trigger OnAfterGetRecord()
-                begin
-                    Clear(StoreAddr);
-                    StoreAddr[1] := Name;
-                    StoreAddr[2] := "Name 2";
-                    StoreAddr[3] := Address;
-                    StoreAddr[4] := "Address 2";
-                    StoreAddr[5] := "Post Code" + ' - ' + City;
-                    CompressArray(StoreAddr);
-                end;
             }
-            dataitem(POS_Unit; "NPR POS Unit")
+            column(POS_Store_Code; "POS Store Code")
             {
-                DataItemLink = "No." = FIELD("POS Unit No.");
-                DataItemTableView = SORTING("No.");
             }
-            dataitem(Customer; Customer)
+            column(POS_Unit_No_; "POS Unit No.")
             {
-                DataItemLink = "No." = FIELD("Customer No.");
-                DataItemTableView = SORTING("No.");
-                column(No_Customer; "No.")
-                {
-                }
-                column(Name_Customer; Name)
-                {
-                }
-                column(Address_Customer; Address)
-                {
-                }
-                column(CustomerPriceGroup_Customer; "Customer Price Group")
-                {
-                }
-                column(City_Customer; City)
-                {
-                }
-                column(PostCode_Customer; "Post Code")
-                {
-                    IncludeCaption = true;
-                }
-
-                trigger OnAfterGetRecord()
-                begin
-                    Clear(CustAddr);
-                    CustAddr[1] := Name;
-                    CustAddr[2] := "Name 2";
-                    CustAddr[3] := Address;
-                    CustAddr[4] := "Address 2";
-                    CustAddr[5] := "Post Code" + ' - ' + City;
-                    CustAddr[6] := CustomerNoCaption + ': ' + "No.";
-                    CompressArray(CustAddr);
-                end;
-            }
-            dataitem(POS_Entry_Blank_Customer; "NPR POS Entry")
-            {
-                DataItemLink = "Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("Entry No.") WHERE("Customer No." = FILTER(' '));
-                dataitem(Contact; Contact)
-                {
-                    DataItemLink = "No." = FIELD("Contact No.");
-                    DataItemTableView = SORTING("No.");
-                    column(No_Contact; "No.")
-                    {
-                    }
-                    column(Name_Contact; Name)
-                    {
-                    }
-                    column(Address_Contact; Address)
-                    {
-                    }
-                    column(City_Contact; City)
-                    {
-                    }
-                    column(PostCode_Contact; "Post Code")
-                    {
-                    }
-
-                    trigger OnAfterGetRecord()
-                    begin
-                        Clear(CustAddr);
-                        CustAddr[1] := Name;
-                        CustAddr[2] := "Name 2";
-                        CustAddr[3] := Address;
-                        CustAddr[4] := "Address 2";
-                        CustAddr[5] := "Post Code" + ' - ' + City;
-                        CustAddr[6] := '';
-                        CustAddr[7] := '';
-                        CompressArray(CustAddr);
-                    end;
-                }
-            }
-            dataitem(CustAddress; "Integer")
-            {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
-                column(Number; Number)
-                {
-                }
-                column(CustAddr1; CustAddr[1])
-                {
-                }
-                column(CustAddr2; CustAddr[2])
-                {
-                }
-                column(CustAddr3; CustAddr[3])
-                {
-                }
-                column(CustAddr4; CustAddr[4])
-                {
-                }
-                column(CustAddr5; CustAddr[5])
-                {
-                }
-                column(CustAddr6; CustAddr[6])
-                {
-                }
-                column(CustAddr7; CustAddr[7])
-                {
-                }
+                IncludeCaption = true;
             }
             dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
             {
                 DataItemLink = Code = FIELD("Salesperson Code");
                 DataItemTableView = SORTING(Code);
-                column(Code_SalespersonPurchaser; Code)
-                {
-                }
                 column(Name_SalespersonPurchaser; Name)
                 {
                 }
             }
-            dataitem(POS_Sales_Line; "NPR POS Entry Sales Line")
+            dataitem("NPR POS Entry Sales Line"; "NPR POS Entry Sales Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("POS Entry No.", "Line No.");
-                column(POSEntryNo_POS_Sales_Line; "POS Entry No.")
+                DataItemTableView = Sorting("POS Entry No.", "Line No.");
+                column(Type_POS_Entry_Sales_Line; Type)
                 {
                 }
-                column(LineNo_POS_Sales_Line; "Line No.")
+                column(No_POS_Entry_Sales_Line; "No.")
+                {
+                    IncludeCaption = true;
+                }
+                column(Description_POS_Entry_Sales_Line; Description)
+                {
+                    IncludeCaption = true;
+                }
+                column(Quantity_POS_Entry_Sales_Line; Quantity)
+                {
+                    IncludeCaption = true;
+                }
+                column(Unit_Price_POS_Entry_Sales_Line; "Unit Price")
+                {
+                    IncludeCaption = true;
+                }
+                column(Line_Discount_pct_POS_Entry_Sales_Line; "Line Discount %")
+                {
+                    IncludeCaption = true;
+                }
+                column(Amount_Incl_VAT_POS_Entry_Sales_Line; "Amount Incl. VAT")
+                {
+                    IncludeCaption = true;
+                }
+                column(Total_Quantity_UnitPrice; TotalQuantityUnitPrice)
                 {
                 }
-                dataitem(POS_Sales_Item_Line; "NPR POS Entry Sales Line")
+                column(Line_Discount_Amount_Incl__VAT; "Line Discount Amount Incl. VAT")
                 {
-                    DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Item));
-                    column(Type_POS_Sales_Item_Line; Type)
+                }
+                dataitem(Item_Variant; "Item Variant")
+                {
+                    DataItemLink = Code = FIELD("Variant Code"), "Item No." = FIELD("No.");
+                    DataItemTableView = SORTING("Item No.", Code);
+                    column(Description_Item_Variant; Description)
                     {
                     }
-                    column(No_POS_Sales_Item_Line; "No.")
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(Description_POS_Sales_Item_Line; Description)
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(Quantity_POS_Sales_Item_Line; Quantity)
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(UnitPrice_POS_Sales_Item_Line; "Unit Price")
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(AmountInclVAT_POS_Sales_Item_Line; "Amount Incl. VAT")
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(LineDiscount_POS_Sales_Item_Line; "Line Discount %")
-                    {
-                        IncludeCaption = true;
-                    }
-                    dataitem(Item_Variant; "Item Variant")
-                    {
-                        DataItemLink = Code = FIELD("Variant Code"), "Item No." = FIELD("No.");
-                        DataItemTableView = SORTING("Item No.", Code);
-                        column(Description_Item_Variant; Description)
-                        {
-                        }
-                    }
+                }
+                trigger OnAfterGetRecord()
+                var
+                    Item: Record Item;
+                begin
+                    if (Type = Type::Item) and Item.Get("No.") and Item."NPR No Print on Reciept" then
+                        CurrReport.Skip();
 
-                    trigger OnAfterGetRecord()
-                    var
-                        Item: Record Item;
-                    begin
-                        if Item.Get("No.") and Item."NPR No Print on Reciept" then
-                            CurrReport.Skip();
+                    TotalQuantityUnitPrice := (Quantity * "Unit Price");
+                end;
+            }
+            trigger OnAfterGetRecord()
+            var
+                FormatAddress: Codeunit "Format Address";
+                NPRTextFunctions: codeunit "NPR Text Functions";
+                NPRPOSStore: Record "NPR POS Store";
+                Customer: Record Customer;
+                Contact: Record Contact;
+            begin
+                if NPRPOSStore.Get("NPR POS Entry"."POS Store Code") then begin
+                    CompanyInformation.Name := NPRPOSStore.Name;
+                    CompanyInformation."Name 2" := NPRPOSStore."Name 2";
+                    CompanyInformation.Address := NPRPOSStore.Address;
+                    CompanyInformation."Address 2" := NPRPOSStore."Address 2";
+                    CompanyInformation.City := NPRPOSStore.City;
+                    CompanyInformation."Post Code" := NPRPOSStore."Post Code";
+                    CompanyInformation."Phone No." := NPRPOSStore."Phone No.";
+                    CompanyInformation."E-Mail" := NPRPOSStore."E-Mail";
+                    CompanyInformation."Home Page" := NPRPOSStore."Home Page";
+                    CompanyInformation."VAT Registration No." := NPRPOSStore."VAT Registration No.";
+                    FormatAddress.Company(AddrArray, CompanyInformation);
+                    StoreAddress := NPRTextFunctions.AddressArrayToMultilineString(AddrArray);
+                end;
+
+                Clear(AddrArray);
+                if "NPR POS Entry"."Customer No." <> '' then begin
+                    Customer.Get("NPR POS Entry"."Customer No.");
+                    FormatAddress.Customer(AddrArray, Customer);
+                end else
+                    if "NPR POS Entry"."Contact No." <> '' then begin
+                        Contact.Get("NPR POS Entry"."Contact No.");
+                        FormatAddress.ContactAddr(AddrArray, Contact);
                     end;
-                }
-                dataitem(POS_Sales_GLAccount_Line; "NPR POS Entry Sales Line")
-                {
-                    DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER("G/L Account"));
-                    column(Type_POS_Sales_GLAccount_Line; Type)
-                    {
-                    }
-                    column(No_POS_Sales_GLAccount_Line; "No.")
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(Description_POS_Sales_GLAccount_Line; Description)
-                    {
-                    }
-                    column(AmountInclVAT_POS_Sales_GLAccount_Line; "Amount Incl. VAT")
-                    {
-                    }
-                }
-                dataitem(POS_Sales_Comment_Line; "NPR POS Entry Sales Line")
-                {
-                    DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Comment));
-                    column(Type_POS_Sales_Comment_Line; Type)
-                    {
-                    }
-                    column(No_POS_Sales_Comment_Line; "No.")
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(Description_POS_Sales_Comment_Line; Description)
-                    {
-                    }
-                }
-                dataitem(POS_Sales_Customer_Line; "NPR POS Entry Sales Line")
-                {
-                    DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Customer));
-                    column(Type_POS_Sales_Customer_Line; Type)
-                    {
-                    }
-                    column(No_POS_Sales_Customer_Line; "No.")
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(Description_POS_Sales_Customer_Line; Description)
-                    {
-                    }
-                    column(AmountInclVAT_POS_Sales_Customer_Line; "Amount Incl. VAT")
-                    {
-                    }
-                }
-                dataitem(POS_Sales_Voucher_Line; "NPR POS Entry Sales Line")
-                {
-                    DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Voucher));
-                    column(Type_POS_Sales_Voucher_Line; Type)
-                    {
-                    }
-                    column(No_POS_Sales_Voucher_Line; "No.")
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(Description_POS_Sales_Voucher_Line; Description)
-                    {
-                    }
-                    column(AmountInclVAT_POS_Sales_Voucher_Line; "Amount Incl. VAT")
-                    {
-                    }
-                }
-                dataitem(POS_Sales_Payout_Line; "NPR POS Entry Sales Line")
-                {
-                    DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Payout));
-                    column(Type_POS_Sales_Payout_Line; Type)
-                    {
-                    }
-                    column(No_POS_Sales_Payout_Line; "No.")
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(Description_POS_Sales_Payout_Line; Description)
-                    {
-                    }
-                    column(AmountInclVAT_POS_Sales_Payout_Line; "Amount Incl. VAT")
-                    {
-                    }
-                }
-                dataitem(POS_Sales_Rounding_Line; "NPR POS Entry Sales Line")
-                {
-                    DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Rounding));
-                    column(Type_POS_Sales_Rounding_Line; Type)
-                    {
-                    }
-                    column(No_POS_Sales_Rounding_Line; "No.")
-                    {
-                        IncludeCaption = true;
-                    }
-                    column(Description_POS_Sales_Rounding_Line; Description)
-                    {
-                    }
-                    column(AmountInclVAT_POS_Sales_Rounding_Line; "Amount Incl. VAT")
-                    {
-                    }
-                }
-            }
-            dataitem(POS_Payment_Line; "NPR POS Entry Payment Line")
+                CustomerAddress := NPRTextFunctions.AddressArrayToMultilineString(AddrArray);
+
+            end;
+        }
+        dataitem("NPR POS Entry Payment Line"; "NPR POS Entry Payment Line")
+        {
+            DataItemTableView = SORTING("POS Entry No.", "Line No.");
+            column(POS_Entry_No_POS_Payment_Line; "POS Entry No.")
             {
-                DataItemLink = "POS Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("POS Entry No.", "Line No.");
-                column(POS_Entry_No_POS_Payment_Line; "POS Entry No.")
-                {
-                }
-                column(Line_No_POS_Payment_Line; "Line No.")
-                {
-                    IncludeCaption = true;
-                }
-                column(Description_POS_Payment_Line; Description)
-                {
-                    IncludeCaption = true;
-                }
-                column(Amount_POS_Payment_Line; Amount)
-                {
-                    IncludeCaption = true;
-                }
-                column(CurrencyCode_POS_Payment_Line; "Currency Code")
-                {
-                }
-                column(AmountSalesCurrency_POS_Payment_Line; "Amount (Sales Currency)")
-                {
-                    IncludeCaption = true;
-                }
-                column(POSPaymentMethodCode_POS_Payment_Line; "POS Payment Method Code")
-                {
-                    IncludeCaption = true;
-                }
             }
-            dataitem(POS_Tax_Amount_Line; "NPR POS Entry Tax Line")
+            column(POSPaymentMethodCode_POS_Payment_Line; "POS Payment Method Code")
             {
-                DataItemLink = "POS Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive);
-                column(POS_Entry_No_POS_Tax_Amount_Line; "POS Entry No.")
-                {
-                }
-                column(TaxCalculationType_POS_Tax_Amount_Line; "Tax Calculation Type")
-                {
-                    IncludeCaption = true;
-                }
-                column(Tax_POS_Tax_Amount_Line; "Tax %")
-                {
-                    IncludeCaption = true;
-                }
-                column(TaxBaseAmount_POS_Tax_Amount_Line; "Tax Base Amount")
-                {
-                    IncludeCaption = true;
-                }
-                column(TaxAmount_POS_Tax_Amount_Line; "Tax Amount")
-                {
-                    IncludeCaption = true;
-                }
-                column(Quantity_POS_Tax_Amount_Line; Quantity)
-                {
-                    IncludeCaption = true;
-                }
-                column(TaxAreaCode_POS_Tax_Amount_Line; "Tax Area Code")
-                {
-                    IncludeCaption = true;
-                }
-                column(VATIdentifier_POS_Tax_Amount_Line; "VAT Identifier")
-                {
-                    IncludeCaption = true;
-                }
-                column(AmountIncludingTax_POS_Tax_Amount_Line; "Amount Including Tax")
-                {
-                    IncludeCaption = true;
-                }
-                column(LineAmount_POS_Tax_Amount_Line; "Line Amount")
-                {
-                    IncludeCaption = true;
-                }
+                IncludeCaption = true;
             }
+            column(Description_POS_Payment_Line; Description)
+            {
+                IncludeCaption = true;
+            }
+            column(CurrencyCode_POS_Payment_Line; "Currency Code")
+            {
+            }
+            column(Amount_POS_Payment_Line; Amount)
+            {
+                IncludeCaption = true;
+            }
+
+            column(AmountSalesCurrency_POS_Payment_Line; "Amount (Sales Currency)")
+            {
+                IncludeCaption = true;
+            }
+
+            trigger OnPreDataItem()
+            begin
+                "NPR POS Entry Payment Line".SetRange("POS Entry No.", "NPR POS Entry"."Entry No.");
+                Clear(AmounTotalPOSPaymentLine);
+                Clear(AmountSalesCurrencyTotalPOSPaymentLine);
+            end;
+
+            trigger OnAfterGetRecord()
+            var
+            begin
+                AmounTotalPOSPaymentLine += Amount;
+                AmountSalesCurrencyTotalPOSPaymentLine += "Amount (Sales Currency)";
+            end;
+        }
+        dataitem("NPR POS Entry Payment Line Totals"; Integer) // Because we have Word Layout!
+        {
+            DataItemTableView = Sorting(Number) Where(Number = Const(1));
+            column(AmountTotal_POS_Payment_Line; AmounTotalPOSPaymentLine)
+            {
+            }
+            column(AmountSalesCurrencyTotal_POS_Payment_Line; AmountSalesCurrencyTotalPOSPaymentLine)
+            {
+            }
+        }
+        dataitem("NPR POS Entry Tax Line"; "NPR POS Entry Tax Line")
+        {
+            DataItemTableView = SORTING("POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive);
+            column(VATIdentifier_POS_Tax_Amount_Line; "VAT Identifier")
+            {
+                IncludeCaption = true;
+            }
+            column(TaxCalculationType_POS_Tax_Amount_Line; "Tax Calculation Type")
+            {
+                IncludeCaption = true;
+            }
+            column(Tax_POS_Tax_Amount_Line; "Tax %")
+            {
+                IncludeCaption = true;
+            }
+            column(Quantity_POS_Tax_Amount_Line; Quantity)
+            {
+                IncludeCaption = true;
+            }
+            column(LineAmount_POS_Tax_Amount_Line; "Line Amount")
+            {
+                IncludeCaption = true;
+            }
+            column(TaxBaseAmount_POS_Tax_Amount_Line; "Tax Base Amount")
+            {
+                IncludeCaption = true;
+            }
+            column(TaxAmount_POS_Tax_Amount_Line; "Tax Amount")
+            {
+                IncludeCaption = true;
+            }
+            column(TotalTaxText_POS_Tax_Amount_Line; TotalTaxAmountLabel)
+            {
+            }
+
+            trigger OnPreDataItem()
+            begin
+                "NPR POS Entry Tax Line".SetRange("POS Entry No.", "NPR POS Entry"."Entry No.");
+                Clear(QuantityTotalPOSTaxAmountLine);
+                Clear(LineAmountTotalPOSTaxAmountLine);
+                Clear(TaxBaseAmountTotalPOSTaxAmountLine);
+                Clear(TaxAmountTotalPOSTaxAmountLine);
+            end;
 
             trigger OnAfterGetRecord()
             begin
-                TotalTaxText := GetVATText("Entry No.");
-                CompanyInformation.CalcFields(Picture);
+                QuantityTotalPOSTaxAmountLine += Quantity;
+                LineAmountTotalPOSTaxAmountLine += "Line Amount";
+                TaxBaseAmountTotalPOSTaxAmountLine += "Tax Base Amount";
+                TaxAmountTotalPOSTaxAmountLine += "Tax Amount";
             end;
         }
+        dataitem("NPR POS Entry Tax Line Totals"; Integer) // Because we have Word Layout!
+        {
+            DataItemTableView = Sorting(Number) Where(Number = Const(1));
+            column(QuantityTotal_POS_Tax_Amount_Line; QuantityTotalPOSTaxAmountLine)
+            {
+            }
+            column(LineAmountTotal_POS_Tax_Amount_Line; LineAmountTotalPOSTaxAmountLine)
+            {
+            }
+            column(TaxBaseAmountTotal_POS_Tax_Amount_Line; TaxBaseAmountTotalPOSTaxAmountLine)
+            {
+            }
+            column(TaxAmountTotal_POS_Tax_Amount_Line; TaxAmountTotalPOSTaxAmountLine)
+            {
+            }
+        }
     }
+
     requestpage
     {
         SaveValues = true;
     }
     labels
     {
-        LineDiscountPercentageLabel = 'Disc. %';
-        TotalAmountLabel = 'Total %1 Excl. VAT';
-        TotalDiscountAmountLabel = 'Discount Amount';
-        TotalTaxAmountLabel = '%1 VAT';
-        TotalAmountInclVATLabel = 'Total %1 Incl. VAT';
+        DocumentDateLabel = 'Document Date';
+        SalespersonNameLabel = 'Salesperson';
+        PageLabel = 'Page';
+        PageOfLabel = '%1 of %2';
+        LineDiscountPercentageLabel = 'Discount Amount';
         PaidCurrencyLabel = 'Paid Currency';
-        MethodCodeLabel = 'Method Code';
         TotalLabel = 'Total';
+        MethodCodeLabel = 'Method Code';
+        TotalDiscountAmountLabel = 'Total Discount Amount';
         PaymentLabel = 'Payment Specification';
         VATLabel = 'VAT Specification';
-        SalespersonNameLabel = 'Salesperson';
-        DocumentDateLabel = 'Document Date';
-        PageOfLabel = '%1 of %2';
-        PageLabel = 'Page';
+        PosStoreCodeLabel = 'Store Code';
     }
 
     trigger OnPreReport()
     begin
-        CompanyInformation.Get();
+        GeneralLedgerSetup.Get();
     end;
 
     var
-        CompanyInformation: Record "Company Information";
-        CustomerNoCaption: Label 'Customer No.';
-        CustAddr: array[8] of Text;
-        StoreAddr: array[8] of Text;
-        TotalTaxText: Text;
-
-    local procedure GetVATText(EntryNo: Integer): Text
-    var
-        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
-    begin
-        POSTaxAmountLine.SetRange("POS Entry No.", EntryNo);
-        if POSTaxAmountLine.Count() > 1 then
-            exit('');
-
-        if POSTaxAmountLine.FindFirst() then
-            exit(Format(POSTaxAmountLine."Tax %") + '%');
-
-        exit('');
-    end;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        AddrArray: Array[8] of Text[100];
+        StoreAddress: Text;
+        CustomerAddress: Text;
+        TotalAmountLabel: Label 'Total %1 Excl. VAT';
+        TotalAmountInclVATLabel: Label 'Total %1 Incl. VAT';
+        TotalTaxAmountLabel: Label 'VAT';
+        AmounTotalPOSPaymentLine: Decimal;
+        AmountSalesCurrencyTotalPOSPaymentLine: Decimal;
+        QuantityTotalPOSTaxAmountLine: Decimal;
+        LineAmountTotalPOSTaxAmountLine: Decimal;
+        TaxBaseAmountTotalPOSTaxAmountLine: Decimal;
+        TaxAmountTotalPOSTaxAmountLine: Decimal;
+        TotalQuantityUnitPrice: Decimal;
 }
-

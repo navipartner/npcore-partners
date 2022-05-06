@@ -22,6 +22,62 @@
       </Page>
     </ReportSection>
   </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="AmountLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AmountLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AmountLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="IssueDateLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>IssueDateLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>IssueDateLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ExpireDateLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ExpireDateLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ExpireDateLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="VoucherTypeLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>VoucherTypeLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>VoucherTypeLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DescriptionLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DescriptionLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DescriptionLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ReferenceNoLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ReferenceNoLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ReferenceNoLbl</Prompt>
+    </ReportParameter>
+  </ReportParameters>
   <Code>Public Function BlankZero(ByVal Value As Decimal)
     if Value = 0 then
         Return ""
@@ -209,6 +265,9 @@ End Function
         </Field>
         <Field Name="IssuedDate_DateFormat">
           <DataField>IssuedDate_DateFormat</DataField>
+        </Field>
+        <Field Name="VoucherTypeDescription">
+          <DataField>VoucherTypeDescription</DataField>
         </Field>
       </Fields>
       <Query>

@@ -29,7 +29,7 @@
         BusChartBuf.AddMeasure(TurnoverLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
 #endif
         BusChartBuf."Period Length" := PeriodType;
-        BusChartBuf.SetPeriodXAxis();
+        BusChartBuf.SetXAxis(Format(BusChartBuf."Period Length"), BusChartBuf."Data Type"::String);
         BusChartBuf.AddPeriods(StartDate, Enddate);
         TotNoOfPeriod := BusChartBuf.CalcNumberOfPeriods(StartDate, Enddate);
 

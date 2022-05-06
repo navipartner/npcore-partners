@@ -68,7 +68,7 @@
                     action("Download Minor Tom +")
                     {
                         Caption = 'Download Minor Tom +';
-                        ToolTip = 'Open URL to download version compatible with both 32-bit or 64-bit systems.';
+                        ToolTip = 'Download Minor Tom';
                         Image = TileCloud;
                         ApplicationArea = NPRRetail;
 
@@ -80,7 +80,7 @@
                     action("Download Major Tom")
                     {
                         Caption = 'Download Major Tom';
-                        ToolTip = 'Open URL with the option to download either 32-bit or 64-bit version.';
+                        ToolTip = 'Download Major Tom ';
                         Image = TileCloud;
                         ApplicationArea = NPRRetail;
 

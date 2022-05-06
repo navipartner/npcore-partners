@@ -33,13 +33,34 @@
         NOT_CONFIRMED: Label 'The ticket request must be confirmed prior to change.';
         BAD_REFERENCE: Label 'The template field reference %1 on line %2 is invalid.';
 
-    procedure LockResources()
+    procedure LockResources(Source: Text)
     var
         TMTicket: Record "NPR TM Ticket";
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+        StartTime, EndTime : Time;
+        DurationMs: Decimal;
+        MessageTextLbl: Label '%1: (%2)', Locked = true;
     begin
 
+        StartTime := Time();
         TMTicket.LockTable(true);
         if (TMTicket.FindFirst()) then;
+        EndTime := Time();
+
+        DurationMs := EndTime - StartTime;
+        CustomDimensions.Add('NPR_LockRequestedBy', Source);
+        CustomDimensions.Add('NPR_WaitDurationMs', Format(DurationMs, 0, 9));
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
+
+        Session.LogMessage('NPR_TM_LockResources', StrSubstNo(MessageTextLbl, Source, DurationMs), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
         exit;
 
     end;
@@ -677,7 +698,7 @@
                 until (TicketReservationRequest.Next() = 0);
 
                 Commit();
-                LockResources();
+                LockResources('ExpireReservationRequests-1');
             end;
         end;
 
@@ -692,7 +713,7 @@
                 until (TicketReservationRequest.Next() = 0);
 
                 Commit();
-                LockResources();
+                LockResources('ExpireReservationRequests-2');
             end;
         end;
     end;
