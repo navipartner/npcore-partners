@@ -351,4 +351,14 @@
     internal procedure OnAfterPrintEntry(POSEntry: Record "NPR POS Entry"; IsReprint: Boolean)
     begin
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterInsertEvent', '', false, false)]
+    local procedure POSPaymentMethod_OnAfterInsertEvent(var Rec: Record "NPR POS Payment Method")
+    var
+        ModInfo: ModuleInfo;
+    begin
+        NavApp.GetCurrentModuleInfo(ModInfo);
+        Rec."Created by Version" := Format(ModInfo.AppVersion());
+        Rec.Modify();
+    end;
 }

@@ -450,7 +450,7 @@
             exit;
 
         // This is a ticket event
-        TicketRequestManager.LockResources();
+        TicketRequestManager.LockResources('UpdateTicketOnSaleLineInsert');
         TicketRequestManager.ExpireReservationRequests();
 
         if (SaleLinePOS.Quantity > 0) then
@@ -715,7 +715,7 @@
         Ticket: Record "NPR TM Ticket";
     begin
 
-        TicketRequestManager.LockResources();
+        TicketRequestManager.LockResources('RegisterArrival');
 
         if ((AdmissionCode = '') and (PosUnitNo <> '')) then begin
             Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
@@ -746,7 +746,7 @@
             if (not Admission.Get(AdmissionCode)) then
                 Error(INVALID_ADMISSION, 'Admission Code', AdmissionCode);
 
-        TicketRequestManager.LockResources();
+        TicketRequestManager.LockResources('RegisterDeparture');
         TicketManagement.ValidateTicketForDeparture(1, ExternalTicketNumber, AdmissionCode);
 
     end;
