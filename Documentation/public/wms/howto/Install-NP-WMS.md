@@ -1,4 +1,4 @@
-# Download and install NP WMS extension
+# Download and install NP WMS extension for Business Central
 
 To download and install NP WMS, follow the provided steps:
 
@@ -9,9 +9,14 @@ To download and install NP WMS, follow the provided steps:
 > [!Note]
 > A valid license is requested at this point. In order to proceed with the installation, you need to have a license.
 
-3. Once installed proceed with the other necessary setups.
+Once NP WMS is installed, you can proceed with other necessary setups. 
+## Next steps
+
+- You can [fetch preset configurations](fetch-setup-data.md) on your environment, and in that way avoid custom setup. 
+- 
 
 ### Related Links
 
 - [Log into NP WMS](../explanation/cs-logging.md)
 - [Set up NP WMS](../explanation/cs-setup.md)
+- [Install WMS and RFID apps on mobile devices](install-mobile-apps.md)
