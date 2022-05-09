@@ -44,6 +44,27 @@ codeunit 6059814 "NPR Stripe REST Web Service"
         TempStripeRESTWSArgument.SetResponseContent(Content);
 
         HttpStatusCode := ResponseMessage.HttpStatusCode();
+        if HttpStatusCode in [400 .. 599] then
+            EmitTelemetryDataOnError(ResponseMessage.ReasonPhrase);
         exit(ResponseMessage.IsSuccessStatusCode());
+    end;
+
+    local procedure EmitTelemetryDataOnError(ErrorMessageText: Text)
+    var
+        ActiveSession: Record "Active Session";
+        CustomDimensions: Dictionary of [Text, Text];
+    begin
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', UserId());
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+        CustomDimensions.Add('NPR_ST_Response', ErrorMessageText);
+
+        Session.LogMessage('NPR_Stripe', 'Stripe Response Error', Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 }
