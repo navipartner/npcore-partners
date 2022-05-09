@@ -1,11 +1,11 @@
-﻿report 6014457 "NPR Sales Stat/Analysis"
+﻿report 6014457 "NPR Sales St. by Item Category"
 {
 #IF NOT BC17
     Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales StatAnalysis.rdlc';
-    Caption = 'Sales Stat/Analysis';
+    RDLCLayout = './src/_Reports/layouts/Sales Statistics by Item Category.rdlc';
+    Caption = 'Sales Statistics by Item Category';
     PreviewMode = Normal;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
@@ -718,7 +718,7 @@
 
     labels
     {
-        Report_Caption = 'Sales Statistics/Item Category Analysis';
+        Report_Caption = 'Sales Statistics by Item Category';
         Page_Caption = 'Page';
         No_Caption = 'No.';
         Name_Caption = 'Name';
@@ -728,7 +728,8 @@
         Percentage_Caption = 'Percentage';
         ProfitExclVat_Caption = 'Profit excl. VAT';
         ProfitPct_Caption = 'Profit %';
-        InventoryLbl = 'Inv.';
+        InventoryLbl = 'Inventory';
+        TotalforAllCategoriesLb = 'Total for All Categories';
     }
 
     trigger OnInitReport()
