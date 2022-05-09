@@ -491,11 +491,11 @@
                             ToolTip = 'Generate the Turnover/Profit report per category & salesperson.';
                             ApplicationArea = NPRRetail;
                         }
-                        action("NPR Sales Stat/Analysis")
+                        action("NPR Sales St. by Item Category")
                         {
-                            Caption = 'Sales Stat/Analysis';
+                            Caption = 'Sales Statistics by Item Category';
                             Image = Report;
-                            RunObject = Report "NPR Sales Stat/Analysis";
+                            RunObject = Report "NPR Sales St. by Item Category";
 
                             ToolTip = 'Generate the Turnover/Profit report per category.';
                             ApplicationArea = NPRRetail;
