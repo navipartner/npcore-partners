@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>b82257b7-54d2-450e-bd33-0b3b6ceef0fd</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -18,7 +19,7 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>19.33848cm</Width>
+                  <Width>27.5122cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -33,34 +34,34 @@
                               <TablixBody>
                                 <TablixColumns>
                                   <TablixColumn>
-                                    <Width>2.37471cm</Width>
+                                    <Width>3.19208cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>3.05506cm</Width>
+                                    <Width>3.87243cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>2.4cm</Width>
+                                    <Width>3.21737cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1.63836cm</Width>
+                                    <Width>2.45573cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>2.33529cm</Width>
+                                    <Width>3.15266cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>2.2cm</Width>
+                                    <Width>3.01737cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1.06719cm</Width>
+                                    <Width>1.88456cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>2.1cm</Width>
+                                    <Width>2.91737cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1.02958cm</Width>
+                                    <Width>1.84695cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1.13829cm</Width>
+                                    <Width>1.95566cm</Width>
                                   </TablixColumn>
                                 </TablixColumns>
                                 <TablixRows>
@@ -132,18 +133,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="Textbox8">
+                                          <Textbox Name="Textbox32">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemCategoryHeader.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SalesQty_ItemCategoryHeaderFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -152,7 +152,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox6</rd:DefaultName>
+                                            <rd:DefaultName>Textbox32</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Blue</Color>
@@ -199,18 +199,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="Textbox16">
+                                          <Textbox Name="Textbox50">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemCategoryHeader.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!ConsumptionAmount_ItemCategoryHeaderFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -219,7 +218,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox15</rd:DefaultName>
+                                            <rd:DefaultName>Textbox50</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Blue</Color>
@@ -233,18 +232,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="Textbox20">
+                                          <Textbox Name="Textbox66">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemCategoryHeader.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!SaleLCY_ItemCategoryHeaderFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -253,7 +251,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox19</rd:DefaultName>
+                                            <rd:DefaultName>Textbox66</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Blue</Color>
@@ -267,18 +265,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="TurnoverPct_ItemCategorySub3">
+                                          <Textbox Name="Textbox68">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemCategoryH.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!TurnoverPct_ItemCategoryHFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -287,7 +284,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>TurnoverPct_ItemCategorySub1</rd:DefaultName>
+                                            <rd:DefaultName>Textbox68</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Blue</Color>
@@ -301,18 +298,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="Textbox116">
+                                          <Textbox Name="Textbox69">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Profit_ItemCategoryH.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Profit_ItemCategoryHFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -321,7 +317,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox31</rd:DefaultName>
+                                            <rd:DefaultName>Textbox69</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Blue</Color>
@@ -335,18 +331,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="Textbox169">
+                                          <Textbox Name="Textbox70">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemCategoryH.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!Coverage_ItemCategoryHFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -355,7 +350,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox167</rd:DefaultName>
+                                            <rd:DefaultName>Textbox70</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Blue</Color>
@@ -369,18 +364,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="Textbox218">
+                                          <Textbox Name="Textbox71">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemCategoryH.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>=Fields!CoveragePct_ItemCategoryHFormat.Value</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -389,7 +383,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox216</rd:DefaultName>
+                                            <rd:DefaultName>Textbox71</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Color>Blue</Color>
@@ -791,18 +785,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SalesQty_Item10">
+                                          <Textbox Name="Textbox8">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!SalesQty_Item.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -811,7 +804,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SalesQty_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox8</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -856,18 +849,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="COGSLCY_Item10">
+                                          <Textbox Name="Textbox16">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!COGSLCY_Item.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -876,7 +868,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>COGSLCY_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox16</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -889,18 +881,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SalesLCY_Item10">
+                                          <Textbox Name="Textbox20">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!SalesLCY_Item.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -909,7 +900,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SalesLCY_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox20</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1767,18 +1758,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SalesQty_Item2">
+                                          <Textbox Name="Textbox72">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!SalesQty_Item1.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1787,7 +1777,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SalesQty_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox72</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1839,7 +1829,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!COGSLCY_Item1.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -1865,18 +1855,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SalesLCY_Item2">
+                                          <Textbox Name="Textbox73">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!SalesLCY_Item1.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1885,7 +1874,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SalesLCY_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox73</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -2753,18 +2742,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SalesQty_Item4">
+                                          <Textbox Name="Textbox74">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!SalesQty_Item2.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -2773,7 +2761,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SalesQty_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox74</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -2818,18 +2806,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="COGSLCY_Item4">
+                                          <Textbox Name="Textbox75">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!COGSLCY_Item2.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -2838,7 +2825,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>COGSLCY_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox75</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -2851,18 +2838,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SalesLCY_Item4">
+                                          <Textbox Name="Textbox76">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!SalesLCY_Item2.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -2871,7 +2857,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SalesLCY_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox76</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -3739,18 +3725,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SalesQty_Item5">
+                                          <Textbox Name="Textbox77">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!SalesQty_Item3.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -3759,7 +3744,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SalesQty_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox77</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -3804,18 +3789,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="COGSLCY_Item5">
+                                          <Textbox Name="Textbox78">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!COGSLCY_Item3.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -3824,7 +3808,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>COGSLCY_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox78</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -3837,18 +3821,17 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="SalesLCY_Item6">
+                                          <Textbox Name="Textbox79">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!SalesLCY_Item3.Value)</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
-                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -3857,7 +3840,7 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>SalesLCY_Item</rd:DefaultName>
+                                            <rd:DefaultName>Textbox79</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -3866,6 +3849,7 @@
                                               <PaddingRight>2pt</PaddingRight>
                                             </Style>
                                           </Textbox>
+                                          <rd:Selected>true</rd:Selected>
                                         </CellContents>
                                       </TablixCell>
                                       <TablixCell>
@@ -5036,7 +5020,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemCategorySub4.Value)</Value>
+                                                    <Value>=Fields!SalesQty_ItemCategorySub4.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5101,7 +5085,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemCategorySub4.Value)</Value>
+                                                    <Value>=Fields!ConsumptionAmount_ItemCategorySub4.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5134,7 +5118,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemCategorySub4.Value)</Value>
+                                                    <Value>=Fields!SaleLCY_ItemCategorySub4.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5167,7 +5151,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemCategorySub4.Value)</Value>
+                                                    <Value>=Fields!TurnoverPct_ItemCategorySub4.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5200,7 +5184,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Profit_ItemCategorySub4.Value)</Value>
+                                                    <Value>=Fields!Profit_ItemCategorySub4.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5233,7 +5217,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemCategorySub4.Value)</Value>
+                                                    <Value>=Fields!Coverage_ItemCategorySub4.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5266,7 +5250,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemCategorySub4.Value)</Value>
+                                                    <Value>=Fields!CoveragePct_ItemCategorySub4.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5337,7 +5321,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemCategorySub3.Value)</Value>
+                                                    <Value>=Fields!SalesQty_ItemCategorySub3.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5403,7 +5387,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemCategorySub3.Value)</Value>
+                                                    <Value>=Fields!ConsumptionAmount_ItemCategorySub3.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5437,7 +5421,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemCategorySub3.Value)</Value>
+                                                    <Value>=Fields!SaleLCY_ItemCategorySub3.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5471,7 +5455,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemCategorySub3.Value)</Value>
+                                                    <Value>=Fields!TurnoverPct_ItemCategorySub3.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5505,7 +5489,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Profit_ItemCategorySub3.Value)</Value>
+                                                    <Value>=Fields!Profit_ItemCategorySub3.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5539,7 +5523,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemCategorySub3.Value)</Value>
+                                                    <Value>=Fields!Coverage_ItemCategorySub3.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5573,7 +5557,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemCategorySub3.Value)</Value>
+                                                    <Value>=Fields!CoveragePct_ItemCategorySub3.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5645,7 +5629,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemCategorySub2.Value)</Value>
+                                                    <Value>=Fields!SalesQty_ItemCategorySub2.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5711,7 +5695,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemCategorySub2.Value)</Value>
+                                                    <Value>=Fields!ConsumptionAmount_ItemCategorySub2.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5745,7 +5729,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemCategorySub2.Value)</Value>
+                                                    <Value>=Fields!SaleLCY_ItemCategorySub2.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5779,7 +5763,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemCategorySub2.Value)</Value>
+                                                    <Value>=Fields!TurnoverPct_ItemCategorySub2.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5813,7 +5797,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Profit_ItemCategorySub2.Value)</Value>
+                                                    <Value>=Fields!Profit_ItemCategorySub2.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5847,7 +5831,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemCategorySub2.Value)</Value>
+                                                    <Value>=Fields!Coverage_ItemCategorySub2.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5881,7 +5865,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemCategorySub2.Value)</Value>
+                                                    <Value>=Fields!CoveragePct_ItemCategorySub2.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -5953,7 +5937,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SalesQty_ItemCategorySub1.Value)</Value>
+                                                    <Value>=Fields!SalesQty_ItemCategorySub1.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -6018,7 +6002,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!ConsumptionAmount_ItemCategorySub1.Value)</Value>
+                                                    <Value>=Fields!ConsumptionAmount_ItemCategorySub1.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -6051,7 +6035,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!SaleLCY_ItemCategorySub1.Value)</Value>
+                                                    <Value>=Fields!SaleLCY_ItemCategorySub1.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -6084,7 +6068,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!TurnoverPct_ItemCategorySub1.Value)</Value>
+                                                    <Value>=Fields!TurnoverPct_ItemCategorySub1.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -6117,7 +6101,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Profit_ItemCategorySub1.Value)</Value>
+                                                    <Value>=Fields!Profit_ItemCategorySub1.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -6150,7 +6134,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!Coverage_ItemCategorySub1.Value)</Value>
+                                                    <Value>=Fields!Coverage_ItemCategorySub1.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -6183,7 +6167,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Code.BlankZero(Fields!CoveragePct_ItemCategorySub1.Value)</Value>
+                                                    <Value>=Fields!CoveragePct_ItemCategorySub1.Value</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
@@ -6590,6 +6574,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
                                                       <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
@@ -6655,6 +6640,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
                                                       <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
@@ -6688,6 +6674,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
                                                       <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
@@ -6721,6 +6708,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
                                                       <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
@@ -6754,6 +6742,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
                                                       <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
@@ -6787,6 +6776,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
                                                       <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
@@ -6820,6 +6810,7 @@
                                                     <Style>
                                                       <FontFamily>Segoe Ui</FontFamily>
                                                       <FontSize>6.5pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
                                                       <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
@@ -7427,7 +7418,7 @@
                               <DataSetName>DataSet_Result</DataSetName>
                               <Top>0.03175cm</Top>
                               <Height>8.58563cm</Height>
-                              <Width>19.33848cm</Width>
+                              <Width>27.51218cm</Width>
                               <Style>
                                 <Border>
                                   <Style>None</Style>
@@ -7436,6 +7427,7 @@
                             </Tablix>
                           </ReportItems>
                           <KeepTogether>true</KeepTogether>
+                          <ZIndex>1</ZIndex>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -7466,21 +7458,304 @@
             </TablixRowHierarchy>
             <RepeatRowHeaders>true</RepeatRowHeaders>
             <DataSetName>DataSet_Result</DataSetName>
-            <Top>0cm</Top>
             <Left>0.11611cm</Left>
             <Height>8.61738cm</Height>
-            <Width>19.33848cm</Width>
+            <Width>27.5122cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
               </Border>
             </Style>
           </Tablix>
+          <Rectangle Name="Rectangle3">
+            <ReportItems>
+              <Textbox Name="Textbox17">
+                <CanGrow>true</CanGrow>
+                <KeepTogether>true</KeepTogether>
+                <Paragraphs>
+                  <Paragraph>
+                    <TextRuns>
+                      <TextRun>
+                        <Value>=Max(Fields!TSQty.Value, "DataSet_Result")</Value>
+                        <Style>
+                          <FontFamily>Segoe UI</FontFamily>
+                          <FontSize>6.5pt</FontSize>
+                          <FontWeight>Bold</FontWeight>
+                          <Format>n2</Format>
+                        </Style>
+                      </TextRun>
+                    </TextRuns>
+                    <Style>
+                      <TextAlign>Right</TextAlign>
+                    </Style>
+                  </Paragraph>
+                </Paragraphs>
+                <rd:DefaultName>Textbox2</rd:DefaultName>
+                <Top>0.03834cm</Top>
+                <Left>7.18062cm</Left>
+                <Height>0.5cm</Height>
+                <Width>3.21737cm</Width>
+                <Style>
+                  <Border>
+                    <Style>None</Style>
+                  </Border>
+                  <PaddingRight>4pt</PaddingRight>
+                </Style>
+              </Textbox>
+              <Textbox Name="Textbox137">
+                <CanGrow>true</CanGrow>
+                <KeepTogether>true</KeepTogether>
+                <Paragraphs>
+                  <Paragraph>
+                    <TextRuns>
+                      <TextRun>
+                        <Value>=Max(Fields!TSConsumption.Value, "DataSet_Result")</Value>
+                        <Style>
+                          <FontFamily>Segoe Ui</FontFamily>
+                          <FontSize>6.5pt</FontSize>
+                          <FontWeight>Bold</FontWeight>
+                          <Format>n2</Format>
+                        </Style>
+                      </TextRun>
+                    </TextRuns>
+                    <Style>
+                      <TextAlign>Right</TextAlign>
+                    </Style>
+                  </Paragraph>
+                </Paragraphs>
+                <rd:DefaultName>Textbox121</rd:DefaultName>
+                <Left>12.85372cm</Left>
+                <Height>0.5cm</Height>
+                <Width>3.15266cm</Width>
+                <ZIndex>1</ZIndex>
+                <Style>
+                  <Border>
+                    <Style>None</Style>
+                  </Border>
+                  <PaddingRight>2pt</PaddingRight>
+                </Style>
+              </Textbox>
+              <Textbox Name="Textbox147">
+                <CanGrow>true</CanGrow>
+                <KeepTogether>true</KeepTogether>
+                <Paragraphs>
+                  <Paragraph>
+                    <TextRuns>
+                      <TextRun>
+                        <Value>=Max(Fields!TSTurnoverPct.Value, "DataSet_Result")</Value>
+                        <Style>
+                          <FontFamily>Segoe Ui</FontFamily>
+                          <FontSize>6.5pt</FontSize>
+                          <FontWeight>Bold</FontWeight>
+                          <Format>n2</Format>
+                        </Style>
+                      </TextRun>
+                    </TextRuns>
+                    <Style>
+                      <TextAlign>Right</TextAlign>
+                    </Style>
+                  </Paragraph>
+                </Paragraphs>
+                <rd:DefaultName>Textbox123</rd:DefaultName>
+                <Left>19.02375cm</Left>
+                <Height>0.5cm</Height>
+                <Width>1.88456cm</Width>
+                <ZIndex>2</ZIndex>
+                <Style>
+                  <Border>
+                    <Style>None</Style>
+                  </Border>
+                  <PaddingRight>2pt</PaddingRight>
+                </Style>
+              </Textbox>
+              <Textbox Name="Textbox140">
+                <CanGrow>true</CanGrow>
+                <KeepTogether>true</KeepTogether>
+                <Paragraphs>
+                  <Paragraph>
+                    <TextRuns>
+                      <TextRun>
+                        <Value>=Max(Fields!TSProfit.Value, "DataSet_Result")</Value>
+                        <Style>
+                          <FontFamily>Segoe Ui</FontFamily>
+                          <FontSize>6.5pt</FontSize>
+                          <FontWeight>Bold</FontWeight>
+                          <Format>n2</Format>
+                        </Style>
+                      </TextRun>
+                    </TextRuns>
+                    <Style>
+                      <TextAlign>Right</TextAlign>
+                    </Style>
+                  </Paragraph>
+                </Paragraphs>
+                <rd:DefaultName>Textbox124</rd:DefaultName>
+                <Left>20.90831cm</Left>
+                <Height>0.5cm</Height>
+                <Width>2.91737cm</Width>
+                <ZIndex>3</ZIndex>
+                <Style>
+                  <Border>
+                    <Style>None</Style>
+                  </Border>
+                  <PaddingRight>2pt</PaddingRight>
+                </Style>
+              </Textbox>
+              <Textbox Name="Textbox142">
+                <CanGrow>true</CanGrow>
+                <KeepTogether>true</KeepTogether>
+                <Paragraphs>
+                  <Paragraph>
+                    <TextRuns>
+                      <TextRun>
+                        <Value>=Max(Fields!TSCoverage.Value, "DataSet_Result")</Value>
+                        <Style>
+                          <FontFamily>Segoe Ui</FontFamily>
+                          <FontSize>6.5pt</FontSize>
+                          <FontWeight>Bold</FontWeight>
+                          <Format>n2</Format>
+                        </Style>
+                      </TextRun>
+                    </TextRuns>
+                    <Style>
+                      <TextAlign>Right</TextAlign>
+                    </Style>
+                  </Paragraph>
+                </Paragraphs>
+                <rd:DefaultName>Textbox125</rd:DefaultName>
+                <Left>23.82568cm</Left>
+                <Height>0.5cm</Height>
+                <Width>1.84695cm</Width>
+                <ZIndex>4</ZIndex>
+                <Style>
+                  <Border>
+                    <Style>None</Style>
+                  </Border>
+                  <PaddingRight>2pt</PaddingRight>
+                </Style>
+              </Textbox>
+              <Textbox Name="Textbox146">
+                <CanGrow>true</CanGrow>
+                <KeepTogether>true</KeepTogether>
+                <Paragraphs>
+                  <Paragraph>
+                    <TextRuns>
+                      <TextRun>
+                        <Value>=Max(Fields!TSCoveragePct.Value, "DataSet_Result")</Value>
+                        <Style>
+                          <FontFamily>Segoe Ui</FontFamily>
+                          <FontSize>6.5pt</FontSize>
+                          <FontWeight>Bold</FontWeight>
+                          <Format>n2</Format>
+                        </Style>
+                      </TextRun>
+                    </TextRuns>
+                    <Style>
+                      <TextAlign>Right</TextAlign>
+                    </Style>
+                  </Paragraph>
+                </Paragraphs>
+                <rd:DefaultName>Textbox126</rd:DefaultName>
+                <Left>25.67263cm</Left>
+                <Height>0.5cm</Height>
+                <Width>1.95566cm</Width>
+                <ZIndex>5</ZIndex>
+                <Style>
+                  <Border>
+                    <Style>None</Style>
+                  </Border>
+                  <PaddingRight>2pt</PaddingRight>
+                </Style>
+              </Textbox>
+              <Textbox Name="TotalforAllCategoriesLb">
+                <CanGrow>true</CanGrow>
+                <KeepTogether>true</KeepTogether>
+                <Paragraphs>
+                  <Paragraph>
+                    <TextRuns>
+                      <TextRun>
+                        <Value>=Parameters!TotalforAllCategoriesLb.Value</Value>
+                        <Style>
+                          <FontFamily>Segoe UI</FontFamily>
+                          <FontSize>6.5pt</FontSize>
+                          <FontWeight>Bold</FontWeight>
+                        </Style>
+                      </TextRun>
+                    </TextRuns>
+                    <Style />
+                  </Paragraph>
+                </Paragraphs>
+                <rd:DefaultName>TotalforAllCategoriesLb</rd:DefaultName>
+                <Top>0.03074cm</Top>
+                <Left>0.11513cm</Left>
+                <Height>0.5076cm</Height>
+                <Width>4.42254cm</Width>
+                <ZIndex>6</ZIndex>
+                <Style>
+                  <Border>
+                    <Style>None</Style>
+                  </Border>
+                  <PaddingLeft>2pt</PaddingLeft>
+                  <PaddingRight>2pt</PaddingRight>
+                  <PaddingTop>2pt</PaddingTop>
+                  <PaddingBottom>2pt</PaddingBottom>
+                </Style>
+              </Textbox>
+            </ReportItems>
+            <KeepTogether>true</KeepTogether>
+            <Top>8.72775cm</Top>
+            <Left>0.00098cm</Left>
+            <Height>0.74933cm</Height>
+            <Width>27.62831cm</Width>
+            <ZIndex>1</ZIndex>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+              <BottomBorder>
+                <Style>Solid</Style>
+              </BottomBorder>
+            </Style>
+          </Rectangle>
+          <Textbox Name="Textbox138">
+            <CanGrow>true</CanGrow>
+            <KeepTogether>true</KeepTogether>
+            <Paragraphs>
+              <Paragraph>
+                <TextRuns>
+                  <TextRun>
+                    <Value>=Max(Fields!TSSale.Value, "DataSet_Result")</Value>
+                    <Style>
+                      <FontFamily>Segoe Ui</FontFamily>
+                      <FontSize>6.5pt</FontSize>
+                      <FontWeight>Bold</FontWeight>
+                      <Format>n2</Format>
+                    </Style>
+                  </TextRun>
+                </TextRuns>
+                <Style>
+                  <TextAlign>Right</TextAlign>
+                </Style>
+              </Paragraph>
+            </Paragraphs>
+            <rd:DefaultName>Textbox122</rd:DefaultName>
+            <Top>8.72775cm</Top>
+            <Left>16.00736cm</Left>
+            <Height>0.5cm</Height>
+            <Width>3.01737cm</Width>
+            <ZIndex>2</ZIndex>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+              <PaddingRight>2pt</PaddingRight>
+            </Style>
+          </Textbox>
         </ReportItems>
-        <Height>8.61738cm</Height>
+        <Height>9.51696cm</Height>
         <Style />
       </Body>
-      <Width>19.4546cm</Width>
+      <Width>27.63023cm</Width>
       <Page>
         <PageHeader>
           <Height>4.63995cm</Height>
@@ -7565,7 +7840,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox28</rd:DefaultName>
               <Top>0.51927in</Top>
-              <Left>6.21658in</Left>
+              <Left>9.60946in</Left>
               <Height>0.2in</Height>
               <Width>1.26783in</Width>
               <ZIndex>2</ZIndex>
@@ -7601,7 +7876,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox28</rd:DefaultName>
               <Top>0.1375in</Top>
-              <Left>6.21658in</Left>
+              <Left>9.60946in</Left>
               <Height>0.2in</Height>
               <Width>1.26783in</Width>
               <ZIndex>3</ZIndex>
@@ -7613,38 +7888,6 @@
                 <PaddingRight>2pt</PaddingRight>
                 <PaddingTop>2pt</PaddingTop>
                 <PaddingBottom>2pt</PaddingBottom>
-              </Style>
-            </Textbox>
-            <Textbox Name="Textbox50">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value EvaluationMode="Constant" />
-                      <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox28</rd:DefaultName>
-              <Top>0.98177in</Top>
-              <Left>6.21658in</Left>
-              <Height>0.19708in</Height>
-              <Width>1.44271in</Width>
-              <ZIndex>4</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <VerticalAlign>Middle</VerticalAlign>
               </Style>
             </Textbox>
             <Rectangle Name="Rectangle2">
@@ -7669,7 +7912,7 @@
                   <Top>0.20285cm</Top>
                   <Left>0.17961cm</Left>
                   <Height>0.6cm</Height>
-                  <Width>2.37471cm</Width>
+                  <Width>3.12858cm</Width>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -7697,10 +7940,10 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox10</rd:DefaultName>
-                  <Top>0.20285cm</Top>
-                  <Left>2.55432cm</Left>
+                  <Top>0.22225cm</Top>
+                  <Left>3.30819cm</Left>
                   <Height>0.6cm</Height>
-                  <Width>2.99156cm</Width>
+                  <Width>3.87243cm</Width>
                   <ZIndex>1</ZIndex>
                   <Style>
                     <Border>
@@ -7731,10 +7974,10 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox5</rd:DefaultName>
-                  <Top>0.20285cm</Top>
-                  <Left>5.58116cm</Left>
+                  <Top>0.22225cm</Top>
+                  <Left>7.18062cm</Left>
                   <Height>0.6cm</Height>
-                  <Width>2.43514cm</Width>
+                  <Width>3.21737cm</Width>
                   <ZIndex>2</ZIndex>
                   <Style>
                     <Border>
@@ -7766,10 +8009,10 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox14</rd:DefaultName>
-                  <Top>0.20285cm</Top>
-                  <Left>9.58424cm</Left>
+                  <Top>0.22225cm</Top>
+                  <Left>12.85372cm</Left>
                   <Height>0.6cm</Height>
-                  <Width>2.30001cm</Width>
+                  <Width>3.15266cm</Width>
                   <ZIndex>3</ZIndex>
                   <Style>
                     <Border>
@@ -7801,10 +8044,10 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox18</rd:DefaultName>
-                  <Top>0.20285cm</Top>
-                  <Left>11.91953cm</Left>
+                  <Top>0.22225cm</Top>
+                  <Left>16.00638cm</Left>
                   <Height>0.6cm</Height>
-                  <Width>2.2cm</Width>
+                  <Width>3.01737cm</Width>
                   <ZIndex>4</ZIndex>
                   <Style>
                     <Border>
@@ -7836,10 +8079,10 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox26</rd:DefaultName>
-                  <Top>0.20285cm</Top>
-                  <Left>14.11953cm</Left>
+                  <Top>0.22225cm</Top>
+                  <Left>19.02375cm</Left>
                   <Height>0.6cm</Height>
-                  <Width>1.02958cm</Width>
+                  <Width>1.88456cm</Width>
                   <ZIndex>5</ZIndex>
                   <Style>
                     <Border>
@@ -7872,9 +8115,9 @@
                   </Paragraphs>
                   <rd:DefaultName>Textbox30</rd:DefaultName>
                   <Top>0.20285cm</Top>
-                  <Left>15.14911cm</Left>
+                  <Left>20.90831cm</Left>
                   <Height>0.6cm</Height>
-                  <Width>2.1cm</Width>
+                  <Width>2.91737cm</Width>
                   <ZIndex>6</ZIndex>
                   <Style>
                     <Border>
@@ -7907,9 +8150,9 @@
                   </Paragraphs>
                   <rd:DefaultName>Textbox34</rd:DefaultName>
                   <Top>0.20285cm</Top>
-                  <Left>17.24911cm</Left>
+                  <Left>23.82568cm</Left>
                   <Height>0.6cm</Height>
-                  <Width>0.99431cm</Width>
+                  <Width>1.84695cm</Width>
                   <ZIndex>7</ZIndex>
                   <Style>
                     <Border>
@@ -7942,9 +8185,9 @@
                   </Paragraphs>
                   <rd:DefaultName>Textbox44</rd:DefaultName>
                   <Top>0.20285cm</Top>
-                  <Left>18.2787cm</Left>
+                  <Left>25.67263cm</Left>
                   <Height>0.6cm</Height>
-                  <Width>1.06718cm</Width>
+                  <Width>1.95566cm</Width>
                   <ZIndex>8</ZIndex>
                   <Style>
                     <Border>
@@ -7967,46 +8210,7 @@
                           <Value>=Parameters!InventoryLbl.Value</Value>
                           <Style>
                             <FontSize>7pt</FontSize>
-                            <FontWeight>Bold</FontWeight>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Right</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox5</rd:DefaultName>
-                  <Top>0.20285cm</Top>
-                  <Left>8.05158cm</Left>
-                  <Height>0.6cm</Height>
-                  <Width>1.49738cm</Width>
-                  <ZIndex>9</ZIndex>
-                  <Visibility>
-                    <Hidden>=iif(Fields!ShowItem.Value=TRUE,FALSE,TRUE)</Hidden>
-                  </Visibility>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <VerticalAlign>Middle</VerticalAlign>
-                    <PaddingLeft>2pt</PaddingLeft>
-                    <PaddingRight>2pt</PaddingRight>
-                    <PaddingTop>2pt</PaddingTop>
-                    <PaddingBottom>2pt</PaddingBottom>
-                  </Style>
-                </Textbox>
-                <Textbox Name="Textbox32">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value EvaluationMode="Constant" />
-                          <Style>
-                            <FontSize>7pt</FontSize>
-                            <FontWeight>Bold</FontWeight>
+                            <FontWeight>Normal</FontWeight>
                           </Style>
                         </TextRun>
                       </TextRuns>
@@ -8017,13 +8221,10 @@
                   </Paragraphs>
                   <rd:DefaultName>Textbox5</rd:DefaultName>
                   <Top>0.22225cm</Top>
-                  <Left>8.0163cm</Left>
+                  <Left>10.39799cm</Left>
                   <Height>0.6cm</Height>
-                  <Width>1.56794cm</Width>
-                  <ZIndex>10</ZIndex>
-                  <Visibility>
-                    <Hidden>=Microsoft.VisualBasic.Interaction.iif(Fields!ShowItem.Value = True, True, False)</Hidden>
-                  </Visibility>
+                  <Width>2.45573cm</Width>
+                  <ZIndex>9</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -8039,8 +8240,8 @@
               <KeepTogether>true</KeepTogether>
               <Top>3.28016cm</Top>
               <Height>1.05897cm</Height>
-              <Width>19.45459cm</Width>
-              <ZIndex>5</ZIndex>
+              <Width>27.62831cm</Width>
+              <ZIndex>4</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -8075,7 +8276,7 @@
               <Left>0.06812in</Left>
               <Height>0.2in</Height>
               <Width>1.71875in</Width>
-              <ZIndex>6</ZIndex>
+              <ZIndex>5</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -8086,25 +8287,13 @@
                 <PaddingBottom>2pt</PaddingBottom>
               </Style>
             </Textbox>
-            <Rectangle Name="Rectangle4">
-              <KeepTogether>true</KeepTogether>
-              <Top>4.51552cm</Top>
-              <Height>0.12443cm</Height>
-              <Width>19.4546cm</Width>
-              <ZIndex>7</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-              </Style>
-            </Rectangle>
             <Textbox Name="CompanyName20">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Globals!PageNumber</Value>
+                      <Value>=Globals!PageNumber</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -8117,10 +8306,10 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.85725cm</Top>
-              <Left>18.57665cm</Left>
+              <Left>27.19456cm</Left>
               <Height>0.423cm</Height>
               <Width>0.43567cm</Width>
-              <ZIndex>8</ZIndex>
+              <ZIndex>6</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -8131,7 +8320,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Parameters!Page_Caption.Value</Value>
+                      <Value>=Parameters!Page_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -8144,10 +8333,10 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.85725cm</Top>
-              <Left>15.79011cm</Left>
+              <Left>24.40802cm</Left>
               <Height>0.423cm</Height>
               <Width>2.71598cm</Width>
-              <ZIndex>9</ZIndex>
+              <ZIndex>7</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -8159,260 +8348,10 @@
             </Border>
           </Style>
         </PageHeader>
-        <PageFooter>
-          <Height>1.32275cm</Height>
-          <PrintOnFirstPage>true</PrintOnFirstPage>
-          <PrintOnLastPage>true</PrintOnLastPage>
-          <ReportItems>
-            <Rectangle Name="Rectangle3">
-              <ReportItems>
-                <Textbox Name="Textbox17">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value>=Max(Fields!TSQty.Value, "DataSet_Result")</Value>
-                          <Style>
-                            <FontFamily>Segoe UI</FontFamily>
-                            <FontSize>6.5pt</FontSize>
-                            <Format>n2</Format>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Right</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox2</rd:DefaultName>
-                  <Left>5.54588cm</Left>
-                  <Height>0.5cm</Height>
-                  <Width>2.4cm</Width>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <PaddingRight>4pt</PaddingRight>
-                  </Style>
-                </Textbox>
-                <Textbox Name="Textbox137">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value>=Max(Fields!TSConsumption.Value, "DataSet_Result")</Value>
-                          <Style>
-                            <FontFamily>Segoe Ui</FontFamily>
-                            <FontSize>6.5pt</FontSize>
-                            <Format>n2</Format>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Right</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox121</rd:DefaultName>
-                  <Left>9.58424cm</Left>
-                  <Height>0.5cm</Height>
-                  <Width>2.33529cm</Width>
-                  <ZIndex>1</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <PaddingRight>2pt</PaddingRight>
-                  </Style>
-                </Textbox>
-                <Textbox Name="Textbox138">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value>=Max(Fields!TSSale.Value, "DataSet_Result")</Value>
-                          <Style>
-                            <FontFamily>Segoe Ui</FontFamily>
-                            <FontSize>6.5pt</FontSize>
-                            <Format>n2</Format>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Right</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox122</rd:DefaultName>
-                  <Left>11.91953cm</Left>
-                  <Height>0.5cm</Height>
-                  <Width>2.2cm</Width>
-                  <ZIndex>2</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <PaddingRight>2pt</PaddingRight>
-                  </Style>
-                </Textbox>
-                <Textbox Name="Textbox147">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value>=Max(Fields!TSTurnoverPct.Value, "DataSet_Result")</Value>
-                          <Style>
-                            <FontFamily>Segoe Ui</FontFamily>
-                            <FontSize>6.5pt</FontSize>
-                            <Format>n2</Format>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Right</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox123</rd:DefaultName>
-                  <Left>14.11953cm</Left>
-                  <Height>0.5cm</Height>
-                  <Width>1.06719cm</Width>
-                  <ZIndex>3</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <PaddingRight>2pt</PaddingRight>
-                  </Style>
-                </Textbox>
-                <Textbox Name="Textbox140">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value>=Max(Fields!TSProfit.Value, "DataSet_Result")</Value>
-                          <Style>
-                            <FontFamily>Segoe Ui</FontFamily>
-                            <FontSize>6.5pt</FontSize>
-                            <Format>n2</Format>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Right</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox124</rd:DefaultName>
-                  <Left>15.18672cm</Left>
-                  <Height>0.5cm</Height>
-                  <Width>2.1cm</Width>
-                  <ZIndex>4</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <PaddingRight>2pt</PaddingRight>
-                  </Style>
-                </Textbox>
-                <Textbox Name="Textbox142">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value>=Max(Fields!TSCoverage.Value, "DataSet_Result")</Value>
-                          <Style>
-                            <FontFamily>Segoe Ui</FontFamily>
-                            <FontSize>6.5pt</FontSize>
-                            <Format>n2</Format>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Right</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox125</rd:DefaultName>
-                  <Left>17.28672cm</Left>
-                  <Height>0.5cm</Height>
-                  <Width>1.02958cm</Width>
-                  <ZIndex>5</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <PaddingRight>2pt</PaddingRight>
-                  </Style>
-                </Textbox>
-                <Textbox Name="Textbox146">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value>=Max(Fields!TSCoveragePct.Value, "DataSet_Result")</Value>
-                          <Style>
-                            <FontFamily>Segoe Ui</FontFamily>
-                            <FontSize>6.5pt</FontSize>
-                            <Format>n2</Format>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Right</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox126</rd:DefaultName>
-                  <Left>18.35158cm</Left>
-                  <Height>0.5cm</Height>
-                  <Width>1.10301cm</Width>
-                  <ZIndex>6</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <PaddingRight>2pt</PaddingRight>
-                  </Style>
-                </Textbox>
-              </ReportItems>
-              <KeepTogether>true</KeepTogether>
-              <Top>0.06749cm</Top>
-              <Height>0.60751cm</Height>
-              <Width>19.45459cm</Width>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <BottomBorder>
-                  <Style>Solid</Style>
-                </BottomBorder>
-              </Style>
-            </Rectangle>
-          </ReportItems>
-          <Style>
-            <Border>
-              <Style>None</Style>
-            </Border>
-          </Style>
-        </PageFooter>
-        <PageHeight>29.7cm</PageHeight>
-        <PageWidth>21cm</PageWidth>
-        <LeftMargin>0.7cm</LeftMargin>
+        <PageHeight>21cm</PageHeight>
+        <PageWidth>29.7cm</PageWidth>
+        <LeftMargin>1cm</LeftMargin>
+        <RightMargin>1cm</RightMargin>
         <TopMargin>1cm</TopMargin>
         <BottomMargin>1cm</BottomMargin>
         <ColumnSpacing>1.27cm</ColumnSpacing>
@@ -8520,11 +8459,20 @@
       </DefaultValue>
       <Prompt>InventoryLbl</Prompt>
     </ReportParameter>
+    <ReportParameter Name="TotalforAllCategoriesLb">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TotalforAllCategoriesLb</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TotalforAllCategoriesLb</Prompt>
+    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>11</NumberOfRows>
+      <NumberOfRows>12</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -8581,6 +8529,11 @@
           <RowIndex>10</RowIndex>
           <ParameterName>InventoryLbl</ParameterName>
         </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>11</RowIndex>
+          <ParameterName>TotalforAllCategoriesLb</ParameterName>
+        </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
   </ReportParametersLayout>
@@ -8631,6 +8584,7 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>466c07ca-1043-46a4-89d4-5cd4fdeb45b2</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
