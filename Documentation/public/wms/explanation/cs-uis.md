@@ -1,9 +1,9 @@
 # Capture service UIs
 
-The Capture Service user interface (CS UI) setup section is used for defining the user interface on mobile devices.
+The Capture Service user interface (CS UI) setup section is used for defining the user interface on mobile devices. It consists of a header, in which you define the parameters for the display and lines where you add the texts and fields which need to be displayed on the mobile interface. 
 
-There should be one **Start UI** for the company.
-Generally its the LOGIN UI.
+> [!Note]
+> There should be one **Start UI** for the company. By default, this is the LOGIN UI.
 
 There are mainly 3 types of UIs:
 
