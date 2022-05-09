@@ -101,13 +101,16 @@
         ItemAddOn_GroupLineJObject: JsonObject;
         ItemAddOn_LineJObject: JsonObject;
         ValueJObject: JsonObject;
+        AppliesToLineNo: Integer;
     begin
 
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         if (ItemAddOnLine.FindSet()) then begin
             repeat
 
-                if (FindSaleLine(POSSale, MasterSaleLinePOS."Main Line No.", ItemAddOnLine, SaleLinePOS)) then
+                AppliesToLineNo := FindAppliesToLineNo(MasterSaleLinePOS);
+
+                if (FindSaleLine(POSSale, AppliesToLineNo, ItemAddOnLine, SaleLinePOS)) then
                     CommentText := '';
 
                 if (ItemAddOnLine.Type = ItemAddOnLine.Type::Quantity) then begin
@@ -227,10 +230,10 @@
     begin
 
         POSSession.GetSale(POSSale);
-        POSSession.GetSaleLine(POSSaleLine);
-
         POSSale.GetCurrentSale(SalePOS);
+
         POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         MasterLineNumber := 0;
         if (not ItemAddOn.Get(Context.GetStringParameter('ItemAddOnNo'))) then begin
@@ -289,6 +292,15 @@
 
         if (DecVal < 0) then
             exit;
+
+        if (DecVal = 0) then begin
+            if FindSaleLine(POSSale, MasterLineNumber, ItemAddOnLine, SaleLinePOS) then begin
+                POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
+                POSSaleLine.DeleteLine();
+            end;
+            exit;
+        end;
+
 
         if (not FindSaleLine(POSSale, MasterLineNumber, ItemAddOnLine, SaleLinePOS)) then begin
             POSSaleLine.GetNewSaleLine(SaleLinePOS);
@@ -415,6 +427,18 @@
         end;
     end;
 
+    local procedure FindAppliesToLineNo(SaleLinePOS: Record "NPR POS Sale Line"): Integer
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+    begin
+        ItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
+        if SaleLinePOSAddOn.FindFirst() then
+            exit(SaleLinePOSAddOn."Applies-to Line No.");
+
+        exit(SaleLinePOS."Line No.");
+    end;
+
 
     local procedure FindSaleLine(POSSale: Codeunit "NPR POS Sale"; AppliesToLineNo: Integer; NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     var
@@ -434,13 +458,11 @@
         if not SaleLinePOSAddOn.FindFirst() then
             exit(false);
 
-        SaleLinePOS.SetRange("Register No.", SaleLinePOSAddOn."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOSAddOn."Sales Ticket No.");
-        SaleLinePOS.SetRange(Date, SaleLinePOSAddOn."Sale Date");
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOSAddOn."Sale Type");
-        SaleLinePOS.SetRange("Line No.", SaleLinePOSAddOn."Sale Line No.");
-        SaleLinePOS.SetRange("No.", NpIaItemAddOnLine."Item No.");
-        exit(SaleLinePOS.FindFirst());
+        exit(SaleLinePOS.Get(SaleLinePOSAddOn."Register No.",
+                             SaleLinePOSAddOn."Sales Ticket No.",
+                             SaleLinePOSAddOn."Sale Date",
+                             SaleLinePOSAddOn."Sale Type",
+                             SaleLinePOSAddOn."Sale Line No."));
 
     end;
 
