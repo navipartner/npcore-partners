@@ -26,6 +26,8 @@
     href: howto/set-up-cs-users.md
   - name: Create QR codes
     href: howto/create-qr-codes.md
+  - name: Set up CS UIs
+    href: howto/set-up-cs-uis.md
   - name: Fetch setup data
     href: howto/fetch-setup-data.md
   - name: Set up Business Central licensing

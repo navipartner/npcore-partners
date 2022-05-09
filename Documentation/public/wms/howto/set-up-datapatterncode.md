@@ -2,9 +2,9 @@
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **CS Data Patterns** and choose the related link.        
 
-A list of configured Data Pattern is displayed.              
+A list of configured Data Patterns is displayed.              
  
-2. Choose the New action.
+2. Click **New**.
 
 3. Fill out the necessary fields with the following information:
 [CS Data Pattern](../images/CS-Data-Pattern.JPG)
