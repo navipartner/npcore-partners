@@ -5,12 +5,10 @@ codeunit 85040 "NPR Library FR NF525"
         FRAuditSetup: Record "NPR FR Audit Setup";
         FRAuditNoSeries: Record "NPR FR Audit No. Series";
         TempBlob: Codeunit "Temp Blob";
-        RecRef: RecordRef;
+        TempBlob2: Codeunit "Temp Blob";
         DateFormulaVariable: DateFormula;
         OutStream: OutStream;
         InStream: InStream;
-        test: integer;
-        test2: Boolean;
         NoSeriesLine: Record "No. Series Line";
         POSStore: Record "NPR POS Store";
     begin
@@ -85,7 +83,6 @@ codeunit 85040 "NPR Library FR NF525"
 
     procedure GetTestCert(var TempBlob: Codeunit "Temp Blob");
     var
-        ReadBase64File: Codeunit "Read File in Base64 Encoding";
         OStream: OutStream;
     begin
         TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
