@@ -1,4 +1,4 @@
-﻿codeunit 6014641 "NPR BTF Service API"
+codeunit 6014641 "NPR BTF Service API"
 {
     Permissions = TableData "Job Queue Entry" = rm;
 
@@ -148,7 +148,7 @@
         ErrorLog.CopyFromServiceSetup(ServiceSetup);
         ErrorLog.CopyFromServiceEndPoint(ServiceEndPoint);
         ErrorLog.SetResponse(Response, ServiceEndPoint, ErrorNote);
-        ErrorLog.Insert(true);
+        ErrorLog.Modify(true);
     end;
 
     procedure ShowErrorLogEntries(ServiceCode: Code[20]; EndPointID: Text)

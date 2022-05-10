@@ -1,4 +1,4 @@
-﻿codeunit 6014646 "NPR BTF XML Response" implements "NPR BTF IFormatResponse"
+codeunit 6014646 "NPR BTF XML Response" implements "NPR BTF IFormatResponse"
 {
     var
         NoBodyReturnedLbl: Label 'No body returned';
@@ -54,13 +54,14 @@
         Response.CreateInStream(InStr);
         if not XmlDocument.ReadFrom(InStr, Document) then
             exit(NoBodyReturnedLbl);
+
         if Document.SelectSingleNode('.//exceptionMessage', Node) then
             exit(Node.AsXmlElement().InnerText());
         if Document.SelectSingleNode('.//error_description', Node) then
             exit(Node.AsXmlElement().InnerText());
-        if Node.AsXmlElement().SelectSingleNode('.//message', Node) then
+        if Document.SelectSingleNode('.//message', Node) then
             exit(Node.AsXmlElement().InnerText());
-        if Node.AsXmlElement().SelectSingleNode('.//Message', Node) then
+        if Document.SelectSingleNode('.//Message', Node) then
             exit(Node.AsXmlElement().InnerText());
     end;
 

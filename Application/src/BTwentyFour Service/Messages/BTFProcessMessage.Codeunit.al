@@ -1,4 +1,4 @@
-﻿codeunit 6014651 "NPR BTF ProcessMessage" implements "NPR BTF IEndPoint"
+codeunit 6014651 "NPR BTF ProcessMessage" implements "NPR BTF IEndPoint"
 {
     Access = Internal;
 
@@ -8,6 +8,7 @@
         RequestNotSentLbl: Label 'Failed to send request to %1', Comment = '%1=Request URI';
         MessageIdEmptyErr: Label 'Message Id empty';
         MethodNotSupportedErr: Label 'This method is not supported for the current service endpoint';
+        DefaultFileNameLbl: Label 'ProcessMessage_%1', Comment = '%1=Current Date and Time';
 
     procedure SendRequest(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; Request: Codeunit "Temp Blob"; var Response: Codeunit "Temp Blob"; var StatusCode: Integer)
     var
@@ -123,6 +124,12 @@
         exit(true);
     end;
 
+    procedure GetDefaultFileName(ServiceEndPoint: Record "NPR BTF Service EndPoint"): Text
+    begin
+        // used as File Name in table "NPR BTF EndPoint Error Log" --> function "SetResponse"
+        exit(StrSubstNo(DefaultFileNameLbl, CurrentDateTime));
+    end;
+
     procedure ProcessImportedContent(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint"): Boolean
     begin
         //If response of processing should be saved to database, then reimplement this method
@@ -130,12 +137,6 @@
     end;
 
     procedure ProcessImportedContentOffline(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint")
-    begin
-        //If response of processing should be saved to database, then reimplement this method
-        error(MethodNotSupportedErr);
-    end;
-
-    procedure GetDefaultFileName(ServiceEndPoint: Record "NPR BTF Service EndPoint"): Text
     begin
         //If response of processing should be saved to database, then reimplement this method
         error(MethodNotSupportedErr);
