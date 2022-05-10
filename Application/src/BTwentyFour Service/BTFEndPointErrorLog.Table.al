@@ -1,4 +1,4 @@
-﻿table 6014524 "NPR BTF EndPoint Error Log"
+table 6014524 "NPR BTF EndPoint Error Log"
 {
     Access = Internal;
     DataClassification = CustomerContent;
@@ -131,9 +131,12 @@
     procedure InitRec(CurrUserId: Code[50]; InitiatiedFromRecID: RecordID)
     begin
         Rec.Init();
+        Rec."Entry No." := 0;
         Rec."Sent on Date" := CurrentDateTime();
         Rec."Sent by User ID" := CurrUserId;
         Rec."Initiatied From Rec. ID" := InitiatiedFromRecID;
+
+        Rec.Insert(true);
 
         OnAfterInitRec(Rec);
     end;
