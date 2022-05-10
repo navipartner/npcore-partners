@@ -1,6 +1,7 @@
 ﻿codeunit 6150861 "NPR POS Action: Doc. Import"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'Import an open standard NAV sales document to current POS sale and delete the document.';
         CaptionDocType: Label 'Document Type';
@@ -15,6 +16,7 @@
         DescLocationFilter: Label 'A string, which will be used as a location filter for sales document list, if ''Location From'' parameter is set to ''Location Filter Parameter''';
         OptionDocType: Label 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
         OptionLocationFrom: Label 'POS Store,Location Filter Parameter';
+        EnableSalesPersonFromOrderDescLbl: Label 'Keeps salesperson from sales order';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -23,7 +25,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.4');
+        exit('1.5');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -45,6 +47,7 @@
             Sender.RegisterOptionParameter('LocationFrom', 'POS Store,Location Filter Parameter', 'POS Store');
             Sender.RegisterTextParameter('LocationFilter', '');
             Sender.RegisterBooleanParameter('ConfirmInvDiscAmt', false);
+            Sender.RegisterBooleanParameter('EnableSalesPersonFromOrder', false);
         end;
     end;
 
@@ -61,6 +64,7 @@
         LocationSource: Option "POS Store","Location Filter Parameter";
         LocationFilter: Text;
         SalesDocViewString: Text;
+        SalesPersonFromOrder: Boolean;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -72,6 +76,7 @@
         SalesDocViewString := JSON.GetStringParameter('SalesDocViewString');
         LocationSource := JSON.GetIntegerParameterOrFail('LocationFrom', ActionCode());
         LocationFilter := JSON.GetStringParameter('LocationFilter');
+        SalesPersonFromOrder := JSON.GetBooleanParameterOrFail('EnableSalesPersonFromOrder', ActionCode());
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
@@ -103,6 +108,20 @@
         SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
 
         ImportFromDocument(POSSession, SalesHeader);
+
+        if SalesPersonFromOrder then
+            UpdateSalesPerson(POSSale, SalesHeader);
+
+    end;
+
+    local procedure UpdateSalesPerson(POSSale: Codeunit "NPR POS Sale"; SalesHeader: Record "Sales Header")
+    var
+        SalePOS: Record "NPR POS Sale";
+    begin
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Salesperson Code", SalesHeader."Salesperson Code");
+        SalePOS.Modify();
+        POSSale.RefreshCurrent();
     end;
 
     local procedure CheckCustomer(POSSession: Codeunit "NPR POS Session"; SelectCustomer: Boolean): Boolean
@@ -226,6 +245,8 @@
                 Caption := DescLocationFilter;
             'ConfirmInvDiscAmt':
                 Caption := SalesDocImpMgt.GetConfirmInvDiscAmtDescLbl();
+            'EnableSalesPersonFromOrder':
+                Caption := EnableSalesPersonFromOrderDescLbl;
         end;
     end;
 
