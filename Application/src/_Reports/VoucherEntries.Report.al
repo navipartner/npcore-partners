@@ -1,8 +1,8 @@
 ﻿report 6014407 "NPR Voucher Entries"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
 
     Caption = 'Voucher Entries';
     DefaultLayout = RDLC;
@@ -13,14 +13,26 @@
 
     dataset
     {
+        dataitem("Company Information"; "Company Information")
+        {
+            DataItemTableView = sorting("Primary Key");
+            column(Name; Name)
+            {
+            }
+            column(AplyedFilters; AppliedFilters)
+            {
+            }
+        }
         dataitem("NPR NpRv Voucher"; "NPR NpRv Voucher")
         {
             RequestFilterFields = "No.", "Reference No.", "Issue External Document No.";
             dataitem(NPRNpRvVoucherEntry; "NPR NpRv Voucher Entry")
             {
                 DataItemLink = "Voucher No." = Field("No.");
+                DataItemTableView = sorting("Entry No.");
 
-                column(VoucherNo; "Voucher No.")
+                column(VoucherNo;
+                "Voucher No.")
                 {
                     IncludeCaption = true;
                 }
@@ -44,9 +56,8 @@
                 {
                     IncludeCaption = true;
                 }
-                column(PostingDate; "Posting Date")
+                column(PostingDate; Format("Posting Date"))
                 {
-                    IncludeCaption = true;
                 }
                 column(DocumentType; "Document Type")
                 {
@@ -68,10 +79,8 @@
                 {
                     IncludeCaption = true;
                 }
-
-                column(Positive; Positive)
+                column(Positive; Format(Positive))
                 {
-                    IncludeCaption = true;
                 }
                 column(Amount; Amount)
                 {
@@ -81,34 +90,49 @@
                 {
                     IncludeCaption = true;
                 }
-                column(Open; Open)
+                column(Open; Format(Open))
                 {
-                    IncludeCaption = true;
                 }
                 column(ClosedbyPartnerCode; "Closed by Partner Code")
                 {
                     IncludeCaption = true;
                 }
-                column(PartnerClearing; "Partner Clearing")
+                column(PartnerClearing; format("Partner Clearing"))
                 {
-                    IncludeCaption = true;
                 }
-                column(TotalLbl; TotalLbl)
-                {
 
-                }
-                column(TitleLbl; TitleLbl)
-                {
-
-                }
             }
+
         }
+
     }
     requestpage
     {
         SaveValues = true;
     }
+
+    labels
+    {
+        CompanyLbl = 'Company: ';
+        DateAndTimeLbl = 'Date and Time: ';
+        UserLbl = 'User: ';
+        PageLbl = 'Page';
+        TitleLbl = 'VOUCHER ENTRIES';
+        TotalLbl = 'Total';
+        FiltersLbl = 'Applied Filters: ';
+        PositiveLbl = 'Positive';
+        OpenLbl = 'Open';
+        PartnerClearingLbl = 'Partner Clearing';
+        PostingDateLbl = 'Posting Date';
+        TotalForVoucherLbl = 'Total for Voucher ';
+        OfLbl = 'of';
+    }
+
+    trigger OnPreReport()
+    begin
+        AppliedFilters := "NPR NpRv Voucher".GetFilters;
+    end;
+
     var
-        TitleLbl: Label 'VOUCHER ENTRIES';
-        TotalLbl: Label 'Total';
+        AppliedFilters: Text;
 }
