@@ -55,6 +55,8 @@
 
         _Initialized := true;
         OnInitialize(_FrontEnd);
+        if GetErrorOnInitialize() then
+            Error(GetLastErrorText());
     end;
 
     internal procedure ClearAll()

@@ -6,7 +6,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     var
         FRCertificationSetup: Record "NPR FR Audit Setup";
-        Base64Cert: Text;
         Initialized: Boolean;
         Enabled: Boolean;
         CertificateLoaded: Boolean;
@@ -46,34 +45,29 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure LoadCertificate()
     var
-        Base64Convert: Codeunit "Base64 Convert";
         X509Certificate2: Codeunit X509Certificate2;
         InStr: InStream;
+        Base64Cert: Text;
     begin
         if not CertificateLoaded then begin
             FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
             FRCertificationSetup.Get();
+            FRCertificationSetup.TestField("Signing Certificate Thumbprint");
             FRCertificationSetup.TestField("Signing Certificate Password");
-            FRCertificationSetup."Signing Certificate".CreateInStream(InStr);
-            Base64Cert := Base64Convert.ToBase64(InStr);
+            FRCertificationSetup."Signing Certificate".CreateInStream(InStr, TextEncoding::UTF8);
+            InStr.ReadText(Base64Cert);
             if X509Certificate2.VerifyCertificate(Base64Cert, FRCertificationSetup."Signing Certificate Password", "X509 Content Type"::Cert) then
                 CertificateLoaded := true;
         end;
     end;
 
-    procedure VerifySignature(Data: Text; HashAlgo: Enum "Hash Algorithm"; SignatureBase64: Text): Boolean
+    procedure VerifySignature(POSAuditLog: Record "NPR POS Audit Log"; HashAlgo: Enum "Hash Algorithm"; SignatureBase64: Text): Boolean
     var
-        CryptoMgt: Codeunit "Cryptography Management";
-        ConvertBase64: Codeunit "Base64 Convert";
-        OutStr: OutStream;
-        InStream: InStream;
-        TempBlob: Codeunit "Temp Blob";
+        TempPOSAuditLog: Record "NPR POS Audit Log" temporary;
     begin
-        LoadCertificate();
-        TempBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
-        ConvertBase64.FromBase64(SignatureBase64, OutStr);
-        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
-        exit(CryptoMgt.VerifyData(Data, Base64Cert, Enum::"Hash Algorithm"::SHA256, InStream));
+        TempPOSAuditLog.Copy(POSAuditLog);
+        SignRecord(TempPOSAuditLog);
+        exit(TempPOSAuditLog."Signature Base Hash" = POSAuditLog."Original Signature Base Hash");
     end;
 
     procedure GetLastUnitEventSignature(POSUnitNo: Code[10]; var POSAuditLogOut: Record "NPR POS Audit Log"; ExternalType: Code[20]): Boolean
@@ -109,13 +103,24 @@ codeunit 6184850 "NPR FR Audit Mgt."
     var
         CryptoMgt: Codeunit "Cryptography Management";
         OutStr: OutStream;
+        SignCertInStr: InStream;
         InStream: InStream;
         TempBLOB: Codeunit "Temp Blob";
         ConvertBase64: Codeunit "Base64 Convert";
+#if BC19
+        SignatureKey: Record "Signature Key";
+#else
+        SignatureKey: Codeunit "Signature Key";
+#endif
+        Base64CertValue: Text;
     begin
         TempBLOB.CreateOutStream(OutStr, TextEncoding::UTF8);
+        FRCertificationSetup.CalcFields("Signing Certificate");
+        FRCertificationSetup."Signing Certificate".CreateInStream(SignCertInStr);
+        SignCertInStr.ReadText(Base64CertValue);
+        SignatureKey.FromBase64String(Base64CertValue, FRCertificationSetup."Signing Certificate Password", true);
+        CryptoMgt.SignData(BaseHash, SignatureKey, Enum::"Hash Algorithm"::SHA256, OutStr);
         TempBLOB.CreateInStream(InStream, TextEncoding::UTF8);
-        CryptoMgt.SignData(BaseHash, Base64Cert, Enum::"Hash Algorithm"::SHA256, OutStr);
         exit(ConvertBase64.ToBase64(InStream));
     end;
 
@@ -157,19 +162,18 @@ codeunit 6184850 "NPR FR Audit Mgt."
         if FileName = '' then
             exit;
 
-        CopyStream(OutStr, InStreamBLOB);
-
-        Base64Text := Base64Convert.ToBase64(InStream);
+        Base64Text := Base64Convert.ToBase64(InStreamBLOB);
+        OutStr.Write(Base64Text);
         Base64Text2 := Base64Text;
 
 
         X509Certificate2.VerifyCertificate(Base64Text2, FRCertificationSetup."Signing Certificate Password", Enum::"X509 Content Type"::Cert);
-
         if (not X509Certificate2.HasPrivateKey(Base64Text, FRCertificationSetup."Signing Certificate Password")) then
             Error(ERROR_MISSING_KEY);
 
         CertificateThumbprint := CopyStr(FRCertificationSetup."Signing Certificate Thumbprint", 1, MaxStrLen(FRCertificationSetup."Signing Certificate Thumbprint"));
         X509Certificate2.GetCertificateThumbprint(Base64Text, FRCertificationSetup."Signing Certificate Password", CertificateThumbprint);
+        FRCertificationSetup."Signing Certificate Thumbprint" := CertificateThumbprint;
         FRCertificationSetup.Modify(true);
 
         Message(CAPTION_CERT_SUCCESS, FRCertificationSetup."Signing Certificate Thumbprint");
@@ -1195,7 +1199,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
                     InStream.ReadText(Signature);
                 Clear(InStream);
 
-                if not VerifySignature(DecodeBase64URL(POSAuditLog."Signature Base Hash"), Enum::"Hash Algorithm"::SHA256, DecodeBase64URL(Signature)) then
+                if not VerifySignature(POSAuditLog, Enum::"Hash Algorithm"::SHA256, DecodeBase64URL(Signature)) then
                     Error(ERROR_SIGNATURE_VALUE, POSAuditLog.TableCaption, POSAuditLog."Entry No.");
 
                 First := false;
@@ -1317,7 +1321,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSAuditProfile.TestField("Print Receipt On Sale Cancel", false);
         POSAuditProfile.TestField("Allow Zero Amount Sales", false);
         POSAuditProfile.TestField("Require Item Return Reason", true);
-
 
         if POSEndofDayProfile.Get(POSUnit."POS End of Day Profile") then begin
             POSEndofDayProfile.TestField(POSEndofDayProfile."End of Day Type", POSEndofDayProfile."End of Day Type"::INDIVIDUAL);
