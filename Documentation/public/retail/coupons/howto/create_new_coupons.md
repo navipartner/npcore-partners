@@ -1,8 +1,8 @@
 # Create a new coupon
 
-Coupons give customers a discount on items which they add to shopping carts. You can create a coupon either for all customers, or for a specific group of customers. If you wish to create a new coupon, follow the provided steps:
+Coupons can give customers a discount on items which they add to shopping carts. You can create a coupon either for all customers, or for a specific group of customers. If you wish to create a new coupon, follow the provided steps:
 
-1. From the Role Center, search for **Coupon Types** and open the related link.      
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Coupon Types** and choose the related link.         
    The available coupon types are displayed.
 2. Click **New**.
 3. Populate the following fields:
@@ -18,3 +18,8 @@ Coupons give customers a discount on items which they add to shopping carts. You
 6. Add items to the shopping cart, and click **Scan Discount Coupon**.
 7. Provide the **Coupon Reference No.** in the window that pops up.     
    The discount coupon is now applied. 
+
+
+### Related links
+
+- [Coupon troubleshooting](../../../troubleshooting/coupons_troubleshooting.md)
