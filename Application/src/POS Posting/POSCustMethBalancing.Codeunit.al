@@ -177,7 +177,7 @@
             if (PaymentMethodDenom.FindSet()) then begin
                 repeat
                     CoinType.ReadFrom('{}');
-                    CountingType.Add('id', POSPaymentBinCheckPoint."Entry No.");
+                    CoinType.Add('id', POSPaymentBinCheckPoint."Entry No.");
                     CoinType.Add('type', PaymentMethodDenom."Denomination Type");
                     CoinType.Add('description', StrSubstNo(CoinTypeDescLbl, PaymentMethodDenom.Denomination, PaymentMethodDenom."Denomination Type"));
                     CoinType.Add('value', PaymentMethodDenom.Denomination);
