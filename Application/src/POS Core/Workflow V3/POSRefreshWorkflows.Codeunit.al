@@ -28,12 +28,12 @@ codeunit 6059798 "NPR POS Refresh Workflows"
         ActionCode := Enum::"NPR POS Workflow".Names().Get(Enum::"NPR POS Workflow".Ordinals().IndexOf(WorkflowOrdinal));
         WorkflowConfig.SetActionCode(ActionCode);
         Workflow.Register(WorkflowConfig); //Workflow registers all config
-        if (WorkflowConfig.GetDescription() = '') then
+        if (WorkflowConfig.GetWorkflowDescription() = '') then
             Error(MissingDescriptionLbl, ActionCode);
 
         BufferCaptions(ActionCode, WorkflowConfig); //Used by POS Session init and by POS Parameter Value page
 
-        ActionVersion := WorkflowConfig.CalculateHash();
+        ActionVersion := WorkflowConfig.CalculateWorkflowHash();
         POSAction.SetRange(Code, ActionCode);
         POSAction.SetRange(Version, ActionVersion);
         if not POSAction.Find('=') then
@@ -51,11 +51,11 @@ codeunit 6059798 "NPR POS Refresh Workflows"
         DataSource: Text;
         CustomJSMethod: Text;
         CustomJSCode: Text;
-        BlockingUI: Boolean;
+        NonBlockingUI: Boolean;
         Description: Text;
         ActionParameters: Record "NPR POS Action Parameter";
     begin
-        WorkflowConfig.GetConfigValues(TempParameters, Javascript, Unattended, BoundToDataSource, DataSource, CustomJSMethod, CustomJSCode, BlockingUI, Description);
+        WorkflowConfig.GetWorkflowParameters(TempParameters, Javascript, Unattended, BoundToDataSource, DataSource, CustomJSMethod, CustomJSCode, NonBlockingUI, Description);
 
         POSAction.LockTable();
         if POSAction.Get(ActionCode) then
@@ -63,7 +63,7 @@ codeunit 6059798 "NPR POS Refresh Workflows"
 
         POSAction.Init();
         POSAction.Code := ActionCode;
-        POSAction."Blocking UI" := BlockingUI;
+        POSAction."Blocking UI" := not NonBlockingUI;
         POSAction."Bound to DataSource" := BoundToDataSource;
         POSAction."Data Source Name" := DataSource;
         POSAction.Version := ActionVersion;
@@ -96,11 +96,11 @@ codeunit 6059798 "NPR POS Refresh Workflows"
         ParameterOptionCaption: Dictionary of [Text, Text];
         FrontendLabels: Dictionary of [Text, Text];
     begin
-        WorkflowConfig.GetCaptions(FrontEndLabels, ParameterNameCaption, ParameterDescriptionCaption, ParameterOptionCaption);
+        WorkflowConfig.GetWorkflowCaptions(FrontEndLabels, ParameterNameCaption, ParameterDescriptionCaption, ParameterOptionCaption);
         WorkflowCaptionBuffer.AddWorkflowNameCaptions(ActionCode, ParameterNameCaption);
         WorkflowCaptionBuffer.AddWorkflowDescriptionCaptions(ActionCode, ParameterDescriptionCaption);
         WorkflowCaptionBuffer.AddWorkflowOptionCaptions(ActionCode, ParameterOptionCaption);
         WorkflowCaptionBuffer.AddFrontendLabels(ActionCode, FrontendLabels);
-        WorkflowCaptionBuffer.AddActionDescription(ActionCode, WorkflowConfig.GetDescription());
+        WorkflowCaptionBuffer.AddActionDescription(ActionCode, WorkflowConfig.GetWorkflowDescription());
     end;
 }
