@@ -34,12 +34,14 @@
     var
         Request: Codeunit "NPR Front-End: Generic";
         BalancingContext: JsonObject;
+        POSWorkShiftCheckpoint: Record "NPR POS Workshift Checkpoint";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
-        BalancingContext.Add('endOfDayCheckpointEntryNo', '35');
+        POSWorkShiftCheckpoint.FindLast();
+        BalancingContext.Add('endOfDayCheckpointEntryNo', POSWorkShiftCheckpoint."Entry No.");
 
         Request.SetMethod('BalanceSetContext');
         Request.GetContent().Add('balancingContext', BalancingContext);
