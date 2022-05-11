@@ -2,6 +2,7 @@
 codeunit 6151019 "NPR NpRv Module Valid.: Global"
 {
     Access = Internal;
+
     var
         Text000: Label 'Validate Global Voucher';
         Text001: Label 'Voucher is being used';
@@ -335,7 +336,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<issue_register_no>' + Voucher."Issue Register No." + '</issue_register_no>' +
                     '<issue_sales_ticket_no>' + Voucher."Issue Document No." + '</issue_sales_ticket_no>' +
                     '<issue_user_id>' + Voucher."Issue User ID" + '</issue_user_id>' +
-                    '<issue_partner_code>' + NpRvVoucherType."Partner Code" + '</issue_partner_code>' +
+                    '<issue_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</issue_partner_code>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</CreateVouchers>' +
@@ -524,7 +525,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<redeem_register_no>' + TempNpRvVoucherBuffer."Redeem Register No." + '</redeem_register_no>' +
                     '<redeem_sales_ticket_no>' + TempNpRvVoucherBuffer."Redeem Sales Ticket No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + TempNpRvVoucherBuffer."Redeem User ID" + '</redeem_user_id>' +
-                    '<redeem_partner_code>' + VoucherType."Partner Code" + '</redeem_partner_code>' +
+                    '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</ReserveVouchers>' +
@@ -608,8 +609,8 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
 #pragma warning restore
         Voucher.Modify(true);
         Voucher.CalcFields(Amount);
-        if Voucher.Amount <> VoucherAmount then;
-        PostSyncEntry(Voucher, VoucherAmount - Voucher.Amount, Node);
+        if Voucher.Amount <> VoucherAmount then
+            PostSyncEntry(Voucher, VoucherAmount - Voucher.Amount, Node);
         NpRvVoucherMgt.Voucher2Buffer(Voucher, TempNpRvVoucherBuffer);
     end;
 
@@ -648,7 +649,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<redeem_register_no>' + VoucherEntry."Register No." + '</redeem_register_no>' +
                     '<redeem_sales_ticket_no>' + VoucherEntry."Document No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + VoucherEntry."User ID" + '</redeem_user_id>' +
-                    '<redeem_partner_code>' + VoucherType."Partner Code" + '</redeem_partner_code>' +
+                    '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</RedeemVouchers>' +
@@ -727,7 +728,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<redeem_register_no>' + NpRvVoucherEntry."Register No." + '</redeem_register_no>' +
                     '<redeem_sales_ticket_no>' + NpRvVoucherEntry."Document No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + NpRvVoucherEntry."User ID" + '</redeem_user_id>' +
-                    '<redeem_partner_code>' + NpRvVoucherEntry."Partner Code" + '</redeem_partner_code>' +
+                    '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</RedeemPartnerVouchers>' +
@@ -794,7 +795,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<redeem_register_no>' + VoucherEntry."Register No." + '</redeem_register_no>' +
                     '<redeem_sales_ticket_no>' + VoucherEntry."Document No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + VoucherEntry."User ID" + '</redeem_user_id>' +
-                    '<redeem_partner_code>' + VoucherType."Partner Code" + '</redeem_partner_code>' +
+                    '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</TopUpVouchers>' +
@@ -885,6 +886,90 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry."Partner Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_partner_code', MaxStrLen(NpRvVoucherEntry."Partner Code"), false));
         NpRvVoucherEntry.Insert();
+        Commit();
+    end;
+
+
+    internal procedure UpdateVoucherAmount(NpRvVoucher: Record "NPR NpRv Voucher")
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        VoucherAmount: Decimal;
+        Node: XmlNode;
+    begin
+        NpRvVoucherType.Get(NpRvVoucher."Voucher Type");
+        if NpRvVoucherType."Partner Code" = '' then
+            exit;
+        if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
+            exit;
+        if FindVoucherAmount(NpRvVoucher."Reference No.", NpRvVoucherType, VoucherAmount, Node) then begin
+            NpRvVoucher.CalcFields(Amount);
+            if (VoucherAmount <> 0) and (NpRvVoucher.Amount <> VoucherAmount) then
+                PostSyncEntry(NpRvVoucher, VoucherAmount - NpRvVoucher.Amount, Node);
+
+        end;
+    end;
+
+    procedure FindVoucherAmount(ReferenceNo: Text; NpRvVoucherType: Record "NPR NpRv Voucher Type"; var VoucherAmount: Decimal; var Node: XmlNode) Found: Boolean
+    var
+        NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
+        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        XmlDomManagement: codeunit "XML DOM Management";
+        Client: HttpClient;
+        RequestMessage: HttpRequestMessage;
+        ContentHeader: HttpHeaders;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
+        Document: XmlDocument;
+        RequestXmlText: Text;
+        ResponseText: Text;
+    begin
+        NpRvGlobalVoucherSetup.Get(NpRvVoucherType.Code);
+        NpRvGlobalVoucherSetup.TestField("Service Url");
+
+        RequestXmlText :=
+          '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
+            '<soapenv:Body>' +
+              '<FindVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
+                '<vouchers>' +
+                  '<voucher reference_no="' + ReferenceNo + '" voucher_type="' + NpRvVoucherType.Code + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/global_voucher_service">' +
+                    '<redeem_partner_code>' + NpRvVoucherType."Partner Code" + '</redeem_partner_code>' +
+                  '</voucher>' +
+                '</vouchers>' +
+              '</FindVouchers>' +
+            '</soapenv:Body>' +
+          '</soapenv:Envelope>';
+
+        RequestMessage.GetHeaders(RequestHeaders);
+        if RequestHeaders.Contains('Connection') then
+            RequestHeaders.Remove('Connection');
+        NpRvGlobalVoucherSetup.SetRequestHeadersAuthorization(RequestHeaders);
+
+        RequestMessage.Content.WriteFrom(RequestXmlText);
+        RequestMessage.Content.GetHeaders(ContentHeader);
+        if ContentHeader.Contains('Content-Type') then
+            ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
+        if ContentHeader.Contains('SOAPAction') then
+            ContentHeader.Remove('SOAPAction');
+        ContentHeader.Add('SOAPAction', 'FindVouchers');
+
+        RequestMessage.Method := 'POST';
+        RequestMessage.SetRequestUri(NpRvGlobalVoucherSetup."Service Url");
+        Client.Send(RequestMessage, ResponseMessage);
+        ResponseMessage.Content.ReadAs(ResponseText);
+        if not ResponseMessage.IsSuccessStatusCode() then begin
+            ThrowGlobalVoucherWSError(ResponseMessage.ReasonPhrase, ResponseText);
+        end;
+
+        ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
+        XmlDocument.ReadFrom(ResponseText, Document);
+        if not NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//Body/FindVouchers_Result/vouchers/voucher', Node) then
+            Error(Text005, ReferenceNo);
+
+        if Evaluate(VoucherAmount, NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'amount', 0, false), 9) then
+            Found := true;
+
     end;
 
     internal procedure ThrowGlobalVoucherWSError(ResponseReasonPhrase: Text; ResponseText: Text)
