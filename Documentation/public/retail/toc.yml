@@ -8,6 +8,8 @@
   href: eft/toc.yml
 - name: Data replication module
   href: replication/toc.yml
+- name: Coupons
+  href: coupons/toc.yml
 - name: End user communication
   href: sms/toc.yml
 - name: GDPR in NP Retail
