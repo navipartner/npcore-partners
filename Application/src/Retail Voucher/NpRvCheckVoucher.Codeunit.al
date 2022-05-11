@@ -46,6 +46,8 @@
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         NotFoundErr: Label 'Reference No. %1 and Voucher Type %2 not found';
         NpRvVoucherCard: Page "NPR NpRv Voucher Card";
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -60,7 +62,9 @@
         else
             VoucherTypeCode := CopyStr(VoucherType, 1, MaxStrLen(VoucherTypeCode));
 
-        if not NpRvVoucherMgt.FindVoucher(VoucherTypeCode, ReferenceNo, Voucher) then
+        if NpRvVoucherMgt.FindVoucher(VoucherTypeCode, ReferenceNo, Voucher) then
+            NpRvModuleValidGlobal.UpdateVoucherAmount(Voucher)
+        else
             if not NpRvVoucherMgt.FindPartnerVoucher(VoucherTypeCode, ReferenceNo, Voucher) then
                 Error(NotFoundErr, ReferenceNo, VoucherTypeCode);
 
