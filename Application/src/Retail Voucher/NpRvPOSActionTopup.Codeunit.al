@@ -133,6 +133,7 @@
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
         VoucherTypeFilter: Text;
         ReferenceNo: Text;
         NotFoundErr: Label 'Reference No. %1 and Voucher Type %2 not found';
@@ -145,9 +146,12 @@
 
         NpRvVoucher.SetFilter("Voucher Type", VoucherTypeFilter);
         NpRvVoucher.SetFilter("Reference No.", '=%1', ReferenceNo);
-        if not NpRvVoucher.FindFirst() then
+        if NpRvVoucher.FindFirst() then
+            NpRvModuleValidGlobal.UpdateVoucherAmount(NpRvVoucher)
+        else
             if not NpRvVoucherMgt.FindPartnerVoucher(VoucherTypeFilter, ReferenceNo, NpRvVoucher) then
                 Error(NotFoundErr, ReferenceNo, VoucherTypeFilter);
+
         if not NpRvVoucher."Allow Top-up" then
             Error(Text006, NpRvVoucher."Reference No.");
 
@@ -209,6 +213,8 @@
     begin
         exit('1.0');
     end;
+
+
 
 
 }

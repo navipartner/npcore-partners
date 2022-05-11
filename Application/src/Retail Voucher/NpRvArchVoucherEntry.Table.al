@@ -24,8 +24,8 @@
         {
             Caption = 'Entry Type';
             DataClassification = CustomerContent;
-            OptionCaption = ',Issue Voucher,Payment,Manual Archive,Partner Issue Voucher,Partner Payment,Top-up';
-            OptionMembers = ,"Issue Voucher",Payment,"Manual Archive","Partner Issue Voucher","Partner Payment","Top-up";
+            OptionCaption = ',Issue Voucher,Payment,Manual Archive,Partner Issue Voucher,Partner Payment,Top-up,Synchronisation,Partner Top-up';
+            OptionMembers = ,"Issue Voucher",Payment,"Manual Archive","Partner Issue Voucher","Partner Payment","Top-up",Synchronisation,"Partner Top-up";
         }
         field(15; "Voucher Type"; Code[20])
         {

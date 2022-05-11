@@ -112,6 +112,7 @@
         NpRvVoucher."Issue Register No." := TempNpRvVoucherBuffer."Issue Register No.";
         NpRvVoucher."Issue Document No." := TempNpRvVoucherBuffer."Issue Sales Ticket No.";
         NpRvVoucher."Issue User ID" := TempNpRvVoucherBuffer."Issue User ID";
+        NpRvVoucher."Allow Top-up" := NpRvVoucherType."Allow Top-up";
         NpRvVoucher.Insert(true);
 
         NpRvVoucherEntry.Init();

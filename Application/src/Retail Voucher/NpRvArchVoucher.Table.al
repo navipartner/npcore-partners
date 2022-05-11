@@ -106,7 +106,7 @@
         field(76; "Initial Amount"; Decimal)
         {
             CalcFormula = Sum("NPR NpRv Arch. Voucher Entry".Amount WHERE("Arch. Voucher No." = FIELD("No."),
-                                                                       "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher" | "Top-up")));
+                                                                       "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher" | "Top-up" | "Partner Top-up")));
             Caption = 'Initial Amount';
             Editable = false;
             FieldClass = FlowField;
