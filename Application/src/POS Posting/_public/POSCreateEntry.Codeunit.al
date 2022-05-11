@@ -729,11 +729,6 @@
 
     end;
 
-    internal procedure InsertBinOpenEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20])
-    begin
-        CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Bin Open');
-    end;
-
     internal procedure InsertParkSaleEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";

@@ -353,7 +353,7 @@
         if not POSPaymentBin.Get(CashDrawerNo) then
             exit;
 
-        POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS);
+        POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS, false);
     end;
 
     local procedure CloseSlaveUnits(UnitNo: Code[10]; DimensionSetId: Integer)
