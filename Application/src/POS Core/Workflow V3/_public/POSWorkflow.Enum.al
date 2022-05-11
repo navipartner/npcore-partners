@@ -112,4 +112,10 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ADJUST_INVENTORY', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Adjust Inv.";
     }
+
+    value(16; BLOCK_DISCOUNT)
+    {
+        Caption = 'BLOCK_DISCOUNT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Block Discount";
+    }
 }
