@@ -1,6 +1,6 @@
 # NaviPartner Troubleshooting
 
-This section contains solutions for some of the common issues that may occur across the NaviPartner solutions.
+This section contains questions and answers pertaining to some of the common issues that may occur across the NaviPartner solutions.
 
 ## NP Retail troubleshooting
 
