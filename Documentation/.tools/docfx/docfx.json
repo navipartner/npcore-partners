@@ -14,7 +14,9 @@
           "wms/**.md",
           "wms/**/toc.yml",
           "partner/**.md", 
-          "partner/**/toc.yml",  
+          "partner/**/toc.yml",
+          "troubleshooting/**.md",
+          "troubleshooting/**/toc.yml",  
           "toc.yml",
           "*.md"          
         ],
@@ -43,7 +45,7 @@
     ],
     "globalMetadata": {
       "_appFooter": "<span>NaviPartner Online Help  -  Site generated using DocFx</span>",
-      "_appTitle": "NP Retail",
+      "_appTitle": "NP Help",
       "_enableSearch": "true",
       "_appFaviconPath": "images/favicon.ico"
     },
