@@ -108,6 +108,7 @@
       <p> The <a href="https://docs.navipartner.com/wms/intro.html">NP WMS</a> connects your inventory management in Business Central with your POS solution and your online store, and makes every item visible across the supply chain, distribution centers, and sales channels.</p>
       <p>The <a href="https://docs.navipartner.com/api/gettingstarted/intro.html">API documentation</a> comprises technical webservice references and a sandbox for testing purposes.</p>
       <p>The <a href="https://docs.navipartner.com/partner/intro.html">Partner</a> documentation consists of documentation intended for our partners.</p>
+      <p> The <a href="https://docs.navipartner.com/troubleshooting/intro.html">Troubleshooting</a> documentation which provides answers to some frequently asked questions.</p>
       <p>The <a href="https://support.navipartner.com/">Old Documentation</a> section contains articles that have not yet been migrated to this format. As soon as all articles are rewritten and migrated here, the old documentation portal will be obsoleted</p>                           
     </section>
   </div>
