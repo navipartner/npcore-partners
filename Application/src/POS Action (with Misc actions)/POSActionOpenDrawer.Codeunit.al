@@ -72,7 +72,7 @@
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
     begin
         POSPaymentBin.Get(CashDrawerNo);
-        POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS);
+        POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS, true);
     end;
 }
 

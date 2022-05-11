@@ -3,18 +3,25 @@
     var
         WORKFLOW_STEP: Label 'Eject Payment Bin';
 
-    internal procedure EjectDrawer(POSPaymentBin: Record "NPR POS Payment Bin"; SalePOS: Record "NPR POS Sale"): Boolean
+    internal procedure EjectDrawer(POSPaymentBin: Record "NPR POS Payment Bin"; SalePOS: Record "NPR POS Sale"; ManualOpen: Boolean): Boolean
     var
         Ejected: Boolean;
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        RecordId: RecordId;
+        AuditLogDesc: Label 'Opened by %1';
+        POSEntry: Record "NPR POS Entry";
     begin
         if POSPaymentBin."Eject Method" = '' then
             exit;
 
         OnEjectPaymentBin(POSPaymentBin, Ejected);
 
-        if Ejected then
-            POSCreateEntry.InsertBinOpenEntry(SalePOS."Register No.", SalePOS."Salesperson Code");
+        if Ejected then begin
+            if POSEntry.GetBySystemId(SalePOS.SystemId) then
+                POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, GetDrawerActionType(ManualOpen), POSEntry."Entry No.", POSEntry."Fiscal No.", SalePOS."Register No.", StrSubstNo(AuditLogDesc, SalePOS."Salesperson Code"), '')
+            else
+                POSAuditLogMgt.CreateEntryExtended(RecordId, GetDrawerActionType(ManualOpen), 0, '', SalePOS."Register No.", StrSubstNo(AuditLogDesc, SalePOS."Salesperson Code"), '');
+        end;
 
         exit(Ejected);
     end;
@@ -142,7 +149,17 @@
         if ((not POSUnit.Get(SalePOS."Register No.")) or (not POSPaymentBin.Get(POSUnit."Default POS Payment Bin"))) then
             POSPaymentBin."Eject Method" := 'PRINTER';
 
-        EjectDrawer(POSPaymentBin, SalePOS);
+        EjectDrawer(POSPaymentBin, SalePOS, false);
+    end;
+
+    local procedure GetDrawerActionType(Manual: Boolean): Option
+    var
+        POSAuditLog: Record "NPR POS Audit Log";
+    begin
+        if Manual then
+            exit(POSAuditLog."Action Type"::MANUAL_DRAWER_OPEN);
+        
+        exit(POSAuditLog."Action Type"::AUTO_DRAWER_OPEN);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]

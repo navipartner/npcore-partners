@@ -204,6 +204,9 @@
         }
         key(Key5; "Acted on POS Entry No.")
         {
+        }        
+        key(Key6; "Active POS Sale SystemId")
+        {
         }
     }
 }

@@ -116,7 +116,7 @@
     var
         POSAuditLog: Record "NPR POS Audit Log";
     begin
-        POSAuditLog.SetRange("Acted on POS Entry No.", POSEntry."Entry No.");
+        POSAuditLog.SetRange("Active POS Sale SystemId", POSEntry.SystemId);
         PAGE.RunModal(0, POSAuditLog);
     end;
 
