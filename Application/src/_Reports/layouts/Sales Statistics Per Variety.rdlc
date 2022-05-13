@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>d0d0a413-f6bf-4436-b8a1-6e107a339466</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -18,7 +19,7 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>21.78177cm</Width>
+                  <Width>25.14415cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -33,19 +34,19 @@
                               <TablixBody>
                                 <TablixColumns>
                                   <TablixColumn>
-                                    <Width>0.79642cm</Width>
+                                    <Width>1.23207cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>2.12607cm</Width>
-                                  </TablixColumn>
-                                  <TablixColumn>
-                                    <Width>0.07938cm</Width>
-                                  </TablixColumn>
-                                  <TablixColumn>
-                                    <Width>2.5141cm</Width>
+                                    <Width>2.38175cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
                                     <Width>0.07938cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>4.89701cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>0.17001cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
                                     <Width>2.04492cm</Width>
@@ -1254,11 +1255,12 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value />
+                                                    <Value>=SUM(Fields!VariantUnitCost.Value*Fields!SalesQty.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
+                                                      <Format>n2</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1512,7 +1514,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Sum(Fields!ItemInventory.Value)</Value>
+                                                    <Value>=Sum(Fields!ItemInventory.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -1614,7 +1616,7 @@
                               </Filters>
                               <Top>0.0635cm</Top>
                               <Height>1.58834cm</Height>
-                              <Width>21.78177cm</Width>
+                              <Width>24.94664cm</Width>
                               <Style>
                                 <Border>
                                   <Style>None</Style>
@@ -1673,7 +1675,7 @@
             <Top>0.11289cm</Top>
             <Left>0.127cm</Left>
             <Height>1.65334cm</Height>
-            <Width>21.78177cm</Width>
+            <Width>25.14415cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1684,10 +1686,10 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>1.05118cm</Width>
+                  <Width>1.07932cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.69972cm</Width>
+                  <Width>1.7791cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.07938cm</Width>
@@ -1699,19 +1701,19 @@
                   <Width>0.07938cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>2.1425cm</Width>
+                  <Width>2.14251cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.07938cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.81208cm</Width>
+                  <Width>1.81207cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.11875cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.28684cm</Width>
+                  <Width>1.28682cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -1793,10 +1795,6 @@
                             <BottomBorder>
                               <Style>Solid</Style>
                             </BottomBorder>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
                       </CellContents>
@@ -1854,9 +1852,7 @@
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
+                              <Style />
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox25</rd:DefaultName>
@@ -1870,10 +1866,6 @@
                             <BottomBorder>
                               <Style>Solid</Style>
                             </BottomBorder>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
                       </CellContents>
@@ -1947,10 +1939,6 @@
                             <BottomBorder>
                               <Style>Solid</Style>
                             </BottomBorder>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
                       </CellContents>
@@ -1999,7 +1987,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Last(Fields!AverageProfit_.Value)</Value>
+                                  <Value>=Last(Fields!TotalProfit_.Value)</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -2024,12 +2012,9 @@
                             <BottomBorder>
                               <Style>Solid</Style>
                             </BottomBorder>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -2101,10 +2086,6 @@
                             <BottomBorder>
                               <Style>Solid</Style>
                             </BottomBorder>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
                       </CellContents>
@@ -2134,9 +2115,9 @@
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
             <Top>1.90734cm</Top>
-            <Left>10.3639cm</Left>
+            <Left>13.42125cm</Left>
             <Height>0.6cm</Height>
-            <Width>9.97091cm</Width>
+            <Width>10.07841cm</Width>
             <ZIndex>1</ZIndex>
             <Visibility>
               <Hidden>=iif(Fields!PrintTotal_.Value,False,True)</Hidden>
@@ -2148,10 +2129,10 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>2.50734cm</Height>
+        <Height>2.54262cm</Height>
         <Style />
       </Body>
-      <Width>22.00579cm</Width>
+      <Width>25.27115cm</Width>
       <Page>
         <PageHeader>
           <Height>4.00757cm</Height>
@@ -2259,7 +2240,7 @@
               <Top>0.0635cm</Top>
               <Left>0.09525cm</Left>
               <Height>0.92302cm</Height>
-              <Width>15.57307cm</Width>
+              <Width>20.13845cm</Width>
               <ZIndex>3</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
@@ -2286,7 +2267,7 @@
               <Top>1.77728cm</Top>
               <Left>0.09525cm</Left>
               <Height>0.35245cm</Height>
-              <Width>18.83397cm</Width>
+              <Width>20.13845cm</Width>
               <ZIndex>4</ZIndex>
               <Style>
                 <Border />
@@ -2374,9 +2355,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox11</rd:DefaultName>
               <Top>3.31407cm</Top>
-              <Left>0.127cm</Left>
+              <Left>0.16228cm</Left>
               <Height>0.6cm</Height>
-              <Width>2.92249cm</Width>
+              <Width>3.62743cm</Width>
               <ZIndex>7</ZIndex>
               <Style>
                 <Border>
@@ -2395,7 +2376,7 @@
                       <Value>=Parameters!Description_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2407,9 +2388,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox7</rd:DefaultName>
               <Top>3.31407cm</Top>
-              <Left>3.15532cm</Left>
+              <Left>3.89554cm</Left>
               <Height>0.6cm</Height>
-              <Width>2.41709cm</Width>
+              <Width>4.8cm</Width>
               <ZIndex>8</ZIndex>
               <Style>
                 <Border>
@@ -2428,7 +2409,7 @@
                       <Value>=Parameters!VendorItemNo_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2440,9 +2421,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox3</rd:DefaultName>
               <Top>3.31407cm</Top>
-              <Left>5.64297cm</Left>
-              <Height>0.6cm</Height>
-              <Width>2.04492cm</Width>
+              <Left>8.87193cm</Left>
+              <Height>0.55239cm</Height>
+              <Width>2.03854cm</Width>
               <ZIndex>9</ZIndex>
               <Style>
                 <Border>
@@ -2461,7 +2442,7 @@
                       <Value>=Parameters!UnitCost_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2472,10 +2453,10 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox21</rd:DefaultName>
-              <Top>3.31407cm</Top>
-              <Left>7.76198cm</Left>
+              <Top>3.30174cm</Top>
+              <Left>11.0426cm</Left>
               <Height>0.6cm</Height>
-              <Width>1.90172cm</Width>
+              <Width>1.81704cm</Width>
               <ZIndex>10</ZIndex>
               <Style>
                 <Border>
@@ -2494,7 +2475,7 @@
                       <Value>=Parameters!UnitPrice_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2505,8 +2486,8 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox25</rd:DefaultName>
-              <Top>3.31407cm</Top>
-              <Left>9.73426cm</Left>
+              <Top>3.30174cm</Top>
+              <Left>12.9302cm</Left>
               <Height>0.6cm</Height>
               <Width>1.5487cm</Width>
               <ZIndex>11</ZIndex>
@@ -2527,7 +2508,7 @@
                       <Value>=Parameters!SaleQty_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2539,7 +2520,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox29</rd:DefaultName>
               <Top>3.31407cm</Top>
-              <Left>11.41508cm</Left>
+              <Left>14.61102cm</Left>
               <Height>0.6cm</Height>
               <Width>1.69972cm</Width>
               <ZIndex>12</ZIndex>
@@ -2560,7 +2541,7 @@
                       <Value>=Parameters!SaleLCY_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2572,7 +2553,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox13</rd:DefaultName>
               <Top>3.31407cm</Top>
-              <Left>14.90408cm</Left>
+              <Left>18.10002cm</Left>
               <Height>0.6cm</Height>
               <Width>2.1425cm</Width>
               <ZIndex>13</ZIndex>
@@ -2593,7 +2574,7 @@
                       <Value>=Parameters!Profit_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2605,7 +2586,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox35</rd:DefaultName>
               <Top>3.31407cm</Top>
-              <Left>17.11714cm</Left>
+              <Left>20.31308cm</Left>
               <Height>0.6cm</Height>
               <Width>1.81208cm</Width>
               <ZIndex>14</ZIndex>
@@ -2626,7 +2607,7 @@
                       <Value>=Parameters!ProfitPct_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2638,7 +2619,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox39</rd:DefaultName>
               <Top>3.31407cm</Top>
-              <Left>19.05679cm</Left>
+              <Left>22.25273cm</Left>
               <Height>0.6cm</Height>
               <Width>1.27802cm</Width>
               <ZIndex>15</ZIndex>
@@ -2659,7 +2640,7 @@
                       <Value>=Parameters!Inventory_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2671,7 +2652,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox43</rd:DefaultName>
               <Top>3.31407cm</Top>
-              <Left>20.44064cm</Left>
+              <Left>23.63658cm</Left>
               <Height>0.6cm</Height>
               <Width>1.46813cm</Width>
               <ZIndex>16</ZIndex>
@@ -2704,8 +2685,8 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.61123cm</Top>
-              <Left>19.32137cm</Left>
+              <Top>1.70224cm</Top>
+              <Left>22.51731cm</Left>
               <Height>12.11783pt</Height>
               <Width>2.58738cm</Width>
               <ZIndex>17</ZIndex>
@@ -2738,10 +2719,10 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.11318cm</Top>
-              <Left>16.06591cm</Left>
+              <Top>1.20419cm</Top>
+              <Left>20.23371cm</Left>
               <Height>12.11783pt</Height>
-              <Width>5.84286cm</Width>
+              <Width>4.871cm</Width>
               <ZIndex>18</ZIndex>
               <Style>
                 <Border />
@@ -2752,9 +2733,9 @@
             </Textbox>
             <Line Name="Line1">
               <Top>3.05541cm</Top>
-              <Left>21.93078cm</Left>
+              <Left>25.05286cm</Left>
               <Height>0cm</Height>
-              <Width>-21.93078cm</Width>
+              <Width>-25.05286cm</Width>
               <ZIndex>19</ZIndex>
               <Style>
                 <Border>
@@ -2772,7 +2753,7 @@
                       <Value>=Parameters!COGS_Caption.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>9pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2784,9 +2765,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox29</rd:DefaultName>
               <Top>3.31407cm</Top>
-              <Left>13.29119cm</Left>
+              <Left>16.39013cm</Left>
               <Height>0.6cm</Height>
-              <Width>1.52469cm</Width>
+              <Width>1.62169cm</Width>
               <ZIndex>20</ZIndex>
               <Style>
                 <Border>
@@ -2804,8 +2785,10 @@
         </PageHeader>
         <PageHeight>21cm</PageHeight>
         <PageWidth>29.7cm</PageWidth>
-        <LeftMargin>0.5cm</LeftMargin>
-        <TopMargin>0.2cm</TopMargin>
+        <LeftMargin>1.5cm</LeftMargin>
+        <RightMargin>2.5cm</RightMargin>
+        <TopMargin>1cm</TopMargin>
+        <BottomMargin>0.5cm</BottomMargin>
         <ColumnSpacing>1.27cm</ColumnSpacing>
         <Style />
       </Page>
@@ -3102,6 +3085,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>c310972f-899b-482f-85f4-30c5b413b0be</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
