@@ -15,7 +15,7 @@
         dataitem(Item; Item)
         {
             DataItemTableView = SORTING("No.");
-            RequestFilterFields = "No.";
+            RequestFilterFields = "No.", "Item Category Code", "Date Filter";
             column(PrintTotal_; PrintTotal)
             {
             }
@@ -55,6 +55,8 @@
             dataitem("Item Variant"; "Item Variant")
             {
                 DataItemLink = "Item No." = FIELD("No.");
+                RequestFilterFields = Code, Description;
+
                 column(Code_ItemVariant; "Item Variant".Code)
                 {
                 }
@@ -210,7 +212,7 @@
 
     labels
     {
-        Report_Caption = 'Inventory - Sales Statistics';
+        Report_Caption = 'Sales Statistics Variant';
         HeaderNote_Caption = 'This report also includes items that are not sold.';
         No_Caption = 'No.';
         Description_Caption = 'Description';
