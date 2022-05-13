@@ -64,6 +64,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG E-Mail Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Aux Tables"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MPOS QR Code"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -220,6 +221,8 @@
                 Exit('NPRUPGUPGEMailSetup-20220312');
             Codeunit::"NPR UPG Aux Tables":
                 Exit('NPRUPGAuxTables');
+            Codeunit::"NPR UPG MPOS QR Code":
+                Exit('NPRUPGMPOSQRCode');
         end;
     end;
 }

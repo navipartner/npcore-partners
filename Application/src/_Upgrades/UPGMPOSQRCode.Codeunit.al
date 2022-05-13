@@ -6,7 +6,6 @@
     trigger OnUpgradePerDatabase()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        NPRUPGBitmap2Media: Codeunit "NPR UPG Bitmap 2 Media";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
         UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
@@ -17,10 +16,6 @@
             LogMessageStopwatch.LogFinish();
             exit;
         end;
-
-        //Move from Blob to Media before deletion
-        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Bitmap 2 Media")) then
-            NPRUPGBitmap2Media.UpgradeMPOSQRCode();
 
         // Run upgrade code
         Upgrade();
@@ -38,23 +33,28 @@
 
     local procedure UpgradeMPOSQRCode()
     var
+        CheckNewMPOSQRCode: Record "NPR MPOS QR Codes";
         NewMPOSQRCode: Record "NPR MPOS QR Codes";
         OldMPOSQRCode: Record "NPR MPOS QR Code";
-        InStr: InStream;
         TenantMedia: Record "Tenant Media";
+        InStr: InStream;
     begin
-
         if not OldMPOSQRCode.FindSet() then
             exit;
         repeat
-            NewMPOSQRCode.Init();
-            NewMPOSQRCode.TransferFields(OldMPOSQRCode);
-            if TenantMedia.Get(OldMPOSQRCode."QR Image".MediaId) then begin
-                TenantMedia.CalcFields(Content);
-                TenantMedia.Content.CreateInStream(InStr);
-                NewMPOSQRCode."QR Image".ImportStream(InStr, NewMPOSQRCode.FieldName("QR Image"));
+            CheckNewMPOSQRCode.Reset();
+            CheckNewMPOSQRCode.SetRange(Company, OldMPOSQRCode.Company);
+            CheckNewMPOSQRCode.SetRange("User ID", OldMPOSQRCode."User ID");
+            if CheckNewMPOSQRCode.IsEmpty() then begin
+                NewMPOSQRCode.Init();
+                NewMPOSQRCode.TransferFields(OldMPOSQRCode);
+                if TenantMedia.Get(OldMPOSQRCode."QR Image".MediaId) then begin
+                    TenantMedia.CalcFields(Content);
+                    TenantMedia.Content.CreateInStream(InStr);
+                    NewMPOSQRCode."QR Image".ImportStream(InStr, NewMPOSQRCode.FieldName("QR Image"));
+                end;
+                NewMPOSQRCode.Insert();
             end;
-            NewMPOSQRCode.Insert();
         until OldMPOSQRCode.Next() = 0;
 
         OldMPOSQRCode.DeleteAll();
