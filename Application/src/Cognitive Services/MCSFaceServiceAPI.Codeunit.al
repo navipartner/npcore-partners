@@ -1,6 +1,7 @@
 ﻿codeunit 6059955 "NPR MCS Face Service API"
 {
     Access = Internal;
+
     var
         PersonGroupURI: label '/persongroups/', Locked = true;
         PersonURI: label '/persons/', Locked = true;
@@ -651,7 +652,8 @@
         MCSAPISetup.Get(MCSAPISetup.API::Face);
         if not MCSAPISetup.BaseURL.HasValue() then
             Error(BaseUriMissingErr, MCSAPISetup.FieldCaption(BaseURL), MCSAPISetup.TableCaption, MCSAPISetup.API);
-        MCSAPISetup.TestField("Key 1");
+        If MCSAPISetup."Use Cognitive Services" then
+            MCSAPISetup.TestField("Key 1");
     end;
 
     local procedure SendHttpRequest(var HttpRespMessage: HttpResponseMessage; HttpCont: HttpContent; Uri: Text; Method: Text)
