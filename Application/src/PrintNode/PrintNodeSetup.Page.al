@@ -46,6 +46,22 @@
                     PrintNodeAPIMgt.TestConnection(true);
                 end;
             }
+            action(PrinterList)
+            {
+                Caption = 'Printer List';
+                Image = PrintInstallment;
+                Promoted = true;
+                PromotedCategory = Process;
+                ToolTip = 'Specification of available printers';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    PrintNodePrinterList: Page "NPR PrintNode Printer List";
+                begin
+                    PrintNodePrinterList.Run();
+                end;
+            }
         }
     }
 
