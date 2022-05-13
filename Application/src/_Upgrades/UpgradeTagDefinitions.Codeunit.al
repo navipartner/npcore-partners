@@ -150,7 +150,7 @@
             Codeunit::"NPR Upgrade Magento Passwords":
                 exit('Magento_Password_IsolatedStorage_20210129');
             Codeunit::"NPR Reten. Pol. Install":
-                exit('NPR-RetenPolTables-20211217');
+                exit('NPR-RetenPolTables-20220513');
             Codeunit::"NPR Job Queue Install":
                 Case UpgradeStep of
                     'AddJobQueues':
