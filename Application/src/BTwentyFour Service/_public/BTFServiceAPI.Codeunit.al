@@ -8,6 +8,7 @@ codeunit 6014641 "NPR BTF Service API"
         ResponseContentNotFoundMsg: Label 'Response content not found. Instead, check out Response Note to see error details: %1.';
         EmptyContentErr: Label 'Nothing to import';
         APIIntegrationLbl: Label 'BTwentyFour API Integration - %1', Comment = '%1=API Endpoint ID';
+        ServiceSetupNotFoundLbl: Label '%1 %2 not found.', Comment = '%1=ServiceSetup.TableCaption();%2=ServiceSetup.Code';
         ServiceEndPointsNotFoundLbl: Label '%1 not found for %2: %3 or endpoints exist but they are not enabled. Try to navigate to service endpoints through the setup by running an action "Show Setup Page"', Comment = '%1=ServiceEndPoint.TableCaption();%2=ServiceSetup.TableCaption();%3=ServiceSetup.Code';
         BearerTokenLbl: Label 'bearer %1', locked = true;
         ClassIdTok: Label 'classid=%1', Locked = true;
@@ -273,7 +274,7 @@ codeunit 6014641 "NPR BTF Service API"
 
         Clear(JQParamStrMgt);
         JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcImportListProcessing.ParamImportType(), ServiceEndPoint."EndPoint ID"));
-        JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, ServiceEndPoint.TableName(), ServiceEndPoint.RecordId()));
+        JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, ServiceEndPoint.TableName(), Format(ServiceEndPoint.SystemId)));
         JQParamStrMgt.AddToParamDict(NcImportListProcessing.ParamProcessImport());
 
         CreateJobQueueCategory(JobQueueCategory, ServiceEndPoint);
@@ -348,29 +349,25 @@ codeunit 6014641 "NPR BTF Service API"
         Page.Run(0, JobQueueEntry);
     end;
 
-    procedure SendWebRequests(ImportType: Record "NPR Nc Import Type"; InitiateFromRecID: RecordId; EndPointIDFilter: Text)
+    procedure SendWebRequests(ImportType: Record "NPR Nc Import Type"; InitiateFromRecID: RecordId; EndPointSysIdFilter: Text)
     var
         ServiceSetup: Record "NPR BTF Service Setup";
         ImportEntry: Record "NPR Nc Import Entry";
         ServiceEndPoint: Record "NPR BTF Service EndPoint";
         Response: Codeunit "Temp Blob";
         DummyRequest: Codeunit "Temp Blob";
-        DataTypeMgt: Codeunit "Data Type Management";
         FormatResponse: Interface "NPR BTF IFormatResponse";
-        RecIdToProcess: RecordId;
-        RecRef: RecordRef;
         StatusCode: Integer;
+        EndpointSysIdGUID: GUID;
     begin
-        if evaluate(RecIdToProcess, EndPointIDFilter) then;
+        if Evaluate(EndpointSysIdGUID, EndPointSysIdFilter) then;
 
-        if not DataTypeMgt.GetRecordRef(RecIdToProcess, RecRef) then begin
-            LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', StrSubstNo(ServiceEndPointsNotFoundLbl, ServiceEndPoint.TableCaption(), ServiceSetup.TableCaption(), ServiceSetup.Code), InitiateFromRecID);
+        if (not ServiceEndPoint.GetBySystemId(EndpointSysIdGUID)) or (not ServiceEndPoint.Enabled) then begin
+            LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', StrSubstNo(ServiceEndPointsNotFoundLbl, ServiceEndPoint.TableCaption(), ServiceSetup.TableCaption(), ServiceEndPoint."Service Code"), InitiateFromRecID);
             exit;
         end;
-
-        RecRef.SetTable(ServiceEndPoint);
-        if (not ServiceEndPoint.Find()) or (not ServiceEndPoint.Enabled) then begin
-            LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', StrSubstNo(ServiceEndPointsNotFoundLbl, ServiceEndPoint.TableCaption(), ServiceSetup.TableCaption(), ServiceSetup.Code), InitiateFromRecID);
+        if not ServiceSetup.get(ServiceEndPoint."Service Code") then begin
+            LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', StrSubstNo(ServiceSetupNotFoundLbl, ServiceSetup.TableCaption(), ServiceEndPoint."Service Code"), InitiateFromRecID);
             exit;
         end;
 
