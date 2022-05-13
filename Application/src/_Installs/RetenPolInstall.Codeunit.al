@@ -29,7 +29,8 @@
         tabledata "NPR EFT Transaction Request" = rd,
         tabledata "NPR Aux. Value Entry" = rd,
         tabledata "NPR Aux. Item Ledger Entry" = rd,
-        tabledata "NPR Replication Error Log" = rd;
+        tabledata "NPR Replication Error Log" = rd,
+        tabledata "NPR BTF EndPoint Error Log" = rd;
 
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
@@ -83,6 +84,7 @@
         AddAllowedTable(Database::"NPR POS Balancing Line", RtnPeriodEnum::"5 Years");
 
         AddAllowedTable(Database::"NPR Replication Error Log", RtnPeriodEnum::"1 Month");
+        AddAllowedTable(Database::"NPR BTF EndPoint Error Log", RtnPeriodEnum::"1 Month");
 
         // do not forget to add table to DeleteRecordsWithIndirectPermissionsOnApplyRetentionPolicyIndirectPermissionRequired below
         // and to CDU permissions
@@ -193,7 +195,8 @@
             Database::"NPR EFT Transaction Request",
             Database::"NPR Aux. Value Entry",
             Database::"NPR Aux. Item Ledger Entry",
-            Database::"NPR Replication Error Log"])
+            Database::"NPR Replication Error Log",
+            Database::"NPR BTF EndPoint Error Log"])
         then
             exit;
 
