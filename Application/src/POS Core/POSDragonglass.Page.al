@@ -49,11 +49,6 @@
         }
     }
 
-    trigger OnClosePage()
-    begin
-        _POSSession.ClearAll();
-    end;
-
     trigger OnOpenPage()
     var
         TempAction: Record "NPR POS Action" temporary;
