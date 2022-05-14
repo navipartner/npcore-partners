@@ -163,7 +163,7 @@
             ItemJnlLine."Discount Amount" :=
               POSSalesLine."Line Discount Amount Incl. VAT" / (1 + POSSalesLine."VAT %" / 100)
         else
-            ItemJnlLine."Discount Amount" := POSSalesLine."Line Discount Amount Incl. VAT";
+            ItemJnlLine."Discount Amount" := POSSalesLine."Line Discount Amount Excl. VAT";
         ItemJnlLine."Source Type" := ItemJnlLine."Source Type"::Customer;
         ItemJnlLine."Source No." := POSSalesLine."Customer No.";
         ItemJnlLine."Invoice-to Source No." := POSSalesLine."Customer No.";
