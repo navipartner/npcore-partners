@@ -1,6 +1,7 @@
 ﻿codeunit 6150634 "NPR POS Give Change"
 {
     Access = Internal;
+
     var
         TextNoReturnPaymentType: Label 'Setup missing: no %1 could be found to give the customer change in. ', Comment = '%1=POSPaymentMethod.TableCaption()';
         TextChange: Label 'Change';
