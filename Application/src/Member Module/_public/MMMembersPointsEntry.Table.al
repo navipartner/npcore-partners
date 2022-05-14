@@ -1,7 +1,5 @@
 ﻿table 6060130 "NPR MM Members. Points Entry"
 {
-    Access = Internal;
-
     Caption = 'Membership Points Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR MM Members. Point Entry";
