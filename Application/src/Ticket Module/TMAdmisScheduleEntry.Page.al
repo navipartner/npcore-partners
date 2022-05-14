@@ -398,9 +398,15 @@
                 trigger OnAction()
                 var
                     AttendeePage: Page "NPR TM Attendee List";
+                    AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
                 begin
-                    AttendeePage.LoadPageBuffer(Rec);
-                    AttendeePage.Run();
+                    CurrPage.SetSelectionFilter(AdmissionScheduleEntry);
+                    if (AdmissionScheduleEntry.FindSet()) then begin
+                        repeat
+                            AttendeePage.LoadPageBuffer(AdmissionScheduleEntry);
+                        until (AdmissionScheduleEntry.Next() = 0);
+                        AttendeePage.Run();
+                    end;
                 end;
             }
         }
