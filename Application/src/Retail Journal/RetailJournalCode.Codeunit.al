@@ -10,54 +10,32 @@
     procedure ExportToRetailJournal(var RetailJournalLine: Record "NPR Retail Journal Line")
     var
         RetailJournalHeader: Record "NPR Retail Journal Header";
-        RetailJournalLine2: Record "NPR Retail Journal Line";
-        RetailJournalList: Page "NPR Retail Journal List";
         Dialog: Dialog;
-        Counter: Integer;
-        RetailJournalLineNo: Integer;
-        LineCounter: Integer;
-        TotalHeaders: Integer;
-        Text001: Label 'Transferring...';
-        Text002: Label '@1@@@@@@@@@@';
-        Total: Integer;
+        Text001: Label 'Transferring lines...';
+        LineNo: Integer;
     begin
-        RetailJournalList.LookupMode(true);
-        RetailJournalList.SetTableView(RetailJournalHeader);
-
-        if not (RetailJournalList.RunModal() = ACTION::LookupOK) then
+        if not SelectRetailJournalHeaders(RetailJournalHeader) then
             exit;
 
-        RetailJournalList.GetSelectionFilter(RetailJournalHeader);
-
-        Total := RetailJournalLine.Count();
-        TotalHeaders := RetailJournalHeader.Count();
-
-        Dialog.Open(Text001 + '\' + Text002);
+        Dialog.Open(Text001);
 
         if RetailJournalHeader.FindSet() then
             repeat
-                Clear(RetailJournalLine2);
-                RetailJournalLine2.SetRange("No.", RetailJournalHeader."No.");
-
-                if RetailJournalLine2.FindLast() then
-                    TotalHeaders := RetailJournalLine2."Line No." + 10000
-                else
-                    TotalHeaders := 10000;
-
-                LineCounter := 0;
-                if RetailJournalLine.Find('-') then
-                    repeat
-                        Counter += 1;
-                        LineCounter += 1;
-                        Dialog.Update(1, Round(Counter / (Total * TotalHeaders) * 10000, 1, '>'));
-                        RetailJournalLine2.Init();
-                        RetailJournalLine2 := RetailJournalLine;
-                        RetailJournalLine2."No." := RetailJournalHeader."No.";
-                        RetailJournalLine2."Line No." := RetailJournalLineNo + LineCounter * 10000;
-                        RetailJournalLine2.Insert(true);
-                    until RetailJournalLine.Next() = 0;
+                LineNo := GetInitialJournalLineNo(RetailJournalHeader."No.");
+                CreateRetailJournalLines(RetailJournalLine, RetailJournalHeader."No.", LineNo);
             until RetailJournalHeader.Next() = 0;
         Dialog.Close();
+    end;
+
+    local procedure GetInitialJournalLineNo (JournalHeaderNo: Code[40]) LineNo: Integer
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+    begin
+        LineNo := 10000;
+
+        RetailJournalLine.SetRange("No.", JournalHeaderNo);
+        if RetailJournalLine.FindLast() then
+            LineNo += RetailJournalLine."Line No.";
     end;
 
     procedure ExportToPeriodDiscount(var RetailJournalLine: Record "NPR Retail Journal Line")
@@ -613,6 +591,41 @@
         RetailJnlHeader."No." := RetailJnlCode;
         RetailJnlHeader."Register No." := POSUnit.GetCurrentPOSUnit();
 
+    end;
+
+    local procedure SelectRetailJournalHeaders(var RetailJournalHeader: Record "NPR Retail Journal Header"): Boolean
+    var
+        RetailJournalList: Page "NPR Retail Journal List";
+    begin
+        RetailJournalList.LookupMode(true);
+        RetailJournalList.SetTableView(RetailJournalHeader);
+
+        if RetailJournalList.RunModal() <> ACTION::LookupOK then
+            exit(false);
+
+        RetailJournalList.GetSelectionFilter(RetailJournalHeader);
+        exit(true);
+    end;
+
+    local procedure CreateRetailJournalLine(var RetailJournalLine: Record "NPR Retail Journal Line"; RetailJournalNo: Code[40]; var LineNo: Integer)
+    var
+        RetailJournalLine2: Record "NPR Retail Journal Line";
+    begin
+        RetailJournalLine2.Init();
+        RetailJournalLine2 := RetailJournalLine;
+        RetailJournalLine2."No." := RetailJournalNo;
+        RetailJournalLine2."Line No." := LineNo;
+        RetailJournalLine2.Insert(true);
+
+        LineNo += 10000;
+    end;
+
+    local procedure CreateRetailJournalLines(var RetailJournalLine: Record "NPR Retail Journal Line"; RetailJournalNo: Code[40]; var LineNo: Integer)
+    begin
+        if RetailJournalLine.FindSet() then
+            repeat
+                CreateRetailJournalLine(RetailJournalLine, RetailJournalNo, LineNo);
+            until RetailJournalLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Label Library", 'OnBeforePrintRetailJournal', '', true, true)]
