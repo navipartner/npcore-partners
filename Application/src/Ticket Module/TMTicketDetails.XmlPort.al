@@ -112,7 +112,7 @@ xmlport 6060120 "NPR TM Ticket Details"
                                 TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
                             begin
                                 pin_code := '';
-                                if (TicketReservationRequest.Get()) then
+                                if (TicketReservationRequest.Get(TempTicket."Ticket Reservation Entry No.")) then
                                     pin_code := TicketReservationRequest."Authorization Code";
                             end;
                         }
