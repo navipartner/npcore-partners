@@ -210,9 +210,16 @@
 
         end;
 
-        if (Rec.IsTemporary()) then
-            Rec.DeleteAll();
-        Rec.Copy(TempAttendeeBuffer, true);
+        TempAttendeeBuffer.Reset();
+        if (TempAttendeeBuffer.FindSet()) then begin
+            RecordCounter := Rec.Count();
+            repeat
+                RecordCounter += 1;
+                Rec.TransferFields(TempAttendeeBuffer, false);
+                Rec.EntryNo := RecordCounter;
+                Rec.Insert();
+            until (TempAttendeeBuffer.Next() = 0)
+        end;
 
         exit(RecordCounter);
 
