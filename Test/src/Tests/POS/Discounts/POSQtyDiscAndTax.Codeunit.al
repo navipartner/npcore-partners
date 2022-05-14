@@ -219,6 +219,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -294,6 +296,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -578,6 +582,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -688,6 +694,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -797,8 +805,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
-        // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -909,8 +916,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
-        // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -1085,6 +1091,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Customer applied to sale
+        POSSaleUnit.GetCurrentSale(POSSale);
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
         // [WHEN] Add Item to active sale
@@ -1159,6 +1166,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -1342,6 +1351,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -1451,8 +1462,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
-        // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -1761,6 +1771,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -1862,6 +1874,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -2216,6 +2230,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -2227,9 +2243,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
         AmountToPay := GetAmountToPay(POSSaleLine);
         AmountToPay := Round(AmountToPay, 1, '>');
-
-        POSSession.GetSale(POSSaleUnit);
-        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
@@ -2347,6 +2360,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -2358,9 +2373,6 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
         AmountToPay := GetAmountToPay(POSSaleLine);
         AmountToPay := Round(AmountToPay, 1, '>');
-
-        POSSession.GetSale(POSSaleUnit);
-        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
@@ -2560,6 +2572,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -2642,6 +2656,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -2837,6 +2853,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -2952,6 +2970,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -3136,6 +3156,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -3217,6 +3239,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -3412,6 +3436,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -3526,6 +3552,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -3750,6 +3778,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -3998,6 +4028,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -4210,6 +4242,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -4279,6 +4313,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -4411,6 +4447,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
+        POSSaleUnit.GetCurrentSale(POSSale);
+
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
 
@@ -4480,6 +4518,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
@@ -4644,6 +4684,8 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
