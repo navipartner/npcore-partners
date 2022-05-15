@@ -6,6 +6,7 @@
     trigger OnUpgradePerDatabase()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        NPRUPGBitmap2Media: Codeunit "NPR UPG Bitmap 2 Media";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
         UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
@@ -16,6 +17,10 @@
             LogMessageStopwatch.LogFinish();
             exit;
         end;
+
+        //Move from Blob to Media before deletion
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Bitmap 2 Media")) then
+            NPRUPGBitmap2Media.UpgradeMPOSQRCode();
 
         // Run upgrade code
         Upgrade();
