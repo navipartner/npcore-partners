@@ -37,9 +37,17 @@ codeunit 6059807 "NPR Stripe Integration"
     local procedure UpdateStripeSetup(UsingRegularInvoicing: Boolean)
     var
         StripeSetup: Record "NPR Stripe Setup";
+        ShouldUpdate: Boolean;
     begin
         StripeSetup.GetSetup();
-        StripeSetup.Disabled := UsingRegularInvoicing;
-        StripeSetup.Modify();
+        ShouldUpdate := true;
+        if StripeSetup."Last Updated" <> 0DT then
+            ShouldUpdate := (CurrentDateTime() - StripeSetup."Last Updated") > (1 * 60 * 60 * 1000);
+
+        if ShouldUpdate then begin
+            StripeSetup.Disabled := UsingRegularInvoicing;
+            StripeSetup."Last Updated" := CurrentDateTime();
+            StripeSetup.Modify();
+        end;
     end;
 }
