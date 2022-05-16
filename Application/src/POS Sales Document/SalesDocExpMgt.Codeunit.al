@@ -741,9 +741,9 @@
         SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
 
         if SaleLinePOS."Sales Doc. Prepay Is Percent" then
-            POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, SaleLinePOS."Sales Doc. Prepayment Value")
+            POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, SaleLinePOS."Sales Doc. Prepayment Value")
         else
-            POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, true, SaleLinePOS."Sales Doc. Prepayment Value");
+            POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, SaleLinePOS."Sales Doc. Prepayment Value");
 
         Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
         Send := SaleLinePOS."Sales Document Send";
@@ -924,10 +924,10 @@
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
     begin
         if ValueIsAmount then begin
-            POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, true, PrepaymentValue);
+            POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, PrepaymentValue);
             PrepaymentAmount := PrepaymentValue;
         end else begin
-            PrepaymentAmount := POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, PrepaymentValue);
+            PrepaymentAmount := POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, PrepaymentValue);
         end;
 
         if PrepaymentAmount = 0 then
