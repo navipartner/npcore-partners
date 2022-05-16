@@ -25,6 +25,11 @@ table 6014649 "NPR Stripe Setup"
             Caption = 'Disabled';
             DataClassification = OrganizationIdentifiableInformation;
         }
+        field(5; "Last Updated"; DateTime)
+        {
+            Caption = 'Last Updated';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

@@ -68,11 +68,14 @@
 
     local procedure TestUserOnLogin()
     var
+        EnvironmentInformation: Codeunit "Environment Information";
         Handled: Boolean;
     begin
-        OnBeforeTestUserOnLogin(IsUsingRegularInvoicing(), Handled);
-        if Handled then
-            exit;
+        if EnvironmentInformation.IsProduction() and EnvironmentInformation.IsSaaS() then begin
+            OnBeforeTestUserOnLogin(IsUsingRegularInvoicing(), Handled);
+            if Handled then
+                exit;
+        end;
 
         TestUserExpired();
         TestUserLocked(false);
@@ -80,12 +83,15 @@
 
     local procedure TestUserOnPOSSessionInitialize()
     var
+        EnvironmentInformation: Codeunit "Environment Information";
         POSSession: Codeunit "NPR POS Session";
         Handled: Boolean;
     begin
-        OnBeforeTestUserOnPOSSessionInitialize(IsUsingRegularInvoicing(), Handled);
-        if Handled then
-            exit;
+        if EnvironmentInformation.IsProduction() and EnvironmentInformation.IsSaaS() then begin
+            OnBeforeTestUserOnPOSSessionInitialize(IsUsingRegularInvoicing(), Handled);
+            if Handled then
+                exit;
+        end;
 
         TestUserExpired();
         if not TryTestUserLocked() then

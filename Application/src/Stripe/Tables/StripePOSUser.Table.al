@@ -11,15 +11,8 @@ table 6014549 "NPR Stripe POS User"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             NotBlank = true;
-            TableRelation = User."User Name";
-            ValidateTableRelation = false;
+            TableRelation = "User Setup";
 
-            trigger OnValidate()
-            var
-                UserSelection: Codeunit "User Selection";
-            begin
-                UserSelection.ValidateUserName("User ID");
-            end;
         }
     }
 
