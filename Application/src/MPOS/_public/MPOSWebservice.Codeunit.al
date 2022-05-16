@@ -100,7 +100,7 @@
         exit(DataViewMgt.FormatResultAsText(DataViews));
     end;
 
-    procedure GetBarcodeInventoryView(DataViewCode: Code[20]; Barcode: Code[20]): Text
+    procedure GetBarcodeInventoryView(DataViewCode: Code[20]; Barcode: Code[50]): Text
     var
         DataViewMgt: Codeunit "NPR MPOS Data View Mgt.";
         DataView: JsonToken;
@@ -111,6 +111,7 @@
         exit(DataViewMgt.FormatResultAsText(DataView));
     end;
 
+    [Obsolete('Replaced by new function GetBarcodeInventoryView.')]
     procedure GetItemInfoByBarcode(Barcode: Code[20]): Text
     var
         Item: Record Item;

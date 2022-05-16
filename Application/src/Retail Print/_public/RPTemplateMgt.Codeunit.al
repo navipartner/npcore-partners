@@ -149,7 +149,7 @@
         InputDialog.LookupMode := true;
         InputDialog.SetInput(1, NewTemplateCode, Caption_InsertNewCode);
         if InputDialog.RunModal() = ACTION::LookupOK then
-            ID := InputDialog.InputCode(1, NewTemplateCode);
+            ID := InputDialog.InputCodeValue(1, NewTemplateCode);
 
         if ID = 0 then
             exit;

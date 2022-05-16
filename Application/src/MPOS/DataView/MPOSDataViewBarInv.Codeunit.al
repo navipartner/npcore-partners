@@ -13,7 +13,7 @@ codeunit 6059825 "NPR MPOS Data View - Bar. Inv." implements "NPR MPOS IDataView
         InputDialog: Page "NPR Input Dialog";
         MPOSWebservice: codeunit "NPR MPOS Webservice";
         EnterBarcodeLbl: Label 'Enter barcode';
-        Barcode: Code[20];
+        Barcode: Code[50];
     begin
         Rec.GetBySystemId(SystemId);
         case Rec.Indent of
@@ -31,7 +31,7 @@ codeunit 6059825 "NPR MPOS Data View - Bar. Inv." implements "NPR MPOS IDataView
                     InputDialog.LookupMode(true);
                     if InputDialog.RunModal() <> ACTION::LookupOK then
                         exit;
-                    InputDialog.InputCode(1, Barcode);
+                    InputDialog.InputCodeValue(1, Barcode);
 
                     Message(MPOSWebservice.GetBarcodeInventoryView(Rec."Data View Code", Barcode));
                 end;

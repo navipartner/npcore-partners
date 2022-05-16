@@ -190,7 +190,13 @@
         if Evaluate(OutVar, Format(Vars[ControlID])) then exit(ControlID);
     end;
 
+    [Obsolete('Replaced by new function InputCodeValue.')]
     procedure InputCode(ControlID: Integer; var OutVar: Code[20]): Integer
+    begin
+        if Evaluate(OutVar, Format(Vars[ControlID])) then exit(ControlID);
+    end;
+
+    procedure InputCodeValue(ControlID: Integer; var OutVar: Code[50]): Integer
     begin
         if Evaluate(OutVar, Format(Vars[ControlID])) then exit(ControlID);
     end;
@@ -208,7 +214,7 @@
     local procedure StoreInput(ControlID: Integer; var Value: Text; var Variable: Variant)
     var
         BoolVar: Boolean;
-        CodeVar: Code[20];
+        CodeVar: Code[50];
         DateVar: Date;
         DecimalVar: Decimal;
         IntegerVar: Integer;

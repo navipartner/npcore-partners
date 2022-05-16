@@ -584,8 +584,8 @@
             InputDialog.SetInput(2, CompNo, Text006);
             InputDialog.LookupMode(true);
             if InputDialog.RunModal() = ACTION::LookupOK then;
-            InputDialog.InputCode(1, Prefix);
-            InputDialog.InputCode(2, CompNo);
+            InputDialog.InputCodeValue(1, Prefix);
+            InputDialog.InputCodeValue(2, CompNo);
 
             if (Prefix = '') or (CompNo = '') then
                 exit;
