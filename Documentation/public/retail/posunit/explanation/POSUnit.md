@@ -9,12 +9,9 @@ In brief, the POS units help streamline retail operations by automating the tran
 As POS units in the NP Retail solution are highly customizable, it's possible to configure each of their many aspects. To find out more, refer to one of the following links.
 
 ### Related links
- - [Create a new POS (from scratch)](../../../../public/404.md) 
- - [Create a new POS (using an old one as a reference)](../howto/createnew.md)
- - [Configure a payment terminal for a POS unit](../../../../public/404.md)
- - [Configure an opening mechanism for a POS unit cash drawer](../../../../public/404.md)
- - [Configure a master/slave POS unit drawer counting](../../../../public/404.md)
- - [Configure self-service for a POS unit](../../../../public/404.md)
- - [POS unit fiscalization](../../../../public/404.md)
- - [POS unit profiles](../../../../public/404.md)
- - [POS unit tax-free profile](../../../../public/404.md)
+- [Create a new POS (using an old one as a reference)](../howto/createnew.md)
+- [POS self-service actions](../explanation/POS_Self_Service_Actions.md)
+- [Balancing the POS](../howto/balance_the_pos.md)
+- [Configure a cash draw opening](../howto/ConfigureCashDrawerOpening.md)
+- [Set up the POS Customer Display](../howto/POSCustomerDisplay.md)
+- [Change the POS unit receipt footer text](../howto/POSUnitReceiptFooter.md)
