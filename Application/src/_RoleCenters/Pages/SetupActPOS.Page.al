@@ -20,12 +20,20 @@
                     ToolTip = 'Specifies the value of the User Setups field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Salespersons; Rec.Salespersons)
+                field(Salespersons; SalesPersonCountAsDec)
                 {
-
-                    DrillDownPageID = "Salespersons/Purchasers";
+                    Caption = 'Salespersons';
                     ToolTip = 'Specifies the value of the Salespersons field';
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+
+                    trigger OnDrillDown()
+                    var
+                        SalespersonsPurchasers: Page "Salespersons/Purchasers";
+                    begin
+                        SalespersonsPurchasers.Run()
+                    end;
                 }
             }
             cuegroup(stores)
@@ -126,5 +134,14 @@
 
         ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent();
     end;
+
+    trigger OnAfterGetRecord()
+    begin
+        Rec.CalcFields(Salespersons);
+        SalesPersonCountAsDec := Rec.Salespersons;
+    end;
+
+    var
+        SalesPersonCountAsDec: Decimal;
 }
 
