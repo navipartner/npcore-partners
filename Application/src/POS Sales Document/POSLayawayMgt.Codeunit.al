@@ -299,7 +299,7 @@
                     SalesLine.Modify(true);
                 until SalesLine.Next() = 0;
         end else
-            POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, PrepaymentPct);
+            POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, PrepaymentPct);
 
         SalesPostPrepayments.Invoice(SalesHeader);
 
