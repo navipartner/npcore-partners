@@ -124,14 +124,73 @@
                 ToolTip = 'Specifies the value of the No. of Print Output Entries field';
                 ApplicationArea = NPRRetail;
             }
-            field("Images Exist"; Rec."Images Exist")
+            group(CleanCashTransactions)
             {
-                ToolTip = 'Specifies if there are any image related to POS Entry';
-                ApplicationArea = NPRRetail;
+                ShowCaption = false;
+                Visible = ShowCleanCash;
+                field("Clean Cash Transactions"; Rec."Clean Cash Transactions")
+                {
+                    ToolTip = 'Specifies the details of Clean Cash transactions';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    var
+                        CleanCashTransReq: Record "NPR CleanCash Trans. Request";
+                    begin
+                        CleanCashTransReq.FilterGroup(10);
+                        CleanCashTransReq.SetRange("POS Entry No.", Rec."Entry No.");
+                        CleanCashTransReq.FilterGroup(0);
+                        Page.RunModal(Page::"NPR CleanCash Transactions", CleanCashTransReq);
+                    end;
+                }
+            }
+            group(DEPosAuditLog)
+            {
+                ShowCaption = false;
+                Visible = ShowDEAudit;
+                field("DE POS Audit Log"; Rec."DE POS Audit Log")
+                {
+                    ToolTip = 'Specifies the details of DE POS Audit Log information';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    var
+                        DEPOSAuditLogAuxInfo: Record "NPR DE POS Audit Log Aux. Info";
+                    begin
+                        DEPOSAuditLogAuxInfo.FilterGroup(10);
+                        DEPOSAuditLogAuxInfo.SetRange("POS Entry No.", Rec."Entry No.");
+                        DEPOSAuditLogAuxInfo.FilterGroup(0);
+                        Page.RunModal(Page::"NPR DE POS Audit Log Aux. Info", DEPOSAuditLogAuxInfo);
+                    end;
+                }
+            }
+            group(FRAuditLog)
+            {
+                ShowCaption = false;
+                Visible = ShowFRAudit;
+                field("FR POS Audit Log"; Rec."FR POS Audit Log")
+                {
+                    ToolTip = 'Specifies the details of FR POS Audit Log information';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    var
+                        FRPOSAuditLogAuxInfo: Record "NPR FR POS Audit Log Aux. Info";
+                    begin
+                        FRPOSAuditLogAuxInfo.FilterGroup(10);
+                        FRPOSAuditLogAuxInfo.SetRange("POS Entry No.", Rec."Entry No.");
+                        FRPOSAuditLogAuxInfo.FilterGroup(0);
+                        Page.RunModal(Page::"NPR FR POS Audit Log Aux. Info", FRPOSAuditLogAuxInfo);
+                    end;
+                }
+                field("Images Exist"; Rec."Images Exist")
+                {
+                    ToolTip = 'Specifies if there are any image related to POS Entry';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
-
     actions
     {
     }
@@ -140,6 +199,11 @@
     begin
         if Rec."Discount Amount" = 0 then
             UpdateDiscountAmt();
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        SetAuditFieldsVisibility();
     end;
 
     local procedure TaxDetail()
@@ -176,5 +240,35 @@
             until POSSalesLine.Next() = 0;
         end;
     end;
+
+    local procedure SetAuditFieldsVisibility()
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
+        DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
+        FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
+    begin
+        Clear(ShowCleanCash);
+        Clear(ShowDEAudit);
+        Clear(ShowFRAudit);
+        if not POSUnit.Get(Rec."POS Unit No.") then
+            exit;
+        if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
+            exit;
+        case POSAuditProfile."Audit Handler" of
+            CleanCashXCCSPProtocol.HandlerCode():
+                ShowCleanCash := true;
+            DEAuditMgt.HandlerCode():
+                ShowDEAudit := true;
+            FRAuditMgt.HandlerCode():
+                ShowFRAudit := true;
+        end;
+    end;
+
+    var
+        ShowCleanCash: Boolean;
+        ShowFRAudit: Boolean;
+        ShowDEAudit: Boolean;
 }
 

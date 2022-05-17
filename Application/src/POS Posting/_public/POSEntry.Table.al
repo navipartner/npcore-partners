@@ -474,6 +474,27 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.53';
         }
+        field(800; "Clean Cash Transactions"; Integer)
+        {
+            Editable = false;
+            Caption = 'Clean Cash Transactions';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR CleanCash Trans. Request" where("POS Entry No." = field("Entry No.")));
+        }
+        field(810; "DE POS Audit Log"; Boolean)
+        {
+            Editable = false;
+            Caption = 'DE POS Audit Log Aux. Info';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR DE POS Audit Log Aux. Info" where("POS Entry No." = field("Entry No.")));
+        }
+        field(820; "FR POS Audit Log"; Boolean)
+        {
+            Editable = false;
+            Caption = 'FR POS Audit Log Aux. Info';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR FR POS Audit Log Aux. Info" where("POS Entry No." = field("Entry No.")));
+        }
         field(5052; "Contact No."; Code[20])
         {
             Caption = 'Contact No.';
