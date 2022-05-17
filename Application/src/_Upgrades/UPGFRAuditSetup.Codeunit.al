@@ -50,7 +50,10 @@
         Base64RegexCheckLbl: Label '^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$', Locked = true;
     begin
         FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
-        FRCertificationSetup.Get();
+        if not FRCertificationSetup.Get() then
+            exit;
+        if not FRCertificationSetup."Signing Certificate".HasValue() then
+            exit;
         FRCertificationSetup."Signing Certificate".CreateInStream(InStr, TextEncoding::UTF8);
         InStr.ReadText(Base64Cert);
         if not Regex.IsMatch(Base64Cert, Base64RegexCheckLbl) then begin
