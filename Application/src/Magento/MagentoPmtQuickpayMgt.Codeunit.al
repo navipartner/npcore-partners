@@ -1,6 +1,7 @@
 ﻿codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt."
 {
     Access = Internal;
+
     var
         Text000: Label 'Quickpay error:\%1 - %2  \%3';
 
@@ -32,6 +33,19 @@
         PaymentLine.Modify(true);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CancelPaymentEvent', '', false, true)]
+    local procedure OnCancelPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
+    begin
+        if not IsQuickpayCancelLine(PaymentLine) then
+            exit;
+        if PaymentLine."Document Table No." <> DATABASE::"Sales Header" then
+            exit;
+        if PaymentLine."Document Type" <> PaymentLine."Document Type"::Order then
+            exit;
+
+        Cancel(PaymentLine);
+    end;
+
     #region Create Request
 
     local procedure Capture(PaymentLine: Record "NPR Magento Payment Line")
@@ -57,6 +71,14 @@
         JsonBody.Add("RequestParameter.Amount"(), ConvertToQuickPayAmount(PaymentLine.Amount));
         JsonBody.WriteTo(RequestBodyText);
         SetupHttpWebRequest(HttpWebRequest, CopyStr("RequestMethod.Post"(), 1, 10), PaymentLine, "ServiceName.Refund"(), RequestBodyText);
+        SendWebRequest(HttpWebRequest);
+    end;
+
+    local procedure Cancel(PaymentLine: Record "NPR Magento Payment Line")
+    var
+        HttpWebRequest: HttpRequestMessage;
+    begin
+        SetupHttpWebRequest(HttpWebRequest, CopyStr("RequestMethod.Post"(), 1, 10), PaymentLine, "ServiceName.Cancel"(), '');
         SendWebRequest(HttpWebRequest);
     end;
 
@@ -106,6 +128,19 @@
             exit(false);
 
         exit(PaymentGateway."Refund Codeunit Id" = CurrCodeunitId());
+    end;
+
+    procedure IsQuickpayCancelLine(PaymentLine: Record "NPR Magento Payment Line"): Boolean
+    var
+        PaymentGateway: Record "NPR Magento Payment Gateway";
+    begin
+        if PaymentLine."Payment Gateway Code" = '' then
+            exit;
+
+        if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
+            exit(false);
+
+        exit(PaymentGateway."Cancel Codeunit Id" = CurrCodeunitId());
     end;
 
     local procedure SendWebRequest(HttpWebRequest: HttpRequestMessage)
@@ -172,6 +207,11 @@
     local procedure "ServiceName.Refund"(): Text
     begin
         exit('refund');
+    end;
+
+    local procedure "ServiceName.Cancel"(): Text
+    begin
+        exit('cancel');
     end;
 # pragma warning disable AA0228
 
