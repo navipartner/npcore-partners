@@ -514,7 +514,6 @@
         ItemTrackingManagement: Codeunit "Item Tracking Management";
         ErrServiceNoCust: Label 'A Customer must be chosen, because the sale contains items which are to be transferred to service items.';
         saleNegCashSum: Decimal;
-        POSInfoManagement: Codeunit "NPR POS Info Management";
         NPRPOSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
         TotalItemAmountInclVat: Decimal;
@@ -648,8 +647,6 @@
             if SaleLinePOS."Shortcut Dimension 2 Code" = '' then
                 SaleLinePOS.Validate("Shortcut Dimension 2 Code", NPRPOSUnit."Global Dimension 2 Code");
         until SaleLinePOS.Next() = 0;
-
-        POSInfoManagement.PostPOSInfo(Sale);
     end;
 
     internal procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR POS Sale"; POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
