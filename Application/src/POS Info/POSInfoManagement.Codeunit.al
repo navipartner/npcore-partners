@@ -69,13 +69,12 @@
     local procedure OnAfterInsertPOSEntry(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
-        POSInfoAuditRoll: Record "NPR POS Info Audit Roll";
         POSInfoPOSEntry: Record "NPR POS Info POS Entry";
     begin
         POSInfoTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.");
         POSInfoTransaction.SetRange("Register No.", SalePOS."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if POSInfoTransaction.FindSet() then begin
+        if POSInfoTransaction.FindSet() then
             repeat
                 UpdatePOSInfoTransaction(POSInfoTransaction);
                 POSInfoPOSEntry.Init();
@@ -87,21 +86,6 @@
                 POSInfoPOSEntry."Salesperson Code" := POSEntry."Salesperson Code";
                 POSInfoPOSEntry.Insert();
             until POSInfoTransaction.Next() = 0;
-        end else begin
-            POSInfoAuditRoll.SetRange("Register No.", SalePOS."Register No.");
-            POSInfoAuditRoll.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            if POSInfoAuditRoll.FindSet() then
-                repeat
-                    POSInfoPOSEntry.Init();
-                    POSInfoPOSEntry."POS Entry No." := POSEntry."Entry No.";
-                    POSInfoPOSEntry."POS Info Code" := POSInfoAuditRoll."POS Info Code";
-                    POSInfoPOSEntry."Entry No." := POSInfoAuditRoll."Entry No.";
-                    POSInfoPOSEntry.TransferFields(POSInfoAuditRoll, false);
-                    POSInfoPOSEntry."POS Unit No." := POSEntry."POS Unit No.";
-                    POSInfoPOSEntry."Salesperson Code" := POSEntry."Salesperson Code";
-                    POSInfoPOSEntry.Insert();
-                until POSInfoAuditRoll.Next() = 0;
-        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnAfterDeleteEvent', '', true, true)]
@@ -360,31 +344,6 @@
         ToSaleLinePos.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'OnAfterDebitSalePostEvent', '', true, true)]
-    local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean)
-    begin
-        PostPOSInfo(SalePOS);
-    end;
-
-    procedure PostPOSInfo(PSalePos: Record "NPR POS Sale")
-    var
-        POSInfoTransaction: Record "NPR POS Info Transaction";
-        POSInfoAuditRoll: Record "NPR POS Info Audit Roll";
-    begin
-        POSInfoTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.");
-        POSInfoTransaction.SetRange("Register No.", PSalePos."Register No.");
-        POSInfoTransaction.SetRange("Sales Ticket No.", PSalePos."Sales Ticket No.");
-        if POSInfoTransaction.FindSet(true) then begin
-            repeat
-                UpdatePOSInfoTransaction(POSInfoTransaction);
-                POSInfoAuditRoll.Init();
-                POSInfoAuditRoll.TransferFields(POSInfoTransaction);
-                POSInfoAuditRoll.Insert();
-            until POSInfoTransaction.Next() = 0;
-            POSInfoTransaction.DeleteAll();
-        end;
-    end;
-
     procedure DeleteLine(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
@@ -422,7 +381,6 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        //Register No.,Sales Ticket No.,Date,Sale Type,Line No.
         SaleLinePOS.Reset();
         SaleLinePOS.SetRange("Register No.", POSInfoTransaction."Register No.");
         SaleLinePOS.SetFilter("Sale Type", '%1|%2', SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::"Debit Sale");
