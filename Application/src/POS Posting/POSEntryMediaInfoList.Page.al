@@ -1,4 +1,4 @@
-page 6059871 "NPR POS Entry Media Info List"
+page 6059873 "NPR POS Entry Media Info List"
 {
     Caption = 'POS Entry Media Info List';
     PageType = List;
