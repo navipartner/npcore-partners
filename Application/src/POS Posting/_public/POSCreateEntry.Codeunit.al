@@ -11,6 +11,7 @@
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
         SaleCancelled: Boolean;
+        POSSaleMediaInfo: Record "NPR POS Sale Media Info";
     begin
         Clear(GlobalPOSEntry);
         ValidateSaleHeader(Rec);
@@ -40,6 +41,8 @@
             POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::GRANDTOTAL, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
             POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::DIRECT_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_DIRECT_SALE_END, '');
         end;
+
+        POSSaleMediaInfo.TransferEntriesToPOSEntryMediaInfo(Rec, POSEntry, true);
 
         OnAfterInsertPOSEntry(Rec, POSEntry);
         GlobalPOSEntry := POSEntry;

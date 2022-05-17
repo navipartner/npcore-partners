@@ -92,6 +92,7 @@
     local procedure OnAfterDeleteSalePOS(var Rec: Record "NPR POS Sale"; RunTrigger: Boolean)
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
+        POSSaleMediaInfo: Record "NPR POS Sale Media Info";
     begin
         if Rec.IsTemporary then
             exit;
@@ -101,6 +102,8 @@
         POSInfoTransaction.SetRange("Sales Line No.", 0);
         if not POSInfoTransaction.IsEmpty() then
             POSInfoTransaction.DeleteAll();
+
+        POSSaleMediaInfo.DeleteEntriesForPosSale(Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterDeleteEvent', '', true, true)]
