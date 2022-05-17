@@ -371,16 +371,6 @@
                 ToolTip = 'Executes the POS Info POS Entry action';
                 ApplicationArea = NPRRetail;
             }
-            action("POS Info Audit Roll")
-            {
-                Caption = 'POS Info Audit Roll';
-                Image = "Action";
-                RunObject = Page "NPR POS Info Audit Roll";
-                RunPageLink = "Sales Ticket No." = FIELD("Document No.");
-                Visible = false;
-                ToolTip = 'Executes the POS Info Audit Roll action';
-                ApplicationArea = NPRRetail;
-            }
             action("POS Audit Log")
             {
                 Caption = 'POS Audit Log';
