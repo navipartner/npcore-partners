@@ -127,4 +127,10 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'TURNOVER_STATS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Turnover Stats";
     }
+
+    value(18; BOARDINGPASS)
+    {
+        Caption = 'BOARDINGPASS', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Boarding Pass";
+    }
 }
