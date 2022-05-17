@@ -481,6 +481,13 @@
             DataClassification = CustomerContent;
             TableRelation = Contact;
         }
+        field(6000; "Images Exist"; Boolean)
+        {
+            Caption = 'Images exist';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR POS Entry Media Info" WHERE("Pos Entry No." = FIELD("Entry No.")));
+        }
     }
 
     keys

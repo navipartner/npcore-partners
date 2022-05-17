@@ -747,10 +747,13 @@
     trigger OnDelete()
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        POSSaleMediaInfo: Record "NPR POS Sale Media Info";
     begin
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
         SaleLinePOS.DeleteAll(true);
+
+        POSSaleMediaInfo.DeleteEntriesForPosSale(Rec);
     end;
 
     trigger OnInsert()
