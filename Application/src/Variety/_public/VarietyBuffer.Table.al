@@ -1,13 +1,5 @@
 ﻿table 6059974 "NPR Variety Buffer"
 {
-    // VRT1.11/JDH /20160602 CASE 242940 Added captions
-    // NPR5.29/TJ  /20170119 CASE 263917 Changed how to call GetFromVariety function in function LoadAll
-    // NPR5.32/JDH /20170510 CASE 274170 Variable Cleanup
-    // NPR5.36/NPKNAV/20171003  CASE 285733 Transport NPR5.36 - 3 October 2017
-    // NPR5.46/JDH /20180912 CASE 327541 Chenged length of Description field, due to overflow error
-    // NPR5.47/JDH /20180912 CASE 327541 Chenged length of Variety field, due to overflow error
-    // NPR5.50/ZESO/20190424 CASE 348210 Added Dialog to show Progress while matrix is being loaded.
-
     Caption = 'Variety Buffer';
     DataClassification = CustomerContent;
 
@@ -134,7 +126,6 @@
         VRT3Desc: Text[30];
         VRT4Desc: Text[30];
     begin
-        //TMPVRTBuffer.Reset(); deletes the current key;
         TMPVRTBuffer.SetRange("Variety 1 Value");
         TMPVRTBuffer.SetRange("Variety 2 Value");
         TMPVRTBuffer.SetRange("Variety 3 Value");
@@ -489,10 +480,8 @@
                                         TMPVRTBuffer."Variety 4 Sort Order" := TempVRT4."Sort Order";
                                         TMPVRTBuffer."Item No." := ItemNo;
                                         TMPVRTBuffer."Master Record ID" := MasterRecordID;
-                                        //-NPR5.29 [263917]
-                                        //IF ItemVar.GetFromVariety(ItemNo, "Variety 1 Value", "Variety 2 Value",
+
                                         if VarietyCloneData.GetFromVariety(ItemVar, ItemNo, TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value",
-                                                                          //+NPR5.29 [263917]
                                                                           TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then begin
                                             TMPVRTBuffer."Variant Code" := ItemVar.Code;
                                             if SetRecordID2ItemVar then begin
@@ -509,8 +498,6 @@
 
     procedure LoadMatrixRows(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item; CrossVRTNo: Option VRT1,VRT2,VRT3,VRT4; HideInactive: Boolean)
     begin
-        //-NPR5.36 [285733]
-        //TMPVRTBuffer.Reset(); deletes the current key;
         TMPVRTBuffer.SetRange("Variety 1 Value");
         TMPVRTBuffer.SetRange("Variety 2 Value");
         TMPVRTBuffer.SetRange("Variety 3 Value");
@@ -544,16 +531,13 @@
         RecRef: RecordRef;
         VarietyCloneData: Codeunit "NPR Variety Clone Data";
     begin
-        //-NPR5.36 [285733]
         TMPVRTBuffer.Reset();
         TMPVRTBuffer.DeleteAll();
 
         Item.Get(ItemNo);
         Item.NPR_GetAuxItem(AuxItem);
 
-        //-NPR5.50 [348210]
         Window.Open(text000);
-        //+NPR5.50 [348210]
 
         if HideInactive then begin
             //Warning - sort order is not filled into the tmp buffer from below function call (and its not used for anything)
@@ -580,10 +564,7 @@
                             repeat
                                 if TempVRT4.FindSet() then
                                     repeat
-                                        //-NPR5.50 [348210]
                                         Window.Update(1, TempVRT1.Value + ' ' + TempVRT2.Value + ' ' + TempVRT3.Value + ' ' + TempVRT4.Value + ' ');
-                                        //+NPR5.50 [348210]
-
                                         TMPVRTBuffer.Init();
                                         TMPVRTBuffer."Variety 1 Value" := TempVRT1.Value;
                                         TMPVRTBuffer."Variety 2 Value" := TempVRT2.Value;
@@ -595,10 +576,8 @@
                                         TMPVRTBuffer."Variety 4 Sort Order" := TempVRT4."Sort Order";
                                         TMPVRTBuffer."Item No." := ItemNo;
                                         TMPVRTBuffer."Master Record ID" := MasterRecordID;
-                                        //-NPR5.29 [263917]
-                                        //IF ItemVar.GetFromVariety(ItemNo, "Variety 1 Value", "Variety 2 Value",
+
                                         if VarietyCloneData.GetFromVariety(ItemVar, ItemNo, TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value",
-                                                                          //+NPR5.29 [263917]
                                                                           TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then begin
                                             TMPVRTBuffer."Variant Code" := ItemVar.Code;
                                             if SetRecordID2ItemVar then begin
@@ -611,11 +590,8 @@
                             until TempVRT3.Next() = 0;
                     until TempVRT2.Next() = 0;
             until TempVRT1.Next() = 0;
-        //+NPR5.36 [285733]
 
-        //-NPR5.50 [348210]
         Window.Close();
-        //+NPR5.50 [348210]
     end;
 
     local procedure InsertAllValuesInTmpTable(VarietyType: Code[20]; VarietyTable: Code[40]; var TMPVRTValue: Record "NPR Variety Value" temporary)
@@ -667,7 +643,6 @@
         VRT4Desc: Text[30];
     begin
         Item.NPR_GetAuxItem(AuxItem);
-        //-NPR5.36 [285733]
         LoadTmpValue(TempVRT1, AuxItem."Variety 1", AuxItem."Variety 1 Table", CrossVRTNo = CrossVRTNo::VRT1);
         LoadTmpValue(TempVRT2, AuxItem."Variety 2", AuxItem."Variety 2 Table", CrossVRTNo = CrossVRTNo::VRT2);
         LoadTmpValue(TempVRT3, AuxItem."Variety 3", AuxItem."Variety 3 Table", CrossVRTNo = CrossVRTNo::VRT3);
@@ -722,7 +697,6 @@
                             until TempVRT3.Next() = 0;
                     until TempVRT2.Next() = 0;
             until TempVRT1.Next() = 0;
-        //+NPR5.36 [285733]
     end;
 
     local procedure LoadUsedRowsCrossVRT1(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
@@ -731,7 +705,6 @@
         GetRowsCrossVariety1: Query "NPR Get Rows - Cross Variety 1";
     begin
         Item.NPR_GetAuxItem(AuxItem);
-        //-NPR5.36 [285733]
         GetRowsCrossVariety1.SetRange(Item_No, Item."No.");
         GetRowsCrossVariety1.SetRange(Variety_2, AuxItem."Variety 2");
         GetRowsCrossVariety1.SetRange(Variety_2_Table, AuxItem."Variety 2 Table");
@@ -753,7 +726,6 @@
             SetBufferValues(TMPVRTBuffer."Variety 4 Sort Order", TMPVRTBuffer.Description, GetRowsCrossVariety1.Variety_4, GetRowsCrossVariety1.Variety_4_Table, GetRowsCrossVariety1.Variety_4_Value);
             TMPVRTBuffer.Insert();
         end;
-        //+NPR5.36 [285733]
     end;
 
     local procedure LoadUsedRowsCrossVRT2(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
@@ -762,7 +734,6 @@
         GetRowsCrossVariety2: Query "NPR Get Rows - Cross Variety 2";
     begin
         Item.NPR_GetAuxItem(AuxItem);
-        //-NPR5.36 [285733]
         GetRowsCrossVariety2.SetRange(Item_No, Item."No.");
         GetRowsCrossVariety2.SetRange(Variety_1, AuxItem."Variety 1");
         GetRowsCrossVariety2.SetRange(Variety_1_Table, AuxItem."Variety 1 Table");
@@ -785,7 +756,6 @@
             SetBufferValues(TMPVRTBuffer."Variety 4 Sort Order", TMPVRTBuffer.Description, GetRowsCrossVariety2.Variety_4, GetRowsCrossVariety2.Variety_4_Table, GetRowsCrossVariety2.Variety_4_Value);
             TMPVRTBuffer.Insert();
         end;
-        //+NPR5.36 [285733]
     end;
 
     local procedure LoadUsedRowsCrossVRT3(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
@@ -794,7 +764,6 @@
         GetRowsCrossVariety3: Query "NPR Get Rows - Cross Variety 3";
     begin
         Item.NPR_GetAuxItem(AuxItem);
-        //-NPR5.36 [285733]
         GetRowsCrossVariety3.SetRange(Item_No, Item."No.");
         GetRowsCrossVariety3.SetRange(Variety_1, AuxItem."Variety 1");
         GetRowsCrossVariety3.SetRange(Variety_1_Table, AuxItem."Variety 1 Table");
@@ -817,7 +786,6 @@
             SetBufferValues(TMPVRTBuffer."Variety 4 Sort Order", TMPVRTBuffer.Description, GetRowsCrossVariety3.Variety_4, GetRowsCrossVariety3.Variety_4_Table, GetRowsCrossVariety3.Variety_4_Value);
             TMPVRTBuffer.Insert();
         end;
-        //+NPR5.36 [285733]
     end;
 
     local procedure LoadUsedRowsCrossVRT4(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item)
@@ -826,7 +794,6 @@
         GetRowsCrossVariety4: Query "NPR Get Rows - Cross Variety 4";
     begin
         Item.NPR_GetAuxItem(AuxItem);
-        //-NPR5.36 [285733]
         GetRowsCrossVariety4.SetRange(Item_No, Item."No.");
         GetRowsCrossVariety4.SetRange(Variety_1, AuxItem."Variety 1");
         GetRowsCrossVariety4.SetRange(Variety_1_Table, AuxItem."Variety 1 Table");
@@ -849,14 +816,12 @@
             SetBufferValues(TMPVRTBuffer."Variety 3 Sort Order", TMPVRTBuffer.Description, GetRowsCrossVariety4.Variety_3, GetRowsCrossVariety4.Variety_3_Table, GetRowsCrossVariety4.Variety_3_Value);
             TMPVRTBuffer.Insert();
         end;
-        //+NPR5.36 [285733]
     end;
 
-    local procedure SetBufferValues(var BufferSortOrder: Integer; var BufferDescription: Text[92]; VarietyType: Code[10]; VarietyTable: Code[40]; VarietyValue: Code[20])
+    local procedure SetBufferValues(var BufferSortOrder: Integer; var BufferDescription: Text[92]; VarietyType: Code[10]; VarietyTable: Code[40]; VarietyValue: Code[50])
     var
         VRTValue: Record "NPR Variety Value";
     begin
-        //-NPR5.36 [285733]
         if (VarietyType = '') or (VarietyTable = '') or (VarietyValue = '') then
             exit;
 
@@ -871,7 +836,6 @@
             BufferDescription += VRTValue.Value
         else
             BufferDescription += VRTValue.Description;
-        //+NPR5.36 [285733]
     end;
 
     local procedure LoadUsedValuesVRT1(Item: Record Item; var TMPVRTValue: Record "NPR Variety Value" temporary)
