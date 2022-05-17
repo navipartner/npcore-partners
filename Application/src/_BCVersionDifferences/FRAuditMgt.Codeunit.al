@@ -20,7 +20,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         CAPTION_CERT_SUCCESS: Label 'Certificate with thumbprint %1 was uploaded successfully';
         CAPTION_SIGNATURES_VALID: Label 'Chained signatures of %1 entries verified successfully';
 
-    local procedure HandlerCode(): Text[8]
+    procedure HandlerCode(): Text[8]
     begin
         exit('FR_NF525');
     end;
