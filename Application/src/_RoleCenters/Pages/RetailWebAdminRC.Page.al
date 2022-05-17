@@ -1,4 +1,4 @@
-page 6059873 "NPR Retail Web Admin RC"
+page 6059871 "NPR Retail Web Admin RC"
 {
     Extensible = False;
     Caption = 'NP Retail Web Manag. Role Center';
