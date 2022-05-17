@@ -122,4 +122,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'BLOCK_DISCOUNT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Block Discount";
     }
+    value(17; TURNOVER_STATS)
+    {
+        Caption = 'TURNOVER_STATS', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Turnover Stats";
+    }
 }
