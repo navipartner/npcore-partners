@@ -29,6 +29,18 @@
             Caption = 'Parent Category Id';
             DataClassification = CustomerContent;
             TableRelation = "NPR Magento Category";
+
+            trigger OnValidate()
+            begin
+                if "Parent Category Id" = '' then
+                    exit;
+
+                if xRec."Parent Category Id" = Rec."Parent Category Id" then
+                    exit;
+
+                if Id = "Parent Category Id" then
+                    Error(SameParentAndChildCattegoryIdErr, Id, "Parent Category Id");
+            end;
         }
         field(5; Level; Integer)
         {
@@ -256,6 +268,7 @@
         NaviConnectFunctions: Codeunit "NPR Magento Functions";
         Text000: Label 'Do you wish to delete this category with its subcategories and all the item links?';
         SilentDelete: Boolean;
+        SameParentAndChildCattegoryIdErr: Label 'Magento Category Id "%1" is the same as Parent Category Id "%2". It''s not allowed to have same child and parent IDs', Comment = '%1 = Id, %2 = Parent Category Id';
 
     internal procedure GetChildrenCount() ChildrenCount: Integer
     var
@@ -289,6 +302,9 @@
         MagentoCategoryPath := Id;
         if MagentoCategory.Get("Parent Category Id") then
             repeat
+                if MagentoCategory.Id = MagentoCategory."Parent Category Id" then
+                    Error(SameParentAndChildCattegoryIdErr, MagentoCategory.Id, MagentoCategory."Parent Category Id");
+
                 MagentoCategoryPath := CopyStr(MagentoCategory.Id + '/' + MagentoCategoryPath, 1, MaxStrLen(MagentoCategoryPath));
             until (not MagentoCategory.Get(MagentoCategory."Parent Category Id")) or (MagentoCategory.Id = '');
 
