@@ -371,6 +371,16 @@
                 ToolTip = 'Executes the POS Info POS Entry action';
                 ApplicationArea = NPRRetail;
             }
+            action("POS Info Audit Roll")
+            {
+                Caption = 'POS Info Audit Roll';
+                Image = "Action";
+                Visible = false;
+                ToolTip = 'Executes the POS Info Audit Roll action';
+                ApplicationArea = NPRRetail;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Not used';
+            }
             action("POS Audit Log")
             {
                 Caption = 'POS Audit Log';
