@@ -254,5 +254,14 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
             tmpTicketReservationResponse.Insert();
         end;
     end;
+
+    procedure SetErrorResult(DocumentID: Text[100]; ErrorText: Text)
+    var
+    begin
+        tmpTicketReservationResponse.Reset();
+        tmpTicketReservationResponse."Session Token ID" := DocumentID;
+        tmpTicketReservationResponse."Response Message" := CopyStr(ErrorText, 1, MaxStrLen(tmpTicketReservationResponse."Response Message"));
+        tmpTicketReservationResponse.Insert();
+    end;
 }
 

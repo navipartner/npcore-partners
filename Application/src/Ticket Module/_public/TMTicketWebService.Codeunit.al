@@ -161,7 +161,8 @@
         NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
         ImportEntry.Get(ImportEntry."Entry No.");
         if (not ImportEntry.Imported) then
-            Error(ImportEntry."Error Message");
+            Confirmation.SetErrorResult(ImportEntry."Document ID", ImportEntry."Error Message") else
+            Confirmation.SetReservationResult(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Confirmation.SetReservationResult(ImportEntry."Document ID");
@@ -170,7 +171,7 @@
         ImportEntry.Modify(true);
         Commit();
 
-        exit(true);
+        exit(ImportEntry.Imported);
     end;
 
     procedure GetTicketChangeRequest(var TicketChangeRequest: XmlPort "NPR TM Ticket Change Request");
@@ -284,8 +285,81 @@
         Reservation.SetReservationResult(ImportEntry."Document ID");
     end;
 
-    procedure RevokeTicketReservation()
+    procedure RevokeTicketReservation(var TicketRevoke: XmlPort "NPR TM Ticket Revoke")
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        OutStr: OutStream;
+        FileNameLbl: Label 'RevokeTicketRequest-%1-%2.xml', Locked = true;
     begin
+        TicketRevoke.Import();
+
+        InsertImportEntry('RevokeTicketRequest', ImportEntry);
+        ImportEntry."Document ID" := TicketRevoke.GetToken();
+        if (ImportEntry."Document ID" = '') then
+            ImportEntry."Document ID" := CreateDocumentId();
+
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, ImportEntry."Document ID", TicketRevoke.GetSummary());
+        ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        TicketRevoke.SetDestination(OutStr);
+        TicketRevoke.Export();
+
+        ImportEntry.Modify(true);
+
+        Commit();
+        NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
+
+        ImportEntry.Get(ImportEntry."Entry No.");
+        if (not ImportEntry.Imported) then
+            TicketRevoke.SetErrorResult(ImportEntry."Error Message") else
+            TicketRevoke.SetReservationResult(ImportEntry."Document ID", true);
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        TicketRevoke.SetDestination(OutStr);
+        TicketRevoke.Export();
+        ImportEntry.Modify(true);
+        Commit();
+    end;
+
+    procedure ConfirmRevokeRequest(var Confirmation: XMLport "NPR TM Ticket Confirmation"; ScannerStationId: Code[10]) Success: Boolean
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        OutStr: OutStream;
+        FileNameLbl: Label 'RevokeConfirmation-%1-%2.xml', Locked = true;
+    begin
+
+        Confirmation.Import();
+
+        InsertImportEntry('ConfirmRevokeRequest', ImportEntry);
+        ImportEntry."Document ID" := Confirmation.GetToken();
+        if (ImportEntry."Document ID" = '') then
+            ImportEntry."Document ID" := CreateDocumentId();
+
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, ImportEntry."Document ID", Confirmation.GetSummary());
+        ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        Confirmation.SetDestination(OutStr);
+        Confirmation.Export();
+        ImportEntry.Modify(true);
+        Commit();
+
+        NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
+        ImportEntry.Get(ImportEntry."Entry No.");
+        if (not ImportEntry.Imported) then
+            Confirmation.SetErrorResult(ImportEntry."Document ID", ImportEntry."Error Message") else
+            Confirmation.SetReservationResult(ImportEntry."Document ID");
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        Confirmation.SetDestination(OutStr);
+        Confirmation.Export();
+        ImportEntry.Modify(true);
+        Commit();
+
+        exit(ImportEntry.Imported);
     end;
 
     procedure GetComplementaryMembershipItemNo(ExternalTicketNo: Code[20]; var ComplementaryItemNo: Code[20]) Success: Integer
@@ -516,6 +590,8 @@
         CreateImportType('TICKET-07', 'Ticket reservation', 'SetAttributes');
         CreateImportType('TICKET-08', 'Ticket reservation', 'GetTicketChangeRequest');
         CreateImportType('TICKET-09', 'Ticket reservation', 'ConfirmTicketChangeRequest');
+        CreateImportType('TICKET-10', 'Ticket reservation', 'RevokeTicketRequest');
+        CreateImportType('TICKET-11', 'Ticket reservation', 'ConfirmRevokeRequest');
     end;
 
     local procedure CreateImportType("Code": Code[20]; Description: Text[30]; FunctionName: Text[30])

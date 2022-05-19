@@ -952,7 +952,10 @@
 
     end;
 
-    procedure ValidateTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
+    procedure ValidateTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO;
+        TicketIdentifier: Text[50];
+        AdmissionCode: Code[20];
+        var TicketAccessEntryNo: Integer)
     var
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";

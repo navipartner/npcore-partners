@@ -34,6 +34,12 @@
                     ImportTicketChangeRequest(XmlDoc, Rec."Document ID");
                 'ConfirmTicketChangeRequest':
                     ImportTicketConfirmChangeRequest(XmlDoc, Rec."Document ID");
+
+                'RevokeTicketRequest':
+                    ImportTicketRevokeRequest(XmlDoc, Rec."Document ID");
+                'ConfirmRevokeRequest':
+                    ImportTicketConfirmRevokeRequest(XmlDoc);
+
                 else
                     Error(MISSING_CASE, Rec."Import Type", FunctionName);
             end;
@@ -153,7 +159,6 @@
             PreConfirmReservationRequest(Token);
         end;
     end;
-
 
     local procedure PreConfirmReservationRequest(Token: Text[100])
     var
@@ -533,8 +538,8 @@
                 TicketChangeRequest.FindSet();
                 repeat
                     TicketManagement.RescheduleTicketAdmission(Ticket."No.", TicketChangeRequest."External Adm. Sch. Entry No.", true, TicketChangeRequest."Request Status Date Time");
-                until (TicketChangeRequest.NEXT() = 0);
-            until (Ticket.NEXT() = 0);
+                until (TicketChangeRequest.Next() = 0);
+            until (Ticket.Next() = 0);
 
             // Relink tickets to this request
             Ticket.ModifyALL("Ticket Reservation Entry No.", TicketReservationRequest."Entry No.", false);
@@ -551,6 +556,92 @@
             TicketReservationResponse.Confirmed := true;
             TicketReservationResponse.Modify();
         end;
+    end;
+
+    local procedure ImportTicketRevokeRequest(Document: XmlDocument; DocumentID: Text[100])
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketManager: Codeunit "NPR TM Ticket Management";
+        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Item: Record "Item";
+        Element: XmlElement;
+        Node: XmlNode;
+        TicketNumber: Code[30];
+        PinCode: Code[10];
+        TicketAccessEntryNo: Integer;
+        Amount: Decimal;
+        RevokeQty: Integer;
+    begin
+
+        TicketRequestManager.ExpireReservationRequests();
+
+        if (not Document.GetRoot(Element)) then
+            exit;
+
+        if (not NpXmlDomMgt.FindNode(Element.AsXmlNode(), 'RevokeTicketRequest', Node)) then
+            exit;
+
+        TicketNumber := GetXmlText30(Node.AsXmlElement(), 'Request/TicketNumber', MaxStrLen(TicketNumber), true);
+        PinCode := GetXmlText10(Node.AsXmlElement(), 'Request/PinCode', MaxStrLen(PinCode), true);
+
+        TicketManager.ValidateTicketReference(1, TicketNumber, '', TicketAccessEntryNo);
+        TicketAccessEntry.Get(TicketAccessEntryNo);
+        Ticket.Get(TicketAccessEntry."Ticket No.");
+
+        Item.Get(Ticket."Item No.");
+        Amount := Item."Unit Price";
+
+        TicketRequestManager.WS_CreateRevokeRequest(DocumentID, Ticket."No.", PinCode, Amount, RevokeQty);
+
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', DocumentID);
+        TicketReservationRequest.FindFirst();
+
+        CreateResponse(TicketReservationRequest, TicketReservationResponse);
+    end;
+
+    local procedure ImportTicketConfirmRevokeRequest(Document: XmlDocument)
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
+        NodeList: XmlNodeList;
+        Node: XmlNode;
+        Element: XmlElement;
+        i: Integer;
+        Token: Text[100];
+    begin
+
+        TicketRequestManager.ExpireReservationRequests();
+
+        if (not Document.GetRoot(Element)) then
+            exit;
+
+        if (not NpXmlDomMgt.FindNodes(Element.AsXmlNode(), 'ticket_tokens', NodeList)) then
+            exit;
+
+        for i := 1 to NodeList.Count() do begin
+            NodeList.Get(i, Node);
+            Element := Node.AsXmlElement();
+
+            Token := GetXmlText100(Element, 'ticket_token', MaxStrLen(Token), false);
+
+            TicketRequestManager.SetReservationRequestExtraInfo(Token,
+              GetXmlText80(Element, 'send_notification_to', 80, false),
+              GetXmlText20(Element, 'external_order_no', 20, false));
+
+            // Response is updated with a soft fail message if confirm fails.
+            TicketRequestManager.RevokeReservationTokenRequest(Token, false);
+
+            TicketReservationResponse.SetCurrentKey("Session Token ID");
+            TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
+            TicketReservationResponse.ModifyAll(Confirmed, true);
+            TicketReservationResponse.ModifyAll(Canceled, true);
+
+        end;
+
     end;
 
     // ******************* Database Operations ()
@@ -786,10 +877,10 @@
         WebService: Record "Web Service Aggregate";
         WebServiceManagement: Codeunit "Web Service Management";
     begin
-        if not WebService.ReadPermission then
+        if (not WebService.ReadPermission) then
             exit;
 
-        if not WebService.WritePermission then
+        if (not WebService.WritePermission) then
             exit;
 
         WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR TM Ticket WebService", 'ticket_services', true);
@@ -823,4 +914,5 @@
 #pragma warning restore
 
 }
+
 
