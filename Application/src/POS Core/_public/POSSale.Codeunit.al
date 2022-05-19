@@ -507,13 +507,12 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        ServiceItemGrp: Record "Service Item Group";
         ItemTrackingCode: Record "Item Tracking Code";
         ItemTrackingSetup: Record "Item Tracking Setup";
         SerialNoInfo: Record "Serial No. Information";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
-        ErrServiceNoCust: Label 'A Customer must be chosen, because the sale contains items which are to be transferred to service items.';
         saleNegCashSum: Decimal;
+        CreateServiceItem: codeunit "NPR Create Service Item";
         NPRPOSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
         TotalItemAmountInclVat: Decimal;
@@ -586,19 +585,9 @@
             Error(ErrNoLines);
 
         repeat
-            if (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale) and
-               (SaleLinePOS.Type = SaleLinePOS.Type::Item)
-            then begin
+            if (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale) and (SaleLinePOS.Type = SaleLinePOS.Type::Item) then begin
                 Item.Get(SaleLinePOS."No.");
-                if Item."Service Item Group" <> '' then begin
-                    ServiceItemGrp.Get(Item."Service Item Group");
-                    if ServiceItemGrp."Create Service Item" and (Item."Costing Method" = Item."Costing Method"::Specific) and
-                                                                (SaleLinePOS.Quantity > 0) then begin
-                        if not ((Sale."Customer Type" = Sale."Customer Type"::Ord) and (Sale."Customer No." <> '')) then
-                            Error(ErrServiceNoCust);
-                        SaleLinePOS.TransferToService();
-                    end;
-                end;
+                CreateServiceItem.Create(SaleLinePOS, Sale, Item);
                 if Item."Item Tracking Code" <> '' then begin
                     ItemTrackingCode.Get(Item."Item Tracking Code");
 #if BC17
