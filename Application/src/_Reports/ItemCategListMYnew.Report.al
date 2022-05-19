@@ -10,7 +10,9 @@ report 6014437 "NPR Item Categ. List. M/Y new"
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = Suite;
+#IF NOT BC17
     DataAccessIntent = ReadOnly;
+#ENDIF
 
     dataset
     {
