@@ -3993,6 +3993,8 @@
     begin
 
         CurrentMember.Copy(Member);
+        MembershipEvents.OnBeforeSetMemberFields(Member, MemberInfoCapture);
+
 #pragma warning disable AA0139
         Member."First Name" := DeleteCtrlChars(MemberInfoCapture."First Name");
         Member."Middle Name" := DeleteCtrlChars(MemberInfoCapture."Middle Name");
@@ -4066,6 +4068,7 @@
 
         Member."Store Code" := MemberInfoCapture."Store Code";
 
+        MembershipEvents.OnAfterSetMemberFields(Member, MemberInfoCapture);
         MembershipEvents.OnAfterMemberFieldsAssignmentEvent(CurrentMember, Member);
 
         exit;

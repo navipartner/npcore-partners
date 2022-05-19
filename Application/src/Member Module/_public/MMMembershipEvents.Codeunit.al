@@ -27,6 +27,16 @@
     end;
 
     [IntegrationEvent(false, false)]
+    procedure OnBeforeSetMemberFields(Member: Record "NPR MM Member"; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnAfterSetMemberFields(var Member: Record "NPR MM Member"; MemberInfoCapture: Record "NPR MM Member Info Capture")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnAfterMemberFieldsAssignmentEvent(CurrentMember: Record "NPR MM Member"; var NewMember: Record "NPR MM Member")
     begin
     end;
