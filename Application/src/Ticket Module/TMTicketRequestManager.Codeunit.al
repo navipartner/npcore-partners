@@ -263,7 +263,6 @@
         OverAllocationConfirmed: Dictionary of [Code[20], Enum "NPR TM Ternary"];
     begin
 
-
         Item.Get(ItemNo);
         Item.NPR_GetAuxItem(AuxItem);
         if (not TicketType.Get(AuxItem."TM Ticket Type")) then
@@ -422,7 +421,7 @@
         TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", AdmissionCode);
         CreateAdmission := (TicketBom."Admission Inclusion" <> TicketBom."Admission Inclusion"::NOT_SELECTED);
 
-        // Lets see if there is a specific request for the admission code, then it might carry some additional scheduling information
+        // Lets see if (there is a specific request for the admission code,) then it might carry some additional scheduling information
         ReservationRequest.SetCurrentKey("Session Token ID");
         ReservationRequest.SetFilter("Session Token ID", '=%1', SourceRequest."Session Token ID");
         ReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', SourceRequest."Ext. Line Reference No.");
@@ -589,7 +588,7 @@
         TicketReservationRequest.SetFilter("Request Status", '=%1|=%2', TicketReservationRequest."Request Status"::REGISTERED, TicketReservationRequest."Request Status"::RESERVED);
 
         TicketReservationRequest.ModifyAll("Request Status", TicketReservationRequest."Request Status"::CONFIRMED);
-        TicketReservationRequest.ModifyAll("Request Status Date Time", CurrentDateTime);
+        TicketReservationRequest.ModifyAll("Request Status Date Time", CurrentDateTime());
         TicketReservationRequest.ModifyAll("Expires Date Time", CreateDateTime(0D, 0T));
 
         FinalizePayment(Token);
@@ -678,7 +677,7 @@
 
         // Perforance enhancement
         TicketReservationRequest.SetCurrentKey("Request Status");
-        TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime);
+        TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime());
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
         if (not TicketReservationRequest.IsEmpty()) then begin
             if (TicketReservationRequest.FindSet()) then begin
@@ -690,9 +689,9 @@
                     TicketReservationRequest2.ModifyAll("Request Status", TicketReservationRequest2."Request Status"::EXPIRED);
 
                     if (TicketReservationRequest."Revoke Ticket Request") then begin
-                        TicketReservationRequest2.ModifyAll("Expires Date Time", CurrentDateTime - 10 * 1000); // Revoke transactions will not be retained when it has expired
+                        TicketReservationRequest2.ModifyAll("Expires Date Time", CurrentDateTime() - 10 * 1000); // Revoke transactions will not be retained when it has expired
                     end else begin
-                        TicketReservationRequest2.ModifyAll("Expires Date Time", CurrentDateTime + 3600 * 1000); // Expired transactions will be retained 1 hour
+                        TicketReservationRequest2.ModifyAll("Expires Date Time", CurrentDateTime() + 3600 * 1000); // Expired transactions will be retained 1 hour
                     end;
 
                 until (TicketReservationRequest.Next() = 0);
@@ -704,7 +703,7 @@
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Request Status");
-        TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime);
+        TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime());
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::EXPIRED);
         if (TicketReservationRequest.FindFirst()) then begin
             if (TicketReservationRequest.FindSet()) then begin
@@ -799,7 +798,7 @@
             ItemReference.SetCurrentKey("Reference Type", "Reference No.");
             ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
             ItemReference.SetFilter("Reference No.", '=%1', UpperCase(Barcode));
-            if ItemReference.FindFirst() then begin
+            if (ItemReference.FindFirst()) then begin
                 ResolvingTable := Database::"Item Reference";
                 ItemNo := ItemReference."Item No.";
                 VariantCode := ItemReference."Variant Code";
@@ -890,9 +889,9 @@
             TicketChangeRequest.TransferFields(TicketReservationRequest, false);
             TicketChangeRequest."Session Token ID" := MessageToken;
             TicketChangeRequest."Entry Type" := TicketChangeRequest."Entry Type"::CHANGE;
-            TicketChangeRequest."Created Date Time" := CURRENTDATETIME();
+            TicketChangeRequest."Created Date Time" := CurrentDateTime();
             TicketChangeRequest."Request Status" := TicketChangeRequest."Request Status"::REGISTERED;
-            TicketChangeRequest."Request Status Date Time" := CURRENTDATETIME();
+            TicketChangeRequest."Request Status Date Time" := CurrentDateTime();
             TicketChangeRequest."Expires Date Time" := CalculateNewExpireTime();
             TicketChangeRequest."Admission Created" := false;
             TicketChangeRequest."Superseeds Entry No." := Ticket."Ticket Reservation Entry No.";
@@ -991,7 +990,6 @@
             POS_AppendToReservationRequest(Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, TicketBom."Admission Code", Quantity, 0, ExternalMemberNo);
         until (TicketBom.Next() = 0);
 
-
         exit(Token);
     end;
 
@@ -1041,7 +1039,6 @@
             if (StrPos(ReservationRequest."Notification Address", '@') > 1) then
                 ReservationRequest."Notification Method" := ReservationRequest."Notification Method"::EMAIL;
         end;
-
 
         if (ExternalAdmissionScheduleEntryNo = 0) then begin
             case TicketManagement.GetAdmissionSchedule(ItemNo, VariantCode, AdmissionCode) of
@@ -1116,7 +1113,6 @@
 
             Admission.Get(TicketAccessEntry."Admission Code");
             AdmissionRefundAmount := 0;
-
 
             TicketBOM.Get(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code");
             RevokeQuantity := TicketAccessEntry.Quantity;
@@ -1217,6 +1213,8 @@
             ReservationRequest."Revoke Ticket Request" := true;
             ReservationRequest."Revoke Access Entry No." := TicketAccessEntry."Entry No.";
             ReservationRequest.Quantity := RevokeQuantity;
+            ReservationRequest.Amount := AdmissionRefundAmount;
+            ReservationRequest."AmountInclVat" := 0; //AdmissionRefundAmount;
 
             ReservationRequest."External Member No." := Ticket."External Member Card No.";
             ReservationRequest."Admission Description" := Admission.Description;
@@ -1224,9 +1222,12 @@
             ReservationRequest."Created Date Time" := CurrentDateTime();
 
             ReservationRequest."Request Status" := ReservationRequest."Request Status"::REGISTERED;
-
             ReservationRequest."Request Status Date Time" := CurrentDateTime();
             ReservationRequest."Expires Date Time" := CalculateNewExpireTime();
+
+            ReservationRequest."Entry Type" := ReservationRequest."Entry Type"::REVOKE;
+            ReservationRequest."Superseeds Entry No." := Ticket."Ticket Reservation Entry No.";
+
             ReservationRequest.Insert();
 
         until (TicketAccessEntry.Next() = 0);
@@ -1234,6 +1235,185 @@
         AmountInOut := Round(TotalRefundAmount, 0.01);
 
         exit(true);
+    end;
+
+    procedure WS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; AuthorizationCode: Code[10]; VAR AmountInclVatInOut: Decimal; VAR RevokeQuantity: Integer)
+    var
+        Ticket: Record "NPR TM Ticket";
+        ReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Admission: Record "NPR TM Admission";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        DetTicketAccessEntry2: Record "NPR TM Det. Ticket AccessEntry";
+        InitialQuantity: Integer;
+        TotalRefundAmount: Decimal;
+        AdmissionRefundAmount: Decimal;
+        TotalPct: Decimal;
+        UsePctDistribution: Boolean;
+        AdmissionCount: Integer;
+        UnitPrice: Decimal;
+    begin
+
+        Ticket.Get(TicketNo);
+        if (Ticket.Blocked) then
+            Error('Ticket is blocked and cannot be revoked.');
+
+        ReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
+        if (ReservationRequest."Authorization Code" <> AuthorizationCode) then
+            Error(INVALID_TICKET_PIN);
+
+        ReservationRequest.CalcFields("Is Superseeded");
+        if (ReservationRequest."Is Superseeded") then begin
+            // Invalidate the other request
+            ReservationRequest.SetFilter("Superseeds Entry No.", '=%1', ReservationRequest."Entry No.");
+            ReservationRequest.ModifyAll("Request Status", ReservationRequest."Request Status"::CANCELED);
+        end;
+
+        TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code"); // -+ #333705 [333705]
+        TicketBOM.FindSet();
+        repeat
+            TotalPct += TicketBOM."Refund Price %";
+            AdmissionCount += 1;
+        until (TicketBOM.Next() = 0);
+        UsePctDistribution := (TotalPct = 100);
+
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindSet();
+
+        if (Token = '') then
+            Token := GetNewToken();
+
+        repeat
+            DetTicketAccessEntry2.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+            DetTicketAccessEntry2.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+            DetTicketAccessEntry2.FindFirst();
+            InitialQuantity := DetTicketAccessEntry2.Quantity;
+
+            Admission.Get(TicketAccessEntry."Admission Code");
+            AdmissionRefundAmount := 0;
+
+            TicketBOM.Get(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code");
+            RevokeQuantity := TicketAccessEntry.Quantity;
+            UnitPrice := AmountInclVatInOut / InitialQuantity;
+
+            CASE TicketBOM."Revoke Policy" OF
+                TicketBOM."Revoke Policy"::UNUSED:
+                    begin
+
+                        DetTicketAccessEntry.Reset();
+                        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+                        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
+                        if (DetTicketAccessEntry.FindFirst()) then begin
+
+                            DetTicketAccessEntry2.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+                            DetTicketAccessEntry2.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+                            DetTicketAccessEntry2.FindFirst();
+                            if (TicketAccessEntry.Quantity >= DetTicketAccessEntry2.Quantity) then
+                                Error(REVOKE_UNUSED_ERROR, TicketNo, Admission.Description, DetTicketAccessEntry."Created Datetime", Ticket."Item No.", TicketAccessEntry."Admission Code");
+
+                            RevokeQuantity := DetTicketAccessEntry2.Quantity - TicketAccessEntry.Quantity;
+                            AmountInclVatInOut := UnitPrice * RevokeQuantity;
+
+                            if (UsePctDistribution) then
+                                AdmissionRefundAmount := RevokeQuantity * UnitPrice * TicketBOM."Refund Price %" / 100;
+
+                            if (not UsePctDistribution) then
+                                AdmissionRefundAmount := RevokeQuantity * UnitPrice / AdmissionCount;
+
+                        end else begin
+                            if (UsePctDistribution) then
+                                AdmissionRefundAmount := TicketAccessEntry.Quantity * UnitPrice * TicketBOM."Refund Price %" / 100;
+
+                            if (not UsePctDistribution) then
+                                AdmissionRefundAmount := TicketAccessEntry.Quantity * UnitPrice / AdmissionCount;
+                        end;
+
+                    end;
+                TicketBOM."Revoke Policy"::NEVER:
+                    Error(REVOKE_NEVER_ERROR, TicketNo, Ticket."Item No.", TicketAccessEntry."Admission Code");
+
+                TicketBOM."Revoke Policy"::ALWAYS:
+                    AdmissionRefundAmount := AmountInclVatInOut / AdmissionCount;
+
+                else
+                    Error(INVALID_POLICY, TicketBOM."Revoke Policy");
+            end;
+
+            DetTicketAccessEntry.Reset();
+            DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+            DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::CANCELED_ADMISSION);
+            if (DetTicketAccessEntry.FindFirst()) then
+                Error(TICKET_CANCELLED, TicketNo, DetTicketAccessEntry."Created Datetime");
+
+            DetTicketAccessEntry.Reset();
+            DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+            DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+            DetTicketAccessEntry.FindFirst();
+
+            // Ticket is prepaid by third party
+            DetTicketAccessEntry.Reset();
+            DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+            DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::PREPAID);
+            if (DetTicketAccessEntry.FindFirst()) then begin
+                if (AdmissionRefundAmount <> 0) then begin
+                    // Pickup price from sales order - should be referenced in DetTicketAccessEntry."Sales Channel No."
+                    // AdmissionRefundAmount := 0;
+                    // Default to Unit Price (AmountIn)
+                end;
+            end;
+
+            // Ticket will be post paid after admission, by claim from us to third party. we will claim ticket if admission was registered.
+            DetTicketAccessEntry.Reset();
+            DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+            DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::POSTPAID);
+            if (DetTicketAccessEntry.FindFirst()) then begin
+                if (AdmissionRefundAmount <> 0) then
+                    AdmissionRefundAmount := 0;
+            end;
+
+            TotalRefundAmount += AdmissionRefundAmount;
+
+            Clear(ReservationRequest);
+            ReservationRequest."Entry No." := 0;
+            ReservationRequest."Session Token ID" := Token;
+            ReservationRequest."Ext. Line Reference No." := 1;
+
+            ReservationRequest."Item No." := Ticket."Item No.";
+            ReservationRequest."Variant Code" := Ticket."Variant Code";
+            ReservationRequest."External Item Code" := GetExternalNo(Ticket."Item No.", Ticket."Variant Code");
+
+            ReservationRequest."Admission Code" := TicketAccessEntry."Admission Code";
+            ReservationRequest."Receipt No." := '';
+            ReservationRequest."Line No." := 0;
+
+            ReservationRequest."External Ticket Number" := Ticket."External Ticket No.";
+
+            ReservationRequest."Revoke Ticket Request" := true;
+            ReservationRequest."Revoke Access Entry No." := TicketAccessEntry."Entry No.";
+            ReservationRequest.Quantity := RevokeQuantity;
+            ReservationRequest.Amount := 0; //AdmissionRefundAmount;
+            ReservationRequest."AmountInclVat" := AdmissionRefundAmount;
+
+            ReservationRequest."External Member No." := Ticket."External Member Card No.";
+            ReservationRequest."Admission Description" := Admission.Description;
+
+            ReservationRequest."Created Date Time" := CurrentDateTime();
+
+            ReservationRequest."Request Status" := ReservationRequest."Request Status"::REGISTERED;
+            ReservationRequest."Request Status Date Time" := CurrentDateTime();
+            ReservationRequest."Expires Date Time" := CalculateNewExpireTime();
+
+            ReservationRequest."Entry Type" := ReservationRequest."Entry Type"::REVOKE;
+            ReservationRequest."Superseeds Entry No." := Ticket."Ticket Reservation Entry No.";
+
+            ReservationRequest.Insert();
+
+        until (TicketAccessEntry.Next() = 0);
+
+        AmountInclVatInOut := ROUND(TotalRefundAmount, 0.01);
+
     end;
 
     procedure IsReservationRequest(Token: Text[100]): Boolean
@@ -1316,7 +1496,6 @@
         if (TicketReservationRequest.FindSet()) then begin
             repeat
 
-
             until (TicketReservationRequest.Next() = 0);
             exit(true);
 
@@ -1396,7 +1575,6 @@
         ReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (ReservationRequest.FindFirst()) then begin
 
-
             if (SaleLinePOS.Quantity > 0) then begin
                 if (ReservationRequest.Quantity = SaleLinePOS.Quantity) then
                     exit;
@@ -1438,7 +1616,6 @@
 
                 end;
             end;
-
 
         end;
     end;
@@ -1762,7 +1939,6 @@
 
                     TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::PENDING;
 
-
                     case TicketReservationRequest."Notification Method" of
                         TicketReservationRequest."Notification Method"::SMS:
                             TicketNotificationEntry2."Notification Method" := TicketNotificationEntry."Notification Method"::SMS;
@@ -1783,7 +1959,6 @@
                 exit(true);
             end;
         end;
-
 
         if (TicketReservationRequest."Notification Method" = TicketReservationRequest."Notification Method"::NA) then begin
             if (not NotifyWithExternalModule) then begin
@@ -2066,7 +2241,7 @@
 
     begin
 
-        if not (NPPassServerInvokeApi('GET', TicketNotificationEntry, ReasonMessage, '', JSONResult)) then
+        if (not (NPPassServerInvokeApi('Get', TicketNotificationEntry, ReasonMessage, '', JSONResult))) then
             exit(false);
 
         if (JSONResult = '') then
@@ -2118,7 +2293,7 @@
             if (RecRef.FieldExist(FieldNo)) then begin
 
                 FieldRef := RecRef.field(FieldNo);
-                if FieldRef.Class = FieldClass::FlowField then
+                if (FieldRef.Class = FieldClass::FlowField) then
                     FieldRef.CalcField();
                 NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + SeparatorLength);
 
@@ -2262,7 +2437,7 @@
         if (RequestMethod = 'PUT') then
             RequestOk := Client.Put(Url, Content, Response);
 
-        if (RequestMethod = 'GET') then
+        if (RequestMethod = 'Get') then
             RequestOk := Client.Get(Url, Response);
 
         if (RequestOk) then begin
@@ -2284,4 +2459,5 @@
     end;
 
 }
+
 

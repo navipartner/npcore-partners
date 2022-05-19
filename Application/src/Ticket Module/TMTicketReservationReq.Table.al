@@ -111,6 +111,16 @@
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
         }
+        field(52; Amount; Decimal)
+        {
+            Caption = 'Amount';
+            DataClassification = CustomerContent;
+        }
+        field(53; AmountInclVat; Decimal)
+        {
+            Caption = 'Amount Incl. VAT';
+            DataClassification = CustomerContent;
+        }
         field(60; "Admission Description"; Text[50])
         {
             Caption = 'Admission Description';
@@ -186,7 +196,7 @@
         field(120; "Entry Type"; Option)
         {
             Caption = 'Entry Type';
-            OptionMembers = PRIMARY,CHANGE;
+            OptionMembers = PRIMARY,CHANGE,REVOKE;
             OptionCaption = 'Primary,Change';
             DataClassification = CustomerContent;
         }
