@@ -184,5 +184,18 @@
                 end;
         end;
     end;
+
+    internal procedure LinkServiceItem2Line(POSEntryNo: Integer; POSEntryLineNo: Integer; ServiceItemNo: Code[20])
+    begin
+        if Rec.Get(POSEntryNo, Rec."POS Entry Reference Type"::SALESLINE, POSEntryLineNo, Rec."Sales Document Type"::SERVICE_ITEM, ServiceItemNo) then
+            exit;
+        Rec."POS Entry No." := POSEntryNo;
+        Rec."POS Entry Reference Type" := Rec."POS Entry Reference Type"::SALESLINE;
+        Rec."POS Entry Reference Line No." := POSEntryLineNo;
+        Rec."Sales Document Type" := Rec."Sales Document Type"::SERVICE_ITEM;
+        Rec."Sales Document No" := ServiceItemNo;
+        Rec.Init();
+        Rec.Insert();
+    end;
 }
 
