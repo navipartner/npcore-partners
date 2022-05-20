@@ -171,6 +171,9 @@
         if Line.Description <> '' then
             Rec.Description := Line.Description;
 
+        if Line."Description 2" <> '' then
+            Rec."Description 2" := Line."Description 2";
+
         Rec.Validate(Quantity, Line.Quantity);
 
         Rec.Validate("NPRE Seating Code", Line."NPRE Seating Code");
