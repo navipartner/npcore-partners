@@ -1,6 +1,6 @@
 # Capture Service Setup (CS Setup)
 
-Before starting using NP WMS, you must configure the rules which define how NP WMS will work. This is done in the **CS Setup** administrative section.
+Before you start using NP WMS, you must configure the rules which define how NP WMS will work. This is done in the **CS Setup** administrative section.
 
 If comprises on of the following groups
 

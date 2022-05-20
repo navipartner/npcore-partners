@@ -1,43 +1,36 @@
 # Welcome to the NP Warehouse Management System product documentation
 
-NP WMS connects your inventory management in Business Central with your POS solution and your online store, and makes every item visible across the supply chain, distribution centers, and sales channels.
+NP WMS connects a company's inventory database in Business Central to the warehouse stock and makes every item visible across the supply chain, distribution centers, and sales channels. It also employs the RFID technology to more easily track item placement, status, quantity, and so on. 
 
-It is linked with Business Central Warehousing module. NP WMS makes use of these warehouse documents created on BC and are exposed on a mobile device to facilitates warehouse movements.
+This solution is recommended for any business which uses warehouses in its operations, regardless of its capacity, as it vastly improves organization, structure, and space management of warehouses. 
 
-NaviPartner provides two standard templates to accelerate the setup procedures:
+## Onboarding
 
-- Live templates - sample setups of NP WMS
-- Demo Data - demo data for users to test NP WMS
+The initial setup of NP WMS consists of the following steps:
 
-Once the extension is installed, the SAAS license can be purchased online. A trial period is offered to test the functionalities.
+1. To get started, you need to [download and install the NP WMS extension for Business Central](./howto/Install-NP-WMS.md), as well as the [accompanying mobile applications](./howto/install-mobile-apps.md). 
 
-> [!NOTE]
-> For pricing details refer to [this link](https://www.navipartner.com/np-wms-pricing/).
+2. (Optional) Download and install one of the preset WMS templates provided by NaviPartner, to accelerate the setup procedure:
 
-## WMS Setup
+- Live templates - provides sample setups of NP WMS
+- Test Data - provides the necessary data for testing NP WMS
 
-The NP WMS setup process consists of the following tasks:
+3. Purchase the [SAAS license](https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/deployment/licensing) online.
 
-- [CS setup](./explanation/cs-setup.md)
-    Setting up the main parameters for NP WMS
+> [!Note]
+> For pricing details refer to [our website](https://www.navipartner.com/np-wms-pricing/). A trial period is offered to test the functionalities.
 
-- [CS UIs setup](./howto/set-up-cs-uis.md)
-    Setting up the mobile user interface
+4. Set the main parameters for your instance of NP WMS in [CS setup](./explanation/cs-setup.md). These parameters include, but aren't limited to:
 
-- [CS users setup](./howto/set-up-cs-users.md)
-    Setting up users who will have access on the mobile devices
+    - [CS UIs](./howto/set-up-cs-uis.md) - user interface of the mobile apps. 
+    - [CS users](./howto/set-up-cs-users.md) - users who will have access to the mobile devices used for warehouse management.
+    - [Warehouse employees](./howto/set-up-warehouse-users.md) - entities in BC which correspond to warehouse employees.
 
-- [Warehouse employee setup](./howto/set-up-warehouse-users.md)
-    Setting up users to have access to BC warehouses
+5. [Create QR codes](./howto/create-qr-codes.md) which will be associated with the individual users in NP WMS.
 
-- [BC warehousing setup](./howto/set-up-warehousing-bc.md)
-    Setting up standard BC warehousing
+After the necessary setup is performed, you can explore the rest of the available options to personalize your WMS instance.
 
 ### Related Links
 
-- [Download and install NP WMS extension](./howto/Install-NP-WMS.md)
 - [NP WMS Role Center](./explanation/role-center.md)
-- [Fetch preset setup data](./howto/fetch-setup-data.md)
-- [Capture Service Logging](./explanation/cs-logging.md)
 - [Capture service UIs](./explanation/cs-uis.md)
-- [Create QR codes](./howto/create-qr-codes.md)

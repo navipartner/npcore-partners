@@ -1,1 +1,0 @@
-# Set up BC licensing on mobile devices
