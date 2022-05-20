@@ -14,6 +14,7 @@
         UnitPriceCaption: Label 'This is item is an item group. Specify the unit price for item.';
         UnitPriceTitle: Label 'Unit price is required';
         TEXTeditDesc_title: Label 'Add or change description.';
+        TEXTeditDesc2_title: Label 'Add or change description 2.';
         ERROR_ITEMSEARCH: Label 'Could not find a matching item for input %1';
         SerialSelectionFromList: Boolean;
         ReadingErr: Label 'reading in %1 of %2';
@@ -40,6 +41,7 @@
           Sender."Subscriber Instances Allowed"::Single)
         then begin
             Sender.RegisterWorkflowStep('editDescription', 'param.descriptionEdit && input({title: labels.editDesc_title, caption: labels.editDesc_lead, value: context.defaultDescription}).cancel(abort);');
+            Sender.RegisterWorkflowStep('editDescription2', 'param.description2Edit && input({title: labels.editDesc2_title, caption: labels.editDesc2_lead, value: context.defaultDescription2}).cancel(abort);');
             Sender.RegisterWorkflowStep('skipContextDialogs', 'goto("addSalesLine")');
 
             Sender.RegisterWorkflowStep('promptContextDialogs', '');
@@ -53,6 +55,7 @@
             Sender.RegisterTextParameter('itemNo', '');
             Sender.RegisterDecimalParameter('itemQuantity', 1);
             Sender.RegisterBooleanParameter('descriptionEdit', false);
+            Sender.RegisterBooleanParameter('description2Edit', false);
             Sender.RegisterBooleanParameter('usePreSetUnitPrice', false);
             Sender.RegisterDecimalParameter('preSetUnitPrice', 0);
             Sender.RegisterBooleanParameter('AllowToSelectSerialNoFromList', false);
@@ -71,6 +74,8 @@
         Captions.AddActionCaption(ActionCode(), 'UnitpriceCaption', UnitPriceCaption);
         Captions.AddActionCaption(ActionCode(), 'editDesc_title', TEXTeditDesc_title);
         Captions.AddActionCaption(ActionCode(), 'editDesc_lead', TEXTeditDesc_title);
+        Captions.AddActionCaption(ActionCode(), 'editDesc2_title', TEXTeditDesc2_title);
+        Captions.AddActionCaption(ActionCode(), 'editDesc2_lead', TEXTeditDesc2_title);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
@@ -108,6 +113,7 @@
         DialogPrompt: Boolean;
         SetUnitPrice: Boolean;
         CustomDescription: Text;
+        CustomDescription2: Text;
         ValidatedSerialNumber: Text;
         ValidatedVariantCode: Text;
         PosInventoryProfile: Record "NPR POS Inventory Profile";
@@ -176,12 +182,16 @@
         if JSON.SetScope('$editDescription') then
             CustomDescription := JSON.GetString('input');
 
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        if JSON.SetScope('$editDescription2') then
+            CustomDescription2 := JSON.GetString('input');
+
         if not SkipItemAvailabilityCheck then begin
             PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
             if PosInventoryProfile."Stockout Warning" then
                 PosItemCheckAvail.SetxDataset(POSSession);
         end;
-        AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, SetUnitPrice, CustomDescription, InputSerial, UseSpecificTracking, ValidatedSerialNumber, POSSession, FrontEnd);
+        AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, SetUnitPrice, CustomDescription, CustomDescription2, InputSerial, UseSpecificTracking, ValidatedSerialNumber, POSSession, FrontEnd);
         if not SkipItemAvailabilityCheck and PosInventoryProfile."Stockout Warning" then
             PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
     end;
@@ -293,7 +303,7 @@
         ItemReference."Item No." := Item."No.";
     end;
 
-    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UnitPrice: Decimal; SetUnitPrice: Boolean; CustomDescription: Text; InputSerial: Text; UseSpecificTracking: Boolean; ValidatedSerialNumber: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UnitPrice: Decimal; SetUnitPrice: Boolean; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; UseSpecificTracking: Boolean; ValidatedSerialNumber: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Line: Record "NPR POS Sale Line";
         SaleLine: Codeunit "NPR POS Sale Line";
@@ -347,6 +357,9 @@
 
         if CustomDescription <> '' then
             Line.Description := CopyStr(CustomDescription, 1, MaxStrLen(Line.Description));
+
+        if CustomDescription2 <> '' then
+            Line."Description 2" := CopyStr(CustomDescription2, 1, MaxStrLen(Line."Description 2"));
 
         if SetUnitPrice then begin
             Line."Unit Price" := UnitPrice;
