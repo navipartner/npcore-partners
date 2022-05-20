@@ -1,30 +1,30 @@
 # Capture service UIs
 
-The Capture Service user interface (CS UI) setup section is used for defining the user interface on mobile devices. It consists of a header, in which you define the parameters for the display and lines where you add the texts and fields which need to be displayed on the mobile interface. 
+The Capture Service user interface (CS UI) setup section is used for defining the user interface in the apps installed on mobile devices.
 
 > [!Note]
-> There should be one **Start UI** for the company. By default, this is the LOGIN UI.
+> There should be one **Start UI** for the company. By default, this is the **LOGIN UI**.
 
-There are mainly 3 types of UIs:
+There are mainly 3 types of UIs. To enable any of these types, apply the options indicated in the respective screenshots of the **CS UI** setup performed in BC.
 
-1. Menus (type Selection List). 
-    Used to create menu
-    [example](../images/menu-type-ui.JPG)
+- Menu (Selection List)
 
-2. Data List (type Data List).
-    used to display a list of data e.g List of Locations, List of Warehouse Documents
-    [example](../images/datalist-type-ui.JPG)
+    ![example](../images/menu-type-ui.JPG)
 
-3. Data Input (type Data List Input)
-    used to interact with the user. E.g Warehouse Pick document.
-    [example](../images/datainput-type.JPG)
+2. Data List (e.g. a list of locations, warehouse documents etc.)
+
+    ![example](../images/datalist-type-ui.JPG)
+
+3. Data Input (interactive UIs e.g. Warehouse Pick document)
+
+    ![example](../images/datainput-type.JPG)
 
 
-A UI is made up of 3 sections.
+A UI is made up of 3 sections:
 
-- The header part defines the type of UI.
+- The header part which defines the type of UI
 
-- The detail part defines the fields to be displayed on the header part on the mobile device.
+- The detail part which consists of fields to be displayed on the header part on the mobile device.
 
 - The link to **Data Pattern Code** will defines the data displayed as lines on the mobile apps.
 
