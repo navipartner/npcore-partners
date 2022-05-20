@@ -70,6 +70,9 @@
                 'GetSetMemberComOption':
                     ; // Do nothing, handled by xmlport */
 
+                'SearchMembers':
+                    ; // Do nothing, handled by xmlport */
+
                 else
                     Error(MISSING_CASE, Rec."Import Type", FunctionName);
             end;
