@@ -445,6 +445,41 @@
         Commit();
     end;
 
+    procedure SearchMembers(var searchMember: XMLport "NPR MM Search Members")
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        OutStr: OutStream;
+        FileNameLbl: Label 'SearchMembers-%1.xml', Locked = true;
+    begin
+        searchMember.Import();
+
+        InsertImportEntry('SearchMembers', ImportEntry);
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, FORMAT(CurrentDateTime(), 0, 9));
+        ImportEntry."Document ID" := CreateDocumentId();
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        searchMember.SetDestination(OutStr);
+        searchMember.Export();
+        ImportEntry.Modify(true);
+
+        Commit();
+
+        if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
+            searchMember.AddResponse();
+
+        end else begin
+            searchMember.AddErrorResponse(ImportEntry."Error Message");
+        end;
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        searchMember.SetDestination(OutStr);
+        searchMember.Export();
+        ImportEntry.Modify(true);
+
+        Commit();
+    end;
+
     procedure UpdateMember(var member: XMLport "NPR MM Update Member"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
@@ -1123,7 +1158,7 @@
         MemberFieldUpdateMgr: Codeunit "NPR MM Request Member Upd Mgr";
     begin
         MemberFieldUpdateMgr.UpdateMemberField(EntryNo, CurrentValue, NewValue, 0);
-        COMMIT();
+        Commit();
     end;
 
     procedure ReqeustMemberFieldUpdate(MemberCardNumber: Text[50]; FieldId: Code[10]; ScannerStationId: Code[10]): Boolean
@@ -1132,7 +1167,7 @@
     begin
 
         MemberFieldUpdateMgr.RequestFieldUpdate(MemberCardNumber, FieldId, ScannerStationId);
-        EXIT(TRUE);
+        exit(true);
     end;
 
     procedure ResolveMemberIdentifier(var MemberIdentifier: XMLport "NPR MM Member Identifier")
@@ -1225,7 +1260,6 @@
 
     end;
 
-
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
     var
         FileNameLbl: Label '%1-%2.xml', Locked = true;
@@ -1275,6 +1309,7 @@
         CreateImportType('MEMBER-18', 'MemberManagement', 'GetSetAutoRenewOption');
         CreateImportType('MEMBER-19', 'MemberManagement', 'GetSetMemberComOption');
         CreateImportType('MEMBER-20', 'MemberManagement', 'BlockMember');
+        CreateImportType('MEMBER-21', 'MemberManagement', 'SearchMembers');
 
         Commit();
     end;
@@ -1316,4 +1351,5 @@
     end;
 #pragma warning restore
 }
+
 
