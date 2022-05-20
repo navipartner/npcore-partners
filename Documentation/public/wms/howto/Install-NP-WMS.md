@@ -17,6 +17,5 @@ Once NP WMS is installed, you can proceed with other necessary setups.
 
 ### Related Links
 
-- [Log into NP WMS](../explanation/cs-logging.md)
 - [Set up NP WMS](../explanation/cs-setup.md)
 - [Install WMS and RFID apps on mobile devices](install-mobile-apps.md)

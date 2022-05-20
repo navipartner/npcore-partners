@@ -2,13 +2,9 @@
   href: intro.md
 - name: Explanation
   items:
-  - name: Capture service logging
-    href: explanation/cs-logging.md
-  - name: Capture service posting profile
-    href: explanation/cs-posting-profile.md
-  - name: Capture service printing
-    href: explanation/cs-printing.md
-  - name: Capture service setup
+  - name: NP WMS Role Center
+    href: explanation/role-center.md
+  - name: CS setup
     href: explanation/cs-setup.md
   - name: Capture service UIs
     href: explanation/cs-uis.md
@@ -16,25 +12,20 @@
     href: explanation/cs-users.md
   - name: Main header setup
     href: explanation/main-header-setup.md
-  - name: Role center (landing page)
-    href: explanation/role-center.md
+
 - name: How-to
   items: 
+  - name: Download and install NP WMS extension for BC
+    href: howto/install-NP-WMS.md
   - name: Install mobile apps
     href: howto/install-mobile-apps.md
-  - name: Set up capture service users
+  - name: Fetch setup data
+    href: howto/fetch-setup-data.md
+  - name: Set up CS users
     href: howto/set-up-cs-users.md
   - name: Create QR codes
     href: howto/create-qr-codes.md
   - name: Set up CS UIs
     href: howto/set-up-cs-uis.md
-  - name: Fetch setup data
-    href: howto/fetch-setup-data.md
-  - name: Set up Business Central licensing
-    href: howto/set-up-bc-licensing.md
-  - name: Set up RFID
-    href: howto/set-up-rfid.md
   - name: Set up warehouse users
     href: howto/set-up-warehouse-users.md
-  - name: Set up warehousing in Business Central
-    href: howto/set-up-warehousing-bc.md
