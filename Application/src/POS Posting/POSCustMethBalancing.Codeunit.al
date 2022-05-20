@@ -153,6 +153,7 @@
 
     local procedure GetCashCountingTypes() CashCounting: JsonArray
     var
+        PaymentMethod: Record "NPR POS Payment Method";
         CountingType: JsonObject;
         CoinTypes: JsonArray;
         CoinType: JsonObject;
@@ -165,28 +166,46 @@
             exit;
 
         repeat
-            CountingType.ReadFrom('{}');
-            CountingType.Add('id', POSPaymentBinCheckPoint."Entry No.");
-            CountingType.Add('paymentTypeNo', POSPaymentBinCheckPoint."Payment Type No.");
-            CountingType.Add('description', POSPaymentBinCheckPoint.Description);
-            CountingType.Add('difference', POSPaymentBinCheckPoint."Calculated Amount Incl. Float");
-            CountingType.Add('calculatedAmount', POSPaymentBinCheckPoint."Calculated Amount Incl. Float");
-            CountingType.Add('countedAmount', 0);
 
-            PaymentMethodDenom.SetFilter("POS Payment Method Code", '=%1', POSPaymentBinCheckPoint."Payment Method No.");
-            if (PaymentMethodDenom.FindSet()) then begin
-                repeat
-                    CoinType.ReadFrom('{}');
-                    CoinType.Add('id', POSPaymentBinCheckPoint."Entry No.");
-                    CoinType.Add('type', PaymentMethodDenom."Denomination Type");
-                    CoinType.Add('description', StrSubstNo(CoinTypeDescLbl, PaymentMethodDenom.Denomination, PaymentMethodDenom."Denomination Type"));
-                    CoinType.Add('value', PaymentMethodDenom.Denomination);
-                    CoinTypes.Add(CoinType);
-                until (PaymentMethodDenom.Next() = 0);
+            if (PaymentMethod.Get(POSPaymentBinCheckPoint."Payment Method No.")) then begin
+                if (PaymentMethod."Include In Counting" <> PaymentMethod."Include In Counting"::NO) then begin
+                    CountingType.ReadFrom('{}');
+                    CountingType.Add('id', POSPaymentBinCheckPoint."Entry No.");
+                    CountingType.Add('paymentTypeNo', POSPaymentBinCheckPoint."Payment Type No.");
+                    CountingType.Add('description', POSPaymentBinCheckPoint.Description);
+                    CountingType.Add('difference', POSPaymentBinCheckPoint."Calculated Amount Incl. Float");
+                    CountingType.Add('calculatedAmount', POSPaymentBinCheckPoint."Calculated Amount Incl. Float");
+                    CountingType.Add('countedAmount', 0);
+
+                    case (PaymentMethod."Include In Counting") of
+                        PaymentMethod."Include In Counting"::YES:
+                            CountingType.Add('includeInCounting', 'yes');
+                        PaymentMethod."Include In Counting"::BLIND:
+                            CountingType.Add('includeInCounting', 'blind');
+                        PaymentMethod."Include In Counting"::VIRTUAL:
+                            begin
+                                CountingType.Add('includeInCounting', 'auto');
+                                CountingType.Add('countedAmount', POSPaymentBinCheckPoint."Calculated Amount Incl. Float");
+                            end;
+                    end;
+                    CountingType.Add('disableDifferenceField', false);
+
+                    PaymentMethodDenom.SetFilter("POS Payment Method Code", '=%1', POSPaymentBinCheckPoint."Payment Method No.");
+                    if (PaymentMethodDenom.FindSet()) then begin
+                        repeat
+                            CoinType.ReadFrom('{}');
+                            CoinType.Add('id', POSPaymentBinCheckPoint."Entry No.");
+                            CoinType.Add('type', PaymentMethodDenom."Denomination Type");
+                            CoinType.Add('description', StrSubstNo(CoinTypeDescLbl, PaymentMethodDenom.Denomination, PaymentMethodDenom."Denomination Type"));
+                            CoinType.Add('value', PaymentMethodDenom.Denomination);
+                            CoinTypes.Add(CoinType);
+                        until (PaymentMethodDenom.Next() = 0);
+                    end;
+
+                    CountingType.Add('coinTypes', CoinTypes);
+                    CashCounting.Add(CountingType);
+                end;
             end;
-
-            CountingType.Add('coinTypes', CoinTypes);
-            CashCounting.Add(CountingType);
 
         until (POSPaymentBinCheckPoint.Next() = 0);
     end;
@@ -225,6 +244,35 @@
         CashCount.Add('closingAndTransfer', GetClosingAndTransfer());
     end;
 
+    local procedure GetBins(BinType: Option) BinList: JsonArray
+    var
+        Bin: JsonObject;
+        Bins: Record "NPR POS Payment Bin";
+    begin
+        if (BinType = 1) then
+            Bins.SetFilter("Bin Type", '=%1', Bins."Bin Type"::BANK);
+        if (BinType = 2) then
+            Bins.SetFilter("Bin Type", '=%1', Bins."Bin Type"::SAFE);
+
+        Bins.SetFilter("Attached to POS Unit No.", '=%1|=%2', '', _POSWorkShiftCheckpoint."POS Unit No.");
+        if (Bins.FindSet()) then begin
+            repeat
+                Bin.ReadFrom('{}');
+                Bin.Add('binCode', Bins."No.");
+                Bin.Add('description', Bins.Description);
+                BinList.Add(Bin);
+            until (Bins.Next() = 0);
+        end;
+    end;
+
+    local procedure GetAvailableBins() Bins: JsonObject
+    begin
+        Bins.ReadFrom('{}');
+        Bins.Add('bankBins', GetBins(1));
+        Bins.Add('otherBins', GetBins(2));
+    end;
+
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
     local procedure OnCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
     var
@@ -240,6 +288,7 @@
 
     local procedure BalancingGetState(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
     var
+        EndOfDayProfile: Record "NPR POS End of Day Profile";
         Response: JsonObject;
         JsonText: Text;
         ResponseLbl: Label '%1 - %2', Locked = true;
@@ -253,11 +302,14 @@
 
         _POSWorkShiftCheckpoint.get(CheckpointEntryNo);
         _POSUnit.Get(_POSWorkShiftCheckpoint."POS Unit No.");
+        if (not EndOfDayProfile.Get(_POSUnit."POS End of Day Profile")) then
+            EndOfDayProfile.Init();
 
         Response.Add('caption', StrSubstNo(ResponseLbl, _POSWorkShiftCheckpoint.TableCaption(), _POSWorkShiftCheckpoint."Entry No."));
         Response.Add('statistics', GetStatistics());
         Response.Add('cashCount', GetCashCount());
-        Response.Add('isStatisticsEnabled', false);
+        Response.Add('bins', GetAvailableBins());
+        Response.Add('isStatisticsEnabled', (EndOfDayProfile."Z-Report UI" = EndOfDayProfile."Z-Report UI"::SUMMARY_BALANCING));
 
         Response.WriteTo(JsonText);
         Message(JsonText);
