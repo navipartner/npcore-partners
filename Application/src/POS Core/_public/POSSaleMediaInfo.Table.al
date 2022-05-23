@@ -66,6 +66,9 @@ table 6014681 "NPR POS Sale Media Info"
     var
         POSSaleMediaInfo: Record "NPR POS Sale Media Info";
         POSEntryMediaInfo: Record "NPR POS Entry Media Info";
+        TempBlob: Codeunit "Temp Blob";
+        InStr: InStream;
+        OutStr: OutStream;
     begin
         POSSaleMediaInfo.SetCurrentKey("Register No.", "Sales Ticket No.");
         POSSaleMediaInfo.SetRange("Register No.", POSSale."Register No.");
@@ -78,11 +81,59 @@ table 6014681 "NPR POS Sale Media Info"
             POSEntryMediaInfo.TransferFields(POSSaleMediaInfo, true, true);
             POSEntryMediaInfo."Entry No." := 0;
             POSEntryMediaInfo."Pos Entry No." := POSEntry."Entry No.";
+            if POSSaleMediaInfo.Image.HasValue then begin
+                Clear(TempBlob);
+                Clear(InStr);
+                Clear(OutStr);
+                TempBlob.CreateOutStream(OutStr);
+                POSSaleMediaInfo.Image.ExportStream(OutStr);
+                TempBlob.CreateInStream(InStr);
+                POSEntryMediaInfo.Image.ImportStream(InStr, POSEntryMediaInfo.FieldName(Image));
+            end;
             POSEntryMediaInfo.Insert(true);
         until POSSaleMediaInfo.Next() = 0;
 
         if DeleteTransfered then
             if POSSaleMediaInfo.FindSet() then
                 POSSaleMediaInfo.DeleteAll(true);
+    end;
+
+    procedure CreateNewEntry(POSSale: Record "NPR POS Sale"; GetImageFrom: Option Import,Camera)
+    var
+        POSSaleMediaInfo: Record "NPR POS Sale Media Info";
+    begin
+        InitNewEntry(POSSaleMediaInfo, POSSale);
+
+        case GetImageFrom of
+            GetImageFrom::Camera:
+                SetImageFromCamera(POSSaleMediaInfo);
+        end;
+
+        POSSaleMediaInfo.Insert(true);
+    end;
+
+    local procedure InitNewEntry(var POSSaleMediaInfo: Record "NPR POS Sale Media Info"; POSSale: Record "NPR POS Sale")
+    begin
+        POSSale.TestField("Register No.");
+        POSSale.TestField("Sales Ticket No.");
+        POSSaleMediaInfo.Init();
+        POSSaleMediaInfo."Entry No." := 0;
+        POSSaleMediaInfo."Register No." := POSSale."Register No.";
+        POSSaleMediaInfo."Sales Ticket No." := POSSale."Sales Ticket No."
+    end;
+
+    procedure SetImageFromCamera(var POSSaleMediaInfo: Record "NPR POS Sale Media Info")
+    var
+        Camera: Page Camera;
+        inStr: InStream;
+    begin
+        Clear(Camera);
+        Camera.SetQuality(50);
+        Camera.RunModal();
+        if not Camera.HasPicture() then
+            Error('');
+
+        Camera.GetPicture(inStr);
+        POSSaleMediaInfo.Image.ImportStream(inStr, POSSaleMediaInfo.FieldName(Image));
     end;
 }
