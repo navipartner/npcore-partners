@@ -162,6 +162,15 @@
                 ToolTip = 'Executes the Coupon Entries action';
                 ApplicationArea = NPRRetail;
             }
+            action("Show Archived Coupon")
+            {
+                Caption = 'Show Archived Coupons';
+                Image = PostedPutAway;
+                RunObject = Page "NPR NpDc Arch. Coupons";
+
+                ToolTip = 'Executes the Show Archived Coupons action';
+                ApplicationArea = NPRRetail;
+            }
         }
     }
 
