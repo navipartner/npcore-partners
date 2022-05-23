@@ -1,8 +1,8 @@
 ﻿report 6014403 "NPR Archived Voucher List"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     Caption = 'Archived Voucher List';
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Archived Voucher List.rdlc';
@@ -86,11 +86,19 @@
             }
             column(TotalLbl; TotalLbl)
             {
-
             }
             column(TitleLbl; TitleLbl)
             {
-
+            }
+            column(AplyedFilters; AppliedFilters)
+            {
+            }
+            dataitem("Company Information"; "Company Information")
+            {
+                DataItemTableView = sorting("Primary Key");
+                column(CompanyName; Name)
+                {
+                }
             }
         }
     }
@@ -108,8 +116,24 @@
             }
         }
     }
+
+    labels
+    {
+        CompanyLbl = 'Company: ';
+        DateAndTimeLbl = 'Date and Time: ';
+        UserLbl = 'User: ';
+        OfLbl = 'of';
+        PageLbl = 'Page';
+        TotalForLbl = 'Total for';
+    }
+
+    trigger OnPreReport()
+    begin
+        AppliedFilters := NPRNpRvArchVoucher.GetFilters;
+    end;
+
     var
         TotalLbl: Label 'Total';
-        TitleLbl: Label 'ARCHIVED VOUCHER LIST';
-
+        TitleLbl: Label 'Archived Voucher List';
+        AppliedFilters: Text;
 }
