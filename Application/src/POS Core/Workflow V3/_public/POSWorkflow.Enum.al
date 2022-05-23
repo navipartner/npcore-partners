@@ -61,26 +61,21 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'PAYMENT_CHECK', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Check Payment";
     }
-
-
     value(6184481; EFT_PEPPER_OPEN)
     {
         Caption = 'EFT_PEPPER_OPEN', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Pepper Open";
     }
-
     value(6184482; EFT_PEPPER_TRX)
     {
         Caption = 'EFT_PEPPER_TRX', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Pepper Trx";
     }
-
     value(6184483; EFT_PEPPER_CLOSE)
     {
         Caption = 'EFT_PEPPER_CLOSE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Pepper Close";
     }
-
     value(6184484; EFT_PEPPER_AUX)
     {
         Caption = 'EFT_PEPPER_AUX', Locked = true, MaxLength = 20;
@@ -91,7 +86,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_PEPPER_INSTALL', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Pepper Install";
     }
-
     value(11; CUSTOMER_SELECT)
     {
         Caption = 'CUSTOMER_SELECT', Locked = true, MaxLength = 20;
@@ -127,10 +121,14 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'TURNOVER_STATS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Turnover Stats";
     }
-
     value(18; BOARDINGPASS)
     {
         Caption = 'BOARDINGPASS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Boarding Pass";
+    }
+    value(19; TAKE_PHOTO)
+    {
+        Caption = 'TAKE_PHOTO', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Take Photo";
     }
 }
