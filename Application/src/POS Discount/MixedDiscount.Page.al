@@ -604,7 +604,7 @@
             Error(ErrorNo1);
         Clear(MixedDiscountList);
         repeat
-            if NPRMixedDiscountLine.Get(Rec.Code, Item."No.") then
+            if NPRMixedDiscountLine.Get(Rec.Code, NPRMixedDiscountLine."Disc. Grouping Type"::"Mix Discount", Item."No.", '') then
                 Error(ErrorNo2, Item."No.");
             NPRMixedDiscountLine.Init();
             NPRMixedDiscountLine.Code := Rec.Code;
