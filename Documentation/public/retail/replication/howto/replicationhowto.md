@@ -10,7 +10,9 @@ This topic describes the process of configuring the Replication Setup. As soon a
 ## Setup in the Target (Store) companies
 
 1. Open the **Replication API Setup List** page.  
-   Multiple predefined setups are created automatically and grouped according to the master data, for example customer-related data, vendor-related data, and so on.
+   By using the action **Create Default Setup**, multiple predefined setups are created and grouped according to the master data, for example customer-related data, vendor-related data, and so on.
+   
+   In a multi-company scenario, actions **Export Replication Setups** and **Import Replication Setups** can be used to export and import setups from one company to another in XML format.
 2. Open the first **CUST_NPAPI V1** setup.
 3. Enter the necessary information in order to enable the setup (the setup is disabled by default).
  > [!IMPORTANT]

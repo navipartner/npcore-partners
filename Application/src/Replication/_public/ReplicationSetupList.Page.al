@@ -39,6 +39,21 @@
     {
         area(Processing)
         {
+
+            action("Create Default Setup")
+            {
+                ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+                ToolTip = 'Creates pre-defined replication setups, replication endpoints and replication endpoint special field mappings.';
+                Image = InsertFromCheckJournal;
+                trigger OnAction()
+                begin
+                    Rec.OnRegisterService();
+                end;
+            }
             action("Update Custom Endpoints")
             {
                 ApplicationArea = NPRRetail;
@@ -60,6 +75,54 @@
                         Message(NotUpdatedCustomEnpointsMsg);
                 end;
             }
+
+            action(ImportReplicationSetups)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Import Replication Setups';
+                Image = Import;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = false;
+                PromotedOnly = true;
+                ToolTip = 'Import a file with Replication Setups.';
+
+                trigger OnAction()
+                var
+                begin
+                    XMLPORT.Run(XMLPORT::"NPR Import Replication Setup", true, true);
+                end;
+            }
+
+            action(ExportSetup)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Export Replication Setups';
+                Image = Export;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = false;
+                PromotedOnly = true;
+                ToolTip = 'Export one or more Replication Setups to a file.';
+
+                trigger OnAction()
+                var
+                    ReplicationSetup: Record "NPR Replication Service Setup";
+                    TempBlob: Codeunit "Temp Blob";
+                    FileManagement: Codeunit "File Management";
+                    ExportSetup: XMLport "NPR Export Replication Setup";
+                    OutStr: OutStream;
+                    ExportFileName: Text;
+                begin
+                    CurrPage.SetSelectionFilter(ReplicationSetup);
+                    TempBlob.CreateOutStream(OutStr);
+                    ExportSetup.SetTableView(ReplicationSetup);
+                    ExportSetup.SetDestination(OutStr);
+                    ExportSetup.Export();
+                    ExportFileName := DELCHR(Rec.TableCaption, '=', ' ') + '_' + CompanyName() + '.xml';
+                    FileManagement.BLOBExport(TempBlob, ExportFileName, true);
+                end;
+            }
         }
         area(Reporting)
         {
@@ -76,12 +139,6 @@
             }
         }
     }
-
-    trigger OnOpenPage()
-    begin
-        Rec.OnRegisterService();
-    end;
-
     var
         UpdatedCustomEnpointsMsg: Label 'Custom Endpoints updated.';
         NotUpdatedCustomEnpointsMsg: Label 'There is no code defined to update Custom Endpoints.';
