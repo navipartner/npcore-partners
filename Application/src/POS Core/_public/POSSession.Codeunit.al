@@ -32,7 +32,10 @@
 #if not CLOUD
         _Stargate: Codeunit "NPR POS Stargate Management";
 #endif
+        _SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';
+        _SESSION_FINALIZED_ERROR: Label 'This POS window is no longer active.\This happens if you''ve opened the POS in a newer window. Please use that instead or reload this one.';
         TempSessionActions: Record "NPR POS Action" temporary;
+
 
     //#region Initialization
 
@@ -55,8 +58,6 @@
 
         _Initialized := true;
         OnInitialize(_FrontEnd);
-        if GetErrorOnInitialize() then
-            Error(GetLastErrorText());
     end;
 
     internal procedure ClearAll()
@@ -92,11 +93,6 @@
     procedure IsInitialized(): Boolean
     begin
         exit(_Initialized);
-    end;
-
-    internal procedure AttachedToPageId(PageId: Guid): Boolean
-    begin
-        exit(_POSPageId = PageId);
     end;
 
     internal procedure SetPageId(PageId: Guid)
@@ -505,22 +501,26 @@
 
     procedure GetSetup(var SetupOut: Codeunit "NPR POS Setup")
     begin
+        ErrorIfNotInitialized();
         SetupOut := _Setup;
     end;
 
     procedure GetCurrentView(var ViewOut: Codeunit "NPR POS View")
     begin
+        ErrorIfNotInitialized();
         ViewOut := _CurrentView;
     end;
 
     procedure GetSaleContext(var SaleOut: Codeunit "NPR POS Sale"; var SaleLineOut: Codeunit "NPR POS Sale Line"; var PaymentLineOut: Codeunit "NPR POS Payment Line")
     begin
+        ErrorIfNotInitialized();
         SaleOut := _Sale;
         _Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
     procedure GetSale(var SaleOut: Codeunit "NPR POS Sale")
     begin
+        ErrorIfNotInitialized();
         if _Sale.PosSaleRecMustExit() then
             _Sale.RefreshCurrent();
         SaleOut := _Sale;
@@ -530,6 +530,7 @@
     var
         PaymentLineOut: Codeunit "NPR POS Payment Line";
     begin
+        ErrorIfNotInitialized();
         _Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
@@ -537,11 +538,13 @@
     var
         SaleLineOut: Codeunit "NPR POS Sale Line";
     begin
+        ErrorIfNotInitialized();
         _Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
     procedure GetDataStore(var DataStoreOut: Codeunit "NPR Data Store")
     begin
+        ErrorIfNotInitialized();
         DataStoreOut := _DataStore;
     end;
 
@@ -549,6 +552,7 @@
     [Obsolete('Remove when stargate is gone')]
     procedure GetStargate(var StargateOut: Codeunit "NPR POS Stargate Management")
     begin
+        ErrorIfNotInitialized();
         StargateOut := _Stargate;
     end;
 #endif
@@ -596,6 +600,19 @@
         Result := _ServerStopwatch;
         _ServerStopwatch := '';
     end;
+
+    procedure ErrorIfNotInitialized()
+    begin
+        if not _Initialized then
+            Error(_SESSION_MISSING);
+    end;
+
+    procedure ErrorIfPageIdMismatch(Id: Guid)
+    begin
+        if (Id <> _POSPageId) then
+            Error(_SESSION_FINALIZED_ERROR);
+    end;
+
     //#endregion
 
     //#region Data Refresh
@@ -610,11 +627,13 @@
 
     procedure ChangeViewLogin()
     begin
+        ErrorIfNotInitialized();
         _FrontEnd.LoginView(_Setup);
     end;
 
     procedure ChangeViewSale()
     begin
+        ErrorIfNotInitialized();
         _FrontEnd.SaleView(_Setup);
     end;
 
@@ -622,22 +641,26 @@
     var
         POSViewChangeWorkflowMgt: Codeunit "NPR POS View Change WF Mgt.";
     begin
+        ErrorIfNotInitialized();
         POSViewChangeWorkflowMgt.InvokeOnPaymentViewWorkflow();
         _FrontEnd.PaymentView(_Setup);
     end;
 
     procedure ChangeViewLocked()
     begin
+        ErrorIfNotInitialized();
         _FrontEnd.LockedView(_Setup);
     end;
 
     procedure ChangeViewBalancing()
     begin
+        ErrorIfNotInitialized();
         _FrontEnd.BalancingView(_Setup);
     end;
 
     procedure ChangeViewRestaurant()
     begin
+        ErrorIfNotInitialized();
         _FrontEnd.RestaurantView(_Setup);
     end;
 
@@ -650,7 +673,7 @@
         exit(_Initialized);
     end;
 
-    [Obsolete('Use session directly since it''s single instance now')]
+    [Obsolete('Use session directly since it''s single instance now, or use IsInitialized if you need to check if POS is running without error')]
     procedure GetSession(var POSSessionOut: Codeunit "NPR POS Session"; WithError: Boolean): Boolean
     var
         SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';

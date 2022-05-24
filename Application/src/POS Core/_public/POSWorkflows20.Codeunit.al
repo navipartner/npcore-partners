@@ -40,6 +40,7 @@
 
         Handled := true;
 
+        POSSession.ErrorIfNotInitialized();
         RetrieveActionContext(Context, ActionCode, WorkflowId, Workflowstep, ActionId, ActionContext);
         POSWorkflows20.InvokeAction20(ActionCode, WorkflowId, Workflowstep, ActionId, ActionContext, POSSession, FrontEnd, POSWorkflows20);
     end;
