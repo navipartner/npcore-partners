@@ -32,16 +32,17 @@
                 begin
                     if method = 'KeepAlive' then
                         exit; //exit asap to minimize overhead of idle sessions       
-                    if not _POSSession.AttachedToPageId(_PageId) then
-                        Error(_SESSION_FINALIZED_ERROR);
+                    _POSSession.ErrorIfPageIdMismatch(_PageId);
+
                     _POSSession.DebugWithTimestamp('Method:' + method);
                     _JavaScript.InvokeMethod(method, eventContext, _POSSession, _FrontEnd, _JavaScript);
                 end;
 
                 trigger OnAction("action": Text; workflowStep: Text; workflowId: Integer; actionId: Integer; context: JsonObject)
                 begin
-                    if not _POSSession.AttachedToPageId(_PageId) then
-                        Error(_SESSION_FINALIZED_ERROR);
+                    _POSSession.ErrorIfNotInitialized();
+                    _POSSession.ErrorIfPageIdMismatch(_PageId);
+
                     _POSSession.DebugWithTimestamp('Action:' + action);
                     _JavaScript.InvokeAction(CopyStr(action, 1, 20), workflowStep, workflowId, actionId, context, _POSSession, _FrontEnd, _JavaScript);
                 end;
@@ -65,7 +66,6 @@
         _POSSession: Codeunit "NPR POS Session";
         _JavaScript: Codeunit "NPR POS JavaScript Interface";
         _FrontEnd: Codeunit "NPR POS Front End Management";
-        _SESSION_FINALIZED_ERROR: Label 'This POS window is no longer active.\This happens if you''ve opened the POS in a newer window. Please use that instead or reload this one.';
         _PageId: Guid;
 }
 

@@ -36,11 +36,13 @@
         ActionId: Integer;
         ActionContext: JsonObject;
         POSWorkflows30: Codeunit "NPR POS Workflow 3.0";
+        POSSession: Codeunit "NPR POS Session";
     begin
         RetrieveActionContext(Context, ActionCode, WorkflowId, Workflowstep, ActionId, ActionContext);
         if not Enum::"NPR POS Workflow".Names().Contains(ActionCode) then
             exit(false);
 
+        POSSession.ErrorIfNotInitialized();
         POSWorkflows30.InvokeAction30(ActionCode, WorkflowId, Workflowstep, ActionId, ActionContext, FrontEnd, POSWorkflows30);
         exit(true);
     end;

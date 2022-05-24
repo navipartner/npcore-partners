@@ -487,8 +487,9 @@ codeunit 85039 "NPR French Compliance Tests"
         POSAUditProfile.Modify();
 
         // [When] We log into a new sale on POS
-        // [Then] Error
-        AssertError NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSaleWrapper);
+        // [Then] Error on init
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSaleWrapper);
+        Assert.IsTrue(_POSSession.GetErrorOnInitialize(), 'Session must be marked with error on init, which would have closed a real POS page');
         _FRAuditMgt.Destruct();
     end;
 
