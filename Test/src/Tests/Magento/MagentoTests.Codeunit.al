@@ -1,4 +1,4 @@
-codeunit 85050 "NPR MagentoTests"
+codeunit 85054 "NPR MagentoTests"
 {
     Subtype = Test;
 
