@@ -132,6 +132,16 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
+        field(6014417; "NPR POS Unit Group"; Code[20])
+        {
+            Caption = 'POS Unit Group';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Unit Group";
+            trigger OnValidate()
+            begin
+                CheckPosUnitGroupLines();
+            end;
+        }        
         field(6014420; "NPR Maximum Cash Returnsale"; Decimal)
         {
             Caption = 'Maximum Cash Returnsale';
@@ -167,6 +177,18 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         {
         }
     }
+
+    local procedure CheckPosUnitGroupLines()
+    var
+        POSUnitGroupLine: Record "NPR POS Unit Group Line";
+        EmptyLinesErr: Label 'POS Unit Group Lines are empty. Please assign POS Units to Lines before selecting POS Unit Group.';
+    begin
+        if "NPR POS Unit Group" = '' then
+            exit;
+        POSUnitGroupLine.SetRange("No.", "NPR POS Unit Group");
+        if POSUnitGroupLine.IsEmpty() then
+            Error(EmptyLinesErr);
+    end;    
 
     trigger OnAfterDelete()
     var
