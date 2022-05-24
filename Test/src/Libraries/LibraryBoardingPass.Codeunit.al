@@ -1,4 +1,4 @@
-codeunit 85051 "NPR Library - Boarding Pass"
+codeunit 85053 "NPR Library - Boarding Pass"
 {
     procedure GenerateBoardingPass(NoOfLegs: text; PassengerName: Text; TravelLegs: Text) BoardingPass: Text;
     var
