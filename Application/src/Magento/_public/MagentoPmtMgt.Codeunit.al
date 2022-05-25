@@ -583,9 +583,6 @@
         GenJnlLine."Posting Date" := PaymentLine."Posting Date";
         GenJnlLine."Document Date" := PaymentLine."Posting Date";
         GenJnlLine.Description := PaymentLine.Description;
-        GenJnlLine."Shortcut Dimension 1 Code" := SalesInvHeader."Shortcut Dimension 1 Code";
-        GenJnlLine."Shortcut Dimension 2 Code" := SalesInvHeader."Shortcut Dimension 2 Code";
-        GenJnlLine."Dimension Set ID" := SalesInvHeader."Dimension Set ID";
         GenJnlLine."Reason Code" := SalesInvHeader."Reason Code";
         GenJnlLine."Account Type" := GenJnlLine."Account Type"::Customer;
         GenJnlLine.Validate("Account No.", SalesInvHeader."Bill-to Customer No.");
@@ -620,6 +617,9 @@
         GenJnlLine."Source Code" := SourceCode;
         GenJnlLine.Validate("Salespers./Purch. Code", SalesInvHeader."Salesperson Code");
         GenJnlLine."Allow Zero-Amount Posting" := true;
+        GenJnlLine."Shortcut Dimension 1 Code" := SalesInvHeader."Shortcut Dimension 1 Code";
+        GenJnlLine."Shortcut Dimension 2 Code" := SalesInvHeader."Shortcut Dimension 2 Code";
+        GenJnlLine."Dimension Set ID" := SalesInvHeader."Dimension Set ID";
     end;
 
     local procedure InsertRefundPaymentLines(var SalesHeader: Record "Sales Header")
