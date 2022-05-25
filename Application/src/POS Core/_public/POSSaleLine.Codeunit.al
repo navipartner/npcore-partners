@@ -249,6 +249,8 @@
     var
         LocalxRec: Record "NPR POS Sale Line";
     begin
+        CheckInit(true);
+
         if Rec.FindSet(true) then
             repeat
                 OnBeforeDeletePOSSaleLine(Rec);

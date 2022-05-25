@@ -32,17 +32,6 @@ codeunit 6014538 "NPR RP Aux - Line Misc Library"
         tmpRetailList.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnBuildFunctionCodeunitList', '', false, false)]
-    local procedure OnLineBuildFunctionCodeunitList(var tmpAllObj: Record AllObj)
-    var
-        AllObj: Record AllObj;
-    begin
-        AllObj.Get(AllObj."Object Type"::Codeunit, CODEUNIT::"NPR RP Aux - Misc. Library");
-        tmpAllObj.Init();
-        tmpAllObj := AllObj;
-        tmpAllObj.Insert();
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnBuildFunctionList', '', false, false)]
     local procedure OnLineBuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List")
     begin

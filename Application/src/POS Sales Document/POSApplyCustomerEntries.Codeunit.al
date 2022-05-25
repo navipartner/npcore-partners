@@ -5,113 +5,33 @@
     TableNo = "NPR POS Sale Line";
 
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        CustLedgerEntryView: Text;
+        CustLedgEntryView: Text;
         CONFIRM_BALANCE: Label 'Do you wish to apply %1 %2 for customer %3?';
         BALANCING_OF: Label 'Balancing of %1';
 
-    procedure DeleteExistingLines(var SaleLinePOS: Record "NPR POS Sale Line")
-    begin
-        SaleLinePOS.SetRange("Register No.", SaleLinePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOS.SetFilter("Buffer Document No.", '<>%1', '');
-        SaleLinePOS.DeleteAll();
-    end;
-
-    procedure GetLineNo(var SaleLinePOS: Record "NPR POS Sale Line") LineNo: Integer
-    begin
-        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
-        SaleLinePOS.SetRange("Register No.", SaleLinePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOS.SetFilter("Buffer Document No.", '<>%1', '');
-        if SaleLinePOS.Find('+') then
-            LineNo := SaleLinePOS."Line No."
-        else
-            LineNo := 10000;
-    end;
-
-    procedure CheckCurrency(ApplicationCurrencyCode: Code[10]; CompareToCurrencyCode: Code[10]; AccountType: Option "G/L",Customer,Vendor,Bank,"Fixed Asset"; ShowError: Boolean): Boolean
+    procedure DeleteExistingLines(SalePOS: Record "NPR POS Sale")
     var
-        Currency: Record Currency;
-        Currency2: Record Currency;
-        SalesReceivablesSetup: Record "Sales & Receivables Setup";
-        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
-        CurrencyApplication: Option "None",EMU,All;
-        Txt001: Label 'All Ledger Entries must be the same currency';
-        Txt002: Label 'All Ledger Entries must be the same currency,or in one or more of the EMU-Currencies';
-        Txt003: Label 'All Ledger Entries on a Vendor must be the same currency';
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        if (ApplicationCurrencyCode = CompareToCurrencyCode) then
-            exit(true);
-
-        case AccountType of
-            AccountType::Customer:
-                begin
-                    SalesReceivablesSetup.Get();
-                    CurrencyApplication := SalesReceivablesSetup."Appln. between Currencies";
-                    case CurrencyApplication of
-                        CurrencyApplication::None:
-                            begin
-                                if ApplicationCurrencyCode <> CompareToCurrencyCode then
-                                    if ShowError then
-                                        Error(Txt001)
-                                    else
-                                        exit(false);
-                            end;
-                        CurrencyApplication::EMU:
-                            begin
-                                GeneralLedgerSetup.Get();
-                                if not Currency.Get(ApplicationCurrencyCode) then
-                                    Currency."EMU Currency" := GeneralLedgerSetup."EMU Currency";
-                                if not Currency2.Get(CompareToCurrencyCode) then
-                                    Currency2."EMU Currency" := GeneralLedgerSetup."EMU Currency";
-                                if not Currency."EMU Currency" or not Currency2."EMU Currency" then
-                                    if ShowError then
-                                        Error(Txt002)
-                                    else
-                                        exit(false);
-                            end;
-                    end;
-                end;
-            AccountType::Vendor:
-                begin
-                    PurchasesPayablesSetup.Get();
-                    CurrencyApplication := PurchasesPayablesSetup."Appln. between Currencies";
-                    case CurrencyApplication of
-                        CurrencyApplication::None:
-                            begin
-                                if ApplicationCurrencyCode <> CompareToCurrencyCode then
-                                    if ShowError then
-                                        Error(Txt003)
-                                    else
-                                        exit(false);
-                            end;
-                        CurrencyApplication::EMU:
-                            begin
-                                GeneralLedgerSetup.Get();
-                                if not Currency.Get(ApplicationCurrencyCode) then
-                                    Currency."EMU Currency" := GeneralLedgerSetup."EMU Currency";
-                                if not Currency2.Get(CompareToCurrencyCode) then
-                                    Currency2."EMU Currency" := GeneralLedgerSetup."EMU Currency";
-                                if not Currency."EMU Currency" or not Currency2."EMU Currency" then
-                                    if ShowError then
-                                        Error(Txt002)
-                                    else
-                                        exit(false);
-                            end;
-                    end;
-                end;
-        end;
-
-        exit(true);
+        FilterPosSaleLines(SalePOS, SaleLinePOS);
+        if not SaleLinePOS.IsEmpty() then
+            SaleLinePOS.DeleteAll();
     end;
 
-    procedure SetCustLedgerEntryView(TableView: Text)
+    local procedure FilterPosSaleLines(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
-        CustLedgerEntryView := TableView;
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter("Buffer Document No.", '<>%1', '');
     end;
 
-    procedure SelectCustomerEntries(var POSSession: Codeunit "NPR POS Session"; CustLedgerEntryView: Text)
+    procedure SetCustLedgEntryView(TableView: Text)
+    begin
+        CustLedgEntryView := TableView;
+    end;
+
+    procedure SelectCustomerEntries(var POSSession: Codeunit "NPR POS Session"; CustLedgEntryView: Text)
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
@@ -119,7 +39,9 @@
         SalePOS: Record "NPR POS Sale";
         CustLedgEntry: Record "Cust. Ledger Entry";
         POSApplyCustomerEntries: Page "NPR POS Apply Cust. Entries";
-        CustomerEntriesLbl: Label '%1-%2', Locked = true;
+        AppliesToID: Code[20];
+        Confirmed: Boolean;
+        AppliesToIDLbl: Label '%1-%2', Locked = true;
     begin
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -127,30 +49,39 @@
 
         SalePOS.TestField("Customer No.");
         SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-        if CustLedgerEntryView <> '' then
-            CustLedgEntry.SetView(CustLedgerEntryView);
+        AppliesToID := StrSubstNo(AppliesToIDLbl, SalePOS."Register No.", SalePOS."Sales Ticket No.");
+        RestoreAppliesToIDMarks(SalePOS, AppliesToID);
+
+        if CustLedgEntryView <> '' then
+            CustLedgEntry.SetView(CustLedgEntryView)
+        else
+            CustLedgEntry.SetCurrentKey("Customer No.", Open);
         CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
         CustLedgEntry.SetRange(Open, true);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS."Buffer ID" := StrSubstNo(CustomerEntriesLbl, SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
-        POSApplyCustomerEntries.SetSalesLine(SaleLinePOS, SaleLinePOS.FieldNo("Buffer ID"));
+        SaleLinePOS."Buffer ID" := AppliesToID;
+        POSApplyCustomerEntries.SetPOSSaleLine(SalePOS, SaleLinePOS, SaleLinePOS.FieldNo("Buffer ID"));
         POSApplyCustomerEntries.SetRecord(CustLedgEntry);
         POSApplyCustomerEntries.SetTableView(CustLedgEntry);
         POSApplyCustomerEntries.LookupMode(true);
-        if POSApplyCustomerEntries.RunModal() <> ACTION::LookupOK then
-            exit;
-        DeleteExistingLines(SaleLinePOS);
-        POSSaleLine.RefreshCurrent();
+        Confirmed := POSApplyCustomerEntries.RunModal() = ACTION::LookupOK;
 
         CustLedgEntry.Reset();
+        CustLedgEntry.SetCurrentKey("Customer No.", "Applies-to ID", Open);
         CustLedgEntry.SetAutoCalcFields("Remaining Amount");
         CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
+        CustLedgEntry.SetRange("Applies-to ID", AppliesToID);
         CustLedgEntry.SetRange(Open, true);
-        CustLedgEntry.SetRange("Applies-to ID", UserId);
-
         if not CustLedgEntry.FindSet() then
             exit;
+        if not Confirmed then begin
+            ClearAppliesToID(CustLedgEntry);
+            exit;
+        end;
+        DeleteExistingLines(SalePOS);
+        POSSaleLine.RefreshCurrent();
 
+        ClearAcceptedPmtTolerance(CustLedgEntry);
         repeat
             CreateApplyingPOSSaleLine(POSSaleLine, CustLedgEntry);
         until CustLedgEntry.Next() = 0;
@@ -158,7 +89,7 @@
 
     procedure BalanceDocument(var POSSession: Codeunit "NPR POS Session"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; Silent: Boolean)
     var
-        CustLedgerEntry: Record "Cust. Ledger Entry";
+        CustLedgEntry: Record "Cust. Ledger Entry";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -170,75 +101,159 @@
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
 
-        CustLedgerEntry.SetAutoCalcFields("Remaining Amount");
-        CustLedgerEntry.SetRange("Document Type", DocumentType);
-        CustLedgerEntry.SetRange("Document No.", DocumentNo);
+        CustLedgEntry.SetAutoCalcFields("Remaining Amount");
+        CustLedgEntry.SetRange("Document Type", DocumentType);
+        CustLedgEntry.SetRange("Document No.", DocumentNo);
         if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
             if SalePOS."Customer No." <> '' then
-                CustLedgerEntry.SetRange("Customer No.", SalePOS."Customer No.");
-        CustLedgerEntry.FindFirst();
-        CustLedgerEntry.TestField(Open);
+                CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
+        CustLedgEntry.FindFirst();
+        CustLedgEntry.TestField(Open);
 
         if not Silent then
-            if not Confirm(StrSubstNo(CONFIRM_BALANCE, CustLedgerEntry."Document Type", CustLedgerEntry."Document No.", CustLedgerEntry."Customer No."), true) then
+            if not Confirm(StrSubstNo(CONFIRM_BALANCE, CustLedgEntry."Document Type", CustLedgEntry."Document No.", CustLedgEntry."Customer No."), true) then
                 Error('');
 
         if SalePOS."Customer No." = '' then begin
             SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-            SalePOS.Validate("Customer No.", CustLedgerEntry."Customer No.");
+            SalePOS.Validate("Customer No.", CustLedgEntry."Customer No.");
             SalePOS.Modify();
             POSSale.RefreshCurrent();
         end else begin
             SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-            SalePOS.TestField("Customer No.", CustLedgerEntry."Customer No.");
+            SalePOS.TestField("Customer No.", CustLedgEntry."Customer No.");
         end;
 
-        CreateApplyingPOSSaleLine(POSSaleLine, CustLedgerEntry);
+        CreateApplyingPOSSaleLine(POSSaleLine, CustLedgEntry);
     end;
 
-    local procedure CreateApplyingPOSSaleLine(var POSSaleLine: Codeunit "NPR POS Sale Line"; CustLedgerEntry: Record "Cust. Ledger Entry")
+    local procedure CreateApplyingPOSSaleLine(var POSSaleLine: Codeunit "NPR POS Sale Line"; CustLedgEntry: Record "Cust. Ledger Entry")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        GenJnlApply: Codeunit "Gen. Jnl.-Apply";
+        ApplnAmountToApply: Decimal;
         LineAmount: Decimal;
     begin
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
 
+        GenJnlApply.CheckAgainstApplnCurrency(SaleLinePOS."Currency Code", CustLedgEntry."Currency Code", "Gen. Journal Account Type"::Customer, true);
         if (SaleLinePOS.Type = SaleLinePOS.Type::Customer) and
-   (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Deposit) and
-     (CustLedgerEntry."Document Type" = CustLedgerEntry."Document Type"::Invoice) and
-       (SaleLinePOS.Date <= CustLedgerEntry."Pmt. Discount Date") then
-            LineAmount := (CustLedgerEntry."Remaining Amount" - CustLedgerEntry."Original Pmt. Disc. Possible")
+           (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Deposit) and
+           (CustLedgEntry."Document Type" = CustLedgEntry."Document Type"::Invoice) and
+           (SaleLinePOS.Date <= CustLedgEntry."Pmt. Discount Date")
+        then
+            LineAmount := (CustLedgEntry."Remaining Amount" - CustLedgEntry."Original Pmt. Disc. Possible")
         else
-            LineAmount := CustLedgerEntry."Remaining Amount";
+            LineAmount := CustLedgEntry."Remaining Amount";
+
+        if CustLedgEntry."Currency Code" = SaleLinePOS."Currency Code" then
+            ApplnAmountToApply := CustLedgEntry."Amount to Apply"
+        else begin
+            ApplnAmountToApply := ConvertFromCurrency(SaleLinePOS.Date, CustLedgEntry."Currency Code", SaleLinePOS."Currency Code", CustLedgEntry."Amount to Apply");
+            LineAmount := ConvertFromCurrency(SaleLinePOS.Date, CustLedgEntry."Currency Code", SaleLinePOS."Currency Code", LineAmount);
+        end;
+        if (ApplnAmountToApply < LineAmount) and (ApplnAmountToApply <> 0) then
+            LineAmount := ApplnAmountToApply;
 
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
         SaleLinePOS.Type := SaleLinePOS.Type::Customer;
-        SaleLinePOS.Validate("No.", CustLedgerEntry."Customer No.");
-        SaleLinePOS."Buffer Document Type" := CustLedgerEntry."Document Type";
-        SaleLinePOS."Buffer Document No." := CustLedgerEntry."Document No.";
-        SaleLinePOS."Buffer ID" := CopyStr(SaleLinePOS."Register No." + '-' + SaleLinePOS."Sales Ticket No.", 1, MaxStrLen(SaleLinePOS."Buffer ID"));
+        SaleLinePOS.Validate("No.", CustLedgEntry."Customer No.");
+        SaleLinePOS."Buffer Document Type" := CustLedgEntry."Document Type";
+        SaleLinePOS."Buffer Document No." := CustLedgEntry."Document No.";
+        SaleLinePOS."Buffer ID" := CustLedgEntry."Applies-to ID";
 
-        case CustLedgerEntry."Document Type" of
-            CustLedgerEntry."Document Type"::Invoice:
-                begin
-                    SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::INVOICE;
-                    SaleLinePOS."Posted Sales Document No." := CustLedgerEntry."Document No.";
-                end;
-            CustLedgerEntry."Document Type"::"Credit Memo":
-                begin
-                    SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO;
-                    SaleLinePOS."Posted Sales Document No." := CustLedgerEntry."Document No.";
-                end;
+        case CustLedgEntry."Document Type" of
+            CustLedgEntry."Document Type"::Invoice:
+                SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::INVOICE;
+            CustLedgEntry."Document Type"::"Credit Memo":
+                SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO;
         end;
+        SaleLinePOS."Posted Sales Document No." := CustLedgEntry."Document No.";
 
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Validate("Unit Price", LineAmount);
-        SaleLinePOS.Description := StrSubstNo(BALANCING_OF, CustLedgerEntry.Description);
-
-        CheckCurrency(SaleLinePOS."Currency Code", CustLedgerEntry."Currency Code", 1, true);
+        SaleLinePOS.Description := StrSubstNo(BALANCING_OF, CustLedgEntry.Description);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
 
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+
+        CustLedgEntry.SetRecFilter();
+        ClearAppliesToID(CustLedgEntry);
+    end;
+
+    local procedure ClearAppliesToID(var CustLedgEntry: Record "Cust. Ledger Entry")
+    var
+        ApplyingCustLedgEntry: Record "Cust. Ledger Entry";
+        CustEntrySetApplID: Codeunit "Cust. Entry-SetAppl.ID";
+    begin
+        CustEntrySetApplID.SetApplId(CustLedgEntry, ApplyingCustLedgEntry, '');
+    end;
+
+    local procedure ConvertFromCurrency(Date: Date; FromCurrencyCode: Code[10]; ToCurrencyCode: Code[10]; Amount: Decimal): Decimal
+    var
+        Currency: Record Currency;
+        CurrExchRate: Record "Currency Exchange Rate";
+        ValidExchRate: Boolean;
+    begin
+        ValidExchRate := true;
+        if ToCurrencyCode <> '' then
+            Currency.Get(ToCurrencyCode)
+        else
+            Currency.InitRoundingPrecision();
+        exit(Round(CurrExchRate.ApplnExchangeAmtFCYToFCY(Date, FromCurrencyCode, ToCurrencyCode, Amount, ValidExchRate), Currency."Amount Rounding Precision"));
+    end;
+
+    local procedure ClearAcceptedPmtTolerance(CustLedgEntry: Record "Cust. Ledger Entry")
+    var
+        AppliedCustLedgEntry: Record "Cust. Ledger Entry";
+    begin
+        if CustLedgEntry."Applies-to ID" = '' then
+            exit;
+        AppliedCustLedgEntry.SetCurrentKey("Customer No.", "Applies-to ID", Open);
+        AppliedCustLedgEntry.SetRange("Customer No.", CustledgEntry."Customer No.");
+        AppliedCustLedgEntry.SetRange(Open, true);
+        AppliedCustLedgEntry.SetRange("Applies-to ID", CustLedgEntry."Applies-to ID");
+        if AppliedCustLedgEntry.FindSet(true) then
+            repeat
+                AppliedCustLedgEntry."Accepted Payment Tolerance" := 0;
+                AppliedCustLedgEntry."Accepted Pmt. Disc. Tolerance" := false;
+                AppliedCustLedgEntry.Modify();
+            until AppliedCustLedgEntry.Next() = 0;
+    end;
+
+    local procedure RestoreAppliesToIDMarks(SalePOS: Record "NPR POS Sale"; AppliesToID: Code[20])
+    var
+        ApplyingCustLedgEntry: Record "Cust. Ledger Entry";
+        CustLedgEntry: Record "Cust. Ledger Entry";
+        CustLedgEntry2: Record "Cust. Ledger Entry";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        CustEntrySetApplID: Codeunit "Cust. Entry-SetAppl.ID";
+        ApplnAmountToApply: Decimal;
+    begin
+        FilterPosSaleLines(SalePOS, SaleLinePOS);
+        if not SaleLinePOS.FindSet() then
+            exit;
+        CustLedgEntry.SetCurrentKey("Document No.");
+        CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
+        CustLedgEntry.SetRange(Open, true);
+        repeat
+            CustLedgEntry.SetRange("Document No.", SaleLinePOS."Buffer Document No.");
+            CustLedgEntry.SetRange("Document Type", SaleLinePOS."Buffer Document Type");
+            if CustLedgEntry.FindFirst() then begin
+                CustLedgEntry2 := CustLedgEntry;
+                CustLedgEntry2.SetRecFilter();
+                CustEntrySetApplID.SetApplId(CustLedgEntry2, ApplyingCustLedgEntry, AppliesToID);
+                CustLedgEntry2.Find();
+                if CustLedgEntry."Currency Code" = SaleLinePOS."Currency Code" then
+                    ApplnAmountToApply := SaleLinePOS."Amount Including VAT"
+                else
+                    ApplnAmountToApply := ConvertFromCurrency(SaleLinePOS.Date, SaleLinePOS."Currency Code", CustLedgEntry."Currency Code", SalePOS."Amount Including VAT");
+                if (Abs(CustLedgEntry2."Amount to Apply") > Abs(ApplnAmountToApply)) and (CustLedgEntry2."Amount to Apply" * ApplnAmountToApply > 0) then begin
+                    CustLedgEntry2.Validate("Amount to Apply", ApplnAmountToApply);
+                    CustLedgEntry2.Modify();
+                end;
+            end;
+        until SaleLinePOS.Next() = 0;
+        Commit();
     end;
 }
-

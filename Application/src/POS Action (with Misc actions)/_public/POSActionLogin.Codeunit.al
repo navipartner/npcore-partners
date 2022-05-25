@@ -77,6 +77,7 @@
 
     local procedure OpenPosUnit(FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup"; POSSession: Codeunit "NPR POS Session")
     var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSUnit: Record "NPR POS Unit";
         BalanceAge: Integer;
         IsManagedPOS: Boolean;
@@ -90,6 +91,9 @@
 
         Setup.GetPOSUnit(POSUnit);
         POSUnit.Get(POSUnit."No.");
+
+        Setup.GetSalespersonRecord(SalespersonPurchaser);
+        CheckPosUnitGroup(SalespersonPurchaser, POSUnit."No.");
 
         BalanceAge := DaysSinceLastBalance(POSUnit."No.");
 
@@ -256,6 +260,19 @@
 
         IF TODAY - POSEntry."Entry Date" >= 1 THEN
             exit(Today - DT2Date(POSWorkshiftCheckpoint."Created At"));
+    end;
+
+    internal procedure CheckPosUnitGroup(SalespersonPurchaser: Record "Salesperson/Purchaser"; POSUnitNo: Code[20])
+    var
+        POSUnitGroupLine: Record "NPR POS Unit Group Line";
+        SalesPersonNotAllowedErr: Label 'Salesperson %1 is not allowed to access POS Unit %2', Comment = '%1 = Salesperson Name; %2 = Pos Unit No.';
+    begin
+        if SalespersonPurchaser."NPR POS Unit Group" = '' then
+            exit;
+        POSUnitGroupLine.SetRange("POS Unit", POSUnitNo);
+        POSUnitGroupLine.SetRange("No.", SalespersonPurchaser."NPR POS Unit Group");
+        if POSUnitGroupLine.IsEmpty() then
+            Error(SalesPersonNotAllowedErr, SalespersonPurchaser.Name, POSUnitNo);
     end;
 
     [IntegrationEvent(false, false)]

@@ -102,14 +102,19 @@
 
     local procedure OpenPosUnit(FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup"; POSSession: Codeunit "NPR POS Session")
     var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSUnit: Record "NPR POS Unit";
         BalanceAge: Integer;
+        POSActionLogin: Codeunit "NPR POS Action - Login";
     begin
         // This should be inside the START_POS workflow
         // But to save a roundtrip and because nested workflows are not perfect yet, I have kept this part here
 
         Setup.GetPOSUnit(POSUnit);
         POSUnit.Get(POSUnit."No.");
+
+        Setup.GetSalespersonRecord(SalespersonPurchaser);
+        POSActionLogin.CheckPosUnitGroup(SalespersonPurchaser, POSUnit."No.");        
 
         BalanceAge := DaysSinceLastBalance(POSUnit."No.");
 

@@ -69,6 +69,7 @@
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
+        POSActionLogin: Codeunit "NPR POS Action - Login";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -79,6 +80,8 @@
         SalespersonPurchaser.FilterGroup(0);
         if PAGE.RunModal(0, SalespersonPurchaser) <> ACTION::LookupOK then
             exit;
+
+        POSActionLogin.CheckPosUnitGroup(SalespersonPurchaser, SalePOS."Register No.");
 
         ApplySalespersonCode(SalespersonPurchaser.Code, POSSession);
         POSSession.RequestRefreshData();
