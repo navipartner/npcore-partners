@@ -1,6 +1,7 @@
 ﻿codeunit 6150792 "NPR POS Action - Discount"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This is a built-in action for handling discount';
         TotalAmountLabel: Label 'Type in the total amount that you want for the whole sales';
@@ -727,7 +728,7 @@
     var
         PrevRec: Text;
     begin
-        if not (SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::"Debit Sale"]) then
+        if not (SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::"Debit Sale", SaleLinePOS."Sale Type"::Deposit]) then
             Error(Text005, SaleLinePOS."Sale Type");
         if SaleLinePOS.Type = SaleLinePOS.Type::Comment then
             Error(Text005, SaleLinePOS.Type);

@@ -26,6 +26,11 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                     ToolTip = 'Enable assigning the salesperson to a specific POS unit.';
                     ApplicationArea = NPRRetail;
                 }
+                field("NPR POS Unit Group"; Rec."NPR POS Unit Group")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the group of POS Units that Salesperson can access.';
+                }                
             }
         }
     }
