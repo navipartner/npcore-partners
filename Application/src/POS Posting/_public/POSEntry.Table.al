@@ -559,6 +559,7 @@
         { }
         key(Key13; "Posting Date", "Sales Document Type", "Sales Document No.")
         { }
+        key(Key14; "Post Item Entry Status") { }
     }
 
     fieldgroups
