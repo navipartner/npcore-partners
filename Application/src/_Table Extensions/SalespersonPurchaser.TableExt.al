@@ -99,6 +99,8 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             Description = 'NPR7.100.000';
             FieldClass = FlowFilter;
             TableRelation = "NPR POS Unit";
+            ObsoleteReason = 'Not used.';
+            ObsoleteState = Removed;
         }
         field(6014411; "NPR Global Dimension 1 Filter"; Code[20])
         {
@@ -141,7 +143,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             begin
                 CheckPosUnitGroupLines();
             end;
-        }        
+        }
         field(6014420; "NPR Maximum Cash Returnsale"; Decimal)
         {
             Caption = 'Maximum Cash Returnsale';
@@ -188,7 +190,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         POSUnitGroupLine.SetRange("No.", "NPR POS Unit Group");
         if POSUnitGroupLine.IsEmpty() then
             Error(EmptyLinesErr);
-    end;    
+    end;
 
     trigger OnAfterDelete()
     var
