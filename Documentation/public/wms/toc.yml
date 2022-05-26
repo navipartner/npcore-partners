@@ -10,6 +10,8 @@
     href: explanation/cs-uis.md
   - name: Capture service users
     href: explanation/cs-users.md
+  - name: CS logs
+    href: explanation/cs_logs.md
   - name: Main header setup
     href: explanation/main-header-setup.md
 

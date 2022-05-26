@@ -20,7 +20,5 @@
     href: howto/balance_the_pos.md
   - name: Configure an opening mechanism for a POS unit cash drawer
     href: howto/ConfigureCashDrawerOpening.md
-  - name: Insert the initial float for a POS Unit
-    href: howto/POSInsertInitialFloat.md
   - name: Change the POS unit receipt footer text
     href: howto/POSUnitReceiptFooter.md
