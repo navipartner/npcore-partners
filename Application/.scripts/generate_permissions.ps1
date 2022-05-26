@@ -85,6 +85,9 @@ function AddFileToArray {
             $pragmaExist = 1
             $pragmaText = $line
         }
+        elseif ($line -match '^(\bpermissionset\b)[\s\n]*') {        
+            $insertedObject = 1
+        }
         if ($insertedObject -eq 1) {
             return
         }
