@@ -1,8 +1,8 @@
 # Capture Service Setup (CS Setup)
 
-Before you start using NP WMS, you must configure the rules which define how NP WMS will work. This is done in the **CS Setup** administrative section.
+Before you start using NP WMS, you need to configure the rules which define how it will work. This is done in the **CS Setup** administrative section.
 
-If comprises on of the following groups
+CS setup options consist of the following sections:
 
 - **General Setup** - general settings for the Capture Service.
 - **Stock Take** - settings for the Stock Take module.
@@ -15,10 +15,14 @@ If comprises on of the following groups
 - **Job Queue** - settings related to Job queue processing.
 - **Azure Printing** - settings related to printing.
 
+From **CS Setup** you can also set up [CS users](../howto/set-up-cs-users.md), devices, and mobile app UI.
+
+> [!Note]
+> You can also access one of the [logs](cs_logs.md) in **CS Setup** if you encounter unforeseen issues in the environment. 
+
 
 ### Related Links
 
-- [Setup CS users](../howto/set-up-cs-users.md)
 - [Create QR codes](../howto/create-qr-codes.md)
 - [Set up Warehouse users](../howto/set-up-warehouse-users.md)
 - [Set up CS](../howto/set-up-cssetup.md)
