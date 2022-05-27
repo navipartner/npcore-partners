@@ -285,6 +285,12 @@
         Reservation.SetReservationResult(ImportEntry."Document ID");
     end;
 
+    [Obsolete('Pending removal, use RevokeTicketReservation(var TicketRevoke: XmlPort "NPR TM Ticket Revoke") instead.')]
+    procedure RevokeTicketReservation()
+    begin
+
+    end;
+
     procedure RevokeTicketReservation(var TicketRevoke: XmlPort "NPR TM Ticket Revoke")
     var
         ImportEntry: Record "NPR Nc Import Entry";

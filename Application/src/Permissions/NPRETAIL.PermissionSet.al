@@ -1,10 +1,10 @@
 #if not BC17
 permissionset 6014400 "NPR NP RETAIL"
 {
-Access = Internal;
-Assignable = true;
-Caption = 'NP Retail', Locked = true;
-Permissions =
+    Access = Internal;
+    Assignable = true;
+    Caption = 'NP Retail', Locked = true;
+    Permissions =
 codeunit "NPR Accessory Unfold Mgt." = X,
 codeunit "NPR Att. Item Search" = X,
 codeunit "NPR Attribute Management" = X,
@@ -2466,7 +2466,7 @@ report "NPR Sales per week year/Last" = X,
 report "NPR Salesp./Item Cat Top 20" = X,
 report "NPR Sales Statistics By Dept." = X,
 report "NPR Sales Stats Per Variety" = X,
-report "NPR Sales St. by Item Category" = X,
+report "NPR Sales Stats w/ Variants" = X,
 report "NPR Sale Statistics per Vendor" = X,
 report "NPR Sales Ticket A4 - POS Rdlc" = X,
 report "NPR Sale Time Report POS" = X,
