@@ -60,18 +60,18 @@
                 field("POS Store Code"; Rec."POS Store Code")
                 {
                     Visible = not IsSimpleView;
-                    ToolTip = 'Specifies the value of the POS Store Code field';
+                    ToolTip = 'Specifies POS Store from which the POS entry has been created.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies POS unit number that has been used for processing this transaction.';
                     ApplicationArea = NPRRetail;
                     Visible = not IsSimpleView;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ToolTip = 'Specifies the person that has been working on this transaction.';
                     ApplicationArea = NPRRetail;
                     Visible = not IsSimpleView;
                 }
@@ -84,13 +84,13 @@
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     Visible = not IsSimpleView;
-                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
+                    ToolTip = 'Specifies the code for a global dimension that is linked to the record or entry for analysis purposes';
                     ApplicationArea = NPRRetail;
                 }
                 field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
                     Visible = not IsSimpleView;
-                    ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
+                    ToolTip = 'Specifies the code for a global dimension that is linked to the record or entry for analysis purposes. ';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry Type"; Rec."Entry Type")
@@ -105,7 +105,7 @@
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-                    ToolTip = 'Specifies the value of the Customer No. field';
+                    ToolTip = 'Specifies the customer account number that the entry is linked to.';
                     ApplicationArea = NPRRetail;
                     Visible = not IsSimpleView;
                 }
