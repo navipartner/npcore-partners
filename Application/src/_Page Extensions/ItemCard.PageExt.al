@@ -189,13 +189,11 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     trigger OnDrillDown()
                     var
                         PeriodDiscountLine: Record "NPR Period Discount Line";
-                        CampaignDiscountLines: Page "NPR Campaign Discount Lines";
+                        CampaignDiscLineList: Page "NPR Campaign Disc. Line List";
                     begin
-                        CampaignDiscountLines.Editable(false);
-                        PeriodDiscountLine.Reset();
                         PeriodDiscountLine.SetRange("Item No.", Rec."No.");
-                        CampaignDiscountLines.SetTableView(PeriodDiscountLine);
-                        CampaignDiscountLines.RunModal();
+                        CampaignDiscLineList.SetTableView(PeriodDiscountLine);
+                        CampaignDiscLineList.RunModal();
                     end;
                 }
             }
@@ -1227,15 +1225,12 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     trigger OnAction()
                     var
                         PeriodDiscountLine: Record "NPR Period Discount Line";
-                        CampaignDiscountLines: Page "NPR Campaign Discount Lines";
+                        CampaignDiscLineList: Page "NPR Campaign Disc. Line List";
                     begin
-                        CLEAR(CampaignDiscountLines);
-                        CampaignDiscountLines.EDITABLE(FALSE);
-                        PeriodDiscountLine.Reset();
-                        PeriodDiscountLine.SETRANGE(Status, PeriodDiscountLine.Status::Active);
-                        PeriodDiscountLine.SETRANGE("Item No.", Rec."No.");
-                        CampaignDiscountLines.SETTABLEVIEW(PeriodDiscountLine);
-                        CampaignDiscountLines.RunModal();
+                        PeriodDiscountLine.SetRange(Status, PeriodDiscountLine.Status::Active);
+                        PeriodDiscountLine.SetRange("Item No.", Rec."No.");
+                        CampaignDiscLineList.SetTableView(PeriodDiscountLine);
+                        CampaignDiscLineList.RunModal();
                     end;
                 }
                 action("NPR MixDiscount")
