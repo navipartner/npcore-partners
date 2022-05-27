@@ -1878,6 +1878,25 @@
         end;
     end;
 
+    [Obsolete('Pending removal, not used')]
+    procedure TransferToService()
+    var
+        ServiceItem: Record "Service Item";
+    begin
+        GetPOSHeader();
+        ServiceItem.Init();
+        ServiceItem.Insert(true);
+        ServiceItem.Validate("Item No.", "No.");
+        ServiceItem.Validate("Serial No.", "Serial No.");
+        ServiceItem.Validate(Status, ServiceItem.Status::Installed);
+        ServiceItem.Validate("Warranty Starting Date (Labor)", SalePOS.Date);
+        ServiceItem.Validate("Warranty Ending Date (Labor)", CalcDate('<+1Y>', SalePOS.Date));
+        ServiceItem.Validate("Customer No.", SalePOS."Customer No.");
+        ServiceItem.Validate("Unit of Measure Code", "Unit of Measure Code");
+        ServiceItem.Validate("Sales Date", SalePOS.Date);
+        ServiceItem.Modify();
+    end;
+
     procedure ExplodeBOM(ItemNo: Code[20]; StartLineNo: Integer; EndLineNo: Integer; var Level: Integer; UnitPrice: Decimal; "Sum": Decimal)
     var
         BOMComponent: Record "BOM Component";
