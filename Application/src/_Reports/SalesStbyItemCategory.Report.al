@@ -1,4 +1,4 @@
-﻿report 6014457 "NPR Sales St. by Item Category"
+﻿report 6014457 "NPR Sales Stat/Analysis"
 {
 #IF NOT BC17
     Extensible = False;

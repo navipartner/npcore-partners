@@ -495,7 +495,7 @@
                         {
                             Caption = 'Sales Statistics by Item Category';
                             Image = Report;
-                            RunObject = Report "NPR Sales St. by Item Category";
+                            RunObject = Report "NPR Sales Stat/Analysis";
 
                             ToolTip = 'Generate the Turnover/Profit report per category.';
                             ApplicationArea = NPRRetail;
