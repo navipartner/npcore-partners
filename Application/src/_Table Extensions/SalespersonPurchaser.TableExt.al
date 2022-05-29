@@ -133,6 +133,8 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             Caption = 'Locked-to POS Unit No.';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
+            ObsoleteReason = 'Replaced with POS Unit Group field.';
+            ObsoleteState = Pending;
         }
         field(6014417; "NPR POS Unit Group"; Code[20])
         {
