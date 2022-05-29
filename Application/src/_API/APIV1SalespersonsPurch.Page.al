@@ -78,11 +78,6 @@ page 6014636 "NPR APIV1 - Salespersons/Purch"
                     Caption = 'Register Password', Locked = true;
                 }
 
-                field(nprLockedToRegisterNo; Rec."NPR Locked-to Register No.")
-                {
-                    Caption = 'Locked-to Register No.', Locked = true;
-                }
-
                 field(nprMaximumCashReturnsale; Rec."NPR Maximum Cash Returnsale")
                 {
                     Caption = 'Maximum Cash Returnsale', Locked = true;
