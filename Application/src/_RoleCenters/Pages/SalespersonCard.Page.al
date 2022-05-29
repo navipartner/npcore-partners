@@ -78,17 +78,11 @@
                     ToolTip = 'Specifies the value of the NPR POS Unit Password field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Locked-to Register No."; Rec."NPR Locked-to Register No.")
-                {
-
-                    ToolTip = 'Specifies the value of the NPR Locked-to POS Unit No. field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("NPR POS Unit Group"; Rec."NPR POS Unit Group")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the group of POS Units that Salesperson can access.';
-                }                
+                }
             }
             group(Retail)
             {

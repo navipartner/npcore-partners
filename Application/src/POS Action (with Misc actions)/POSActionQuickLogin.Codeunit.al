@@ -1,6 +1,7 @@
 ﻿codeunit 6150845 "NPR POS Action: Quick Login"
 {
     Access = Internal;
+
     var
         Text000: Label 'Quick Login - change Salesperson on current POS Sale';
         ReadingErr: Label 'reading in %1';
@@ -75,9 +76,6 @@
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find();
         if SalespersonPurchaser.Get(SalePOS."Salesperson Code") then;
-        SalespersonPurchaser.FilterGroup(2);
-        SalespersonPurchaser.SetFilter("NPR Locked-to Register No.", '%1|%2', '', SalePOS."Register No.");
-        SalespersonPurchaser.FilterGroup(0);
         if PAGE.RunModal(0, SalespersonPurchaser) <> ACTION::LookupOK then
             exit;
 

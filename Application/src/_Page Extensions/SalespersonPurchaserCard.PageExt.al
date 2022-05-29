@@ -22,15 +22,18 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                 }
                 field("NPR Locked-to Register No."; Rec."NPR Locked-to Register No.")
                 {
-
                     ToolTip = 'Enable assigning the salesperson to a specific POS unit.';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
+                    Enabled = false;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Replaced with POS Unit Group field.';
                 }
                 field("NPR POS Unit Group"; Rec."NPR POS Unit Group")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the group of POS Units that Salesperson can access.';
-                }                
+                }
             }
         }
     }
