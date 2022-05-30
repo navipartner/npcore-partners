@@ -2615,7 +2615,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         Assert.AreEqual(POSSaleTaxLine."Amount Excl. Tax", POSPostedTaxAmountLine."Tax Base Amount", 'Tax Base Amount not posted from active Amount Excl. Tax calculation');
         Assert.AreEqual(POSSaleTaxLine."Amount Excl. Tax", POSPostedTaxAmountLine."Tax Base Amount FCY", 'Tax Base Amount FCY not posted from active Amount Excl. Tax calculation');
-        Assert.AreEqual(POSSaleTaxLine."Line Amount", POSPostedTaxAmountLine."Line Amount", 'Line Amount not posted from active tax line amount');
+        Assert.AreEqual(POSSaleTaxLine."Line Amount", POSPostedTaxAmountLine."Amount Including Tax", 'Line Amount not posted from active tax line amount');
         Assert.AreEqual(POSSaleTaxLine."Amount Incl. Tax", POSPostedTaxAmountLine."Amount Including Tax", 'Amount Including Tax not posted from active Amount Incl. Tax calculation');
         Assert.AreEqual(POSSaleTaxLine."Tax %", POSPostedTaxAmountLine."Tax %", 'Tax % not posted from active to posted tax line');
 
