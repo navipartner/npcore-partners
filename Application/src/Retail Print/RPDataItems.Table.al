@@ -38,18 +38,18 @@ table 6014561 "NPR RP Data Items"
 
             trigger OnLookup()
             var
-                AllObj: Record AllObj;
+                AllObjWithCaption: Record AllObjWithCaption;
                 AllObjects: Page "All Objects with Caption";
             begin
-                AllObj.FilterGroup(2);
-                AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
-                AllObj.FilterGroup(0);
-                AllObjects.SetTableView(AllObj);
+                AllObjWithCaption.FilterGroup(2);
+                AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
+                AllObjWithCaption.FilterGroup(0);
+                AllObjects.SetTableView(AllObjWithCaption);
                 AllObjects.LookupMode(true);
                 if AllObjects.RunModal() = ACTION::LookupOK then begin
-                    AllObjects.GetRecord(AllObj);
-                    "Data Source" := AllObj."Object Name";
-                    "Table ID" := AllObj."Object ID";
+                    AllObjects.GetRecord(AllObjWithCaption);
+                    "Data Source" := AllObjWithCaption."Object Name";
+                    "Table ID" := AllObjWithCaption."Object ID";
                     Name := "Data Source";
                 end;
                 FindParentItem();
@@ -57,11 +57,11 @@ table 6014561 "NPR RP Data Items"
 
             trigger OnValidate()
             var
-                AllObj: Record AllObj;
+                AllObjWithCaption: Record AllObjWithCaption;
             begin
-                AllObj.Get(AllObj."Object Type"::Table, Rec."Table ID");
-                "Data Source" := AllObj."Object Name";
-                "Table ID" := AllObj."Object ID";
+                AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Table, Rec."Table ID");
+                "Data Source" := AllObjWithCaption."Object Name";
+                "Table ID" := AllObjWithCaption."Object ID";
                 Name := "Data Source";
 
                 if "Data Source" <> xRec."Data Source" then
@@ -75,18 +75,18 @@ table 6014561 "NPR RP Data Items"
 
             trigger OnLookup()
             var
-                AllObj: Record AllObj;
+                AllObjWithCaption: Record AllObjWithCaption;
                 AllObjects: Page "All Objects with Caption";
             begin
-                AllObj.FilterGroup(2);
-                AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
-                AllObj.FilterGroup(0);
-                AllObjects.SetTableView(AllObj);
+                AllObjWithCaption.FilterGroup(2);
+                AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
+                AllObjWithCaption.FilterGroup(0);
+                AllObjects.SetTableView(AllObjWithCaption);
                 AllObjects.LookupMode(true);
                 if AllObjects.RunModal() = ACTION::LookupOK then begin
-                    AllObjects.GetRecord(AllObj);
-                    "Data Source" := AllObj."Object Name";
-                    "Table ID" := AllObj."Object ID";
+                    AllObjects.GetRecord(AllObjWithCaption);
+                    "Data Source" := AllObjWithCaption."Object Name";
+                    "Table ID" := AllObjWithCaption."Object ID";
                     Name := "Data Source";
                 end;
                 FindParentItem();
@@ -94,16 +94,16 @@ table 6014561 "NPR RP Data Items"
 
             trigger OnValidate()
             var
-                AllObj: Record AllObj;
+                AllObjWithCaption: Record AllObjWithCaption;
             begin
-                AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
-                AllObj.SetFilter("Object Name", '@' + "Data Source");
-                if not AllObj.FindFirst() then
-                    AllObj.SetFilter("Object Name", '@' + "Data Source" + '*');
-                AllObj.FindFirst();
+                AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
+                AllObjWithCaption.SetFilter("Object Name", '@' + "Data Source");
+                if not AllObjWithCaption.FindFirst() then
+                    AllObjWithCaption.SetFilter("Object Name", '@' + "Data Source" + '*');
+                AllObjWithCaption.FindFirst();
 
-                "Data Source" := AllObj."Object Name";
-                "Table ID" := AllObj."Object ID";
+                "Data Source" := AllObjWithCaption."Object Name";
+                "Table ID" := AllObjWithCaption."Object ID";
                 Name := "Data Source";
 
                 if "Data Source" <> xRec."Data Source" then
@@ -429,6 +429,17 @@ table 6014561 "NPR RP Data Items"
         DataItemLinks.SetRange("Child Line No.", "Line No.");
         DataItemLinks.DeleteAll(true);
         DataItemConstraint.DeleteAll(true);
+    end;
+
+    procedure GetNextLineNo(): Integer
+    var
+        CurrentLineNo: Integer;
+    begin
+        CurrentLineNo := Rec."Line No.";
+        if Rec.Next() > 0 then
+            exit(Round(CurrentLineNo + ((Rec."Line No." - CurrentLineNo) / 2), 1, '='))
+        else
+            exit(CurrentLineNo + 10000);
     end;
 }
 
