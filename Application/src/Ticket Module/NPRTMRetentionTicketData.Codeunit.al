@@ -1,6 +1,7 @@
 ﻿codeunit 6014688 "NPR TM Retention Ticket Data"
 {
     Access = Internal;
+
     var
         _Window: Dialog;
         _EndDateTime: DateTime;
@@ -145,7 +146,7 @@
         while (TicketsToDelete.Count() = 0) do begin
 
             TicketAccessEntry.SetFilter("Entry No.", '>%1', EntryNo);
-            TicketAccessEntry.SetLoadFields("Ticket No.", "Access Date");
+            TicketAccessEntry.SetLoadFields("Ticket No.", "Access Date", "Entry No.");
             if (not TicketAccessEntry.FindSet()) then
                 exit(EntryNo);
 
