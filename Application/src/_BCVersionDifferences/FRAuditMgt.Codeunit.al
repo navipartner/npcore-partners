@@ -36,7 +36,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 exit(false);
             FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
             FRCertificationSetup.Get();
-            SetRetentionPolicies();
             Initialized := true;
             Enabled := true;
         end;
@@ -981,23 +980,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
             VATPostingSetup.SetView(FilterPageBuilder.GetView(VATPostingSetup.TableCaption, false));
             exit(VATPostingSetup.GetFilter("VAT Identifier"));
         end;
-    end;
-
-    local procedure SetRetentionPolicies()
-    var
-        RetentionPolicySetup: Record "Retention Policy Setup";
-        RetPeriod: Record "Retention Period";
-    begin
-        if not RetentionPolicySetup.Get(Database::"NPR Data Log Record") then
-            exit;
-        RetPeriod.Reset();
-        RetPeriod.SetRange(RetPeriod."Retention Period", RetPeriod."Retention Period"::"5 Years");
-        if not RetPeriod.FindFirst() then
-            exit;
-        if RetentionPolicySetup."Retention Period" <> RetPeriod.Code then begin
-            RetentionPolicySetup."Retention Period" := RetPeriod.Code;
-            RetentionPolicySetup.Modify();
-        end
     end;
 
     procedure Destruct()
