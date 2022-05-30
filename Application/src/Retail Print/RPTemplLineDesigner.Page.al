@@ -249,7 +249,34 @@ page 6014630 "NPR RP Templ. Line Designer"
 
     actions
     {
+        area(Processing)
+        {
+            action("Insert Line")
+            {
+                Caption = 'Insert Line';
+                ToolTip = 'Action inserts a new line below selected line with same identation';
+                ApplicationArea = NPRRetail;
+                Image = Add;
+                trigger OnAction()
+                begin
+                    InsertNewLine();
+                end;
+            }
+        }
     }
+
+    internal procedure InsertNewLine()
+    var
+        RPTemplateLine: Record "NPR RP Template Line";
+    begin
+        RPTemplateLine.Init();
+        RPTemplateLine."Template Code" := Rec."Template Code";
+        RPTemplateLine."Line No." := Rec.GetNextLineNo();
+        RPTemplateLine.Level := Rec.Level;
+        RPTemplateLine."Parent Line No." := Rec."Parent Line No.";
+        RPTemplateLine.Insert(true);
+        Rec := RPTemplateLine;
+    end;
 
     internal procedure IndentLine()
     var

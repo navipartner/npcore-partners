@@ -106,6 +106,20 @@
     {
         area(processing)
         {
+            action("Insert Line")
+            {
+                Caption = 'Insert Line';
+                ToolTip = 'Action inserts a new line below selected line with same identation';
+                ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                Image = Add;
+                trigger OnAction()
+                begin
+                    InsertNewLine();
+                end;
+            }
             action(Unindent)
             {
                 Caption = 'Unindent';
@@ -157,6 +171,21 @@
             }
         }
     }
+
+    internal procedure InsertNewLine()
+    var
+        DataItem: Record "NPR RP Data Items";
+    begin
+        DataItem.Init();
+        DataItem.Code := Rec.Code;
+        DataItem."Data Source" := Rec."Data Source";
+        DataItem."Parent Table ID" := Rec."Parent Table ID";
+        DataItem."Parent Line No." := rec."Parent Line No.";
+        DataItem."Line No." := Rec.GetNextLineNo();
+        DataItem.Level := Rec.Level;
+        DataItem.Insert();
+        Rec := DataItem;
+    end;
 
     internal procedure IndentLine()
     var
