@@ -241,9 +241,9 @@ codeunit 85046 "NPR NpXml Mock Handler"
         XmlTemplate.Append('  <T6151552 primary_key="Field1=0(UPD_ITEM),Field5=0(40000)" table_no="6151552" table_name="NPR NpXml Element">');
         XmlTemplate.Append('    <F1 field_no="1" field_name="Xml Template Code"><![CDATA[UPD_ITEM]]></F1>');
         XmlTemplate.Append('    <F5 field_no="5" field_name="Line No."><![CDATA[40000]]></F5>');
-        XmlTemplate.Append('    <F10 field_no="10" field_name="Table No."><![CDATA[27]]></F10>');
-        XmlTemplate.Append('    <F20 field_no="20" field_name="Template Version No."><![CDATA[MAG2.20]]></F20>');
-        XmlTemplate.Append('    <F100 field_no="100" field_name="Field No."><![CDATA[6151410]]></F100>');
+        XmlTemplate.Append('    <F10 field_no="10" field_name="Table No."><![CDATA[6014659]]></F10>');
+        XmlTemplate.Append('    <F20 field_no="20" field_name="Template Version No."><![CDATA[NPR1700.1]]></F20>');
+        XmlTemplate.Append('    <F100 field_no="100" field_name="Field No."><![CDATA[0]]></F100>');
         XmlTemplate.Append('    <F110 field_no="110" field_name="Field Name"><![CDATA[]]></F110>');
         XmlTemplate.Append('    <F200 field_no="200" field_name="Parent Line No."><![CDATA[10000]]></F200>');
         XmlTemplate.Append('    <F201 field_no="201" field_name="Parent Table No."><![CDATA[27]]></F201>');
@@ -256,8 +256,8 @@ codeunit 85046 "NPR NpXml Mock Handler"
         XmlTemplate.Append('    <F625 field_no="625" field_name="Xml Value Codeunit Name"><![CDATA[]]></F625>');
         XmlTemplate.Append('    <F630 field_no="630" field_name="Xml Value Function"><![CDATA[]]></F630>');
         XmlTemplate.Append('    <F1000 field_no="1000" field_name="Active"><![CDATA[true]]></F1000>');
-        XmlTemplate.Append('    <F1010 field_no="1010" field_name="Hidden"><![CDATA[false]]></F1010>');
-        XmlTemplate.Append('    <F5100 field_no="5100" field_name="Element Name"><![CDATA[attribute_set]]></F5100>');
+        XmlTemplate.Append('    <F1010 field_no="1010" field_name="Hidden"><![CDATA[true]]></F1010>');
+        XmlTemplate.Append('    <F5100 field_no="5100" field_name="Element Name"><![CDATA[auxitem_buffer]]></F5100>');
         XmlTemplate.Append('    <F5105 field_no="5105" field_name="Namespace"><![CDATA[]]></F5105>');
         XmlTemplate.Append('    <F5117 field_no="5117" field_name="Default Value"><![CDATA[default]]></F5117>');
         XmlTemplate.Append('    <F5120 field_no="5120" field_name="Table Name"><![CDATA[]]></F5120>');
