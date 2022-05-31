@@ -1,6 +1,7 @@
 ﻿codeunit 6151053 "NPR POS Paym. View Event Mgt."
 {
     Access = Internal;
+
     var
         Text000: Label 'Enter Dimension on POS Sale';
 
@@ -102,6 +103,7 @@
                     POSAction.SetWorkflowInvocationParameter('ValueSelection', '3', POSFrontEndMgt);
                 end;
         end;
+        POSAction.SetWorkflowInvocationParameter('ApplyTo', 0, POSFrontEndMgt);
         POSAction.SetWorkflowInvocationParameter('StatisticsFrequency', 1, POSFrontEndMgt);
         POSAction.SetWorkflowInvocationParameter('ShowConfirmMessage', false, POSFrontEndMgt);
         POSAction.SetWorkflowInvocationParameter('DimensionSource', '2', POSFrontEndMgt);
