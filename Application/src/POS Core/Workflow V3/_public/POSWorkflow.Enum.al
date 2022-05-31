@@ -131,4 +131,10 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'TAKE_PHOTO', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Take Photo";
     }
+
+    value(21; SALE_DIMENSION)
+    {
+        Caption = 'SALE_DIMENSION', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Sale Dimension";
+    }
 }
