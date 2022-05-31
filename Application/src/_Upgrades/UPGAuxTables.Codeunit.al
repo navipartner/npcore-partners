@@ -157,7 +157,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             NPRNpXmlFilter2.ModifyAll("Parent Field No.", ToFieldNo);
         end;
         Clear(NPRNpXmlFilter);
-        NPRNpXmlFilter.SetLoadFields("Table No.", "Field No.");
+        NPRNpXmlFilter.SetLoadFields("Table No.", "Field No.", "Xml Template Code", "Line No.");
         NPRNpXmlFilter.SetRange("Table No.", FromTableNo);
         NPRNpXmlFilter.SetRange("Field No.", FromFieldNo);
         if NPRNpXmlFilter.FindFirst() then begin
