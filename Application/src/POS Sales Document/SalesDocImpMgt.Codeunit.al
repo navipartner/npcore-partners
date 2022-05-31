@@ -1,6 +1,7 @@
 ﻿codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
 {
     Access = Internal;
+
     var
         ERR_DUPLICATE_DOCUMENT: Label 'Only one sales document can be processed per sale.';
         DOCUMENT_IMPORTED_DELETED: Label '%1 %2 was imported in POS. The document has been deleted.';
@@ -79,15 +80,15 @@
             SaleLinePOS.Validate("Unit Price", SalesLine."Unit Price");
             SaleLinePOS."Bin Code" := SalesLine."Bin Code";
             SaleLinePOS."Location Code" := SalesLine."Location Code";
+            SaleLinePOS."Discount Type" := SalesLine."NPR Discount Type";
+            SaleLinePOS."Discount Code" := SalesLine."NPR Discount Code";
+            SaleLinePOS."Allow Line Discount" := SalesLine."Allow Line Disc.";
+            SaleLinePOS."Discount %" := SalesLine."Line Discount %";
+            SaleLinePOS."Discount Amount" := SalesLine."Line Discount Amount";
+            SaleLinePOS.UpdateAmounts(SaleLinePOS);
             SaleLinePOS."Shortcut Dimension 1 Code" := SalesLine."Shortcut Dimension 1 Code";
             SaleLinePOS."Shortcut Dimension 2 Code" := SalesLine."Shortcut Dimension 2 Code";
-            SaleLinePOS.Validate("Discount Type", SalesLine."NPR Discount Type");
-            SaleLinePOS.Validate("Discount Code", SalesLine."NPR Discount Code");
-            SaleLinePOS.Validate("Allow Line Discount", SalesLine."Allow Line Disc.");
-            SaleLinePOS.Validate("Discount %", SalesLine."Line Discount %");
-            SaleLinePOS.Validate("Discount Amount", SalesLine."Line Discount Amount");
-
-            SaleLinePOS.UpdateAmounts(SaleLinePOS);
+            SaleLinePOS."Dimension Set ID" := SalesLine."Dimension Set ID";
             POSSaleLine.InsertLineRaw(SaleLinePOS, false);
             SaleLinePOS.SetSkipCalcDiscount(false);
         until SalesLine.Next() = 0;
