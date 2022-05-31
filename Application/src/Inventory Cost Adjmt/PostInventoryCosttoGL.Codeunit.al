@@ -1,5 +1,4 @@
-﻿#if BC17
-//For BC18 and above use standard CU 2846 "Post Inventory Cost to G/L"
+﻿//This is an alternative for standard CU 2846 "Post Inventory Cost to G/L"
 codeunit 6014683 "NPR Post Inventory Cost to G/L"
 {
     Access = Internal;
@@ -40,5 +39,20 @@ codeunit 6014683 "NPR Post Inventory Cost to G/L"
     begin
         exit('save_to_report_inbox');
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
+    local procedure OnValidateJobQueueEntryObjectIDtoRun(var Rec: Record "Job Queue Entry")
+    begin
+        if Rec."Object Type to Run" <> Rec."Object Type to Run"::Codeunit then
+            exit;
+        if Rec."Object ID to Run" <> CurrCodeunitId() then
+            exit;
+
+        Rec.Validate("Parameter String", CopyStr(ParamSaveToReportInbox(), 1, MaxStrLen(Rec."Parameter String")));
+    end;
+
+    local procedure CurrCodeunitId(): Integer
+    begin
+        exit(Codeunit::"NPR Post Inventory Cost to G/L");
+    end;
 }
-#endif

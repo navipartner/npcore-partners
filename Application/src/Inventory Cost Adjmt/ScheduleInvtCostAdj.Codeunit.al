@@ -3,15 +3,11 @@
     Access = Internal;
     trigger OnRun()
     begin
-#if BC17
-        ScheduleBC17(true);
-#else
-        ScheduleBC18();
-#endif
+        Schedule(true);
+        //ScheduleBC18();
     end;
 
-#if BC17
-    local procedure ScheduleBC17(WithCheck: Boolean)
+    local procedure Schedule(WithCheck: Boolean)
     var
         InventorySetup: Record "Inventory Setup";
         xInventorySetup: Record "Inventory Setup";
@@ -96,6 +92,10 @@
     begin
         if JobQueueEntryExists(JobQueueEntryGlobal."Object Type to Run"::Report, Report::"Post Inventory Cost to G/L", AtDateTime) then
             exit(true);
+#if not BC17
+        if JobQueueEntryExists(JobQueueEntryGlobal."Object Type to Run"::Codeunit, Codeunit::"Post Inventory Cost to G/L", AtDateTime) then
+            exit(true);
+#endif
         exit(JobQueueEntryExists(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR Post Inventory Cost to G/L", AtDateTime));
     end;
 
@@ -148,7 +148,7 @@
         if not Confirm(ScheduleJobQueuesConfLbl, true) then
             exit;
 
-        ScheduleBC17(false);
+        Schedule(false);
         JobQueueEntryGlobal.MarkedOnly(true);
         Page.Run(Page::"Job Queue Entries", JobQueueEntryGlobal);
     end;
@@ -168,8 +168,9 @@
 
         exit(true);
     end;
-#else
 
+#if not BC17
+/*
     local procedure ScheduleBC18()
     var
         SchedulingManager: Codeunit "Cost Adj. Scheduling Manager";
@@ -177,6 +178,7 @@
         SchedulingManager.CreateAdjCostJobQueue();
         SchedulingManager.CreatePostInvCostToGLJobQueue();
     end;
+ */
 #endif
 
     local procedure JobQueueDescription(ObjectTypeToRun: Integer; ObjectIdToRun: Integer): Text
@@ -188,9 +190,8 @@
             (ObjectTypeToRun = JobQueueEntryGlobal."Object Type to Run"::Report) and (ObjectIdToRun = Report::"Adjust Cost - Item Entries"):
                 exit(CostAdjmtLbl);
 
-#if BC17
             (ObjectTypeToRun = JobQueueEntryGlobal."Object Type to Run"::Codeunit) and (ObjectIdToRun = Codeunit::"NPR Post Inventory Cost to G/L"),
-#else
+#if not BC17
             (ObjectTypeToRun = JobQueueEntryGlobal."Object Type to Run"::Codeunit) and (ObjectIdToRun = Codeunit::"Post Inventory Cost to G/L"),
 #endif
             (ObjectTypeToRun = JobQueueEntryGlobal."Object Type to Run"::Report) and (ObjectIdToRun = Report::"Post Inventory Cost to G/L"):
@@ -207,7 +208,7 @@
 #if BC17
             (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Post Inventory Cost to G/L"))
 #else
-            (JobQueueEntry."Object ID to Run" = Codeunit::"Post Inventory Cost to G/L"))
+            (JobQueueEntry."Object ID to Run" in [Codeunit::"Post Inventory Cost to G/L", Codeunit::"NPR Post Inventory Cost to G/L"]))
 #endif
         then begin
             if JobQueueEntry.Description = '' then
@@ -217,8 +218,6 @@
 
     var
         JobQueueEntryGlobal: Record "Job Queue Entry";
-#if BC17
         SalesSetup: Record "Sales & Receivables Setup";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
-#endif
 }

@@ -52,6 +52,13 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'NotifyOnSuccessFalse'));
         end;
 
+#if not BC17
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'CustomCUforPostInvtCostToGL')) then begin
+            SetCustomCUforPostInvtCostToGL();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'CustomCUforPostInvtCostToGL'));
+        end;
+#endif
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -252,4 +259,22 @@
         JobQueueEntry.SetFilter("Object ID to Run", '6014400..6184471'); //NP object range
         JobQueueEntry.ModifyAll("Notify On Success", false, false); //Make sure not to validate
     end;
+
+#if not BC17
+    local procedure SetCustomCUforPostInvtCostToGL()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueEntry2: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"Post Inventory Cost to G/L");
+        if JobQueueEntry.FindSet(true) then
+            repeat
+                JobQueueEntry2 := JobQueueEntry;
+                JobQueueEntry2."Object ID to Run" := Codeunit::"NPR Post Inventory Cost to G/L";
+                JobQueueEntry2."Parameter String" := '';
+                JobQueueEntry2.Modify();
+            until JobQueueEntry.Next() = 0;
+    end;
+#endif
 }
