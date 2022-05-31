@@ -431,7 +431,7 @@
 
         // Each admission must only contribute with only one of its INITIAL_ENTRY or RESERVATION entries
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-        TicketAccessEntry.SetLoadFields("Admission Code");
+        TicketAccessEntry.SetLoadFields("Admission Code", "Entry No.");
         if (TicketAccessEntry.FindSet()) then begin
             repeat
                 if (TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code")) then begin
