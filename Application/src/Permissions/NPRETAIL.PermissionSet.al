@@ -148,9 +148,7 @@ codeunit "NPR IC - Map ICR Barcodes" = X,
 codeunit "NPR Map Incom. Item Lines" = X,
 codeunit "NPR Pre-map Incoming Purch Doc" = X,
 codeunit "NPR Premap Incom. Item Lines" = X,
-#if BC17
 codeunit "NPR Post Inventory Cost to G/L" = X,
-#endif
 codeunit "NPR Schedule Invt. Cost Adj." = X,
 codeunit "NPR NpIa Before Ins. Func." = X,
 codeunit "NPR NpIa Item AddOn Mgt." = X,
