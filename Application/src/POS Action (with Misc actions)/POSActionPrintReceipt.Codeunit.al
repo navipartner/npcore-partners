@@ -1,6 +1,7 @@
 ﻿codeunit 6150787 "NPR POS Action: Print Receipt"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This is a built-in action for printing a receipt for the current or selected transaction.';
         CurrentRegisterNo: Code[10];
@@ -40,7 +41,7 @@
             Sender.RegisterBooleanParameter('Print Memberships', false);
             Sender.RegisterBooleanParameter('Print Terminal Receipt', false);
             Sender.RegisterOptionParameter('ReceiptListFilter', 'None,Current POS Store,Current POS Unit,Current Salesperson', 'None');
-            Sender.RegisterTextParameter('ReceiptListView', 'SORTING(Entry No.) ORDER(Descending)');
+            Sender.RegisterTextParameter('ReceiptListView', '');
             Sender.RegisterOptionParameter('SelectionDialogType', 'TextField,List', 'List');
             Sender.RegisterOptionParameter('ObfuscationMethod', 'None,MI', 'None');
             Sender.RegisterBooleanParameter('Print Tax Free Voucher', false);
@@ -136,25 +137,43 @@
     local procedure ChooseReceiptPOSEntry(Setting: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large"; ListTableView: Text; FilterOn: Option; FilterEntityCode: Code[20]; SalesTicketNo: Code[20]): Code[20]
     var
         POSEntry: Record "NPR POS Entry";
+        POSEntry2: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
+        IsPrimaryKey: Boolean;
     begin
         POSEntry.Reset();
         if ListTableView <> '' then
             POSEntry.SetView(ListTableView);
+        IsPrimaryKey := POSEntry.CurrentKey() = POSEntry2.CurrentKey();
         case FilterOn of
             ReceiptListFilterOption::"POS Store":
-                POSEntry.SetRange("POS Store Code", FilterEntityCode);
+                begin
+                    if IsPrimaryKey then
+                        POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
+                    POSEntry.SetRange("POS Store Code", FilterEntityCode);
+                end;
             ReceiptListFilterOption::"POS Unit":
-                POSEntry.SetRange("POS Unit No.", FilterEntityCode);
+                begin
+                    if IsPrimaryKey then begin
+                        POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
+                        if POSUnit.Get(FilterEntityCode) then
+                            POSEntry.SetRange("POS Store Code", POSUnit."POS Store Code");
+                    end;
+                    POSEntry.SetRange("POS Unit No.", FilterEntityCode);
+                end;
             ReceiptListFilterOption::Salesperson:
                 POSEntry.SetRange("Salesperson Code", FilterEntityCode);
         end;
         POSEntry.SetRange("System Entry", false);
         POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::"Direct Sale");
         if SalesTicketNo <> '' then begin
+            POSEntry.SetCurrentKey("Document No.");
             POSEntry.SetRange("Document No.", SalesTicketNo);
             POSEntry.FindFirst();
         end else begin
+            if POSEntry.Ascending() then
+                POSEntry.Ascending(false);
             if POSEntry.FindFirst() then;
             if PAGE.RunModal(0, POSEntry) <> ACTION::LookupOK then
                 exit('');
@@ -257,5 +276,45 @@
         if not JSON.SetScope('$' + Path) then
             exit('');
         exit(JSON.GetString('input'));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
+    local procedure OnLookupParameter(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
+    var
+        PosEntry: Record "NPR POS Entry";
+        FilterPageBuilder: FilterPageBuilder;
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ReceiptListView':
+                begin
+                    FilterPageBuilder.AddRecord(PosEntry.TableCaption, PosEntry);
+                    if POSParameterValue.Value <> '' then begin
+                        PosEntry.SetView(POSParameterValue.Value);
+                        FilterPageBuilder.SetView(PosEntry.TableCaption, PosEntry.GetView(false));
+                    end;
+                    if FilterPageBuilder.RunModal() then
+                        POSParameterValue.Value := CopyStr(FilterPageBuilder.GetView(PosEntry.TableCaption, false), 1, MaxStrLen(POSParameterValue.Value));
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', false, false)]
+    local procedure OnValidateParameter(var POSParameterValue: Record "NPR POS Parameter Value")
+    var
+        PosEntry: Record "NPR POS Entry";
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ReceiptListView':
+                begin
+                    if POSParameterValue.Value <> '' then
+                        PosEntry.SetView(POSParameterValue.Value);
+                end;
+        end;
     end;
 }
