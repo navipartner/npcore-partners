@@ -27,7 +27,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.9');
+        exit('1.10');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
