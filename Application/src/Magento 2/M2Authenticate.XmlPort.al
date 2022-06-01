@@ -21,6 +21,10 @@ xmlport 6151150 "NPR M2 Authenticate"
                     fieldattribute(Email; TmpOneTimePasswordRequest."E-Mail")
                     {
                     }
+                    fieldattribute(PhoneNo; tmponetimepasswordrequest."Phone No.")
+                    {
+                        Occurrence = Optional;
+                    }
                     fieldattribute(PasswordHash; TmpOneTimePasswordRequest."Password (Hash)")
                     {
                     }

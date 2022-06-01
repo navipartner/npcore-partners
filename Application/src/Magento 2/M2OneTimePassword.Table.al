@@ -42,6 +42,13 @@
             Caption = 'E-Mail';
             DataClassification = CustomerContent;
         }
+
+        field(21; "Phone No."; Text[30])
+        {
+            Caption = 'Phone No.';
+            ExtendedDatatype = PhoneNo;
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
