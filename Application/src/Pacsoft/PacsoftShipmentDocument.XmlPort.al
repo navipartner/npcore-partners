@@ -496,6 +496,7 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         rcvemail := PacsoftMgt.HandleSpecialChars(ShipmentDocument."E-Mail");
+                        OnAfterBeforePassVariableRCVemail(ShipmentDocument, rcvemail);
                         if rcvemail = '' then
                             currXMLport.Skip();
                     end;
@@ -695,6 +696,7 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         orderno := Format(ShipmentDocument."Entry No.");
+                        OnAfterBeforePassVariableOrderNo(ShipmentDocument, orderno);
                     end;
                 }
                 textelement(from)
@@ -825,8 +827,13 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                         XmlName = 'srvid';
 
                         trigger OnBeforePassVariable()
+                        var
+                            TempShippingAgentCode: Code[20];
                         begin
-                            srvid := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Shipping Agent Code");
+                            TempShippingAgentCode := ShipmentDocument."Shipping Agent Code";
+                            OnAfterBeforePassVariable(shipmentdocument, TempShippingAgentCode);
+
+                            srvid := PacsoftMgt.HandleSpecialChars(TempShippingAgentCode);
                         end;
                     }
                     textelement(return)
@@ -997,6 +1004,9 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                             weight := Format(ShipmentDocument."Total Weight");
                             if ShipmentDocument."Total Weight" = 0.01 then
                                 weight := '';
+
+                            OnAfterBeforePassVariableWeight(weight);
+
                             if weight = '' then
                                 currXMLport.Skip();
                         end;
@@ -1437,6 +1447,364 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     end;
                 }
             }
+
+            textelement(Returnshipment)
+            {
+                XmlName = 'shipment';
+                textattribute(Returnorderno)
+                {
+                    XmlName = 'orderno';
+                    trigger OnBeforePassVariable()
+                    begin
+                        if Showreturn then
+                            Returnorderno := FORMAT(ShipmentDocument."External Document No.");
+                    end;
+                }
+                textelement(Returnfrom)
+                {
+                    XmlName = 'val';
+                    textattribute(Returnfromattr)
+                    {
+                        XmlName = 'n';
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returnfromattr := 'from';
+                        end;
+                    }
+                    trigger OnBeforePassVariable()
+                    begin
+                        if Showreturn then
+                            Returnfrom := sndid;
+                    end;
+                }
+                textelement(Returntofield)
+                {
+                    XmlName = 'val';
+                    textattribute(Returntoattr)
+                    {
+                        XmlName = 'n';
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returntoattr := 'to';
+                        end;
+                    }
+
+                    trigger OnBeforePassVariable()
+                    begin
+                        if Showreturn then begin
+                            Returntofield := rcvid;
+
+                            if dl_rcvid <> '' then
+                                Returntofield := dl_rcvid;
+                        end;
+                    end;
+                }
+
+                textelement(Returnagentto)
+                {
+                    XmlName = 'val';
+                    textattribute(Returnagenttoattr)
+                    {
+                        XmlName = 'n';
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returnagenttoattr := 'agentto';
+                        end;
+                    }
+
+                    trigger OnBeforePassVariable()
+                    begin
+                        if Showreturn then
+                            Returnagentto := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Delivery Location");
+                    end;
+                }
+
+                textelement(Returnfreetext)
+                {
+                    XmlName = 'val';
+                    textattribute(Returnfreetextattr)
+                    {
+                        XmlName = 'n';
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returnfreetextattr := 'freetext1';
+                        end;
+                    }
+
+                    trigger OnBeforePassVariable()
+                    begin
+                        if Showreturn then
+                            Returnfreetext := PacsoftMgt.HandleSpecialChars(ShipmentDocument."Free Text");
+                    end;
+                }
+
+                textelement(Returnref)
+                {
+                    XmlName = 'val';
+                    textattribute(Returnrefattr)
+                    {
+                        XmlName = 'n';
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returnrefattr := 'reference';
+                        end;
+                    }
+
+                    trigger OnBeforePassVariable()
+                    begin
+                        if Showreturn then
+                            Returnref := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Reference);
+                    end;
+                }
+
+                textelement(Returnshipdate)
+                {
+                    XmlName = 'val';
+                    textattribute(Returnshipdateattr)
+                    {
+                        XmlName = 'n';
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returnshipdateattr := 'shipdate';
+                        end;
+                    }
+
+                    trigger OnBeforePassVariable()
+                    begin
+                        if Showreturn then
+                            Returnshipdate := PacsoftMgt.HandleSpecialChars(FORMAT(ShipmentDocument."Shipment Date", 0, '<Year4>-<Month,2>-<Day,2>'));
+                    end;
+                }
+
+                textelement(Returnservice)
+                {
+                    XmlName = 'service';
+
+                    textattribute(Returnsrvid)
+                    {
+                        XmlName = 'srvid';
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returnsrvid := PackageShippingAgent."Return shipping Agent Code";
+                        end;
+                    }
+
+                    textelement(Rretrun)
+                    {
+                        XmlName = 'val';
+                        textattribute(Rreturnattr)
+                        {
+                            XmlName = 'n';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                Rreturnattr := 'returnlabel';
+                            end;
+                        }
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Rretrun := 'no';
+                        end;
+                    }
+                }
+
+                textelement(Returncontainer)
+                {
+                    XmlName = 'container';
+
+                    textattribute(Returntype)
+                    {
+                        XmlName = 'type';
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then begin
+                                if (ShipmentDocument."Parcel Qty." = 1) then
+                                    Returntype := 'parcel';
+
+                                if (ShipmentDocument."Parcel Qty." > 1) AND (ShipmentDocument."Parcel Weight" <> 0) then
+                                    Returntype := 'parcel';
+
+                                if (ShipmentDocument."Parcel Qty." > 1) AND (ShipmentDocument."Parcel Weight" = 0) then
+                                    Returntype := 'totals';
+                            end;
+                        end;
+                    }
+
+                    textattribute(Returnmeasure)
+                    {
+                        XmlName = 'measure';
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then begin
+                                if (ShipmentDocument."Parcel Qty." = 1) then
+                                    Returnmeasure := ''
+                                else
+                                    Returnmeasure := 'totals';
+                            end;
+                        end;
+                    }
+
+                    textelement(Returncopies)
+                    {
+                        XmlName = 'val';
+                        textattribute(Returncopiesattr)
+                        {
+                            XmlName = 'n';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                if Showreturn then
+                                    Returncopiesattr := 'copies';
+                            end;
+                        }
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returncopies := FORMAT(ShipmentDocument."Parcel Qty.");
+                        end;
+                    }
+
+                    textelement(Returnmarking)
+                    {
+                        XmlName = 'val';
+                        textattribute(Returnmarkingattr)
+                        {
+                            XmlName = 'n';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                if Showreturn then
+                                    Returnmarkingattr := 'marking';
+                            end;
+                        }
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returnmarking := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Marking);
+                        end;
+                    }
+                    textelement(Returnpackage)
+                    {
+                        XmlName = 'val';
+                        textattribute(Returnpackageattr)
+                        {
+                            XmlName = 'n';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                if Showreturn then
+                                    Returnpackageattr := 'packagecode';
+                            end;
+                        }
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then begin
+                                Returnpackage := ShipmentDocument."Package Code";
+                                if package = '' then
+                                    Returnpackage := 'PC';
+                            end;
+                        end;
+                    }
+
+                    textelement(Returnweight)
+                    {
+                        XmlName = 'val';
+                        textattribute(Returnweightattr)
+                        {
+                            XmlName = 'n';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                if Showreturn then
+                                    Returnweightattr := 'weight';
+                            end;
+                        }
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then begin
+                                Returnweight := FORMAT(ShipmentDocument."Total Weight");
+                                if ShipmentDocument."Total Weight" = 0.01 then
+                                    Returnweight := '';
+
+                                if Returnweight = '' then
+                                    Returnweight := '1';
+                            end;
+                        end;
+                    }
+
+                    textelement(Returnvolume)
+                    {
+                        XmlName = 'val';
+                        textattribute(Returnvolumeattr)
+                        {
+                            XmlName = 'n';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                if Showreturn then
+                                    Returnvolumeattr := 'volume';
+                            end;
+                        }
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returnvolume := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Volume);
+                        end;
+                    }
+
+                    textelement(Returncontents)
+                    {
+                        XmlName = 'val';
+                        textattribute(Returncontentsattr)
+                        {
+                            XmlName = 'n';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                if Showreturn then
+                                    Returncontentsattr := 'contents';
+                            end;
+                        }
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if Showreturn then
+                                Returncontents := PacsoftMgt.HandleSpecialChars(ShipmentDocument.Contents);
+                        end;
+                    }
+                }
+
+                trigger OnBeforePassVariable()
+                begin
+                    Showreturn := false;
+                    PackageShippingAgent.GET(ShipmentDocument."Shipping Agent Code");
+                    if PackageShippingAgent."Return shipping Agent Code" <> '' then
+                        Showreturn := true;
+                end;
+            }
         }
     }
 
@@ -1462,6 +1830,28 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
     var
         CompanyInfo: Record "Company Information";
         PacsoftSetup: Record "NPR Shipping Provider Setup";
+        PackageShippingAgent: Record "NPR Package Shipping Agent";
         PacsoftMgt: Codeunit "NPR Pacsoft Management";
+        Showreturn: Boolean;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterBeforePassVariable(ShippingProviderDocument: Record "NPR Shipping Provider Document"; var TempShippingAgentCode: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterBeforePassVariableOrderNo(ShippingProviderDocument: Record "NPR Shipping Provider Document"; var OrderNo: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterBeforePassVariableRCVemail(ShippingProviderDocument: Record "NPR Shipping Provider Document"; var rcvemail: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterBeforePassVariableWeight(var Weight: Text)
+    begin
+    end;
 }
 
