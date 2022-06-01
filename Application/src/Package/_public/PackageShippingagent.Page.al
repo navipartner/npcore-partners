@@ -62,6 +62,11 @@
                     ToolTip = 'Specifies if the Phone Number is mandatory';
                     ApplicationArea = NPRRetail;
                 }
+                field("Return shipping Agent Code"; Rec."Return shipping Agent Code")
+                {
+                    ToolTip = 'Return shipping Agent Code';
+                    ApplicationArea = NPRRetail;
+                }
                 group(Advanced)
                 {
                     Caption = 'Advanced';

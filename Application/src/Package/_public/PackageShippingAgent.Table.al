@@ -52,6 +52,12 @@
             DataClassification = CustomerContent;
 
         }
+        field(70; "Return shipping Agent Code"; Code[20])
+        {
+            Caption = 'Return shipping Agent Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Shipping Agent".Code;
+        }
     }
 
     keys

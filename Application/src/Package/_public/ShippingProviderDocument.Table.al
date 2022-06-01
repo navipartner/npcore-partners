@@ -508,6 +508,7 @@ table 6014452 "NPR Shipping Provider Document"
                             ShipToAddress."Fax No." := Customer."Fax No.";
                             ShipToAddress."E-Mail" := Customer."E-Mail";
                         end;
+
                         ShipmentDocument."Receiver ID" := SalesShipmentHeader."Sell-to Customer No.";
 
                         ShipmentDocument.Name := SalesShipmentHeader."Ship-to Name";
@@ -526,6 +527,11 @@ table 6014452 "NPR Shipping Provider Document"
                         ShipmentDocument."E-Mail" := ShipToAddress."E-Mail";
                         ShipmentDocument."SMS No." := ShipToAddress."Phone No.";
                         ShipmentDocument."Shipping Agent Code" := SalesShipmentHeader."Shipping Agent Code";
+
+                        ShipmentDocument."Document Type" := ShipmentDocument."Document Type"::"Posted Shipment";
+                        ShipmentDocument."Document No." := SalesShipmentHeader."No.";
+                        ShipmentDocument."Order No." := SalesShipmentHeader."Order No.";
+                        ShipmentDocument."External Document No." := SalesShipmentHeader."External Document No.";
 
                         if SalesShipmentHeader."NPR Delivery Location" <> '' then begin
                             ShipmentDocument.Name := SalesShipmentHeader."Bill-to Name";
@@ -551,6 +557,8 @@ table 6014452 "NPR Shipping Provider Document"
                             if SalesShipmentHeader."Order No." <> '' then
                                 ShipmentDocument.Reference := CopyStr(SalesShipmentHeader."Order No.", 1,
                                                                       MaxStrLen(ShipmentDocument.Reference));
+
+                        OnAfterFindSalesShipmentHeader(ShipmentDocument, SalesShipmentHeader);
                     end;
                 end;
         end;
@@ -700,6 +708,11 @@ table 6014452 "NPR Shipping Provider Document"
         Tb.Append(FldRef.Caption);
         Tb.Append('.xml');
         FileMgmt.BLOBExport(TempBlob, Tb.ToText(), true);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterFindSalesShipmentHeader(var ShipmentDocument: Record "NPR Shipping Provider Document"; SalesShipmentHeader: Record "Sales Shipment Header")
+    begin
     end;
 }
 
