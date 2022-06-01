@@ -543,52 +543,76 @@
         if (not TmpOneTimePassword.FindFirst()) then
             Error('No account to validate.');
 
-        if (TmpOneTimePassword."E-Mail" = '') then
-            Error('E-Mail must not be blank.');
+        if (TmpOneTimePassword."E-Mail" = '') and (TmpOneTimePassword."Phone No." = '') then
+            Error('E-Mail and Phone No. cannot both be blank.');
 
         if (TmpOneTimePassword."Password (Hash)" = '') and (not AllowBlankPassword) then
             Error('Password must not be blank.');
 
-        OneTimePassword.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
-        OneTimePassword.SetFilter("Password (Hash)", '=%1', TmpOneTimePassword."Password (Hash)");
-        OTPAuthentication := OneTimePassword.FindFirst();
+        if (TmpOneTimePassword."E-Mail" = '') and (not AllowBlankPassword) then
+            Error('E-Mail must be specified when attempting to validate a password.');
 
-        if (OTPAuthentication) then begin
-            if (TmpOneTimePassword."Password (Hash)" = '') then
-                Error('Password must not be blank.'); // OTP must never be blank
+        if (TmpOneTimePassword."E-Mail" <> '') then begin
+            OneTimePassword.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+            OneTimePassword.SetFilter("Password (Hash)", '=%1', TmpOneTimePassword."Password (Hash)");
+            OTPAuthentication := OneTimePassword.FindFirst();
 
-            if (OneTimePassword."Used At" <> 0DT) then
-                Error('The security token %1 has already been used.', TmpOneTimePassword."Password (Hash)");
+            if (OTPAuthentication) then begin
+                if (TmpOneTimePassword."Password (Hash)" = '') then
+                    Error('Password must not be blank.'); // OTP must never be blank
 
-            if (OneTimePassword."Valid Until" < CurrentDateTime) then
-                Error('The security token %1 has expired.', TmpOneTimePassword."Password (Hash)");
+                if (OneTimePassword."Used At" <> 0DT) then
+                    Error('The security token %1 has already been used.', TmpOneTimePassword."Password (Hash)");
 
-            OneTimePassword."Used At" := CurrentDateTime;
-            OneTimePassword.Modify();
-        end;
+                if (OneTimePassword."Valid Until" < CurrentDateTime()) then
+                    Error('The security token %1 has expired.', TmpOneTimePassword."Password (Hash)");
 
-        Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
-        Contact.SetFilter("NPR Magento Contact", '=%1', true);
+                OneTimePassword."Used At" := CurrentDateTime();
+                OneTimePassword.Modify();
+            end;
 
-        if (not OTPAuthentication) then
-            Contact.SetFilter("NPR Magento Password (Md5)", '=%1', TmpOneTimePassword."Password (Hash)");
-
-        if (not OTPAuthentication) and (AllowBlankPassword) and (TmpOneTimePassword."Password (Hash)" = '') then
-            Contact.SetFilter("NPR Magento Password (Md5)", '');
-
-        if (Contact.IsEmpty()) then begin
-            Contact.Reset();
             Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
             Contact.SetFilter("NPR Magento Contact", '=%1', true);
-            Contact.SetFilter("NPR Magento Password (Md5)", '<>%1', '');
-            if (not Contact.IsEmpty()) then
-                Error('E-Mail and password does not identify a valid magento contact.');
-            Error('Contact not found.');
+
+            if (not OTPAuthentication) then
+                Contact.SetFilter("NPR Magento Password (Md5)", '=%1', TmpOneTimePassword."Password (Hash)");
+
+            if (not OTPAuthentication) and (AllowBlankPassword) and (TmpOneTimePassword."Password (Hash)" = '') then
+                Contact.SetFilter("NPR Magento Password (Md5)", '');
+
+            if (Contact.IsEmpty()) then begin
+                Contact.Reset();
+                Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+                Contact.SetFilter("NPR Magento Contact", '=%1', true);
+                Contact.SetFilter("NPR Magento Password (Md5)", '<>%1', '');
+                if (not Contact.IsEmpty()) then
+                    Error('E-Mail and password does not identify a valid magento contact.');
+                Error('Contact not found.');
+            end;
+
+            // Attempted to authenticate either using one time password or an existing account.
+            if (OTPAuthentication) or (TmpOneTimePassword."Password (Hash)" <> '') then begin
+                if (Contact.FindSet()) then begin
+                    repeat
+                        TmpContact.TransferFields(Contact, true);
+                        TmpContact.Insert();
+                    until Contact.Next() = 0;
+                end;
+
+                exit;
+            end;
         end;
 
+        // Search by e-mail and/or phone no.
         Contact.Reset();
-        Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
         Contact.SetFilter("NPR Magento Contact", '=%1', true);
+        Contact.FilterGroup := -1;
+        if (TmpOneTimePassword."E-Mail" <> '') then
+            Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+        if (TmpOneTimePassword."Phone No." <> '') then begin
+            Contact.SetFilter("Phone No.", '=%1', TmpOneTimePassword."Phone No.");
+            Contact.SetFilter("Mobile Phone No.", '=%1', TmpOneTimePassword."Phone No.");
+        end;
         if (Contact.FindSet()) then begin
             repeat
                 TmpContact.TransferFields(Contact, true);
