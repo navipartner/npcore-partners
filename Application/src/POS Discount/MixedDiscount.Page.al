@@ -604,11 +604,12 @@
             Error(ErrorNo1);
         Clear(MixedDiscountList);
         repeat
-            if NPRMixedDiscountLine.Get(Rec.Code, NPRMixedDiscountLine."Disc. Grouping Type"::"Mix Discount", Item."No.", '') then
+            if NPRMixedDiscountLine.Get(Rec.Code, NPRMixedDiscountLine."Disc. Grouping Type"::Item, Item."No.", '') then
                 Error(ErrorNo2, Item."No.");
             NPRMixedDiscountLine.Init();
             NPRMixedDiscountLine.Code := Rec.Code;
             NPRMixedDiscountLine."No." := Item."No.";
+            NPRMixedDiscountLine."Disc. Grouping Type" := NPRMixedDiscountLine."Disc. Grouping Type"::Item;
             NPRMixedDiscountLine.Quantity := 1;
             NPRMixedDiscountLine.Description := Item.Description;
             NPRMixedDiscountLine."Unit cost" := Item."Unit Cost";
