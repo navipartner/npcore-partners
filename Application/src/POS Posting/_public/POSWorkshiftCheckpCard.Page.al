@@ -1,6 +1,5 @@
 ﻿page 6150627 "NPR POS Workshift Checkp. Card"
 {
-    Extensible = False;
     UsageCategory = None;
     Caption = 'Workshift Details';
     DataCaptionFields = "POS Unit No.";

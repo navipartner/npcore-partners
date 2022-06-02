@@ -1,12 +1,12 @@
 ﻿codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
 {
     Access = Internal;
+
     var
         Text003: Label 'Document Archived';
 
     //--- Archive ---
-
-    procedure ArchiveCollectDocument(var NpCsDocument: Record "NPR NpCs Document"): Boolean
+    internal procedure ArchiveCollectDocument(var NpCsDocument: Record "NPR NpCs Document"; DeleteSalesDocument: Boolean): Boolean
     var
         NpCsArchDocument: Record "NPR NpCs Arch. Document";
         NpCsArchDocumentLogEntry: Record "NPR NpCs Arch. Doc. Log Entry";
@@ -18,14 +18,16 @@
     begin
         PrevNpCsDocument := NpCsDocument;
 
-        ClearLastError();
-        Success := Codeunit.Run(Codeunit::"NPR NpCs Delete Related S.Doc.", NpCsDocument);
+        if DeleteSalesDocument then begin
+            ClearLastError();
+            Success := Codeunit.Run(Codeunit::"NPR NpCs Delete Related S.Doc.", NpCsDocument);
 
-        NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Post Processing";
-        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, Text003, not Success, GetLastErrorText);
-        Commit();
-        if not Success then
-            exit(false);
+            NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Post Processing";
+            NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, Text003, not Success, GetLastErrorText);
+            Commit();
+            if not Success then
+                exit(false);
+        end;
 
         InsertArchCollectDocument(NpCsDocument, NpCsArchDocument);
 
