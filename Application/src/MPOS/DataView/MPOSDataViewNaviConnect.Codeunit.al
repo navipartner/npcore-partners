@@ -98,6 +98,7 @@ codeunit 6059826 "NPR MPOS Data View NaviConnect" implements "NPR MPOS IDataView
 
         repeat
             if IsActive(DataView."Data View Code") then begin
+                clear(DataViewResponse);
                 DataViewResponse.Add(DataView.FieldName("Data View Type"), Format(DataView."Data View Type"));
                 DataViewResponse.Add(DataView.FieldName("Data View Category"), Format(DataView."Data View Category"));
                 DataViewResponse.Add(DataView.FieldName("Data View Code"), Format(DataView."Data View Code"));

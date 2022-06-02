@@ -46,6 +46,11 @@ page 6059870 "NPR MPOS Data Views"
                     ToolTip = 'Specifies default value per category. Only one record, under the same type and category, can be marked as a default.';
                     Visible = false;
                 }
+                field("Response Size"; Rec."Response Size")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies category of response size. E.g. small response size suit to camera view';
+                }
             }
         }
     }
