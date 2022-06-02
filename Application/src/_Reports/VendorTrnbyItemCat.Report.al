@@ -5,7 +5,7 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Vendor trn. by Item Cat.rdlc';
-    Caption = 'Vendor Trn. By Item Category';
+    Caption = 'Vendor Turnover by Item Category';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
@@ -164,7 +164,8 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
                 TotalSaleQty += "NPR Sales (Qty.)";
                 TotalConsumptionAmt += "NPR Consumption (Amount)";
                 TotalProfitLCY := (TotalSaleLCY - TotalConsumptionAmt);
-                Totaldg := ((TotalSaleLCY - TotalConsumptionAmt) / TotalSaleLCY) * 100;
+                if TotalSaleLCY <> 0 then
+                    Totaldg := ((TotalSaleLCY - TotalConsumptionAmt) / TotalSaleLCY) * 100;
             end;
 
             trigger OnPreDataItem()
@@ -243,7 +244,7 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
 
     labels
     {
-        Report_Caption = 'Item Category/Supplier';
+        Report_Caption = 'Vendor Turnover by Item Category';
         Period_Caption = 'Period:';
         ItemCategoryFilter_Caption = 'Item Category Filter:';
         DeptFilter_Caption = 'Departmentfilter:';
@@ -255,8 +256,8 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
         Quantity_Caption = 'Quantity';
         Turnover_Caption = 'Turnover';
         PctLastYear_Caption = '% Last Year';
-        DB_Caption = 'DB';
-        DB_Pct_Caption = 'DB%';
+        DB_Caption = 'Profit';
+        DB_Pct_Caption = 'Profit %';
         TotalSales_Caption = '% Total Sales';
         Total_Caption = 'Total';
     }
