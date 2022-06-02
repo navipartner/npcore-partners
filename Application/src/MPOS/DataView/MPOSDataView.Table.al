@@ -61,6 +61,11 @@ table 6014672 "NPR MPOS Data View"
                 ClearDefaultCategory();
             end;
         }
+        field(7; "Response Size"; Enum "NPR MPOS Response Size")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Response Size';
+        }
     }
 
     keys

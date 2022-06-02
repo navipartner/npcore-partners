@@ -111,6 +111,39 @@
         exit(DataViewMgt.FormatResultAsText(DataView));
     end;
 
+    procedure GetBarcodeInventorySmallView(Barcode: Code[50]): Text
+    var
+        DataView: Record "NPR MPOS Data View";
+    begin
+        DataView.SetRange("Data View Type", DataView."Data View Type"::NaviConnect);
+        DataView.SetRange("Data View Category", DataView."Data View Category"::"Barcode Inventory");
+        DataView.SetRange("Response Size", DataView."Response Size"::Small);
+        DataView.FindFirst();
+        exit(GetBarcodeInventoryView(DataView."Data View Code", Barcode));
+    end;
+
+    procedure GetBarcodeInventoryMediumView(Barcode: Code[50]): Text
+    var
+        DataView: Record "NPR MPOS Data View";
+    begin
+        DataView.SetRange("Data View Type", DataView."Data View Type"::NaviConnect);
+        DataView.SetRange("Data View Category", DataView."Data View Category"::"Barcode Inventory");
+        DataView.SetRange("Response Size", DataView."Response Size"::Medium);
+        DataView.FindFirst();
+        exit(GetBarcodeInventoryView(DataView."Data View Code", Barcode));
+    end;
+
+    procedure GetBarcodeInventoryLargeView(Barcode: Code[50]): Text
+    var
+        DataView: Record "NPR MPOS Data View";
+    begin
+        DataView.SetRange("Data View Type", DataView."Data View Type"::NaviConnect);
+        DataView.SetRange("Data View Category", DataView."Data View Category"::"Barcode Inventory");
+        DataView.SetRange("Response Size", DataView."Response Size"::Large);
+        DataView.FindFirst();
+        exit(GetBarcodeInventoryView(DataView."Data View Code", Barcode));
+    end;
+
     [Obsolete('Replaced by new function GetBarcodeInventoryView.')]
     procedure GetItemInfoByBarcode(Barcode: Code[20]): Text
     var
