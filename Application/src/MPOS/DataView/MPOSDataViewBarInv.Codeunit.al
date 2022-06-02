@@ -57,6 +57,7 @@ codeunit 6059825 "NPR MPOS Data View - Bar. Inv." implements "NPR MPOS IDataView
         repeat
             IDataViewType := DataView."Data View Type";
             if IDataViewType.IsActive(DataView."Data View Code") then begin
+                Clear(DataViewResponse);
                 DataViewResponse.Add(DataView.FieldName("Data View Type"), Format(DataView."Data View Type"));
                 DataViewResponse.Add(DataView.FieldName("Data View Category"), Format(DataView."Data View Category"));
                 DataViewResponse.Add(DataView.FieldName("Data View Code"), Format(DataView."Data View Code"));
