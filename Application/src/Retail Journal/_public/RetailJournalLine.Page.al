@@ -402,7 +402,7 @@
         IsWebClient: Boolean;
         ItemNo: Text;
 
-    internal procedure GetSelectionFilter(var Lines: Record "NPR Retail Journal Line")
+    procedure GetSelectionFilter(var Lines: Record "NPR Retail Journal Line")
     var
         t001: Label 'No lines chosen!\Select using mouse or keyboard';
         t002: Label 'Only one item chosen. Continue?';

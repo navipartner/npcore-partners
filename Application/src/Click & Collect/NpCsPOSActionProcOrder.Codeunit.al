@@ -1,6 +1,7 @@
 ﻿codeunit 6151202 "NPR NpCs POSAction Proc. Order"
 {
     Access = Internal;
+
     var
         Text000: Label 'Process Collect in Store Orders';
 
@@ -181,6 +182,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        POSMenuMgt: Codeunit "NPR POS Menu Mgt.";
         UnprocessedOrdersExists: Boolean;
         LocationFilter: Text;
     begin
@@ -191,49 +193,13 @@
 
         Handled := true;
 
-        LocationFilter := GetPOSMenuButtonLocationFilter(POSSession);
+        LocationFilter := POSMenuMgt.GetPOSMenuButtonLocationFilter(POSSession, ActionCode());
         UnprocessedOrdersExists := GetUnprocessedOrdersExists(LocationFilter);
         DataRow.Fields().Add('UnprocessedOrdersExists', UnprocessedOrdersExists);
         if UnprocessedOrdersExists then
             DataRow.Fields().Add('UnprocessedOrdersQty', GetUnprocessedOrdersQty(LocationFilter))
         else
             DataRow.Fields().Add('UnprocessedOrdersQty', 0);
-    end;
-
-    local procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session"): Text
-    var
-        POSStore: Record "NPR POS Store";
-        POSMenuButton: Record "NPR POS Menu Button";
-        POSParameterValue: Record "NPR POS Parameter Value";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        POSMenuButton.SetRange("Action Code", ActionCode());
-        POSMenuButton.SetRange("Register No.", SalePOS."Register No.");
-        if not POSMenuButton.FindFirst() then
-            POSMenuButton.SetRange("Register No.");
-        if not POSMenuButton.FindFirst() then
-            exit('');
-
-        if not POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'Location From') then
-            exit('');
-        case POSParameterValue.Value of
-            'POS Store':
-                begin
-                    if POSStore.Get(SalePOS."POS Store Code") then;
-                    exit(POSStore."Location Code");
-                end;
-            'Location Filter Parameter':
-                begin
-                    Clear(POSParameterValue);
-                    if POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'Location Filter') then;
-                    exit(POSParameterValue.Value);
-                end;
-        end;
-
-        exit('');
     end;
 
     local procedure GetUnprocessedOrdersExists(LocationFilter: Text): Boolean

@@ -402,7 +402,7 @@
                             if not Confirm(Text002, false, Rec."Document Type", Rec."Document No.") then
                                 exit;
                         end;
-                        if NpCsArchCollectMgt.ArchiveCollectDocument(Rec) then
+                        if NpCsArchCollectMgt.ArchiveCollectDocument(Rec, true) then
                             Message(Text003, Rec."Document Type", Rec."Reference No.")
                         else
                             Message(Text004, Rec."Document Type", Rec."Reference No.", GetLastErrorText);

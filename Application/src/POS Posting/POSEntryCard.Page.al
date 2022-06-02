@@ -52,7 +52,6 @@
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                     ApplicationArea = NPRRetail;
                 }

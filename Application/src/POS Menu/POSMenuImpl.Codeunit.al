@@ -1,0 +1,42 @@
+codeunit 6059848 "NPR POS Menu Impl."
+{
+    Access = Internal;
+
+    internal procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session"; ActionCode: Code[20]): Text
+    var
+        POSStore: Record "NPR POS Store";
+        POSMenuButton: Record "NPR POS Menu Button";
+        POSParameterValue: Record "NPR POS Parameter Value";
+        SalePOS: Record "NPR POS Sale";
+        POSSale: Codeunit "NPR POS Sale";
+    begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSMenuButton.SetRange("Action Code", ActionCode);
+        POSMenuButton.SetRange("Register No.", SalePOS."Register No.");
+        if not POSMenuButton.FindFirst() then
+            POSMenuButton.SetRange("Register No.");
+        if not POSMenuButton.FindFirst() then
+            exit('');
+
+        if not POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'Location From') then
+            if not POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'LocationFrom') then
+                exit('');
+        case POSParameterValue.Value of
+            'POS Store':
+                begin
+                    if not POSStore.Get(SalePOS."POS Store Code") then;
+                    exit(POSStore."Location Code");
+                end;
+            'Location Filter Parameter':
+                begin
+                    Clear(POSParameterValue);
+                    if not POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'Location Filter') then
+                        if not POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'LocationFilter') then;
+                    exit(POSParameterValue.Value);
+                end;
+        end;
+
+        exit('');
+    end;
+}
