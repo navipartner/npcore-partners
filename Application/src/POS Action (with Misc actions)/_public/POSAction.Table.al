@@ -461,7 +461,7 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    internal procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
+    procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
     var
         Json: JsonObject;
     begin

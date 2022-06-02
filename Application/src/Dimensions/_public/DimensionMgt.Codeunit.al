@@ -331,5 +331,61 @@
             end;
     end;
     #endregion
+
+    #region POS Entry Dimensions
+    internal procedure CreateSeatingDimForPOSEntry(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry")
+    begin
+        CreatePosEntrySalesLineDim(POSEntrySalesLine,
+                                    POSEntry,
+                                    TypeToTableNPR(POSEntrySalesLine.Type), POSEntrySalesLine."No.",
+                                    DiscountTypeToTableNPR(POSEntrySalesLine."Discount Type"), POSEntrySalesLine."Discount Code",
+                                    DATABASE::"NPR NPRE Seating", POSEntrySalesLine."NPRE Seating Code",
+                                    0, '');
+    end;
+
+    local procedure CreatePosEntrySalesLineDim(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry"; Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20])
+    var
+        TableID: array[10] of Integer;
+        No: array[10] of Code[20];
+        DimensionMgt: Codeunit DimensionManagement;
+    begin
+        TableID[1] := Type1;
+        No[1] := No1;
+        TableID[2] := Type2;
+        No[2] := No2;
+        TableID[3] := Type3;
+        No[3] := No3;
+        TableID[3] := Type3;
+        No[3] := No3;
+        TableID[4] := Type4;
+        No[4] := No4;
+
+        POSEntrySalesLine."Shortcut Dimension 1 Code" := '';
+        POSEntrySalesLine."Shortcut Dimension 2 Code" := '';
+
+        POSEntrySalesLine."Dimension Set ID" :=
+          DimensionMgt.GetDefaultDimID(
+            TableID, No, GetPOSSourceCode(POSEntry."POS Unit No."),
+            POSEntrySalesLine."Shortcut Dimension 1 Code", POSEntrySalesLine."Shortcut Dimension 2 Code",
+            POSEntry."Dimension Set ID", DATABASE::Customer);
+        DimensionMgt.UpdateGlobalDimFromDimSetID(POSEntrySalesLine."Dimension Set ID", POSEntrySalesLine."Shortcut Dimension 1 Code", POSEntrySalesLine."Shortcut Dimension 2 Code");
+    end;
+
+    local procedure GetPOSSourceCode(POSUnitNo: Code[10]) SourceCode: Code[10]
+    var
+        NPRPOSUnit: Record "NPR Pos Unit";
+        NPRPOSStore: Record "NPR POS Store";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+    begin
+        SourceCode := '';
+
+        if not NPRPOSUnit.Get(POSUnitNo) then
+            exit;
+        if not NPRPOSStore.Get(NPRPOSUnit."POS Store Code") then
+            exit;
+        if POSPostingProfile.Get(NPRPOSStore."POS Posting Profile") then
+            SourceCode := POSPostingProfile."Source Code";
+    end;
+    #endregion
 }
 

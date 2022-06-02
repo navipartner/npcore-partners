@@ -33,7 +33,7 @@
         if NpCsDocument.Type = NpCsDocument.Type::"Collect in Store" then begin
             if IsReadyForArchivation(NpCsDocument) then begin
                 RunCallback(NpCsDocument);
-                NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument);
+                NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument, true);
             end;
             exit;
         end;
