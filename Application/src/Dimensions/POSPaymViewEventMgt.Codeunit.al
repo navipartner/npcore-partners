@@ -135,19 +135,21 @@
                 exit(true);
         end;
 
-        if SkipOnItemFilter() then
+        if SkipOnItemFilter(SalePOS) then
             exit(true);
 
         exit(false);
     end;
 
-    local procedure SkipOnItemFilter(): Boolean;
+    local procedure SkipOnItemFilter(SalePOS: Record "NPR POS Sale"): Boolean;
     var
         SalePOSLine: Record "NPR POS Sale Line";
         PopupDimFilter: Record "NPR Popup Dim. Filter";
     begin
         if PopupDimFilter.IsEmpty() then
             exit(false);
+        SalePOSLine.SetRange("Register No.", SalePOS."Register No.");
+        SalePOSLine.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SalePOSLine.SetRange(Type, SalePOSLine.Type::Item);
         if not SalePOSLine.FindSet() then
             exit(true);
