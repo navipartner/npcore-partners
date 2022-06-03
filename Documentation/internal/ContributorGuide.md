@@ -11,7 +11,6 @@
 7. [In-app tooltips](https://navipartner.visualstudio.com/_git/NpCore?path=/Documentation/internal/ContributorGuide.md&anchor=defining-tooltips)
 8. [General recommendations](https://navipartner.visualstudio.com/_git/NpCore?path=/Documentation/internal/ContributorGuide.md&anchor=general-recommendations)
 
-test
 
 
 # What is technical documentation?
