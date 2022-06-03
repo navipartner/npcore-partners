@@ -97,7 +97,6 @@
                 field("Ext. Line Reference No."; Rec."Ext. Line Reference No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Line Reference No. field';
                 }
                 field("External Ticket Number"; Rec."External Ticket Number")
@@ -176,6 +175,11 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Order No. field';
+                }
+                field("Admission Inclusion"; Rec."Admission Inclusion")
+                {
+                    ToolTip = 'Specifies the value of the Admission Inclusion field.';
+                    ApplicationArea = All;
                 }
             }
         }

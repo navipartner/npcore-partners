@@ -30,7 +30,6 @@
         OutStr: OutStream;
         FileNameLbl: Label 'TicketReservation-%1-%2.xml', Locked = true;
     begin
-
         Reservation.Import();
 
         InsertImportEntry('MakeTicketReservation', ImportEntry);
@@ -62,7 +61,6 @@
         Reservation.Export();
         ImportEntry.Modify(true);
         Commit();
-
     end;
 
     procedure PreConfirmTicketReservation(var PreConfirm: XmlPort "NPR TM Ticket PreConfirm"; ScannerStationId: Code[10])

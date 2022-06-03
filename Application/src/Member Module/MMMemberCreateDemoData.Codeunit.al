@@ -112,10 +112,10 @@
         TicketDemo.CreateItem('320100-2', '', 'MM-AUTO', 'Child Guest Ticket', 0);
         TicketDemo.CreateItem('320100-3', '', 'MM-AUTO', 'Senior Guesy Ticket', 0);
 
-        TicketDemo.CreateTicketBOM('320100-0', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        TicketDemo.CreateTicketBOM('320100-1', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        TicketDemo.CreateTicketBOM('320100-2', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        TicketDemo.CreateTicketBOM('320100-3', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        TicketDemo.CreateTicketBOM('320100-0', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        TicketDemo.CreateTicketBOM('320100-1', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        TicketDemo.CreateTicketBOM('320100-2', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        TicketDemo.CreateTicketBOM('320100-3', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
         MembershipSetup.Get('GOLD');
         MembershipSetup."Ticket Item Barcode" := 'IXRF-320100-0';

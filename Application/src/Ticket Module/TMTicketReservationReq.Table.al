@@ -26,8 +26,8 @@
         {
             Caption = 'Request Status';
             DataClassification = CustomerContent;
-            OptionCaption = 'Registered,Confirmed,Expired,Canceled,Work In Progress,Reserved,Waiting List';
-            OptionMembers = REGISTERED,CONFIRMED,EXPIRED,CANCELED,WIP,RESERVED,WAITINGLIST;
+            OptionCaption = 'Registered,Confirmed,Expired,Canceled,Work In Progress,Reserved,Waiting List,Optional';
+            OptionMembers = REGISTERED,CONFIRMED,EXPIRED,CANCELED,WIP,RESERVED,WAITINGLIST,OPTIONAL;
         }
         field(13; "Request Status Date Time"; DateTime)
         {
@@ -217,6 +217,11 @@
             Caption = 'Authorization Code';
             DataClassification = CustomerContent;
         }
+        field(130; Default; Boolean)
+        {
+            Caption = 'Default';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Receipt No."; Code[20])
         {
             Caption = 'Receipt No.';
@@ -250,10 +255,16 @@
         key(Key6; "External Ticket Number")
         {
         }
+        key(Key7; "Session Token ID", "Admission Inclusion")
+        {
+        }
     }
 
     fieldgroups
     {
     }
+
+
+
 }
 

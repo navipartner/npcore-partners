@@ -98,39 +98,40 @@
         IsValid: Boolean;
     begin
         TicketRequestManager.LockResources('IssueTicketsFromToken');
+        if LastSalesLineForTicket(Token, SalesReceiptNo, SalesLineNo) then
+            if (TicketRequestManager.IsReservationRequest(Token)) then begin
+                TicketRequestManager.ConfirmReservationRequestWithValidate(Token);
 
-        if (TicketRequestManager.IsReservationRequest(Token)) then begin
-            TicketRequestManager.ConfirmReservationRequestWithValidate(Token);
+                Ticket.Reset();
+                Ticket.SetCurrentKey("Sales Receipt No.");
+                Ticket.SetFilter("Sales Receipt No.", '=%1', SalesReceiptNo);
+                Ticket.SetFilter("Line No.", '=%1', SalesLineNo);
+                if (Ticket.FindSet()) then begin
+                    repeat
 
-            Ticket.Reset();
-            Ticket.SetCurrentKey("Sales Receipt No.");
-            Ticket.SetFilter("Sales Receipt No.", '=%1', SalesReceiptNo);
-            Ticket.SetFilter("Line No.", '=%1', SalesLineNo);
-            if (Ticket.FindSet()) then begin
-                repeat
+                        if (TicketType.Get(Ticket."Ticket Type Code")) then begin
 
-                    if (TicketType.Get(Ticket."Ticket Type Code")) then begin
+                            if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
+                                if (TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) then
+                                    RegisterDefaultAdmissionArrivalOnPosSales(Ticket);
 
-                        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
-                            if (TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) then
-                                RegisterDefaultAdmissionArrivalOnPosSales(Ticket);
+                                if (TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) then
+                                    RegisterAllAdmissionArrivalOnPosSales(Ticket);
+                            end;
 
-                            if (TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) then
-                                RegisterAllAdmissionArrivalOnPosSales(Ticket);
+                            if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then
+                                RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, 0);
+
                         end;
+                    until (Ticket.Next() = 0);
 
-                        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then
-                            RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, 0);
+                    OnAfterPosTicketArrival(IsCheckedBySubscriber, IsValid, Ticket."No.", Ticket."External Member Card No.", Token, ResponseMessage);
+                    if ((IsCheckedBySubscriber) and (not IsValid)) then
+                        Error(ResponseMessage);
 
-                    end;
-                until (Ticket.Next() = 0);
 
-                OnAfterPosTicketArrival(IsCheckedBySubscriber, IsValid, Ticket."No.", Ticket."External Member Card No.", Token, ResponseMessage);
-                if ((IsCheckedBySubscriber) and (not IsValid)) then
-                    Error(ResponseMessage);
-
+                end;
             end;
-        end;
 
         if (TicketRequestManager.IsRevokeRequest(Token)) then begin
             TicketRequestManager.RevokeReservationTokenRequest(Token, false);
@@ -525,6 +526,76 @@
 
     end;
 
+    procedure CreateAdmissionAccessEntryDynamicTicket(var Ticket: Record "NPR TM Ticket"; TicketQty: Integer; AdmissionCode: Code[20]; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; var TicketAccessEntry: Record "NPR TM Ticket Access Entry"; var AllowAdmissionOverAllocation: Enum "NPR TM Ternary")
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        Admission: Record "NPR TM Admission";
+        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        MaxCapacity: Integer;
+        CapacityControl: Option;
+        ResponseMessage: Text;
+        ResponseCode: Integer;
+    begin
+
+        if (TicketQty <= 0) then
+            exit;
+
+        Admission.Get(AdmissionCode);
+        TicketType.Get(Ticket."Ticket Type Code");
+
+
+        if (AdmissionSchEntry."Entry No." <= 0) then begin
+            case GetAdmissionSchedule(Ticket."Item No.", Ticket."Variant Code", AdmissionCode) of
+                Admission."Default Schedule"::TODAY,
+              Admission."Default Schedule"::NEXT_AVAILABLE:
+
+                    if (not AdmissionSchEntry.Get(GetCurrentScheduleEntry(Ticket, Admission."Admission Code", true))) then
+                        RaiseError(StrSubstNo(NO_DEFAULT_SCHEDULE, Admission."Admission Code", Admission.FieldCaption("Default Schedule"), Admission."Default Schedule"), NO_DEFAULT_SCHEDULE_NO);
+            end;
+        end else begin
+
+            if (IsSelectedAdmissionSchEntryExpired(AdmissionSchEntry, Today, Time, ResponseMessage, ResponseCode)) then
+                RaiseError(ResponseMessage, Format(ResponseCode, 0, 9));
+
+        end;
+
+        TicketAccessEntry.Init();
+        TicketAccessEntry."Entry No." := 0;
+        TicketAccessEntry."Ticket No." := Ticket."No.";
+        TicketAccessEntry."Admission Code" := Admission."Admission Code";
+        TicketAccessEntry."Ticket Type Code" := Ticket."Ticket Type Code";
+        TicketAccessEntry.Description := CopyStr(Admission.Description, 1, MaxStrLen(TicketAccessEntry.Description));
+        TicketAccessEntry.Status := TicketAccessEntry.Status::ACCESS;
+        TicketAccessEntry.Quantity := TicketQty;
+        TicketAccessEntry.Insert(true);
+
+        DetailedTicketAccessEntry.Init();
+        DetailedTicketAccessEntry."Entry No." := 0;
+        DetailedTicketAccessEntry."Ticket No." := TicketAccessEntry."Ticket No.";
+        DetailedTicketAccessEntry."Ticket Access Entry No." := TicketAccessEntry."Entry No.";
+        DetailedTicketAccessEntry.Type := DetailedTicketAccessEntry.Type::INITIAL_ENTRY;
+        DetailedTicketAccessEntry."External Adm. Sch. Entry No." := AdmissionSchEntry."External Schedule Entry No.";
+        DetailedTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
+        DetailedTicketAccessEntry.Open := true;
+        DetailedTicketAccessEntry.Insert(true);
+
+        if (Admission.Type = Admission.Type::OCCASION) then begin
+            RegisterReservation_Worker(Ticket, TicketAccessEntry."Entry No.", AdmissionSchEntry."Entry No.");
+            ValidateReservationCapacityExceeded(Ticket, AdmissionSchEntry, AllowAdmissionOverAllocation);
+        end;
+
+        if (GetAdmissionCapacity(AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code", AdmissionSchEntry."Entry No.", MaxCapacity, CapacityControl)) then
+            if (CapacityControl = Admission."Capacity Control"::SALES) then
+                ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionSchEntry."Entry No.", _TicketExecutionContext::SALES, AllowAdmissionOverAllocation);
+
+        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then
+            ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionSchEntry."Entry No.", _TicketExecutionContext::SALES, AllowAdmissionOverAllocation);
+
+        ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", AdmissionSchEntry."Admission Start Date");
+
+    end;
+
+
     procedure RescheduleTicketAdmission(TicketNo: Code[20]; NewExtScheduleEntryNo: Integer; EnforceReschedulePolicy: Boolean; ReferenceDateTime: DateTime)
     var
         Ticket: Record "NPR TM Ticket";
@@ -606,6 +677,88 @@
 
     end;
 
+    procedure RescheduleDynamicTicketAdmission(TicketNo: Code[20]; NewExtScheduleEntryNo: Integer; EnforceReschedulePolicy: Boolean; ReferenceDateTime: DateTime; POSSession: Codeunit "NPR POS Session"; var SalesTicketNo: Code[20]; EntryNo: Integer)
+    var
+        Ticket: Record "NPR TM Ticket";
+        Admission: Record "NPR TM Admission";
+        NewAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        OldDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        NewDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary";
+        CapacityControl: Option;
+        MaxCapacity: Integer;
+    begin
+        Ticket.Get(TicketNo);
+
+        NewAdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', NewExtScheduleEntryNo);
+        NewAdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        if (not NewAdmissionScheduleEntry.FindFirst()) then
+            RaiseError(StrSubstNo(INVALID_REFERENCE, NewAdmissionScheduleEntry.TableCaption(), NewAdmissionScheduleEntry), '-2002');
+
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
+        TicketAccessEntry.SetFilter("Admission Code", '=%1', NewAdmissionScheduleEntry."Admission Code");
+        if not TicketAccessEntry.FindFirst() then begin // adding new admission
+            CreateAdmissionAccessEntryDynamicTicket(Ticket, 1, NewAdmissionScheduleEntry."Admission Code", NewAdmissionScheduleEntry, TicketAccessEntry, AdmissionOverAllocationConfirmed);
+            // create POS line, get correct item,     
+            CreateSalesLinePerAdmission(POSSession, SalesTicketNo, NewAdmissionScheduleEntry, EntryNo, Ticket."Item No.");
+        end
+        else begin
+            OldDetTicketAccessEntry.SetFilter(Type, '=%1', OldDetTicketAccessEntry.Type::INITIAL_ENTRY);
+            OldDetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type, Open, "Posting Date");
+            OldDetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+            OldDetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
+            OldDetTicketAccessEntry.FindLast();
+
+            if (NewExtScheduleEntryNo = OldDetTicketAccessEntry."External Adm. Sch. Entry No.") then
+                exit;
+
+            if (EnforceReschedulePolicy) then
+                if (not IsRescheduleAllowed(Ticket."External Ticket No.", OldDetTicketAccessEntry."External Adm. Sch. Entry No.", ReferenceDateTime)) then
+                    RaiseError(StrSubstNo(RESCHEDULE_NOT_ALLOWED, Ticket."Item No.", NewAdmissionScheduleEntry."Admission Code"), RESCHEDULE_NOT_ALLOWED_NO);
+
+            NewDetTicketAccessEntry.TransferFields(OldDetTicketAccessEntry, false);
+
+            // create a new initial entry for the new time
+            NewDetTicketAccessEntry."Entry No." := 0;
+            NewDetTicketAccessEntry."External Adm. Sch. Entry No." := NewExtScheduleEntryNo;
+            NewDetTicketAccessEntry."Created Datetime" := CurrentDateTime();
+            NewDetTicketAccessEntry.Insert();
+
+            // reverse original initial entry
+            NewDetTicketAccessEntry."Entry No." := 0;
+            NewDetTicketAccessEntry."External Adm. Sch. Entry No." := OldDetTicketAccessEntry."External Adm. Sch. Entry No.";
+            NewDetTicketAccessEntry.Quantity := OldDetTicketAccessEntry.Quantity * -1;
+            NewDetTicketAccessEntry.Insert();
+
+            // link original entry with reversal entry instead of payment entry
+            OldDetTicketAccessEntry."Closed By Entry No." := NewDetTicketAccessEntry."Entry No.";
+            OldDetTicketAccessEntry.Modify();
+
+            Admission.Get(NewAdmissionScheduleEntry."Admission Code");
+            if (Admission.Type = Admission.Type::OCCASION) then begin
+                OldDetTicketAccessEntry.SetFilter(Type, '=%1', OldDetTicketAccessEntry.Type::RESERVATION);
+                OldDetTicketAccessEntry.FindLast();
+
+                OldDetTicketAccessEntry.Type := OldDetTicketAccessEntry.Type::CANCELED_RESERVATION;
+                OldDetTicketAccessEntry."Closed By Entry No." := RegisterReservation_Worker(Ticket, TicketAccessEntry."Entry No.", NewAdmissionScheduleEntry."Entry No.");
+                OldDetTicketAccessEntry.Open := false;
+                OldDetTicketAccessEntry.Modify();
+
+                ValidateReservationCapacityExceeded(Ticket, NewAdmissionScheduleEntry, AdmissionOverAllocationConfirmed);
+
+            end;
+        end;
+        if (GetAdmissionCapacity(NewAdmissionScheduleEntry."Admission Code", NewAdmissionScheduleEntry."Schedule Code", NewAdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControl)) then
+            if (CapacityControl = Admission."Capacity Control"::SALES) then
+                ValidateTicketAdmissionCapacityExceeded(Ticket, NewAdmissionScheduleEntry."Entry No.", _TicketExecutionContext::SALES, AdmissionOverAllocationConfirmed);
+
+        ValidateTicketAdmissionReservationDate(TicketAccessEntry."Entry No.", NewAdmissionScheduleEntry."Entry No.");
+
+        ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", NewAdmissionScheduleEntry."Admission Start Date");
+
+    end;
+
     procedure IsRescheduleAllowed(ExternalTicketNumber: Text[30]; ExtAdmSchEntryNo: Integer; ReferenceDateTime: DateTime): Boolean
     var
         Ticket: Record "NPR TM Ticket";
@@ -616,10 +769,14 @@
         ResponseCode: Integer;
     begin
 
+
         Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
         Ticket.SetFilter(Blocked, '=%1', false);
         if (not Ticket.FindFirst()) then
             exit(false);
+
+        if ExtAdmSchEntryNo = 0 then
+            exit(true);
 
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtAdmSchEntryNo);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
@@ -639,7 +796,7 @@
                     TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
                     TicketAccessEntry.SetFilter("Access Date", '=%1', 0D);
                     if (TicketAccessEntry.IsEmpty()) then
-                        exit(false);
+                        exit(true);
 
                     ReferenceDateTime := CurrentDateTime();
                     exit(not IsSelectedAdmissionSchEntryExpired(AdmissionScheduleEntry, DT2DATE(ReferenceDateTime), DT2TIME(ReferenceDateTime), ResponseMessage, ResponseCode));
@@ -650,7 +807,7 @@
                     TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
                     TicketAccessEntry.SetFilter("Access Date", '=%1', 0D);
                     if (TicketAccessEntry.IsEmpty()) then
-                        exit(false);
+                        exit(true);
 
                     ReferenceDateTime += TicketAdmissionBOM."Reschedule Cut-Off (Hours)" * 60 * 60 * 1000;
                     exit(not IsSelectedAdmissionSchEntryExpired(AdmissionScheduleEntry, DT2DATE(ReferenceDateTime), DT2TIME(ReferenceDateTime), ResponseMessage, ResponseCode));
@@ -661,7 +818,7 @@
 
     end;
 
-    local procedure IsSelectedAdmissionSchEntryExpired(AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; ReferenceDate: Date; ReferenceTime: Time; var ResponseMessage: Text; var ResponseCode: Integer): Boolean
+    procedure IsSelectedAdmissionSchEntryExpired(AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; ReferenceDate: Date; ReferenceTime: Time; var ResponseMessage: Text; var ResponseCode: Integer): Boolean
     var
         DateTimeLbl: Label '%1  - %2', Locked = true;
     begin
@@ -3076,6 +3233,48 @@
         if (not DocumentEntry.Insert()) then;
 
         exit(DocNoOfRecords);
+    end;
+
+    local procedure CreateSalesLinePerAdmission(var POSSession: Codeunit "NPR POS Session"; var SalesTicketNo: Code[20]; NewAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; EntryNo: Integer; ItemNo: Code[20])
+    var
+        Admission: Record "NPR TM Admission";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        BasePrice, AddonPrice : Decimal;
+    begin
+        Admission.Get(NewAdmissionScheduleEntry."Admission Code");
+        if Admission."Additional Experience Item No." = '' then
+            exit;
+
+        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."No." := Admission."Additional Experience Item No.";
+        SaleLinePOS.Description := Admission.Description;
+        SaleLinePOS.Quantity := 1;
+
+        POSSession.GetSaleLine(SaleLine);
+        TicketPrice.CalculateScheduleEntryPrice(ItemNo, SaleLinePOS."Variant Code", NewAdmissionScheduleEntry."Admission Code", NewAdmissionScheduleEntry."External Schedule Entry No.", SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", Today(), Time(), BasePrice, AddonPrice);
+        SaleLine.InsertLine(SaleLinePOS, false);
+        SaleLinePOS.Validate("Unit Price", BasePrice + AddonPrice);
+        SaleLinePOS.Modify();
+
+        SalesTicketNo := SaleLinePOS."Sales Ticket No.";
+
+        TicketReservationRequest.Get(EntryNo);
+        TicketReservationRequest."Line No." := SaleLinePOS."Line No.";
+        TicketReservationRequest.Modify();
+    end;
+
+    local procedure LastSalesLineForTicket(Token: Text[100]; SalesReceiptNo: Code[20]; SalesLineNo: Integer): Boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID", "Receipt No.", "Line No.");
+        TicketReservationRequest.SetRange("Session Token ID", Token);
+        TicketReservationRequest.SetRange("Receipt No.", SalesReceiptNo);
+        TicketReservationRequest.FindLast();
+        exit(SalesLineNo = TicketReservationRequest."Line No.");
     end;
 }
 
