@@ -159,7 +159,12 @@
         {
             Caption = 'eTicket Type Code';
             DataClassification = CustomerContent;
-            Description = '//-TM1.38 [332109]';
+        }
+        field(220; "Additional Experience Item No."; Code[20])
+        {
+            Caption = 'Additional Experience Item No.';
+            DataClassification = CustomerContent;
+            TableRelation = Item;
         }
 
     }
@@ -181,7 +186,6 @@
         TMTicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         MMMembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
     begin
-        //-TM1.11
         TMTicketAdmissionBOM.SetRange("Admission Code", "Admission Code");
         if (TMTicketAdmissionBOM.FindFirst()) then
             Error(ADMISSION_REF, "Admission Code", TMTicketAdmissionBOM.TableCaption, TMTicketAdmissionBOM."Item No.");
@@ -193,7 +197,6 @@
         TMAdmissionScheduleLines.Reset();
         TMAdmissionScheduleLines.SetRange("Admission Code", "Admission Code");
         TMAdmissionScheduleLines.DeleteAll(true);
-        //+TM1.11
     end;
 
     trigger OnModify()

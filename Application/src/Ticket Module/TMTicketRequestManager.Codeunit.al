@@ -167,6 +167,44 @@
         end;
     end;
 
+    procedure DeleteReservationRequestDynamicTicket(Token: Text[100]; RemoveRequest: Boolean; POSSalesLineNo: Integer)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Request Status", '<>%1 & <>%2', TicketReservationRequest."Request Status"::RESERVED, TicketReservationRequest."Request Status"::WAITINGLIST);
+        if MoreSalesLinesForTicket(Token, POSSalesLineNo) then
+            TicketReservationRequest.SetRange("Line No.", POSSalesLineNo);
+
+
+        if (TicketReservationRequest.FindSet(true, false)) then begin
+            repeat
+                if TicketReservationRequest."Line No." = POSSalesLineNo then begin
+                    FindTicketByToken(Ticket, Token, TicketReservationRequest."Admission Code", false, TicketReservationRequest."Ext. Line Reference No.");
+                    if Ticket."No." = '' then
+                        FindTicketByToken(Ticket, Token, TicketReservationRequest."Admission Code", true, TicketReservationRequest."Ext. Line Reference No.");
+                    TicketReservationRequest.Quantity := 0;
+                    TicketReservationRequest."Admission Inclusion" := TicketReservationRequest."Admission Inclusion"::NOT_SELECTED;
+                    TicketReservationRequest."Line No." := 0;
+                    TicketReservationRequest."Admission Created" := false; //DeleteAdmission
+                    TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                    TicketAccessEntry.SetRange("Admission Code", TicketReservationRequest."Admission Code");
+                    if TicketAccessEntry.FindFirst() then begin
+                        DetailedTicketAccessEntry.SetRange("Ticket Access Entry No.", TicketAccessEntry."Entry No.");
+                        DetailedTicketAccessEntry.DeleteAll();
+                        TicketAccessEntry.Delete(true);
+                    end;
+                    TicketReservationRequest.Modify();
+                end;
+            until (TicketReservationRequest.Next() = 0);
+
+        end;
+    end;
+
     local procedure ReverseInitialEntryStatistics(DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; MaxAccessEntryNo: Integer)
     var
         TicketAccessStatistics: Record "NPR TM Ticket Access Stats";
@@ -214,6 +252,7 @@
         exit(0);
     end;
 
+
     procedure IssueTicketFromReservation(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
         Ticket: Record "NPR TM Ticket";
@@ -244,6 +283,7 @@
                 end;
             end;
         end;
+
     end;
 
     local procedure _IssueNewTickets(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; RequestEntryNo: Integer; AdditionCost: Decimal)
@@ -253,6 +293,7 @@
         TicketType: Record "NPR TM Ticket Type";
         TicketSetup: Record "NPR TM Ticket Setup";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        ReservationRequest2: Record "NPR TM Ticket Reservation Req.";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         TicketManagement: Codeunit "NPR TM Ticket Management";
         NumberOfTickets: Integer;
@@ -296,9 +337,11 @@
 
         if (GetShowProgressBar()) then
             Window.Open('Creating tickets... @1@@@@@@@@@@@@@');
+        if ReservationRequest."Receipt No." <> '' then
+            CreateAdditionalExperienceLine(ReservationRequest);
 
         ReservationRequest."Primary Request Line" := true;
-        ReservationRequest."Admission Created" := true;
+        ReservationRequest."Admission Created" := false;
         ReservationRequest."Request Status" := ReservationRequest."Request Status"::REGISTERED;
         ReservationRequest."Expires Date Time" := CalculateNewExpireTime();
 
@@ -308,7 +351,12 @@
         if (TicketSetup."Authorization Code Scheme" = '') then
             TicketSetup."Authorization Code Scheme" := '[N*4]-[N*4]';
 
-        ReservationRequest."Authorization Code" := CopyStr(TicketManagement.GenerateCertificateNumber(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(ReservationRequest."Authorization Code"));
+        ReservationRequest2.SetRange("Session Token ID", ReservationRequest."Session Token ID");
+        ReservationRequest2.SetFilter("Authorization Code", '<>%1', '');
+        if ReservationRequest2.FindFirst() then
+            ReservationRequest."Authorization Code" := ReservationRequest2."Authorization Code"
+        else
+            ReservationRequest."Authorization Code" := CopyStr(TicketManagement.GenerateCertificateNumber(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(ReservationRequest."Authorization Code"));
         ReservationRequest.Modify();
 
         for i := 1 to Abs(NumberOfTickets) do begin
@@ -335,30 +383,12 @@
         TicketManagement: Codeunit "NPR TM Ticket Management";
         LowDate: Date;
         HighDate: Date;
-        UserSetup: Record "User Setup";
         ScheduleSelectionError: Label 'Ticket is not valid for selected schedule. Ticket is valid until %1 but you have selected a schedule on %2';
     begin
-
-        Ticket.Init();
-        Ticket."No." := '';
-        Ticket."No. Series" := TicketType."No. Series";
-        Ticket."Ticket Type Code" := TicketType.Code;
-        Ticket."Item No." := ItemNo;
-        Ticket."Variant Code" := VariantCode;
-        Ticket."Customer No." := ReservationRequest."Customer No.";
-        Ticket."Ticket Reservation Entry No." := ReservationRequest."Entry No.";
-        Ticket."External Member Card No." := ReservationRequest."External Member No.";
-        Ticket."Sales Receipt No." := ReservationRequest."Receipt No.";
-        Ticket."Line No." := ReservationRequest."Line No.";
-
-        if (UserSetup.Get(CopyStr(UserId(), 1, MaxStrLen(UserSetup."User ID")))) then
-            Ticket."Salesperson Code" := UserSetup."Salespers./Purch. Code";
-
-        if (Ticket."Salesperson Code" = '') then
-            Ticket."Salesperson Code" := CopyStr(UserId(), 1, MaxStrLen(Ticket."Salesperson Code"));
-
-        TicketManagement.SetTicketProperties(Ticket, Today);
-        Ticket.Insert(true);
+        if ReservationRequest.Default then begin
+            InsertTicket(ItemNo, VariantCode, TicketType, ReservationRequest, Ticket, TicketManagement);
+        end else
+            FindTicketByToken(Ticket, ReservationRequest."Session Token ID", ReservationRequest."Admission Code", true, ReservationRequest."Ext. Line Reference No.");
 
         _IssueAdmissionsAppendToTicket(Ticket, QuantityPerTicket, ReservationRequest, AdditionalAdmissionCosts, OverAllocationConfirmed);
 
@@ -374,14 +404,13 @@
         AdmissionUnitPrice: Decimal;
         AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary";
     begin
-
         // Create Ticket Content
         TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketBom.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
+        TicketBom.SetFilter("Admission Code", ReservationRequest."Admission Code");
         if (TicketBom.FindSet()) then begin
 
             ValidateTicketBomSalesDateLimit(TicketBom, QuantityPerTicket, Today);
-
             repeat
 
                 if (not OverAllocationConfirmed.ContainsKey(TicketBom."Admission Code")) then begin
@@ -401,7 +430,6 @@
 
             until (TicketBom.Next() = 0);
         end;
-
     end;
 
     local procedure _IssueOneAdmission(SourceRequest: Record "NPR TM Ticket Reservation Req."; Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; QuantityPerTicket: Integer; ValidateWaitinglistReference: Boolean; var AdmissionUnitPrice: Decimal; var AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary")
@@ -533,6 +561,8 @@
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
         TicketReservationRequest.FindSet();
         repeat
+            if TicketReservationRequest.Default then
+                SwitchTicketReservationEntryNo(TicketReservationRequest);
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
             if (Ticket.FindSet()) then begin
                 repeat
@@ -587,8 +617,16 @@
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Request Status", '=%1|=%2', TicketReservationRequest."Request Status"::REGISTERED, TicketReservationRequest."Request Status"::RESERVED);
 
+        // Filter only on Required and Selected
+        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequest."Admission Inclusion"::REQUIRED, TicketReservationRequest."Admission Inclusion"::SELECTED);
         TicketReservationRequest.ModifyAll("Request Status", TicketReservationRequest."Request Status"::CONFIRMED);
         TicketReservationRequest.ModifyAll("Request Status Date Time", CurrentDateTime());
+        TicketReservationRequest.ModifyAll("Expires Date Time", CreateDateTime(0D, 0T));
+
+        // Filter only on not Selected
+        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
+        TicketReservationRequest.ModifyAll("Request Status", TicketReservationRequest."Request Status"::OPTIONAL);
+        TicketReservationRequest.ModifyAll("Request Status Date Time", CurrentDateTime);
         TicketReservationRequest.ModifyAll("Expires Date Time", CreateDateTime(0D, 0T));
 
         FinalizePayment(Token);
@@ -617,6 +655,35 @@
         repeat
             TicketReservationRequest."Request Status Date Time" := CurrentDateTime();
             TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CONFIRMED;
+            TicketReservationRequest."Admission Created" := (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
+            TicketReservationRequest."Scheduled Time Description" := '';
+            if (TicketReservationRequest."External Adm. Sch. Entry No." <> 0) then begin
+                AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
+                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                if (AdmissionScheduleEntry.FindLast()) then
+                    TicketReservationRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+            end;
+            TicketReservationRequest.Modify();
+
+        until (TicketReservationRequest.Next() = 0);
+
+        OnAfterConfirmTicketChangeRequestPublisher(Token);
+
+    end;
+
+    procedure ConfirmChangeRequestDynamicTicket(Token: Text[100]);
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        DateTimeLbl: Label '%1 - %2', Locked = true;
+    begin
+
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter(Quantity, '<>0');
+        TicketReservationRequest.FindSet();
+        repeat
+            TicketReservationRequest."Request Status Date Time" := CurrentDateTime();
             TicketReservationRequest."Admission Created" := (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
             TicketReservationRequest."Scheduled Time Description" := '';
             if (TicketReservationRequest."External Adm. Sch. Entry No." <> 0) then begin
@@ -858,6 +925,7 @@
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
         TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
+        TicketReservationRequest.SetFilter("Admission Inclusion", '%1|%2', TicketReservationRequest."Admission Inclusion"::REQUIRED, TicketReservationRequest."Admission Inclusion"::SELECTED);
         if (not TicketReservationRequest.FindSet()) then begin
             ResponseMessage := 'Houston, - we have a problem with ticket request table integrity.';
             exit(false);
@@ -885,6 +953,8 @@
         if (MessageToken = '') then
             MessageToken := GetNewToken();
 
+        TicketReservationRequest.SetRange("Admission Inclusion");
+        TicketReservationRequest.FindSet();
         repeat
             TicketChangeRequest.TransferFields(TicketReservationRequest, false);
             TicketChangeRequest."Session Token ID" := MessageToken;
@@ -902,36 +972,167 @@
             if (TicketReservationRequest."Admission Code" <> '') then
                 TicketAccessEntry.SetFilter("Admission Code", '=%1', TicketChangeRequest."Admission Code");
 
-            TicketAccessEntry.FindSet();
-            repeat
-                TicketChangeRequest."Entry No." := 0;
-                TicketChangeRequest."Admission Code" := TicketAccessEntry."Admission Code";
-                Admission.Get(TicketChangeRequest."Admission Code");
-                TicketBom.Get(TicketChangeRequest."Item No.", TicketChangeRequest."Variant Code", TicketChangeRequest."Admission Code");
-                TicketChangeRequest."Primary Request Line" := TicketBom.Default;
-                TicketChangeRequest."Admission Description" := Admission.Description;
+            if TicketAccessEntry.FindSet() then
+                repeat
+                    TicketChangeRequest."Entry No." := 0;
+                    TicketChangeRequest."Admission Code" := TicketAccessEntry."Admission Code";
+                    Admission.Get(TicketChangeRequest."Admission Code");
+                    TicketBom.Get(TicketChangeRequest."Item No.", TicketChangeRequest."Variant Code", TicketChangeRequest."Admission Code");
+                    TicketChangeRequest."Primary Request Line" := TicketBom.Default;
+                    TicketChangeRequest."Admission Description" := Admission.Description;
 
-                DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-                DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
-                DetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
-                if (DetTicketAccessEntry.FindLast()) then
-                    TicketChangeRequest."External Adm. Sch. Entry No." := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+                    DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+                    DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+                    DetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
+                    if (DetTicketAccessEntry.FindLast()) then
+                        TicketChangeRequest."External Adm. Sch. Entry No." := DetTicketAccessEntry."External Adm. Sch. Entry No.";
 
-                DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
-                if (DetTicketAccessEntry.FindLast()) then
-                    TicketChangeRequest."External Adm. Sch. Entry No." := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+                    DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+                    if (DetTicketAccessEntry.FindLast()) then
+                        TicketChangeRequest."External Adm. Sch. Entry No." := DetTicketAccessEntry."External Adm. Sch. Entry No.";
 
-                AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketChangeRequest."External Adm. Sch. Entry No.");
-                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                AdmissionScheduleEntry.FindLast();
-                TicketChangeRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+                    AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketChangeRequest."External Adm. Sch. Entry No.");
+                    AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                    AdmissionScheduleEntry.FindLast();
+                    TicketChangeRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
 
-                TicketChangeRequest.Insert();
-            until (TicketAccessEntry.Next() = 0);
+                    TicketChangeRequest.Insert();
+                until (TicketAccessEntry.Next() = 0);
 
             if (TicketReservationRequest."Admission Code" = '') then
                 exit(true); // either the request is complete with all admission codes, or it is created in lazy mode with just the item
 
+        until (TicketReservationRequest.Next() = 0);
+
+        exit(true);
+
+    end;
+
+
+    procedure CreateChangeRequestDynamicTicket(ExternalTicketNo: Code[30]; AuthorizationCode: Code[10]; var MessageToken: Text[100]; var ResponseMessage: Text): Boolean;
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketChangeRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        Admission: Record "NPR TM Admission";
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        DateTimeLbl: Label '%1-%2', Locked = true;
+    begin
+
+        Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNo);
+        Ticket.SetFilter(Blocked, '=%1', false);
+        if (not Ticket.FindFirst()) then begin
+            ResponseMessage := INVALID_TICKET_PIN;
+            exit(false);
+        end;
+
+
+        if (not TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then begin
+            ResponseMessage := INVALID_TICKET_PIN;
+            exit(false);
+        end;
+
+        if (TicketReservationRequest."Authorization Code" <> AuthorizationCode) then begin
+            ResponseMessage := INVALID_TICKET_PIN;
+            exit(false);
+        end;
+
+        TicketReservationRequest.CalcFields("Is Superseeded");
+        repeat
+            if (TicketReservationRequest."Is Superseeded") then begin
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.SetFilter("Superseeds Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                TicketReservationRequest.FindFirst();
+                TicketReservationRequest.CalcFields("Is Superseeded");
+            end;
+        until (not TicketReservationRequest."Is Superseeded");
+
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
+        TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
+        TicketReservationRequest.SetFilter("Admission Inclusion", '%1|%2', TicketReservationRequest."Admission Inclusion"::REQUIRED, TicketReservationRequest."Admission Inclusion"::SELECTED);
+        if (not TicketReservationRequest.FindSet()) then begin
+            ResponseMessage := 'Houston, - we have a problem with ticket request table integrity.';
+            exit(false);
+        end;
+
+        if ((TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::PRIMARY) and
+            (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED)) then begin
+            ResponseMessage := NOT_CONFIRMED;
+            exit(false);
+        end;
+        TicketReservationRequest.SetRange("Admission Inclusion");
+        if ((TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::CHANGE) and
+            (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::REGISTERED)) then begin
+            if ((MessageToken <> TicketReservationRequest."Session Token ID") and (MessageToken <> '')) then begin
+                TicketReservationRequest.ModifyAll("Expires Date Time", CalculateNewExpireTime());
+                TicketReservationRequest.ModifyAll("Session Token ID", MessageToken, false); // Multiple change requests - invalidate the previous one
+            end;
+            if (MessageToken = '') then begin
+                TicketReservationRequest.ModifyAll("Expires Date Time", CalculateNewExpireTime());
+                MessageToken := TicketReservationRequest."Session Token ID";
+            end;
+            exit(true);
+        end;
+
+        if (MessageToken = '') then
+            MessageToken := GetNewToken();
+
+
+        TicketReservationRequest.FindSet();
+        repeat
+            TicketChangeRequest.TransferFields(TicketReservationRequest, false);
+            if TicketChangeRequest.Quantity <> 0 then
+                TicketChangeRequest.Quantity := 1;
+            TicketChangeRequest."Session Token ID" := MessageToken;
+            TicketChangeRequest."Entry Type" := TicketChangeRequest."Entry Type"::CHANGE;
+            TicketChangeRequest."Created Date Time" := CURRENTDATETIME();
+            TicketChangeRequest."Request Status" := TicketChangeRequest."Request Status"::WIP;
+            TicketChangeRequest."Request Status Date Time" := CURRENTDATETIME();
+            TicketChangeRequest."Expires Date Time" := CalculateNewExpireTime();
+            TicketChangeRequest."Admission Created" := false;
+            TicketChangeRequest."Superseeds Entry No." := Ticket."Ticket Reservation Entry No.";
+            TicketChangeRequest."Receipt No." := '';
+            TicketChangeRequest."Line No." := 0;
+            TicketBom.Get(TicketChangeRequest."Item No.", TicketChangeRequest."Variant Code", TicketChangeRequest."Admission Code");
+            TicketChangeRequest."Primary Request Line" := TicketBom.Default;
+
+
+            TicketAccessEntry.SetFilter(TicketAccessEntry."Ticket No.", '=%1', Ticket."No.");
+            if (TicketReservationRequest."Admission Code" <> '') then
+                TicketAccessEntry.SetFilter("Admission Code", '=%1', TicketChangeRequest."Admission Code");
+
+            if TicketAccessEntry.FindSet() then
+                repeat
+                    TicketChangeRequest."Entry No." := 0;
+                    TicketChangeRequest."Admission Code" := TicketAccessEntry."Admission Code";
+                    Admission.Get(TicketChangeRequest."Admission Code");
+                    TicketChangeRequest."Admission Description" := Admission.Description;
+
+                    DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+                    DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+                    DetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
+                    if (DetTicketAccessEntry.FindLast()) then
+                        TicketChangeRequest."External Adm. Sch. Entry No." := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+
+                    DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+                    if (DetTicketAccessEntry.FindLast()) then
+                        TicketChangeRequest."External Adm. Sch. Entry No." := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+
+                    AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketChangeRequest."External Adm. Sch. Entry No.");
+                    AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                    AdmissionScheduleEntry.FindLast();
+                    TicketChangeRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+
+                until (TicketAccessEntry.Next() = 0);
+
+            if (TicketReservationRequest."Admission Code" = '') then
+                exit(true); // either the request is complete with all admission codes, or it is created in lazy mode with just the item
+            TicketChangeRequest."Entry No." := 0;
+            TicketChangeRequest.Insert();
         until (TicketReservationRequest.Next() = 0);
 
         exit(true);
@@ -987,18 +1188,18 @@
         TicketBom.FindSet();
 
         repeat
-            POS_AppendToReservationRequest(Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, TicketBom."Admission Code", Quantity, 0, ExternalMemberNo);
+            POS_AppendToReservationRequest(Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, TicketBom."Admission Code", Quantity, 0, ExternalMemberNo, 0);
         until (TicketBom.Next() = 0);
 
         exit(Token);
     end;
 
-    procedure POS_AppendToReservationRequest(Token: Text[100]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; Quantity: Integer; ExternalAdmissionScheduleEntryNo: Integer; ExternalMemberNo: Code[20])
+    procedure POS_AppendToReservationRequest(Token: Text[100]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; Quantity: Integer; ExternalAdmissionScheduleEntryNo: Integer; ExternalMemberNo: Code[20]; ExtLineReferenceNo: Integer)
     begin
-        POS_AppendToReservationRequest2(Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, AdmissionCode, Quantity, ExternalAdmissionScheduleEntryNo, ExternalMemberNo, '', '', '');
+        POS_AppendToReservationRequest2(Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, AdmissionCode, Quantity, ExternalAdmissionScheduleEntryNo, ExternalMemberNo, '', '', '', ExtLineReferenceNo);
     end;
 
-    procedure POS_AppendToReservationRequest2(Token: Text[100]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; Quantity: Integer; ExternalAdmissionScheduleEntryNo: Integer; ExternalMemberNo: Code[20]; ExternalOrderNo: Code[20]; CustomerNo: Code[20]; NotificationAddress: Text[100])
+    procedure POS_AppendToReservationRequest2(Token: Text[100]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; Quantity: Integer; ExternalAdmissionScheduleEntryNo: Integer; ExternalMemberNo: Code[20]; ExternalOrderNo: Code[20]; CustomerNo: Code[20]; NotificationAddress: Text[100]; ExtLineReferenceNo: Integer)
     var
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Admission: Record "NPR TM Admission";
@@ -1007,7 +1208,6 @@
         AdmSchEntry: Record "NPR TM Admis. Schedule Entry";
         DateTimeLbl: Label '%1 - %2', Locked = true;
     begin
-
         Admission.Get(AdmissionCode);
 
         Clear(ReservationRequest);
@@ -1020,12 +1220,15 @@
 
         TicketAdmissionBOM.Get(ItemNo, VariantCode, AdmissionCode);
         ReservationRequest."Admission Inclusion" := TicketAdmissionBOM."Admission Inclusion";
+        ReservationRequest.Default := TicketAdmissionBOM.Default;
         ReservationRequest."External Item Code" := GetExternalNo(ItemNo, VariantCode);
+        ReservationRequest."Ext. Line Reference No." := ExtLineReferenceNo;
 
         ReservationRequest."Item No." := ItemNo;
         ReservationRequest."Variant Code" := VariantCode;
 
-        ReservationRequest.Quantity := Quantity;
+        if ReservationRequest."Admission Inclusion" <> ReservationRequest."Admission Inclusion"::NOT_SELECTED then
+            ReservationRequest.Quantity := Quantity;
         ReservationRequest."External Member No." := ExternalMemberNo;
         ReservationRequest."Admission Description" := Admission.Description;
 
@@ -1059,11 +1262,11 @@
         end;
 
         ReservationRequest."Created Date Time" := CurrentDateTime();
-        ReservationRequest."Request Status" := ReservationRequest."Request Status"::WIP;
+        if (ReservationRequest."Receipt No." <> '') or (ReservationRequest."Ext. Line Reference No." <> 0) then
+            ReservationRequest."Request Status" := ReservationRequest."Request Status"::WIP;
         ReservationRequest."Request Status Date Time" := CurrentDateTime();
         ReservationRequest."Expires Date Time" := CalculateNewExpireTime();
         ReservationRequest.Insert();
-
     end;
 
     procedure POS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var RevokeQuantity: Integer): Boolean
@@ -1073,6 +1276,7 @@
         Admission: Record "NPR TM Admission";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         DetTicketAccessEntry2: Record "NPR TM Det. Ticket AccessEntry";
         InitialQuantity: Integer;
@@ -1090,15 +1294,18 @@
             exit(false);
 
         TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
-        TicketBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code"); // -+ #333705 [333705]
+        TicketBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
         TicketBOM.FindSet();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         repeat
             TotalPct += TicketBOM."Refund Price %";
-            AdmissionCount += 1;
+            TicketAccessEntry.SetFilter("Admission Code", '=%1', TicketBOM."Admission Code");
+            if not TicketAccessEntry.IsEmpty() then
+                AdmissionCount += 1;
         until (TicketBOM.Next() = 0);
         UsePctDistribution := (TotalPct = 100);
 
-        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.SetRange("Admission Code");
         TicketAccessEntry.FindSet();
 
         if (Token = '') then
@@ -1633,7 +1840,7 @@
         ReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         ReservationRequest.SetFilter("Request Status", '=%1', ReservationRequest."Request Status"::CONFIRMED);
         if (ReservationRequest.IsEmpty()) then
-            DeleteReservationRequest(Token, true);
+            DeleteReservationRequestDynamicTicket(Token, true, SaleLinePOS."Line No.");
     end;
 
     procedure ReadyToConfirm(Token: Text[100]): Boolean
@@ -2386,6 +2593,110 @@
         exit(ResponseMessage = '');
     end;
 
+    local procedure FindTicketByToken(var Ticket: Record "NPR TM Ticket"; SessionTokenID: Text[100]; AdmissionCode: Code[20]; Current: Boolean; ExtLineReferenceNo: Integer)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TMTicketAccessEntry: Record "NPR TM Ticket Access Entry";
+    begin
+        TicketReservationRequest.SetRange("Session Token ID", SessionTokenID);
+        TicketReservationRequest.SetRange(Default, true);
+        TicketReservationRequest.SetRange("Ext. Line Reference No.", ExtLineReferenceNo);
+        if TicketReservationRequest.FindFirst() then begin
+            if Current then
+                Ticket.SetRange("Ticket Reservation Entry No.", TicketReservationRequest."Entry No.")
+            else
+                Ticket.SetRange("Ticket Reservation Entry No.", TicketReservationRequest."Superseeds Entry No.");
+            if Ticket.FindSet() then
+                repeat
+                    TMTicketAccessEntry.Reset();
+                    TMTicketAccessEntry.SetRange("Ticket No.", Ticket."No.");
+                    TMTicketAccessEntry.SetRange("Admission Code", AdmissionCode);
+                    if TMTicketAccessEntry.IsEmpty() then
+                        exit;
+                until Ticket.Next() = 0;
+        end;
+    end;
+
+    local procedure InsertTicket(ItemNo: Code[20]; VariantCode: Code[10]; TicketType: Record "NPR TM Ticket Type"; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var Ticket: Record "NPR TM Ticket"; var TicketManagement: Codeunit "NPR TM Ticket Management")
+    var
+        UserSetup: Record "User Setup";
+    begin
+        Ticket.Init();
+        Ticket."No." := '';
+        Ticket."No. Series" := TicketType."No. Series";
+        Ticket."Ticket Type Code" := TicketType.Code;
+        Ticket."Item No." := ItemNo;
+        Ticket."Variant Code" := VariantCode;
+        Ticket."Customer No." := ReservationRequest."Customer No.";
+        Ticket."Ticket Reservation Entry No." := ReservationRequest."Entry No.";
+        Ticket."External Member Card No." := ReservationRequest."External Member No.";
+        Ticket."Sales Receipt No." := ReservationRequest."Receipt No.";
+        Ticket."Line No." := ReservationRequest."Line No.";
+
+        if (UserSetup.Get(CopyStr(UserId(), 1, MaxStrLen(UserSetup."User ID")))) then
+            Ticket."Salesperson Code" := UserSetup."Salespers./Purch. Code";
+
+        if (Ticket."Salesperson Code" = '') then
+            Ticket."Salesperson Code" := CopyStr(UserId(), 1, MaxStrLen(Ticket."Salesperson Code"));
+
+        TicketManagement.SetTicketProperties(Ticket, Today);
+        Ticket.Insert(true);
+    end;
+
+    local procedure CreateAdditionalExperienceLine(var ReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    var
+        Admission: Record "NPR TM Admission";
+        POSSession: Codeunit "NPR POS Session";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        BasePrice, AddonPrice : Decimal;
+    begin
+        if ReservationRequest."Admission Inclusion" <> ReservationRequest."Admission Inclusion"::SELECTED then
+            exit;
+        Admission.Get(ReservationRequest."Admission Code");
+        if Admission."Additional Experience Item No." = '' then
+            exit;
+
+        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."No." := Admission."Additional Experience Item No.";
+        SaleLinePOS.Description := Admission.Description;
+        SaleLinePOS.Quantity := ReservationRequest.Quantity;
+
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.InsertLine(SaleLinePOS, false);
+        TicketPrice.CalculateScheduleEntryPrice(ReservationRequest."Item No.", ReservationRequest."Variant Code", ReservationRequest."Admission Code", ReservationRequest."External Adm. Sch. Entry No.", SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", Today(), Time(), BasePrice, AddonPrice);
+        SaleLinePOS.Validate("Unit Price", BasePrice + AddonPrice);
+        SaleLinePOS.Modify();
+
+        ReservationRequest."Line No." := SaleLinePOS."Line No.";
+
+    end;
+
+    local procedure MoreSalesLinesForTicket(Token: Text[100]; POSSalesLineNo: Integer): Boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        if POSSalesLineNo = 0 then
+            exit(true);
+        TicketReservationRequest.SetRange("Session Token ID", Token);
+        TicketReservationRequest.SetFilter("Line No.", '<>0&<>%1', POSSalesLineNo);
+        exit(not TicketReservationRequest.IsEmpty());
+    end;
+
+    local procedure SwitchTicketReservationEntryNo(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    var
+        Ticket: Record "NPR TM Ticket";
+    begin
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Superseeds Entry No.");
+        if Ticket.FindSet() then
+            repeat
+                Ticket."Ticket Reservation Entry No." := TicketReservationRequest."Entry No.";
+                Ticket.Modify();
+            until Ticket.Next() = 0;
+    end;
+
+
     [TryFunction]
     procedure NPPassServerInvokeApi(RequestMethod: Code[10]; TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ReasonText: Text; JSONIn: Text; var JSONOut: Text)
     var
@@ -2455,6 +2766,36 @@
 
         ReasonText := GetLastErrorText();
         Error(ReasonText);
+
+    end;
+
+    internal procedure CalculateAdmissionPrice(TMTicketReservationReq: Record "NPR TM Ticket Reservation Req."): Decimal
+    var
+        Item: Record Item;
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        BasePrice, AddonPrice : Decimal;
+    begin
+        if TMTicketReservationReq.Default then
+            if Item.Get(TMTicketReservationReq."Item No.") then
+                exit(Item."Unit Price");
+        if TMTicketReservationReq."Admission Inclusion" = TMTicketReservationReq."Admission Inclusion"::REQUIRED then
+            exit(0);
+
+        if TicketPrice.CalculateScheduleEntryPrice(TMTicketReservationReq."Item No.", TMTicketReservationReq."Variant Code", TMTicketReservationReq."Admission Code", TMTicketReservationReq."External Adm. Sch. Entry No.", Today, Time, BasePrice, AddonPrice) then
+            exit(BasePrice + AddonPrice);
+        exit(0)
+    end;
+
+    internal procedure CalculateAdmissionPrice(AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines"): Decimal
+    var
+        TMAdmission: Record "NPR TM Admission";
+        Item: Record Item;
+    begin
+
+        if TMAdmission.Get(AdmissionScheduleLines."Admission Code") then
+            if Item.Get(TMAdmission."Additional Experience Item No.") then
+                exit(Item."Unit Price");
+        exit(0)
 
     end;
 

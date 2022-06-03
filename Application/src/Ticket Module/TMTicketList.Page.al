@@ -5,7 +5,6 @@
     DeleteAllowed = false;
     Editable = true;
     InsertAllowed = false;
-    ModifyAllowed = false;
     PageType = List;
     SourceTable = "NPR TM Ticket";
     SourceTableView = ORDER(Descending);
@@ -182,6 +181,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Last Date Modified field';
                 }
+                field("Ticket Reservation Entry No."; Rec."Ticket Reservation Entry No.")
+                {
+                    ToolTip = 'Specifies the value of the Ticket Reservation Entry No. field.';
+                    ApplicationArea = NPRetail;
+                }
             }
         }
     }
@@ -259,6 +263,7 @@
                         ChangeTicketReservation();
                     end;
                 }
+
                 Action(Ticketholder)
                 {
                     ToolTip = 'Edit ticket holder.';

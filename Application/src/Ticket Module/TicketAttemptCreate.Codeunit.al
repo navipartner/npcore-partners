@@ -184,7 +184,8 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
 
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetCurrentKey("Session Token ID", Default);
+        TicketReservationRequest.SetAscending(Default, false);
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.FindSet();
 

@@ -19,7 +19,7 @@ codeunit 85011 "NPR Library - Ticket Module"
     begin
 
         NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today);
+        WorkDate(Today());
 
         // Used for testing dynamic prices
 
@@ -60,7 +60,7 @@ codeunit 85011 "NPR Library - Ticket Module"
     begin
 
         NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today);
+        WorkDate(Today());
 
         // Used for smoke testing
         // This scenario creates a ticket which is always available today.
@@ -325,6 +325,38 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketBom.Modify();
     end;
 
+    procedure CreateTicketBOMDynamic(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Option; EntryValidation: Option; AdmissionInclusion: Option)
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Item: Record Item;
+        Admission: Record "NPR TM Admission";
+    begin
+        TicketBom.INIT();
+        if (not TicketBom.Get(ItemNo, VariantCode, AdmissionCode)) then begin
+            TicketBom."Item No." := ItemNo;
+            TicketBom."Variant Code" := VariantCode;
+            TicketBom."Admission Code" := AdmissionCode;
+            TicketBom.Insert();
+        end;
+
+        Item.Get(ItemNo);
+        Admission.Get(AdmissionCode);
+
+        TicketBom.Quantity := Quantity;
+        TicketBom.Description := Item.Description;
+        TicketBom.Default := Default;
+        TicketBom."Admission Description" := Admission.Description;
+        TicketBom."Prefered Sales Display Method" := TicketBom."Prefered Sales Display Method"::DEFAULT;
+
+        Evaluate(TicketBom."Duration Formula", DurationFormula);
+        TicketBom."Max No. Of Entries" := MaxNoOfEntries;
+        TicketBom."Activation Method" := ActivationMethod;
+        TicketBom."Admission Entry Validation" := EntryValidation;
+        TicketBom."Ticket Base Calendar Code" := TicketBaseCalendarCode;
+        TicketBom."Admission Inclusion" := AdmissionInclusion;
+        TicketBom.Modify();
+    end;
+
     procedure CreateAttribute(CodePrefix: Code[10]; AttributeNumber: Integer; BaseDescription: Text): Code[20]
     var
         NPRAttribute: Record "NPR Attribute";
@@ -381,6 +413,53 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(GetNextNoFromSeries('C2'));
     end;
 
+    internal procedure CreateDynamicTicketScenario(TicketBOMElements: Integer; RequiredBOMElements: Integer): Code[20]
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        AdmissionSchedule: Record "NPR TM Admis. Schedule";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        NprMasterData: Codeunit "NPR Library - POS Master Data";
+        ScheduleManager: Codeunit "NPR TM Admission Sch. Mgt.";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        i: Integer;
+        Default: Boolean;
+        AdmissionInclusion: Option;
+    begin
+        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+        WorkDate(Today());
+
+        // Used for smoke testing
+        // This scenario creates a ticket which is always available today.
+
+        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
+        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
+        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
+        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
+
+        TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
+        ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
+
+        for i := 1 to TicketBOMElements do begin
+            Setup(i, Default, AdmissionInclusion, RequiredBOMElements);
+            AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
+            ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+            CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+
+            CreateTicketBOMDynamic(ItemNo, '', AdmissionCode, '', 1, Default, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, AdmissionInclusion);
+        end;
+
+        ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
+
+        exit(ItemNo)
+    end;
+
+
     local procedure GetNextNo(): Code[20]
     begin
         exit(GetNextNoFromSeries('TM'));
@@ -400,6 +479,15 @@ codeunit 85011 "NPR Library - Ticket Module"
             else
                 Error('Get Next No %1 from number series is not configured.', FromSeries);
         end;
+    end;
+
+    local procedure Setup(i: Integer; var Default: Boolean; var AdmissionInclusion: Option; RequiredBOMElements: Integer)
+    begin
+        Default := i = 1;
+        if i <= RequiredBOMElements then
+            AdmissionInclusion := 0
+        else
+            AdmissionInclusion := 2;
     end;
 
 }

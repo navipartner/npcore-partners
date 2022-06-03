@@ -43,7 +43,6 @@
         PriceProfileCodeList: array[10] of Code[10];
         i: Integer;
     begin
-
         CreateNoSerie('TM-ATF001', 'TMATF0000001');
         CreateNoSerie('NPR-TICKET', 'NPR0000001');
         CreateNoSerie('TM-PK10', 'TM-PK10000');
@@ -63,6 +62,9 @@
         AdmissionList[5] := (CreateAdmissionCode('TOUR02', 'Event Tour', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY));
         AdmissionList[6] := (CreateAdmissionCode('TOUR03', 'Event Tour', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY));
         AdmissionList[7] := (CreateAdmissionCode('TOUR04', 'Event Tour', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY));
+        AdmissionList[8] := (CreateAdmissionCode('OPTIONAL1', 'Optional admission 1', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
+        AdmissionList[9] := (CreateAdmissionCode('OPTIONAL2', 'Optional admission 2', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
+        AdmissionList[10] := (CreateAdmissionCode('OPTIONAL3', 'Optional admission 3', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
 
         CreateSchedule('M-WEEKDAYS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, true, true, true, true, true, false, false);
         CreateSchedule('M-WEEKENDS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, false, false, false, false, false, true, true);
@@ -123,6 +125,23 @@
         CreateScheduleLine(AdmissionList[7], 'TS-08-03', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
         CreateScheduleLine(AdmissionList[7], 'TS-08-04', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
+        CreateScheduleLine(AdmissionList[8], 'TS-08-01', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[8], 'TS-08-02', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[8], 'TS-08-03', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[8], 'TS-08-04', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+
+        CreateScheduleLine(AdmissionList[9], 'TS-08-01', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[9], 'TS-08-02', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[9], 'TS-08-03', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[9], 'TS-08-04', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+
+        CreateScheduleLine(AdmissionList[10], 'TS-08-01', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[10], 'TS-08-02', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[10], 'TS-08-03', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[10], 'TS-08-04', 1, false, 2, ScheduleLine."Capacity Control"::SALES, '<+7D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+
+
+
         CreateConcurrencyLimit('MAX3', 'Max 3 tours at the same time', 3, AdmissionGroupConcurrency."Capacity Control"::SALES, AdmissionGroupConcurrency."Concurrency Type"::SCHEDULE);
 
         ApplyConcurrencyLimit(AdmissionList[4], '*', 'MAX3');
@@ -161,38 +180,56 @@
         CreateItem('31043', '', 'POS-MSCAN', 'Tour 3 Ticket with Concurrency', 107);
         CreateItem('31044', '', 'POS-MSCAN', 'Tour 4 Ticket with Concurrency', 107);
 
-        CreateTicketBOM('31001', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31002', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31003', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31004', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        //Dynamic ticket        
+        CreateItem('31100', '', 'POS-MSCAN', 'Dynamic ticket', 111);
+        CreateItem('31110', '', '', 'Optional admission 1', 11);
+        CreateItem('31111', '', '', 'Optional admission 2', 23);
+        CreateItem('31112', '', '', 'Optional admission 3', 37);
+        AddItemToAdmission('31110', AdmissionList[8]);
+        AddItemToAdmission('31111', AdmissionList[9]);
+        AddItemToAdmission('31112', AdmissionList[10]);
 
-        CreateTicketBOM('31006', '', AdmissionList[1], SeasonBaseCalendar, 1, true, '<CY>', 4, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE);
 
-        CreateTicketBOM('31008', '', AdmissionList[1], '', 4, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31001', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31002', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31003', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31004', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31009', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY);
-        CreateTicketBOM('31009', '', AdmissionList[2], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31006', '', AdmissionList[1], SeasonBaseCalendar, 1, true, '<CY>', 4, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE, 0);
 
-        CreateTicketBOM('31010', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY);
-        CreateTicketBOM('31010', '', AdmissionList[2], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31010', '', AdmissionList[3], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31008', '', AdmissionList[1], '', 4, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('32001', '', AdmissionList[1], '', 10, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31009', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY, 0);
+        CreateTicketBOM('31009', '', AdmissionList[2], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31031', 'ADULT', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31031', 'CHILD', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31010', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY, 0);
+        CreateTicketBOM('31010', '', AdmissionList[2], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31010', '', AdmissionList[3], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31041', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31041', '', AdmissionList[4], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('32001', '', AdmissionList[1], '', 10, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31042', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31042', '', AdmissionList[5], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31031', 'ADULT', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31031', 'CHILD', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31043', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31043', '', AdmissionList[6], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31041', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31041', '', AdmissionList[4], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31044', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
-        CreateTicketBOM('31044', '', AdmissionList[7], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31042', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31042', '', AdmissionList[5], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+
+        CreateTicketBOM('31043', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31043', '', AdmissionList[6], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+
+        CreateTicketBOM('31044', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31044', '', AdmissionList[7], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+
+
+        CreateTicketBOM('31100', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY, 0);
+        CreateTicketBOM('31100', '', AdmissionList[2], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31100', '', AdmissionList[3], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31100', '', AdmissionList[8], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
+        CreateTicketBOM('31100', '', AdmissionList[9], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
+        CreateTicketBOM('31100', '', AdmissionList[10], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
 
         TicketSetup."Print Server Generator URL" := 'http://test.ticket.navipartner.dk/import/api/rest/v1/ticket/orders';
         TicketSetup."Timeout (ms)" := 30000;
@@ -239,7 +276,7 @@
 
         CreateItem(ItemCode, '', 'MM-AUTO', ItemDescription, 0);
 
-        CreateTicketBOM(ItemCode, '', AdmissionCode, '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM(ItemCode, '', AdmissionCode, '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
         exit(StrSubstNo(MembershipGuestTicket3Lbl, ItemCode));
     end;
@@ -572,7 +609,7 @@
         Schedule.Modify();
     end;
 
-    procedure CreateTicketBOM(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Option; EntryValidation: Option)
+    procedure CreateTicketBOM(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Option; EntryValidation: Option; AdmissionInclusion: Option)
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";
         Item: Record Item;
@@ -600,7 +637,7 @@
         TicketBom."Activation Method" := ActivationMethod;
         TicketBom."Admission Entry Validation" := EntryValidation;
         TicketBom."Ticket Base Calendar Code" := TicketBaseCalendarCode;
-
+        TicketBom."Admission Inclusion" := AdmissionInclusion;
         TicketBom.Modify();
     end;
 
@@ -675,6 +712,15 @@
         end;
 
         if (BaseCalendarChange.Insert()) then;
+    end;
+
+    local procedure AddItemToAdmission(ItemNo: Code[20]; AdmissionCode: Code[20])
+    var
+        Admission: Record "NPR TM Admission";
+    begin
+        Admission.Get(AdmissionCode);
+        Admission.Validate("Additional Experience Item No.", ItemNo);
+        Admission.Modify(true);
     end;
 
 }

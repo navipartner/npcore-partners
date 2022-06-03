@@ -7,6 +7,7 @@
     InsertAllowed = false;
     PageType = StandardDialog;
     SourceTable = "NPR TM Ticket Reservation Req.";
+    SourceTableView = sorting("Session Token ID", "Admission Inclusion");
     SourceTableTemporary = true;
     UsageCategory = None;
 
@@ -29,6 +30,21 @@
                     begin
                         gReservationEdited := true;
                     end;
+                }
+                field("Admission Created"; Rec."Admission Created")
+                {
+                    ToolTip = 'Specifies the value of the Admission Created field';
+                    ApplicationArea = NPRetail;
+                }
+                field("Admission Inclusion Status"; Rec."Admission Inclusion Status")
+                {
+                    ToolTip = 'Specifies the value of the Admission Inclusion Status field.';
+                    ApplicationArea = NPRetail;
+                }
+                field("Authorization Code"; Rec."Authorization Code")
+                {
+                    ToolTip = 'Specifies the value of the Authorization Code field';
+                    ApplicationArea = NPRetail;
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
@@ -117,11 +133,12 @@
 
                         if (Rec.Quantity < 1) then
                             Error(QTY_MUST_BE_GT_ZERO);
+                        if CustomisableTicket() then
+                            Error(OptionalErr);
 
                         if (xRec.Quantity <> Rec.Quantity) then
                             ChangeQuantity(Rec.Quantity);
-
-                        CurrPage.Update(false);
+                        //CurrPage.Update(false);
                     end;
                 }
                 field("Admission Inclusion"; Rec."Admission Inclusion")
@@ -131,8 +148,8 @@
 
                     trigger OnValidate()
                     var
-                        CurrentEntryNo: Integer;
                         CommonQty: Integer;
+                        CurrentEntryNo: Integer;
                     begin
 
                         if (xRec."Admission Inclusion" = xRec."Admission Inclusion"::REQUIRED) then
@@ -161,6 +178,9 @@
                             Rec."Admission Inclusion" := Rec."Admission Inclusion"::NOT_SELECTED;
                             Rec.Modify();
                         end;
+
+                        if (xRec."Admission Inclusion" <> Rec."Admission Inclusion") then
+                            gReservationEdited := true;
 
                         gReservationEdited := true;
 
@@ -221,12 +241,12 @@
                     trigger OnValidate()
                     var
                         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                        Admission: Record "NPR TM Admission";
                         TicketWaitingList: Record "NPR TM Ticket Wait. List";
                         WaitingListSetup: Record "NPR TM Waiting List Setup";
                         TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
-                        ResponseMessage: Text;
-                        Admission: Record "NPR TM Admission";
                         DateTimeLbl: Label '%1  - %2', Locked = true;
+                        ResponseMessage: Text;
                     begin
 
                         if (Rec."Waiting List Reference Code" <> '') then
@@ -384,53 +404,52 @@
     end;
 
     var
-        gVisualQueueUnfavorable: Boolean;
-        gConfirmStatusText: Text;
-        gConfirmStatusStyleFavorable: Boolean;
-        gReservationEdited: Boolean;
-        gQuantityChanged: Boolean;
         gAllowQuantityChange: Boolean;
-        STATUS_CONFIRMED: Label 'The reservation is confirmed.';
-        STATUS_UNCONFIRMED: Label 'Ticket is unconfirmed. Press OK to confirm new reservation.';
-        QTY_MUST_BE_GT_ZERO: Label 'Ticket quantity must be greater than zero.';
         gBatchTicketCreateMode: Boolean;
-        gTicketItemNo: Code[20];
-        gTicketVariantCode: Code[10];
-        gDeliverTicketTo: Text[100];
+        gChangeRequestMode: Boolean;
+        gConfirmStatusStyleFavorable: Boolean;
+        gDisallowReschedule: Boolean;
+        gIgnoreScheduleFilter: Boolean;
+        gPrimaryRequestMode: Boolean;
+        gQuantityChanged: Boolean;
+        gReservationEdited: Boolean;
         gShowDeliverTo: Boolean;
-        WAITING_LIST: Label 'Waiting List';
-        NO_NOTIFICATION_ADDR: Label 'When you have selected a ticket schedule with waiting list, you need to provide e-mail or sms in the deliver-to field.';
+        gVisualQueueUnfavorable: Boolean;
+        gTicketVariantCode: Code[10];
+        gTicketItemNo: Code[20];
         gLimitToDateSelected: Date;
-        DIFFERENT_DATES: Label 'The selected time schedules have different dates. This schedule is for %1 whereas the previous was for %2. Continue anyway?';
+        gTicketRequestEntryNo: Integer;
+        NOT_REQUIRED: Label '%1 can not be changed to required when initial value was optional.';
+        NOT_EDITABLE: Label '%1 can not be changed when admission is required.';
         DIFFERENT_DATES_WARNING: Label 'Please note that the selected time schedules have different dates.';
         QTY_NOT_EDITABLE: Label 'Quantity can not be changed for admissions that are not included.';
-        NOT_EDITABLE: Label '%1 can not be changed when admission is required.';
-        NOT_REQUIRED: Label '%1 can not be changed to required when initial value was optional.';
-        gIgnoreScheduleFilter: Boolean;
-        gChangeRequestMode: Boolean;
-        gPrimaryRequestMode: Boolean;
-        gDisallowReschedule: Boolean;
-        gTicketRequestEntryNo: Integer;
+        OptionalErr: Label 'Quantity is not editable for customisable tickets.';
         RESCHEDULE_NOT_ALLOWED: Label 'The reschedule policy disallows change at this time.';
+        STATUS_CONFIRMED: Label 'The reservation is confirmed.';
+        DIFFERENT_DATES: Label 'The selected time schedules have different dates. This schedule is for %1 whereas the previous was for %2. Continue anyway?';
+        STATUS_UNCONFIRMED: Label 'Ticket is unconfirmed. Press OK to confirm new reservation.';
+        QTY_MUST_BE_GT_ZERO: Label 'Ticket quantity must be greater than zero.';
+        WAITING_LIST: Label 'Waiting List';
+        NO_NOTIFICATION_ADDR: Label 'When you have selected a ticket schedule with waiting list, you need to provide e-mail or sms in the deliver-to field.';
+        gConfirmStatusText: Text;
+        gDeliverTicketTo: Text[100];
         _UnitPrice: Text;
 
     local procedure ChangeQuantity(NewQuantity: Integer)
     var
         CurrentEntryNo: Integer;
     begin
-
         CurrentEntryNo := Rec."Entry No.";
 
         gReservationEdited := true;
         gQuantityChanged := true;
 
-        Rec.Reset();
         Rec.ModifyAll(Quantity, NewQuantity);
 
         Rec.SetFilter("Admission Inclusion", '=%1', Rec."Admission Inclusion"::NOT_SELECTED);
         Rec.ModifyAll(Quantity, 0);
+        Rec.SetRange("Admission Inclusion");
 
-        Rec.Reset();
         Rec.Get(CurrentEntryNo);
     end;
 
@@ -439,10 +458,10 @@
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         TMAdmission: Record "NPR TM Admission";
         PageScheduleEntry: Page "NPR TM Ticket Select Schedule";
-        PageAction: Action;
-        OldEntryNo: Integer;
         "0DF": DateFormula;
+        PageAction: Action;
         ToDate: Date;
+        OldEntryNo: Integer;
         DateTimeLbl: Label '%1  - %2', Locked = true;
         PlaceHolderLbl: Label '%1', Locked = true;
     begin
@@ -494,6 +513,7 @@
 
             Rec.Modify();
 
+
             ConfirmOverlappingTimes(Rec."Entry No.", Rec."External Adm. Sch. Entry No.");
 
             if (OldEntryNo <> Rec."External Adm. Sch. Entry No.") then begin
@@ -507,14 +527,14 @@
     local procedure CalcVisualQueueUnfavorable(TicketReservationRequest: Record "NPR TM Ticket Reservation Req."): Boolean
     var
         AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
-        Admission: Record "NPR TM Admission";
         ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        Admission: Record "NPR TM Admission";
         TicketManagement: Codeunit "NPR TM Ticket Management";
-        CapacityControl: Option;
+        NonWorking: Boolean;
         MaxCapacity: Integer;
         Remaining: Integer;
+        CapacityControl: Option;
         ResponseMessage: Text;
-        NonWorking: Boolean;
     begin
 
         gConfirmStatusText := '';
@@ -560,8 +580,8 @@
 
     internal procedure LoadTicketRequest(Token: Text[100])
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         ShowDifferentDatesWarning: Boolean;
     begin
 
@@ -641,8 +661,8 @@
 
     internal procedure FinalizeReservationRequest(FailWithError: Boolean; var ResponseMessage: Text): Integer
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
     begin
@@ -721,6 +741,7 @@
             until (Rec.Next() = 0);
 
             TicketRequestManager.SetShowProgressBar(gBatchTicketCreateMode);
+
             exit(TicketRequestManager.IssueTicketFromReservationToken(Rec."Session Token ID", FailWithError, ResponseMessage));
         end;
 
@@ -729,10 +750,10 @@
 
     internal procedure FinalizeChangeRequest(FailWithError: Boolean; var ResponseMessage: Text): Integer;
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         NewTicketRequestEntryNo: Integer;
     begin
 
@@ -793,9 +814,82 @@
         exit(0);
     end;
 
-    internal procedure GetChangedTicketQuantity(var NewQuantity: Integer) QtyChanged: Boolean
+    procedure FinalizeChangeRequestDynamicTicket(TicketNo: Code[20]; POSSession: Codeunit "NPR POS Session"; FailWithError: Boolean; var ResponseMessage: Text): Integer;
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        SalesTicketNo: Code[20];
     begin
 
+        if (gDeliverTicketTo <> '') then begin
+            Rec.Reset();
+            if (Rec.FindSet()) then;
+            repeat
+                TicketReservationRequest.Get(Rec."Entry No.");
+                TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                if (STRPOS(gDeliverTicketTo, '@') > 0) then
+                    TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
+                else
+                    TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
+
+                TicketReservationRequest.Modify();
+            until (Rec.Next() = 0);
+        end;
+
+        Rec.Reset();
+        Rec.SetFilter("Scheduled Time Description", '=%1', WAITING_LIST);
+        if (not (Rec.IsEmpty())) then begin
+            ResponseMessage := 'Not in this version: It is not supported to change to a timeslot that is on a waitinglist.';
+            exit(13);
+        end;
+
+        if (gReservationEdited) then begin
+
+
+            Rec.Reset();
+            Rec.SetFilter("Primary Request Line", '=%1', true);
+            Rec.FindFirst();
+
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', Rec."Superseeds Entry No.");
+            if Rec.Quantity = 1 then
+                Ticket.SetRange("No.", TicketNo);
+
+            if (Ticket.FindSet()) then begin
+                repeat
+                    Rec.Reset();
+                    Rec.SetFilter(Quantity, '<>0');
+                    Rec.FindSet();
+                    repeat
+                        TicketManagement.RescheduleDynamicTicketAdmission(Ticket."No.", Rec."External Adm. Sch. Entry No.", true, Rec."Request Status Date Time", POSSession, SalesTicketNo, Rec."Entry No.");
+                    until (Rec.Next() = 0);
+                until (Ticket.Next() = 0);
+
+            end;
+
+            Rec.Reset();
+            Rec.FindSet();
+            repeat
+                TicketReservationRequest.Get(Rec."Entry No.");
+                TicketReservationRequest.Quantity := Rec.Quantity;
+                TicketReservationRequest."Admission Inclusion" := Rec."Admission Inclusion";
+                TicketReservationRequest."External Adm. Sch. Entry No." := Rec."External Adm. Sch. Entry No.";
+                TicketReservationRequest."Scheduled Time Description" := Rec."Scheduled Time Description";
+                TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::REGISTERED;
+                TicketReservationRequest."Receipt No." := SalesTicketNo;
+                TicketReservationRequest.Modify();
+            until (Rec.Next() = 0);
+
+            TicketRequestManager.ConfirmChangeRequestDynamicTicket(Rec."Session Token ID");
+        end;
+
+        exit(0);
+    end;
+
+    procedure GetChangedTicketQuantity(var NewQuantity: Integer) QtyChanged: Boolean
+    begin
+        Rec.SetFilter("Admission Inclusion", '%1|%2', Rec."Admission Inclusion"::REQUIRED, Rec."Admission Inclusion"::SELECTED);
         if (Rec.FindFirst()) then
             NewQuantity := Rec.Quantity;
 
@@ -886,5 +980,14 @@
         DateTimeLbl: Label '%1  - %2', Locked = true;
     begin
         exit(StrSubstNo(DateTimeLbl, Today(), Time()));
+    end;
+
+    local procedure CustomisableTicket(): Boolean
+    var
+        TMTicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TMTicketReservationReq.SetRange("Session Token ID", Rec."Session Token ID");
+        TMTicketReservationReq.SetFilter("Admission Inclusion", '%1|%2', TMTicketReservationReq."Admission Inclusion"::NOT_SELECTED, TMTicketReservationReq."Admission Inclusion"::SELECTED);
+        exit(not TMTicketReservationReq.IsEmpty());
     end;
 }
