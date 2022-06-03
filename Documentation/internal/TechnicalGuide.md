@@ -12,6 +12,7 @@
 10. [Quick edites - DevOps Azure](https://navipartner.visualstudio.com/_git/NpCore?path=/Documentation/internal/TechnicalGuide.md&anchor=quick-edits)
 11. [Full edits - Visual Studio Code + DevOps Azure](https://navipartner.visualstudio.com/_git/NpCore?path=/Documentation/internal/TechnicalGuide.md&anchor=full-edit-example)
 12. [Work items](https://navipartner.visualstudio.com/_git/NpCore?path=/Documentation/internal/TechnicalGuide.md&anchor=work-items)
+13. [Quick edit procedure - browser VSC](https://navipartner.visualstudio.com/_git/NpCore?path=/Documentation/internal/TechnicalGuide.md&version=GBtopic/bd/technical_guide_browser_vsc_update&anchor=(new)-quick-edit-procedure---visual-studio-code)
 
 
 # Intro
@@ -221,7 +222,7 @@ In the articles, you can indicate a place where the image are placed by using th
 
 **Notice that the filepath must use forward slashes, not backwards slashes!**
 
-# Quick edits 
+# Quick edit procedure and example - DevOps Azure
 
 If you are not making big changes to many files, then you can use the browser-based Azure DevOps webclient to create, upload and modify files. 
 The downside to this is that each of the files will be tracked in a **separate** pull request so this "quick" flow is mainly intended for single-face changes. Otherwise the Visual Studio Code tool is a better match.
@@ -247,7 +248,7 @@ The following gif shows all the steps involved in editing an existing markdown f
 
 ![in-browser branch selection](images/branch_selection.png)
 
-# Full edit procedure and example
+# Full edit procedure and example - Visual Studio Code + DevOps Azure
 Follow these steps to set up the local machine and perform the full edit procedure
 
 ## Set up the local machine (done only once)
@@ -290,3 +291,9 @@ You can click the following action on any case assigned to 70220322 (internal NP
 ![case system work item flow](images/case_workitem.png)
 
 if you confirm the dialog, it'll create a work item with same description as the case and fill out the "DevOps Work Item Id" field on the case card so you can easily find any existing work items linked to cases later.
+
+# (NEW) Quick edit procedure - Visual Studio Code
+
+It is possible to avoid installation of Git and Visual Studio Code on the local machine alltogether by opening [Np Core from the browser directly](https://vscode.dev/azurerepos/navipartner/NpCore/NpCore). The only required authentication is Microsoft login. 
+
+When you open it, you can basically follow the same procedure from the full edit example, but without downloading anything on your computer.
