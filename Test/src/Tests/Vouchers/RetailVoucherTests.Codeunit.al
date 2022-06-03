@@ -111,12 +111,12 @@
     procedure IssuePartialVoucherScanVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
+        Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -136,12 +136,12 @@
     procedure IssuePartialVoucherScanVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
+        Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -162,13 +162,13 @@
     procedure IssuePartialVoucherScanVoucherIn2TransactionsEnd()
     // [SCENARIO] Issue Voucher - fully use voucher end 2 transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         Assert: Codeunit "Assert";
         LibraryRandom: Codeunit "Library - Random";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -191,13 +191,13 @@
     procedure IssuePartialVoucherScanVoucherIn2TransactionsDontEnd()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         Assert: Codeunit "Assert";
         LibraryRandom: Codeunit "Library - Random";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -220,15 +220,15 @@
     procedure IssuePartialVoucherScanVoucherIn2TransactionsDontEndPayWithCash()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction with voucher but with cash
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
-        LibraryRandom: Codeunit "Library - Random";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        TransactionEnded: Boolean;
-        Suggestion: Decimal;
+        Assert: Codeunit "Assert";
+        LibraryRandom: Codeunit "Library - Random";
         VoucherAmount: Decimal;
+        Suggestion: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -258,16 +258,16 @@
     procedure IssuePartialVoucherTryScanArhivedVoucher()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
+        VourcherRedeemedErr: Label 'The voucher with Reference No. %1 has already been redeemed in another transaction on %2.', Comment = '%1 - voucher reference number, 2% - date';
+        Text005: Label 'Invalid Reference No. %1';
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
         ArchvoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        TransactionEnded: Boolean;
-        VoucherAmount: Decimal;
-        ArchivedVoucherNotFoundErr: Label 'Archived Voucher not found.';
-        VourcherRedeemedErr: Label 'The voucher with Reference No. %1 has already been redeemed in another transaction on %2.', Comment = '%1 - voucher reference number, 2% - date';
+        Assert: Codeunit "Assert";
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -282,10 +282,13 @@
         if NpRvVoucherMgt.FindArchivedVoucher(NpRvVoucher."Voucher Type", NpRvVoucher."Reference No.", ArchVoucher) then begin
             ArchvoucherEntry.SetCurrentKey("Arch. Voucher No.");
             ArchvoucherEntry.SetRange("Arch. Voucher No.", ArchVoucher."No.");
-            if ArchvoucherEntry.FindLast() then;
-            Assert.ExpectedError(StrSubstNo(VourcherRedeemedErr, NpRvVoucher."Reference No.", ArchvoucherEntry."Posting Date"));
-        end else
-            Error(ArchivedVoucherNotFoundErr);
+            if ArchvoucherEntry.FindLast() then
+                Assert.ExpectedError(StrSubstNo(VourcherRedeemedErr, NpRvVoucher."Reference No.", ArchvoucherEntry."Posting Date"))
+            else
+                Assert.ExpectedError(StrSubstNo(Text005, NpRvVoucher."Reference No."));
+        end
+        else
+            Assert.ExpectedError(StrSubstNo(Text005, NpRvVoucher."Reference No."));
     end;
 
 
@@ -293,12 +296,12 @@
     procedure IssuePartialVoucherPayWithVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
+        Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -319,10 +322,10 @@
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
+        Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -341,13 +344,13 @@
     procedure IssuePartialVoucherPayWithVoucherIn2TransactionsEnd()
     // [SCENARIO] Issue Voucher - fully use voucher end 2 transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         Assert: Codeunit "Assert";
         LibraryRandom: Codeunit "Library - Random";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -370,13 +373,13 @@
     procedure IssuePartialVoucherPayWithVoucherIn2TransactionsDontEnd()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         Assert: Codeunit "Assert";
         LibraryRandom: Codeunit "Library - Random";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -399,15 +402,15 @@
     procedure IssuePartialVoucherPayWithVoucherIn2TransactionsDontEndPayWithCash()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction with voucher but with cash
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
-        LibraryRandom: Codeunit "Library - Random";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        TransactionEnded: Boolean;
-        Suggestion: Decimal;
+        Assert: Codeunit "Assert";
+        LibraryRandom: Codeunit "Library - Random";
         VoucherAmount: Decimal;
+        Suggestion: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -438,11 +441,11 @@
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
+        Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
-        Text005: Label 'Voucher %1 is not valid.';
+        TransactionEnded: Boolean;
+        Text005: Label 'Invalid Reference No. %1';
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -452,9 +455,10 @@
         CreateItemTransaction(VoucherAmount);
         TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _VoucherTypePartial."Payment Type", VoucherAmount, NpRvVoucher."Reference No.");
         CreateItemTransaction(NpRvVoucher.Amount);
+        TransactionEnded := false;
         // [THEN] Check if error when reusing voucher
         asserterror TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _VoucherTypePartial."Payment Type", VoucherAmount, NpRvVoucher."Reference No.");
-        Assert.ExpectedError(StrSubstNo(Text005, NpRvVoucher."Reference No."));
+        Assert.IsFalse(TransactionEnded, 'Transaction should not end');
     end;
 
 
@@ -589,12 +593,12 @@
     procedure IssueDefaultVoucherScanVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
+        Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
@@ -614,14 +618,14 @@
     procedure IssueDefaultVoucherScanVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
-        NpRvVoucher: Record "NPR NpRv Voucher";
         SalePOS: Record "NPR POS Sale";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         Assert: Codeunit "Assert";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
-        TransactionEnded: Boolean;
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
@@ -648,17 +652,11 @@
     procedure IssueDefaultVoucherTryScanArhivedVoucher()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        ArchVoucher: Record "NPR NpRv Arch. Voucher";
-        ArchvoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        TransactionEnded: Boolean;
+        Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
-        ArchivedVoucherNotFoundErr: Label 'Archived Voucher not found.';
-        VourcherRedeemedErr: Label 'The voucher with Reference No. %1 has already been redeemed in another transaction on %2.', Comment = '%1 - voucher reference number, 2% - date';
-
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
@@ -668,27 +666,22 @@
         CreateItemTransaction(VoucherAmount);
         TransactionEnded := NPRLibraryPOSMock.PayWithVoucherAndTryEndSaleAndStartNew(_POSSession, _VoucherTypeDefault.Code, NpRvVoucher."Reference No.");
         CreateItemTransaction(NpRvVoucher.Amount);
+        TransactionEnded := false;
         // [THEN] Check if error when reusing voucher
-        asserterror NPRLibraryPOSMock.PayWithVoucherAndTryEndSaleAndStartNew(_POSSession, _VoucherTypeDefault.Code, NpRvVoucher."Reference No.");
-        if NpRvVoucherMgt.FindArchivedVoucher(NpRvVoucher."Voucher Type", NpRvVoucher."Reference No.", ArchVoucher) then begin
-            ArchvoucherEntry.SetCurrentKey("Arch. Voucher No.");
-            ArchvoucherEntry.SetRange("Arch. Voucher No.", ArchVoucher."No.");
-            if ArchvoucherEntry.FindLast() then;
-            Assert.ExpectedError(StrSubstNo(VourcherRedeemedErr, NpRvVoucher."Reference No.", ArchvoucherEntry."Posting Date"));
-        end else
-            Error(ArchivedVoucherNotFoundErr);
+        asserterror TransactionEnded := NPRLibraryPOSMock.PayWithVoucherAndTryEndSaleAndStartNew(_POSSession, _VoucherTypeDefault.Code, NpRvVoucher."Reference No.");
+        Assert.IsFalse(TransactionEnded, 'Transaction should not end');
     end;
 
     [Test]
     procedure IssueDefaultVoucherPayWithVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucher: Record "NPR NpRv Voucher";
-        Assert: Codeunit "Assert";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        TransactionEnded: Boolean;
+        Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
@@ -708,9 +701,9 @@
     procedure IssueDefaultVoucherPayWithVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
-        NpRvVoucher: Record "NPR NpRv Voucher";
         SalePOS: Record "NPR POS Sale";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         Assert: Codeunit "Assert";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";

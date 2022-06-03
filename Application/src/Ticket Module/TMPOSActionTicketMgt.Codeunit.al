@@ -31,7 +31,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.1.1');
+        exit('1.1.6');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
@@ -44,7 +44,6 @@
         JsArrLbl: Label '"%1",', Locked = true;
         JsArr2Lbl: Label 'var optionNames = [%1];', Locked = true;
     begin
-
         if Sender.DiscoverAction(
           ActionCode(''),
           ActionDescription,
@@ -57,9 +56,10 @@
                                     'Revoke Reservation,Edit Reservation,Reconfirm Reservation,' +
                                     'Edit Ticketholder,' +
                                   'Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership,' +
-                                  'Register Departure';
+                                  'Register Departure,' +
+                                  'Additional Experience';
 
-            for N := 1 to 10 do
+            for N := 1 to 11 do
                 JSArr += StrSubstNo(JsArrLbl, SelectStr(N, FunctionOptionString));
             JSArr := StrSubstNo(JsArr2Lbl, CopyStr(JSArr, 1, StrLen(JSArr) - 1));
 
@@ -85,14 +85,14 @@
           ActionDescription,
           ActionVersion()))
         then begin
-
             FunctionOptionString := 'Admission Count,' +
                                     'Register Arrival,' +
                                     'Revoke Reservation,Edit Reservation,Reconfirm Reservation,' +
                                     'Edit Ticketholder,' +
                                   'Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership,' +
-                                  'Register Departure';
-            for N := 1 to 10 do
+                                  'Register Departure,' +
+                                  'Additional Experience';
+            for N := 1 to 11 do
                 OptionsNameArray += StrSubstNo(JsArrLbl, SelectStr(N, FunctionOptionString));
             OptionsNameArray := StrSubstNo(JsArr2Lbl, CopyStr(OptionsNameArray, 1, StrLen(OptionsNameArray) - 1));
 
@@ -161,7 +161,6 @@
         DefaultTicketNumber: Text;
         BeforeWorkflowErr: Label 'executing OnBeforeWorkflow of %1';
     begin
-
         if (not Action.IsThisAction(ActionCode(''))) then
             exit;
 
@@ -196,7 +195,6 @@
         PosUnitNo: Code[10];
         PosSetup: Codeunit "NPR POS Setup";
     begin
-
         if (not Action.IsThisAction(ActionCode(''))) then
             exit;
 
@@ -269,12 +267,13 @@
                     ConvertToMembership(POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
                 9:
                     RegisterDeparture(ExternalTicketNumber, AdmissionCode);
+                10:
+                    AddAdditionalExperience(POSSession, ExternalTicketNumber);
                 else
                     Error('Function with ID %1 is not implemented.', FunctionId);
             end;
 
             POSSession.RequestRefreshData();
-
         end;
 
         FrontEnd.SetActionContext(ActionCode(''), JSON);
@@ -284,7 +283,6 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-
         if (not Action.IsThisAction(ActionCode('2'))) then
             exit;
 
@@ -300,7 +298,6 @@
         ShowTicketQtyDialog: Boolean;
         ShowReferenceDialog: Boolean;
     begin
-
         Context.SetContext('TicketPrompt', TicketNumberPrompt);
         Context.SetContext('TicketQtyPrompt', TicketQtyPrompt);
         Context.SetContext('TicketTitle', TicketTitle);
@@ -337,17 +334,17 @@
                 ShowTicketDialog := true; // Convert To Membership
             9:
                 ShowTicketDialog := true; // Register Departure
+            10:
+                ShowTicketDialog := true; // Register Additional Experience
         end;
 
         Context.SetContext('ShowTicketDialog', ShowTicketDialog and (DefaultTicketNumber = ''));
         Context.SetContext('ShowTicketQtyDialog', ShowTicketQtyDialog);
         Context.SetContext('ShowReferenceDialog', ShowReferenceDialog);
-
     end;
 
     local procedure DoWorkflowFunction(FunctionId: Integer; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; AdmissionCode: Code[20]; ExternalTicketNumber: Code[50]; TicketReference: Text[30]; PosUnitNo: Code[10]; WithTicketPrint: Boolean)
     begin
-
         case FunctionId of
             0:
                 ShowQuickStatistics(AdmissionCode);
@@ -372,6 +369,8 @@
                 Error('WF20 support for EAN box is not completed yet.'); //ConvertToMembership (POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
             9:
                 RegisterDeparture(ExternalTicketNumber, AdmissionCode);
+            10:
+                AddAdditionalExperience(POSSession, ExternalTicketNumber);
             else
                 Error('Function with ID %1 is not implemented.', FunctionId);
         end;
@@ -390,7 +389,6 @@
         WithTicketPrint: Boolean;
         PosSetup: Codeunit "NPR POS Setup";
     begin
-
         FunctionId := Context.GetIntegerParameterOrFail('Function', ActionCode(''));
         if (FunctionId < 0) then
             FunctionId := 1;
@@ -467,7 +465,6 @@
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Token: Text[100];
     begin
-
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
@@ -477,7 +474,6 @@
                 exit;
 
             TicketRequestManager.DeleteReservationRequest(Token, true);
-
         end;
     end;
 
@@ -489,7 +485,6 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         Token: Text[100];
     begin
-
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
@@ -510,7 +505,6 @@
         POSUnit: Record "NPR POS Unit";
         Token: Text[100];
     begin
-
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
@@ -528,9 +522,6 @@
             if (Abs(NewQuantity) > 20000) then
                 Error('%1 is a ridiculous number of tickets! Create them in batches of 20000, if you really want that many.', NewQuantity);
 
-            //  IF (ABS (NewQuantity) > 100) THEN
-            //    IF (NOT CONFIRM ('Do you really want to create %1 tickets?', TRUE, NewQuantity)) THEN
-            //      ERROR ('');
             if (Abs(NewQuantity) > 100) then begin
                 if (POSUnit.Get(SaleLinePOS."Register No.")) then
                     if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
@@ -539,7 +530,6 @@
                 if (not Confirm('Do you really want to create %1 tickets?', true, NewQuantity)) then
                     Error('');
             end;
-
         end;
 
         SaleLinePOS.Quantity := NewQuantity;
@@ -548,14 +538,10 @@
             TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS);
             if (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)) then begin
                 if (POSSession.IsActiveSession(FrontEnd)) then
-                    SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false); //-+TM1.45 [322432]
+                    SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false);
             end;
             exit;
         end;
-
-
-        //IF (SaleLinePOS.Quantity < 0) THEN
-        //  ERROR (DELETE_SINGLE_ERROR);
 
         if (SaleLinePOS.Quantity < 0) then begin
             if (SaleLinePOS."Return Sale Sales Ticket No." = '') then
@@ -574,7 +560,6 @@
         TicketUnitPrice: Decimal;
         Token: Text[100];
     begin
-
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
@@ -601,8 +586,8 @@
         FrontEnd: Codeunit "NPR POS Front End Management";
         SeatingUI: Codeunit "NPR TM Seating UI";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
+        RequiredAdmissionHasTimeSlots, AllAdmissionsRequired : Boolean;
     begin
-
         if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)) then begin
             if (TicketRequestManager.IsRequestStatusReservation(Token)) then
                 exit(0);
@@ -620,8 +605,14 @@
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("External Adm. Sch. Entry No.", '<=%1', 0);
+        TicketReservationRequest.SetRange("Admission Inclusion", TicketReservationRequest."Admission Inclusion"::REQUIRED);
+        RequiredAdmissionHasTimeSlots := TicketReservationRequest.IsEmpty();
 
-        if (TicketReservationRequest.IsEmpty()) then begin
+        TicketReservationRequest.SetRange("External Adm. Sch. Entry No.");
+        TicketReservationRequest.SetFilter("Admission Inclusion", '<>%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
+        AllAdmissionsRequired := TicketReservationRequest.IsEmpty();
+
+        if (RequiredAdmissionHasTimeSlots and AllAdmissionsRequired) then begin
             ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage);
             if (ResponseCode = 0) then begin
                 Commit();
@@ -741,7 +732,6 @@
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Admission: Record "NPR TM Admission";
     begin
-
         if (AdmissionCode <> '') then
             if (not Admission.Get(AdmissionCode)) then
                 Error(INVALID_ADMISSION, 'Admission Code', AdmissionCode);
@@ -757,7 +747,6 @@
         QuickStatsPage: Page "NPR TM Ticket Quick Stats";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
     begin
-
         if (AdmissionCode <> '') then begin
             if (not Admission.Get(AdmissionCode)) then
                 Error(INVALID_ADMISSION, 'Admission Code', AdmissionCode);
@@ -785,7 +774,6 @@
         PosEntry: Record "NPR POS Entry";
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
-
         if (ExternalTicketNumber = '') then
             Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
 
@@ -833,6 +821,8 @@
         POSSaleLine.SetQuantity(-1 * Abs(RevokeQuantity));
         POSSaleLine.SetUnitPrice(UnitPrice);
 
+        AddAdditionalExperienceRevokeLines(POSSession, Ticket, SaleLinePOS."Sales Ticket No.");
+
         POSSession.RequestRefreshData();
     end;
 
@@ -846,7 +836,6 @@
         ResponseMessage: Text;
         HaveSalesTicket: Boolean;
     begin
-
         if (ExternalTicketNumber <> '') then begin
             Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
             if (not Ticket.FindFirst()) then
@@ -876,7 +865,6 @@
         ResponseMessage: Text;
         ResponseCode: Integer;
     begin
-
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
@@ -900,7 +888,6 @@
         Ticket: Record "NPR TM Ticket";
         Token: Text[100];
     begin
-
         if (ExternalTicketNumber <> '') then begin
             Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
             if (not Ticket.FindFirst()) then
@@ -928,7 +915,6 @@
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         IsAdmitted: Boolean;
     begin
-
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
         if (not Ticket.FindFirst()) then
             Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
@@ -972,7 +958,6 @@
         NewTicketQty: Integer;
         QtyChanged: Boolean;
     begin
-
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
         if (not Ticket.FindFirst()) then
             Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
@@ -1004,7 +989,6 @@
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
-
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(TicketReference, 1, MaxStrLen(Ticket."External Ticket No.")));
         if (Ticket.FindFirst()) then begin
             TicketReservationRequest.SetFilter("Entry No.", '=%1', Ticket."Ticket Reservation Entry No.");
@@ -1046,7 +1030,6 @@
             TicketReservationRequest2.ModifyAll("Request Status", TicketReservationRequest2."Request Status"::RESERVED);
 
             SaleLinePos.Type := SaleLinePos.Type::Item;
-
             SaleLinePos."No." := TicketReservationRequest."Item No.";
             SaleLinePos."Variant Code" := TicketReservationRequest."Variant Code";
 
@@ -1077,7 +1060,6 @@
         TicketManagement: Codeunit "NPR TM Ticket Management";
         ReasonText: Text;
     begin
-
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
         if (not Ticket.FindFirst()) then
             Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
@@ -1088,7 +1070,6 @@
 
         if (not TicketManagement.CheckIfCanBeConsumed(Ticket."No.", AdmissionCode, TicketType."Membership Sales Item No.", ReasonText)) then
             Error(ReasonText);
-
         EanBoxEventHandler.InvokeEanBox(TicketType."Membership Sales Item No.", Context, POSSession, FrontEnd);
 
         if (not TicketManagement.CheckAndConsumeItem(Ticket."No.", AdmissionCode, TicketType."Membership Sales Item No.", ReasonText)) then
@@ -1099,8 +1080,7 @@
     var
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
     begin
-
-        LookupOK := TicketRetailManagement.AcquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesLine, ResponseMessage); //-+TM1.45 [380754]
+        LookupOK := TicketRetailManagement.AcquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesLine, ResponseMessage);
         exit(LookupOK);
     end;
 
@@ -1150,7 +1130,6 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
     begin
-
         // assign same schedule to same admission objects
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -1176,7 +1155,6 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
     begin
-
         // assign same notification address
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -1218,7 +1196,6 @@
 
     local procedure GetInput(var JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-
         JSON.SetScopeRoot();
         if (not JSON.SetScope('$' + Path)) then
             exit('');
@@ -1228,7 +1205,6 @@
 
     local procedure GetInteger(var JSON: Codeunit "NPR POS JSON Management"; Path: Text): Integer
     begin
-
         JSON.SetScopeRoot();
         if (not JSON.SetScope('$' + Path)) then
             exit(0);
@@ -1242,7 +1218,6 @@
         Item: Record Item;
         AuxItem: Record "NPR Auxiliary Item";
     begin
-
         if (not Item.Get(SaleLinePOS."No.")) then
             exit(false);
 
@@ -1265,7 +1240,6 @@
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeExternalTicketNo();
             EanBoxEvent."Module Name" := 'Ticket Management';
-            //EanBoxEvent.Description := TMTicket.FIELDCAPTION ("External Ticket No.");
             EanBoxEvent.Description := CopyStr(TMTicket.FieldCaption("External Ticket No."), 1, MaxStrLen(EanBoxEvent.Description));
             EanBoxEvent."Action Code" := ActionCode('');
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
@@ -1327,4 +1301,82 @@
         exit(Codeunit::"NPR TM POS Action: Ticket Mgt.");
     end;
 
+    local procedure AddAdditionalExperience(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50])
+    var
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Ticket: Record "NPR TM Ticket";
+        Token: Text[100];
+        ResponseMessage: Text;
+        HaveSalesTicket: Boolean;
+    begin
+        if (ExternalTicketNumber <> '') then begin
+            Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
+            if (not Ticket.FindFirst()) then
+                Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
+
+            Ticket.TestField(Blocked, false);
+            HaveSalesTicket := false;
+
+        end else begin
+            POSSession.GetSaleLine(POSSaleLine);
+            POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+            GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token);
+            HaveSalesTicket := true;
+        end;
+
+        AquireAdditionalExperience(Ticket, Token, POSSession, HaveSalesTicket, ResponseMessage);
+    end;
+
+
+    local procedure AquireAdditionalExperience(Ticket: Record "NPR TM Ticket"; Token: Text[100]; POSSession: Codeunit "NPR POS Session"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
+    var
+        TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
+    begin
+        LookupOK := TicketRetailManagement.AquireAdditionalExperiences(Ticket, Token, POSSession, HaveSalesLine, ResponseMessage);
+        exit(LookupOK);
+    end;
+
+    local procedure AddAdditionalExperienceRevokeLines(POSSession: Codeunit "NPR POS Session"; Ticket: Record "NPR TM Ticket"; SalesTicketNo: Code[20])
+    var
+        TMTicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+
+        Admission: Record "NPR TM Admission";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLine: Codeunit "NPR POS Sale Line";
+    begin
+        TMTicketReservationReq.Get(Ticket."Ticket Reservation Entry No.");
+
+        TMTicketReservationReq.Reset();
+        TMTicketReservationReq.SetRange("Session Token ID", TMTicketReservationReq."Session Token ID");
+        TMTicketReservationReq.SetRange("Admission Inclusion", TMTicketReservationReq."Admission Inclusion"::SELECTED);
+
+        if TMTicketReservationReq.FindSet() then
+            repeat
+
+                Admission.Get(TMTicketReservationReq."Admission Code");
+                if Admission."Additional Experience Item No." <> '' then begin
+                    SaleLinePOS."Sales Ticket No." := SalesTicketNo;
+                    SaleLinePOS.Type := SaleLinePOS.Type::Item;
+                    SaleLinePOS."No." := Admission."Additional Experience Item No.";
+                    SaleLinePOS.Description := Admission.Description;
+                    SaleLinePOS.Quantity := -1;
+                    SaleLinePOS."Unit Price" := GetOriginalPrice(TMTicketReservationReq."Receipt No.", TMTicketReservationReq."Line No.");
+                    POSSession.GetSaleLine(SaleLine);
+                    SaleLine.InsertLine(SaleLinePOS, false);
+                end;
+
+            until TMTicketReservationReq.Next() = 0;
+
+    end;
+
+    local procedure GetOriginalPrice(ReceiptNo: Code[20]; LineNo: Integer): Decimal
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        POSEntrySalesLine.SetRange("Document No.", ReceiptNo);
+        POSEntrySalesLine.SetRange("Line No.", LineNo);
+        if POSEntrySalesLine.FindFirst() then
+            exit(POSEntrySalesLine."Amount Incl. VAT");
+    end;
 }

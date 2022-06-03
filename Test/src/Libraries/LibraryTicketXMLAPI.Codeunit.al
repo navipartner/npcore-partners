@@ -68,6 +68,75 @@ codeunit 85012 "NPR Library - Ticket XML API"
 
     end;
 
+    procedure MakeDynamicReservation(OrderCount: Integer; ItemNumber: Code[20]; Quantity: Integer; MemberReference: Code[20]; ScannerStation: Code[10]; var Token: Text[100]; var ResponseMessage: Text): Boolean
+    var
+        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
+        TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
+        TicketWebService: Codeunit "NPR TM Ticket WebService";
+        MakeReservation: XMLport "NPR TM Ticket Reservation";
+        IStream: InStream;
+        OrderNumber: Integer;
+        OStream: OutStream;
+        NameSpace: Text;
+        XmlAsText: Text;
+        ReservationStatus: Boolean;
+        XmlDec: XmlDeclaration;
+        XmlDoc: XmlDocument;
+        Reservation: XmlElement;
+        TicketAdmission: XmlElement;
+        Tickets: XmlElement;
+        XMLNameSpace: XmlNamespaceManager;
+    begin
+
+        TicketAdmissionBOM.SetFilter("Item No.", '=%1', ItemNumber);
+
+        NameSpace := 'urn:microsoft-dynamics-nav/xmlports/x6060114';
+
+        XMLDoc := XmlDocument.Create();
+        XMLDec := XmlDeclaration.Create('1.0', 'utf-8', 'yes');
+        XMLDoc.SetDeclaration(XMLDec);
+
+        Reservation := XmlElement.Create('reserve_tickets', NameSpace);
+        Reservation.SetAttribute('token', '');
+
+        for OrderNumber := 1 to OrderCount do begin
+            TicketAdmissionBOM.SetRange(Default, true);
+            TicketAdmissionBOM.FINDSET();
+            repeat
+                TicketAdmission := XmlElement.Create('ticket', NameSpace);
+                TicketAdmission.SetAttribute('external_id', ItemNumber);
+                TicketAdmission.SetAttribute('line_no', Format(OrderNumber));
+                TicketAdmission.SetAttribute('qty', Format(Quantity));
+                TicketAdmission.SetAttribute('admission_schedule_entry', Format(0));
+                if (MemberReference <> '') then
+                    TicketAdmission.SetAttribute('member_number', MemberReference);
+                TicketAdmission.SetAttribute('admission_code', TicketAdmissionBOM."Admission Code");
+
+                Reservation.Add(TicketAdmission);
+            until (TicketAdmissionBOM.Next() = 0);
+
+        end;
+        Tickets := XmlElement.Create('tickets', NameSpace);
+        Tickets.Add(Reservation);
+
+        XmlDoc.Add(Tickets);
+        XmlDoc.WriteTo(XmlAsText);
+
+        TmpBLOBbuffer.Insert();
+        TmpBLOBbuffer."Buffer 1".CreateOutStream(OStream);
+        OStream.WriteText(XmlAsText);
+        TmpBLOBbuffer.Modify();
+
+        TmpBLOBbuffer."Buffer 1".CreateInStream(IStream);
+        MakeReservation.SetSource(IStream);
+
+        TicketWebService.MakeTicketReservation(MakeReservation, ScannerStation);
+
+        ReservationStatus := MakeReservation.GetResult(Token, ResponseMessage);
+        exit(ReservationStatus);
+
+    end;
+
     procedure PreConfirmTicketReservation(Token: Text[100]; ScannerStation: Code[10]; var ResponseMessage: Text) PreConfirmationStatus: Boolean
     var
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
@@ -673,6 +742,83 @@ codeunit 85012 "NPR Library - Ticket XML API"
                 Admissions.Add(AdmissionElement);
             end;
         until (TmpTargetRequest.Next() = 0);
+
+        RequestElement := XmlElement.Create('Request', NameSpace);
+        RequestElement.Add(AddElement('ChangeRequestToken', ChangeToken, NameSpace));
+        RequestElement.Add(Admissions);
+
+        ConfirmElement := XmlElement.Create('ConfirmChangeReservation', NameSpace);
+        ConfirmElement.Add(RequestElement);
+
+        TicketsElement := XmlElement.Create('Tickets', NameSpace);
+        TicketsElement.Add(ConfirmElement);
+
+        XmlDoc.Add(TicketsElement);
+        XmlDoc.WriteTo(XmlAsText);
+
+        TmpBLOBbuffer.Insert();
+        TmpBLOBbuffer."Buffer 1".CreateOutStream(OStream);
+        OStream.WriteText(XmlAsText);
+        TmpBLOBbuffer.Modify();
+
+        TmpBLOBbuffer."Buffer 1".CreateInStream(IStream);
+        ConfirmTicketRequest.SetSource(IStream);
+        TicketWebService.ConfirmTicketChangeRequest(ConfirmTicketRequest);
+
+        ApiStatus := ConfirmTicketRequest.GetConfirmResponse(TmpTicketReservationResponse, ResponseMessage);
+        exit(ApiStatus);
+
+
+    end;
+
+    procedure ConfirmChangeDynamicTicketReservation(ChangeToken: Text[100]; var TmpTargetRequest: Record "NPR TM Ticket Reservation Req." temporary; var TmpTicketReservationResponse: Record "NPR TM Ticket Reserv. Resp." temporary; var ResponseMessage: Text): Boolean
+    var
+        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
+        TicketWebService: Codeunit "NPR TM Ticket WebService";
+        IStream: InStream;
+        OStream: OutStream;
+        NameSpace: Text;
+        XmlAsText: Text;
+        ApiStatus: Boolean;
+        XmlDec: XmlDeclaration;
+        XmlDoc: XmlDocument;
+        RequestElement: XmlElement;
+        AdmissionElement: XmlElement;
+        Admissions: XmlElement;
+        ConfirmElement: XmlElement;
+        TicketsElement: XmlElement;
+        ConfirmTicketRequest: XmlPort "NPR TM Ticket Conf. Change Req";
+    begin
+        TmpTargetRequest.Reset();
+
+        NameSpace := 'urn:microsoft-dynamics-nav/xmlports/x6060108';
+
+        XMLDoc := XmlDocument.Create();
+        XMLDec := XmlDeclaration.Create('1.0', 'utf-8', 'yes');
+        XMLDoc.SetDeclaration(XMLDec);
+
+        Admissions := XmlElement.Create('Admissions', NameSpace);
+        //Copy selected admissions
+        TmpTargetRequest.SetFilter("Admission Inclusion", '0|1');
+        TmpTargetRequest.FindSet();
+        repeat
+            if (TmpTargetRequest.Get(TmpTargetRequest."Entry No.")) then begin
+                AdmissionElement := XmlElement.Create('Admission', NameSpace);
+                AdmissionElement.SetAttribute('Code', TmpTargetRequest."Admission Code");
+                AdmissionElement.SetAttribute('OldScheduleEntryNo', Format(TmpTargetRequest."External Adm. Sch. Entry No.", 0, 9));
+                AdmissionElement.SetAttribute('NewScheduleEntryNo', Format(TmpTargetRequest."External Adm. Sch. Entry No.", 0, 9));
+                Admissions.Add(AdmissionElement);
+            end;
+        until (TmpTargetRequest.Next() = 0);
+        //Add 1 unselected admission
+        TmpTargetRequest.SetFilter("Admission Inclusion", '2');
+        if TmpTargetRequest.FindFirst() then begin
+            AdmissionElement := XmlElement.Create('Admission', NameSpace);
+            AdmissionElement.SetAttribute('Code', TmpTargetRequest."Admission Code");
+            AdmissionElement.SetAttribute('OldScheduleEntryNo', Format(-1));
+            AdmissionElement.SetAttribute('NewScheduleEntryNo', Format(TmpTargetRequest."External Adm. Sch. Entry No."));
+            Admissions.Add(AdmissionElement);
+        end;
 
         RequestElement := XmlElement.Create('Request', NameSpace);
         RequestElement.Add(AddElement('ChangeRequestToken', ChangeToken, NameSpace));

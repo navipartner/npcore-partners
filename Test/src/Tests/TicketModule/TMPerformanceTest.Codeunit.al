@@ -24,20 +24,6 @@ codeunit 85050 "NPR TM Performance Test"
     end;
 
     [Test]
-    procedure Create_100_Vouchers_NoScan()
-    begin
-        Create_Vouchers_NoScan(100);
-    end;
-
-    [Test]
-    procedure Create_1000_Vouchers_NoScan()
-    begin
-        Create_Vouchers_NoScan(1000);
-    end;
-
-
-    #region Create
-    [Test]
     procedure Create_10_Tickets()
     var
     begin
@@ -52,38 +38,6 @@ codeunit 85050 "NPR TM Performance Test"
     end;
 
     [Test]
-    procedure Create_100_Tickets()
-    var
-    begin
-        PosTickets_Create(100);
-    end;
-
-    [Test]
-    procedure Create_100_Tickets_FromVoucher()
-    var
-    begin
-        PosTickets_Create_FromVoucher(100);
-    end;
-
-    [Test]
-    procedure Create_1000_Tickets()
-    var
-    begin
-        PosTickets_Create(1000);
-    end;
-
-    /* To slow to run!
-    [Test]
-    procedure Create_1000_Tickets_FromVoucher()
-    var
-    begin
-        PosTickets_Create_FromVoucher(1000);
-    end;
-    */
-    #endregion Create
-
-    #region Cancel
-    [Test]
     procedure Cancel_10_Tickets()
     var
     begin
@@ -91,92 +45,12 @@ codeunit 85050 "NPR TM Performance Test"
     end;
 
     [Test]
-    procedure Cancel_100_Tickets()
-    var
-    begin
-        PosTickets_Cancel(100, false);
-    end;
-
-    [Test]
-    procedure Cancel_100_Tickets_FromVoucher()
-    var
-    begin
-        PosTickets_Cancel_FromVoucher(100, false);
-    end;
-
-    [Test]
-    procedure Cancel_100_Tickets_FromVoucher_WithStats()
-    var
-    begin
-        PosTickets_Cancel_FromVoucher(100, true);
-    end;
-
-    [Test]
-    procedure Cancel_1000_Tickets()
-    var
-    begin
-        PosTickets_Cancel(1000, false);
-    end;
-
-    [Test]
-    procedure Cancel_1000_Tickets_WithStats()
-    var
-    begin
-        PosTickets_Cancel(1000, true);
-    end;
-
-    /* To slow to run!
-    procedure Cancel_1000_Tickets_FromVoucher()
-    var
-    begin
-        PosTickets_Cancel_FromVoucher(1000, false);
-    end;
-
-    procedure Cancel_1000_Tickets_FromVoucher_WithStats()
-    var
-    begin
-        PosTickets_Cancel_FromVoucher(1000, true);
-    end;
-    */
-    #endregion Cancel
-
-
-    #region EndSale
-    [Test]
     procedure EndSale_10_Tickets()
     var
     begin
         PosTickets_EndSale(10);
     end;
 
-    [Test]
-    procedure EndSale_100_Tickets()
-    var
-    begin
-        PosTickets_EndSale(100);
-    end;
-
-    [Test]
-    procedure EndSale_100_Tickets_FromVoucher()
-    begin
-        PosTickets_EndSale_FromVoucher(100);
-    end;
-
-    [Test]
-    procedure EndSale_1000_Tickets()
-    var
-    begin
-        PosTickets_EndSale(1000);
-    end;
-
-    /* To slow to run!
-    [Test]
-    procedure EndSale_1000_Tickets_FromVoucher()
-    begin
-        PosTickets_EndSale_FromVoucher(1000);
-    end;
-    */
-    #endregion EndSale
 
     procedure Create_Vouchers_NoScan(Quantity: Decimal)
     var
@@ -311,7 +185,7 @@ codeunit 85050 "NPR TM Performance Test"
         CountAfter := Ticket.Count();
         Assert.AreEqual(TicketsToSell, CountAfter - CountBefore, StrSubstNo('Number of tickets to be created must be %1.', TicketsToSell));
 
-        if (not NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice * TicketsToSell, '')) then
+        if (not NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, Round(UnitPrice * TicketsToSell, _POSPaymentMethod."Rounding Precision"), '')) then
             Error('Sale expected to end.');
     end;
 

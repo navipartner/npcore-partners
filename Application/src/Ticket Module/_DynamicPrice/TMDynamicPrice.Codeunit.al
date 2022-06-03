@@ -138,6 +138,8 @@ codeunit 6014559 "NPR TM Dynamic Price"
         Admission: Record "NPR TM Admission";
         PriceRule: Record "NPR TM Dynamic Price Rule";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Item: Record Item;
+        IncludeBasePrice: Boolean;
     begin
         if (not Admission.Get(AdmissionCode)) then
             Admission.Init();
@@ -146,12 +148,22 @@ codeunit 6014559 "NPR TM Dynamic Price"
             TicketBOM.Init();
 
         BasePrice := 0;
+        AddonPrice := 0;
 
-        /* Get different unit price from admission. 
-        if (Admission."Price Item" <> '') then begin
+        IncludeBasePrice := TicketBOM.Default;
 
+        // Get different unit price from admission. 
+        if (Admission."Additional Experience Item No." <> '') then begin
+            Item.Get(Admission."Additional Experience Item No.");
+
+            OriginalUnitPrice := Item."Unit Price";
+            UnitPriceVatPercentage := GetItemDefaultVat(Item."No.");
+            if Item."Price Includes VAT" and not UnitPriceIncludesVAT then
+                OriginalUnitPrice := RemoveVat(Item."Unit Price", UnitPriceVatPercentage);
+            if not Item."Price Includes VAT" and UnitPriceIncludesVAT then
+                OriginalUnitPrice := AddVat(Item."Unit Price", UnitPriceVatPercentage);
+            IncludeBasePrice := true;
         end;
-        */
 
         HavePriceRule := false;
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalScheduleEntryNo);
@@ -159,12 +171,14 @@ codeunit 6014559 "NPR TM Dynamic Price"
         if (AdmissionScheduleEntry.FindLast()) then begin
             HavePriceRule := SelectPriceRule(AdmissionScheduleEntry, BookingDateDate, BookingTime, PriceRule);
             if (HavePriceRule) then
-                EvaluatePriceRule(PriceRule, OriginalUnitPrice, UnitPriceIncludesVAT, UnitPriceVatPercentage, TicketBOM.Default, BasePrice, AddonPrice);
+                EvaluatePriceRule(PriceRule, OriginalUnitPrice, UnitPriceIncludesVAT, UnitPriceVatPercentage, IncludeBasePrice, BasePrice, AddonPrice);
         end;
 
         if (not HavePriceRule) then
             BasePrice := OriginalUnitPrice;
 
+        if (not TicketBOM.Default) and (TicketBOM."Admission Inclusion" = TicketBOM."Admission Inclusion"::REQUIRED) then
+            BasePrice := 0;
         exit(HavePriceRule);
     end;
 

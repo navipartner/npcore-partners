@@ -144,18 +144,34 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                     textattribute(priceoption)
                     {
                         XmlName = 'price_option';
+                        trigger OnBeforePassVariable()
+                        begin
+                            priceoption := PriceOption;
+                        end;
                     }
                     textattribute(amount)
                     {
                         XmlName = 'price_amount';
+                        trigger OnBeforePassVariable()
+                        begin
+                            amount := Amount;
+                        end;
                     }
                     textattribute(percentage)
                     {
                         XmlName = 'price_percentage';
+                        trigger OnBeforePassVariable()
+                        begin
+                            percentage := Percentage;
+                        end;
                     }
                     textattribute(includesvat)
                     {
                         XmlName = 'includes_vat';
+                        trigger OnBeforePassVariable()
+                        begin
+                            includesvat := IncludesVAT;
+                        end;
                     }
                     fieldattribute(event_arrival_from_time; TmpAdmScheduleEntryResponse."Event Arrival From Time")
                     {
@@ -175,6 +191,14 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                     fieldattribute(sales_until_time; TmpAdmScheduleEntryResponse."Sales Until Time")
                     {
                     }
+                    textattribute(admission_price)
+                    {
+                        XmlName = 'admission_price';
+                        trigger OnBeforePassVariable()
+                        begin
+                            admission_price := Format(AdmissionPrice, 0, 9);
+                        end;
+                    }
 
                     trigger OnAfterGetRecord()
                     var
@@ -187,10 +211,14 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         VariantCode: Code[10];
                         ResolvingTable: Integer;
                         NonWorking: Boolean;
+                        BasePrice, AddonPrice : Decimal;
                     begin
 
                         RemainingCapacity := 0;
                         CapacityStatusCode := 1;
+                        AdmissionPrice := 0;
+                        TicketPrice.CalculateScheduleEntryPrice(gExternalItemNo, '', TmpAdmScheduleEntryResponse."Admission Code", TmpAdmScheduleEntryResponse."External Schedule Entry No.", Today(), Time(), BasePrice, AddonPrice);
+                        AdmissionPrice := BasePrice + AddonPrice;
 
                         if (TmpAdmScheduleEntryResponse."Admission Code" = '') then
                             CapacityStatusCode := -4;
@@ -247,6 +275,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                             Amount := Format(PriceRule.Amount, 0, 9);
                             Percentage := Format(PriceRule.Percentage, 0, 9);
                             IncludesVAT := Format(PriceRule.AmountIncludesVAT, 0, 9);
+
                         end;
                     end;
                 }
@@ -269,6 +298,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
     var
         RequestEntryNo: Integer;
         RemainingCapacity: Integer;
+        AdmissionPrice: Decimal;
         CapacityStatusCode: Integer;
         gExternalItemNo: Code[20];
         ResponseLbl: Label 'Capacity Status Code %1 does not have a dedicated message yet.';

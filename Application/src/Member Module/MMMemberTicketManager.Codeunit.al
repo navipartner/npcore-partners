@@ -230,7 +230,7 @@
                     TicketRequestManager.POS_AppendToReservationRequest2(Token,
                       '', 0,
                       TempTicketReservationRequest."Item No.", TempTicketReservationRequest."Variant Code", TicketAdmissionBOM."Admission Code",
-                      TempTicketReservationRequest.Quantity, 0, Member."External Member No.", Member."External Member No.", '', TempTicketReservationRequest."Notification Address");
+                      TempTicketReservationRequest.Quantity, 0, Member."External Member No.", Member."External Member No.", '', TempTicketReservationRequest."Notification Address", TempTicketReservationRequest."Ext. Line Reference No.");
 
                 until (TicketAdmissionBOM.Next() = 0);
 

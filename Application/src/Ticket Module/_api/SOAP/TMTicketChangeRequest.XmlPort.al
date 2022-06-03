@@ -154,6 +154,36 @@ xmlport 6060107 "NPR TM Ticket Change Request"
                                     XmlName = 'CanReschedule';
                                     Occurrence = Required;
                                 }
+                                textattribute(admission_price)
+                                {
+                                    XmlName = 'admission_price';
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        admission_price := Format(AdmissionPrice, 0, 9);
+                                    end;
+                                }
+                                textelement(admission_is)
+                                {
+                                    XmlName = 'admission_is';
+                                    textattribute(admission_is_id)
+                                    {
+                                        XmlName = 'option_value';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+
+                                            admission_is_id := Format(tmpChangeRequest."Admission Inclusion", 0, 9);
+                                        end;
+                                    }
+
+
+                                    trigger OnBeforePassVariable()
+                                    begin
+
+                                        admission_is := Format(tmpChangeRequest."Admission Inclusion");
+                                    end;
+                                }
+
                             }
 
                             textelement(AdmissionDescription)
@@ -169,8 +199,10 @@ xmlport 6060107 "NPR TM Ticket Change Request"
                                 Admission: Record "NPR TM Admission";
                                 Ticket: Record "NPR TM Ticket";
                                 TicketManagement: Codeunit "NPR TM Ticket Management";
+                                TicketPrice: Codeunit "NPR TM Dynamic Price";
+                                BasePrice, AddonPrice : Decimal;
                             begin
-
+                                AdmissionPrice := 0;
                                 Admission.Get(tmpChangeRequest."Admission Code");
                                 AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', tmpChangeRequest."External Adm. Sch. Entry No.");
                                 AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
@@ -198,7 +230,8 @@ xmlport 6060107 "NPR TM Ticket Change Request"
                                     ValidFrom := Format(Ticket."Valid From Date", 0, 9);
                                     ValidUntil := Format(Ticket."Valid To Date", 0, 9)
                                 end;
-
+                                TicketPrice.CalculateScheduleEntryPrice(tmpChangeRequest."Item No.", tmpChangeRequest."Variant Code", tmpChangeRequest."Admission Code", tmpChangeRequest."External Adm. Sch. Entry No.", Today(), Time(), BasePrice, AddonPrice);
+                                AdmissionPrice := BasePrice + AddonPrice;
                             end;
                         }
                     }
@@ -224,15 +257,33 @@ xmlport 6060107 "NPR TM Ticket Change Request"
         }
     }
 
+    var
+        AdmissionPrice: Decimal;
+
     internal procedure SetChangeRequestId(Token: Text[100])
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
+        TMTicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
+        TMTicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
         Commit();
         if (tmpResult.IsTemporary) then
             tmpResult.DeleteAll();
 
         ChangeRequestToken := Token;
+
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.FindFirst();
+        TMTicketAdmissionBOM.SetFilter("Item No.", '=%1', TicketReservationRequest."Item No.");
+        TMTicketAdmissionBOM.SetFilter("Variant Code", '=%1', TicketReservationRequest."Variant Code");
+        TMTicketAdmissionBOM.FindSet();
+        repeat
+            TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
+            TicketReservationRequest2.SetRange("Admission Code", TMTicketAdmissionBOM."Admission Code");
+            if TicketReservationRequest2.IsEmpty() then
+                TMTicketRequestManager.POS_AppendToReservationRequest(Token, TicketReservationRequest."Receipt No.", TicketReservationRequest."Line No.", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TMTicketAdmissionBOM."Admission Code", TicketReservationRequest.Quantity, 0, TicketReservationRequest."External Member No.", TicketReservationRequest."Ext. Line Reference No.");
+        until (TMTicketAdmissionBOM.Next() = 0);
 
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.FindSet();
@@ -245,6 +296,8 @@ xmlport 6060107 "NPR TM Ticket Change Request"
             tmpChangeRequest.TransferFields(TicketReservationRequest, true);
             tmpChangeRequest.Insert();
         until (TicketReservationRequest.Next() = 0);
+
+
 
         ResponseCode := 'OK';
         ResponseMessage := '';

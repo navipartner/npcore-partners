@@ -182,6 +182,12 @@
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the URL to the server on which you can share the ticket with customers.';
                 }
+                field("Admission Inclusion"; Rec."Admission Inclusion")
+                {
+                    ToolTip = 'Specifies the value of the Admission Inclusion field.';
+                    ApplicationArea = All;
+                }
+
             }
         }
     }

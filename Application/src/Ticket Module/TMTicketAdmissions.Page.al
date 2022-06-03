@@ -148,6 +148,11 @@
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies conditions which need to be met for a waiting list to be created, and how the customers will be notified when they are able to buy tickets.';
                 }
+                field("Additional Experienc Item No."; Rec."Additional Experience Item No.")
+                {
+                    ToolTip = 'Specifies the value of the Additional Experience Item No. field. This Item will be used to post POS Line when adding additional experience to existing ticket.';
+                    ApplicationArea = NPRetail;
+                }
             }
         }
     }

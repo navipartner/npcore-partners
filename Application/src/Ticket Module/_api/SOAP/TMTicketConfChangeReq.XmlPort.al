@@ -49,6 +49,10 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
                                 XmlName = 'NewScheduleEntryNo';
                                 Occurrence = Required;
                             }
+                            trigger OnBeforeInsertRecord()
+                            begin
+                                tmpTicketReservationRequest."Entry No." := tmpTicketReservationRequest.Count() + 1;
+                            end;
                         }
                     }
 
