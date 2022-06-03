@@ -3,7 +3,7 @@
 
 
 Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
-$ErrorActionPreference = “Stop”
+$ErrorActionPreference = "Stop"
 
 function Get-ObjectType {
     param (
@@ -103,7 +103,8 @@ $throwError = $false;
 foreach ($file in $fileList) 
 {
     try {    
-        $InPublicFolder = $file.directory.Name.ToLower().Equals('_public')        
+        $folderPath = Split-Path -Path $file.FullName
+        $InPublicFolder = $folderPath -like '*_public*'                
 
         $fileLines = Get-Content -LiteralPath $file.FullName        
 
