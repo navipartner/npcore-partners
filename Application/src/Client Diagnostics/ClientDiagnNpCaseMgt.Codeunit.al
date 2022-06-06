@@ -53,6 +53,7 @@
     var
         ActiveSession: Record "Active Session";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        AzureADTenant: Codeunit "Azure AD Tenant";
         Node: XmlNode;
         Element: XmlElement;
         MethodName: Text;
@@ -82,6 +83,7 @@
         NpXmlDomMgt.AddAttribute(Node, 'username', CopyStr(UserId, 1, 260));
         NpXmlDomMgt.AddAttribute(Node, 'database_name', ActiveSession."Database Name");
         NpXmlDomMgt.AddAttribute(Node, 'tenant_id', CopyStr(TenantId(), 1, 260));
+        NpXmlDomMgt.AddAttribute(Node, 'azure_ad_tenant_id', CopyStr(AzureADTenant.GetAadTenantId(), 1, 260));
 
         Element := Node.AsXmlElement();
         MethodNS := Element.NamespaceUri();
