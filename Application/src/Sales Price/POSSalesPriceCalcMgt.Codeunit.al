@@ -148,6 +148,8 @@
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         Customer: Record Customer;
+        POSPricingProfile: Record "NPR POS Pricing Profile";
+        POSUnit: Record "NPR POS Unit";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
         LineWithPrice: Interface "Line With Price";
         PriceCalculation: Interface "Price Calculation";
@@ -156,6 +158,8 @@
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;
+        if POSUnit.Get(SalePOS."Register No.") then;
+        POSUnit.GetProfile(POSPricingProfile);
 
 
         SalesLine.Init();
@@ -175,6 +179,9 @@
                 SalesHeader."Customer Price Group" := Customer."Customer Price Group";
                 SalesLine."Customer Price Group" := Customer."Customer Price Group";
                 SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
+            end else begin
+                SalesLine."Customer Price Group" := POSPricingProfile."Customer Price Group";
+                SalesLine."Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
             end;
 
         SalesLine.GetLineWithPrice(LineWithPrice);
@@ -188,6 +195,8 @@
     procedure SalesLineLineDiscExists(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; ShowAll: Boolean): Boolean
     var
         Customer: Record Customer;
+        POSPricingProfile: Record "NPR POS Pricing Profile";
+        POSUnit: Record "NPR POS Unit";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
@@ -198,6 +207,8 @@
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;
+        if POSUnit.Get(SalePOS."Register No.") then;
+        POSUnit.GetProfile(POSPricingProfile);
 
 
         SalesLine.Init();
@@ -216,6 +227,9 @@
                 SalesHeader."Customer Price Group" := Customer."Customer Price Group";
                 SalesLine."Customer Price Group" := Customer."Customer Price Group";
                 SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
+            end else begin
+                SalesLine."Customer Price Group" := POSPricingProfile."Customer Price Group";
+                SalesLine."Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
             end;
         SalesLine.GetLineWithPrice(LineWithPrice);
         LineWithPrice.SetLine(TempSalesPriceLineDisc."Price Type"::Sale, SalesHeader, SalesLine);
@@ -450,7 +464,4 @@
         FilterSubscribedFunction(EventSubscription, POSPricingProfile);
         EventSubscription.FindFirst();
     end;
-
-
 }
-
