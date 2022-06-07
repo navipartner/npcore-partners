@@ -1,6 +1,7 @@
 ﻿codeunit 6151600 "NPR NpDc Module Issue: OnSale"
 {
     Access = Internal;
+
     var
         Text000: Label 'Issue Coupon - Default';
         Text001: Label 'On-Sale Coupons can only be issued through POS Sale';
@@ -135,6 +136,8 @@
         LineNo: Integer;
         i: Integer;
     begin
+        if CheckIfCouponTypeSettingsAreNotValid(SalePOS, CouponType) then
+            exit;
         SaleLinePOS.SetSkipCalcDiscount(true);
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -569,6 +572,20 @@
     local procedure ModuleCode(): Code[20]
     begin
         exit('ON-SALE');
+    end;
+
+    local procedure CheckIfCouponTypeSettingsAreNotValid(SalePOS: Record "NPR POS Sale"; CouponType: Record "NPR NpDc Coupon Type"): Boolean
+    var
+        POSStoreGroupLine: Record "NPR POS Store Group Line";
+    begin
+        if CouponType."POS Store Group" = '' then
+            exit;
+        if not CouponType."Match POS Store Group" then
+            exit;
+        POSStoreGroupLine.SetRange("No.", CouponType."POS Store Group");
+        POSStoreGroupLine.SetRange("POS Store", SalePOS."POS Store Code");
+        if POSStoreGroupLine.IsEmpty() then
+            exit(true);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]

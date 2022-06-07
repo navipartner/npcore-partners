@@ -143,6 +143,21 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR NpDc Coupon Module".Code WHERE(Type = CONST("Apply Discount"));
         }
+        field(150; "POS Store Group"; Code[20])
+        {
+            Caption = 'POS Store Group';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Store Group";
+            trigger OnValidate()
+            begin
+                CheckPosStoreGroupLines();
+            end;
+        }
+        field(160; "Match POS Store Group"; Boolean)
+        {
+            Caption = 'Match POS Store Group';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Coupon Qty. (Open)"; Integer)
         {
             CalcFormula = Count("NPR NpDc Coupon" WHERE("Coupon Type" = FIELD(Code),
@@ -159,7 +174,6 @@
             Editable = false;
             FieldClass = FlowField;
         }
-
         field(6151479; "Replication Counter"; BigInteger)
         {
             Caption = 'Replication Counter';
@@ -219,6 +233,18 @@
     begin
         if "Max Use per Sale" < 1 then
             "Max Use per Sale" := 1;
+    end;
+
+    local procedure CheckPosStoreGroupLines()
+    var
+        POSStoreGroupLine: Record "NPR POS Store Group Line";
+        EmptyLinesErr: Label 'POS Store Group Lines are empty. Please assign POS Stores to Lines before selecting POS Store Group.';
+    begin
+        if "POS Store Group" = '' then
+            exit;
+        POSStoreGroupLine.SetRange("No.", "POS Store Group");
+        if POSStoreGroupLine.IsEmpty() then
+            Error(EmptyLinesErr);
     end;
 
 }

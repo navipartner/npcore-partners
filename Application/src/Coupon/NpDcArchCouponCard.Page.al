@@ -86,6 +86,11 @@
                         ToolTip = 'Specifies the value of the Open field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("POS Store Group"; Rec."POS Store Group")
+                    {
+                        ToolTip = 'Specifies the group of POS Stores where Coupon can be used.';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("Remaining Quantity"; Rec."Remaining Quantity")
                     {
 

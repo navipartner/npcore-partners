@@ -643,6 +643,7 @@
         ArchCoupon."Issue Coupon Module" := Coupon."Issue Coupon Module";
         ArchCoupon."Validate Coupon Module" := Coupon."Validate Coupon Module";
         ArchCoupon."Apply Discount Module" := Coupon."Apply Discount Module";
+        ArchCoupon."POS Store Group" := Coupon."POS Store Group";
         ArchCoupon.Insert();
     end;
 

@@ -34,6 +34,7 @@
                 "Discount Amount" := CouponType."Discount Amount";
                 "Max Use per Sale" := CouponType."Max Use per Sale";
                 "Print Template Code" := CouponType."Print Template Code";
+                "POS Store Group" := CouponType."POS Store Group";
 
                 if ((Rec."Starting Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Starting Date DateFormula") <> '')) then
                     Rec."Starting Date" := CreateDateTime(CalcDate(CouponType."Starting Date DateFormula"), 0T);
@@ -171,6 +172,12 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(150; "POS Store Group"; Code[20])
+        {
+            Caption = 'POS Store Group';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Store Group";
+        }        
     }
 
     keys
