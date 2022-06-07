@@ -34,6 +34,7 @@
         FldSSN: Text;
         FldAddress: Text;
         FldPostCode: Text;
+        FldCity: Text;
         FldCountryCode: Text;
         FldCountry: Text;
         FldGender: Text;
@@ -146,6 +147,7 @@
         FldSSN := nextField(PLine);
         FldAddress := nextField(PLine);
         FldPostCode := nextField(PLine);
+        FldCity := nextField(PLine);
         FldCountryCode := nextField(PLine);
         FldCountry := nextField(PLine);
         FldGender := nextField(PLine);
@@ -190,6 +192,8 @@
         GMemberInfo.Address := validateTextField(FldAddress, MaxStrLen(GMemberInfo.Address), OPTIONAL, GMemberInfo.FieldCaption(Address));
         GMemberInfo."Country Code" := validateTextField(FldCountryCode, MaxStrLen(GMemberInfo."Country Code"), OPTIONAL, GMemberInfo.FieldCaption("Country Code"));
         GMemberInfo.Validate("Post Code Code", validateTextField(FldPostCode, MaxStrLen(GMemberInfo."Post Code Code"), OPTIONAL, GMemberInfo.FieldCaption("Post Code Code")));
+        if (GMemberInfo.City = '') then
+            GMemberInfo.City := FldCity;
         GMemberInfo.Country := validateTextField(FldCountry, MaxStrLen(GMemberInfo.Country), OPTIONAL, GMemberInfo.FieldCaption(Country));
 
         case LowerCase(FldGender) of
@@ -221,7 +225,7 @@
             'yes':
                 GMemberInfo."News Letter" := GMemberInfo."News Letter"::YES;
             else
-                GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::NO_THANKYOU;
+                GMemberInfo."News Letter" := GMemberInfo."News Letter"::NOT_SPECIFIED;
         end;
 
         // -- Membership
@@ -237,6 +241,9 @@
             Error(INVALID_VALUE, GMemberInfo."Membership Code", GMemberInfo.FieldCaption("Membership Code"), GLineCount);
 
         GMemberInfo."Item No." := MembershipSalesSetup."No.";
+
+        MembershipSetup.Get(MembershipSalesSetup."Membership Code");
+        Community.Get(MembershipSetup."Community Code");
 
         // fldValidFromDate
         // fldValidUntilDate
@@ -261,14 +268,13 @@
         GMemberInfo."External Card No." := validateTextField(FldExternalCardNo, MaxStrLen(GMemberInfo."External Card No."), OPTIONAL, GMemberInfo.FieldCaption("External Card No."));
         GMemberInfo."Valid Until" := validateDateField(FldExternalCardNoValidUntilDate, GDateMask, OPTIONAL, GMemberInfo.FieldCaption("Valid Until"));
 
+        GMemberInfo."Member Card Type" := MembershipSalesSetup."Member Card Type";
+
         GMemberInfo."Originates From File Import" := true;
         GMemberInfo.Insert();
 
         if (StrLen(FldFirstName + FldLastName) = 0) then exit(false);
         if (GMemberInfo."Item No." = '') then exit(false);
-
-        MembershipSetup.Get(MembershipSalesSetup."Membership Code");
-        Community.Get(MembershipSetup."Community Code");
 
         Member.Reset();
         case Community."Member Unique Identity" of
