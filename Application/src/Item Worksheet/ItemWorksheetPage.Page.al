@@ -200,6 +200,16 @@
                     ToolTip = 'Specifies the value of the Sales Price Start Date field.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Current Sales Price"; Rec."Current Sales Price")
+                {
+                    ToolTip = 'Specifies the value of the Current Sales Price field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Sales Price Changing"; Rec."Sales Price Changing")
+                {
+                    ToolTip = 'Specifies the value of the Sales Price Changing field.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Direct Unit Cost"; Rec."Direct Unit Cost")
                 {
 
