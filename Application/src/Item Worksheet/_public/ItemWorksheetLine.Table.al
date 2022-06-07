@@ -2,8 +2,8 @@
 {
     Caption = 'Item Worksheet Line';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Item Worksheet Page";
-    LookupPageID = "NPR Item Worksheet Page";
+    DrillDownPageId = "NPR Item Worksheet Page";
+    LookupPageId = "NPR Item Worksheet Page";
 
     fields
     {
@@ -19,7 +19,7 @@
             Caption = 'Worksheet Name';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Item Worksheet".Name WHERE("Item Template Name" = FIELD("Worksheet Template Name"));
+            TableRelation = "NPR Item Worksheet".Name where("Item Template Name" = field("Worksheet Template Name"));
         }
         field(3; "Line No."; Integer)
         {
@@ -78,106 +78,8 @@
             TableRelation = Item;
 
             trigger OnValidate()
-            var
-                AuxItem: Record "NPR Auxiliary Item";
-                ItemWorksheetTemplate2: Record "NPR Item Worksh. Template";
             begin
-                TestField("Line No.");
-                if "Existing Item No." = '' then
-                    exit;
-                Item.Get("Existing Item No.");
-                Description := Item.Description;
-                "Base Unit of Measure" := Item."Base Unit of Measure";
-                Validate("VAT Prod. Posting Group", Item."VAT Prod. Posting Group");
-                "VAT Bus. Posting Gr. (Price)" := Item."VAT Bus. Posting Gr. (Price)";
-                "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
-                "Inventory Posting Group" := Item."Inventory Posting Group";
-                "Sales Unit of Measure" := Item."Sales Unit of Measure";
-                "Purch. Unit of Measure" := Item."Purch. Unit of Measure";
-                "Costing Method" := Item."Costing Method";
-                if "No. Series" = '' then
-                    "No. Series" := Item."No. Series";
-                "Sales Price" := Item."Unit Price";
-                "Direct Unit Cost" := Item."Last Direct Cost";
-                "Tax Group Code" := Item."Tax Group Code";
-                if "Vendor No." = '' then
-                    "Vendor No." := Item."Vendor No.";
-                if "Vendor Item No." = '' then
-                    "Vendor Item No." := CopyStr(ItemNumberManagement.GetItemItemVendorNo(Item."No.", '', "Vendor No."), 1, MaxStrLen("Vendor Item No."));
-
-                if ItemWorksheetTemplate2.Get("Worksheet Template Name") then;
-                if ("Internal Bar Code" = '') and not ItemWorksheetTemplate2."Do not Apply Internal Barcode" then
-                    "Internal Bar Code" := ItemNumberManagement.GetItemBarcode(Item."No.", '', '', "Vendor No.");
-
-                if ItemWorksheetItemMgt.ItemVariantExists("Existing Item No.") then
-                    "Use Variant" := true
-                else
-                    if ItemWorksheetItemMgt.ItemVarietyExists("Existing Item No.") then
-                        "Use Variant" := true;
-
-                Item.NPR_GetAuxItem(AuxItem);
-                "Variety Group" := AuxItem."Variety Group";
-                "Cross Variety No." := Item."NPR Cross Variety No.";
-                "Gross Weight" := Item."Gross Weight";
-                "Net Weight" := Item."Net Weight";
-                "Item Category Code" := Item."Item Category Code";
-                "Profit %" := Item."Profit %";
-                "Description 2" := Item."Description 2";
-                if Item."NPR Magento Item" then
-                    "Magento Item" := "Magento Item"::Yes
-                else
-                    "Magento Item" := "Magento Item"::No;
-
-                CopyItemAttributes(Item."No.");
-
-                "Variety 1" := AuxItem."Variety 1";
-                if VRTTable.Get("Variety 1", AuxItem."Variety 1 Table") then
-                    if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
-                        Validate("Variety 1 Table (Base)", VRTTable."Copy from");
-                        "Create Copy of Variety 1 Table" := true;
-                    end else begin
-                        Validate("Variety 1 Table (Base)", AuxItem."Variety 1 Table");
-                        "Create Copy of Variety 1 Table" := false;
-                    end;
-
-                "Variety 2" := AuxItem."Variety 2";
-                if VRTTable.Get("Variety 2", AuxItem."Variety 2 Table") then
-                    if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
-                        Validate("Variety 2 Table (Base)", VRTTable."Copy from");
-                        "Create Copy of Variety 2 Table" := true;
-                    end else begin
-                        Validate("Variety 2 Table (Base)", AuxItem."Variety 2 Table");
-                        "Create Copy of Variety 2 Table" := false;
-                    end;
-
-                "Variety 3" := AuxItem."Variety 3";
-                if VRTTable.Get("Variety 3", AuxItem."Variety 3 Table") then
-                    if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
-                        Validate("Variety 3 Table (Base)", VRTTable."Copy from");
-                        "Create Copy of Variety 3 Table" := true;
-                    end else begin
-                        Validate("Variety 3 Table (Base)", AuxItem."Variety 3 Table");
-                        "Create Copy of Variety 3 Table" := false;
-                    end;
-
-                "Variety 4" := AuxItem."Variety 4";
-                if VRTTable.Get("Variety 4", AuxItem."Variety 4 Table") then
-                    if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
-                        Validate("Variety 4 Table (Base)", VRTTable."Copy from");
-                        "Create Copy of Variety 4 Table" := true;
-                    end else begin
-                        Validate("Variety 4 Table (Base)", AuxItem."Variety 4 Table");
-                        "Create Copy of Variety 4 Table" := false;
-                    end;
-
-                FillVarietyTableNew();
-
-                if Action = Action::CreateNew then
-                    if "Existing Item No." <> '' then
-                        if "Item No." = '' then
-                            Validate("Item No.", GetNewItemNo());
-                UpdateVarietyHeadingText();
-                FillMappedFields();
+                ValidateExistingItemNo();
             end;
         }
         field(6; "Item No."; Code[20])
@@ -279,6 +181,10 @@
             Caption = 'Unit Price';
             DataClassification = CustomerContent;
             MinValue = 0;
+            trigger OnValidate()
+            begin
+                UpdateCurrentSalesPrice();
+            end;
         }
         field(20; "Use Variant"; Boolean)
         {
@@ -360,14 +266,14 @@
         }
         field(33; "Lead Time Calculation"; DateFormula)
         {
-            AccessByPermission = TableData "Purch. Rcpt. Header" = R;
+            AccessByPermission = tabledata "Purch. Rcpt. Header" = R;
             Caption = 'Lead Time Calculation';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
         }
         field(34; "Reorder Point"; Decimal)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Reorder Point';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -385,7 +291,7 @@
         }
         field(36; "Maximum Inventory"; Decimal)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Maximum Inventory';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -393,7 +299,7 @@
         }
         field(37; "Reorder Quantity"; Decimal)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Reorder Quantity';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -599,7 +505,7 @@
         }
         field(100; Reserve; Option)
         {
-            AccessByPermission = TableData "Purch. Rcpt. Header" = R;
+            AccessByPermission = tabledata "Purch. Rcpt. Header" = R;
             Caption = 'Reserve';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
@@ -612,7 +518,7 @@
             Caption = 'Global Dimension 1 Code';
             CaptionClass = '1,1,1';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -625,7 +531,7 @@
             Caption = 'Global Dimension 2 Code';
             CaptionClass = '1,1,2';
             DataClassification = CustomerContent;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -676,7 +582,7 @@
             Caption = 'Variety 1 Table';
             DataClassification = CustomerContent;
             Description = 'Variety';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 1"));
+            TableRelation = "NPR Variety Table".Code where(Type = field("Variety 1"));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -729,7 +635,7 @@
             Caption = 'Variety 2 Table';
             DataClassification = CustomerContent;
             Description = 'Variety';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 2"));
+            TableRelation = "NPR Variety Table".Code where(Type = field("Variety 2"));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -782,7 +688,7 @@
             Caption = 'Variety 3 Table';
             DataClassification = CustomerContent;
             Description = 'Variety';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 3"));
+            TableRelation = "NPR Variety Table".Code where(Type = field("Variety 3"));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -835,7 +741,7 @@
             Caption = 'Variety 4 Table';
             DataClassification = CustomerContent;
             Description = 'Variety';
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 4"));
+            TableRelation = "NPR Variety Table".Code where(Type = field("Variety 4"));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -1003,30 +909,30 @@
         }
         field(500; "Variety Lines to Skip"; Integer)
         {
-            CalcFormula = Count("NPR Item Worksh. Variant Line" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                                                     "Worksheet Name" = FIELD("Worksheet Name"),
-                                                                     "Worksheet Line No." = FIELD("Line No."),
-                                                                     Action = CONST(Skip)));
+            CalcFormula = count("NPR Item Worksh. Variant Line" where("Worksheet Template Name" = field("Worksheet Template Name"),
+                                                                     "Worksheet Name" = field("Worksheet Name"),
+                                                                     "Worksheet Line No." = field("Line No."),
+                                                                     Action = const(Skip)));
             Caption = 'Variety Lines to Skip';
             Editable = false;
             FieldClass = FlowField;
         }
         field(510; "Variety Lines to Update"; Integer)
         {
-            CalcFormula = Count("NPR Item Worksh. Variant Line" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                                                     "Worksheet Name" = FIELD("Worksheet Name"),
-                                                                     "Worksheet Line No." = FIELD("Line No."),
-                                                                     Action = CONST(Update)));
+            CalcFormula = count("NPR Item Worksh. Variant Line" where("Worksheet Template Name" = field("Worksheet Template Name"),
+                                                                     "Worksheet Name" = field("Worksheet Name"),
+                                                                     "Worksheet Line No." = field("Line No."),
+                                                                     Action = const(Update)));
             Caption = 'Variety Lines to Update';
             Editable = false;
             FieldClass = FlowField;
         }
         field(520; "Variety Lines to Create"; Integer)
         {
-            CalcFormula = Count("NPR Item Worksh. Variant Line" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                                                     "Worksheet Name" = FIELD("Worksheet Name"),
-                                                                     "Worksheet Line No." = FIELD("Line No."),
-                                                                     Action = CONST(CreateNew)));
+            CalcFormula = count("NPR Item Worksh. Variant Line" where("Worksheet Template Name" = field("Worksheet Template Name"),
+                                                                     "Worksheet Name" = field("Worksheet Name"),
+                                                                     "Worksheet Line No." = field("Line No."),
+                                                                     Action = const(CreateNew)));
             Caption = 'Variety Lines to Create';
             Editable = false;
             FieldClass = FlowField;
@@ -1038,10 +944,10 @@
         }
         field(610; "No. of Changes"; Integer)
         {
-            CalcFormula = Count("NPR Item Worksh. Field Change" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                                                     "Worksheet Name" = FIELD("Worksheet Name"),
-                                                                     "Worksheet Line No." = FIELD("Line No."),
-                                                                     Process = CONST(true)));
+            CalcFormula = count("NPR Item Worksh. Field Change" where("Worksheet Template Name" = field("Worksheet Template Name"),
+                                                                     "Worksheet Name" = field("Worksheet Name"),
+                                                                     "Worksheet Line No." = field("Line No."),
+                                                                     Process = const(true)));
             Caption = 'No. of Changes';
             Description = 'NPR5.25';
             Editable = false;
@@ -1049,10 +955,10 @@
         }
         field(611; "No. of Warnings"; Integer)
         {
-            CalcFormula = Count("NPR Item Worksh. Field Change" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                                                     "Worksheet Name" = FIELD("Worksheet Name"),
-                                                                     "Worksheet Line No." = FIELD("Line No."),
-                                                                     Warning = CONST(true)));
+            CalcFormula = count("NPR Item Worksh. Field Change" where("Worksheet Template Name" = field("Worksheet Template Name"),
+                                                                     "Worksheet Name" = field("Worksheet Name"),
+                                                                     "Worksheet Line No." = field("Line No."),
+                                                                     Warning = const(true)));
             Caption = 'No. of Warnings';
             Description = 'NPR5.25';
             Editable = false;
@@ -1060,7 +966,7 @@
         }
         field(910; "Assembly Policy"; Option)
         {
-            AccessByPermission = TableData "BOM Component" = R;
+            AccessByPermission = tabledata "BOM Component" = R;
             Caption = 'Assembly Policy';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
@@ -1077,7 +983,7 @@
         }
         field(5401; "Lot Size"; Decimal)
         {
-            AccessByPermission = TableData "Production Order" = R;
+            AccessByPermission = tabledata "Production Order" = R;
             Caption = 'Lot Size';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -1094,7 +1000,7 @@
         }
         field(5407; "Scrap %"; Decimal)
         {
-            AccessByPermission = TableData "Production Order" = R;
+            AccessByPermission = tabledata "Production Order" = R;
             Caption = 'Scrap %';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 2;
@@ -1120,7 +1026,7 @@
         }
         field(5411; "Minimum Order Quantity"; Decimal)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Minimum Order Quantity';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -1129,7 +1035,7 @@
         }
         field(5412; "Maximum Order Quantity"; Decimal)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Maximum Order Quantity';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -1138,7 +1044,7 @@
         }
         field(5413; "Safety Stock Quantity"; Decimal)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Safety Stock Quantity';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -1147,7 +1053,7 @@
         }
         field(5414; "Order Multiple"; Decimal)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Order Multiple';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -1156,14 +1062,14 @@
         }
         field(5415; "Safety Lead Time"; DateFormula)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Safety Lead Time';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
         }
         field(5417; "Flushing Method"; Option)
         {
-            AccessByPermission = TableData "Production Order" = R;
+            AccessByPermission = tabledata "Production Order" = R;
             Caption = 'Flushing Method';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
@@ -1173,7 +1079,7 @@
         }
         field(5419; "Replenishment System"; Option)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Replenishment System';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
@@ -1196,7 +1102,7 @@
         }
         field(5440; "Reordering Policy"; Option)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Reordering Policy';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
@@ -1206,7 +1112,7 @@
         }
         field(5441; "Include Inventory"; Option)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Include Inventory';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
@@ -1216,7 +1122,7 @@
         }
         field(5442; "Manufacturing Policy"; Option)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Manufacturing Policy';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
@@ -1226,28 +1132,28 @@
         }
         field(5443; "Rescheduling Period"; DateFormula)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Rescheduling Period';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
         }
         field(5444; "Lot Accumulation Period"; DateFormula)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Lot Accumulation Period';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
         }
         field(5445; "Dampener Period"; DateFormula)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Dampener Period';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
         }
         field(5446; "Dampener Quantity"; Decimal)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Dampener Quantity';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -1256,7 +1162,7 @@
         }
         field(5447; "Overflow Level"; Decimal)
         {
-            AccessByPermission = TableData "Req. Wksh. Template" = R;
+            AccessByPermission = tabledata "Req. Wksh. Template" = R;
             Caption = 'Overflow Level';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -1366,7 +1272,7 @@
         }
         field(7307; "Put-away Unit of Measure Code"; Code[10])
         {
-            AccessByPermission = TableData "Posted Invt. Put-away Header" = R;
+            AccessByPermission = tabledata "Posted Invt. Put-away Header" = R;
             Caption = 'Put-away Unit of Measure Code';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
@@ -1381,7 +1287,7 @@
         }
         field(7384; "Use Cross-Docking"; Option)
         {
-            AccessByPermission = TableData "Bin Content" = R;
+            AccessByPermission = tabledata "Bin Content" = R;
             Caption = 'Use Cross-Docking';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
@@ -1646,7 +1552,7 @@
             TableRelation = "NPR Magento Attribute Set";
             ValidateTableRelation = false;
         }
-        field(6151415; "Magento Description"; BLOB)
+        field(6151415; "Magento Description"; Blob)
         {
             Caption = 'Magento Description';
             DataClassification = CustomerContent;
@@ -1658,7 +1564,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
         }
-        field(6151425; "Magento Short Description"; BLOB)
+        field(6151425; "Magento Short Description"; Blob)
         {
             Caption = 'Magento Short Description';
             DataClassification = CustomerContent;
@@ -1766,7 +1672,7 @@
         }
         field(6014682; "Overhead Rate"; Decimal)
         {
-            AccessByPermission = TableData "Production Order" = R;
+            AccessByPermission = tabledata "Production Order" = R;
             AutoFormatType = 2;
             Caption = 'Overhead Rate';
             DataClassification = CustomerContent;
@@ -1779,7 +1685,7 @@
             Description = 'NPR5.25';
             InitValue = Undefined;
             OptionCaption = 'None,Tracking Only,Tracking & Action Msg.,,,,,,,Undefined';
-            OptionMembers = "None","Tracking Only","Tracking & Action Msg.",,,,,,,Undefined;
+            OptionMembers = None,"Tracking Only","Tracking & Action Msg.",,,,,,,Undefined;
         }
         field(6014684; Critical; Option)
         {
@@ -1795,6 +1701,18 @@
             Caption = 'Common Item No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
+        }
+        field(6014686; "Current Sales Price"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Current Sales Price';
+            Editable = false;
+        }
+        field(6014687; "Sales Price Changing"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Sales Price Changing';
+            Editable = false;
         }
     }
 
@@ -1850,7 +1768,7 @@
     var
         "Field": Record "Field";
     begin
-        Field.Get(DATABASE::"NPR Item Worksheet Line", FieldNumber);
+        Field.Get(Database::"NPR Item Worksheet Line", FieldNumber);
         exit(Field."Field Caption");
     end;
 
@@ -2116,7 +2034,7 @@
             RefreshVariants(3, true);
     end;
 
-    internal procedure RefreshVariants(LinesType: Option "None",Variants,"Varieties Without Variants",All; IncludeHeaders: Boolean)
+    internal procedure RefreshVariants(LinesType: Option None,Variants,"Varieties Without Variants",All; IncludeHeaders: Boolean)
     var
         ItemWorksheetVar: Record "NPR Item Worksh. Variant Line";
     begin
@@ -2197,7 +2115,7 @@
             until ItemVar.Next() = 0;
     end;
 
-    local procedure CopyItemVarieties(LinesType: Option "None",Variants,"Varieties Without Variants",All; IncludeHeaders: Boolean)
+    local procedure CopyItemVarieties(LinesType: Option None,Variants,"Varieties Without Variants",All; IncludeHeaders: Boolean)
     var
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetVarietyValue1: Record "NPR Item Worksh. Variety Value";
@@ -2369,7 +2287,7 @@
         AttributeManagement: Codeunit "NPR Attribute Management";
     begin
         AttributeKey.SetCurrentKey("Table ID", "MDR Code PK");
-        AttributeKey.SetFilter("Table ID", '=%1', DATABASE::Item);
+        AttributeKey.SetFilter("Table ID", '=%1', Database::Item);
         AttributeKey.SetFilter("MDR Code PK", '=%1', ItemNo);
 
         // Fill array
@@ -2380,12 +2298,12 @@
                 repeat
                     AttributeID.Reset();
                     AttributeID.SetRange("Attribute Code", AttributeValueSet."Attribute Code");
-                    AttributeID.SetRange("Table ID", DATABASE::Item);
+                    AttributeID.SetRange("Table ID", Database::Item);
                     if AttributeID.FindFirst() then begin
-                        AttributeID."Table ID" := DATABASE::"NPR Item Worksheet Line";
+                        AttributeID."Table ID" := Database::"NPR Item Worksheet Line";
                         if AttributeID.Insert() then;
                     end;
-                    AttributeManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", AttributeID."Shortcut Attribute ID",
+                    AttributeManagement.SetWorksheetLineAttributeValue(Database::"NPR Item Worksheet Line", AttributeID."Shortcut Attribute ID",
                         "Worksheet Template Name", "Worksheet Name", "Line No.", AttributeValueSet."Text Value");
 
                 until AttributeValueSet.Next() = 0;
@@ -2775,7 +2693,7 @@
         ItemWorksheetVrtValue.DeleteAll();
 
         NPRAttributeKey.SetCurrentKey("Table ID", "MDR Code PK", "MDR Line PK", "MDR Option PK");
-        NPRAttributeKey.SetRange("Table ID", DATABASE::"NPR Item Worksheet Line");
+        NPRAttributeKey.SetRange("Table ID", Database::"NPR Item Worksheet Line");
         NPRAttributeKey.SetRange("MDR Code PK", "Worksheet Template Name");
         NPRAttributeKey.SetRange("MDR Code 2 PK", "Worksheet Name");
         NPRAttributeKey.SetRange("MDR Line PK", "Line No.");
@@ -2944,7 +2862,7 @@
         ItemWorksheetFieldSetup.Reset();
         ItemWorksheetFieldSetup.SetFilter("Worksheet Template Name", '=%1|=%2', VarItemWorksheetLine."Worksheet Template Name", '');
         ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '=%1|=%2', VarItemWorksheetLine."Worksheet Name", '');
-        ItemWorksheetFieldSetup.SetRange("Table No.", DATABASE::"NPR Item Worksheet Line");
+        ItemWorksheetFieldSetup.SetRange("Table No.", Database::"NPR Item Worksheet Line");
         if ItemWorksheetFieldSetup.FindSet() then
             repeat
                 //Find the setup on Template, Worksheet or General
@@ -2958,7 +2876,7 @@
                         ItemWorksheetFldRef := ItemWorksheetRecRef.Field(TargetFieldRec."No.");
                         SourceFieldRec.Init();
                         if not SourceFieldRec.Get(ItemWorksheetFieldSetup."Target Table No. Update", ItemWorksheetFieldSetup."Target Field Number Update") then
-                            if not SourceFieldRec.Get(DATABASE::Item, ItemWorksheetFieldSetup."Target Field Number Update") then
+                            if not SourceFieldRec.Get(Database::Item, ItemWorksheetFieldSetup."Target Field Number Update") then
                                 SourceFieldRec.Init();
                         if SourceFieldRec."No." <> 0 then begin
                             ItemFldRef := ItemRecRef.Field(SourceFieldRec."No.");
@@ -3091,7 +3009,7 @@
                 ItemWorksheetFieldSetup.SetFilter("Worksheet Template Name", '=%1|=%2', "Worksheet Template Name", '');
                 ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '=%1|=%2', "Worksheet Name", '');
                 ItemWorksheetFieldSetup.SetRange("Field Number", FldRef.Number);
-                ItemWorksheetFieldSetup.SetRange("Table No.", DATABASE::"NPR Item Worksheet Line");
+                ItemWorksheetFieldSetup.SetRange("Table No.", Database::"NPR Item Worksheet Line");
                 if ItemWorksheetFieldSetup.FindLast() then begin
                     if ItemWorksheetFieldSetup."Process Update" in [ItemWorksheetFieldSetup."Process Update"::Ignore, ItemWorksheetFieldSetup."Process Update"::"Warn and Ignore"] then
                         Message(WarnChangeMsg, Format(FldRef.Name));
@@ -3165,7 +3083,7 @@
             until ObsoleteWorksheetLine.Next() = 0;
     end;
 
-    local procedure GetTempVarietyLines(var ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value"; var TempItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value" temporary; ShortcutValue: Integer; LinesType: Option "None",Variants,"Varieties Without Variants",All)
+    local procedure GetTempVarietyLines(var ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value"; var TempItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value" temporary; ShortcutValue: Integer; LinesType: Option None,Variants,"Varieties Without Variants",All)
     var
         ItemVariant: Record "Item Variant";
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
@@ -3270,6 +3188,119 @@
                     exit(false);
             until ItemWorksheetVariantLineToCompare.Next() = 0;
         exit(true);
+    end;
+
+    local procedure ValidateExistingItemNo()
+    var
+        AuxItem: Record "NPR Auxiliary Item";
+        ItemWorksheetTemplate2: Record "NPR Item Worksh. Template";
+    begin
+        TestField("Line No.");
+        if "Existing Item No." = '' then
+            exit;
+        Item.Get("Existing Item No.");
+        Description := Item.Description;
+        "Base Unit of Measure" := Item."Base Unit of Measure";
+        Validate("VAT Prod. Posting Group", Item."VAT Prod. Posting Group");
+        "VAT Bus. Posting Gr. (Price)" := Item."VAT Bus. Posting Gr. (Price)";
+        "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
+        "Inventory Posting Group" := Item."Inventory Posting Group";
+        "Sales Unit of Measure" := Item."Sales Unit of Measure";
+        "Purch. Unit of Measure" := Item."Purch. Unit of Measure";
+        "Costing Method" := Item."Costing Method";
+        if "No. Series" = '' then
+            "No. Series" := Item."No. Series";
+        "Sales Price" := Item."Unit Price";
+        "Direct Unit Cost" := Item."Last Direct Cost";
+        "Tax Group Code" := Item."Tax Group Code";
+        if "Vendor No." = '' then
+            "Vendor No." := Item."Vendor No.";
+        if "Vendor Item No." = '' then
+            "Vendor Item No." := CopyStr(ItemNumberManagement.GetItemItemVendorNo(Item."No.", '', "Vendor No."), 1, MaxStrLen("Vendor Item No."));
+
+        if ItemWorksheetTemplate2.Get("Worksheet Template Name") then;
+        if ("Internal Bar Code" = '') and not ItemWorksheetTemplate2."Do not Apply Internal Barcode" then
+            "Internal Bar Code" := ItemNumberManagement.GetItemBarcode(Item."No.", '', '', "Vendor No.");
+
+        if ItemWorksheetItemMgt.ItemVariantExists("Existing Item No.") then
+            "Use Variant" := true
+        else
+            if ItemWorksheetItemMgt.ItemVarietyExists("Existing Item No.") then
+                "Use Variant" := true;
+
+        Item.NPR_GetAuxItem(AuxItem);
+        "Variety Group" := AuxItem."Variety Group";
+        "Cross Variety No." := Item."NPR Cross Variety No.";
+        "Gross Weight" := Item."Gross Weight";
+        "Net Weight" := Item."Net Weight";
+        "Item Category Code" := Item."Item Category Code";
+        "Profit %" := Item."Profit %";
+        "Description 2" := Item."Description 2";
+        if Item."NPR Magento Item" then
+            "Magento Item" := "Magento Item"::Yes
+        else
+            "Magento Item" := "Magento Item"::No;
+
+        CopyItemAttributes(Item."No.");
+
+        "Variety 1" := AuxItem."Variety 1";
+        if VRTTable.Get("Variety 1", AuxItem."Variety 1 Table") then
+            if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
+                Validate("Variety 1 Table (Base)", VRTTable."Copy from");
+                "Create Copy of Variety 1 Table" := true;
+            end else begin
+                Validate("Variety 1 Table (Base)", AuxItem."Variety 1 Table");
+                "Create Copy of Variety 1 Table" := false;
+            end;
+
+        "Variety 2" := AuxItem."Variety 2";
+        if VRTTable.Get("Variety 2", AuxItem."Variety 2 Table") then
+            if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
+                Validate("Variety 2 Table (Base)", VRTTable."Copy from");
+                "Create Copy of Variety 2 Table" := true;
+            end else begin
+                Validate("Variety 2 Table (Base)", AuxItem."Variety 2 Table");
+                "Create Copy of Variety 2 Table" := false;
+            end;
+
+        "Variety 3" := AuxItem."Variety 3";
+        if VRTTable.Get("Variety 3", AuxItem."Variety 3 Table") then
+            if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
+                Validate("Variety 3 Table (Base)", VRTTable."Copy from");
+                "Create Copy of Variety 3 Table" := true;
+            end else begin
+                Validate("Variety 3 Table (Base)", AuxItem."Variety 3 Table");
+                "Create Copy of Variety 3 Table" := false;
+            end;
+
+        "Variety 4" := AuxItem."Variety 4";
+        if VRTTable.Get("Variety 4", AuxItem."Variety 4 Table") then
+            if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
+                Validate("Variety 4 Table (Base)", VRTTable."Copy from");
+                "Create Copy of Variety 4 Table" := true;
+            end else begin
+                Validate("Variety 4 Table (Base)", AuxItem."Variety 4 Table");
+                "Create Copy of Variety 4 Table" := false;
+            end;
+
+        FillVarietyTableNew();
+
+        if Action = Action::CreateNew then
+            if "Existing Item No." <> '' then
+                if "Item No." = '' then
+                    Validate("Item No.", GetNewItemNo());
+        UpdateVarietyHeadingText();
+        FillMappedFields();
+        UpdateCurrentSalesPrice();
+    end;
+
+    local procedure UpdateCurrentSalesPrice()
+    begin
+        if Rec."Existing Item No." <> '' then begin
+            Item.Get(Rec."Existing Item No.");
+            Rec."Current Sales Price" := Item."Unit Price";
+            Rec."Sales Price Changing" := Rec."Current Sales Price" <> Rec."Sales Price";
+        end;
     end;
 
     var
