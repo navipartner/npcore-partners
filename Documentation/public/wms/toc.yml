@@ -6,9 +6,11 @@
     href: explanation/role-center.md
   - name: CS setup
     href: explanation/cs-setup.md
-  - name: Capture service UIs
+  - name: CS UIs
     href: explanation/cs-uis.md
-  - name: Capture service users
+  - name: CS UI structure
+    href: explanation/cs_ui_structure.md
+  - name: CS users
     href: explanation/cs-users.md
   - name: CS logs
     href: explanation/cs_logs.md
