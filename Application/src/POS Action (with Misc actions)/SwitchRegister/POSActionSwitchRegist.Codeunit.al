@@ -8,6 +8,8 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
         ParameterDialogType_OptionNameLbl: Label 'TextField,Numpad,List', Locked = true;
         ParameterDialogType_OptionCaptionsLbl: Label 'TextField,Numpad,List';
         ParameterDialogType_NameLbl: Label 'DialogType';
+        FilterByPosUnitGroupName: Label 'FilterByPosUnitGroup';
+        FilterByPosUnitGroupDesc: Label 'Pos Unit list will be filtered by selected Pos Unit Group on Salesperson';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -17,6 +19,7 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
             ParameterDialogType_NameLbl,
             ParameterDialogType_NameLbl,
             ParameterDialogType_OptionCaptionsLbl);
+        WorkflowConfig.AddBooleanParameter('FilterByPosUnitGroup', false, FilterByPosUnitGroupName, FilterByPosUnitGroupDesc);
         WorkflowConfig.AddLabel('registerprompt', EnterRegisterPromptLbl);
     end;
 
@@ -26,7 +29,7 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
             'EnterRegister':
                 FrontEnd.WorkflowResponse(SwitchToNewRegister(Context, Setup));
             else
-                FrontEnd.WorkflowResponse(OnActionList(Setup));
+                FrontEnd.WorkflowResponse(OnActionList(Setup, Context));
         end;
     end;
 
@@ -67,7 +70,7 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
     end;
 
 
-    local procedure OnActionList(Setup: Codeunit "NPR POS Setup"): JsonObject
+    local procedure OnActionList(Setup: Codeunit "NPR POS Setup"; Context: Codeunit "NPR POS JSON Helper"): JsonObject
     var
         POSSession: Codeunit "NPR POS Session";
         SalePOS: Record "NPR POS Sale";
@@ -76,12 +79,12 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        if not SelectRegister(SalePOS."Register No.", NewRegisterNo) then
+        if not SelectRegister(SalePOS."Register No.", NewRegisterNo, Setup, Context) then
             exit;
         SwitchRegister(NewRegisterNo, Setup);
     end;
 
-    local procedure SelectRegister(CurrUnitNo: Code[10]; var NewUnitNo: Code[10]) LookupOK: Boolean
+    local procedure SelectRegister(CurrUnitNo: Code[10]; var NewUnitNo: Code[10]; Setup: Codeunit "NPR POS Setup"; Context: Codeunit "NPR POS JSON Helper") LookupOK: Boolean
     var
         POSUnit: Record "NPR POS Unit";
         UserSetup: Record "User Setup";
@@ -95,11 +98,40 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
         POSUnit.SetFilter("No.", '<>%1', CurrUnitNo);
         POSUnit.FilterGroup(42);
         POSUnit.SetFilter("No.", UserSetup."NPR Register Switch Filter");
+        FilterByPosUnitGroup(POSUnit, Setup, Context);
         POSUnit.FilterGroup(0);
 
         LookupOK := PAGE.RunModal(0, POSUnit) = ACTION::LookupOK;
         NewUnitNo := POSUnit."No.";
         exit(LookupOK);
+    end;
+
+    local procedure FilterByPosUnitGroup(var POSUnit: Record "NPR POS Unit"; Setup: Codeunit "NPR POS Setup"; Context: Codeunit "NPR POS JSON Helper")
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        POSUnitGroupLine: Record "NPR POS Unit Group Line";
+        FilterText: Text;
+        FilterByPosUnitGroupValue: Boolean;
+    begin
+        Setup.GetSalespersonRecord(SalespersonPurchaser);
+        if SalespersonPurchaser."NPR POS Unit Group" = '' then
+            exit;
+
+        Context.GetBooleanParameter('FilterByPosUnitGroup', FilterByPosUnitGroupValue);
+        if not FilterByPosUnitGroupValue then
+            exit;
+
+        POSUnitGroupLine.SetRange("No.", SalespersonPurchaser."NPR POS Unit Group");
+        if POSUnitGroupLine.IsEmpty() then
+            exit;
+        POSUnitGroupLine.FindSet();
+        repeat
+            if FilterText = '' then
+                FilterText += POSUnitGroupLine."POS Unit"
+            else
+                FilterText += '|' + POSUnitGroupLine."POS Unit";
+        until POSUnitGroupLine.Next() = 0;
+        POSUnit.SetFilter("No.", FilterText);
     end;
 
     internal procedure SwitchRegister(RegisterNo: code[10]; Setup: Codeunit "NPR POS Setup")
