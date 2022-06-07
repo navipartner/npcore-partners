@@ -312,7 +312,7 @@
                                                 end;
                                         end;
                                     end;
-                                POSPostingBuffer.Type::"G/L Account", POSPostingBuffer.Type::Voucher:
+                                POSPostingBuffer.Type::"G/L Account":
                                     begin
                                         if POSPostingBuffer."Rounding Amount (LCY)" <> 0 then begin
                                             GenPostingType := GenJournalLine."Gen. Posting Type"::" ";
@@ -335,6 +335,63 @@
                                                 POSPostingBuffer."VAT Amount",
                                                 POSPostingBuffer."VAT Amount (LCY)",
                                                 GenJournalLine);
+                                        end;
+                                    end;
+                                POSPostingBuffer.Type::Voucher:
+                                    begin
+                                        if POSPostingBuffer."Rounding Amount (LCY)" <> 0 then begin
+                                            GenPostingType := GenJournalLine."Gen. Posting Type"::" ";
+                                            MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
+                                                POSPostingBuffer."Rounding Amount",
+                                                POSPostingBuffer."Rounding Amount (LCY)",
+                                                GenPostingType,
+                                                GenJournalLine."Account Type"::"G/L Account",
+                                                POSPostingBuffer."No.",
+                                                POSPostingBuffer."VAT Amount",
+                                                POSPostingBuffer."VAT Amount (LCY)",
+                                                GenJournalLine);
+                                        end else begin
+                                            GeneralPostingSetup.Get(POSPostingBuffer."Gen. Bus. Posting Group", POSPostingBuffer."Gen. Prod. Posting Group");
+                                            GeneralPostingSetup.TestField("Sales Account");
+                                            case SalesReceivablesSetup."Discount Posting" of
+                                                SalesReceivablesSetup."Discount Posting"::"Line Discounts",
+                                                SalesReceivablesSetup."Discount Posting"::"All Discounts":
+                                                    begin
+                                                        MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
+                                                            Round(POSPostingBuffer.Amount + POSPostingBuffer."Discount Amount", Currency."Amount Rounding Precision"),
+                                                            Round(POSPostingBuffer."Amount (LCY)" + POSPostingBuffer."Discount Amount (LCY)", Currency."Amount Rounding Precision"),
+                                                            GenJournalLine."Gen. Posting Type"::Sale,
+                                                            GenJournalLine."Account Type"::"G/L Account",
+                                                            POSPostingBuffer."No.",
+                                                            Round(POSPostingBuffer."VAT Amount" + POSPostingBuffer."VAT Amount Discount", Currency."Amount Rounding Precision"),
+                                                            Round(POSPostingBuffer."VAT Amount (LCY)" + POSPostingBuffer."VAT Amount Discount (LCY)", Currency."Amount Rounding Precision"),
+                                                            GenJournalLine);
+
+                                                        if (POSPostingBuffer."Discount Amount" <> 0) or (POSPostingBuffer."Discount Amount (LCY)" <> 0) then begin
+                                                            GeneralPostingSetup.TestField("Sales Line Disc. Account");
+                                                            MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
+                                                              Round(-POSPostingBuffer."Discount Amount", Currency."Amount Rounding Precision"),
+                                                              Round(-POSPostingBuffer."Discount Amount (LCY)", Currency."Amount Rounding Precision"),
+                                                              GenJournalLine."Gen. Posting Type"::Sale,
+                                                              GenJournalLine."Account Type"::"G/L Account",
+                                                              GeneralPostingSetup."Sales Line Disc. Account",
+                                                              Round(-POSPostingBuffer."VAT Amount Discount", Currency."Amount Rounding Precision"),
+                                                              Round(-POSPostingBuffer."VAT Amount Discount (LCY)", Currency."Amount Rounding Precision"),
+                                                              GenJournalLine);
+                                                        end;
+                                                    end;
+                                                else begin
+                                                        MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
+                                                            POSPostingBuffer.Amount,
+                                                            POSPostingBuffer."Amount (LCY)",
+                                                            GenJournalLine."Gen. Posting Type"::Sale,
+                                                            GenJournalLine."Account Type"::"G/L Account",
+                                                            POSPostingBuffer."No.",
+                                                            POSPostingBuffer."VAT Amount",
+                                                            POSPostingBuffer."VAT Amount (LCY)",
+                                                            GenJournalLine);
+                                                    end;
+                                            end
                                         end;
                                     end;
                                 POSPostingBuffer.Type::Customer:
