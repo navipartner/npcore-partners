@@ -1,6 +1,7 @@
 ﻿codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
 {
     Access = Internal;
+
     var
         Text000: Label 'Coupon is not Valid';
         Text001: Label 'Coupon is being used';
@@ -47,6 +48,8 @@
             Coupon."Max Use per Sale" := 1;
         if CurrSaleCouponCount >= Coupon."Max Use per Sale" then
             Error(Text002, Coupon."Max Use per Sale");
+
+        CheckIfCuponIsForCurrentStore(SalePOS, Coupon);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnInitCouponModules', '', true, true)]
@@ -111,6 +114,19 @@
     local procedure ModuleCode(): Code[20]
     begin
         exit('DEFAULT');
+    end;
+
+    local procedure CheckIfCuponIsForCurrentStore(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon")
+    var
+        POSStoreGroupLine: Record "NPR POS Store Group Line";
+        InvalidStoreErr: Label 'Coupon %1 cannot be used in this store! Assigned store group is %2.', Comment = '%1 = Reference No. of Coupon; %2 = POS Store Group';
+    begin
+        if Coupon."POS Store Group" = '' then
+            exit;
+        POSStoreGroupLine.SetRange("No.", Coupon."POS Store Group");
+        POSStoreGroupLine.SetRange("POS Store", SalePOS."POS Store Code");
+        if POSStoreGroupLine.IsEmpty() then
+            Error(InvalidStoreErr, Coupon."Reference No.", Coupon."POS Store Group");
     end;
 }
 

@@ -128,6 +128,13 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(150; "POS Store Group"; Code[20])
+        {
+            Caption = 'POS Store Group';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Store Group";
+            Editable = false;
+        }
     }
 
     keys
