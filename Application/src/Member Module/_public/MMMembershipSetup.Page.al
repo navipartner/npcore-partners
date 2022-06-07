@@ -508,13 +508,13 @@
     }
 
     var
-        PROCESSING: Label 'Processing. ';
-        PENDING: Label 'Pending.... %1';
-        SENT: Label 'Sent....... %1';
-        NOT_SENT: Label 'Not Sent... %1';
-        FAILED: Label 'Failed..... %1';
-        WALLET_RESULT: Label '%1 memberships were processed, and resulted in the following notifications: \\%2\\%3\\%4\\%5';
-        REMAINING: Label 'Remaining.. ';
+        PROCESSING: Label 'Processing: %1';
+        PENDING: Label 'Pending: %1';
+        SENT: Label 'Sent: %1';
+        NOT_SENT: Label 'Not Sent: %1';
+        FAILED: Label 'Failed: %1';
+        REMAINING: Label 'Remaining: %1';
+        WALLET_RESULT: Label '%1 memberships were processed, and resulted in the following notifications: \\%2\%3\%4\%5';
         CONFIRM_MSG: Label '%1 members for %2 do not have a wallet created for them. Do you want to proceed with creating them?';
         NOTIFICATION_OPTION: Label '1,10,100,1000,10000,Unlimited';
         NOTIFICATION_TEXT: Label 'Max number of notifications to create in this session:';
@@ -551,7 +551,7 @@
         if (not Confirm(CONFIRM_MSG, true, MissingWalletCount, MembershipCode)) then
             Error('');
 
-        MaxToCreate := STRMENU(NOTIFICATION_OPTION, 0, NOTIFICATION_TEXT);
+        MaxToCreate := StrMenu(NOTIFICATION_OPTION, 0, NOTIFICATION_TEXT);
         case MaxToCreate OF
             1:
                 RemainingToCreate := 1;
@@ -576,22 +576,22 @@
 
         if (MembershipRole.FindSet()) then begin
             Window.Open(
-             PROCESSING +
+             StrSubstNo(PROCESSING, '#1######') +
              StrSubstNo(PENDING, '#2######') +
              StrSubstNo(SENT, '#3######') +
              StrSubstNo(NOT_SENT, '#4######') +
              StrSubstNo(FAILED, '#5######') +
-             REMAINING
+             StrSubstNo(REMAINING, '#6######')
              );
 
             ProgressBase := 1;
             if (MissingWalletCount > 100) then
-                ProgressBase := ROUND(MissingWalletCount / 100, 1, '<');
+                ProgressBase := Round(MissingWalletCount / 100, 1, '<');
 
             repeat
 
-                if (MembershipManagement.IsMembershipActive(MembershipRole."Membership Entry No.", TODAY, false)) then begin
-                    EntryNo := MemberNotification.CreateWalletSendNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, TODAY);
+                if (MembershipManagement.IsMembershipActive(MembershipRole."Membership Entry No.", Today(), false)) then begin
+                    EntryNo := MemberNotification.CreateWalletSendNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, Today());
 
                     if (MembershipNotification.Get(EntryNo)) then begin
                         RemainingToCreate -= 1;
@@ -606,18 +606,18 @@
                 end;
 
                 if (ProgressIndex MOD ProgressBase = 0) then begin
-                    Window.Update(1, ROUND(ProgressIndex / MissingWalletCount * 10000, 1));
+                    Window.Update(1, Round(ProgressIndex / MissingWalletCount * 100, 1));
                     Window.Update(2, Summary[1 + MemberNotificationEntry."Notification Send Status"::PENDING]);
                     Window.Update(3, Summary[1 + MemberNotificationEntry."Notification Send Status"::SENT]);
                     Window.Update(4, Summary[1 + MemberNotificationEntry."Notification Send Status"::NOT_SENT]);
                     Window.Update(5, Summary[1 + MemberNotificationEntry."Notification Send Status"::FAILED]);
-                    Window.Update(6, ROUND(RemainingToCreate / MaxToCreate * 10000, 1));
+                    Window.Update(6, Round(RemainingToCreate / MaxToCreate * 100, 1));
                 end;
 
                 ProgressIndex += 1;
                 Commit();
 
-            until ((MembershipRole.NEXT() = 0) or (RemainingToCreate = 0));
+            until ((MembershipRole.Next() = 0) or (RemainingToCreate = 0));
             Window.Close();
 
             Message(WALLET_RESULT, MissingWalletCount,
@@ -652,16 +652,16 @@
             Error('');
 
         if (MembershipRole.FindSet()) then begin
-            Window.Open(PROCESSING);
+            Window.Open(StrSubstNo(PROCESSING, '#1######'));
 
             ProgressBase := 1;
             if (UpdateWalletCount > 100) then
-                ProgressBase := ROUND(UpdateWalletCount / 100, 1, '<');
+                ProgressBase := Round(UpdateWalletCount / 100, 1, '<');
 
             repeat
 
-                if (MembershipManagement.IsMembershipActive(MembershipRole."Membership Entry No.", TODAY, false)) then begin
-                    EntryNo := MemberNotification.CreateUpdateWalletNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, TODAY);
+                if (MembershipManagement.IsMembershipActive(MembershipRole."Membership Entry No.", Today(), false)) then begin
+                    EntryNo := MemberNotification.CreateUpdateWalletNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, Today());
 
                     if (MembershipNotification.Get(EntryNo)) then begin
 
@@ -671,14 +671,14 @@
                     end;
                 end;
 
-                if (ProgressIndex MOD ProgressBase = 0) then begin
-                    Window.Update(1, ROUND(ProgressIndex / UpdateWalletCount * 10000, 1));
+                if (ProgressIndex mod ProgressBase = 0) then begin
+                    Window.Update(1, Round(ProgressIndex / UpdateWalletCount * 100, 1));
                 end;
 
                 ProgressIndex += 1;
                 Commit();
 
-            until (MembershipRole.NEXT() = 0);
+            until (MembershipRole.Next() = 0);
             Window.Close();
 
         end;
