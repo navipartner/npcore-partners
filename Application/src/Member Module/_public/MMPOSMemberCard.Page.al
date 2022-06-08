@@ -70,10 +70,23 @@
             }
             group(CRM)
             {
-                field(Picture; Rec.Image)
+                group(MemberImage)
                 {
-                    ToolTip = 'Specifies the value of the Picture field';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Caption = 'Member Image';
+                    ShowCaption = false;
+                    field(Picture; Rec.Image)
+                    {
+                        ToolTip = 'Specifies the value of the Picture field';
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Needs to be in a Card Part, but it is breaking change to delete.';
+                    }
+                    part(MemberPicture; "NPR MM Member Picture")
+                    {
+                        Caption = 'Picture';
+                        SubPageLink = "Entry No." = field("Entry No.");
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    }
                 }
                 field(Gender; Rec.Gender)
                 {
@@ -155,25 +168,39 @@
                     }
                 }
             }
-
-            part("PointsSummary"; "NPR MM Members. Points Summary")
+            group(points)
             {
-                SubPageView = SORTING("Membership Entry No.", "Relative Period") ORDER(Descending);
-                ShowFilter = false;
-                UpdatePropagation = Both;
-                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Caption = 'Points Summary';
+                Editable = false;
+                part("PointsSummary"; "NPR MM Members. Points Summary")
+                {
+                    SubPageView = SORTING("Membership Entry No.", "Relative Period") ORDER(Descending);
+                    ShowFilter = false;
+                    UpdatePropagation = Both;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
             }
-
-            part("Member Cards Subpage"; "NPR MM Member Cards ListPart")
+            group(card)
             {
-                SubPageLink = "Member Entry No." = FIELD("Entry No.");
-                SubPageView = SORTING("Entry No.") ORDER(Descending);
-                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-
+                Caption = 'Membership Cards';
+                Editable = false;
+                part("Member Cards Subpage"; "NPR MM Member Cards ListPart")
+                {
+                    SubPageLink = "Member Entry No." = FIELD("Entry No.");
+                    SubPageView = SORTING("Entry No.") ORDER(Descending);
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ShowFilter = false;
+                }
             }
         }
         area(factboxes)
         {
+            part(MMMemberPicture; "NPR MM Member Picture")
+            {
+                Caption = 'Picture';
+                SubPageLink = "Entry No." = field("Entry No.");
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
             systempart(Control6014400; Notes)
             {
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
