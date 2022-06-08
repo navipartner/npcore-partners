@@ -7,16 +7,18 @@
 #pragma warning restore
     var
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
-        CifferCode: Code[10];
         Index: Integer;
         Itt: Integer;
     begin
+        if "Proccesing Value" = '' then
+            exit;
+
         ExchangeLabelSetup.Get();
 
         for Itt := 1 to StrLen("Proccesing Value") do begin
             if Evaluate(Index, Format("Proccesing Value"[Itt])) and (Format("Proccesing Value"[Itt]) <> '.') then begin
                 Index += 1;
-                CifferCodeValue += Format(CifferCode[Index]);
+                CifferCodeValue += Format(ExchangeLabelSetup."Purchace Price Code"[Index]);
             end else begin
                 if HandleDecimals then
                     Index += 1
