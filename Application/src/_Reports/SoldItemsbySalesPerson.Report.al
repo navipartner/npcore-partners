@@ -1,7 +1,7 @@
 ﻿report 6014412 "NPR Sold Items by Sales Person"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sold Items by Sales Person.rdlc';
@@ -74,12 +74,27 @@
                     ProfitPct := ("Sales (LCY)" - "COGS (LCY)") / "Sales (LCY)" * 100
                 else
                     ProfitPct := 0;
+
+                if (Item."Sales (Qty.)" = 0) and (not ShowItemsWithoutSale) then
+                    CurrReport.Skip();
             end;
         }
     }
     requestpage
     {
         SaveValues = true;
+        layout
+        {
+            area(content)
+            {
+                field("Show Items Without Sale"; ShowItemsWithoutSale)
+                {
+                    Caption = 'Show Items Without Sale';
+                    ToolTip = 'Specifies the value of the Show Items Without Sale field.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
+        }
     }
     labels
     {
@@ -104,4 +119,5 @@
         ProfitPct: Decimal;
         ObjectDetails: Text[100];
         SalespersonName: Text[50];
+        ShowItemsWithoutSale: Boolean;
 }
