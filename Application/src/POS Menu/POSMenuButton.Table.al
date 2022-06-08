@@ -108,6 +108,12 @@
             begin
                 POSTempDataSourceDiscovery.LookupDataSource("Data Source Name");
             end;
+
+            trigger OnValidate()
+            begin
+                if ("Data Source Name" = '') and (Enabled = Enabled::Auto) and ("Action Type" = "Action Type"::PaymentType) then
+                    Validate(Enabled, Enabled::Yes);
+            end;
         }
         field(19; Blocked; Boolean)
         {
@@ -342,6 +348,7 @@
     local procedure AssignActionSpecifics()
     var
         POSAction: Record "NPR POS Action";
+        PosDataDriverSaleLine: Codeunit "NPR POS Data Driver: Sale Line";
     begin
         if ("Action Type" = "Action Type"::Action) then begin
             if POSAction.Get("Action Code") then begin
@@ -357,6 +364,10 @@
                     ClearActionSpecifics();
                 end;
             end;
+        end;
+        if "Action Type" = "Action Type"::PaymentType then begin
+            Enabled := Enabled::Auto;
+            "Data Source Name" := PosDataDriverSaleLine.GetSourceNameText();
         end;
     end;
 
@@ -538,11 +549,21 @@
     local procedure HandleEnabled()
     var
         POSAction: Record "NPR POS Action";
+        PosDataDriverSaleLine: Codeunit "NPR POS Data Driver: Sale Line";
     begin
         if Enabled = Enabled::Auto then begin
-            TestField("Action Type", "Action Type"::Action);
-            POSAction.Get("Action Code");
-            POSAction.TestField("Bound to DataSource");
+            if not ("Action Type" in ["Action Type"::Action, "Action Type"::PaymentType]) then
+                FieldError("Action Type");
+            case "Action Type" of
+                "Action Type"::Action:
+                    begin
+                        POSAction.Get("Action Code");
+                        POSAction.TestField("Bound to DataSource");
+                    end;
+                "Action Type"::PaymentType:
+                    if "Data Source Name" = '' then
+                        "Data Source Name" := PosDataDriverSaleLine.GetSourceNameText();
+            end;
         end;
     end;
 

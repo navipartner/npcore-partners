@@ -89,7 +89,7 @@
         Rec.RegisterDataSource(GetSourceNameText(), '(Built-in data source)');
     end;
 
-    local procedure GetSourceNameText(): Text[50]
+    procedure GetSourceNameText(): Text[50]
     begin
         exit('BUILTIN_SALELINE');
     end;
