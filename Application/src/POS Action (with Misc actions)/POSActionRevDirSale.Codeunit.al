@@ -200,8 +200,9 @@
 
         SaleLinePOS2.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS2.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS2.FindLast() then
-            SaleLinePOSLineNo := SaleLinePOS2."Line No." + 10000;
+        if not SaleLinePOS2.FindLast() then
+            SaleLinePOS2."Line No." := 0;
+        SaleLinePOSLineNo := SaleLinePOS2."Line No." + 10000;
 
         if POSSalesLine.FindSet(false, false) then
             repeat
