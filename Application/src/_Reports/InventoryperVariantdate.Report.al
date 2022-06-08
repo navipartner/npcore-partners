@@ -504,7 +504,7 @@
         Gross_Caption: Label 'Gross';
         NetChange_Caption: Label 'Inventory ';
         InvValue_Caption: Label 'Inventory value';
-        Report_Caption: Label 'Item stock acc. date';
+        Report_Caption: Label 'Inventory Per Variant at Date';
         DirCost_Caption: Label 'Last cost price';
         LocationCaption: Label 'Location Code';
         No_Caption: Label 'Number';
