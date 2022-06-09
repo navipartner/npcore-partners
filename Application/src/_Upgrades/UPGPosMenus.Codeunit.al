@@ -20,6 +20,10 @@
             AdjustDeletePOSLinePOSActionParameters();
             UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustDeletePOSLinePOSActionParameters'));
         end;
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'PosMenuPaymentButtonsAutoEnabled')) then begin
+            SetPosMenuPaymentButtonsAutoEnabled();
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'PosMenuPaymentButtonsAutoEnabled'));
+        end;
 
         LogMessageStopwatch.LogFinish();
     end;
@@ -155,5 +159,17 @@
                         end;
                     until TempParamValue.Next() = 0;
             until POSMenuButton.Next() = 0;
+    end;
+
+    local procedure SetPosMenuPaymentButtonsAutoEnabled()
+    var
+        PosMenuButton: Record "NPR POS Menu Button";
+        PosDataDriverSaleLine: Codeunit "NPR POS Data Driver: Sale Line";
+    begin
+        PosMenuButton.SetRange("Action Type", PosMenuButton."Action Type"::PaymentType);
+        PosMenuButton.SetFilter("Action Code", '<>%1', '');
+        PosMenuButton.ModifyAll(Enabled, PosMenuButton.Enabled::Auto);
+        PosMenuButton.SetRange("Data Source Name", '');
+        PosMenuButton.ModifyAll("Data Source Name", PosDataDriverSaleLine.GetSourceNameText());
     end;
 }
