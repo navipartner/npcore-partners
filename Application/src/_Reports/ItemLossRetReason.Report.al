@@ -9,6 +9,9 @@
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This report will be replaced NPR Return Reason Code Stat.';
+    
 
     dataset
     {

@@ -397,16 +397,6 @@
                             ToolTip = 'View the summary of item quantity modified by negative adjustments and the Reason code.';
                             ApplicationArea = NPRRetail;
                         }
-
-                        action("NPR Item Loss - Return Reason")
-                        {
-                            Caption = 'Item Loss - Return Reason';
-                            Image = Report;
-                            RunObject = report "NPR Item Loss - Ret. Reason";
-
-                            ToolTip = 'Generate the list for Loss of item, with the Return Reason.';
-                            ApplicationArea = NPRRetail;
-                        }
                         action("NPR Sales Statistics Variant")
                         {
                             Caption = 'Sales Statistics Variant';
