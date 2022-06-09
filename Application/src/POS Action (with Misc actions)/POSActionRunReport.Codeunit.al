@@ -1,86 +1,83 @@
-﻿codeunit 6150810 "NPR POSAction: Run Report"
+﻿codeunit 6150810 "NPR POSAction: Run Report" implements "NPR IPOS Workflow"
 {
-    Access = Internal;
+    Access = internal;
 
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This is a built-in action for running a report';
-        ReadingErr: Label 'reading in %1';
-
-    local procedure ActionCode(): Code[20]
+        RecordIdCaptionLbl: Label 'Report Id';
+        RecordIdDescriptionLbl: Label 'Specifies Report''s id';
+        RequestPageCaptionLbl: label 'Request Page';
+        RequestPageDescriptionLbl: label 'Specifies should Request Page be called';
+        RecordOption_OptionNameLbl: Label 'None,SaleLine,SaleHeader', Locked = true;
+        RecordCaptionLbl: Label 'Record';
+        RecordDescriptionLbl: Label 'Specifies the Record as Table View';
+        RecordOption_OptionCaptionLbl: Label 'None,POS Sale Line,POS Sale Header';
     begin
-        exit('RUNREPORT');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddIntegerParameter('ReportId', 0, RecordIdCaptionLbl, RecordIdDescriptionLbl);
+        WorkflowConfig.AddBooleanParameter('RequestPage', false, RequestPageCaptionLbl, RequestPageDescriptionLbl);
+        WorkflowConfig.AddOptionParameter('Record',
+            RecordOption_OptionNameLbl,
+            SelectStr(1, RecordOption_OptionNameLbl),
+            RecordCaptionLbl,
+            RecordDescriptionLbl,
+            RecordOption_OptionCaptionLbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('1', 'respond();');
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterIntegerParameter('ReportId', 0);
-            Sender.RegisterBooleanParameter('RequestPage', false);
-            Sender.RegisterOptionParameter('Record', 'None,Sale Line,Sale Header', 'None');
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        JSON: Codeunit "NPR POS JSON Management";
         ReportId: Integer;
         RunRequestPage: Boolean;
         RecordSetting: Option "None","Sale Line POS","Sale POS";
-        "Record": Variant;
+        SetRecord: Variant;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScopeParameters(ActionCode());
-
-        ReportId := JSON.GetIntegerOrFail('ReportId', StrSubstNo(ReadingErr, ActionCode()));
-        RunRequestPage := JSON.GetBooleanOrFail('RequestPage', StrSubstNo(ReadingErr, ActionCode()));
-        RecordSetting := JSON.GetIntegerOrFail('Record', StrSubstNo(ReadingErr, ActionCode()));
+        ReportId := Context.GetIntegerParameter('ReportId');
+        RunRequestPage := Context.GetBooleanParameter('RequestPage');
+        RecordSetting := Context.GetIntegerParameter('Record');
 
         case RecordSetting of
+            RecordSetting::None:
+                report.run(ReportId, RunRequestPage);
             RecordSetting::"Sale Line POS":
                 begin
-                    POSSession.GetSaleLine(POSSaleLine);
+                    SaleLine.GetCurrentSaleLine(SaleLinePOS);
                     POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
                     SaleLinePOS.SetRecFilter();
-                    Record := SaleLinePOS;
+                    SetRecord := SaleLinePOS;
+                    RunReport(ReportId, RunRequestPage, SetRecord)
                 end;
             RecordSetting::"Sale POS":
                 begin
-                    POSSession.GetSale(POSSale);
+                    Sale.GetCurrentSale(SalePOS);
                     POSSale.GetCurrentSale(SalePOS);
                     SalePOS.SetRecFilter();
-                    Record := SalePOS;
+                    SetRecord := SalePOS;
+                    RunReport(ReportId, RunRequestPage, SetRecord)
                 end;
         end;
-        RunReport(ReportId, RunRequestPage, Record);
-        Handled := true;
+
+
     end;
 
-    local procedure RunReport(ReportId: Integer; RunRequestPage: Boolean; "Record": Variant)
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionRunReport.js###
+        'let main=async({})=>await workflow.respond();'
+        );
+    end;
+
+    local procedure RunReport(ReportId: Integer; RunRequestPage: Boolean; SetRecord: Variant)
     begin
         if ReportId = 0 then
             exit;
-        Report.Run(ReportId, RunRequestPage, false, Record);
+        Report.Run(ReportId, RunRequestPage, false, SetRecord);
     end;
 }
