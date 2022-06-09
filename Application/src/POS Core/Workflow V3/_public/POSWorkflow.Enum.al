@@ -141,4 +141,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SWITCH_REGISTER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Switch Regist.";
     }
+    value(26; RUN_REPORT)
+    {
+        Caption = 'RUN_REPORT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Run Report";
+    }
 }
