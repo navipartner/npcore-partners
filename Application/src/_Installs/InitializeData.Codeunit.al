@@ -6,6 +6,7 @@
     trigger OnInstallAppPerCompany()
     begin
         InitPOSSalesWorkflowSteps();
+        InitExchangeLabelSetup();
     end;
 
     local procedure InitPOSSalesWorkflowSteps()
@@ -17,5 +18,15 @@
             repeat
                 POSSalesWorkflow.InitPOSSalesWorkflowSteps();
             until POSSalesWorkflow.Next() = 0;
+    end;
+
+    local procedure InitExchangeLabelSetup()
+    var
+        ExchangeLabelSetup: Record "NPR Exchange Label Setup";
+    begin
+        if not ExchangeLabelSetup.Get() then begin
+            ExchangeLabelSetup.Init();
+            ExchangeLabelSetup.Insert();
+        end;
     end;
 }
