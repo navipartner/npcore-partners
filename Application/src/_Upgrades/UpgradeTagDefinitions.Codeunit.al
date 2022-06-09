@@ -20,6 +20,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pricing Profile"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustSplitBillPOSActionParameters'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustDeletePOSLinePOSActionParameters'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'PosMenuPaymentButtonsAutoEnabled'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Cross Ref"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Gift Voucher"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Credit Voucher"));
@@ -174,6 +175,8 @@
                         exit('NPRSplitBillActionToWF2-938526df-0edf-4c2c-9db8-19e28af11c5a');
                     'AdjustDeletePOSLinePOSActionParameters':
                         exit('NPRDeletePOSLineActionToWF2-938526df-0edf-4c2c-9db8-19e28af11c5a');
+                    'PosMenuPaymentButtonsAutoEnabled':
+                        exit('NPRPosMenuPaymentButtonsAutoEnabled-20220608');
                 end;
             Codeunit::"NPR Event Report Layout Upg.":
                 exit('NPREventReportLayoutUpg-20210803');
