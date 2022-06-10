@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>5ec5381b-2e5f-43fd-8372-e00ba86cabb4</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -19,34 +18,34 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>1.51729cm</Width>
+                  <Width>1.77129cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>4.18748cm</Width>
+                  <Width>5.06759cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.1cm</Width>
+                  <Width>1.88485cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.18875cm</Width>
+                  <Width>4.03086cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.10059cm</Width>
+                  <Width>2.53247cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.47718cm</Width>
+                  <Width>2.31156cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.96591cm</Width>
+                  <Width>2.27452cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.99097cm</Width>
+                  <Width>2.2238cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.92449cm</Width>
+                  <Width>2.31439cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.34239cm</Width>
+                  <Width>1.95622cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -2457,14 +2456,14 @@
             <DataSetName>DataSet_Result</DataSetName>
             <Top>0.73731cm</Top>
             <Height>2.26592cm</Height>
-            <Width>17.79504cm</Width>
+            <Width>26.36754cm</Width>
             <Style />
           </Tablix>
           <Tablix Name="Tablix1">
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>17.79504cm</Width>
+                  <Width>26.36754cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -2554,7 +2553,7 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <Height>0.70556cm</Height>
-            <Width>17.79504cm</Width>
+            <Width>26.36754cm</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
@@ -2566,7 +2565,7 @@
         <Height>3.5595cm</Height>
         <Style />
       </Body>
-      <Width>17.79504cm</Width>
+      <Width>26.68505cm</Width>
       <Page>
         <PageHeader>
           <Height>2.17664cm</Height>
@@ -2616,7 +2615,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>15.90006pt</Top>
-              <Left>12.97595cm</Left>
+              <Left>21.54845cm</Left>
               <Height>11pt</Height>
               <Width>4.81909cm</Width>
               <ZIndex>1</ZIndex>
@@ -2670,7 +2669,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.95603cm</Top>
-              <Left>12.97595cm</Left>
+              <Left>21.54845cm</Left>
               <Height>11pt</Height>
               <Width>4.81909cm</Width>
               <ZIndex>3</ZIndex>
@@ -2699,7 +2698,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>39pt</Top>
-              <Left>12.97595cm</Left>
+              <Left>21.54845cm</Left>
               <Height>11pt</Height>
               <Width>4.81909cm</Width>
               <ZIndex>4</ZIndex>
@@ -2727,7 +2726,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>50.60006pt</Top>
-              <Left>12.97595cm</Left>
+              <Left>21.54845cm</Left>
               <Height>11pt</Height>
               <Width>4.81909cm</Width>
               <ZIndex>5</ZIndex>
@@ -2738,8 +2737,8 @@
           </ReportItems>
           <Style />
         </PageHeader>
-        <PageHeight>29.7cm</PageHeight>
-        <PageWidth>21cm</PageWidth>
+        <PageHeight>21cm</PageHeight>
+        <PageWidth>29.7cm</PageWidth>
         <InteractiveHeight>11in</InteractiveHeight>
         <InteractiveWidth>8.5in</InteractiveWidth>
         <LeftMargin>1.76388cm</LeftMargin>

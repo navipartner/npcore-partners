@@ -1,13 +1,13 @@
 ﻿report 6014662 "NPR Retail Inv.: Sales Stat."
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Inventory - Sales Stat..rdlc';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-    Caption = 'Inventory - Sales Statistics';
+    Caption = 'Item Sales Statistics Per Inventory Posting Group';
     DataAccessIntent = ReadOnly;
 
     dataset
@@ -170,7 +170,7 @@
         UnitCost: Decimal;
         UnitPrice: Decimal;
         ItemAssemblyBOMCaptionLbl: Label 'BOM';
-        InvSalesStatisticsCaptLbl: Label 'Inventory - Sales Statistics';
+        InvSalesStatisticsCaptLbl: Label 'Item Sales Statistics Per Inventory Posting Group';
         PageCaptionLbl: Label 'Page';
         Text000: Label 'Period: %1';
         ItemProfitCaptionLbl: Label 'Profit';
