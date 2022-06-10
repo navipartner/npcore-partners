@@ -8,3 +8,4 @@ The ticket information structure is complex and consists of several entities whi
 ### Related links
  - [Create setup for a ticket](../tutorial/ticket_tutorial.md)
  - [Ticket Admission](./admission.md)
+ - [Dynamic Ticket](./DynamicTicket.md)

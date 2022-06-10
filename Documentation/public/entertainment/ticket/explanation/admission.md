@@ -12,3 +12,4 @@ Ticket types work in the same way, but there are a few exceptions. A key differe
 ### Related links
 - [Ticket module](../intro.md)
 - [Tickets](./ticket.md)
+- [Dynamic Ticket](./DynamicTicket.md)
