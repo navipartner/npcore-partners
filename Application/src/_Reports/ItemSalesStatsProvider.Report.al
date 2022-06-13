@@ -5,7 +5,7 @@
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Sales StatisticsProvider.rdlc';
-    Caption = 'Item Sales Statistics/Provider';
+    Caption = 'Item Sales Statistics by Vendor';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
@@ -48,7 +48,7 @@
 
             trigger OnAfterGetRecord()
             begin
-                DateFilter := Text10600002 + ' ' + Format(Item.GetFilter("Date Filter"));
+                DateFilter := Text10600002 + ' ' + Format(StartDate) + '..' + Format(EndDate);
             end;
         }
         dataitem(Vendor; Vendor)
@@ -215,6 +215,7 @@
 
                     trigger OnPreDataItem()
                     begin
+                        SetFilter("Date Filter", '%1..%2', StartDate, EndDate);
                         SetRange("Vendor No.", Vendor."No.");
                         StartDate := GetRangeMin("Date Filter");
                         EndDate := GetRangeMax("Date Filter");
@@ -255,6 +256,20 @@
                         ToolTip = 'Specifies the value of the Value Date field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Start Date"; StartDate)
+                    {
+                        Caption = 'Start Date';
+                        ToolTip = 'Specifies the value of the Start Date field';
+                        ApplicationArea = NPRRetail;
+                        ShowMandatory = true;
+                    }
+                    field("End date"; EndDate)
+                    {
+                        Caption = 'End date';
+                        ToolTip = 'Specifies the value of the End Date field';
+                        ApplicationArea = NPRRetail;
+                        ShowMandatory = true;
+                    }
                     field("Show Item With Sales"; ShowItemWithSales)
                     {
 
@@ -293,7 +308,7 @@
     {
         OnlyItemsWithSaleCap = 'Only items with sales';
         ShowItemsCap = 'Show items';
-        Report_Caption = 'Sales Person Trn. by Item Gr.';
+        Report_Caption = 'Item Sales Statistics by Vendor';
         Desc_Cap = 'Description';
         VendorItemNo_Cap = 'Supplier item no.';
         ItemNo_Cap = 'No.';
@@ -312,12 +327,21 @@
     }
 
     trigger OnPreReport()
+    var
+        DateNotPopulatedErr: Label 'Fields Start date and End Date need to be populated!';
+        StartDateHigherThanEndDateErr: Label 'Field Start date must contain date that is before the End date';
     begin
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
 
         if ValueDate = 0D then
             ValueDate := Today();
+
+        if (StartDate = 0D) or (EndDate = 0D) then
+            Error(DateNotPopulatedErr);
+
+        if (StartDate > EndDate) then
+            Error(StartDateHigherThanEndDateErr);
     end;
 
     var
