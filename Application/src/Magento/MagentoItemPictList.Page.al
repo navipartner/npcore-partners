@@ -6,7 +6,7 @@
     InsertAllowed = false;
     PageType = List;
     UsageCategory = None;
-    SourceTable = "Item Variant";
+    SourceTable = "Name/Value Buffer";
     SourceTableTemporary = true;
 
     layout
@@ -22,16 +22,14 @@
                     Caption = 'Variants';
                     repeater(Group)
                     {
-                        field("Item No."; Rec."Item No.")
+                        field("Item No."; Rec.Name)
                         {
-
                             Editable = false;
                             ToolTip = 'Specifies the value of the Item No. field';
                             ApplicationArea = NPRRetail;
                         }
-                        field(Description; Rec.Description)
+                        field(Description; Rec.Value)
                         {
-
                             Editable = false;
                             ToolTip = 'Specifies the value of the Description field';
                             ApplicationArea = NPRRetail;
@@ -43,7 +41,6 @@
                     Caption = 'Pictures';
                     ShowFilter = false;
                     ApplicationArea = NPRRetail;
-
                 }
             }
             part(MagentoPictureLinkSubform2; "NPR Magento Pict. Link Subform")
@@ -52,7 +49,6 @@
                 ShowFilter = false;
                 Visible = (NOT HasVariants);
                 ApplicationArea = NPRRetail;
-
             }
         }
         area(factboxes)
@@ -85,53 +81,19 @@
         case MagentoSetup."Picture Variety Type" of
             MagentoSetup."Picture Variety Type"::Fixed:
                 begin
-                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVariantValueCode(Rec."Item No.");
-                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVariantValueCode(Rec."Item No.");
+                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVariantValueCode(Rec.Name);
+                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVariantValueCode(Rec.Name);
                 end;
-            MagentoSetup."Picture Variety Type"::"Select on Item":
-                begin
-                    case Item."NPR Magento Pict. Variety Type" of
-                        Item."NPR Magento Pict. Variety Type"::"Variety 1":
-                            begin
-                                CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters(Rec."NPR Variety 1", Rec."NPR Variety 1 Table", Rec."NPR Variety 1 Value");
-                                CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters(Rec."NPR Variety 1", Rec."NPR Variety 1 Table", Rec."NPR Variety 1 Value");
-                            end;
-                        Item."NPR Magento Pict. Variety Type"::"Variety 2":
-                            begin
-                                CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters(Rec."NPR Variety 2", Rec."NPR Variety 2 Table", Rec."NPR Variety 2 Value");
-                                CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters(Rec."NPR Variety 2", Rec."NPR Variety 2 Table", Rec."NPR Variety 2 Value");
-                            end;
-                        Item."NPR Magento Pict. Variety Type"::"Variety 3":
-                            begin
-                                CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters(Rec."NPR Variety 3", Rec."NPR Variety 3 Table", Rec."NPR Variety 3 Value");
-                                CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters(Rec."NPR Variety 3", Rec."NPR Variety 3 Table", Rec."NPR Variety 3 Value");
-                            end;
-                        Item."NPR Magento Pict. Variety Type"::"Variety 4":
-                            begin
-                                CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters(Rec."NPR Variety 4", Rec."NPR Variety 4 Table", Rec."NPR Variety 4 Value");
-                                CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters(Rec."NPR Variety 4", Rec."NPR Variety 4 Table", Rec."NPR Variety 4 Value");
-                            end;
+            else begin
+                    if (Rec.Name = '') then begin
+                        // If Rec.Name = '' it means we are looking at the main item line,
+                        // so we set the filters to blank here.
+                        CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters('', '', '');
+                        CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters('', '', '');
+                    end else begin
+                        CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters(Variety, VarietyTable, Rec.Name);
+                        CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters(Variety, VarietyTable, Rec.Name);
                     end;
-                end;
-            MagentoSetup."Picture Variety Type"::"Variety 1":
-                begin
-                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters(Rec."NPR Variety 1", Rec."NPR Variety 1 Table", Rec."NPR Variety 1 Value");
-                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters(Rec."NPR Variety 1", Rec."NPR Variety 1 Table", Rec."NPR Variety 1 Value");
-                end;
-            MagentoSetup."Picture Variety Type"::"Variety 2":
-                begin
-                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters(Rec."NPR Variety 2", Rec."NPR Variety 2 Table", Rec."NPR Variety 2 Value");
-                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters(Rec."NPR Variety 2", Rec."NPR Variety 2 Table", Rec."NPR Variety 2 Value");
-                end;
-            MagentoSetup."Picture Variety Type"::"Variety 3":
-                begin
-                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters(Rec."NPR Variety 3", Rec."NPR Variety 3 Table", Rec."NPR Variety 3 Value");
-                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters(Rec."NPR Variety 3", Rec."NPR Variety 3 Table", Rec."NPR Variety 3 Value");
-                end;
-            MagentoSetup."Picture Variety Type"::"Variety 4":
-                begin
-                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters(Rec."NPR Variety 4", Rec."NPR Variety 4 Table", Rec."NPR Variety 4 Value");
-                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters(Rec."NPR Variety 4", Rec."NPR Variety 4 Table", Rec."NPR Variety 4 Value");
                 end;
         end;
     end;
@@ -154,10 +116,11 @@
         Item: Record Item;
         MagentoSetup: Record "NPR Magento Setup";
         ItemNo: Code[20];
-        Text000: Label 'Item No. must not be blank';
+        Variety: Code[10];
+        VarietyTable: Code[40];
+        ItemNoBlankErr: Label 'Item No. must not be blank';
         HasVariants: Boolean;
-        Text001: Label 'Main Item Pictures';
-        VarietyTooLongErr: Label 'You cannot use variety with more than %1 characters.';
+        MainItemPicturesLbl: Label 'Main Item Pictures';
 
     procedure SetItemNo(NewItemNo: Code[20])
     begin
@@ -170,14 +133,10 @@
         if Item.Get(ItemNo) then;
 
         if ItemNo = '' then
-            Error(Text000);
+            Error(ItemNoBlankErr);
 
         HasVariants := false;
-        Rec.Init();
-        Rec."Item No." := '';
-        Rec.Code := '';
-        Rec.Description := Text001;
-        Rec.Insert();
+        Rec.AddNewEntry('', MainItemPicturesLbl);
 
         case MagentoSetup."Variant System" of
             MagentoSetup."Variant System"::Variety:
@@ -276,29 +235,23 @@
         if AuxItem."Variety 1 Table" = '' then
             exit;
 
+        Variety := AuxItem."Variety 1";
+        VarietyTable := AuxItem."Variety 1 Table";
+
         VarietyValue.SetRange(Type, AuxItem."Variety 1");
         VarietyValue.SetRange(Table, AuxItem."Variety 1 Table");
-        if not VarietyValue.FindSet() then
+        if (VarietyValue.IsEmpty()) then
             exit;
 
+        VarietyValue.FindSet();
         repeat
             ItemVariant.SetRange("Item No.", Item."No.");
             ItemVariant.SetRange("NPR Variety 1", VarietyValue.Type);
             ItemVariant.SetRange("NPR Variety 1 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 1 Value", VarietyValue.Value);
             ItemVariant.SetRange("NPR Blocked", false);
-            if ItemVariant.FindFirst() then begin
-                Rec.Init();
-                if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
-                    Error(VarietyTooLongErr)
-                else
-                    Rec."Item No." := CopyStr(VarietyValue.Value, 1, MaxStrLen(Rec."Item No."));
-                Rec.Description := VarietyValue.Description;
-                Rec."NPR Variety 1" := VarietyValue.Type;
-                Rec."NPR Variety 1 Table" := VarietyValue.Table;
-                Rec."NPR Variety 1 Value" := VarietyValue.Value;
-                Rec.Insert();
-            end;
+            if (not ItemVariant.IsEmpty()) then
+                Rec.AddNewEntry(UpperCase(VarietyValue.Value), VarietyValue.Description);
         until VarietyValue.Next() = 0;
     end;
 
@@ -314,29 +267,23 @@
         if AuxItem."Variety 2 Table" = '' then
             exit;
 
+        Variety := AuxItem."Variety 2";
+        VarietyTable := AuxItem."Variety 2 Table";
+
         VarietyValue.SetRange(Type, AuxItem."Variety 2");
         VarietyValue.SetRange(Table, AuxItem."Variety 2 Table");
-        if not VarietyValue.FindSet() then
+        if (VarietyValue.IsEmpty()) then
             exit;
 
+        VarietyValue.FindSet();
         repeat
             ItemVariant.SetRange("Item No.", Item."No.");
             ItemVariant.SetRange("NPR Variety 2", VarietyValue.Type);
             ItemVariant.SetRange("NPR Variety 2 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 2 Value", VarietyValue.Value);
             ItemVariant.SetRange("NPR Blocked", false);
-            if ItemVariant.FindFirst() then begin
-                Rec.Init();
-                if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
-                    Error(VarietyTooLongErr)
-                else
-                    Rec."Item No." := CopyStr(VarietyValue.Value, 1, MaxStrLen(Rec."Item No."));
-                Rec.Description := VarietyValue.Description;
-                Rec."NPR Variety 2" := VarietyValue.Type;
-                Rec."NPR Variety 2 Table" := VarietyValue.Table;
-                Rec."NPR Variety 2 Value" := VarietyValue.Value;
-                Rec.Insert();
-            end;
+            if (not ItemVariant.IsEmpty()) then
+                Rec.AddNewEntry(UpperCase(VarietyValue.Value), VarietyValue.Description);
         until VarietyValue.Next() = 0;
     end;
 
@@ -352,29 +299,23 @@
         if AuxItem."Variety 3 Table" = '' then
             exit;
 
+        Variety := AuxItem."Variety 3";
+        VarietyTable := AuxItem."Variety 3 Table";
+
         VarietyValue.SetRange(Type, AuxItem."Variety 3");
         VarietyValue.SetRange(Table, AuxItem."Variety 3 Table");
-        if not VarietyValue.FindSet() then
+        if (VarietyValue.IsEmpty()) then
             exit;
 
+        VarietyValue.FindSet();
         repeat
             ItemVariant.SetRange("Item No.", Item."No.");
             ItemVariant.SetRange("NPR Variety 3", VarietyValue.Type);
             ItemVariant.SetRange("NPR Variety 3 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 3 Value", VarietyValue.Value);
             ItemVariant.SetRange("NPR Blocked", false);
-            if ItemVariant.FindFirst() then begin
-                Rec.Init();
-                if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
-                    Error(VarietyTooLongErr)
-                else
-                    Rec."Item No." := CopyStr(VarietyValue.Value, 1, MaxStrLen(Rec."Item No."));
-                Rec.Description := VarietyValue.Description;
-                Rec."NPR Variety 3" := VarietyValue.Type;
-                Rec."NPR Variety 3 Table" := VarietyValue.Table;
-                Rec."NPR Variety 3 Value" := VarietyValue.Value;
-                Rec.Insert();
-            end;
+            if (not ItemVariant.IsEmpty()) then
+                Rec.AddNewEntry(UpperCase(VarietyValue.Value), VarietyValue.Description);
         until VarietyValue.Next() = 0;
     end;
 
@@ -390,29 +331,23 @@
         if AuxItem."Variety 4 Table" = '' then
             exit;
 
+        Variety := AuxItem."Variety 4";
+        VarietyTable := AuxItem."Variety 4 Table";
+
         VarietyValue.SetRange(Type, AuxItem."Variety 4");
         VarietyValue.SetRange(Table, AuxItem."Variety 4 Table");
-        if not VarietyValue.FindSet() then
+        if (VarietyValue.IsEmpty()) then
             exit;
 
+        VarietyValue.FindSet();
         repeat
             ItemVariant.SetRange("Item No.", Item."No.");
             ItemVariant.SetRange("NPR Variety 4", VarietyValue.Type);
             ItemVariant.SetRange("NPR Variety 4 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 4 Value", VarietyValue.Value);
             ItemVariant.SetRange("NPR Blocked", false);
-            if ItemVariant.FindFirst() then begin
-                Rec.Init();
-                if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
-                    Error(VarietyTooLongErr)
-                else
-                    Rec."Item No." := CopyStr(VarietyValue.Value, 1, MaxStrLen(Rec."Item No."));
-                Rec.Description := VarietyValue.Description;
-                Rec."NPR Variety 4" := VarietyValue.Type;
-                Rec."NPR Variety 4 Table" := VarietyValue.Table;
-                Rec."NPR Variety 4 Value" := VarietyValue.Value;
-                Rec.Insert();
-            end;
+            if (not ItemVariant.IsEmpty()) then
+                Rec.AddNewEntry(UpperCase(VarietyValue.Value), VarietyValue.Description);
         until VarietyValue.Next() = 0;
     end;
 }
