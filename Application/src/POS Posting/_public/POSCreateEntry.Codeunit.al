@@ -268,6 +268,7 @@
         POSSalesLine."Location Code" := SaleLinePOS."Location Code";
         POSSalesLine."Posting Group" := SaleLinePOS."Posting Group";
         POSSalesLine.Description := SaleLinePOS.Description;
+        POSSalesLine."Description 2" := SaleLinePOS."Description 2";
 
         POSSalesLine."Gen. Posting Type" := SaleLinePOS."Gen. Posting Type";
         POSSalesLine."Gen. Bus. Posting Group" := SaleLinePOS."Gen. Bus. Posting Group";
