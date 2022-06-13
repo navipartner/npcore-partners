@@ -225,12 +225,12 @@ report 6014437 "NPR Item Categ. List. M/Y new"
         ItemGroupCaption = 'Item Category';
         DescriptionItemGroupCaption = 'Description';
         QuantityCaption = 'Qty.';
-        EkspeditCaption = 'Ekspedit';
+        NoOfTransactionsCaption = 'No of Transactions';
         TurnoverCaption = 'Turnover';
         CostCaption = 'Cost';
         DiscountCaption = 'Discount';
-        ProfitCaption = 'DB DKK';
-        ProfitPercentCaption = 'DG %';
+        ProfitCaption = 'Profit Amount';
+        ProfitPercentCaption = 'Profit %';
         Period1Caption = 'Period 1';
         Period2Caption = 'Period 2';
     }
