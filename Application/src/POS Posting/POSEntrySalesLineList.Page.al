@@ -76,6 +76,14 @@
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("Description 2"; Rec."Description 2")
+                {
+
+                    ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
+                }
+
                 field("Location Code"; Rec."Location Code")
                 {
 

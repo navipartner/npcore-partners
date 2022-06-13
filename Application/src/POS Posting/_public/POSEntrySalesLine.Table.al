@@ -543,6 +543,11 @@
             Caption = 'Retail Serial No.';
             DataClassification = CustomerContent;
         }
+        field(6039; "Description 2"; Text[50])
+        {
+            Caption = 'Description 2';
+            DataClassification = CustomerContent;
+        }
         field(6500; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
