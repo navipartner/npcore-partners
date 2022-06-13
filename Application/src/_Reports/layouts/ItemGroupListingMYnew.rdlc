@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>c3cc61e7-d456-4777-8bb1-faa81bbae234</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -28,7 +27,7 @@
                   <Width>1.20119cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.54516cm</Width>
+                  <Width>1.81854cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>1.79916cm</Width>
@@ -49,7 +48,7 @@
                   <Width>1.22766cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.54516cm</Width>
+                  <Width>1.90499cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>1.79916cm</Width>
@@ -185,7 +184,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!EkspeditCaption.Value</Value>
+                                  <Value>=Parameters!NoOfTransactionsCaption.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -430,7 +429,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!EkspeditCaption.Value</Value>
+                                  <Value>=Parameters!NoOfTransactionsCaption.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -4387,7 +4386,7 @@
             <DataSetName>DataSet_Result</DataSetName>
             <Top>0.17598cm</Top>
             <Height>2.94709cm</Height>
-            <Width>28.20621cm</Width>
+            <Width>28.83942cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -4433,7 +4432,7 @@
         <Height>3.88683cm</Height>
         <Style />
       </Body>
-      <Width>28.47959cm</Width>
+      <Width>28.96642cm</Width>
       <Page>
         <PageHeader>
           <Height>1.96591cm</Height>
@@ -4680,14 +4679,14 @@
       </DefaultValue>
       <Prompt>QuantityCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="EkspeditCaption">
+    <ReportParameter Name="NoOfTransactionsCaption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>EkspeditCaption</Value>
+          <Value>NoOfTransactionsCaption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>EkspeditCaption</Prompt>
+      <Prompt>NoOfTransactionsCaption</Prompt>
     </ReportParameter>
     <ReportParameter Name="TurnoverCaption">
       <DataType>String</DataType>
@@ -4776,7 +4775,7 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>3</RowIndex>
-          <ParameterName>EkspeditCaption</ParameterName>
+          <ParameterName>NoOfTransactionsCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
