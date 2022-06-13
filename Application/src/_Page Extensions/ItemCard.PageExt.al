@@ -251,6 +251,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         if VarietyTable.IsEmpty() then
                             exit;
                         VarietyTablePage.SetTableView(VarietyTable);
+                        VarietyTablePage.LookupMode(true);
                         if VarietyTablePage.RunModal() = Action::LookupOK then begin
                             VarietyTablePage.GetRecord(VarietyTable);
                             AuxItem."Variety 1 Table" := VarietyTable.Code;
@@ -291,6 +292,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         if VarietyTable.IsEmpty() then
                             exit;
                         VarietyTablePage.SetTableView(VarietyTable);
+                        VarietyTablePage.LookupMode(true);
                         if VarietyTablePage.RunModal() = Action::LookupOK then begin
                             VarietyTablePage.GetRecord(VarietyTable);
                             AuxItem."Variety 2 Table" := VarietyTable.Code;
@@ -331,6 +333,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         if VarietyTable.IsEmpty() then
                             exit;
                         VarietyTablePage.SetTableView(VarietyTable);
+                        VarietyTablePage.LookupMode(true);
                         if VarietyTablePage.RunModal() = Action::LookupOK then begin
                             VarietyTablePage.GetRecord(VarietyTable);
                             AuxItem."Variety 3 Table" := VarietyTable.Code;
@@ -371,6 +374,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         if VarietyTable.IsEmpty() then
                             exit;
                         VarietyTablePage.SetTableView(VarietyTable);
+                        VarietyTablePage.LookupMode(true);
                         if VarietyTablePage.RunModal() = Action::LookupOK then begin
                             VarietyTablePage.GetRecord(VarietyTable);
                             AuxItem."Variety 4 Table" := VarietyTable.Code;
