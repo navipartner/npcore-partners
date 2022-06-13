@@ -7,7 +7,6 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         ValueSelectionOptions: Option "LIST","FIXED",PROMPT_N,PROMPT_A;
         ParameterValueIncorrectErr: Label 'Please assign value ''%1'' to parameter "%2" before selecting "%3"', Comment = '%1 - required related parameter value, %2 - related parameter name, %3 - changed parameter name';
         ParameterValueMissingErr: Label 'Please select a value for parameter "%1"', Comment = '%1 - parameter name';
-        OptionApplyToLbl: Label 'Entire Sale,Current Line,All Sales Items';
         DimensionSourceOptionsLbl: Label '1st Global Dimension,2nd Global Dimension,Any';
         OptionValueSelectionLbl: Label 'List,Fixed,Numpad,Textpad';
 
@@ -15,28 +14,26 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This Action updates the POS Sale Dimension with either a fixed value or provides a list of valid value';
-        ParamValueSelection_OptionsLbl: Label 'List,Fixed,Numpad,Textpad';
-        ParamValueSelectionOption_CptLbl: Label 'List, Fixed, Numpad, Textpad';
+        ParamValueSelection_OptionsLbl: Label 'List,Fixed,Numpad,Textpad', Locked = true;
         ParamValueSelection_CptLbl: Label 'Value Selection';
-        ParamValueSelection_DescrLbl: Label 'Specifies the selection value for the dimension';
+        ParamValueSelection_DescrLbl: Label 'Specifies the way system will ask user to specify a dimension value';
         ParamDimensionSource_CptLbl: Label 'Dimension Source';
-        ParamDimensionSource_OptionsLbl: Label 'Shortcut1,Shortcut2,Any';
-        ParamDimensionSource_OptionsCptLbl: Label 'Shortcut 1, Shortcut 2, Any';
-        ParamDimensionSource_DescrLbl: Label 'Specifies the dimension source';
-        ParamApplyTo_OptionsLbl: Label 'Sale,CurrentLine,LinesOfTypeSale';
-        ParamApplyToOption_CptLbl: Label 'Sale,Current Line,Lines Of Type Sale';
-        ParamApplyTo_CptLbl: Label 'Value Selection';
-        ParamApplyTo_DescrLbl: Label 'Specifies the apply to the dimension';
+        ParamDimensionSource_OptionsLbl: Label 'Shortcut1,Shortcut2,Any', Locked = true;
+        ParamDimensionSource_DescrLbl: Label 'Specifies the source of the dimension code to be used for the POS action';
+        ParamApplyTo_OptionsLbl: Label 'Sale,CurrentLine,LinesOfTypeSale', Locked = true;
+        ParamApplyToOption_CptLbl: Label 'Entire Sale,Current Line,All Sales Items';
+        ParamApplyTo_CptLbl: Label 'Apply-To';
+        ParamApplyTo_DescrLbl: Label 'Specifies the scope the dimension is to be applied to. ''All Sales Items'' means all lines of type ''Sale''';
         ParamDimensionCode_CptLbl: Label 'Dimension Code';
-        ParamDimensionCode_DescrLbl: Label 'Specifies the Dimension Code';
+        ParamDimensionCode_DescrLbl: Label 'Specifies the code of the dimension you want to assign to the sale';
         ParamDimensionValue_CptLbl: Label 'Dimension Value';
-        ParamDimensionValue_DescrLbl: Label 'Specifies the Dimension Value';
+        ParamDimensionValue_DescrLbl: Label 'Specifies the dimention value you want to assign to the sale';
         ParamStatisticsFrequency_CptLbl: Label 'Statistics Frequency';
-        ParamStatisticsFrequency_DescrLbl: Label 'Specifies the Statistics Frequency';
-        ParamShowConfirmMessage_CptLbl: Label 'Show Confirm Message';
-        ParamShowConfirmMessage_DescLbl: Label 'Specifies if Confirm Message will show';
-        ParamCreateDimValue_CptLbl: Label 'Create Dimension Value';
-        ParamCreateDimValue_DescLbl: Label 'Enable/Disable creating dimension value';
+        ParamStatisticsFrequency_DescrLbl: Label 'Specifies the probability system will run the POS action. 1 - means 100% (always), 2 - 50%, 4 - 25% etc.';
+        ParamShowConfirmMessage_CptLbl: Label 'Confirm';
+        ParamShowConfirmMessage_DescLbl: Label 'Specifies whether system should acknowledge successful dimension assignment with a confirmation message';
+        ParamCreateDimValue_CptLbl: Label 'Create Value';
+        ParamCreateDimValue_DescLbl: Label 'Specifies if the system will automatically create missing dimension values';
         DimTitle: Label 'Dimension and Statistics';
 
     begin
@@ -47,7 +44,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
                                          SelectStr(1, ParamValueSelection_OptionsLbl),
                                          ParamValueSelection_CptLbl,
                                          ParamValueSelection_DescrLbl,
-                                         ParamValueSelectionOption_CptLbl
+                                         OptionValueSelectionLbl
                                          );
 
         WorkflowConfig.AddOptionParameter('DimensionSource',
@@ -55,7 +52,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
                                          SelectStr(1, ParamDimensionSource_OptionsLbl),
                                          ParamDimensionSource_CptLbl,
                                          ParamDimensionSource_DescrLbl,
-                                         ParamDimensionSource_OptionsCptLbl
+                                         DimensionSourceOptionsLbl
                                          );
 
         WorkflowConfig.AddOptionParameter('ApplyTo',
@@ -439,82 +436,6 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         SelectedOptionNo := POSActionParameter.GetOptionInt(POSParameterValue.Value);
         if SelectedOptionNo < 0 then
             SelectedOptionNo := 0;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
-    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    var
-        CaptionApplyTo: Label 'Apply-To';
-        CaptionCreateDimValue: Label 'Create Value';
-        CaptionShowConfirmMessage: Label 'Confirm';
-        CaptionStatisticsFrequency: Label 'Statistics Frequency';
-    begin
-
-        case POSParameterValue.Name of
-            'DimensionCode':
-                Caption := 'Dimension Code';
-            'DimensionValue':
-                Caption := 'Dimension Value Code';
-            'DimensionSource':
-                Caption := 'Dimension Source';
-            'CreateDimValue':
-                Caption := CaptionCreateDimValue;
-            'ValueSelection':
-                Caption := 'Value Selection';
-            'ApplyTo':
-                Caption := CaptionApplyTo;
-            'StatisticsFrequency':
-                Caption := CaptionStatisticsFrequency;
-            'ShowConfirmMessage':
-                Caption := CaptionShowConfirmMessage;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
-    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    var
-        DescApplyTo: Label 'Specifies the scope the dimension is to be applied to. ''All Sales Items'' means all lines of type ''Sale''';
-        DescCreateDimValue: Label 'Specifies if the system will automatically create missing dimension values';
-        DescDimensionCode: Label 'Specifies the code of the dimension you want to assign to the sale';
-        DescDimensionSource: Label 'Specifies the source of the dimension code to be used for the POS action';
-        DescDimensionValue: Label 'Specifies the dimention value you want to assign to the sale';
-        DescShowConfirmMessage: Label 'Specifies whether system should acknowledge successful dimension assignment with a confirmation message';
-        DescStatisticsFrequency: Label 'Specifies the probability system will run the POS action. 1 - means 100% (always), 2 - 50%, 4 - 25% etc.';
-        DescValueSelection: Label 'Specifies the way system will ask user to specify a dimension value';
-    begin
-
-        case POSParameterValue.Name of
-            'DimensionCode':
-                Caption := DescDimensionCode;
-            'DimensionValue':
-                Caption := DescDimensionValue;
-            'DimensionSource':
-                Caption := DescDimensionSource;
-            'CreateDimValue':
-                Caption := DescCreateDimValue;
-            'ValueSelection':
-                Caption := DescValueSelection;
-            'ApplyTo':
-                Caption := DescApplyTo;
-            'StatisticsFrequency':
-                Caption := DescStatisticsFrequency;
-            'ShowConfirmMessage':
-                Caption := DescShowConfirmMessage;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', true, false)]
-    local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    begin
-
-        case POSParameterValue.Name of
-            'DimensionSource':
-                Caption := DimensionSourceOptionsLbl;
-            'ValueSelection':
-                Caption := OptionValueSelectionLbl;
-            'ApplyTo':
-                Caption := OptionApplyToLbl;
-        end;
     end;
 
     local procedure GetActionScript(): Text
