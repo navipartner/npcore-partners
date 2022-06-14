@@ -143,7 +143,7 @@ xmlport 6151195 "NPR NpCs Sales Document"
                     fieldelement(contact; TempSalesHeader."Sell-to Contact")
                     {
                     }
-                    fieldelement(phone_no; TempSalesHeader."NPR Bill-to Company")
+                    fieldelement(phone_no; TempSalesHeader."Sell-to Phone No.")
                     {
                         MinOccurs = Zero;
                     }
