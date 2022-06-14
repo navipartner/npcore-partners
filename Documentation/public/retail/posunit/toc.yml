@@ -24,5 +24,7 @@
     href: howto/POSUnitReceiptFooter.md
   - name: POS menu
     href: howto/POS_menu.md
+  - name: Set up job queue to post POS entries
+    href: howto/set_up_job_queue_to_post_POS_entries.md
   - name: Manually post POS entries and check if they are posted
     href: howto/manually_post_POS_entries.md
