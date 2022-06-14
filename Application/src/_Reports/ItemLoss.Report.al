@@ -69,7 +69,12 @@
             column(TotalCaption; TotalCaptionLbl)
             {
             }
-
+            column(gReasonCodeValue; ReasonCodeValue)
+            {
+            }
+            column(txtReasonCode; TxtReasonCode)
+            {
+            }
             trigger OnAfterGetRecord()
             begin
                 SvindCalculation();
@@ -123,6 +128,8 @@
         SourceCodeFilter: Code[10];
         SvindAmount: Decimal;
         SvindAmountTotal: Decimal;
+        TxtReasonCode: Label 'Reason Code';
+        ReasonCodeValue: Code[10];
         SvindQty: Decimal;
         SvindQtyTotal: Decimal;
         TxtAmount: Label 'Amount';
@@ -130,7 +137,7 @@
         ItemFilterTxtConst: Label 'Item Filter:';
         Shrinkage___ItemCaptionLbl: Label 'Item - Loss';
         TxtItemNo: Label 'Item no.';
-        TxtReportName: Label 'Item - Shrinkage';
+        TxtReportName: Label 'Item-Loss';
         Page_CaptionLbl: Label 'Page.';
         TxtQty: Label 'Qty.';
         Text001: Label 'Source Code Filter:  ';
@@ -175,6 +182,7 @@
                     SvindQty += ItemLedgerEntry.Quantity;
                     ItemLedgerEntry.CalcFields("Cost Amount (Actual)");
                     SvindAmount += ItemLedgerEntry."Cost Amount (Actual)";
+                    ReasonCodeValue := ValueEntry."Reason Code";
                 end;
             until ItemLedgerEntry.Next() = 0;
         end;
