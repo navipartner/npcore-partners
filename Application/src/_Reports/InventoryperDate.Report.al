@@ -41,6 +41,9 @@
             column(UnitPrice_Item; Item."Unit Price")
             {
             }
+            column(UnitPriceExclVAT; CalcUnitPriceExclVAT())
+            {
+            }
             column(LastDirectCost_Item; Item."Last Direct Cost")
             {
                 IncludeCaption = true;
@@ -255,6 +258,8 @@
         LastPurchaseDate_Caption = 'Last Purchase Date';
         LastCostPrice_Caption = 'Last Cost Price';
         SalesPrice_Caption = 'Sales Price';
+        End_Date = 'End Date:';
+        FooterText = '* All values in report are without VAT';
     }
 
     trigger OnInitReport()
@@ -295,5 +300,6 @@
         SelectCalcMethod: Option "Sidste Kostpris",Kostpris;
         CalcMethod: Text[50];
         Itemfilter: Text;
+
 }
 
