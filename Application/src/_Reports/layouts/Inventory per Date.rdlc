@@ -11,6 +11,97 @@
       <rd:DataSourceID>a0e326e1-5f81-444f-900f-caef436353dd</rd:DataSourceID>
     </DataSource>
   </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="CalcMethod">
+          <DataField>CalcMethod</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="UnitCost_Item">
+          <DataField>UnitCost_Item</DataField>
+        </Field>
+        <Field Name="UnitCost_ItemFormat">
+          <DataField>UnitCost_ItemFormat</DataField>
+        </Field>
+        <Field Name="VendorItemNo_Item">
+          <DataField>VendorItemNo_Item</DataField>
+        </Field>
+        <Field Name="NetChange_Item">
+          <DataField>NetChange_Item</DataField>
+        </Field>
+        <Field Name="NetChange_ItemFormat">
+          <DataField>NetChange_ItemFormat</DataField>
+        </Field>
+        <Field Name="UnitPrice_Item">
+          <DataField>UnitPrice_Item</DataField>
+        </Field>
+        <Field Name="UnitPrice_ItemFormat">
+          <DataField>UnitPrice_ItemFormat</DataField>
+        </Field>
+        <Field Name="UnitPriceExclVAT">
+          <DataField>UnitPriceExclVAT</DataField>
+        </Field>
+        <Field Name="UnitPriceExclVATFormat">
+          <DataField>UnitPriceExclVATFormat</DataField>
+        </Field>
+        <Field Name="LastDirectCost_Item">
+          <DataField>LastDirectCost_Item</DataField>
+        </Field>
+        <Field Name="LastDirectCost_ItemFormat">
+          <DataField>LastDirectCost_ItemFormat</DataField>
+        </Field>
+        <Field Name="CostValuation">
+          <DataField>CostValuation</DataField>
+        </Field>
+        <Field Name="CostValuationFormat">
+          <DataField>CostValuationFormat</DataField>
+        </Field>
+        <Field Name="GrossAvg">
+          <DataField>GrossAvg</DataField>
+        </Field>
+        <Field Name="GrossAvgFormat">
+          <DataField>GrossAvgFormat</DataField>
+        </Field>
+        <Field Name="ActualSales">
+          <DataField>ActualSales</DataField>
+        </Field>
+        <Field Name="ActualSalesFormat">
+          <DataField>ActualSalesFormat</DataField>
+        </Field>
+        <Field Name="LatestSalesDate">
+          <DataField>LatestSalesDate</DataField>
+        </Field>
+        <Field Name="Itemfilter">
+          <DataField>Itemfilter</DataField>
+        </Field>
+        <Field Name="EndDate">
+          <DataField>EndDate</DataField>
+        </Field>
+        <Field Name="ItemCategory_Item">
+          <DataField>ItemCategory_Item</DataField>
+        </Field>
+        <Field Name="GroupByItemCategory">
+          <DataField>GroupByItemCategory</DataField>
+        </Field>
+        <Field Name="LatestPurchaseDate_ItemLedgerEntry">
+          <DataField>LatestPurchaseDate_ItemLedgerEntry</DataField>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -19,31 +110,31 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>1.0375in</Width>
+                  <Width>1.3in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.5012in</Width>
+                  <Width>1.57in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.98224in</Width>
+                  <Width>1.3in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.80624in</Width>
+                  <Width>1.3in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.75524in</Width>
+                  <Width>0.75in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.72383in</Width>
+                  <Width>0.75in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.73477in</Width>
+                  <Width>0.75in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.68287in</Width>
+                  <Width>1.12in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.88in</Width>
+                  <Width>1.12in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -145,7 +236,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Center</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -184,7 +275,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -223,7 +314,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -262,7 +353,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -301,7 +392,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -340,7 +431,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Center</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -379,7 +470,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Center</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -404,7 +495,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23622in</Height>
+                  <Height>0.48622in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -690,7 +781,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.13541in</Height>
+                  <Height>0.38541in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -774,7 +865,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Center</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -808,7 +899,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -834,15 +925,15 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!UnitPrice_Item.Value</Value>
+                                  <Value>=Fields!UnitPriceExclVAT.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
-                                    <Format>=Fields!UnitPrice_ItemFormat.Value</Format>
+                                    <Format>=Fields!UnitPriceExclVATFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -871,11 +962,12 @@
                                   <Value>=Fields!LastDirectCost_Item.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
+                                    <Format>=Fields!LastDirectCost_ItemFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -909,7 +1001,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -943,7 +1035,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Center</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -977,7 +1069,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Center</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -1146,7 +1238,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -1276,7 +1368,7 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -1450,10 +1542,10 @@
             <RepeatColumnHeaders>true</RepeatColumnHeaders>
             <RepeatRowHeaders>true</RepeatRowHeaders>
             <DataSetName>DataSet_Result</DataSetName>
-            <Top>0.36554in</Top>
-            <Left>0.00636in</Left>
-            <Height>0.87163in</Height>
-            <Width>8.10389in</Width>
+            <Top>0.17803in</Top>
+            <Left>0in</Left>
+            <Height>1.37163in</Height>
+            <Width>9.96in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1465,50 +1557,14 @@
               </TopBorder>
             </Style>
           </Tablix>
-          <Textbox Name="Textbox8">
-            <CanGrow>true</CanGrow>
-            <KeepTogether>true</KeepTogether>
-            <Paragraphs>
-              <Paragraph>
-                <TextRuns>
-                  <TextRun>
-                    <Value>=Fields!EndDate.Value</Value>
-                    <Style>
-                      <FontSize>8pt</FontSize>
-                      <FontWeight>Bold</FontWeight>
-                      <Format>d</Format>
-                    </Style>
-                  </TextRun>
-                </TextRuns>
-                <Style>
-                  <TextAlign>Left</TextAlign>
-                </Style>
-              </Paragraph>
-            </Paragraphs>
-            <rd:DefaultName>Textbox7</rd:DefaultName>
-            <Top>0.22292cm</Top>
-            <Left>9.2798cm</Left>
-            <Height>0.635cm</Height>
-            <Width>11.32024cm</Width>
-            <ZIndex>1</ZIndex>
-            <Style>
-              <Border>
-                <Style>None</Style>
-              </Border>
-              <PaddingLeft>2pt</PaddingLeft>
-              <PaddingRight>2pt</PaddingRight>
-              <PaddingTop>2pt</PaddingTop>
-              <PaddingBottom>2pt</PaddingBottom>
-            </Style>
-          </Textbox>
         </ReportItems>
-        <Height>3.14242cm</Height>
+        <Height>4.12137cm</Height>
         <Style />
       </Body>
-      <Width>20.60004cm</Width>
+      <Width>25.42901cm</Width>
       <Page>
         <PageHeader>
-          <Height>2.88397cm</Height>
+          <Height>4.60377cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -1529,9 +1585,9 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.33962cm</Top>
-              <Left>0.09525cm</Left>
+              <Left>0.01615cm</Left>
               <Height>0.92302cm</Height>
-              <Width>10.46826cm</Width>
+              <Width>10.54736cm</Width>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1544,90 +1600,7 @@
                     <TextRun>
                       <Value>=First(Fields!COMPANYNAME.Value, "DataSet_Result")</Value>
                       <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>1.56603cm</Top>
-              <Left>9.45619cm</Left>
-              <Height>0.423cm</Height>
-              <Width>4.73565cm</Width>
-              <ZIndex>1</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="ExecutionTimeTextBox">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Globals!ExecutionTime</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                        <Format>dd-MM-yyyy</Format>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>1.56603cm</Top>
-              <Left>0.07926cm</Left>
-              <Height>0.423cm</Height>
-              <Width>2.67375cm</Width>
-              <ZIndex>2</ZIndex>
-              <Style>
-                <Border />
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="UserIdTextBox">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=User!UserID</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>1.58333cm</Top>
-              <Left>2.94708cm</Left>
-              <Height>0.423cm</Height>
-              <Width>6.33272cm</Width>
-              <ZIndex>3</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyName17">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>="6014417,NPR70.00.00.00"</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
+                        <FontSize>8pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -1637,11 +1610,11 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.58333cm</Top>
-              <Left>15.08331cm</Left>
+              <Top>1.29792cm</Top>
+              <Left>18.75123cm</Left>
               <Height>0.423cm</Height>
-              <Width>4.3132cm</Width>
-              <ZIndex>4</ZIndex>
+              <Width>6.67778cm</Width>
+              <ZIndex>1</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1660,21 +1633,145 @@
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Center</TextAlign>
+                    <TextAlign>Left</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox15</rd:DefaultName>
               <Top>2.19717cm</Top>
-              <Left>0.1495cm</Left>
+              <Left>0.01615cm</Left>
               <Height>0.52917cm</Height>
-              <Width>20.45054cm</Width>
-              <ZIndex>5</ZIndex>
+              <Width>10.54736cm</Width>
+              <ZIndex>2</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
                 </Border>
                 <VerticalAlign>Bottom</VerticalAlign>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+                <PaddingTop>2pt</PaddingTop>
+                <PaddingBottom>2pt</PaddingBottom>
+              </Style>
+            </Textbox>
+            <Textbox Name="CurrReportPageNoCaption1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Label>PageNumber</Label>
+                      <Value>="Page " &amp; Globals!PageNumber &amp; " of " &amp; Globals!TotalPages</Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>2.89102cm</Top>
+              <Left>18.75123cm</Left>
+              <Height>0.38806cm</Height>
+              <Width>6.67778cm</Width>
+              <ZIndex>3</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="ExecutionTimeTextBox2">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Globals!ExecutionTime</Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                        <Format>g</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>0.78126in</Top>
+              <Left>18.75123cm</Left>
+              <Height>11pt</Height>
+              <Width>6.67778cm</Width>
+              <ZIndex>4</ZIndex>
+              <Style>
+                <Border />
+                <VerticalAlign>Top</VerticalAlign>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="UserIdTextBox2">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=User!UserID</Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>2.43593cm</Top>
+              <Left>18.75123cm</Left>
+              <Height>0.38806cm</Height>
+              <Width>6.67778cm</Width>
+              <ZIndex>5</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox8">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Parameters!End_Date.Value &amp; " " &amp; Fields!EndDate.Value</Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                        <Format>d</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox7</rd:DefaultName>
+              <Top>3.20147cm</Top>
+              <Left>0.01615cm</Left>
+              <Height>0.635cm</Height>
+              <Width>10.56351cm</Width>
+              <ZIndex>6</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
                 <PaddingLeft>2pt</PaddingLeft>
                 <PaddingRight>2pt</PaddingRight>
                 <PaddingTop>2pt</PaddingTop>
@@ -1689,20 +1786,20 @@
           </Style>
         </PageHeader>
         <PageFooter>
-          <Height>1.00541cm</Height>
+          <Height>0.79375cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
-            <Textbox Name="CompanyName18">
+            <Textbox Name="Textbox6">
+              <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>="Side "&amp; Globals!PageNumber</Value>
+                      <Value>=Parameters!FooterText.Value</Value>
                       <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
+                        <FontSize>8pt</FontSize>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -1711,39 +1808,19 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>0.49775cm</Top>
-              <Left>0.1495cm</Left>
-              <Height>0.423cm</Height>
-              <Width>20.45054cm</Width>
+              <rd:DefaultName>Textbox6</rd:DefaultName>
+              <Top>0.17639cm</Top>
+              <Left>0.01615cm</Left>
+              <Height>0.6cm</Height>
+              <Width>25.18065cm</Width>
               <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyName19">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Parameters!Footer_Caption.Value</Value>
-                      <Style>
-                        <FontSize>6pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>0.11675cm</Top>
-              <Left>14.01406cm</Left>
-              <Height>0.37008cm</Height>
-              <Width>6.58598cm</Width>
-              <ZIndex>1</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+                <PaddingTop>2pt</PaddingTop>
+                <PaddingBottom>2pt</PaddingBottom>
               </Style>
             </Textbox>
           </ReportItems>
@@ -1753,8 +1830,8 @@
             </Border>
           </Style>
         </PageFooter>
-        <PageHeight>29.7cm</PageHeight>
-        <PageWidth>21cm</PageWidth>
+        <PageHeight>21cm</PageHeight>
+        <PageWidth>29.7cm</PageWidth>
         <LeftMargin>1cm</LeftMargin>
         <RightMargin>1cm</RightMargin>
         <TopMargin>1cm</TopMargin>
@@ -1891,6 +1968,24 @@
       </DefaultValue>
       <Prompt>SalesPrice_Caption</Prompt>
     </ReportParameter>
+    <ReportParameter Name="End_Date">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>End_Date</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>End_Date</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="FooterText">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>FooterText</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>FooterText</Prompt>
+    </ReportParameter>
     <ReportParameter Name="No_ItemCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -1922,7 +2017,7 @@
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>17</NumberOfRows>
+      <NumberOfRows>19</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -1997,16 +2092,26 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>14</RowIndex>
-          <ParameterName>No_ItemCaption</ParameterName>
+          <ParameterName>End_Date</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>15</RowIndex>
-          <ParameterName>LastDirectCost_ItemCaption</ParameterName>
+          <ParameterName>FooterText</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>16</RowIndex>
+          <ParameterName>No_ItemCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>17</RowIndex>
+          <ParameterName>LastDirectCost_ItemCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>18</RowIndex>
           <ParameterName>ItemCategory_ItemCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
@@ -2058,89 +2163,4 @@ End Function
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>08101579-7c92-421a-a9f8-a07c906bed32</rd:ReportID>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CalcMethod">
-          <DataField>CalcMethod</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="UnitCost_Item">
-          <DataField>UnitCost_Item</DataField>
-        </Field>
-        <Field Name="UnitCost_ItemFormat">
-          <DataField>UnitCost_ItemFormat</DataField>
-        </Field>
-        <Field Name="VendorItemNo_Item">
-          <DataField>VendorItemNo_Item</DataField>
-        </Field>
-        <Field Name="NetChange_Item">
-          <DataField>NetChange_Item</DataField>
-        </Field>
-        <Field Name="NetChange_ItemFormat">
-          <DataField>NetChange_ItemFormat</DataField>
-        </Field>
-        <Field Name="UnitPrice_Item">
-          <DataField>UnitPrice_Item</DataField>
-        </Field>
-        <Field Name="UnitPrice_ItemFormat">
-          <DataField>UnitPrice_ItemFormat</DataField>
-        </Field>
-        <Field Name="LastDirectCost_Item">
-          <DataField>LastDirectCost_Item</DataField>
-        </Field>
-        <Field Name="LastDirectCost_ItemFormat">
-          <DataField>LastDirectCost_ItemFormat</DataField>
-        </Field>
-        <Field Name="CostValuation">
-          <DataField>CostValuation</DataField>
-        </Field>
-        <Field Name="CostValuationFormat">
-          <DataField>CostValuationFormat</DataField>
-        </Field>
-        <Field Name="GrossAvg">
-          <DataField>GrossAvg</DataField>
-        </Field>
-        <Field Name="GrossAvgFormat">
-          <DataField>GrossAvgFormat</DataField>
-        </Field>
-        <Field Name="ActualSales">
-          <DataField>ActualSales</DataField>
-        </Field>
-        <Field Name="ActualSalesFormat">
-          <DataField>ActualSalesFormat</DataField>
-        </Field>
-        <Field Name="LatestSalesDate">
-          <DataField>LatestSalesDate</DataField>
-        </Field>
-        <Field Name="Itemfilter">
-          <DataField>Itemfilter</DataField>
-        </Field>
-        <Field Name="EndDate">
-          <DataField>EndDate</DataField>
-        </Field>
-        <Field Name="ItemCategory_Item">
-          <DataField>ItemCategory_Item</DataField>
-        </Field>
-        <Field Name="GroupByItemCategory">
-          <DataField>GroupByItemCategory</DataField>
-        </Field>
-        <Field Name="LatestPurchaseDate_ItemLedgerEntry">
-          <DataField>LatestPurchaseDate_ItemLedgerEntry</DataField>
-        </Field>
-      </Fields>
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-    </DataSet>
-  </DataSets>
 </Report>
