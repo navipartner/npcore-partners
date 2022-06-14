@@ -22,5 +22,7 @@
     href: howto/ConfigureCashDrawerOpening.md
   - name: Change the POS unit receipt footer text
     href: howto/POSUnitReceiptFooter.md
+  - name: POS menu
+    href: howto/POS_menu.md
   - name: Manually post POS entries and check if they are posted
     href: howto/manually_post_POS_entries.md
