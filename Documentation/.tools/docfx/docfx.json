@@ -13,6 +13,8 @@
           "retail/**/toc.yml",    
           "wms/**.md",
           "wms/**/toc.yml",
+          "power_bi/**.md",
+          "power_bi/**/toc.yml",
           "partner/**.md", 
           "partner/**/toc.yml",
           "troubleshooting/**.md",
