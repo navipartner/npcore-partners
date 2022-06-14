@@ -1,0 +1,4 @@
+- name: Getting started
+  href: intro.md
+- name: NP Power BI for Retail
+  href: power_bi_retail/toc.yml

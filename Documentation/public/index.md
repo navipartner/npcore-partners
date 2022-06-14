@@ -106,6 +106,7 @@
       <p> The <a href="https://docs.navipartner.com/ecommerce/intro.html">NP E-commerce</a> solution helps our customers build a foundation for a successful omnichannel online business.</p>
       <p> The <a href="https://docs.navipartner.com/entertainment/intro.html">NP Entertainment</a> is all-in-one ticketing and membership management system that streamlines sales and validation of tickets and memberships.</p>
       <p> The <a href="https://docs.navipartner.com/wms/intro.html">NP WMS</a> connects your inventory management in Business Central with your POS solution and your online store, and makes every item visible across the supply chain, distribution centers, and sales channels.</p>
+      <p> The <a href="https://docs.navipartner.com/power_bi/intro.html">Power BI</a> is an all-in-one tool that you can use to analyze data, create dashboards, reports, and provide services for individuals and teams. NaviPartner currently offers the NP Power BI for Retail solution.</p>
       <p>The <a href="https://docs.navipartner.com/api/gettingstarted/intro.html">API documentation</a> comprises technical webservice references and a sandbox for testing purposes.</p>
       <p>The <a href="https://docs.navipartner.com/partner/intro.html">Partner</a> documentation consists of documentation intended for our partners.</p>
       <p> The <a href="https://docs.navipartner.com/troubleshooting/intro.html">Troubleshooting</a> documentation which provides answers to some of the frequently asked questions.</p>
