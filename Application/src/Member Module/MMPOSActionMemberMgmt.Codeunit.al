@@ -1,6 +1,7 @@
 ﻿codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 {
     Access = Internal;
+
     var
         QTY_CANT_CHANGE: Label 'Changing quantity for membership sales is not possible.';
         ActionDescription: Label 'This action handles member management functions.';
@@ -965,7 +966,7 @@
         exit(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl", 'OnAfterLoadFromQuote', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl B", 'OnAfterLoadFromQuote', '', true, true)]
     local procedure OnBeforeLoadSavedSaleSubscriber(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";

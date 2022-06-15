@@ -1337,7 +1337,7 @@ codeunit 85004 "NPR EFT Tests"
     [Test]
     procedure VoidTransactionInParkedSale()
     var
-        POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl";
+        POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl B";
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -2194,7 +2194,7 @@ codeunit 85004 "NPR EFT Tests"
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         EntryNo: Integer;
         Assert: Codeunit Assert;
-        POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl";
+        POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl B";
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
     begin
         // [Scenario] Check that a lost purchase in a sale that has been parked, is handled correctly when looked up.
