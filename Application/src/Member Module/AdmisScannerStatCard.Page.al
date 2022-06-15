@@ -4,10 +4,8 @@
 
     Caption = 'NPR MM Admis. Scanner Station Card';
     PageType = Card;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR MM Admis. Scanner Stations";
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
