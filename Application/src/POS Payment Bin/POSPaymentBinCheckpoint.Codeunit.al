@@ -1,6 +1,7 @@
 ﻿codeunit 6150628 "NPR POS Payment Bin Checkpoint"
 {
     Access = Internal;
+
     var
         UNCONFIRMED_CP: Label 'Not Counted.';
         ACCOUNT_DIFFERENCE: Label 'WARNING!\\As a result of the close workshift, there needs to be a transfer of %1 to the amount of %5 from bin %2 to bin %3. These bins are configured with different G/L Accounts, and the posting needs to be handled.\\You can either:\\A) configure the bins to use the same account\\B) perform a BIN TRANSFER prior to close workshift on unit %4\\C) manually post the difference in a journal.\\If you continue, you will have to manually post the difference in a journal. Do you want to continue?';
@@ -30,6 +31,7 @@
         POSBinMovement: Boolean;
         LastCheckpointEntryNo: Integer;
         PaymentBinCheckpointDescriptionLbl: Label '[%1] %2', Locked = true;
+        POSBinEntryCalc: Query "NPR POS Bin Entry Calc.";
     begin
 
         POSUnit.Get(UnitNo);
@@ -121,39 +123,50 @@
 
             // Aggregate the transfers from between this checkpoint and previous
             if (LastCheckpointEntryNo >= 0) then begin
-                POSBinEntry.Reset();
-                POSBinEntry.SetCurrentKey("Payment Bin No.", "POS Unit No.", "Payment Method Code", "Type");
-                POSBinEntry.SetFilter("Entry No.", '>%1', LastCheckpointEntryNo);
-                POSBinEntry.SetFilter("Payment Bin No.", '=%1', PaymentBinCheckpoint."Payment Bin No.");
-                POSBinEntry.SetFilter("Payment Method Code", '=%1', PaymentBinCheckpoint."Payment Method No.");
-                POSBinEntry.SetFilter("POS Unit No.", '=%1', UnitNo);
-                POSBinEntry.SetFilter(Type, '=%1|=%2', POSBinEntry.Type::BIN_TRANSFER_IN, POSBinEntry.Type::BIN_TRANSFER_OUT);
-                if (POSBinEntry.FindSet()) then begin
-                    POSBinMovement := true;
-                    repeat
-                        case POSBinEntry.Type of
-                            POSBinEntry.Type::BIN_TRANSFER_IN:
-                                PaymentBinCheckpoint."Transfer In Amount" += POSBinEntry."Transaction Amount";
-                            POSBinEntry.Type::BIN_TRANSFER_OUT:
-                                PaymentBinCheckpoint."Transfer Out Amount" += POSBinEntry."Transaction Amount";
-                        end;
-                    until (POSBinEntry.Next() = 0);
+                Clear(POSBinEntryCalc);
+                POSBinEntryCalc.SetFilter(PBE_EntryNo_Filter, '>%1', LastCheckpointEntryNo);
+                POSBinEntryCalc.SetRange(PBE_PaymentBinNo_Filter, PaymentBinCheckpoint."Payment Bin No.");
+                POSBinEntryCalc.SetRange(PBE_PaymentMethodCode_Filter, PaymentBinCheckpoint."Payment Method No.");
+                POSBinEntryCalc.SetRange(PBE_POSUnitNo_Filter, UnitNo);
+                POSBinEntryCalc.SetRange(PBE_Type_Filter, POSBinEntry.Type::BIN_TRANSFER_IN);
+                POSBinEntryCalc.Open();
+                if POSBinEntryCalc.Read() then begin
+                    if POSBinEntryCalc.PBE_RecordsCount > 0 then
+                        POSBinMovement := true;
+                    PaymentBinCheckpoint."Transfer In Amount" += POSBinEntryCalc.PBE_TransactionAmount;
                 end;
+
+                POSBinEntryCalc.SetRange(PBE_Type_Filter, POSBinEntry.Type::BIN_TRANSFER_OUT);
+                POSBinEntryCalc.Open();
+                if POSBinEntryCalc.Read() then begin
+                    if POSBinEntryCalc.PBE_RecordsCount > 0 then
+                        POSBinMovement := true;
+                    PaymentBinCheckpoint."Transfer Out Amount" += POSBinEntryCalc.PBE_TransactionAmount;
+                end;
+                POSBinEntryCalc.Close();
 
                 // Check if the 0 float amount is a sum of transactions or result of zero transactions
                 if ((not POSBinMovement) and (PaymentBinCheckpoint."Calculated Amount Incl. Float" = 0)) then begin
+                    POSBinEntry.Reset();
+                    POSBinEntry.SetCurrentKey("Payment Bin No.", "POS Unit No.", "Payment Method Code", "Type");
+                    POSBinEntry.SetFilter("Entry No.", '>%1', LastCheckpointEntryNo);
+                    POSBinEntry.SetFilter("Payment Bin No.", '=%1', PaymentBinCheckpoint."Payment Bin No.");
+                    POSBinEntry.SetFilter("Payment Method Code", '=%1', PaymentBinCheckpoint."Payment Method No.");
+                    POSBinEntry.SetFilter("POS Unit No.", '=%1', UnitNo);
                     POSBinEntry.SetFilter(Type, '=%1', POSBinEntry.Type::CHECKPOINT);
                     if (POSBinEntry.FindFirst()) then begin
-                        POSBinEntry.Reset();
-                        POSBinEntry.SetCurrentKey("Payment Bin No.", "POS Unit No.", "Payment Method Code", "Type");
-                        POSBinEntry.SetFilter("Entry No.", '%1..', POSBinEntry."Entry No.");
-                        POSBinEntry.SetFilter("Payment Bin No.", '=%1', PaymentBinCheckpoint."Payment Bin No.");
-                        POSBinEntry.SetFilter("Payment Method Code", '=%1', PaymentBinCheckpoint."Payment Method No.");
-                        POSBinEntry.SetFilter(Type, '=%1|=%2', POSBinEntry.Type::INPAYMENT, POSBinEntry.Type::OUTPAYMENT);
-                        POSBinMovement := (not POSBinEntry.IsEmpty());
+
+                        Clear(POSBinEntryCalc);
+                        POSBinEntryCalc.SetFilter(PBE_EntryNo_Filter, '%1..', POSBinEntry."Entry No.");
+                        POSBinEntryCalc.SetRange(PBE_PaymentBinNo_Filter, PaymentBinCheckpoint."Payment Bin No.");
+                        POSBinEntryCalc.SetRange(PBE_PaymentMethodCode_Filter, PaymentBinCheckpoint."Payment Method No.");
+                        POSBinEntryCalc.SetFilter(PBE_Type_Filter, '=%1|=%2', POSBinEntry.Type::INPAYMENT, POSBinEntry.Type::OUTPAYMENT);
+                        POSBinEntryCalc.Open();
+                        If POSBinEntryCalc.Read() then
+                            if POSBinEntryCalc.PBE_RecordsCount > 0 then
+                                POSBinMovement := true;
                     end;
                 end;
-
             end;
         end;
 
@@ -174,7 +187,6 @@
                 PaymentBinCheckpoint.Delete();
             end;
         end;
-
     end;
 
     procedure TransferToPaymentBin(FromWorkshiftCheckpointEntryNo: Integer; FromUnitNo: Code[10]; ToUnitNo: Code[10])
