@@ -5,10 +5,9 @@
 
     Caption = 'Distribution Group';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Distrib. Group";
-    ApplicationArea = NPRRetail;
 
     layout
     {

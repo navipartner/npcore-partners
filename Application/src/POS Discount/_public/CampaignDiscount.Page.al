@@ -2,9 +2,8 @@
 {
     Caption = 'Period Discount';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Period Discount";
-    ApplicationArea = NPRRetail;
 
     layout
     {

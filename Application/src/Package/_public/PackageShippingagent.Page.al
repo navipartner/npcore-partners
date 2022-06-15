@@ -5,8 +5,7 @@
     PageType = Card;
     SourceTable = "NPR package Shipping Agent";
     caption = 'NPR Shipping Agent';
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
 
     layout
     {

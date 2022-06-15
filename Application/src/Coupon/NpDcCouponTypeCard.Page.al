@@ -3,11 +3,11 @@
     Extensible = False;
     Caption = 'Coupon Type Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     PromotedActionCategories = 'New,Process,Reports,Manage,Setup';
     SourceTable = "NPR NpDc Coupon Type";
-    ApplicationArea = NPRRetail;
+
 
     layout
     {

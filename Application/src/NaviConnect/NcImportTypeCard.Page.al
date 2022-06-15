@@ -3,9 +3,8 @@
     Extensible = False;
     Caption = 'Import Type Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Nc Import Type";
-    ApplicationArea = NPRNaviConnect;
 
     layout
     {

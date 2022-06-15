@@ -3,10 +3,9 @@
     Extensible = False;
     Caption = 'Pepper Version Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Pepper Version";
-    ApplicationArea = NPRRetail;
 
     layout
     {

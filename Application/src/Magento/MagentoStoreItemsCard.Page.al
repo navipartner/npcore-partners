@@ -3,13 +3,11 @@
     Extensible = False;
     Caption = 'Magento Store Items Card';
     PageType = Card;
-
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Magento Store Item";
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
-    ApplicationArea = NPRRetail;
 
     layout
     {

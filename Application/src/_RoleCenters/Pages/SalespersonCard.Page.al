@@ -3,9 +3,7 @@
     Extensible = False;
     Caption = 'Salesperson/Purchaser Card';
     SourceTable = "Salesperson/Purchaser";
-    UsageCategory = Documents;
-    ApplicationArea = NPRRetail;
-
+    UsageCategory = None;
     layout
     {
         area(content)

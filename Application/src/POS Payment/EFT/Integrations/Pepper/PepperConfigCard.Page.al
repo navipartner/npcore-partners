@@ -11,10 +11,10 @@
 
     Caption = 'Pepper Configuration Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Pepper Config.";
-    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -303,7 +303,7 @@
         }
         area(processing)
         {
-            #if not CLOUD
+#if not CLOUD
             group(Import)
             {
                 Caption = 'Import';
@@ -336,7 +336,7 @@
                     end;
                 }
             }
-            #endif
+#endif
             group(Show)
             {
                 Caption = 'Show';

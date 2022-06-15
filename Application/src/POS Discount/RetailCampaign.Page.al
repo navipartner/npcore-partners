@@ -8,10 +8,9 @@
 
     Caption = 'Retail Campaign';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Retail Campaign Header";
-    ApplicationArea = NPRRetail;
 
     layout
     {
