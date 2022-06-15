@@ -3,7 +3,7 @@
 The Power BI Retail Report is an exceptionally useful tool for analyzing sales through multidimensional views and gaining a detailed insight into business performance at the right point in time. Some of its capabilities and benefits are listed below:
 
 - Enables tracking sales and sold items through different time frames, as well as the most important segments of business, such as customers, vendors, stores, and salespersons.
-- Enables tracking the stock level per **Item Category** and **Items** over a period.
+- Enables tracking the stock level per item category and items over a period of time.
 - Enables monitoring of the starting and ending quantity of stocks, and the cumulative change per document type. 
 - Suitable for all decision-making levels.
 - Provides a quality set of information with multidimensional views.
