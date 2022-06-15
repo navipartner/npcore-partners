@@ -547,7 +547,7 @@
             until POSEntry2.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl", 'OnAfterLoadFromQuote', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl B", 'OnAfterLoadFromQuote', '', true, true)]
     local procedure POSActionLoadFromQuoteOnAfterLoadFromQuote(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";

@@ -1,128 +1,99 @@
-﻿codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
+codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-    var
-        Text000: Label 'Load POS Sale from POS saved Sale';
-        CannotLoad: Label 'The POS Saved Sale is missing essential data and cannot be loaded.';
-        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Code[20]
     begin
-        exit('LOAD_FROM_POS_QUOTE');
+        exit(Format(Enum::"NPR POS Workflow"::LOAD_FROM_POS_QUOTE));
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.4');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-          ActionCode(),
-          Text000,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Single)
-        then begin
-            Sender.RegisterWorkflowStep('select_quote',
-              'switch("" + param.QuoteInputType) {' +
-              '  case "0":' +
-              '    intpad({title: labels.SalesTicketNo, caption: labels.SalesTicketNo}).respond("SalesTicketNo").cancel(abort);' +
-              '    break;' +
-              '  case "1":' +
-              '    respond();' +
-              '    break;' +
-              '  case "2":' +
-              '    input({title: labels.SalesTicketNo, caption: labels.SalesTicketNo, notBlank: true}).respond("SalesTicketNo").cancel(abort);' +
-              '    break;' +
-              '}');
-            Sender.RegisterWorkflowStep('preview', 'if (param.PreviewBeforeLoad) { respond(); }');
-            Sender.RegisterWorkflowStep('load_from_quote', 'if (context.quote_entry_no) { respond(); }');
-            Sender.RegisterWorkflow(false);
-
-            Sender.RegisterOptionParameter('QuoteInputType', 'IntPad,List,Input', 'IntPad');
-            Sender.RegisterBooleanParameter('PreviewBeforeLoad', true);
-            Sender.RegisterOptionParameter('Filter', 'All,Register,Salesperson,Register+Salesperson', 'Register');
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
+        ParamPreviewBeforeLoad_CptLbl: Label 'Preview Before Load';
+        ParamPreviewBeforeLoad_DescLbl: Label 'Enable/Disable Preview parked sale before load';
+        ParamScanSalesTicketNo_CptLbl: Label 'Scan Sales Ticket No.';
+        ParamScanSalesTicketNo_DescLbl: Label 'Predefined Sales Ticket No.';
+        ParamFilterOptionsLbl: Label 'All,Register,Salesperson,Register+Salesperson', Locked = true;
+        ParamFilterOptions_CptLbl: Label 'All,Register,Salesperson,Register and Salesperson';
+        ParamFilter_CptLbl: Label 'Filter';
+        ParamFilter_DescLbl: Label 'Defines filter on POS Saved Sales';
+        ParamQuoteInputTypeOptionsLbl: Label 'IntPad,List,Input', Locked = true;
+        ParamQuoteInputTypeOptions_CptLbl: Label 'Numeric input,List,Text Input';
+        ParamQuoteInputType_CptLbl: Label 'Quote Input Type';
+        ParamQuoteInputType_DescLbl: Label 'Defines quote input type';
         POSEntry: Record "NPR POS Entry";
+        ActionDescription: Label 'Load POS Sale from POS saved Sale';
+
     begin
-        Captions.AddActionCaption(ActionCode(), 'SalesTicketNo', POSEntry.FieldCaption("Document No."));
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddBooleanParameter('PreviewBeforeLoad', true, ParamPreviewBeforeLoad_CptLbl, ParamPreviewBeforeLoad_DescLbl);
+        WorkflowConfig.AddTextParameter('ScanSalesTicketNo', '', ParamScanSalesTicketNo_CptLbl, ParamScanSalesTicketNo_DescLbl);
+        WorkflowConfig.AddOptionParameter('Filter',
+                                          ParamFilterOptionsLbl,
+                                          SelectStr(2, ParamFilterOptionsLbl),
+                                          ParamFilter_CptLbl,
+                                          ParamFilter_DescLbl,
+                                          ParamFilterOptions_CptLbl
+                                          );
+        WorkflowConfig.AddOptionParameter('QuoteInputType',
+                                          ParamQuoteInputTypeOptionsLbl,
+                                          SelectStr(1, ParamQuoteInputTypeOptionsLbl),
+                                          ParamQuoteInputType_CptLbl,
+                                          ParamQuoteInputType_DescLbl,
+                                          ParamQuoteInputTypeOptions_CptLbl
+                                          );
+        WorkflowConfig.AddLabel('SalesTicketNo', POSEntry.FieldCaption("Document No."));
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        JSON: Codeunit "NPR POS JSON Management";
+
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        case WorkflowStep of
+        case Step of
             'select_quote':
-                OnActionSelectQuote(JSON, POSSession, FrontEnd);
+                FrontEnd.WorkflowResponse(SelectQuote(Context));
             'preview':
-                OnActionPreview(JSON, FrontEnd);
+                FrontEnd.WorkflowResponse(Preview(Context));
             'load_from_quote':
-                OnActionLoadFromQuote(JSON, POSSession);
+                LoadFromQuote(Context);
         end;
     end;
 
-    local procedure OnActionSelectQuote(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure SelectQuote(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         SalePOS: Record "NPR POS Sale";
         POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         SalesTicketNo: Code[20];
-        LastQuoteEntryNo: BigInteger;
         "Filter": Integer;
+        POSSession: Codeunit "NPR POS Session";
     begin
-
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        Filter := JSON.GetIntegerParameterOrFail('Filter', ActionCode());
+        Filter := Context.GetIntegerParameter('Filter');
         POSQuoteMgt.SetSalePOSFilter(SalePOS, POSQuoteEntry, Filter);
 
-        SalesTicketNo := CopyStr(JSON.GetString('SalesTicketNo'), 1, MaxStrLen(SalesTicketNo));
+        SalesTicketNo := CopyStr(Context.GetStringParameter('ScanSalesTicketNo'), 1, MaxStrLen(SalesTicketNo));
         if SalesTicketNo = '' then begin
             if PAGE.RunModal(0, POSQuoteEntry) <> ACTION::LookupOK then
                 exit;
-
-            JSON.SetContext('quote_entry_no', POSQuoteEntry."Entry No.");
-            FrontEnd.SetActionContext(ActionCode(), JSON);
-
-            exit;
+        end else begin
+            POSQuoteEntry.SetRange("Sales Ticket No.", SalesTicketNo);
+            POSQuoteEntry.FindFirst();
         end;
 
-        POSQuoteEntry.SetRange("Sales Ticket No.", SalesTicketNo);
-        POSQuoteEntry.FindLast();
-        LastQuoteEntryNo := POSQuoteEntry."Entry No.";
-        POSQuoteEntry.FindFirst();
-        if POSQuoteEntry."Entry No." <> LastQuoteEntryNo then begin
-            if PAGE.RunModal(0, POSQuoteEntry) <> ACTION::LookupOK then
-                exit;
-        end;
+        Response.Add('quote_entry_no', POSQuoteEntry."Entry No.");
 
-        JSON.SetContext('quote_entry_no', POSQuoteEntry."Entry No.");
-        FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionPreview(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure Preview(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         QuoteEntryNo: BigInteger;
     begin
-        QuoteEntryNo := JSON.GetInteger('quote_entry_no');
+        QuoteEntryNo := Context.GetInteger('quote_entry_no');
         if QuoteEntryNo = 0 then
             exit;
 
@@ -132,96 +103,92 @@
         POSQuoteEntry.FilterGroup(2);
         POSQuoteEntry.SetRecFilter();
         POSQuoteEntry.FilterGroup(0);
-        IF Page.RunModal(Page::"NPR POS Saved Sale Card", POSQuoteEntry) <> Action::LookupOK then begin
-            JSON.SetContext('quote_entry_no', '');
-            FrontEnd.SetActionContext(ActionCode(), JSON);
-        end;
+        IF Page.RunModal(Page::"NPR POS Saved Sale Card", POSQuoteEntry) <> Action::LookupOK then
+            Response.Add('quote_entry_no', '');
+
     end;
 
-    local procedure OnActionLoadFromQuote(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure LoadFromQuote(Context: Codeunit "NPR POS JSON Helper")
     var
         SalePOS: Record "NPR POS Sale";
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        SalePOS2: Record "NPR POS Sale";
-        POSStore: Record "NPR POS Store";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         QuoteEntryNo: BigInteger;
+        POSSession: Codeunit "NPR POS Session";
+        CannotLoad: Label 'The POS Saved Sale is missing essential data and cannot be loaded.';
+        POSActionLoadPOSSvSlB: Codeunit "NPR POS Action: LoadPOSSvSl B";
+
     begin
-        QuoteEntryNo := JSON.GetIntegerOrFail('quote_entry_no', StrSubstNo(ReadingErr, ActionCode()));
+        QuoteEntryNo := Context.GetInteger('quote_entry_no');
         POSQuoteEntry.Get(QuoteEntryNo);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find();
 
-        if LoadFromQuote(POSQuoteEntry, SalePOS) then begin
-            // reload proper dimensions
-            POSSale.GetCurrentSale(SalePOS2);
-            POSStore.Get(SalePOS2."POS Store Code");
-            SalePOS."Location Code" := POSStore."Location Code";
-            SalePOS.Validate("POS Store Code", SalePOS2."POS Store Code");
-            SalePOS.Modify();
+        if POSActionLoadPOSSvSlB.LoadFromQuote(POSQuoteEntry, SalePOS) then
+            POSActionLoadPOSSvSlB.InsertParkedSale(POSQuoteEntry, SalePOS)
+        else
+            Error(CannotLoad);
+    end;
 
-            POSSale.Refresh(SalePOS);
-            POSSale.SetModified();
 
-            POSSession.GetSaleLine(POSSaleLine);
-            SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-            SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Payment);
-            if not SaleLinePOS.IsEmpty then
-                POSSaleLine.SetLast();
 
-            POSCreateEntry.InsertParkedSaleRetrievalEntry(
-              SalePOS."Register No.", SalePOS."Salesperson Code", POSQuoteEntry."Sales Ticket No.", SalePOS."Sales Ticket No.");
-            POSSession.RequestRefreshData();
-            exit;
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
+    local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
+    var
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
+        Text002: Label 'Parked Sales Ticket No.';
+    begin
+        if not EanBoxEvent.Get(EventCodeParkedSale()) then begin
+            EanBoxEvent.Init();
+            EanBoxEvent.Code := EventCodeParkedSale();
+            EanBoxEvent."Module Name" := Text002;
+            EanBoxEvent.Description := CopyStr(POSQuoteEntry.FieldCaption("Sales Ticket No."), 1, MaxStrLen(EanBoxEvent.Description));
+            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
+            EanBoxEvent."Event Codeunit" := Codeunit::"NPR POS Action: LoadPOSSvSl";
+            EanBoxEvent.Insert(true);
         end;
-
-        Error(CannotLoad);
     end;
 
-    local procedure DeletePOSSalesLines(SalePOS: Record "NPR POS Sale")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
+    begin
+        case EanBoxEvent.Code of
+            EventCodeParkedSale():
+                begin
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'ScanSalesTicketNo', true, '');
+                end;
+
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
+    local procedure SetEanBoxEventInScopeSalesTicketNo(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
     begin
-        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS.FindFirst() then
-            SaleLinePOS.DeleteAll(true);
+
+        if (EanBoxSetupEvent."Event Code" <> EventCodeParkedSale()) then
+            exit;
+
+        POSQuoteEntry.SetRange("Sales Ticket No.", EanBoxValue);
+        if not POSQuoteEntry.IsEmpty() then
+            InScope := true;
+
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeLoadFromPOSQuote(var SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        var XmlDoc: XmlDocument)
+    local procedure EventCodeParkedSale(): Code[20]
     begin
+        exit('PARKED_SALE');
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterLoadFromQuote(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
+    local procedure GetActionScript(): Text
     begin
-    end;
-
-    procedure LoadFromQuote(var POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale"): Boolean
-    var
-        POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
-        XmlDoc: XmlDocument;
-    begin
-        POSQuoteEntry.SkipLineDeleteTrigger(true);
-
-        if not POSQuoteMgt.LoadPOSSaleData(POSQuoteEntry, XmlDoc) then
-            exit(false);
-
-        OnBeforeLoadFromPOSQuote(SalePOS, POSQuoteEntry, XmlDoc);
-        DeletePOSSalesLines(SalePOS);
-
-        POSQuoteMgt.Xml2POSSale(XmlDoc, SalePOS);
-        OnAfterLoadFromQuote(POSQuoteEntry, SalePOS);
-        POSQuoteEntry.Delete(true);
-
-        exit(true);
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionLoadPOSSvSl.js###
+'let main=async({parameters:a,captions:t})=>{let e=a.ScanSalesTicketNo;switch(""+a.QuoteInputType){case"0":e=await popup.numpad({title:t.SalesTicketNo,caption:t.SalesTicketNo});break;case"2":e=await popup.input({title:t.SalesTicketNo,caption:t.SalesTicketNo});break;default:e=await workflow.respond("select_quote")}Object.keys(e).length!==0&&(a.PreviewBeforeLoad&&await workflow.respond("preview",e),await workflow.respond("load_from_quote",e))};'
+        );
     end;
 }

@@ -775,14 +775,14 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: SavePOSSvSl", 'OnBeforeSaveAsQuote', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: SavePOSSvSl B", 'OnBeforeSaveAsQuote', '', true, false)]
     local procedure OnBeforeSaveAsPOSQuote(var SalePOS: Record "NPR POS Sale")
     begin
         if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then
             Error(CannotParkWPSale);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl", 'OnBeforeLoadFromPOSQuote', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl B", 'OnBeforeLoadFromPOSQuote', '', true, false)]
     local procedure OnBeforeLoadPOSQuote(var SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var XmlDoc: XmlDocument)
     begin
         ClearSaleHdrNPREPresetFields(SalePOS, true);
