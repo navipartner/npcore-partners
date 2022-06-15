@@ -1,50 +1,40 @@
-### Setting POS Named Action Profile
+# Set up the POS Named Action Profile
+
+In order to have a working POS unit, certain actions need to be set correctly. This is done with the POS Named Actions profile.   
+Follow the provided steps to set all actions that need to be set in order to have a fully operational POS unit.
 
 Fist thing that needs to be done is create and set **POS Named Action Profile**.
 
-1. Search **POS Actions Profile**
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Actions Profiles** and choose the related link.
+2. Create **New**.    
+   The **POS Named Actions Profile** window is displayed.
+3. Type in the code in the **General** section.
+4. Populate the fields in the **Actions** section with the correct actions:
+   - **Login Action Code** (required) - add the action *LOGIN*.
+   - **Text Enter Action Code** (required) - add the action *TEXT_ENTER*.
+   - **Item Insert Action Code** (required) - add the action *ITEM*.
+   - **Payment Action Code** (required) - add the action *PAYMENT*.
+   - **Customer Action Code** (required) - add the action *INSERT_CUSTOMER* or *CUSTOMER_SELECT*.
+   - **Lock POS Action Code** - add the action *LOCK_POS*.
+   - **Unlock POS Action Code** - add the action *UNLOCK_POS*.
+   - **On Before Payment View Action Code** - populate this field with an action that should work before finishing the payment in the POS.
+   - **Idle Timeout Action Code** - add the action *SS_IDLE_TIMEOUT*.
+   - **Admin Menu Action Code** - add the action *SS_ADMIN_MENU*.
 
-![POS_ACTION_PROF](../images/Pos_Action_Prof.png)
-
-2. Create New.
-3. Type in the code
-
-
-Next thing to to is to set necessary actions in order to get POS working.
-On **Actions** tab there are fileds that need to be filled with correct action.
-Avaiable fields:
-1. **Login Action Code** - add action LOGIN
-2. **Text Enter Action Code** - add action TEXT_ENTER
-3. **Item Insert Action Code** - add action ITEM
-4. **Payment Action Code** - add action PAYMENT
-5. **Customer Action Code** - add action INSERT_CUSTOMER or CUSTOMER_SELECT
-6. **Lock POS Action Code** - add action LOCK_POS
-7. **Unlock POS Action Code** - add action UBLOCK_POS
-8. **On Before Payment View Action Code** - this filed should be populated with an action that should work before finishing payment in POS
-9. **Idle Timeout Action Code** - add action SS_IDLE_TIMEOUT
-10. **Admin Menu Action Code** - add action SS_ADMIN_MENU
+> [!Note]
+> All fields that are not marked as **(required)** are optional.
 
 ![POS_NAMED](../images/POS_Ac_Set.png)
 
+## Next steps
 
-Neceessay fields that must be filed are:
-1. **Login Action Code**
-2. **Text Enter Action Code**
-3. **Item Insert Action Code**
-4. **Payment Action Code**
-5. **Customer Action Code**
+### Add the POS Named Action Profile to the POS Unit
 
-All other fields are opptional.
+After setting up the POS Named Actions Profile, you need to add it to the POS Unit.
 
-### Add POS Named Action Profile on POS Unit
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit list** and choose the related link.
 
-Prepared POS Action Profile needs to be set on POS Unit.
-
-1. Search **POS Unit list**
-
-![POS_unit](../images/POS_UNIT_AC.png)
-
-2. Open POS unit card
-3. In filed **POS Named Action Profile** add prepared POS profile
+2. Open the **POS Unit Card**
+3. Provide the prepared POS profile in the **POS Named Action Profile** field. 
 
 ![POS_NAMED_PROFILE_ACC](../images/POS_NAM.png)
