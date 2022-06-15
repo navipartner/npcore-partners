@@ -1,8 +1,9 @@
 # Create a new voucher
 
-After Voucher type is created (for creating voucher type look at -link- to create voucher, voucher needs to be sold. 
+After the [voucher type](../explanation/Voucher_types.md) is created, the voucher needs to be sold.
 
-In POS should be created buttons for Issuing vouchers so voucher can be sold. Button must have Action – ISSUE_VOUCHER. Depending on parameters set on this button depends which voucher will be created with which amount and how much customer will pay for it.
+> [!Important]
+> Buttons for issuing vouchers should be created in the POS, so that the voucher can be sold. The button must have Action – ISSUE_VOUCHER. The parameters set on this button determine which voucher will be created with which amount, and how much the customer will pay for it.
 
 ![parameters](../images/parameters.png)
 
@@ -24,6 +25,8 @@ After button has been created, choose button and line with voucher will be added
 Go to payment and end sale.
 After sale is ended, in **Retail vouchers** list you will see new voucher created:
 
-![Vouchers](../images/List%20vouchers.png)
+![Vouchers](../images/List_vouchers.png)
 
 ## Related links:
+
+- [Voucher types](../explanation/Voucher_types.md)

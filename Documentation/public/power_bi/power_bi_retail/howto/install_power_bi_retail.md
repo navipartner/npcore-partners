@@ -27,7 +27,7 @@ Prior to the installation of the Power BI app, request a free BC account from th
    ![Install_Power_BI](./../images/Pic3.jpg)              
    When the application is installed, it will be added to your list in the **Apps** section.      
    ![Microsoft_Apps](./../images/Pic3a.png)
-4. If you've already installed the application, you can update it to the new version by selecting the first option in the in the update app pop-up window, or install a new copy by selecting the third option. After selecting the third option, you need to  add a new name of the installation app, and confirm it.    
+4. If you've already installed the application, you can update it to the new version by selecting the first option in the update app pop-up window, or install a new copy by selecting the third option. After selecting the third option, you need to  add a new name of the installation app, and confirm it.    
    ![Update_app](./../images/Pic4.jpg)
 5. Once the app is installed, click on the application name to open its content.     
    You can review the contents with the test data or connect to your test database from Business Central. 
