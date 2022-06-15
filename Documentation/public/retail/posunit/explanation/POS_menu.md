@@ -30,7 +30,7 @@ It's also possible to create support menus. They are used as popup menus.
 
 ![POPUP](../images/POPUP%20MENU.png)
 
-All menus are created in **POS Menu** page in Business Central.
+All menus are created in **POS Menus** page in Business Central.
 This page contains the list of all created menus. Menus can be defined for all POS units or for specific ones, in which case it is necessary to provide the **POS Unit No.** of that specific POS unit.    
 It is also possible to provide access to some menus to specific salespeople only, in which case the **Salesperson code** needs to be provided.  
 
