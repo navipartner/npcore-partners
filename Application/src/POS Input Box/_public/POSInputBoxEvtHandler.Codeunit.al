@@ -149,9 +149,28 @@
         if not POSSession.RetrieveSessionAction(EanBoxSetupEvent."Action Code", POSAction) then
             POSAction.Get(EanBoxSetupEvent."Action Code");
 
-        SetPOSActionParameters(EanBoxValue, EanBoxSetupEvent, POSAction, FrontEnd);
+        if (POSAction."Workflow Implementation" = POSAction."Workflow Implementation"::LEGACY) then
+            SetPOSActionParameters(EanBoxValue, EanBoxSetupEvent, POSAction, FrontEnd)
+        else
+            SetPOSActionParametersV3(EanBoxValue, EanBoxSetupEvent, POSAction);
+
         FrontEnd.InvokeWorkflow(POSAction);
     end;
+
+    local procedure SetPOSActionParametersV3(EanBoxValue: Text; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; var POSAction: Record "NPR POS Action")
+    var
+        EanBoxParameter: Record "NPR Ean Box Parameter";
+    begin
+        EanBoxParameter.SetRange("Setup Code", EanBoxSetupEvent."Setup Code");
+        EanBoxParameter.SetRange("Event Code", EanBoxSetupEvent."Event Code");
+        if not EanBoxParameter.FindSet() then
+            exit;
+
+        repeat
+            SetPOSActionParameterV3(EanBoxValue, EanBoxParameter, POSAction);
+        until EanBoxParameter.Next() = 0;
+    end;
+
 
     local procedure SetPOSActionParameters(EanBoxValue: Text; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; var POSAction: Record "NPR POS Action"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
@@ -165,6 +184,38 @@
         repeat
             SetPOSActionParameter(EanBoxValue, EanBoxParameter, POSAction, FrontEnd);
         until EanBoxParameter.Next() = 0;
+    end;
+
+    local procedure SetPOSActionParameterV3(EanBoxValue: Text; EanBoxParameter: Record "NPR Ean Box Parameter"; var POSAction: Record "NPR POS Action")
+    var
+        IntBuffer: Integer;
+        DecBuffer: Decimal;
+    begin
+        if EanBoxParameter."Ean Box Value" then
+            EanBoxParameter.Value := EanBoxValue;
+
+        case EanBoxParameter."Data Type" of
+            EanBoxParameter."Data Type"::Option:
+                begin
+                    POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, EanBoxParameter.OptionValueInteger);
+                end;
+            EanBoxParameter."Data Type"::Boolean:
+                begin
+                    POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, LowerCase(EanBoxParameter.Value) in ['yes', '1', 'true']);
+                end;
+            EanBoxParameter."Data Type"::Decimal:
+                begin
+                    Evaluate(DecBuffer, EanBoxParameter.Value);
+                    POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, DecBuffer);
+                end;
+            EanBoxParameter."Data Type"::Integer:
+                begin
+                    Evaluate(IntBuffer, EanBoxParameter.Value);
+                    POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, IntBuffer);
+                end;
+            else
+                POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, EanBoxParameter.Value);
+        end;
     end;
 
     local procedure SetPOSActionParameter(EanBoxValue: Text; EanBoxParameter: Record "NPR Ean Box Parameter"; var POSAction: Record "NPR POS Action"; FrontEnd: Codeunit "NPR POS Front End Management")

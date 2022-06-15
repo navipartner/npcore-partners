@@ -1,53 +1,30 @@
-﻿codeunit 6151004 "NPR POS Action: SavePOSSvSl"
+codeunit 6151004 "NPR POS Action: SavePOSSvSl" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        Text000: Label 'Save POS Sale as POS Quote';
-        Text001: Label 'POS Quote';
+        ParamConfirmBeforeSave_CptLbl: Label 'Confirm before sale';
+        ParamConfirmBeforeSale_DescLbl: Label 'Defines if confirm before sales is needed';
+        ParamConfirmText_CptLbl: Label 'Confirm Text';
+        ParamConfirmText_DescLbl: Label 'Defines confirm text';
+        ParamPrintAfterSave_CptLbl: Label 'Print After Save';
+        ParamPrintAfterSave_DescLbl: Label 'Defines if the system is going to print confirmation of saved sale';
+        ParamPrintTemplate_CptLbl: Label 'Print Template';
+        ParamPrintTemplate_DescLbl: Label 'Defines Print Template for printing after save';
+        ParamFullBackup_CptLbl: Label 'Full Backup';
+        ParamFullBackup_DescLbl: Label 'Full Backup';
         Text002: Label 'Save current Sale as POS Quote?';
-
-    local procedure ActionCode(): Code[20]
+        ActionDescription: Label 'Save POS Sale as POS Quote';
+        Text001: Label 'POS Quote';
     begin
-        exit('SAVE_AS_POS_QUOTE');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-          ActionCode(),
-          Text000,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Single)
-        then begin
-            Sender.RegisterWorkflowStep('confirm_save_as_quote',
-              'if (param.ConfirmBeforeSave) {' +
-                'confirm(labels["ConfirmLabel"], param.ConfirmText, true, true).no(abort);' +
-              '}'
-            );
-            Sender.RegisterWorkflowStep('save_as_quote', 'respond();');
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
-
-            Sender.RegisterBooleanParameter('ConfirmBeforeSave', true);
-            Sender.RegisterTextParameter('ConfirmText', Text002);
-            Sender.RegisterBooleanParameter('PrintAfterSave', false);
-            Sender.RegisterTextParameter('PrintTemplate', '');
-            Sender.RegisterBooleanParameter('FullBackup', false);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-        Captions.AddActionCaption(ActionCode(), 'ConfirmLabel', Text001);
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddBooleanParameter('ConfirmBeforeSave', true, ParamConfirmBeforeSave_CptLbl, ParamConfirmBeforeSale_DescLbl);
+        WorkflowConfig.AddTextParameter('ConfirmText', Text002, ParamConfirmText_CptLbl, ParamConfirmText_DescLbl);
+        WorkflowConfig.AddBooleanParameter('PrintAfterSave', false, ParamPrintAfterSave_CptLbl, ParamPrintAfterSave_DescLbl);
+        WorkflowConfig.AddTextParameter('PrintTemplate', '', ParamPrintTemplate_CptLbl, ParamPrintTemplate_DescLbl);
+        WorkflowConfig.AddBooleanParameter('FullBackup', false, ParamFullBackup_CptLbl, ParamFullBackup_DescLbl);
+        WorkflowConfig.AddLabel('ConfirmLabel', Text001);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
@@ -69,155 +46,48 @@
             POSParameterValue.Value := RPTemplateHeader.Code;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        JSON: Codeunit "NPR POS JSON Management";
+
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        case WorkflowStep of
+        case Step of
             'save_as_quote':
-                OnActionSaveAsQuote(JSON, POSSession);
+                SaveAsQuote(Context);
         end;
     end;
 
-    local procedure OnActionSaveAsQuote(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure SaveAsQuote(Context: Codeunit "NPR POS JSON Helper")
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        RPTemplateHeader: Record "NPR RP Template Header";
-        RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
+        POSSession: Codeunit "NPR POS Session";
         PrintAfterSave: Boolean;
         PrintTemplateCode: Code[20];
+        POSActSavePOSSvSlB: Codeunit "NPR POS Action: SavePOSSvSl B";
     begin
-        CreatePOSQuoteAndStartNewSale(POSSession, POSQuoteEntry);
+        POSActSavePOSSvSlB.CreatePOSQuoteAndStartNewSale(POSSession, POSQuoteEntry);
 
-        PrintAfterSave := JSON.GetBooleanParameter('PrintAfterSave');
+        PrintAfterSave := Context.GetBooleanParameter('PrintAfterSave');
+
         if not PrintAfterSave then
             exit;
 
-        PrintTemplateCode := CopyStr(JSON.GetStringParameter('PrintTemplate'), 1, MaxStrLen(PrintTemplateCode));
-        if not RPTemplateHeader.Get(PrintTemplateCode) then
-            exit;
-        RPTemplateHeader.CalcFields("Table ID");
-        if RPTemplateHeader."Table ID" <> DATABASE::"NPR POS Saved Sale Entry" then
-            exit;
+        PrintTemplateCode := CopyStr(Context.GetStringParameter('PrintTemplate'), 1, MaxStrLen(PrintTemplateCode));
 
-        POSQuoteEntry.SetRecFilter();
-        RPTemplateMgt.PrintTemplate(RPTemplateHeader.Code, POSQuoteEntry, 0);
-
+        POSActSavePOSSvSlB.PrintAfterSave(PrintTemplateCode, POSQuoteEntry);
     end;
 
-    procedure CreatePOSQuoteAndStartNewSale(POSSession: Codeunit "NPR POS Session"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry")
-    var
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
+    local procedure ActionCode(): Code[20]
     begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        CreatePOSQuote(SalePOS, POSQuoteEntry);
-        POSCreateEntry.InsertParkSaleEntry(SalePOS."Register No.", SalePOS."Salesperson Code");
-
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.DeleteAll();
-        SalePOS.Delete();
-        Commit();
-
-        POSSale.SelectViewForEndOfSale(POSSession);
+        exit(Format(Enum::"NPR POS Workflow"::SAVE_AS_POS_QUOTE));
     end;
 
-    procedure CreatePOSQuote(SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry")
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        LineNo: Integer;
+
+    local procedure GetActionScript(): Text
     begin
-        OnBeforeSaveAsQuote(SalePOS);
-
-        InsertPOSQuoteEntry(SalePOS, POSQuoteEntry);
-
-        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS.FindSet() then
-            repeat
-                InsertPOSQuoteLine(SaleLinePOS, POSQuoteEntry, LineNo);
-                if SaleLinePOS."EFT Approved" or SaleLinePOS."From Selection" then begin
-                    SaleLinePOS."EFT Approved" := false;
-                    SaleLinePOS."From Selection" := false;
-                    SaleLinePOS.Modify();
-                end;
-                SaleLinePOS.Delete(true);
-            until SaleLinePOS.Next() = 0;
-    end;
-
-    local procedure InsertPOSQuoteEntry(SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry")
-    var
-        POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
-        XmlDoc: XmlDocument;
-        OutStr: OutStream;
-    begin
-        POSQuoteEntry.Init();
-        POSQuoteEntry."Entry No." := 0;
-        POSQuoteEntry."Created at" := CurrentDateTime;
-        POSQuoteEntry."Register No." := SalePOS."Register No.";
-        POSQuoteEntry."Sales Ticket No." := SalePOS."Sales Ticket No.";
-        POSQuoteEntry."Salesperson Code" := SalePOS."Salesperson Code";
-        POSQuoteEntry."Customer Type" := SalePOS."Customer Type";
-        POSQuoteEntry."Customer No." := SalePOS."Customer No.";
-        POSQuoteEntry."Customer Price Group" := SalePOS."Customer Price Group";
-        POSQuoteEntry."Customer Disc. Group" := SalePOS."Customer Disc. Group";
-        POSQuoteEntry.Attention := SalePOS."Contact No.";
-        POSQuoteEntry.Reference := SalePOS.Reference;
-        POSQuoteEntry.SystemId := SalePOS.SystemId;
-        POSQuoteMgt.POSSale2Xml(SalePOS, XmlDoc);
-        POSQuoteEntry."POS Sales Data".CreateOutStream(OutStr, TEXTENCODING::UTF8);
-        XmlDoc.WriteTo(OutStr);
-        POSQuoteEntry.Insert(true, true);
-    end;
-
-    local procedure InsertPOSQuoteLine(SaleLinePOS: Record "NPR POS Sale Line"; POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var LineNo: Integer)
-    var
-        POSQuoteLine: Record "NPR POS Saved Sale Line";
-    begin
-        LineNo += 10000;
-
-        POSQuoteLine.Init();
-        POSQuoteLine."Quote Entry No." := POSQuoteEntry."Entry No.";
-        POSQuoteLine."Line No." := LineNo;
-        POSQuoteLine."Sale Line No." := SaleLinePOS."Line No.";
-        POSQuoteLine."Sale Date" := SaleLinePOS.Date;
-        POSQuoteLine."Sale Type" := SaleLinePOS."Sale Type";
-        POSQuoteLine.Type := SaleLinePOS.Type;
-        POSQuoteLine."No." := SaleLinePOS."No.";
-        POSQuoteLine."Variant Code" := SaleLinePOS."Variant Code";
-        POSQuoteLine.Description := SaleLinePOS.Description;
-        POSQuoteLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
-        POSQuoteLine.Quantity := SaleLinePOS.Quantity;
-        POSQuoteLine."Price Includes VAT" := SaleLinePOS."Price Includes VAT";
-        POSQuoteLine."Currency Code" := SaleLinePOS."Currency Code";
-        POSQuoteLine."Unit Price" := SaleLinePOS."Unit Price";
-        POSQuoteLine.Amount := SaleLinePOS.Amount;
-        POSQuoteLine."Amount Including VAT" := SaleLinePOS."Amount Including VAT";
-        POSQuoteLine."Customer Price Group" := SaleLinePOS."Customer Price Group";
-        POSQuoteLine."Discount Type" := SaleLinePOS."Discount Type";
-        POSQuoteLine."Discount %" := SaleLinePOS."Discount %";
-        POSQuoteLine."Discount Amount" := SaleLinePOS."Discount Amount";
-        POSQuoteLine."Discount Code" := SaleLinePOS."Discount Code";
-        POSQuoteLine."Discount Authorised by" := SaleLinePOS."Discount Authorised by";
-        POSQuoteLine."EFT Approved" := SaleLinePOS."EFT Approved";
-        POSQuoteLine.SystemId := SaleLinePOS.SystemId;
-        POSQuoteLine.Insert(true, true);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSaveAsQuote(var SalePOS: Record "NPR POS Sale")
-    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionSavePOSSvSl.js###
+'let main=async({parameters:e,captions:o})=>{if(e.ConfirmBeforeSave){if(await popup.confirm(e.ConfirmText,o.ConfirmLabel,!0,!0))return await workflow.respond("save_as_quote")}else return await workflow.respond("save_as_quote")};'
+        );
     end;
 }
 
