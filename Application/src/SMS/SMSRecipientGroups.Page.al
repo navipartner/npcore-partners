@@ -2,7 +2,6 @@
 {
     Extensible = False;
 
-
     Caption = 'SMS Recipient Groups';
     PageType = List;
     SourceTable = "NPR SMS Recipient Group";
@@ -10,6 +9,7 @@
     Editable = False;
     CardPageId = "NPR SMS Recipient Group";
     ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)

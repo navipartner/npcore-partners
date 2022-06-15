@@ -8,10 +8,8 @@
 
     Caption = 'Client Attribute Card';
     PageType = Card;
-    UsageCategory = Administration;
-
     SourceTable = "NPR Attribute";
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
 
     layout
     {

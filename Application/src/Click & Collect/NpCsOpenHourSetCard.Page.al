@@ -3,10 +3,8 @@
     Extensible = False;
     Caption = 'Collect Store Opening Hour Set Card';
     PageType = Card;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpCs Open. Hour Set";
-    ApplicationArea = NPRRetail;
 
     layout
     {

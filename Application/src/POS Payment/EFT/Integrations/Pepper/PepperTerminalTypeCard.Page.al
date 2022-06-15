@@ -6,10 +6,9 @@
 
     Caption = 'Pepper Terminal Type Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Pepper Terminal Type";
-    ApplicationArea = NPRRetail;
 
     layout
     {

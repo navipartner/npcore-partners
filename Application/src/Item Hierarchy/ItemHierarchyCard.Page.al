@@ -5,10 +5,8 @@
 
     Caption = 'Item Hierarchy Card';
     PageType = Card;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Item Hierarchy";
-    ApplicationArea = NPRRetail;
 
     layout
     {

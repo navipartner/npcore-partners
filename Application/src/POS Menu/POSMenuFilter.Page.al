@@ -4,10 +4,9 @@
     Caption = 'POS Menu Filter';
     DelayedInsert = true;
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR POS Menu Filter";
-    ApplicationArea = NPRRetail;
 
     layout
     {

@@ -4,9 +4,7 @@
     Caption = 'Item Worksheet Template';
     PageType = Card;
     SourceTable = "NPR Item Worksh. Template";
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
-
+    UsageCategory = None;
 
     layout
     {

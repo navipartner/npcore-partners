@@ -1,13 +1,10 @@
 ﻿page 6060071 "NPR MM Members. AutoRenew Card"
 {
     Extensible = False;
-
     Caption = 'Membership Auto Renew Card';
     PageType = Card;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR MM Membership Auto Renew";
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {

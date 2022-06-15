@@ -2,11 +2,11 @@
 {
     Caption = 'Magento Websites';
     InsertAllowed = false;
+
     PageType = List;
     SourceTable = "NPR Magento Website";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-
 
     layout
     {

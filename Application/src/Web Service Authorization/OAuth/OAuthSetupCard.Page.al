@@ -5,8 +5,7 @@
     Caption = 'OAuth Setup';
     PageType = Card;
     SourceTable = "NPR OAuth Setup";
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
 
     layout
     {

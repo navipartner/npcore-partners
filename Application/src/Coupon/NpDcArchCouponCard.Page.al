@@ -6,10 +6,9 @@
     Editable = false;
     InsertAllowed = false;
     PageType = Card;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpDc Arch. Coupon";
-    ApplicationArea = NPRRetail;
+
 
     layout
     {
