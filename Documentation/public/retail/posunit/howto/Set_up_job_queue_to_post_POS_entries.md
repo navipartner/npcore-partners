@@ -19,4 +19,6 @@ After the  sale is finalized, the POS entry is created. This entry has **Post it
     - **NPR Post Inventory Cost to G/L – Code Unit 6014683**    
      This job is used for posting inventory to G/L accounts.
 
+     ![6014683](../images/6014683.PNG)
+
 All data is automatically saved.
