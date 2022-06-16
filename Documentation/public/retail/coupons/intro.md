@@ -5,3 +5,5 @@ Coupons can provide discount to the sum of item prices on checkout if certain co
 ### Related link
 
 - [Create a new coupon](./howto/create_new_coupons.md)
+- [Coupon types](./explanation/coupon_types.md)
+- [Vouchers](../Vouchers/intro.md)
