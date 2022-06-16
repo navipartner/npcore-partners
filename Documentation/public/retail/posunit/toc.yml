@@ -38,3 +38,5 @@
     href: howto/add_button_to_pos_menu.md
   - name: Set up the POS Named Action Profile
     href: howto/Named_Action_Code.md
+  - name: Set up the POS Global Sales Profile
+    href: howto/POS_Global.md
