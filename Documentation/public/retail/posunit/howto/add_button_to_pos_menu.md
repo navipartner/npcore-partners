@@ -30,3 +30,8 @@ To create new buttons in the POS menu, follow the provided steps:
    - **Salesperson Code** - if the button needs to be seen only by one salesperson, the salesperson's code needs to be stated here.
 
 All data is automatically saved. 
+
+### Related links
+
+- [POS menu](../explanation/POS_menu.md)
+- [Create a new item button in the POS](Create_a_new_item_button_in_the_POS.md)

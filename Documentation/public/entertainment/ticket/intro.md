@@ -1,12 +1,15 @@
 # Ticket module
 
-The ticket module in NPRetail is used for managing tickets, which are essentially a type of vouchers, that entitle the holder to an admission to an event or an establishment such as an amusement park, concert or a tourist attraction.
+The ticket module in NPRetail is used for managing tickets. A Ticket is an entity that links all properties and characteristics of a specific issued ticket. From a user's perspective, this represents the physical ticket that the user has acquired.
+
+The ticket information structure is complex and consists of several entities which can present its capabilities and capture all events when a ticket is used.
+
 
 ### Related links
 
-- [Tickets](./explanation/ticket.md)
-- [Ticket Designer](./tutorial/TicketDesigner.md)
-- [Ticket Admission](./explanation/admission.md)
+- [Ticket designer](./tutorial/TicketDesigner.md)
+- [Ticket admission](./explanation/admission.md)
+- [Dynamic ticket](explanation/DynamicTicket.md)
 - [Location vs. reservation](./explanation/locationVsReservation.md)
 - [Authorization code](./explanation/AuthorizationCode.md)
 - [Admission dependency code](./explanation/AdmissionDependencyCode.md)
@@ -15,3 +18,4 @@ The ticket module in NPRetail is used for managing tickets, which are essentiall
 - [Create notification profile](./howto/CreateNotificationProfile.md)
 - [Refund tickets](./howto/RefundingTickets.md)
 - [Set up refund policy](./howto/SetUpRefundPolicy.md)
+- [Create setup for a ticket](./tutorial/ticket_tutorial.md)

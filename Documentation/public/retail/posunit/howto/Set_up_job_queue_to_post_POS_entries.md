@@ -1,6 +1,6 @@
 # Set up job queue to post POS entries
 
-After the  sale is finalized, the POS entry is created. This entry has **Post item entry status** and **Post Entry Status** - UNPOSTED. The entry can be posted manually, but it is more common to create jobs in **Job Queue Entry**, which will post the entry. To set up this flow, follow the provided steps:
+After the  sale is finalized, the POS entry is created. This entry has **Post item entry status** and **Post Entry Status** - UNPOSTED. The entry can be [posted manually](manually_post_POS_entries.md), but it is more common to create jobs in **Job Queue Entry**, which will post the entry. To set up this flow, follow the provided steps:
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Job Queue Entries** and choose the related link.     
 
@@ -22,3 +22,7 @@ After the  sale is finalized, the POS entry is created. This entry has **Post it
      ![6014683](../images/6014683.PNG)
 
 All data is automatically saved.
+
+### Related links
+
+- [Manually post POS entries and check if they're posted](manually_post_POS_entries.md)

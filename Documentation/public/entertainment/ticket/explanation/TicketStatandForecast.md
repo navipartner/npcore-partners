@@ -50,6 +50,5 @@ In **Periodtype** you then choose between:
 
 ### Related links
 
-- [Tickets](../intro.md)
 - [Ticket admission](./admission.md)
 - [Issue tickets from Business Central](../howto/issue_ticket.md)
