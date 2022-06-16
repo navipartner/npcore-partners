@@ -34,7 +34,7 @@ After setting up the POS Named Actions Profile, you need to add it to the POS Un
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit list** and choose the related link.
 
-2. Open the **POS Unit Card**
+2. Open the **POS Unit Card**.
 3. Provide the prepared POS profile in the **POS Named Action Profile** field. 
 
 ![POS_NAMED_PROFILE_ACC](../images/POS_NAM.png)

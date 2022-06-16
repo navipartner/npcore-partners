@@ -6,8 +6,8 @@ In the **General** section the following fields can be defined:
 
 | Field Name      | Description |
 | ----------- | ----------- |
-| **Code**       | Unique code for coupon.     |
-| **Description**   | Short description of a coupon.        |
+| **Code**       | The unique code for coupon.     |
+| **Description**   | The short description of a coupon.        |
 | **Discount Type**  | You can choose between two methods of conveying discounts - **Discount amount** or **Discount %**. |
 | **Discount Amount** | The amount that will be on the coupon. |
 | **Discount %** | The discount percentage that the customer gets with the coupon. |
@@ -21,7 +21,7 @@ In the **General** section the following fields can be defined:
 
 For example, the coupon from the screenshot above will give a discount amount of 65 to the customer and it is possible to apply it in all stores.
 
-In the **Issue coupon** section it must be defined how the coupon will be issued:
+In the **Issue coupon** section you can define how the coupon will be issued:
 
 | Field Name      | Description |
 | ----------- | ----------- |
