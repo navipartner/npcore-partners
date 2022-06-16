@@ -12,6 +12,8 @@
     href: explanation/POS_unit_Receipt_profile.md
   - name: POS input box profile
     href: explanation/POS_input_box_profile.md
+  - name: POS audit profile
+    href: explanation/POS_audit_profile.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
