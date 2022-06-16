@@ -15,7 +15,7 @@
   - name: POS audit profile
     href: explanation/POS_audit_profile.md
   - name: POS view profile
-    href: explanation/POSUnit.md
+    href: explanation/POS_view_profile.md
 - name: How-To  
   items:
   - name: Create a new POS Unit

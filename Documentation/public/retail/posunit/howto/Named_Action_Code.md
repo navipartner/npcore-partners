@@ -38,3 +38,9 @@ After setting up the POS Named Actions Profile, you need to add it to the POS Un
 3. Provide the prepared POS profile in the **POS Named Action Profile** field. 
 
 ![POS_NAMED_PROFILE_ACC](../images/POS_NAM.png)
+
+### Related links
+
+- [Set up the POS Global Sales Profile](POS_Global.md)
+- [POS view profile](../explanation/POS_view_profile.md)
+- [POS unit Receipt Text Profile](../explanation/POS_unit_Receipt_profile.md)
