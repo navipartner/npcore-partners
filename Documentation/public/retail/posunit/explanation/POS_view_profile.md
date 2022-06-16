@@ -30,3 +30,10 @@ The following options are available in the **Name and Date Formatting** section:
 | **Client Day Names** |  Names of days of week. Days should be inserted with comma between names. |
 
 ![nameanddate](../images/Name%20and%20date.PNG)
+
+### Related links
+
+- [POS unit](POSUnit.md)
+- [POS unit receipt profile](POS_unit_Receipt_profile.md)
+- [Set up the POS Global Sales Profile](../howto/POS_Global.md)
+- [Set up the POS Named Action Profile](../howto/Named_Action_Code.md)
