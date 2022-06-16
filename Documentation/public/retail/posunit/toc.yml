@@ -30,3 +30,5 @@
     href: howto/Create_a_new_item_button_in_the_POS.md
   - name: Create a new button in the POS menu
     href: howto/add_button_to_pos_menu.md
+  - name: Set up the POS Named Action Profile
+    href: howto/Named_Action_Code.md
