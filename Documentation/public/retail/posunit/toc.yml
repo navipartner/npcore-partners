@@ -8,6 +8,10 @@
     href: explanation/POS_Self_Service_Actions.md
   - name: POS menu
     href: explanation/POS_menu.md
+  - name: POS unit receipt text profile
+    href: explanation/POS_unit_Receipt_profile.md
+  - name: POS input box profile
+    href: explanation/POS_input_box_profile.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
