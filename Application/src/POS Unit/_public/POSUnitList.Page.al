@@ -16,50 +16,50 @@
             {
                 field("No."; Rec."No.")
                 {
-                    ToolTip = 'Specifies the unique number for each POS Unit.';
+                    ToolTip = 'Defines number of POS Unit';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ToolTip = 'Specifies the Name of the POS Unit.';
+                    ToolTip = 'Defines name of POS Unit';
                     ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ToolTip = 'Displays Status for each POS Unit which includes: Open,Closed,End of Day. ';
+                    ToolTip = 'Defines in which status POS is: 1. Open POS is active in the moment, 2. Closed POS is closed in the moment, end of day is done, 3. End of Day POS is in the process of end of day in the moment';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-                    ToolTip = 'Specifies an unique Code for each POS Store.';
+                    ToolTip = 'Defines to which store is assigned a POS unit';
                     ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ToolTip = 'Specifies the default Global Dimension 1 Code for the POS Unit.';
+                    ToolTip = 'Dimension value of Global dimension 1 assigned to POS Unit';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ToolTip = 'Specifies the default Global Dimension 2 Code for the POS Unit.';
+                    ToolTip = 'Dimension value of Global dimension 2 assigned to POS Unit';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field("POS Sales Workflow Set"; Rec."POS Sales Workflow Set")
                 {
-                    ToolTip = 'Specifies the value of the POS Sales Workflow Set field.';
+                    ToolTip = 'Defines Scenarios Profile attached to Unit. Depending on scenario profile will initiate defined actions in POS';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Type"; Rec."POS Type")
                 {
-                    ToolTip = 'Specifies the type of the POS unit.';
+                    ToolTip = 'Specifies POS Type: 1. Full/Fixed normal cash register, 2. Unattended used for Self-service, 3. mPOS, 4. External';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Bin"; Rec."Default POS Payment Bin")
                 {
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the default value of the POS Payment Bin.';
+                    ToolTip = 'Defines Payment Bin attached to POS Unit';
                     ApplicationArea = NPRRetail;
                 }
             }
