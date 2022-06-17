@@ -16,6 +16,13 @@
         {
             Caption = 'Fiscal Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by field 11 "Fiskaly Payment Type"';
+        }
+        field(11; "Fiskaly Payment Type"; Enum "NPR DE Fiskaly Payment Type")
+        {
+            Caption = 'Fiskaly Payment Type';
+            DataClassification = CustomerContent;
         }
         field(20; "DSFINVK Type"; Enum "NPR DSFINVK Payment Type")
         {
