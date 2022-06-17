@@ -551,13 +551,11 @@
                         SalesHeader."Bill-to Address 2" := SalesHeader."Sell-to Address 2";
                         SalesHeader."Bill-to Post Code" := SalesHeader."Sell-to Post Code";
                         SalesHeader."Bill-to City" := SalesHeader."Sell-to City";
-                        SalesHeader."NPR Bill-to Company" := '';
                         SalesHeader."Bill-to Contact" := SalesHeader."Sell-to Contact";
                         SalesHeader."Bill-to Contact No." := SalesHeader."Sell-to Contact No.";
                         SalesHeader."Bill-to Country/Region Code" := SalesHeader."Sell-to Country/Region Code";
                         SalesHeader."Bill-to County" := SalesHeader."Sell-to County";
                         SalesHeader."NPR Bill-to E-mail" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement2, 'email', MaxStrLen(SalesHeader."NPR Bill-to E-mail"), false), 1, MaxStrLen(SalesHeader."NPR Bill-to E-mail"));
-
                         SalesHeader."Ship-to Name" := SalesHeader."Sell-to Customer Name";
                         SalesHeader."Ship-to Name 2" := SalesHeader."Sell-to Customer Name 2";
                         SalesHeader."Ship-to Address" := SalesHeader."Sell-to Address";

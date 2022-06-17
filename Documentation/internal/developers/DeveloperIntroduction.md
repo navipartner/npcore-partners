@@ -137,7 +137,12 @@ https://github.com/microsoft/ALAppExtensions/tree/main/Modules/System/Azure%20Ke
 They also have some additional notes on these ideas on their docs portal here: 
 https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-blueprint#object-accessibility
 
+## Internal procedures to Public
+**Internal procedures should not be converted to public ones.** Instead of making existing internal procedures public and exposing more of the code, better would be to create a facade codeunit that will call internal procedure, as standard is doing it.
 
+![image.png](.attachments/FacadeExample.png)
+
+As you can see in the example above, a new public codeunit is created with a public procedure that is calling the existing internal procedure.
 # Code Review
 Do not be afraid to write feedback on a colleagues pull request - we all have to learn and improve :)
 And try not to take it personal if your pull request is failed in the first go.

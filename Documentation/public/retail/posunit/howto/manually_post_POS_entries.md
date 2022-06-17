@@ -17,3 +17,7 @@ To post an entry manually, follow the provided steps:
 
 > [!Note]
 > If you wish to simultaneously post multiple entries, instead of **Post Entry**, use the **Post Range** option.
+
+### Related links
+
+- [Set up job queue to automatically post POS entries](./Set_up_job_queue_to_post_POS_entries.md)

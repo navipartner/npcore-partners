@@ -13,7 +13,7 @@
         FillTransactionData();
 
         DSFINVKJson.Add('head', GetHeader());
-        DSFINVKJson.Add('client_id', Format(DePosUnit."Client ID", 0, 4));
+        DSFINVKJson.Add('client_id', Format(DePosUnit.SystemId, 0, 4));
         DSFINVKJson.Add('cash_point_closing_export_id', DSFINVKClosing."DSFINVK Closing No.");
         DSFINVKJson.Add('cash_statement', CreateCashStatement());
         DSFINVKJson.Add('transactions', CreateTransactions());

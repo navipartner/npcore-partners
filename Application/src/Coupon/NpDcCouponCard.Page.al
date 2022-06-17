@@ -5,10 +5,10 @@
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR NpDc Coupon";
-    ApplicationArea = NPRRetail;
+
 
     layout
     {

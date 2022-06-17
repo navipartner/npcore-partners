@@ -3,12 +3,12 @@
     Extensible = False;
     Caption = 'Event Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
     PromotedActionCategories = 'New,Process,Report,Prices,Tickets';
     RefreshOnActivate = true;
     SourceTable = Job;
     SourceTableView = WHERE("NPR Event" = CONST(true));
-    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)

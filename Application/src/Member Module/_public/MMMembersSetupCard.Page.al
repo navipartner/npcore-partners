@@ -2,9 +2,8 @@
 {
     Caption = 'Membership Setup Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR MM Membership Setup";
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {

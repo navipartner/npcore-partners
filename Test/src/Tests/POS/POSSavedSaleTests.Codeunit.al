@@ -43,8 +43,8 @@ codeunit 85007 "NPR POS Saved Sale Tests"
         Assert: Codeunit "Assert";
         SaleEnded: Boolean;
         POSEntry: Record "NPR POS Entry";
-        POSActionSavePOSQuote: codeunit "NPR POS Action: SavePOSSvSl";
-        POSActionLoadPOSQuote: codeunit "NPR POS Action: LoadPOSSvSl";
+        POSActionSavePOSQuote: codeunit "NPR POS Action: SavePOSSvSl B";
+        POSActionLoadPOSQuote: codeunit "NPR POS Action: LoadPOSSvSl B";
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         POSQuoteLine: Record "NPR POS Saved Sale Line";
         PreviousSaleSystemId: Guid;

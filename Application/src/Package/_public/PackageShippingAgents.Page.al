@@ -2,7 +2,6 @@
 {
     Extensible = true;
     UsageCategory = Administration;
-
     CardPageID = "NPR Package Shipping agent";
     PageType = List;
     SourceTable = "NPR Package Shipping Agent";

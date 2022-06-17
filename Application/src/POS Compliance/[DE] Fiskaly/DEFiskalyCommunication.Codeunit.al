@@ -1,232 +1,375 @@
 ﻿codeunit 6014445 "NPR DE Fiskaly Communication"
 {
     Access = Internal;
+
+    procedure SendDocument(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info")
+    var
+        DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
+    begin
+        if not TrySendDocument(DeAuditAux) then
+            DEAuditMgt.SetErrorMsg(DeAuditAux);
+        DeAuditAux.Modify();
+    end;
+
+    #region manage Transactions
     [TryFunction]
-    procedure SendDocument(var DeAuditAuxPar: Record "NPR DE POS Audit Log Aux. Info"; DocumentJsonObject: JsonObject; var ResponseJsonObject: JsonObject; var DEAuditSetupPar: Record "NPR DE Audit Setup")
+    local procedure TrySendDocument(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info")
     var
-        POSEntry: Record "NPR POS Entry";
-        StrOut: OutStream;
+        DETSS: Record "NPR DE TSS";
+        POSUnitAux: Record "NPR DE POS Unit Aux. Info";
     begin
-        POSEntry.Get(DeAuditAuxPar."POS Entry No.");
-        PosUnitAuxDE.Get(POSEntry."POS Unit No.");
-        GetContext();
-        TransactionID := Format(DeAuditAuxPar."Transaction ID", 0, 4);
-        if DeAuditAuxPar."Fiscalization Status" = DeAuditAuxPar."Fiscalization Status"::"Not Fiscalized" then begin
-            StartTransaction();
-            DeAuditAuxPar."Fiscalization Status" := DeAuditAuxPar."Fiscalization Status"::"Transaction Started";
-            DeAuditAuxPar."Last Revision" := LastRevision;
-        end;
+        DeAuditAux.TestField("Transaction ID");
+        DeAuditAux.TestField("Client ID");
+        POSUnitAux.GetBySystemId(DeAuditAux."Client ID");
+        POSUnitAux.TestField("Fiskaly Client Created at");
 
-        DEAuditSetupPar."Last Fiskaly Context".CreateOutStream(StrOut, TextEncoding::UTF8);
-        StrOut.Write(LastContext);
+        DeAuditAux.TestField("TSS Code");
+        DETSS.Get(DeAuditAux."TSS Code");
+        DETSS.TestField("Fiskaly TSS Created at");
+        DeAuditAux.TestField("TSS ID", DETSS.SystemId);
 
-        if LastRevision = '' then
-            LastRevision := DeAuditAuxPar."Last Revision";
+        if DeAuditAux."Fiscalization Status" = DeAuditAux."Fiscalization Status"::"Not Fiscalized" then
+            StartTransaction(DeAuditAux);
 
-        ResponseJsonObject := EndTransaction(DocumentJsonObject);
-        DeAuditAuxPar."Last Revision" := LastRevision;
-        Clear(StrOut);
-        DEAuditSetupPar."Last Fiskaly Context".CreateOutStream(StrOut, TextEncoding::UTF8);
-        StrOut.Write(LastContext);
+        EndTransaction(DeAuditAux);
     end;
 
-    [NonDebuggable]
-    local procedure GetContext()
+    local procedure StartTransaction(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info")
     var
-        ParamsJson: JsonObject;
-        ResponseObject: JsonObject;
-        StreamIn: InStream;
+        RequestBody: JsonObject;
     begin
-        DEAuditSetup.Get();
-        DEAuditSetup.CalcFields("Last Fiskaly Context");
-        if DEAuditSetup."Last Fiskaly Context".HasValue then begin
-            DEAuditSetup."Last Fiskaly Context".CreateInStream(StreamIn, TextEncoding::UTF8);
-            StreamIn.ReadText(LastContext);
+        RequestBody.Add('state', Enum::"NPR DE Fiskaly Trx. State".Names().Get(Enum::"NPR DE Fiskaly Trx. State".Ordinals().IndexOf(Enum::"NPR DE Fiskaly Trx. State"::ACTIVE.AsInteger())));
+        RequestBody.Add('client_id', Format(DeAuditAux."Client ID", 0, 4));
+        SendTransaction(DeAuditAux, RequestBody);
+    end;
+
+    local procedure EndTransaction(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info")
+    var
+        DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
+        RequestBody: JsonObject;
+    begin
+        DEAuditMgt.CreateDocumentJson(DeAuditAux, Enum::"NPR DE Fiskaly Trx. State"::FINISHED, RequestBody);
+        SendTransaction(DeAuditAux, RequestBody);
+    end;
+
+    local procedure SendTransaction(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; RequestBody: JsonObject)
+    var
+        DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
+        ResponseJson: JsonToken;
+        Url: Text;
+        TrxUploadErr: Label 'Error while trying to send a transaction to Fiskaly.\%1';
+    begin
+        Url := StrSubstNo('/tss/%1/tx/%2?tx_revision=%3', Format(DeAuditAux."TSS ID", 0, 4), Format(DeAuditAux."Transaction ID", 0, 4), DeAuditAux."Latest Revision" + 1);
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, 'PUT', Url, GetJwtToken()) then
+            Error(TrxUploadErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+        if not DEAuditMgt.DeAuxInfoInsertResponse(DeAuditAux, ResponseJson) then
+            Error(GetLastErrorText());
+    end;
+
+    procedure GetTransaction(TssId: Guid; TransactionId: Guid; TransactionRevision: Integer) ResponseJson: JsonToken
+    var
+        RequestBody: JsonObject;
+        Url: Text;
+        TxGetErr: Label 'Error while trying to get a transaction from Fiskaly.\%1';
+    begin
+        Url := StrSubstNo('/tss/%1/tx/%2', Format(TssId, 0, 4), Format(TransactionId, 0, 4));
+        if TransactionRevision > 0 then
+            Url := Url + StrSubstNo('?tx_revision=%1', TransactionRevision);
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, 'GET', Url, GetJwtToken()) then
+            Error(TxGetErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+    end;
+    #endregion
+
+    #region manage Technical Security Systems (TSS)
+    procedure CreateTSS(var DETSS: Record "NPR DE TSS")
+    var
+        RequestBody: JsonObject;
+        RequestMetadata: JsonObject;
+        ResponseJson: JsonToken;
+        TSSCreateErr: Label 'Error while trying to create a new Technical Security System (TSS) at Fiskaly.\%1';
+    begin
+        DETSS.TestField(SystemId);
+        DETSS.TestField("Fiskaly TSS Created at", 0DT);
+
+        RequestMetadata.Add('company', CompanyName);
+        RequestMetadata.Add('bc_code', DETSS.Code);
+        RequestMetadata.Add('bc_desription', DETSS.Description);
+        RequestBody.Add('metadata', RequestMetadata);
+
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, 'PUT', StrSubstNo('/tss/%1', Format(DETSS.SystemId, 0, 4)), GetJwtToken()) then
+            Error(TSSCreateErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+
+        UpdateDeTssWithDataFromFiskaly(DETSS, ResponseJson);
+
+        if DETSS."Fiskaly TSS State".AsInteger() < DETSS."Fiskaly TSS State"::UNINITIALIZED.AsInteger() then
+            UpdateTSS_State(DETSS, DETSS."Fiskaly TSS State"::UNINITIALIZED, true);
+
+        UpdateTSS_AdminPIN(DETSS, '');
+
+        if DETSS."Fiskaly TSS State".AsInteger() < DETSS."Fiskaly TSS State"::INITIALIZED.AsInteger() then begin
+            TSS_AuthenticateAdmin(DETSS);
+            UpdateTSS_State(DETSS, DETSS."Fiskaly TSS State"::INITIALIZED, true);
+            TSS_LogoutAdmin(DETSS);
+        end;
+    end;
+
+    procedure UpdateTSS_AdminPIN(var DETSS: Record "NPR DE TSS"; NewAdminPIN: Text)
+    var
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+        TSSUpdateErr: Label 'Error while trying to set new admin PIN for a Technical Security System (TSS) at Fiskaly.\%1';
+    begin
+        DETSS.TestField(SystemId);
+        DETSS.TestField("Fiskaly TSS Created at");
+
+        if NewAdminPIN = '' then
+            NewAdminPIN := GenerateNewRandomPIN(6);
+
+        RequestBody.Add('admin_puk', DESecretMgt.GetSecretKey(DETSS.AdminPUKSecretLbl()));
+        RequestBody.Add('new_admin_pin', NewAdminPIN);
+
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, 'PATCH', StrSubstNo('/tss/%1/admin', Format(DETSS.SystemId, 0, 4)), GetJwtToken()) then
+            Error(TSSUpdateErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+
+        DESecretMgt.SetSecretKey(DETSS.AdminPINSecretLbl(), NewAdminPIN);
+        Commit();
+    end;
+
+    procedure TSS_AuthenticateAdmin(DETSS: Record "NPR DE TSS")
+    var
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+        TSSAdminAuthErr: Label 'Error while trying to authenticate admin of a Technical Security System (TSS) at Fiskaly.\%1';
+    begin
+        DETSS.TestField(SystemId);
+        DETSS.TestField("Fiskaly TSS Created at");
+
+        RequestBody.Add('admin_pin', DESecretMgt.GetSecretKey(DETSS.AdminPINSecretLbl()));
+
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, 'POST', StrSubstNo('/tss/%1/admin/auth', Format(DETSS.SystemId, 0, 4)), GetJwtToken()) then
+            Error(TSSAdminAuthErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+    end;
+
+    procedure TSS_LogoutAdmin(DETSS: Record "NPR DE TSS")
+    var
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+    begin
+        DETSS.TestField(SystemId);
+        DETSS.TestField("Fiskaly TSS Created at");
+
+        SendRequest_signDE_V2(RequestBody, ResponseJson, 'POST', StrSubstNo('/tss/%1/admin/logout', Format(DETSS.SystemId, 0, 4)), GetJwtToken());
+    end;
+
+    procedure UpdateTSS_State(var DETSS: Record "NPR DE TSS"; NewState: Enum "NPR DE TSS State"; UpdateBCInfo: Boolean)
+    var
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+        TSSUpdateErr: Label 'Error while trying to update a Technical Security System (TSS) at Fiskaly.\%1';
+    begin
+        DETSS.TestField(SystemId);
+        DETSS.TestField("Fiskaly TSS Created at");
+
+        RequestBody.Add('state', Enum::"NPR DE TSS State".Names().Get(Enum::"NPR DE TSS State".Ordinals().IndexOf(NewState.AsInteger())));
+
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, 'PATCH', StrSubstNo('/tss/%1', Format(DETSS.SystemId, 0, 4)), GetJwtToken()) then
+            Error(TSSUpdateErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+
+        if UpdateBCInfo then
+            UpdateDeTssWithDataFromFiskaly(DETSS, ResponseJson);
+    end;
+
+    procedure GetTSSList()
+    var
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+        TSSListAccessErr: Label 'Error while retrieving list of Technical Security Systems (TSS) from Fiskaly.\%1';
+    begin
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, 'GET', '/tss', GetJwtToken()) then
+            Error(TSSListAccessErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+        UpdateDeTssListFromFiskaly(ResponseJson);
+    end;
+
+    local procedure UpdateDeTssListFromFiskaly(ResponseJson: JsonToken)
+    var
+        DETSS: Record "NPR DE TSS";
+        JToken: JsonToken;
+        TssObject: JsonToken;
+        TssObjects: JsonToken;
+    begin
+        if not ResponseJson.SelectToken('data', TssObjects) then
             exit;
+        if not TssObjects.IsArray() then
+            exit;
+        foreach TssObject in TssObjects.AsArray() do begin
+            TssObject.SelectToken('_id', JToken);
+            FindOrCreateNewDeTss(DETSS, JToken.AsValue().AsText());
+            UpdateDeTssWithDataFromFiskaly(DETSS, TssObject);
+        end;
+    end;
+
+    local procedure FindOrCreateNewDeTss(var DETSS: Record "NPR DE TSS"; TSS_Id: Guid)
+    begin
+        if DETSS.GetBySystemId(TSS_Id) then
+            exit;
+        DETSS.Code := '0001';
+        while DETSS.Find() do
+            DETSS.Code := IncStr(DETSS.Code);
+        DETSS.Init();
+        DETSS.SystemId := TSS_Id;
+        DETSS.Insert(false, true);
+    end;
+
+    local procedure UpdateDeTssWithDataFromFiskaly(var DETSS: Record "NPR DE TSS"; ResponseJson: JsonToken)
+    var
+        TypeHelper: Codeunit "Type Helper";
+        JToken: JsonToken;
+        Description: Text[100];
+        State: Text;
+    begin
+        if ResponseJson.SelectToken('time_creation', JToken) then
+            DETSS."Fiskaly TSS Created at" := TypeHelper.EvaluateUnixTimestamp(JToken.AsValue().AsBigInteger());
+
+        if ResponseJson.SelectToken('description', JToken) then begin
+            Description := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(Description));
+            if (Description <> '') and (DETSS.Description <> Description) then
+                DETSS.Description := Description;
         end;
 
-        ParamsJson.Add('api_key', DEAuditSetup.GetApiKey());
-        ParamsJson.Add('api_secret', DEAuditSetup.GetApiSecret());
-        ParamsJson.Add('base_url', DEAuditSetup."Api URL");
+        ResponseJson.SelectToken('state', JToken);
+        State := JToken.AsValue().AsText();
+        if not Enum::"NPR DE TSS State".Names().Contains(State) then
+            DETSS."Fiskaly TSS State" := DETSS."Fiskaly TSS State"::Unknown
+        else
+            DETSS."Fiskaly TSS State" := Enum::"NPR DE TSS State".FromInteger(Enum::"NPR DE TSS State".Ordinals().Get(Enum::"NPR DE TSS State".Names().IndexOf(State)));
+        DETSS.Modify();
 
-        SendRequest(CreateRequestBody(ParamsJson, 'create-context'), ResponseObject);
+        if ResponseJson.SelectToken('admin_puk', JToken) then
+            DESecretMgt.SetSecretKey(DETSS.AdminPUKSecretLbl(), JToken.AsValue().AsText());
+        Commit();
     end;
 
-    local procedure StartTransaction()
+    procedure GenerateNewRandomPIN(Length: Integer): Text
     var
-        RequestObject: JsonObject;
-        HeadersObject: JsonObject;
+        Counter: Integer;
+        Digit: Integer;
+        Result: Text;
+    begin
+        if Length < 1 then
+            Length := 1;
+        Randomize();
+        for Counter := 1 to Length do begin
+            if Counter = 1 then
+                Digit := Random(9)
+            else
+                Digit := Random(10) - 1;
+            Result := Result + Format(Digit);
+        end;
+        exit(Result);
+    end;
+    #endregion
+
+    #region manage TSS clients
+    procedure CreateClient(var PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info")
+    var
+        DETSS: Record "NPR DE TSS";
         RequestBody: JsonObject;
-        ResponseJson: JsonObject;
-        ParamsJson: JsonObject;
-        BodyToken: JsonToken;
-        Base64Body: Text;
-        BodyTxt: Text;
+        RequestMetadata: JsonObject;
+        ResponseJson: JsonToken;
+        ClientCreateErr: Label 'Error while trying to create a new Client at Fiskaly.\%1';
     begin
-        RequestBody.Add('state', 'ACTIVE');
-        RequestBody.Add('client_id', Format(PosUnitAuxDE."Client ID", 0, 4));
-        RequestBody.WriteTo(BodyTxt);
-        Base64Body := Base64Convert.ToBase64(BodyTxt, TextEncoding::UTF8);
-
-        HeadersObject.Add('Content-Type', 'application/json');
-
-        RequestObject.Add('method', 'PUT');
-        RequestObject.Add('path', '/tss/' + Format(PosUnitAuxDE."TSS ID", 0, 4) + '/tx/' + TransactionID);
-        RequestObject.Add('headers', HeadersObject);
-        RequestObject.Add('body', Base64Body);
-
-        ParamsJson.Add('request', RequestObject);
-        ParamsJson.Add('context', LastContext);
-
-        SendRequest(CreateRequestBody(ParamsJson, 'request'), ResponseJson);
-        ResponseJson.SelectToken('$.result.response.body', BodyToken);
-        BodyTxt := Base64Convert.FromBase64(BodyToken.AsValue().AsText());
-        ResponseJson.ReadFrom(BodyTxt);
-
-        ResponseJson.SelectToken('latest_revision', LastRevisionToken);
-        LastRevision := CopyStr(LastRevisionToken.AsValue().AsText(), 1, MaxStrLen(LastRevision));
-    end;
-
-    local procedure EndTransaction(DocumentJsonObjectPar: JsonObject) ResponseJson: JsonObject
-    var
-        RequestObject: JsonObject;
-        HeadersObject: JsonObject;
-        ParamsJson: JsonObject;
-        QueryObject: JsonObject;
-        BodyToken: JsonToken;
-        Base64Body: Text;
-        BodyTxt: Text;
-    begin
-        DocumentJsonObjectPar.WriteTo(BodyTxt);
-        Base64Body := Base64Convert.ToBase64(BodyTxt, TextEncoding::UTF8);
-
-        QueryObject.Add('last_revision', LastRevision);
-        HeadersObject.Add('Content-Type', 'application/json');
-
-        RequestObject.Add('method', 'PUT');
-        RequestObject.Add('path', '/tss/' + Format(PosUnitAuxDE."TSS ID", 0, 4) + '/tx/' + TransactionID);
-        RequestObject.Add('query', QueryObject);
-        RequestObject.Add('headers', HeadersObject);
-        RequestObject.Add('body', Base64Body);
-
-        ParamsJson.Add('request', RequestObject);
-        ParamsJson.Add('context', LastContext);
-
-        SendRequest(CreateRequestBody(ParamsJson, 'request'), ResponseJson);
-        ResponseJson.SelectToken('$.result.response.body', BodyToken);
-        BodyTxt := Base64Convert.FromBase64(BodyToken.AsValue().AsText());
-        ResponseJson.ReadFrom(BodyTxt);
-
-        ResponseJson.SelectToken('latest_revision', LastRevisionToken);
-        LastRevision := CopyStr(LastRevisionToken.AsValue().AsText(), 1, MaxStrLen(LastRevision));
-    end;
-
-    procedure CreateTSSClient(PosUnitAuxDEPar: Record "NPR DE POS Unit Aux. Info")
-    var
-        StrOut: OutStream;
-    begin
-        PosUnitAuxDE := PosUnitAuxDEPar;
-        GetContext();
-
-        CreateTSS();
-        CreateClient();
-
-        Clear(DEAuditSetup."Last Fiskaly Context");
-        DEAuditSetup."Last Fiskaly Context".CreateOutStream(StrOut, TextEncoding::UTF8);
-        StrOut.Write(LastContext);
-        DEAuditSetup.Modify();
-    end;
-
-    local procedure CreateTSS()
-    var
-        RequestObject: JsonObject;
-        HeadersObject: JsonObject;
-        RequestBody: JsonObject;
-        ResponseJson: JsonObject;
-        ParamsJson: JsonObject;
-        Base64Body: Text;
-        BodyTxt: Text;
-    begin
-        PosUnitAuxDE."TSS ID" := CreateGuid();
-
-        RequestBody.Add('description', 'TSS created for Company: ' + CompanyName + ', and POS Unit No.: ' + PosUnitAuxDE."POS Unit No.");
-        RequestBody.Add('state', 'INITIALIZED');
-        RequestBody.WriteTo(BodyTxt);
-        Base64Body := Base64Convert.ToBase64(BodyTxt, TextEncoding::UTF8);
-
-        HeadersObject.Add('Content-Type', 'application/json');
-
-        RequestObject.Add('method', 'PUT');
-        RequestObject.Add('path', '/tss/' + Format(PosUnitAuxDE."TSS ID", 0, 4));
-        RequestObject.Add('headers', HeadersObject);
-        RequestObject.Add('body', Base64Body);
-
-        ParamsJson.Add('request', RequestObject);
-        ParamsJson.Add('context', LastContext);
-
-        SendRequest(CreateRequestBody(ParamsJson, 'request'), ResponseJson);
-        PosUnitAuxDE.Modify();
-    end;
-
-    local procedure CreateClient()
-    var
-        RequestObject: JsonObject;
-        HeadersObject: JsonObject;
-        RequestBody: JsonObject;
-        ResponseJson: JsonObject;
-        ParamsJson: JsonObject;
-        Base64Body: Text;
-        BodyTxt: Text;
-    begin
-        PosUnitAuxDE."Client ID" := CreateGuid();
-
+        PosUnitAuxDE.TestField(SystemId);
+        PosUnitAuxDE.TestField("Fiskaly Client Created at", 0DT);
+        PosUnitAuxDE.TestField("TSS Code");
+        DETSS.Get(PosUnitAuxDE."TSS Code");
+        if DETSS."Fiskaly TSS Created at" = 0DT then begin
+            CreateTSS(DETSS);
+            Commit();
+        end;
+        TSS_AuthenticateAdmin(DETSS);
 
         RequestBody.Add('serial_number', PosUnitAuxDE."Serial Number");
-        RequestBody.WriteTo(BodyTxt);
-        Base64Body := Base64Convert.ToBase64(BodyTxt, TextEncoding::UTF8);
+        RequestMetadata.Add('company', CompanyName);
+        RequestMetadata.Add('pos_unit_no', PosUnitAuxDE."POS Unit No.");
+        RequestMetadata.Add('tss_bc_code', DETSS."Code");
+        RequestBody.Add('metadata', RequestMetadata);
 
-        HeadersObject.Add('Content-Type', 'application/json');
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, 'PUT', StrSubstNo('/tss/%1/client/%2', Format(DETSS.SystemId, 0, 4), Format(PosUnitAuxDE.SystemId, 0, 4)), GetJwtToken()) then
+            Error(ClientCreateErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+        UpdateDeTssClientWithDataFromFiskaly(PosUnitAuxDE, ResponseJson);
 
-        RequestObject.Add('method', 'PUT');
-        RequestObject.Add('path', '/tss/' + Format(PosUnitAuxDE."TSS ID", 0, 4) + '/client/' + Format(PosUnitAuxDE."Client ID", 0, 4));
-        RequestObject.Add('headers', HeadersObject);
-        RequestObject.Add('body', Base64Body);
-
-        ParamsJson.Add('request', RequestObject);
-        ParamsJson.Add('context', LastContext);
-
-        SendRequest(CreateRequestBody(ParamsJson, 'request'), ResponseJson);
-        PosUnitAuxDE.Modify();
+        TSS_LogoutAdmin(DETSS);
     end;
 
-    procedure GetTransaction(TssId: Text; TxId: Text): JsonObject
+    procedure GetTSSClientList(DETSS: Record "NPR DE TSS")
     var
-        RequestObject: JsonObject;
-        ResponseJson: JsonObject;
-        ParamsJson: JsonObject;
-        BodyToken: JsonToken;
-        BodyTxt: Text;
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+        TSSClientListAccessErr: Label 'Error while retrieving list of clients from Fiskaly.\%1';
     begin
-        GetContext();
-        DEAuditSetup.GET();
-
-        RequestObject.Add('method', 'GET');
-        RequestObject.Add('path', '/tss/' + TssId + '/tx/' + TxId);
-
-        ParamsJson.Add('request', RequestObject);
-        ParamsJson.Add('context', LastContext);
-
-        SendRequest(CreateRequestBody(ParamsJson, 'request'), ResponseJson);
-        ResponseJson.SelectToken('$.result.response.body', BodyToken);
-        BodyTxt := Base64Convert.FromBase64(BodyToken.AsValue().AsText());
-        ResponseJson.ReadFrom(BodyTxt);
-        EXIT(ResponseJson);
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, 'GET', StrSubstNo('/tss/%1/client', Format(DETSS.SystemId, 0, 4)), GetJwtToken()) then
+            Error(TSSClientListAccessErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+        UpdateDeTssClientFromFiskaly(ResponseJson);
     end;
 
-    [NonDebuggable]
-    local procedure SendRequest(RequestBodyPar: JsonObject; ResponseJsonPar: JsonObject)
+    local procedure UpdateDeTssClientFromFiskaly(ResponseJson: JsonToken)
     var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info";
+        JToken: JsonToken;
+        TssClient: JsonToken;
+        TssClients: JsonToken;
+    begin
+        if not ResponseJson.SelectToken('data', TssClients) then
+            exit;
+        if not TssClients.IsArray() then
+            exit;
+        foreach TssClient in TssClients.AsArray() do begin
+            TssClient.SelectToken('_id', JToken);
+            if not PosUnitAuxDE.GetBySystemId(JToken.AsValue().AsText()) then begin
+                PosUnitAuxDE."POS Unit No." := '_UKN000001';
+                while PosUnitAuxDE.Find() do
+                    PosUnitAuxDE."POS Unit No." := IncStr(PosUnitAuxDE."POS Unit No.");
+                PosUnitAuxDE.SystemId := JToken.AsValue().AsText();
+                PosUnitAuxDE.Insert(false, true);
+            end;
+            UpdateDeTssClientWithDataFromFiskaly(PosUnitAuxDE, TssClient);
+        end;
+    end;
+
+    local procedure UpdateDeTssClientWithDataFromFiskaly(var PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info"; ResponseJson: JsonToken)
+    var
+        DETSS: Record "NPR DE TSS";
+        TypeHelper: Codeunit "Type Helper";
+        JToken: JsonToken;
+        State: Text;
+    begin
+        ResponseJson.SelectToken('time_creation', JToken);
+        PosUnitAuxDE."Fiskaly Client Created at" := TypeHelper.EvaluateUnixTimestamp(JToken.AsValue().AsBigInteger());
+
+        ResponseJson.SelectToken('tss_id', JToken);
+        FindOrCreateNewDeTss(DETSS, JToken.AsValue().AsText());
+        PosUnitAuxDE."TSS Code" := DETSS."Code";
+
+        ResponseJson.SelectToken('serial_number', JToken);
+        PosUnitAuxDE."Serial Number" := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(PosUnitAuxDE."Serial Number"));
+
+        ResponseJson.SelectToken('state', JToken);
+        State := JToken.AsValue().AsText();
+        if not Enum::"NPR DE TSS Client State".Names().Contains(State) then
+            PosUnitAuxDE."Fiskaly Client State" := PosUnitAuxDE."Fiskaly Client State"::Unknown
+        else
+            PosUnitAuxDE."Fiskaly Client State" :=
+                Enum::"NPR DE TSS Client State".FromInteger(Enum::"NPR DE TSS Client State".Ordinals().Get(Enum::"NPR DE TSS Client State".Names().IndexOf(State)));
+        PosUnitAuxDE.Modify();
+        Commit();
+    end;
+    #endregion
+
+    #region V1 API request handling (obsolete)
+    /*[TryFunction]
+    [NonDebuggable]
+    local procedure SendRequest(RequestBodyPar: JsonObject; RestMethod: text; Url: Text; ResponseJsonPar: JsonObject)
+    var
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Client: HttpClient;
@@ -234,8 +377,10 @@
         Headers: HttpHeaders;
         ContextToken: JsonToken;
         RequestBodyTxt: Text;
-        Response: Text;
+        ResponseTxt: Text;
     begin
+        CheckHttpClientRequestsAllowed();
+
         RequestBodyPar.WriteTo(RequestBodyTxt);
         Content.WriteFrom(RequestBodyTxt);
 
@@ -245,17 +390,22 @@
         Headers.Add('Content-Type', 'application/json');
 
         HttpWebRequest.Content(Content);
-        HttpWebRequest.SetRequestUri(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpFiskalyAPIURL'));
-        HttpWebRequest.Method := 'POST';
+
+        HttpWebRequest.SetRequestUri(Url);
+        HttpWebRequest.Method(RestMethod);
+        HttpWebRequest.GetHeaders(Headers);
+        Headers.Add('Accept', 'application/json');
+        Headers.Add('User-Agent', 'Dynamics 365');
 
         Client.Send(HttpWebRequest, HttpWebResponse);
 
-        HttpWebResponse.Content.ReadAs(Response);
+        if not HttpWebResponse.Content.ReadAs(ResponseTxt) then
+            ResponseTxt := '';
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
+            Error('%1: %2\%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, ResponseTxt);
 
-        ResponseJsonPar.ReadFrom(Response);
+        ResponseJsonPar.ReadFrom(ResponseTxt);
         CheckForErrors(ResponseJsonPar, RequestBodyTxt);
         ResponseJsonPar.SelectToken('$.result.context', ContextToken);
         LastContext := ContextToken.AsValue().AsText();
@@ -290,7 +440,7 @@
             exit;
 
         if ErrorToken.SelectToken('code', FiskalyCodeToken) then
-            ErrorMessage := FiskalyErrorCodeLbl + Format(FiskalyCodeToken.AsValue().AsInteger());
+            ErrorMessage := FiskalyErrorCodeLbl + Format(FiskalyCodeToken.AsValue().AsText());
         if ErrorToken.SelectToken('message', FiskalyMessageToken) then
             ErrorMessage += '; ' + FiskalyErrorMessageLbl + FiskalyMessageToken.AsValue().AsText();
         if ErrorToken.SelectToken('$.data.response.status', HTTPCodeToken) then
@@ -300,10 +450,12 @@
 
         ErrorMessage += '\' + RequestJsonLbl + '\';
         Error('%1\%2', ErrorMessage, RequestJsonPar);
-    end;
+    end;*/
+    #endregion
 
+    #region V2 (signDE) API request handling
     [TryFunction]
-    internal procedure SendDSFINVK(DSFINVKJson: JsonObject; var ResponseJsonPar: JsonObject; DEAuditSetupPar: Record "NPR DE Audit Setup"; Method: Text; URLFunction: Text; AccessToken: Text)
+    internal procedure SendRequest_signDE_V2(RequestBodyJsonIn: JsonObject; var ResponseJsonOut: JsonToken; RestMethod: Text; UrlFunction: Text; AccessToken: Text)
     var
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
@@ -311,10 +463,13 @@
         Content: HttpContent;
         Headers: HttpHeaders;
         RequestBodyTxt: Text;
-        Response: Text;
+        ResponseTxt: Text;
+        BearerToken: Label 'Bearer %1', Locked = true;
     begin
-        if Method <> 'GET' then begin
-            DSFINVKJson.WriteTo(RequestBodyTxt);
+        CheckHttpClientRequestsAllowed();
+
+        if UpperCase(RestMethod) <> 'GET' then begin
+            RequestBodyJsonIn.WriteTo(RequestBodyTxt);
             Content.WriteFrom(RequestBodyTxt);
 
             Content.GetHeaders(Headers);
@@ -323,32 +478,74 @@
             Headers.Add('Content-Type', 'application/json');
             HttpWebRequest.Content(Content);
         end;
-        HttpWebRequest.SetRequestUri(DEAuditSetupPar."DSFINVK Api URL" + URLFunction);
-        HttpWebRequest.Method := Method;
 
-        if AccessToken <> '' then begin
-            HttpWebRequest.GetHeaders(Headers);
+        DEAuditSetup.GetRecordOnce(false);
+        DEAuditSetup.TestField("Api URL");
+        HttpWebRequest.SetRequestUri(DEAuditSetup."Api URL" + UrlFunction);
+        HttpWebRequest.Method := RestMethod;
+        HttpWebRequest.GetHeaders(Headers);
+        Headers.Add('Accept', 'application/json');
+        Headers.Add('User-Agent', 'Dynamics 365');
+        if AccessToken <> '' then
             Headers.Add('Authorization', StrSubstNo(BearerToken, AccessToken));
-        end;
 
         Client.Send(HttpWebRequest, HttpWebResponse);
-        HttpWebResponse.Content.ReadAs(Response);
+        if not HttpWebResponse.Content.ReadAs(ResponseTxt) then
+            ResponseTxt := '';
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
+            Error('%1: %2\%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, ResponseTxt);
 
-        ResponseJsonPar.ReadFrom(Response);
+        ResponseJsonOut.ReadFrom(ResponseTxt);
     end;
 
+    [TryFunction]
+    procedure GetJwtToken(var AccessToken: Text)
+    begin
+        AccessToken := GetJwtToken();
+    end;
 
+    procedure GetJwtToken(): Text
+    var
+        FiskalyJWT: Codeunit "NPR FiskalyJWT";
+        RefreshTokenJson: JsonObject;
+        JWTResponseJson: JsonToken;
+        AccessToken: Text;
+        RefreshToken: Text;
+        AccessTokenRefreshErr: Label 'Error while trying to get authentication token from the server.\%1';
+    begin
+        if FiskalyJWT.GetToken(AccessToken, RefreshToken) then
+            exit(AccessToken);
+
+        DEAuditSetup.GetRecordOnce(false);
+        if RefreshToken <> '' then
+            RefreshTokenJson.Add('refresh_token', RefreshToken)
+        else begin
+            RefreshTokenJson.Add('api_key', DESecretMgt.GetSecretKey(DEAuditSetup.ApiKeyLbl()));
+            RefreshTokenJson.Add('api_secret', DESecretMgt.GetSecretKey(DEAuditSetup.ApiSecretLbl()));
+        end;
+        ClearLastError();
+        if SendRequest_signDE_V2(RefreshTokenJson, JWTResponseJson, 'POST', '/auth', '') then begin
+            FiskalyJWT.SetJWT(JWTResponseJson, AccessToken);
+            exit(AccessToken);
+        end else
+            Error(AccessTokenRefreshErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+    end;
+
+    local procedure CheckHttpClientRequestsAllowed()
+    var
+        EnvironmentInfo: Codeunit "Environment Information";
+        NavAppSetting: Record "NAV App Setting";
+        HttpRequrestsAreNotAllowedErr: Label 'Http requests are blocked by default in sandbox environments. In order to proceed, you must allow HttpClient requests for NP Retail extension.';
+    begin
+        if EnvironmentInfo.IsSandbox() then
+            if not (NavAppSetting.Get('992c2309-cca4-43cb-9e41-911f482ec088') and NavAppSetting."Allow HttpClient Requests") then
+                Error(HttpRequrestsAreNotAllowedErr);
+    end;
+    #endregion
 
     var
         DEAuditSetup: Record "NPR DE Audit Setup";
-        PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info";
-        Base64Convert: Codeunit "Base64 Convert";
-        LastRevisionToken: JsonToken;
-        TransactionID: Text;
-        LastContext: Text;
-        LastRevision: Text[5];
-        BearerToken: Label 'Bearer %1', Locked = true;
+        DESecretMgt: Codeunit "NPR DE Secret Mgt.";
+        ErrorDetailsTxt: Label 'Error details:\%1', Comment = '%1 - details of the error returned by the server';
 }

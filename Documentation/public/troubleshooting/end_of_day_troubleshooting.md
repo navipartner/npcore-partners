@@ -10,7 +10,7 @@ Yes. For this purpose, it's recommended to use the **POS Entry Payment Details**
 
 #### Is it possible to close the day/shift by closing the POS store, instead of closing each POS unit individually?
 
-Yes. To do this, follow the provided steps:
+Yes. To do this, follow the provided steps.
 
 1. Open one of the POS units which belong to the same store, and navigate to the **Profiles** section. 
 2. Open the **End of Day Profile** dropdown list, and click **New**.

@@ -21,7 +21,7 @@
         DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
         DSFINVKJson: JsonObject;
-        DSFINVKResponseJson: JsonObject;
+        DSFINVKResponseJson: JsonToken;
         AccessToken: Text;
     begin
         DEAuditSetup.Get();
@@ -38,11 +38,12 @@
                 if not DSFINVKMng.CreateDSFINVKDocument(DSFINVKJson, DSFINVKClosing) then
                     DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing);
 
-                if not DEAuditMgt.GetJwtToken(AccessToken) then
+                if not DEFiskalyCommunication.GetJwtToken(AccessToken) then
                     DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing);
 
-                DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings 
-                if not DEFiskalyCommunication.SendDSFINVK(DSFINVKJson, DSFINVKResponseJson, DEAuditSetup, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4), AccessToken) then
+                DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings
+
+                if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, 'PUT', StrSubstNo('/cash_point_closings/%1', Format(DSFINVKClosing."Closing ID", 0, 4)), AccessToken) then
                     DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing)
                 else begin
                     DSFINVKClosing.State := DSFINVKClosing.State::PENDING;
@@ -56,13 +57,12 @@
     local procedure SendParameterStringData(ParameterString: Text)
     var
         DSFINVKClosing: Record "NPR DSFINVK Closing";
-        DEAuditSetup: Record "NPR DE Audit Setup";
         POSEntry: Record "NPR POS Entry";
         DSFINVKMng: Codeunit "NPR DE Fiskaly DSFINVK";
         DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
         DSFINVKJson: JsonObject;
-        DSFINVKResponseJson: JsonObject;
+        DSFINVKResponseJson: JsonToken;
         NextClosingId: Integer;
         AccessToken: Text;
         PosUnit: Text;
@@ -107,13 +107,13 @@
             exit;
         end;
 
-        if not DEAuditMgt.GetJwtToken(AccessToken) then begin
+        if not DEFiskalyCommunication.GetJwtToken(AccessToken) then begin
             DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing);
             exit;
         end;
 
         DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings 
-        if not DEFiskalyCommunication.SendDSFINVK(DSFINVKJson, DSFINVKResponseJson, DEAuditSetup, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4), AccessToken) then begin
+        if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, 'PUT', StrSubstNo('/cash_point_closings/%1', Format(DSFINVKClosing."Closing ID", 0, 4)), AccessToken) then begin
             DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing);
             exit;
         end;
@@ -129,7 +129,7 @@
         DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
         DSFINVKJson: JsonObject;
-        DSFINVKResponseJson: JsonObject;
+        DSFINVKResponseJson: JsonToken;
         AccessToken: Text;
     begin
         UpdateClosingState();
@@ -139,7 +139,7 @@
 
         if DSFINVKClosing.FindSet(true) then
             repeat
-                if not DEAuditMgt.GetJwtToken(AccessToken) then
+                if not DEFiskalyCommunication.GetJwtToken(AccessToken) then
                     DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing);
 
                 Clear(DSFINVKJson);
@@ -147,7 +147,7 @@
                 DSFINVKJson.Add('end_date', DSFINVKMng.GetUnixTime(CreateDateTime(DSFINVKClosing."Closing Date", 235959T)));
 
                 DSFINVKClosing."Export ID" := CreateGuid();
-                if not DEFiskalyCommunication.SendDSFINVK(DSFINVKJson, DSFINVKResponseJson, DEAuditSetup, 'PUT', '/exports/' + Format(DSFINVKClosing."Export ID", 0, 4), AccessToken) then
+                if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, 'PUT', StrSubstNo('/exports/%1', Format(DSFINVKClosing."Export ID", 0, 4)), AccessToken) then
                     DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing)
                 else begin
                     DSFINVKClosing."Trigged Export" := true;
@@ -165,7 +165,7 @@
         DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
         DSFINVKJson: JsonObject;
-        DSFINVKResponseJson: JsonObject;
+        DSFINVKResponseJson: JsonToken;
         AccessToken: Text;
     begin
         DEAuditSetup.Get();
@@ -174,10 +174,10 @@
 
         if DSFINVKClosing.FindSet(true) then
             repeat
-                if not DEAuditMgt.GetJwtToken(AccessToken) then
+                if not DEFiskalyCommunication.GetJwtToken(AccessToken) then
                     DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing);
 
-                if not DEFiskalyCommunication.SendDSFINVK(DSFINVKJson, DSFINVKResponseJson, DEAuditSetup, 'GET', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4), AccessToken) then
+                if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, 'GET', StrSubstNo('/cash_point_closings/%1', Format(DSFINVKClosing."Closing ID", 0, 4)), AccessToken) then
                     DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing)
                 else begin
                     DSFINVKClosing.State := GetClosingState(DSFINVKResponseJson);
@@ -186,7 +186,7 @@
             until DSFINVKClosing.Next() = 0;
     end;
 
-    procedure GetClosingState(DSFINVKResponseJson: JsonObject): Enum "NPR DSFINVK State"
+    procedure GetClosingState(DSFINVKResponseJson: JsonToken): Enum "NPR DSFINVK State"
     var
         DSFINVKState: Enum "NPR DSFINVK State";
         StateToken: JsonToken;

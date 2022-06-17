@@ -26,7 +26,7 @@ You can customize the sales report content that is printed out, depending on the
 Receipt footers are useful when you wish to include the company's name, phone, address, and so on. Therefore, it's very useful to know how to change it.
 
 1. Open the **POS Unit Card**. 
-2. Scroll down to the **Profiles** and open the **POS Unit Receipt Text Profile** dropwdown box.
+2. Scroll down to the **Profiles** and open the **POS Unit Receipt Text Profile** dropdown box.
 3. Open the existing profile to edit, or create a new one and input text relevant for this profile.
 
 
@@ -34,3 +34,5 @@ Receipt footers are useful when you wish to include the company's name, phone, a
 
 - [Create a new POS unit by using an existing one as reference](./createnew.md)
 - [POS units](../explanation/POSUnit.md)
+- [POS unit receipt profile](../explanation/POS_unit_Receipt_profile.md)
+- [Change the POS unit receipt footer text](./POSUnitReceiptFooter.md)

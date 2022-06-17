@@ -3,10 +3,8 @@
     Extensible = False;
     Caption = 'Retail Voucher Partner';
     PageType = Card;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpRv Partner";
-    ApplicationArea = NPRRetail;
 
     layout
     {

@@ -5,13 +5,12 @@
     DeleteAllowed = false;
     Editable = false;
     PageType = Document;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     RefreshOnActivate = true;
     SourceTable = "NPR POS Entry";
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);
-    ApplicationArea = NPRRetail;
 
     layout
     {

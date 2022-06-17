@@ -29,3 +29,8 @@ The default **Authorization Code Scheme** is "[N*4]-[N*4]" and can be changed in
 6. Choose the new time and date that the customer would prefer to change to.
 7. Click **OK**.     
    Ticket reservation has been successfully changed.
+
+
+### Related links
+
+- [Ticket module](../intro.md)

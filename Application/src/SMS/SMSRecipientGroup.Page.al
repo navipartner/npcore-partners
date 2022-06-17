@@ -6,6 +6,7 @@
     PageType = Card;
     SourceTable = "NPR SMS Recipient Group";
     UsageCategory = None;
+
     layout
     {
         area(content)

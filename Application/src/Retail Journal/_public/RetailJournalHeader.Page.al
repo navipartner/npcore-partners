@@ -2,10 +2,9 @@
 {
     Caption = 'Retail Journal';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Retail Journal Header";
-    ApplicationArea = NPRRetail;
 
     layout
     {

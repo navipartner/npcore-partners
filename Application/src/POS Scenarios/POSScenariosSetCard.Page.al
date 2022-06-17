@@ -4,10 +4,10 @@
 
     Caption = 'POS Scenarios Set Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR POS Sales Workflow Set";
-    ApplicationArea = NPRRetail;
+
 
     layout
     {

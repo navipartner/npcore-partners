@@ -9,6 +9,7 @@ page 6059843 "NPR POS HC Endpoint Setup List"
     SourceTable = "NPR POS HC Endpoint Setup";
     ApplicationArea = NPRRetail;
 
+
     layout
     {
         area(content)

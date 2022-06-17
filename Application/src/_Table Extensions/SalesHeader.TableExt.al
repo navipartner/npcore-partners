@@ -28,11 +28,15 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = Company;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not used.';
         }
         field(6014408; "NPR Bill-To Vendor No."; Code[10])
         {
             Caption = 'Bill-to Vendor No. (IC)';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not used.';
         }
         field(6014414; "NPR Bill-to E-mail"; Text[80])
         {

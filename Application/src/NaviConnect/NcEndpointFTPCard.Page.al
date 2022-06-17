@@ -5,9 +5,8 @@
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Nc Endpoint FTP";
-    ApplicationArea = NPRNaviConnect;
 
     layout
     {

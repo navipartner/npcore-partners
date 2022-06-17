@@ -1,11 +1,12 @@
 ﻿page 6059801 "NPR External POS Sale Card"
 {
     Extensible = False;
-    ApplicationArea = NPRRetail;
+
     Caption = 'External POS Sale';
     PageType = Document;
     SourceTable = "NPR External POS Sale";
-    UsageCategory = Administration;
+    UsageCategory = None;
+
     layout
     {
         area(content)

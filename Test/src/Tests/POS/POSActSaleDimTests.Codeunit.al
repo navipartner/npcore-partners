@@ -1,4 +1,4 @@
-codeunit 85053 "NPR POS Act. Sale Dim. Tests"
+codeunit 85057 "NPR POS Act. Sale Dim. Tests"
 {
     Subtype = Test;
 

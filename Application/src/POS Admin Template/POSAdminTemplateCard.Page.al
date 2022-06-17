@@ -7,10 +7,9 @@
     DataCaptionExpression = GetName();
     DataCaptionFields = Id, Name;
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR POS Admin. Template";
-    ApplicationArea = NPRRetail;
 
     layout
     {

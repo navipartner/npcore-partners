@@ -1,15 +1,17 @@
 ﻿report 6014443 "NPR Period Discount Stat."
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Period Discount Statistics.rdlc';
     Caption = 'Period Discount Statistics';
     PreviewMode = PrintLayout;
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
+    UsageCategory = None;
+
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used';
 
     dataset
     {
@@ -81,6 +83,9 @@
                 {
                 }
                 column(PercentDisplay; PercentDisplay)
+                {
+                }
+                column(AplyedFilters; AppliedFilters)
                 {
                 }
                 dataitem("Retail Comment"; "NPR Retail Comment")
@@ -186,8 +191,8 @@
         NoLbl = 'No.';
         DescriptionLbl = 'Description';
         CostPriceLbl = 'Cost Price';
-        SalesPriceLbl = 'Sales Price Incl. VAT';
-        PeriodSalesPriceLbl = 'Period Sales Price Incl. VAT';
+        SalesPriceLbl = 'Sales Price';
+        PeriodSalesPriceLbl = 'Period Sales Price';
         QuantitySoldLbl = 'Quantity Sold';
         SalesLCYLbl = 'Sales (LCY)';
         TheoreticalmarginLbl = 'Theoretical Margin%';
@@ -196,15 +201,16 @@
         RealizedMarginLbl = 'Realized Margin';
         AmountLbl = 'Amount';
         TotalCampaignLbl = 'Campaign Total';
-        FiltersLbl = 'Filters';
+        FiltersLbl = 'Filters:';
     }
 
     trigger OnPreReport()
     begin
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
-
         PercentDisplay := '%';
+
+        AppliedFilters := "Period Discount Line".GetFilters;
     end;
 
     var
@@ -222,5 +228,6 @@
         PeriodLbl: Label 'Period: ';
         PercentDisplay: Text[1];
         DistributionItem: Text[30];
+        AppliedFilters: Text;
 }
 
