@@ -1,5 +1,9 @@
 - name: Introduction
   href: intro.md
+- name: Explanation
+  items:
+  - name: Coupon types
+    href: explanation/coupon_types.md
 - name: How-To  
   items:
   - name: Create new coupon types and coupons

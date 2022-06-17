@@ -3,7 +3,7 @@
     Access = Internal;
     SingleInstance = true;
 
-    procedure HandlerCode(): Text
+    procedure HandlerCode(): Code[20]
     begin
         exit('DE_FISKALY');
     end;
@@ -11,29 +11,47 @@
     local procedure IsEnabled(POSAuditProfileCode: Code[20]): Boolean
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
-        DeAuditSetupMsg: Label 'DE Audit Setup must be entered through Action Additional setup in POS Audit Profiles.';
     begin
-        if not Initialized then begin
-            if not POSAuditProfile.Get(POSAuditProfileCode) then
-                exit(false);
-            if POSAuditProfile."Audit Handler" <> HandlerCode() then
-                exit(false);
-            if not DEAuditSetup.Get() then
-                Message(DeAuditSetupMsg);
-            Initialized := true;
-            Enabled := true;
-        end;
-        exit(Enabled);
+        if not POSAuditProfile.Get(POSAuditProfileCode) then
+            exit(false);
+        exit(IsEnabled(POSAuditProfile));
+    end;
+
+    local procedure IsEnabled(POSAuditProfile: Record "NPR POS Audit Profile"): Boolean
+    begin
+        if POSAuditProfile."Audit Handler" <> HandlerCode() then
+            exit(false);
+        exit(true);
+    end;
+
+    procedure ShouldDisplayNotification(POSAuditProfile: Record "NPR POS Audit Profile"; xPOSAuditProfile: Record "NPR POS Audit Profile"): Boolean
+    begin
+        if not IsEnabled(POSAuditProfile) then
+            exit(false);
+        if POSAuditProfile."Audit Handler" = xPOSAuditProfile."Audit Handler" then
+            exit(false);
+        exit(not (DEAuditSetup.Get() and (DEAuditSetup."Api URL" <> '')));
+    end;
+
+    procedure OnActionShowSetup()
+    begin
+        Page.RunModal(Page::"NPR DE Audit Setup");
+    end;
+
+    procedure OnActionLearnMore()
+    var
+        LearnMoreLinkLbl: Label 'https://docs.navipartner.com/retail/fiscalization/howto/germany.html';
+    begin
+        Hyperlink(LearnMoreLinkLbl);
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR POS Audit Profiles", 'OnHandlePOSAuditProfileAdditionalSetup', '', true, true)]
     local procedure OnHandlePOSAuditProfileAdditionalSetup(POSAuditProfile: Record "NPR POS Audit Profile")
     begin
-        if not IsEnabled(POSAuditProfile.Code) then
+        if not IsEnabled(POSAuditProfile) then
             exit;
-        Page.Run(Page::"NPR DE Audit Setup");
+        OnActionShowSetup();
     end;
-
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnLookupAuditHandler', '', true, true)]
     local procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List" temporary)
@@ -62,7 +80,7 @@
         if (POSAuditLog."Action Type" = POSAuditLog."Action Type"::DIRECT_SALE_END) then begin
             InitDeAuxInfo(DeAuditAux, POSUnitAux, POSAuditLog);
             OnHandleDEAuditAuxLogBeforeInsert(DeAuditAux);
-            DeAuditAux.Insert();
+            DeAuditAux.Insert(true, true);
         end;
     end;
 
@@ -86,59 +104,44 @@
     local procedure CreateDeFiskalyOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";
-        NPRDEAuditSetup: Record "NPR DE Audit Setup";
-        POSUnitAux: Record "NPR DE POS Unit Aux. Info";
         DeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
-        DocumentJson: JsonObject;
-        ResponseJson: JsonObject;
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'CreateDeFiskalyOnSale' then
             exit;
 
-        PosEntry.SetFilter("Document No.", '=%1', SalePOS."Sales Ticket No.");
-        PosEntry.SetFilter("POS Unit No.", '%1', SalePOS."Register No.");
+        PosEntry.SetCurrentKey("Document No.");
+        PosEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        PosEntry.SetRange("POS Unit No.", SalePOS."Register No.");
         if (not PosEntry.FindFirst()) then
             exit;
-        IF NOT POSUnitAux.GET(PosEntry."POS Unit No.") THEN
-            EXIT;
-        IF NOT DeAuditAux.GET(PosEntry."Entry No.") THEN
-            EXIT;
-        IF NOT NPRDEAuditSetup.GET() THEN
-            EXIT;
-
         if PosEntry."Entry Type" <> PosEntry."Entry Type"::"Direct Sale" then
             exit;
+        if not DeAuditAux.GET(PosEntry."Entry No.") then
+            exit;
 
-        CreateDocumentJson(PosEntry."Entry No.", POSUnitAux, DocumentJson);
-
-        if not DEFiskalyCommunication.SendDocument(DeAuditAux, DocumentJson, ResponseJson, NPRDEAuditSetup) then
-            SetErrorMsg(DeAuditAux)
-        else
-            if not DeAuxInfoInsertResponse(DeAuditAux, ResponseJson) then
-                SetErrorMsg(DeAuditAux);
-
-        OnHandleDEAuditAuxLogBeforeModify(DeAuditAux, ResponseJson);
-        DeAuditAux.Modify();
-        NPRDEAuditSetup.Modify();
+        DEFiskalyCommunication.SendDocument(DeAuditAux);
     end;
 
-    procedure CreateDocumentJson(POSEntryNo: Integer; POSUnitAudit: Record "NPR DE POS Unit Aux. Info"; var DocumentJson: JsonObject)
+    procedure CreateDocumentJson(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; NewTransactionState: Enum "NPR DE Fiskaly Trx. State"; var DocumentJson: JsonObject)
     var
         StandardJson: JsonObject;
         ReceiptJson: JsonObject;
         ReceiptDataJson: JsonObject;
     begin
-        ReceiptDataJson.Add('receipt_type', 'RECEIPT');
-        ReceiptDataJson.Add('amounts_per_vat_rate', GetVatRates(POSEntryNo));
-        ReceiptDataJson.Add('amounts_per_payment_type', GetPaymentTypes(POSEntryNo));
+        if DeAuditAux."Fiskaly Transaction Type" = DeAuditAux."Fiskaly Transaction Type"::Unknown then
+            DeAuditAux."Fiskaly Transaction Type" := DeAuditAux."Fiskaly Transaction Type"::RECEIPT;
+        ReceiptDataJson.Add('receipt_type',
+            Enum::"NPR DE Fiskaly Receipt Type".Names().Get(Enum::"NPR DE Fiskaly Receipt Type".Ordinals().IndexOf(DeAuditAux."Fiskaly Transaction Type".AsInteger())));
+        ReceiptDataJson.Add('amounts_per_vat_rate', GetVatRates(DeAuditAux."POS Entry No."));
+        ReceiptDataJson.Add('amounts_per_payment_type', GetPaymentTypes(DeAuditAux."POS Entry No."));
         ReceiptJson.Add('receipt', ReceiptDataJson);
         StandardJson.Add('standard_v1', ReceiptJson);
         DocumentJson.Add('schema', StandardJson);
-        DocumentJson.Add('state', 'FINISHED');
-        DocumentJson.Add('client_id', Format(POSUnitAudit."Client ID", 0, 4));
+        DocumentJson.Add('state', Enum::"NPR DE Fiskaly Trx. State".Names().Get(Enum::"NPR DE Fiskaly Trx. State".Ordinals().IndexOf(NewTransactionState.AsInteger())));
+        DocumentJson.Add('client_id', Format(DeAuditAux."Client ID", 0, 4));
     end;
 
     local procedure GetVatRates(EntryNo: Integer) TaxArray: JsonArray
@@ -152,11 +155,10 @@
         if TaxAmountLine.FindSet() then
             repeat
                 Clear(TaxJsonObject);
-                TaxMapper.RESET();
-                TaxMapper.SETRANGE("VAT Identifier", TaxAmountLine."VAT Identifier");
-                TaxMapper.FINDFIRST();
-                TaxJsonObject.Add('vat_rate', TaxMapper."Fiscal Name");
-                TaxJsonObject.Add('amount', Format(TaxAmountLine."Amount Including Tax", 0, '<Precision,2:26><Standard Format,2>'));
+                TaxMapper.SetRange("VAT Identifier", TaxAmountLine."VAT Identifier");
+                TaxMapper.FindFirst();
+                TaxJsonObject.Add('vat_rate', Enum::"NPR DE Fiskaly VAT Rate".Names().Get(Enum::"NPR DE Fiskaly VAT Rate".Ordinals().IndexOf(TaxMapper."Fiskaly VAT Rate Type".AsInteger())));
+                TaxJsonObject.Add('amount', Format(TaxAmountLine."Amount Including Tax", 0, '<Precision,2:5><Standard Format,2>'));
                 TaxArray.Add(TaxJsonObject);
             until TaxAmountLine.Next() = 0;
     end;
@@ -173,7 +175,7 @@
             repeat
                 Clear(PaymentJsonObject);
                 PaymentMapper.Get(PaymentLine."POS Payment Method Code");
-                PaymentJsonObject.Add('payment_type', PaymentMapper."Fiscal Name");
+                PaymentJsonObject.Add('payment_type', Enum::"NPR DE Fiskaly Payment Type".Names().Get(Enum::"NPR DE Fiskaly Payment Type".Ordinals().IndexOf(PaymentMapper."Fiskaly Payment Type".AsInteger())));
                 PaymentJsonObject.Add('amount', Format(PaymentLine.Amount, 0, '<Precision,2:26><Standard Format,2>'));
                 if PaymentLine."Currency Code" <> '' then
                     PaymentJsonObject.Add('currency_code', PaymentLine."Currency Code");
@@ -188,48 +190,92 @@
         DeAuditAux.Init();
         DeAuditAux."POS Entry No." := POSAuditLog."Acted on POS Entry No.";
         DeAuditAux."NPR Version" := CopyStr(Licenseinformation.GetRetailVersion(), 1, MaxStrLen(DeAuditAux."NPR Version"));
-        DeAuditAux."TSS ID" := POSUnitAuxPar."TSS ID";
-        DeAuditAux."Client ID" := POSUnitAuxPar."Client ID";
+        DeAuditAux.Validate("TSS Code", POSUnitAuxPar."TSS Code");
+        DeAuditAux."Client ID" := POSUnitAuxPar.SystemId;
         DeAuditAux."Serial Number" := POSUnitAuxPar."Serial Number";
-        DeAuditAux."Fiscalization Status" := DeAuditAux."Fiscalization Status"::"Not Fiscalized";
-        DeAuditAux."Transaction ID" := CreateGuid();
+        DeAuditAux."Fiskaly Transaction Type" := DeAuditAux."Fiskaly Transaction Type"::RECEIPT;
+        DeAuditAux."Transaction ID" := POSAuditLog."Active POS Sale SystemId";
+        if IsNullGuid(DeAuditAux."Transaction ID") then
+            DeAuditAux."Transaction ID" := CreateGuid();
         DeAuditAux."Has Error" := true;
     end;
 
     [TryFunction]
-    procedure DeAuxInfoInsertResponse(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; ResponseJson: JsonObject)
+    procedure DeAuxInfoInsertResponse(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; ResponseJson: JsonToken)
     var
+        xDeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
+        DETSS: Record "NPR DE TSS";
         TypeHelper: Codeunit "Type Helper";
-        ResponseTokenList: List of [JsonToken];
         Token: JsonToken;
         OutStr: OutStream;
+        State: Text;
+        UnexpectedResponseJsonErr: Label 'Unexpected response json.\%1';
     begin
-        ResponseTokenList := ResponseJson.Values();
-        DeAuditAux."Transaction ID" := ResponseTokenList.Get(17).AsValue().AsText();
-        DeAuditAux."Start Time" := TypeHelper.EvaluateUnixTimestamp(ResponseTokenList.Get(2).AsValue().AsBigInteger());
-        DeAuditAux."Finish Time" := TypeHelper.EvaluateUnixTimestamp(ResponseTokenList.Get(3).AsValue().AsBigInteger());
+        if not ResponseJson.IsObject() then
+            Error(UnexpectedResponseJsonErr, ResponseJson);
 
-        ResponseTokenList.Get(12).SelectToken('timestamp_format', Token);
-        DeAuditAux."Time Format" := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(DeAuditAux."Time Format"));
-        ResponseTokenList.Get(13).SelectToken('counter', Token);
-        DeAuditAux."Signature Count" := Token.AsValue().AsInteger();
-        ResponseTokenList.Get(13).SelectToken('algorithm', Token);
-        DeAuditAux."Signature Algorithm" := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(DeAuditAux."Signature Algorithm"));
-        ResponseTokenList.Get(13).SelectToken('value', Token);
-        DeAuditAux.Signature.CreateOutStream(OutStr);
-        OutStr.Write(Token.AsValue().AsText());
-        ResponseTokenList.Get(13).SelectToken('public_key', Token);
-        DeAuditAux."Public Key".CreateOutStream(OutStr);
-        OutStr.Write(Token.AsValue().AsText());
-        DeAuditAux."QR Data".CreateOutStream(OutStr);
-        OutStr.Write(ResponseTokenList.Get(9).AsValue().AsText());
+        xDeAuditAux := DeAuditAux;
+        DeAuditAux.Init();
+        DeAuditAux."POS Entry No." := xDeAuditAux."POS Entry No.";
+        DeAuditAux."NPR Version" := xDeAuditAux."NPR Version";
+        DeAuditAux."Fiskaly Transaction Type" := xDeAuditAux."Fiskaly Transaction Type";
+        if not IsNullGuid(xDeAuditAux.SystemId) then
+            DeAuditAux.SystemId := xDeAuditAux.SystemId;
 
-        DeAuditAux."Fiscalization Status" := DeAuditAux."Fiscalization Status"::Fiscalized;
+        ResponseJson.SelectToken('_id', Token);
+        DeAuditAux."Transaction ID" := Token.AsValue().AsText();
+
+        ResponseJson.SelectToken('tss_id', Token);
+        DeAuditAux."TSS ID" := Token.AsValue().AsText();
+        if DETSS.GetBySystemId(DeAuditAux."TSS ID") then
+            DeAuditAux."TSS Code" := DETSS.Code;
+
+        ResponseJson.SelectToken('client_id', Token);
+        DeAuditAux."Client ID" := Token.AsValue().AsText();
+
+        ResponseJson.SelectToken('state', Token);
+        State := Token.AsValue().AsText();
+        if not Enum::"NPR DE Fiskaly Trx. State".Names().Contains(State) then
+            DeAuditAux."Fiskaly Transaction State" := DeAuditAux."Fiskaly Transaction State"::Unknown
+        else
+            DeAuditAux."Fiskaly Transaction State" := Enum::"NPR DE Fiskaly Trx. State".FromInteger(Enum::"NPR DE Fiskaly Trx. State".Ordinals().Get(Enum::"NPR DE Fiskaly Trx. State".Names().IndexOf(State)));
+
+        ResponseJson.SelectToken('latest_revision', Token);
+        DeAuditAux."Latest Revision" := Token.AsValue().AsInteger();
+
+        ResponseJson.SelectToken('time_start', Token);
+        DeAuditAux."Start Time" := TypeHelper.EvaluateUnixTimestamp(Token.AsValue().AsBigInteger());
+        if ResponseJson.SelectToken('time_end', Token) then
+            DeAuditAux."Finish Time" := TypeHelper.EvaluateUnixTimestamp(Token.AsValue().AsBigInteger());
+        if ResponseJson.SelectToken('log.timestamp_format', Token) then
+            DeAuditAux."Time Format" := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(DeAuditAux."Time Format"));
+
+        if ResponseJson.SelectToken('signature.counter', Token) then
+            DeAuditAux."Signature Count" := Token.AsValue().AsInteger();
+        if ResponseJson.SelectToken('signature.algorithm', Token) then
+            DeAuditAux."Signature Algorithm" := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(DeAuditAux."Signature Algorithm"));
+        if ResponseJson.SelectToken('signature.value', Token) then begin
+            DeAuditAux.Signature.CreateOutStream(OutStr);
+            OutStr.Write(Token.AsValue().AsText());
+        end;
+        if ResponseJson.SelectToken('signature.public_key', Token) then begin
+            DeAuditAux."Public Key".CreateOutStream(OutStr);
+            OutStr.Write(Token.AsValue().AsText());
+        end;
+
+        if ResponseJson.SelectToken('qr_code_data', Token) then begin
+            DeAuditAux."QR Data".CreateOutStream(OutStr);
+            OutStr.Write(Token.AsValue().AsText());
+        end;
+
+        if DeAuditAux."Fiskaly Transaction State" in [DeAuditAux."Fiskaly Transaction State"::FINISHED, DeAuditAux."Fiskaly Transaction State"::CANCELLED] then
+            DeAuditAux."Fiscalization Status" := DeAuditAux."Fiscalization Status"::Fiscalized
+        else
+            DeAuditAux."Fiscalization Status" := DeAuditAux."Fiscalization Status"::"Transaction Started";
         DeAuditAux."Has Error" := false;
-        Clear(DeAuditAux."Error Message");
+
+        OnHandleDEAuditAuxLogBeforeModify(DeAuditAux, ResponseJson);
     end;
-
-
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeInitSale', '', false, false)]
     local procedure OnBeforeLogin(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -238,11 +284,12 @@
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Codeunit "NPR POS Setup";
         POSStore: Record "NPR POS Store";
-        NPRDEAuditSetup: Record "NPR DE Audit Setup";
+        DETSS: Record "NPR DE TSS";
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
         POSAuditProfile: Record "NPR POS Audit Profile";
         CompanyInformation: Record "Company Information";
         POSUnitAudit: Record "NPR DE POS Unit Aux. Info";
+        DESecretMgt: Codeunit "NPR DE Secret Mgt.";
         NoApiKeyLbl: Label 'Fiskaly Api Key must be entered in DE Audit Setup.';
         NoApiSecretLbl: Label 'Fiskaly Api Secret must be entered in DE Audit Setup.';
     begin
@@ -255,15 +302,19 @@
             exit;
 
         POSUnitAudit.Get(POSUnit."No.");
-        POSUnitAudit.TestField("TSS ID");
-        POSUnitAudit.TestField("Client ID");
+        POSUnitAudit.TestField(SystemId);
         POSUnitAudit.TestField("Serial Number");
+        POSUnitAudit.TestField("TSS Code");
+        POSUnitAudit.TestField("Fiskaly Client Created at");
+        DETSS.Get(POSUnitAudit."TSS Code");
+        DETSS.TestField(SystemId);
+        DETSS.TestField("Fiskaly TSS Created at");
 
-        NPRDEAuditSetup.Get();
-        NPRDEAuditSetup.TestField("Api URL");
-        if not NPRDEAuditSetup.HasApiKey() then
+        DEAuditSetup.Get();
+        DEAuditSetup.TestField("Api URL");
+        if not DESecretMgt.HasSecretKey(DEAuditSetup.ApiKeyLbl()) then
             Error(NoApiKeyLbl);
-        if not NPRDEAuditSetup.HasApiSecret() then
+        if not DESecretMgt.HasSecretKey(DEAuditSetup.ApiSecretLbl()) then
             Error(NoApiSecretLbl);
 
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
@@ -273,9 +324,8 @@
         POSAuditProfile.TestField("Fill Sale Fiscal No. On", POSAuditProfile."Fill Sale Fiscal No. On"::Successful);
         POSAuditProfile.TestField("Print Receipt On Sale Cancel", false);
 
-        if POSEndofDayProfile.Get(POSUnit."POS End of Day Profile") then begin
+        if POSEndofDayProfile.Get(POSUnit."POS End of Day Profile") then
             POSEndofDayProfile.TestField(POSEndofDayProfile."End of Day Type", POSEndofDayProfile."End of Day Type"::INDIVIDUAL);
-        end;
 
         POSStore.Get(POSUnit."POS Store Code");
         POSStore.TestField("Registration No.");
@@ -296,7 +346,7 @@
         DSFINVKMng: Codeunit "NPR DE Fiskaly DSFINVK";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
         DSFINVKJson: JsonObject;
-        DSFINVKResponseJson: JsonObject;
+        DSFINVKResponseJson: JsonToken;
         AccessToken: Text;
         NextClosingId: Integer;
     begin
@@ -344,13 +394,13 @@
             exit;
         end;
 
-        if not GetJwtToken(AccessToken) then begin
+        if not DEFiskalyCommunication.GetJwtToken(AccessToken) then begin
             SetDSFINVKErrorMsg(DSFINVKClosing);
             exit;
         end;
 
         DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings 
-        if not DEFiskalyCommunication.SendDSFINVK(DSFINVKJson, DSFINVKResponseJson, DEAuditSetup, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4), AccessToken) then begin
+        if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4), AccessToken) then begin
             SetDSFINVKErrorMsg(DSFINVKClosing);
             exit;
         end;
@@ -362,7 +412,7 @@
 
     local procedure CurrCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR DE Audit Mgt.");
+        exit(Codeunit::"NPR DE Audit Mgt.");
     end;
 
     local procedure CheckTssJobQueue()
@@ -415,37 +465,13 @@
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
-    procedure GetJwtToken(var AccessTokenPar: Text): Boolean
-    var
-        FiskalyJWT: Codeunit "NPR FiskalyJWT";
-        DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
-        RefreshTokenJson: JsonObject;
-        JWTResponseJson: JsonObject;
-        RefreshToken: Text;
-    begin
-        if not FiskalyJWT.GetToken(AccessTokenPar, RefreshToken) then begin
-            DEAuditSetup.Get();
-            if RefreshToken <> '' then
-                RefreshTokenJson.Add('refresh_token', RefreshToken)
-            else begin
-                RefreshTokenJson.Add('api_key', DEAuditSetup.GetApiKey());
-                RefreshTokenJson.Add('api_secret', DEAuditSetup.GetApiSecret());
-            end;
-            if not DEFiskalyCommunication.SendDSFINVK(RefreshTokenJson, JWTResponseJson, DEAuditSetup, 'POST', '/auth', '') then begin
-                exit(false);
-            end
-            else
-                FiskalyJWT.SetJWT(JWTResponseJson, AccessTokenPar);
-        end;
-        exit(true);
-    end;
-
     procedure SetErrorMsg(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info")
     var
         StrOut: OutStream;
     begin
         DeAuditAux."Error Message".CreateOutStream(StrOut, TextEncoding::UTF8);
         StrOut.Write(GetLastErrorText);
+        DeAuditAux.Modify();
     end;
 
     procedure SetDSFINVKErrorMsg(var DSFINVKClosing: Record "NPR DSFINVK Closing")
@@ -465,12 +491,10 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnHandleDEAuditAuxLogBeforeModify(var DEPOSAuditAuxLog: Record "NPR DE POS Audit Log Aux. Info"; ResponseJson: JsonObject)
+    local procedure OnHandleDEAuditAuxLogBeforeModify(var DEPOSAuditAuxLog: Record "NPR DE POS Audit Log Aux. Info"; ResponseJson: JsonToken)
     begin
     end;
 
     var
         DEAuditSetup: Record "NPR DE Audit Setup";
-        Initialized: Boolean;
-        Enabled: Boolean;
 }

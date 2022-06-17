@@ -40,6 +40,13 @@
         {
             Caption = 'Fiscal Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by field 11 "Fiskaly VAT Rate Type"';
+        }
+        field(11; "Fiskaly VAT Rate Type"; Enum "NPR DE Fiskaly VAT Rate")
+        {
+            Caption = 'Fiskaly VAT Rate Type';
+            DataClassification = CustomerContent;
         }
         field(20; "DSFINVK ID"; Integer)
         {

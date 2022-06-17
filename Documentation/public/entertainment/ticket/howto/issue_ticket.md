@@ -23,6 +23,5 @@ The **Ticket List** pages opens with the created tickets.
 
 ### Related Links:
 
-- [Tickets](../explanation/admission.md)
 - [Set up DIY printed tickets](SetUpDIYPrintedTicket.md)
 - [Refunding tickets](RefundingTickets.md)

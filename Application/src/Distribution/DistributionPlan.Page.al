@@ -6,10 +6,9 @@
     AutoSplitKey = true;
     Caption = 'Distribution Plan';
     PageType = ListPlus;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Distribution Headers";
-    ApplicationArea = NPRRetail;
 
     layout
     {

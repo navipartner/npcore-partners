@@ -30,6 +30,8 @@
             Editable = false;
             Description = 'Client ID for DE Fiskaly';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use field SystemId instead';
         }
         field(20; "TSS ID"; Guid)
         {
@@ -37,18 +39,45 @@
             Editable = false;
             Description = 'TSS ID for DE Fiskaly';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by field "TSS Code" and related table 6014685 "NPR DE TSS"';
+        }
+        field(21; "TSS Code"; Code[10])
+        {
+            Caption = 'TSS Code';
+            TableRelation = "NPR DE TSS";
+            DataClassification = CustomerContent;
         }
         field(30; "Serial Number"; Text[250])
         {
             Caption = 'Serial Number';
             Description = 'Serial Number for DE Fiskaly';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Serial Number" = '' then
+                    exit;
+                "Serial Number" := DelChr("Serial Number", '=', '/_');
+            end;
         }
         field(40; "Cash Register Created"; Boolean)
         {
             Caption = 'Cash Register Created';
             Description = 'Is Cash Register Created for DE Fiskaly DSFINVK';
             DataClassification = CustomerContent;
+        }
+        field(50; "Fiskaly Client Created at"; DateTime)
+        {
+            Caption = 'Fiskaly Client Created at';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(60; "Fiskaly Client State"; Enum "NPR DE TSS Client State")
+        {
+            Caption = 'Last Known Fiskaly Client State';
+            DataClassification = CustomerContent;
+            Editable = false;
         }
     }
 

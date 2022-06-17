@@ -152,4 +152,15 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'RUN_REPORT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: Run Report";
     }
+
+    value(37; LOAD_FROM_POS_QUOTE)
+    {
+        Caption = 'LOAD_FROM_POS_QUOTE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: LoadPOSSvSl";
+    }
+    value(39; SAVE_AS_POS_QUOTE)
+    {
+        Caption = 'SAVE_AS_POS_QUOTE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: SavePOSSvSl";
+    }
 }

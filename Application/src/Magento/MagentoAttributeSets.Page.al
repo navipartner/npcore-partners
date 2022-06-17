@@ -2,13 +2,12 @@
 {
     Extensible = False;
     AutoSplitKey = true;
+    UsageCategory = Lists;
     Caption = 'Attribute Sets';
     MultipleNewLines = false;
     PageType = List;
     SourceTable = "NPR Magento Attribute Set";
-    UsageCategory = Lists;
     ApplicationArea = NPRRetail;
-
 
     layout
     {

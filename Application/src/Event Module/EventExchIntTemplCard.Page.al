@@ -3,10 +3,9 @@
     Extensible = False;
     Caption = 'Event Exch. Int. Template Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Event Exch. Int. Template";
-    ApplicationArea = NPRRetail;
 
     layout
     {

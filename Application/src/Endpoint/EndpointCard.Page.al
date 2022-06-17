@@ -8,10 +8,9 @@
 
     Caption = 'Endpoint Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Endpoint";
-    ApplicationArea = NPRRetail;
 
     layout
     {

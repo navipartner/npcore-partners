@@ -7,10 +7,9 @@
     Caption = 'GDPR Agreement Card';
     DelayedInsert = true;
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR GDPR Agreement";
-    ApplicationArea = NPRRetail;
 
     layout
     {

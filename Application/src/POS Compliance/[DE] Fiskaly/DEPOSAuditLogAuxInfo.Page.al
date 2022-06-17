@@ -2,13 +2,9 @@
 {
     Extensible = False;
     Caption = 'DE POS Audit Log Aux. Info';
-    DeleteAllowed = false;
     Editable = false;
-    InsertAllowed = false;
-    ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-
     SourceTable = "NPR DE POS Audit Log Aux. Info";
     ApplicationArea = NPRRetail;
 
@@ -20,55 +16,66 @@
             {
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
-
                     ToolTip = 'Specifies the value of the POS Entry No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Version"; Rec."NPR Version")
                 {
-
                     ToolTip = 'Specifies the value of the NPR Version field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("TSS Code"; Rec."TSS Code")
+                {
+                    ToolTip = 'Specifies the Technical Security System (TSS) Code assinged to the transaction';
                     ApplicationArea = NPRRetail;
                 }
                 field("TSS ID"; Rec."TSS ID")
                 {
-
                     ToolTip = 'Specifies the value of the TSS ID on Fiskaly';
                     ApplicationArea = NPRRetail;
                 }
                 field("Client ID"; Rec."Client ID")
                 {
-
                     ToolTip = 'Specifies the value of the Client ID on Fiskaly';
                     ApplicationArea = NPRRetail;
                 }
                 field("Transaction ID"; Rec."Transaction ID")
                 {
-
                     ToolTip = 'Specifies the value of the Transaction ID on Fiskaly';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Fiskaly Transaction Type"; Rec."Fiskaly Transaction Type")
+                {
+                    ToolTip = 'Specifies the Fiskaly transaction (receipt) type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Start Time"; Rec."Start Time")
                 {
-
                     ToolTip = 'Specifies the value of the Start DateTime of transaction on Fiskaly';
                     ApplicationArea = NPRRetail;
                 }
                 field("Finish Time"; Rec."Finish Time")
                 {
-
                     ToolTip = 'Specifies the value of the Finish DateTime of transaction on Fiskaly';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Fiskaly Transaction State"; Rec."Fiskaly Transaction State")
+                {
+                    ToolTip = 'Specifies the Fiskaly state of the transaction';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Latest Revision"; Rec."Latest Revision")
+                {
+                    ToolTip = 'Specifies the latest revision number of the transaction on Fiskaly';
                     ApplicationArea = NPRRetail;
                 }
                 field(Fiscalized; Rec."Fiscalization Status")
                 {
-
                     ToolTip = 'Specifies if receipt is loged on TSS system';
                     ApplicationArea = NPRRetail;
                 }
                 field("Error"; Rec."Has Error")
                 {
-
                     ToolTip = 'Specifies the value of the Error Message if receipt is not loged on TSS system';
                     ApplicationArea = NPRRetail;
                 }
@@ -88,35 +95,17 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Send record to Fiskaly if not fiskalized.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
-                    POSEntry: Record "NPR POS Entry";
-                    POSUnitAux: Record "NPR DE POS Unit Aux. Info";
-                    DEAuditSetup: Record "NPR DE Audit Setup";
-                    DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
                     DEFiskalyComm: Codeunit "NPR DE Fiskaly Communication";
-                    DocumentJson: JsonObject;
-                    ResponseJson: JsonObject;
                 begin
                     if Rec."Fiscalization Status" = Rec."Fiscalization Status"::Fiscalized then
-                        exit;
-                    POSEntry.Get(Rec."POS Entry No.");
-                    POSUnitAux.Get(POSEntry."POS Unit No.");
-                    DEAuditSetup.Get();
-                    DEAuditMgt.CreateDocumentJson(Rec."POS Entry No.", POSUnitAux, DocumentJson);
-
-                    if not DEFiskalyComm.SendDocument(Rec, DocumentJson, ResponseJson, DEAuditSetup) then
-                        DEAuditMgt.SetErrorMsg(Rec)
-                    else
-                        if not DEAuditMgt.DeAuxInfoInsertResponse(Rec, ResponseJson) then
-                            DEAuditMgt.SetErrorMsg(Rec);
-
-                    DEAuditSetup.Modify();
-                    Rec.Modify();
+                        Rec.FieldError("Fiscalization Status");
+                    DEFiskalyComm.SendDocument(Rec);
+                    CurrPage.Update(false);
                 end;
             }
             action(GetTransactionInfo)
@@ -127,26 +116,26 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Get transaction data from Fiskaly.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
+                    DeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
                     DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
                     DEFiskalyComm: Codeunit "NPR DE Fiskaly Communication";
-                    ResponseJson: JsonObject;
-                    HasData: Label 'This record have data, do you really want to get data from Fiskaly?';
+                    ResponseJson: JsonToken;
+                    HasData: Label 'This record has already been populated with Fiskaly related data.\Are you sure you want to overwrite it with data from Fiskaly?';
                 begin
-                    IF Rec."Time Format" <> '' THEN
-                        IF NOT CONFIRM(HasData) THEN
-                            EXIT;
-                    ResponseJson := DEFiskalyComm.GetTransaction(Format(Rec."TSS ID", 0, 4), Format(Rec."Transaction ID", 0, 4));
-
-                    IF NOT DEAuditMgt.DeAuxInfoInsertResponse(Rec, ResponseJson) THEN
-                        Message(GETLASTERRORTEXT);
-
-                    Rec.MODIFY();
+                    if Rec."Time Format" <> '' then
+                        if not Confirm(HasData) then
+                            exit;
+                    DeAuditAux := Rec;
+                    ResponseJson := DEFiskalyComm.GetTransaction(Format(DeAuditAux."TSS ID", 0, 4), Format(DeAuditAux."Transaction ID", 0, 4), 0);
+                    if not DEAuditMgt.DeAuxInfoInsertResponse(DeAuditAux, ResponseJson) then
+                        Message(GetLastErrorText());
+                    DeAuditAux.Modify();
+                    CurrPage.Update(false);
                 end;
             }
             action(ShowError)
@@ -158,7 +147,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Show Error Message.';
                 ApplicationArea = NPRRetail;
 

@@ -20,4 +20,4 @@ An item created for an optional admission must **NOT** have the **Ticket Type** 
 
 ### Related links
 - [Ticket module](../intro.md)
-- [Tickets](../explanation/ticket.md)
+- [Dynamic tickets](../explanation/DynamicTicket.md)
