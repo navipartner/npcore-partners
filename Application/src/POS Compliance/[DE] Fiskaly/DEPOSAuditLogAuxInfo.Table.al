@@ -17,6 +17,22 @@
             Caption = 'NPR Version';
             DataClassification = CustomerContent;
         }
+        field(20; "TSS Code"; Code[10])
+        {
+            Caption = 'TSS Code';
+            TableRelation = "NPR DE TSS";
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                DETSS: Record "NPR DE TSS";
+            begin
+                if "TSS Code" = '' then
+                    exit;
+                DETSS.Get("TSS Code");
+                "TSS ID" := DETSS.SystemId;
+            end;
+        }
         field(30; "TSS ID"; Guid)
         {
             Caption = 'TSS ID';
@@ -26,6 +42,15 @@
         {
             Caption = 'Client ID';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                POSUnitAuxPar: Record "NPR DE POS Unit Aux. Info";
+            begin
+                if not POSUnitAuxPar.GetBySystemId("Client ID") then
+                    Clear(POSUnitAuxPar);
+                "Serial Number" := POSUnitAuxPar."Serial Number";
+            end;
         }
         field(50; "Serial Number"; Text[250])
         {
@@ -77,14 +102,31 @@
             Caption = 'QR Data';
             DataClassification = CustomerContent;
         }
+        field(145; "Fiskaly Transaction Type"; Enum "NPR DE Fiskaly Receipt Type")
+        {
+            Caption = 'Fiskaly Transaction Type';
+            DataClassification = CustomerContent;
+        }
         field(150; "Fiscalization Status"; Enum "NPR Fiscalization Status")
         {
             Caption = 'Fiscalization Status';
             DataClassification = CustomerContent;
         }
+        field(155; "Fiskaly Transaction State"; Enum "NPR DE Fiskaly Trx. State")
+        {
+            Caption = 'Fiskaly Transaction State';
+            DataClassification = CustomerContent;
+        }
         field(160; "Last Revision"; Text[5])
         {
             Caption = 'Last Revision';
+            DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Incorrect data type. Replaced by integer field "Latest Revision"';
+        }
+        field(161; "Latest Revision"; Integer)
+        {
+            Caption = 'Latest Revision';
             DataClassification = CustomerContent;
         }
         field(170; "Error Message"; Blob)

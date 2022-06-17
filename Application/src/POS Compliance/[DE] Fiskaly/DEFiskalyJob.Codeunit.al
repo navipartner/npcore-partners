@@ -1,36 +1,19 @@
 ﻿codeunit 6014449 "NPR DE Fiskaly Job"
 {
     Access = Internal;
+
     trigger OnRun()
     var
-        POSEntry: Record "NPR POS Entry";
-        POSUnitAux: Record "NPR DE POS Unit Aux. Info";
-        DEAuditSetup: Record "NPR DE Audit Setup";
-        DEPOSAuditLogAux: Record "NPR DE POS Audit Log Aux. Info";
-        DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
+        DeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
+        DeAuditAux2: Record "NPR DE POS Audit Log Aux. Info";
         DEFiskalyComm: Codeunit "NPR DE Fiskaly Communication";
-        DocumentJson: JsonObject;
-        ResponseJson: JsonObject;
     begin
-        DEPOSAuditLogAux.Reset();
-        DEPOSAuditLogAux.SetFilter("Fiscalization Status", '<> %1', DEPOSAuditLogAux."Fiscalization Status"::Fiscalized);
-
-        if DEPOSAuditLogAux.FindSet(true) then
+        DeAuditAux.SetCurrentKey("Fiscalization Status");
+        DeAuditAux.SetFilter("Fiscalization Status", '<>%1', DeAuditAux."Fiscalization Status"::Fiscalized);
+        if DeAuditAux.FindSet(true) then
             repeat
-                Clear(DocumentJson);
-                POSEntry.Get(DEPOSAuditLogAux."POS Entry No.");
-                POSUnitAux.Get(POSEntry."POS Unit No.");
-                DEAuditSetup.Get();
-                DEAuditMgt.CreateDocumentJson(DEPOSAuditLogAux."POS Entry No.", POSUnitAux, DocumentJson);
-
-                if not DEFiskalyComm.SendDocument(DEPOSAuditLogAux, DocumentJson, ResponseJson, DEAuditSetup) then
-                    DEAuditMgt.SetErrorMsg(DEPOSAuditLogAux)
-                else
-                    if not DEAuditMgt.DeAuxInfoInsertResponse(DEPOSAuditLogAux, ResponseJson) then
-                        DEAuditMgt.SetErrorMsg(DEPOSAuditLogAux);
-
-                DEAuditSetup.Modify();
-                DEPOSAuditLogAux.Modify();
-            until DEPOSAuditLogAux.Next() = 0;
+                DeAuditAux2 := DeAuditAux;
+                DEFiskalyComm.SendDocument(DeAuditAux2);
+            until DeAuditAux.Next() = 0;
     end;
 }

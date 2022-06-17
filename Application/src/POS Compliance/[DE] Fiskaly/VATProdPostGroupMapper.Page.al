@@ -30,10 +30,10 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'VAT Identifier for Fiskaly.';
                 }
-                field("Fiscal Name"; Rec."Fiscal Name")
+                field("Fiskaly VAT Rate Type"; Rec."Fiskaly VAT Rate Type")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Fiscal Name for Fiskaly API.';
+                    ToolTip = 'Specifies Fiskaly API VAT rate type.';
                 }
                 field("DSFINVK ID"; Rec."DSFINVK ID")
                 {

@@ -16,7 +16,6 @@
             Caption = 'Fiskaly API URL';
             DataClassification = CustomerContent;
         }
-
         field(21; "DSFINVK Api URL"; Text[250])
         {
             Caption = 'DSFINVK API URL';
@@ -26,6 +25,8 @@
         {
             Caption = 'Last Fiskaly Context';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not needed in Fiskaly V2 anymore.';
         }
     }
 
@@ -36,59 +37,27 @@
         }
     }
 
-    [NonDebuggable]
-    procedure SetApiKey(NewKey: Text)
-    begin
-        if not EncryptionEnabled() then
-            IsolatedStorage.Set(ApiKeyLbl, NewKey, DataScope::Company)
-        else
-            IsolatedStorage.SetEncrypted(ApiKeyLbl, NewKey, DataScope::Company);
-    end;
-
-    [NonDebuggable]
-    procedure GetApiKey() KeyValue: Text
-    begin
-        if IsolatedStorage.Get(ApiKeyLbl, DataScope::Company, KeyValue) then;
-    end;
-
-    [NonDebuggable]
-    procedure HasApiKey(): Boolean
-    begin
-        exit(GetApiKey() <> '');
-    end;
-
-    procedure RemoveApiKey()
-    begin
-        IsolatedStorage.Delete(ApiKeyLbl, DataScope::Company);
-    end;
-
-    [NonDebuggable]
-    procedure SetApiSecret(NewSecret: Text)
-    begin
-        if not EncryptionEnabled() then
-            IsolatedStorage.Set(ApiSecretLbl, NewSecret, DataScope::Company)
-        else
-            IsolatedStorage.SetEncrypted(ApiSecretLbl, NewSecret, DataScope::Company);
-    end;
-
-    [NonDebuggable]
-    procedure GetApiSecret() SecretValue: Text
-    begin
-        if IsolatedStorage.Get(ApiSecretLbl, DataScope::Company, SecretValue) then;
-    end;
-
-    [NonDebuggable]
-    procedure HasApiSecret(): Boolean
-    begin
-        exit(GetApiSecret() <> '');
-    end;
-
-    procedure RemoveApiSecret()
-    begin
-        IsolatedStorage.Delete(ApiSecretLbl, DataScope::Company);
-    end;
-
     var
-        ApiKeyLbl: Label 'DEFiskalyApiKey', Locked = true;
-        ApiSecretLbl: Label 'DEFiskalyApiSecret', Locked = true;
+        RecordHasBeenRead: Boolean;
+
+    procedure GetRecordOnce(ReRead: Boolean)
+    begin
+        if RecordHasBeenRead and not ReRead then
+            exit;
+        if not Get() then begin
+            Init();
+            Insert();
+        end;
+        RecordHasBeenRead := true;
+    end;
+
+    procedure ApiKeyLbl(): Text
+    begin
+        exit('DEFiskalyApiKey');
+    end;
+
+    procedure ApiSecretLbl(): Text
+    begin
+        exit('DEFiskalyApiSecret');
+    end;
 }

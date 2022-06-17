@@ -1,8 +1,6 @@
 ﻿page 6014433 "NPR Payment Method Mapper"
 {
     Extensible = False;
-
-
     Caption = 'Payment Method Mapper';
     PageType = List;
     SourceTable = "NPR Payment Method Mapper";
@@ -20,10 +18,10 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'POS Payment Method for Fiskaly.';
                 }
-                field("Fiscal Name"; Rec."Fiscal Name")
+                field("Fiskaly Payment Type"; Rec."Fiskaly Payment Type")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Fiscal Name for Fiskaly API.';
+                    ToolTip = 'Specifies Fiskaly API payment type.';
                 }
                 field("DSFINVK Type"; Rec."DSFINVK Type")
                 {

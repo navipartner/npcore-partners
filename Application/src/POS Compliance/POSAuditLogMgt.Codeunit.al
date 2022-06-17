@@ -1,6 +1,7 @@
 ﻿codeunit 6150619 "NPR POS Audit Log Mgt."
 {
     Access = Internal;
+
     var
         ERROR_NO_LOG_VALIDATION: Label 'No log validation routine found';
 
@@ -120,14 +121,19 @@
         PAGE.RunModal(0, POSAuditLog);
     end;
 
-    procedure LookupAuditHandler(var POSAuditProfile: Record "NPR POS Audit Profile")
+    procedure LookupAuditHandler(var SelectedAuditHandler: Text): Boolean
     var
         TempRetailList: Record "NPR Retail List" temporary;
     begin
         OnLookupAuditHandler(TempRetailList);
+        if SelectedAuditHandler <> '' then begin
+            TempRetailList.Choice := CopyStr(SelectedAuditHandler, 1, MaxStrLen(TempRetailList.Choice));
+            if TempRetailList.Find('=><') then;
+        end;
         if PAGE.RunModal(0, TempRetailList) <> ACTION::LookupOK then
-            exit;
-        POSAuditProfile."Audit Handler" := CopyStr(TempRetailList.Choice, 1, MaxStrLen(POSAuditProfile."Audit Handler"));
+            exit(false);
+        SelectedAuditHandler := TempRetailList.Choice;
+        exit(true);
     end;
 
     procedure LogPartnerModification(POSUnitNo: Text[10]; Description: Text[250])
@@ -175,7 +181,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List" temporary)
+    procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
     end;
 }
