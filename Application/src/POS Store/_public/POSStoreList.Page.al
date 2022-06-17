@@ -18,63 +18,63 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the code for the POS Store';
+                    ToolTip = 'Defines code of POS Store';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the name for the POS Store';
+                    ToolTip = 'Defines name of POS Store';
                     ApplicationArea = NPRRetail;
                 }
                 field("Post Code"; Rec."Post Code")
                 {
 
-                    ToolTip = 'Specifies the Post Code of the location in which the store is located.';
+                    ToolTip = 'Defines Post Code of POS Store';
                     ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
 
-                    ToolTip = 'Specifies the City in which the POS Store is situated ';
+                    ToolTip = 'Defines city in which store is located';
                     ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ToolTip = 'Dimension value of Global dimension 1 assigned to POS Store';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ToolTip = 'Dimension value of Global dimension 2 assigned to POS Store';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
 
-                    ToolTip = 'Specifies the Location Code that is attached the POS Store ';
+                    ToolTip = 'Defines Location for store. This location is used for posting item ledger entries';
                     ApplicationArea = NPRRetail;
                 }
                 field("Store Group Code"; Rec."Store Group Code")
                 {
 
-                    ToolTip = 'Specifies a Group Code that a set of POS Stores can be grouped into for BI purposes.';
+                    ToolTip = 'Defines Store Group for a store. Store Group code can be used in reporting purposes';
                     ApplicationArea = NPRRetail;
                 }
                 field("Store Category Code"; Rec."Store Category Code")
                 {
 
-                    ToolTip = 'Specifies a Category Code that POS Stores can be categorized into for BI purposes.';
+                    ToolTip = 'Defines Store Category for a store. Store Category code can be used in reporting purposes';
                     ApplicationArea = NPRRetail;
                 }
                 field("Store Locality Code"; Rec."Store Locality Code")
                 {
 
-                    ToolTip = 'Specifies a Locality Code that POS Stores can be regrouped into for BI purposes';
+                    ToolTip = 'Defines Store Locality for a store. Store Locality code can be used in reporting purposes';
                     ApplicationArea = NPRRetail;
                 }
             }
