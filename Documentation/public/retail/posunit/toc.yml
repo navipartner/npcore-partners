@@ -42,3 +42,5 @@
     href: howto/Named_Action_Code.md
   - name: Set up the POS Global Sales Profile
     href: howto/POS_Global.md
+  - name: Set up POS Pricing Profile
+    href: howto/POS_Pricing_profile.md
