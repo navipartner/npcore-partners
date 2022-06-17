@@ -9,8 +9,8 @@ In **General** section you can set up the following options:
 | **Code**       | The unique code for the POS view profile.   |
 | **Description**   | The short description of a profile.        |
 | **POS Theme code**  | The POS theme used in the POS unit. If there is some which will be used instead of default theme. |
-| **Show discount** | Specifies if discount should be shown in POS sale document lines. |
-| **Show prices including VAT** | Specifies if **Unit price** and **Line amount** on POS sale document lines should be shown with VAT. |
+| **Show discount** | Specifies if discount should be shown in POS sale lines. |
+| **Show prices including VAT** | Specifies if **Unit price** and **Line amount** on POS sale lines should be shown with VAT. |
 | **Initial sales view** | Which view will be shown as initial. Options: **Sale view** and **Restaurant view**. |
 | **After end of sale view** | Which view will be shown after sale is done. Options: **Initial Sales view** and **Login view**. |
 
