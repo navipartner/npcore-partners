@@ -44,3 +44,5 @@
     href: howto/POS_Global.md
   - name: Set up POS Pricing Profile
     href: howto/POS_Pricing_profile.md
+  - name: Set up a POS payment bin
+    href: howto/create_pos_payment_bin.md
