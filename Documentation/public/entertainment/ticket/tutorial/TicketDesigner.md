@@ -148,3 +148,7 @@ For creating a mobile ticket the procedure is just like creating a printed ticke
 
 >[!NOTE]
 >This ticket will be opened in a browser.
+
+### Related links
+
+- [Ticket module](../intro.md)

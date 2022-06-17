@@ -6,8 +6,16 @@
     href: explanation/POSUnit.md
   - name: POS self-service actions
     href: explanation/POS_Self_Service_Actions.md
-  - name: Retail vouchers
-    href: explanation/Retail_Vouchers.md
+  - name: POS menu
+    href: explanation/POS_menu.md
+  - name: POS unit receipt text profile
+    href: explanation/POS_unit_Receipt_profile.md
+  - name: POS input box profile
+    href: explanation/POS_input_box_profile.md
+  - name: POS audit profile
+    href: explanation/POS_audit_profile.md
+  - name: POS view profile
+    href: explanation/POS_view_profile.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
@@ -22,7 +30,19 @@
     href: howto/ConfigureCashDrawerOpening.md
   - name: Change the POS unit receipt footer text
     href: howto/POSUnitReceiptFooter.md
-  - name: POS menu
-    href: howto/POS_menu.md
+  - name: Set up job queue to post POS entries
+    href: howto/set_up_job_queue_to_post_POS_entries.md
   - name: Manually post POS entries and check if they are posted
     href: howto/manually_post_POS_entries.md
+  - name: Create a new item button in the POS
+    href: howto/Create_a_new_item_button_in_the_POS.md
+  - name: Create a new button in the POS menu
+    href: howto/add_button_to_pos_menu.md
+  - name: Set up the POS Named Action Profile
+    href: howto/Named_Action_Code.md
+  - name: Set up the POS Global Sales Profile
+    href: howto/POS_Global.md
+  - name: Set up POS Pricing Profile
+    href: howto/POS_Pricing_profile.md
+  - name: Set up a POS payment bin
+    href: howto/create_pos_payment_bin.md

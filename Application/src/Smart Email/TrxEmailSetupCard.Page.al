@@ -5,6 +5,7 @@
     PageType = Card;
     SourceTable = "NPR Trx Email Setup";
     UsageCategory = None;
+
     layout
     {
         area(content)

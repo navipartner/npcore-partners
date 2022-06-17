@@ -10,32 +10,34 @@
   items:
   - name: Issue tickets from Business Central
     href: howto/issue_ticket.md
-  - name: Set up DIY Printed Ticket
+  - name: Set up DIY printed ticket
     href: howto/SetUpDIYPrintedTicket.md
+  - name: Create a dynamic ticket
+    href: howto/CreateDynamicTicket.md
   - name: Create a ticket notification profile
     href: howto/CreateNotificationProfile.md
   - name: Create a ticket price profile
     href: howto/CreatePriceProfile.md
-  - name: Change Ticket Reservation 
+  - name: Change ticket reservation 
     href: howto/ChangeTicketReservation.md
-  - name: Set Up Ticket Refund Policy
+  - name: Set up ticket refund policy
     href: howto/SetUpRefundPolicy.md
-  - name: Refunding Tickets
+  - name: Refunding tickets
     href: howto/RefundingTickets.md
 
 - name: Explanation
   items:
-  - name: Tickets
-    href: explanation/ticket.md
-  - name: Ticket Admission
+  - name: Ticket admission
     href: explanation/admission.md
-  - name: Ticket-holder Notifications
+  - name: Dynamic ticket
+    href: explanation/DynamicTicket.md
+  - name: Ticket-holder notifications
     href: explanation/TicketHolderNotification.md
-  - name: Ticket Pricing
+  - name: Ticket pricing
     href: explanation/TicketPricing.md
-  - name: Reservation Vs. Location
+  - name: Reservation Vs. location
     href: explanation/LocationVsReservation.md
-  - name: Authorization Code for Ticket Rescheduling
+  - name: Authorization code for ticket rescheduling
     href: explanation/AuthorizationCode.md
-  - name: Ticket Statistics and Forecast
+  - name: Ticket statistics and forecast
     href: explanation/TicketStatandForecast.md

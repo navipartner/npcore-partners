@@ -84,7 +84,7 @@
                     DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
                     DSFINVKJson: JsonObject;
-                    DSFINVKResponseJson: JsonObject;
+                    DSFINVKResponseJson: JsonToken;
                     AccessToken: Text;
                 begin
                     DEAuditSetup.Get();
@@ -92,11 +92,11 @@
                     if not DSFINVKMng.CreateDSFINVKDocument(DSFINVKJson, Rec) then
                         DEAuditMgt.SetDSFINVKErrorMsg(Rec);
 
-                    if not DEAuditMgt.GetJwtToken(AccessToken) then
+                    if not DEFiskalyCommunication.GetJwtToken(AccessToken) then
                         DEAuditMgt.SetDSFINVKErrorMsg(Rec);
 
                     Rec."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings 
-                    if not DEFiskalyCommunication.SendDSFINVK(DSFINVKJson, DSFINVKResponseJson, DEAuditSetup, 'PUT', '/cash_point_closings/' + Format(Rec."Closing ID", 0, 4), AccessToken) then begin
+                    if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, 'PUT', StrSubstNo('/cash_point_closings/%1', Format(Rec."Closing ID", 0, 4)), AccessToken) then begin
                         DEAuditMgt.SetDSFINVKErrorMsg(Rec);
                         exit;
                     end;

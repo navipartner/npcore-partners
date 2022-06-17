@@ -3,39 +3,42 @@
     Access = Internal;
     SingleInstance = true;
 
-    procedure SetJWT(JsonString: JsonObject; var TokenPar: Text)
+    procedure SetJWT(ResponseJson: JsonToken; var AccessTokenOut: Text)
     var
         TypeHelper: Codeunit "Type Helper";
-        JsonTokenValue: JsonToken;
+        JToken: JsonToken;
     begin
-        JsonString.SelectToken('access_token', JsonTokenValue);
-        AccessToken := JsonTokenValue.AsValue().AsText();
-        JsonString.SelectToken('access_token_expires_at', JsonTokenValue);
-        AccessTokenExpires := TypeHelper.EvaluateUnixTimestamp(JsonTokenValue.AsValue().AsBigInteger());
-        JsonString.SelectToken('refresh_token', JsonTokenValue);
-        RefreshToken := JsonTokenValue.AsValue().AsText();
-        JsonString.SelectToken('refresh_token_expires_at', JsonTokenValue);
-        RefreshTokenExpires := TypeHelper.EvaluateUnixTimestamp(JsonTokenValue.AsValue().AsBigInteger());
-        TokenPar := AccessToken;
+        ResponseJson.SelectToken('access_token', JToken);
+        AccessToken := JToken.AsValue().AsText();
+        ResponseJson.SelectToken('access_token_expires_at', JToken);
+        AccessTokenExpires := TypeHelper.EvaluateUnixTimestamp(JToken.AsValue().AsBigInteger());
+        ResponseJson.SelectToken('refresh_token', JToken);
+        RefreshToken := JToken.AsValue().AsText();
+        ResponseJson.SelectToken('refresh_token_expires_at', JToken);
+        RefreshTokenExpires := TypeHelper.EvaluateUnixTimestamp(JToken.AsValue().AsBigInteger());
+        AccessTokenOut := AccessToken;
     end;
 
-    procedure GetToken(var TokenPar: Text; var RefreshTokenPar: Text): Boolean
+    procedure GetToken(var AccessTokenOut: Text; var RefreshTokenOut: Text): Boolean
+    var
+        NPRJobQueueMgt: Codeunit "NPR Job Queue Management";
+        ExpirationThresholdDateTime: DateTime;
     begin
+        AccessTokenOut := '';
+        RefreshTokenOut := '';
         if AccessToken = '' then
             exit(false);
-        if CurrentDateTime < AccessTokenExpires then
-            if CurrentDateTime < RefreshTokenExpires then
-                exit(false)
-            else begin
-                RefreshTokenPar := RefreshToken;
-                exit(false);
-            end
-        else begin
-            TokenPar := AccessToken;
+
+        ExpirationThresholdDateTime := RoundDateTime(NPRJobQueueMgt.NowWithDelayInSeconds(-120), 1000);
+        if (ExpirationThresholdDateTime < AccessTokenExpires) and (AccessTokenExpires <> 0DT) then begin
+            AccessTokenOut := AccessToken;
             exit(true);
         end;
-    end;
 
+        if (ExpirationThresholdDateTime < RefreshTokenExpires) and (RefreshTokenExpires <> 0DT) then
+            RefreshTokenOut := RefreshToken;
+        exit(false);
+    end;
 
     var
         AccessToken: Text;

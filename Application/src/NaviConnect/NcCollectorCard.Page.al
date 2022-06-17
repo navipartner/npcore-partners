@@ -3,9 +3,8 @@
     Extensible = False;
     Caption = 'Nc Collector Card';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Nc Collector";
-    ApplicationArea = NPRNaviConnect;
 
     layout
     {

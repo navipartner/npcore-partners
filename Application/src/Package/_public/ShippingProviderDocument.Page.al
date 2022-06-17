@@ -1,15 +1,13 @@
 page 6014486 "NPR Shipping Provider Document"
 {
     Extensible = true;
-
     Caption = 'Shipping Provider Document';
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = true;
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Shipping Provider Document";
-    ApplicationArea = NPRRetail;
 
     layout
     {

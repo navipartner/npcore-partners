@@ -128,7 +128,7 @@
     procedure DoSaveAsPOSQuote(POSSession: Codeunit "NPR POS Session"; SalePOS: Record "NPR POS Sale"; SkipDialog: Boolean): Integer
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl";
+        POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl B";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
     begin
         //Do not save as POS Saved Sales unfinished sales with no lines
@@ -164,7 +164,7 @@
     local procedure DoLoadFromPOSQuote(var SalePOS: Record "NPR POS Sale"; POSQuoteEntryNo: Integer): Boolean
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        POSActionLoadPOSQuote: Codeunit "NPR POS Action: LoadPOSSvSl";
+        POSActionLoadPOSQuote: Codeunit "NPR POS Action: LoadPOSSvSl B";
     begin
         if not POSQuoteEntry.Get(POSQuoteEntryNo) then
             exit(false);

@@ -6,6 +6,7 @@
     InsertAllowed = false;
     SourceTable = "NPR MM Member Info Capture";
     PageType = Card;
+
     layout
     {
         area(content)

@@ -98,10 +98,6 @@
   <div class="descriptiontext">        
     <section> </br>
       <p>NaviPartner delivers unified solutions for vertical retail businesses, museums and attractions. This documentation is intended to assist you in using all of these solutions.</p> </br>
-      <p> Our product documentation consists of three distinct groups of articles:</p>
-      <p> Explanations - high-level information about features and functionalities </p>
-      <p> How-to guides - a series of steps for completing a certain task </p>
-      <p> Tutorials - how-to guides for beginners </p> </br>
       <p> The <a href="https://docs.navipartner.com/retail/gettingstarted/intro.html">NP Retail</a> is an extension for Microsoft Business Central that adds Point of Sale capabilities to the ERP system along with auxiliary features such as RFID warehousing, Member & Ticket management, Replenishment, Receipt/Label printing, Webshop integration and much more.</p>
       <p> The <a href="https://docs.navipartner.com/ecommerce/intro.html">NP E-commerce</a> solution helps our customers build a foundation for a successful omnichannel online business.</p>
       <p> The <a href="https://docs.navipartner.com/entertainment/intro.html">NP Entertainment</a> is all-in-one ticketing and membership management system that streamlines sales and validation of tickets and memberships.</p>

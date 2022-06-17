@@ -81,19 +81,19 @@
             Caption = 'Audit Handler';
             DataClassification = CustomerContent;
 
-            trigger OnLookup()
+            trigger OnValidate()
             var
+                TempRetailList: Record "NPR Retail List" temporary;
                 POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
-                DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
-                CleanCashXCCSP: Codeunit "NPR CleanCash XCCSP Protocol";
             begin
-                POSAuditLogMgt.LookupAuditHandler(Rec);
-
-                case "Audit Handler" of
-                    DEAuditMgt.HandlerCode():
-                        Page.Run(Page::"NPR DE Audit Setup");
-                    CleanCashXCCSP.HandlerCode():
-                        Page.Run(Page::"NPR CleanCash Setup List");
+                if "Audit Handler" = '' then
+                    exit;
+                POSAuditLogMgt.OnLookupAuditHandler(TempRetailList);
+                TempRetailList.SetRange(Choice, "Audit Handler");
+                if TempRetailList.IsEmpty() then begin
+                    TempRetailList.SetFilter(Choice, StrSubstNo('@%1*', "Audit Handler"));
+                    TempRetailList.FindFirst();
+                    "Audit Handler" := TempRetailList.Choice;
                 end;
             end;
         }
