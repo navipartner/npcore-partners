@@ -77,6 +77,7 @@
         LibraryUtility: Codeunit "Library - Utility";
         LibraryRandom: Codeunit "Library - Random";
         LibraryERM: Codeunit "Library - ERM";
+        Currency: Record Currency;
     begin
         POSPaymentMethod.Init();
         POSPaymentMethod.Validate(
@@ -86,11 +87,12 @@
             LibraryUtility.GetFieldLength(DATABASE::"NPR POS Payment Method", POSPaymentMethod.FieldNo(POSPaymentMethod.Code))));
         POSPaymentMethod.Validate("Processing Type", ProcessingType);
         POSPaymentMethod.Validate("Currency Code", CurrencyCode);
+        GetCurrency(Currency, CurrencyCode);
         POSPaymentMethod.Validate("Post Condensed", PostCondensed);
-        POSPaymentMethod.Validate("Rounding Type", LibraryRandom.RandIntInRange(0, 2));
+        POSPaymentMethod.Validate("Rounding Type", Currency."Invoice Rounding Type");
         POSPaymentMethod.Validate("Rounding Gains Account", LibraryERM.CreateGLAccountNo);
         POSPaymentMethod.Validate("Rounding Losses Account", LibraryERM.CreateGLAccountNo);
-        POSPaymentMethod.Validate("Rounding Precision", GetRandomPrecision());
+        POSPaymentMethod.Validate("Rounding Precision", Currency."Amount Rounding Precision");
         POSPaymentMethod.Insert(true);
 
         if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CASH then
@@ -106,6 +108,14 @@
         POSPaymentMethod.Modify();
 
         CreatePOSPostingSetup(POSPaymentMethod);
+    end;
+
+    local procedure GetCurrency(var Currency: Record Currency; CurrencyCode: Code[10])
+    begin
+        if CurrencyCode <> '' then
+            Currency.Get(CurrencyCode)
+        else
+            Currency.InitRoundingPrecision();
     end;
 
     procedure CreatePOSPostingSetupSet(POSStoreCode: Code[10]; POSPaymentMethodCode: Code[10]; POSPaymentBinCode: Code[10])

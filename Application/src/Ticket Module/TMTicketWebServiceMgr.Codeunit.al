@@ -752,6 +752,7 @@
         TicketReservationRequest2.SetFilter("External Item Code", '=%1', TicketReservationRequest."External Item Code");
         TicketReservationRequest2.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
         TicketReservationRequest2.SetFilter("Admission Code", '=%1|=%2', '', TicketReservationRequest."Admission Code");
+        TicketReservationRequest2.SetFilter("Admission Created", '=%1', TicketReservationRequest."Admission Created");
 
         if (not TicketReservationRequest2.IsEmpty()) then begin
             TicketReservationResponse."Response Message" := StrSubstNo(InvalidRequest,

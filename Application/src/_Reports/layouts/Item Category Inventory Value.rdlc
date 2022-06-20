@@ -11,103 +11,6 @@
       <rd:DataSourceID>50fcd8b1-915d-4b81-b28b-dadfa9b78eb7</rd:DataSourceID>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="CompanyInfoName">
-          <DataField>CompanyInfoName</DataField>
-        </Field>
-        <Field Name="CompanyInfoPicture">
-          <DataField>CompanyInfoPicture</DataField>
-        </Field>
-        <Field Name="DateFilter">
-          <DataField>DateFilter</DataField>
-        </Field>
-        <Field Name="Primo">
-          <DataField>Primo</DataField>
-        </Field>
-        <Field Name="Ultimo">
-          <DataField>Ultimo</DataField>
-        </Field>
-        <Field Name="No">
-          <DataField>No</DataField>
-        </Field>
-        <Field Name="Description">
-          <DataField>Description</DataField>
-        </Field>
-        <Field Name="ItemCategoryMovementAtStartOf">
-          <DataField>ItemCategoryMovementAtStartOf</DataField>
-        </Field>
-        <Field Name="ItemCategoryMovementAtStartOfFormat">
-          <DataField>ItemCategoryMovementAtStartOfFormat</DataField>
-        </Field>
-        <Field Name="ItemCategoryInventoryAtStartOf">
-          <DataField>ItemCategoryInventoryAtStartOf</DataField>
-        </Field>
-        <Field Name="ItemCategoryInventoryAtStartOfFormat">
-          <DataField>ItemCategoryInventoryAtStartOfFormat</DataField>
-        </Field>
-        <Field Name="PurchaseQuantity">
-          <DataField>PurchaseQuantity</DataField>
-        </Field>
-        <Field Name="PurchaseQuantityFormat">
-          <DataField>PurchaseQuantityFormat</DataField>
-        </Field>
-        <Field Name="PurchaseLCY">
-          <DataField>PurchaseLCY</DataField>
-        </Field>
-        <Field Name="PurchaseLCYFormat">
-          <DataField>PurchaseLCYFormat</DataField>
-        </Field>
-        <Field Name="SalesQty">
-          <DataField>SalesQty</DataField>
-        </Field>
-        <Field Name="SalesQtyFormat">
-          <DataField>SalesQtyFormat</DataField>
-        </Field>
-        <Field Name="SaleLCY">
-          <DataField>SaleLCY</DataField>
-        </Field>
-        <Field Name="SaleLCYFormat">
-          <DataField>SaleLCYFormat</DataField>
-        </Field>
-        <Field Name="Profit">
-          <DataField>Profit</DataField>
-        </Field>
-        <Field Name="ProfitFormat">
-          <DataField>ProfitFormat</DataField>
-        </Field>
-        <Field Name="Dg">
-          <DataField>Dg</DataField>
-        </Field>
-        <Field Name="DgFormat">
-          <DataField>DgFormat</DataField>
-        </Field>
-        <Field Name="ItemCategoryMovementAtEndOf">
-          <DataField>ItemCategoryMovementAtEndOf</DataField>
-        </Field>
-        <Field Name="ItemCategoryMovementAtEndOfFormat">
-          <DataField>ItemCategoryMovementAtEndOfFormat</DataField>
-        </Field>
-        <Field Name="ItemCategoryInventoryAtEndOf">
-          <DataField>ItemCategoryInventoryAtEndOf</DataField>
-        </Field>
-        <Field Name="ItemCategoryInventoryAtEndOfFormat">
-          <DataField>ItemCategoryInventoryAtEndOfFormat</DataField>
-        </Field>
-        <Field Name="SaleLbl">
-          <DataField>SaleLbl</DataField>
-        </Field>
-        <Field Name="PurchaseLbl">
-          <DataField>PurchaseLbl</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3406,4 +3309,101 @@ End Function
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>ebb5b682-8155-4905-b301-23deaeddb6e7</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="CompanyInfoName">
+          <DataField>CompanyInfoName</DataField>
+        </Field>
+        <Field Name="CompanyInfoPicture">
+          <DataField>CompanyInfoPicture</DataField>
+        </Field>
+        <Field Name="DateFilter">
+          <DataField>DateFilter</DataField>
+        </Field>
+        <Field Name="Primo">
+          <DataField>Primo</DataField>
+        </Field>
+        <Field Name="Ultimo">
+          <DataField>Ultimo</DataField>
+        </Field>
+        <Field Name="No">
+          <DataField>No</DataField>
+        </Field>
+        <Field Name="Description">
+          <DataField>Description</DataField>
+        </Field>
+        <Field Name="ItemCategoryMovementAtStartOf">
+          <DataField>ItemCategoryMovementAtStartOf</DataField>
+        </Field>
+        <Field Name="ItemCategoryMovementAtStartOfFormat">
+          <DataField>ItemCategoryMovementAtStartOfFormat</DataField>
+        </Field>
+        <Field Name="ItemCategoryInventoryAtStartOf">
+          <DataField>ItemCategoryInventoryAtStartOf</DataField>
+        </Field>
+        <Field Name="ItemCategoryInventoryAtStartOfFormat">
+          <DataField>ItemCategoryInventoryAtStartOfFormat</DataField>
+        </Field>
+        <Field Name="PurchaseQuantity">
+          <DataField>PurchaseQuantity</DataField>
+        </Field>
+        <Field Name="PurchaseQuantityFormat">
+          <DataField>PurchaseQuantityFormat</DataField>
+        </Field>
+        <Field Name="PurchaseLCY">
+          <DataField>PurchaseLCY</DataField>
+        </Field>
+        <Field Name="PurchaseLCYFormat">
+          <DataField>PurchaseLCYFormat</DataField>
+        </Field>
+        <Field Name="SalesQty">
+          <DataField>SalesQty</DataField>
+        </Field>
+        <Field Name="SalesQtyFormat">
+          <DataField>SalesQtyFormat</DataField>
+        </Field>
+        <Field Name="SaleLCY">
+          <DataField>SaleLCY</DataField>
+        </Field>
+        <Field Name="SaleLCYFormat">
+          <DataField>SaleLCYFormat</DataField>
+        </Field>
+        <Field Name="Profit">
+          <DataField>Profit</DataField>
+        </Field>
+        <Field Name="ProfitFormat">
+          <DataField>ProfitFormat</DataField>
+        </Field>
+        <Field Name="Dg">
+          <DataField>Dg</DataField>
+        </Field>
+        <Field Name="DgFormat">
+          <DataField>DgFormat</DataField>
+        </Field>
+        <Field Name="ItemCategoryMovementAtEndOf">
+          <DataField>ItemCategoryMovementAtEndOf</DataField>
+        </Field>
+        <Field Name="ItemCategoryMovementAtEndOfFormat">
+          <DataField>ItemCategoryMovementAtEndOfFormat</DataField>
+        </Field>
+        <Field Name="ItemCategoryInventoryAtEndOf">
+          <DataField>ItemCategoryInventoryAtEndOf</DataField>
+        </Field>
+        <Field Name="ItemCategoryInventoryAtEndOfFormat">
+          <DataField>ItemCategoryInventoryAtEndOfFormat</DataField>
+        </Field>
+        <Field Name="SaleLbl">
+          <DataField>SaleLbl</DataField>
+        </Field>
+        <Field Name="PurchaseLbl">
+          <DataField>PurchaseLbl</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

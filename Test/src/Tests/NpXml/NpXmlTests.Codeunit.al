@@ -48,6 +48,7 @@ codeunit 85021 "NPR NpXml Tests"
 
         //[GIVEN] Download XML Template
         MockDownloadXmlTemplate('upd_item', NpXmlTemplate);
+        NpXmlMockHandler.UpdateNpXmlReferences();
 
         //[GIVEN] Configure XML Template
         ConfigureXmlTemplateForAPI(NpXmlTemplate);
@@ -201,7 +202,7 @@ codeunit 85021 "NPR NpXml Tests"
         NpXmlElement: Record "NPR NpXml Element";
     begin
         NpXmlTemplate."FTP Transfer" := false;
-        NpXmlTemplate."API Transfer" := true;
+        NpXmlTemplate."API Transfer" := false;
         NpXmlTemplate."API Type" := NpXmlTemplate."API Type"::"REST (Json)";
         NpXmlTemplate.Modify();
 

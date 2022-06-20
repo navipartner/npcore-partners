@@ -69,7 +69,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
                                                         ParamShowTripMessage,
                                                         POSSale,
                                                         POSSaleLine);
-
+        ClearAll();
     end;
 
     [Test]
@@ -131,7 +131,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
         POSInfoTransaction.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         POSInfoTransaction.SetRange("POS Info", TravelSaveString);
         Assert.IsTrue(POSInfoTransaction.FindFirst(), 'POS Info Transaction is created');
-
+        ClearAll();
     end;
 
     local procedure CreatePOSInfo(POSInfoCode: code[20])
@@ -189,7 +189,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
                                                         ParamShowTripMessage,
                                                         POSSale,
                                                         POSSaleLine);
-
+        ClearAll();
     end;
 
     [Test]
@@ -243,7 +243,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
                                                         ParamShowTripMessage,
                                                         POSSale,
                                                         POSSaleLine);
-
+        ClearAll();
     end;
 
 

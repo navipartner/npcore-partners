@@ -11,97 +11,6 @@
       <rd:DataSourceID>a0e326e1-5f81-444f-900f-caef436353dd</rd:DataSourceID>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CalcMethod">
-          <DataField>CalcMethod</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="UnitCost_Item">
-          <DataField>UnitCost_Item</DataField>
-        </Field>
-        <Field Name="UnitCost_ItemFormat">
-          <DataField>UnitCost_ItemFormat</DataField>
-        </Field>
-        <Field Name="VendorItemNo_Item">
-          <DataField>VendorItemNo_Item</DataField>
-        </Field>
-        <Field Name="NetChange_Item">
-          <DataField>NetChange_Item</DataField>
-        </Field>
-        <Field Name="NetChange_ItemFormat">
-          <DataField>NetChange_ItemFormat</DataField>
-        </Field>
-        <Field Name="UnitPrice_Item">
-          <DataField>UnitPrice_Item</DataField>
-        </Field>
-        <Field Name="UnitPrice_ItemFormat">
-          <DataField>UnitPrice_ItemFormat</DataField>
-        </Field>
-        <Field Name="UnitPriceExclVAT">
-          <DataField>UnitPriceExclVAT</DataField>
-        </Field>
-        <Field Name="UnitPriceExclVATFormat">
-          <DataField>UnitPriceExclVATFormat</DataField>
-        </Field>
-        <Field Name="LastDirectCost_Item">
-          <DataField>LastDirectCost_Item</DataField>
-        </Field>
-        <Field Name="LastDirectCost_ItemFormat">
-          <DataField>LastDirectCost_ItemFormat</DataField>
-        </Field>
-        <Field Name="CostValuation">
-          <DataField>CostValuation</DataField>
-        </Field>
-        <Field Name="CostValuationFormat">
-          <DataField>CostValuationFormat</DataField>
-        </Field>
-        <Field Name="GrossAvg">
-          <DataField>GrossAvg</DataField>
-        </Field>
-        <Field Name="GrossAvgFormat">
-          <DataField>GrossAvgFormat</DataField>
-        </Field>
-        <Field Name="ActualSales">
-          <DataField>ActualSales</DataField>
-        </Field>
-        <Field Name="ActualSalesFormat">
-          <DataField>ActualSalesFormat</DataField>
-        </Field>
-        <Field Name="LatestSalesDate">
-          <DataField>LatestSalesDate</DataField>
-        </Field>
-        <Field Name="Itemfilter">
-          <DataField>Itemfilter</DataField>
-        </Field>
-        <Field Name="EndDate">
-          <DataField>EndDate</DataField>
-        </Field>
-        <Field Name="ItemCategory_Item">
-          <DataField>ItemCategory_Item</DataField>
-        </Field>
-        <Field Name="GroupByItemCategory">
-          <DataField>GroupByItemCategory</DataField>
-        </Field>
-        <Field Name="LatestPurchaseDate_ItemLedgerEntry">
-          <DataField>LatestPurchaseDate_ItemLedgerEntry</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2163,4 +2072,95 @@ End Function
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>08101579-7c92-421a-a9f8-a07c906bed32</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="CalcMethod">
+          <DataField>CalcMethod</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="UnitCost_Item">
+          <DataField>UnitCost_Item</DataField>
+        </Field>
+        <Field Name="UnitCost_ItemFormat">
+          <DataField>UnitCost_ItemFormat</DataField>
+        </Field>
+        <Field Name="VendorItemNo_Item">
+          <DataField>VendorItemNo_Item</DataField>
+        </Field>
+        <Field Name="NetChange_Item">
+          <DataField>NetChange_Item</DataField>
+        </Field>
+        <Field Name="NetChange_ItemFormat">
+          <DataField>NetChange_ItemFormat</DataField>
+        </Field>
+        <Field Name="UnitPrice_Item">
+          <DataField>UnitPrice_Item</DataField>
+        </Field>
+        <Field Name="UnitPrice_ItemFormat">
+          <DataField>UnitPrice_ItemFormat</DataField>
+        </Field>
+        <Field Name="UnitPriceExclVAT">
+          <DataField>UnitPriceExclVAT</DataField>
+        </Field>
+        <Field Name="UnitPriceExclVATFormat">
+          <DataField>UnitPriceExclVATFormat</DataField>
+        </Field>
+        <Field Name="LastDirectCost_Item">
+          <DataField>LastDirectCost_Item</DataField>
+        </Field>
+        <Field Name="LastDirectCost_ItemFormat">
+          <DataField>LastDirectCost_ItemFormat</DataField>
+        </Field>
+        <Field Name="CostValuation">
+          <DataField>CostValuation</DataField>
+        </Field>
+        <Field Name="CostValuationFormat">
+          <DataField>CostValuationFormat</DataField>
+        </Field>
+        <Field Name="GrossAvg">
+          <DataField>GrossAvg</DataField>
+        </Field>
+        <Field Name="GrossAvgFormat">
+          <DataField>GrossAvgFormat</DataField>
+        </Field>
+        <Field Name="ActualSales">
+          <DataField>ActualSales</DataField>
+        </Field>
+        <Field Name="ActualSalesFormat">
+          <DataField>ActualSalesFormat</DataField>
+        </Field>
+        <Field Name="LatestSalesDate">
+          <DataField>LatestSalesDate</DataField>
+        </Field>
+        <Field Name="Itemfilter">
+          <DataField>Itemfilter</DataField>
+        </Field>
+        <Field Name="EndDate">
+          <DataField>EndDate</DataField>
+        </Field>
+        <Field Name="ItemCategory_Item">
+          <DataField>ItemCategory_Item</DataField>
+        </Field>
+        <Field Name="GroupByItemCategory">
+          <DataField>GroupByItemCategory</DataField>
+        </Field>
+        <Field Name="LatestPurchaseDate_ItemLedgerEntry">
+          <DataField>LatestPurchaseDate_ItemLedgerEntry</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

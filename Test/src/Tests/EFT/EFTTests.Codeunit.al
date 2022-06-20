@@ -15,6 +15,39 @@ codeunit 85004 "NPR EFT Tests"
         _POSSetup: Record "NPR POS Setup";
 
     [Test]
+    procedure LookupReversedTransaction()
+    var
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NPRLibraryEFT: Codeunit "NPR Library - EFT";
+        EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
+        SalePOS: Record "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        Item: Record Item;
+        POSSale: Codeunit "NPR POS Sale";
+        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
+        EntryNo: Integer;
+        Assert: Codeunit Assert;
+    begin
+        // [Scenario] Check that a EFT lookup of a reversed transaction is not possible. (Result is final)
+
+        // [Given] An active sale, with items, and approved purchase + reversed trx
+        VoidSuccess();
+        OriginalEFTTransactionRequest.Get(_LastTrxEntryNo);
+        OriginalEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Processed Entry No.");
+
+        // [When] Performing lookup on the void trx
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        // [Then] Error
+        asserterror EFTTransactionMgt.StartLookup(_EFTSetup, SalePOS, OriginalEFTTransactionRequest."Entry No.");
+    end;
+
+    [Test]
     procedure PurchaseSuccess()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2034,39 +2067,6 @@ codeunit 85004 "NPR EFT Tests"
         OriginalEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Entry No.");
         OriginalEFTTransactionRequest.TestField(Recovered, true);
         OriginalEFTTransactionRequest.TestField("Recovered by Entry No.", EFTTransactionRequest."Entry No.");
-    end;
-
-    [Test]
-    procedure LookupReversedTransaction()
-    var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
-        EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
-        SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
-        POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
-    begin
-        // [Scenario] Check that a EFT lookup of a reversed transaction is not possible. (Result is final)
-
-        // [Given] An active sale, with items, and approved purchase + reversed trx
-        VoidSuccess();
-        OriginalEFTTransactionRequest.Get(_LastTrxEntryNo);
-        OriginalEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Processed Entry No.");
-
-        // [When] Performing lookup on the void trx
-        _POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        // [Then] Error
-        asserterror EFTTransactionMgt.StartLookup(_EFTSetup, SalePOS, OriginalEFTTransactionRequest."Entry No.");
     end;
 
     [Test]
