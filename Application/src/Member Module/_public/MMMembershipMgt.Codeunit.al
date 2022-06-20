@@ -4699,6 +4699,11 @@
         ContactBusinessRelation.SetFilter("Contact No.", '=%1', ContactNo);
         ContactBusinessRelation.SetFilter("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
         ContactBusinessRelation.SetFilter("No.", '=%1', CustomerNo);
+
+        if (ContactBusinessRelation.IsEmpty()) then 
+            if (Contact."Company No." <> '') then
+                ContactBusinessRelation.SetFilter("Contact No.", '=%1', Contact."Company No.");
+
         exit(not ContactBusinessRelation.IsEmpty());
 
     end;

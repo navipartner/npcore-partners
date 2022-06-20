@@ -245,31 +245,31 @@
                 Visible = ShowNewMemberSection;
                 field("Company Name"; Rec."Company Name")
                 {
-
+                    Editable = not _PreSelectedCustomerContact;
                     ToolTip = 'Specifies the value of the Company Name field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("First Name"; Rec."First Name")
                 {
-
+                    Editable = not _PreSelectedCustomerContact;
                     ToolTip = 'Specifies the value of the First Name field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Middle Name"; Rec."Middle Name")
                 {
-
+                    Editable = not _PreSelectedCustomerContact;
                     ToolTip = 'Specifies the value of the Middle Name field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
-
+                    Editable = not _PreSelectedCustomerContact;
                     ToolTip = 'Specifies the value of the Last Name field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-
+                    Editable = not _PreSelectedCustomerContact;
                     ShowMandatory = phonenomandatory;
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
@@ -284,31 +284,30 @@
                 }
                 field(Address; Rec.Address)
                 {
-
+                    Editable = not _PreSelectedCustomerContact;
                     ToolTip = 'Specifies the value of the Address field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Post Code Code"; Rec."Post Code Code")
                 {
-
+                    Editable = not _PreSelectedCustomerContact;
                     ToolTip = 'Specifies the value of the Post Code field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(City; Rec.City)
                 {
-
+                    Editable = not _PreSelectedCustomerContact;
                     ToolTip = 'Specifies the value of the City field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Country Code"; Rec."Country Code")
                 {
-
+                    Editable = not _PreSelectedCustomerContact;
                     ToolTip = 'Specifies the value of the Country Code field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Enable Auto-Renew"; Rec."Enable Auto-Renew")
                 {
-
                     Editable = ShowAutoRenew;
                     Importance = Additional;
                     Visible = false;
@@ -325,7 +324,6 @@
                 }
                 field("Auto-Renew Payment Method Code"; Rec."Auto-Renew Payment Method Code")
                 {
-
                     Importance = Additional;
                     ShowMandatory = AutoRenewPaymentMethodMandatory;
                     ToolTip = 'Specifies the value of the Auto-Renew Payment Method Code field';
@@ -339,6 +337,46 @@
                         SetMandatoryVisualQue();
                     end;
                 }
+                field("Customer No."; Rec."Customer No.")
+                {
+                    Importance = Additional;
+                    ToolTip = 'Links membership with a pre-existing customer number.';
+                    Visible = true; // if membership -> customer relationship is enabled.
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnValidate()
+                    var
+                        Customer: Record "Customer";
+                        ContactNumber: Code[20];
+                    begin
+                        Rec."Contact No." := '';
+                        if (Rec."Customer No." <> '') then begin
+                            Customer.Get(Rec."Customer No.");
+                            ApplyCustomer(Customer."No.", Rec);
+                            if (SelectContact(Customer."No.", ContactNumber)) then
+                                ApplyContact(ContactNumber, Rec);
+                            CurrPage.Update(true);
+                        end;
+                        _PreSelectedCustomerContact := (Rec."Customer No." <> '');
+                    end;
+
+                    trigger OnDrillDown()
+                    var
+                        CustomerNumber: Code[20];
+                        ContactNumber: Code[20];
+                    begin
+                        Rec."Customer No." := '';
+                        Rec."Contact No." := '';
+                        if (SelectCustomer(CustomerNumber)) then begin
+                            ApplyCustomer(CustomerNumber, Rec);
+                            if (SelectContact(CustomerNumber, ContactNumber)) then
+                                ApplyContact(ContactNumber, Rec);
+                        end;
+                        CurrPage.Update(true);
+                        _PreSelectedCustomerContact := (Rec."Customer No." <> '');
+                    end;
+                }
+
             }
             group(CRM)
             {
@@ -394,7 +432,7 @@
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
-
+                    Editable = (not _PreSelectedCustomerContact) or (EmailMandatory and (Rec."E-Mail Address" = ''));
                     ShowMandatory = EmailMandatory;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
@@ -947,6 +985,7 @@
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
         AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
+        _PreSelectedCustomerContact: Boolean;
 
     local procedure CheckEmail()
     var
@@ -1168,6 +1207,7 @@
         ValidUntilBaseDate: Date;
     begin
 
+        _PreSelectedCustomerContact := (Rec."Contact No." <> '') or (Rec."Customer No." <> '');
         ShowNewMemberSection := true;
 
         ShowAddToMembershipSection := false;
@@ -1511,6 +1551,96 @@
     internal procedure SetAddMembershipGuardianMode()
     begin
         SetAddGuardianMode := true;
+    end;
+
+    local procedure SelectCustomer(var CustomerNumber: Code[20]): Boolean
+    var
+        Customers: Page "Customer List";
+        Customer: Record "Customer";
+    begin
+        CustomerNumber := '';
+
+        Customer.SetFilter(Blocked, '=%1', "Customer Blocked"::" ");
+        Customers.SetTableView(Customer);
+        Customers.LookupMode(true);
+        if (Action::LookupOK = Customers.RunModal()) then begin
+            Customers.GetRecord(Customer);
+            CustomerNumber := Customer."No.";
+        end;
+
+        exit(CustomerNumber <> '');
+    end;
+
+    local procedure SelectContact(CustomerNumber: Code[20]; var ContactNumber: Code[20]): Boolean
+    var
+        Contact: Record "Contact";
+        ContactRelation: Record "Contact Business Relation";
+        Contacts: Page "Contact List";
+    begin
+        ContactNumber := '';
+
+        ContactRelation.SetFilter("Link to Table", '=%1', "Contact Business Relation Link To Table"::"Customer");
+        ContactRelation.SetFilter("No.", '=%1', CustomerNumber);
+        if (not ContactRelation.FindFirst()) then
+            exit;
+
+        Contact.SetFilter("Company No.", '=%1', ContactRelation."Contact No.");
+        Contacts.SetTableView(Contact);
+        Contacts.LookupMode(true);
+        if (Action::LookupOK = Contacts.RunModal()) then begin
+            Contacts.GetRecord(Contact);
+            ContactNumber := Contact."No.";
+        end;
+
+        exit(ContactNumber <> '');
+    end;
+
+    local procedure ApplyCustomer(CustomerNumber: Code[20]; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    var
+        Customer: Record "Customer";
+        Membership: Record "NPR MM Membership";
+        CustomerLinkedToMembership: Label 'Customer number %2 is already linked to membership %1.';
+    begin
+        Customer.Get(CustomerNumber);
+
+        Membership.SetFilter("Customer No.", '=%1', CustomerNumber);
+        Membership.SetFilter(Blocked, '=%1', false);
+        if (Membership.FindFirst()) then
+            Error(CustomerLinkedToMembership, Membership."External Membership No.", CustomerNumber);
+
+        MemberInfoCapture."Company Name" := Customer.Name;
+        MemberInfoCapture.Address := Customer.Address;
+        MemberInfoCapture."Post Code Code" := Customer."Post Code";
+        MemberInfoCapture.City := Customer.City;
+        MemberInfoCapture."Country Code" := Customer."Country/Region Code";
+        MemberInfoCapture."E-Mail Address" := Customer."E-Mail";
+        MemberInfoCapture."Phone No." := Customer."Phone No.";
+        MemberInfoCapture."Customer No." := CustomerNumber;
+    end;
+
+    local procedure ApplyContact(ContactNumber: Code[20]; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    var
+        Contact: Record "Contact";
+        MembershipRole: Record "NPR MM Membership Role";
+        ContactLinkedToMember: Label 'Contact %1 is assigned to member %2 %3 on membership %4';
+    begin
+        Contact.Get(ContactNumber);
+
+        MembershipRole.SetFilter("Contact No.", '=%1', ContactNumber);
+        MembershipRole.CalcFields("External Member No.", "External Membership No.", "Member Display Name");
+        if (MembershipRole.FindFirst()) then
+            Error(ContactLinkedToMember, ContactNumber, MembershipRole."External Member No.", MembershipRole."Member Display Name", MembershipRole."External Membership No.");
+
+        MemberInfoCapture."First Name" := Contact."First Name";
+        MemberInfoCapture."Middle Name" := Contact."Middle Name";
+        MemberInfoCapture."Last Name" := Contact.Surname;
+        MemberInfoCapture.Address := Contact.Address;
+        MemberInfoCapture."Post Code Code" := Contact."Post Code";
+        MemberInfoCapture.City := Contact.City;
+        MemberInfoCapture."Country Code" := Contact."Country/Region Code";
+        MemberInfoCapture."E-Mail Address" := Contact."E-Mail";
+        MemberInfoCapture."Phone No." := Contact."Phone No.";
+        MemberInfoCapture."Contact No." := Contact."No.";
     end;
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
