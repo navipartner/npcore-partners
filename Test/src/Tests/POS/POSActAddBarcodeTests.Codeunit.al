@@ -2,11 +2,6 @@ codeunit 85048 "NPR POS Act. Add Barcode Tests"
 {
     Subtype = Test;
 
-    trigger OnRun()
-    begin
-
-    end;
-
     var
         LibraryRandom: Codeunit "Library - Random";
         Assert: Codeunit "Assert";
