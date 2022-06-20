@@ -645,8 +645,18 @@
         JsonMgt.AddVariantValueToJsonObject(Json, Name, Value);
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure SetWorkflowInvocationParameter(Name: Text; Value: Variant; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
+        CheckParameter(Name, Value, FrontEnd);
+        SetWorkflowInvocationDictionary(WorkflowInvocationParameters, Name, Value);
+    end;
+
+    procedure SetWorkflowParameter(Name: Text; Value: Variant)
+    var
+        FrontEnd: Codeunit "NPR POS Front End Management";
+    begin
+        POSSession.GetFrontEnd(FrontEnd);
         CheckParameter(Name, Value, FrontEnd);
         SetWorkflowInvocationDictionary(WorkflowInvocationParameters, Name, Value);
     end;

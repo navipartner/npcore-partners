@@ -4,7 +4,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ParametarOptionsLbl: Label 'perform only Negative Adjustment,perform only Positive Adjustment,perform both Negative and Positive Adjustment';
+        ParametarOptionsLbl: Label 'perform only Negative Adjustment,perform only Positive Adjustment,perform both Negative and Positive Adjustment', Locked = true;
         ActionDescription: Label 'Post Inventory Adjustment directly from POS';
         ParameterFixedReturnReason_NameLbl: Label 'FixedReturnReason';
         ParameterFixedReturnReason_CptLbl: Label 'Fixed Return Reason';

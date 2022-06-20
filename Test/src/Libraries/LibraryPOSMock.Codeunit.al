@@ -83,7 +83,7 @@ codeunit 85003 "NPR Library - POS Mock"
 
     procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; ItemNo: Text; Quantity: Decimal)
     var
-        POSActionInsertItem: Codeunit "NPR POS Action: Insert Item";
+        POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
         Item: Record Item;
         ItemReference: Record "Item Reference";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -94,7 +94,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
         Item.Get(ItemNo);
-        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, false, '', '', '', false, '', POSSession, FrontEnd); //Insert step of item action
+        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, '', '', '', POSSession); //Insert step of item action
     end;
 
     procedure EndSale(POSSession: Codeunit "NPR POS Session"): Boolean
