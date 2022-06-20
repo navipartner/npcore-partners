@@ -6,12 +6,8 @@
         TempCustDiscGroup: Record "Customer Discount Group" temporary;
         GLSetup: Record "General Ledger Setup";
 
-    procedure ApplyMixDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; TriggerRec: Record "NPR POS Sale Line"; RecalculateAllLines: Boolean): Boolean
-    begin
-        Exit(ApplyMixDiscounts(SalePOS, TempSaleLinePOS, TriggerRec, RecalculateAllLines, false));
-    end;
 
-    procedure ApplyMixDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; TriggerRec: Record "NPR POS Sale Line"; RecalculateAllLines: Boolean; CalculateOnly: Boolean): Boolean
+    procedure ApplyMixDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; TriggerRec: Record "NPR POS Sale Line"; RecalculateAllLines: Boolean; CalculateOnly: Boolean; CalculationDate: Date): Boolean
     var
         TempMixedDiscount: Record "NPR Mixed Discount" temporary;
         TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary;
@@ -19,7 +15,7 @@
         GLSetup.Get();
         GLSetup.TestField("Amount Rounding Precision");
 
-        FindPotentiallyImpactedMixesAndLines(TempSaleLinePOS, TriggerRec, TempMixedDiscount, RecalculateAllLines);
+        FindPotentiallyImpactedMixesAndLines(TempSaleLinePOS, TriggerRec, TempMixedDiscount, RecalculateAllLines, CalculationDate);
 
         if not FindMatchingMixedDiscounts(SalePOS, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS) then begin
             Clear(TempSaleLinePOS);
@@ -49,6 +45,11 @@
     end;
 
     procedure FindPotentiallyImpactedMixesAndLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; RecalculateAllLines: Boolean)
+    begin
+        FindPotentiallyImpactedMixesAndLines(TempSaleLinePOS, Rec, tmpImpactedMixHeaders, RecalculateAllLines, Today);
+    end;
+
+    procedure FindPotentiallyImpactedMixesAndLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; RecalculateAllLines: Boolean; CalculationDate: Date)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         TempImpactedItems: Record "Item Variant" temporary;
@@ -66,16 +67,16 @@
 
         if RecalculateAllLines then begin
             repeat
-                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, TempSaleLinePOS."No.", TempSaleLinePOS."Variant Code", tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
-                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", TempSaleLinePOS."Item Disc. Group", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
-                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", TempSaleLinePOS."Item Category Code", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
+                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, TempSaleLinePOS."No.", TempSaleLinePOS."Variant Code", tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups, CalculationDate);
+                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", TempSaleLinePOS."Item Disc. Group", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups, CalculationDate);
+                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", TempSaleLinePOS."Item Category Code", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups, CalculationDate);
             until TempSaleLinePOS.Next() = 0;
         end else begin
             if not Rec."Allow Line Discount" then
                 exit;
-            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, Rec."No.", Rec."Variant Code", tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
-            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", Rec."Item Disc. Group", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
-            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", Rec."Item Category Code", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
+            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, Rec."No.", Rec."Variant Code", tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups, CalculationDate);
+            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", Rec."Item Disc. Group", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups, CalculationDate);
+            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", Rec."Item Category Code", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups, CalculationDate);
         end;
 
         TempSaleLinePOS.FindSet();
@@ -89,7 +90,7 @@
         TempSaleLinePOS.MarkedOnly(true);
     end;
 
-    local procedure FindMixGroupingImpact(GroupingType: Enum "NPR Disc. Grouping Type"; No: Code[20]; VariantCode: Code[10]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary)
+    local procedure FindMixGroupingImpact(GroupingType: Enum "NPR Disc. Grouping Type"; No: Code[20]; VariantCode: Code[10]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary; CalculationDate: Date)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
     begin
@@ -97,17 +98,20 @@
         MixedDiscountLine.SetRange("Disc. Grouping Type", GroupingType);
         MixedDiscountLine.SetRange("No.", No);
         MixedDiscountLine.SetFilter("Variant Code", '%1|%2', VariantCode, '');
-        MixedDiscountLine.SetFilter("Starting Date", '<=%1|=%2', Today, 0D);
-        MixedDiscountLine.SetFilter("Ending Date", '>=%1|=%2', Today, 0D);
+        MixedDiscountLine.SetFilter("Starting Date", '<=%1|=%2', CalculationDate, 0D);//
+        MixedDiscountLine.SetFilter("Ending Date", '>=%1|=%2', CalculationDate, 0D);
+        MixedDiscountLine."Starting Date" := CalculationDate;
+
+
         MixedDiscountLine.SetRange(Status, MixedDiscountLine.Status::Active);
 
         if MixedDiscountLine.FindSet() then
             repeat
-                FindMixHeaderImpact(MixedDiscountLine.Code, tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
+                FindMixHeaderImpact(MixedDiscountLine.Code, tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups, CalculationDate);
             until MixedDiscountLine.Next() = 0;
     end;
 
-    local procedure FindMixHeaderImpact(MixDiscountCode: Code[20]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary)
+    local procedure FindMixHeaderImpact(MixDiscountCode: Code[20]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary; CalculationDate: Date)
     var
         MixedDiscount: Record "NPR Mixed Discount";
         MixedDiscountLine: Record "NPR Mixed Discount Line";
@@ -118,19 +122,19 @@
             exit;
         if MixedDiscount.Status <> MixedDiscount.Status::Active then
             exit;
-        if MixedDiscount."Starting date" > Today then
+        if MixedDiscount."Starting date" > CalculationDate then
             exit;
-        if MixedDiscount."Ending date" < Today then
+        if MixedDiscount."Ending date" < CalculationDate then
             exit;
 
         tmpImpactedMixHeaders := MixedDiscount;
         tmpImpactedMixHeaders.Insert();
 
-        FindMixLineImpact(MixDiscountCode, tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
-        FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Mix Discount", MixDiscountCode, '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
+        FindMixLineImpact(MixDiscountCode, tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups, CalculationDate);
+        FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Mix Discount", MixDiscountCode, '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups, CalculationDate);
     end;
 
-    local procedure FindMixLineImpact(MixDiscountCode: Code[20]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary)
+    local procedure FindMixLineImpact(MixDiscountCode: Code[20]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary; CalculationDate: Date)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
     begin
@@ -145,22 +149,22 @@
                         tmpImpactedItems."Item No." := MixedDiscountLine."No.";
                         tmpImpactedItems.Code := MixedDiscountLine."Variant Code";
                         tmpImpactedItems.Insert();
-                        FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type", MixedDiscountLine."No.", MixedDiscountLine."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
+                        FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type", MixedDiscountLine."No.", MixedDiscountLine."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups, CalculationDate);
                     end;
                 MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group":
                     if not tmpImpactedItemDiscGroups.Get(MixedDiscountLine."No.") then begin
                         tmpImpactedItemDiscGroups.Code := MixedDiscountLine."No.";
                         tmpImpactedItemDiscGroups.Insert();
-                        FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type", MixedDiscountLine."No.", MixedDiscountLine."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
+                        FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type", MixedDiscountLine."No.", MixedDiscountLine."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups, CalculationDate);
                     end;
                 MixedDiscountLine."Disc. Grouping Type"::"Item Group":
                     if not tmpImpactedItemGroups.Get(MixedDiscountLine."No.") then begin
                         tmpImpactedItemGroups.Code := MixedDiscountLine."No.";
                         tmpImpactedItemGroups.Insert();
-                        FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type", MixedDiscountLine."No.", MixedDiscountLine."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
+                        FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type", MixedDiscountLine."No.", MixedDiscountLine."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups, CalculationDate);
                     end;
                 MixedDiscountLine."Disc. Grouping Type"::"Mix Discount":
-                    FindMixHeaderImpact(MixedDiscountLine."No.", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
+                    FindMixHeaderImpact(MixedDiscountLine."No.", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups, CalculationDate);
             end;
         until MixedDiscountLine.Next() = 0;
     end;
@@ -1210,12 +1214,14 @@
     var
         MixedDiscount2: Record "NPR Mixed Discount";
         MixedDiscountLine2: Record "NPR Mixed Discount Line";
+        MixDiscCalcMgt: Codeunit "NPR Mix Discount Calc. Mgt.";
     begin
         case MixedDiscount."Mix Type" of
             MixedDiscount."Mix Type"::Standard, MixedDiscount."Mix Type"::Combination:
                 begin
-                    if not IsActiveNow(MixedDiscount) then
-                        exit(false);
+                    if SalePos."Register No." <> MixDiscCalcMgt.GetCalculationTempPosSalesLineId() then
+                        if not IsActiveNow(MixedDiscount) then
+                            exit(false);
 
                     if MixedDiscount."Customer Disc. Group Filter" <> '' then begin
                         GenerateTmpCustDiscGroupList();
@@ -1393,7 +1399,7 @@
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
 
-        ApplyMixDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines);
+        ApplyMixDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines, false, Today);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'OnFindActiveSaleLineDiscounts', '', false, false)]
