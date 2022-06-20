@@ -171,7 +171,6 @@
         until EanBoxParameter.Next() = 0;
     end;
 
-
     local procedure SetPOSActionParameters(EanBoxValue: Text; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; var POSAction: Record "NPR POS Action"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         EanBoxParameter: Record "NPR Ean Box Parameter";

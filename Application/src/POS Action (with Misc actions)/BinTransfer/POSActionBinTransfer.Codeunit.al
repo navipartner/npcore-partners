@@ -5,8 +5,8 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'Transfer funds from one bin to another using the POS.';
-        SourceBinSelectionLbl: Label 'SourceBinSelection';
-        SourceBinOptionsLbl: Label 'PosUnitDefaultBin,UserSelection,FixedParameter';
+        SourceBinSelectionLbl: Label 'SourceBinSelection', Locked = true;
+        SourceBinOptionsLbl: Label 'PosUnitDefaultBin,UserSelection,FixedParameter', Locked = true;
         SourceBinSelection_NameLbl: Label 'Source Bin Selection';
         SourceBinOptions_CptLbl: Label 'POS Unit Default Bin,User Selection,Fixed Parametar';
         SourceBin_NameLbl: Label 'SourceBin';

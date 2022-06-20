@@ -106,6 +106,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ADJUST_INVENTORY', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Adjust Inv.";
     }
+
     value(15; BIN_TRANSFER)
     {
         Caption = 'BIN_TRANSFER', Locked = true, MaxLength = 20;
@@ -141,6 +142,41 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'SALE_DIMENSION', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Sale Dimension";
+    }
+    value(23; ITEM_PRICE)
+    {
+        Caption = 'ITEM_PRICE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Item Price";
+    }
+
+    value(25; ITEM_PROMPT)
+    {
+        Caption = 'ITEM_PROMPT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Item Prompt";
+
+    }
+    value(27; ITEM_UNIT_PRICE)
+    {
+        Caption = 'ITEM_UNIT_PRICE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Item UnitPrice";
+
+    }
+
+    value(29; ITEM_QTY)
+    {
+        Caption = 'ITEM_QTY', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Item Qty.";
+    }
+
+    value(31; LOOKUP)
+    {
+        Caption = 'LOOKUP', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Item Lookup";
+    }
+    value(33; ITEM)
+    {
+        Caption = 'ITEM', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Insert Item";
     }
     value(22; SWITCH_REGISTER)
     {
