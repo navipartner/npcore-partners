@@ -2688,6 +2688,8 @@
     var
         Ticket: Record "NPR TM Ticket";
     begin
+        if TicketReservationRequest."Entry Type" <> TicketReservationRequest."Entry Type"::CHANGE then
+            exit;
         Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Superseeds Entry No.");
         if Ticket.FindSet() then
             repeat
