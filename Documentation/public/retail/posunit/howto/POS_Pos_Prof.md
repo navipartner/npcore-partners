@@ -1,40 +1,38 @@
-# POS( Point of sale) Posting Profile
+# Set up POS Posting Profile
 
-Each POS unit can have different set of posting rules.
+Each POS unit can have a different set of posting rules. First thing is to set POS Posting Profile.
 
-## POS Profile setup
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Posting Profile** and choose the related link.
+2. Create **New**.
+3. Add the **Code** in the indicated field.
+4. Add a **Description**.
+5. Make a selection between **Store** and **Customer** in the **Default POS Posting Setup** field.   
+   Your choice determines whether rules will apply to the POS store or customers.
+6. Set the value of the **Source Code** field to **Retail**.
+7. Set the predefined posting group in the field **General Business Posting Group**. 
+8. Set the predefined VAT posting group in the field **VAT Business Posting Group**.
 
-First thing is to set POS Posting Profile.
+> [!NOTE]
+> The **Tax Area Code** and **Tax Liable** fields can be set if necessary.
 
-1. Search **POS Posting Profile**
-2. Create New
-3. Add Code
-4. Add Description
-5. Field **Default POS Posting setup** has two values: Store and Customer. It defines if rules will apply to the POS store or Customers.
-6. Field **Sorce Code** should be set to Retail.
-7. In field **General Business Posting Group** should be set with predefined posting group. 
-8. In field **VAT Business Posting Group** should be set with predefined VAT posting group.
-
->[!NOTE]
->If there is a need fields **Tax Area Code** and **Tax Liable** can be set.
-
-9. Posting Compression - defines how POS entries will be posted. 
-   It can be : Uncompressed, Per POS Entry, Per POS Period.
-10. Journal Template name - Specifies the value of the Journal Template Name which will be assigned to General Journal Lines in the POS Posting activity.
-11. In FIeld **Max POS Posting Differences** define max difference that will be allowed that are caused by currencies.
-12. In field **Difference Account** define G/L account on which these diferrences will be posted.
-
-13. In field **POS Sales Rounding Account** - define G/L account where all sales rounding amounts will be posted.
-14. In field **POS Sales Amount Rounding**- difine on which decimal amounts should be rounded.
-15. In filed **Rounding Type** - define how rounding should work. It can be set on **Nearest**, **Up** or **Down**.
+9. Define how the POS entries will be posted in **Posting Compression**.
+   You can choose between **Uncompressed**, **Per POS Entry**, **Per POS Period**.
+10. Specify the value of the **Journal Template Name**, which will be assigned to **General Journal Lines** in the POS Posting activity.
+11. Use the **Max POS Posting Differences** field to define the maximum allowed difference caused by the difference between currencies.
+12. Define the G/L account on which these differences will be posted in **Difference Account**.
+13. Use the **POS Sales Rounding Account** field to define the G/L account in which all sales rounding amounts will be posted.
+14. Define on which decimal spaces the rounding will be performed in the **POS Sales Amount Rounding** field.
+15. Define how the rounding will be performed in **Rounding Type**.  
+    The possible settings are **Nearest**, **Up** or **Down**.
 
 ![POS_posting](../images/POS_posting.png)
 
+## Next steps
 
-## Adding POS Posting Profile on POS Store
+### Add the POS Posting Profile to the POS Store
 
-1. Search **POS Store List**
-2. Select POS store that need to have prepared POS Posting Profile
-3. In filed **POS Posting Profile** add prepared POS Posting Profile
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Store List** and choose the related link.
+2. Select the POS store to which you want to link the prepared POS Posting Profile.
+3. Add the prepared POS Posting Profile to the **POS Posting Profile** field.
 
 ![POS_pos](../images/POS_POS_1.png)
