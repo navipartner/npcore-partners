@@ -1,14 +1,14 @@
 ﻿page 6151445 "NPR Magento Store Items"
 {
     Caption = 'Magento Webshop Items';
-    Editable = false;
     LinksAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR Magento Store Item";
     CardPageId = "NPR Magento Store Items Card";
-    ApplicationArea = NPRRetail;
+    InsertAllowed = false;
+    DeleteAllowed = false;
 
     layout
     {
@@ -19,6 +19,7 @@
                 field(Webshop; Rec.Webshop)
                 {
 
+                    Editable = false;
                     ToolTip = 'Specifies the value of the Webshop field';
                     ApplicationArea = NPRRetail;
                 }
@@ -58,9 +59,4 @@
             }
         }
     }
-
-    trigger OnAfterGetRecord()
-    begin
-    end;
-
 }
