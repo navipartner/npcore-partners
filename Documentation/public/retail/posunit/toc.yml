@@ -16,6 +16,8 @@
     href: explanation/POS_audit_profile.md
   - name: POS view profile
     href: explanation/POS_view_profile.md
+  - name: POS Display Profile
+    href: explanation/POS_Display_profile.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
@@ -46,3 +48,5 @@
     href: howto/POS_Pricing_profile.md
   - name: Set up a POS payment bin
     href: howto/create_pos_payment_bin.md
+  - name: Set up POS Posting Profile
+    href: howto/POS_Pos_Prof.md
