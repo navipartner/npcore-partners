@@ -31,7 +31,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.1.6');
+        exit('1.1.7');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
@@ -77,6 +77,7 @@
             Sender.RegisterTextParameter('Admission Code', '');
             Sender.RegisterTextParameter('DefaultTicketNumber', '');
             Sender.RegisterBooleanParameter('PrintTicketOnArrival', false);
+            Sender.RegisterBooleanParameter('SuppressWelcomeMessage', false);
 
         end;
 
@@ -132,7 +133,7 @@
             Sender.RegisterTextParameter('Admission Code', '');
             Sender.RegisterTextParameter('DefaultTicketNumber', '');
             Sender.RegisterBooleanParameter('PrintTicketOnArrival', false);
-
+            Sender.RegisterBooleanParameter('SuppressWelcomeMessage', false);
         end;
     end;
 
@@ -194,6 +195,7 @@
         WithTicketPrint: Boolean;
         PosUnitNo: Code[10];
         PosSetup: Codeunit "NPR POS Setup";
+        ShowWelcomeMessage: Boolean;
     begin
         if (not Action.IsThisAction(ActionCode(''))) then
             exit;
@@ -218,12 +220,13 @@
         end else begin
             // From EAN Box or similar
             ExternalTicketNumber := CopyStr(DefaultTicketNumber, 1, MaxStrLen(ExternalTicketNumber));
+            ShowWelcomeMessage := not (JSON.GetBooleanParameter('SuppressWelcomeMessage'));
             if (FunctionId = 1) then begin
-                JSON.SetContext('Verbose', true);
+                JSON.SetContext('Verbose', ShowWelcomeMessage);
                 JSON.SetContext('VerboseMessage', Welcome);
             end;
             if (FunctionId = 9) then begin
-                JSON.SetContext('Verbose', true);
+                JSON.SetContext('Verbose', ShowWelcomeMessage);
                 JSON.SetContext('VerboseMessage', WelcomeBack);
             end;
         end;
@@ -388,6 +391,7 @@
         PosUnitNo: Code[10];
         WithTicketPrint: Boolean;
         PosSetup: Codeunit "NPR POS Setup";
+        ShowWelcomeMessage: Boolean;
     begin
         FunctionId := Context.GetIntegerParameterOrFail('Function', ActionCode(''));
         if (FunctionId < 0) then
@@ -409,8 +413,9 @@
             ExternalTicketNumber := CopyStr(Context.GetString('value'), 1, MaxStrLen(ExternalTicketNumber));
         end else begin
             ExternalTicketNumber := CopyStr(DefaultTicketNumber, 1, MaxStrLen(ExternalTicketNumber));
+            ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
             if (FunctionId = 1) then begin
-                Context.SetContext('Verbose', true);
+                Context.SetContext('Verbose', ShowWelcomeMessage);
                 Context.SetContext('VerboseMessage', Welcome);
             end;
         end;
