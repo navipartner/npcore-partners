@@ -77,7 +77,7 @@ codeunit 85054 "NPR POS Act. Bin Trans. Tests"
         for i := 1 to NoOfSales do begin
             NPRLibraryPOSMock.CreateItemLine(POSSession, Item1."No.", 1);
             NPRLibraryPOSMock.CreateItemLine(POSSession, Item2."No.", 1);
-            asserterror NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, 30, '', false);
+            NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, 30, '', false);
         end;
     end;
 

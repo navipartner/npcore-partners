@@ -22,6 +22,97 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Initialized: Boolean;
         CreatedSalesOrderNo: Code[20];
 
+    [Test]
+    procedure VerifyTaxCalcForwardForDebitSaleNormalVATLineDiscountManualPosted()
+    var
+        Customer: Record Customer;
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        POSSaleTax: Record "NPR POS Sale Tax";
+        POSSaleTaxLine: Record "NPR POS Sale Tax Line";
+        TempPOSSaleTaxLine: Record "NPR POS Sale Tax Line" temporary;
+        POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line";
+        POSEntry: Record "NPR POS Entry";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        LineDisc: Decimal;
+        LineDiscPct: Decimal;
+        InvDiscAmt: Decimal;
+        AmountToPay: Decimal;
+        SaleEnded: Boolean;
+    begin
+        // [SCENARIO] Verify Tax Calculation has been posted backward for debit sale with tax calculation type set as normal vat including discount
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Customer
+        CreateCustomer(Customer, false);
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
+
+        // [GIVEN] Item with unit price
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
+        Item."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
+        Item.Modify();
+
+        // Quantity to sell with line discount
+        Qty := 1;
+        LineDisc := 0;
+        LineDiscPct := LibraryRandom.RandDecInRange(1, 100, 5);
+        InvDiscAmt := 0;
+
+        //Store random decimal values in temporary record
+        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+
+        // [GIVEN] Add Item to active sale
+        LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
+
+        // [GIVEN] Get amount to pay for active sale
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        AmountToPay := GetAmountToPay(SaleLinePOS);
+
+        POSSaleTaxCalc.Find(POSSaleTax, SaleLinePOS.SystemId);
+        VerifySingleTaxLineCalculation(POSSaleTaxLine, POSSaleTax);
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+
+        // [WHEN] End of Sale
+        SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
+        Assert.IsTrue(SaleEnded, 'Sale should have ended when applying full payment.');
+
+        // [THEN] Verify tax calculation
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.FindFirst();
+
+        VerifySingleTaxLineCalculation(POSPostedTaxAmountLine, POSEntry);
+        VerifyActiveTaxCalcCopied2PostedTaxCalc(POSSaleTaxLine, POSPostedTaxAmountLine);
+        VerifyPostedTaxCalcCopied2Entries(POSPostedTaxAmountLine, POSEntry);
+        VerifyPostedTaxCalcCopied2VATEntries(POSPostedTaxAmountLine, POSEntry);
+        //Revert
+        AssignPOSViewProfileToPOSUnit('');
+        AssignVATBusPostGroupToPOSPostingProfile('');
+
+    end;
 
     [Test]
     procedure SkipTaxCalcForwardForZeroAmountDebitSaleNormalVAT()
@@ -1010,98 +1101,6 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         //Revert
         AssignPOSViewProfileToPOSUnit('');
         AssignVATBusPostGroupToPOSPostingProfile('');
-    end;
-
-    [Test]
-    procedure VerifyTaxCalcForwardForDebitSaleNormalVATLineDiscountManualPosted()
-    var
-        Customer: Record Customer;
-        VATPostingSetup: Record "VAT Posting Setup";
-        Item: Record Item;
-        POSSaleTax: Record "NPR POS Sale Tax";
-        POSSaleTaxLine: Record "NPR POS Sale Tax Line";
-        TempPOSSaleTaxLine: Record "NPR POS Sale Tax Line" temporary;
-        POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line";
-        POSEntry: Record "NPR POS Entry";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
-        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
-        SaleLine: Codeunit "NPR POS Sale Line";
-        Qty: Decimal;
-        LineDisc: Decimal;
-        LineDiscPct: Decimal;
-        InvDiscAmt: Decimal;
-        AmountToPay: Decimal;
-        SaleEnded: Boolean;
-    begin
-        // [SCENARIO] Verify Tax Calculation has been posted backward for debit sale with tax calculation type set as normal vat including discount
-
-        // [GIVEN] POS, Payment & Tax Setup
-        InitializeData();
-
-        // [GIVEN] Customer
-        CreateCustomer(Customer, false);
-
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
-        Customer.Modify();
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
-
-        // [GIVEN] Active POS session & sale
-        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
-
-        // [GIVEN] Item with unit price
-        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
-        Item."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
-        Item.Modify();
-
-        // Quantity to sell with line discount
-        Qty := 1;
-        LineDisc := 0;
-        LineDiscPct := 10;
-        InvDiscAmt := 0;
-
-        //Store random decimal values in temporary record
-        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
-
-        // [GIVEN] Add Item to active sale
-        LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
-
-        // [GIVEN] Get amount to pay for active sale
-        POSSession.GetSaleLine(SaleLine);
-        SaleLine.GetCurrentSaleLine(SaleLinePOS);
-        AmountToPay := GetAmountToPay(SaleLinePOS);
-
-        POSSaleTaxCalc.Find(POSSaleTax, SaleLinePOS.SystemId);
-        VerifySingleTaxLineCalculation(POSSaleTaxLine, POSSaleTax);
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
-
-        // [WHEN] End of Sale
-        SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
-        Assert.IsTrue(SaleEnded, 'Sale should have ended when applying full payment.');
-
-        // [THEN] Verify tax calculation
-        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        POSEntry.FindFirst();
-
-        VerifySingleTaxLineCalculation(POSPostedTaxAmountLine, POSEntry);
-        VerifyActiveTaxCalcCopied2PostedTaxCalc(POSSaleTaxLine, POSPostedTaxAmountLine);
-        VerifyPostedTaxCalcCopied2Entries(POSPostedTaxAmountLine, POSEntry);
-        VerifyPostedTaxCalcCopied2VATEntries(POSPostedTaxAmountLine, POSEntry);
-        //Revert
-        AssignPOSViewProfileToPOSUnit('');
-        AssignVATBusPostGroupToPOSPostingProfile('');
-
     end;
 
     [Test]
@@ -2640,7 +2639,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         POSSaleTaxCalc.GetCurrency(Currency, TempPOSSaleTaxLine."Currency Code");
 
         if Item."Price Includes VAT" then
-            TempPOSSaleTaxLine."Unit Price Excl. Tax" := Item."Unit Price" / (1 + TaxPct / 100)
+            TempPOSSaleTaxLine."Unit Price Excl. Tax" := Round(Item."Unit Price" / (1 + TaxPct / 100), Currency."Unit-Amount Rounding Precision")
         else
             TempPOSSaleTaxLine."Unit Price Excl. Tax" := Item."Unit Price";
         TempPOSSaleTaxLine.Quantity := Qty;

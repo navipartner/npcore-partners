@@ -1421,7 +1421,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignTaxDetailToPOSPostingProfile(TaxArea.Code, true);
+        AssignTaxDetailToPOSPostingProfile(TaxArea.Code, false);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile, false);
@@ -1472,7 +1472,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
+        VerifyMultieTaxLineCalculationUnliable(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
 
         //Second Direct Sale
         SaleLinePOS.SetRange("No.", Item[2]."No.");
@@ -1480,7 +1480,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         AmountToPay[2] := GetAmountToPay(SaleLinePOS);
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
+        VerifyMultieTaxLineCalculationUnliable(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay[1] + AmountToPay[2], '');
@@ -1490,7 +1490,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
 
-        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, true, TaxDetail."Effective Date");
+        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, false, TaxDetail."Effective Date");
         VerifyPostedTaxCalcCopied2POSEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyPostedTaxCalcCopied2VATEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyVATforGLEntry(POSEntry, TaxArea);
@@ -1507,6 +1507,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     procedure CalcTaxAmountForSalesTaxTypeUnknownMaximumDebitSalePosted()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
+        POSViewProfile: Record "NPR POS View Profile";
         Customer: Record Customer;
         VATPostingSetup: Record "VAT Posting Setup";
         Item: array[2] of Record Item;
@@ -1545,13 +1546,18 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         TaxDetail.ModifyAll("Maximum Amount/Qty.", 0);
 
         // [GIVEN] Customer
-        CreateCustomer(Customer, false, TaxArea.Code, true);
+        CreateCustomer(Customer, false, TaxArea.Code, false);
 
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignTaxDetailToPOSPostingProfile(TaxArea.Code, false);
+
+        // [GIVEN] POS View Profile
+        CreatePOSViewProfile(POSViewProfile, false);
+        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Update rounding amount account
         UpdatePOSSalesRoundingAcc();
@@ -1606,7 +1612,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
+        VerifyMultieTaxLineCalculationUnliable(POSActiveTaxAmountLine[1], POSActiveTaxAmount);
 
         //Second Debit Sale
         SaleLinePOS.SetRange("No.", Item[2]."No.");
@@ -1614,7 +1620,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         AmountToPay[2] := GetAmountToPay(SaleLinePOS);
 
         POSActiveTaxCalc.Find(POSActiveTaxAmount, SaleLinePOS.SystemId);
-        VerifyMultieTaxLineCalculation(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
+        VerifyMultieTaxLineCalculationUnliable(POSActiveTaxAmountLine[2], POSActiveTaxAmount);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay[1] + AmountToPay[2], '');
@@ -1624,7 +1630,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
 
-        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, true, TaxDetail."Effective Date");
+        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, false, TaxDetail."Effective Date");
         VerifyPostedTaxCalcCopied2POSEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyPostedTaxCalcCopied2VATEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyVATforGLEntry(POSEntry, TaxArea);
@@ -1930,7 +1936,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignTaxDetailToPOSPostingProfile(TaxArea.Code, true);
+        AssignTaxDetailToPOSPostingProfile(TaxArea.Code, false);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile, false);
@@ -1999,10 +2005,11 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
 
-        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, true, TaxDetail."Effective Date");
+        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, false, TaxDetail."Effective Date");
         VerifyPostedTaxCalcCopied2POSEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyPostedTaxCalcCopied2VATEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyVATforGLEntry(POSEntry, TaxArea);
+
         POSStore.GetProfile(POSPostingProfile);
         VerifySalesforGLEntry(POSEntry, Item, POSPostingProfile."Gen. Bus. Posting Group");
 
@@ -2015,6 +2022,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     procedure CalcTaxAmountForSalesTaxTypeWhereUnitPriceHigherThenMaxAmtDebitSalePosted()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
+        POSViewProfile: Record "NPR POS View Profile";
         Customer: Record Customer;
         VATPostingSetup: Record "VAT Posting Setup";
         Item: array[2] of Record Item;
@@ -2044,18 +2052,28 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         InitializeData();
 
         TaxJurisdiction.DeleteAll();
+
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
         LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
 
-        // [GIVEN] Customer
-        CreateCustomer(Customer, false, TaxArea.Code, true);
+        // [GIVEN] Customer tax unliable
+        CreateCustomer(Customer, false, TaxArea.Code, false);
+
+        //If it's set, reset maximum amount on Tax Details
+        TaxDetail.SetRange("Tax Jurisdiction Code");
+        TaxDetail.ModifyAll("Maximum Amount/Qty.", 0);
 
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Sales Tax");
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignTaxDetailToPOSPostingProfile(TaxArea.Code, false);
+
+        // [GIVEN] POS View Profile
+        CreatePOSViewProfile(POSViewProfile, false);
+        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Update rounding amount account
         UpdatePOSSalesRoundingAcc();
@@ -2127,7 +2145,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
 
-        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, true, TaxDetail."Effective Date");
+        VerifyMultieTaxLineCalculation(POSPostedTaxAmountLine, POSEntry, TaxArea.Code, TaxGroup.Code, false, TaxDetail."Effective Date");
         VerifyPostedTaxCalcCopied2POSEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyPostedTaxCalcCopied2VATEntries(POSPostedTaxAmountLine, POSEntry);
         VerifyVATforGLEntry(POSEntry, TaxArea);
@@ -2538,7 +2556,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
             else
                 Assert.AreEqual(3, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created');
         end else begin
-            Assert.AreEqual(4, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created');
+            Assert.AreEqual(1, GLEntry.Count(), 'G/L Entries for Tax Jurisdiction account has not been created');
         end;
         POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntryTaxLine.CalcSums("Tax Amount");

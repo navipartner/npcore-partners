@@ -241,9 +241,9 @@ codeunit 85046 "NPR NpXml Mock Handler"
         XmlTemplate.Append('  <T6151552 primary_key="Field1=0(UPD_ITEM),Field5=0(40000)" table_no="6151552" table_name="NPR NpXml Element">');
         XmlTemplate.Append('    <F1 field_no="1" field_name="Xml Template Code"><![CDATA[UPD_ITEM]]></F1>');
         XmlTemplate.Append('    <F5 field_no="5" field_name="Line No."><![CDATA[40000]]></F5>');
-        XmlTemplate.Append('    <F10 field_no="10" field_name="Table No."><![CDATA[6014659]]></F10>');
-        XmlTemplate.Append('    <F20 field_no="20" field_name="Template Version No."><![CDATA[NPR1700.1]]></F20>');
-        XmlTemplate.Append('    <F100 field_no="100" field_name="Field No."><![CDATA[0]]></F100>');
+        XmlTemplate.Append('    <F10 field_no="10" field_name="Table No."><![CDATA[27]]></F10>');
+        XmlTemplate.Append('    <F20 field_no="20" field_name="Template Version No."><![CDATA[MAG2.20]]></F20>');
+        XmlTemplate.Append('    <F100 field_no="100" field_name="Field No."><![CDATA[6151410]]></F100>');
         XmlTemplate.Append('    <F110 field_no="110" field_name="Field Name"><![CDATA[]]></F110>');
         XmlTemplate.Append('    <F200 field_no="200" field_name="Parent Line No."><![CDATA[10000]]></F200>');
         XmlTemplate.Append('    <F201 field_no="201" field_name="Parent Table No."><![CDATA[27]]></F201>');
@@ -256,8 +256,8 @@ codeunit 85046 "NPR NpXml Mock Handler"
         XmlTemplate.Append('    <F625 field_no="625" field_name="Xml Value Codeunit Name"><![CDATA[]]></F625>');
         XmlTemplate.Append('    <F630 field_no="630" field_name="Xml Value Function"><![CDATA[]]></F630>');
         XmlTemplate.Append('    <F1000 field_no="1000" field_name="Active"><![CDATA[true]]></F1000>');
-        XmlTemplate.Append('    <F1010 field_no="1010" field_name="Hidden"><![CDATA[true]]></F1010>');
-        XmlTemplate.Append('    <F5100 field_no="5100" field_name="Element Name"><![CDATA[auxitem_buffer]]></F5100>');
+        XmlTemplate.Append('    <F1010 field_no="1010" field_name="Hidden"><![CDATA[false]]></F1010>');
+        XmlTemplate.Append('    <F5100 field_no="5100" field_name="Element Name"><![CDATA[attribute_set]]></F5100>');
         XmlTemplate.Append('    <F5105 field_no="5105" field_name="Namespace"><![CDATA[]]></F5105>');
         XmlTemplate.Append('    <F5117 field_no="5117" field_name="Default Value"><![CDATA[default]]></F5117>');
         XmlTemplate.Append('    <F5120 field_no="5120" field_name="Table Name"><![CDATA[]]></F5120>');
@@ -13273,5 +13273,248 @@ codeunit 85046 "NPR NpXml Mock Handler"
             if not JToken.AsValue().IsNull then
                 Assert.Fail(Message);
 
+    end;
+
+    procedure UpdateNpXmlReferences()
+    begin
+        UpdateAuxItemNpXmlReferences();
+    end;
+
+    local procedure UpdateAuxItemNpXmlReferences()
+    var
+        AuxTableFields: Record Field;
+        ItemTableFields: Record Field;
+        NPRNpXmlTemplate: Record "NPR NpXml Template";
+        NPRNpXmlElement: Record "NPR NpXml Element";
+        NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
+        AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
+    begin
+        AuxTableFields.SetRange(TableNo, AuxTablesMgt.GetAuxTableIdFromParentTable(Database::Item));
+        AuxTableFields.SetFilter("No.", '>%1', 1);
+        if not AuxTableFields.FindSet() then
+            exit;
+        repeat
+            ItemTableFields.SetRange(TableNo, Database::Item);
+            if (AuxTableFields.FieldName.StartsWith('NPR ')) then
+                ItemTableFields.SetRange(FieldName, AuxTableFields.FieldName)
+            else
+                ItemTableFields.SetRange(FieldName, 'NPR ' + AuxTableFields.FieldName);
+            if ItemTableFields.FindFirst() then begin
+                //Updating References in XML Template
+                //XML Element
+                UpgradeFieldReferencesToXMLElement(Database::Item, ItemTableFields."No.", AuxTablesMgt.GetAuxTableIdFromParentTable(Database::Item), AuxTableFields."No.");
+
+                //XML Filter
+                UpgradeFieldReferencesToXMLFilter(Database::Item, ItemTableFields."No.", AuxTablesMgt.GetAuxTableIdFromParentTable(Database::Item), AuxTableFields."No.");
+
+                //XML Attribute
+                UpgradeFieldReferencesToXMLAttribute(Database::Item, ItemTableFields."No.", AuxTablesMgt.GetAuxTableIdFromParentTable(Database::Item), AuxTableFields."No.");
+            end;
+        until AuxTableFields.Next() = 0;
+        if NPRNpXmlTemplate.IsEmpty() then
+            exit;
+        NPRNpXmlTemplate.FindSet();
+        repeat
+            NPRNpXmlElement.SetRange("Xml Template Code", NPRNpXmlTemplate.Code);
+            if NPRNpXmlElement.FindFirst() then
+                NpXmlTemplateMgt.NormalizeNpXmlElementLineNo(NPRNpXmlElement."Xml Template Code", NPRNpXmlElement);
+        until NPRNpXmlTemplate.Next() = 0;
+    end;
+
+    local procedure UpgradeFieldReferencesToXMLElement(FromTableNo: Integer; FromFieldNo: Integer; ToTableNo: Integer; ToFieldNo: Integer)
+    var
+        NPRNpXmlElement: Record "NPR NpXml Element";
+        NPRNpXmlElement2: Record "NPR NpXml Element";
+    begin
+        if NPRNpXmlElement.IsEmpty() then
+            exit;
+
+        NPRNpXmlElement.SetLoadFields("Table No.", "Field No.", Level);
+        NPRNpXmlElement.SetRange("Table No.", FromTableNo);
+        NPRNpXmlElement.SetRange("Field No.", FromFieldNo);
+        if NPRNpXmlElement.FindFirst() then begin
+            InsertNewParentElement(NPRNpXmlElement, ToTableNo);
+            NPRNpXmlElement."Table No." := ToTableNo;
+            NPRNpXmlElement.Level += 1;
+            NPRNpXmlElement.Modify();
+            IncreaseChildElementsLevel(NPRNpXmlElement);
+            NPRNpXmlElement2.SetRange("Table No.", FromTableNo);
+            NPRNpXmlElement2.SetRange("Field No.", FromFieldNo);
+            NPRNpXmlElement2.ModifyAll("Table No.", ToTableNo);
+            NPRNpXmlElement2.SetRange("Table No.", ToTableNo);
+            NPRNpXmlElement2.ModifyAll("Field No.", ToFieldNo);
+        end;
+    end;
+
+    local procedure InsertNewParentElement(NPRNpXmlElement: Record "NPR NpXml Element"; ToTableNo: Integer)
+    var
+        NpXmlElement: Record "NPR NpXml Element";
+        ElementNameLbl: Label 'auxitem_buffer', Locked = true;
+        NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
+    begin
+        NpXmlTemplateMgt.InitNpXmlElementAbove(NPRNpXmlElement."Xml Template Code", NPRNpXmlElement."Line No.", NpXmlElement);
+
+        NpXmlElement.Level := NPRNpXmlElement.Level;
+        if NpXmlElement.Level < 0 then
+            NpXmlElement.Level := 0;
+        NpXmlElement."Table No." := ToTableNo;
+        NpXmlElement.Hidden := true;
+        NpXmlElement."Element Name" := ElementNameLbl;
+        NpXmlElement.Insert(true);
+        InsertAuxRelations(NpXmlElement);
+    end;
+
+    local procedure UpgradeFieldReferencesToXMLFilter(FromTableNo: Integer; FromFieldNo: Integer; ToTableNo: Integer; ToFieldNo: Integer)
+    var
+        NPRNpXmlFilter: Record "NPR NpXml Filter";
+        NPRNpXmlFilter2: Record "NPR NpXml Filter";
+        NPRNpXmlElement: Record "NPR NpXml Element";
+    begin
+        if NPRNpXmlFilter.IsEmpty() then
+            exit;
+
+        NPRNpXmlFilter.SetLoadFields("Parent Table No.", "Parent Field No.");
+        NPRNpXmlFilter.SetRange("Parent Table No.", FromTableNo);
+        NPRNpXmlFilter.SetRange("Parent Field No.", FromFieldNo);
+        if NPRNpXmlFilter.FindFirst() then begin
+            NPRNpXmlElement.Get(NPRNpXmlFilter."Xml Template Code", NPRNpXmlFilter."Xml Element Line No.");
+            InsertNewParentElement(NPRNpXmlElement, ToTableNo);
+            NPRNpXmlElement.Level += 1;
+            NPRNpXmlElement.Modify();
+            NPRNpXmlElement.Level -= 1;
+            IncreaseChildElementsLevel(NPRNpXmlElement);
+            NPRNpXmlFilter2.SetRange("Parent Table No.", FromTableNo);
+            NPRNpXmlFilter2.SetRange("Parent Field No.", FromFieldNo);
+            NPRNpXmlFilter2.ModifyAll("Parent Table No.", ToTableNo);
+            NPRNpXmlFilter2.SetRange("Parent Table No.", ToTableNo);
+            NPRNpXmlFilter2.ModifyAll("Parent Field No.", ToFieldNo);
+        end;
+        Clear(NPRNpXmlFilter);
+        NPRNpXmlFilter.SetLoadFields("Table No.", "Field No.", "Xml Template Code", "Line No.");
+        NPRNpXmlFilter.SetRange("Table No.", FromTableNo);
+        NPRNpXmlFilter.SetRange("Field No.", FromFieldNo);
+        if NPRNpXmlFilter.FindFirst() then begin
+            NPRNpXmlElement.Get(NPRNpXmlFilter."Xml Template Code", NPRNpXmlFilter."Line No.");
+            InsertNewParentElement(NPRNpXmlElement, ToTableNo);
+            NPRNpXmlElement.Level += 1;
+            NPRNpXmlElement.Modify();
+            NPRNpXmlElement.Level -= 1;
+            IncreaseChildElementsLevel(NPRNpXmlElement);
+            NPRNpXmlFilter2.SetRange("Parent Table No.", FromTableNo);
+            NPRNpXmlFilter2.SetRange("Parent Field No.", FromFieldNo);
+            NPRNpXmlFilter2.ModifyAll("Parent Table No.", ToTableNo);
+            NPRNpXmlFilter2.SetRange("Parent Table No.", ToTableNo);
+            NPRNpXmlFilter2.ModifyAll("Parent Field No.", ToFieldNo);
+        end;
+    end;
+
+    local procedure UpgradeFieldReferencesToXMLAttribute(FromTableNo: Integer; FromFieldNo: Integer; ToTableNo: Integer; ToFieldNo: Integer)
+    var
+        NPRNpXmlAttribute: Record "NPR NpXml Attribute";
+    begin
+        if NPRNpXmlAttribute.IsEmpty() then
+            exit;
+
+        NPRNpXmlAttribute.SetLoadFields("Table No.", "Attribute Field No.");
+        NPRNpXmlAttribute.SetRange("Table No.", FromTableNo);
+        NPRNpXmlAttribute.SetRange("Attribute Field No.", FromFieldNo);
+        if not NPRNpXmlAttribute.IsEmpty() then begin
+            NPRNpXmlAttribute.ModifyAll("Table No.", ToTableNo);
+            NPRNpXmlAttribute.SetRange("Table No.", ToTableNo);
+            NPRNpXmlAttribute.ModifyAll("Attribute Field No.", ToFieldNo);
+        end;
+    end;
+
+    local procedure IncreaseChildElementsLevel(SelectedNpXmlElement: Record "NPR NpXml Element")
+    var
+        NPRNpXmlElement: Record "NPR NpXml Element";
+        InitialLevel: Integer;
+    begin
+        InitialLevel := SelectedNpXmlElement.Level;
+        NPRNpXmlElement.SetCurrentKey("Xml Template Code", "Line No.");
+        NPRNpXmlElement.Ascending(true);
+        NPRNpXmlElement.SetRange("Xml Template Code", SelectedNpXmlElement."Xml Template Code");
+        NPRNpXmlElement.SetFilter("Line No.", '>%1', SelectedNpXmlElement."Line No.");
+        NPRNpXmlElement.FindSet(true);
+        repeat
+            if (NPRNpXmlElement.Level > InitialLevel) then begin
+                NPRNpXmlElement.Level += 1;
+                NPRNpXmlElement.Modify();
+            end else
+                break;
+        until NPRNpXmlElement.Next() = 0;
+    end;
+
+    local procedure InsertAuxRelations(SelectedNpXmlElement: Record "NPR NpXml Element")
+    var
+        "Field": Record "Field";
+        NpXmlElement: Record "NPR NpXml Element";
+        NpXmlFilter: Record "NPR NpXml Filter";
+        TempField: Record "Field" temporary;
+        TableMetadata: Record "Table Metadata";
+        RecRef: RecordRef;
+        KeyRef: KeyRef;
+        FieldRef: FieldRef;
+        LineNo: Integer;
+        i: Integer;
+    begin
+        if not TableMetadata.Get(SelectedNpXmlElement."Table No.") then
+            exit;
+
+        NpXmlElement := SelectedNpXmlElement;
+        NpXmlElement.SetRange("Xml Template Code", SelectedNpXmlElement."Xml Template Code");
+        repeat
+            if NpXmlElement.Next(-1) = 0 then
+                exit;
+        until NpXmlElement.Level + 1 = SelectedNpXmlElement.Level;
+
+        if NpXmlElement."Table No." = SelectedNpXmlElement."Table No." then
+            exit;
+        if not TableMetadata.Get(NpXmlElement."Table No.") then
+            exit;
+
+        RecRef.Open(SelectedNpXmlElement."Table No.");
+        KeyRef := RecRef.KeyIndex(1);
+        RecRef.Close();
+        for i := 1 to KeyRef.FieldCount do begin
+            FieldRef := KeyRef.FieldIndex(i);
+
+            Field.Get(SelectedNpXmlElement."Table No.", FieldRef.Number);
+            if Field.RelationTableNo = NpXmlElement."Table No." then begin
+                TempField.Init();
+                TempField := Field;
+                TempField.Insert();
+            end;
+        end;
+
+        if not TempField.FindSet() then
+            exit;
+
+        NpXmlElement.CalcFields("Table Name");
+
+        RecRef.Open(NpXmlElement."Table No.");
+        KeyRef := RecRef.KeyIndex(1);
+        RecRef.Close();
+        FieldRef := KeyRef.FieldIndex(1);
+
+        NpXmlFilter.SetRange("Xml Template Code", SelectedNpXmlElement."Xml Template Code");
+        NpXmlFilter.SetRange("Xml Element Line No.", SelectedNpXmlElement."Line No.");
+        NpXmlFilter.DeleteAll();
+        LineNo := 0;
+        repeat
+            LineNo += 10000;
+            NpXmlFilter.Init();
+            NpXmlFilter."Xml Template Code" := SelectedNpXmlElement."Xml Template Code";
+            NpXmlFilter."Xml Element Line No." := SelectedNpXmlElement."Line No.";
+            NpXmlFilter."Line No." := LineNo;
+            NpXmlFilter."Filter Type" := NpXmlFilter."Filter Type"::TableLink;
+            NpXmlFilter."Parent Table No." := TempField.RelationTableNo;
+            NpXmlFilter."Parent Field No." := TempField.RelationFieldNo;
+            if NpXmlFilter."Parent Field No." = 0 then
+                NpXmlFilter."Parent Field No." := FieldRef.Number;
+            NpXmlFilter."Table No." := TempField.TableNo;
+            NpXmlFilter."Field No." := TempField."No.";
+            NpXmlFilter.Insert(true);
+        until TempField.Next() = 0;
     end;
 }
