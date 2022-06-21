@@ -1,4 +1,4 @@
-# Install NP Power BI Retail
+# Install NP Power BI for Retail
 
 Take control over your operations by using the Power BI app for retail business. To install the application, follow the provided steps:
 

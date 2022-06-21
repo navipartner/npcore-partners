@@ -3,6 +3,7 @@
 Retail vouchers can be used as a payment type in their own right, so the owner of the voucher can use them to purchase various goods and services.
 
 Retailers offer different types of vouchers. The most common ones are gift vouchers and credit vouchers. There are four sections in the **Retail Voucher Type Card**:
+
 - **General**      
   In the **General** section you can define the **Code** and **Description** of a voucher. This section also contains a number of open, closed, and archived vouchers.
 
