@@ -16,3 +16,15 @@ The following fields can be defined in the **General** section:
 
 
 The **POS Sales Ticket Receipt Text** section is used for entering text which will be shown in the receipt footer. If the text was already entered in the **Sales Ticket Receipt Text** field in the **General** section, it will automatically be shown in this section.
+
+### Related links
+
+- [Balance the POS (Z-report)](../howto/balance_the_pos.md)
+- [POS Display Profile](POS_Display_profile.md)
+- [POS Input Box Profile](POS_input_box_profile.md)
+- [POS End-of-Day Profile](POS_End_of_Day_Profile.md)
+- [POS View Profile](POS_view_profile.md)
+- [POS Audit Profile](POS_audit_profile.md)
+- [Set up the POS Global Sales Profile](../howto/POS_Global.md)
+- [Set up POS Posting Profile](../howto/POS_Pos_Prof.md)
+- [Set up POS Pricing Profile](../howto/POS_Pricing_profile.md)
