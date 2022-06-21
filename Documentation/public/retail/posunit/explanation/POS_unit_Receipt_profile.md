@@ -1,6 +1,6 @@
-# POS unit Receipt Text Profile
+# POS Unit Receipt Text Profile
 
-The POS unit Receipt Text Profile can be used for assigning additional text to the footer area of receipts. Every POS unit can have different text in the footer if they have different POS unit Receipt Text Profiles with different text in them.
+The POS Unit Receipt Text Profile can be used for assigning additional text to the footer area of receipts. Every POS unit can have different text in the footer if they have different POS unit Receipt Text Profiles with different text in them.
 The POS Unit Receipt Text Profile consists of two sections: **General** and **POS Sales Ticket Receipt Text**.
 
 ![POSreceipt](../images/POS%20receipt.PNG)
