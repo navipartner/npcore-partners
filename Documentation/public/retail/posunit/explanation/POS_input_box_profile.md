@@ -1,6 +1,6 @@
-# POS input box profile
+# POS Input Box Profile
 
-The POS input box profile is used for setting up which data will be recognized in the input box in a POS Unit.
+The POS Input Box Profile is used for setting up which data will be recognized in the input box in a POS Unit.
 
 By default there is one POS input box profile with the **Code** *SALE* and **Description** *Default EAN box Sales Setup* in the system. If there is a need to create a different profile, you can create a new one with the unique **Code** and **Description**.
 

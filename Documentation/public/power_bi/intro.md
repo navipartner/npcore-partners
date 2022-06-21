@@ -1,4 +1,4 @@
-# Power Business Intelligence (BI)
+# Business Intelligence (BI)
 
 [Business Intelligence](https://powerbi.microsoft.com/en-us/what-is-business-intelligence/) is a set of technologies and tools that help companies to perform in-depth analyses of the most important business segments and consequently to bring the right decision. Six key areas that can benefit from using BI reports are:
 

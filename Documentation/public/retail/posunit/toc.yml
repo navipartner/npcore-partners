@@ -8,13 +8,13 @@
     href: explanation/POS_Self_Service_Actions.md
   - name: POS menu
     href: explanation/POS_menu.md
-  - name: POS unit receipt text profile
+  - name: POS Unit Receipt Text Profile
     href: explanation/POS_unit_Receipt_profile.md
-  - name: POS input box profile
+  - name: POS Input Box profile
     href: explanation/POS_input_box_profile.md
-  - name: POS audit profile
+  - name: POS Audit Profile
     href: explanation/POS_audit_profile.md
-  - name: POS view profile
+  - name: POS View Profile
     href: explanation/POS_view_profile.md
   - name: POS Display Profile
     href: explanation/POS_Display_profile.md
@@ -48,7 +48,7 @@
     href: howto/POS_Global.md
   - name: Set up POS Pricing Profile
     href: howto/POS_Pricing_profile.md
-  - name: Set up a POS payment bin
+  - name: Set up POS payment bins
     href: howto/create_pos_payment_bin.md
   - name: Set up POS Posting Profile
     href: howto/POS_Pos_Prof.md
