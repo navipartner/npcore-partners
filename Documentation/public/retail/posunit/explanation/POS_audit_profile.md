@@ -15,7 +15,7 @@ The following options can be set up in the **General** section:
 | **Sale Fiscal No. Series** | The number series used for creating the fiscal number. |
 | **Credit Sale Fiscal No. Series** | The items will be searched by their cross reference numbers. |
 | **Balancing Fiscal No. Series** | The number series used for creating the fiscal number for balancing. |
-| **Fill Sales Fiscal No. On** | You can choose between **All Sale** and - **Successful Sale** |
+| **Fill Sales Fiscal No. On** | You can choose between **All Sale** and **Successful Sale**. |
 | **Audit Log Enabled** | Used in certain countries for creating additional logs, usually for VAT. |
 | **Audit Handler** | If **Audit Log Enabled** is checked use this field to choose which log will be created. |
 | **Allow Zero Amount Sale** | Allow the sale to be finalized with the amount zero. |
