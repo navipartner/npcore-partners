@@ -18,6 +18,8 @@
     href: explanation/POS_view_profile.md
   - name: POS Display Profile
     href: explanation/POS_Display_profile.md
+  - name: POS End of Day Profile
+    href: explanation/POS_End_of_Day_Profile.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
