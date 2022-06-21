@@ -1,4 +1,4 @@
-# Set up the POS Customer Display
+# Set up the POS customer display
 
 You can set up the content of customer display in **Display Setup**. Here, it is possible to:
 
@@ -35,3 +35,4 @@ You can set up the content of customer display in **Display Setup**. Here, it is
 - [Create a new POS unit (by using the existing one for reference)](./createnew.md)   
 - [Configure an opening mechanism for a POS unit cash drawer](./ConfigureCashDrawerOpening.md)
 - [POS menu](../explanation/POS_menu.md)
+- [POS Display Profile](../explanation/POS_Display_profile.md)

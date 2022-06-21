@@ -24,3 +24,11 @@ In the POS End of Day profile it is defined how and how often the End of Day wil
 ### Related links
 
 - [Balance the POS (Z-report)](../howto/balance_the_pos.md)
+- [POS Display Profile](POS_Display_profile.md)
+- [POS Input Box Profile](POS_input_box_profile.md)
+- [POS Unit Receipt Profile](POS_unit_Receipt_profile.md)
+- [POS View Profile](POS_view_profile.md)
+- [POS Audit Profile](POS_audit_profile.md)
+- [Set up the POS Global Sales Profile](../howto/POS_Global.md)
+- [Set up POS Posting Profile](../howto/POS_Pos_Prof.md)
+- [Set up POS Pricing Profile](../howto/POS_Pricing_profile.md)

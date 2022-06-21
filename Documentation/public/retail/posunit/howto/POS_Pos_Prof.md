@@ -36,3 +36,14 @@ Each POS unit can have a different set of posting rules. First thing is to set P
 3. Add the prepared POS Posting Profile to the **POS Posting Profile** field.
 
 ![POS_pos](../images/POS_POS_1.png)
+
+### Related links
+
+- [Balance the POS (Z-report)](../howto/balance_the_pos.md)
+- [POS Display Profile](../explanation/POS_Display_profile.md)
+- [POS Unit Receipt Profile](../explanation/POS_unit_Receipt_profile.md)
+- [POS View Profile](../explanation/POS_audit_profile.md)
+- [POS Audit Profile](../explanation/POS_audit_profile.md)
+- [POS End-of-Day Profile](../explanation/POS_End_of_Day_Profile.md)
+- [Set up the POS Global Sales Profile](../howto/POS_Global.md)
+- [Set up POS Pricing Profile](../howto/POS_Pricing_profile.md)

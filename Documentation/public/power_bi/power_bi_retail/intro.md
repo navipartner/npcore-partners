@@ -20,4 +20,5 @@ Furthermore, you can get an overview of:
 - Transactions on the POS.
 
 ### Related links
-- [Install NP Power BI Retail](howto/install_power_bi_retail.md)
+
+- [Install NP Power BI for Retail](howto/install_power_bi_retail.md)
