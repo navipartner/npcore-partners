@@ -19,6 +19,10 @@ Furthermore, you can get an overview of:
 - The most and the least productive units, stores, and resources.
 - Transactions on the POS.
 
+> [!Note]
+> If you need any assistance with NP Power BI for Retail, contact our support team at *support-bi@navipartner.com*.
+
+
 ### Related links
 
 - [Install NP Power BI for Retail](howto/install_power_bi_retail.md)
