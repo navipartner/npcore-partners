@@ -52,3 +52,5 @@
     href: howto/create_pos_payment_bin.md
   - name: Set up POS Posting Profile
     href: howto/POS_Pos_Prof.md
+  - name: Add a logo to the POS login screen
+    href: howto/add_logo_to_pos_login_screen.md
