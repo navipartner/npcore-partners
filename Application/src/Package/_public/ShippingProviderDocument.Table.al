@@ -177,6 +177,11 @@ table 6014452 "NPR Shipping Provider Document"
             Caption = 'SMS No.';
             DataClassification = CustomerContent;
         }
+        field(350; "Currency Code"; Code[20])
+        {
+            Caption = '"Currency Code"';
+            DataClassification = CustomerContent;
+        }
         field(400; "Shipping Agent Code"; Code[10])
         {
             Caption = 'Shipping Agent Code';

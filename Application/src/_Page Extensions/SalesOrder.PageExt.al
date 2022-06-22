@@ -69,8 +69,13 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ApplicationArea = NPRRetail;
             }
         }
-        addafter("Outbound Whse. Handling Time")
+        addafter("Shipping Time")
         {
+            field("NPR Package Code"; Rec."NPR Package Code")
+            {
+                ToolTip = 'Specifies the value of the Package Code field.';
+                ApplicationArea = All;
+            }
             field("NPR Kolli"; Rec."NPR Kolli")
             {
 
