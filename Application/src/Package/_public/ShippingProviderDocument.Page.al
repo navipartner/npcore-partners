@@ -155,6 +155,7 @@ page 6014486 "NPR Shipping Provider Document"
                     ToolTip = 'Specifies the value of the Package Code field';
                     ApplicationArea = NPRRetail;
                 }
+
                 field("Parcel Qty."; Rec."Parcel Qty.")
                 {
 
@@ -188,6 +189,11 @@ page 6014486 "NPR Shipping Provider Document"
                     begin
                         ValidateWeights(true);
                     end;
+                }
+                field("Delivery Instructions"; Rec."Delivery Instructions")
+                {
+                    ToolTip = 'Specifies the value of the Delivery Instructions field.';
+                    ApplicationArea = All;
                 }
                 field("Print Return Label"; Rec."Print Return Label")
                 {
