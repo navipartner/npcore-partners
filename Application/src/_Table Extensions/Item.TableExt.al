@@ -616,7 +616,12 @@ tableextension 6014427 "NPR Item" extends Item
 
     procedure NPR_GetAuxItem(var AuxItem: Record "NPR Auxiliary Item")
     begin
-        NPR_ReadAuxItem();
+        NPR_GetAuxItem(AuxItem, false);
+    end;
+
+    procedure NPR_GetAuxItem(var AuxItem: Record "NPR Auxiliary Item"; Force: Boolean)
+    begin
+        NPR_ReadAuxItem(Force);
         AuxItem := _AuxItem;
     end;
 
@@ -634,13 +639,13 @@ tableextension 6014427 "NPR Item" extends Item
 
     internal procedure NPR_DeleteAuxItem()
     begin
-        NPR_ReadAuxItem();
+        NPR_ReadAuxItem(false);
         if _AuxItem.Delete() then;
     end;
 
-    local procedure NPR_ReadAuxItem()
+    local procedure NPR_ReadAuxItem(Force: Boolean)
     begin
-        if _AuxItem."Item No." <> "No." then
+        if (_AuxItem."Item No." <> "No.") or Force then
             if not _AuxItem.Get("No.") then begin
                 _AuxItem.Init();
                 _AuxItem."Item No." := "No.";
