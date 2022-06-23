@@ -184,6 +184,23 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 ApplicationArea = NPRRetail;
             }
         }
+        addbefore("Base Unit of Measure")
+        {
+            field("NPR Main Item/Variation"; AuxItem."Main Item/Variation")
+            {
+                Caption = 'Main Item/Variation';
+                ToolTip = 'Specifies if the item is a main item or a variation of another item.';
+                ApplicationArea = NPRRetail;
+                Editable = false;
+            }
+            field("NPR Main Item No."; AuxItem."Main Item No.")
+            {
+                Caption = 'Main Item No.';
+                ToolTip = 'Specifies the number of the main item.';
+                ApplicationArea = NPRRetail;
+                Editable = false;
+            }
+        }
     }
 
     actions
@@ -459,6 +476,44 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 end;
             }
         }
+
+        addafter(Identifiers)
+        {
+            action("NPR ShowMainItemVariations")
+            {
+                Caption = 'Main Item Variations';
+                ToolTip = 'View or edit main item variations related to currently selected item card.';
+                ApplicationArea = NPRRetail;
+                Image = CoupledItem;
+
+                trigger OnAction()
+                var
+                    MainItemVariationMgt: Codeunit "NPR Main Item Variation Mgt.";
+                begin
+                    Rec.NPR_SaveAuxItem();
+                    Commit();
+                    MainItemVariationMgt.OpenMainItemVariationList(AuxItem);
+                end;
+            }
+        }
+        addlast(Functions)
+        {
+            action("NPR SetAsMainItemVariation")
+            {
+                Caption = 'Set as Variation';
+                ToolTip = 'Sets current item as a variation of another main item.';
+                ApplicationArea = NPRRetail;
+                Image = CoupledItem;
+
+                trigger OnAction()
+                var
+                    MainItemVariationMgt: Codeunit "NPR Main Item Variation Mgt.";
+                begin
+                    MainItemVariationMgt.AddAsVariation(Rec, AuxItem);
+                    Rec.NPR_SetAuxItem(AuxItem);
+                end;
+            }
+        }
     }
 
     trigger OnOpenPage()
@@ -471,7 +526,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         TableView := Rec.GetView(false);
     end;
 
-    trigger OnAfterGetCurrRecord()
+    trigger OnAfterGetRecord()
     begin
         Rec.NPR_GetAuxItem(AuxItem);
     end;
