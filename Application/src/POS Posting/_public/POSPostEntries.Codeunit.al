@@ -497,11 +497,15 @@
                         AmountToPostToAccount := 0;
                         if POSBalancingLine."Balanced Diff. Amount" > 0 then begin
                             POSPostingSetup.TestField("Difference Acc. No.");
-                            MakeGenJournalFromPOSBalancingLine(POSBalancingLine, POSBalancingLine."Balanced Diff. Amount", GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No.", POSBalancingLine.Description, GenJournalLine);
+                            MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                    POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No.",
+                                    POSBalancingLine."Balanced Diff. Amount", POSBalancingLine.Description, GenJournalLine);
                         end;
                         if POSBalancingLine."Balanced Diff. Amount" < 0 then begin
                             POSPostingSetup.TestField("Difference Acc. No. (Neg)");
-                            MakeGenJournalFromPOSBalancingLine(POSBalancingLine, POSBalancingLine."Balanced Diff. Amount", GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No. (Neg)", POSBalancingLine.Description, GenJournalLine);
+                            MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                    POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No. (Neg)",
+                                    POSBalancingLine."Balanced Diff. Amount", POSBalancingLine.Description, GenJournalLine);
                         end;
                         AmountToPostToAccount := -POSBalancingLine."Balanced Diff. Amount";
 
@@ -516,7 +520,9 @@
                                 //Make posting only if the account is different for the new Bin
                                 AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."Move-To Bin Amount";
                                 POSPostingSetupNewBin.TestField("Account No.");
-                                MakeGenJournalFromPOSBalancingLine(POSBalancingLine, POSBalancingLine."Move-To Bin Amount", GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.", POSBalancingLine."Move-To Reference", GenJournalLine);
+                                MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                    POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
+                                    POSBalancingLine."Move-To Bin Amount", POSBalancingLine."Move-To Reference", GenJournalLine);
                             end;
                         end;
 
@@ -530,16 +536,22 @@
                             if (POSPostingSetup."Account Type" <> POSPostingSetupNewBin."Account Type") or (POSPostingSetup."Account No." <> POSPostingSetupNewBin."Account No.") then begin
                                 AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."Deposit-To Bin Amount";
                                 POSPostingSetupNewBin.TestField("Account No.");
-                                MakeGenJournalFromPOSBalancingLine(POSBalancingLine, POSBalancingLine."Deposit-To Bin Amount", GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.", POSBalancingLine."Deposit-To Reference", GenJournalLine);
+                                MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                    POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
+                                    POSBalancingLine."Deposit-To Bin Amount", POSBalancingLine."Deposit-To Reference", GenJournalLine);
                             end;
                         end;
 
                         if POSBalancingLine."New Float Amount" <> 0 then
-                            MakeGenJournalFromPOSBalancingLine(POSBalancingLine, POSBalancingLine."New Float Amount", GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.", StrSubstNo(TextClosingEntryFloat, POSEntry."Entry No."), GenJournalLine);
+                            MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                        POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.",
+                                        POSBalancingLine."New Float Amount", StrSubstNo(TextClosingEntryFloat, POSEntry."Entry No."), GenJournalLine);
                         AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."New Float Amount";
 
                         if AmountToPostToAccount <> 0 then
-                            MakeGenJournalFromPOSBalancingLine(POSBalancingLine, AmountToPostToAccount, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.", POSBalancingLine.Description, GenJournalLine);
+                            MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                            POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.",
+                                            AmountToPostToAccount, POSBalancingLine.Description, GenJournalLine);
                     until POSBalancingLine.Next() = 0;
             until POSEntry.Next() = 0;
     end;
@@ -1308,50 +1320,7 @@
         OnAfterInsertPOSPostingBufferToGenJnl(POSPostingBuffer, GenJournalLine, false);
     end;
 
-    local procedure MakeGenJournalFromPOSBalancingLine(POSBalancingLine: Record "NPR POS Balancing Line"; Amount: Decimal; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
-                                                                                                                                            PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line")
-    var
-        POSEntry: Record "NPR POS Entry";
-        POSStore: Record "NPR POS Store";
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        TempPosPostingProfile: Record "NPR POS Posting Profile" temporary;
-    begin
-        POSEntry.Get(POSBalancingLine."POS Entry No.");
-        POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
-        TempPosPostingProfile.Copy(POSPostingProfile);
-        TempPosPostingProfile."VAT Customer No." := '';
 
-        MakeGenJournalLine(
-          AccountType,
-          AccountNo,
-          Enum::"General Posting Type"::" ",
-          POSEntry."Posting Date",
-          POSBalancingLine."Document No.",
-          PostingDescription,
-          0,
-          POSBalancingLine."Currency Code",
-          Amount,
-          0,
-          '',
-          '',
-          '',
-          '',
-          '',
-          POSBalancingLine."Shortcut Dimension 1 Code",
-          POSBalancingLine."Shortcut Dimension 2 Code",
-          POSBalancingLine."Dimension Set ID",
-          '',
-          '',
-          '',
-          false,
-          0,
-          0,
-          TempPosPostingProfile,
-          "Tax Calculation Type"::"Normal VAT",
-          GenJournalLine);
-
-        OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine, GenJournalLine, false);
-    end;
 
     local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
                                                         GenPostingType: Enum "General Posting Type";
@@ -1443,6 +1412,89 @@
         GenJournalLine."Reason Code" := ReasonCode;
         GenJournalLine."Source Code" := POSPostingProfile."Source Code";
         GenJournalLine.Insert();
+    end;
+
+    local procedure MakeGenJournalFromPOSBalancingLineWithVatOption(POSEntry: Record "NPR POS Entry"; POSBalancingLine: Record "NPR POS Balancing Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; PostingAmount: Decimal; PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line")
+    var
+        GLAccount: Record "G/L Account";
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSStore: Record "NPR POS Store";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        DoPostVAT: Boolean;
+        TempPosPostingProfile: Record "NPR POS Posting Profile" temporary;
+    begin
+        DoPostVAT := GetAccountSetup(AccountNo, AccountType, GLAccount, VATPostingSetup);
+
+        POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
+        TempPosPostingProfile.Copy(POSPostingProfile);
+        TempPosPostingProfile."VAT Customer No." := '';
+
+        LineNumber := LineNumber + 10000;
+        GenJournalLine.Init();
+        GenJournalLine."Journal Template Name" := POSPostingProfile."Journal Template Name";
+        GenJournalLine."Journal Batch Name" := '';
+        GenJournalLine."Line No." := LineNumber;
+        GenJournalLine."System-Created Entry" := true;
+        GenJournalLine."Account Type" := AccountType;
+        GenJournalLine."Account No." := AccountNo;
+        if DoPostVAT then
+            GenJournalLine."Gen. Posting Type" := GLAccount."Gen. Posting Type";
+        GenJournalLine."Posting Date" := POSEntry."Posting Date";
+        GenJournalLine."Document Date" := GenJournalLine."Posting Date";
+        GenJournalLine."Document No." := POSBalancingLine."Document No.";
+        GenJournalLine."External Document No." := '';
+        GenJournalLine.Description := CopyStr(PostingDescription, 1, MaxStrLen(GenJournalLine.Description));
+        if StrLen(PostingDescription) > MaxStrLen(GenJournalLine.Description) then
+            GenJournalLine.Comment := CopyStr(PostingDescription, 1, MaxStrLen(GenJournalLine.Comment));
+
+        GenJournalLine."Currency Code" := POSBalancingLine."Currency Code";
+        if (GenJournalLine."Currency Code" <> '') then
+            GenJournalLine.Validate("Currency Code");
+        if PostingAmount <> 0 then
+            GenJournalLine.Validate(Amount, PostingAmount);
+
+        GenJournalLine."Source Currency Code" := POSBalancingLine."Currency Code";
+        GenJournalLine."Source Currency Amount" := PostingAmount;
+
+        if DoPostVAT then begin
+            GenJournalLine."VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
+            GenJournalLine."Gen. Bus. Posting Group" := GLAccount."Gen. Bus. Posting Group";
+            GenJournalLine."Gen. Prod. Posting Group" := GLAccount."Gen. Prod. Posting Group";
+            GenJournalLine."VAT Bus. Posting Group" := GLAccount."VAT Bus. Posting Group";
+            GenJournalLine."VAT Prod. Posting Group" := GLAccount."VAT Prod. Posting Group";
+        end;
+
+        GenJournalLine."Posting Group" := '';
+        GenJournalLine."Shortcut Dimension 1 Code" := POSBalancingLine."Shortcut Dimension 1 Code";
+        GenJournalLine."Shortcut Dimension 2 Code" := POSBalancingLine."Shortcut Dimension 2 Code";
+        GenJournalLine."Dimension Set ID" := POSBalancingLine."Dimension Set ID";
+        GenJournalLine."Salespers./Purch. Code" := '';
+        GenJournalLine."Reason Code" := '';
+        GenJournalLine."Source Code" := POSPostingProfile."Source Code";
+        GenJournalLine.Insert();
+
+        OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine, GenJournalLine, false);
+    end;
+
+    local procedure GetAccountSetup(AccountNo: Code[20]; AccountType: Enum "Gen. Journal Account Type"; var GLAccount: Record "G/L Account"; var VATPostingSetup: Record "VAT Posting Setup"): Boolean
+    begin
+        if AccountNo = '' then
+            exit;
+
+        if AccountType <> AccountType::"G/L Account" then
+            exit;
+
+        if not GLAccount.Get(AccountNo) then
+            exit;
+
+        if (GLAccount."Gen. Bus. Posting Group" = '') or
+         (GLAccount."Gen. Prod. Posting Group" = '') or
+         (GLAccount."VAT Bus. Posting Group" = '') or
+         (GLAccount."VAT Prod. Posting Group" = '') or
+         (GLAccount."Gen. Posting Type" = GLAccount."Gen. Posting Type"::" ") then
+            exit;
+
+        exit(VATPostingSetup.Get(GLAccount."VAT Bus. Posting Group", GLAccount."VAT Prod. Posting Group"));
     end;
 
     local procedure SetAppliesToDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer")
