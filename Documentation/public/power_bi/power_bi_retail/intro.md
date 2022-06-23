@@ -20,7 +20,7 @@ Furthermore, you can get an overview of:
 - Transactions on the POS.
 
 > [!Note]
-> If you need any assistance with NP Power BI for Retail, contact our support team at *support-bi@navipartner.com*.
+> If you need any assistance with NP Power BI for Retail, contact our support team at support-bi@navipartner.com.
 
 
 ### Related links
