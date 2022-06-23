@@ -119,14 +119,11 @@
                             DetailedTicketAccessEntry.SetCurrentKey("Ticket No.");
                             DetailedTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                             if (DetailedTicketAccessEntry.Find('-')) then begin
-                                if (DetailedTicketAccessEntry."Entry No." > TicketAccessStatistics."Highest Access Entry No.") then begin // Not yet aggregated to statistics
-                                    DetailedTicketAccessEntry.DeleteAll();
-                                end else begin
+                                if (DetailedTicketAccessEntry."Entry No." <= TicketAccessStatistics."Highest Access Entry No.") then // Reverse aggregated statistics
                                     repeat
                                         ReverseInitialEntryStatistics(DetailedTicketAccessEntry, TicketAccessStatistics."Highest Access Entry No.");
-
-                                    until (DetailedTicketAccessEntry.Next() = 0)
-                                end;
+                                    until (DetailedTicketAccessEntry.Next() = 0);
+                                DetailedTicketAccessEntry.DeleteAll();
                             end;
 
                             TicketAccessEntry.SetCurrentKey("Ticket No.");
@@ -385,6 +382,8 @@
         HighDate: Date;
         ScheduleSelectionError: Label 'Ticket is not valid for selected schedule. Ticket is valid until %1 but you have selected a schedule on %2';
     begin
+        //InsertTicket(ItemNo, VariantCode, TicketType, ReservationRequest, Ticket, TicketManagement);       
+
         if ReservationRequest.Default then begin
             InsertTicket(ItemNo, VariantCode, TicketType, ReservationRequest, Ticket, TicketManagement);
         end else
@@ -2593,7 +2592,7 @@
         exit(ResponseMessage = '');
     end;
 
-    local procedure FindTicketByToken(var Ticket: Record "NPR TM Ticket"; SessionTokenID: Text[100]; AdmissionCode: Code[20]; Current: Boolean; ExtLineReferenceNo: Integer)
+    local procedure FindTicketByToken(var Ticket: Record "NPR TM Ticket"; SessionTokenID: Text[100]; AdmissionCode: Code[20]; Current: Boolean; ExtLineReferenceNo: Integer): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TMTicketAccessEntry: Record "NPR TM Ticket Access Entry";
