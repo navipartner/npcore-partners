@@ -16,13 +16,13 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique code of the profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = '	Specifies the short description of a profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS View"; Rec."POS View")
