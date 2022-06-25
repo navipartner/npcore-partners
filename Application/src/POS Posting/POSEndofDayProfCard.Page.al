@@ -15,43 +15,43 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique code for the profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the short description of profile.';
                     ApplicationArea = NPRRetail;
                 }
 
                 field("End of Day Frequency"; Rec."End of Day Frequency")
                 {
-                    ToolTip = 'Specifies how often the end of day process is required.';
+                    ToolTip = 'Specifies how often the end of day process is required. There are two available options: Daily (End of Day will be performed every day) or Never (End of Day will never be performed).';
                     ApplicationArea = NPRRetail;
                 }
                 field("End of Day Type"; Rec."End of Day Type")
                 {
-                    ToolTip = 'Specifies the value of the End of Day Type field';
+                    ToolTip = 'Specifies the type of the end-of-day process. Master&Slave (there are master and slave POS units, the master unit is a unit in which balancing is performed for slave POS units) or Individual (every POS unit has to be balanced individually).';
                     ApplicationArea = NPRRetail;
                 }
                 field("Master POS Unit No."; Rec."Master POS Unit No.")
                 {
-                    ToolTip = 'Specifies the value of the Master POS Unit No. field';
+                    ToolTip = 'Specifies the number of the POS unit in which the balancing is performed if the End of Day Type is Master&Slave.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Z-Report UI"; Rec."Z-Report UI")
                 {
-                    ToolTip = 'Specifies the value of the Z-Report UI field';
+                    ToolTip = 'There are two available options: Summary+Balancing (when running the Z-report the page with summary will be opened first, followed by the balancing page) and Only Balancing (the balancing page is opened immediately).';
                     ApplicationArea = NPRRetail;
                 }
                 field("X-Report UI"; Rec."X-Report UI")
                 {
-                    ToolTip = 'Specifies the value of the X-Report UI field';
+                    ToolTip = 'There are two available options: Summary+Balancing (when running the X-report the page with summary will be opened first, followed by the balancing page) and Only Balancing (the balancing page is opened immediately).';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Workshift UI"; Rec."Close Workshift UI")
                 {
-                    ToolTip = 'Specifies the value of the Close Workshift UI field';
+                    ToolTip = 'You can choose between either Print or No print.';
                     ApplicationArea = NPRRetail;
                 }
                 field("User Experience"; Rec."User Experience")
@@ -62,32 +62,32 @@
                 }
                 field("Force Blind Counting"; Rec."Force Blind Counting")
                 {
-                    ToolTip = 'Specifies the value of the Force Blind Counting field';
+                    ToolTip = 'If this field is checked on the balancing page the amount won''t be shown in the system.';
                     ApplicationArea = NPRRetail;
                 }
                 field("SMS Profile"; Rec."SMS Profile")
                 {
-                    ToolTip = 'Specifies the value of the SMS Profile field';
+                    ToolTip = 'Specifies the SMS template which will be used for sending an SMS after the balancing is done.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Z-Report Number Series"; Rec."Z-Report Number Series")
                 {
-                    ToolTip = 'Specifies the value of the Z-Report Number Series field';
+                    ToolTip = 'Specifies the number series used for creating the Document No. in the POS entry for entries created from running the Z report.';
                     ApplicationArea = NPRRetail;
                 }
                 field("X-Report Number Series"; Rec."X-Report Number Series")
                 {
-                    ToolTip = 'Specifies the value of the X-Report Number Series field';
+                    ToolTip = 'Specifies the number series used for creating the Document No. in the POS entry for entries created from running the X report.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show Zero Amount Lines"; Rec."Show Zero Amount Lines")
                 {
-                    ToolTip = 'Specifies the value of the Show Zero Amount Lines field';
+                    ToolTip = 'Make all payment methods visible on the balancing page even if they haven''t been used.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Hide Turnover Section"; Rec."Hide Turnover Section")
                 {
-                    ToolTip = 'Specifies the value of the Hide Turnover Section field';
+                    ToolTip = 'Hide the turnover section on the summary page.';
                     ApplicationArea = NPRRetail;
                 }
             }

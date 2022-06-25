@@ -16,25 +16,25 @@
                 field("Register No."; Rec."Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Code field.';
+                    ToolTip = 'Specifies the unique code of the profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the Description of the POS Display Profile.';
+                    ToolTip = 'Specifies the short description of a profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Activate; Rec.Activate)
                 {
 
-                    ToolTip = 'Activate the Customer Display.';
+                    ToolTip = 'Activate the POS Display Profile on the customer display.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Prices ex. VAT"; Rec."Prices ex. VAT")
                 {
 
-                    ToolTip = 'Activate to display sales prices excl. VAT on the receipt.';
+                    ToolTip = 'Specifies whether the prices are visible without the VAT on the POS.';
                     ApplicationArea = NPRRetail;
                 }
                 group(Media)
@@ -43,7 +43,7 @@
                     field("Image Rotation Interval"; Rec."Image Rotation Interval")
                     {
 
-                        ToolTip = 'Specifies the time-delay between the images, ie. the duration an image is displayed (in milliseconds).';
+                        ToolTip = 'Specifies the time-delay between the images (the number of milliseconds during which an image is displayed).';
                         ApplicationArea = NPRRetail;
                     }
                     field("Media Downloaded"; Rec."Media Downloaded")
