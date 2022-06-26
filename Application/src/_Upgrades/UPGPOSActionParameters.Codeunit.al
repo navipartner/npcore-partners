@@ -10,6 +10,8 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
     trigger OnUpgradePerCompany()
     begin
         SalesDocExpPaymentMethodCode();
+        ItemIdentifierType();
+        ItemPriceIdentifierType();
     end;
 
     local procedure SalesDocExpPaymentMethodCode()
@@ -64,6 +66,66 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
                 end;
             end;
         until POSActionParameter.Next() = 0;
+    end;
+
+    local procedure ItemIdentifierType()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'ItemIdentifierType');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ItemIdentifierType')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        UpgradeItemIdentifierType();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ItemIdentifierType'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradeItemIdentifierType()
+    var
+        POSActionParameter: Record "NPR POS Parameter Value";
+    begin
+        POSActionParameter.SetRange("Table No.", Database::"NPR POS Menu Button");
+        POSActionParameter.SetRange("Action Code", 'ITEM');
+        POSActionParameter.SetRange(Name, 'itemIdentifyerType');
+        if POSActionParameter.FindSet() then
+            repeat
+                    POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
+            until POSActionParameter.Next() = 0;
+    end;
+
+    local procedure ItemPriceIdentifierType()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'ItemPriceIdentifierType');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ItemPriceIdentifierType')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        UpgradeItemPriceIdentifierType();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ItemPriceIdentifierType'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradeItemPriceIdentifierType()
+    var
+        POSActionParameter: Record "NPR POS Parameter Value";
+    begin
+        POSActionParameter.SetRange("Table No.", Database::"NPR POS Menu Button");
+        POSActionParameter.SetRange("Action Code", 'ITEM_PRICE');
+        POSActionParameter.SetRange(Name, 'itemIdentifyerType');
+        if POSActionParameter.FindSet() then
+            repeat
+                    POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
+            until POSActionParameter.Next() = 0;
     end;
 
     local procedure CurrCodeunitId(): Integer
