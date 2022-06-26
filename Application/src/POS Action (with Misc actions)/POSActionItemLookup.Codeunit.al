@@ -182,7 +182,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
 
             POSAction.SetWorkflowInvocationParameterUnsafe('itemNo', ItemNo);
             POSAction.SetWorkflowInvocationParameterUnsafe('itemQuantity', 1);
-            POSAction.SetWorkflowInvocationParameterUnsafe('itemIdentifyerType', 0); //0 = ItemNumber
+            POSAction.SetWorkflowInvocationParameterUnsafe('itemIdentifierType', 0); //0 = ItemNumber
             FrontEnd.InvokeWorkflow(POSAction);
 
             Response.ReadFrom('{}');

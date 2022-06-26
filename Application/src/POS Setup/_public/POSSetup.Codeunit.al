@@ -147,6 +147,64 @@
         end;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnAfterActionUpdated', '', false, false)]
+    local procedure OnAfterActionUpdated("Action": Record "NPR POS Action")
+    var
+        POSSetup: Record "NPR POS Setup";
+        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+    begin
+        POSSetup.Reset();
+        POSSetup.SetRange("Login Action Code", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Login Action Code"), POSSetup."Login Action Code");
+
+        POSSetup.Reset();
+        POSSetup.SetRange("Text Enter Action Code", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Text Enter Action Code"), POSSetup."Text Enter Action Code");
+
+        POSSetup.Reset();
+        POSSetup.SetRange("Item Insert Action Code", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Item Insert Action Code"), POSSetup."Item Insert Action Code");
+
+        POSSetup.Reset();
+        POSSetup.SetRange("Payment Action Code", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Payment Action Code"), POSSetup."Payment Action Code");
+
+        POSSetup.Reset();
+        POSSetup.SetRange("Customer Action Code", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Customer Action Code"), POSSetup."Customer Action Code");
+
+        POSSetup.Reset();
+        POSSetup.SetRange("Lock POS Action Code", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Lock POS Action Code"), POSSetup."Lock POS Action Code");
+
+        POSSetup.Reset();
+        POSSetup.SetRange("Unlock POS Action Code", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Unlock POS Action Code"), POSSetup."Unlock POS Action Code");
+
+        POSSetup.Reset();
+        POSSetup.SetRange("OnBeforePaymentView Action", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("OnBeforePaymentView Action"), POSSetup."OnBeforePaymentView Action");
+
+        POSSetup.Reset();
+        POSSetup.SetRange("Idle Timeout Action Code", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Idle Timeout Action Code"), POSSetup."Idle Timeout Action Code");
+
+        POSSetup.Reset();
+        POSSetup.SetRange("Idle Timeout Action Code", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Idle Timeout Action Code"), POSSetup."Idle Timeout Action Code");
+
+    end;
+
     #endregion Setup
 
     #region "Set Record => functions"
