@@ -5,7 +5,7 @@
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Points Value.rdlc';
-    Caption = 'Membership Points Summary';
+    Caption = 'Membership Points Value';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
@@ -15,7 +15,7 @@
     {
         dataitem("MM Membership"; "NPR MM Membership")
         {
-            RequestFilterFields = "Membership Code";
+            RequestFilterFields = "Membership Code", "Remaining Points";
             column(MembershipCode_MMMembership; "Membership Code")
             {
             }
@@ -251,7 +251,7 @@
 
     labels
     {
-        ReportLbl = 'Membership Points Summary';
+        ReportLbl = 'Membership Points Value';
     }
 
     var
