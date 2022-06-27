@@ -6,9 +6,10 @@
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Visiting Report.rdlc';
     Caption = 'MM Visiting Report';
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+    UsageCategory = None;
     DataAccessIntent = ReadOnly;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used';
 
     dataset
     {
