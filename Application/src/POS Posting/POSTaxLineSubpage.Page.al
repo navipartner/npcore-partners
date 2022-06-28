@@ -14,37 +14,33 @@
             {
                 field("Tax Base Amount"; Rec."Tax Base Amount")
                 {
-
-                    ToolTip = 'Specifies the value of the Tax Base Amount field';
+                    ToolTip = 'Specifies the value of the Tax Base Amount field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Tax %"; Rec."Tax %")
                 {
-
-                    ToolTip = 'Specifies the value of the Tax % field';
+                    BlankZero = true;
+                    ToolTip = 'Specifies the value of the Tax % field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Tax Amount"; Rec."Tax Amount")
                 {
-
-                    ToolTip = 'Specifies the value of the Tax Amount field';
+                    BlankZero = true;
+                    ToolTip = 'Specifies the value of the Tax Amount field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Amount Including Tax"; Rec."Amount Including Tax")
                 {
-
-                    ToolTip = 'Specifies the value of the Amount Including Tax field';
+                    ToolTip = 'Specifies the value of the Amount Including Tax field. If the Tax % wasn''t set on the VAT Posting Setup when sale is ended, "Amount Including Tax" will be equal to "Tax Base Amount"';
                     ApplicationArea = NPRRetail;
                 }
                 field("VAT Identifier"; Rec."VAT Identifier")
                 {
-
-                    ToolTip = 'Specifies the value of the Tax Identifier field';
+                    ToolTip = 'Specifies the value of the Tax Identifier field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Tax Calculation Type"; Rec."Tax Calculation Type")
                 {
-
                     ToolTip = 'Specifies the value of the VAT Calculation Type field';
                     ApplicationArea = NPRRetail;
                 }

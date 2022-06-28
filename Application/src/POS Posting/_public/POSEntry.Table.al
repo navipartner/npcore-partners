@@ -340,10 +340,6 @@
             Caption = 'Prices Including VAT';
             Editable = false;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-            end;
         }
         field(208; "Reason Code"; Code[10])
         {
@@ -369,6 +365,14 @@
             Caption = 'External Source Entry No.';
             Editable = false;
             DataClassification = CustomerContent;
+        }
+        field(213; "Is Pay-in Pay-out"; Boolean)
+        {
+            Caption = 'Is Pay-in Pay-out';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR POS Entry Sales Line" where("POS Entry No." = FIELD("Entry No."),
+                                                                Type = filter(Payout)));
+            Editable = false;
         }
         field(230; "No. of Print Output Entries"; Integer)
         {
