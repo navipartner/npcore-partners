@@ -642,6 +642,7 @@
         end;
 
         Commit();
+
         ResponseCode := -1;
         ResponseMessage := ABORTED;
         if (AcquireTicketAdmissionSchedule(Token, SaleLinePOS, true, ResponseMessage)) then //-+TM1.45 [380754]
@@ -659,6 +660,7 @@
             exit(1);
         end;
 
+        TicketRequestManager.LockResources('NewTicketSales_3');
         SaleLinePOS.Delete();
         TicketRequestManager.DeleteReservationRequest(Token, true);
         Commit();
