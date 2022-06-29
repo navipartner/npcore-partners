@@ -112,6 +112,7 @@
             TempSalesPriceListLine."Currency Code" := SaleLinePOS."Currency Code";
             TempSalesPriceListLine."Unit Price" := SaleLinePOS."Unit Price";
             TempSalesPriceListLine."Price Includes VAT" := SaleLinePOS."Price Includes VAT";
+            TempSalesPriceListLine."Allow Line Disc." := SaleLinePOS."Allow Line Discount";
             TempSalesPriceListLine.Insert();
         end else
             SalesLinePriceExists(SalePOS, SaleLinePOS);

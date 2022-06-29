@@ -509,6 +509,8 @@
     local procedure ApplyDiscountOnLines(var SalePOS: Record "NPR POS Sale"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; Discount: Decimal)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        AdjustedDiscountAmt: Decimal;
+        RoundingRemainder: Decimal;
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
         if not SaleLinePOS.FindSet() then
@@ -516,16 +518,27 @@
 
         repeat
             ApplyDiscountOnLine(SaleLinePOS, DiscountType, Discount);
+            if DiscountType = DiscountType::DiscountPct then begin
+                AdjustedDiscountAmt := SaleLinePOS."Unit Price" * Discount / 100 + RoundingRemainder;
+                if SaleLinePOS."Discount Amount" <> Round(AdjustedDiscountAmt) then
+                    SetLineDiscountAmount(SaleLinePOS, Round(AdjustedDiscountAmt), true);
+                RoundingRemainder := AdjustedDiscountAmt - SaleLinePOS."Discount Amount";
+            end;
         until SaleLinePOS.Next() = 0;
     end;
 
     local procedure ApplyDiscountOnLine(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; InputValue: Decimal)
+    begin
+        ApplyDiscountOnLine(SaleLinePOS, DiscountType, InputValue, false);
+    end;
+
+    local procedure ApplyDiscountOnLine(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; InputValue: Decimal; SkipAjmts: Boolean)
     var
         PrevRec: Text;
     begin
         if SaleLinePOS."Custom Disc Blocked" then
             exit;
-        if DiscountType in [DiscountType::DiscountAmt, DiscountType::LineAmt] then begin
+        if (DiscountType in [DiscountType::DiscountAmt, DiscountType::LineAmt]) and not SkipAjmts then begin
             InputValue := InputValue * GetSignFactor(SaleLinePOS);
             AdjustAmountForVat(SaleLinePOS, InputValue);
         end;
@@ -700,7 +713,12 @@
 
     local procedure SetLineDiscountAmount(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountAmount: Decimal)
     begin
-        ApplyDiscountOnLine(SaleLinePOS, "DiscType.DiscountAmt"(), DiscountAmount);
+        SetLineDiscountAmount(SaleLinePOS, DiscountAmount, false);
+    end;
+
+    local procedure SetLineDiscountAmount(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountAmount: Decimal; SkipAjmts: Boolean)
+    begin
+        ApplyDiscountOnLine(SaleLinePOS, "DiscType.DiscountAmt"(), DiscountAmount, SkipAjmts);
     end;
 
     procedure SetLineDiscountPctABS(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountPct: Decimal)
@@ -760,6 +778,7 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TotalLineValue: Decimal;
+        RoundingAmt: Decimal;
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
         if (SaleLinePOS.FindSet()) then begin
@@ -767,8 +786,11 @@
                 TotalLineValue += GetSingleLineTotalDiscountableValue(SaleLinePOS, true);
             until (SaleLinePOS.Next() = 0);
 
-            if (TotalLineValue <> Amount) then
-                SetLineDiscountAmount(SaleLinePOS, SaleLinePOS."Discount Amount" * GetSignFactor(SaleLinePOS) + (TotalLineValue - Amount));
+            RoundingAmt := TotalLineValue - Amount;
+            if RoundingAmt <> 0 then begin
+                AdjustAmountForVat(SaleLinePOS, RoundingAmt);
+                SetLineDiscountAmount(SaleLinePOS, SaleLinePOS."Discount Amount" + RoundingAmt, true);
+            end;
         end;
     end;
 

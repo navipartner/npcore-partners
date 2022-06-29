@@ -123,6 +123,10 @@ codeunit 85013 "NPR TM API SmokeTest"
     procedure CancelPrelTicketReservation()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         Assert: Codeunit "Assert";
         ItemNo: Code[20];
@@ -145,6 +149,15 @@ codeunit 85013 "NPR TM API SmokeTest"
         ReservationOk := TicketApiLibrary.MakeReservation(NumberOfTicketOrders, ItemNo, TicketQuantityPerOrder, MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
 
+        TicketRequest.SetFilter("Session Token ID", '=%1', ResponseToken);
+        TicketRequest.FindFirst();
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
+        Ticket.FindFirst();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+        DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        DetTicketAccessEntry.FindFirst();
+
         ReservationOk := TicketApiLibrary.CancelTicketReservation(ResponseToken, ScannerStation, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
 
@@ -153,6 +166,75 @@ codeunit 85013 "NPR TM API SmokeTest"
         ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, SendNotificationTo, ExternalOrderNo, ScannerStation, TmpCreatedTickets, ResponseMessage);
         Assert.IsFalse(ReservationOk, ResponseMessage);
 
+        // Test
+        // All ticket transactional data should be deleted
+        Assert.IsTrue(TmpCreatedTickets.IsEmpty(), 'ConfirmTicketReservation API returned invalid data.');
+        Assert.IsTrue(Ticket.IsEmpty(), 'Ticket was not deleted.');
+        Assert.IsTrue(TicketAccessEntry.IsEmpty(), 'TicketAccessEntry was not deleted.');
+        Assert.IsTrue(DetTicketAccessEntry.IsEmpty(), 'DetailedTicketAccessEntry was not deleted.');
+        Assert.IsTrue(TicketRequest.IsEmpty(), 'Ticket Reservation Request was not deleted.')
+    end;
+
+
+
+    [Test]
+    procedure CancelPrelTicketReservationStatistics()
+    var
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        Assert: Codeunit "Assert";
+        TicketStatistics: Codeunit "NPR TM Ticket Access Stats";
+        ItemNo: Code[20];
+        ResponseToken: Text;
+        ResponseMessage: Text;
+        ReservationOk: Boolean;
+        NumberOfTicketOrders: Integer;
+        TicketQuantityPerOrder: Integer;
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        SendNotificationTo: Text;
+        ExternalOrderNo: Text;
+    begin
+
+        ItemNo := SelectSmokeTestScenario();
+
+        NumberOfTicketOrders := Random(2) + 1;
+        TicketQuantityPerOrder := Random(5) + 1;
+
+        ReservationOk := TicketApiLibrary.MakeReservation(NumberOfTicketOrders, ItemNo, TicketQuantityPerOrder, MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        // Aggregate statistics
+        TicketStatistics.BuildCompressedStatistics(Today(), false);
+
+        TicketRequest.SetFilter("Session Token ID", '=%1', ResponseToken);
+        TicketRequest.FindFirst();
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
+        Ticket.FindFirst();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+        DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        DetTicketAccessEntry.FindFirst();
+
+        ReservationOk := TicketApiLibrary.CancelTicketReservation(ResponseToken, ScannerStation, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        // [Test]
+        // Confirming a cancelled reservation should fail
+        ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, SendNotificationTo, ExternalOrderNo, ScannerStation, TmpCreatedTickets, ResponseMessage);
+        Assert.IsFalse(ReservationOk, ResponseMessage);
+
+        // Test
+        // All ticket transactional data should be deleted
+        Assert.IsTrue(TmpCreatedTickets.IsEmpty(), 'ConfirmTicketReservation API returned invalid data.');
+        Assert.IsTrue(Ticket.IsEmpty(), 'Ticket was not deleted.');
+        Assert.IsTrue(TicketAccessEntry.IsEmpty(), 'TicketAccessEntry was not deleted.');
+        Assert.IsTrue(DetTicketAccessEntry.IsEmpty(), 'DetailedTicketAccessEntry was not deleted.');
+        Assert.IsTrue(TicketRequest.IsEmpty(), 'Ticket Reservation Request was not deleted.')
     end;
 
     [Test]
@@ -189,6 +271,139 @@ codeunit 85013 "NPR TM API SmokeTest"
         ReservationOk := TicketApiLibrary.CancelTicketReservation(ResponseToken, ScannerStation, ResponseMessage);
         Assert.IsFalse(ReservationOk, ResponseMessage);
 
+    end;
+
+
+    [Test]
+    procedure CancelReservedTicketReservation()
+    var
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TmpAdmScheduleEntryResponseOut: Record "NPR TM Admis. Schedule Entry" temporary;
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        Assert: Codeunit "Assert";
+        ItemNo: Code[20];
+        ResponseToken: Text;
+        ResponseMessage: Text;
+        ReservationOk: Boolean;
+        NumberOfTicketOrders: Integer;
+        TicketQuantityPerOrder: Integer;
+        NumberOfReservations: Integer;
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        SendNotificationTo: Text;
+        ExternalOrderNo: Text;
+    begin
+        NumberOfTicketOrders := Random(2) + 1;
+        TicketQuantityPerOrder := Random(5) + 1;
+        NumberOfReservations := 1;
+
+        ItemNo := SelectSimpleReservationTestScenario(NumberOfReservations);
+        TicketBom.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBom.FindFirst();
+
+        TicketApiLibrary.AdmissionCapacityCheck(TicketBom."Admission Code", Today(), ItemNo, TmpAdmScheduleEntryResponseOut);
+        Assert.AreEqual(NumberOfReservations, TmpAdmScheduleEntryResponseOut.Count(), 'Invalid response count.');
+        TmpAdmScheduleEntryResponseOut.SetFilter("Admission Start Time", '<=%1', Time());
+        TmpAdmScheduleEntryResponseOut.SetFilter("Admission End Time", '>=%1', Time());
+        TmpAdmScheduleEntryResponseOut.FindFirst();
+
+        ReservationOk := TicketApiLibrary.MakeReservation(NumberOfTicketOrders, ItemNo, TicketQuantityPerOrder, TmpAdmScheduleEntryResponseOut."External Schedule Entry No.", MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        TicketRequest.SetFilter("Session Token ID", '=%1', ResponseToken);
+        TicketRequest.FindFirst();
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
+        Ticket.FindFirst();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+        DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        DetTicketAccessEntry.FindFirst();
+
+        // [Test]
+        // Cancel is OK.
+        ReservationOk := TicketApiLibrary.CancelTicketReservation(ResponseToken, ScannerStation, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        // Test
+        // All ticket transactional data should be deleted
+        Assert.IsTrue(TmpCreatedTickets.IsEmpty(), 'ConfirmTicketReservation API returned invalid data.');
+        Assert.IsTrue(Ticket.IsEmpty(), 'Ticket was not deleted.');
+        Assert.IsTrue(TicketAccessEntry.IsEmpty(), 'TicketAccessEntry was not deleted.');
+        Assert.IsTrue(DetTicketAccessEntry.IsEmpty(), 'DetailedTicketAccessEntry was not deleted.');
+        Assert.IsTrue(TicketRequest.IsEmpty(), 'Ticket Reservation Request was not deleted.')
+    end;
+
+    [Test]
+    procedure CancelReservedTicketReservationStatistics()
+    var
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TmpAdmScheduleEntryResponseOut: Record "NPR TM Admis. Schedule Entry" temporary;
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        TicketStatistics: Codeunit "NPR TM Ticket Access Stats";
+        Assert: Codeunit "Assert";
+        ItemNo: Code[20];
+        ResponseToken: Text;
+        ResponseMessage: Text;
+        ReservationOk: Boolean;
+        NumberOfTicketOrders: Integer;
+        TicketQuantityPerOrder: Integer;
+        NumberOfReservations: Integer;
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        SendNotificationTo: Text;
+        ExternalOrderNo: Text;
+    begin
+        NumberOfTicketOrders := Random(2) + 1;
+        TicketQuantityPerOrder := Random(5) + 1;
+        NumberOfReservations := 1;
+
+        ItemNo := SelectSimpleReservationTestScenario(NumberOfReservations);
+        TicketBom.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBom.FindFirst();
+
+        TicketApiLibrary.AdmissionCapacityCheck(TicketBom."Admission Code", Today(), ItemNo, TmpAdmScheduleEntryResponseOut);
+        Assert.AreEqual(NumberOfReservations, TmpAdmScheduleEntryResponseOut.Count(), 'Invalid response count.');
+        TmpAdmScheduleEntryResponseOut.SetFilter("Admission Start Time", '<=%1', Time());
+        TmpAdmScheduleEntryResponseOut.SetFilter("Admission End Time", '>=%1', Time());
+        TmpAdmScheduleEntryResponseOut.FindFirst();
+
+        ReservationOk := TicketApiLibrary.MakeReservation(NumberOfTicketOrders, ItemNo, TicketQuantityPerOrder, TmpAdmScheduleEntryResponseOut."External Schedule Entry No.", MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        // Aggregate statistics
+        TicketStatistics.BuildCompressedStatistics(Today(), false);
+
+        TicketRequest.SetFilter("Session Token ID", '=%1', ResponseToken);
+        TicketRequest.FindFirst();
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
+        Ticket.FindFirst();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+        DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        DetTicketAccessEntry.FindFirst();
+
+        // [Test]
+        // Cancel is OK.
+        ReservationOk := TicketApiLibrary.CancelTicketReservation(ResponseToken, ScannerStation, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        // Test
+        // All ticket transactional data should be deleted
+        Assert.IsTrue(TmpCreatedTickets.IsEmpty(), 'ConfirmTicketReservation API returned invalid data.');
+        Assert.IsTrue(Ticket.IsEmpty(), 'Ticket was not deleted.');
+        Assert.IsTrue(TicketAccessEntry.IsEmpty(), 'TicketAccessEntry was not deleted.');
+        Assert.IsTrue(DetTicketAccessEntry.IsEmpty(), 'DetailedTicketAccessEntry was not deleted.');
+        Assert.IsTrue(TicketRequest.IsEmpty(), 'Ticket Reservation Request was not deleted.')
     end;
 
     [Test]
@@ -413,7 +628,7 @@ codeunit 85013 "NPR TM API SmokeTest"
         Assert.AreEqual(1, TmpAdmScheduleEntryResponseOut.Count(), 'Invalid response count.');
 
         // [Test]
-        // Smoketest scenario sets up scedules for +5D so, today inclusive, it should be 6 entries
+        // Smoketest scenario sets up schedules for +5D so, today inclusive, it should be 6 entries
         TicketApiLibrary.AdmissionCapacityCheck(TicketBom."Admission Code", 0D, ItemNo, TmpAdmScheduleEntryResponseOut);
         Assert.AreEqual(6, TmpAdmScheduleEntryResponseOut.Count(), 'Invalid response count.');
 
@@ -812,6 +1027,12 @@ codeunit 85013 "NPR TM API SmokeTest"
         ItemNo := TicketLibrary.CreateScenario_SmokeTest();
     end;
 
+    local procedure SelectSimpleReservationTestScenario(NumberOfTimeslots: Integer) ItemNo: Code[20]
+    var
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+    begin
+        ItemNo := TicketLibrary.CreateScenario_ReservationRequired(NumberOfTimeslots)
+    end;
 
 
     local procedure GenerateCode20(): Code[20]

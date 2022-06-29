@@ -125,13 +125,15 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib." implements "NPR IMatrix Printe
     var
         OStream: OutStream;
     begin
-        Clear(OStream);
-        Clear(_PrintBuffer);
-        Clear(_DotNetStream);
-        Clear(_DotNetEncoding);
-        _PrintBuffer.CreateOutStream(OStream);
-        _DotNetEncoding.Encoding(850);
-        _DotNetStream.FromOutStream(OStream);
+        if not _PrintBuffer.HasValue() then begin
+            Clear(OStream);
+            Clear(_PrintBuffer);
+            Clear(_DotNetStream);
+            Clear(_DotNetEncoding);
+            _PrintBuffer.CreateOutStream(OStream);
+            _DotNetEncoding.Encoding(850);
+            _DotNetStream.FromOutStream(OStream);
+        end;
     end;
 
     local procedure AddStringToBuffer(String: Text)

@@ -1,14 +1,14 @@
 ﻿page 6014416 "NPR Pakke Foreign Shipm. Map."
 {
-    Extensible = False;
+    Extensible = true;
 
-    Caption = 'Pakke Foreign Shipment Mapping';
+    Caption = 'NPR Package Foreign Countries';
     PageType = List;
     UsageCategory = Administration;
-
-    SourceTable = "NPR Pakke Foreign Shipm. Map.";
-    SourceTableView = SORTING("Country/Region Code", "Base Shipping Agent Code");
+    SourceTable = "NPR Package Foreign Countries";
     ApplicationArea = NPRRetail;
+
+
 
     layout
     {
@@ -32,18 +32,6 @@
                 {
 
                     ToolTip = 'Specifies the value of the Ship-to Country/Region Code field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
-                {
-
-                    ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Base Shipping Agent Code"; Rec."Base Shipping Agent Code")
-                {
-
-                    ToolTip = 'Specifies the value of the Shipping Agent Code field';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -7,9 +7,10 @@
     RDLCLayout = './src/_Reports/layouts/MM Member Card Owner.rdlc';
     Caption = 'Member Card Owner';
     ShowPrintStatus = false;
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+    UsageCategory = None;
     DataAccessIntent = ReadOnly;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used';
 
     dataset
     {
