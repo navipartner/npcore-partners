@@ -1207,7 +1207,7 @@
         ValidUntilBaseDate: Date;
     begin
 
-        _PreSelectedCustomerContact := (Rec."Contact No." <> '') or (Rec."Customer No." <> '');
+        _PreSelectedCustomerContact := ((Rec."Contact No." <> '') or (Rec."Customer No." <> '')) and not Rec."Originates From File Import";
         ShowNewMemberSection := true;
 
         ShowAddToMembershipSection := false;

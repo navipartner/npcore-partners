@@ -51,6 +51,8 @@
         FldNAVMembershipCode: Text;
         FldLoyaltyPoints: Text;
         FldExternalCardNo: Text;
+        FldCustomerNumber: Text;
+        FldContactNumber: Text;
         FldExternalCardNoValidUntilDate: Text;
         INVALID_VALUE: Label 'The value %1 specified for %2 on line %3 is not valid.';
         INVALID_LENGTH: Label 'The length of %1 exceeds the max length of %2 for %3 on line %4.';
@@ -169,6 +171,10 @@
         // -- card
         FldExternalCardNo := nextField(PLine);
         FldExternalCardNoValidUntilDate := nextField(PLine);
+
+        // -- extra
+        FldCustomerNumber := nextField(PLine);
+        FldContactNumber := nextField(PLine);
     end;
 
     local procedure isValidMember(): Boolean
@@ -269,6 +275,11 @@
         GMemberInfo."Valid Until" := validateDateField(FldExternalCardNoValidUntilDate, GDateMask, OPTIONAL, GMemberInfo.FieldCaption("Valid Until"));
 
         GMemberInfo."Member Card Type" := MembershipSalesSetup."Member Card Type";
+
+        if (Community."Membership to Cust. Rel.") then begin
+            GMemberInfo."Customer No." := FldCustomerNumber;
+            GMemberInfo."Contact No." := FldContactNumber;
+        end;
 
         GMemberInfo."Originates From File Import" := true;
         GMemberInfo.Insert();
