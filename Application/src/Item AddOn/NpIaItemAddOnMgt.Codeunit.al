@@ -483,6 +483,7 @@
             SaleLinePOSAddOn."Fixed Quantity" := ItemAddOnLine."Fixed Quantity";
             SaleLinePOSAddOn."Per Unit" := ItemAddOnLine."Per Unit";
             SaleLinePOSAddOn.Mandatory := ItemAddOnLine.Mandatory;
+            SaleLinePOSAddOn."Copy Serial No." := ItemAddOnLine."Copy Serial No.";
             SaleLinePOSAddOn.Insert(true);
             exit(true);
         end;
@@ -788,6 +789,9 @@
 
         FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
         if not SaleLinePOSAddOn.FindSet() then
+            exit;
+
+        if not SaleLinePOSAddOn."Copy Serial No." then
             exit;
 
         repeat
