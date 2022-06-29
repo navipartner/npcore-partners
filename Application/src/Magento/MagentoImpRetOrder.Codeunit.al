@@ -479,7 +479,7 @@
                         InsertSalesLine(SalesLine, SalesHeader, LineNo);
                         ShipmentMapping.SetRange("External Shipment Method Code", NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'external_no', false));
                         ShipmentMapping.FindFirst();
-                        SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
+                        SalesLine.Validate(Type, GetShipmentType(ShipmentMapping."Shipment Fee Type"));
                         SalesLine.Validate("No.", ShipmentMapping."Shipment Fee No.");
                         if Quantity2 <> 0 then
                             SalesLine.Validate(Quantity, Quantity2);
@@ -554,7 +554,7 @@
         SalesLine."Line No." := LineNo;
         InsertSalesLine(SalesLine, SalesHeader, LineNo);
 
-        SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
+        SalesLine.Validate(Type, GetShipmentType(ShipmentMapping."Shipment Fee Type"));
         SalesLine.Validate("No.", ShipmentMapping."Shipment Fee No.");
         SalesLine.Validate("Unit Price", ShipmentFeeRefund);
         SalesLine.Validate(Quantity, 1);
@@ -703,6 +703,21 @@
                 exit(true);
             end;
         end;
+    end;
 
+    local procedure GetShipmentType(ShipmentFeeType: Enum "NPR Mag. Shipment Fee Type") SalesLineType: Enum "Sales Line Type"
+    begin
+        case ShipmentFeeType of
+            ShipmentFeeType::"G/L Account":
+                exit(SalesLineType::"G/L Account");
+            ShipmentFeeType::Item:
+                exit(SalesLineType::Item);
+            ShipmentFeeType::"Charge (Item)":
+                exit(SalesLineType::"Charge (Item)");
+            ShipmentFeeType::"Fixed Asset":
+                exit(SalesLineType::"Fixed Asset");
+            ShipmentFeeType::Resource:
+                exit(SalesLineType::Resource);
+        end;
     end;
 }

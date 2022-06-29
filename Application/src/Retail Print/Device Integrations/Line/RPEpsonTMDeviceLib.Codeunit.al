@@ -424,7 +424,7 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         LineFeed();
     end;
 
-    procedure PrintText(POSPrintBuffer: Record "NPR RP Print Buffer")
+    procedure PrintText(var POSPrintBuffer: Record "NPR RP Print Buffer")
     var
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
         JustificationSet: Boolean;
@@ -597,6 +597,7 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         _DotNetStream.WriteByte(29); //GS
         AddStringToBuffer('(' + 'k' + Format(pL) + Format(pH) + Format(cn) + Format(fn) + Format(m));
     end;
+
     local procedure PrintGraphicsInBuffer()
     begin
         // GS ( L %1 %2 %3 %4        

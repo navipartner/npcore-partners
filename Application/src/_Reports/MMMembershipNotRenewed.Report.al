@@ -17,6 +17,7 @@
             dataitem("MM Membership"; "NPR MM Membership")
             {
                 DataItemLink = "Membership Code" = FIELD(Code);
+                RequestFilterFields = "Membership Code";
                 dataitem("MM Membership Role"; "NPR MM Membership Role")
                 {
                     dataitem("MM Member"; "NPR MM Member")

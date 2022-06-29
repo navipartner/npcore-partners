@@ -43,7 +43,8 @@
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.SetFilter(Type, '%1|%2', SalesLine.Type::Item, SalesLine.Type::" ");
-        SalesLine.FindSet();
+        if not SalesLine.FindSet() then
+            exit;
 
         repeat
             POSSaleLine.GetNewSaleLine(SaleLinePOS);

@@ -4,6 +4,8 @@
 
     Caption = 'Pakke Foreign Shipment Mapping';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Replaced by the table 6014688 "NPR Package Foreign Countries" ';
 
     fields
     {

@@ -64,7 +64,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         {
             Caption = 'Package Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Package Code".Code;
+            TableRelation = "NPR Package Code".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
         }
         field(6014425; "NPR Order Type"; Option)
         {

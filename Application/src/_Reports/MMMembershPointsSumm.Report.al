@@ -15,6 +15,7 @@
     {
         dataitem("MM Membership"; "NPR MM Membership")
         {
+            RequestFilterFields = "Membership Code", "Awarded Points (Sale)", "Remaining Points";
             column(MembershipCode_MMMembership; "Membership Code")
             {
                 IncludeCaption = true;
@@ -82,6 +83,7 @@
         trigger OnOpenPage()
         begin
             "MM Membership".SetFilter("Date Filter", '..%2', ToDate);
+            "MM Membership".SetFilter("Awarded Points (Sale)", '>0');
         end;
     }
 

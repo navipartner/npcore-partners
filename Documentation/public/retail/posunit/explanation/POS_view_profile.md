@@ -1,4 +1,4 @@
-# POS view profile
+# POS View Profile
 
 In the **POS View Profile** there are two sections: **General** and **Name and Date Formatting**.
 

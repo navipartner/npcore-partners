@@ -12,7 +12,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ParamItemIdentifierType_CaptionLbl: Label 'Item Identifier Type';
         ParamItemIdentifierType_DescLbl: Label 'Specifies the Item Identifier Type';
         ParamItemIdentifierOptionsLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference', Locked = true;
-        ParamItemIdentifierOptions_CaptionLbl: Label 'Item No,Item Cross Reference,Item Search,Serial No Item Cross Reference';
+        ParamItemIdentifierOptions_CaptionLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference';
         ParamItemNo_CaptionLbl: Label 'Item No.';
         ParamItemNo_DescLbl: Label 'Specifies the Item No.';
         ParamEditDescription_CaptionLbl: Label 'Edit Description';
@@ -241,22 +241,22 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
             EventCodeItemNo():
                 begin
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemNo', true, '');
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifyerType', false, 'ItemNo');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifierType', false, 'ItemNo');
                 end;
             EventCodeItemRef():
                 begin
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemNo', true, '');
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifyerType', false, 'ItemCrossReference');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifierType', false, 'ItemCrossReference');
                 end;
             EventCodeItemSearch():
                 begin
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemNo', true, '');
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifyerType', false, 'ItemSearch');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifierType', false, 'ItemSearch');
                 end;
             EventCodeSerialNoItemRef():
                 begin
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemNo', true, '');
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifyerType', false, 'SerialNoItemCrossReference');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifierType', false, 'SerialNoItemCrossReference');
                 end;
         end;
     end;

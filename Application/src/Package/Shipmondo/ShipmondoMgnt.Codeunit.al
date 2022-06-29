@@ -154,6 +154,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
             Output += STRSUBSTNO(QueryParams8Lbl, BuildServicePoint(PakkelabelsShipment));
 
         Output += STRSUBSTNO(QueryParams9Lbl, BuildParcels(PakkelabelsShipment));
+        Output += BuildCustoms((PakkelabelsShipment));
 
         if PrintAllowed(PakkelabelsShipment) then begin
             Output += '"print": true,';
@@ -211,7 +212,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         QueryParams8Lbl: Label '"email": "%1",', Locked = true;
         QueryParams9Lbl: Label '"mobile": "%1",', Locked = true;
         QueryParams10Lbl: Label '"telephone": "%1"', Locked = true;
-        QueryParams11Lbl: Label ',"instruction":"%1",', Locked = true;
+        QueryParams11Lbl: Label ',"instruction":"%1"', Locked = true;
     begin
         Output := '{';
         Output += STRSUBSTNO(QueryParamsLbl, PakkelabelsShipment.Name);
@@ -227,12 +228,11 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         Output += STRSUBSTNO(QueryParams9Lbl, PakkelabelsShipment."SMS No.");
         Output += STRSUBSTNO(QueryParams10Lbl, PakkelabelsShipment."SMS No.");
 
-
-
         if (PackageProviderSetup."Send Delivery Instructions") and (PakkelabelsShipment."Delivery Instructions" <> '') then
             Output += STRSUBSTNO(QueryParams11Lbl, PakkelabelsShipment."Delivery Instructions");
         Output += '}';
     end;
+
 
     local procedure BuildServicePoint(var PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;
     var
@@ -248,14 +248,18 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         PakkeShippingAgent: Record "NPR Package Shipping Agent";
         QueryParamsLbl: Label '"weight":"%1"', Locked = true;
         QueryParams2Lbl: Label '"packaging":"%1"', Locked = true;
+        QueryParams3Lbl: Label '"quantity":"%1",', Locked = true;
+        ShippingPackageCode: Record "NPR Package Code";
     begin
         PakkeShippingAgent.GET(PakkelabelsShipment."Shipping Agent Code");
         Output := '[';
         Output += '{';
+        Output += STRSUBSTNO(QueryParams3Lbl, FORMAT(PakkelabelsShipment."Parcel Qty.", 0, 1));
         Output += STRSUBSTNO(QueryParamsLbl, FORMAT(PakkelabelsShipment."Total Weight", 0, 1));
         IF PakkeShippingAgent."Package Type Required" THEN BEGIN
+            ShippingPackageCode.GET(PakkelabelsShipment."Shipping Agent Code", PakkelabelsShipment."Package Code");
             Output += ',';
-            Output += STRSUBSTNO(QueryParams2Lbl, FORMAT(PakkelabelsShipment."Package Code", 0, 1));
+            Output += STRSUBSTNO(QueryParams2Lbl, FORMAT(ShippingPackageCode.Description, 0, 1));
         END;
         Output += '}';
         Output += ']';
@@ -270,6 +274,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
             exit(false);
 
         PakkelabelsPrinter.SETRANGE("Location Code", PakkelabelsShipment."Location Code");
+        IF NOT PakkelabelsPrinter.FINDFIRST() THEN
+            PakkelabelsPrinter.SETRANGE("Location Code");
         if PakkelabelsPrinter.FINDFIRST() then
             exit(true)
         else
@@ -284,6 +290,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         QueryParams3Lbl: Label '"label_format": "%1"', Locked = true;
     begin
         PakkelabelsPrinter.SETRANGE("Location Code", PakkelabelsShipment."Location Code");
+        IF NOT PakkelabelsPrinter.FINDFIRST() THEN
+            PakkelabelsPrinter.SETRANGE("Location Code");
         if PakkelabelsPrinter.FINDFIRST() then begin
             Output := '{';
             Output += STRSUBSTNO(QueryParamsLbl, PakkelabelsPrinter."Host Name");
@@ -292,6 +300,67 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
             Output += '}';
         end;
     end;
+
+    LOCAL procedure BuildCustoms(PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text
+    var
+        CompanyInformation: Record "Company Information";
+        PakkeForeignShipmentMapping: Record "NPR Package Foreign Countries";
+        SalesShipmentLine: Record "Sales Shipment Line";
+        Item: Record Item;
+        i: Integer;
+        J: Integer;
+        QueryParamsLbl: Label '"currency_code": "%1",', Locked = true;
+        QueryParams2Lbl: Label '"quantity": "%1",', Locked = true;
+        QueryParams3Lbl: Label '"content":"%1",', Locked = true;
+        QueryParams4Lbl: Label '"commodity_code": "%1",', Locked = true;
+        QueryParams5Lbl: Label '"unit_value": "%1",', Locked = true;
+        QueryParams6Lbl: Label '"unit_weight": "%1"', Locked = true;
+        QueryParams7Lbl: Label '"country_code": "%1"', Locked = true;
+
+
+    begin
+        CompanyInformation.GET();
+
+        IF PakkelabelsShipment."Country/Region Code" = CompanyInformation."Country/Region Code" THEN
+            EXIT;
+
+        PakkeForeignShipmentMapping.SETRANGE("Country/Region Code", PakkelabelsShipment."Country/Region Code");
+        IF PakkeForeignShipmentMapping.FINDFIRST() THEN BEGIN
+            Output := '"customs": ';
+            Output += '{';
+            Output += STRSUBSTNO(QueryParamsLbl, FORMAT(PakkelabelsShipment."Currency Code", 0, 1));
+
+            Output += '"goods": ';
+            Output += '[';
+
+            SalesShipmentLine.SETRANGE("Document No.", PakkelabelsShipment."Document No.");
+            SalesShipmentLine.SETFILTER("Net Weight", '<>0');
+            SalesShipmentLine.SETFILTER(Quantity, '<>0');
+            SalesShipmentLine.SETRANGE(Type, SalesShipmentLine.Type::Item);
+            j := SalesShipmentLine.COUNT;
+            IF SalesShipmentLine.FINDSET() THEN
+                REPEAT
+                    i += 1;
+                    Output += '{';
+                    Item.GET(SalesShipmentLine."No.");
+                    Output += STRSUBSTNO(QueryParams2Lbl, FORMAT(SalesShipmentLine.Quantity, 0, 1));
+                    Output += STRSUBSTNO(QueryParams7Lbl, FORMAT(PakkelabelsShipment."Country/Region Code", 0, 1));
+                    Output += STRSUBSTNO(QueryParams3Lbl, FORMAT(SalesShipmentLine.Description, 0, 1));
+                    Output += STRSUBSTNO(QueryParams4Lbl, FORMAT(Item."Tariff No.", 0, 1));
+                    Output += STRSUBSTNO(QueryParams5Lbl, FORMAT(SalesShipmentLine."Unit Price", 0, 1));
+                    Output += STRSUBSTNO(QueryParams6Lbl, FORMAT(ROUND(SalesShipmentLine."Net Weight", 1, '>') * 1000, 0, 1));
+                    IF j <> i THEN
+                        Output += '},'
+                    ELSE
+                        Output += '}';
+                UNTIL SalesShipmentLine.NEXT() = 0;
+
+            Output += ']';
+            Output += '},';
+        END;
+    end;
+
+
 
     local procedure PrintJob(ShipmentDocument: Record "NPR Shipping Provider Document") output: Text;
     var
@@ -659,7 +728,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
                         ShipmentDocument.Reference := SalesShipmentHeader."Your Reference";
                         ShipmentDocument."Shipment Date" := SalesShipmentHeader."Shipment Date";
                         ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
-
+                        ShipmentDocument."Currency Code" := SalesShipmentHeader."Currency Code";
 
                         ShipmentDocument."Shipping Method Code" := SalesShipmentHeader."Shipment Method Code";
                         ShipmentDocument."Shipping Agent Code" := SalesShipmentHeader."Shipping Agent Code";
@@ -738,26 +807,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         CreateShipment(PacsoftShipmentDocument, false)
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterModifyEvent', '', true, true)]
-    local procedure T36OnAfterModifyEvent(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; RunTrigger: Boolean);
-    var
-        ForeignShipmentMapping: Record "NPR Pakke Foreign Shipm. Map.";
-    begin
-        if not RunTrigger then
-            exit;
-        if not InitPackageProvider() then
-            exit;
-        if (Rec."Shipment Method Code" = '') or (Rec."Shipping Agent Code" = '') then
-            exit;
-        ForeignShipmentMapping.SETRANGE("Shipment Method Code", Rec."Shipment Method Code");
-        ForeignShipmentMapping.SETRANGE("Base Shipping Agent Code", Rec."Shipping Agent Code");
-        ForeignShipmentMapping.SETRANGE("Country/Region Code", Rec."Ship-to Country/Region Code");
-        if ForeignShipmentMapping.FINDFIRST() then begin
-            Rec."Shipping Agent Code" := ForeignShipmentMapping."Shipping Agent Code";
-            Rec."Shipping Agent Service Code" := ForeignShipmentMapping."Shipping Agent Service Code";
-            Rec.MODIFY(true);
-        end;
-    end;
 
     procedure GetArrayLength(Jarray: JsonArray) ArrayLength: Integer;
 
@@ -884,7 +933,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     begin
         exit('https://app.shipmondo.com/api/public/v3/')
     end;
-
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAssignSender(VAR PakkelabelsShipment: Record "NPR Shipping Provider Document"; VAR Output: Text; VAR RunTrigger: Boolean)

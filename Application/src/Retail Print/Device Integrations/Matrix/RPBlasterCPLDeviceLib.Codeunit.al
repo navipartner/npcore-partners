@@ -1,6 +1,7 @@
 codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printer"
 {
     Access = Internal;
+
     var
         _PrintBuffer: Codeunit "Temp Blob";
         _Initialized: Boolean;
@@ -17,14 +18,14 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printe
         InitBuffer();
 
         if DeviceSettings.FindSet() then
-            repeat
-                case DeviceSettings.Name of
-                    'MEDIA_SIZE':
-                        InitializePrinter(DeviceSettings.Value);
-                    else
-                        Error(InvalidDeviceSettingErr, DeviceSettings.Name);
-                end;
-            until DeviceSettings.Next() = 0;
+                repeat
+                    case DeviceSettings.Name of
+                        'MEDIA_SIZE':
+                            InitializePrinter(DeviceSettings.Value);
+                        else
+                            Error(InvalidDeviceSettingErr, DeviceSettings.Name);
+                    end;
+                until DeviceSettings.Next() = 0;
     end;
 
     procedure PrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
@@ -204,13 +205,15 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printe
     var
         OStream: OutStream;
     begin
-        Clear(OStream);
-        Clear(_PrintBuffer);
-        Clear(_DotNetStream);
-        Clear(_DotNetEncoding);
-        _PrintBuffer.CreateOutStream(OStream);
-        _DotNetEncoding.Encoding(858);
-        _DotNetStream.FromOutStream(OStream);
+        if not _PrintBuffer.HasValue() then begin
+            Clear(OStream);
+            Clear(_PrintBuffer);
+            Clear(_DotNetStream);
+            Clear(_DotNetEncoding);
+            _PrintBuffer.CreateOutStream(OStream);
+            _DotNetEncoding.Encoding(858);
+            _DotNetStream.FromOutStream(OStream);
+        end;
     end;
 
     local procedure AddStringToBuffer(String: Text)
@@ -259,6 +262,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printe
         // h in [1:256]        
         AddStringToBuffer(StrSubstNo('BARCODE[%1] %2%3 %4 %5 %6 %7', Rnnn, type, modifiers, x, y, h, characters));
     end;
+
     local procedure DrawLine(x: Integer; y: Integer; w: Integer)
     begin
         // Not in ref sheet
@@ -267,30 +271,35 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printe
         // Hardcoded y2 so the lines can only be horizontal
         AddStringToBuffer(StrSubstNo('DRAW_LINE %1 %2 %3 %4 %5', x, y, x + w, y, 2));
     end;
+
     local procedure HeaderLine(mode: Text[2]; x: Integer; dottime: Integer; maxY: Integer; numlbls: Integer)
     begin
         // Ref sheet 51-54
         // mode in [!,@,!#,#,!*,!+,!A]
         AddStringToBuffer(StrSubstNo('%1 %2 %3 %4 %5', mode, x, dottime, maxY, numlbls));
     end;
+
     local procedure Justify(alignment: Text[6])
     begin
         // Ref sheet 56-57
         // Alignment in [LEFT,RIGHT,CENTER]
         AddStringToBuffer(StrSubstNo('JUSTIFY %1', alignment));
     end;
+
     local procedure String(type: Text[10]; x: Integer; y: Integer; characters: Text[250])
     begin
         // Ref sheet 74-77
         // type in [3X5,5X7,8X8,9X12,12X16,18X23,24X31]
         AddStringToBuffer(StrSubstNo('STRING %1 %2 %3 %4', type, x, y, characters));
     end;
+
     local procedure Text(fontID: Text[1]; x: Integer; y: Integer; characters: Text[250])
     begin
         // Ref sheet 78-80
         // fontID in [1:6]
         AddStringToBuffer(StrSubstNo('TEXT %1 %2 %3 %4', fontID, x, y, characters));
     end;
+
     local procedure UltraFont(T: Text[1]; nnn: Text[10]; x: Integer; y: Integer; char: Text[250])
     begin
         // Ref sheet 74-77

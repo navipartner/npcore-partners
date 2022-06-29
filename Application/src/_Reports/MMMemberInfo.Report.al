@@ -6,9 +6,10 @@
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Info.rdlc';
     Caption = 'Member Info';
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+    UsageCategory = None;
     DataAccessIntent = ReadOnly;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used';
 
     dataset
     {

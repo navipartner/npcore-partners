@@ -228,6 +228,12 @@
                     ToolTip = 'Specifies the value of the Area field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Is Pay-in Pay-out"; Rec."Is Pay-in Pay-out")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies if transaction is created as pay-in/pay-out action. Sales transaction created on retail payment G/L accounts is treated as a pay-in/pay-out transaction.';
+                    ApplicationArea = NPRRetail;
+                }
             }
             part(Sales; "NPR POS Sale Line Subpage")
             {

@@ -1,0 +1,328 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="ReportTitleLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ReportTitleLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ReportTitleLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PageLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PageLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PageLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="NoLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NoLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NoLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DescriptionLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DescriptionLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DescriptionLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="CostPriceLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>CostPriceLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>CostPriceLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SalesPriceLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SalesPriceLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SalesPriceLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PeriodSalesPriceLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PeriodSalesPriceLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PeriodSalesPriceLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="QuantitySoldLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>QuantitySoldLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>QuantitySoldLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SalesLCYLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SalesLCYLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SalesLCYLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TheoreticalmarginLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TheoreticalmarginLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TheoreticalmarginLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="UsuageOldStockLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>UsuageOldStockLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>UsuageOldStockLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="StockPerEndDateLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>StockPerEndDateLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>StockPerEndDateLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="RealizedMarginLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>RealizedMarginLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>RealizedMarginLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AmountLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AmountLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AmountLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TotalCampaignLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TotalCampaignLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TotalCampaignLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="FiltersLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>FiltersLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>FiltersLbl</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="GetFilter">
+          <DataField>GetFilter</DataField>
+        </Field>
+        <Field Name="CompanyName">
+          <DataField>CompanyName</DataField>
+        </Field>
+        <Field Name="Today">
+          <DataField>Today</DataField>
+        </Field>
+        <Field Name="Picture_CompanyInformation">
+          <DataField>Picture_CompanyInformation</DataField>
+        </Field>
+        <Field Name="Code_PeriodDiscount">
+          <DataField>Code_PeriodDiscount</DataField>
+        </Field>
+        <Field Name="Description_PeriodDiscount">
+          <DataField>Description_PeriodDiscount</DataField>
+        </Field>
+        <Field Name="PeriodLength_PeriodDiscount">
+          <DataField>PeriodLength_PeriodDiscount</DataField>
+        </Field>
+        <Field Name="CurrReportPageNoCaption">
+          <DataField>CurrReportPageNoCaption</DataField>
+        </Field>
+        <Field Name="ItemNo_PeriodDiscountLine">
+          <DataField>ItemNo_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Description_PeriodDiscountLine">
+          <DataField>Description_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Unitprice_PeriodDiscountLine">
+          <DataField>Unitprice_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Unitprice_PeriodDiscountLineFormat">
+          <DataField>Unitprice_PeriodDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="CampaignUnitprice_PeriodDiscountLine">
+          <DataField>CampaignUnitprice_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="CampaignUnitprice_PeriodDiscountLineFormat">
+          <DataField>CampaignUnitprice_PeriodDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="Turnover_PeriodDiscountLine">
+          <DataField>Turnover_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Turnover_PeriodDiscountLineFormat">
+          <DataField>Turnover_PeriodDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="Quantitysold_PeriodDiscountLine">
+          <DataField>Quantitysold_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Quantitysold_PeriodDiscountLineFormat">
+          <DataField>Quantitysold_PeriodDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="ProfitPerUnit">
+          <DataField>ProfitPerUnit</DataField>
+        </Field>
+        <Field Name="ProfitPerUnitFormat">
+          <DataField>ProfitPerUnitFormat</DataField>
+        </Field>
+        <Field Name="ProfitPerUnitPercent">
+          <DataField>ProfitPerUnitPercent</DataField>
+        </Field>
+        <Field Name="ProfitPerUnitPercentFormat">
+          <DataField>ProfitPerUnitPercentFormat</DataField>
+        </Field>
+        <Field Name="CampaignProfitPercent">
+          <DataField>CampaignProfitPercent</DataField>
+        </Field>
+        <Field Name="CampaignProfitPercentFormat">
+          <DataField>CampaignProfitPercentFormat</DataField>
+        </Field>
+        <Field Name="UnitCost_Item">
+          <DataField>UnitCost_Item</DataField>
+        </Field>
+        <Field Name="UnitCost_ItemFormat">
+          <DataField>UnitCost_ItemFormat</DataField>
+        </Field>
+        <Field Name="NetChange_Item">
+          <DataField>NetChange_Item</DataField>
+        </Field>
+        <Field Name="NetChange_ItemFormat">
+          <DataField>NetChange_ItemFormat</DataField>
+        </Field>
+        <Field Name="ItemVendorName">
+          <DataField>ItemVendorName</DataField>
+        </Field>
+        <Field Name="PercentDisplay">
+          <DataField>PercentDisplay</DataField>
+        </Field>
+        <Field Name="AplyedFilters">
+          <DataField>AplyedFilters</DataField>
+        </Field>
+        <Field Name="No_RetailComment">
+          <DataField>No_RetailComment</DataField>
+        </Field>
+        <Field Name="No2_RetailComment">
+          <DataField>No2_RetailComment</DataField>
+        </Field>
+        <Field Name="Comment_RetailComment">
+          <DataField>Comment_RetailComment</DataField>
+        </Field>
+        <Field Name="TotalProfitPerUnit">
+          <DataField>TotalProfitPerUnit</DataField>
+        </Field>
+        <Field Name="TotalProfitPerUnitFormat">
+          <DataField>TotalProfitPerUnitFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

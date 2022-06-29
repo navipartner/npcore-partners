@@ -1308,6 +1308,8 @@
         end;
         CurrVRTField.SetRange("Field No.");
         CurrVRTField.SetRange("Is Table Default");
+
+        OnAfterSetRecordRefFilters(ItemFilters, Item, RecRef);
     end;
 
     internal procedure SetValue(FieldNumber: Integer): Text[250]
@@ -1349,6 +1351,11 @@
             //The cross variants is decreased. Data that are outside new arraylength must be cleared;
             Clear(MATRIX_CellData);
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetRecordRefFilters(var ItemFilters: Record Item; Item: Record Item; RecRef: RecordRef)
+    begin
     end;
 }
 
