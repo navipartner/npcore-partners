@@ -32,6 +32,12 @@
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("Description 2"; Rec."Description 2")
+                {
+                    ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Quantity; Rec.Quantity)
                 {
                     ToolTip = 'Specifies the value of the Quantity field';
