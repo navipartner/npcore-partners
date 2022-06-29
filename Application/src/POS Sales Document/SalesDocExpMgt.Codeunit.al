@@ -47,6 +47,7 @@
         UsePaymentMethodCodeFrom: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code";
         PaymentMethodCode: Code[10];
         CustomerCreditCheck: Boolean;
+        WarningCustomerCreditCheck: Boolean;
         CUSTOMER_CREDIT_CHECK_FAILED: Label 'Customer credit check failed';
 
     procedure SetAsk(AskIn: Boolean)
@@ -165,6 +166,11 @@
         CustomerCreditCheck := Set;
     end;
 
+    procedure SetWarningCustomerCreditCheck(Set: Boolean)
+    begin
+        WarningCustomerCreditCheck := Set;
+    end;
+
     procedure SetPaymentMethodCodeFrom(NewPaymentMethodCodeFrom: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code")
     begin
         UsePaymentMethodCodeFrom := NewPaymentMethodCodeFrom;
@@ -191,9 +197,12 @@
         POSSale.GetCurrentSale(SalePOS);
         CreateSalesHeader(SalePOS, SalesHeader);
 
-        if CustomerCreditCheck then begin
+        if CustomerCreditCheck then
             DoCustomerCreditCheck(SalesHeader);
-        end;
+
+        if WarningCustomerCreditCheck then
+            DoCustomerWarningCreditCheck(SalesHeader);
+
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -1131,6 +1140,18 @@ then
     begin
         if CustCheckCrLimit.SalesHeaderCheck(SalesHeader) then
             error(CUSTOMER_CREDIT_CHECK_FAILED);
+    end;
+
+    local procedure DoCustomerWarningCreditCheck(SalesHeader: Record "Sales Header")
+    var
+        CustCheckCrLimit: Codeunit "Cust-Check Cr. Limit";
+        CustomerCreditWarningLbl: Label 'The customer''s credit limit has been exceeded. Do you want to continue?';
+    begin
+        if CustomerCreditCheck then
+            exit;
+        if CustCheckCrLimit.SalesHeaderCheck(SalesHeader) then
+            if not Confirm(CustomerCreditWarningLbl) then
+                Error('');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, false)]
