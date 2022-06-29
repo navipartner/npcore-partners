@@ -1608,7 +1608,10 @@
         if (Membership.FindFirst()) then
             Error(CustomerLinkedToMembership, Membership."External Membership No.", CustomerNumber);
 
-        MemberInfoCapture."Company Name" := Customer.Name;
+        MemberInfoCapture."Company Name" := CopyStr(Customer.Name, 1, MaxStrLen(MemberInfoCapture."Company Name"));
+        MemberInfoCapture."First Name" := CopyStr(Customer.Name, 1, MaxStrLen(MemberInfoCapture."First Name"));
+        MemberInfoCapture."Middle Name" := '';
+        MemberInfoCapture."Last Name" := '';
         MemberInfoCapture.Address := Customer.Address;
         MemberInfoCapture."Post Code Code" := Customer."Post Code";
         MemberInfoCapture.City := Customer.City;

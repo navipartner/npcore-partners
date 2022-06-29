@@ -3720,9 +3720,11 @@
         end;
 
         if (Membership."Company Name" = '') then begin
-            Customer.Validate(Name, CopyStr(Member."Display Name", 1, MaxStrLen(Customer.Name)));
+            if (Customer.Name = '') then
+                Customer.Validate(Name, CopyStr(Member."Display Name", 1, MaxStrLen(Customer.Name)));
         end else begin
-            Customer.Validate(Name, Membership."Company Name");
+            if (Customer.Name = '') then
+                Customer.Validate(Name, Membership."Company Name");
             Customer.Validate("Name 2", CopyStr(Member."Display Name", 1, MaxStrLen(Customer."Name 2")));
         end;
 
@@ -4700,7 +4702,7 @@
         ContactBusinessRelation.SetFilter("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
         ContactBusinessRelation.SetFilter("No.", '=%1', CustomerNo);
 
-        if (ContactBusinessRelation.IsEmpty()) then 
+        if (ContactBusinessRelation.IsEmpty()) then
             if (Contact."Company No." <> '') then
                 ContactBusinessRelation.SetFilter("Contact No.", '=%1', Contact."Company No.");
 
