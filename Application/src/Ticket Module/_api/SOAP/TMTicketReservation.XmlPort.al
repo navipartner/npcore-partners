@@ -364,11 +364,17 @@ xmlport 6060114 "NPR TM Ticket Reservation"
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetRange("Ext. Line Reference No.", RequestEntryNo);
         TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
-        TicketReservationRequest.FindFirst();
+        if (not TicketReservationRequest.FindFirst()) then
+            exit;
+
         Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
-        Ticket.FindFirst();
+        if (not Ticket.FindFirst()) then
+            exit;
+
         TicketReservationRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.", "Admission Inclusion");
-        TicketReservationRequest.FindSet();
+        if (not TicketReservationRequest.FindSet()) then
+            exit;
+
         repeat
             tmpAdmissions.TransferFields(TicketReservationRequest, true);
             if tmpAdmissions."External Adm. Sch. Entry No." = 0 then
