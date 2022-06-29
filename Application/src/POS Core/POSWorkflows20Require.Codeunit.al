@@ -4,7 +4,6 @@
 
     var
         CustomHandlerMissingErr: Label 'Custom Require method handler for require type "%1" was not found.';
-        LookupTemplateMissingErr: Label 'Lookup template wiht code "%1" was not found.';
         ReadingErr: Label 'reading in %1';
         SettingScopeErr: Label 'setting scope in %1';
 
@@ -37,8 +36,6 @@
                 RequireImage(ID, JSON, FrontEnd);
             'picture.item':
                 RequireItemPicture(ID, JSON, FrontEnd);
-            'lookup':
-                RequireLookupTemplate(ID, JSON, FrontEnd);
             else begin
                     OnRequireCustom(ID, Type, JSON, FrontEnd, CustomHandled);
                     if not CustomHandled then begin
@@ -95,6 +92,9 @@
             JavaScriptJson := POSAction.GetCustomJavaScriptLogic();
             WorkflowAction.Content().Add('CustomJavaScript', JavaScriptJson);
         end;
+        if POSAction."Blocking UI" then begin
+            WorkflowAction.Content().Add('Blocking', true);
+        end;
 
         POSActionParam.SetRange("POS Action Code", POSAction.Code);
         if POSActionParam.FindSet() then
@@ -144,28 +144,8 @@
         FrontEnd.RequireResponse(ID, DataUri);
     end;
 
-    local procedure RequireLookupTemplate(ID: Integer; JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        Template: JsonObject;
-        TemplateCode: Text;
-        Handled: Boolean;
-    begin
-        JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
-        TemplateCode := JSON.GetStringOrFail('code', StrSubstNo(ReadingErr, MethodName()));
-        OnRequireLookupTemplate(TemplateCode, Template, Handled);
-        if not Handled then
-            FrontEnd.ReportBugAndThrowError(StrSubstNo(LookupTemplateMissingErr, TemplateCode))
-        else
-            FrontEnd.RequireResponse(ID, Template);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnRequireCustom(ID: Integer; Type: Text; Context: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRequireLookupTemplate(TemplateCode: Text; Template: JsonObject; var Handled: Boolean)
     begin
     end;
 }

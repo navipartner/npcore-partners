@@ -1,16 +1,7 @@
 ﻿codeunit 6150737 "NPR Discover POSAction Seq."
 {
     Access = Internal;
-    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
-    //                                    This codeunit is used only for the purpose of IF CODEUNIT.RUN construct.
-
-
-    trigger OnRun()
-    begin
-        Sequence.RunActionSequenceDiscovery();
-    end;
-
-    var
-        Sequence: Record "NPR POS Action Sequence";
+    ObsoleteState = Pending;
+    ObsoleteReason = '0 references. And done much simpler by maintaining separate actions with extra code at the start/end or by making an action extensible';
 }
 

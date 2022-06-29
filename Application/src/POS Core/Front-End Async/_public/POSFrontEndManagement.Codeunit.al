@@ -8,7 +8,6 @@
         _WorkflowStack: Codeunit "NPR Stack of [Integer]";//TODO: Delete when workflow v1/v2 are gone
 
         _ActionStack: Codeunit "NPR Stack of [Integer]"; //TODO: Delete when workflow v1/v2 are gone
-        _QueuedWorkflows: JsonArray;
         _WorkflowResponseContent: Variant;
         _HasWorkflowResponse: Boolean;
         _Initialized: Boolean;
@@ -29,7 +28,6 @@
         Clear(_RegisteredWorkflows);
         Clear(_WorkflowStack);
         Clear(_ActionStack);
-        Clear(_QueuedWorkflows);
 
         // The following variable is used only in debugging sessions to indicate whether this instance of the codeunit has actually
         // been initialized. There is no other purpose to this variable, but it is absolutely indispensable for debugging purposes.
@@ -537,30 +535,10 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('Action sequences are no longer supported')]
     procedure ConfigureActionSequences(var TempSessionAction: Record "NPR POS Action" temporary)
-    var
-        Sequence: Record "NPR POS Action Sequence";
-        Request: Codeunit "NPR Front-End: ConfigActSeq.";
-        SequenceContent: JsonArray;
-        SequenceEntry: JsonObject;
     begin
-        Sequence.SetActionsForValidation(TempSessionAction);
-        Sequence.RunActionSequenceDiscovery();
-        if not Sequence.FindSet() then
-            exit;
-
-        MakeSureFrameworkIsAvailable(true);
-
-        repeat
-            Clear(SequenceEntry);
-            SequenceEntry.Add('referenceAction', Sequence."Reference POS Action Code");
-            SequenceEntry.Add('referenceType', LowerCase(Format(Sequence."Reference Type")));
-            SequenceEntry.Add('action', Sequence."POS Action Code");
-            SequenceEntry.Add('priority', Sequence."Sequence No.");
-            SequenceContent.Add(SequenceEntry);
-        until Sequence.Next() = 0;
-        Request.SetSequences(SequenceContent);
-        InvokeFrontEndAsync(Request);
+        Error('Action sequences are no longer supported');
     end;
 
     procedure ConfigureCaptions(Captions: JsonObject)
@@ -992,8 +970,6 @@
                 _HasWorkflowResponse := false;
                 Request.SetWorkflowResponse(_WorkflowResponseContent);
             end;
-            if _QueuedWorkflows.Count() > 0 then
-                Request.SetQueuedWorkflows(_QueuedWorkflows);
         end;
         InvokeFrontEndAsync(Request);
     end;
@@ -1005,12 +981,10 @@
         _WorkflowResponseContent := ResponseContent;
     end;
 
+    [Obsolete('Queue workflow is not supported anymore.')]
     procedure QueueWorkflow(ActionCode: Text; Context: Text)
-    var
-        QueuedWorkflowsLbl: Label '%1;%2', Locked = true;
     begin
-        MakeSureFrameworkIsAvailableIn20(true);
-        _QueuedWorkflows.Add(StrSubstNo(QueuedWorkflowsLbl, ActionCode, Context));
+        Error('QueueWorkflow method in POSFrontEndManagement codeunit is no longer supported');
     end;
 
     #region Dragonglass Awaitable Methods Response Context
