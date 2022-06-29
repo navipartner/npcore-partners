@@ -73,6 +73,11 @@
             Caption = 'Mandatory';
             DataClassification = CustomerContent;
         }
+        field(70; "Copy Serial No."; Boolean)
+        {
+            Caption = 'Copy Serial No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
