@@ -122,6 +122,11 @@
                     ToolTip = 'Specifies name of the processing unit for recalculating unit price on current entry by appling unit price % from add-on line setup table to the ratio of Total Amount and Quantity sold on POS.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Copy Serial No."; Rec."Copy Serial No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if Serial No. will be copied from Applies-to Line';
+                }
             }
         }
     }

@@ -252,6 +252,11 @@
                 "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
             end;
         }
+        field(220; "Copy Serial No."; Boolean)
+        {
+            Caption = 'Copy Serial No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
