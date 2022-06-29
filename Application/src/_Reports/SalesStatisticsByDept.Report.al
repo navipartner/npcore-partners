@@ -468,7 +468,7 @@
         QuantitySale_Caption = 'Quantity (sale)';
         CostExcVAT_Caption = 'Cost excl. VAT';
         TurnoverExcVAT_Caption = 'Turnover excl. VAT';
-        Pct_Caption = 'Percentage';
+        Pct_Caption = 'Line Percentage';
         ProfitExcVAT_Caption = 'Profit excl. VAT';
         ProfitPct_Caption = 'Profit %';
         LastYear_Caption = 'Last year';
