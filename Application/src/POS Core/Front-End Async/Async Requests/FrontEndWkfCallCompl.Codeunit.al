@@ -39,11 +39,6 @@
         JsonMgt.AddVariantValueToJsonObject(_content, 'workflowResponse', Response);
     end;
 
-    procedure SetQueuedWorkflows(QueuedWorkflows: JsonArray)
-    begin
-        _content.Add('queuedWorkflows', QueuedWorkflows);
-    end;
-
     procedure SetEngine20(Context: JsonObject)
     begin
         _engine := '2.0';
