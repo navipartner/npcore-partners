@@ -71,9 +71,8 @@
     /// <code>
     /// {
     ///     //On Success
-    ///     "File": string,
-    ///     "Base64String": string,
-    ///     "Size": long,   
+    ///     "Name": string,
+    ///     "base64String": string
     ///     //On Post request reached server
     ///     "StatusCode": integer,  
     ///     //Request parsing Error
@@ -241,9 +240,8 @@
     ///     //On Success
     ///     "Files": 
     ///     [
-    ///     {"File": string,
-    ///     "Base64String": string,
-    ///     "Size": long}, ...
+    ///     {"Name": string,
+    ///     "base64String": string}, ...
     ///     ],
     ///     //On Post request reached server
     ///     "StatusCode": integer,  
@@ -330,9 +328,8 @@
     ///     //On Success
     ///     "Files": 
     ///     [
-    ///     {"File": string,
-    ///     "Base64String": string,
-    ///     "Size": long}, ...
+    ///     {"Name": string,
+    ///     "base64String": string}, ...
     ///     ],
     ///     //On Post request reached server
     ///     "StatusCode": integer,  
@@ -381,9 +378,8 @@
     ///     //On Success
     ///     "Files": 
     ///     [
-    ///     {"File": string,
-    ///     "Directory": boolean,
-    ///     "Size": long}, ...
+    ///     {"Name": string,
+    ///     "IsDirectory": boolean}, ...
     ///     ],
     ///     //On Post request reached server
     ///     "StatusCode": integer,  
