@@ -141,8 +141,6 @@
         DebugWithTimestamp('InitializeSecureMethods');
 #endif
         _FrontEnd.ConfigureSecureMethods();
-        DebugWithTimestamp('ConfigureActionSequences');
-        _FrontEnd.ConfigureActionSequences(TempSessionActions);
         DebugWithTimestamp('InitializeTheme');
         UI.InitializeTheme(_POSUnit);
         DebugWithTimestamp('InitializeAdminTemplates');
