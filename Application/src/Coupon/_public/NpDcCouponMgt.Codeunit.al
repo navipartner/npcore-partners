@@ -140,8 +140,8 @@
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetFilter("Sale Type", '=%1|=%2', SaleLinePOS."Sale Type"::Deposit, SaleLinePOS."Sale Type"::Sale);
+        SaleLinePOS.SetFilter(Type, '=%1|=%2', SaleLinePOS.Type::"G/L Entry", SaleLinePOS.Type::Item);
         SaleLinePOS.SetFilter("Coupon Discount Amount", '>%1', 0);
         if SaleLinePOS.IsEmpty then
             exit;
