@@ -41,8 +41,8 @@
         CaptionSendPdf2Nav: Label 'Send PDF2NAV';
         CaptionRetailPrint: Label 'Retail Confirmation Print';
         CaptionOpenDoc: Label 'Open Document';
-        CaptionCheckCustCredit: Label 'Check Customer Credit';
-
+        CaptionCheckCustCredit: Label 'Check Customer Credit Error';
+        CaptionWarningCustCredit: Label 'Check Customer Credit Warning';
         DescAskExtDocNo: Label 'Ask user to input external document number';
         DescAskAttention: Label 'Ask user to input attention';
         DescAskYourRef: Label 'Ask user to input ''Your Reference''';
@@ -65,7 +65,8 @@
         DescSendPdf2Nav: Label 'Handle document output via PDF2NAV';
         DescRetailPrint: Label 'Print receipt confirming exported document';
         DescOpenDoc: Label 'Open sales document page after export is done';
-        DescCheckCustCredit: Label 'Check the customer credit before export is done';
+        DescCheckCustCredit: Label 'Check the customer credit before export is done, returns an error';
+        DescWarningCheckCustCredit: Label 'Check the customer credit before export is done, returns a warning';
         OptionDocTypePozitive: Label 'Order,Invoice,Quote,Restrict';
         OptionDocTypeNegative: Label 'Return Order,Credit Memo,Restrict';
         CaptionPrintPrepaymentDoc: Label 'Print Prepayment Document';
@@ -128,7 +129,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.15');
+        exit('1.17');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -178,7 +179,8 @@
             Sender.RegisterDecimalParameter('FixedPrepaymentValue', 0);
             Sender.RegisterBooleanParameter('PrintPrepaymentDocument', false);
             Sender.RegisterBooleanParameter('PrintRetailConfirmation', true);
-            Sender.RegisterBooleanParameter('CheckCustomerCredit', true);
+            Sender.RegisterBooleanParameter('CheckCustomerCredit', false);
+            Sender.RegisterBooleanParameter('CheckCustomerCreditWarning', true);
             Sender.RegisterBooleanParameter('OpenDocumentAfterExport', false);
             Sender.RegisterBooleanParameter('PayAndPostInNextSale', false);
             Sender.RegisterBooleanParameter('PrintPayAndPostDocument', false);
@@ -465,6 +467,7 @@
         RetailSalesDocMgt.SetSendDocument(JSON.GetBooleanParameterOrFail('SetSend', ActionCode()));
         RetailSalesDocMgt.SetSendICOrderConf(JSON.GetBooleanParameter('SendICOrderConfirmation'));
         RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('CheckCustomerCredit'));
+        RetailSalesDocMgt.SetWarningCustomerCreditCheck(JSON.GetBooleanParameter('CheckCustomerCreditWarning'));
 
         if JSON.GetBooleanParameterOrFail('SetShowCreationMessage', ActionCode()) then
             RetailSalesDocMgt.SetShowCreationMessage();
@@ -674,6 +677,8 @@
                 Caption := CaptionRetailPrint;
             'CheckCustomerCredit':
                 Caption := CaptionCheckCustCredit;
+            'CheckCustomerCreditWarning':
+                Caption := CaptionWarningCustCredit;
             'PrintPrepaymentDocument':
                 Caption := CaptionPrintPrepaymentDoc;
             'OpenDocumentAfterExport':
@@ -774,6 +779,8 @@
                 Caption := DescRetailPrint;
             'CheckCustomerCredit':
                 Caption := DescCheckCustCredit;
+            'CheckCustomerCreditWarning':
+                Caption := DescWarningCheckCustCredit;
             'PrintPrepaymentDocument':
                 Caption := DescPrintPrepaymentDoc;
             'OpenDocumentAfterExport':
