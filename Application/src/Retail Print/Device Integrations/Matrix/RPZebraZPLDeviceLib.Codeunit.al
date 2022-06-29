@@ -1,6 +1,7 @@
 codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
 {
     Access = Internal;
+
     var
         _Encoding: Option "Windows-1252","UTF-8";
         _PrintBuffer: Codeunit "Temp Blob";
@@ -32,34 +33,34 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
         AddStringToBuffer('^XA');
 
         if DeviceSettings.FindSet() then
-            repeat
-                case DeviceSettings.Name of
-                    'PRINT_RATE':
-                        Setup('PR', DeviceSettings.Value);
-                    'PRINT_WIDTH':
-                        Setup('PW', DeviceSettings.Value);
-                    'SET_DARKNESS':
-                        Setup('SD', DeviceSettings.Value);
-                    'MEDIA_DARKNESS':
-                        Setup('MD', DeviceSettings.Value);
-                    'LABEL_LENGTH':
-                        Setup('LL', DeviceSettings.Value);
-                    'MEDIA_TYPE':
-                        Setup('MT', DeviceSettings.Value);
-                    'PRINT_ORIENTATION':
-                        Setup('PO', DeviceSettings.Value);
-                    'LABEL_HOME':
-                        Setup('LH', DeviceSettings.Value);
-                    'RFID_EPC_MEMORY':
-                        Setup('RB', DeviceSettings.Value);
-                    'LABEL_REVERSE':
-                        Setup('LR', DeviceSettings.Value);
-                    'SENSOR_SELECT':
-                        Setup('JS', DeviceSettings.Value);
-                    else
-                        Error(InvalidDeviceSettingErr, DeviceSettings.Name);
-                end;
-            until DeviceSettings.Next() = 0;
+                repeat
+                    case DeviceSettings.Name of
+                        'PRINT_RATE':
+                            Setup('PR', DeviceSettings.Value);
+                        'PRINT_WIDTH':
+                            Setup('PW', DeviceSettings.Value);
+                        'SET_DARKNESS':
+                            Setup('SD', DeviceSettings.Value);
+                        'MEDIA_DARKNESS':
+                            Setup('MD', DeviceSettings.Value);
+                        'LABEL_LENGTH':
+                            Setup('LL', DeviceSettings.Value);
+                        'MEDIA_TYPE':
+                            Setup('MT', DeviceSettings.Value);
+                        'PRINT_ORIENTATION':
+                            Setup('PO', DeviceSettings.Value);
+                        'LABEL_HOME':
+                            Setup('LH', DeviceSettings.Value);
+                        'RFID_EPC_MEMORY':
+                            Setup('RB', DeviceSettings.Value);
+                        'LABEL_REVERSE':
+                            Setup('LR', DeviceSettings.Value);
+                        'SENSOR_SELECT':
+                            Setup('JS', DeviceSettings.Value);
+                        else
+                            Error(InvalidDeviceSettingErr, DeviceSettings.Name);
+                    end;
+                until DeviceSettings.Next() = 0;
     end;
 
     procedure EndJob()
@@ -146,18 +147,20 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
     var
         OStream: OutStream;
     begin
-        Clear(OStream);
-        Clear(_PrintBuffer);
-        Clear(_DotNetStream);
-        Clear(_DotNetEncoding);
-        _PrintBuffer.CreateOutStream(OStream);
-        case _Encoding of
-            _Encoding::"Windows-1252":
-                _DotNetEncoding.Encoding(1252);
-            _Encoding::"UTF-8":
-                _DotNetEncoding.UTF8();
-        end;
-        _DotNetStream.FromOutStream(OStream);
+        if not _PrintBuffer.HasValue() then begin
+            Clear(OStream);
+            Clear(_PrintBuffer);
+            Clear(_DotNetStream);
+            Clear(_DotNetEncoding);
+            _PrintBuffer.CreateOutStream(OStream);
+            case _Encoding of
+                _Encoding::"Windows-1252":
+                    _DotNetEncoding.Encoding(1252);
+                _Encoding::"UTF-8":
+                    _DotNetEncoding.UTF8();
+            end;
+            _DotNetStream.FromOutStream(OStream);
+        end
     end;
 
     local procedure AddStringToBuffer(String: Text)
@@ -709,10 +712,10 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
             if HorzStart < 0 then begin
                 MaxLength := StrLength + HorzStart;
                 CharLength := GetFontWidth(Type);
-                repeat
-                    StrLength := StrLength - CharLength;
-                    TextIn := CopyStr(TextIn, 2);
-                until StrLength <= MaxLength;
+                                      repeat
+                                          StrLength := StrLength - CharLength;
+                                          TextIn := CopyStr(TextIn, 2);
+                                      until StrLength <= MaxLength;
                 StrLength := MaxLength;
                 HorzStart := 0;
             end;
