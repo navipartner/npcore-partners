@@ -486,6 +486,17 @@
         Session.LogMessage('NPR_JobQueue', 'Job Queue Error', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
+    procedure AutoRestartRetentionPolicyJQ(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = 3997)  //Codeunit::"Retention Policy JQ"
+        then begin
+            JobQueueEntry."NPR Auto-Resched. after Error" := true;
+            if JobQueueEntry."NPR Auto-Resched. Delay (sec.)" < 300 then
+                JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 300;
+        end;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
     local procedure SetDefaultValues(var JobQueueEntry: Record "Job Queue Entry")
     begin
@@ -493,6 +504,8 @@
             JobQueueEntry."Maximum No. of Attempts to Run" := 5;
         if (JobQueueEntry."Rerun Delay (sec.)" <= 0) or (JobQueueEntry."Rerun Delay (sec.)" = 60) then  //60 - default value in MS standard application
             JobQueueEntry."Rerun Delay (sec.)" := 180;
+
+        AutoRestartRetentionPolicyJQ(JobQueueEntry);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterFinalizeRun', '', true, false)]
