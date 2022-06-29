@@ -49,7 +49,7 @@
                 field("Initial Amount"; Rec."Initial Amount")
                 {
 
-                    Visible = false;
+                    Visible = true;
                     ToolTip = 'Specifies the value of the Initial Amount field';
                     ApplicationArea = NPRRetail;
                 }

@@ -215,6 +215,8 @@ page 6059845 "NPR Generic Filter Page"
         FilterText := '';
         Include := false;
         Static := false;
+        if SkipIfHasObsoleteState() then
+            exit;
         GetFieldRef();
         ResetFieldFilter();
         RawFilter := ReadRawFilter(FldRef.Name);
@@ -433,6 +435,12 @@ page 6059845 "NPR Generic Filter Page"
     internal procedure SetRawFilter(RawFilter: Text)
     begin
         CompleteFilterText := RawFilter;
+    end;
+
+    local procedure SkipIfHasObsoleteState(): Boolean
+    begin
+        if Rec.ObsoleteState = Rec.ObsoleteState::Removed then
+            exit(true);
     end;
 }
 
