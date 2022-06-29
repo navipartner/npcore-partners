@@ -26,3 +26,14 @@ The created POS Pricing Profile needs to be set on a POS unit for the settings t
 3. Add the created profile in the **POS Pricing Profile** field.
 
 ![POS_3](../images/POS_add.png)
+
+### Related links
+
+- [Balance the POS (Z-report)](../howto/balance_the_pos.md)
+- [POS Display Profile](../explanation/POS_Display_profile.md)
+- [POS Unit Receipt Profile](../explanation/POS_unit_Receipt_profile.md)
+- [POS View Profile](../explanation/POS_view_profile.md)
+- [POS Audit Profile](../explanation/POS_audit_profile.md)
+- [POS End-of-Day Profile](../explanation/POS_End_of_Day_Profile.md)
+- [Set up the POS Global Sales Profile](../howto/POS_Global.md)
+- [Set up POS Posting Profile](../howto/POS_Pos_Prof.md)

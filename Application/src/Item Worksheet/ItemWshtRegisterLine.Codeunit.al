@@ -859,7 +859,11 @@
             PriceListLine.Validate("Unit Price", ItemWkshLine."Sales Price");
             PriceListLine.Validate("Ending Date", SalesPriceEndDate);
             PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
+#if BC17
+            PriceListLine.Status := PriceListLine.Status::Active;
+#else
             PriceListLine.Validate(Status, PriceListLine.Status::Active);
+#endif
             PriceListLine.Insert(true);
 
             MasterLineMapMgt.CreateMap(Database::"Price List Line", PriceListLine.SystemId, PriceListLine.SystemId);
@@ -877,6 +881,14 @@
         end;
     end;
 
+#if BC17
+    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnAfterInitHeaderDefaults', '', true, true)]
+    local procedure UpdateLineStatus(var sender: Record "Price List Line"; PriceListHeader: Record "Price List Header")
+    begin
+        if sender.Status <> sender.Status::Draft then
+            sender.Status := sender.Status::Draft;
+    end;
+#endif
 
     local procedure ProcessVariantLineSalesPrice()
     var
@@ -1128,7 +1140,11 @@
             if not PriceListHeader.Get(ItemWkshLine."Worksheet Template Name") then
                 CreatePriceListHeader(ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
             PriceListLine.Validate("Price List Code", ItemWkshLine."Worksheet Template Name");
+#if BC17
+            PriceListLine.Status := PriceListLine.Status::Active;
+#else
             PriceListLine.Validate(Status, PriceListLine.Status::Active);
+#endif
             PriceListLine.Insert(true);
         end;
     end;
@@ -1217,7 +1233,11 @@
                 if not PriceListHeader.Get(ItemWkshLine."Worksheet Template Name") then
                     CreatePriceListHeader(ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
                 PriceListLine.Validate("Price List Code", ItemWkshLine."Worksheet Template Name");
+#if BC17
+                PriceListLine.Status := PriceListLine.Status::Active;
+#else
                 PriceListLine.Validate(Status, PriceListLine.Status::Active);
+#endif
                 PriceListLine.Insert(true);
             end;
         end;

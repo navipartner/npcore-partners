@@ -115,6 +115,35 @@ table 6014659 "NPR Auxiliary Item"
             DataClassification = CustomerContent;
             Editable = false;
         }
+        field(140; "Main Item/Variation"; enum "NPR Main Item/Variation")
+        {
+            Caption = 'Main Item/Variation';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(150; "Main Item No."; Code[20])
+        {
+            Caption = 'Main Item No.';
+            DataClassification = CustomerContent;
+            TableRelation = Item."No.";
+
+            trigger OnValidate()
+            var
+                Item: Record Item;
+                MainItemVariationMgt: Codeunit "NPR Main Item Variation Mgt.";
+                CannotChangeManuallyErr: Label 'The field "%2" cannot be changed manually.', Comment = 'Main Item No. field caption';
+            begin
+                if xRec."Main Item No." = "Main Item No." then
+                    exit;
+                TestField("Main Item/Variation", "Main Item/Variation"::" ");
+                if xRec."Main Item No." <> '' then
+                    Error(CannotChangeManuallyErr, FieldCaption("Main Item No."));
+                IF "Main Item No." <> '' THEN begin
+                    Item.Get("Main Item No.");
+                    MainItemVariationMgt.AddAsVariation(Item, Rec, "Main Item No.");
+                end;
+            end;
+        }
         field(1000; "Replication Counter"; BigInteger)
         {
             Caption = 'Replication Counter';
@@ -129,5 +158,6 @@ table 6014659 "NPR Auxiliary Item"
             Clustered = true;
         }
         key(Key2; "Replication Counter") { }
+        key(MainItemVariationLinks; "Main Item No.", "Main Item/Variation") { }
     }
 }

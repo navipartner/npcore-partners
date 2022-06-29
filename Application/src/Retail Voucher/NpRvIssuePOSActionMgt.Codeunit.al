@@ -1,6 +1,7 @@
 ﻿codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
 {
     Access = Internal;
+
     var
         Text000: Label 'This action Issues Retail Vouchers.';
         Text001: Label 'Select Voucher Type';
