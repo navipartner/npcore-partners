@@ -867,8 +867,8 @@
         AdminMemberCount: Integer;
         MemberMemberCount: Integer;
         AnonymousMemberCount: Integer;
-        ShowMemberCountAs: Text[30];
-        ShowCurrentPeriod: Text[30];
+        ShowMemberCountAs: Text;
+        ShowCurrentPeriod: Text;
         NeedsActivation: Boolean;
         NOT_ACTIVATED: Label 'Not activated';
         ADD_MEMBER_SETUP: Label 'Could not find %1 with %2 set to option %3 for %4 %5. Additional members can''t be added until setup is completed.';
