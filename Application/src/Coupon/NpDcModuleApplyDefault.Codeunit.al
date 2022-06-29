@@ -1,6 +1,7 @@
 ﻿codeunit 6151594 "NPR NpDc Module Apply: Default"
 {
     Access = Internal;
+
     var
         Text000: Label 'Apply Discount - Default';
 
@@ -170,8 +171,8 @@
         SaleLinePOS.SetRange("Register No.", SaleLinePOSCoupon."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SaleLinePOSCoupon."Sale Date");
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOSCoupon."Sale Type");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetFilter("Sale Type", '=%1|=%2', SaleLinePOS."Sale Type"::Deposit, SaleLinePOS."Sale Type"::Sale);
+        SaleLinePOS.SetFilter(Type, '=%1|=%2', SaleLinePOS.Type::Item, SaleLinePOS.Type::"G/L Entry");
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
         exit(SaleLinePOS.FindFirst());
     end;
