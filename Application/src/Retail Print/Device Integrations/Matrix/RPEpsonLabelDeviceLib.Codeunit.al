@@ -1,6 +1,7 @@
 codeunit 6014537 "NPR RP Epson Label Device Lib." implements "NPR IMatrix Printer"
 {
     Access = Internal;
+
     var
         _PrintBuffer: Codeunit "Temp Blob";
         _PrinterInitialized: Boolean;
@@ -104,13 +105,15 @@ codeunit 6014537 "NPR RP Epson Label Device Lib." implements "NPR IMatrix Printe
     var
         OStream: OutStream;
     begin
-        Clear(OStream);
-        Clear(_PrintBuffer);
-        Clear(_DotNetStream);
-        Clear(_DotNetEncoding);
-        _PrintBuffer.CreateOutStream(OStream);
-        _DotNetEncoding.Encoding(1252);
-        _DotNetStream.FromOutStream(OStream);
+        if not _PrintBuffer.HasValue() then begin
+            Clear(OStream);
+            Clear(_PrintBuffer);
+            Clear(_DotNetStream);
+            Clear(_DotNetEncoding);
+            _PrintBuffer.CreateOutStream(OStream);
+            _DotNetEncoding.Encoding(1252);
+            _DotNetStream.FromOutStream(OStream);
+        end;
     end;
 
     local procedure AddStringToBuffer(String: Text)
@@ -265,6 +268,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib." implements "NPR IMatrix Printe
         SelectDefaultLineSpacing();
         _PrinterInitialized := true;
     end;
+
     local procedure PrintBarCodeA(m: Char; "d1..dk": Text[30])
     begin
         // GS k %1 %2 NUL
@@ -293,6 +297,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib." implements "NPR IMatrix Printe
         _DotNetStream.WriteByte(29);
         AddStringToBuffer('(L' + format(pL) + format(pH) + format(m) + format(fn) + format(kc1) + format(kc2) + format(x) + format(y));
     end;
+
     local procedure SelectCharacterCodeTable(n: Char)
     begin
         // ESC t %1
@@ -317,6 +322,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib." implements "NPR IMatrix Printe
         _DotNetStream.WriteByte(29); //GS
         AddStringToBuffer('!' + Format(n));
     end;
+
     local procedure SelectDefaultLineSpacing()
     begin
         //ESC 2        
