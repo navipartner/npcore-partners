@@ -1,20 +1,29 @@
-﻿codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
+﻿codeunit 6014568 "NPR End Of Day UI Handler"
 {
     Access = Internal;
-    // TODO: Delete the following explanation section when everything is done with this codeunit
-    /*
-        The purpose of this codeunit is to feed state to the front-end balancing view. The state is a JSON object that
-        corresponds to content and structure explained in the specification document with case #310085, in the 2nd
-        chapter "Proposed Screen Layout" (on page 5 and onwards).
-        The state is one big JSON object that contains properties for each described balancing screen, section, subsection,
-        and field, and all of them are identified with a JSON property name (a camelCase text, e.g. 'createdAt').
-        For each JSON property in this codeunit, whenever a value is added, replace the hardcoded proof-of-concept value
-        with an actual value calculated using the end-of-day procedures.
-    */
+
     var
         _POSWorkShiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         _POSUnit: Record "NPR POS Unit";
         _EodWorkShiftMode: Option XREPORT,ZREPORT,CLOSEWORKSHIFT;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
+    local procedure OnCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
+    begin
+        if (Method = 'BalancingGetState') then
+            BalancingGetState(Context, FrontEnd, Handled);
+
+        if (Method = 'BalancingSetState') then
+            BalancingSetState(Context, Handled);
+    end;
+
+    local procedure GetEndOfDayContext(Context: JsonObject) EODContext: JsonObject
+    begin
+        EODContext.Add('createdAt', Format(_POSWorkShiftCheckpoint."Created At"));
+        EODContext.Add('checkPointId', GetValueAsInteger(Context, 'checkPointId'));
+        EODContext.Add('salesPersonCode', GetValueAsText(Context, 'salesPersonCode'));
+        EODContext.Add('dimensionId', GetValueAsInteger(Context, 'dimensionId'));
+    end;
 
     local procedure GetSectionBalancing() Balancing: JsonObject
     begin
@@ -57,7 +66,7 @@
 
         OverviewCreditSales.Add('creditSalesCount', _POSWorkShiftCheckpoint."Credit Sales Count");
         OverviewCreditSales.Add('creditSalesAmountLcy', _POSWorkShiftCheckpoint."Credit Sales Amount (LCY)");
-        OverviewCreditSales.Add('creditNetSalesAmountLcy', 100);
+        //OverviewCreditSales.Add('creditNetSalesAmountLcy', 100);
         Overview.Add('creditSales', OverviewCreditSales);
 
         OverviewDetails.Add('creditUnrealSaleAmtLcy', _POSWorkShiftCheckpoint."Credit Unreal. Sale Amt. (LCY)");
@@ -109,7 +118,7 @@
         Turnover.Add('general', TurnoverGeneral);
 
         TurnoverProfit.Add('profitAmountLcy', _POSWorkShiftCheckpoint."Profit Amount (LCY)");
-        TurnoverProfit.Add('profitPct', _POSWorkShiftCheckpoint."Profit %");
+        TurnoverProfit.Add('profitPct', Round(_POSWorkShiftCheckpoint."Profit %", 0.01));
         Turnover.Add('profit', TurnoverProfit);
 
         TurnoverDirect.Add('directTurnoverLcy', _POSWorkShiftCheckpoint."Direct Turnover (LCY)");
@@ -185,7 +194,7 @@
                         PaymentMethod."Include In Counting"::VIRTUAL:
                             begin
                                 CountingType.Add('includeInCounting', 'auto');
-                                CountingType.Add('countedAmount', POSPaymentBinCheckPoint."Calculated Amount Incl. Float");
+                                CountingType.Replace('countedAmount', POSPaymentBinCheckPoint."Calculated Amount Incl. Float");
                             end;
                     end;
                     CountingType.Add('disableDifferenceField', false);
@@ -203,7 +212,12 @@
                     end;
 
                     CountingType.Add('coinTypes', CoinTypes);
-                    CashCounting.Add(CountingType);
+                    if (PaymentMethod."Include In Counting" in [PaymentMethod."Include In Counting"::YES, PaymentMethod."Include In Counting"::BLIND]) then
+                        CashCounting.Add(CountingType);
+
+                    if (PaymentMethod."Include In Counting" = PaymentMethod."Include In Counting"::VIRTUAL) then
+                        if (PaymentMethod."Bin for Virtual-Count" = '') then
+                            CashCounting.Add(CountingType);
                 end;
             end;
 
@@ -272,21 +286,7 @@
         Bins.Add('otherBins', GetBins(2));
     end;
 
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
-    local procedure OnCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
-    var
-    begin
-
-        if (Method = 'BalancingGetState') then
-            BalancingGetState(Context, POSSession, FrontEnd, Handled);
-
-        if (Method = 'BalancingSetState') then
-            BalancingSetState(Context, FrontEnd, Handled);
-
-    end;
-
-    local procedure BalancingGetState(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
+    local procedure BalancingGetState(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
     var
         EndOfDayProfile: Record "NPR POS End of Day Profile";
         Response: JsonObject;
@@ -298,7 +298,7 @@
         Handled := true;
         Context.WriteTo(JsonText);
 
-        CheckpointEntryNo := GetValueAsInteger(Context, 'endOfDayCheckpointEntryNo');
+        CheckpointEntryNo := GetValueAsInteger(Context, 'checkPointId');
 
         _POSWorkShiftCheckpoint.get(CheckpointEntryNo);
         _POSUnit.Get(_POSWorkShiftCheckpoint."POS Unit No.");
@@ -310,47 +310,42 @@
         Response.Add('cashCount', GetCashCount());
         Response.Add('bins', GetAvailableBins());
         Response.Add('isStatisticsEnabled', (EndOfDayProfile."Z-Report UI" = EndOfDayProfile."Z-Report UI"::SUMMARY_BALANCING));
+        Response.Add('backendContext', GetEndOfDayContext(Context));
 
         Response.WriteTo(JsonText);
-        Message(JsonText);
 
         Handled := true;
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
-        POSSession.IsInAction();
-
-
     end;
 
-    local procedure BalancingSetState(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
+    local procedure BalancingSetState(Context: JsonObject; var Handled: Boolean);
     var
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
+        POSSession: Codeunit "NPR POS Session";
         JsonText: Text;
-        Response: JsonObject;
         CheckpointEntryNo: Integer;
     begin
         Handled := true;
 
         Context.WriteTo(JsonText);
-        Message(JsonText);
 
-        CheckpointEntryNo := GetValueAsInteger(Context, 'state.backEndContext.endOfDayCheckpointEntryNo');
+        CheckpointEntryNo := GetValueAsInteger(Context, 'state.backendContext.checkPointId');
         _POSWorkShiftCheckpoint.Get(CheckpointEntryNo);
         _POSUnit.Get(_POSWorkShiftCheckpoint."POS Unit No.");
 
         if (not GetValueAsBoolean(Context, 'confirmed')) then begin
             // User clicked cancel, balancing will be aborted. Return to invoking workflow
             POSManagePOSUnit.ReOpenLastPeriodRegister(_POSUnit."No.");
-            FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
+            Commit();
+            POSSession.ChangeViewLogin();
             exit;
         end;
 
         if (_POSWorkShiftCheckpoint.type = _POSWorkShiftCheckpoint.Type::ZREPORT) then
-            FinalizeZReport(Context, CheckpointEntryNo);
+            FinalizeZReport(Context);
 
         if (_POSWorkShiftCheckpoint.type = _POSWorkShiftCheckpoint.Type::XREPORT) then
-            FinalizeXReport(CheckpointEntryNo);
-
-        FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
+            FinalizeXReport();
 
     end;
 
@@ -378,37 +373,63 @@
         end;
     end;
 
-    local procedure TransferCountingToBinCheckpointRec(Counting: JsonArray; var TempBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary)
+    local procedure TransferCountingToBinCheckpointRec(Counting: JsonArray; var TempBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary; POSUnitNo: Code[10])
     var
         CountedPayment: JsonToken;
+        ManualCountComment: Label 'Counted by %1', MaxLength = 25;
+        Denominations: JsonArray;
+        CoinTypesToken, Denomination : JsonToken;
+        EODDenomination: Record "NPR EOD Denomination";
     begin
         foreach CountedPayment in Counting do begin
             TempBinCheckpoint.Get(GetValueAsInteger(CountedPayment.AsObject(), 'id'));
 
             TempBinCheckpoint."Counted Amount Incl. Float" := GetValueAsDecimal(CountedPayment.AsObject(), 'countedAmount');
+            TempBinCheckpoint.Comment := StrSubstNo(ManualCountComment, CopyStr(UserId, 1, 25));
             TempBinCheckpoint.Modify();
+
+            if (CountedPayment.AsObject().Get('coinTypes', CoinTypesToken)) then
+                if (CoinTypesToken.IsArray) then begin
+                    Denominations := CoinTypesToken.AsArray();
+                    foreach Denomination in Denominations do begin
+                        EODDenomination."POS Payment Method Code" := TempBinCheckpoint."Payment Method No.";
+                        EODDenomination."POS Unit No." := POSUnitNo;
+                        EODDenomination."Denomination Type" := GetValueAsInteger(Denomination.AsObject(), 'type');
+                        EODDenomination.Denomination := GetValueAsDecimal(Denomination.AsObject(), 'value');
+                        EODDenomination.Quantity := GetValueAsInteger(Denomination.AsObject(), 'quantity');
+                        EODDenomination.Amount := EODDenomination.Denomination * EODDenomination.Quantity;
+                        if (EODDenomination.Quantity <> 0) then
+                            if (not EODDenomination.Insert()) then
+                                ;
+                    end;
+                end;
         end;
     end;
 
-    internal procedure PrintEndOfDayReport(UnitNo: Code[10]; EntryNo: Integer)
+    local procedure HandleVirtualCounting(var TempBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary)
     var
-        POSEntry: Record "NPR POS Entry";
-        RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
-        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        RecRef: RecordRef;
+        PaymentMethod: Record "NPR POS Payment Method";
+        POSPaymentBinCheckPoint: Record "NPR POS Payment Bin Checkp.";
+        VirtualCountComment: Label 'Virtual Count', MaxLength = 50;
     begin
-        if (not POSEntry.Get(EntryNo)) then
+        POSPaymentBinCheckPoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', _POSWorkShiftCheckpoint."Entry No.");
+        if (not POSPaymentBinCheckPoint.FindSet()) then
             exit;
 
-        POSEntry.TestField("Entry Type", POSEntry."Entry Type"::Balancing);
-
-        POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '=%1', EntryNo);
-        POSWorkshiftCheckpoint.FindFirst();
-        RecRef.GetTable(POSWorkshiftCheckpoint);
-
-        RetailReportSelectionMgt.SetRegisterNo(UnitNo);
-        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
+        repeat
+            if (PaymentMethod.Get(POSPaymentBinCheckPoint."Payment Method No.")) then begin
+                if ((PaymentMethod."Include In Counting" = PaymentMethod."Include In Counting"::VIRTUAL) and (PaymentMethod."Bin for Virtual-Count" <> '')) then begin
+                    TempBinCheckpoint.TransferFields(POSPaymentBinCheckPoint, true);
+                    TempBinCheckpoint."Bank Deposit Bin Code" := PaymentMethod."Bin for Virtual-Count";
+                    TempBinCheckpoint."Bank Deposit Amount" := POSPaymentBinCheckPoint."Calculated Amount Incl. Float";
+                    TempBinCheckpoint."Bank Deposit Reference" := StrSubstNo('%1 %2', PaymentMethod.Code, CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
+                    TempBinCheckpoint."New Float Amount" := 0;
+                    TempBinCheckpoint."Counted Amount Incl. Float" := POSPaymentBinCheckPoint."Calculated Amount Incl. Float";
+                    TempBinCheckpoint.Comment := VirtualCountComment;
+                    TempBinCheckpoint.Insert();
+                end;
+            end;
+        until (POSPaymentBinCheckPoint.Next() = 0);
     end;
 
     local procedure GetValueAsText(JObject: JsonObject; KeyName: Text): Text
@@ -463,26 +484,24 @@
         exit(JToken.AsValue().AsBoolean());
     end;
 
-    local procedure FinalizeZReport(Context: JsonObject; CheckpointEntryNo: Integer)
+    local procedure FinalizeZReport(Context: JsonObject)
     var
         BinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         TempBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary;
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
         CheckPointMgr: codeunit "NPR POS Workshift Checkpoint";
-        AllPaymentMethodsConfirmed: Boolean;
-        PaymentType: Code[10];
+        EndOfDayWorker: Codeunit "NPR End Of Day Worker";
         SalesPersonCode: Code[10];
         BalanceEntryToPrint: Integer;
         DimId: Integer;
         ClosingEntryNo: Integer;
         ClosingAndTransfer: JsonArray;
         CountingArray: JsonArray;
-        CashCountStatus: JsonObject;
-        IsPaymentTypeConfirmed: JsonToken;
         JToken: JsonToken;
         UnexpectedJsonError: Label 'Invalid json returned by Balance View. Expected key %1 not found.';
         JPath: Text;
+        POSSession: Codeunit "NPR POS Session";
     begin
         JPath := 'state.cashCount.closingAndTransfer';
         if (not Context.SelectToken(JPath, JToken)) then
@@ -494,27 +513,12 @@
         if (not Context.SelectToken(JPath, JToken)) then
             Error(UnexpectedJsonError, JPath);
         CountingArray := JToken.AsArray();
-        TransferCountingToBinCheckpointRec(CountingArray, TempBinCheckpoint);
-
-        JPath := 'state.cashCount.confirmed';
-        if (not Context.SelectToken(JPath, JToken)) then
-            Error(UnexpectedJsonError, JPath);
-        CashCountStatus := JToken.AsObject();
-        AllPaymentMethodsConfirmed := true;
-        foreach PaymentType in CashCountStatus.Keys() do begin
-            CashCountStatus.Get(PaymentType, IsPaymentTypeConfirmed);
-            TempBinCheckpoint.SetFilter("Payment Type No.", '=%1', PaymentType);
-            TempBinCheckpoint.ModifyAll(Status, TempBinCheckpoint.Status::WIP);
-
-            if (not IsPaymentTypeConfirmed.AsValue().AsBoolean()) then begin
-                AllPaymentMethodsConfirmed := false;
-                TempBinCheckpoint.ModifyAll(Status, TempBinCheckpoint.Status::WIP);
-            end else begin
-                TempBinCheckpoint.ModifyAll(Status, TempBinCheckpoint.Status::READY);
-            end;
-        end;
+        TransferCountingToBinCheckpointRec(CountingArray, TempBinCheckpoint, _POSWorkShiftCheckpoint."POS Unit No.");
+        HandleVirtualCounting(TempBinCheckpoint);
 
         TempBinCheckpoint.Reset();
+        TempBinCheckpoint.ModifyAll(Status, TempBinCheckpoint.Status::READY);
+
         if (TempBinCheckpoint.FindSet()) then begin
             repeat
                 BinCheckpoint.Get(TempBinCheckpoint."Entry No.");
@@ -523,29 +527,34 @@
             until (TempBinCheckpoint.Next() = 0);
         end;
 
-        if (AllPaymentMethodsConfirmed) then begin
-            DimId := GetValueAsInteger(Context, 'state.backEndContext.DimensionSetId');
-            SalesPersonCode := GetValueAsText(Context, 'state.backEndContext.SalesPersonCode');
-            BalanceEntryToPrint := CheckPointMgr.CreateBalancingEntry(_EodWorkShiftMode::ZREPORT, _POSWorkShiftCheckpoint."POS Unit No.", CheckpointEntryNo, DimId);
-            ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(_POSWorkShiftCheckpoint."POS Unit No.", SalesPersonCode);
-            POSManagePOSUnit.ClosePOSUnitNo(_POSWorkShiftCheckpoint."POS Unit No.", ClosingEntryNo);
-            Commit();
+        // Warning when not all checkpoints have status READY? 
 
-            PrintEndOfDayReport(_POSWorkShiftCheckpoint."POS Unit No.", BalanceEntryToPrint);
-        end;
+        DimId := GetValueAsInteger(Context, 'state.backendContext.dimensionId');
+        SalesPersonCode := GetValueAsText(Context, 'state.backendContext.salesPersonCode');
+        BalanceEntryToPrint := CheckPointMgr.CreateBalancingEntry(_EodWorkShiftMode::ZREPORT, _POSWorkShiftCheckpoint."POS Unit No.", _POSWorkShiftCheckpoint."Entry No.", DimId);
+        ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(_POSWorkShiftCheckpoint."POS Unit No.", SalesPersonCode);
+        POSManagePOSUnit.ClosePOSUnitNo(_POSWorkShiftCheckpoint."POS Unit No.", ClosingEntryNo);
+        Commit();
+
+        POSSession.ChangeViewLogin();
+        EndOfDayWorker.PrintEndOfDayReport(_POSWorkShiftCheckpoint."POS Unit No.", BalanceEntryToPrint);
     end;
 
-    local procedure FinalizeXReport(CheckpointEntryNo: Integer)
+    local procedure FinalizeXReport()
     var
         BinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         CheckPointMgr: codeunit "NPR POS Workshift Checkpoint";
         BalanceEntryToPrint: Integer;
+        POSSession: Codeunit "NPR POS Session";
+        EndOfDayWorker: Codeunit "NPR End Of Day Worker";
     begin
-        BinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', CheckpointEntryNo);
+        BinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', _POSWorkShiftCheckpoint."Entry No.");
         BinCheckpoint.ModifyAll(Status, BinCheckpoint.Status::READY);
-        BalanceEntryToPrint := CheckPointMgr.CreateBalancingEntry(_EodWorkShiftMode::XREPORT, _POSWorkShiftCheckpoint."POS Unit No.", CheckpointEntryNo, 0);
+        BalanceEntryToPrint := CheckPointMgr.CreateBalancingEntry(_EodWorkShiftMode::XREPORT, _POSWorkShiftCheckpoint."POS Unit No.", _POSWorkShiftCheckpoint."Entry No.", 0);
         Commit();
 
-        PrintEndOfDayReport(_POSWorkShiftCheckpoint."POS Unit No.", BalanceEntryToPrint);
+        POSSession.ChangeViewLogin();
+        EndOfDayWorker.PrintEndOfDayReport(_POSWorkShiftCheckpoint."POS Unit No.", BalanceEntryToPrint);
     end;
+
 }
