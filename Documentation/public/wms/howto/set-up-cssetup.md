@@ -6,7 +6,21 @@ In order to effectively use NP WMS, the module should be first set up with the r
 
 2. Click **New**.
 
-3. Fill out the necessary fields.
+3. Fill out the necessary fields in the following tabs:
+
+
+| Field Name      | Description |
+| ----------- | ----------- |
+| **General Setup**   | General settings regarding the capture service.     |
+| **Stock Take**   | Settings for the Stock Take module.        |
+| **RFID**  | Settings related to the radio-frequency identification. |
+| **Ship & Receive** | Settings related to warehouse document posting. |
+| **Price Calculation** | Settings related to the price calculation of items. |
+| **Search** | Settings related to grouping of search results. |
+| **Worksheet** | Settings related to the stock count. |
+| **Physical Inventory Counting** | Settings related to the physical inventory count. |
+| **Job Queue** | Settings related to job queue processing. |
+| **Azure Printing** | Settings related to the Azure universal print service.|
 
 
 > [!Note]

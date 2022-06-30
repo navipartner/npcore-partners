@@ -23,8 +23,9 @@ The initial setup of NP WMS consists of the following steps:
 4. Set the main parameters for your instance of NP WMS in [CS setup](./explanation/cs-setup.md). These parameters include, but aren't limited to:
 
     - [CS UIs](./howto/set-up-cs-uis.md) - user interface of the mobile apps. 
-    - [CS users](./howto/set-up-cs-users.md) - users who will have access to the mobile devices used for warehouse management.
     - [Warehouse employees](./howto/set-up-warehouse-users.md) - entities in BC which correspond to warehouse employees.
+    - [CS users](./howto/set-up-cs-users.md) - users who will have access to the mobile devices used for warehouse management. CS users are based on the existing warehouse employees.
+ 
 
 5. [Create QR codes](./howto/create-qr-codes.md) which will be associated with the individual users in NP WMS.
 
