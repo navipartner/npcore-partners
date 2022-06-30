@@ -5,7 +5,7 @@ The Capture Service user interfaces (CS UI) are used for defining the look and f
 To see the current UI layout and hierarchy of UIs in the mobile app, navigate to the [**CS UI Structure**](./cs_ui_structure.md) administrative section. You can add or remove some segments from the current app layout if needed. 
 
 > [!Note]
-> There should be one **Start UI** for the company. By default, this is the login screen. You can pick the start UI either from the **CS UI Structure**, or an individual **CS UI** card.
+> For the mobile app to work correctly, it's necessary to define the starting UI, which is the first screen that the user sees when opening the mobile app. By default, this is the login screen. You can pick the start UI either from the **CS UI Structure**, or an individual **CS UI** card.
 
 ## Form Type
 
@@ -14,17 +14,19 @@ There are several types of UIs in NP WMS. The three main ones are listed below. 
 - **Card** (e.g. Login)     
   The **Card** type is used only for the Login screen, in which user input is required.
 
+    ![example](../images/Logging.jpg)
+
 - **Selection List** (e.g. main menu)
 
-    ![example](../images/wms_menu_basic_ui.PNG)
+    ![example](../images/menu-type-ui.jpg)
 
 - **Data List** (e.g. a list of locations, warehouse documents etc.)
 
-    ![example](../images/wms_whse_inv_put_list.PNG)
+    ![example](../images/datalist-type-ui.jpg)
 
 - **Data List Input** (interactive UIs e.g. Warehouse Pick document)
 
-    ![example](../images/wms_whse_activity_pick.PNG)
+    ![example](../images/datainput-type.jpg)
 
 > [!Note]
 > NaviPartner provides standard UIs which can be implemented and modified as per requirements of the users.
