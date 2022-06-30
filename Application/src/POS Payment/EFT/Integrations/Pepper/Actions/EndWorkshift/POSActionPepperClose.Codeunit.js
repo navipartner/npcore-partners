@@ -29,10 +29,12 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
                         _bcResponse = await workflow.respond ("FinalizeCloseRequest", {hwcResponse: hwcResponse});
                         
                         if (hwcResponse.ResultCode != 10)
-                            popup.message ({title: captions.workflowTitle, caption: "<center><font color=red size=72>&#x274C;</font><h3>"+hwcResponse.ResultString+"</h3></center>"})
+                            if (!context.hideFailureMessage)
+                                popup.message ({title: captions.workflowTitle, caption: "<center><font color=red size=72>&#x274C;</font><h3>"+hwcResponse.ResultString+"</h3></center>"})
 
                         if (hwcResponse.ResultCode == 10 && !_bcResponse.Success)
-                            popup.message ({title: captions.workflowTitle, caption: "<center><font color=red size=72>&#x274C;</font><h3>"+_bcResponse.Message+"</h3></center>"})
+                            if (!context.hideFailureMessage)
+                                popup.message ({title: captions.workflowTitle, caption: "<center><font color=red size=72>&#x274C;</font><h3>"+_bcResponse.Message+"</h3></center>"})
 
                         if ((context.showSuccessMessage == undefined && _bcResponse.Success) || (context.showSuccessMessage && _bcResponse.Success))
                             popup.message({ caption: "<center><font color=green size=72>&#x2713;</font><h3>"+_bcResponse.Message+"</h3></center>", title: captions.workflowTitle, });

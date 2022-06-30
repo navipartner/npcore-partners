@@ -1,7 +1,8 @@
-#if not BC17
+
 codeunit 6014405 "NPR PermissionSet Upgrade"
 {
     Access = Internal;
+#if not BC17    
     Subtype = Upgrade;
 
     trigger OnUpgradePerDatabase()
@@ -60,5 +61,5 @@ codeunit 6014405 "NPR PermissionSet Upgrade"
         NavApp.GetCurrentModuleInfo(ModInfo);
         exit(ModInfo.DataVersion());
     end;
-}
 #endif
+}

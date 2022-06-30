@@ -97,10 +97,19 @@
     begin
     end;
 
+    [Obsolete('Use HWX OnEndOfDayCloseEft')]
     [IntegrationEvent(false, false)]
     internal procedure OnQueueCloseBeforeRegisterBalance(POSSession: Codeunit "NPR POS Session"; var tmpEFTSetup: Record "NPR EFT Setup" temporary)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnEndOfDayCloseEft(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift; var EftWorkflowList: JsonArray)
+    begin
+        // The entire JsonObject object stored in the array will be passed as context to the invoke workflow
+        // The object must contain the property WorkflowName which is the name of the workflow to run.
+    end;
+
 
     [IntegrationEvent(false, false)]
     internal procedure OnDisplayReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ReceiptNo: Integer; var Handled: Boolean)

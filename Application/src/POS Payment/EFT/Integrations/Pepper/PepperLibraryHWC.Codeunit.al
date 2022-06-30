@@ -1833,14 +1833,23 @@ codeunit 6184496 "NPR Pepper Library HWC"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnQueueCloseBeforeRegisterBalance', '', false, false)]
-    local procedure OnQueueCloseBeforeRegisterBalance(POSSession: Codeunit "NPR POS Session"; var tmpEFTSetup: Record "NPR EFT Setup" temporary)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnEndOfDayCloseEft', '', false, false)]
+    local procedure OnEndOfDayCloseEft(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift; var EftWorkflowList: JsonArray)
     var
         POSSetup: Codeunit "NPR POS Setup";
+        POSSession: Codeunit "NPR POS Session";
+        Sale: codeunit "NPR POS Sale";
+        PosSale: Record "NPR POS Sale";
         EFTSetup: Record "NPR EFT Setup";
+        EftWorkflow, HwcRequest : JsonObject;
+        EftTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
+        if (EndOfDayType = EndOfDayType::"X-Report") then
+            exit;
 
         POSSession.GetSetup(POSSetup);
+        POSSession.GetSale(Sale);
+        Sale.GetCurrentSale(PosSale);
 
         EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", GetIntegrationType());
@@ -1850,10 +1859,19 @@ codeunit 6184496 "NPR Pepper Library HWC"
                 exit;
         end;
 
-        tmpEFTSetup := EFTSetup;
-        tmpEFTSetup.Insert();
+        // It is sufficient to include "WorkflowName" only. It will cause the workflow to call its preparation stage
+        //EftWorkflow.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_PEPPER_CLOSE));
 
+        // But by including the the hwcRequest and if the workflow supports it, we can save a roundtrip
+        EftTransactionMgt.PrepareEndWorkshift(EFTSetup, PosSale, HwcRequest);
+        EftWorkflow.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_PEPPER_CLOSE));
+        EftWorkflow.Add('showSuccessMessage', false);
+        EftWorkflow.Add('hideFailureMessage', true);
+        EftWorkflow.Add('hwcRequest', HwcRequest);
+        EftWorkflowList.Add(EftWorkflow);
     end;
+
+
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDisplayReceipt', '', false, false)]
     local procedure OnDisplayReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ReceiptNo: Integer; var Handled: Boolean)

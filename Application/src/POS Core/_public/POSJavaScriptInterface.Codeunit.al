@@ -140,6 +140,10 @@
                 end else
                     FrontEnd.ReportBugAndThrowError(StrSubstNo(CustomMethodWithoutResponseErr, Method));
             end;
+        end else begin
+            if (not Success) then
+                if (Method in ['BalancingGetState', 'BalancingSetState']) then
+                    FrontEnd.ReportBugAndThrowError(GetLastErrorText());
         end;
 
         if not Handled then begin

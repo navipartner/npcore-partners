@@ -1,12 +1,12 @@
 ﻿codeunit 6150849 "NPR POS Action: EndOfDay V3"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This is the built in function to perform balancing of the register (Version 1)';
-        t002: Label 'Delete all sales lines before balancing the register';
+
         NextWorkflowStep: Option NA,JUMP_BALANCE_REGISTER,EFT_CLOSE;
         EndOfDayTypeOption: Option "X-Report","Z-Report",CloseWorkShift;
-        MustBeManaged: Label 'The Close Work shift function is only intended for POS units that are managed for End-of-Day. Use X-Report or Z-Report instead.';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -54,16 +54,17 @@
         POSSetup: Codeunit "NPR POS Setup";
         POSSale: Codeunit "NPR POS Sale";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
+        POSEndOfDay: Codeunit "NPR End Of Day Worker";
         SalePOS: Record "NPR POS Sale";
         POSUnit: Record "NPR POS Unit";
+        POSWorkShiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         EndOfDayType: Integer;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
-        ClosingEntryNo: Integer;
         CashDrawerNo: Code[10];
         OpenUnit: Boolean;
-        BalanceEntryToPrint: Integer;
         CurrentView: Codeunit "NPR POS View";
+        EntryNo: Integer;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -91,7 +92,7 @@
         case WorkflowStep of
             'ValidateRequirements':
                 begin
-                    if (not (ValidateRequirements(POSUnit."No.", SalePOS."Sales Ticket No."))) then
+                    if (not (POSEndOfDay.ValidateRequirements(POSUnit."No.", SalePOS."Sales Ticket No."))) then
                         FrontEnd.ContinueAtStep('EndOfWorkflow');
                     POSCreateEntry.InsertUnitCloseBeginEntry(POSUnit."No.", SalespersonPurchaser.Code);
                 end;
@@ -125,28 +126,22 @@
                         EndOfDayTypeOption::"Z-Report":
                             begin
                                 if (UseBusinessCentralUI(POSUnit."No.")) then CreateZReport(POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession);
-                                if (not UseBusinessCentralUI(POSUnit."No.")) then CreateZReportPosUI(POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
+                                if (not UseBusinessCentralUI(POSUnit."No.")) then begin
+                                    EntryNo := POSEndOfDay.CreateReport(EndOfDayType, POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
+                                    if (POSWorkShiftCheckpoint.Get(EntryNo)) then
+                                        POSEndOfDay.SwitchView(FrontEnd, EndOfDayType, POSWorkShiftCheckpoint);
+                                end;
                             end;
 
                         EndOfDayTypeOption::CloseWorkShift:
-                            begin
-                                CloseWorkShift(POSUnit."No.", SalePOS."Dimension Set ID", BalanceEntryToPrint);
-                                ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnit."No.", SalespersonPurchaser.Code);
-                                POSManagePOSUnit.ClosePOSUnitNo(POSUnit."No.", ClosingEntryNo);
+                            POSEndOfDay.CloseWorkshift(POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID");
 
-                                if (BalanceEntryToPrint <> 0) then begin
-                                    Commit();
-                                    POSSession.ChangeViewLogin();
-                                    PrintEndOfDayReport(POSUnit."No.", BalanceEntryToPrint);
-                                end;
-
-                            end;
                         else begin
                                 if (UseBusinessCentralUI(POSUnit."No.")) then begin
                                     PreliminaryEndOfDay(POSUnit."No.", SalePOS."Dimension Set ID");
                                     POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnit."No.");
                                 end;
-                                if (not UseBusinessCentralUI(POSUnit."No.")) then CreateXReportPosUI(POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
+                                if (not UseBusinessCentralUI(POSUnit."No.")) then POSEndOfDay.CreateReport(EndOfDayType, POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
                             end;
                     end;
                 end;
@@ -167,36 +162,14 @@
         end;
     end;
 
-    procedure ValidateRequirements(POSUnitCode: Code[10]; SalesTicketNo: Code[20]): Boolean
-    var
-        POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR POS Sale";
-        POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
-    begin
-
-        if (SalesTicketNo = '') then
-            exit(true);
-
-        // TODO - Needs to verified for UNITS / BINS
-        POSUnit.Get(POSUnitCode);
-
-        SalePOS.Get(POSUnitCode, SalesTicketNo);
-        if (LineExists(SalePOS)) then
-            Error(t002);
-
-        if not POSQuoteMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
-            Error('');
-
-        exit(true);
-    end;
-
     local procedure FinalEndOfDay(UnitNo: Code[10]; DimensionSetId: Integer; var EntryNo: Integer): Boolean
     var
         POSEntry: Record "NPR POS Entry";
         POSWorkShiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
+        POSEndOfDay: Codeunit "NPR End Of Day Worker";
     begin
-        CloseSlaveUnits(UnitNo, DimensionSetId);
+        POSEndOfDay.CloseSlaveUnits(UnitNo, DimensionSetId);
         EntryNo := POSCheckpointMgr.EndWorkshift(EndOfDayTypeOption::"Z-Report", UnitNo, DimensionSetId);
 
         if (not POSEntry.Get(EntryNo)) then
@@ -209,7 +182,7 @@
         exit(false);
     end;
 
-    local procedure PreliminaryEndOfDay(UnitNo: Code[10]; DimensionSetId: Integer): Boolean
+    procedure PreliminaryEndOfDay(UnitNo: Code[10]; DimensionSetId: Integer): Boolean
     var
         POSEntry: Record "NPR POS Entry";
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
@@ -224,58 +197,6 @@
         exit(true);
     end;
 
-    local procedure CloseWorkShift(UnitNo: Code[10]; DimensionSetId: Integer; var PrintEntryNo: Integer): Boolean
-    var
-        POSEntry: Record "NPR POS Entry";
-        POSUnit: Record "NPR POS Unit";
-        POSEndOfDayProfile: Record "NPR POS End of Day Profile";
-        POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
-        EntryNo: Integer;
-        PosIsManaged: Boolean;
-        WithPrint: Boolean;
-    begin
-        PosIsManaged := false;
-        WithPrint := true;
-        POSUnit.Get(UnitNo);
-        if (POSUnit."POS End of Day Profile" <> '') then
-            if (POSEndOfDayProfile.Get(POSUnit."POS End of Day Profile")) then
-                if (POSEndOfDayProfile."End of Day Type" = POSEndOfDayProfile."End of Day Type"::MASTER_SLAVE) then begin
-                    PosIsManaged := (POSUnit."No." <> POSEndOfDayProfile."Master POS Unit No.");
-                    WithPrint := (POSEndOfDayProfile."Close Workshift UI" <> POSEndOfDayProfile."Close Workshift UI"::NO_PRINT);
-                end;
-
-        if (not PosIsManaged) then
-            Error(MustBeManaged);
-
-        EntryNo := POSCheckpointMgr.EndWorkshift(EndOfDayTypeOption::CloseWorkShift, UnitNo, DimensionSetId);
-
-        if (not POSEntry.Get(EntryNo)) then
-            exit(false);
-
-        if (WithPrint) then
-            PrintEntryNo := EntryNo;
-
-        exit(true);
-    end;
-
-    internal procedure PrintEndOfDayReport(UnitNo: Code[10]; EntryNo: Integer)
-    var
-        POSEntry: Record "NPR POS Entry";
-        RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
-        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        RecRef: RecordRef;
-    begin
-        POSEntry.Get(EntryNo);
-        POSEntry.TestField("Entry Type", POSEntry."Entry Type"::Balancing);
-
-        POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '=%1', EntryNo);
-        POSWorkshiftCheckpoint.FindFirst();
-        RecRef.GetTable(POSWorkshiftCheckpoint);
-
-        RetailReportSelectionMgt.SetRegisterNo(UnitNo);
-        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
-    end;
 
     local procedure EftDiscovery(POSSession: Codeunit "NPR POS Session")
     var
@@ -322,6 +243,7 @@
         POSSale.GetCurrentSale(SalePOS);
 
         EFTTransactionMgt.StartEndWorkshift(EFTSetup, SalePOS);
+
     end;
 
     local procedure EftCloseDone(POSSession: Codeunit "NPR POS Session")
@@ -356,33 +278,7 @@
         POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS, false);
     end;
 
-    local procedure CloseSlaveUnits(UnitNo: Code[10]; DimensionSetId: Integer)
-    var
-        POSEndOfDayProfile: Record "NPR POS End of Day Profile";
-        POSUnit: Record "NPR POS Unit";
-        POSUnitSlaves: Record "NPR POS Unit";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
-        POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
-        ClosingEntryNo: Integer;
-        EntryNo: Integer;
-    begin
-        POSUnit.Get(UnitNo);
-        if (POSUnit."POS End of Day Profile" <> '') then
-            if (POSEndOfDayProfile.Get(POSUnit."POS End of Day Profile")) then
-                if (POSEndOfDayProfile."End of Day Type" = POSEndOfDayProfile."End of Day Type"::MASTER_SLAVE) then begin
-                    POSUnitSlaves.SetFilter("POS End of Day Profile", '=%1', POSUnit."POS End of Day Profile");
-                    if (POSUnitSlaves.FindSet()) then begin
-                        repeat
-                            if (POSUnitSlaves."No." <> POSEndOfDayProfile."Master POS Unit No.") then
-                                if (POSUnitSlaves.Status = POSUnitSlaves.Status::OPEN) then begin
-                                    CloseWorkShift(POSUnitSlaves."No.", DimensionSetId, EntryNo);
-                                    ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnitSlaves."No.", '');
-                                    POSManagePOSUnit.ClosePOSUnitNo(POSUnitSlaves."No.", ClosingEntryNo);
-                                end;
-                        until (POSUnitSlaves.Next() = 0);
-                    end;
-                end;
-    end;
+
 
     local procedure UseBusinessCentralUI(UnitNo: Code[10]): Boolean
     var
@@ -396,15 +292,7 @@
         exit(true);
     end;
 
-    procedure LineExists(var SalePOS: Record "NPR POS Sale"): Boolean
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-    begin
-        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Date, SalePOS.Date);
-        exit(not SaleLinePOS.IsEmpty());
-    end;
+
 
     procedure CreateZReport(POSUnitNo: Code[10]; SalespersonPurchaserCode: Text; SaleDimSetID: Integer; POSSession: Codeunit "NPR POS Session"): Integer
     var
@@ -427,54 +315,23 @@
         exit(BalanceEntryToPrint);
     end;
 
-    procedure CreateZReportPosUI(POSUnitNo: Code[10]; SalesPersonCode: Code[10]; SaleDimSetID: Integer; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Integer
+    procedure PrintEndOfDayReport(UnitNo: Code[10]; EntryNo: Integer)
     var
-        POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
-        EntryNo: Integer;
-        Request: Codeunit "NPR Front-End: Generic";
-        BalancingContext: JsonObject;
+        POSEntry: Record "NPR POS Entry";
+        RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        RecRef: RecordRef;
     begin
-        CloseSlaveUnits(POSUnitNo, SaleDimSetID);
-        EntryNo := POSCheckpointMgr.CreateCheckpointWorker(EndOfDayTypeOption::"Z-Report", POSUnitNo);
+        POSEntry.Get(EntryNo);
+        POSEntry.TestField("Entry Type", POSEntry."Entry Type"::Balancing);
 
-        BalancingContext.Add('endOfDayCheckpointEntryNo', EntryNo);
-        BalancingContext.Add('DimensionSetId', SaleDimSetID);
-        BalancingContext.Add('SalesPersonCode', SalesPersonCode);
+        POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '=%1', EntryNo);
+        POSWorkshiftCheckpoint.FindFirst();
+        RecRef.GetTable(POSWorkshiftCheckpoint);
 
-        Request.SetMethod('BalanceSetContext');
-        Request.GetContent().Add('balancingContext', BalancingContext);
-
-        POSSession.GetFrontEnd(FrontEnd, true);
-        FrontEnd.InvokeFrontEndMethod(Request);
-        POSSession.ChangeViewBalancing();
-
-        // Execution in AL continues when frontend invokes OnCustomMethod with method BalancingSetState
-
-    end;
-
-    procedure CreateXReportPosUI(POSUnitNo: Code[10]; SalesPersonCode: Code[10]; SaleDimSetID: Integer; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Integer
-    var
-        POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
-        EntryNo: Integer;
-        Request: Codeunit "NPR Front-End: Generic";
-        BalancingContext: JsonObject;
-    begin
-        CloseSlaveUnits(POSUnitNo, SaleDimSetID);
-        EntryNo := POSCheckpointMgr.CreateCheckpointWorker(EndOfDayTypeOption::"X-Report", POSUnitNo);
-
-        BalancingContext.Add('endOfDayCheckpointEntryNo', EntryNo);
-        BalancingContext.Add('DimensionSetId', SaleDimSetID);
-        BalancingContext.Add('SalesPersonCode', SalesPersonCode);
-
-        Request.SetMethod('BalanceSetContext');
-        Request.GetContent().Add('balancingContext', BalancingContext);
-
-        POSSession.GetFrontEnd(FrontEnd, true);
-        FrontEnd.InvokeFrontEndMethod(Request);
-        POSSession.ChangeViewBalancing();
-
-        // Execution in AL continues when frontend invokes OnCustomMethod with method BalancingSetState
-
+        RetailReportSelectionMgt.SetRegisterNo(UnitNo);
+        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
     end;
 
 }
