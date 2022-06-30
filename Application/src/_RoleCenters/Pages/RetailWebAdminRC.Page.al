@@ -58,7 +58,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Setup action';
+                    ToolTip = 'View or edit the Magento Setup';
                 }
                 action("Magento Websites Setup")
                 {
@@ -66,7 +66,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Websites";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Websites Setup action';
+                    ToolTip = 'View or edit the Magento Websites Setup';
                 }
                 action("Magento Stores")
                 {
@@ -74,7 +74,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Store List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Stores action';
+                    ToolTip = 'View or edit the Magento Stores';
                 }
                 action("Magento Tax Classes")
                 {
@@ -82,7 +82,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Tax Classes";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Tax Classes action';
+                    ToolTip = 'View or edit the Magento Tax Classes';
                 }
                 action("VAT Business Posting Groups Mapping")
                 {
@@ -90,7 +90,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento VAT Bus. Groups";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the VAT Business Posting Groups Mapping action';
+                    ToolTip = 'View or edit the VAT Business Posting Groups Mapping';
                 }
                 action("VAT Product Posting Groups Mapping")
                 {
@@ -98,7 +98,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento VAT Prod. Groups";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the VAT Product Posting Groups Mapping action';
+                    ToolTip = 'View or edit the VAT Product Posting Groups Mapping';
                 }
                 action("Magento Shipment Method Mapping")
                 {
@@ -106,7 +106,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Shipment Mapping";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Shipment Method Mapping action';
+                    ToolTip = 'View or edit the Magento Shipment Method Mapping';
                 }
                 action("Magento Payment Method Mapping")
                 {
@@ -114,7 +114,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Payment Mapping";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Payment Method Mapping action';
+                    ToolTip = 'View or edit the Magento Payment Method Mapping';
                 }
                 action("Magento Payment Gateway Setup")
                 {
@@ -122,7 +122,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Payment Gateways";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Payment Gateway Setup action';
+                    ToolTip = 'View or edit the Payment Gateway Setup';
                 }
             }
             group("Magento Content")
@@ -134,7 +134,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Item List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Item List action';
+                    ToolTip = 'View or edit the Item List';
                 }
                 action("Magento Attributes")
                 {
@@ -142,7 +142,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Attributes";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Attributes action';
+                    ToolTip = 'View or edit the Magento Attributes';
                 }
                 action("Magento Attribute Sets")
                 {
@@ -150,7 +150,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Attribute Sets";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Attribute Sets action';
+                    ToolTip = 'View or edit the Magento Attribute Sets';
                 }
                 action("Magento Attribute Groups")
                 {
@@ -158,7 +158,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Attr. Group List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Attribute Groups action';
+                    ToolTip = 'View or edit the Magento Attribute Groups';
                 }
 
                 action("Magento Categories")
@@ -167,7 +167,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Categories";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Categories action';
+                    ToolTip = 'View or edit the Magento Categories';
                 }
 
 
@@ -177,7 +177,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Brands";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Brands action';
+                    ToolTip = 'View or edit the Magento Brands';
                 }
                 action("Magento Custom Options")
                 {
@@ -185,7 +185,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Custom Option List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Custom Options action';
+                    ToolTip = 'View or edit the Custom Options';
                 }
                 action("Magento Pictures")
                 {
@@ -193,7 +193,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = Picture;
                     RunObject = page "NPR Magento Pictures";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Pictures action';
+                    ToolTip = 'View or edit the Pictures';
                 }
             }
             group("Magento Customers")
@@ -205,7 +205,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Customer List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Customers action';
+                    ToolTip = 'View or edit the Customers';
                 }
                 action(Contact)
                 {
@@ -213,7 +213,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Contact List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Contacts action';
+                    ToolTip = 'View or edit the Contacts';
                 }
                 action("Magento Customer Mapping")
                 {
@@ -221,7 +221,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Magento Customer Mapping";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Customer Mapping action';
+                    ToolTip = 'View or edit the Customer Mapping';
                 }
                 action("Customer Config. Templates")
                 {
@@ -230,7 +230,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     RunObject = page "Config. Template List";
                     RunPageLink = "Table ID" = const(18);
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Customer Config. Templates action';
+                    ToolTip = 'View or edit the Customer Config. Templates';
                 }
                 action("Post Code")
                 {
@@ -238,7 +238,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Post Codes";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Post Code action';
+                    ToolTip = 'View or edit the Post Code';
                 }
                 action("Customer GDPR")
                 {
@@ -246,7 +246,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Customer GDPR Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Customer GDPR action';
+                    ToolTip = 'View or edit the Customer GDPR';
                 }
             }
             group("Magento Sales")
@@ -258,7 +258,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = Document;
                     RunObject = page "Sales Order List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Orders action';
+                    ToolTip = 'View or edit the Sales Orders';
                 }
 
                 action("Sales Invoices")
@@ -267,7 +267,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = Document;
                     RunObject = page "Sales Invoice List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Invoices action';
+                    ToolTip = 'View or edit the Sales Invoices';
                 }
                 action("Sales Shipment")
                 {
@@ -275,7 +275,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Posted Sales Shipments";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Shipments action';
+                    ToolTip = 'View or edit the Sales Shipments';
                 }
                 action("Sales Credit Memos")
                 {
@@ -283,7 +283,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = Document;
                     RunObject = page "Sales Credit Memos";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Credit Memos action';
+                    ToolTip = 'View or edit the Sales Credit Memos';
                 }
                 action("Payment Lines")
                 {
@@ -291,7 +291,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = Document;
                     RunObject = page "NPR Magento Payment Line List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Payment Lines action';
+                    ToolTip = 'View or edit the Payment Lines';
                 }
                 action("Sales Return Orders")
                 {
@@ -299,7 +299,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Sales Return Order List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Return Orders action';
+                    ToolTip = 'View or edit the Sales Return Orders';
                 }
                 action("Posted Sales Invoices")
                 {
@@ -307,7 +307,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Posted Sales Invoices";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Posted Sales Invoices action';
+                    ToolTip = 'View or edit the Posted Sales Invoices';
                 }
                 action("Posted Sales Credit Memos")
                 {
@@ -315,7 +315,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Posted Sales Credit Memos";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Credit Memos action';
+                    ToolTip = 'View or edit the Sales Credit Memos';
                 }
             }
             group("Retail Vouchers")
@@ -327,7 +327,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpRv Vouchers";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Vouchers action';
+                    ToolTip = 'View or edit the Vouchers';
                 }
                 action("Archived Vouchers")
                 {
@@ -335,7 +335,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpRv Arch. Vouchers";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Archived Vouchers action';
+                    ToolTip = 'View or edit the Archived Vouchers';
                 }
                 action("Voucher Types")
                 {
@@ -343,7 +343,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpRv Voucher Types";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Voucher Types action';
+                    ToolTip = 'View or edit the Voucher Types';
                 }
                 action("Voucher Modules")
                 {
@@ -351,7 +351,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpRv Voucher Modules";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Voucher Modules action';
+                    ToolTip = 'View or edit the Voucher Modules';
                 }
                 action("Retail Voucher Partners")
                 {
@@ -359,7 +359,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpRv Partners";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Retail Voucher Partners action';
+                    ToolTip = 'View or edit the Retail Voucher Partners';
                 }
             }
             group(NaviConnect)
@@ -371,7 +371,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Nc Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the NaviConnect Setup action';
+                    ToolTip = 'View or edit the NaviConnect Setup';
                 }
                 action("NpXml Templates Setup")
                 {
@@ -379,7 +379,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpXml Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the NpXml Templates Setup action';
+                    ToolTip = 'View or edit the NpXml Templates Setup';
                 }
                 action("Task Processors")
                 {
@@ -387,7 +387,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Nc Task Proces. List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Task Processors action';
+                    ToolTip = 'View or edit the Task Processors';
                 }
                 action("Task Setup")
                 {
@@ -395,7 +395,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Nc Task Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Task Setup action';
+                    ToolTip = 'View or edit the Task Setup';
                 }
                 action("Import Types")
                 {
@@ -403,7 +403,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Nc Import Types";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Import Types action';
+                    ToolTip = 'View or edit the Import Types';
                 }
                 action("Web Services")
                 {
@@ -411,7 +411,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Web Services";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Web Services action';
+                    ToolTip = 'View or edit the Web Services';
                 }
                 action("NpXml Template")
                 {
@@ -419,7 +419,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpXml Template List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the NpXml Template action';
+                    ToolTip = 'View or edit the NpXml Template';
                 }
                 action("Data Log Setup")
                 {
@@ -427,7 +427,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Data Log Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Data Log Setup action';
+                    ToolTip = 'View or edit the Data Log Setup';
                 }
                 action(TaskList)
                 {
@@ -435,7 +435,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Nc Task List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Task List action';
+                    ToolTip = 'View or edit the Task List';
                 }
                 action("Email Templates")
                 {
@@ -443,7 +443,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR E-mail Templates";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Email Templates action';
+                    ToolTip = 'View or edit the Email Templates';
                 }
                 action("Config. Packages")
                 {
@@ -451,7 +451,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Config. Packages";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Config. Packages action';
+                    ToolTip = 'View or edit the Config. Packages';
                 }
                 action("Import List")
                 {
@@ -459,7 +459,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR Nc Import List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Import List action';
+                    ToolTip = 'View or edit the Import List';
                 }
             }
             group("Collect Store")
@@ -471,7 +471,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpCs Send to Store Orders";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sent to Store Orders action';
+                    ToolTip = 'View or edit the Sent to Store Orders';
                 }
                 action("Collect in Store Orders")
                 {
@@ -479,7 +479,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpCs Coll. Store Orders";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Collect in Store Orders action';
+                    ToolTip = 'View or edit the Collect in Store Orders';
                 }
                 action("Archived Collect Document List")
                 {
@@ -487,7 +487,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpCs Arch. Doc. List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Archived Collect Document List action';
+                    ToolTip = 'View or edit the Archived Collect Document List';
                 }
                 action("Collect Stores")
                 {
@@ -495,7 +495,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpCs Stores";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Collect Stores action';
+                    ToolTip = 'View or edit the Collect Stores';
                 }
                 action("Collect Workflows")
                 {
@@ -503,7 +503,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpCs Workflows";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Collect Workflows action';
+                    ToolTip = 'View or edit the Collect Workflows';
                 }
                 action("Collect Store Opening Hour Sets")
                 {
@@ -511,7 +511,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpCs Open. Hour Sets";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Collect Store Opening Hour Sets action';
+                    ToolTip = 'View or edit the Collect Store Opening Hour Sets';
                 }
                 action("Collect Workflows Modules")
                 {
@@ -519,7 +519,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpCs Workflow Modules";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Collect Workflows Modules action';
+                    ToolTip = 'View or edit the Collect Workflows Modules';
                 }
                 action("Collect Document Mapping")
                 {
@@ -527,7 +527,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpCs Document Mapping";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Collect Document Mapping action';
+                    ToolTip = 'View or edit the Collect Document Mapping';
                 }
             }
             group(Membership)
@@ -539,7 +539,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Members";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Members action';
+                    ToolTip = 'View or edit the Members';
                 }
                 action(Memberships)
                 {
@@ -547,7 +547,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Memberships";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Memberships action';
+                    ToolTip = 'View or edit the Memberships';
                 }
                 action("Member Cards")
                 {
@@ -555,7 +555,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Member Card List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Member Cards action';
+                    ToolTip = 'View or edit the Member Cards';
                 }
                 action("MCS Person")
                 {
@@ -563,7 +563,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MCS Person";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the MCS Person action';
+                    ToolTip = 'View or edit the MCS Person';
                 }
                 action("MCS Faces")
                 {
@@ -571,7 +571,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MCS Faces";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the MCS Faces action';
+                    ToolTip = 'View or edit the MCS Faces';
                 }
                 action("MCS Person Business Entries")
                 {
@@ -579,7 +579,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MCS Person Bus. Entities";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the MCS Person Business Entries action';
+                    ToolTip = 'View or edit the MCS Person Business Entries';
                 }
                 action("Create Membership")
                 {
@@ -587,7 +587,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Create Membership";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Create Membership action';
+                    ToolTip = 'View or edit the Create Membership';
                 }
                 action("Membership Alteration Journal")
                 {
@@ -595,7 +595,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Members. Alteration Jnl";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Membership Alteration Journal action';
+                    ToolTip = 'View or edit the Membership Alteration Journal';
                 }
                 action("Membership Auto Renew List")
                 {
@@ -603,7 +603,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Members. AutoRenew List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Membership Auto Renew List action';
+                    ToolTip = 'View or edit the Membership Auto Renew List';
                 }
                 action("Membership Offline Print Journal")
                 {
@@ -611,7 +611,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Membership Print Jnl";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Membership Offline Print Journal action';
+                    ToolTip = 'View or edit the Membership Offline Print Journal';
                 }
                 action("Membership Status")
                 {
@@ -619,7 +619,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = report "NPR MM Membership Status";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Membership Status action';
+                    ToolTip = 'View or edit the Membership Status';
                 }
                 action("Membership Not Renewed")
                 {
@@ -627,7 +627,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = report "NPR MM Membership Not Renewed";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Membership Not Renewed action';
+                    ToolTip = 'View or edit the Membership Not Renewed';
                 }
                 action("Membership Sales Setup")
                 {
@@ -635,7 +635,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Membership Sales Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Membership Sales Setup action';
+                    ToolTip = 'View or edit the Membership Sales Setup';
                 }
                 action("Membership Alteration")
                 {
@@ -643,7 +643,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Membership Alter.";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Membership Alteration action';
+                    ToolTip = 'View or edit the Membership Alteration';
                 }
                 action("Member Community")
                 {
@@ -651,7 +651,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Member Community";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Member Community action';
+                    ToolTip = 'View or edit the Member Community';
                 }
                 action("Membership Setup")
                 {
@@ -659,7 +659,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MM Membership Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Membership Setup action';
+                    ToolTip = 'View or edit the Membership Setup';
                 }
                 action("MCS Person Group Setup")
                 {
@@ -667,7 +667,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MCS Person Group Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the MCS Person Group Setup action';
+                    ToolTip = 'View or edit the MCS Person Group Setup';
                 }
                 action("MCS Person Groups")
                 {
@@ -675,7 +675,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR MCS Person Groups";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the MCS Person Groups action';
+                    ToolTip = 'View or edit the MCS Person Groups';
                 }
             }
             group("Discount Coupons")
@@ -687,7 +687,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpDc Coupons";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Coupons action';
+                    ToolTip = 'View or edit the Coupons';
                 }
                 action("Coupon Types")
                 {
@@ -695,7 +695,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpDc Coupon Types";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Coupon Types action';
+                    ToolTip = 'View or edit the Coupon Types';
                 }
                 action("Open/Archived Coupon Statistics")
                 {
@@ -703,7 +703,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = report "NPR Open/Archive Coupon Stat.";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Open/Archived Coupon Statistics action';
+                    ToolTip = 'View or edit the Open/Archived Coupon Statistics';
                 }
                 action("Archived Coupons")
                 {
@@ -711,7 +711,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpDc Arch. Coupons";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Archived Coupons action';
+                    ToolTip = 'View or edit the Archived Coupons';
                 }
                 action("Coupon Setup")
                 {
@@ -719,7 +719,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpDc Coupon Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Coupon Setup action';
+                    ToolTip = 'View or edit the Coupon Setup';
                 }
                 action("Coupon Modules")
                 {
@@ -727,7 +727,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "NPR NpDc Coupon Modules";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Coupon Modules action';
+                    ToolTip = 'View or edit the Coupon Modules';
                 }
             }
         }
@@ -739,7 +739,7 @@ page 6059871 "NPR Retail Web Admin RC"
                 Caption = 'Items';
                 RunObject = Page "Item List";
 
-                ToolTip = 'Executes the Item List action';
+                ToolTip = 'View or edit the Item List';
                 ApplicationArea = NPRRetail;
             }
             action("Sales &Order")
@@ -750,7 +750,7 @@ page 6059871 "NPR Retail Web Admin RC"
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
 
-                ToolTip = 'Executes the Sales &Order action';
+                ToolTip = 'View or edit the Sales &Order';
                 ApplicationArea = NPRRetail;
             }
         }

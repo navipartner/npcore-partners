@@ -20,7 +20,9 @@
                     Caption = 'Greeting headline';
                     Editable = false;
                     Visible = UserGreetingVisible;
-                    ToolTip = 'Specifies the value of the Greeting headline field';
+                    ToolTip = 'Specifies the greeting headline.';
+
+
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -36,7 +38,8 @@
                     DrillDown = true;
                     Editable = false;
                     Visible = DefaultFieldsVisible;
-                    ToolTip = 'Specifies the value of the Documentation headline field';
+                    ToolTip = 'Specifies the documentation headline.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -55,7 +58,8 @@
 
                     Caption = 'My Pick Text';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the My Pick Text field';
+                    ToolTip = 'Specifies My Pick Text.';
+
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -67,7 +71,7 @@
 
                     Caption = 'Away Pick Text';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Away Pick Text field';
+                    ToolTip = 'Specifies the Away Pick Text.';
                     ApplicationArea = NPRRetail;
                 }
             }

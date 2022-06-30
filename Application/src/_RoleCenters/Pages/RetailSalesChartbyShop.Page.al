@@ -17,7 +17,7 @@
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = true;
-                ToolTip = 'Specifies the value of the Date Range field';
+                ToolTip = 'The user can specify the Date Range from which wants to see the data.';
                 ApplicationArea = NPRRetail;
                 Editable = false;
             }
@@ -29,7 +29,7 @@
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = true;
-                ToolTip = 'Specifies the value of the Chart type field';
+                ToolTip = 'Specifies the value of the Chart type.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
@@ -65,7 +65,7 @@
 
                     Caption = 'Day';
                     Image = ChangeDate;
-                    ToolTip = 'Executes the Day action';
+                    ToolTip = 'Select this filter to visualize data by day.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -80,7 +80,7 @@
 
                     Caption = 'Week';
                     Image = ChangeDate;
-                    ToolTip = 'Executes the Week action';
+                    ToolTip = 'Select this filter to visualize data by week.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -95,7 +95,7 @@
 
                     Caption = 'Month';
                     Image = ChangeDate;
-                    ToolTip = 'Executes the Month action';
+                    ToolTip = 'Select this filter to visualize data by month.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -110,7 +110,7 @@
 
                     Caption = 'Quarter';
                     Image = ChangeDate;
-                    ToolTip = 'Executes the Quarter action';
+                    ToolTip = 'Select this filter to visualize data by quarter.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -125,7 +125,7 @@
 
                     Caption = 'Year';
                     Image = ChangeDate;
-                    ToolTip = 'Executes the Year action';
+                    ToolTip = 'Select this filter to visualize data by year.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -141,7 +141,7 @@
 
                 Caption = 'Previous';
                 Image = PreviousRecord;
-                ToolTip = 'Executes the Previous action';
+                ToolTip = 'Executes the Previous action.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -155,7 +155,7 @@
 
                 Caption = 'Next';
                 Image = NextRecord;
-                ToolTip = 'Executes the Next action';
+                ToolTip = 'Executes the Next action.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

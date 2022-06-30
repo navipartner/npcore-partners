@@ -18,21 +18,21 @@
                 field("Pending Inc. Documents"; Rec."Pending Inc. Documents")
                 {
 
-                    ToolTip = 'Specifies the value of the Pending Inc. Documents field';
+                    ToolTip = 'Specifies the list of Incoming Documents.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Processed Error Tasks"; Rec."Processed Error Tasks")
                 {
 
                     DrillDownPageID = "NPR Nc Task List";
-                    ToolTip = 'Specifies the value of the Processed Error Tasks field';
+                    ToolTip = 'Specifies the list of Processed Error Tasks.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Failed Webshop Payments"; Rec."Failed Webshop Payments")
                 {
 
                     DrillDownPageID = "NPR Magento Payment Line List";
-                    ToolTip = 'Specifies the value of the Failed Webshop Payments field';
+                    ToolTip = 'Specifies the list of Failed Webshop Payments.';
                     ApplicationArea = NPRRetail;
                 }
 

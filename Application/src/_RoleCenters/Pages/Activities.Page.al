@@ -18,7 +18,7 @@
                 field(TaskList; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Task List"))))
                 {
                     Caption = 'Task List';
-                    ToolTip = 'Specifies the value of the Task List field';
+                    ToolTip = 'Specifies the number of the tasks assigned to the current user.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -37,7 +37,8 @@
                 field("Failed tasks"; Rec."Failed Webshop Payments")
                 {
                     Caption = 'Failed Capturing of Payments';
-                    ToolTip = 'Specifies the value of the Failed Webshop Payments field';
+                    ToolTip = 'Specifies the number of the failed capturing of payments.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -50,7 +51,8 @@
                 field("Failed imports in the import list"; Rec."Failed imports")
                 {
                     Caption = 'Failed Imports in the Import List';
-                    ToolTip = 'Specifies the amount of failed import entries';
+                    ToolTip = 'Specifies the number of failed import entries from the Import List.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -72,7 +74,9 @@
                 field(TodaysSalesOrders; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Daily Sales Orders"))))
                 {
                     Caption = 'Daily Sales Orders';
-                    ToolTip = 'Specifies the value of the Daily Sales Orders field';
+                    ToolTip = 'Specifies the number of the daily sales orders that have been registered on today''s date.';
+
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -83,7 +87,9 @@
                 field(TotalSalesOrders; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Sales Orders"))))
                 {
                     Caption = 'Sales Orders';
-                    ToolTip = 'Specifies the value of the Sales Orders field';
+                    ToolTip = 'Specifies the number of the sales orders that have been registered.';
+
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -95,7 +101,9 @@
                 {
                     Caption = 'Shipped Sales Orders';
                     ShowCaption = true;
-                    ToolTip = 'Specifies the value of the Shipped Sales Orders field';
+                    ToolTip = 'Specifies the number of the sales orders that have been shipped.';
+
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -111,7 +119,8 @@
                 field("My Incoming Documents"; Rec."My Incoming Documents")
                 {
                     ApplicationArea = Suite;
-                    ToolTip = 'Specifies incoming documents that are assigned to you.';
+                    ToolTip = 'Specifies the number of the incoming documents that are assigned to the current user.';
+
                 }
             }
         }

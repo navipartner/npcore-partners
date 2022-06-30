@@ -17,61 +17,61 @@
                 field("Magento Version"; Rec."Magento Version")
                 {
 
-                    ToolTip = 'Specifies the value of the Magento Version field';
+                    ToolTip = 'Specifies the Magento Version.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Magento Enabled"; Rec."Magento Enabled")
                 {
 
-                    ToolTip = 'Specifies the value of the Magento Enabled field';
+                    ToolTip = 'Specifies if Magento is enabled.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Magento Url"; Rec."Magento Url")
                 {
 
-                    ToolTip = 'Specifies the value of the Magento Url field';
+                    ToolTip = 'Specifies the Magento URL';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant System"; Rec."Variant System")
                 {
 
-                    ToolTip = 'Specifies the value of the Variant System field';
+                    ToolTip = 'Specifies if this setup uses variant or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Picture Dimension"; Rec."Variant Picture Dimension")
                 {
 
-                    ToolTip = 'Specifies the value of the Variant Picture Dimension field';
+                    ToolTip = 'Specifies the variant by choosing from the list of available variants';
                     ApplicationArea = NPRRetail;
                 }
                 field("Miniature Picture"; Rec."Miniature Picture")
                 {
 
-                    ToolTip = 'Specifies the value of the Miniature Picture field';
+                    ToolTip = 'Specifies what type of picture this setup uses';
                     ApplicationArea = NPRRetail;
                 }
                 field("Max. Picture Size"; Rec."Max. Picture Size")
                 {
 
-                    ToolTip = 'Specifies the value of the Max. Picture Size (kb) field';
+                    ToolTip = 'Specifies the maximum picture size (kb).';
                     ApplicationArea = NPRRetail;
                 }
                 field("Inventory Location Filter"; Rec."Inventory Location Filter")
                 {
 
-                    ToolTip = 'Specifies the value of the Inventory Location Filter field';
+                    ToolTip = 'Specifies if there is any filter for location inventory and you can choose from the list of available locations';
                     ApplicationArea = NPRRetail;
                 }
                 field("Intercompany Inventory Enabled"; Rec."Intercompany Inventory Enabled")
                 {
 
-                    ToolTip = 'Specifies the value of the Intercompany Inventory Enabled field';
+                    ToolTip = 'Specifies if the intercompany inventory is enabled';
                     ApplicationArea = NPRRetail;
                 }
                 field("Api Url"; Rec."Api Url")
                 {
 
-                    ToolTip = 'Specifies the value of the Api Url field';
+                    ToolTip = 'Specifies the API URL';
                     ApplicationArea = NPRRetail;
                 }
                 field(AuthType; Rec.AuthType)
@@ -86,8 +86,7 @@
                 }
                 field("Api Username"; Rec."Api Username")
                 {
-
-                    ToolTip = 'Specifies the value of the Api Username field';
+                    ToolTip = 'Specifies the API username.';
                     ApplicationArea = NPRRetail;
                     Visible = IsBasicAuthVisible;
                 }
@@ -96,7 +95,7 @@
 
                     Caption = 'Api Password';
                     ExtendedDatatype = Masked;
-                    ToolTip = 'Specifies the value of the Api Password field';
+                    ToolTip = 'Specifies the API password.';
                     ApplicationArea = NPRRetail;
                     Visible = IsBasicAuthVisible;
 
@@ -122,7 +121,7 @@
 
                 field("Api Authorization"; Rec."Api Authorization")
                 {
-                    ToolTip = 'Specifies the value of the Api Authorization field';
+                    ToolTip = 'Specifies the API authorization type.';
                     ApplicationArea = NPRRetail;
                     Visible = IsCustomAuthVisible;
                 }

@@ -14,55 +14,55 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the Code of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the Name of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("Job Title"; Rec."Job Title")
                 {
 
-                    ToolTip = 'Specifies the value of the Job Title field';
+                    ToolTip = 'Specifies the Job Title of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("E-Mail"; Rec."E-Mail")
                 {
 
-                    ToolTip = 'Specifies the value of the E-Mail field';
+                    ToolTip = 'Specifies the E-Mail of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Phone No. field';
+                    ToolTip = 'Specifies the Phone No. of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ToolTip = 'Specifies the Global Dimension 1 Code of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ToolTip = 'Specifies the Global Dimension 2 Code of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("Commission %"; Rec."Commission %")
                 {
 
-                    ToolTip = 'Specifies the value of the Commission % field';
+                    ToolTip = 'Specifies the Commission % of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("Maximum Cash Returnsale"; Rec."NPR Maximum Cash Returnsale")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Maximum Cash Returnsale field';
+                    ToolTip = 'Specifies the NPR Maximum Cash Returnsale of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -73,13 +73,13 @@
                 {
 
                     ExtendedDatatype = Masked;
-                    ToolTip = 'Specifies the value of the NPR POS Unit Password field';
+                    ToolTip = 'Specifies the NPR POS Unit Password of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR POS Unit Group"; Rec."NPR POS Unit Group")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the group of POS Units that Salesperson can access.';
+                    ToolTip = 'Specifies the NPR Locked-to POS Unit No. of the salesperson/purchaser';
                 }
             }
             group(Retail)
@@ -88,37 +88,37 @@
                 field("Hide Register Imbalance"; Rec."NPR Hide Register Imbalance")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Hide Register Imbalance field';
+                    ToolTip = 'Specifies the NPR Hide Register Imbalance of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales (Qty.)"; Rec."NPR Sales (Qty.)")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Sales (Qty.) field';
+                    ToolTip = 'Specifies the NPR Sales (Qty.) of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."NPR Discount Amount")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Discount Amount field';
+                    ToolTip = 'Specifies the NPR Discount Amount of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Group Sales (LCY)"; Rec."NPR Item Group Sales (LCY)")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Item Group Sales (LCY) field';
+                    ToolTip = 'Specifies the NPR Item Group Sales (LCY) of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales (LCY)"; Rec."NPR Sales (LCY)")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Sales (LCY) field';
+                    ToolTip = 'Specifies the NPR Sales (LCY) of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
                 field("COGS (LCY)"; Rec."NPR COGS (LCY)")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR COGS (LCY) field';
+                    ToolTip = 'Specifies the NPR COGS (LCY) of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -145,7 +145,7 @@
                 RunObject = Page "Salespersons/Purchasers";
                 ShortCutKey = 'F5';
 
-                ToolTip = 'Executes the List action';
+                ToolTip = 'View or edit the List of the salesperson/purchaser';
                 ApplicationArea = NPRRetail;
             }
             action("&Statistics")
@@ -156,7 +156,7 @@
                 RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'F9';
 
-                ToolTip = 'Executes the &Statistics action';
+                ToolTip = 'Executes the &Statistics report for the salespersons/purchasers';
                 ApplicationArea = NPRRetail;
             }
             action("Sales Person report")
@@ -165,7 +165,7 @@
                 Image = SalesPerson;
                 ShortCutKey = 'Ctrl+F9';
 
-                ToolTip = 'Executes the Sales Person report action';
+                ToolTip = 'Executes the Sales Person report for the salespersons/purchasers';
                 ApplicationArea = NPRRetail;
             }
             action("Remove from staff Sale")
@@ -173,7 +173,7 @@
                 Caption = 'Remove from Staff Sale';
                 Image = RemoveContacts;
 
-                ToolTip = 'Executes the Remove from Staff Sale action';
+                ToolTip = 'Executes the Remove from Staff Sale for the salespersons/purchasers';
                 ApplicationArea = NPRRetail;
             }
         }

@@ -72,8 +72,7 @@
                     Caption = 'S&tatement';
                     Image = "Report";
                     RunObject = Report Statement;
-
-                    ToolTip = 'Executes the S&tatement action.';
+                    ToolTip = 'Opens the Statement report.';
                     ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150667)
@@ -84,8 +83,7 @@
                     Caption = 'Customer - Order Su&mmary';
                     Image = "Report";
                     RunObject = Report "Customer - Order Summary";
-
-                    ToolTip = 'Executes the Customer - Order Su&mmary action.';
+                    ToolTip = 'Opens the Customer - Order Summary report.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Customer - T&op 10 List")
@@ -93,8 +91,7 @@
                     Caption = 'Customer - T&op 10 List';
                     Image = "Report";
                     RunObject = Report "Customer - Top 10 List";
-
-                    ToolTip = 'Executes the Customer - T&op 10 List action.';
+                    ToolTip = 'Opens the Customer Top 10 List report';
                     ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150663)
@@ -108,8 +105,7 @@
                     Caption = 'Inventory - Sales &Back Orders';
                     Image = "Report";
                     RunObject = Report "Inventory - Sales Back Orders";
-
-                    ToolTip = 'Executes the Inventory - Sales &Back Orders action.';
+                    ToolTip = 'Opens the Inventory - Sales Back Orders report.';
                     ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150658)
@@ -120,8 +116,7 @@
                     Caption = '&G/L Trial Balance';
                     Image = "Report";
                     RunObject = Report "Trial Balance";
-
-                    ToolTip = 'Executes the &G/L Trial Balance action.';
+                    ToolTip = 'Runs the &G/L Trial Balance report.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Trial Balance by &Period")
@@ -129,8 +124,7 @@
                     Caption = 'Trial Balance by &Period';
                     Image = "Report";
                     RunObject = Report "Trial Balance by Period";
-
-                    ToolTip = 'Executes the Trial Balance by &Period action.';
+                    ToolTip = 'Runs the Trial Balance by &Period report.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Closing T&rial Balance")
@@ -138,8 +132,7 @@
                     Caption = 'Closing T&rial Balance';
                     Image = "Report";
                     RunObject = Report "Closing Trial Balance";
-
-                    ToolTip = 'Executes the Closing T&rial Balance action.';
+                    ToolTip = 'Runs the Closing T&rial Balance report.';
                     ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150654)
@@ -150,8 +143,7 @@
                     Caption = 'Aged Ac&counts Receivable';
                     Image = "Report";
                     RunObject = Report "Aged Accounts Receivable";
-
-                    ToolTip = 'Executes the Aged Ac&counts Receivable action.';
+                    ToolTip = 'Runs the Aged Ac&counts Receivable report.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Aged Accounts Pa&yable")
@@ -159,8 +151,7 @@
                     Caption = 'Aged Accounts Pa&yable';
                     Image = "Report";
                     RunObject = Report "Aged Accounts Payable";
-
-                    ToolTip = 'Executes the Aged Accounts Pa&yable action.';
+                    ToolTip = 'Runs the Aged Accounts Pa&yable report.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Reconcile Cust. and &Vend. Accs")
@@ -168,8 +159,7 @@
                     Caption = 'Reconcile Cust. and &Vend. Accs';
                     Image = "Report";
                     RunObject = Report "Reconcile Cust. and Vend. Accs";
-
-                    ToolTip = 'Executes the Reconcile Cust. and &Vend. Accs action.';
+                    ToolTip = 'Runs the Reconcile Cust. and &Vend. Accs report.';
                     ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150650)
@@ -180,8 +170,7 @@
                     Caption = 'VAT Registration No. Chec&k';
                     Image = "Report";
                     RunObject = Report "VAT Registration No. Check";
-
-                    ToolTip = 'Executes the VAT Registration No. Chec&k action.';
+                    ToolTip = 'Runs the VAT Registration No. Chec&k report.';
                     ApplicationArea = NPRRetail;
                 }
                 action("VAT E&xceptions")
@@ -189,8 +178,7 @@
                     Caption = 'VAT E&xceptions';
                     Image = "Report";
                     RunObject = Report "VAT Exceptions";
-
-                    ToolTip = 'Executes the VAT E&xceptions action.';
+                    ToolTip = 'Runs the VAT E&xceptions report.';
                     ApplicationArea = NPRRetail;
                 }
                 action("V&AT Statement")
@@ -198,8 +186,7 @@
                     Caption = 'V&AT Statement';
                     Image = "Report";
                     RunObject = Report "VAT Statement";
-
-                    ToolTip = 'Executes the V&AT Statement action.';
+                    ToolTip = 'Runs the V&AT Statement report.';
                     ApplicationArea = NPRRetail;
                 }
                 action("VAT-VIES Declaration Tax A&uth")
@@ -207,8 +194,7 @@
                     Caption = 'VAT - VIES Declaration Tax A&uth';
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Tax Auth";
-
-                    ToolTip = 'Executes the VAT - VIES Declaration Tax A&uth action.';
+                    ToolTip = 'Runs the VAT - VIES Declaration Tax A&uth report.';
                     ApplicationArea = NPRRetail;
                 }
                 action("VAT - VIES Declaration &Disk")
@@ -216,8 +202,7 @@
                     Caption = 'VAT - VIES Declaration &Disk';
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Disk";
-
-                    ToolTip = 'Executes the VAT - VIES Declaration &Disk action.';
+                    ToolTip = 'Runs the VAT - VIES Declaration &Disk report.';
                     ApplicationArea = NPRRetail;
                 }
                 action("EC Sal&es List")
@@ -225,8 +210,7 @@
                     Caption = 'EC Sal&es List';
                     Image = "Report";
                     RunObject = Report "EC Sales List";
-
-                    ToolTip = 'Executes the EC Sal&es List action.';
+                    ToolTip = 'Runs the EC Sal&es List report.';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -16,14 +16,14 @@
                 {
 
                     DrillDownPageID = "Sales Orders";
-                    ToolTip = 'Specifies the value of the Open Sales Orders field';
+                    ToolTip = 'Specifies the number of the Open Sales Orders. By clicking you can view the list of Open Sales Orders';
                     ApplicationArea = NPRRetail;
                 }
                 field("Open Purchase Orders"; Rec."Open Purchase Orders")
                 {
 
                     DrillDownPageID = "Purchase Orders";
-                    ToolTip = 'Specifies the value of the Open Purchase Orders field';
+                    ToolTip = 'Specifies the number of the Open Purchase Orders. By clicking you can view the list of Open Purchase Orders';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -39,7 +39,7 @@
                         RunPageMode = Create;
 
                         Image = TileNew;
-                        ToolTip = 'Executes the New Salesorder action';
+                        ToolTip = 'Create new Purchase Order';
                         ApplicationArea = NPRRetail;
                     }
                     action("New Purchase Order")
@@ -49,7 +49,7 @@
                         RunPageMode = Create;
 
                         Image = TileNew;
-                        ToolTip = 'Executes the New Purchase Order action';
+                        ToolTip = 'Create new Purchase Order';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -63,14 +63,14 @@
                 {
 
                     DrillDownPageID = "Posted Sales Invoices";
-                    ToolTip = 'Specifies the value of the Posted Sales Invoices field';
+                    ToolTip = 'Specifies the number of the Posted Sales Invoices. By clicking you can view the list of Posted Sales Invoices.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Posted Purchase Orders"; Rec."Posted Purchase Orders")
                 {
 
                     DrillDownPageID = "Posted Purchase Invoices";
-                    ToolTip = 'Specifies the value of the Posted Purchase Orders field';
+                    ToolTip = 'Specifies the number of the Posted Purchase Orders field. By clicking you can view the list of Posted Purchase Invoices.';
                     ApplicationArea = NPRRetail;
                 }
             }

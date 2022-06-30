@@ -22,7 +22,7 @@
                 {
 
                     Caption = 'Start Date';
-                    ToolTip = 'Specifies the value of the Start Date field';
+                    ToolTip = 'The user can specify the Start Date from which wants to see the data';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -34,7 +34,7 @@
                 {
 
                     Caption = 'End date';
-                    ToolTip = 'Specifies the value of the End date field';
+                    ToolTip = 'The user can specify the End date until which wants to see the data';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -51,7 +51,7 @@
                     field("Code"; Rec.Code)
                     {
 
-                        ToolTip = 'Specifies the value of the Code field';
+                        ToolTip = 'Specifies the Code of the salesperson';
                         ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
@@ -63,13 +63,13 @@
                     field(Name; Rec.Name)
                     {
 
-                        ToolTip = 'Specifies the value of the Name field';
+                        ToolTip = 'Specifies the Name of the salesperson';
                         ApplicationArea = NPRRetail;
                     }
                     field("Sales (Qty.)"; Rec."NPR Sales (Qty.)")
                     {
 
-                        ToolTip = 'Specifies the value of the NPR Sales (Qty.) field';
+                        ToolTip = 'Specifies the value of the NPR Sales (Qty.) made within the date range';
                         ApplicationArea = NPRRetail;
                     }
                     field("Sales (LCY)"; Rec."NPR Sales (LCY)")
@@ -77,7 +77,7 @@
 
                         BlankZero = true;
                         Caption = 'Sales Amount (Actual)';
-                        ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
+                        ToolTip = 'Specifies the value of the Sales Amount (Actual) made within the date range';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -98,7 +98,7 @@
                 {
                     Caption = 'Day';
 
-                    ToolTip = 'Executes the Day action';
+                    ToolTip = 'Select this filter to visualize data by day';
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -112,7 +112,7 @@
                 {
                     Caption = 'Week';
 
-                    ToolTip = 'Executes the Week action';
+                    ToolTip = 'Select this filter to visualize data by week';
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -126,7 +126,7 @@
                 {
                     Caption = 'Month';
 
-                    ToolTip = 'Executes the Month action';
+                    ToolTip = 'Select this filter to visualize data by month';
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -140,7 +140,7 @@
                 {
                     Caption = 'Quarter';
 
-                    ToolTip = 'Executes the Quarter action';
+                    ToolTip = 'Select this filter to visualize data by quarter';
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -154,7 +154,7 @@
                 {
                     Caption = 'Year';
 
-                    ToolTip = 'Executes the Year action';
+                    ToolTip = 'Select this filter to visualize data by year';
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 

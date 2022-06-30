@@ -49,7 +49,7 @@
                 field("Ticket Admission BOM"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Ticket Admission BOM"))))
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Ticket BOM field';
+                    ToolTip = 'Specifies the value of the Ticket BOM field.';
                     Caption = 'Ticket BOM';
 
                     trigger OnDrillDown()

@@ -69,7 +69,8 @@
 
                     Caption = 'Member Community';
                     RunObject = Page "NPR MM Member Community";
-                    ToolTip = 'Executes the Member Community action';
+                    ToolTip = 'View or edit detailed information about the community members such as code, type etc.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Membership Setup")
@@ -77,15 +78,15 @@
 
                     Caption = 'Membership Setup';
                     RunObject = Page "NPR MM Membership Setup";
-                    ToolTip = 'Executes the Membership Setup action';
+                    ToolTip = 'View or edit detailed information about membership setups and related entities.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Membership Sales Setup")
                 {
                     Caption = 'Membership Sales Setup';
                     RunObject = Page "NPR MM Membership Sales Setup";
-
-                    ToolTip = 'Executes the Membership Sales Setup action';
+                    ToolTip = 'View or edit detailed information about membership sales setup such as relation to the Item or Gl Account, validity etc.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Membership Alteration")
@@ -93,7 +94,8 @@
                     Caption = 'Membership Alteration';
                     RunObject = Page "NPR MM Membership Alter.";
 
-                    ToolTip = 'Executes the Membership Alteration action';
+                    ToolTip = 'View or edit detailed information about membership alterations such as renewal, upgrades, cancellation, etc.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Member Notification Setup")
@@ -101,7 +103,8 @@
 
                     Caption = 'Member Notification Setup';
                     RunObject = Page "NPR MM Member Notific. Setup";
-                    ToolTip = 'Executes the Member Notification Setup action';
+                    ToolTip = 'View or edit detailed information about member notification setups such as notification templates, events, days before, days past, etc.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Membership Limitation Setup")
@@ -109,7 +112,8 @@
 
                     Caption = 'Membership Limitation Setup';
                     RunObject = Page "NPR MM Membership Lim. Setup";
-                    ToolTip = 'Executes the Membership Limitation Setup action';
+                    ToolTip = 'View or edit detailed information about membership limitation setups such as different constraints, event limits, etc."';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Membership Admission Setup")
@@ -117,7 +121,8 @@
 
                     Caption = 'Membership Admission Setup';
                     RunObject = Page "NPR MM Members. Admis. Setup";
-                    ToolTip = 'Executes the Membership Admission Setup action';
+                    ToolTip = 'View or edit detailed information about membership admission setups such as membership code, admission code, ticket type, ticket number, etc.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("MCS Person Groups")
@@ -125,7 +130,8 @@
 
                     Caption = 'MCS Person Groups';
                     RunObject = Page "NPR MCS Person Groups";
-                    ToolTip = 'Executes the MCS Person Groups action';
+                    ToolTip = 'View or edit detailed information about MCS Person Groups.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("MCS Person Group Setup")
@@ -133,7 +139,8 @@
 
                     Caption = 'MCS Person Group Setup';
                     RunObject = Page "NPR MCS Person Group Setup";
-                    ToolTip = 'Executes the MCS Person Group Setup action';
+                    ToolTip = 'View or edit detailed information about MCS Person Group setups.';
+
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -145,7 +152,7 @@
 
                     Caption = 'Loyalty Setup';
                     RunObject = Page "NPR MM Loyalty Setup";
-                    ToolTip = 'Executes the Loyalty Setup action';
+                    ToolTip = 'View or edit detailed information about the loyalty setups such as collection period, fixed period start and length, voucher point source etc.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Loyalty Points Setup")
@@ -153,7 +160,7 @@
 
                     Caption = 'Loyalty Points Setup';
                     RunObject = Page "NPR MM Loyalty Point Setup";
-                    ToolTip = 'Executes the Loyalty Points Setup action';
+                    ToolTip = 'View or edit detailed information about the loyalty points setups such as coupon type code, points threshold, amount and point rate etc.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Loyalty Item Point Setup")
@@ -161,7 +168,7 @@
 
                     Caption = 'Loyalty Item Point Setup';
                     RunObject = Page "NPR MM Loy. Item Point Setup";
-                    ToolTip = 'Executes the Loyalty Item Point Setup action';
+                    ToolTip = 'View or edit detailed information about the loyalty item points setups such as type, contraint, points etc.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Loyalty Store Setup Server")
@@ -169,7 +176,7 @@
 
                     Caption = 'Loyalty Store Setup Server';
                     RunObject = Page "NPR MM Loy. Store Setup Server";
-                    ToolTip = 'Executes the Loyalty Store Setup Server action';
+                    ToolTip = 'View or edit detailed information about the loyalty store setup server such as company, store code, unit code etc.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Loyalty Store Setup Client")
@@ -177,7 +184,7 @@
 
                     Caption = 'Loyalty Store Setup Client';
                     RunObject = Page "NPR MM Loy. Store Setup Client";
-                    ToolTip = 'Executes the Loyalty Store Setup Client action';
+                    ToolTip = 'Executes the Loyalty Store Setup Client action.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Foreign Membership Setup")
@@ -185,7 +192,8 @@
 
                     Caption = 'Foreign Membership Setup';
                     RunObject = Page "NPR MM Foreign Members. Setup";
-                    ToolTip = 'Executes the Foreign Membership Setup action';
+                    ToolTip = 'View or edit detailed information about the foreign membership setups to configure the append/remove local prefixes/suffixes for each community code.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("NPR Endpoint Setup")
@@ -193,7 +201,8 @@
 
                     Caption = 'NPR Endpoint Setup';
                     RunObject = Page "NPR MM NPR Endpoint Setup";
-                    ToolTip = 'Executes the NPR Endpoint Setup action';
+                    ToolTip = 'View or edit detailed information about the NPR endpoint setups such as type, authentication, username etc';
+
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -205,7 +214,8 @@
 
                     Caption = 'Ticket Type';
                     RunObject = Page "NPR TM Ticket Type";
-                    ToolTip = 'Executes the Ticket Type action';
+                    ToolTip = 'View or edit detailed information about the ticket types such as admission registration, number of series, activation method etc.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Ticket BOM")
@@ -213,7 +223,8 @@
 
                     Caption = 'Ticket BOM';
                     RunObject = Page "NPR TM Ticket BOM";
-                    ToolTip = 'Executes the Ticket BOM action';
+                    ToolTip = 'View or edit detailed information about the ticket BOMs, such as the admission code, item number, admission entry validation, etc.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Ticket Schedules")
@@ -221,7 +232,8 @@
 
                     Caption = 'Ticket Schedules';
                     RunObject = Page "NPR TM Ticket Schedules";
-                    ToolTip = 'Executes the Ticket Schedules action';
+                    ToolTip = 'View or edit detailed information about the sicket schedules such as schedule code and type, start from, recurrence pattern etc.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Ticket Admissions")
@@ -229,7 +241,8 @@
 
                     Caption = 'Ticket Admissions';
                     RunObject = Page "NPR TM Ticket Admissions";
-                    ToolTip = 'Executes the Ticket Admissions action';
+                    ToolTip = 'View or edit detailed information about the ticket admissions such as capacity limits, default schedule, capacity control etc.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Admission Schedule Lines")
@@ -237,7 +250,8 @@
 
                     Caption = 'Admission Schedule Lines';
                     RunObject = Page "NPR TM Admis. Schedule Lines";
-                    ToolTip = 'Executes the Admission Schedule Lines action';
+                    ToolTip = 'View or edit detailed information about the admission schedule lines such as admission code, schedule code, process order, scheduled start time and stop time etc.';
+
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -249,7 +263,8 @@
 
                     Caption = 'Seating Location';
                     RunObject = Page "NPR NPRE Seating Location";
-                    ToolTip = 'Executes the Seating Location action';
+                    ToolTip = 'View or edit detailed information about the seating locations for different zones of a restaurant.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Seating List")
@@ -257,7 +272,8 @@
 
                     Caption = 'Seating List';
                     RunObject = Page "NPR NPRE Seating List";
-                    ToolTip = 'Executes the Seating List action';
+                    ToolTip = 'View or edit detailed information about the seating lists with statuses and capacity for each seating location.';
+
                     ApplicationArea = NPRRetail;
                 }
                 action("Flow Status")
@@ -265,7 +281,8 @@
 
                     Caption = 'Flow Status';
                     RunObject = Page "NPR NPRE Select Flow Status";
-                    ToolTip = 'Executes the Flow Status action';
+                    ToolTip = 'View detailed information about the flow statuses for each object. ';
+
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -276,8 +293,8 @@
                     Caption = 'POS Menus';
                     Image = PaymentJournal;
                     RunObject = Page "NPR POS Menus";
+                    ToolTip = 'View or edit detailed information about the POS menus and related entities like Buttons for each menu.';
 
-                    ToolTip = 'Executes the POS Menus action';
                     ApplicationArea = NPRRetail;
                 }
                 action(POSDragonglass)
@@ -285,7 +302,8 @@
 
                     Caption = 'Open POS';
                     RunObject = Codeunit "NPR Open POS Page";
-                    ToolTip = 'Executes the Open POS action';
+                    ToolTip = 'Opens the POS created to another window.';
+
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -299,17 +317,16 @@
                 {
                     Caption = 'Ticket Setup';
                     RunObject = Page "NPR TM Ticket Setup";
-
-                    ToolTip = 'Executes the Ticket Setup action';
-                    Image = Setup;
+                    ToolTip = 'View or edit detailed information about the ticket setup and related information.';
+                    Image = ShowMatrix;
                     ApplicationArea = NPRRetail;
                 }
                 action("Ticket Access Statistics Matrix")
                 {
                     Caption = 'Ticket Access Statistics Matrix';
                     RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
+                    ToolTip = 'View detailed information about the ticket access statistics by specifying rows and columns and also different filtering criteria.';
 
-                    ToolTip = 'Executes the Ticket Access Statistics Matrix action';
                     Image = ShowMatrix;
                     ApplicationArea = NPRRetail;
                 }
@@ -317,8 +334,8 @@
                 {
                     Caption = 'Admission Forecast Matrix';
                     RunObject = Page "NPR TM Admis. Forecast Matrix";
+                    ToolTip = 'View detailed information about the admission forecasts by specifying rows and columns and also different filtering criteria.';
 
-                    ToolTip = 'Executes the Admission Forecast Matrix action';
                     Image = ShowMatrix;
                     ApplicationArea = NPRRetail;
                 }
@@ -339,7 +356,8 @@
 
                     Caption = 'GDPR Setup';
                     RunObject = Page "NPR GDPR Setup";
-                    ToolTip = 'Executes the GDPR Setup action';
+                    ToolTip = 'View the list of the GDPR setup options.';
+
                     Image = Setup;
                     ApplicationArea = NPRRetail;
                 }
@@ -348,7 +366,9 @@
 
                     Caption = 'Recurring Payment Setup';
                     RunObject = Page "NPR MM Recur. Payment Setup";
-                    ToolTip = 'Executes the Recurring Payment Setup action';
+                    ToolTip = 'View or edit detailed information about the recurring payment setup and its posting.';
+
+
                     Image = SetupPayment;
                     ApplicationArea = NPRRetail;
                 }
@@ -357,7 +377,8 @@
 
                     Caption = 'Membership Alteration Journal';
                     RunObject = Page "NPR MM Members. Alteration Jnl";
-                    ToolTip = 'Executes the Membership Alteration Journal action';
+                    ToolTip = 'Create a journal for the membership alterations such as upgrade, cancelation, renewal, etc.';
+
                     Image = Journal;
                     ApplicationArea = NPRRetail;
                 }
@@ -369,8 +390,8 @@
                 {
                     Caption = 'Restaurant Setup';
                     RunObject = Page "NPR NPRE Restaurant Setup";
+                    ToolTip = 'View or edit detailed information about the restaurant setup, configure seating statuses, kitchen integration etc.';
 
-                    ToolTip = 'Executes the Restaurant Setup action';
                     Image = Setup;
                     ApplicationArea = NPRRetail;
                 }
@@ -382,8 +403,8 @@
             {
                 Caption = 'Import List';
                 RunObject = Page "NPR Nc Import List";
+                ToolTip = 'View, edit or execute different imports.';
 
-                ToolTip = 'Executes the Import List action';
                 ApplicationArea = NPRRetail;
             }
         }

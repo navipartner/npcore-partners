@@ -21,7 +21,7 @@
                 {
 
                     Caption = 'Start Date';
-                    ToolTip = 'Specifies the value of the Start Date field';
+                    ToolTip = 'Specify the Start Date from which wants to see the data';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -33,7 +33,7 @@
                 {
 
                     Caption = 'End date';
-                    ToolTip = 'Specifies the value of the End date field';
+                    ToolTip = 'Specify the End date until which wants to see the data';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -51,7 +51,7 @@
                     {
 
                         Editable = false;
-                        ToolTip = 'Specifies the value of the No. field';
+                        ToolTip = 'Specifies the No. of the vendor';
                         ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
@@ -64,14 +64,14 @@
                     {
 
                         Editable = false;
-                        ToolTip = 'Specifies the value of the Name field';
+                        ToolTip = 'Specifies the Name of the vendor';
                         ApplicationArea = NPRRetail;
                     }
                     field("Phone No."; Rec."Phone No.")
                     {
 
                         Editable = false;
-                        ToolTip = 'Specifies the value of the Phone No. field';
+                        ToolTip = 'Specifies the Phone No. of the vendor';
                         ApplicationArea = NPRRetail;
                     }
                     field("Sales (LCY)"; Rec."NPR Sales (LCY)")
@@ -80,7 +80,7 @@
                         BlankZero = true;
                         Caption = 'Sales Amount (Actual)';
                         Editable = false;
-                        ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
+                        ToolTip = 'Speficies the Sales Amount (Actual) that the vendor has made within the date range';
                         ApplicationArea = NPRRetail;
                     }
                 }
