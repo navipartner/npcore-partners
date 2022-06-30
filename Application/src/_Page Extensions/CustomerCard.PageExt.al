@@ -63,6 +63,19 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
     }
     actions
     {
+        addlast(History)
+        {
+            action("NPR Item Ledger Entries")
+            {
+                ApplicationArea = All;
+                Caption = 'Item Ledger Entries';
+                Image = ItemLedger;
+                RunObject = Page "Item Ledger Entries";
+                RunPageLink = "Source Type" = const(Customer),
+                                "Source No." = field("No.");
+                ToolTip = 'View item ledger entries for this customer.';
+            }
+        }
         addfirst(Navigation)
         {
             group("NPR Retail")
