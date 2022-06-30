@@ -197,7 +197,7 @@
         EmailItem.Modify();
     end;
 
-    procedure Send(EmailItem: Record "Email Item"; var ErrorMessage: Record "Error Message") IsSuccess: Boolean
+    procedure Send(var EmailItem: Record "Email Item"; var ErrorMessage: Record "Error Message") IsSuccess: Boolean
     var
         ErrorContextElement: Codeunit "Error Context Element";
         ErrorMessageHandler: Codeunit "Error Message Handler";
