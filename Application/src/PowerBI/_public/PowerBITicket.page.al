@@ -1,6 +1,7 @@
 page 6184621 NPRPowerBITicket
 {
     PageType = List;
+    Caption = 'PowerBI Ticket';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "NPR TM Ticket";

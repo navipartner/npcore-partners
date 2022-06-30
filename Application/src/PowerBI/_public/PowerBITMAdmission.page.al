@@ -1,6 +1,7 @@
 page 6184622 NPRPowerBITMAdmission
 {
     PageType = List;
+    Caption = 'PowerBI TM Admission';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "NPR TM Admission";

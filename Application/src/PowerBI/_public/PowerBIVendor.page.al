@@ -1,6 +1,7 @@
 page 6184626 NPRPowerBIVendor
 {
     PageType = List;
+    Caption = 'PowerBI Vendor';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = Vendor;

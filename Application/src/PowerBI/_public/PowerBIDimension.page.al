@@ -1,6 +1,7 @@
 page 6184603 NPRPowerBIDimension
 {
     PageType = List;
+    Caption = 'PowerBI Dimensions';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = Dimension;

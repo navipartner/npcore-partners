@@ -1,6 +1,7 @@
 page 6184604 NPRPowerBIDimensionSet
 {
     PageType = list;
+    Caption = 'PowerBI Dimension Set Entry';
     ApplicationArea = All;
     UsageCategory = Administration;
     SourceTable = "Dimension Set Entry";

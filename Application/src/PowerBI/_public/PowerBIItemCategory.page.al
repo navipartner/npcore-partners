@@ -1,6 +1,7 @@
 page 6184611 NPRPowerBIItemCategory
 {
     PageType = List;
+    Caption = 'PowerBI Item Category';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Item Category";

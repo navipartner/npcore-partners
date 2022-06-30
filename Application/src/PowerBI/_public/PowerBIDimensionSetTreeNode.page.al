@@ -1,6 +1,7 @@
 page 6184606 NPRPowerBIDimensionSetTreeNode
 {
     PageType = List;
+    Caption = 'PowerBI Dimension Set Tree Node';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Dimension Set Tree Node";
