@@ -82,6 +82,14 @@
             Caption = 'Foreign Membership';
             FieldClass = FlowField;
         }
+
+        field(40; MemberDefaultCountryCode; Code[10])
+        {
+            Caption = 'Member Default Country Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Country/Region";
+            ValidateTableRelation = true;
+        }
         field(60; "Create Renewal Notifications"; Boolean)
         {
             Caption = 'Create Renewal Notifications';

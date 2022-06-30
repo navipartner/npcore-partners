@@ -1247,6 +1247,8 @@
                 if (MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
                     MemberCommunity.Get(MembershipSetup."Community Code");
 
+                Rec."Country Code" := MemberCommunity.MemberDefaultCountryCode;
+
                 ShowNewCardSection := (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::YES);
 
                 EditMemberCardType := (MembershipSalesSetup."Member Card Type Selection" = MembershipSalesSetup."Member Card Type Selection"::USER_SELECT);

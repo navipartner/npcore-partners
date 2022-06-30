@@ -1,12 +1,10 @@
 ﻿page 6060132 "NPR MM Member Community"
 {
-
     Caption = 'Member Community';
     PageType = List;
     SourceTable = "NPR MM Member Community";
     UsageCategory = Administration;
     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-
 
     layout
     {
@@ -72,6 +70,11 @@
                 {
 
                     ToolTip = 'Specifies the value of the Membership to Cust. Rel. field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field(MemberDefaultCountryCode; Rec.MemberDefaultCountryCode)
+                {
+                    ToolTip = 'Specifies the value of the Member Default Country Code field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Create Renewal Notifications"; Rec."Create Renewal Notifications")
