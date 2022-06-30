@@ -1,6 +1,7 @@
 page 6184608 NPRPowerBIG_LAccount
 {
     PageType = List;
+    Caption = 'PowerBI G/L Account';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "G/L Account";

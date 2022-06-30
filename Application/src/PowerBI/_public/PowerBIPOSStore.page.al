@@ -1,6 +1,7 @@
 page 6184618 NPRPowerBIPOSStore
 {
     PageType = List;
+    Caption = 'PowerBI POS Store';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "NPR POS Store";

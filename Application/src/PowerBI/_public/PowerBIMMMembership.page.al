@@ -1,6 +1,7 @@
 page 6184615 NPRPowerBIMM_Membership
 {
     PageType = List;
+    Caption = 'PowerBI MM Membership';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "NPR MM Membership";

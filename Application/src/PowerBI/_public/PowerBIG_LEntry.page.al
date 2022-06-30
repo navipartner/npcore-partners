@@ -1,6 +1,7 @@
 page 6184609 NPRPowerBIG_LEntry
 {
     PageType = List;
+    Caption = 'PowerBI G/L Entry';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "G/L Entry";

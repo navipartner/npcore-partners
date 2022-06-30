@@ -1,6 +1,7 @@
 page 6184620 NPRPowerBISalesPerson_Purc
 {
     PageType = List;
+    Caption = 'PowerBI SalesPerson/Purchaser';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Salesperson/Purchaser";

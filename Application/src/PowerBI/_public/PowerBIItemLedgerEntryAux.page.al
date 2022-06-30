@@ -1,6 +1,7 @@
 page 6184613 NPRPowerBIItemledgerEntryAux
 {
     PageType = List;
+    Caption = 'PowerBI Item Ledger Entry Aux.';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "NPR Aux. Item Ledger Entry";

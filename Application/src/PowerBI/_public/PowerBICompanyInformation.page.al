@@ -1,6 +1,7 @@
 page 6184600 NPRPowerBICompanyInformaion
 {
     PageType = List;
+    Caption = 'PowerBI Company Informaion';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Company Information";

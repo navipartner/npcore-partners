@@ -1,6 +1,7 @@
 page 6184623 NPRPowerBITMDetTicketAccess
 {
     PageType = List;
+    Caption = 'PowerBI TM Detailed Ticket Access Entry';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "NPR TM Det. Ticket AccessEntry";

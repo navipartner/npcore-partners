@@ -1,6 +1,7 @@
 page 6184607 NPRPowerBIDimensionValues
 {
     PageType = List;
+    Caption = 'PowerBI Dimension Values';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Dimension Value";

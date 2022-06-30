@@ -1,6 +1,7 @@
 page 6184601 NPRPowerBICust_LedgerEntry
 {
     PageType = List;
+    Caption = 'PowerBI Customer Ledger Entry';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Cust. Ledger Entry";

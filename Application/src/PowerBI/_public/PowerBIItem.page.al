@@ -1,6 +1,7 @@
 page 6184610 NPRPowerBIItem
 {
     PageType = List;
+    Caption = 'PowerBI Item';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = Item;

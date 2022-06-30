@@ -1,6 +1,7 @@
 page 6184616 NPRPowerBIMM_Membership_Setup
 {
     PageType = List;
+    Caption = 'PowerBI MM Membership Setup';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "NPR MM Membership Setup";

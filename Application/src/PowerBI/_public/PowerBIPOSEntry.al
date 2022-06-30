@@ -1,6 +1,7 @@
 page 6184617 NPRPowerBIPOSEntry
 {
     PageType = List;
+    Caption = 'PowerBI POS Entry';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "NPR POS Entry";

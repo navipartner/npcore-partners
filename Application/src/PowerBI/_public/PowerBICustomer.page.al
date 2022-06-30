@@ -1,6 +1,7 @@
 page 6184602 NPRPowerBICustomer
 {
     PageType = List;
+    Caption = 'PowerBI Customer';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = Customer;
