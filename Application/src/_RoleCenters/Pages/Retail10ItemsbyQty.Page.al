@@ -23,7 +23,8 @@
                 {
 
                     Caption = 'Start Date';
-                    ToolTip = 'Specifies the value of the Start Date field';
+                    ToolTip = 'Specifies the start date used to filter the sales data.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -35,7 +36,7 @@
                 {
 
                     Caption = 'End date';
-                    ToolTip = 'Specifies the value of the End date field';
+                    ToolTip = 'Specifies the end date to filter the sales data.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -52,7 +53,10 @@
                     field("No."; Rec."No.")
                     {
 
-                        ToolTip = 'Specifies the value of the No. field';
+
+                        ToolTip = 'Specifies the number of the item.';
+
+
                         ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
@@ -64,7 +68,8 @@
                     field(Description; Rec.Description)
                     {
 
-                        ToolTip = 'Specifies the value of the Description field';
+                        ToolTip = 'Specifies the description of the item.';
+
                         ApplicationArea = NPRRetail;
                     }
                     field("Sales (Qty.)"; Rec."Sales (Qty.)")
@@ -72,7 +77,8 @@
 
                         BlankZero = true;
                         Caption = 'Sales (Qty.)';
-                        ToolTip = 'Specifies the value of the Sales (Qty.) field';
+                        ToolTip = 'Specifies the quantity of items sold.';
+
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -93,7 +99,8 @@
                 {
                     Caption = 'Day';
 
-                    ToolTip = 'Executes the Day action';
+                    ToolTip = 'Select this filter to visualize data by day.';
+
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -107,7 +114,9 @@
                 {
                     Caption = 'Week';
 
-                    ToolTip = 'Executes the Week action';
+                    ToolTip = 'Select this filter to visualize data by week.';
+
+
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -121,7 +130,8 @@
                 {
                     Caption = 'Month';
 
-                    ToolTip = 'Executes the Month action';
+                    ToolTip = 'Select this filter to visualize data by month.';
+
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -135,7 +145,8 @@
                 {
                     Caption = 'Quarter';
 
-                    ToolTip = 'Executes the Quarter action';
+                    ToolTip = 'Select this filter to visualize data by quarter.';
+
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -149,7 +160,8 @@
                 {
                     Caption = 'Year';
 
-                    ToolTip = 'Executes the Year action';
+                    ToolTip = 'Select this filter to visualize data by year.';
+
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 

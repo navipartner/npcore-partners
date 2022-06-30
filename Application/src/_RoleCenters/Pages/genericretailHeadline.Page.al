@@ -20,7 +20,7 @@
 
                     Caption = 'Greetings headline';
                     Editable = false;
-                    ToolTip = 'Greeting txt';
+                    ToolTip = 'Greeting text.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -31,7 +31,7 @@
 
                     Caption = 'Learn more about NP Retail headline';
                     Editable = false;
-                    ToolTip = 'Learn more about NP Retail';
+                    ToolTip = 'Learn more about NP Retail.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()

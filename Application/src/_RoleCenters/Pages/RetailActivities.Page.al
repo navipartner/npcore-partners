@@ -16,7 +16,8 @@
                 {
                     Caption = 'Sales Orders';
                     Image = "Document";
-                    ToolTip = 'Specifies the value of the Sales Orders field';
+                    ToolTip = 'Specifies the number of the created sales orders. By clicking you can drill down to the list of the created sales orders.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -28,7 +29,8 @@
                 {
                     Caption = 'Daily Sales Orders';
                     Image = "Document";
-                    ToolTip = 'Specifies the value of the Daily Sales Orders field';
+                    ToolTip = 'Specifies the number of the sales orders created today. By clicking you can drilldown to the list of sales orders created today.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -40,7 +42,8 @@
                 {
                     Caption = 'Import Pending';
                     Image = "Document";
-                    ToolTip = 'Specifies the value of the Import Unprocessed field';
+                    ToolTip = 'Specifies the number of the unprocessed imports. By clicking you can drilldown to the list of unprocessed imports.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -58,11 +61,13 @@
                     action("New Sales Order")
                     {
                         Caption = 'New Sales Order';
+
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
 
                         Image = TileNew;
-                        ToolTip = 'Executes the New Sales Order action';
+                        ToolTip = 'Create a new sales order.';
+
                         ApplicationArea = NPRRetail;
                     }
                     action("New Sales Quote")
@@ -72,7 +77,8 @@
                         RunPageMode = Create;
 
                         Image = TileNew;
-                        ToolTip = 'Executes the New Sales Quote action';
+                        ToolTip = 'Create a new sales quote.';
+
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -84,7 +90,8 @@
                 {
                     Caption = 'Pending Inc. Documents';
                     Image = "Document";
-                    ToolTip = 'Specifies the value of the Pending Inc. Documents field';
+                    ToolTip = 'Specifies the number of the tasks processed in error. By clicking you can drilldown to the list of the tasks processed in error.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -102,7 +109,8 @@
                 {
                     Caption = 'Processed Error Tasks';
                     Image = "Document";
-                    ToolTip = 'Specifies the value of the Processed Error Tasks field';
+                    ToolTip = 'Specifies the number of the tasks processed in error. By clicking you can drilldown to the list of the tasks processed in error.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -119,7 +127,8 @@
                 {
                     Caption = 'Failed Webshop Payments';
                     Image = "Document";
-                    ToolTip = 'Specifies the value of the Failed Webshop Payments field';
+                    ToolTip = 'Specifies the number of the failed webshop payments. By clicking you can drilldown to the list of the failed webshop payments.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -144,7 +153,8 @@
                     Caption = 'Sales Quotes';
                     Image = "Document";
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Sales Quotes field';
+                    ToolTip = 'Specifies the number of the created sales quotes. By clicking you can drilldown to the list of the created sales quotes.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -158,7 +168,8 @@
                     Caption = 'Sales Return Orders';
                     Image = "Document";
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Sales Return Orders field';
+                    ToolTip = 'Specifies the number of the created sales return orders. By clicking you can drilldown to the list of the created sales return orders.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -172,7 +183,8 @@
                     Caption = 'Magento Orders';
                     Image = "Document";
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Magento Orders field';
+                    ToolTip = 'Specifies the number of the created magento orders. By clicking you can drilldown to the list of the created magento orders.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -191,7 +203,8 @@
                     Caption = 'Daily Sales Invoices';
                     Image = "Document";
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Daily Sales Invoices field';
+                    ToolTip = 'Specifies the number of the created daily sales invoices. By clicking you can drilldown to the list of the created daily sales invoices.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -209,7 +222,8 @@
                     Caption = 'Tasks Unprocessed';
                     Image = "Document";
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Tasks Unprocessed field';
+                    ToolTip = 'Specifies the number of the unprocessed tasks. By clicking you can drilldown to the list of the unprocessed tasks';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()

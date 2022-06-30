@@ -7,7 +7,7 @@ pageextension 6014414 "NPR My Job Queue" extends "My Job Queue"
             action("NPR ShowAllEntries")
             {
                 Caption = 'Show All Jobs';
-                ToolTip = 'Display all job queue entries regardless of the user, who has scheduled the job';
+                ToolTip = 'Display all job queue entries regardless of the user, who has scheduled the job.';
                 Visible = not AllJobs;
                 Image = ClearFilter;
                 ApplicationArea = NPRRetail;
@@ -21,7 +21,7 @@ pageextension 6014414 "NPR My Job Queue" extends "My Job Queue"
             action("NPR ShowOnlyMy")
             {
                 Caption = 'Show Only My Jobs';
-                ToolTip = 'Display only my job queue entries';
+                ToolTip = 'Display only my job queue entries.';
                 Visible = AllJobs;
                 Image = ShowSelected;
                 ApplicationArea = NPRRetail;

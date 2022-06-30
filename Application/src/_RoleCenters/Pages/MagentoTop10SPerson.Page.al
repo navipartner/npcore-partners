@@ -21,7 +21,7 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the salesperson.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -33,7 +33,8 @@
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the name of the salesperson.';
+
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales (LCY)"; Rec."NPR Sales (LCY)")
@@ -41,19 +42,21 @@
 
                     BlankZero = true;
                     Caption = 'Sales Amount (Actual)';
-                    ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
+                    ToolTip = 'Specifies the actual sales amount for each salesperson.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales (Qty.)"; Rec."NPR Sales (Qty.)")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Sales (Qty.) field';
+                    ToolTip = 'Specifies the quantity of NPR sales for each salesperson.';
+
                     ApplicationArea = NPRRetail;
                 }
                 field("Search E-Mail"; Rec."Search E-Mail")
                 {
 
-                    ToolTip = 'Specifies the value of the Search E-Mail field';
+                    ToolTip = 'Specifies the search e-mail for each salesperson.';
+
                     ApplicationArea = NPRRetail;
                 }
             }

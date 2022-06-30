@@ -16,7 +16,8 @@
                 field(UnpostedItemTrans; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Unposted Item Trans."))))
                 {
                     Caption = 'Unposted Item Transactions';
-                    ToolTip = 'Specifies the value of the Unposted Item Transactions field';
+                    ToolTip = 'Specifies the number of the unposted item transactions. By clicking, you can drill down to a list of unposted item transactions.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -32,7 +33,8 @@
                 field(UnpostedGLTrans; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Unposted G/L Trans."))))
                 {
                     Caption = 'Unposted G/L Transactions';
-                    ToolTip = 'Specifies the value of the Unposted G/L Transactions field';
+                    ToolTip = 'Specifies the number of the unposted G/L transactions. By clicking, you can drill down to the list of unposted G/L transactions.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -52,7 +54,8 @@
                 field(FailedItemTrans; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed Item Transaction."))))
                 {
                     Caption = 'Failed Item Transactions';
-                    ToolTip = 'Specifies the value of the Failed Item Transactions field';
+                    ToolTip = 'Specifies the number of the failed item transactions. By clicking, you can drill down to the list of the failed item transactions.';
+
                     ApplicationArea = NPRRetail;
                     Style = Unfavorable;
                     StyleExpr = FailedItemTransExists;
@@ -69,7 +72,8 @@
                 field(FailedGLTrans; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed G/L Posting Trans."))))
                 {
                     Caption = 'Failed G/L Transaction';
-                    ToolTip = 'Specifies the value of the Failed G/L Transactions field';
+                    ToolTip = 'Specifies the number of the Failed G/L transactions. By clicking, you can drill down to the list of the Failed G/L transactions.';
+
                     ApplicationArea = NPRRetail;
                     Style = Unfavorable;
                     StyleExpr = FailedGLPostTransExists;
@@ -92,7 +96,8 @@
                 field(EFTReconcErrors; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("EFT Reconciliation Errors"))))
                 {
                     Caption = 'EFT Reconciliation Errors';
-                    ToolTip = 'Specifies Reconciliation EFT Errors in last 30 days';
+                    ToolTip = 'Specifies the number of Reconciliation EFT Errors in the last 30 days. By clicking, you can drill down to the list of Reconciliation EFT Errors in the last 30 days.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -109,7 +114,8 @@
                 field(UnfinishedEFTRequests; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Unfinished EFT Requests"))))
                 {
                     Caption = 'Unfinished EFT Requests';
-                    ToolTip = 'Specifies Unfinished EFT Requests in last 30 days';
+                    ToolTip = 'Specifies the number of Unfinished EFT Requests in last 30 days. By clicking, you can drill down to the list of Unfinished EFT Requests in last 30 days.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -126,7 +132,8 @@
                 field(EFTUnknownResultRequests; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("EFT Req. with Unknown Result"))))
                 {
                     Caption = 'EFT Requests with Unknown Result';
-                    ToolTip = 'Specifies the value of the EFT Requests with unknown result in last 30 days';
+                    ToolTip = 'Specifies the number of Unfinished EFT Requests in last 30 days. By clicking, you can drill down to the list of Unfinished EFT Requests in last 30 days.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -149,7 +156,8 @@
                 field(CampaignDiscounts; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Campaign Discount List"))))
                 {
                     Caption = 'Campaign Discounts';
-                    ToolTip = 'Specifies the value of the Campaign Discounts field';
+                    ToolTip = 'Specifies the number of the Campaign Discounts. By clicking, you can drill down to the list of the Campaign Discounts.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -161,7 +169,8 @@
                 field(MixDiscounts; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Mix Discount List"))))
                 {
                     Caption = 'Mix Discounts';
-                    ToolTip = 'Specifies the value of the Mix Discounts field';
+                    ToolTip = 'Specifies the number of the Mix Discounts. By clicking, you can drill down to the list of the Mix Discounts.';
+
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
