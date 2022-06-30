@@ -352,48 +352,6 @@
             VRTCheck.PostingCheck(ItemJnlLine);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Auxiliary Item", 'OnAfterValidateEvent', 'Variety Group', true, false)]
-    local procedure T27OnAfterValVarietyGroup(var Rec: Record "NPR Auxiliary Item"; var xRec: Record "NPR Auxiliary Item"; CurrFieldNo: Integer)
-    var
-        Item: Record Item;
-        xItem: Record Item;
-        VrtGroup: Record "NPR Variety Group";
-        VrtCheck: Codeunit "NPR Variety Check";
-    begin
-        if Rec."Variety Group" = xRec."Variety Group" then
-            exit;
-        Item.Get(Rec."Item No.");
-        xItem.Get(xRec."Item No.");
-
-        //updateitem
-        if Rec."Variety Group" = '' then
-            VrtGroup.Init()
-        else
-            VrtGroup.Get(Rec."Variety Group");
-
-        Rec."Variety 1" := VrtGroup."Variety 1";
-        Rec."Variety 1 Table" := VrtGroup.GetVariety1Table(Item);
-        Rec."Variety 2" := VrtGroup."Variety 2";
-        Rec."Variety 2 Table" := VrtGroup.GetVariety2Table(Item);
-        Rec."Variety 3" := VrtGroup."Variety 3";
-        Rec."Variety 3 Table" := VrtGroup.GetVariety3Table(Item);
-        Rec."Variety 4" := VrtGroup."Variety 4";
-        Rec."Variety 4 Table" := VrtGroup.GetVariety4Table(Item);
-        Item."NPR Cross Variety No." := VrtGroup."Cross Variety No.";
-
-        //Above code will be executed IF its a temporary record - Below wont be executed if its a temporary record
-        if Item.IsTemporary then
-            exit;
-        //check change allowed
-        VrtCheck.ChangeItemVariety(Item, xItem);
-        //copy base table info (if needed)
-        VrtGroup.CopyTableData(Item);
-
-        Item.Modify(false);
-        Item.NPR_SetAuxItem(Rec);
-        Item.NPR_SaveAuxItem();
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterInsertEvent', '', true, false)]
     local procedure ItemOnAfterInsertEvent(var Rec: Record Item; RunTrigger: Boolean)
     var
