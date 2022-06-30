@@ -101,6 +101,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         UserInformationErrorWarning: Text;
         POSStore: Record "NPR POS Store";
         Success: Boolean;
+        GetPromptSerial: Boolean;
     begin
 
         ItemIdentifier := Context.GetStringParameter('itemNo');
@@ -133,11 +134,16 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
             Response.Add('ItemGroupSale', true);
         end;
 
-        POSActionInsertItemB.ItemRequiresSerialNumberOnSale(Item, UseSpecificTracking);
+        if POSActionInsertItemB.ItemRequiresSerialNumberOnSale(Item, UseSpecificTracking) then begin
+            Response.Add('GetPromptSerial', true);
+            GetPromptSerial := true;
+        end;
+
         Response.Add('useSpecTracking', UseSpecificTracking);
 
-        Success := (not UseSpecificTracking) and (not Item."NPR Group sale");
+        Success := (not UseSpecificTracking) and (not Item."NPR Group sale") and (not GetPromptSerial);
         Response.Add('Success', Success);
+
 
         If Not Success then
             If Context.GetBoolean('GetPrompt') = true then begin
@@ -160,10 +166,12 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                 if Item."NPR Group sale" then
                     UnitPrice := Context.GetDecimal('UnitPrice');
 
-                if UseSpecificTracking and (SerialNumberInput = '') then
-                    InputSerial := CopyStr(Context.GetString('SerialNo'), 1, MaxStrLen(InputSerial))
-                else
+                if SerialNumberInput = '' then begin
+                    if (UseSpecificTracking) or (GetPromptSerial) then
+                        InputSerial := CopyStr(Context.GetString('SerialNo'), 1, MaxStrLen(InputSerial))
+                end else
                     InputSerial := CopyStr(SerialNumberInput, 1, MaxStrLen(InputSerial));
+
             end else
                 exit;
 
@@ -342,7 +350,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionInsertItem.js###
-'let main=async({workflow:e,context:c,scope:d,popup:i,parameters:n,captions:t})=>{if(e.context.GetPrompt=!1,n.EditDescription&&(e.context.Desc1=await i.input({title:t.editDesc_title,caption:t.editDesc_lead,value:c.defaultDescription}),e.context.Desc1===null)||n.EditDescription2&&(e.context.Desc2=await i.input({title:t.editDesc2_title,caption:t.editDesc2_lead,value:c.defaultDescription}),e.context.Desc2===null))return" ";const{ItemGroupSale:l,useSpecTracking:a,Success:u}=await e.respond("addSalesLine");if(!u){if(e.context.GetPrompt=!0,l&&!n.usePreSetUnitPrice&&(e.context.UnitPrice=await i.numpad({title:t.UnitpriceTitle,caption:t.UnitPriceCaption}),e.context.UnitPrice===null)||a&&!n.SelectSerialNo&&(e.context.SerialNo=await i.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),e.context.SerialNo===null))return" ";e.context.useSpecTracking=a,await e.respond("addSalesLine")}};'
+'let main=async({workflow:t,context:a,scope:r,popup:i,parameters:n,captions:e})=>{if(t.context.GetPrompt=!1,n.EditDescription&&(t.context.Desc1=await i.input({title:e.editDesc_title,caption:e.editDesc_lead,value:a.defaultDescription}),t.context.Desc1===null)||n.EditDescription2&&(t.context.Desc2=await i.input({title:e.editDesc2_title,caption:e.editDesc2_lead,value:a.defaultDescription}),t.context.Desc2===null))return" ";const{ItemGroupSale:l,useSpecTracking:c,GetPromptSerial:u,Success:d}=await t.respond("addSalesLine");if(!d){if(t.context.GetPrompt=!0,l&&!n.usePreSetUnitPrice&&(t.context.UnitPrice=await i.numpad({title:e.UnitpriceTitle,caption:e.UnitPriceCaption}),t.context.UnitPrice===null)||c&&!n.SelectSerialNo&&(t.context.SerialNo=await i.input({title:e.itemTracking_title,caption:e.itemTracking_lead}),t.context.SerialNo===null)||!c&&u&&(t.context.SerialNo=await i.input({title:e.itemTracking_title,caption:e.itemTracking_lead}),t.context.SerialNo===null))return" ";t.context.useSpecTracking=c,await t.respond("addSalesLine")}};'
         );
     end;
 }
