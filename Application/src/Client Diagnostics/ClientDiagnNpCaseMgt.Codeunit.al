@@ -120,6 +120,7 @@
         XmlElementLoginInfo.Add(AddElement('user_login_type', UserLoginType, MethodNS));
         XmlElementLoginInfo.Add(AddElement('application_version', GetRetailVersion() + ' ' + GetBaseAppVersion(), MethodNS));
         XmlElementLoginInfo.Add(AddElement('environment_name', EnvironmentInformation.GetEnvironmentName(), MethodNS));
+        XmlElementLoginInfo.Add(AddElement('pos_unit_no', GetPosUnitNo(), MethodNS));
 
         Element.Add(XmlElementLoginInfo);
     end;
@@ -142,6 +143,16 @@
         BaseAppID := '437dbf0e-84ff-417a-965d-ed2bb9650972';
         NavApp.GetModuleInfo(BaseAppID, BaseAppModInfo);
         exit(StrSubstNo(BaseAppLabel, format(BaseAppModInfo.AppVersion())));
+    end;
+
+    local procedure GetPosUnitNo(): text[10]
+    var
+        UserSetup: Record "User Setup";
+    begin
+        if not UserSetup.Get(CopyStr(UserId(), 1, MaxStrLen(UserSetup."User ID"))) then
+            exit('');
+
+        exit(UserSetup."NPR POS Unit No.");
     end;
 
     local procedure AppendLicenseInfo(ActiveSession: Record "Active Session"; MethodNS: Text; var Element: XmlElement)
