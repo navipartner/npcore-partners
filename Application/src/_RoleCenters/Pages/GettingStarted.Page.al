@@ -43,7 +43,7 @@
     {
         area(Creation)
         {
-            action("Done")
+            action(Done)
             {
 
                 Caption = 'Done!';
@@ -51,7 +51,8 @@
                 Promoted = true;
                 PromotedOnly = true;
                 Image = Completed;
-                ToolTip = 'Executes the Done! action';
+                ToolTip = 'Close the welcome window.';
+
                 ApplicationArea = NPRRetail;
                 trigger OnAction()
                 begin

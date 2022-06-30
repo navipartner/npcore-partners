@@ -19,21 +19,24 @@
                 {
 
                     DrillDownPageID = "Sales Order List";
-                    ToolTip = 'Specifies the value of the Sales Orders field';
+                    ToolTip = 'Specifies the number of the sales orders that have been registered';
+
                     ApplicationArea = NPRRetail;
                 }
                 field("Daily Sales Orders"; Rec."Daily Sales Orders")
                 {
 
                     DrillDownPageID = "Sales Order List";
-                    ToolTip = 'Specifies the value of the Daily Sales Orders field';
+                    ToolTip = 'Specifies the number of the daily sales orders that have been registered on todays date';
+
                     ApplicationArea = NPRRetail;
                 }
                 field("Import Pending"; Rec."Import Pending")
                 {
 
                     DrillDownPageID = "NPR Nc Import List";
-                    ToolTip = 'Specifies the value of the Import Unprocessed field';
+                    ToolTip = 'Specifies the number of import unprocessed entries';
+
                     ApplicationArea = NPRRetail;
                 }
             }

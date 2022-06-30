@@ -16,20 +16,18 @@
                 Caption = 'Master Data';
                 field(Items; Rec.Items)
                 {
-
-                    ToolTip = 'Specifies the value of the Items field';
+                    ToolTip = 'Specifies the number of the items. By clicking you can drilldown to list of items.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Contacts; Rec.Contacts)
                 {
-
-                    ToolTip = 'Specifies the value of the Contacts field';
+                    ToolTip = 'Specifies the number of the contacts. By clicking you can drilldown to list of contacts.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Customers; Rec.Customers)
                 {
 
-                    ToolTip = 'Specifies the value of the Customers field';
+                    ToolTip = 'Specifies the number of the customers. By clicking you can drilldown to list of customers.';
                     ApplicationArea = NPRRetail;
                 }
             }

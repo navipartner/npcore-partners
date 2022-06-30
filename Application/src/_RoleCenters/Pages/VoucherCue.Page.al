@@ -21,7 +21,7 @@
                 {
 
                     DrillDownPageId = "NPR NpRv Vouchers";
-                    ToolTip = 'Specifies the value of the Retail Vouchers field';
+                    ToolTip = 'Specifies the number of the Retail Vouchers. By clicking you can view the list of Retail Vouchers';
                     ApplicationArea = NPRRetail;
                 }
 

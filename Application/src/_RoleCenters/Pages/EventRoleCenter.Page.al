@@ -57,40 +57,40 @@
             {
                 Caption = 'Customer List';
                 RunObject = Page "Customer List";
+                ToolTip = 'View or edit detailed information for the customers that you trade with. For each customer card you can open related information, such as sales statistics and ongoing orders, and you can define special prices and line discounts that you grant if certain conditions are met.';
 
-                ToolTip = 'Executes the Customer List action';
                 ApplicationArea = NPRRetail;
             }
             action(ItemList)
             {
                 Caption = 'Item List';
                 RunObject = Page "Item List";
+                ToolTip = 'View or edit detailed information for the products that you trade in. The item card can be of type Inventory or Service to specify if the item is a physical unit or a labor time unit. Here you also define if items in inventory or on incoming orders are automatically reserved for outbound documents and whether order tracking links are created between demand and supply to reflect planning actions';
 
-                ToolTip = 'Executes the Item List action';
                 ApplicationArea = NPRRetail;
             }
             action(PlanningLines)
             {
                 Caption = 'Planning Lines';
                 RunObject = Page "NPR Event Planning Line List";
+                ToolTip = 'View detailed information for job lines like planning date, job number, task number, type, quantity etc.';
 
-                ToolTip = 'Executes the Planning Lines action';
                 ApplicationArea = NPRRetail;
             }
             action(ResourceList)
             {
                 Caption = 'Resource List';
                 RunObject = Page "Resource List";
+                ToolTip = 'View or edit detailed information for all resources and related information.';
 
-                ToolTip = 'Executes the Resource List action';
                 ApplicationArea = NPRRetail;
             }
             action(ExchIntEmails)
             {
                 Caption = 'Exch. Int. E-mails';
                 RunObject = Page "NPR Event Exch. Int. E-Mails";
+                ToolTip = 'View or edit detailed information for all email addresses that you specify for an exchange integration.';
 
-                ToolTip = 'Executes the Exch. Int. E-mails action';
                 ApplicationArea = NPRRetail;
             }
             action("Event Analysis")
@@ -98,8 +98,8 @@
                 Caption = 'Event Resource Avail.';
                 Image = AnalysisView;
                 RunObject = Page "NPR Event Res. Avail. Overview";
+                ToolTip = 'View detailed information about resource availability after specifying the time interval.';
 
-                ToolTip = 'Executes the Event Resource Availability Overview';
                 ApplicationArea = NPRRetail;
             }
 
@@ -108,8 +108,8 @@
                 Caption = 'Event Overview';
                 Image = AnalysisView;
                 RunObject = report "NPR Event Overview";
+                ToolTip = 'Executes the report Event Overview where you can filter data for time interval and type.';
 
-                ToolTip = 'Executes the Event Overview';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -123,24 +123,24 @@
                 {
                     Caption = 'Exch. Int. Templates';
                     RunObject = Page "NPR Event Exch. Int. Templates";
+                    ToolTip = 'View and edit detailed information for the templates of event exchange integration whether sending e-mail, creating an appointment or a meeting request.';
 
-                    ToolTip = 'Executes the Exch. Int. Templates action';
                     ApplicationArea = NPRRetail;
                 }
                 action(AttributeTemplates)
                 {
                     Caption = 'Attribute Templates';
                     RunObject = Page "NPR Event Attribute Templ.";
+                    ToolTip = 'View or edit detailed information for the attribute templates which serve as generic area to store different information about an event.';
 
-                    ToolTip = 'Executes the Attribute Templates action';
                     ApplicationArea = NPRRetail;
                 }
                 action(JobsSetup)
                 {
                     Caption = 'Jobs Setup';
                     RunObject = Page "Jobs Setup";
+                    ToolTip = 'View detailed information about job setup regarding the events.';
 
-                    ToolTip = 'Executes the Jobs Setup action';
                     ApplicationArea = NPRRetail;
                 }
 

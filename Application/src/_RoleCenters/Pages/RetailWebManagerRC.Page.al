@@ -56,7 +56,7 @@
                     Image = List;
                     RunObject = page "NPR Magento Attributes";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Attributes action';
+                    ToolTip = 'View or edit the Magento Attributes';
                 }
                 action("Attribute Sets")
                 {
@@ -64,7 +64,7 @@
                     Image = List;
                     RunObject = page "NPR Magento Attribute Sets";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Attribute Sets action';
+                    ToolTip = 'View or edit the Magento Attribute Sets';
                 }
                 action("Attribute Groups")
                 {
@@ -72,7 +72,7 @@
                     Image = List;
                     RunObject = page "NPR Magento Attr. Group List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Attribute Groups action';
+                    ToolTip = 'View or edit the Magento Attribute Groups';
                 }
 
                 action(Categories)
@@ -81,7 +81,7 @@
                     Image = List;
                     RunObject = page "NPR Magento Categories";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Categories action';
+                    ToolTip = 'View or edit the Magento Categories';
                 }
 
 
@@ -91,7 +91,7 @@
                     Image = List;
                     RunObject = page "NPR Magento Brands";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Brands action';
+                    ToolTip = 'View or edit the Magento Brands';
                 }
                 action("Magento Setup")
                 {
@@ -99,7 +99,7 @@
                     Image = List;
                     RunObject = page "NPR Magento Setup";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Magento Setup action';
+                    ToolTip = 'View or edit the Magento Setup';
                 }
 
             }
@@ -113,7 +113,7 @@
                     Image = List;
                     RunObject = page "Customer List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Customers action';
+                    ToolTip = 'View or edit the Customers';
                 }
                 action(Contact)
                 {
@@ -121,7 +121,7 @@
                     Image = List;
                     RunObject = page "Contact List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Contacts action';
+                    ToolTip = 'View or edit the Contacts';
                 }
 
                 action("Sales Orders")
@@ -130,7 +130,7 @@
                     Image = List;
                     RunObject = page "Sales Order List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Orders action';
+                    ToolTip = 'View or edit the Sales Orders';
                 }
                 action("Sales Return Orders")
                 {
@@ -138,7 +138,7 @@
                     Image = List;
                     RunObject = page "Sales Return Order List";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Return Orders action';
+                    ToolTip = 'View or edit the Sales Return Orders';
                 }
                 action("Posted Sales Invoices")
                 {
@@ -146,7 +146,7 @@
                     Image = List;
                     RunObject = page "Posted Sales Invoices";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Invoices action';
+                    ToolTip = 'View or edit the Sales Invoices';
                 }
 
                 action("Posted Sales Credit Memos")
@@ -155,7 +155,7 @@
                     Image = List;
                     RunObject = page "Posted Sales Credit Memos";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Credit Memos action';
+                    ToolTip = 'View or edit the Sales Credit Memos';
                 }
             }
 
@@ -168,7 +168,7 @@
                     Image = List;
                     RunObject = page "NPR NpRv Vouchers";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Vouchers action';
+                    ToolTip = 'View or edit the Vouchers';
                 }
                 action("Archived Vouchers")
                 {
@@ -176,7 +176,7 @@
                     Image = List;
                     RunObject = page "NPR NpRv Arch. Vouchers";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Archived Vouchers action';
+                    ToolTip = 'View or edit the Archived Vouchers';
                 }
 
             }
@@ -190,7 +190,7 @@
                     Image = List;
                     RunObject = page "NPR NpDc Coupons";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Coupons action';
+                    ToolTip = 'View or edit the Coupons';
                 }
                 action("Archived Coupons")
                 {
@@ -198,7 +198,7 @@
                     Image = List;
                     RunObject = page "NPR NpDc Arch. Coupons";
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Archived Coupons action';
+                    ToolTip = 'View or edit the Archived Coupons';
                 }
             }
         }
@@ -210,7 +210,7 @@
                 Caption = 'Items';
                 RunObject = Page "Item List";
 
-                ToolTip = 'Executes the Item List action';
+                ToolTip = 'View or edit the Item List';
                 ApplicationArea = NPRRetail;
             }
 
@@ -222,7 +222,7 @@
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
 
-                ToolTip = 'Executes the Sales &Order action';
+                ToolTip = 'View or edit the Sales &Order';
                 ApplicationArea = NPRRetail;
             }
             action("Import List")
@@ -230,7 +230,7 @@
                 Caption = 'Import List';
                 RunObject = Page "NPR Nc Import List";
 
-                ToolTip = 'Executes the Import List action';
+                ToolTip = 'View or edit the Import List';
                 ApplicationArea = NPRRetail;
             }
         }

@@ -18,7 +18,7 @@
 
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the IssuedTicketText field';
+                    ToolTip = 'Specifies the number of the issued tickets.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -30,7 +30,7 @@
 
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the TicketAdmission field';
+                    ToolTip = 'Specifies the number of the ticket admissions.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -42,7 +42,7 @@
 
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the MembersCreated field';
+                    ToolTip = 'Specifies the number of the members created.';
                     ApplicationArea = NPRRetail;
                 }
             }

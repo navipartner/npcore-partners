@@ -17,13 +17,13 @@
                 field("User Setups"; Rec."User Setups")
                 {
 
-                    ToolTip = 'Specifies the value of the User Setups field';
+                    ToolTip = 'Specifies the number of the User Setups. By clicking you can view the list of User Setups.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Salespersons; SalesPersonCountAsDec)
                 {
                     Caption = 'Salespersons';
-                    ToolTip = 'Specifies the value of the Salespersons field';
+                    ToolTip = 'Specifies the number of the Salespersons. By clicking you can view the list of Salespersons.';
                     ApplicationArea = NPRRetail;
                     AutoFormatType = 11;
                     AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
@@ -42,13 +42,13 @@
                 field("POS Stores"; Rec."POS Stores")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Stores field';
+                    ToolTip = 'Specifies the number of the POS Stores. By clicking you can view the list of POS Stores.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Units"; Rec."POS Units")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Units field';
+                    ToolTip = 'Specifies the number of the POS Units. By clicking you can view the list of POS Units.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -58,13 +58,13 @@
                 field("POS Payment Methods"; Rec."POS Payment Methods")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Payment Methods field';
+                    ToolTip = 'Specifies the number of the POS Payment Methods. By clicking you can view the list of POS Payment Methods.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Bins"; Rec."POS Payment Bins")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Payment Bins field';
+                    ToolTip = 'Specifies the number of the POS Payment Bins. By clicking you can view the list of POS Payment Bins.';
                     ApplicationArea = NPRRetail;
                 }
             }

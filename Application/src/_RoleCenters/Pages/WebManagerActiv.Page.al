@@ -15,7 +15,7 @@
                 field("Open Web Sales Orders"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Open Web Sales Orders"))))
                 {
                     Caption = 'Open Web Sales Orders';
-                    ToolTip = 'Specifies the value of the Open Web Sales Orders field';
+                    ToolTip = 'Specifies the number of the Open Web Sales Orders. By clicking you can view the list of Open Web Sales Orders.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -26,7 +26,7 @@
                 field("Open Credit Memos"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Open Credit Memos"))))
                 {
                     Caption = 'Open Credit Memos';
-                    ToolTip = 'Specifies the value of the Open Credit Memos field';
+                    ToolTip = 'Specifies the number of the Open Credit Memos. By clicking you can view the list of Open Credit Memos.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -37,7 +37,7 @@
                 field("Open Purchase Orders"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Open Purchase Orders"))))
                 {
                     Caption = 'Open Purchase Orders';
-                    ToolTip = 'Specifies the value of the Open Purchase Orders field';
+                    ToolTip = 'Specifies the number of the Open Purchase Orders. By clicking you can view the list of Open Purchase Orders.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -52,7 +52,7 @@
                 field("Posted Web Sales Orders"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Posted Web Sales Orders"))))
                 {
                     Caption = 'Posted Web Sales Orders';
-                    ToolTip = 'Specifies the value of the Posted Web Sales Orders field';
+                    ToolTip = 'Specifies the number of the Posted Web Sales Orders. By clicking you can view the list of Posted Web Sales Orders.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -63,7 +63,7 @@
                 field("Posted Credit Memos"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Posted Credit Memos"))))
                 {
                     Caption = 'Posted Credit Memos';
-                    ToolTip = 'Specifies the value of the Posted Credit Memos field';
+                    ToolTip = 'Specifies the number of the Posted Credit Memos. By clicking you can view the list of Posted Credit Memos.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -74,7 +74,7 @@
                 field("Posted Purchase Orders"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Posted Purchase Orders"))))
                 {
                     Caption = 'Posted Purchase Orders';
-                    ToolTip = 'Specifies the value of the Posted Purchase Orders field';
+                    ToolTip = 'Specifies the number of the Posted Purchase Orders. By clicking you can view the list of Posted Purchase Orders';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -96,7 +96,7 @@
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
 
-                ToolTip = 'Executes the New Credit Memo action';
+                ToolTip = 'Create new Credit Memo';
                 Image = New;
                 ApplicationArea = NPRRetail;
             }
@@ -105,7 +105,7 @@
                 Caption = 'New Purchase Order';
                 RunObject = Page "Purchase Order";
 
-                ToolTip = 'Executes the New Purchase Order action';
+                ToolTip = 'Create new Purchase Order';
                 Image = New;
                 ApplicationArea = NPRRetail;
             }
