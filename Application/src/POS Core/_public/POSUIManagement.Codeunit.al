@@ -479,6 +479,15 @@
         Payment_TimeoutCaption: Label 'Do you wish to continue?';
         Payment_TimeoutButtonCaption: Label 'Yes please, I need some more time.';
         GlobalRecordLbl: Label 'Global_Record_%1_Field_%2', Locked = true;
+        Balancing_CashCountFinalizedLbl: Label 'finalized';
+        Balancing_CashCountFinalizeLbl: Label 'Finalize';
+        Balancing_CashCountCompleteBalancingLbl: Label 'Complete balancing';
+        Balancing_CashCountTransferAmountTooMuchLbl: Label 'The amount you are attempting to transfer is higher than the counted amount. Please correct this before proceeding.';
+        Balancing_CashCountShouldNotExceedCountedAmtLbl: Label 'should not exceed counted amount';
+        Balancing_CashCountEnterBankDepositCodeLbl: Label 'Please enter a bank deposit bin code.';
+        Balancing_CashCountEnterBankDepositReferenceLbl: Label 'Please enter a bank deposit reference.';
+        Balancing_CashCountEnterMoveToBinCodeLbl: Label 'Please enter a move to bin no.';
+        Balancing_CashCountEnterMoveToBinReferenceLbl: Label 'Please enter a move to bin reference.';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -615,6 +624,15 @@
         Captions.Add('Balancing_CashCountAmount', BalancingCashCountAmountLbl);
         Captions.Add('Balancing_CashCountTotal', BalancingCashCountTotalLbl);
         Captions.Add('Balancing_CountByTypeCompletedLbl', BalancingCountByTypeCompletedLbl);
+        Captions.Add('Balancing_CashCountFinalized', Balancing_CashCountFinalizedLbl);
+        Captions.Add('Balancing_CashCountFinalize', Balancing_CashCountFinalizeLbl);
+        Captions.Add('Balancing_CashCountCompleteBalancing', Balancing_CashCountCompleteBalancingLbl);
+        Captions.Add('Balancing_CashCountTransferAmountTooMuch', Balancing_CashCountTransferAmountTooMuchLbl);
+        Captions.Add('Balancing_CashCountShouldNotExceedCountedAmt', Balancing_CashCountShouldNotExceedCountedAmtLbl);
+        Captions.Add('Balancing_CashCountEnterBankDepositCode', Balancing_CashCountEnterBankDepositCodeLbl);
+        Captions.Add('Balancing_CashCountEnterBankDepositReference', Balancing_CashCountEnterBankDepositReferenceLbl);
+        Captions.Add('Balancing_CashCountEnterMoveToBinCode', Balancing_CashCountEnterMoveToBinCodeLbl);
+        Captions.Add('Balancing_CashCountEnterMoveToBinReference', Balancing_CashCountEnterMoveToBinReferenceLbl);
         Captions.Add('CaptionDataGridSelected', CaptionDataGridSelected);
         Captions.Add('Lookup_Search', CaptionLookupSearch);
         Captions.Add('Lookup_Caption', CaptionLookup);
