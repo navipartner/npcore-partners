@@ -489,10 +489,17 @@
         case LoyaltySetup."Collection Period" of
             LoyaltySetup."Collection Period"::AS_YOU_GO:
                 begin
-                    ValidUntilDate := ReferenceDate;
-                    ValidFromDate := 0D;
-                    if (Format(LoyaltySetup."Expire Uncollected After") <> '') and (LoyaltySetup."Expire Uncollected Points") then
-                        ValidFromDate := CalcDate('<+1D>', CalcDate(LoyaltySetup."Expire Uncollected After", ReferenceDate));
+                    ValidFromDate := ReferenceDate;
+                    ValidUntilDate := DMY2Date(31, 12, 9999);
+                    if ((Format(LoyaltySetup."Expire Uncollected After") <> '') and (LoyaltySetup."Expire Uncollected Points")) then begin
+                        ValidUntilDate := CalcDate(LoyaltySetup."Expire Uncollected After", ReferenceDate);
+
+                        // when negative date formula
+                        if (ValidUntilDate < ValidFromDate) then begin
+                            ValidUntilDate := ReferenceDate + (ValidFromDate - ValidUntilDate);
+                            ValidUntilDate := CalcDate('<+2D>', ValidUntilDate); // Fence post problem
+                        end;
+                    end;
                 end;
 
             LoyaltySetup."Collection Period"::FIXED:
