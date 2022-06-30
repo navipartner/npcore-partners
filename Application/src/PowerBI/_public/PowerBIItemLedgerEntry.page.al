@@ -1,6 +1,7 @@
 page 6184612 NPRPowerBIItemledgerEntry
 {
     PageType = List;
+    Caption = 'PowerBI Item Ledger Entry';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Item Ledger Entry";
@@ -60,6 +61,16 @@ page 6184612 NPRPowerBIItemledgerEntry
                 field("Item No."; Rec."Item No.")
                 {
                     ToolTip = 'Specifies the number of the item in the entry.';
+                    ApplicationArea = All;
+                }
+                field(Open; Rec.Open)
+                {
+                    ToolTip = 'Specifies whether the entry has been fully applied to.';
+                    ApplicationArea = All;
+                }
+                field("Remaining Quantity"; Rec."Remaining Quantity")
+                {
+                    ToolTip = 'Specifies the quantity in the Quantity field that remains to be processed.';
                     ApplicationArea = All;
                 }
 

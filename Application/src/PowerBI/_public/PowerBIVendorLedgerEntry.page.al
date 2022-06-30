@@ -1,6 +1,7 @@
 page 6184627 NPRPowerBIVendorLedgerEntry
 {
     PageType = List;
+    Caption = 'PowerBI Vendor Ledger Entry';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Vendor Ledger Entry";

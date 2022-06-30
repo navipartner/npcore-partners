@@ -1,6 +1,7 @@
 page 6184625 NPRPowerBIValueEntry
 {
     PageType = List;
+    Caption = 'PowerBI Value Entry';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Value Entry";

@@ -1,6 +1,7 @@
 page 6184619 NPRPowerBIPostCode
 {
     PageType = List;
+    Caption = 'PowerBI Post Code';
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Post Code";
