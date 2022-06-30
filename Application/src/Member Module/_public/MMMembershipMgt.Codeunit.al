@@ -3691,11 +3691,17 @@
         ContactBusinessRelation: Record "Contact Business Relation";
         MarketingSetup: Record "Marketing Setup";
         MagentoSetup: Record "NPR Magento Setup";
+        Community: Record "NPR MM Member Community";
     begin
 
         Membership.Get(MembershipEntryNo);
         Member.Get(MemberEntryNo);
         MembershipRole.Get(MembershipEntryNo, MemberEntryNo);
+
+        if (not Community.Get(Membership."Community Code")) then
+            Community.Init();
+        if (Community.MemberDefaultCountryCode = '') then
+            Community.MemberDefaultCountryCode := 'DK';
 
         if (not Customer.Get(Membership."Customer No.")) then
             exit;
@@ -3735,7 +3741,7 @@
         // this should remain.
         Customer.Validate("Country/Region Code", CopyStr(Member."Country Code", 1, MaxStrLen(Customer."Country/Region Code")));
         if (Customer."Country/Region Code" = '') then
-            Customer.Validate("Country/Region Code", 'DK');
+            Customer.Validate("Country/Region Code", Community.MemberDefaultCountryCode);
 
         Customer.Validate(City, CopyStr(Member.City, 1, MaxStrLen(Customer.City)));
         Customer.Validate("Post Code", CopyStr(Member."Post Code Code", 1, MaxStrLen(Customer."Post Code")));
@@ -3803,12 +3809,17 @@
         MembershipRole: Record "NPR MM Membership Role";
         Contact: Record Contact;
         ContactXRec: Record Contact;
+        Community: Record "NPR MM Member Community";
         MagentoSetup: Record "NPR Magento Setup";
         HaveContact: Boolean;
     begin
 
         Membership.Get(MembershipEntryNo);
         MembershipRole.Get(MembershipEntryNo, Member."Entry No.");
+        if (not Community.Get(Membership."Community Code")) then
+            Community.Init();
+        if (Community.MemberDefaultCountryCode = '') then
+            Community.MemberDefaultCountryCode := 'DK';
 
         HaveContact := false;
         if (MembershipRole."Contact No." <> '') then
@@ -3836,7 +3847,7 @@
         // the magento integration requires a country code, until "mandatory fields" have been implemented for member creation
         // this should remain.
         if (Contact."Country/Region Code" = '') then
-            Contact.Validate("Country/Region Code", 'DK');
+            Contact.Validate("Country/Region Code", Community.MemberDefaultCountryCode);
 
         Contact.Validate("Post Code", CopyStr(Member."Post Code Code", 1, MaxStrLen(Contact."Post Code")));
         Contact.Validate(City, CopyStr(Member.City, 1, MaxStrLen(Contact.City)));
