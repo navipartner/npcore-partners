@@ -164,6 +164,7 @@
         if SalePOS."Contact No." <> '' then
             if Contact.Get(CopyStr(SalePOS."Contact No.", 1, MaxStrLen(Contact."No."))) then
                 POSEntry."Contact No." := Contact."No.";
+        AssignRelatedCustomerNoForContact(POSEntry, SalePOS);
 
         POSEntry."Event No." := SalePOS."Event No.";
         POSEntry."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
@@ -1902,6 +1903,36 @@
         POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId(), POSAuditLog."Action Type"::ITEM_RMA, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", '',
           StrSubstNo(RMAEntryLbl, PosRmaLine."Return Line No.", PosRmaLine."Sales Ticket No.", PosRmaLine."Return Reason Code"));
 
+    end;
+
+    local procedure AssignRelatedCustomerNoForContact(var POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR POS Sale")
+    var
+        MarketingSetup: Record "Marketing Setup";
+        Contact: Record Contact;
+        ContBusRel: Record "Contact Business Relation";
+        POSEntryNavigation: Codeunit "NPR POS Entry Navigation";
+    begin
+        if SalePOS."Customer Type" <> SalePOS."Customer Type"::Cash then
+            exit;
+        if not MarketingSetup.Get() then
+            exit;
+        if not Contact.Get(SalePOS."Customer No.") then
+            exit;
+        if not POSEntryNavigation.HasBusinessRelation("Contact Business Relation Link To Table"::Customer, MarketingSetup."Bus. Rel. Code for Customers", Contact) then
+            exit;
+
+        ContBusRel.Reset();
+        if (Contact."Company No." = '') or (Contact."Company No." = Contact."No.") then
+            ContBusRel.SetRange("Contact No.", Contact."No.")
+        else
+            ContBusRel.SetFilter("Contact No.", '%1|%2', Contact."No.", Contact."Company No.");
+        ContBusRel.SetFilter("No.", '<>''''');
+        ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
+
+        if ContBusRel.IsEmpty() then
+            exit;
+        ContBusRel.FindFirst();
+        POSEntry."Customer No." := ContBusRel."No.";
     end;
     #endregion
 }
