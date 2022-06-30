@@ -16,7 +16,7 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
         }
     }
 
-    const { ItemGroupSale, useSpecTracking, Success } = await workflow.respond("addSalesLine");
+    const { ItemGroupSale, useSpecTracking, GetPromptSerial, Success } = await workflow.respond("addSalesLine");
 
     if (!Success) {
         workflow.context.GetPrompt = true;
@@ -29,6 +29,13 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
         }
 
         if (useSpecTracking && !parameters.SelectSerialNo) {
+            workflow.context.SerialNo = await popup.input({ title: captions.itemTracking_title, caption: captions.itemTracking_lead })
+            if (workflow.context.SerialNo === null) {
+                return (" ");
+            }
+        }
+
+        if (!useSpecTracking && GetPromptSerial) {
             workflow.context.SerialNo = await popup.input({ title: captions.itemTracking_title, caption: captions.itemTracking_lead })
             if (workflow.context.SerialNo === null) {
                 return (" ");
