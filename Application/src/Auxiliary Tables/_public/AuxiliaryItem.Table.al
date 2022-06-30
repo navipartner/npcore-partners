@@ -35,6 +35,10 @@ table 6014659 "NPR Auxiliary Item"
             Caption = 'Variety Group';
             DataClassification = CustomerContent;
             TableRelation = "NPR Variety Group";
+            trigger OnValidate()
+            begin
+                CopyFromVarietyGroup();
+            end;
         }
         field(50; "Item Status"; Code[10])
         {
@@ -160,4 +164,37 @@ table 6014659 "NPR Auxiliary Item"
         key(Key2; "Replication Counter") { }
         key(MainItemVariationLinks; "Main Item No.", "Main Item/Variation") { }
     }
+
+    local procedure CopyFromVarietyGroup()
+    var
+        Item: Record Item;
+        xItem: Record Item;
+        VrtGroup: Record "NPR Variety Group";
+        VrtCheck: Codeunit "NPR Variety Check";
+    begin
+        Item.Get(Rec."Item No.");
+        xItem.Get(xRec."Item No.");
+
+        //updateitem
+        if (not VrtGroup.Get(Rec."Variety Group")) then
+            VrtGroup.Init();
+
+        Rec."Variety 1" := VrtGroup."Variety 1";
+        Rec."Variety 1 Table" := VrtGroup.GetVariety1Table(Item);
+        Rec."Variety 2" := VrtGroup."Variety 2";
+        Rec."Variety 2 Table" := VrtGroup.GetVariety2Table(Item);
+        Rec."Variety 3" := VrtGroup."Variety 3";
+        Rec."Variety 3 Table" := VrtGroup.GetVariety3Table(Item);
+        Rec."Variety 4" := VrtGroup."Variety 4";
+        Rec."Variety 4 Table" := VrtGroup.GetVariety4Table(Item);
+        Item."NPR Cross Variety No." := VrtGroup."Cross Variety No.";
+
+        //Above code will be executed IF its a temporary record - Below wont be executed if its a temporary record
+        if Item.IsTemporary then
+            exit;
+        //check change allowed
+        VrtCheck.ChangeItemVariety(Item, xItem);
+        //copy base table info (if needed)
+        VrtGroup.CopyTableData(Rec);
+    end;
 }

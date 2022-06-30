@@ -201,6 +201,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 }
                 field("NPR Variety Group"; AuxItem."Variety Group")
                 {
+                    Caption = 'Variety Group';
                     ToolTip = 'Specifies the value of the Variety Group.';
                     ApplicationArea = NPRRetail;
                     TableRelation = "NPR Variety Group";
@@ -1053,6 +1054,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     var
                         VRTWrapper: Codeunit "NPR Variety Wrapper";
                     begin
+                        Rec.NPR_SaveAuxItem();
+                        Commit();
                         VRTWrapper.ShowVarietyMatrix(Rec, 0);
                     end;
                 }
@@ -1071,6 +1074,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     var
                         VRTWrapper: Codeunit "NPR Variety Wrapper";
                     begin
+                        Rec.NPR_SaveAuxItem();
+                        Commit();
                         VRTWrapper.ShowMaintainItemMatrix(Rec, 0);
                     end;
                 }
