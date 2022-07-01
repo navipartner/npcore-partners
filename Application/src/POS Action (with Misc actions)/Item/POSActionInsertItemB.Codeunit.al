@@ -53,7 +53,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         ItemReference."Item No." := Item."No.";
     end;
 
-    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session")
+    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
 
         Line: Record "NPR POS Sale Line";
@@ -118,6 +118,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         SaleLine.InsertLine(Line, false);
         AddAccessories(Item, SaleLine);
         AutoExplodeBOM(Item, SaleLine);
+        AddItemAddOns(FrontEnd, Item, Line."Line No.");
     end;
 
     local procedure AutoExplodeBOM(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
@@ -222,6 +223,20 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             POSSaleLine.RefreshCurrent();
         until (AccessorySparePart.Next() = 0);
 
+    end;
+
+    local procedure AddItemAddOns(POSFrontEnd: Codeunit "NPR POS Front End Management"; Item: Record Item; BaseLineNo: Integer)
+    var
+        POSAction: Record "NPR POS Action";
+        AuxItem: Record "NPR Auxiliary Item";
+    begin
+        Item.NPR_GetAuxItem(AuxItem);
+        if AuxItem."Item AddOn No." = '' then
+            exit;
+
+        POSAction.Get('RUN_ITEM_ADDONS');
+        POSAction.SetWorkflowInvocationContext('BaseLineNo', BaseLineNo);
+        POSFrontEnd.InvokeWorkflow(POSAction);
     end;
 
     procedure ItemRequiresSerialNumberOnSale(Item: Record Item; var UseSpecificTracking: Boolean): Boolean
