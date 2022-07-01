@@ -70,11 +70,11 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     begin
         case Step of
             'addSalesLine':
-                FrontEnd.WorkflowResponse(Step_AddSalesLine(Context, Setup));
+                FrontEnd.WorkflowResponse(Step_AddSalesLine(Context, FrontEnd, Setup));
         end;
     end;
 
-    local procedure Step_AddSalesLine(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
+    local procedure Step_AddSalesLine(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
         UseSpecificTracking: Boolean;
         InputSerial: Code[20];
@@ -181,7 +181,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                 PosItemCheckAvail.SetxDataset(POSSession);
         end;
 
-        POSActionInsertItemB.AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession);
+        POSActionInsertItemB.AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd);
         if not SkipItemAvailabilityCheck and PosInventoryProfile."Stockout Warning" then
             PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
     end;
