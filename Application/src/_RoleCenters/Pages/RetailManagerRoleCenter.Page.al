@@ -221,6 +221,7 @@
                 group(Management)
                 {
                     Caption = 'Management';
+                    Image = Report;
                     group(Sales)
                     {
                         Caption = 'Sales';
