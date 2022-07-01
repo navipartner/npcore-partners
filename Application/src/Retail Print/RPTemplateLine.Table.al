@@ -521,7 +521,7 @@
         DataItem.SetRange(Code, "Template Code");
         if DataItem.FindSet() then
             repeat
-                TempRetailList.Number += 1;
+                    TempRetailList.Number += 1;
                 TempRetailList.Choice := DataItem.Name;
                 TempRetailList.Value := Format(DataItem."Table ID");
                 TempRetailList.Insert();
@@ -534,15 +534,24 @@
         end;
     end;
 
-    procedure GetNextLineNo(): Integer
-    var
-        CurrentLineNo: Integer;
+    internal procedure IndentLine(var RPTemplateLine: Record "NPR RP Template Line")
     begin
-        CurrentLineNo := Rec."Line No.";
-        if Rec.Next() > 0 then
-            exit(Round(CurrentLineNo + ((Rec."Line No." - CurrentLineNo) / 2), 1, '='))
-        else
-            exit(CurrentLineNo + 10000);
+        if RPTemplateLine.FindSet() then
+            repeat
+                    RPTemplateLine.Validate(Level, RPTemplateLine.Level + 1);
+                RPTemplateLine.Modify(true);
+            until RPTemplateLine.Next() = 0;
+    end;
+
+    internal procedure UnindentLine(var RPTemplateLine: Record "NPR RP Template Line")
+    begin
+        if RPTemplateLine.FindSet() then
+                repeat
+                    if RPTemplateLine.Level > 0 then begin
+                        RPTemplateLine.Validate(Level, RPTemplateLine.Level - 1);
+                        RPTemplateLine.Modify(true);
+                    end;
+                until RPTemplateLine.Next() = 0;
     end;
 }
 

@@ -1,20 +1,14 @@
 controladdin "NPR HardwareConnector"
 {
-    Scripts = 'src/_ControlAddIns/HardwareConnector/Scripts/HardwareConnectorClient.js',
-              'src/_ControlAddIns/HardwareConnector/Scripts/script.js';
+    Scripts = 'src/_ControlAddIns/HardwareConnector/bundle.js';
+    StyleSheets = 'src/_ControlAddIns/HardwareConnector/bundle.css';
 
-    MinimumHeight = 1;
-    MinimumWidth = 1;
-    RequestedHeight = 1;
-    RequestedWidth = 1;
-    MaximumHeight = 1;
-    MaximumWidth = 1;
-    VerticalStretch = false;
-    VerticalShrink = false;
-    HorizontalStretch = false;
-    HorizontalShrink = false;
+    VerticalStretch = true;
+    HorizontalStretch = true;
+    MinimumHeight = 200;
+    VerticalShrink = true;
 
-    procedure SendRequest(Handler: Text; Request: JsonObject);
+    procedure SendRequest(Handler: Text; Request: JsonObject; Caption: Text);
     event ControlAddInReady();
     event ResponseReceived(Response: JsonObject);
     event ExceptionCaught(ExceptionMessage: Text);

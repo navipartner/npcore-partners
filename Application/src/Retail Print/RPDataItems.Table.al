@@ -430,16 +430,5 @@ table 6014561 "NPR RP Data Items"
         DataItemLinks.DeleteAll(true);
         DataItemConstraint.DeleteAll(true);
     end;
-
-    procedure GetNextLineNo(): Integer
-    var
-        CurrentLineNo: Integer;
-    begin
-        CurrentLineNo := Rec."Line No.";
-        if Rec.Next() > 0 then
-            exit(Round(CurrentLineNo + ((Rec."Line No." - CurrentLineNo) / 2), 1, '='))
-        else
-            exit(CurrentLineNo + 10000);
-    end;
 }
 

@@ -45,6 +45,23 @@ codeunit 6014584 "NPR Mobile Print Mgt."
             Message(ClosedPageErr);
     end;
 
+    procedure PrintJobFile(IP: Text; FileBase64: Text)
+    var
+        JSON: JsonObject;
+        MPOSConnector: Page "NPR MPOS Connector";
+        AutoClosed: Boolean;
+    begin
+        if not (GuiAllowed) then
+            Error(InvalidClientTypeErr, Format(CurrentClientType));
+
+        JSON := BuildJSONParams(IP, '', FileBase64, 'FILE', PrintFailedErr);
+        MPOSConnector.SetInput(PrintingLbl, JSON);
+        MPOSConnector.RunModal();
+        MPOSConnector.GetOutput(AutoClosed);
+        if not AutoClosed then
+            Message(ClosedPageErr);
+    end;
+
     local procedure BuildJSONParams(BaseAddress: Text; Endpoint: Text; PrintJob: Text; RequestType: Text; ErrorCaption: Text) JSON: JsonObject
     begin
         JSON.Add('RequestMethod', 'PRINT');
