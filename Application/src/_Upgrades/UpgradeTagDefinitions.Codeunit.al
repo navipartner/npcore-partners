@@ -69,6 +69,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG E-Mail Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Aux Tables"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Object Output"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MPOS QR Code"));
     end;
 
@@ -236,6 +237,8 @@
                 Exit('NPRUPGUPGEMailSetup-20220312');
             Codeunit::"NPR UPG Aux Tables":
                 Exit('NPRUPGAuxTables');
+            Codeunit::"NPR UPG Object Output":
+                Exit('NPRUPGObjectOutput-6e45a4a7887c4210be8059396b7ac71c');
             Codeunit::"NPR UPG MPOS QR Code":
                 Exit('NPRUPGMPOSQRCode');
         end;

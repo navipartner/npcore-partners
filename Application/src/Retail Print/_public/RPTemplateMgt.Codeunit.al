@@ -7,6 +7,11 @@
         Error_TemplateAlreadyExists: Label 'Template %1 already exists. Please pick a new code.';
         Error_VersionDown: Label 'Cannot version down from %1 to %2';
 
+    procedure PrintTemplate(TemplateCode: Code[20]; "Record": Variant)
+    begin
+        PrintTemplate(TemplateCode, "Record", 0);
+    end;
+
     procedure PrintTemplate(TemplateCode: Code[20]; "Record": Variant; MatrixIterationField: Integer)
     var
         RPTemplateHeader: Record "NPR RP Template Header";

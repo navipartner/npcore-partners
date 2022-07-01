@@ -1,4 +1,4 @@
-codeunit 6014495 "NPR HWC Report Printer"
+codeunit 6059855 "NPR MPOS Report Printer"
 {
     Access = Internal;
 
@@ -6,29 +6,30 @@ codeunit 6014495 "NPR HWC Report Printer"
     local procedure SetupPrinters(var Printers: Dictionary of [Text[250], JsonObject]);
     var
         Payload: JsonObject;
-        HWCPrinter: Record "NPR HWC Printer";
-        HardwareConnectorLbl: Label 'Hardware Connector Printer: %1';
+        MPOSReportPrinter: Record "NPR MPOS Report Printer";
+        HardwareConnectorLbl: Label 'MPOS Printer: %1';
     begin
-        if HWCPrinter.FindSet() then
+        if MPOSReportPrinter.FindSet() then
             repeat
-                if HWCPrinter."Paper Size" = HWCPrinter."Paper Size"::Custom then begin
+                if MPOSReportPrinter."Paper Size" = MPOSReportPrinter."Paper Size"::Custom then begin
                     Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3,"units":%4,"height":"%5","width":"%6","landscape":"%7"}]}',
-                                                CopyStr(StrSubstNo(HardwareConnectorLbl, HWCPrinter.Name), 1, 250), HWCPrinter."Paper Source".AsInteger(), HWCPrinter."Paper Size".AsInteger(), HWCPrinter."Paper Unit".AsInteger(), HWCPrinter."Paper Height", HWCPrinter."Paper Width", HWCPrinter.Landscape));
+                                                CopyStr(StrSubstNo(HardwareConnectorLbl, MPOSReportPrinter.ID), 1, 250), MPOSReportPrinter."Paper Source".AsInteger(), MPOSReportPrinter."Paper Size".AsInteger(), MPOSReportPrinter."Paper Unit".AsInteger(), MPOSReportPrinter."Paper Height", MPOSReportPrinter."Paper Width", MPOSReportPrinter.Landscape));
                 end else begin
-                    Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3}]}', CopyStr(StrSubstNo(HardwareConnectorLbl, HWCPrinter.Name), 1, 250), HWCPrinter."Paper Source".AsInteger(), HWCPrinter."Paper Size".AsInteger()));
+                    Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3}]}', CopyStr(StrSubstNo(HardwareConnectorLbl, MPOSReportPrinter.ID), 1, 250), MPOSReportPrinter."Paper Source".AsInteger(), MPOSReportPrinter."Paper Size".AsInteger()));
                 end;
-                Printers.Add('NPR_HWC_' + HWCPrinter.ID, Payload);
+                Printers.Add('NPR_MPOS_' + MPOSReportPrinter.ID, Payload);
                 Clear(Payload);
-            until HWCPrinter.Next() = 0;
+            until MPOSReportPrinter.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ReportManagement", 'OnAfterDocumentPrintReady', '', true, true)]
     local procedure OnDocumentPrintReady(ObjectType: Option "Report","Page"; ObjectId: Integer; ObjectPayload: JsonObject; DocumentStream: InStream; var Success: Boolean);
     var
-        HWCPrinter: Record "NPR HWC Printer";
+        MPOSPrinter: Record "NPR MPOS Report Printer";
         JToken: JsonToken;
         PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
         PrinterName: Text;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         begin
             if Success then
@@ -40,16 +41,16 @@ codeunit 6014495 "NPR HWC Report Printer"
             if not ObjectPayload.Get('printername', JToken) then
                 exit;
             PrinterName := JToken.AsValue().AsText();
-            if not PrinterName.StartsWith('NPR_HWC_') then
+            if not PrinterName.StartsWith('NPR_MPOS_') then
                 exit;
-            if not HWCPrinter.Get(PrinterName.Substring(9)) then
+            if not MPOSPrinter.Get(PrinterName.Substring(10)) then
                 exit;
             if not ObjectPayload.Get('documenttype', JToken) then
                 exit;
             if JToken.AsValue().AsText() <> 'application/pdf' then
                 exit;
 
-            PrintMethodMgt.PrintFileLocal(HWCPrinter.Name, DocumentStream, 'pdf');
+            PrintMethodMgt.PrintFileMPOS(MPOSPrinter."LAN IP", Base64Convert.ToBase64(DocumentStream));
             Success := true;
         end;
     end;

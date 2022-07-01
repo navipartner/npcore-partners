@@ -1,4 +1,3 @@
-
 codeunit 6014405 "NPR PermissionSet Upgrade"
 {
     Access = Internal;

@@ -1,11 +1,11 @@
-page 6059862 "NPR HWC Printers"
+page 6059883 "NPR MPOS Report Printers"
 {
     Extensible = false;
     PageType = List;
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;
-    SourceTable = "NPR HWC Printer";
-    Caption = 'Hardware Connector Report Printer Setup';
+    SourceTable = "NPR MPOS Report Printer";
+    Caption = 'MPOS Report Printer Setup';
 
     layout
     {
@@ -18,9 +18,9 @@ page 6059862 "NPR HWC Printers"
                     ToolTip = 'The ID of the printed used for printer selection internally';
                     ApplicationArea = NPRRetail;
                 }
-                field(Name; Rec.Name)
+                field(Name; Rec."LAN IP")
                 {
-                    ToolTip = 'The name of the local printer';
+                    ToolTip = 'The IP of the printer on the local network that the MPOS is also connected to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Paper Size"; Rec."Paper Size")

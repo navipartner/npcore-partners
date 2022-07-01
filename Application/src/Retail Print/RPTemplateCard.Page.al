@@ -186,18 +186,6 @@
                     ToolTip = 'Specifies the value of the Pre Processing Codeunit field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Print Processing Object Type"; Rec."Print Processing Object Type")
-                {
-
-                    ToolTip = 'Specifies the value of the Print Processing Object Type field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Print Processing Object ID"; Rec."Print Processing Object ID")
-                {
-
-                    ToolTip = 'Specifies the value of the Print Processing Object ID field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Post Processing Codeunit"; Rec."Post Processing Codeunit")
                 {
 
@@ -296,11 +284,23 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                RunObject = Page "NPR RP Template Designer";
-                RunPageLink = Code = FIELD(Code);
 
                 ToolTip = 'Executes the Edit Layout action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    RPTemplateLine: Record "NPR RP Template Line";
+                begin
+                    RPTemplateLine.SetRange("Template Code", Rec.Code);
+
+                    case Rec."Printer Type" of
+                        Rec."Printer Type"::Line:
+                            Page.RunModal(Page::"NPR RP Templ. Line Designer", RPTemplateLine);
+                        Rec."Printer Type"::Matrix:
+                            Page.RunModal(Page::"NPR RP Templ. Matrix Designer", RPTemplateLine);
+                    end;
+                end;
             }
             action("Edit Device Settings")
             {

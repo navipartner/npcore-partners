@@ -1,8 +1,8 @@
-table 6014668 "NPR HWC Printer"
+table 6014689 "NPR MPOS Report Printer"
 {
     Access = Internal;
     DataClassification = CustomerContent;
-    Caption = 'Hardware Connector Report Printers';
+    Caption = 'MPOS Report Printers';
 
     fields
     {
@@ -12,11 +12,19 @@ table 6014668 "NPR HWC Printer"
             NotBlank = true;
             DataClassification = CustomerContent;
         }
-        field(2; Name; Text[250])
+        field(2; "LAN IP"; Text[50])
         {
-            Caption = 'Printer Name';
+            Caption = 'LAN IP';
             NotBlank = true;
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                Regex: Codeunit "NPR Regex";
+            begin
+                if not Regex.IsMatch(Rec."LAN IP", '^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$') then
+                    Rec.FieldError("LAN IP");
+            end;
         }
         field(5; "Paper Source"; Enum "Printer Paper Source Kind")
         {
