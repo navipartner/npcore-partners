@@ -396,6 +396,79 @@
                     ApplicationArea = NPRRetail;
                 }
             }
+            group(Reports)
+            {
+                Caption = 'List & Reports';
+                group(Ticketing)
+                {
+                    Caption = 'Ticketing';
+                    action("NPR TM Ticket Reservation List")
+                    {
+                        Caption = 'List of Attendees';
+                        Image = Report;
+                        RunObject = Report "NPR TM Ticket Reservation List";
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Executes the List of Attendees action.';
+                    }
+                    action("NPR TM Visiting Report")
+                    {
+                        Caption = 'Admission Statistics';
+                        Image = Report;
+                        RunObject = Report "NPR TM Visiting Report";
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Executes the Admission Statistics action.';
+                    }
+                }
+                group(Membership)
+                {
+                    Caption = 'Membership';
+                    action("NPR MM Membership Status")
+                    {
+                        Caption = 'Membership Status';
+                        Image = Report;
+                        RunObject = Report "NPR MM Membership Status";
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Executes the Membership Status action.';
+                    }
+                    action("NPR MM Membership Not Renewed")
+                    {
+                        Caption = 'Memberships not yet Renewed';
+                        Image = Report;
+                        RunObject = Report "NPR MM Membership Not Renewed";
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Executes the Memberships not yet Renewed action.';
+                    }
+                }
+                group(LoyaltyProcessing)
+                {
+                    Caption = 'Loyalty';
+                    action("NPR MM Membersh. Points Summ.")
+                    {
+                        Caption = 'Membership Point Summary';
+                        Image = Report;
+                        RunObject = Report "NPR MM Membersh. Points Summ.";
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Executes the Membership Point Summary action.';
+                    }
+                    action("NPR MM Membership Points Value")
+                    {
+                        Caption = 'Membership Points Value';
+                        Image = Report;
+                        RunObject = Report "NPR MM Membership Points Value";
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Executes the Membership Points Value action.';
+                    }
+
+                    action("NPR MM Membership Points Det.")
+                    {
+                        Caption = 'Membership Point Detailed';
+                        Image = Report;
+                        RunObject = Report "NPR MM Membership Points Det.";
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Executes the Membership Point Detailed action.';
+                    }
+                }
+            }
         }
         area(Creation)
         {
