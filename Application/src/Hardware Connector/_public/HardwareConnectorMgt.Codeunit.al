@@ -23,8 +23,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
     var
         Content: JsonObject;
         Base64Convert: Codeunit "Base64 Convert";
-        AzureKeyVault: Codeunit "App Key Vault Secret Provider";
-        licenseKey: Text;
+        AzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
         Response: JsonObject;
     begin
         Content.Add('PrinterName', PrinterName);
@@ -32,9 +31,8 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Content.Add('FileExtension', FileExtension);
 
         if UpperCase(FileExtension) = 'PDF' then begin
-            AzureKeyVault.GetSecret('SpirePDFLicenseKey', licenseKey);
             Content.Add('PrintMethod', 'Spire');
-            Content.Add('ExternalLibLicenseKey', licenseKey)
+            Content.Add('ExternalLibLicenseKey', AzureKeyVault.GetAzureKeyVaultSecret('SpirePDFLicenseKey'))
         end else begin
             Content.Add('PrintMethod', 'OSFileHandler');
         end;

@@ -4,23 +4,12 @@
     Caption = 'Hardware Connector';
     Editable = false;
     PageType = StandardDialog;
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
-
+    UsageCategory = None;
 
     layout
     {
         area(content)
         {
-            field(PageCaption; _Caption)
-            {
-
-                Caption = 'Page Caption';
-                Style = Strong;
-                StyleExpr = TRUE;
-                ToolTip = 'Specifies the value of the PageCaption field';
-                ApplicationArea = NPRRetail;
-            }
             usercontrol(HardwareConnector; "NPR HardwareConnector")
             {
                 ApplicationArea = NPRRetail;
@@ -28,7 +17,7 @@
 
                 trigger ControlAddInReady()
                 begin
-                    CurrPage.HardwareConnector.SendRequest(_Handler, _Request);
+                    CurrPage.HardwareConnector.SendRequest(_Handler, _Request, _Caption);
                 end;
 
                 trigger ExceptionCaught(ErrorMessage: Text)
@@ -45,8 +34,6 @@
                     _Response := Response;
                     CurrPage.Close();
                 end;
-
-
             }
         }
     }

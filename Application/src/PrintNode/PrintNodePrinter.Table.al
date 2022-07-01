@@ -48,6 +48,18 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
+        field(30; "BC Paper Source"; Enum "Printer Paper Source Kind")
+        {
+            Caption = 'Paper Source sent to Business Central reporting engine';
+            InitValue = "AutomaticFeed";
+            DataClassification = CustomerContent;
+        }
+        field(40; "BC Paper Size"; Enum "Printer Paper Kind")
+        {
+            Caption = 'Paper Size sent to Business Central reporting engine';
+            InitValue = "A4";
+            DataClassification = CustomerContent;
+        }
         field(100; Settings; Blob)
         {
             Caption = 'Settings';

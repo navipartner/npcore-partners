@@ -53,6 +53,18 @@
                     ToolTip = 'Specifies the value of the Settings Stored field';
                     ApplicationArea = NPRRetail;
                 }
+                field("BC Paper Size"; Rec."BC Paper Size")
+                {
+                    Caption = 'BC Paper Size';
+                    ToolTip = 'The paper size sent to the Business Central reporting engine';
+                    ApplicationArea = NPRRetail;
+                }
+                field("BC Paper Source"; Rec."BC Paper Source")
+                {
+                    Caption = 'BC Paper Source';
+                    ToolTip = 'The paper source sent to the Business Central reporting engine';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

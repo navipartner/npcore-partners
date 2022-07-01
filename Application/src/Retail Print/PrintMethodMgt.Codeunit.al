@@ -37,8 +37,7 @@ codeunit 6014582 "NPR Print Method Mgt."
         HWCPOSRequest: Codeunit "NPR Front-End: HWC";
         Request: JsonObject;
         Base64Convert: Codeunit "Base64 Convert";
-        AzureKeyVault: Codeunit "App Key Vault Secret Provider";
-        licenseKey: Text;
+        AzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         if not GuiAllowed then
             exit;
@@ -55,8 +54,7 @@ codeunit 6014582 "NPR Print Method Mgt."
 
             if UpperCase(FileExtension) = 'PDF' then begin
                 Request.Add('PrintMethod', 'Spire');
-                AzureKeyVault.GetSecret('SpirePDFLicenseKey', licenseKey);
-                Request.Add('ExternalLibLicenseKey', licenseKey)
+                Request.Add('ExternalLibLicenseKey', AzureKeyVault.GetAzureKeyVaultSecret('SpirePDFLicenseKey'))
             end else begin
                 Request.Add('PrintMethod', 'OSFileHandler');
             end;
@@ -123,5 +121,12 @@ codeunit 6014582 "NPR Print Method Mgt."
         MobilePrintMgt: Codeunit "NPR Mobile Print Mgt.";
     begin
         MobilePrintMgt.PrintJobBluetooth(DeviceName, PrintJobBase64);
+    end;
+
+    procedure PrintFileMPOS(IP: Text; FileBase64: Text)
+    var
+        MobilePrintMgt: Codeunit "NPR Mobile Print Mgt.";
+    begin
+        MobilePrintMgt.PrintJobFile(IP, FileBase64);
     end;
 }

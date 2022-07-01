@@ -1,20 +1,9 @@
 ﻿page 6014637 "NPR RP Templ. Matrix Designer"
 {
     Extensible = False;
-    // NPR4.02/MMV/20150223 CASE 204483 Made "Field Text Start" visible and changed the Caption.
-    // NPR4.10/MMV/20150506 CASE 167059 Added field "Print With Next".
-    // NPR4.10/MMV720150513 CASE 207985 Added field Attribute
-    // NPR4.14/MMV/20150825 CASE 181190 Added field 43 : "Next Record"
-    // NPR4.15.01/MMV/20150918 CASE 181190 Added field 44 : "Master Record No."
-    //                                     Removed field 43.
-    // NPR5.32/MMV /20170424 CASE 241995 Retail Print 2.0
-    // NPR5.44/MMV /20180706 CASE 315362 Added field 60
-    // NPR5.46/MMV /20180911 CASE 314067 Added field 52
-    // NPR5.51/MMV /20190712 CASE 360972 Added field 70
-
     AutoSplitKey = true;
     Caption = 'Template Matrix Designer';
-    PageType = ListPart;
+    PageType = Worksheet;
     UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR RP Template Line";
@@ -257,6 +246,120 @@
 
     actions
     {
+        area(processing)
+        {
+            action(Unindent)
+            {
+                Caption = 'Unindent';
+                Image = PreviousRecord;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Executes the Unindent action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    RPTemplateLine: Record "NPR RP Template Line";
+                begin
+                    CurrPage.SetSelectionFilter(RPTemplateLine);
+                    Rec.UnindentLine(RPTemplateLine);
+                end;
+            }
+            action(Indent)
+            {
+                Caption = 'Indent';
+                Image = NextRecord;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Executes the Indent action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    RPTemplateLine: Record "NPR RP Template Line";
+                begin
+                    CurrPage.SetSelectionFilter(RPTemplateLine);
+                    Rec.IndentLine(RPTemplateLine);
+                end;
+            }
+            action("Test Print")
+            {
+                Caption = 'Test Print';
+                Image = Start;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = "Report";
+                PromotedIsBig = true;
+                ShortCutKey = 'Shift+F8';
+
+                ToolTip = 'Executes the Test Print action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    DataItem: Record "NPR RP Data Items";
+                    TemplateMgt: Codeunit "NPR RP Template Mgt.";
+                    RecRef: RecordRef;
+                begin
+                    CurrPage.Update(true);
+
+                    DataItem.SetRange(Code, Rec."Template Code");
+                    DataItem.SetRange(Level, 0);
+                    DataItem.FindFirst();
+
+                    RecRef.Open(DataItem."Table ID");
+                    if RecordView <> '' then begin
+                        RecRef.SetView(RecordView);
+                        RecRef.FindSet();
+                    end else begin
+                        RecRef.FindFirst();
+                        RecRef.SetRecFilter();
+                    end;
+
+                    TemplateMgt.PrintTemplate(Rec."Template Code", RecRef, 0);
+                end;
+            }
+            action("Set Test Print Filter")
+            {
+                Caption = 'Set Test Print Filter';
+                Image = EditFilter;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = "Report";
+                PromotedIsBig = true;
+                ShortCutKey = 'Shift+F7';
+
+                ToolTip = 'Executes the Set Test Print Filter action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    FilterPageBuilder: FilterPageBuilder;
+                    DataItem: Record "NPR RP Data Items";
+                begin
+                    DataItem.SetRange(Code, Rec."Template Code");
+                    DataItem.SetRange(Level, 0);
+                    DataItem.FindFirst();
+
+                    FilterPageBuilder.AddTable(DataItem."Data Source", DataItem."Table ID");
+                    if (RecordView <> '') and (RecordTableNo = DataItem."Table ID") then
+                        FilterPageBuilder.SetView(DataItem."Data Source", RecordView); //Reapply previously set filter
+
+                    if FilterPageBuilder.RunModal() then begin
+                        RecordView := FilterPageBuilder.GetView(DataItem."Data Source", false);
+                        RecordTableNo := DataItem."Table ID";
+                    end;
+                end;
+            }
+        }
     }
+
+    var
+        RecordView: Text;
+        RecordTableNo: Integer;
 }
 

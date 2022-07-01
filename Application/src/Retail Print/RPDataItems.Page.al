@@ -1,10 +1,6 @@
 ﻿page 6014561 "NPR RP Data Items"
 {
     Extensible = False;
-    // NPR5.34/MMV /20170724 CASE 284505 Indent multiple.
-    // NPR5.40/MMV /20180208 CASE 304639 Added new fields 30,31
-    // NPR5.50/MMV /20190502 CASE 353588 Added support for distinct iteration.
-
     AutoSplitKey = true;
     Caption = 'Data Items';
     PageType = Worksheet;
@@ -22,23 +18,18 @@
             {
                 FreezeColumn = Name;
                 IndentationColumn = Rec.Level;
-                IndentationControls = "Table ID";
-                ShowAsTree = true;
-
-                field("Table ID"; Rec."Table ID")
+                IndentationControls = "Data Source";
+                field("Data Source"; Rec."Data Source")
                 {
-
                     Style = Strong;
                     StyleExpr = Rec.Level = 0;
-                    ToolTip = 'The table ID of the data item';
+                    ToolTip = 'Specifies the value of the Data Source field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
+                    ToolTip = 'Specifies the value of the Name field';
                     ApplicationArea = NPRRetail;
-                    Style = Strong;
-                    StyleExpr = Rec.Level = 0;
-                    ToolTip = 'The unique name of the data item';
                 }
                 field("Iteration Type"; Rec."Iteration Type")
                 {
@@ -106,20 +97,6 @@
     {
         area(processing)
         {
-            action("Insert Line")
-            {
-                Caption = 'Insert Line';
-                ToolTip = 'Action inserts a new line below selected line with same identation';
-                ApplicationArea = NPRRetail;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                Image = Add;
-                trigger OnAction()
-                begin
-                    InsertNewLine();
-                end;
-            }
             action(Unindent)
             {
                 Caption = 'Unindent';
@@ -171,21 +148,6 @@
             }
         }
     }
-
-    internal procedure InsertNewLine()
-    var
-        DataItem: Record "NPR RP Data Items";
-    begin
-        DataItem.Init();
-        DataItem.Code := Rec.Code;
-        DataItem."Data Source" := Rec."Data Source";
-        DataItem."Parent Table ID" := Rec."Parent Table ID";
-        DataItem."Parent Line No." := rec."Parent Line No.";
-        DataItem."Line No." := Rec.GetNextLineNo();
-        DataItem.Level := Rec.Level;
-        DataItem.Insert();
-        Rec := DataItem;
-    end;
 
     internal procedure IndentLine()
     var

@@ -251,5 +251,51 @@
         if LookupPrinter(ID) then
             ObjectOutputSelection."Output Path" := ID;
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"ReportManagement", 'OnAfterSetupPrinters', '', true, true)]
+    local procedure SetupPrinters(var Printers: Dictionary of [Text[250], JsonObject]);
+    var
+        Payload: JsonObject;
+        PrintNodePrinter: Record "NPR PrintNode Printer";
+        PrintNodePrinterLbl: Label 'Print Node Printer: %1';
+    begin
+        if PrintNodePrinter.FindSet() then
+            repeat
+                Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3}]}', CopyStr(StrSubstNo(PrintNodePrinterLbl, PrintNodePrinter.Name), 1, 250), PrintNodePrinter."BC Paper Source".AsInteger(), PrintNodePrinter."BC Paper Size".AsInteger()));
+                Printers.Add('NPR_PRINTNODE_' + PrintNodePrinter.ID, Payload);
+                Clear(Payload);
+            until PrintNodePrinter.Next() = 0;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"ReportManagement", 'OnAfterDocumentPrintReady', '', true, true)]
+    local procedure OnDocumentPrintReady(ObjectType: Option "Report","Page"; ObjectId: Integer; ObjectPayload: JsonObject; DocumentStream: InStream; var Success: Boolean);
+    var
+        PrintNodePrinter: Record "NPR PrintNode Printer";
+        JToken: JsonToken;
+        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
+        PrinterName: Text;
+    begin
+        begin
+            if Success then
+                exit;
+            if ObjectType <> ObjectType::Report then
+                exit;
+            if not ObjectPayload.Get('printername', JToken) then
+                exit;
+            PrinterName := JToken.AsValue().AsText();
+            if not PrinterName.StartsWith('NPR_PRINTNODE_') then
+                exit;
+            if not PrintNodePrinter.Get(PrinterName.Substring(15)) then
+                exit;
+            if not ObjectPayload.Get('documenttype', JToken) then
+                exit;
+            if JToken.AsValue().AsText() <> 'application/pdf' then
+                exit;
+
+            PrintMethodMgt.PrintViaPrintNodePdf(PrintNodePrinter.Id, DocumentStream, StrSubstNo('NPRetail PrintNode Print - Report %1', ObjectId), 0, ObjectId);
+            Success := true;
+        end;
+    end;
 }
+
 

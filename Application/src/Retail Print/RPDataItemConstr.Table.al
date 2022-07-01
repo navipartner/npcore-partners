@@ -73,6 +73,7 @@
     begin
         ModifiedRec();
         SetLineNo();
+        TestField("Table ID");
     end;
 
     trigger OnModify()

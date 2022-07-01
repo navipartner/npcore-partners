@@ -105,15 +105,8 @@ table 6014446 "NPR RP Template Header"
             ELSE
             IF ("Print Processing Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = FILTER(Report));
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if ("Print Processing Object ID" > 0) and (xRec."Print Processing Object ID" = 0) then begin
-                    if GuiAllowed then
-                        if not Confirm(Caption_PrintOverwrite) then
-                            Error('');
-                end;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Modules should have a field for report ID if they want to support running a report directly. With newer report print event subscribers there is no need for a custom PDF handler';
         }
         field(73; "Post Processing Codeunit"; Integer)
         {
@@ -270,7 +263,6 @@ table 6014446 "NPR RP Template Header"
     var
         Error_Archived: Label 'You cannot modify an archived print template.';
         Error_MissingVersionDesc: Label 'Version comments must be written before archiving.';
-        Caption_PrintOverwrite: Label 'Specifying a print processing object will bypass the print engine completely!\Do you want to continue?';
         Caption_DeviceSettingsOverwrite: Label 'Changing printer device will delete all stored device settings!\Do you want to continue?';
 
     local procedure ClearDeviceSettings()
