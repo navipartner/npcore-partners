@@ -32,7 +32,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
 
         if UpperCase(FileExtension) = 'PDF' then begin
             Content.Add('PrintMethod', 'Spire');
-            Content.Add('ExternalLibLicenseKey', AzureKeyVault.GetAzureKeyVaultSecret('SpirePDFLicenseKey'))
+            Content.Add('ExternalLibLicenseKey', AzureKeyVault.GetAzureKeyVaultSecret('SpirePDFDotNetCoreLicenseKey'))
         end else begin
             Content.Add('PrintMethod', 'OSFileHandler');
         end;
