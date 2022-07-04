@@ -39,4 +39,24 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
             }
         }
     }
+    actions
+    {
+        addafter(AttachAsPDF)
+        {
+            action("NPR SendSMS")
+            {
+                Caption = 'Send SMS';
+                Image = SendConfirmation;
+
+                ToolTip = 'Specifies whether a notification SMS should be sent to a responsible person. The messages are sent using SMS templates.';
+                ApplicationArea = NPRRetail;
+                trigger OnAction()
+                var
+                    SMSMgt: Codeunit "NPR SMS Management";
+                begin
+                    SMSMgt.EditAndSendSMS(Rec);
+                end;
+            }
+        }
+    }
 }
