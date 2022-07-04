@@ -54,7 +54,7 @@ codeunit 6014582 "NPR Print Method Mgt."
 
             if UpperCase(FileExtension) = 'PDF' then begin
                 Request.Add('PrintMethod', 'Spire');
-                Request.Add('ExternalLibLicenseKey', AzureKeyVault.GetAzureKeyVaultSecret('SpirePDFLicenseKey'))
+                Request.Add('ExternalLibLicenseKey', AzureKeyVault.GetAzureKeyVaultSecret('SpirePDFDotNetCoreLicenseKey'))
             end else begin
                 Request.Add('PrintMethod', 'OSFileHandler');
             end;
