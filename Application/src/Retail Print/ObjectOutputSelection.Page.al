@@ -1,9 +1,8 @@
 page 6014580 "NPR Object Output Selection"
 {
     Extensible = False;
-    Caption = 'Object Output Selection';
+    Caption = 'Print Template Output Setup';
     PageType = List;
-    PromotedActionCategories = 'New,Process,Reports,Google Cloud Print';
     SourceTable = "NPR Object Output Selection";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
