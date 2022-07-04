@@ -274,9 +274,9 @@
                             ApplicationArea = NPRRetail;
                             ToolTip = 'Executes the Sales Ticket Statistics action.';
                         }
-                        action("Advanced Sales Statistics")
+                        action("Monthly Advance Sales Statistics")
                         {
-                            Caption = 'Advanced Sales Statistics';
+                            Caption = 'Monthly Advance Sales Statistics';
                             Image = ListPage;
                             RunObject = page "NPR Advanced Sales Stats";
                             ToolTip = 'Generate the daily sales report per quantity and amount';
@@ -356,14 +356,6 @@
                     {
                         Caption = 'History';
                         Image = History;
-                        action("NPR Sales per week year/Last")
-                        {
-                            Caption = 'Sales Per Week Current Year/Last Year';
-                            Image = Report;
-                            RunObject = Report "NPR Sales per week year/Last";
-                            ApplicationArea = NPRRetail;
-                            ToolTip = 'Executes the Sales Per Week Current Year/Last Year action.';
-                        }
                         action("NPR Advanced Sales Stat.")
                         {
                             Caption = 'Advanced Sales Statistics';
