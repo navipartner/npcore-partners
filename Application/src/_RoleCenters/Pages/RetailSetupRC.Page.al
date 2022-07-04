@@ -52,7 +52,7 @@ page 6151245 "NPR Retail Setup RC"
             }
             action("Object Output_Selection")
             {
-                Caption = 'Object Output Selection';
+                Caption = 'Print Template Output Setup';
                 RunObject = Page "NPR Object Output Selection";
 
                 ToolTip = 'View or edit the Object Output Selections';
