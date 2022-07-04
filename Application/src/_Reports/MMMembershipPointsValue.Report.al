@@ -245,7 +245,8 @@
         SaveValues = true;
         trigger OnOpenPage()
         begin
-            "MM Membership".SetFilter("Date Filter", '..%2', Today);
+            "MM Membership".SetRange("Date Filter", 0D, Today);
+            "MM Membership".SetFilter("Remaining Points", '>0');
         end;
     }
 

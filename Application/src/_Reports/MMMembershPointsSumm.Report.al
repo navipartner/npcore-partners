@@ -82,7 +82,7 @@
         SaveValues = true;
         trigger OnOpenPage()
         begin
-            "MM Membership".SetFilter("Date Filter", '..%2', ToDate);
+            "MM Membership".SetRange("Date Filter", 0D, ToDate);
             "MM Membership".SetFilter("Awarded Points (Sale)", '>0');
         end;
     }
