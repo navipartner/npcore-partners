@@ -126,6 +126,29 @@
                 RunPageLink = "Membership Entry No." = field("Membership Entry No.");
                 RunPageView = sorting("Membership Entry No.") order(ascending);
             }
+            action("&Navigate")
+            {
+                Caption = 'Find entries...';
+                Image = Navigate;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                ToolTip = 'Executes the Find entries action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    Navigate: Page Navigate;
+                begin
+                    if (Rec."Document No." <> '') then
+                        Navigate.SetDoc(DT2Date(Rec."Created At"), Rec."Document No.");
+                    if (Rec."Receipt No." <> '') then
+                        Navigate.SetDoc(DT2Date(Rec."Created At"), Rec."Receipt No.");
+                    Navigate.Run();
+                end;
+            }
         }
     }
 
