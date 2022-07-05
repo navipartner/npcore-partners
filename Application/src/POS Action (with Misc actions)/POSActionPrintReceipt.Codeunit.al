@@ -4,7 +4,6 @@
 
     var
         ActionDescription: Label 'This is a built-in action for printing a receipt for the current or selected transaction.';
-        CurrentRegisterNo: Code[10];
         ReceiptListFilterOption: Option "None","POS Store","POS Unit",Salesperson;
         EnterReceiptNoLbl: Label 'Enter Receipt Number';
         ReadingErr: Label 'reading in %1';
@@ -62,6 +61,7 @@
         POSEntryMgt: Codeunit "NPR POS Entry Management";
         POSSetup: Codeunit "NPR POS Setup";
         POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
         Salesperson: Record "Salesperson/Purchaser";
         SalesTicketNo: Code[20];
         FilterEntityCode: Code[20];
@@ -79,7 +79,7 @@
         PresetTableView := JSON.GetStringParameter('ReceiptListView');
 
         POSSession.GetSetup(POSSetup);
-        CurrentRegisterNo := POSSetup.GetPOSUnitNo();
+        POSSetup.GetPOSUnit(POSUnit);
 
         if (ReceiptListFilterOption < 0) or (ReceiptListFilterOption > ReceiptListFilterOption::Salesperson) then
             ReceiptListFilterOption := ReceiptListFilterOption::"POS Unit";
@@ -90,7 +90,7 @@
                     FilterEntityCode := POSStore.Code;
                 end;
             ReceiptListFilterOption::"POS Unit":
-                FilterEntityCode := CurrentRegisterNo;
+                FilterEntityCode := POSUnit."No.";
             ReceiptListFilterOption::Salesperson:
                 begin
                     POSSetup.GetSalespersonRecord(Salesperson);
@@ -118,18 +118,18 @@
 
             Setting::"Last Receipt",
             Setting::"Last Receipt Large":
-                SalesTicketNo := LastReceiptPOSEntry(Setting);
+                SalesTicketNo := LastReceiptPOSEntry(POSUnit, Setting);
 
             Setting::"Last Receipt and Balance",
             Setting::"Last Receipt and Balance Large":
-                SalesTicketNo := LastReceiptPOSEntry(Setting);
+                SalesTicketNo := LastReceiptPOSEntry(POSUnit, Setting);
 
             Setting::"Last Balance",
             Setting::"Last Balance Large":
-                SalesTicketNo := LastBalancePOSEntry(Setting = Setting::"Last Balance Large");
+                SalesTicketNo := LastBalancePOSEntry(POSUnit, Setting = Setting::"Last Balance Large");
         end;
         if SalesTicketNo <> '' then
-            AdditionalPrints(CurrentRegisterNo, SalesTicketNo, JSON);
+            AdditionalPrints(POSUnit."No.", SalesTicketNo, JSON);
 
         Handled := true;
     end;
@@ -182,39 +182,47 @@
         exit(POSEntry."Document No.");
     end;
 
-    local procedure LastReceiptPOSEntry(Setting: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large","Last Receipt and Balance","Last Receipt and Balance Large"): Code[20]
+    local procedure LastReceiptPOSEntry(POSUnit: Record "NPR POS Unit"; Setting: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large","Last Receipt and Balance","Last Receipt and Balance Large"): Code[20]
     var
         POSEntry: Record "NPR POS Entry";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
     begin
-        POSEntry.SetRange("POS Unit No.", CurrentRegisterNo);
-        POSEntry.SetRange("System Entry", false);
+        FilterPOSEntries(POSUnit, POSEntry);
         POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::"Direct Sale");
 
         if POSEntry.FindLast() then begin
             POSEntryManagement.PrintEntry(POSEntry, Setting in [Setting::"Choose Receipt Large", Setting::"Last Receipt Large"]);
             if (Setting in [Setting::"Last Receipt and Balance", Setting::"Last Receipt and Balance Large"]) then
-                LastBalancePOSEntry(Setting = Setting::"Last Receipt and Balance Large");
+                LastBalancePOSEntry(POSUnit, Setting = Setting::"Last Receipt and Balance Large");
             exit(POSEntry."Document No.");
         end;
     end;
 
-    local procedure LastBalancePOSEntry(LargePrint: Boolean): Code[20]
+    local procedure LastBalancePOSEntry(POSUnit: Record "NPR POS Unit"; LargePrint: Boolean): Code[20]
     var
         POSEntry: Record "NPR POS Entry";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
     begin
-        if (CurrentRegisterNo = '') then
+        if not FilterPOSEntries(POSUnit, POSEntry) then
             exit('');
-
-        POSEntry.SetFilter("POS Unit No.", '=%1', CurrentRegisterNo);
-        POSEntry.SetFilter("System Entry", '=%1', false);
         POSEntry.SetFilter("Entry Type", '=%1', POSEntry."Entry Type"::Balancing);
 
         if POSEntry.FindLast() then begin
             POSEntryManagement.PrintEntry(POSEntry, LargePrint);
             exit(POSEntry."Document No.");
         end;
+    end;
+
+    local procedure FilterPOSEntries(POSUnit: Record "NPR POS Unit"; var POSEntry: Record "NPR POS Entry"): Boolean
+    begin
+        if POSUnit."No." = '' then
+            exit(false);
+
+        POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
+        POSEntry.SetRange("POS Store Code", POSUnit."POS Store Code");
+        POSEntry.SetRange("POS Unit No.", POSUnit."No.");
+        POSEntry.SetRange("System Entry", false);
+        exit(true);
     end;
 
     local procedure AdditionalPrints(RegisterNo: Code[10]; SalesTicketNo: Code[20]; var JSON: Codeunit "NPR POS JSON Management")
@@ -260,9 +268,10 @@
 
         if JSON.GetBoolean('Print Tax Free Voucher') then begin
             POSEntry.Reset();
+            POSEntry.SetCurrentKey("Document No.");
+            POSEntry.SetRange("Document No.", SalesTicketNo);
             POSEntry.SetRange("System Entry", false);
             POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
-            POSEntry.SetRange("Document No.", SalesTicketNo);
             PrintDoc := not POSEntry.IsEmpty();
 
             if PrintDoc then
