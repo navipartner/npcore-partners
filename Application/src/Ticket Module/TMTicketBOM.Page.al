@@ -8,6 +8,9 @@
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     ContextSensitiveHelpPage = 'product/ticket/intro.html';
     PromotedActionCategories = 'New,Process,Report,Create Tickets,Navigate';
+    CardPageId = "NPR TM Ticket BOM Card";
+    Editable = true;
+
     layout
     {
         area(content)
@@ -296,7 +299,7 @@
                 PromotedIsBig = true;
                 trigger OnAction()
                 begin
-                    MakeTickets(TicketPaymentType::PREPAID);
+                    MakeTickets(TicketPaymentType::PREPAID, Rec."Item No.", Rec."Variant Code");
                 end;
             }
             Action("Create Postpaid Tickets")
@@ -311,7 +314,7 @@
                 PromotedIsBig = true;
                 trigger OnAction()
                 begin
-                    MakeTickets(TicketPaymentType::POSTPAID);
+                    MakeTickets(TicketPaymentType::POSTPAID, Rec."Item No.", Rec."Variant Code");
                 end;
             }
         }
@@ -334,7 +337,7 @@
         TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
 
-    local procedure MakeTickets(PaymentType: Option)
+    procedure MakeTickets(PaymentType: Option; ItemNo: Code[20]; VariantCode: Code[10])
     var
         Ticket: Record "NPR TM Ticket";
         OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
@@ -349,7 +352,7 @@
 
         Token := TicketRequestManager.GetNewToken();
 
-        if (not FinalizeReservation(CreateTicketRequest(PaymentType, Token, Rec."Item No.", Rec."Variant Code"), Rec."Item No.", Rec."Variant Code")) then begin
+        if (not FinalizeReservation(CreateTicketRequest(PaymentType, Token, ItemNo, VariantCode), ItemNo, VariantCode)) then begin
             TicketRequestManager.DeleteReservationRequest(Token, true);
             exit;
         end;
