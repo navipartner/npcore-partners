@@ -91,6 +91,16 @@
             Caption = 'Turnstile Error Image';
             DataClassification = CustomerContent;
         }
+        field(30; "Show Sensitive Info"; Boolean)
+        {
+            Caption = 'Show Sensitive Info';
+            DataClassification = CustomerContent;
+        }
+        field(35; "Use Foreign Membership"; Boolean)
+        {
+            Caption = 'Use Foreign Membership';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

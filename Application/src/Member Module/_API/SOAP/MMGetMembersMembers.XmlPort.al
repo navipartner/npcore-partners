@@ -26,6 +26,11 @@ xmlport 6060130 "NPR MM Get Members. Members"
                     fieldelement(cardnumber; tmpMemberInfoRequest."External Card No.")
                     {
                     }
+                    textelement(includememberimage)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                    }
                 }
                 textelement(response)
                 {
@@ -102,6 +107,9 @@ xmlport 6060130 "NPR MM Get Members. Members"
                         {
                         }
                         fieldelement(email; tmpMemberInfoResponse."E-Mail Address")
+                        {
+                        }
+                        textelement(base64Image)
                         {
                         }
                         textelement(memberships)
@@ -233,6 +241,11 @@ xmlport 6060130 "NPR MM Get Members. Members"
         NPRAttributeKey: Record "NPR Attribute Key";
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
         RequestMemberUpdate: Record "NPR MM Request Member Update";
+        TempBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
+        InStr: InStream;
+        Base64Convert: Codeunit "Base64 Convert";
+        IncludeMemberImageBool: Boolean;
     begin
 
         errordescription := '';
@@ -254,6 +267,14 @@ xmlport 6060130 "NPR MM Get Members. Members"
                 Member.Get(MembershipRole."Member Entry No.");
 
                 tmpMemberInfoResponse.TransferFields(Member, true);
+
+                if Evaluate(IncludeMemberImageBool, includememberimage) and IncludeMemberImageBool then
+                    if Member.Image.HasValue() then begin
+                        TempBlob.CreateOutStream(OutStr);
+                        Member.Image.ExportStream(OutStr);
+                        TempBlob.CreateInStream(InStr);
+                        base64Image := Base64Convert.ToBase64(InStr);
+                    end;
 
                 MemberCard.SetCurrentKey("Member Entry No.");
                 MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
@@ -336,6 +357,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
         errordescription := ErrorMessage;
         status := '0';
     end;
+
 }
 
 
