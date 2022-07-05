@@ -108,6 +108,15 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             }
         }
 
+        addlast("Prices & Sales")
+        {
+            field("NPR Sales (Qty.)"; Rec."Sales (Qty.)")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Sales (Qty.) field';
+            }
+        }
+
         addbefore("Cost Details")
         {
             group("NPR Dimensions")
