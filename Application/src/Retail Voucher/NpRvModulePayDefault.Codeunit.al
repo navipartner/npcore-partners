@@ -1,6 +1,7 @@
 ﻿codeunit 6151017 "NPR NpRv Module Pay.: Default"
 {
     Access = Internal;
+
     var
         Text000: Label 'Apply Payment - Default (Full Payment)';
 
@@ -167,7 +168,7 @@
         MagentoPaymentLineNew."No." := TempNpRvVoucher."Reference No.";
         MagentoPaymentLineNew.Amount := -ReturnAmount;
         MagentoPaymentLineNew."Account Type" := MagentoPaymentLineNew."Account Type"::"G/L Account";
-        MagentoPaymentLineNew."Account No." := NpRvVoucherType."Account No.";
+        MagentoPaymentLineNew."Account No." := NpRvVoucherTypeNew."Account No.";
         MagentoPaymentLineNew.Description := TempNpRvVoucher.Description;
         MagentoPaymentLineNew."Source Table No." := Database::"NPR NpRv Voucher";
         MagentoPaymentLineNew."Source No." := TempNpRvVoucher."No.";
