@@ -339,6 +339,7 @@
         MMAdmissionServiceLog: Record "NPR MM Admis. Service Log";
         MMAdmissionServiceEntry: Record "NPR MM Admis. Service Entry";
         MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup";
+        Member: Record "NPR MM Member";
         DataError: Boolean;
         MMMemberWebService: Codeunit "NPR MM Member WebService";
         MessageText: Text;
@@ -405,6 +406,9 @@
                         Name := MMAdmissionServiceEntry."Ticket Type Description";
                     end;
             end;
+            if Name <> MMAdmissionServiceEntry."Display Name" then
+                if MMAdmissionServiceSetup."Show Sensitive Info" and Member.Get(MMAdmissionServiceEntry."Member Entry No.") then
+                    Name += ' - ' + Member."Display Name" + ' - ' + GetMemberAge(Member);
 
             case MMAdmissionServiceEntry.Type of
                 MMAdmissionServiceEntry.Type::Blank:
@@ -457,6 +461,21 @@
         Commit();
 
         exit(MMAdmissionServiceLog."Return Value");
+    end;
+
+    local procedure GetMemberAge(Member: Record "NPR MM Member"): Text
+    var
+        Age: Integer;
+    begin
+        if Member.Birthday <> 0D then begin
+            Age := Date2DWY(Today(), 3) - Date2DWY(Member.Birthday, 3);
+            if ((Date2DWY(Today(), 2) < Date2DWY(Member.Birthday, 2)) or
+             (Date2DWY(Today(), 2) = Date2DWY(Member.Birthday, 2)) and (Date2DWY(Today(), 1) < Date2DWY(Member.Birthday, 1))) then
+                Age -= 1;
+            exit(Format(Age)); // generally perceived age
+        end;
+
+        exit('unknown');
     end;
 
     procedure ValidateConnection(ScannerStationId: Code[10]): Text
@@ -584,7 +603,6 @@
 
     procedure GuestValidationV2(Barcode: Text[50]; ScannerStationId: Code[10]; var No: Code[20]; var Token: Code[50]; var ErrorNumber: Code[10]; var ErrorDescription: Text; var LightColor: Text[30]): Boolean
     var
-        MMMemberWebService: Codeunit "NPR MM Member WebService";
         MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
         AuxItem: Record "NPR Auxiliary Item";
@@ -601,6 +619,7 @@
         MMMembershipSetup: Record "NPR MM Membership Setup";
         AdmissionCode: Code[20];
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
     begin
 
         SelectLatestVersion();
@@ -648,11 +667,9 @@
             AdmissionCode := MMAdmissionScannerStations."Admission Code";
 
         if not DataError then begin
-            if MMAdmissionServiceSetup."Validate Members" and not AdmissionIsValid then begin
-                if MMMemberWebService.MemberCardNumberValidation(Barcode, ScannerStationId) then begin
-                    MemberCard.SetCurrentKey("External Card No.");
-                    MemberCard.SetRange("External Card No.", Barcode);
-                    if MemberCard.FindLast() then begin
+            if MMAdmissionServiceSetup."Validate Members" and not AdmissionIsValid then
+                if MemberCardNumberValidation(Barcode, ScannerStationId, MMAdmissionServiceSetup) then
+                    if MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(Barcode)) then
                         if Member.Get(MemberCard."Member Entry No.") then begin
                             MMAdmissionServiceLog."Response No" := Member."External Member No.";
                             MMAdmissionServiceLog."Response Token" := CreateToken();
@@ -678,13 +695,8 @@
                             AdmissionIsValid := true;
                             LightColor := '2';
                         end;
-                    end;
-                end;
-            end;
 
-            if MMAdmissionServiceSetup."Validate Tickes" and not AdmissionIsValid then begin
-
-                //IF TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) THEN BEGIN
+            if MMAdmissionServiceSetup."Validate Tickes" and not AdmissionIsValid then
                 if TMTicketWebService.ValidateTicketArrival(AdmissionCode, Barcode, ScannerStationId, MessageText) then begin
 #pragma warning disable AA0139
                     MMAdmissionServiceLog."Response No" := Barcode;
@@ -705,10 +717,6 @@
                     MMAdmissionServiceEntry."External Ticket No." := TMTicket."External Ticket No.";
                     MMAdmissionServiceEntry."External Card No." := TMTicket."External Member Card No.";
 
-                    //      IF TMTicketType.GET(TMTicket."Ticket Type Code") THEN BEGIN
-                    //        MMAdmissionServiceEntry."Ticket Type Code" := TMTicketType.Code;
-                    //        MMAdmissionServiceEntry."Ticket Type Description" := TMTicketType.Description;
-                    //      END;
                     if Item.Get(TMTicket."Item No.") then begin
                         Item.NPR_GetAuxItem(AuxItem);
                         MMAdmissionServiceEntry."Ticket Type Code" := AuxItem."TM Ticket Type";
@@ -716,7 +724,6 @@
                             MMAdmissionServiceEntry."Ticket Type Description" := CopyStr(Item.Description, 1, MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description"))
                         else
                             MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
-                        //MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
                     end;
 
                     MemberCard.SetCurrentKey("External Card No.");
@@ -742,13 +749,12 @@
 #pragma warning disable AA0139
                     MMAdmissionServiceLog."Response No" := Barcode;
 #pragma warning restore
-
                     MMAdmissionServiceEntry.Type := MMAdmissionServiceEntry.Type::Ticket;
                     MMAdmissionServiceEntry.Key := MMAdmissionServiceLog."Response No";
                     MMAdmissionServiceEntry."Display Name" := TicketDisplayName;
                     MMAdmissionServiceEntry.Message := CopyStr(MessageText, 1, MaxStrLen(MMAdmissionServiceEntry.Message));
                 end;
-            end;
+
             if not AdmissionIsValid then begin
                 if StrPos(MessageText, '-1004') > 0 then begin
                     ErrorNumber := '1002';
@@ -777,6 +783,30 @@
         Commit();
 
         exit(MMAdmissionServiceLog."Return Value");
+    end;
+
+    local procedure MemberCardNumberValidation(Barcode: Text[50]; ScannerStationId: Code[10]; MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"): Boolean
+    var
+        MMMemberWebService: Codeunit "NPR MM Member WebService";
+    begin
+        if MMMemberWebService.MemberCardNumberValidation(Barcode, ScannerStationId) then
+            exit(true);
+
+        if MMAdmissionServiceSetup."Use Foreign Membership" then
+            if Foreign_MemberCardNumberValidation(Barcode) then
+                exit(true);
+    end;
+
+    local procedure Foreign_MemberCardNumberValidation(Barcode: Text[50]): Boolean
+    var
+        ForeignMembershipMgr: Codeunit "NPR MM Foreign Members. Mgr.";
+        FormattedForeignCardNumber: Text[100];
+        ForeignCardIsValid: Boolean;
+        NotFoundReasonText: Text;
+    begin
+        ForeignMembershipMgr.DispatchToReplicateForeignMemberCard('', Barcode, true, FormattedForeignCardNumber, ForeignCardIsValid, NotFoundReasonText);
+        if ForeignCardIsValid then
+            exit(true);
     end;
 
     #region Admis. Scanner Stations

@@ -106,7 +106,7 @@
             FormattedCardNumber := ExternalMemberCardNo;
         end;
 
-        ForeignMembershipEntryNo := ForeignMembershipMgr.DispatchToReplicateForeignMemberCard('', ExternalMemberCardNo, FormattedForeignCardNumber, ForeignCardIsValid, NotFoundReasonText);
+        ForeignMembershipEntryNo := ForeignMembershipMgr.DispatchToReplicateForeignMemberCard('', ExternalMemberCardNo, false, FormattedForeignCardNumber, ForeignCardIsValid, NotFoundReasonText);
         if (ForeignCardIsValid) then begin
             MembershipEntryNo := ForeignMembershipEntryNo;
             FormattedCardNumber := FormattedForeignCardNumber;

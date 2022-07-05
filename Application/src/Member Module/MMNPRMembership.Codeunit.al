@@ -2,6 +2,7 @@
 codeunit 6060147 "NPR MM NPR Membership"
 {
     Access = Internal;
+
     var
         InvalidXml: Label 'An invalid XML was returned:\%1';
         MemberCardValidation: Label 'Service %1 at %2 could not validate membercard %3.';
@@ -19,7 +20,7 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Foreign Members. Mgr.", 'OnDispatchToReplicateForeignMemberCard', '', true, true)]
     local procedure OnValidateAndReplicateForeignMemberCardSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20];
-        ForeignMemberCardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text; var IsHandled: Boolean)
+        ForeignMemberCardNumber: Text[100]; IncludeMemberImage: Boolean; var IsValid: Boolean; var NotValidReason: Text; var IsHandled: Boolean)
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
         NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
@@ -43,7 +44,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         ValidateForeignMemberCard(NPRRemoteEndpointSetup, NoPrefixForeignMemberCardNumber, IsValid, NotValidReason);
 
         if (IsValid) then
-            ReplicateMembership(NPRRemoteEndpointSetup, NoPrefixForeignMemberCardNumber, IsValid, NotValidReason);
+            ReplicateMembership(NPRRemoteEndpointSetup, NoPrefixForeignMemberCardNumber, IncludeMemberImage, IsValid, NotValidReason);
 
         if (not IsValid) then
             if (NoPrefixForeignMemberCardNumber <> ForeignMemberCardNumber) then
@@ -256,7 +257,7 @@ codeunit 6060147 "NPR MM NPR Membership"
             exit;
     end;
 
-    local procedure ReplicateMembership(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; ForeignMemberCardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text)
+    local procedure ReplicateMembership(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; ForeignMemberCardNumber: Text[100]; IncludeMemberImage: Boolean; var IsValid: Boolean; var NotValidReason: Text)
     var
         ForeignMembershipNumber: Code[20];
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
@@ -285,7 +286,7 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         MembershipSetup.Get(RemoteInfoCapture."Membership Code");
         if (MembershipSetup."Member Information" = MembershipSetup."Member Information"::NAMED) then
-            if (not (GetRemoteMember(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, RemoteInfoCapture, TempRequestMemberFieldUpdate, NotValidReason))) then
+            if (not (GetRemoteMember(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, IncludeMemberImage, RemoteInfoCapture, TempRequestMemberFieldUpdate, NotValidReason))) then
                 exit;
 
         IsValid := CreateLocalMembership(RemoteInfoCapture);
@@ -347,13 +348,13 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(IsValid);
     end;
 
-    local procedure GetRemoteMember(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMemberCardNumber: Text[100]; ForeignMembershipNumber: Code[20]; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var TempRequestMemberFieldUpdate: Record "NPR MM Request Member Update" temporary; var NotValidReason: Text) IsValid: Boolean
+    local procedure GetRemoteMember(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMemberCardNumber: Text[100]; ForeignMembershipNumber: Code[20]; IncludeMemberImage: Boolean; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var TempRequestMemberFieldUpdate: Record "NPR MM Request Member Update" temporary; var NotValidReason: Text) IsValid: Boolean
     var
         SoapAction: Text;
         XmlDocRequest: XmlDocument;
         XmlDocResponse: XmlDocument;
     begin
-        GetMembershipMemberRequest(ForeignMembershipNumber, ForeignMemberCardNumber, '', SoapAction, XmlDocRequest);
+        GetMembershipMemberRequest(ForeignMembershipNumber, ForeignMemberCardNumber, '', IncludeMemberImage, SoapAction, XmlDocRequest);
         if (not WebServiceApi(NPRRemoteEndpointSetup, SoapAction, NotValidReason, XmlDocRequest, XmlDocResponse)) then
             exit(false);
 
@@ -642,7 +643,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(true);
     end;
 
-    local procedure GetMembershipMemberRequest(ExternalMembershipNumber: Code[20]; ExternalMemberCardNumber: Text[100]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
+    local procedure GetMembershipMemberRequest(ExternalMembershipNumber: Code[20]; ExternalMemberCardNumber: Text[100]; ScannerStationId: Text; IncludeMemberImage: Boolean; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlRequest: Text;
     begin
@@ -659,15 +660,16 @@ codeunit 6060147 "NPR MM NPR Membership"
          '                  <membershipnumber>%1</membershipnumber>' +
          '                  <membernumber></membernumber>' +
          '                  <cardnumber>%2</cardnumber>' +
+         '                  <includememberimage>%3</includememberimage>' +
          '               </request>' +
          '            </getmembers>' +
          '         </mem:member>' +
-         '         <mem:scannerStationId>%3</mem:scannerStationId>' +
+         '         <mem:scannerStationId>%4</mem:scannerStationId>' +
          '      </mem:GetMembershipMembers>' +
          '   </soapenv:Body>' +
          '</soapenv:Envelope>';
 
-        XmlRequest := StrSubstNo(XmlRequest, ExternalMembershipNumber, ExternalMemberCardNumber, ScannerStationId);
+        XmlRequest := StrSubstNo(XmlRequest, ExternalMembershipNumber, ExternalMemberCardNumber, IncludeMemberImage, ScannerStationId);
         XmlDocument.ReadFrom(XmlRequest, XmlDoc);
         XmlDoc.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'no'));
     end;
@@ -685,6 +687,11 @@ codeunit 6060147 "NPR MM NPR Membership"
         TextCountry: Text;
         TextCountryCode: Text;
         CountryRegion: Record "Country/Region";
+        Base64Image: Text;
+        Base64Convert: Codeunit "Base64 Convert";
+        OutStr: OutStream;
+        InStr: InStream;
+        TempBlob: Codeunit "Temp Blob";
     begin
         // <GetMembershipMembers_Result xmlns="urn:microsoft-dynamics-schemas/codeunit/member_services">
         //    <member>
@@ -708,6 +715,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         //      <newsletter>0</newsletter>
         //      <phoneno/>
         //      <email>test0227@test.se</email>
+        //      <base64Image>/9j/4AAQSkZJRgABAQEAYAB..</base64Image>
 
         //      <requestfieldupdate>
         //        <field entryno="7" fieldno="35">
@@ -758,6 +766,13 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         MemberInfoCapture."Phone No." := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'phoneno', MaxStrLen(MemberInfoCapture."Phone No."), false);
         MemberInfoCapture."E-Mail Address" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'email', MaxStrLen(MemberInfoCapture."E-Mail Address"), false);
+        Base64Image := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'base64Image', 0, false);
+        if Base64Image <> '' then begin
+            TempBlob.CreateOutStream(OutStr);
+            Base64Convert.FromBase64(Base64Image, OutStr);
+            TempBlob.CreateInStream(InStr);
+            MemberInfoCapture.Image.ImportStream(InStr, MemberInfoCapture.FieldName(Image));
+        end;
 
         ElementPath := '//GetMembershipMembers_Result/member/getmembers/response/member/requestfieldupdate';
         if (NpXmlDomMgt.FindNode(Element.AsXmlNode(), ElementPath, Node)) then begin
@@ -1118,6 +1133,69 @@ codeunit 6060147 "NPR MM NPR Membership"
         end;
         iAuth.CheckMandatoryValues(AuthParamsBuff);
         iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
+    end;
+
+    procedure TestEndpointConnection(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup")
+    var
+        SoapAction: Text[50];
+        XmlDocRequest: XmlDocument;
+        XmlDocResponse: XmlDocument;
+        NotValidReason: Text;
+        InputTxt: Text;
+    begin
+        InputTxt := 'test';
+        TestEndpointConnectionRequest(SoapAction, InputTxt, XmlDocRequest);
+        if (not WebServiceApi(NPRRemoteEndpointSetup, 'Ping', NotValidReason, XmlDocRequest, XmlDocResponse)) then
+            Error(NotValidReason)
+        else begin
+            if TestEndpointConnectionResponse(XmlDocResponse, InputTxt, NotValidReason) then
+                Message('Connection OK')
+            else
+                Message(NotValidReason);
+        end;
+    end;
+
+    local procedure TestEndpointConnectionRequest(var SoapAction: Text[50]; InputTxt: Text; var XmlDoc: XmlDocument)
+    var
+        XmlRequest: Text;
+    begin
+        SoapAction := 'Ping';
+        XmlRequest :=
+          '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services">' +
+          '   <soapenv:Header/>' +
+          '   <soapenv:Body>' +
+          '      <mem:Ping>' +
+          '         <mem:inputTxt>%1</mem:inputTxt>' +
+          '      </mem:Ping>' +
+          '   </soapenv:Body>' +
+          '</soapenv:Envelope>';
+        XmlRequest := StrSubstNo(XmlRequest, InputTxt);
+        XmlDocument.ReadFrom(XmlRequest, XmlDoc);
+        XmlDoc.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'no'));
+    end;
+
+    local procedure TestEndpointConnectionResponse(var XmlDoc: XmlDocument; InputTxt: Text; var ResponseText: Text): Boolean
+    var
+        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        Element: XmlElement;
+        ResultTxt: Text;
+        XmlMessage: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
+    begin
+        XmlDoc.WriteTo(XmlMessage);
+        XmlMessage := XmlDomMgt.RemoveNameSpaces(XmlMessage);
+        XmlDocument.ReadFrom(XmlMessage, XmlDoc);
+        if (not XmlDoc.GetRoot(Element)) then begin
+            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlMessage));
+            exit(false);
+        end;
+        ResultTxt := NpXmlDomMgt.GetXmlText(Element, '//Ping_Result/return_value', 0, false);
+        if ResultTxt = 'Pong:' + InputTxt then
+            exit(true)
+        else begin
+            ResponseText := 'Unexpected Response Text.';
+            Exit(false);
+        end;
     end;
 }
 #pragma warning restore
