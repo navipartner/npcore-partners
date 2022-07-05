@@ -1,6 +1,7 @@
 ﻿codeunit 6151521 "NPR Nc Trigger Scheduler"
 {
     Access = Internal;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR Nc Trigger", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertNcTriggerInsertTaskLine(var Rec: Record "NPR Nc Trigger"; RunTrigger: Boolean)
     begin
@@ -123,6 +124,7 @@
         TaskLine.SetRange("Journal Batch Name", NcTriggerSetup."Task Batch Name");
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Trigger is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure FindTaskLine(NcTrigger: Record "NPR Nc Trigger"; var TaskLine: Record "NPR Task Line"; var TaskLineParam: Record "NPR Task Line Parameters"): Boolean
     var
         NcTriggerSetup: Record "NPR Nc Trigger Setup";
@@ -130,18 +132,19 @@
         NcTriggerSetup.Get();
         FilterTaskLines(TaskLine, NcTriggerSetup);
         if TaskLine.FindSet() then
-            repeat
-                TaskLineParam.SetRange("Journal Template Name", TaskLine."Journal Template Name");
-                TaskLineParam.SetRange("Journal Batch Name", TaskLine."Journal Batch Name");
-                TaskLineParam.SetRange("Journal Line No.", TaskLine."Line No.");
-                TaskLineParam.SetRange("Field Code", GetParamName());
-                TaskLineParam.SetRange(Value, NcTrigger.Code);
-                if TaskLineParam.FindFirst() then
-                    exit(true);
-            until TaskLine.Next() = 0;
+                repeat
+                    TaskLineParam.SetRange("Journal Template Name", TaskLine."Journal Template Name");
+                    TaskLineParam.SetRange("Journal Batch Name", TaskLine."Journal Batch Name");
+                    TaskLineParam.SetRange("Journal Line No.", TaskLine."Line No.");
+                    TaskLineParam.SetRange("Field Code", GetParamName());
+                    TaskLineParam.SetRange(Value, NcTrigger.Code);
+                    if TaskLineParam.FindFirst() then
+                        exit(true);
+                until TaskLine.Next() = 0;
         exit(false);
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Trigger is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure GetParamName(): Text
     begin
         exit('NCTRIG');
