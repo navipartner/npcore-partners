@@ -35,7 +35,7 @@
         OnFormatForeignCardnumberFromScan(CommunityCode, ManagerCode, ScannedCardnumber, FormatedCardnumber, IsHandled);
     end;
 
-    procedure DispatchToReplicateForeignMemberCard(CommunityCode: Code[20]; ForeignMembercardNumber: Text[100]; var FormatedCardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text) MembershipEntryNo: Integer
+    procedure DispatchToReplicateForeignMemberCard(CommunityCode: Code[20]; ForeignMembercardNumber: Text[100]; IncludeMemberImage: Boolean; var FormatedCardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text) MembershipEntryNo: Integer
     var
         ForeignValidationSetup: Record "NPR MM Foreign Members. Setup";
         IsHandled: Boolean;
@@ -56,7 +56,7 @@
 
         if (ForeignValidationSetup.FindSet()) then begin
             repeat
-                OnDispatchToReplicateForeignMemberCard(ForeignValidationSetup."Community Code", ForeignValidationSetup."Manager Code", ForeignMembercardNumber, IsValid, NotValidReason, IsHandled);
+                OnDispatchToReplicateForeignMemberCard(ForeignValidationSetup."Community Code", ForeignValidationSetup."Manager Code", ForeignMembercardNumber, IncludeMemberImage, IsValid, NotValidReason, IsHandled);
 
                 if (not IsHandled) then
                     Error(NotHandled, ForeignMembercardNumber, ForeignValidationSetup.FieldCaption("Community Code"), ForeignValidationSetup."Community Code");
@@ -95,7 +95,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDispatchToReplicateForeignMemberCard(CommunityCode: Code[20]; ManagerCode: Code[20]; ForeignMembercardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text; var IsHandled: Boolean)
+    local procedure OnDispatchToReplicateForeignMemberCard(CommunityCode: Code[20]; ManagerCode: Code[20]; ForeignMembercardNumber: Text[100]; IncludeMemberImage: Boolean; var IsValid: Boolean; var NotValidReason: Text; var IsHandled: Boolean)
     begin
     end;
 

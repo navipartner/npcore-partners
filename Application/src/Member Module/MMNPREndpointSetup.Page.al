@@ -104,6 +104,27 @@
 
     actions
     {
+
+        area(Processing)
+        {
+            action(TestConnection)
+            {
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Caption = 'Test Connection';
+                Image = TestDatabase;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                ToolTip = 'Executes the Test Connection action';
+
+                trigger OnAction()
+                var
+                    MMMembership: Codeunit "NPR MM NPR Membership";
+                begin
+                    MMMembership.TestEndpointConnection(Rec);
+                end;
+            }
+        }
     }
 
     trigger OnOpenPage()

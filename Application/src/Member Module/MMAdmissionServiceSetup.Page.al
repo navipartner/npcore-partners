@@ -46,6 +46,17 @@
                     ToolTip = 'Specifies the value of the Allowed Re-Scan Interval field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+
+                field("Show Sensitive Info"; Rec."Show Sensitive Info")
+                {
+                    ToolTip = 'Specifies if the system should show sensitive information like Member Name and Age.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Use Foreign Membership"; Rec."Use Foreign Membership")
+                {
+                    ToolTip = 'Specifies if the system should use Foreign Membership';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field(WebServiceIsPublished; WebServiceIsPublished)
                 {
                     Caption = 'Web Service Is Published';
@@ -113,6 +124,15 @@
         WebServiceManagement.LoadRecords(WebService);
         if WebService.Get(WebService."Object Type"::Codeunit, 'admission_service') then
             WebServiceIsPublished := true;
+    end;
+
+    trigger OnOpenPage()
+    begin
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
+        end;
     end;
 
     var

@@ -1178,6 +1178,12 @@
 
     end;
 
+    procedure Ping(inputTxt: Text[50]): Text
+    var
+    begin
+        exit('Pong:' + inputTxt);
+    end;
+
     local procedure IsMembershipValid(MembershipEntryNo: Integer) IsValid: Boolean
     var
         MembershipMgr: Codeunit "NPR MM Membership Mgt.";
