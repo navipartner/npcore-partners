@@ -118,8 +118,9 @@
         }
         area(factboxes)
         {
-            part(Control6150641; "Item Invoicing FactBox")
+            part(Control6150641; "NPR Item Details - Invoicing")
             {
+
                 Provider = SubLine;
                 SubPageLink = "No." = FIELD("Item No.");
                 ApplicationArea = NPRRetail;
@@ -132,6 +133,7 @@
                 ApplicationArea = NPRRetail;
 
             }
+
         }
     }
 
