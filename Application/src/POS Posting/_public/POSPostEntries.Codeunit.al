@@ -1411,6 +1411,7 @@
         GenJournalLine."Salespers./Purch. Code" := SalespersonCode;
         GenJournalLine."Reason Code" := ReasonCode;
         GenJournalLine."Source Code" := POSPostingProfile."Source Code";
+
         GenJournalLine.Insert();
     end;
 
