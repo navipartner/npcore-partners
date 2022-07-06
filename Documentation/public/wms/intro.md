@@ -1,6 +1,6 @@
 # Welcome to the NP Warehouse Management System product documentation
 
-NP WMS connects a company's inventory database in Business Central to the warehouse stock and makes every item visible across the supply chain, distribution centers, and sales channels. It also employs the RFID technology to more easily track item placement, status, quantity, and so on. 
+The NP WMS solution provides a variety of tools and processes for managing and tracking items in warehouse and inventory systems. It enables management of warehouse processes in Business Central with a mobile device app possible from any location, and at any time.
 
 This solution is recommended for any business which uses warehouses in its operations, regardless of its capacity, as it vastly improves organization, structure, and space management of warehouses. 
 

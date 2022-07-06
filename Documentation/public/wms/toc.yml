@@ -16,6 +16,14 @@
     href: explanation/cs_logs.md
   - name: Main header setup
     href: explanation/main-header-setup.md
+  - name: Warehouse and inventory putaways
+    href: explanation/warehouse_putaway.md
+  - name: Inventory and warehouse picks
+    href: explanation/inventory_warehouse_pick.md
+  - name: Inventory management approaches (FIFO and LIFO)
+    href: explanation/fifo_and_lifo.md
+  - name: Inventory adjustments
+    href: explanation/inventory_adjustments.md
 
 - name: How-to
   items: 
