@@ -126,7 +126,7 @@
             }
             field("Images Exist"; Rec."Images Exist")
             {
-                ToolTip = 'Specifies if there are any image related to POS Entry';
+                ToolTip = 'Specifies if there are any images related to the POS Entry';
                 ApplicationArea = NPRRetail;
             }
             group(CleanCashTransactions)
