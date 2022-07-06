@@ -2002,12 +2002,11 @@
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
-
         "Dimension Set ID" :=
-          DimMgt.GetDefaultDimID(
-            TableID, No, SalePOS.GetPOSSourceCode(),
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code",
-            SalePOS."Dimension Set ID", DATABASE::Customer);
+                DimMgt.GetRecDefaultDimID(
+                Rec, CurrFieldNo, TableID, No, SalePOS.GetPOSSourceCode(),
+                "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", SalePOS."Dimension Set ID", DATABASE::"NPR POS Store");
+
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
     end;
 

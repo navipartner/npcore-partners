@@ -806,7 +806,8 @@
         "Shortcut Dimension 2 Code" := '';
         OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
-          DimMgt.GetDefaultDimID(TableID, No, GetPOSSourceCode(), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
+          DimMgt.GetRecDefaultDimID(
+            Rec, CurrFieldNo, TableID, No, GetPOSSourceCode(), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
         if (OldDimSetID <> "Dimension Set ID") then begin
             Modify();
@@ -866,35 +867,35 @@
 
     procedure UpdateAllLineDim(NewParentDimSetID: Integer; OldParentDimSetID: Integer)
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
+        POSSaleLine: Record "NPR POS Sale Line";
         NewDimSetID: Integer;
     begin
         // Update all lines with changed dimensions.
         if NewParentDimSetID = OldParentDimSetID then
             exit;
 
-        SaleLinePOS.SetRange("Register No.", "Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-        SaleLinePOS.LockTable();
-        if SaleLinePOS.FindSet() then
+        POSSaleLine.SetRange("Register No.", "Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", "Sales Ticket No.");
+        POSSaleLine.LockTable();
+        if POSSaleLine.FindSet(true) then
             repeat
-                NewDimSetID := DimMgt.GetDeltaDimSetID(SaleLinePOS."Dimension Set ID", NewParentDimSetID, OldParentDimSetID);
-                if SaleLinePOS."Dimension Set ID" <> NewDimSetID then begin
-                    SaleLinePOS."Dimension Set ID" := NewDimSetID;
+                NewDimSetID := DimMgt.GetDeltaDimSetID(POSSaleLine."Dimension Set ID", NewParentDimSetID, OldParentDimSetID);
+                if POSSaleLine."Dimension Set ID" <> NewDimSetID then begin
+                    POSSaleLine."Dimension Set ID" := NewDimSetID;
                     DimMgt.UpdateGlobalDimFromDimSetID(
-                      SaleLinePOS."Dimension Set ID", SaleLinePOS."Shortcut Dimension 1 Code", SaleLinePOS."Shortcut Dimension 2 Code");
-                    SaleLinePOS.Modify();
+                      POSSaleLine."Dimension Set ID", POSSaleLine."Shortcut Dimension 1 Code", POSSaleLine."Shortcut Dimension 2 Code");
+                    POSSaleLine.Modify();
                 end;
-            until SaleLinePOS.Next() = 0;
+            until POSSaleLine.Next() = 0;
     end;
 
     procedure SalesLinesExist(): Boolean
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
+        POSSaleLine: Record "NPR POS Sale Line";
     begin
-        SaleLinePOS.SetRange("Register No.", "Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-        exit(SaleLinePOS.FindFirst());
+        POSSaleLine.SetRange("Register No.", "Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", "Sales Ticket No.");
+        exit(not POSSaleLine.IsEmpty());
     end;
 
     local procedure GetPOSUnit()
