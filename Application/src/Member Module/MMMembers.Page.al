@@ -185,10 +185,79 @@
                 trigger OnAction()
                 var
                     MemberWebService: Codeunit "NPR MM Member WebService";
+                    MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
+                    MembershipSetup: Record "NPR MM Membership Setup";
+                    Membership: Record "NPR MM Membership";
+                    MemberCard: Record "NPR MM Member Card";
+                    TicketBom: Record "NPR TM Ticket Admission BOM";
+                    MemberCardList: Page "NPR MM Member Card List";
+                    AdmissionSelection: Page "NPR TM Select Ticket Admission";
+                    VariantCode: Code[10];
+                    ItemNo: Code[20];
+                    ResolvingTable: Integer;
+                    MemberCardCount: Integer;
+                    AdmissionCount: Integer;
                     ResponseMessage: Text;
+                    AbortedLabel: Label 'Register arrival for member was aborted.';
+                    NoCardsFoundLabel: Label 'No active member cards found for this member.';
+                    NoAdmissionFoundLabel: Label 'No admissions found for the ticket item %1 setup on the membership code %2';
                 begin
 
-                    if (not MemberWebService.MemberRegisterArrival(Rec."External Member No.", '', 'RTC-CLIENT', ResponseMessage)) then
+                    // Select Card and thus membership when multiple
+                    MemberCard.SetCurrentKey("Member Entry No.");
+                    MemberCard.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
+                    MemberCard.SetFilter(Blocked, '=%1', false);
+                    MemberCard.SetFilter("Valid Until", '=%1|>=%2', 0D, Today());
+                    MemberCardCount := MemberCard.Count();
+
+                    case true of
+                        MemberCardCount > 1:
+                            begin
+                                MemberCardList.SetTableView(MemberCard);
+                                MemberCardList.Editable(false);
+                                MemberCardList.LookupMode(true);
+                                if (Action::LookupOK <> MemberCardList.RunModal()) then
+                                    Error(AbortedLabel);
+
+                                MemberCardList.GetRecord(MemberCard);
+                            end;
+                        MemberCardCount = 1:
+                            begin
+                                MemberCard.FindFirst();
+                            end;
+                        else
+                            Error(NoCardsFoundLabel);
+                    end;
+
+                    Membership.Get(MemberCard."Membership Entry No.");
+                    MembershipSetup.Get(Membership."Membership Code");
+                    MembershipSetup.TestField("Ticket Item Barcode");
+
+                    if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(MembershipSetup."Ticket Item Barcode", ItemNo, VariantCode, ResolvingTable))) then
+                        Error(AbortedLabel);
+
+                    // Select admissions from Ticket (from Membership setup) when multiple
+                    TicketBom.SetFilter("Item No.", '=%1', ItemNo);
+                    TicketBom.SetFilter("Variant Code", '=%1', VariantCode);
+                    AdmissionCount := TicketBom.Count();
+
+                    case true of
+                        AdmissionCount = 1:
+                            TicketBom.FindFirst();
+                        AdmissionCount > 1:
+                            begin
+                                AdmissionSelection.SetTableView(TicketBom);
+                                AdmissionSelection.Editable(false);
+                                AdmissionSelection.LookupMode(true);
+                                if (Action::LookupOK <> AdmissionSelection.RunModal()) then
+                                    Error(AbortedLabel);
+                                AdmissionSelection.GetRecord(TicketBom);
+                            end;
+                        else
+                            Error(NoAdmissionFoundLabel, MembershipSetup."Ticket Item Barcode", Membership."Membership Code");
+                    end;
+
+                    if (not MemberWebService.MemberCardRegisterArrival(MemberCard."External Card No.", TicketBom."Admission Code", 'BackOffice', ResponseMessage)) then
                         Error(ResponseMessage);
 
                     Message(ResponseMessage);
