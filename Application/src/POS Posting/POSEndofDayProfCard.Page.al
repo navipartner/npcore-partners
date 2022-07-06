@@ -58,7 +58,6 @@
                 {
                     ToolTip = 'Specifies which platform will show the End of Day user interface.';
                     ApplicationArea = NPRRetail;
-                    Visible = false;
                 }
                 field("Force Blind Counting"; Rec."Force Blind Counting")
                 {
