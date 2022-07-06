@@ -81,6 +81,13 @@
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Membership Card";
                 }
+                field("Membership Code"; Rec."Membership Code")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    DrillDownPageId = "NPR MM Membership Card";
+                }
                 field("External Member No."; Rec."External Member No.")
                 {
                     Editable = false;
