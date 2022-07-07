@@ -1,13 +1,13 @@
 ﻿report 6014533 "NPR Inventory - flow"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory - flow.rdlc';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-    Caption = 'Inventory Flow';
+    Caption = 'Inventory Movement';
     UseRequestPage = true;
     UseSystemPrinter = true;
     DataAccessIntent = ReadOnly;
@@ -17,19 +17,20 @@
         dataitem(Vendor; Vendor)
         {
             RequestFilterFields = "No.", "Date Filter";
-            column(No_Vendor; Vendor."No.")
+            PrintOnlyIfDetail = true;
+            column("No_Vendor"; Vendor."No.")
             {
             }
-            column(Name_Vendor; Vendor.Name)
+            column("Name_Vendor"; Vendor.Name)
             {
             }
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(ShowVendorSection_Vendor; ShowVendorSection)
+            column("ShowVendorSection_Vendor"; ShowVendorSection)
             {
             }
-            column(Filters_Vendor; Vendor.GetFilters)
+            column("Filters_Vendor"; Vendor.GetFilters)
             {
             }
             column(CompanyInfoPicture; CompanyInfo.Picture)
@@ -40,68 +41,71 @@
                 CalcFields = "Sales (Qty.)", "Purchases (Qty.)", "Purchases (LCY)", "Sales (LCY)", "Positive Adjmt. (Qty.)", "Negative Adjmt. (Qty.)", "COGS (LCY)";
                 DataItemLink = "Vendor No." = FIELD("No.");
                 RequestFilterFields = "No.", "Statistics Group", "Item Category Code", "Location Filter";
-                column(No_Item; Item."No.")
+                column("No_Item"; Item."No.")
                 {
                 }
-                column(Description_Item; Item.Description)
+                column("Description_Item"; Item.Description)
                 {
                 }
-                column(ItemCategory_Item; "Item Category Code")
+                column("ItemCategory_Item"; "Item Category Code")
                 {
                 }
-                column(StockInventoryStart_Item; StockInventoryStart)
+                column("StockInventoryStart_Item"; StockInventoryStart)
                 {
                 }
-                column(Regulatory_Item; Regulatory)
+                column("Regulatory_Item"; Regulatory)
                 {
                 }
-                column(StockInventoryEnd_Item; StockInventoryEnd)
+                column("StockInventoryEnd_Item"; StockInventoryEnd)
                 {
                 }
-                column(PurchasesQty_Item; Item."Purchases (Qty.)")
+                column("PurchasesQty_Item"; Item."Purchases (Qty.)")
                 {
                 }
-                column(SalesQty_Item; Item."Sales (Qty.)")
+                column("SalesQty_Item"; Item."Sales (Qty.)")
                 {
                 }
-                column(SalesFlowQty_Item; SalesFlowQty)
+                column("SalesFlowQty_Item"; SalesFlowQty)
                 {
                 }
-                column(PurchasesLCY_Item; Item."Purchases (LCY)")
+                column("PurchasesLCY_Item"; Item."Purchases (LCY)")
                 {
                 }
-                column(SalesLCY_Item; Item."Sales (LCY)")
+                column("SalesLCY_Item"; Item."Sales (LCY)")
                 {
                 }
-                column(COGSLCY_Item; Item."COGS (LCY)")
+                column("COGSLCY_Item"; Item."COGS (LCY)")
                 {
                 }
-                column(Profit_Item; Item."Sales (LCY)" - Item."COGS (LCY)")
+                column("Profit_Item"; Item."Sales (LCY)" - Item."COGS (LCY)")
                 {
                 }
-                column(dg_Item; dg)
+                column("dg_Item"; dg)
                 {
                 }
-                column(SalesFlowAmt_Item; SalesFlowAmt)
+                column("SalesFlowAmt_Item"; SalesFlowAmt)
                 {
                 }
-                column(ShowItemSection_Item; ShowItemSection)
+                column("ShowItemSection_Item"; ShowItemSection)
+                {
+                }
+                column(ApplyFilter; ApplyFilter)
                 {
                 }
                 dataitem("Item Category"; "Item Category")
                 {
                     DataItemLink = "Code" = FIELD("Item Category Code"), "NPR Vendor Filter" = FIELD("Vendor No.");
                     DataItemTableView = SORTING("Code");
-                    column(No_ItemCategory; "Item Category"."Code")
+                    column("No_ItemCategory"; "Item Category"."Code")
                     {
                     }
-                    column(Description_ItemCategory; "Item Category".Description)
+                    column("Description_ItemCategory"; "Item Category".Description)
                     {
                     }
                     column(StockInventoryStart2; StockInventoryStart2)
                     {
                     }
-                    column(ShowItemCategorySection_ItemCategory; ShowItemCategorySection)
+                    column("ShowItemCategorySection_ItemCategory"; ShowItemCategorySection)
                     {
                     }
 
@@ -285,6 +289,10 @@
                             ShowItem := true;
                         ShowItemSection := (not OnlyTotal and ShowItem);
                     end;
+
+                    If Item."Item Category Code" = '' then
+                        Item."Item Category Code" := NoCategoryLabel_Caption;
+
                 end;
 
                 trigger OnPreDataItem()
@@ -346,7 +354,10 @@
 
     labels
     {
-        Report_Caption = 'Inventory Flow';
+        Report_Caption = 'Inventory Movement';
+        Category_Caption = 'Category';
+        No_Caption = 'No';
+        Description_Caption = 'Description';
         Inventory_Caption = 'Inventory';
         Quantity_Caption = 'Quantity';
         Amount_Caption = 'Amount';
@@ -355,13 +366,13 @@
         End_Qty_Caption = 'End (Qty.)';
         Purchases_Qty_Caption = 'Purchases (Qty.)';
         Sales_Qty_Caption = 'Sales (Qty.)';
-        InventoryFlow_Qty_Caption = 'InventoryFlow (Qty) (&)';
+        InventoryFlow_Qty_Caption = 'Inventory Flow (Qty) (&)';
         Purchases_LCY_Caption = 'Purchases (LCY)';
         Sales_LCY_Caption = 'Sales (LCY)';
         COGS_LCY_Caption = 'COGS (LCY)';
         Profit_Caption = 'Profit';
         Profit_Pct_Caption = 'Profit %';
-        InventoryFlow_Amt_Caption = 'InventoryFlow (LCY) (&)';
+        InventoryFlow_Amt_Caption = 'Inventory Flow (LCY) (&)';
         Total_Caption = 'Total';
         ItemCategory_Caption = 'Item Category';
     }
@@ -374,6 +385,10 @@
         ShowVendorSection := false;
         ShowItemSection := false;
         ShowItemCategorySection := false;
+
+
+
+        ApplyFilter := "Item".GetFilters;
     end;
 
     var
@@ -400,5 +415,6 @@
         StockInventoryEnd: Decimal;
         StockInventoryStart: Decimal;
         StockInventoryStart2: Decimal;
+        ApplyFilter: Text;
+        NoCategoryLabel_Caption: Label '(None)';
 }
-
