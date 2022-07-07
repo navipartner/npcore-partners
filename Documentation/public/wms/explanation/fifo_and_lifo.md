@@ -1,4 +1,4 @@
-# Inventory management approaches (FIFO and LIFO)
+# Inventory costing methods
 
 Inventory management is a very important function for all product-oriented businesses. The valuation approach you chose can greatly impact the businesses' logistics, profitability, and income, so it's recommended to research how each of these can be used to maximize your profits.
 
