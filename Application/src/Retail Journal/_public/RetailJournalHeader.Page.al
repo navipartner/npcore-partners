@@ -256,32 +256,8 @@
             group(Texts)
             {
                 Caption = 'Texts';
-                action(GetFormItemCard)
-                {
-                    Caption = 'Get from Item Card';
-                    Image = Card;
+                Visible = false;
 
-                    ToolTip = 'Executes the Get from Item Card action';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnAction()
-                    var
-                        "Retail Journal Line": Record "NPR Retail Journal Line";
-                        item: Record Item;
-                    begin
-
-                        //CurrForm.SubLine.FORM.getSelectionFilter("Retail Journal Line");
-                        CurrPage.SubLine.PAGE.GetSelectionFilter("Retail Journal Line");
-                        if "Retail Journal Line".Find('-') then
-                            repeat
-                                if item.Get("Retail Journal Line"."Item No.") then begin
-                                    "Retail Journal Line".Validate(Description, item.Description);
-                                    "Retail Journal Line".Validate("Description 2", item."Description 2");
-                                    "Retail Journal Line".Modify(true);
-                                end;
-                            until "Retail Journal Line".Next() = 0;
-                    end;
-                }
             }
             group("Import From")
             {
@@ -612,6 +588,34 @@
                         d.Close();
                     end;
                 }
+                action(GetFormItemCard)
+                {
+                    Caption = 'Get from Item Card';
+                    Image = Card;
+
+                    ToolTip = 'Executes the Get from Item Card action';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        "Retail Journal Line": Record "NPR Retail Journal Line";
+                        item: Record Item;
+                    begin
+
+                        //CurrForm.SubLine.FORM.getSelectionFilter("Retail Journal Line");
+                        CurrPage.SubLine.PAGE.GetSelectionFilter("Retail Journal Line");
+                        if "Retail Journal Line".Find('-') then
+                            repeat
+                                if item.Get("Retail Journal Line"."Item No.") then begin
+                                    "Retail Journal Line".Validate(Description, item.Description);
+                                    "Retail Journal Line".Validate("Description 2", item."Description 2");
+                                    "Retail Journal Line".Modify(true);
+                                end;
+                            until "Retail Journal Line".Next() = 0;
+                    end;
+
+                }
+
                 action("Change Price on Selected Items")
                 {
                     Caption = 'Change Price on Selected Items';
