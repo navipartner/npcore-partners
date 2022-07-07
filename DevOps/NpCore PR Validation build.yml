@@ -5,7 +5,6 @@ resources:
   - repository: scriptsRepo
     type: git
     name: 'NpCore/NpDevOps'
-    ref: refs/heads/topic/test-new-visibility-check-and-generate-permissions-functionality
 
 stages:
 - template: /YAML/ZAL Build Definitions/PR Validation build.yml@scriptsRepo
