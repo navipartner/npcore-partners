@@ -481,6 +481,7 @@
         POSPostingSetup: Record "NPR POS Posting Setup";
         POSPostingSetupNewBin: Record "NPR POS Posting Setup";
         AmountToPostToAccount: Decimal;
+        TotalLineAmountLCY: Decimal;
         PostingSetupNotFoundLbl: Label '%1: %4, %2: %5, %3: %6', Locked = true;
     begin
         POSEntry.Copy(POSEntryIn);
@@ -492,18 +493,19 @@
                 POSBalancingLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                 if POSBalancingLine.FindSet() then
                     repeat
+                        TotalLineAmountLCY := 0;
                         GetPostingSetupFromBalancingLine(POSBalancingLine, POSPostingSetup);
                         POSPostingSetup.TestField("Account No.");
                         AmountToPostToAccount := 0;
                         if POSBalancingLine."Balanced Diff. Amount" > 0 then begin
                             POSPostingSetup.TestField("Difference Acc. No.");
-                            MakeGenJournalFromPOSBalancingLineWithVatOption(
+                            TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No.",
                                     POSBalancingLine."Balanced Diff. Amount", POSBalancingLine.Description, GenJournalLine);
                         end;
                         if POSBalancingLine."Balanced Diff. Amount" < 0 then begin
                             POSPostingSetup.TestField("Difference Acc. No. (Neg)");
-                            MakeGenJournalFromPOSBalancingLineWithVatOption(
+                            TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No. (Neg)",
                                     POSBalancingLine."Balanced Diff. Amount", POSBalancingLine.Description, GenJournalLine);
                         end;
@@ -520,7 +522,7 @@
                                 //Make posting only if the account is different for the new Bin
                                 AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."Move-To Bin Amount";
                                 POSPostingSetupNewBin.TestField("Account No.");
-                                MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
                                     POSBalancingLine."Move-To Bin Amount", POSBalancingLine."Move-To Reference", GenJournalLine);
                             end;
@@ -536,22 +538,39 @@
                             if (POSPostingSetup."Account Type" <> POSPostingSetupNewBin."Account Type") or (POSPostingSetup."Account No." <> POSPostingSetupNewBin."Account No.") then begin
                                 AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."Deposit-To Bin Amount";
                                 POSPostingSetupNewBin.TestField("Account No.");
-                                MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
                                     POSBalancingLine."Deposit-To Bin Amount", POSBalancingLine."Deposit-To Reference", GenJournalLine);
                             end;
                         end;
 
                         if POSBalancingLine."New Float Amount" <> 0 then
-                            MakeGenJournalFromPOSBalancingLineWithVatOption(
+                            TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                         POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.",
                                         POSBalancingLine."New Float Amount", StrSubstNo(TextClosingEntryFloat, POSEntry."Entry No."), GenJournalLine);
                         AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."New Float Amount";
 
                         if AmountToPostToAccount <> 0 then
-                            MakeGenJournalFromPOSBalancingLineWithVatOption(
+                            TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                             POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.",
                                             AmountToPostToAccount, POSBalancingLine.Description, GenJournalLine);
+
+                        // For transaction in currency there can be rounding residue, find the difference account to post to. 
+                        // This set of general journal lines need to balance in currency and LCY and rounding error is max 0.01 for each set of +/- entries. With 5 lines, max 0.01 per set => 0.02 should suffice.
+                        if ((POSBalancingLine."Currency Code" <> '') and (TotalLineAmountLCY <> 0) and (Abs(TotalLineAmountLCY) <= 0.05)) then begin
+                            if (-TotalLineAmountLCY > 0) then begin
+                                POSPostingSetup.TestField("Difference Acc. No.");
+                                MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                        POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No.",
+                                        -TotalLineAmountLCY, POSBalancingLine.Description, GenJournalLine);
+                            end;
+                            if (-TotalLineAmountLCY < 0) then begin
+                                POSPostingSetup.TestField("Difference Acc. No. (Neg)");
+                                MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                        POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No. (Neg)",
+                                        -TotalLineAmountLCY, POSBalancingLine.Description, GenJournalLine);
+                            end;
+                        end;
                     until POSBalancingLine.Next() = 0;
             until POSEntry.Next() = 0;
     end;
@@ -1415,7 +1434,7 @@
         GenJournalLine.Insert();
     end;
 
-    local procedure MakeGenJournalFromPOSBalancingLineWithVatOption(POSEntry: Record "NPR POS Entry"; POSBalancingLine: Record "NPR POS Balancing Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; PostingAmount: Decimal; PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalFromPOSBalancingLineWithVatOption(POSEntry: Record "NPR POS Entry"; POSBalancingLine: Record "NPR POS Balancing Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; PostingAmount: Decimal; PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line"): Decimal
     var
         GLAccount: Record "G/L Account";
         VATPostingSetup: Record "VAT Posting Setup";
@@ -1475,6 +1494,7 @@
         GenJournalLine.Insert();
 
         OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine, GenJournalLine, false);
+        exit(GenJournalLine."Amount (LCY)" + GenJournalLine."VAT Amount (LCY)");
     end;
 
     local procedure GetAccountSetup(AccountNo: Code[20]; AccountType: Enum "Gen. Journal Account Type"; var GLAccount: Record "G/L Account"; var VATPostingSetup: Record "VAT Posting Setup"): Boolean
