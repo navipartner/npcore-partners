@@ -5,6 +5,9 @@
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Collection List";
     LookupPageID = "NPR Nc Collection List";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
+    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
 
     fields
     {

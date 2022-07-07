@@ -1,8 +1,13 @@
 ﻿codeunit 6151532 "NPR Nc Coll.  Request WS"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
+    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
+
     var
         ImportTypeMissingErr: Label 'Setup is missing for %1. Unknown value for %2 in %3', Comment = '%1="NPR Nc Import Entry"."Webservice Function";%2="NPR Nc Import Entry".TableCaption();%3="NPR Nc Import Entry".FieldCaption"Import Type"';
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure Createcollectorrequest(var CollectorRequestWebImport: XMLport "NPR Collector Req. Web Imp.")
     var
         ImportEntry: Record "NPR Nc Import Entry";

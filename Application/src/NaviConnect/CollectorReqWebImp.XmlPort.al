@@ -4,6 +4,9 @@ xmlport 6151530 "NPR Collector Req. Web Imp."
     DefaultNamespace = 'urn:microsoft-dynamics-schemas/codeunit/endpointquery_services';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
+    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
 
     schema
     {
@@ -94,11 +97,13 @@ xmlport 6151530 "NPR Collector Req. Web Imp."
     end;
 
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     internal procedure GetMessageID(): Text[50]
     begin
         exit(messageid);
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     internal procedure SetCollectorRequestResult(ParReturnValue: Text)
     begin
         ReturnValue := ParReturnValue;

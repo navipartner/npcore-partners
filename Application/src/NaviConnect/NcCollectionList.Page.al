@@ -7,6 +7,9 @@
     SourceTable = "NPR Nc Collection";
     UsageCategory = Lists;
     ApplicationArea = NPRNaviConnect;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
+    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
 
     layout
     {
@@ -77,6 +80,9 @@
                 {
                     Caption = 'Set to Collecting';
                     Image = Add;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
+                    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
 
                     ToolTip = 'Executes the Set to Collecting action';
                     ApplicationArea = NPRNaviConnect;
@@ -91,6 +97,9 @@
                 {
                     Caption = 'Set to Ready to Send';
                     Image = Approve;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
+                    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
 
                     ToolTip = 'Executes the Set to Ready to Send action';
                     ApplicationArea = NPRNaviConnect;
@@ -105,6 +114,9 @@
                 {
                     Caption = 'Set to Sent';
                     Image = SendApprovalRequest;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
+                    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
 
                     ToolTip = 'Executes the Set to Sent action';
                     ApplicationArea = NPRNaviConnect;

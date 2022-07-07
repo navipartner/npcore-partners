@@ -1,6 +1,11 @@
 ﻿codeunit 6151528 "NPR Nc Collector Management"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
+    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
+
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure GetNcCollectionNo(CollectorCode: Code[20]): BigInteger
     var
         NcCollection: Record "NPR Nc Collection";
@@ -32,6 +37,7 @@
         exit(NcCollection."No.");
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure PopulatePKFields(var NcCollectionLine: Record "NPR Nc Collection Line"; RecRef: RecordRef)
     var
         FieldRefPKField: FieldRef;
@@ -47,37 +53,38 @@
                     NcCollectionLine."PK Code 1" := Format(FieldRefPKField.Value);
                 end;
             else begin
-                    PKKeyRef := RecRef.KeyIndex(1);
-                    ToRecRef.GetTable(NcCollectionLine);
-                    for I := 1 to PKKeyRef.FieldCount do begin
-                        FieldRefPKField := PKKeyRef.FieldIndex(I);
-                        ToFieldRef := ToRecRef.Field(NcCollectionLine.FieldNo("PK Code 1"));
+                PKKeyRef := RecRef.KeyIndex(1);
+                ToRecRef.GetTable(NcCollectionLine);
+                for I := 1 to PKKeyRef.FieldCount do begin
+                    FieldRefPKField := PKKeyRef.FieldIndex(I);
+                    ToFieldRef := ToRecRef.Field(NcCollectionLine.FieldNo("PK Code 1"));
+                    if FieldRefPKField.Type = ToFieldRef.Type then begin
+                        if NcCollectionLine."PK Code 1" = '' then
+                            NcCollectionLine."PK Code 1" := FieldRefPKField.Value
+                        else
+                            if NcCollectionLine."PK Code 2" = '' then
+                                NcCollectionLine."PK Code 2" := FieldRefPKField.Value;
+                    end else begin
+                        ToFieldRef := ToRecRef.Field(NcCollectionLine.FieldNo("PK Line 1"));
                         if FieldRefPKField.Type = ToFieldRef.Type then begin
-                            if NcCollectionLine."PK Code 1" = '' then
-                                NcCollectionLine."PK Code 1" := FieldRefPKField.Value
+                            if NcCollectionLine."PK Line 1" = 0 then
+                                NcCollectionLine."PK Line 1" := FieldRefPKField.Value
                             else
-                                if NcCollectionLine."PK Code 2" = '' then
-                                    NcCollectionLine."PK Code 2" := FieldRefPKField.Value;
+                                NcCollectionLine."PK Line 2" := FieldRefPKField.Value;
                         end else begin
-                            ToFieldRef := ToRecRef.Field(NcCollectionLine.FieldNo("PK Line 1"));
+                            ToFieldRef := ToRecRef.Field(NcCollectionLine.FieldNo("PK Option 1"));
                             if FieldRefPKField.Type = ToFieldRef.Type then begin
-                                if NcCollectionLine."PK Line 1" = 0 then
-                                    NcCollectionLine."PK Line 1" := FieldRefPKField.Value
-                                else
-                                    NcCollectionLine."PK Line 2" := FieldRefPKField.Value;
-                            end else begin
-                                ToFieldRef := ToRecRef.Field(NcCollectionLine.FieldNo("PK Option 1"));
-                                if FieldRefPKField.Type = ToFieldRef.Type then begin
-                                    if NcCollectionLine."PK Option 1" = 20 then
-                                        NcCollectionLine."PK Option 1" := FieldRefPKField.Value;
-                                end;
+                                if NcCollectionLine."PK Option 1" = 20 then
+                                    NcCollectionLine."PK Option 1" := FieldRefPKField.Value;
                             end;
                         end;
                     end;
                 end;
+            end;
         end;
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure CreateModifyCollectionLines(NcCollector: Record "NPR Nc Collector")
     var
         RecRef: RecordRef;
@@ -90,25 +97,25 @@
         RecRef.Open(NcCollector."Table No.");
         RecReftemp.Open(NcCollector."Table No.", true);
         if RecRef.FindFirst() then
-            repeat
-                SkipRecord := false;
-                NcCollectorFilter.Reset();
-                NcCollectorFilter.SetRange("Collector Code", NcCollector.Code);
-                NcCollectorFilter.SetRange("Table No.", NcCollector."Table No.");
-                if NcCollectorFilter.FindSet() then
-                    repeat
-                        FieldRefTemp := RecReftemp.Field(NcCollectorFilter."Field No.");
-                        FieldRefChange := RecRef.Field(NcCollectorFilter."Field No.");
-                        FieldRefTemp.Value := FieldRefChange.Value;
-                        RecReftemp.Insert();
-                        FieldRefTemp.SetFilter(NcCollectorFilter."Filter Text");
-                        if RecReftemp.IsEmpty then
-                            SkipRecord := true;
-                        RecReftemp.Delete();
-                    until (NcCollectorFilter.Next() = 0) or SkipRecord;
-                if not SkipRecord then
-                    InsertModifyCollectionLine(RecRef, NcCollector.Code);
-            until RecRef.Next() = 0;
+                repeat
+                    SkipRecord := false;
+                    NcCollectorFilter.Reset();
+                    NcCollectorFilter.SetRange("Collector Code", NcCollector.Code);
+                    NcCollectorFilter.SetRange("Table No.", NcCollector."Table No.");
+                    if NcCollectorFilter.FindSet() then
+                        repeat
+                                FieldRefTemp := RecReftemp.Field(NcCollectorFilter."Field No.");
+                            FieldRefChange := RecRef.Field(NcCollectorFilter."Field No.");
+                            FieldRefTemp.Value := FieldRefChange.Value;
+                            RecReftemp.Insert();
+                            FieldRefTemp.SetFilter(NcCollectorFilter."Filter Text");
+                            if RecReftemp.IsEmpty then
+                                SkipRecord := true;
+                            RecReftemp.Delete();
+                        until (NcCollectorFilter.Next() = 0) or SkipRecord;
+                    if not SkipRecord then
+                        InsertModifyCollectionLine(RecRef, NcCollector.Code);
+                until RecRef.Next() = 0;
     end;
 
     local procedure InsertModifyCollectionLine(RecRef: RecordRef; NcCollectorCode: Code[20])
@@ -133,6 +140,7 @@
         MarkPreviousCollectionLinesAsObsolete(NcCollectionLine);
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure MarkPreviousCollectionLinesAsObsolete(NcCollectionLine: Record "NPR Nc Collection Line")
     var
         OldNcCollectionLine: Record "NPR Nc Collection Line";
@@ -153,12 +161,13 @@
         end else begin
             if OldNcCollectionLine.FindSet() then
                 repeat
-                    OldNcCollectionLine.Validate(Obsolete, true);
+                        OldNcCollectionLine.Validate(Obsolete, true);
                     OldNcCollectionLine.Modify(true);
                 until OldNcCollectionLine.Next() = 0;
         end;
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure SetCollectionStatus(NcCollection: Record "NPR Nc Collection"; NewStatus: Option Collecting,"Ready to Send",Sent)
     var
         CollectionWillNotbeSentQst: Label '%1 %2 be marked as sent without being sent.', Comment = '%1="NPR Nc Collection".TableCaption();%2="NPR Nc Collection"."No."';
@@ -223,6 +232,7 @@
         end;
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure CreateOutboundCollectorRequest(RequestName: Text[30]; RecordToRequest: Variant; OnlyNewAndModified: Boolean)
     var
         TextOnlyRecordsErr: Label 'You can only create Requests for Records.';
@@ -246,6 +256,7 @@
         InsertFilterRecords(NcCollectorRequest, RecRef);
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure InsertFilterRecords(NcCollectorRequest: Record "NPR Nc Collector Request"; RecRef: RecordRef)
     var
         NcCollectorRequestFilter: Record "NPR Nc Collector Req. Filter";
@@ -265,7 +276,7 @@
             FieldRec.SetRange(Class, FieldRec.Class::Normal);
             if FieldRec.FindSet() then
                 repeat
-                    FldRef := RecRef.Field(FieldRec."No.");
+                        FldRef := RecRef.Field(FieldRec."No.");
                     FilterText := CopyStr(Format(FldRef.GetFilter, 0, 9), 1, MaxStrLen(NcCollectorRequestFilter."Filter Text"));
                     if FilterText <> '' then begin
                         NcCollectorRequestFilter.Init();
