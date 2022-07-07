@@ -64,6 +64,11 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoRescheduleRetenPolicy'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'TMRetentionJQCategory')) then begin
+            AssignJoqCategoryToTMRetentionJQ();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'TMRetentionJQCategory'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -299,4 +304,16 @@
             until JobQueueEntry.Next() = 0;
     end;
 #endif
+
+    local procedure AssignJoqCategoryToTMRetentionJQ()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueCategoryTok: Label 'RETENTION', Locked = true, MaxLength = 10;
+    begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR TM Retention Ticket Data");
+        JobQueueEntry.SetRange("Job Queue Category Code", '');
+        if not JobQueueEntry.IsEmpty() then
+            JobQueueEntry.ModifyAll("Job Queue Category Code", JobQueueCategoryTok);
+    end;
 }

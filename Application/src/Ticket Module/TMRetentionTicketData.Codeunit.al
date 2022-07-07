@@ -252,6 +252,7 @@
     var
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         NextRunDateFormula: DateFormula;
+        JobQueueCategoryTok: Label 'RETENTION', Locked = true, MaxLength = 10;
         JobQueueDescrLbl: Label 'Remove obsolete tickets and schedules', MaxLength = 250;
     begin
         Evaluate(NextRunDateFormula, '<1D>');
@@ -265,7 +266,7 @@
             020000T,
             030000T,
             NextRunDateFormula,
-            '',
+            JobQueueCategoryTok,
             JobQueueEntry)
         then begin
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
