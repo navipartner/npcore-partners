@@ -1,6 +1,10 @@
 ﻿codeunit 6151529 "NPR Nc Collector Send Collect."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
+    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
+
     trigger OnRun()
     begin
         CheckMaxLines();
@@ -18,18 +22,18 @@
         NcCollector.SetFilter("Max. Lines per Collection", '>%1', 0);
         if NcCollector.FindSet() then
             repeat
-                NcCollection.Reset();
+                    NcCollection.Reset();
                 NcCollection.SetCurrentKey("Collector Code", "No.");
                 NcCollection.SetRange("Collector Code", NcCollector.Code);
                 NcCollection.SetRange(Status, NcCollection.Status::Collecting);
                 if NcCollection.FindSet() then
-                    repeat
-                        NcCollection.CalcFields("No. of Lines");
-                        if NcCollection."No. of Lines" >= NcCollector."Max. Lines per Collection" then begin
-                            NcCollection.Validate(Status, NcCollection.Status::"Ready to Send");
-                            NcCollection.Modify(true);
-                        end;
-                    until NcCollection.Next() = 0;
+                        repeat
+                            NcCollection.CalcFields("No. of Lines");
+                            if NcCollection."No. of Lines" >= NcCollector."Max. Lines per Collection" then begin
+                                NcCollection.Validate(Status, NcCollection.Status::"Ready to Send");
+                                NcCollection.Modify(true);
+                            end;
+                        until NcCollection.Next() = 0;
             until NcCollection.Next() = 0;
     end;
 
@@ -44,20 +48,20 @@
         NcCollector.SetFilter("Wait to Send", '>%1', 0);
         if NcCollector.FindSet() then
             repeat
-                NcCollection.Reset();
+                    NcCollection.Reset();
                 NcCollection.SetCurrentKey("Collector Code", "No.");
                 NcCollection.SetRange("Collector Code", NcCollector.Code);
                 NcCollection.SetRange(Status, NcCollection.Status::Collecting);
                 if NcCollection.FindSet() then
-                    repeat
-                        NcCollectionLine.Reset();
-                        NcCollectionLine.SetRange("Collection No.", NcCollection."No.");
-                        NcCollectionLine.FindLast();
-                        if (CurrentDateTime - NcCollectionLine."Date Created") > NcCollector."Wait to Send" then begin
-                            NcCollection.Validate(Status, NcCollection.Status::"Ready to Send");
-                            NcCollection.Modify(true);
-                        end;
-                    until NcCollection.Next() = 0;
+                        repeat
+                            NcCollectionLine.Reset();
+                            NcCollectionLine.SetRange("Collection No.", NcCollection."No.");
+                            NcCollectionLine.FindLast();
+                            if (CurrentDateTime - NcCollectionLine."Date Created") > NcCollector."Wait to Send" then begin
+                                NcCollection.Validate(Status, NcCollection.Status::"Ready to Send");
+                                NcCollection.Modify(true);
+                            end;
+                        until NcCollection.Next() = 0;
             until NcCollector.Next() = 0;
     end;
 
@@ -71,16 +75,16 @@
         NcCollector.SetFilter("Delete Sent Collections After", '>1');
         if NcCollector.FindSet() then
             repeat
-                NcCollection.Reset();
+                    NcCollection.Reset();
                 NcCollection.SetCurrentKey("Collector Code", Status);
                 NcCollection.SetRange("Collector Code", NcCollector.Code);
                 NcCollection.SetRange(Status, NcCollection.Status::Sent);
                 if NcCollection.FindSet() then
-                    repeat
-                        if NcCollection."Sent Date" <> 0DT then
-                            if CurrentDateTime - NcCollection."Sent Date" > NcCollector."Delete Sent Collections After" then
-                                NcCollection.Delete(true);
-                    until NcCollection.Next() = 0;
+                        repeat
+                            if NcCollection."Sent Date" <> 0DT then
+                                if CurrentDateTime - NcCollection."Sent Date" > NcCollector."Delete Sent Collections After" then
+                                    NcCollection.Delete(true);
+                        until NcCollection.Next() = 0;
             until NcCollector.Next() = 0;
     end;
 }

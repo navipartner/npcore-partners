@@ -1,10 +1,15 @@
 ﻿codeunit 6151531 "NPR Nc Collector Setup Tasks"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
+    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
 
     var
         NaviConnectSetup: Record "NPR Nc Setup";
 
+
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     procedure SetupTaskQueue()
     var
         TaskCode: Code[10];
@@ -23,6 +28,7 @@
         SetTaskLineEnabled(TaskCode, TaskCode, TaskLineNo, NaviConnectSetup."Task Queue Enabled");
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     local procedure SetTaskLineEnabled(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; Enabled: Boolean)
     var
         TaskLine: Record "NPR Task Line";
@@ -43,6 +49,7 @@
         end;
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.', 'BC 20 - Task Queue deprecating starting from 28/06/2022')]
     local procedure SetupTaskLineMinute(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; TaskDescription: Text[50]; GroupCode: Code[10])
     var
         TaskLine: Record "NPR Task Line";
