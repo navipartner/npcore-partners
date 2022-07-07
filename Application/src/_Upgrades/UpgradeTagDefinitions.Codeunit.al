@@ -46,6 +46,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'NotifyOnSuccessFalse'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'CustomCUforPostInvtCostToGL'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoRescheduleRetenPolicy'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'TMRetentionJQCategory'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Prices Install"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG App. Area User Exp."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Event Report Layout Upg."));
@@ -172,6 +173,8 @@
                         exit('CustomCUforPostInvtCostToGL-20220530');
                     'AutoRescheduleRetenPolicy':
                         exit('AutoRescheduleRetenPolicy-20220627');
+                    'TMRetentionJQCategory':
+                        exit('TMRetentionJQCategory-20220707');
                 end;
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210920');
