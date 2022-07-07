@@ -71,6 +71,7 @@ xmlport 6060135 "NPR MM Get Members. Chg. Items"
                                 MinOccurs = Zero;
                                 XmlName = 'changeitem';
                                 UseTemporary = true;
+
                                 fieldattribute(itemno; TmpMembershipEntry."Item No.")
                                 {
                                 }
@@ -109,14 +110,43 @@ xmlport 6060135 "NPR MM Get Members. Chg. Items"
                                 fieldattribute(presentationorder; TmpMembershipEntry."Line No.")
                                 {
                                 }
+                                textelement(translations)
+                                {
+                                    XmlName = 'translations';
+                                    MinOccurs = Zero;
+                                    MaxOccurs = Once;
+
+                                    tableelement(ItemTranslation; "Item Translation")
+                                    {
+                                        XmlName = 'translation';
+                                        MinOccurs = Zero;
+                                        MaxOccurs = Unbounded;
+
+                                        fieldattribute(LanguageCode; ItemTranslation."Language Code")
+                                        {
+                                            XmlName = 'languagecode';
+                                            Occurrence = Required;
+                                        }
+                                        fieldattribute(Description; ItemTranslation.Description)
+                                        {
+                                            XmlName = 'description';
+                                            Occurrence = Required;
+                                        }
+
+                                        trigger OnPreXmlItem()
+                                        begin
+                                            ItemTranslation.SetFilter("Item No.", '=%1', TmpMembershipEntry."Item No.");
+                                        end;
+                                    }
+                                }
                             }
                         }
                     }
 
                     trigger OnAfterGetRecord()
                     begin
-
-                        if (MembershipSetup.Get(tmpMembershipResponse."Membership Code")) then;
+                        if (not MembershipSetup.Get(tmpMembershipResponse."Membership Code")) then
+                            MembershipSetup.Init();
                     end;
                 }
             }
