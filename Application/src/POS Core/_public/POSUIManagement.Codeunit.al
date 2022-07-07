@@ -353,7 +353,8 @@
         BalancingCashMovementsLbl: Label 'Cash Movements';
         BalancingBalancingLbl: Label 'Balancing';
         BalancingCreatedAtLbl: Label 'Created At';
-        BalancingDirectItemSalesCountLbl: Label 'Direct Sales Count';
+        BalancingDirectSalesCountLbl: Label 'Direct Sales Count';
+        BalancingDirectItemSalesCountLbl: Label 'Direct Item Sales Count';
         BalancingDirectItemReturnCountLbl: Label 'Direct Items Return Line';
         BalancingOverviewLbl: Label 'Overview';
         BalancingSalesLbl: Label 'Sales';
@@ -435,7 +436,7 @@
         BalancingMovetoBinTransIDLbl: Label 'Move to Bin Trans. ID';
         BalancingTaxSummaryLbl: Label 'Tax Summary';
         BalancingShowAllLbl: Label 'Show All';
-        BalancingNotCompletedConfirmationLbl: Label 'You have not reviewed and confirmed the counting. Are you sure you want to complete balancing?';
+        BalancingNotCompletedConfirmationLbl: Label 'You have not reviewed and confirmed the counting. Are you sure you want to cancel balancing?';
         BalancingButtonPrintStatisticsLbl: Label 'Print Statistics';
         BalancingButtonCashCountLbl: Label 'Cash Count';
         BalancingButtonCashCountNotCompletedLbl: Label '(not completed)';
@@ -525,6 +526,7 @@
         Captions.Add('Balancing_CashMovements', BalancingCashMovementsLbl);
         Captions.Add('Balancing_Balancing', BalancingBalancingLbl);
         Captions.Add('Balancing_CreatedAt', BalancingCreatedAtLbl);
+        Captions.Add('Balancing_DirectSalesCount', BalancingDirectSalesCountLbl);
         Captions.Add('Balancing_DirectItemSalesCount', BalancingDirectItemSalesCountLbl);
         Captions.Add('Balancing_DirectItemReturnCount', BalancingDirectItemReturnCountLbl);
         Captions.Add('Balancing_Overview', BalancingOverviewLbl);
