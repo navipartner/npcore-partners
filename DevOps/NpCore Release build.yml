@@ -39,3 +39,10 @@ stages:
         translationsRepoBranchName: i10n_master
         translationsTargetRepoBranchName: master
       combinedAppsNuGetSourceUri: https://pkgs.dev.azure.com/navipartner/_packaging/NaviPartner.NavApps/nuget/v3/index.json
+      generatePermissions:
+        enabled: true
+        alObjectsFolder: $(Build.Repository.LocalPath)/Application/src/
+        destinationFileName: /Permissions/NPRETAIL.PermissionSet.al
+        objectId: 6014400
+        objectName: 'NPR NP RETAIL'
+        objectCaption: 'NP Retail'      
