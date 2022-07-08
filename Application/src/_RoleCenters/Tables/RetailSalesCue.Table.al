@@ -159,7 +159,24 @@
             Caption = 'My Incoming Documents';
             FieldClass = FlowField;
         }
-
+        field(109; "Sales Credit Memos"; Integer)
+        {
+            Caption = 'Sales Credit Memos';
+            FieldClass = FlowField;
+            CalcFormula = count("Sales Header" WHERE("Document Type" = FILTER("Credit Memo")));
+        }
+        field(110; "Posted Sales Invoices"; Integer)
+        {
+            Caption = 'Posted Sales Invoices';
+            FieldClass = FlowField;
+            CalcFormula = count("Sales Invoice Header");
+        }
+        field(111; "Collect Document List"; Integer)
+        {
+            Caption = 'Collect Document List';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR NpCs Document");
+        }
     }
 
     keys
