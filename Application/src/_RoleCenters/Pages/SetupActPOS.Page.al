@@ -73,9 +73,9 @@
                 Caption = 'Downloads';
                 actions
                 {
-                    action("Download Minor Tom +")
+                    action("Download Minor Tom")
                     {
-                        Caption = 'Download Minor Tom +';
+                        Caption = 'Download Minor Tom';
                         ToolTip = 'Download Minor Tom';
                         Image = TileCloud;
                         ApplicationArea = NPRRetail;
