@@ -9,6 +9,8 @@
     SourceTable = "NPR POS Balancing Line";
     ApplicationArea = NPRRetail;
 
+    PromotedActionCategories = 'New, Process, Report ,POS Entry';
+
     layout
     {
         area(content)
