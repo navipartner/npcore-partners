@@ -75,20 +75,6 @@
                     ToolTip = 'Specifies the value of the Period Description field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Created Date"; Rec."Created Date")
-                {
-
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Created Date field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Last Date Modified"; Rec."Last Date Modified")
-                {
-
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Modified Date field';
-                    ApplicationArea = NPRRetail;
-                }
             }
         }
     }

@@ -88,12 +88,16 @@
             Caption = 'Created Date';
             Editable = false;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(11; "Last Date Modified"; Date)
         {
             Caption = 'Modified Date';
             Editable = false;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(21; "No. Series"; Code[20])
         {
@@ -357,7 +361,6 @@
     var
         Date: Record Date;
     begin
-        "Created Date" := Today();
 
         if Code = '' then
             NoSeriesMgt.InitSeries(GetNoSeries(), xRec."No. Series", 0D, Code, "No. Series");
@@ -376,7 +379,6 @@
 
     trigger OnModify()
     begin
-        "Last Date Modified" := Today();
         UpdateLines();
     end;
 
@@ -385,7 +387,6 @@
         RetailComment: Record "NPR Retail Comment";
         RetailComment2: Record "NPR Retail Comment";
     begin
-        "Last Date Modified" := Today();
         PeriodDiscountLine.SetRange(Code, Code);
         if PeriodDiscountLine.Find('-') then
             repeat

@@ -31,20 +31,27 @@
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Created Date"; Rec."Created Date")
+                field("Created Date"; '')
                 {
 
+                    Caption = 'Created Date';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Created Date field';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Not used.';
+                    Visible = false;
                 }
-                field("Last Date Modified"; Rec."Last Date Modified")
+                field("Last Date Modified"; '')
                 {
 
                     Caption = 'Last Changed';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Changed field';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Not used.';
+                    Visible = false;
                 }
                 field(Status; Rec.Status)
                 {
