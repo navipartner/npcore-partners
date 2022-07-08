@@ -84,6 +84,7 @@
                 Image = Setup;
                 Promoted = true;
                 PromotedOnly = true;
+                PromotedCategory = Process;
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Show Setup action';
