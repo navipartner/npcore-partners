@@ -111,7 +111,40 @@
                         DrillDownSalesOrderList(Rec.FieldNo("Shipped Sales Orders"));
                     end;
                 }
+                field(SalesReturnOrders; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Sales Return Orders"))))
+                {
+                    Caption = 'Sales Return Orders';
+                    ShowCaption = true;
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Sales Return Orders field.';
 
+                    trigger OnDrillDown()
+                    begin
+                        DrillDownSalesOrderList(Rec.FieldNo("Sales Return Orders"));
+                    end;
+                }
+                field(PostedSalesInvoices; Rec."Posted Sales Invoices")
+                {
+                    Caption = 'Posted Sales Invoices';
+                    ShowCaption = true;
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Posted Sales Invoices field.';
+                }
+                field(SalesCreditMemos; Rec."Sales Credit Memos")
+                {
+                    Caption = 'Sales Credit Memos';
+                    ShowCaption = true;
+                    ApplicationArea = NPRRetail;
+                    DrillDownPageId = "Sales Credit Memos";
+                    ToolTip = 'Specifies the value of the Sales Credit Memos field.';
+                }
+                field(CollectDocumentList; Rec."Collect Document List")
+                {
+                    Caption = 'Collect Document List';
+                    ShowCaption = true;
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Collect Document List field.';
+                }
             }
             cuegroup("Incoming Documents")
             {
@@ -176,15 +209,14 @@
                 SalesHeader.SetRange("Posting Date", WorkDate());
             Rec.FieldNo("Shipped Sales Orders"):
                 SalesHeader.SetRange("Shipped Not Invoiced", true);
+            Rec.FieldNo("Sales Return Orders"):
+                SalesHeader.SetRange("Document Type", "Sales Document Type"::"Return Order");
         end;
         Page.RunModal(Page::"Sales Order List", SalesHeader);
         CurrPage.Update(false);
     end;
 
     var
-
         BackgroundTaskResults: Dictionary of [Text, Text];
         BackgroundTaskId: Integer;
-
-
 }
