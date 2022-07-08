@@ -8,7 +8,7 @@ controladdin "NPR HardwareConnector"
     MinimumHeight = 200;
     VerticalShrink = true;
 
-    procedure SendRequest(Handler: Text; Request: JsonObject; Caption: Text);
+    internal procedure SendRequest(Handler: Text; Request: JsonObject; Caption: Text);
 
     //Adding parametar to SendRequest procedure is considered a breaking change by AppSource validation.
     //Crating dummy, unused, two param overload below to solve breaking change issue.
