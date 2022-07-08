@@ -33,7 +33,7 @@ Prior to the installation of the Power BI app, request a free BC account from th
    You can review the contents with the test data or connect to your test database from Business Central. 
 6. To connect to your data from the Business Central, you need to click **Connect your data** in the alert ribbon.      
     ![Power_BI_alert](./../images/pic5.png)
-7. In the **Connect to BC Retail Demo** popup window populate the three fields as indicated in the provided screenshots.   
+7. In the **Connect to NP Power BI for Retail** popup window populate the three fields as indicated in the provided screenshots.   
    ![connect_to_BC_retail_demo](./../images/app_store_instructions.PNG)    
 
 > [!Note]

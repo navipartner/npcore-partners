@@ -20,7 +20,7 @@
     href: explanation/warehouse_putaway.md
   - name: Inventory and warehouse picks
     href: explanation/inventory_warehouse_pick.md
-  - name: Inventory management approaches (FIFO and LIFO)
+  - name: Inventory costing methods
     href: explanation/fifo_and_lifo.md
   - name: Inventory adjustments
     href: explanation/inventory_adjustments.md
@@ -41,3 +41,5 @@
     href: howto/set-up-cs-uis.md
   - name: Set up warehouse users
     href: howto/set-up-warehouse-users.md
+  - name: Perform stock count
+    href: howto/perform_stock_count.md

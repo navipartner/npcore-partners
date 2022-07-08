@@ -1,6 +1,8 @@
 # Inventory adjustments
 
-Inventory adjustments refer to all modifications of the stock level, which occur for various reasons. These can be results of sales, purchases, or positive and negative adjustments. All inventory adjustments need to be recorded in the item journals.
+Inventory adjustments refer to all modifications of the stock level, which occur for various reasons. These can be results of sales, purchases, or positive and negative adjustments.
+
+All inventory adjustments need to be recorded in the item journals.
 
 
 ## Item journals
@@ -16,7 +18,7 @@ Item journals are used for updating stock levels when they are increased or decr
 > [!Note]
 > When recording a positive or negative adjustment, the **Unit Amount**, **Amount**, **Discount Amount**, and the **Unit Cost** will be populated automatically. 
 
-- Purchases are processes of procuring goods at a certain price.
+- Purchases are processes of procuring goods at a certain price. The **Purchase** entry type is used rarely in warehousing. Both purchases and positive adjustments indicate raise in the stock level, but this raise is recorded either in the purchase account or adjustment account respectively in the **General Posting Setup**. 
 
 ![item journal purchase](../images/item_journal_purchase.PNG)
 
