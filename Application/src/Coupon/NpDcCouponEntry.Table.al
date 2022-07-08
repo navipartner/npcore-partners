@@ -134,6 +134,9 @@
         key(Key3; "Document Type", "Document No.")
         {
         }
+        key(Key4; "Entry Type", "Coupon Type", "Posting Date")
+        {
+        }
     }
 
     fieldgroups

@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>e5896867-144d-47a5-b21f-0ebc2ba9d507</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -21,7 +22,7 @@
                   <Width>4.24625cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>6.86562cm</Width>
+                  <Width>8.66134cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>2.5cm</Width>
@@ -43,7 +44,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!CouponNoCptn_.Value</Value>
+                                  <Value>=Parameters!CouponTypeCode_Caption.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -58,6 +59,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -75,7 +86,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!DescriptionCptn_.Value</Value>
+                                  <Value>=Parameters!CouponTypeDescription_Caption.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -90,6 +101,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -124,6 +145,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                           </Style>
                         </Textbox>
                       </CellContents>
@@ -154,6 +185,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                           </Style>
                         </Textbox>
                       </CellContents>
@@ -322,6 +363,11 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -356,6 +402,11 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -452,27 +503,36 @@
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox3">
+                        <Textbox Name="Textbox13">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value />
+                                  <Value>=Parameters!TotalLbl.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox3</rd:DefaultName>
+                          <rd:DefaultName>Textbox4</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
+                            <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -490,7 +550,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!TotalLbl.Value</Value>
+                                  <Value />
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -507,6 +567,11 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -627,7 +692,7 @@
             <DataSetName>DataSet_Result</DataSetName>
             <Top>0.39371cm</Top>
             <Height>2.10896cm</Height>
-            <Width>16.11187cm</Width>
+            <Width>17.90759cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -638,10 +703,10 @@
         <Height>2.926cm</Height>
         <Style />
       </Body>
-      <Width>17.91231cm</Width>
+      <Width>17.94257cm</Width>
       <Page>
         <PageHeader>
-          <Height>4.4979cm</Height>
+          <Height>3.80998cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -660,14 +725,14 @@
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Center</TextAlign>
+                    <TextAlign>Left</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox21</rd:DefaultName>
-              <Top>0.93542cm</Top>
+              <Top>0.10992cm</Top>
               <Height>0.6cm</Height>
-              <Width>17.91231cm</Width>
+              <Width>12.90759cm</Width>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -698,6 +763,7 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox22</rd:DefaultName>
+              <Top>0.8255cm</Top>
               <Left>13.08398cm</Left>
               <Height>0.46771cm</Height>
               <Width>4.82833cm</Width>
@@ -727,7 +793,7 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox22</rd:DefaultName>
-              <Top>0.46771cm</Top>
+              <Top>2.02346cm</Top>
               <Left>13.08398cm</Left>
               <Height>0.46771cm</Height>
               <Width>4.82833cm</Width>
@@ -757,7 +823,7 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox22</rd:DefaultName>
-              <Top>0.93542cm</Top>
+              <Top>1.44342cm</Top>
               <Left>13.08398cm</Left>
               <Height>0.46771cm</Height>
               <Width>4.82833cm</Width>
@@ -785,69 +851,40 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox25</rd:DefaultName>
-              <Top>3.56871cm</Top>
+              <Top>3.18771cm</Top>
               <Height>0.46771cm</Height>
-              <Width>14.45917cm</Width>
+              <Width>17.90759cm</Width>
               <ZIndex>4</ZIndex>
-              <Visibility>
-                <Hidden>=iif(First(Fields!CouponTypeHasFilter.Value, "DataSet_Result"),FALSE,True)</Hidden>
-              </Visibility>
               <Style>
                 <Border>
                   <Style>None</Style>
                 </Border>
               </Style>
             </Textbox>
-            <Textbox Name="Textbox1">
+            <Textbox Name="Textbox26">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!FromDatelbl.Value &amp; " " &amp; First(Fields!StartDate_.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!Name.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>8pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
-                  <Style />
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
                 </Paragraph>
               </Paragraphs>
-              <rd:DefaultName>Textbox1</rd:DefaultName>
-              <Top>2.13995cm</Top>
+              <rd:DefaultName>Textbox22</rd:DefaultName>
+              <Top>0.17889cm</Top>
+              <Left>13.08249cm</Left>
               <Height>0.46771cm</Height>
-              <Width>7.8975cm</Width>
+              <Width>4.82833cm</Width>
               <ZIndex>5</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-              </Style>
-            </Textbox>
-            <Textbox Name="Textbox2">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Parameters!ToDatelbl.Value &amp; " "&amp; First(Fields!EndDate_.Value, "DataSet_Result")</Value>
-                      <Style>
-                        <FontSize>8pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox1</rd:DefaultName>
-              <Top>2.64294cm</Top>
-              <Height>0.46771cm</Height>
-              <Width>7.8975cm</Width>
-              <ZIndex>6</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -909,29 +946,38 @@
       </DefaultValue>
       <Prompt>ReportTitle</Prompt>
     </ReportParameter>
-    <ReportParameter Name="FromDatelbl">
+    <ReportParameter Name="NameCaption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>FromDatelbl</Value>
+          <Value>NameCaption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>FromDatelbl</Prompt>
+      <Prompt>NameCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ToDatelbl">
+    <ReportParameter Name="CouponTypeCode_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ToDatelbl</Value>
+          <Value>CouponTypeCode_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ToDatelbl</Prompt>
+      <Prompt>CouponTypeCode_Caption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="CouponTypeDescription_Caption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>CouponTypeDescription_Caption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>CouponTypeDescription_Caption</Prompt>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>6</NumberOfRows>
+      <NumberOfRows>7</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -956,12 +1002,17 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>4</RowIndex>
-          <ParameterName>FromDatelbl</ParameterName>
+          <ParameterName>NameCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>5</RowIndex>
-          <ParameterName>ToDatelbl</ParameterName>
+          <ParameterName>CouponTypeCode_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>6</RowIndex>
+          <ParameterName>CouponTypeDescription_Caption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -1004,41 +1055,21 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>632f27a7-7e7a-464e-b82e-2d92f1c44de0</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
+        <Field Name="Name">
+          <DataField>Name</DataField>
+        </Field>
+        <Field Name="CouponTypeFilters">
+          <DataField>CouponTypeFilters</DataField>
+        </Field>
         <Field Name="CouponTypeCode_">
           <DataField>CouponTypeCode_</DataField>
         </Field>
         <Field Name="CouponTypeDescription_">
           <DataField>CouponTypeDescription_</DataField>
-        </Field>
-        <Field Name="Archived_">
-          <DataField>Archived_</DataField>
-        </Field>
-        <Field Name="CouponNoCptn_">
-          <DataField>CouponNoCptn_</DataField>
-        </Field>
-        <Field Name="DescriptionCptn_">
-          <DataField>DescriptionCptn_</DataField>
-        </Field>
-        <Field Name="CouponTypeFilters">
-          <DataField>CouponTypeFilters</DataField>
-        </Field>
-        <Field Name="CouponTypeHasFilter">
-          <DataField>CouponTypeHasFilter</DataField>
-        </Field>
-        <Field Name="GrandTotal_">
-          <DataField>GrandTotal_</DataField>
-        </Field>
-        <Field Name="BlankCouponTypes_">
-          <DataField>BlankCouponTypes_</DataField>
-        </Field>
-        <Field Name="StartDate_">
-          <DataField>StartDate_</DataField>
-        </Field>
-        <Field Name="EndDate_">
-          <DataField>EndDate_</DataField>
         </Field>
         <Field Name="QtyIssued_">
           <DataField>QtyIssued_</DataField>

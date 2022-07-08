@@ -177,7 +177,15 @@
             Caption = 'POS Store Group';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Store Group";
-        }        
+        }
+        field(160; "Coupon Issued"; Boolean)
+        {
+            CalcFormula = Exist("NPR NpDc Coupon Entry" WHERE("Coupon No." = FIELD("No."),
+                                                              "Entry Type" = const("Issue Coupon")));
+            Caption = 'Coupon Issued';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys
