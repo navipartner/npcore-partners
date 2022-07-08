@@ -7,7 +7,7 @@ Take control over your operations by using the Power BI app for entertainment. T
 
 Prior to the installation of the Power BI app, request a free BC account from the [NaviPartner website](https://www.navipartner.com/get-trial/).   
 
-1. Populate and submit the registration form.
+1. Populate and submit the registration form.       
        ![Registration_form](./../images/Picture1.png)       
 2.  On the following screen, select the theme, and then the **ERP system** link.      
        ![Erp_system](./../images/Pic1a.png)    
