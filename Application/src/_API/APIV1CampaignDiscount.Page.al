@@ -32,10 +32,6 @@ page 6014470 "NPR APIV1 - Campaign Discount"
                 {
                     Caption = 'blockCustomDisc', Locked = true;
                 }
-                field(createdDate; Rec."Created Date")
-                {
-                    Caption = 'createdDate', Locked = true;
-                }
                 field(customerDiscGroupFilter; Rec."Customer Disc. Group Filter")
                 {
                     Caption = 'customerDiscGroupFilter', Locked = true;
@@ -123,10 +119,6 @@ page 6014470 "NPR APIV1 - Campaign Discount"
                 field(status; Rec.Status)
                 {
                     Caption = 'status', Locked = true;
-                }
-                field(lastDateModified; Rec."Last Date Modified")
-                {
-                    Caption = 'Last Date Modified', Locked = true;
                 }
                 field(systemModifiedAt; Rec.SystemModifiedAt)
                 {
