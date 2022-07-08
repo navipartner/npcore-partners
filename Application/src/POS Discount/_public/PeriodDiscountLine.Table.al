@@ -432,16 +432,12 @@
         if QtyDiscLine.Find('-') then
             Message(Text1060005);
 
-        UpdatePeriodDiscount();
-
         UpdateLine();
     end;
 
     trigger OnModify()
     begin
         "Last Date Modified" := Today();
-
-        UpdatePeriodDiscount();
 
         UpdateLine();
     end;
@@ -451,7 +447,6 @@
         RetailComment: Record "NPR Retail Comment";
         RetailComment2: Record "NPR Retail Comment";
     begin
-        UpdatePeriodDiscount();
 
         RetailComment.SetRange("Table ID", 6014414);
         RetailComment.SetRange("No.", xRec.Code);
@@ -481,16 +476,6 @@
         Text1060005: Label 'This items includes multi unit prices, which will be controlled by period discounts';
         VATPostingSetup: Record "VAT Posting Setup";
         VATPct: Decimal;
-
-    internal procedure UpdatePeriodDiscount()
-    var
-        PeriodDiscount: Record "NPR Period Discount";
-    begin
-        if PeriodDiscount.Get(Rec.Code) then begin
-            PeriodDiscount."Last Date Modified" := Today();
-            PeriodDiscount.Modify();
-        end;
-    end;
 
     internal procedure ShowComment()
     var
