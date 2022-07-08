@@ -296,20 +296,7 @@
                                 ApplicationArea = NPRRetail;
                             }
                         }
-                        field("Created the"; Rec."Created the")
-                        {
 
-                            Editable = false;
-                            ToolTip = 'Specifies the value of the Created Date field';
-                            ApplicationArea = NPRRetail;
-                        }
-                        field("Last Date Modified"; Rec."Last Date Modified")
-                        {
-
-                            Editable = false;
-                            ToolTip = 'Specifies the value of the Last Date Modified field';
-                            ApplicationArea = NPRRetail;
-                        }
                     }
                 }
             }
