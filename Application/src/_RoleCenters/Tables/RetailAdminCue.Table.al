@@ -121,6 +121,12 @@
             Caption = 'Workflow Steps Not Enabled';
             FieldClass = FlowField;
         }
+        field(92; "EFT Setups"; Integer)
+        {
+            CalcFormula = Count("NPR EFT Setup");
+            Caption = 'EFT Setups';
+            FieldClass = FlowField;
+        }
     }
 
     keys
