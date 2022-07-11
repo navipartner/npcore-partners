@@ -2,6 +2,7 @@
 {
     Caption = 'POS Posting Setup';
     DataClassification = CustomerContent;
+    DrillDownPageId = "NPR POS Posting Setup";
 
     fields
     {

@@ -51,6 +51,12 @@
                     ToolTip = 'Specifies the number of the POS Units. By clicking you can view the list of POS Units.';
                     ApplicationArea = NPRRetail;
                 }
+                field("POS Posting Setups"; Rec."POS Posting Setups")
+                {
+
+                    ToolTip = 'View or edit the POS Posting Setup';
+                    ApplicationArea = NPRRetail;
+                }
             }
             cuegroup(payments)
             {
@@ -65,6 +71,12 @@
                 {
 
                     ToolTip = 'Specifies the number of the POS Payment Bins. By clicking you can view the list of POS Payment Bins.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("EFT Setups"; Rec."EFT Setups")
+                {
+
+                    ToolTip = 'Specifies the number of the EFT Setups.';
                     ApplicationArea = NPRRetail;
                 }
             }
