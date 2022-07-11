@@ -21,7 +21,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         WorkshiftCheckpoint.Modify();
 
 
-        PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(GetUnitNo(POSSession), FromBinNo, CheckpointEntryNo);
+        PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(GetUnitNo(POSSession), FromBinNo, CheckpointEntryNo, POSPaymentBinCheckpoint.type::TRANSFER);
         Commit();
 
         // Confirm amounts counted and float/bank/safe transfer

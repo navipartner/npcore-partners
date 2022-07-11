@@ -504,13 +504,20 @@
         PaymentBinCheckpointPage: Page "NPR POS Payment Bin Checkpoint";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
-        POSWorkshiftCheckpoint.CreateBinCheckpoint(Rec."Entry No.");
+
+        case PageMode of
+            PageMode::FINAL:
+                POSPaymentBinCheckpoint.Type := POSPaymentBinCheckpoint.Type::ZREPORT;
+            else
+                POSPaymentBinCheckpoint.Type := POSPaymentBinCheckpoint.Type::NA
+        end;
+
+        POSWorkshiftCheckpoint.CreateBinCheckpoint(Rec."Entry No.", POSPaymentBinCheckpoint.Type);
         if PageMode = PageMode::FINAL then begin
             POSPaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", Rec."Entry No.");
             POSPaymentBinCheckpoint.SetRange("Include In Counting", POSPaymentBinCheckpoint."Include In Counting"::YES);
             if POSPaymentBinCheckpoint.IsEmpty then begin
                 POSPaymentBinCheckpoint.SetRange("Include In Counting");
-                POSPaymentBinCheckpoint.ModifyAll(Type, POSPaymentBinCheckpoint.Type::ZREPORT);
                 PaymentBinCheckpointPage.AutoCount(POSPaymentBinCheckpoint);
                 AutoCountCompleted := true;
             end;
