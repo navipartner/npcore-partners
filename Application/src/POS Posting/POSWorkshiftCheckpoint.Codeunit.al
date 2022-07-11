@@ -33,6 +33,7 @@
     var
         CheckPointEntryNo: Integer;
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
     begin
 
@@ -40,11 +41,11 @@
         POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
         Commit();
 
-        CreateBinCheckpoint(CheckPointEntryNo);
+        CreateBinCheckpoint(CheckPointEntryNo, POSPaymentBinCheckpoint.Type::NA);
         Commit();
     end;
 
-    procedure CreateBinCheckpoint(CheckPointEntryNo: Integer)
+    procedure CreateBinCheckpoint(CheckPointEntryNo: Integer; PaymentBinCheckpointType: Option)
     var
         PaymentBinCheckpoint: Codeunit "NPR POS Payment Bin Checkpoint";
         UnittoBinRelation: Record "NPR POS Unit to Bin Relation";
@@ -57,12 +58,12 @@
         POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
 
         if (POSUnit."Default POS Payment Bin" <> '') then
-            PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(POSUnit."No.", POSUnit."Default POS Payment Bin", CheckPointEntryNo);
+            PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(POSUnit."No.", POSUnit."Default POS Payment Bin", CheckPointEntryNo, PaymentBinCheckpointType);
 
         UnittoBinRelation.SetFilter("POS Unit No.", '=%1', POSWorkshiftCheckpoint."POS Unit No.");
         if (UnittoBinRelation.FindSet()) then begin
             repeat
-                PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(UnittoBinRelation."POS Unit No.", UnittoBinRelation."POS Payment Bin No.", CheckPointEntryNo);
+                PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(UnittoBinRelation."POS Unit No.", UnittoBinRelation."POS Payment Bin No.", CheckPointEntryNo, PaymentBinCheckpointType);
 
             until (UnittoBinRelation.Next() = 0);
         end else begin
@@ -279,17 +280,15 @@
         POSWorkshiftCheckpoint.Modify();
         Commit();
 
-        CreateBinCheckpoint(CheckPointEntryNo);
-        POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
-        POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', CheckPointEntryNo);
         case Mode of
             EodWorkshiftMode::ZREPORT:
-                POSPaymentBinCheckpoint.ModifyAll(Type, POSPaymentBinCheckpoint.Type::ZREPORT);
+                POSPaymentBinCheckpoint.Type := POSPaymentBinCheckpoint.Type::ZREPORT;
             EodWorkshiftMode::XREPORT:
-                POSPaymentBinCheckpoint.ModifyAll(Type, POSPaymentBinCheckpoint.Type::XREPORT);
+                POSPaymentBinCheckpoint.Type := POSPaymentBinCheckpoint.Type::XREPORT;
             EodWorkshiftMode::CLOSEWORKSHIFT:
-                POSPaymentBinCheckpoint.ModifyAll(Type, POSPaymentBinCheckpoint.Type::XREPORT);
+                POSPaymentBinCheckpoint.Type := POSPaymentBinCheckpoint.Type::XREPORT;
         end;
+        CreateBinCheckpoint(CheckPointEntryNo, POSPaymentBinCheckpoint.Type);
 
         if (IsManager) then
             AggregateWorkshifts(UnitNo, CheckPointEntryNo, Mode);
@@ -356,11 +355,8 @@
                 POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::XREPORT;
                 POSWorkshiftCheckpoint.Modify();
 
-                CreateBinCheckpoint(POSWorkshiftCheckpoint."Entry No.");
+                CreateBinCheckpoint(POSWorkshiftCheckpoint."Entry No.", POSPaymentBinCheckpoint.Type::XREPORT);
 
-                POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
-                POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', POSWorkshiftCheckpoint."Entry No.");
-                POSPaymentBinCheckpoint.ModifyAll(Type, POSPaymentBinCheckpoint.Type::XREPORT);
             end;
 
             // Slave bin contents to master bin
@@ -373,12 +369,11 @@
             POSWorkshiftCheckpoint.Open := true;
             POSWorkshiftCheckpoint.Modify();
 
-            CreateBinCheckpoint(CheckPointEntryNo);
+            CreateBinCheckpoint(CheckPointEntryNo, POSPaymentBinCheckpoint.Type::TRANSFER);
 
             POSWorkshiftCheckpoint.Reset();
             POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
             POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', CheckPointEntryNo);
-            POSPaymentBinCheckpoint.ModifyAll(Type, POSPaymentBinCheckpoint.Type::TRANSFER);
             POSPaymentBinCheckpoint.ModifyAll(Status, POSPaymentBinCheckpoint.Status::READY);
         until (POSUnit.Next() = 0);
 
