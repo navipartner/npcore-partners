@@ -79,32 +79,30 @@
 
                 trigger OnAction()
                 var
-                    DEAuditSetup: Record "NPR DE Audit Setup";
+                    ConnectionParameters: Record "NPR DE Audit Setup";
                     DSFINVKMng: Codeunit "NPR DE Fiskaly DSFINVK";
                     DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
                     DSFINVKJson: JsonObject;
                     DSFINVKResponseJson: JsonToken;
-                    AccessToken: Text;
+                    Success: Boolean;
                 begin
-                    DEAuditSetup.Get();
-
-                    if not DSFINVKMng.CreateDSFINVKDocument(DSFINVKJson, Rec) then
-                        DEAuditMgt.SetDSFINVKErrorMsg(Rec);
-
-                    if not DEFiskalyCommunication.GetJwtToken(AccessToken) then
-                        DEAuditMgt.SetDSFINVKErrorMsg(Rec);
-
-                    Rec."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings 
-                    if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, 'PUT', StrSubstNo('/cash_point_closings/%1', Format(Rec."Closing ID", 0, 4)), AccessToken) then begin
-                        DEAuditMgt.SetDSFINVKErrorMsg(Rec);
-                        exit;
+                    Success := ConnectionParameters.GetSetup(Rec);
+                    if Success then
+                        Success := DSFINVKMng.CreateDSFINVKDocument(DSFINVKJson, Rec);
+                    if Success then begin
+                        Rec."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings 
+                        Success := DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'PUT', StrSubstNo('/cash_point_closings/%1', Format(Rec."Closing ID", 0, 4)));
                     end;
 
-                    Rec.State := Rec.State::PENDING;
-                    Rec."Has Error" := false;
-                    Clear(Rec."Error Message");
-                    Rec.Modify();
+                    if not Success then
+                        DEAuditMgt.SetDSFINVKErrorMsg(Rec)
+                    else begin
+                        Rec.State := Rec.State::PENDING;
+                        Rec."Has Error" := false;
+                        Clear(Rec."Error Message");
+                        Rec.Modify();
+                    end;
                     CurrPage.Update();
                 end;
             }

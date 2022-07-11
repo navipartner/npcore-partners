@@ -1,7 +1,7 @@
 ﻿page 6014426 "NPR DE POS Audit Log Aux. Info"
 {
     Extensible = False;
-    Caption = 'DE POS Audit Log Aux. Info';
+    Caption = 'DE POS Audit Log';
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
@@ -131,7 +131,7 @@
                         if not Confirm(HasData) then
                             exit;
                     DeAuditAux := Rec;
-                    ResponseJson := DEFiskalyComm.GetTransaction(Format(DeAuditAux."TSS ID", 0, 4), Format(DeAuditAux."Transaction ID", 0, 4), 0);
+                    ResponseJson := DEFiskalyComm.GetTransaction(DeAuditAux, 0);
                     if not DEAuditMgt.DeAuxInfoInsertResponse(DeAuditAux, ResponseJson) then
                         Message(GetLastErrorText());
                     DeAuditAux.Modify();

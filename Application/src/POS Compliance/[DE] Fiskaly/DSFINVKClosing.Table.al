@@ -74,5 +74,6 @@
         {
             Clustered = true;
         }
+        key(Key2; State, "Has Error") { }
     }
 }
