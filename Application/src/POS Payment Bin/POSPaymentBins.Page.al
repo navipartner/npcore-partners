@@ -1,15 +1,6 @@
 ﻿page 6150620 "NPR POS Payment Bins"
 {
     Extensible = False;
-    // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
-    // NPR5.36/BR/20170810 CASE 277096 Added Action to navigate to POS Posting Setup
-    // NPR5.40/MMV /20180302 CASE 300660 Added field opening method and action for setting parameters
-    // NPR5.40/TSA /20180306 CASE 307267 Added transfer content button
-    // NPR5.40/TSA /20180306 CASE 307267 Added Bin Type field
-    // NPR5.41/MMV /20180425 CASE 312990 Renamed action
-    // NPR5.51/TJ  /20190619 CASE 353761 Action "Transfer Out From Bin" hidden
-    //                                   New action "Insert Initial Float"
-
     Caption = 'POS Payment Bins';
     PageType = List;
     SourceTable = "NPR POS Payment Bin";
@@ -97,9 +88,7 @@
                 var
                     POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
                 begin
-                    //-NPR5.40 [300660]
                     POSPaymentBinInvokeMgt.OnShowInvokeParameters(Rec);
-                    //+NPR5.40 [300660]
                 end;
             }
         }
@@ -137,9 +126,7 @@
 
                 trigger OnAction()
                 begin
-                    //-NPR5.51 [353761]
                     InsertInitialFloat();
-                    //+NPR5.51 [353761]
                 end;
             }
         }
@@ -160,9 +147,8 @@
         PageAction: Action;
     begin
 
-        //-NPR5.40 [307267]
         CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry('');
-        PaymentBinCheckpoint.CreatePosEntryBinCheckpoint('', Rec."No.", CheckpointEntryNo);
+        PaymentBinCheckpoint.CreatePosEntryBinCheckpoint('', Rec."No.", CheckpointEntryNo, POSPaymentBinCheckpoint.type::TRANSFER);
         Commit();
 
         // Confirm amounts counted and float/bank/safe transfer
@@ -189,7 +175,6 @@
                 POSCreateEntry.CreateBalancingEntryAndLines(SalePOS, true, CheckpointEntryNo);
             end;
         end;
-        //+NPR5.40 [307267]
     end;
 
     local procedure InsertInitialFloat()
@@ -202,7 +187,6 @@
         BinEntry: Record "NPR POS Bin Entry";
         POSPayBinSetFloat: Page "NPR POS Paym.Bin Set Float";
     begin
-        //-NPR5.51 [353761]
         POSUnit.Get(Rec."Attached to POS Unit No.");
 
         POSPayBinSetFloat.LookupMode := true;
@@ -266,7 +250,7 @@
                     BinEntry."Bin Checkpoint Entry No." := POSPaymentBinCheckpoint."Entry No.";
                     BinEntry.Modify();
 
-                    // Creating the intial float entry
+                    // Creating the initial float entry
                     BinEntry."Entry No." := 0;
                     BinEntry."Bin Checkpoint Entry No." := POSPaymentBinCheckpoint."Entry No.";
                     BinEntry.Type := BinEntry.Type::FLOAT;
@@ -277,7 +261,6 @@
                 until TempPOSPaymentMethod.Next() = 0;
             end;
         end;
-        //+NPR5.51 [353761]
     end;
 
     local procedure CalculateTransactionAmountLCY(var POSBinEntry: Record "NPR POS Bin Entry")
