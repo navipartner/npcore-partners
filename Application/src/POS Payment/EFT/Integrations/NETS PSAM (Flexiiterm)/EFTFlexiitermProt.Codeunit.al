@@ -233,6 +233,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         Commit(); //Prevent receipt data rollback in case of print error below - printing immediately inside the EFT transaction is unfortunately necessary since signature approval transactions depend on it.
 
         CreditCardTransaction.Reset();
+        CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.");
         CreditCardTransaction.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
         CreditCardTransaction.SetRange("Receipt No.", ReceiptNo);
         CreditCardTransaction.PrintTerminalReceipt();

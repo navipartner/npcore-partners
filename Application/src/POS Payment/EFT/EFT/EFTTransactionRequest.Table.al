@@ -563,6 +563,7 @@
         First := true;
         repeat
             if (ReceiptNo <> CreditCardTransaction."Receipt No.") or (EntryNo <> CreditCardTransaction."EFT Trans. Request Entry No.") or (First) then begin
+                CreditCardTransaction2.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.");
                 CreditCardTransaction2.SetRange("EFT Trans. Request Entry No.", CreditCardTransaction."EFT Trans. Request Entry No.");
                 CreditCardTransaction2.SetRange("Receipt No.", CreditCardTransaction."Receipt No.");
                 CreditCardTransaction2.PrintTerminalReceipt();
