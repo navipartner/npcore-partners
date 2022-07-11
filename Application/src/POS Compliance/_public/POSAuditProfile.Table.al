@@ -95,6 +95,7 @@
                     TempRetailList.FindFirst();
                     "Audit Handler" := TempRetailList.Choice;
                 end;
+                "Audit Log Enabled" := true;
             end;
         }
         field(70; "Allow Zero Amount Sales"; Boolean)

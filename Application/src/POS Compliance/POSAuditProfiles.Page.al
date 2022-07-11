@@ -52,7 +52,7 @@
                 }
                 field("Audit Handler"; Rec."Audit Handler")
                 {
-                    ToolTip = 'Specifies the value of the Audit Handler field';
+                    ToolTip = 'Specifies the audit handler to be used with this POS audit profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Allow Zero Amount Sales"; Rec."Allow Zero Amount Sales")

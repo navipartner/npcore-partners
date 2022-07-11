@@ -17,6 +17,7 @@ page 6059882 "NPR DE TSS List"
                 {
                     ToolTip = 'Specifies a unique code of the TSS. The code is used internally by the system.';
                     ApplicationArea = NPRRetail;
+                    ShowMandatory = true;
                 }
                 field(Description; Rec.Description)
                 {
@@ -27,6 +28,12 @@ page 6059882 "NPR DE TSS List"
                 {
                     ToolTip = 'Specifies an id, which was used to create the TSS at Fiskaly.';
                     ApplicationArea = NPRRetail;
+                }
+                field("Connection Parameter Set Code"; Rec."Connection Parameter Set Code")
+                {
+                    ToolTip = 'Specifies connection parameters to be used for the TSS, when exchanging data with Fiskaly.';
+                    ApplicationArea = NPRRetail;
+                    ShowMandatory = true;
                 }
                 field("Fiskaly TSS Created at"; Rec."Fiskaly TSS Created at")
                 {
@@ -88,8 +95,12 @@ page 6059882 "NPR DE TSS List"
                 trigger OnAction()
                 var
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
+                    Window: Dialog;
+                    WorkingLbl: Label 'Retrieving data from Fiskaly...';
                 begin
+                    Window.Open(WorkingLbl);
                     DEFiskalyCommunication.GetTSSList();
+                    Window.Close();
                     CurrPage.Update(false);
                 end;
             }
@@ -106,17 +117,19 @@ page 6059882 "NPR DE TSS List"
 
                 trigger OnAction()
                 var
+                    ConnectionParameters: Record "NPR DE Audit Setup";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
                     AlreadyCreatedErr: Label 'The Technical Security System (TSS) has already been created at Fiskaly. You cannot create it once again.';
                 begin
                     Rec.TestField(SystemId);
                     Rec.TestField(Description);
+                    ConnectionParameters.GetSetup(Rec);
 
                     if Rec."Fiskaly TSS Created at" <> 0DT then
                         Error(AlreadyCreatedErr);
 
                     CurrPage.SaveRecord();
-                    DEFiskalyCommunication.CreateTSS(Rec);
+                    DEFiskalyCommunication.CreateTSS(Rec, ConnectionParameters);
                     CurrPage.Update(false);
                 end;
             }
@@ -129,13 +142,15 @@ page 6059882 "NPR DE TSS List"
 
                 trigger OnAction()
                 var
+                    ConnectionParameters: Record "NPR DE Audit Setup";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
                 begin
                     Rec.TestField(SystemId);
                     Rec.TestField("Fiskaly TSS State", Rec."Fiskaly TSS State"::CREATED);
+                    ConnectionParameters.GetSetup(Rec);
 
                     CurrPage.SaveRecord();
-                    DEFiskalyCommunication.UpdateTSS_State(Rec, Rec."Fiskaly TSS State"::UNINITIALIZED, true);
+                    DEFiskalyCommunication.UpdateTSS_State(Rec, Rec."Fiskaly TSS State"::UNINITIALIZED, true, ConnectionParameters);
                     CurrPage.Update(false);
                 end;
             }
@@ -148,6 +163,7 @@ page 6059882 "NPR DE TSS List"
 
                 trigger OnAction()
                 var
+                    ConnectionParameters: Record "NPR DE Audit Setup";
                     DESecretMgt: Codeunit "NPR DE Secret Mgt.";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
                     AlreadyAssignedQst: Label 'An admin PIN has already been assigned to selected Technical Security System (TSS). If you continue, system will assign a new PIN.\Are you sure you want to continue?';
@@ -157,9 +173,10 @@ page 6059882 "NPR DE TSS List"
                     if DESecretMgt.HasSecretKey(Rec.AdminPINSecretLbl()) then
                         if not Confirm(AlreadyAssignedQst, true) then
                             exit;
+                    ConnectionParameters.GetSetup(Rec);
 
                     CurrPage.SaveRecord();
-                    DEFiskalyCommunication.UpdateTSS_AdminPIN(Rec, '');
+                    DEFiskalyCommunication.UpdateTSS_AdminPIN(Rec, '', ConnectionParameters);
                     CurrPage.Update(false);
                 end;
             }
@@ -172,6 +189,7 @@ page 6059882 "NPR DE TSS List"
 
                 trigger OnAction()
                 var
+                    ConnectionParameters: Record "NPR DE Audit Setup";
                     DESecretMgt: Codeunit "NPR DE Secret Mgt.";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
                     AdminPinNotAssignedErr: Label 'Please assign admin PIN to selected Technical Security System (TSS) first.';
@@ -181,10 +199,11 @@ page 6059882 "NPR DE TSS List"
                     Rec.TestField("Fiskaly TSS State", Rec."Fiskaly TSS State"::UNINITIALIZED);
                     if not DESecretMgt.HasSecretKey(Rec.AdminPINSecretLbl()) then
                         Error(AdminPinNotAssignedErr);
+                    ConnectionParameters.GetSetup(Rec);
 
                     CurrPage.SaveRecord();
-                    DEFiskalyCommunication.TSS_AuthenticateAdmin(Rec);
-                    DEFiskalyCommunication.UpdateTSS_State(Rec, Rec."Fiskaly TSS State"::INITIALIZED, true);
+                    DEFiskalyCommunication.TSS_AuthenticateAdmin(Rec, ConnectionParameters);
+                    DEFiskalyCommunication.UpdateTSS_State(Rec, Rec."Fiskaly TSS State"::INITIALIZED, true, ConnectionParameters);
                     CurrPage.Update(false);
                 end;
             }

@@ -19,6 +19,18 @@ table 6014687 "NPR DE TSS"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
+        field(3; "Connection Parameter Set Code"; Code[10])
+        {
+            Caption = 'Connection Parameter Set Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR DE Audit Setup";
+
+            trigger OnValidate()
+            begin
+                if "Connection Parameter Set Code" <> xRec."Connection Parameter Set Code" then
+                    TestField("Fiskaly TSS Created at", 0DT);
+            end;
+        }
         field(100; "Fiskaly TSS Created at"; DateTime)
         {
             Caption = 'Fiskaly TSS Created at';
