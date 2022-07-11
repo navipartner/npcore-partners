@@ -3,6 +3,7 @@
     Caption = 'EFT Setup';
     DataClassification = CustomerContent;
     LookupPageID = "NPR EFT Setup";
+    DrillDownPageId = "NPR EFT Setup";
 
     fields
     {
