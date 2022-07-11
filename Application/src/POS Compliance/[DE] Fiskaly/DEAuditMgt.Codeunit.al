@@ -19,23 +19,23 @@
 
     local procedure IsEnabled(POSAuditProfile: Record "NPR POS Audit Profile"): Boolean
     begin
-        if POSAuditProfile."Audit Handler" <> HandlerCode() then
-            exit(false);
-        exit(true);
+        exit(POSAuditProfile."Audit Handler" = HandlerCode());
     end;
 
     procedure ShouldDisplayNotification(POSAuditProfile: Record "NPR POS Audit Profile"; xPOSAuditProfile: Record "NPR POS Audit Profile"): Boolean
+    var
+        DEPosUnitSetup: Record "NPR DE POS Unit Aux. Info";
     begin
         if not IsEnabled(POSAuditProfile) then
             exit(false);
         if POSAuditProfile."Audit Handler" = xPOSAuditProfile."Audit Handler" then
             exit(false);
-        exit(not (DEAuditSetup.Get() and (DEAuditSetup."Api URL" <> '')));
+        exit(DEPosUnitSetup.IsEmpty());
     end;
 
     procedure OnActionShowSetup()
     begin
-        Page.RunModal(Page::"NPR DE Audit Setup");
+        Page.RunModal(Page::"NPR DE POS Unit Aux. Info List");
     end;
 
     procedure OnActionLearnMore()
@@ -84,38 +84,27 @@
         end;
     end;
 
-    // Insert the workflow step in  POS Workflows
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
-    var
-        Text000: Label 'Create Sales in DE Fiskaly';
-    begin
-        if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-        if Rec."Subscriber Function" <> 'CreateDeFiskalyOnSale' then
-            exit;
-
-        Rec.Description := Text000;
-        Rec."Sequence No." := 10;
-    end;
-
     // The methods subscribes to event posted during end of sale
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure CreateDeFiskalyOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
+    local procedure CreateDeFiskalyOnSale(SalePOS: Record "NPR POS Sale")
     var
+        PosUnit: Record "NPR POS Unit";
+        PosAuditProfile: Record "NPR POS Audit Profile";
         PosEntry: Record "NPR POS Entry";
         DeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
     begin
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
+        if not PosUnit.Get(SalePOS."Register No.") then
             exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'CreateDeFiskalyOnSale' then
+        if not PosUnit.GetProfile(PosAuditProfile) then
+            exit;
+        if not IsEnabled(PosAuditProfile) then
             exit;
 
         PosEntry.SetCurrentKey("Document No.");
         PosEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         PosEntry.SetRange("POS Unit No.", SalePOS."Register No.");
-        if (not PosEntry.FindFirst()) then
+        if not PosEntry.FindFirst() then
             exit;
         if PosEntry."Entry Type" <> PosEntry."Entry Type"::"Direct Sale" then
             exit;
@@ -290,8 +279,8 @@
         CompanyInformation: Record "Company Information";
         POSUnitAudit: Record "NPR DE POS Unit Aux. Info";
         DESecretMgt: Codeunit "NPR DE Secret Mgt.";
-        NoApiKeyLbl: Label 'Fiskaly Api Key must be entered in DE Audit Setup.';
-        NoApiSecretLbl: Label 'Fiskaly Api Secret must be entered in DE Audit Setup.';
+        MissingConnectionParameterErr: Label 'Please specify %1 in %2 %3=%4 and then try again.', Comment = '%1 - missing parameter name, %2 - "NPR DE Audit Setup" table caption, %3 - "NPR DE Audit Setup" table primary key field caption, %4 - "NPR DE Audit Setup" table primary key field value';
+        ParameterFieldCaptionsLbl: Label 'Api Key,Api Secret';
     begin
         //Error upon POS login if any configuration is missing or clearly not set according to compliance
 
@@ -306,16 +295,18 @@
         POSUnitAudit.TestField("Serial Number");
         POSUnitAudit.TestField("TSS Code");
         POSUnitAudit.TestField("Fiskaly Client Created at");
+
         DETSS.Get(POSUnitAudit."TSS Code");
         DETSS.TestField(SystemId);
         DETSS.TestField("Fiskaly TSS Created at");
+        DETSS.TestField("Connection Parameter Set Code");
 
-        DEAuditSetup.Get();
-        DEAuditSetup.TestField("Api URL");
-        if not DESecretMgt.HasSecretKey(DEAuditSetup.ApiKeyLbl()) then
-            Error(NoApiKeyLbl);
-        if not DESecretMgt.HasSecretKey(DEAuditSetup.ApiSecretLbl()) then
-            Error(NoApiSecretLbl);
+        DEConnectionParameterSet.Get(DETSS."Connection Parameter Set Code");
+        DEConnectionParameterSet.TestField("Api URL");
+        if not DESecretMgt.HasSecretKey(DEConnectionParameterSet.ApiKeyLbl()) then
+            Error(MissingConnectionParameterErr, SelectStr(1, ParameterFieldCaptionsLbl), DEConnectionParameterSet.TableCaption(), DEConnectionParameterSet.FieldCaption("Primary Key"), DEConnectionParameterSet."Primary Key");
+        if not DESecretMgt.HasSecretKey(DEConnectionParameterSet.ApiSecretLbl()) then
+            Error(MissingConnectionParameterErr, SelectStr(2, ParameterFieldCaptionsLbl), DEConnectionParameterSet.TableCaption(), DEConnectionParameterSet.FieldCaption("Primary Key"), DEConnectionParameterSet."Primary Key");
 
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
         POSAuditProfile.TestField("Sale Fiscal No. Series");
@@ -340,6 +331,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterEndWorkshift', '', true, true)]
     local procedure OnAfterEndWorkshiftDeFiscaly(Mode: Option; UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
     var
+        ConnectionParameters: Record "NPR DE Audit Setup";
         POSWorkshifCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSUnit: Record "NPR POS Unit";
         DSFINVKClosing: Record "NPR DSFINVK Closing";
@@ -347,7 +339,6 @@
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
         DSFINVKJson: JsonObject;
         DSFINVKResponseJson: JsonToken;
-        AccessToken: Text;
         NextClosingId: Integer;
     begin
         if not Successful then
@@ -389,18 +380,18 @@
             if DSFINVKClosing.State <> DSFINVKClosing.State::" " then
                 exit;
 
+        if not ConnectionParameters.GetSetup(DSFINVKClosing) then begin
+            SetDSFINVKErrorMsg(DSFINVKClosing);
+            exit;
+        end;
+
         if not DSFINVKMng.CreateDSFINVKDocument(DSFINVKJson, DSFINVKClosing) then begin
             SetDSFINVKErrorMsg(DSFINVKClosing);
             exit;
         end;
 
-        if not DEFiskalyCommunication.GetJwtToken(AccessToken) then begin
-            SetDSFINVKErrorMsg(DSFINVKClosing);
-            exit;
-        end;
-
         DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings 
-        if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4), AccessToken) then begin
+        if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4)) then begin
             SetDSFINVKErrorMsg(DSFINVKClosing);
             exit;
         end;
@@ -408,11 +399,6 @@
         DSFINVKClosing."Has Error" := false;
         Clear(DSFINVKClosing."Error Message");
         DSFINVKClosing.Modify();
-    end;
-
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(Codeunit::"NPR DE Audit Mgt.");
     end;
 
     local procedure CheckTssJobQueue()
@@ -496,5 +482,5 @@
     end;
 
     var
-        DEAuditSetup: Record "NPR DE Audit Setup";
+        DEConnectionParameterSet: Record "NPR DE Audit Setup";
 }

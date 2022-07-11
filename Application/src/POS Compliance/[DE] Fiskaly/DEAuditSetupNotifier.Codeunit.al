@@ -11,7 +11,7 @@ codeunit 6059849 "NPR DE Audit Setup Notifier"
         DEAuditSetupNotification: Notification;
         LearnMoreActionLbl: Label 'Learn more';
         NotificationActionLbl: Label 'Open Setup Page';
-        NotificationTxt: Label 'You must specify additional audit handler settings in "DE Audit Setup" page.';
+        NotificationTxt: Label 'Selected audit handler requires you to set up Fiskaly POS units.';
     begin
         DEAuditSetupNotification.Id := GetNotificationId();
         DEAuditSetupNotification.Message(NotificationTxt);
@@ -37,7 +37,7 @@ codeunit 6059849 "NPR DE Audit Setup Notifier"
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR POS Audit Profile", 'OnAfterValidateEvent', 'Audit Handler', false, false)]
-    local procedure OnAfterValidateAutomaticCostPosting(var Rec: Record "NPR POS Audit Profile"; var xRec: Record "NPR POS Audit Profile")
+    local procedure OnAfterValidateAuditHandler(var Rec: Record "NPR POS Audit Profile"; var xRec: Record "NPR POS Audit Profile")
     begin
         if DEAuditMgt.ShouldDisplayNotification(Rec, xRec) then
             ShowDEAuditSetupNotification();

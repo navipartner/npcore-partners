@@ -1,7 +1,7 @@
 ﻿page 6014427 "NPR DE POS Unit Aux. Info List"
 {
     Extensible = False;
-    Caption = 'NPR DE POS Unit Aux. Info List';
+    Caption = 'DE Fiskaly POS Unit Setup';
     PageType = List;
     SourceTable = "NPR DE POS Unit Aux. Info";
     UsageCategory = None;
@@ -80,11 +80,18 @@
                 var
                     DETSS: Record "NPR DE TSS";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
+                    Window: Dialog;
+                    NoSyncedTssErr: Label 'No TSS has been synched to Fiskaly.';
+                    WorkingLbl: Label 'Retrieving data from Fiskaly...';
                 begin
-                    DETSS.FindSet();
+                    DETSS.SetFilter("Fiskaly TSS Created at", '<>%1', 0DT);
+                    if not DETSS.FindSet() then
+                        Error(NoSyncedTssErr);
+                    Window.Open(WorkingLbl);
                     repeat
                         DEFiskalyCommunication.GetTSSClientList(DETSS);
                     until DETSS.Next() = 0;
+                    Window.Close();
                     CurrPage.Update(false);
                 end;
             }
@@ -131,7 +138,7 @@
 
                 trigger OnAction()
                 var
-                    DEAuditSetup: Record "NPR DE Audit Setup";
+                    ConnectionParameters: Record "NPR DE Audit Setup";
                     DETSS: Record "NPR DE TSS";
                     GeneralLedgerSetup: Record "General Ledger Setup";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
@@ -140,15 +147,14 @@
                     CashRegisterTypeJson: JsonObject;
                     SoftwareJson: JsonObject;
                 begin
-                    DEAuditSetup.Get();
                     GeneralLedgerSetup.Get();
                     Rec.TestField(SystemId);
                     Rec.TestField("TSS Code");
                     DETSS.Get(Rec."TSS Code");
                     DETSS.TestField("Fiskaly TSS Created at");
+                    ConnectionParameters.GetSetup(DETSS);
                     Rec.TestField("Cash Register Brand");
                     Rec.TestField("Cash Register Model");
-                    //DEAuditSetup.TestField("DSFINVK Api URL");
 
                     CashRegisterTypeJson.Add('type', 'MASTER');
                     CashRegisterTypeJson.Add('tss_id', Format(DETSS.SystemId, 0, 4));
@@ -159,12 +165,51 @@
                     RequestJson.Add('model', Rec."Cash Register Model");
                     RequestJson.Add('base_currency_code', GeneralLedgerSetup."LCY Code");
 
-                    if not DEFiskalyCommunication.SendRequest_signDE_V2(RequestJson, ResponseJson, 'PUT', StrSubstNo('/cash_registers/%1', Format(Rec.SystemId, 0, 4)), DEFiskalyCommunication.GetJwtToken()) then
+                    if not DEFiskalyCommunication.SendRequest_signDE_V2(RequestJson, ResponseJson, ConnectionParameters, 'PUT', StrSubstNo('/cash_registers/%1', Format(Rec.SystemId, 0, 4))) then
                         Error(GetLastErrorText());
 
                     Rec."Cash Register Created" := true;
                     CurrPage.Update();
                 end;
+            }
+        }
+        area(Navigation)
+        {
+            action(PaymentMappings)
+            {
+                Caption = 'Payment Method Mapping';
+                ToolTip = 'Map Fiskaly payment types to POS payment methods.';
+                Image = CoupledCurrency;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                RunObject = page "NPR Payment Method Mapper";
+                ApplicationArea = NPRRetail;
+            }
+            action(VATMappings)
+            {
+                Caption = 'VAT Posting Setup Mapping';
+                ToolTip = 'Map Fiskaly VAT rate types to VAT business and product prosting group combinations.';
+                Image = VATPostingSetup;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                RunObject = page "NPR VAT Prod Post Group Mapper";
+                ApplicationArea = NPRRetail;
+            }
+            action(DEAuditLog)
+            {
+                Caption = 'DE POS Audit Log';
+                ToolTip = 'View transactions recorded in DE POS audit log with their sync. statuses.';
+                Image = Log;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                RunObject = page "NPR DE POS Audit Log Aux. Info";
+                ApplicationArea = NPRRetail;
             }
         }
     }

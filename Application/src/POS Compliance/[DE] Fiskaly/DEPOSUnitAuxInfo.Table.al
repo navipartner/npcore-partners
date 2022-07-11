@@ -1,7 +1,7 @@
 ﻿table 6014532 "NPR DE POS Unit Aux. Info"
 {
     Access = Internal;
-    Caption = 'DE POS Unit Aux. Info';
+    Caption = 'DE Fiskaly POS Unit Setup';
     DataClassification = CustomerContent;
 
     fields
@@ -47,6 +47,12 @@
             Caption = 'TSS Code';
             TableRelation = "NPR DE TSS";
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "TSS Code" <> xRec."TSS Code" then
+                    TestField("Fiskaly Client Created at", 0DT);
+            end;
         }
         field(30; "Serial Number"; Text[250])
         {
@@ -56,6 +62,8 @@
 
             trigger OnValidate()
             begin
+                if "Serial Number" <> xRec."Serial Number" then
+                    TestField("Fiskaly Client Created at", 0DT);
                 if "Serial Number" = '' then
                     exit;
                 "Serial Number" := DelChr("Serial Number", '=', '/_');

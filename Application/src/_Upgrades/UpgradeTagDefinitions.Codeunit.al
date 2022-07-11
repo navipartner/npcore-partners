@@ -72,6 +72,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Aux Tables"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Object Output"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MPOS QR Code"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG DE Audit Setup"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -244,6 +245,8 @@
                 Exit('NPRUPGObjectOutput-6e45a4a7887c4210be8059396b7ac71c');
             Codeunit::"NPR UPG MPOS QR Code":
                 Exit('NPRUPGMPOSQRCode');
+            Codeunit::"NPR UPG DE Audit Setup":
+                Exit('RemoveDEFiskalyPOSWorkflowStep');
         end;
     end;
 }
