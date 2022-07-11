@@ -278,10 +278,12 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
         if (EFTTransactionRequest."Authentication Method" = EFTTransactionRequest."Authentication Method"::Signature)
           and (EFTTransactionRequest."Signature Type" = EFTTransactionRequest."Signature Type"::"On Receipt")
           and (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::PAYMENT)
-          and (EFTTransactionRequest.Finished <> 0DT) then begin
+          and (EFTTransactionRequest.Finished <> 0DT)
+        then begin
 
             Handled := true; //We have already printed the merchant receipt (1) during the purchase transaction. So we manually print only customer receipt at end of trx.
 
+            CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.");
             CreditCardTransaction.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
             CreditCardTransaction.FindFirst();
             CreditCardTransaction.SetRange("Receipt No.", CreditCardTransaction."Receipt No." + 1);

@@ -1898,15 +1898,12 @@ codeunit 6184496 "NPR Pepper Library HWC"
 
         Handled := true;
 
-        CreditCardTransaction.SetFilter("EFT Trans. Request Entry No.", '=%1', EFTTransactionRequest."Entry No.");
+        CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.");
         if (EFTTransactionRequest."Initiated from Entry No." <> 0) then
-            CreditCardTransaction.SetFilter("EFT Trans. Request Entry No.", '=%1', EFTTransactionRequest."Initiated from Entry No.");
-
-        if (not CreditCardTransaction.FindSet()) then
-            exit;
-
+            CreditCardTransaction.SetFilter("EFT Trans. Request Entry No.", '=%1', EFTTransactionRequest."Initiated from Entry No.")
+        else
+            CreditCardTransaction.SetFilter("EFT Trans. Request Entry No.", '=%1', EFTTransactionRequest."Entry No.");
         CreditCardTransaction.PrintTerminalReceipt();
-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
