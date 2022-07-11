@@ -17,6 +17,11 @@ codeunit 6059865 NPRDemoHelper
         DemoHelperImple.UpdatePasswordPaymentGateway(PaymentCode, DemoPassword);
     end;
 
+    Procedure UpdatePasswordCollectStores(StoreCode: code[20]; DemoPassword: text)
+    begin
+        DemoHelperImple.UpdatePasswordCollectStore(StoreCode, DemoPassword);
+    end;
+
     var
         DemoHelperImple: codeunit NPRDemoHelperImplementation;
 }

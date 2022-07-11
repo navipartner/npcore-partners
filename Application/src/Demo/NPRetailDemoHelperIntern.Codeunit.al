@@ -109,5 +109,19 @@ codeunit 6059866 NPRDemoHelperImplementation
             MagPaymentGateway.SetApiPassword("Demo Password");
     end;
 
+    Procedure UpdatePasswordCollectStore(StoreCode: code[20]; Password: text)
+    var
+        NPRNpCsStore: record "NPR NpCs Store";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+        NpCsStoreMgt: Codeunit "NPR NpCs Store Mgt.";
+    begin
+        if not NPRNpCsStore.get(StoreCode) then
+            exit;
+
+        if Password <> '' then
+            WebServiceAuthHelper.SetApiPassword(Password, NPRNpCsStore."API Password Key");
+
+        if NpCsStoreMgt.TryGetCollectService(NPRNpCsStore) then;
+    end;
 
 }
