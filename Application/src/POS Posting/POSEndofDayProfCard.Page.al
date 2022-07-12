@@ -89,6 +89,11 @@
                     ToolTip = 'Hide the turnover section on the summary page.';
                     ApplicationArea = NPRRetail;
                 }
+                field(HideDifferenceField; Rec.DisableDifferenceField)
+                {
+                    ToolTip = 'Hide the difference field on the counting page.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
