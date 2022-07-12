@@ -161,7 +161,7 @@
         Statistics.Add('taxSummary', GetSectionTaxSummary());
     end;
 
-    local procedure GetCashCountingTypes() CashCounting: JsonArray
+    local procedure GetCashCountingTypes(EndOfDayProfile: Record "NPR POS End of Day Profile") CashCounting: JsonArray
     var
         PaymentMethod: Record "NPR POS Payment Method";
         CountingType: JsonObject;
@@ -189,7 +189,9 @@
 
                     case (PaymentMethod."Include In Counting") of
                         PaymentMethod."Include In Counting"::YES:
-                            CountingType.Add('includeInCounting', 'yes');
+                            if (EndOfDayProfile."Force Blind Counting") then
+                                CountingType.Add('includeInCounting', 'blind') else
+                                CountingType.Add('includeInCounting', 'yes');
                         PaymentMethod."Include In Counting"::BLIND:
                             CountingType.Add('includeInCounting', 'blind');
                         PaymentMethod."Include In Counting"::VIRTUAL:
@@ -198,7 +200,7 @@
                                 CountingType.Replace('countedAmount', POSPaymentBinCheckPoint."Calculated Amount Incl. Float");
                             end;
                     end;
-                    CountingType.Add('disableDifferenceField', false);
+                    CountingType.Add('disableDifferenceField', EndOfDayProfile.DisableDifferenceField);
 
                     PaymentMethodDenom.SetFilter("POS Payment Method Code", '=%1', POSPaymentBinCheckPoint."Payment Method No.");
                     if (PaymentMethodDenom.FindSet()) then begin
@@ -253,9 +255,9 @@
 
     end;
 
-    local procedure GetCashCount() CashCount: JsonObject
+    local procedure GetCashCount(EndOfDayProfile: Record "NPR POS End of Day Profile") CashCount: JsonObject
     begin
-        CashCount.Add('counting', GetCashCountingTypes());
+        CashCount.Add('counting', GetCashCountingTypes(EndOfDayProfile));
         CashCount.Add('closingAndTransfer', GetClosingAndTransfer());
     end;
 
@@ -308,9 +310,10 @@
 
         Response.Add('caption', StrSubstNo(ResponseLbl, _POSWorkShiftCheckpoint.TableCaption(), _POSWorkShiftCheckpoint."Entry No."));
         Response.Add('statistics', GetStatistics());
-        Response.Add('cashCount', GetCashCount());
+        Response.Add('cashCount', GetCashCount(EndOfDayProfile));
         Response.Add('bins', GetAvailableBins());
         Response.Add('isStatisticsEnabled', (EndOfDayProfile."Z-Report UI" = EndOfDayProfile."Z-Report UI"::SUMMARY_BALANCING));
+        Response.Add('hideTurnover', EndOfDayProfile."Hide Turnover Section");
         Response.Add('backendContext', GetEndOfDayContext(Context));
 
         Response.WriteTo(JsonText);
@@ -504,6 +507,10 @@
         JPath: Text;
         POSSession: Codeunit "NPR POS Session";
     begin
+
+        if (_POSUnit.Status <> _POSUnit.Status::EOD) then
+            exit;
+
         JPath := 'state.cashCount.closingAndTransfer';
         if (not Context.SelectToken(JPath, JToken)) then
             Error(UnexpectedJsonError, JPath);

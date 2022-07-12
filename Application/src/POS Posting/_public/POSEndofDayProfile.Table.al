@@ -123,6 +123,11 @@
             Caption = 'Hide Turnover Section';
             DataClassification = CustomerContent;
         }
+        field(85; DisableDifferenceField; Boolean)
+        {
+            Caption = 'Disable Difference Field';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
