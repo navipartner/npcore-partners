@@ -1,9 +1,9 @@
-xmlport 6014401 "NPR Scanner Import"
+xmlport 6014403 "NPR Cipher Lab Scanner Import"
 {
-    Caption = 'Zebra Scanner Import';
+    Caption = 'Cipher Lab Scanner Import';
     Direction = Import;
     FieldDelimiter = '"';
-    FieldSeparator = '|';
+    FieldSeparator = ',';
     Format = VariableText;
     UseRequestPage = false;
 
@@ -16,9 +16,6 @@ xmlport 6014401 "NPR Scanner Import"
                 AutoSave = false;
                 XmlName = 'tmpImport';
                 UseTemporary = true;
-                textelement(shelf)
-                {
-                }
                 textelement(scanned_item_code)
                 {
                 }
@@ -28,7 +25,7 @@ xmlport 6014401 "NPR Scanner Import"
 
                 trigger OnBeforeInsertRecord()
                 begin
-                    IScannerImport.ImportLine(shelf, scanned_item_code, quantity);
+                    IScannerImport.ImportLine('', scanned_item_code.TrimStart('$'), quantity);
                 end;
             }
         }
