@@ -23,6 +23,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 begin
                     AuxItem.Validate("Item Status");
                     Rec.NPR_SetAuxItem(AuxItem);
+                    SaveAuxItemChanges := true;
                 end;
             }
 
@@ -218,6 +219,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         AuxItem.Validate("Variety Group");
                         Rec.NPR_SetAuxItem(AuxItem);
+                        SaveAuxItemChanges := true;
                     end;
                 }
                 field("NPR Variety 1"; AuxItem."Variety 1")
@@ -230,6 +232,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         AuxItem.Validate("Variety 1");
                         Rec.NPR_SetAuxItem(AuxItem);
+                        SaveAuxItemChanges := true;
                     end;
                 }
                 field("NPR Variety 1 Table"; AuxItem."Variety 1 Table")
@@ -259,6 +262,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         AuxItem.Validate("Variety 1 Table");
                         Rec.NPR_SetAuxItem(AuxItem);
+                        SaveAuxItemChanges := true;
                     end;
                 }
                 field("NPR Variety 2"; AuxItem."Variety 2")
@@ -271,6 +275,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         AuxItem.Validate("Variety 2");
                         Rec.NPR_SetAuxItem(AuxItem);
+                        SaveAuxItemChanges := true;
                     end;
                 }
                 field("NPR Variety 2 Table"; AuxItem."Variety 2 Table")
@@ -300,6 +305,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         AuxItem.Validate("Variety 2 Table");
                         Rec.NPR_SetAuxItem(AuxItem);
+                        SaveAuxItemChanges := true;
                     end;
                 }
                 field("NPR Variety 3"; AuxItem."Variety 3")
@@ -312,6 +318,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         AuxItem.Validate("Variety 3");
                         Rec.NPR_SetAuxItem(AuxItem);
+                        SaveAuxItemChanges := true;
                     end;
                 }
                 field("NPR Variety 3 Table"; AuxItem."Variety 3 Table")
@@ -341,6 +348,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         AuxItem.Validate("Variety 3 Table");
                         Rec.NPR_SetAuxItem(AuxItem);
+                        SaveAuxItemChanges := true;
                     end;
                 }
                 field("NPR Variety 4"; AuxItem."Variety 4")
@@ -353,6 +361,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         AuxItem.Validate("Variety 4");
                         Rec.NPR_SetAuxItem(AuxItem);
+                        SaveAuxItemChanges := true;
                     end;
                 }
                 field("NPR Variety 4 Table"; AuxItem."Variety 4 Table")
@@ -382,6 +391,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         AuxItem.Validate("Variety 4 Table");
                         Rec.NPR_SetAuxItem(AuxItem);
+                        SaveAuxItemChanges := true;
                     end;
                 }
                 field("NPR Cross Variety No."; Rec."NPR Cross Variety No.")
@@ -428,6 +438,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         begin
                             AuxItem.Validate("Item Addon No.");
                             Rec.NPR_SetAuxItem(AuxItem);
+                            SaveAuxItemChanges := true;
                         end;
                     }
                     field("NPR NPRE Item Routing Profile"; AuxItem."NPRE Item Routing Profile")
@@ -439,6 +450,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         begin
                             AuxItem.Validate("NPRE Item Routing Profile");
                             Rec.NPR_SetAuxItem(AuxItem);
+                            SaveAuxItemChanges := true;
                         end;
                     }
                 }
@@ -467,6 +479,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         begin
                             AuxItem.Validate("TM Ticket Type");
                             Rec.NPR_SetAuxItem(AuxItem);
+                            SaveAuxItemChanges := true;
                         end;
                     }
                     field("NPR Print Tags"; Rec."NPR Print Tags")
@@ -579,6 +592,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         begin
                             AuxItem.Validate("Magento Brand");
                             Rec.NPR_SetAuxItem(AuxItem);
+                            SaveAuxItemChanges := true;
                         end;
                     }
                     field("NPR MagentoUnitPrice"; Rec."Unit Price")
@@ -682,6 +696,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         begin
                             AuxItem.Validate("Attribute Set ID");
                             Rec.NPR_SetAuxItem(AuxItem);
+                            SaveAuxItemChanges := true;
                         end;
 
                         trigger OnAssistEdit()
@@ -1405,6 +1420,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         NPRCustomOptionCount: Integer;
         AverageCostACY: Decimal;
         Text6151400: Label 'Update Seo Link?';
+        SaveAuxItemChanges: Boolean;
 
     trigger OnOpenPage()
     begin
@@ -1441,6 +1457,9 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
     trigger OnAfterGetRecord()
     begin
+        if SaveAuxItemChanges then
+            Rec.NPR_SaveAuxItem();
+        SaveAuxItemChanges := false;
         NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Item, Rec."No.");
         NPRAttrEditable := CurrPage.EDITABLE();
         CheckIfDiscountExist();
