@@ -15,8 +15,6 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
         ParamLocationFilterCaption_Lbl: Label 'Location Filter';
         ParamLocationFilterDesc_Lbl: Label 'Defines location filter';
         ParamLocationFilterOptions_Lbl: Label 'POS Store,POS Unit,Use View', Locked = true;
-        ParamSmartSearchPageCaption_Lbl: Label 'Smart Search Page';
-        ParamSmartSearchPageDesc_Lbl: Label 'Enables Smart Search Page for Items';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -29,7 +27,6 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
                        ParamLookupTypeOptions_Lbl
                        );
         WorkflowConfig.AddTextParameter('View', '', ParamView_Lbl, ParamView_Lbl);
-        WorkflowConfig.AddBooleanParameter('SmartSearchPage', false, ParamSmartSearchPageCaption_Lbl, ParamSmartSearchPageDesc_Lbl);
         WorkflowConfig.AddOptionParameter(
           'LocationFilter',
           ParamLocationFilterOptions_Lbl,
@@ -92,11 +89,9 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
         LocationFilterOption: Integer;
         Item: Record Item;
         SaleLinePOS: Record "NPR POS Sale Line";
-        ItemSmartSearch: Boolean;
     begin
         ItemView := Context.GetStringParameter('View');
         LocationFilterOption := Context.GetIntegerParameter('LocationFilter');
-        ItemSmartSearch := Context.GetBooleanParameter('SmartSearchPage');
 
         if ItemView <> '' then
             Item.SetView(ItemView);
@@ -114,15 +109,8 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
         if SaleLinePOS.Type = SaleLinePOS.Type::Item then
             if Item.Get(SaleLinePOS."No.") then;
 
-        if (CurrentClientType = ClientType::Phone) OR (not ItemSmartSearch) then begin
-            //Smart search uses worksheet page type to hide built-in search but phone client does not support worksheet pages.
-            if Page.RunModal(Page::"Item List", Item) = ACTION::LookupOK then
-                ItemNo := Item."No.";
-        end else begin
-            if PAGE.RunModal(PAGE::"NPR Items Smart Search", Item) = ACTION::LookupOK then
-                ItemNo := Item."No.";
-        end;
-
+        if Page.RunModal(Page::"Item List", Item) = ACTION::LookupOK then
+            ItemNo := Item."No.";
     end;
 
     local procedure CompleteLookup(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject

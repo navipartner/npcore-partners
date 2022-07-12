@@ -5,48 +5,15 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     {
         addfirst(content)
         {
-            field("NPR Search"; _SearchTerm)
+            //Smart search is removed but this field cannot be deleted because of the AppSource validation rules.
+            field("NPR Search"; Rec."No.")
             {
-                Editable = true;
-                Caption = 'Smart Search';
+                Visible = false;
                 ApplicationArea = NPRRetail;
-                ToolTip = 'This search is optimized to search relevant columns only. To serach enter a value in the Searh box and click on this field.';
-                trigger OnValidate()
-                var
-                    Item: Record Item;
-                    SmartSearch: Codeunit "NPR Smart Search";
-                begin
-                    Rec.Reset();
-                    Rec.ClearMarks();
-                    Rec.MarkedOnly(false);
-
-                    if TableView <> '' then begin
-                        Rec.SetView(TableView);
-                        Item.SetView(TableView);
-                    end;
-
-                    if (_SearchTerm = '') then begin
-                        CurrPage.Update(false);
-                        exit;
-                    end;
-
-                    SmartSearch.SearchItemAndItemReference(_SearchTerm, Item);
-#if BC17
-                    Rec.Copy(Item);
-                    Rec.SetLoadFields();
-#else
-                    Item.MarkedOnly(true);
-                    repeat
-                        if Rec.Get(Item."No.") then
-                            Rec.Mark(true);
-                    until Item.Next() = 0;
-#endif
-                    Rec.MarkedOnly(true);
-                    CurrPage.Update(false);
-                end;
+                ToolTip = 'Specifies the item''s No.';
             }
         }
-
+        
         modify(Control1)
         {
             Editable = false;
@@ -522,8 +489,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     begin
         RetailInventoryEnabled := NPRRetailInventorySetMgt.IsRetailInventoryEnabled();
         NPR_SetMagentoEnabled();
-
-        TableView := Rec.GetView(false);
     end;
 
     trigger OnAfterGetRecord()
@@ -579,6 +544,4 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         Error_NoBarcodeMatch: Label 'No item found for value %1';
         Text001: Label 'Item No.';
         RetailInventoryEnabled: Boolean;
-        _SearchTerm: Text[100];
-        TableView: Text;
 }

@@ -12,6 +12,7 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         SalesDocExpPaymentMethodCode();
         ItemIdentifierType();
         ItemPriceIdentifierType();
+        ItemLookupSmartSearch();
     end;
 
     local procedure SalesDocExpPaymentMethodCode()
@@ -113,6 +114,33 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
 
         UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ItemPriceIdentifierType'));
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure ItemLookupSmartSearch()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'ItemLookupSmartSearch');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ItemLookupSmartSearch')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        UpgradeItemLookupSmartSearch();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ItemLookupSmartSearch'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradeItemLookupSmartSearch()
+    var
+        POSActionParameter: Record "NPR POS Parameter Value";
+    begin
+        POSActionParameter.SetRange("Table No.", Database::"NPR POS Menu Button");
+        POSActionParameter.SetRange("Action Code", 'LOOKUP');
+        POSActionParameter.SetRange(Name, 'SmartSearchPage');
+        POSActionParameter.DeleteAll();
     end;
 
     local procedure UpgradeItemPriceIdentifierType()
