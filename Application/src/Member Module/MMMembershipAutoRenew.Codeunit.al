@@ -287,22 +287,20 @@
         SalesHeader.Validate("Payment Terms Code", MembershipAutoRenew."Payment Terms Code");
         SalesHeader.Validate("Salesperson Code", MembershipAutoRenew."Salesperson Code");
 
-        //SalesHeader.VALIDATE ("Posting Date", MembershipAutoRenew."Posting Date");
-        //SalesHeader.VALIDATE ("Document Date", MemberInfoCapture."Document Date");
-
         SalesHeader.Validate("Document Date", MemberInfoCapture."Document Date");
         case MembershipAutoRenew."Due Date Calculation" of
             MembershipAutoRenew."Due Date Calculation"::MEMBERSHIP_EXPIRE:
                 SalesHeader.Validate("Due Date", CalcDate('<-1D>', ValidFromDate));
             MembershipAutoRenew."Due Date Calculation"::PAYMENT_TERMS:
-                ; // Standard behaviour
+                ; // Standard behavior
             else
                 Error(MISSING_CASE, MembershipAutoRenew.FieldCaption("Due Date Calculation"), MembershipAutoRenew."Due Date Calculation");
         end;
 
         case MembershipAutoRenew."Posting Date Calculation" of
             MembershipAutoRenew."Posting Date Calculation"::FIXED:
-                SalesHeader.Validate("Posting Date", MembershipAutoRenew."Posting Date");
+                if (MembershipAutoRenew."Posting Date" <> 0D) then
+                    SalesHeader.Validate("Posting Date", MembershipAutoRenew."Posting Date");
             MembershipAutoRenew."Posting Date Calculation"::MEMBERSHIP_EXPIRE_DATE:
                 SalesHeader.Validate("Posting Date", ValidFromDate);
             else
