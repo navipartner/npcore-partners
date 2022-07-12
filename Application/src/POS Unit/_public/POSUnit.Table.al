@@ -24,6 +24,13 @@
             Caption = 'POS Store Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Store";
+            trigger OnValidate()
+            var
+                StoreCodeChangeLabel: Label 'It is not recommended to change the store code during an active workshift. You can close the workshift from the POS unit using the Z-Report (end-of-day) functionality.';
+            begin
+                if (Status <> Status::CLOSED) then
+                    Error(StoreCodeChangeLabel);
+            end;
         }
         field(11; "Default POS Payment Bin"; Code[10])
         {

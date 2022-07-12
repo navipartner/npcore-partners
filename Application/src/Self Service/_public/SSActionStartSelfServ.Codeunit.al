@@ -84,7 +84,7 @@
             POSUnit.Status::CLOSED:
                 begin
                     CreateFirstTimeCheckpoint(POSUnit."No.");
-                    POSManagePOSUnit.ClosePOSUnitOpenPeriods(POSUnit."No."); // make sure pos period register is correct
+                    POSManagePOSUnit.ClosePOSUnitOpenPeriods(POSUnit."POS Store Code", POSUnit."No."); // make sure pos period register is correct
                     POSManagePOSUnit.OpenPOSUnit(POSUnit);
                     OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry(POSUnit."No.", POSSetup.Salesperson());
                     POSManagePOSUnit.SetOpeningEntryNo(POSUnit."No.", OpeningEntryNo);
