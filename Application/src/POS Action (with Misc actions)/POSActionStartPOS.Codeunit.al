@@ -1,6 +1,7 @@
 ﻿codeunit 6150858 "NPR POS Action: Start POS"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This action is executed when the POS Unit is in status closed, to verify BIN contents.';
         Title: Label 'Confirm Bin Contents.';
@@ -192,7 +193,7 @@
 
                         POSUnit.Get(POSUnit."No.");
 
-                        POSOpenPOSUnit.ClosePOSUnitOpenPeriods(POSUnit."No."); // make sure pos period register is correct
+                        POSOpenPOSUnit.ClosePOSUnitOpenPeriods(POSUnit."POS Store Code", POSUnit."No."); // make sure pos period register is correct
                         POSOpenPOSUnit.OpenPOSUnit(POSUnit);
                         OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry(POSUnit."No.", Setup.Salesperson());
                         POSOpenPOSUnit.SetOpeningEntryNo(POSUnit."No.", OpeningEntryNo);
