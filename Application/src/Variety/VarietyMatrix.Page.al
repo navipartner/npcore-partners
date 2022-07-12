@@ -1339,7 +1339,6 @@
 
         if ShowTotal then
             Total := Format(VRTMatrixMgt.GetTotal(RecRef, CurrVRTField."Field No."));
-        CurrPage.Update(false);
     end;
 
     internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
