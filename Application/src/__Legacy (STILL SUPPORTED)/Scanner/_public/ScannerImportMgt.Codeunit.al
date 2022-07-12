@@ -53,4 +53,8 @@ codeunit 6059780 "NPR Scanner Import Mgt."
         TempErrorMessage.Insert();
     end;
 
+    procedure ImportFromScanner(IScannerProvider: Interface "NPR IScanner Provider"; ScannerImport: Enum "NPR Scanner Import"; RecRef: RecordRef)
+    begin
+        IScannerProvider.Import(ScannerImport, RecRef);
+    end;
 }

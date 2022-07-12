@@ -17,12 +17,15 @@ pageextension 6014456 "NPR Purchase Credit Memo" extends "Purchase Credit Memo"
 
                 trigger OnAction()
                 var
-                    ScannerImport: XmlPort "NPR Scanner Import";
+                    InventorySetup: Record "Inventory Setup";
+                    ScannerImportMgt: Codeunit "NPR Scanner Import Mgt.";
                     RecRef: RecordRef;
                 begin
+                    if not InventorySetup.Get() then
+                        exit;
+                    
                     RecRef.GetTable(Rec);
-                    ScannerImport.ScannerImportFactory(Enum::"NPR Scanner Import"::PURCHASE, RecRef);
-                    ScannerImport.Run();
+                    ScannerImportMgt.ImportFromScanner(InventorySetup."NPR Scanner Provider", Enum::"NPR Scanner Import"::PURCHASE, RecRef);
                 end;
             }
         }

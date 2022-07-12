@@ -43,12 +43,15 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
 
                 trigger OnAction()
                 var
-                    ScannerImport: XmlPort "NPR Scanner Import";
+                    InventorySetup: Record "Inventory Setup";
+                    ScannerImportMgt: Codeunit "NPR Scanner Import Mgt.";
                     RecRef: RecordRef;
                 begin
+                    if not InventorySetup.Get() then
+                        exit;
+                    
                     RecRef.GetTable(Rec);
-                    ScannerImport.ScannerImportFactory(Enum::"NPR Scanner Import"::TRANSFER, RecRef);
-                    ScannerImport.Run();
+                    ScannerImportMgt.ImportFromScanner(InventorySetup."NPR Scanner Provider", Enum::"NPR Scanner Import"::TRANSFER, RecRef);
                 end;
             }
         }
