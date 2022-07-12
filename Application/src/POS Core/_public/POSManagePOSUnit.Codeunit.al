@@ -121,12 +121,25 @@
         POSPeriodRegister.ModifyAll(Status, POSPeriodRegister.Status::CLOSED);
     end;
 
+    [Obsolete('Use the ClosePOSUnitOpenPeriods(POSStoreCode, POSUnitNo) function instead.', '537839')]
     procedure ClosePOSUnitOpenPeriods(POSUnitNo: Code[10])
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if (not POSUnit.Get(POSUnitNo)) then
+            POSUnit.Init();
+
+        ClosePOSUnitOpenPeriods(POSUnit."POS Store Code", POSUnitNo);
+    end;
+
+    procedure ClosePOSUnitOpenPeriods(POSStoreCode: Code[10]; POSUnitNo: Code[10])
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
         ClosingEntryNo: Integer;
     begin
+        POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
+        POSEntry.SetFilter("POS Store Code", '=%1', POSStoreCode);
         POSEntry.SetFilter("POS Unit No.", '=%1', POSUnitNo);
         if (POSEntry.FindLast()) then
             ClosingEntryNo := POSEntry."Entry No.";
