@@ -343,7 +343,6 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     procedure GetItemFromItemSearch(var ItemIdentifierString: Text): Boolean
     var
         Item: Record Item;
-        ItemListSmartSearch: Page "NPR Items Smart Search";
         ItemList: Page "Item List";
         LookupOk: Boolean;
     begin
@@ -356,22 +355,12 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         if ItemIdentifierString = Item."No." then
             exit(true);
 
-        if CurrentClientType = ClientType::Phone then begin
-            //Smart search uses worksheet page type to hide built-in search but phone client does not support worksheet pages.
-            ItemList.Editable(true);
-            ItemList.LookupMode(true);
-            ItemList.SetTableView(Item);
-            LookupOk := ItemList.RunModal() = ACTION::LookupOK;
-            if LookupOk then
-                ItemList.GetRecord(Item);
-        end else begin
-            ItemListSmartSearch.Editable(true);
-            ItemListSmartSearch.LookupMode(true);
-            ItemListSmartSearch.SetTableView(Item);
-            LookupOk := ItemListSmartSearch.RunModal() = ACTION::LookupOK;
-            if LookupOk then
-                ItemListSmartSearch.GetRecord(Item);
-        end;
+        ItemList.Editable(true);
+        ItemList.LookupMode(true);
+        ItemList.SetTableView(Item);
+        LookupOk := ItemList.RunModal() = ACTION::LookupOK;
+        if LookupOk then
+            ItemList.GetRecord(Item);
 
         if LookupOk then begin
             ItemIdentifierString := Item."No.";

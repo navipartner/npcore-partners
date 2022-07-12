@@ -811,7 +811,7 @@
     local procedure GetItemFromItemSearch(var ItemIdentifierString: Text): Boolean
     var
         Item: Record Item;
-        ItemList: Page "NPR Items Smart Search";
+        ItemList: Page "Item List";
     begin
         SetItemSearchFilter(ItemIdentifierString, Item);
         if not Item.FindFirst() then
