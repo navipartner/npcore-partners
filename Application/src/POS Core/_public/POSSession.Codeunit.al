@@ -34,12 +34,13 @@
 #endif
         _SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';
         _SESSION_FINALIZED_ERROR: Label 'This POS window is no longer active.\This happens if you''ve opened the POS in a newer window. Please use that instead or reload this one.';
+        _POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         TempSessionActions: Record "NPR POS Action" temporary;
 
 
     //#region Initialization
 
-    internal procedure Constructor(FrameworkIn: Interface "NPR Framework Interface"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; PageId: Guid)
+    internal procedure Constructor(FrameworkIn: Interface "NPR Framework Interface"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; PageId: Guid; POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API")
     var
         JavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
     begin
@@ -55,6 +56,7 @@
 #endif
         _Setup.Initialize();
         JavaScriptInterface.Initialize(FrontEndIn);
+        _POSBackgroundTaskAPI := POSBackgroundTaskAPI;
 
         _Initialized := true;
         OnInitialize(_FrontEnd);
@@ -88,6 +90,7 @@
         Clear(_POSPageId);
         Clear(_Framework);
         Clear(TempSessionActions);
+        Clear(_POSBackgroundTaskAPI);
     end;
 
     procedure IsInitialized(): Boolean
@@ -703,6 +706,12 @@
     procedure GetFrontEnd(var POSFrontEndOut: Codeunit "NPR POS Front End Management")
     begin
         GetFrontEnd(POSFrontEndOut, true);
+    end;
+
+    procedure GetPOSBackgroundTaskAPI(var POSBackgroundTaskAPIOut: Codeunit "NPR POS Background Task API")
+    begin
+        ErrorIfNotInitialized();
+        POSBackgroundTaskAPIOut := _POSBackgroundTaskAPI;
     end;
 
     //#region Event Publishers
