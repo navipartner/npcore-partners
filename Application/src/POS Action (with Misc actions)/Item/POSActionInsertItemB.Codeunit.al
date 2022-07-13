@@ -279,11 +279,12 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             CanBeUsed := true;
         end else begin
             ItemLedgerEntry.Reset();
-            if ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.") then;
+            ItemLedgerEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Lot No.", "Serial No.");
             ItemLedgerEntry.SetRange(Open, true);
             ItemLedgerEntry.SetRange(Positive, true);
             ItemLedgerEntry.SetRange("Serial No.", SerialNumber);
             ItemLedgerEntry.SetRange("Item No.", ItemRef."Item No.");
+            ItemLedgerEntry.SetRange("Lot No.", '');
             if ItemRef."Variant Code" <> '' then
                 ItemLedgerEntry.SetRange("Variant Code", ItemRef."Variant Code");
             if not ItemLedgerEntry.FindSet() then begin
