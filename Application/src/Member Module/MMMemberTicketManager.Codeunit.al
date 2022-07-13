@@ -268,6 +268,11 @@
     end;
 
     procedure MemberFastCheckIn(ExternalMemberCardNo: Text[100]; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30])
+    begin
+        MemberFastCheckIn(ExternalMemberCardNo, ExternalItemNo, AdmissionCode, Qty, TicketTokenToIgnore, ExternalTicketNo, true);
+    end;
+
+    procedure MemberFastCheckIn(ExternalMemberCardNo: Text[100]; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30]; ShowWelcomeMessage: Boolean)
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberEntryNo: Integer;
@@ -284,10 +289,10 @@
         if (MemberEntryNo = 0) then
             Error(ErrorReason);
 
-        MemberFastCheckIn(MembershipEntryNo, MemberEntryNo, ExternalItemNo, AdmissionCode, Qty, TicketTokenToIgnore, ExternalTicketNo);
+        MemberFastCheckIn(MembershipEntryNo, MemberEntryNo, ExternalItemNo, AdmissionCode, Qty, TicketTokenToIgnore, ExternalTicketNo, ShowWelcomeMessage);
     end;
 
-    internal procedure MemberFastCheckIn(MembershipEntryNo: Integer; MemberEntryNo: Integer; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30])
+    internal procedure MemberFastCheckIn(MembershipEntryNo: Integer; MemberEntryNo: Integer; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30]; ShowWelcomeMessage: Boolean)
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         TicketManagement: Codeunit "NPR TM Ticket Management";
@@ -348,7 +353,8 @@
 
         end;
 
-        Message(WELCOME, Member."Display Name");
+        if (ShowWelcomeMessage) then
+            Message(WELCOME, Member."Display Name");
 
         if (TicketToPrint.GetFilters() <> '') then begin
             MembershipSetup.Get(Membership."Membership Code");
