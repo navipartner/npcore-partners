@@ -19,7 +19,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.2');
+        exit('1.22');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
@@ -42,8 +42,8 @@
             Sender.RegisterOptionParameter('DialogPrompt', 'Member Number,Member Card Number,Membership Number,Facial Recognition,No Prompt', 'Member Card Number');
             Sender.RegisterOptionParameter('POSWorkflow', 'POSSales,Automatic,With Guests', 'POSSales');
             Sender.RegisterTextParameter('AdmissionCode', '');
-            Sender.RegisterBooleanParameter('ConfirmMember', true);
             Sender.RegisterTextParameter('DefaultInputValue', '');
+            Sender.RegisterBooleanParameter('SuppressWelcomeMessage', false);
         end;
     end;
 
@@ -66,12 +66,14 @@
         POSWorkflowType: Option;
         AdmissionCode: Code[20];
         DefaultInputValue: Text;
+        ShowWelcomeMessage: Boolean;
     begin
 
         if (not Action.IsThisAction(ActionCode())) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
+        ShowWelcomeMessage := not (JSON.GetBooleanParameter('SuppressWelcomeMessage'));
         DefaultInputValue := JSON.GetStringParameterOrFail('DefaultInputValue', ActionCode());
         DialogPrompt := JSON.GetIntegerParameterOrFail('DialogPrompt', ActionCode());
         if (DialogPrompt < 0) then
@@ -98,28 +100,22 @@
                 Error('POS Action: Dialog Prompt with ID %1 is not implemented.', DialogPrompt);
         end;
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
         POSWorkflowType := JSON.GetIntegerParameter('POSWorkflow');
         if (POSWorkflowType < 0) then
             POSWorkflowType := POSWorkflowMethod::POS;
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-
         AdmissionCode := CopyStr(JSON.GetStringParameter('AdmissionCode'), 1, MaxStrLen(AdmissionCode));
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.GetBooleanParameterOrFail('ConfirmMember', ActionCode());
 
         if (DefaultInputValue <> '') then
             MemberCardNumber := CopyStr(DefaultInputValue, 1, MaxStrLen(MemberCardNumber));
 
         if (WorkflowStep = '9') then
-            MemberArrival(POSSession, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode);
+            MemberArrival(POSSession, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, ShowWelcomeMessage);
 
         Handled := true;
     end;
 
-    local procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; POSWorkflowType: Option; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20])
+    local procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; POSWorkflowType: Option; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ShowWelcomeMessage: Boolean)
     var
         //Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
@@ -169,11 +165,11 @@
                     ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemForMembership(MemberCard."Membership Entry No.");
 
                     if (POSWorkflowType = POSWorkflowMethod::Automatic) then
-                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ExternalItemNo, AdmissionCode, 1, '', ExternalTicketNo);
+                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ExternalItemNo, AdmissionCode, 1, '', ExternalTicketNo, ShowWelcomeMessage);
 
                     if (POSWorkflowType = POSWorkflowMethod::GuestCheckin) then begin
                         MemberTicketManager.PromptForMemberGuestArrival(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, Token);
-                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ExternalItemNo, AdmissionCode, 1, Token, ExternalTicketNo);
+                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ExternalItemNo, AdmissionCode, 1, Token, ExternalTicketNo, ShowWelcomeMessage);
                     end;
 
                     MemberLimitationMgr.UpdateLogEntry(LogEntryNo, 0, ExternalTicketNo);
