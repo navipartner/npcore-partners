@@ -19,6 +19,36 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         POSSingleStatsBuffer.Insert();
     end;
 
+    procedure FillCurrentStatsBuffer(var POSCurrentStatsBuffer: Record "NPR POS Single Stats Buffer"; var POSSale: Record "NPR POS Sale")
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        if not POSSaleLine.FindSet() then
+            exit;
+
+        POSCurrentStatsBuffer.Init();
+        POSCurrentStatsBuffer."Document No." := POSSale."Sales Ticket No.";
+        POSCurrentStatsBuffer."POS Unit No." := POSSale."Register No.";
+
+        repeat
+            POSCurrentStatsBuffer."Sales Amount" += POSSaleLine.Amount;
+            POSCurrentStatsBuffer."Cost Amount" += GetCostAmount(POSSaleLine);
+            POSCurrentStatsBuffer."Discount Amount" += POSSaleLine."Discount Amount";
+            POSCurrentStatsBuffer."Tax Amount" += POSSaleLine."Amount Including VAT" - POSSaleLine.Amount;
+            POSCurrentStatsBuffer."Amount Incl. Tax" += POSSaleLine."Amount Including VAT";
+            
+            if POSSaleLine.Quantity > 0 then
+                POSCurrentStatsBuffer."Sales Quantity" += POSSaleLine.Quantity
+            else
+                POSCurrentStatsBuffer."Return Sales Quantity" -= POSSaleLine.Quantity;
+        until POSSaleLine.Next() = 0;
+
+        POSCurrentStatsBuffer."Profit %" := CalculatePercentAmount(POSCurrentStatsBuffer."Sales Amount" - POSCurrentStatsBuffer."Cost Amount", POSCurrentStatsBuffer."Sales Amount");
+        POSCurrentStatsBuffer.Insert();
+    end;
+
     procedure TryGetPOSEntry(var POSEntry: Record "NPR POS Entry"; POSUnitNo: Code[10]): Boolean
     begin
         POSEntry.SetLoadFields("Document No.", "POS Unit No.", "Discount Amount", "Tax Amount", "Amount Incl. Tax", "Sales Quantity", "Return Sales Quantity");
@@ -352,10 +382,29 @@ codeunit 6059818 "NPR POS Statistics Mgt."
 
     local procedure CalculatePercentAmount(Amount: Decimal; Total: Decimal): Decimal
     begin
-        if (Amount = 0) and (Total = 0) then
+        if (Amount = 0) or (Total = 0) then
             exit(0);
 
         exit(Amount / Total * 100);
+    end;
+
+    local procedure GetCostAmount(POSSaleLine: Record "NPR POS Sale Line") Cost: Decimal
+    var
+        Item: Record Item;
+    begin
+        Cost := POSSaleLine."Unit Cost (LCY)";
+
+        if POSSaleLine.Type <> POSSaleLine.Type::Item then
+            exit;
+        
+        Item.SetLoadFields("Last Direct Cost", "Unit Cost");
+        if not Item.Get(POSSaleLine."No.") then
+            exit;
+
+        if Item."Last Direct Cost" <> 0 then
+            Cost := Item."Last Direct Cost"
+        else
+            Cost := Item."Unit Cost";
     end;
 
     procedure FillSalePersonTop20(var SalespersonStatsBuffer: Record "NPR POS Salesperson St Buffer" temporary; FromDate: Date; ToDate: Date)
