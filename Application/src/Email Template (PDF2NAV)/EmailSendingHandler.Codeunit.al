@@ -65,13 +65,13 @@
 
     procedure AddAttachmentFromStream(var EmailItem: Record "Email Item"; InStr: InStream; FileName: Text[1024])
     var
-#if BC17
+#if BC1700
         TempAttachment: Record Attachment temporary;
         TempBLOB: Codeunit "Temp Blob";
         Outstr: OutStream;
 #endif
     begin
-#if BC17
+#if BC1700
         TempBLOB.CreateOutStream(Outstr);
         CopyStream(Outstr, InStr);
         TempAttachment.SetAttachmentFileFromBlob(TempBLOB);
