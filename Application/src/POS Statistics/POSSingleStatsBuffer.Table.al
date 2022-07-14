@@ -4,6 +4,7 @@ table 6014663 "NPR POS Single Stats Buffer"
     DataClassification = CustomerContent;
     TableType = Temporary;
     Caption = 'POS Single Stats Buffer';
+    DataCaptionFields = "Document No.";
 
     fields
     {
