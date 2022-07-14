@@ -33,7 +33,7 @@
             column(Itemfilter; Itemfilter)
             {
             }
-            column(tildato; Tildato)
+            column(tildato; ToDate)
             {
             }
             column(No_Caption; No_Caption)
@@ -433,10 +433,6 @@
             }
         }
 
-        trigger OnOpenPage()
-        begin
-            Item.SetFilter("Date Filter", '%1..%2', DMY2Date(1, 1, 1980), (Tildato));
-        end;
     }
 
     labels
@@ -446,16 +442,17 @@
 
     trigger OnInitReport()
     begin
-        Tildato := Today();
+        ToDate := Today();
         ShowLocation := true;
         ViewSalesPrice := true;
+        Item.SetRange("Date Filter", 0D, ToDate);
     end;
 
     trigger OnPreReport()
     begin
         CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
-        if Tildato = 0D then
+        if ToDate = 0D then
             Error(Txt001);
 
         Itemfilter := Item.GetFilters;
@@ -481,7 +478,7 @@
         InventoryLocation: array[10] of Code[30];
         SaleDate: Date;
         SaleDateVariant: Date;
-        Tildato: Date;
+        ToDate: Date;
         Bruttoavialt: Decimal;
         CostValue: Decimal;
         CostValueVariant: Decimal;
