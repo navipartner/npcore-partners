@@ -295,9 +295,11 @@
 
                 trigger OnAction()
                 var
+                    EmailTemplateHeader: Record "NPR E-mail Template Header";
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                 begin
-                    EmailTemplateMgt.SendTestEmail(Rec);
+                    EmailTemplateHeader := Rec;
+                    EmailTemplateMgt.SendTestEmail(EmailTemplateHeader);
                 end;
             }
         }
