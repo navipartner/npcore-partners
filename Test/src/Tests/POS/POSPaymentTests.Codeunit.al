@@ -18,7 +18,6 @@ codeunit 85006 "NPR POS Payment Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
         SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
@@ -57,7 +56,6 @@ codeunit 85006 "NPR POS Payment Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
         SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
@@ -125,7 +123,6 @@ codeunit 85006 "NPR POS Payment Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
         SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";

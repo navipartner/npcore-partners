@@ -56,61 +56,35 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
     local procedure OnLookup(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
         SelectedItem: Code[20];
-
     begin
-
         LookupType := Context.GetIntegerParameter('LookupType');
 
         case LookupType of
             LookupType::Item:
-                begin
-                    SelectedItem := OnLookupItem(SaleLine, Setup, Context);
-                end;
-
+                SelectedItem := OnLookupItem(SaleLine, Setup, Context);
             LookupType::SKU:
-                begin
-                    SelectedItem := OnLookupSKU(Setup, Context);
-                end;
+                SelectedItem := OnLookupSKU(Setup, Context);
             else begin
                     Error('LookUp type %1 is not supported.', Format(LookupType));
                 end;
         end;
+
         if SelectedItem = '' then
             Error('');
 
         Response.ReadFrom('{}');
         Response.Add('itemno', SelectedItem);
-
     end;
 
     local procedure OnLookupItem(POSSaleLine: Codeunit "NPR POS Sale Line"; Setup: Codeunit "NPR POS Setup"; Context: Codeunit "NPR POS JSON Helper") ItemNo: Code[20]
     var
+        POSActionItemLookupB: Codeunit "NPR POS Action: Item Lookup B";
         ItemView: Text;
         LocationFilterOption: Integer;
-        Item: Record Item;
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         ItemView := Context.GetStringParameter('View');
         LocationFilterOption := Context.GetIntegerParameter('LocationFilter');
-
-        if ItemView <> '' then
-            Item.SetView(ItemView);
-
-        case LocationFilterOption of
-            -1, 0:
-                Item.SetRange("Location Filter", GetStoreLocation(Setup));
-            1:
-                Item.SetRange("Location Filter", GetStoreLocationFromUnit(Setup));
-        end;
-
-        Item.SetRange(Blocked, false);
-
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        if SaleLinePOS.Type = SaleLinePOS.Type::Item then
-            if Item.Get(SaleLinePOS."No.") then;
-
-        if Page.RunModal(Page::"Item List", Item) = ACTION::LookupOK then
-            ItemNo := Item."No.";
+        ItemNo := POSActionItemLookupB.LookupItem(POSSaleLine, Setup, ItemView, LocationFilterOption);
     end;
 
     local procedure CompleteLookup(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
@@ -118,9 +92,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
         ItemNo: Code[20];
     begin
         ItemNo := CopyStr(Context.GetString('selected_itemno'), 1, MaxStrLen(ItemNo));
-        if ItemNo = '' then begin
-            exit;
-        end else begin
+        if ItemNo <> '' then begin
             Response.ReadFrom('{}');
             Response.Add('itemno', ItemNo);
             Response.Add('itemQuantity', 1);
@@ -160,9 +132,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
         POSSession: Codeunit "NPR POS Session";
     begin
         ItemNo := CopyStr(Context.GetString('selected_itemno'), 1, MaxStrLen(ItemNo));
-        if ItemNo = '' then begin
-            exit;
-        end else begin
+        if ItemNo <> '' then begin
             Setup.GetNamedActionSetup(POSSetup);
 
             if not POSSession.RetrieveSessionAction(POSSetup."Item Insert Action Code", POSAction) then
@@ -180,55 +150,13 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
 
     local procedure OnLookupSKU(POSSetup: Codeunit "NPR POS Setup"; Context: Codeunit "NPR POS JSON Helper") ItemNo: Code[20]
     var
+        POSActionItemLookupB: Codeunit "NPR POS Action: Item Lookup B";
         SKUView: Text;
         LocationFilterOption: Integer;
-        StockkeepingUnitList: Page "Stockkeeping Unit List";
-        StockkeepingUnit: Record "Stockkeeping Unit";
     begin
         SKUView := Context.GetStringParameter('View');
         LocationFilterOption := Context.GetIntegerParameter('LocationFilter');
-
-        if SKUView <> '' then
-            StockkeepingUnit.SetView(SKUView);
-
-        case LocationFilterOption of
-            -1, 0:
-                StockkeepingUnit.SetRange("Location Code", GetStoreLocation(POSSetup));
-            1:
-                StockkeepingUnit.SetRange("Location Code", GetStoreLocationFromUnit(POSSetup));
-        end;
-
-        StockkeepingUnitList.Editable(false);
-        StockkeepingUnitList.LookupMode(true);
-        StockkeepingUnitList.SetTableView(StockkeepingUnit);
-        if StockkeepingUnitList.RunModal() = ACTION::LookupOK then begin
-            StockkeepingUnitList.GetRecord(StockkeepingUnit);
-            ItemNo := StockkeepingUnit."Item No.";
-        end else begin
-            ItemNo := '';
-        end;
-
-    end;
-
-    local procedure GetStoreLocation(POSSetup: Codeunit "NPR POS Setup"): Code[10]
-    var
-        POSStore: Record "NPR POS Store";
-    begin
-        POSSetup.GetPOSStore(POSStore);
-
-        exit(POSStore."Location Code");
-    end;
-
-    local procedure GetStoreLocationFromUnit(POSSetup: Codeunit "NPR POS Setup"): Code[10]
-    var
-        POSStore: Record "NPR POS Store";
-        POSUnit: Record "NPR POS Unit";
-    begin
-
-        POSSetup.GetPOSUnit(POSUnit);
-        POSStore.Get(POSUnit."POS Store Code");
-
-        exit(POSStore."Location Code");
+        ItemNo := POSActionItemLookupB.LookupSKU(POSSetup, SKUView, LocationFilterOption);
     end;
 
     local procedure GetActionScript(): Text
