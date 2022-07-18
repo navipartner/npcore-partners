@@ -16,7 +16,7 @@ codeunit 85038 "NPR Library - RP Template Data"
         DataItems.Insert();
     end;
 
-    internal procedure ConfigureReportSelection(ReportType: Option; TemplateHeader: Record "NPR RP Template Header")
+    internal procedure ConfigureReportSelection(ReportType: Enum "NPR Report Selection Type"; TemplateHeader: Record "NPR RP Template Header")
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
     begin

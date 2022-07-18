@@ -19,10 +19,8 @@ codeunit 85085 "NPR POS Act. Item Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryRandom: Codeunit "Library - Random";
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
-        POSActionBusinessLogic: Codeunit "NPR POS Action: Insert Item B";
         ItemReference: Record "Item Reference";
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
         ItemQuantity: Decimal;
@@ -32,7 +30,6 @@ codeunit 85085 "NPR POS Act. Item Tests"
         InputSerial: Text;
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
-
     begin
         // [Given] POS & Payment setup
         InitializeData();
@@ -41,22 +38,21 @@ codeunit 85085 "NPR POS Act. Item Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
 
-        POSSession.GetSaleLine(POSSaleLine);
+        ItemIdentifierType := ItemIdentifierType::ItemNo;
         Quantity := 1;
         UnitPrice := LibraryRandom.RandDec(100, 4);
         CustomDescription := LibraryRandom.RandText(50);
         CustomDescription2 := LibraryRandom.RandText(30);
-        ItemIdentifierType := ItemIdentifierType::ItemNo;
 
-        POSActionBusinessLogic.AddItemLine(Item,
-                               ItemReference,
-                               ItemIdentifierType,
-                               ItemQuantity,
-                               UnitPrice,
-                               CustomDescription,
-                               CustomDescription2,
-                               InputSerial,
-                               POSSession);
+        LibraryPOSMock.CreateItemLine(POSSession,
+                                    Item,
+                                    ItemReference,
+                                    ItemIdentifierType,
+                                    ItemQuantity,
+                                    UnitPrice,
+                                    CustomDescription,
+                                    CustomDescription2,
+                                    InputSerial);
 
         POSSale.GetCurrentSale(SalePOS);
 
@@ -70,7 +66,6 @@ codeunit 85085 "NPR POS Act. Item Tests"
         Assert.IsTrue(SaleLinePOS."Unit Price" = UnitPrice, 'Unit Price Inserted');
         Assert.IsTrue(SaleLinePOS.Description = CustomDescription, 'New description inserted');
         Assert.IsTrue(SaleLinePOS."Description 2" = CustomDescription2, 'New description 2 inserted');
-
     end;
 
     procedure InitializeData()

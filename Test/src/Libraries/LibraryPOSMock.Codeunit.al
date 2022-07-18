@@ -11,6 +11,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSMockFramework: Codeunit "NPR POS Framework: Mock";
         POSAction: Record "NPR POS Action" temporary;
         UserSetup: record "User Setup";
+        POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
     begin
         if UserSetup.Get(UserId) then;
         UserSetup."User ID" := UserId;
@@ -19,15 +20,24 @@ codeunit 85003 "NPR Library - POS Mock"
             UserSetup.Modify();
 
         POSMockFramework.Constructor();
-        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid());
+        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid(), POSBackgroundTaskAPI);
         POSSession.StartPOSSession();
 
         POSAction.DiscoverActions();
     end;
 
-    procedure InitializePOSSessionAndStartSale(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; var POSSale: Codeunit "NPR POS Sale")
+    procedure InitializePOSSession(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser")
     var
         POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        InitializePOSSession(POSSession, POSUnit);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.SetSalesperson(Salesperson);
+    end;
+
+    procedure InitializePOSSessionAndStartSale(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; var POSSale: Codeunit "NPR POS Sale")
+    var
         POSSetup: Codeunit "NPR POS Setup";
     begin
         InitializePOSSession(POSSession, POSUnit);
@@ -37,7 +47,6 @@ codeunit 85003 "NPR Library - POS Mock"
 
     procedure InitializePOSSessionAndStartSale(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser"; var POSSale: Codeunit "NPR POS Sale")
     var
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
     begin
         InitializePOSSession(POSSession, POSUnit);
@@ -53,6 +62,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
         POSMockFramework: Codeunit "NPR POS Framework: Mock";
+        POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
     begin
         if UserSetup.Get(UserId) then;
         UserSetup."User ID" := UserId;
@@ -61,7 +71,7 @@ codeunit 85003 "NPR Library - POS Mock"
             UserSetup.Modify();
 
         POSMockFramework.Constructor();
-        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid());
+        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid(), POSBackgroundTaskAPI);
         POSSession.StartPOSSession();
         POSSession.StartTransaction();
         POSSession.GetSale(POSSale);
@@ -83,18 +93,51 @@ codeunit 85003 "NPR Library - POS Mock"
 
     procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; ItemNo: Text; Quantity: Decimal)
     var
-        POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
         Item: Record Item;
         ItemReference: Record "Item Reference";
+        POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        ActionID: Guid;
     begin
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
         Item.Get(ItemNo);
-        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, '', '', '', POSSession); //Insert step of item action
+        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, '', '', '', POSSession, FrontEnd); // Insert step of item action
+    end;
+
+    procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; Quantity: Decimal)
+    var
+        POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSSale: Codeunit "NPR POS Sale";
+    begin
+        POSSession.GetFrontEnd(FrontEnd, true);
+        POSSession.GetSale(POSSale);
+        POSActionInsertItem.AddItemLine(Item, ItemReference, ItemIdentifierType, Quantity, 0, '', '', '', POSSession, FrontEnd); // Insert step of item action
+    end;
+
+    procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text)
+    var
+        POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSSale: Codeunit "NPR POS Sale";
+    begin
+        POSSession.GetFrontEnd(FrontEnd, true);
+        POSSession.GetSale(POSSale);
+        POSActionInsertItem.AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd); // Insert step of item action
+    end;
+
+    procedure LookupItem(POSSession: Codeunit "NPR POS Session"; ItemView: Text; LocationFilterOption: Integer; var Item: Record Item)
+    var
+        POSActionItemLookup: Codeunit "NPR POS Action: Item Lookup B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        POSSession.GetSale(POSSale);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSession.GetSetup(POSSetup);
+        Item.Get(POSActionItemLookup.LookupItem(POSSaleLine, POSSetup, ItemView, LocationFilterOption));
     end;
 
     procedure EndSale(POSSession: Codeunit "NPR POS Session"): Boolean
