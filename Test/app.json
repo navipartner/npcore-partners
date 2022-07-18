@@ -22,6 +22,12 @@
       "publisher": "Microsoft",
       "name": "Tests-TestLibraries",
       "version": "17.0.16993.0"
+    },
+    {
+      "id": "75f1590f-55c5-4501-ae63-bada5534e852",
+      "publisher": "Microsoft",
+      "name": "Performance Toolkit",
+      "version": "19.5.0.0"
     }
   ],
   "screenshots": [],

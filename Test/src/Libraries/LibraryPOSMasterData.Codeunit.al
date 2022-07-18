@@ -70,7 +70,7 @@
 
     end;
 
-    procedure CreatePOSPaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; ProcessingType: Option; CurrencyCode: Code[10]; PostCondensed: Boolean)
+    procedure CreatePOSPaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; ProcessingType: Enum "NPR Payment Processing Type"; CurrencyCode: Code[10]; PostCondensed: Boolean)
     var
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentBin: Record "NPR POS Payment Bin";
@@ -203,7 +203,7 @@
         POSSetup.Insert();
     end;
 
-    procedure CreatePOSPaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; No: Text; ProcessingType: Integer)
+    procedure CreatePOSPaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; No: Text; ProcessingType: Enum "NPR Payment Processing Type")
     var
         LibraryERM: Codeunit "Library - ERM";
         LibraryUtility: Codeunit "Library - Utility";
