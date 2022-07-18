@@ -136,6 +136,7 @@
         ItemAddOn.TestField(Enabled);
         CompulsoryAddOn := Context.GetBoolean('CompulsoryAddOn');
 
+        Clear(PosItemCheckAvail);
         SkipItemAvailabilityCheck := Context.GetBooleanParameter('SkipItemAvailabilityCheck');
         if not SkipItemAvailabilityCheck then begin
             PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);

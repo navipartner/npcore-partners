@@ -759,6 +759,7 @@
     begin
         if SkipItemAvailabilityCheck then
             exit;
+        Clear(PosItemCheckAvail);
         BindSubscription(PosItemCheckAvail);
         if not PosItemCheckAvail.CheckAvailability_PosSale(Rec, true) then
             ItemCheckAvail.RaiseUpdateInterruptedError();
