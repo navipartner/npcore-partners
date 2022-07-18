@@ -71,7 +71,17 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         case Step of
             'addSalesLine':
                 FrontEnd.WorkflowResponse(Step_AddSalesLine(Context, FrontEnd, Setup));
+            'checkAvailability':
+                FrontEnd.WorkflowResponse(CheckAvailability(Context));
         end;
+    end;
+
+    local procedure IfAddItemAddOns(Item: Record Item): Boolean
+    var
+        AuxItem: Record "NPR Auxiliary Item";
+    begin
+        Item.NPR_GetAuxItem(AuxItem);
+        exit(AuxItem."Item Addon No." <> '')
     end;
 
     local procedure Step_AddSalesLine(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
@@ -102,6 +112,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         POSStore: Record "NPR POS Store";
         Success: Boolean;
         GetPromptSerial: Boolean;
+        BaseLineNo: Integer;
+
     begin
 
         ItemIdentifier := Context.GetStringParameter('itemNo');
@@ -113,7 +125,6 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         EditDesc := Context.GetBooleanParameter('EditDescription');
         EditDesc2 := Context.GetBooleanParameter('EditDescription2');
         SerialSelectionFromList := Context.GetBooleanParameter('SelectSerialNo');
-
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
@@ -143,7 +154,6 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
         Success := (not UseSpecificTracking) and (not Item."NPR Group sale") and (not GetPromptSerial);
         Response.Add('Success', Success);
-
 
         If Not Success then
             If Context.GetBoolean('GetPrompt') = true then begin
@@ -175,6 +185,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
             end else
                 exit;
 
+        Clear(PosItemCheckAvail);
         if not SkipItemAvailabilityCheck then begin
             PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
             if PosInventoryProfile."Stockout Warning" then
@@ -182,8 +193,28 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         end;
 
         POSActionInsertItemB.AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd);
-        if not SkipItemAvailabilityCheck and PosInventoryProfile."Stockout Warning" then
-            PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
+        if IfAddItemAddOns(Item) then begin
+            Response.Add('AddItemAddOn', true);
+            BaseLineNo := POSActionInsertItemB.GetLineNo();
+            Response.Add('BaseLineNo', BaseLineNo);
+        end;
+    end;
+
+
+    local procedure CheckAvailability(Context: Codeunit "NPR POS JSON Helper"): JsonObject
+    var
+        PosInventoryProfile: Record "NPR POS Inventory Profile";
+        SkipItemAvailabilityCheck: Boolean;
+        PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        SkipItemAvailabilityCheck := Context.GetBooleanParameter('SkipItemAvailabilityCheck');
+
+        if not SkipItemAvailabilityCheck then begin
+            PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
+            if PosInventoryProfile."Stockout Warning" then
+                PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
+        end;
     end;
 
     procedure ActionCode(): Text
@@ -350,7 +381,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionInsertItem.js###
-'let main=async({workflow:t,context:a,scope:r,popup:i,parameters:n,captions:e})=>{if(t.context.GetPrompt=!1,n.EditDescription&&(t.context.Desc1=await i.input({title:e.editDesc_title,caption:e.editDesc_lead,value:a.defaultDescription}),t.context.Desc1===null)||n.EditDescription2&&(t.context.Desc2=await i.input({title:e.editDesc2_title,caption:e.editDesc2_lead,value:a.defaultDescription}),t.context.Desc2===null))return" ";const{ItemGroupSale:l,useSpecTracking:c,GetPromptSerial:u,Success:d}=await t.respond("addSalesLine");if(!d){if(t.context.GetPrompt=!0,l&&!n.usePreSetUnitPrice&&(t.context.UnitPrice=await i.numpad({title:e.UnitpriceTitle,caption:e.UnitPriceCaption}),t.context.UnitPrice===null)||c&&!n.SelectSerialNo&&(t.context.SerialNo=await i.input({title:e.itemTracking_title,caption:e.itemTracking_lead}),t.context.SerialNo===null)||!c&&u&&(t.context.SerialNo=await i.input({title:e.itemTracking_title,caption:e.itemTracking_lead}),t.context.SerialNo===null))return" ";t.context.useSpecTracking=c,await t.respond("addSalesLine")}};'
+'let main=async({workflow:e,context:c,scope:S,popup:i,parameters:n,captions:t})=>{if(e.context.GetPrompt=!1,n.EditDescription&&(e.context.Desc1=await i.input({title:t.editDesc_title,caption:t.editDesc_lead,value:c.defaultDescription}),e.context.Desc1===null)||n.EditDescription2&&(e.context.Desc2=await i.input({title:t.editDesc2_title,caption:t.editDesc2_lead,value:c.defaultDescription}),e.context.Desc2===null))return" ";const{ItemGroupSale:l,useSpecTracking:a,GetPromptSerial:d,Success:u,AddItemAddOn:r,BaseLineNo:s}=await e.respond("addSalesLine");if(!u){if(e.context.GetPrompt=!0,l&&!n.usePreSetUnitPrice&&(e.context.UnitPrice=await i.numpad({title:t.UnitpriceTitle,caption:t.UnitPriceCaption}),e.context.UnitPrice===null)||a&&!n.SelectSerialNo&&(e.context.SerialNo=await i.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),e.context.SerialNo===null)||!a&&d&&(e.context.SerialNo=await i.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),e.context.SerialNo===null))return" ";e.context.useSpecTracking=a,await e.respond("addSalesLine")}r&&await e.run("RUN_ITEM_ADDONS",{context:{BaseLineNo:s},parameters:{SkipItemAvailabilityCheck:!0}}),await e.respond("checkAvailability")};'
         );
     end;
+
 }

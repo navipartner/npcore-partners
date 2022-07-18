@@ -131,6 +131,7 @@
                 end;
         end;
 
+        Clear(PosItemCheckAvail);
         if not SkipItemAvailabilityCheck then begin
             PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
             if PosInventoryProfile."Stockout Warning" then

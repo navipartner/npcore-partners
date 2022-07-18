@@ -1,6 +1,10 @@
 codeunit 6059854 "NPR POS Action: Insert Item B"
 {
     Access = Internal;
+
+    var
+        BaseLineNo: Integer;
+
     procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference)
     var
         FirstRec: Text;
@@ -118,7 +122,12 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         SaleLine.InsertLine(Line, false);
         AddAccessories(Item, SaleLine);
         AutoExplodeBOM(Item, SaleLine);
-        AddItemAddOns(FrontEnd, Item, Line."Line No.");
+        BaseLineNo := Line."Line No.";
+    end;
+
+    procedure GetLineNo(): Integer;
+    begin
+        exit(BaseLineNo)
     end;
 
     local procedure AutoExplodeBOM(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
@@ -223,20 +232,6 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             POSSaleLine.RefreshCurrent();
         until (AccessorySparePart.Next() = 0);
 
-    end;
-
-    local procedure AddItemAddOns(POSFrontEnd: Codeunit "NPR POS Front End Management"; Item: Record Item; BaseLineNo: Integer)
-    var
-        POSAction: Record "NPR POS Action";
-        AuxItem: Record "NPR Auxiliary Item";
-    begin
-        Item.NPR_GetAuxItem(AuxItem);
-        if AuxItem."Item AddOn No." = '' then
-            exit;
-
-        POSAction.Get('RUN_ITEM_ADDONS');
-        POSAction.SetWorkflowInvocationContext('BaseLineNo', BaseLineNo);
-        POSFrontEnd.InvokeWorkflow(POSAction);
     end;
 
     procedure ItemRequiresSerialNumberOnSale(Item: Record Item; var UseSpecificTracking: Boolean): Boolean
