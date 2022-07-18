@@ -2,6 +2,7 @@ codeunit 6059783 "NPR POS Item-Check Avail."
 {
     Access = Internal;
     EventSubscriberInstance = Manual;
+    SingleInstance = true;
 
     #region Availability check
     procedure DefineScopeAndCheckAvailability(POSSession: Codeunit "NPR POS Session"; AskConfirmation: Boolean): Boolean
