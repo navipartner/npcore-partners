@@ -137,6 +137,15 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             }
         }
 
+        addafter("Price Includes VAT")
+        {
+            field("NPR VAT Bus. Posting Gr. (Price)"; Rec."VAT Bus. Posting Gr. (Price)")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the VAT Bus. Posting Gr. (Price) field';
+            }
+        }
+
         addafter("VAT Bus. Posting Gr. (Price)")
         {
             group("NPR DiscountonPOS")
