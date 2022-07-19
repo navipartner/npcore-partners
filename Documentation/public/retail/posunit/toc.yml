@@ -54,3 +54,5 @@
     href: howto/POS_Pos_Prof.md
   - name: Add a logo to the POS login screen
     href: howto/add_logo_to_pos_login_screen.md
+  - name: Set up the POS Security Profile
+    href: howto/POS_Security_Profile.md
