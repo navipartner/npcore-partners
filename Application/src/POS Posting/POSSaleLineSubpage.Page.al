@@ -149,6 +149,12 @@
                     ToolTip = 'Specifies the value of the Exclude from Posting field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Serial No."; Rec."Serial No.")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies the value of the Serial No. field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
