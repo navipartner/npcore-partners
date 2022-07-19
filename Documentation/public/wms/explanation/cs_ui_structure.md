@@ -1,6 +1,6 @@
 # CS UI structure
 
-The **CS UI Structure** administrative section contains the active app layout and hierarchy of CS UIs organized in a single table. All changes you make here will be reflected in the device connected to your WMS environment.
+The **CS UI Structure** administrative section contains the current app layout and hierarchy of CS UIs organized in a single table. All changes you make here will be reflected in the menu of the mobile device.
 
 ![CS UI structure](../images/wms_cs_ui_structure.PNG)
 

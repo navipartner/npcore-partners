@@ -43,3 +43,5 @@
     href: howto/set-up-warehouse-users.md
   - name: Perform stock count
     href: howto/perform_stock_count.md
+  - name: Set up CS Data Pattern Code
+    href: howto/set-up-datapatterncode.md
