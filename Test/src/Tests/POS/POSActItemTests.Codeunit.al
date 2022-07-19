@@ -21,6 +21,8 @@ codeunit 85085 "NPR POS Act. Item Tests"
         LibraryRandom: Codeunit "Library - Random";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
+        POSActionBusinessLogic: Codeunit "NPR POS Action: Insert Item B";
+        FrontEnd: Codeunit "NPR POS Front End Management";
         ItemReference: Record "Item Reference";
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
         ItemQuantity: Decimal;
@@ -44,15 +46,17 @@ codeunit 85085 "NPR POS Act. Item Tests"
         CustomDescription := LibraryRandom.RandText(50);
         CustomDescription2 := LibraryRandom.RandText(30);
 
-        LibraryPOSMock.CreateItemLine(POSSession,
-                                    Item,
-                                    ItemReference,
-                                    ItemIdentifierType,
-                                    ItemQuantity,
-                                    UnitPrice,
-                                    CustomDescription,
-                                    CustomDescription2,
-                                    InputSerial);
+        POSSession.GetFrontEnd(FrontEnd, true);
+        POSActionBusinessLogic.AddItemLine(Item,
+                               ItemReference,
+                               ItemIdentifierType,
+                               ItemQuantity,
+                               UnitPrice,
+                               CustomDescription,
+                               CustomDescription2,
+                               InputSerial,
+                               POSSession,
+                               FrontEnd);
 
         POSSale.GetCurrentSale(SalePOS);
 

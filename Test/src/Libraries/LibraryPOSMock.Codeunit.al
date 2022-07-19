@@ -9,9 +9,10 @@ codeunit 85003 "NPR Library - POS Mock"
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
         POSMockFramework: Codeunit "NPR POS Framework: Mock";
+        POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
+        _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
         POSAction: Record "NPR POS Action" temporary;
         UserSetup: record "User Setup";
-        POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
     begin
         if UserSetup.Get(UserId) then;
         UserSetup."User ID" := UserId;
@@ -20,6 +21,7 @@ codeunit 85003 "NPR Library - POS Mock"
             UserSetup.Modify();
 
         POSMockFramework.Constructor();
+        POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
         POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid(), POSBackgroundTaskAPI);
         POSSession.StartPOSSession();
 
@@ -63,6 +65,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSetup: Codeunit "NPR POS Setup";
         POSMockFramework: Codeunit "NPR POS Framework: Mock";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
+        _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
     begin
         if UserSetup.Get(UserId) then;
         UserSetup."User ID" := UserId;
@@ -71,6 +74,7 @@ codeunit 85003 "NPR Library - POS Mock"
             UserSetup.Modify();
 
         POSMockFramework.Constructor();
+        POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
         POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid(), POSBackgroundTaskAPI);
         POSSession.StartPOSSession();
         POSSession.StartTransaction();
