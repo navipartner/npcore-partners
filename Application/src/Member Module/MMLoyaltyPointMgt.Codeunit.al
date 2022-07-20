@@ -1635,7 +1635,7 @@
 
         if (LoyaltySetup."Collection Period" = LoyaltySetup."Collection Period"::AS_YOU_GO) then begin
 
-            CalculatePointsValidPeriod(LoyaltySetup, ReferenceDate, PeriodStart, PeriodEnd);
+            GetSpendPeriodToday(LoyaltySetup, PeriodStart, PeriodEnd);
             Membership.SetFilter("Date Filter", '%1..%2', PeriodStart, PeriodEnd);
 
             Membership.CalcFields("Redeemed Points (Withdrawl)", "Awarded Points (Refund)", "Awarded Points (Sale)", "Expired Points");
@@ -1652,8 +1652,6 @@
         end;
 
         exit(AvailablePoints);
-
-        //if (USERID = 'TSA') then MESSAGE ('Available points %1, redeemed %2, expired %3, thresholdcalculation %4', AvailablePoints, RedeemedPoints, ExpiredPoints, ForThreshold);
     end;
 
     procedure CalculateRedeemablePointsCurrentPeriod(MembershipEntryNo: Integer) RedeemablePoints: Integer
@@ -1840,6 +1838,26 @@
         GetRelativePeriodRefDate(LoyaltySetup, RelativePeriodNo, Today(), PeriodStart, PeriodEnd);
     end;
 
+    local procedure GetSpendPeriodToday(LoyaltySetup: Record "NPR MM Loyalty Setup"; var PeriodStart: Date; var PeriodEnd: Date)
+    var
+        ReferenceDate: Date;
+    begin
+        ReferenceDate := Today();
+
+        if (LoyaltySetup."Collection Period" = LoyaltySetup."Collection Period"::AS_YOU_GO) then begin
+            PeriodStart := 0D;
+            PeriodEnd := Today();
+            if (not LoyaltySetup."Expire Uncollected Points") then
+                exit;
+
+            PeriodStart := CalcDate(LoyaltySetup."Expire Uncollected After", ReferenceDate);
+            if (PeriodStart > ReferenceDate) then begin
+                PeriodStart := ReferenceDate - (PeriodStart - ReferenceDate);
+                PeriodStart := CalcDate('<+1D>', PeriodStart); // Fence post problem
+            end;
+        end;
+    end;
+
     local procedure GetRelativePeriodRefDate(LoyaltySetup: Record "NPR MM Loyalty Setup"; RelativePeriodNo: Integer; ReferenceDate: Date; var PeriodStart: Date; var PeriodEnd: Date)
     var
         Period: Integer;
@@ -1847,14 +1865,37 @@
 
         CalculatePointsValidPeriod(LoyaltySetup, ReferenceDate, PeriodStart, PeriodEnd);
 
-        for Period := 1 to Abs(RelativePeriodNo) do begin
-            if (RelativePeriodNo < 0) then
-                ReferenceDate := CalcDate('<-1D>', PeriodStart);
-            if (RelativePeriodNo > 0) then
-                ReferenceDate := CalcDate('<+1D>', PeriodEnd);
+        if (LoyaltySetup."Collection Period" = LoyaltySetup."Collection Period"::FIXED) then
+            for Period := 1 to Abs(RelativePeriodNo) do begin
+                if (RelativePeriodNo < 0) then
+                    ReferenceDate := CalcDate('<-1D>', PeriodStart);
+                if (RelativePeriodNo > 0) then
+                    ReferenceDate := CalcDate('<+1D>', PeriodEnd);
 
-            CalculatePointsValidPeriod(LoyaltySetup, ReferenceDate, PeriodStart, PeriodEnd);
+                CalculatePointsValidPeriod(LoyaltySetup, ReferenceDate, PeriodStart, PeriodEnd);
+            end;
+
+        if (LoyaltySetup."Collection Period" = LoyaltySetup."Collection Period"::AS_YOU_GO) then begin
+
+            if (not LoyaltySetup."Expire Uncollected Points") then begin
+                ReferenceDate := Today();
+                PeriodStart := 0D;
+                PeriodEnd := DMY2Date(31, 12, 9999);
+                CalculatePointsValidPeriod(LoyaltySetup, ReferenceDate, PeriodStart, PeriodEnd);
+                exit;
+            end;
+
+            ReferenceDate := ReferenceDate - (PeriodEnd - PeriodStart);
+            for Period := 1 to Abs(RelativePeriodNo) do begin
+                if (RelativePeriodNo < 0) then
+                    ReferenceDate := CalcDate('<-1D>', PeriodStart);
+                if (RelativePeriodNo > 0) then
+                    ReferenceDate := CalcDate('<+1D>', PeriodEnd);
+
+                CalculatePointsValidPeriod(LoyaltySetup, ReferenceDate, PeriodStart, PeriodEnd);
+            end;
         end;
+
     end;
 
     local procedure SelectCouponFromCouponSetup(var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary; PointsToSpend: Integer; var LoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup")
