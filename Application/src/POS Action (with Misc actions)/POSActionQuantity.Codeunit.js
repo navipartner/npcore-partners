@@ -19,11 +19,11 @@ await (async () => {
         return;
     }
     $context.PromptQuantity =
-        $parameters.InputType == $parameters.InputType["Ask"]
+        $parameters.InputType == 0
             ? await popup.numpad({ caption: $labels.QtyCaption, value: currentQty })
-            : $parameters.InputType == $parameters.InputType["Fixed"]
+            : $parameters.InputType == 1
                 ? $parameters.ChangeToQuantity
-                : $parameters.InputType == $parameters.InputType["Increment"]
+                : $parameters.InputType == 2
                     ? currentQty + $parameters.IncrementQuantity
                     : null;
     if (!$context.PromptQuantity) {

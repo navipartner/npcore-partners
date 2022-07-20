@@ -38,7 +38,7 @@
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionQuantity.Codeunit.js###
-'await(async()=>{await workflow.respond("AddPresetValuesToContext");let e=runtime.getData("BUILTIN_SALELINE"),t=parseFloat(e._current[12]);if($parameters.Constraint==$parameters.Constraint["Positive Quantity Only"]&&t<0){popup.error($labels.MustBePositive);return}if($parameters.Constraint==$parameters.Constraint["Negative Quantity Only"]&&t>0){popup.error($labels.MustBeNegative);return}if($context.PromptQuantity=$parameters.InputType==$parameters.InputType.Ask?await popup.numpad({caption:$labels.QtyCaption,value:t}):$parameters.InputType==$parameters.InputType.Fixed?$parameters.ChangeToQuantity:$parameters.InputType==$parameters.InputType.Increment?t+$parameters.IncrementQuantity:null,!!$context.PromptQuantity){if($parameters.MaxQuantityAllowed&&$parameters.MaxQuantityAllowed!=0&&Math.abs($context.PromptQuantity)>$parameters.MaxQuantityAllowed){popup.error($labels.CannotExceedMaxQty+" "+$parameters.MaxQuantityAllowed);return}$parameters.PromptUnitPriceOnNegativeInput&&($parameters.NegativeInput?$context.PromptQuantity>0:$context.PromptQuantity<0)&&($context.PromptUnitPrice=await popup.numpad({caption:$labels.PriceCaption,value:e._current[15]})),$context.PromptForReason&&await workflow.respond("AskForReturnReason"),await workflow.respond()}})();'
+'await(async()=>{await workflow.respond("AddPresetValuesToContext");let e=runtime.getData("BUILTIN_SALELINE"),t=parseFloat(e._current[12]);if($parameters.Constraint==$parameters.Constraint["Positive Quantity Only"]&&t<0){popup.error($labels.MustBePositive);return}if($parameters.Constraint==$parameters.Constraint["Negative Quantity Only"]&&t>0){popup.error($labels.MustBeNegative);return}if($context.PromptQuantity=$parameters.InputType==0?await popup.numpad({caption:$labels.QtyCaption,value:t}):$parameters.InputType==1?$parameters.ChangeToQuantity:$parameters.InputType==2?t+$parameters.IncrementQuantity:null,!!$context.PromptQuantity){if($parameters.MaxQuantityAllowed&&$parameters.MaxQuantityAllowed!=0&&Math.abs($context.PromptQuantity)>$parameters.MaxQuantityAllowed){popup.error($labels.CannotExceedMaxQty+" "+$parameters.MaxQuantityAllowed);return}$parameters.PromptUnitPriceOnNegativeInput&&($parameters.NegativeInput?$context.PromptQuantity>0:$context.PromptQuantity<0)&&($context.PromptUnitPrice=await popup.numpad({caption:$labels.PriceCaption,value:e._current[15]})),$context.PromptForReason&&await workflow.respond("AskForReturnReason"),await workflow.respond()}})();'
           );
     end;
 
@@ -65,6 +65,7 @@
         PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
         SaleLine: Codeunit "NPR POS Sale Line";
         Quantity: Decimal;
+        QuantityText: Text;
         UnitPrice: Decimal;
         ConstraintOption: Option "No Constraint","Positive Quantity Only","Negative Quantity Only";
         ReturnReasonCode: Code[20];
@@ -94,11 +95,16 @@
         end;
 
         ReturnReasonCode := CopyStr(Context.GetString('ReturnReasonCode'), 1, MaxStrLen(ReturnReasonCode));
-        Quantity := Context.GetDecimalOrFail('PromptQuantity', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        QuantityText := Context.GetStringOrFail('PromptQuantity', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
         UnitPrice := Context.GetDecimal('PromptUnitPrice');
         ConstraintOption := Context.GetIntegerParameter('Constraint');
         NegativeInput := Context.GetBooleanParameter('NegativeInput');
         SkipItemAvailabilityCheck := Context.GetBooleanParameter('SkipItemAvailabilityCheck');
+
+        if not Evaluate(Quantity, QuantityText) then begin
+            RemoveStarFromQuantity(QuantityText);
+            Evaluate(Quantity, QuantityText);
+        end;
 
         if NegativeInput and (Quantity > 0) then
             Quantity := -Quantity;
@@ -155,6 +161,17 @@
             PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
 
         POSSession.RequestRefreshData();
+    end;
+
+    local procedure RemoveStarFromQuantity(var Quantity: Text)
+    var 
+        Position: Integer;
+    begin
+        Position := StrPos(Quantity, '*');
+        if Position <> StrLen(Quantity) then
+            exit;
+
+        Quantity := DelStr(Quantity, Position);
     end;
 
     local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
