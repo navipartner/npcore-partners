@@ -465,7 +465,7 @@
 
     local procedure SerialNoOnAfterValidate()
     var
-#IF NOT BC17 OR NOT BC18
+#IF NOT BC17 AND NOT BC18
         WhseItemTrackingSetup: Record "Item Tracking Setup";
 #ENDIF
         ItemTrackingMgt: Codeunit "Item Tracking Management";
@@ -489,7 +489,7 @@
 
     local procedure LotNoOnAfterValidate()
     var
-#IF NOT BC17 OR NOT BC18
+#IF NOT BC17 AND NOT BC18
         WhseItemTrackingSetup: Record "Item Tracking Setup";
 #ENDIF
         ItemTrackingMgt: Codeunit "Item Tracking Management";
