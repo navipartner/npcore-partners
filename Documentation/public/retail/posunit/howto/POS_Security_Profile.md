@@ -9,12 +9,12 @@ To set up the security profile, follow the provided steps:
 1. In the **General** insert **Code** and **Description**.      
    The **Code** has to be unique for for each profile, while the **Description** field should contain a short description of the profile.
 
-2. Provide the **Administrator Password**. 
-   It can be assigned to different buttons in the POS menu, so if someone presses the button the administrator password should be provided in pop up window. 
+2. Provide the **Administrator Password**.       
+   It can be assigned to different buttons in the POS menu, so if someone presses the button the administrator password should be provided in the pop up window. 
 
 3. Set the **Lock Timeout**, i.e. the time of non-activity after which the POS unit will be locked.
 
-4. Provide the **Unlock Password**. 
+4. Provide the **Unlock Password**.      
    This password will be used for unlocking the POS unit.
 
 ### Related links

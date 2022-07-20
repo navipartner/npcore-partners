@@ -20,4 +20,3 @@ From this page you can access all the available setups for NP WMS, download the 
 - [Set up CS users](../howto/set-up-cs-users.md)
 - [Set up CS UIs](../howto/set-up-cs-uis.md)
 - [Set up warehouse employees](../howto/set-up-warehouse-users.md)
-- [Set up counting](../howto/set-up-counting.md)
