@@ -465,7 +465,7 @@
 
     local procedure SerialNoOnAfterValidate()
     var
-#IF NOT BC17
+#IF NOT BC17 OR NOT BC18
         WhseItemTrackingSetup: Record "Item Tracking Setup";
 #ENDIF
         ItemTrackingMgt: Codeunit "Item Tracking Management";
@@ -473,7 +473,7 @@
         EntriesExist: Boolean;
     begin
         if Rec."Serial No." <> '' then begin
-#IF BC17
+#IF BC17 OR BC18
             ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
                 Rec."Lot No.", Rec."Serial No.", false, EntriesExist);
 #ELSE
@@ -489,7 +489,7 @@
 
     local procedure LotNoOnAfterValidate()
     var
-#IF NOT BC17
+#IF NOT BC17 OR NOT BC18
         WhseItemTrackingSetup: Record "Item Tracking Setup";
 #ENDIF
         ItemTrackingMgt: Codeunit "Item Tracking Management";
@@ -497,7 +497,7 @@
         EntriesExist: Boolean;
     begin
         if Rec."Lot No." <> '' then begin
-#IF BC17
+#IF BC17 OR BC18
             ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
                 Rec."Lot No.", Rec."Serial No.", false, EntriesExist);
 #ELSE
