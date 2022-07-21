@@ -16,7 +16,7 @@ After the card is scanned, the member will be assigned to the sale, and then the
 
 ## Example
 
-If a customer has bought an item with the price of 49EUR, and in **Loyalty Setup** we set that for every EUR spent the customer will receive 1 point, in the **Membership Card** after the sale is complete, the points will be displayed in the **Membership Point entry** tab:
+If a customer has bought an item with the price of 49EUR, and in **Loyalty Setup** we set that for every EUR spent the customer will receive 1 point, in the **Membership Card** after the sale is complete, the points will be displayed in the **Membership Point Entry** tab:
 
 ![Membership_points_entry](../images/Membership%20points%20entry.png)
 
