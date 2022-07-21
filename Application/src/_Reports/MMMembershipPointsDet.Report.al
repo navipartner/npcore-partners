@@ -1,7 +1,7 @@
 ﻿report 6060131 "NPR MM Membership Points Det."
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Points Detail.rdlc';
@@ -15,6 +15,7 @@
     {
         dataitem("MM Membership"; "NPR MM Membership")
         {
+            RequestFilterFields = "External Membership No.", "Membership Code", "Date Filter";
             column(GetFilters; GetFilters)
             {
             }

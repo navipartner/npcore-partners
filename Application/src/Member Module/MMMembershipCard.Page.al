@@ -708,6 +708,25 @@
                     ToolTip = 'Executes the Statistics action';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                action("Membership Details Report")
+                {
+                    Caption = 'Membership Details Report';
+                    Image = Report;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    ToolTip = 'Executes the Statistics action';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnAction()
+                    var
+                        Membership: Record "NPR MM Membership";
+                    begin
+                        Membership.SetRange("Membership Code", Rec."Membership Code");
+                        Membership.SetFilter("Date Filter", '01-01-0000..');
+                        Report.Run(Report::"NPR MM Membership Points Det.", true, false, Membership);
+                    end;
+                }
             }
             group("Raptor Integration")
             {
