@@ -12,6 +12,8 @@
   href: coupons/toc.yml
 - name: Vouchers
   href: vouchers/toc.yml
+- name: POS fiscalization
+  href: posfiscalization/toc.yml
 - name: End user communication
   href: sms/toc.yml
 - name: GDPR in NP Retail
