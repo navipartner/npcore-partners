@@ -10,10 +10,11 @@ One of the following solutions should be applicable in this scenario:
 
   ![print output list](./images/print_output_list.PNG)
 
-> [!Note]
-> The drivers of all receipt and label printers should be **Generic/Text Only**.
-
 - Check if the correct print template has been defined in the **Print Template List**.
 
 > [!Note]
 > If the Epson printer is used, it's not necessary to select a specific **Codeunit ID**, unless you're printing labels, in which case both the **Codeunit ID** and the **Print template** need to be specified regardless of the selected printer. 
+
+### Related links
+
+- [Receipt printer troubleshooting](receipt_printer_troubleshooting.md)
