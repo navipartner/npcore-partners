@@ -208,4 +208,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'BACKGND_TASK_EXAMPLE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction - Task Example";
     }
+    value(28; SS_PAYMENT_CASH)
+    {
+        Caption = 'SS_PAYMENT_CASH', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: SS Paym. Cash";
+    }
 }
