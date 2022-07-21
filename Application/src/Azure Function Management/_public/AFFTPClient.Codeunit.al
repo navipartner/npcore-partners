@@ -94,12 +94,9 @@
         content: HttpContent;
         jsonTxt: Text;
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpFilePathConst, RemotePath) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('DownloadFile', content));
@@ -139,14 +136,11 @@
         content: HttpContent;
     begin
         base64 := gConvert.ToBase64(FileContent);
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpFilePathConst, RemotePath) and
             reqContent.Add(gHttpFileContentConst, base64) and
             reqContent.WriteTo(jsonTxt)
-        )
-            then begin
+        then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('UploadFile', content));
         end else begin
@@ -182,13 +176,11 @@
         jsonResult: JsonObject;
         content: HttpContent;
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpFilePathConst, CurrentRemotePath) and
             reqContent.Add('newname', NewRemotePath) and
             reqContent.WriteTo(jsonTxt)
-        ) then begin
+        then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('RenameFile', content));
         end else begin
@@ -222,12 +214,9 @@
         content: HttpContent;
 
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpFilePathConst, RemotePath) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('DeleteFile', content));
@@ -261,12 +250,9 @@
         jsonResult: JsonObject;
         content: HttpContent;
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpPathConst, RemotePath) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('DeleteDirectory', content));
@@ -304,12 +290,9 @@
         jsonResult: JsonObject;
         content: HttpContent;
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpPathConst, RemotePath) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('ListDirectory', content));
@@ -344,12 +327,9 @@
         jsonResult: JsonObject;
         content: HttpContent;
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpPathConst, RemotePath) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('CreateDirectory', content));
@@ -390,21 +370,17 @@
         returnVal: Boolean;
     begin
         returnVal :=
-        (
             reqContent.Add(gHttpUrlConst, gHost) and
             reqContent.Add(gHttpUsernameConst, gUsername) and
             reqContent.Add(gHttpPasswordConst, gPassword) and
             reqContent.Add(gHttpPortConst, gPort) and
             reqContent.Add(gHttpPasiveConst, gPassive) and
-            reqContent.Add(gHttpEncmodeConst, gEncmode)
-        );
-        if (gTimeoutMs <> -1)
-        then begin
-            returnVal := (returnVal and reqContent.Add(gHttpTimeoutMsConst, gTimeoutMs));
-        end;
+            reqContent.Add(gHttpEncmodeConst, gEncmode);
+
+        if gTimeoutMs <> -1 then
+            returnVal := returnVal and reqContent.Add(gHttpTimeoutMsConst, gTimeoutMs);
+
         exit(returnVal);
     end;
-
-
 }
 
