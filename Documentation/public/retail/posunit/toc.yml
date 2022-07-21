@@ -20,6 +20,8 @@
     href: explanation/POS_Display_profile.md
   - name: POS End of Day Profile
     href: explanation/POS_End_of_Day_Profile.md
+  - name: POS posting setup
+    href: explanation/POS_posting_setup.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
