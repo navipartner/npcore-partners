@@ -17,6 +17,20 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
+        field(10; "Customer Type"; Option)
+        {
+            Caption = 'Customer Type';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Ordinary,Cash';
+            OptionMembers = Ord,Cash;
+        }
+        field(11; "Customer No."; Code[20])
+        {
+            Caption = 'Customer No.';
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Customer Type" = CONST(Ord)) Customer."No." ELSE
+            IF ("Customer Type" = CONST(Cash)) Contact."No.";
+        }
         field(14; "Start Date"; Date)
         {
             Caption = 'Start Date';

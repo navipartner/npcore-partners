@@ -21,10 +21,9 @@
                 'let WaiterPadSelected = await workflow.respond("SelectWaiterPad");' +
                 'if (WaiterPadSelected)' +
                 '{' +
-                //'    console.log("Selected waiter pad no.: " + $context.waiterPadNo);' +
-                '    workflow.queue("RV_GET_WAITER_PAD", {parameters: {WaiterPadCode: $context.waiterPadNo}})' +
+                '    workflow.run("RV_GET_WAITER_PAD", {parameters: {WaiterPadCode: $context.waiterPadNo}})' +
                 '} else {' +
-                '    workflow.queue("RV_NEW_WAITER_PAD", {parameters: {SeatingCode: $parameters.SeatingCode, SwitchToSaleView: true}})' +
+                '    workflow.run("RV_NEW_WAITER_PAD", {parameters: {SeatingCode: $parameters.SeatingCode, SwitchToSaleView: true}})' +
                 '};'
             );
 
