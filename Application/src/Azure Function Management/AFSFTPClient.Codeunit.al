@@ -17,10 +17,7 @@
         gHost, gUsername, gPassword, gPrivateKey : Text;
         gPort, gTimeoutMs : Integer;
 
-
     procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer)
-    var
-
     begin
         CommonConstruct(Host, Username, Password, Port, TimeoutMs);
     end;
@@ -65,6 +62,7 @@
     begin
         SftpClient.Clear();
     end;
+
     /// <summary>
     /// Downloads a file from te remote server with the specified path.
     /// Return a Json Object of the form:
@@ -90,12 +88,9 @@
         content: HttpContent;
         jsonTxt: Text;
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpFilePathConst, RemotePath) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('DownloadFile', content));
@@ -135,14 +130,11 @@
         content: HttpContent;
     begin
         base64 := gConvert.ToBase64(FileContent);
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpFilePathConst, RemotePath) and
             reqContent.Add(gHttpFileContentConst, base64) and
             reqContent.WriteTo(jsonTxt)
-        )
-            then begin
+        then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('UploadFile', content));
         end else begin
@@ -177,13 +169,11 @@
         jsonResult: JsonObject;
         content: HttpContent;
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpFilePathConst, CurrentRemotePath) and
             reqContent.Add('toPath', NewRemotePath) and
             reqContent.WriteTo(jsonTxt)
-        ) then begin
+        then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('MoveFile', content));
         end else begin
@@ -215,14 +205,10 @@
         jsonTxt: Text;
         jsonResult: JsonObject;
         content: HttpContent;
-
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpFilePathConst, RemotePath) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('DeleteFile', content));
@@ -262,17 +248,13 @@
         jsonResult: JsonObject;
         jsonTxt: Text;
         content: HttpContent;
-
     begin
         if CopyStr(RemotePath, StrLen(RemotePath), 1) <> '/' then
             RemotePath += '/';
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpPathConst, RemotePath) and
             reqContent.Add('recursive', IncludeSubFolders) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('DownloadDirectory', content));
@@ -305,12 +287,9 @@
         jsonResult: JsonObject;
         content: HttpContent;
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpPathConst, RemotePath) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('DeleteDirectory', content));
@@ -353,14 +332,11 @@
     begin
         if CopyStr(RemotePath, StrLen(RemotePath), 1) <> '/' then
             RemotePath += '/';
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpPathConst, RemotePath) and
             //Can include recursive search and download, works in azure function
             //reqContent.Add('recursive', IncludeSubFolders) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('SearchFileAndDownload', content));
@@ -398,12 +374,9 @@
         jsonResult: JsonObject;
         content: HttpContent;
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpPathConst, RemotePath) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('ListDirectory', content));
@@ -437,12 +410,9 @@
         jsonResult: JsonObject;
         content: HttpContent;
     begin
-        if
-        (
-            PrepareCommonHttpRequest(reqContent) and
+        if PrepareCommonHttpRequest(reqContent) and
             reqContent.Add(gHttpPathConst, RemotePath) and
             reqContent.WriteTo(jsonTxt)
-        )
         then begin
             content.WriteFrom(jsonTxt);
             exit(HandlePostRequest('CreateDirectory', content));
@@ -465,17 +435,15 @@
         // TODO Insert correct code
         //azFuncWQuery := AZFunction + '?code='+ keyVault.get();
         azFuncWQuery := AZFunction + '?code=' + gHttpHostKey;
-        if (SftpClient.Post(azFuncWQuery, Content, httpResponse))
-            then begin
+        if SftpClient.Post(azFuncWQuery, Content, httpResponse) then begin
             httpResponse.Content.ReadAs(jsonTxt);
             jsonResult.ReadFrom(jsonTxt);
             statusCode := httpResponse.HttpStatusCode;
             jsonResult.Add(gResponseMsg_StatusCode, statusCode);
-            exit(jsonResult);
-        end else begin
+        end else
             jsonResult.Add(gErrorConst, gErrMsg_Post_Fail);
-            exit(jsonResult);
-        end;
+
+        exit(jsonResult);
     end;
 
     local procedure PrepareCommonHttpRequest(var reqContent: JsonObject): Boolean
@@ -483,23 +451,18 @@
         returnVal: Boolean;
     begin
         returnVal :=
-        (
             reqContent.Add(gHttpUrlConst, gHost) and
             reqContent.Add(gHttpUsernameConst, gUsername) and
             reqContent.Add(gHttpPasswordConst, gPassword) and
-            reqContent.Add(gHttpPortConst, gPort)
-        );
-        if (gTimeoutMs <> -1)
-        then begin
-            returnVal := (returnVal and reqContent.Add(gHttpTimeoutMsConst, gHost));
-        end;
-        if (gPrivateKey <> '')
-        then begin
+            reqContent.Add(gHttpPortConst, gPort);
+
+        if gTimeoutMs <> -1 then
+            returnVal := (returnVal and reqContent.Add(gHttpTimeoutMsConst, gTimeoutMs));
+
+        if gPrivateKey <> '' then
             returnVal := (returnVal and reqContent.Add(gHttpPrivateKeyConst, gPrivateKey));
-        end;
+
         exit(returnVal);
     end;
-
-
 }
 

@@ -58,10 +58,12 @@
         JToken: JsonToken;
         ResponseCodeText: Text;
         FileContent: Text;
+        FtpHost: Text[250];
     begin
         if not ValidFilename(Filename) then
             Error(FileIsNotValidErr, Filename);
 
+        FtpHost := ManageHostPrefix(ImportType."Ftp Host");
         SourceUri := ManagePathSlashes(ImportType."Ftp Path");
 
         FtpPort := ImportType."Ftp Port";
@@ -70,7 +72,7 @@
 
         //Check for Binary property (probably not needed anymore): if ImportType."Ftp Binary" then FtpWebRequest.UseBinary := true;
 
-        FTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive", ImportType."Ftp EncMode");
+        FTPClient.Construct(FtpHost, ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive", ImportType."Ftp EncMode");
         FTPResponse := FTPClient.DownloadFile(SourceUri + Filename);
 
         FTPResponse.Get('StatusCode', JToken);
@@ -126,17 +128,19 @@
         JToken: JsonToken;
         ResponseCodeText: Text;
         FileContent: Text;
+        FtpHost: Text[250];
     begin
         if not ValidFilename(Filename) then
             Error(FileIsNotValidErr, Filename);
 
+        FtpHost := ManageHostPrefix(ImportType."Ftp Host");
         RemotePath := ManagePathSlashes(ImportType."Ftp Path");
 
         FtpPort := ImportType."Ftp Port";
         if FtpPort = 0 then
-            FtpPort := 21;
+            FtpPort := 22;
 
-        SFTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000);
+        SFTPClient.Construct(FtpHost, ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000);
         FTPResponse := SFTPClient.DownloadFile(RemotePath + Filename);
 
         FTPResponse.Get('StatusCode', JToken);
@@ -358,17 +362,19 @@
         JArray: JsonArray;
         i: Integer;
         ResponseCodeText: Text;
+        FtpHost: Text[250];
     begin
         Clear(ListDirectoryDetails);
 
         if not ImportType."Ftp Enabled" then
             exit;
 
+        FtpHost := ManageHostPrefix(ImportType."Ftp Host");
         FtpPort := ImportType."Ftp Port";
         IF FtpPort = 0 then
             FtpPort := 21;
 
-        FTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive", ImportType."Ftp EncMode");
+        FTPClient.Construct(FtpHost, ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive", ImportType."Ftp EncMode");
         FTPResponse := FTPClient.ListDirectory(ManagePathSlashes(ImportType."Ftp Path"));
 
         FTPResponse.Get('StatusCode', JToken);
@@ -413,14 +419,16 @@
         JArray: JsonArray;
         i: Integer;
         ResponseCodeText: Text;
+        FtpHost: Text[250];
     begin
+        FtpHost := ManageHostPrefix(ImportType."Ftp Host");
         FtpPort := ImportType."Ftp Port";
-        IF FtpPort = 0 then
-            FtpPort := 21;
+        if FtpPort = 0 then
+            FtpPort := 22;
 
         RemotePath := ManagePathSlashes(ImportType."Ftp Path");
 
-        SFTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000);
+        SFTPClient.Construct(FtpHost, ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000);
         FTPResponse := SFTPClient.ListDirectory(RemotePath);
 
         FTPResponse.Get('StatusCode', JToken);
@@ -452,6 +460,17 @@
                     Error(JToken.AsValue().AsText());
                 end;
         end;
+    end;
+
+    local procedure ManageHostPrefix(Host: Text[250]) NewHost: Text[250]
+    begin
+        NewHost := Host;
+
+        if StrPos(Host, 'sftp://') = 1 then
+            NewHost := CopyStr(Host, 8);
+
+        if StrPos(Host, 'ftp://') = 1 then
+            NewHost := CopyStr(Host, 7);
     end;
 
     local procedure ManagePathSlashes(RemotePath: Text) FormattedPath: Text
