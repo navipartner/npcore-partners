@@ -44,15 +44,15 @@ A **Loyalty Code** is a type of loyalty program which has its own setups. Loyalt
 
 4. Select conditions for accumulation of points in the **Point Base** field. You can choose between the following options: **Amount**, **Item Point Setup** or **Amount and Item Point Setup**. 
 
-   - **Amount** - if selected, the ratio between the amount spent and points awarded will be taken from the **Loyalty Setup** page and the **Amount Factor** field. This setup will be used for all items the member has purchased. 
+- **Amount** - if selected, the ratio between the amount spent and points awarded will be taken from the **Loyalty Setup** page and the **Amount Factor** field. This setup will be used for all items the member has purchased. 
 
-   - **Item Point Setup** - if selected, the setup from the **Loyalty Item Points Setup** page will be taken instead of the setup from the **Loyalty Setup** page. In the **Item Point Setup** page you can define how many points or what value the customer will get for buying a special item, or an item from an item group set up in this page. Additionally, some items can be excluded from the loyalty program if specified here, and assigned the **Exclude** option in the **Constraint** field. 
+- **Item Point Setup** - if selected, the setup from the **Loyalty Item Points Setup** page will be taken instead of the setup from the **Loyalty Setup** page. In the **Item Point Setup** page you can define how many points or what value the customer will get for buying a special item, or an item from an item group set up in this page. Additionally, some items can be excluded from the loyalty program if specified here, and assigned the **Exclude** option in the **Constraint** field. 
 
 ![Loyalty_point_setup](../images/Loyalty%20point%20setup.png)
 
    **Example**: if a customer buys the item 73036 (from the provided image) which belongs to the item group 402 they won't receive any points because it is excluded. However, if they buy any other item from the group 402, they will be awarded 200 points.
 
-   - **Amount and Item Points Setup** - if selected, for items setup in the **Item Points Setup** page, the setup from that page will be used, and for the rest the setup from **Loyalty Setup** page will be used.
+- **Amount and Item Points Setup** - if selected, for items setup in the **Item Points Setup** page, the setup from that page will be used, and for the rest the setup from **Loyalty Setup** page will be used.
 
 5. Provide the **Amount Factor**, which determines how many pointes will be awarded per 1EUR spent.
 
@@ -73,9 +73,9 @@ All benefits which member gets being loyal to the company are summed up in coupo
    In the example illustrated by the screenshot above, the customer needs to have 100 points to be able to get 1EUR for every point accumulated.
 
 > [!Note]
-> Instead of amount of money, customer can get discount % when accumulate enough points.
+> Instead of money, customers can get a discount % when they accumulate enough points.
 
-3. In the **Value Assignment** field you need to set **Coupon Setup**, so that after the customer accumulates the necessary points (points set up in the **Points Threshold** field) they will receive benefits associated with the coupon assigned.       
+1. In the **Value Assignment** field you need to set **Coupon Setup**, so that after the customer accumulates the necessary points (points set up in the **Points Threshold** field) they will receive benefits associated with the coupon assigned.       
    In the example illustrated by the screenshot below, after the customer gets 500 points, they will be able to use the coupon with the “20%OFF” name, and enjoy the benefits that this coupon offers. 
 
 ![Loyalty_points_setup_example](../images/Loyalty%20points%20setup%20example.png)
