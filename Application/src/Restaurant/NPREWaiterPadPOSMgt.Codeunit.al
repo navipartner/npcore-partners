@@ -135,6 +135,7 @@
         SaleLinesExist := SaleLinePOS.FindSet(CleanupSale);
         if SaleLinesExist then begin
             TempTouchedWaiterPadLine.DeleteAll();
+            UpdateWPHdrFromSaleHdr(SalePOS, WaiterPad);
             CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", true);
             repeat
                 MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine);
@@ -179,6 +180,13 @@
 
         Commit();
         NPHHospitalityPrint.LinesAddedToWaiterPad(WaiterPad);
+    end;
+
+    local procedure UpdateWPHdrFromSaleHdr(SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    begin
+        WaiterPad."Customer Type" := SalePOS."Customer Type";
+        WaiterPad."Customer No." := SalePOS."Customer No.";
+        WaiterPad.Modify();
     end;
 
     procedure MoveSaleLineFromPOSToWaiterPad(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
@@ -267,6 +275,8 @@
         SalePOS."NPRE Pre-Set Waiter Pad No." := WaiterPad."No.";
         SalePOS."NPRE Pre-Set Seating Code" := WaiterPad."Current Seating FF";
         SalePOS."NPRE Number of Guests" := WaiterPad."Number of Guests";
+        SalePOS."Customer Type" := WaiterPad."Customer Type";
+        SalePOS.Validate("Customer No.", WaiterPad."Customer No.");
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
 
@@ -688,6 +698,11 @@
         SalePOS."NPRE Number of Guests" := 0;
         SalePOS."NPRE Pre-Set Seating Code" := '';
         SalePOS."NPRE Pre-Set Waiter Pad No." := '';
+
+        if SalePOS."Customer No." <> '' then begin
+            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
+            SalePOS.Validate("Customer No.", '');
+        end;
         if ModifyRec then
             SalePOS.Modify();
 

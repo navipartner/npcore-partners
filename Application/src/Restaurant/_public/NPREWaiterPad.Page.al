@@ -26,6 +26,13 @@
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
+                field(CustomerDetails; GetCustomerDetails())
+                {
+                    Caption = 'Customer';
+                    ToolTip = 'Specifies the name of the customer assigned to the waiter pad.';
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                }
                 field("Number of Guests"; Rec."Number of Guests")
                 {
                     ApplicationArea = NPRRetail;
@@ -358,5 +365,29 @@
             exit(true);
         end;
         exit(false);
+    end;
+
+    local procedure GetCustomerDetails(): Text
+    var
+        Contact: Record Contact;
+        Customer: Record Customer;
+        ExitPlaceholderLbl: Label '%1 %2 "%3"', Comment = '%1 - Customer or Contact table caption, %2 - Customer/Contact No., %3 - Customer/Contact Name';
+    begin
+        if Rec."Customer No." = '' then
+            exit('');
+        case Rec."Customer Type" of
+            Rec."Customer Type"::Ord:
+                begin
+                    if not Customer.Get(Rec."Customer No.") then
+                        Clear(Customer);
+                    exit(StrSubstNo(ExitPlaceholderLbl, Customer.TableCaption(), Customer."No.", Customer.Name));
+                end;
+            Rec."Customer Type"::Cash:
+                begin
+                    if not Contact.Get(Rec."Customer No.") then
+                        Clear(Contact);
+                    exit(StrSubstNo(ExitPlaceholderLbl, Contact.TableCaption(), Contact."No.", Contact.Name));
+                end;
+        end;
     end;
 }

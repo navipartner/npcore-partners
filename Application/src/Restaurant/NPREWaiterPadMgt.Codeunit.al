@@ -176,6 +176,10 @@
         MergeToWaiterPad."Number of Guests" := MergeToWaiterPad."Number of Guests" + WaiterPad."Number of Guests";
         MergeToWaiterPad."Billed Number of Guests" := MergeToWaiterPad."Billed Number of Guests" + WaiterPad."Billed Number of Guests";
         MergeToWaiterPad."Pre-receipt Printed" := false;
+        if MergeToWaiterPad."Customer No." = '' then begin
+            MergeToWaiterPad."Customer Type" := WaiterPad."Customer Type";
+            MergeToWaiterPad."Customer No." := WaiterPad."Customer No.";
+        end;
         MergeToWaiterPad.Modify();
 
         WaiterPad."Number of Guests" := 0;
@@ -281,7 +285,13 @@
     local procedure WaiterPadCanBeClosed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"): Boolean
     var
         ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
+        WaiterPadLine.SetFilter("Quantity (Base)", '<>%1', 0);
+        if WaiterPadLine.IsEmpty() then
+            exit(true);
+
         SetupProxy.GetServiceFlowProfile(ServiceFlowProfile);
         case ServiceFlowProfile."Close Waiter Pad On" of
             ServiceFlowProfile."Close Waiter Pad On"::"Pre-Receipt":
