@@ -6,7 +6,7 @@ The loyalty function is created on top of the Membership module, so the initial 
 2. Creating a Membership setup,
 3. Creating a Membership Sale setup.
 
-While creation of these setups will be provided as a part of another document, this article focuses on the setups which are specific to the loyalty program. 
+While the creation procedure of these setups will be provided in another document, this article focuses on the setups which are specific to the loyalty program. 
 
 ## Loyalty setup activation
 
@@ -31,7 +31,7 @@ As the loyalty setup is created on top of the Membership module, it must be acti
 
 A **Loyalty Code** is a type of loyalty program which has its own setups. Loyalty programs can be different in many ways based on the associated setups. They can have different benefits for customers, different collecting periods, different expiration periods, as well as different conditions for accumulation of points.
 
-1. For members to be able to use a loyalty program, on their **Membership Setup Card** they should be assigned a **Loyalty code** which is created on the **Loyalty setup** page.
+1. For members to be able to use a loyalty program, on their **Membership Setup Card** they should be assigned a **Loyalty Code** which is created on the **Loyalty Setup** page.
 
 ![Loyalty_setup](../images/Loyalty%20setup.PNG)
 
@@ -40,9 +40,9 @@ A **Loyalty Code** is a type of loyalty program which has its own setups. Loyalt
    - **As you go** - a user will become eligible for point collection as soon as they become a member.
    - **Fixed** - a member will be able to collect points in a fixed period which is defined by the fields **Fixed Period Start** and **Collecting Period Length**.
 
-3. If there is need to set up a loyalty program with points that have a defined expiration period, tick the **Expire uncollected points** checkbox and specify the period after which points are going to expire in the **Expire uncollected after** field.
+3. If there is need to set up a loyalty program with points that have a defined expiration period, tick the **Expire Uncollected Points** checkbox and specify the period after which points are going to expire in the **Expire Uncollected After** field.
 
-4. Select conditions for accumulation of points in the **Point Base** field. You can choose between the following options: **Amount**, **Item Point setup** or **Amount and Item point setup**. 
+4. Select conditions for accumulation of points in the **Point Base** field. You can choose between the following options: **Amount**, **Item Point Setup** or **Amount and Item Point Setup**. 
 
    - **Amount** - if selected, the ratio between the amount spent and points awarded will be taken from the **Loyalty Setup** page and the **Amount Factor** field. This setup will be used for all items the member has purchased. 
 
@@ -52,7 +52,7 @@ A **Loyalty Code** is a type of loyalty program which has its own setups. Loyalt
 
    **Example**: if a customer buys the item 73036 (from the provided image) which belongs to the item group 402 they won't receive any points because it is excluded. However, if they buy any other item from the group 402, they will be awarded 200 points.
 
-   - **Amount and Item Points Setup** - if selected, for items setup in the **Item Points Setup** page, the setup from that page will be used, and for the rest the setup from **Loyalty setup** page will be used.
+   - **Amount and Item Points Setup** - if selected, for items setup in the **Item Points Setup** page, the setup from that page will be used, and for the rest the setup from **Loyalty Setup** page will be used.
 
 5. Provide the **Amount Factor**, which determines how many pointes will be awarded per 1EUR spent.
 
@@ -62,7 +62,7 @@ A **Loyalty Code** is a type of loyalty program which has its own setups. Loyalt
 
 ## Loyalty points setup
 
-Loyalty programs can have different benefits by setting up **Points to Amount setup**.
+Loyalty programs can have different benefits by setting up **Points to Amount Setup**.
 
 ![Loyalty_points_setup](../images/Loyalty%20points%20setup.PNG)
 
@@ -75,7 +75,7 @@ All benefits which member gets being loyal to the company are summed up in coupo
 > [!Note]
 > Instead of amount of money, customer can get discount % when accumulate enough points.
 
-3. In the **Value assignment** field you need to set **Coupon Setup**, so that after the customer accumulates the necessary points (points set up in the **Points Threshold** field) they will receive benefits associated with the coupon assigned.       
+3. In the **Value Assignment** field you need to set **Coupon Setup**, so that after the customer accumulates the necessary points (points set up in the **Points Threshold** field) they will receive benefits associated with the coupon assigned.       
    In the example illustrated by the screenshot below, after the customer gets 500 points, they will be able to use the coupon with the “20%OFF” name, and enjoy the benefits that this coupon offers. 
 
 ![Loyalty_points_setup_example](../images/Loyalty%20points%20setup%20example.png)
