@@ -20,6 +20,10 @@ All users working on the [mobile apps](/Documentation/public/wms/howto/install-m
     - **User group** - enter or select a valid User Group Code which determines which group the employee belongs to. 
     - **Device Id** - enter or select the device Id of the mobile device attached to the user.  
 
+## Video walkthrough
+
+> [!video https://youtu.be/11YtGLyGVxI]
+
 
 ### Related links
 

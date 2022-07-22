@@ -31,6 +31,10 @@ To set up CS UIs, follow the provided steps:
 > [!Note]
 > The field type most commonly associated with the **Header** is **Text Type**, while the **Body** is usually a combination of the **Text Type** and the data coming from the database. 
 
+## Video walkthrough
+
+> [!video https://www.youtube.com/watch?v=TV-fvUlQ8Ik]
+
 ### Related links
 
 - [Capture Service UIs](../explanation/cs-uis.md)
