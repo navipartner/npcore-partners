@@ -68,7 +68,9 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'ItemPriceIdentifierType'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'ItemLookupSmartSearch'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Fix POS Entry SystemId"));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRShippingProvider'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRPackageDimensions'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRPackageServices'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG E-Mail Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Aux Tables"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Object Output"));
@@ -239,7 +241,15 @@
                 exit('NPRFixPOSEntrySystemId_20220126');
 
             Codeunit::"NPR Upgrade Shipping Provider":
-                Exit('NPRShippingProvider');
+                case UpgradeStep of
+                    'NPRShippingProvider':
+                        Exit('NPRShippingProvider');
+                    'NPRPackageDimensions':
+                        Exit('NPRPackageDimensions');
+                    'NPRPackageServices':
+                        Exit('NPRPackageServices');
+
+                end;
             Codeunit::"NPR UPG E-Mail Setup":
                 Exit('NPRUPGUPGEMailSetup-20220312');
             Codeunit::"NPR UPG Aux Tables":

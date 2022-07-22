@@ -13,7 +13,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
 
     local procedure SetProductAndServices(var PakkelabelsShipment: Record "NPR Shipping Provider Document") services: Text;
     var
-        ServicesCombination: Record "NPR Services Combination";
+        ServicesCombination: Record "NPR Shipping Provider Services";
         Counter: Integer;
     begin
         ServicesCombination.SETRANGE("Shipping Agent", PakkelabelsShipment."Shipping Agent Code");
@@ -115,6 +115,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         QueryParams8Lbl: Label '"service_point": %1,', Locked = true;
         QueryParams9Lbl: Label '"parcels": %1,', Locked = true;
         QueryParams10Lbl: Label '"print_at": %1', Locked = true;
+        QueryParams11Lbl: Label '"reference": "%1",', Locked = true;
     begin
         if not InitPackageProvider() then
             exit;
@@ -142,6 +143,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         Output += '"label_format": null,';
         Output += STRSUBSTNO(QueryParams3Lbl, PakkelabelsShipment."Shipping Agent Code");
         Output += STRSUBSTNO(QueryParams4Lbl, SetProductAndServices(PakkelabelsShipment));
+        Output += STRSUBSTNO(QueryParams11Lbl, PakkelabelsShipment."Reference");
 
         if (PakkelabelsShipment."Delivery Location" = '') and (ShippingAgent."Automatic Drop Point Service") then
             Output += STRSUBSTNO(QueryParams5Lbl);
@@ -246,22 +248,68 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     local procedure BuildParcels(var PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;
     var
         PakkeShippingAgent: Record "NPR Package Shipping Agent";
+        ShippingPackageCode: Record "NPR Package Code";
+        PackageDimension: record "NPR Package Dimension";
+        i: Integer;
+        J: Integer;
         QueryParamsLbl: Label '"weight":"%1"', Locked = true;
         QueryParams2Lbl: Label '"packaging":"%1"', Locked = true;
         QueryParams3Lbl: Label '"quantity":"%1",', Locked = true;
-        ShippingPackageCode: Record "NPR Package Code";
+        QueryParams5Lbl: Label '"length":"%1",', Locked = true;
+        QueryParams6Lbl: Label '"width":"%1",', Locked = true;
+        QueryParams7Lbl: Label '"height":"%1"', Locked = true;
+        QueryParams8Lbl: Label '"volume":"%1"', Locked = true;
+        QueryParams9Lbl: Label '"running_metre":"%1"', Locked = true;
+        QueryParams10Lbl: Label '"description":"%1"', Locked = true;
+
     begin
         PakkeShippingAgent.GET(PakkelabelsShipment."Shipping Agent Code");
+
         Output := '[';
-        Output += '{';
-        Output += STRSUBSTNO(QueryParams3Lbl, FORMAT(PakkelabelsShipment."Parcel Qty.", 0, 1));
-        Output += STRSUBSTNO(QueryParamsLbl, FORMAT(PakkelabelsShipment."Total Weight", 0, 1));
-        IF PakkeShippingAgent."Package Type Required" THEN BEGIN
-            ShippingPackageCode.GET(PakkelabelsShipment."Shipping Agent Code", PakkelabelsShipment."Package Code");
-            Output += ',';
-            Output += STRSUBSTNO(QueryParams2Lbl, FORMAT(ShippingPackageCode.Description, 0, 1));
-        END;
-        Output += '}';
+        PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Shipment);
+        PackageDimension.Setrange("Document No.", PakkelabelsShipment."Document No.");
+        J := PackageDimension.count;
+        IF PackageDimension.findset() Then
+            repeat
+                i += 1;
+                Output += '{';
+                Output += STRSUBSTNO(QueryParams3Lbl, FORMAT(PackageDimension.Quantity, 0, 1));
+                if PackageDimension.Weight_KG <> 0 then
+                    Output += STRSUBSTNO(QueryParamsLbl, FORMAT(PackageDimension.Weight_KG * 1000, 0, 1))
+                else
+                    Output += STRSUBSTNO(QueryParamsLbl, FORMAT(PakkelabelsShipment."Total Weight", 0, 1));
+
+                if PakkeShippingAgent."LxWxH Dimensions Required" then begin
+                    Output += ',';
+                    Output += STRSUBSTNO(QueryParams5Lbl, FORMAT(PackageDimension.Length, 0, 1));
+                    Output += STRSUBSTNO(QueryParams6Lbl, FORMAT(PackageDimension.width, 0, 1));
+                    Output += STRSUBSTNO(QueryParams7Lbl, FORMAT(PackageDimension.height, 0, 1));
+                end;
+                if PakkeShippingAgent."Volume Required" then begin
+                    Output += ',';
+                    Output += STRSUBSTNO(QueryParams8Lbl, FORMAT(PackageDimension.Volume, 0, 1));
+                end;
+                if PakkeShippingAgent."running_metre required" then begin
+                    Output += ',';
+                    Output += STRSUBSTNO(QueryParams9Lbl, FORMAT(PackageDimension.running_metre, 0, 1));
+                end;
+
+                if PackageDimension.Description <> '' then begin
+                    Output += ',';
+                    Output += STRSUBSTNO(QueryParams10Lbl, FORMAT(PackageDimension.Description, 0, 1));
+                end;
+
+                IF PakkeShippingAgent."Package Type Required" THEN BEGIN
+                    ShippingPackageCode.GET(PakkelabelsShipment."Shipping Agent Code", PackageDimension."Package Code");
+                    Output += ',';
+                    Output += STRSUBSTNO(QueryParams2Lbl, FORMAT(ShippingPackageCode.Description, 0, 1));
+                END;
+                if i <> J then
+                    Output += '},'
+                else
+                    Output += '}';
+
+            until PackageDimension.next() = 0;
         Output += ']';
 
     end;
@@ -439,22 +487,66 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     var
         SalesLine: Record "Sales Line";
         PakkeShippingAgent: Record "NPR Package Shipping Agent";
+        PackageDimension: record "NPR Package Dimension";
     begin
         if not InitPackageProvider() then
             exit;
         if Rec."Shipment Method Code" = '' then exit;
 
-        if PackageProviderSetup."Default Weight" <= 0 then
-            exit;
-
-        SalesLine.SETRANGE(SalesLine."Document Type", Rec."Document Type");
-        SalesLine.SETRANGE("Document No.", Rec."No.");
-        SalesLine.SETRANGE(Type, SalesLine.Type::Item);
-        SalesLine.SETRANGE("Net Weight", 0);
-        SalesLine.MODIFYALL("Net Weight", PackageProviderSetup."Default Weight");
-
         if not PakkeShippingAgent.GET(Rec."Shipping Agent Code") then
             exit;
+
+        if PackageProviderSetup."Default Weight" > 0 then begin
+            SalesLine.SETRANGE(SalesLine."Document Type", Rec."Document Type");
+            SalesLine.SETRANGE("Document No.", Rec."No.");
+            SalesLine.SETRANGE(Type, SalesLine.Type::Item);
+            SalesLine.SETRANGE("Net Weight", 0);
+            SalesLine.MODIFYALL("Net Weight", PackageProviderSetup."Default Weight");
+        end;
+
+        PackageDimension.setrange("Document Type", PackageDimension."Document Type"::Order);
+        PackageDimension.setrange("Document No.", rec."No.");
+        if not PackageDimension.IsEmpty() then
+            exit;
+        PackageDimension.Init();
+        PackageDimension."Document Type" := PackageDimension."Document Type"::Order;
+        PackageDimension."Document No." := rec."No.";
+        PackageDimension."Line No." := 10000;
+        PackageDimension.Quantity := Rec."npr Kolli";
+        PackageDimension.Insert(true);
+        commit();
+    end;
+
+    local procedure UpdatePackageCode(Rec: Record "Sales Header");
+    var
+        PackageDimension: record "NPR Package Dimension";
+    begin
+        if not InitPackageProvider() then
+            exit;
+
+        if rec."NPR Package Code" <> '' then begin
+            PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Order);
+            PackageDimension.Setrange("Document No.", rec."No.");
+            PackageDimension.Setfilter("Package Code", '%1', '');
+            PackageDimension.modifyall("Package Code", rec."NPR Package Code");
+        end;
+    end;
+
+    local procedure UpdatePackageQuantity(Rec: Record "Sales Header");
+    var
+        PackageDimension: record "NPR Package Dimension";
+    begin
+        if not InitPackageProvider() then
+            exit;
+
+        PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Order);
+        PackageDimension.Setrange("Document No.", rec."No.");
+        if PackageDimension.count = 1 then begin
+            PackageDimension.findfirst();
+            PackageDimension.Quantity := Rec."npr Kolli";
+            PackageDimension.modify();
+        end;
+
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Shipping Agent Service Code', false, false)]
@@ -491,6 +583,21 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         end;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'NPR Package Code', false, false)]
+    local procedure OnAfterModifyPackageCode(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer);
+    begin
+        if Rec.ISTEMPORARY then
+            exit;
+        UpdatePackageCode(rec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'NPR Kolli', false, false)]
+    local procedure OnAfterModifyNPRKolli(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer);
+    begin
+        if Rec.ISTEMPORARY then
+            exit;
+        UpdatePackageQuantity(rec);
+    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, false)]
     local procedure C80OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header");
@@ -521,6 +628,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
             ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then begin
             if SalesShptHeader.GET(SalesShptHdrNo) then begin
                 RecRef.GetTable(SalesShptHeader);
+                PostDimension(RecRef);
                 if not AddEntry(RecRef, GuiAllowed, false, ShipmentDocument) then
                     Exit;
                 if PackageProviderSetup."Send Package Doc. Immediately" then
@@ -554,6 +662,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         SalesHeader: Record "Sales Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
         PakkeShippingAgent: Record "NPR Package Shipping Agent";
+        PackageDimension: record "NPR Package Dimension";
     begin
         case RecRef.NUMBER of
             DATABASE::"Sales Header":
@@ -562,8 +671,10 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
                     if SalesHeader.Find() then begin
                         if (SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) or (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) then begin
 
-                            if SalesHeader."NPR Kolli" = 0 then
+                            SalesHeader.CalcFields("NPR Package Quantity");
+                            if SalesHeader."NPR Package Quantity" = 0 then
                                 exit;
+
                             SalesLine.SETRANGE("Document Type", SalesHeader."Document Type");
                             SalesLine.SETRANGE("Document No.", SalesHeader."No.");
                             SalesLine.SETRANGE(Type, SalesLine.Type::Item);
@@ -576,10 +687,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
                                 exit
                             else
                                 SalesHeader.TESTFIELD(SalesHeader."Shipping Agent Service Code");
-
-
-                            if PakkeShippingAgent."Package Type Required" then
-                                SalesHeader.TESTFIELD("NPR Package Code");
 
                             if SalesHeader."Ship-to Code" <> '' then begin
                                 ShiptoAddress.GET(SalesHeader."Sell-to Customer No.", SalesHeader."Ship-to Code");
@@ -606,6 +713,25 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
 
                             if PakkeShippingAgent."Ship to Contact Mandatory" then
                                 SalesHeader.TESTFIELD("Ship-to Contact");
+
+                            PackageDimension.setrange("Document Type", PackageDimension."Document Type"::Order);
+                            PackageDimension.setrange("Document No.", SalesHeader."No.");
+                            PackageDimension.setfilter(Quantity, '<>0');
+                            if PackageDimension.Findset() then
+                                repeat
+                                    if PakkeshippingAgent."LxWxH Dimensions Required" then begin
+                                        PackageDimension.TestField(Length);
+                                        PackageDimension.TestField(Width);
+                                        PackageDimension.TestField(height);
+                                    end;
+                                    if PakkeShippingAgent."Volume Required" then
+                                        PackageDimension.TestField(Volume);
+                                    if PakkeShippingAgent."running_metre required" then
+                                        PackageDimension.TestField(running_metre);
+                                    if PakkeShippingAgent."Package Type Required" then
+                                        PackageDimension.TestField("Package Code");
+                                until PackageDimension.Next() = 0;
+
                         end;
                     end;
                 end;
@@ -616,9 +742,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
 
                         SalesShipmentHeader.TESTFIELD("Shipping Agent Code");
                         PakkeShippingAgent.GET(SalesShipmentHeader."Shipping Agent Code");
-
-                        if PakkeShippingAgent."Package Type Required" then
-                            SalesShipmentHeader.TESTFIELD("NPR Package Code");
 
                         SalesShipmentHeader.TESTFIELD("Shipping Agent Service Code");
 
@@ -670,6 +793,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         ShipToAddress: Record "Ship-to Address";
         SalesShipmentLine: Record "Sales Shipment Line";
         DocFound: Boolean;
+
     begin
         if not InitPackageProvider() then
             exit;
@@ -692,10 +816,11 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
                 begin
                     RecRef.SETTABLE(SalesShipmentHeader);
                     if SalesShipmentHeader.FIND() then begin
-
+                        SalesShipmentHeader.CalcFields("NPR Package Quantity");
                         if SalesShipmentHeader."Shipment Method Code" = '' then exit;
                         if CheckNetWeight(SalesShipmentHeader) = false then exit;
-                        if SalesShipmentHeader."NPR Kolli" = 0 then exit;
+                        if SalesShipmentHeader."NPR Package Quantity" = 0 then exit;
+
                         if not DocFound then
                             ShipmentDocument.INSERT(true);
                         Customer.GET(SalesShipmentHeader."Sell-to Customer No.");
@@ -733,7 +858,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
                         ShipmentDocument."Shipping Method Code" := SalesShipmentHeader."Shipment Method Code";
                         ShipmentDocument."Shipping Agent Code" := SalesShipmentHeader."Shipping Agent Code";
                         ShipmentDocument."Shipping Agent Service Code" := SalesShipmentHeader."Shipping Agent Service Code";
-                        ShipmentDocument."Parcel Qty." := SalesShipmentHeader."NPR Kolli";
+                        ShipmentDocument."Parcel Qty." := SalesShipmentHeader."NPR Package Quantity";
                         ShipmentDocument."Order No." := SalesShipmentHeader."Order No.";
 
                         ShipmentDocument."Package Code" := SalesShipmentHeader."NPR Package Code";
@@ -799,6 +924,35 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         exit(true);
 
     end;
+
+    procedure PostDimension(RecRef: RecordRef)
+    var
+        PackageDimension: record "NPR Package Dimension";
+        PackageDimension1: record "NPR Package Dimension";
+        SalesShipmentHeader: Record "Sales Shipment Header";
+    begin
+        if not InitPackageProvider() then
+            exit;
+        RecRef.SETTABLE(SalesShipmentHeader);
+        PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Shipment);
+        PackageDimension.Setrange("Document No.", SalesShipmentHeader."No.");
+        if not PackageDimension.IsEmpty() then exit;
+
+        PackageDimension.reset();
+        PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Order);
+        PackageDimension.Setrange("Document No.", SalesShipmentHeader."Order No.");
+        PackageDimension.Setfilter(Quantity, '<>0');
+        if PackageDimension.findset() then
+            repeat
+                PackageDimension1.init();
+                PackageDimension1.TransferFields(PackageDimension);
+                PackageDimension1."Document Type" := PackageDimension1."Document Type"::Shipment;
+                PackageDimension1."Document No." := SalesShipmentHeader."No.";
+                PackageDimension1.insert();
+            until PackageDimension.Next() = 0;
+        commit();
+    end;
+
 
     procedure SendDocument(var PacsoftShipmentDocument: Record "NPR Shipping Provider Document")
     begin
@@ -921,6 +1075,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         end else begin
             TestFieldPakkelabels(RecRef);
             if CONFIRM(text000, true) then begin
+                PostDimension(RecRef);
                 if not AddEntry(RecRef, GuiAllowed, false, ShipmentDocument) then
                     exit;
                 if PackageProviderSetup."Send Package Doc. Immediately" then
