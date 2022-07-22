@@ -3,12 +3,11 @@
     Extensible = False;
     Caption = 'Sales Order';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
     SourceTableView = WHERE("Document Type" = FILTER(Order));
-    ApplicationArea = NPRRetail;
 
     layout
     {

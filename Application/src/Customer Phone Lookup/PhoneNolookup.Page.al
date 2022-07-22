@@ -3,11 +3,10 @@
     Extensible = False;
     Caption = 'Phone No lookup';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR Phone Lookup Buffer";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

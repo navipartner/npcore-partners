@@ -4,8 +4,8 @@
     Caption = 'Pdf2Nav Posting Setup';
     PageType = Card;
     SourceTable = "NPR SalesPost Pdf2Nav Setup";
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
+
     layout
     {
         area(content)

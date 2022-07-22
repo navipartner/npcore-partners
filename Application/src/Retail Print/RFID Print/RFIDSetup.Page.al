@@ -7,10 +7,9 @@
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR RFID Setup";
-    ApplicationArea = NPRRetail;
 
     layout
     {
