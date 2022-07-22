@@ -502,12 +502,16 @@
                             TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No.",
                                     POSBalancingLine."Balanced Diff. Amount", POSBalancingLine.Description, GenJournalLine);
+                            
+                            OnAfterMakeGenJournalForBalancedDifference(POSBalancingLine, GenJournalLine);
                         end;
                         if POSBalancingLine."Balanced Diff. Amount" < 0 then begin
                             POSPostingSetup.TestField("Difference Acc. No. (Neg)");
                             TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No. (Neg)",
                                     POSBalancingLine."Balanced Diff. Amount", POSBalancingLine.Description, GenJournalLine);
+
+                            OnAfterMakeGenJournalForBalancedDifference(POSBalancingLine, GenJournalLine);
                         end;
                         AmountToPostToAccount := -POSBalancingLine."Balanced Diff. Amount";
 
@@ -525,6 +529,8 @@
                                 TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
                                     POSBalancingLine."Move-To Bin Amount", POSBalancingLine."Move-To Reference", GenJournalLine);
+
+                                OnAfterMakeGenJournalForMoveToBin(POSBalancingLine, GenJournalLine);
                             end;
                         end;
 
@@ -541,20 +547,27 @@
                                 TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
                                     POSBalancingLine."Deposit-To Bin Amount", POSBalancingLine."Deposit-To Reference", GenJournalLine);
+
+                                OnAfterMakeGenJournalForDepositToBin(POSBalancingLine, GenJournalLine);
                             end;
                         end;
 
-                        if POSBalancingLine."New Float Amount" <> 0 then
+                        if POSBalancingLine."New Float Amount" <> 0 then begin
                             TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                         POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.",
                                         POSBalancingLine."New Float Amount", StrSubstNo(TextClosingEntryFloat, POSEntry."Entry No."), GenJournalLine);
+                        
+                            OnAfterMakeGenJournalForNewFloatAmount(POSBalancingLine, GenJournalLine);
+                        end;
                         AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."New Float Amount";
 
-                        if AmountToPostToAccount <> 0 then
+                        if AmountToPostToAccount <> 0 then begin
                             TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                             POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.",
                                             AmountToPostToAccount, POSBalancingLine.Description, GenJournalLine);
 
+                            OnAfterMakeGenJournalForTotalAmount(POSBalancingLine, GenJournalLine);
+                        end;
                         // For transaction in currency there can be rounding residue, find the difference account to post to. 
                         // This set of general journal lines need to balance in currency and LCY and rounding error is max 0.01 for each set of +/- entries. With 5 lines, max 0.01 per set => 0.02 should suffice.
                         if ((POSBalancingLine."Currency Code" <> '') and (TotalLineAmountLCY <> 0) and (Abs(TotalLineAmountLCY) <= 0.05)) then begin
@@ -563,12 +576,16 @@
                                 MakeGenJournalFromPOSBalancingLineWithVatOption(
                                         POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No.",
                                         -TotalLineAmountLCY, POSBalancingLine.Description, GenJournalLine);
+
+                                OnAfterMakeGenJournalForBalancedDifference(POSBalancingLine, GenJournalLine);
                             end;
                             if (-TotalLineAmountLCY < 0) then begin
                                 POSPostingSetup.TestField("Difference Acc. No. (Neg)");
                                 MakeGenJournalFromPOSBalancingLineWithVatOption(
                                         POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No. (Neg)",
                                         -TotalLineAmountLCY, POSBalancingLine.Description, GenJournalLine);
+
+                                OnAfterMakeGenJournalForBalancedDifference(POSBalancingLine, GenJournalLine);
                             end;
                         end;
                     until POSBalancingLine.Next() = 0;
@@ -1606,6 +1623,31 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterPostPOSEntryBatch(var POSEntry: Record "NPR POS Entry"; PreviewMode: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterMakeGenJournalForBalancedDifference(POSBalancingLine: Record "NPR POS Balancing Line"; var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterMakeGenJournalForMoveToBin(POSBalancingLine: Record "NPR POS Balancing Line"; var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterMakeGenJournalForDepositToBin(POSBalancingLine: Record "NPR POS Balancing Line"; var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterMakeGenJournalForNewFloatAmount(POSBalancingLine: Record "NPR POS Balancing Line"; var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterMakeGenJournalForTotalAmount(POSBalancingLine: Record "NPR POS Balancing Line"; var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 
