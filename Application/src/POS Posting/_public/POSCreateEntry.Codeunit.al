@@ -216,19 +216,18 @@
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
     begin
-        POSSalesLine.Init();
-        POSSalesLine."POS Entry No." := POSEntry."Entry No.";
-        POSSalesLine."POS Period Register No." := POSEntry."POS Period Register No.";
-        POSSalesLine."Line No." := SaleLinePOS."Line No.";
-        POSSalesLine.SetRecFilter();
-        if not POSSalesLine.IsEmpty() then
-            repeat
-                POSSalesLine."Line No." := POSSalesLine."Line No." + 10000;
-                POSSalesLine.SetRecFilter();
-            until POSSalesLine.IsEmpty();
-
         POSSalesLine.Reset();
+        POSSalesLine."POS Entry No." := POSEntry."Entry No.";
+        POSSalesLine."Line No." := SaleLinePOS."Line No.";
+        if POSSalesLine.Find() then begin
+            POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+            POSSalesLine.FindLast();
+            POSSalesLine."Line No." := POSSalesLine."Line No." + 10000;
+            POSSalesLine.SetRange("POS Entry No.");
+        end;
 
+        POSSalesLine.Init();
+        POSSalesLine."POS Period Register No." := POSEntry."POS Period Register No.";
         POSSalesLine."POS Store Code" := SalePOS."POS Store Code";
         POSSalesLine."POS Unit No." := SaleLinePOS."Register No.";
         POSSalesLine."Document No." := SaleLinePOS."Sales Ticket No.";
