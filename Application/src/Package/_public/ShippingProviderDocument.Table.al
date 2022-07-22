@@ -283,6 +283,14 @@ table 6014452 "NPR Shipping Provider Document"
             Caption = 'Contents';
             DataClassification = CustomerContent;
         }
+        field(413; "Package Quantity"; Integer)
+        {
+            Caption = 'Detailed Package Quantity';
+            FieldClass = FlowField;
+            Editable = false;
+            CalcFormula = Sum("NPR Package Dimension".Quantity where("Document Type" = CONST(Shipment),
+                                                                           "Document No." = FIELD("Document No.")));
+        }
         field(500; "Customs Document"; Option)
         {
             Caption = 'Customs Document';

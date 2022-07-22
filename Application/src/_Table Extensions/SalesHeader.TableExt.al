@@ -80,6 +80,14 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             Description = 'NPR7.100.000';
             InitValue = 1;
         }
+        field(6014451; "NPR Package Quantity"; Integer)
+        {
+            Caption = 'Package Quantity';
+            FieldClass = FlowField;
+            Editable = false;
+            CalcFormula = Sum("NPR Package Dimension".Quantity where("Document Type" = const(Order),
+                                                                           "Document No." = FIELD("No.")));
+        }
         field(6014452; "NPR Delivery Instructions"; Text[50])
         {
             Caption = 'Delivery Instructions';

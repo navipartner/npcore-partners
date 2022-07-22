@@ -82,6 +82,12 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ToolTip = 'Specifies the number of packages';
                 ApplicationArea = NPRRetail;
             }
+            field("NPR Package Quantity"; Rec."NPR Package Quantity")
+            {
+                ToolTip = 'Specifies the value of the Package Quantity field.';
+                ApplicationArea = All;
+
+            }
         }
         addlast("Invoice Details")
         {

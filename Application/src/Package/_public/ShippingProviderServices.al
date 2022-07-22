@@ -1,9 +1,8 @@
-﻿table 6014576 "NPR Services Combination"
+﻿table 6014692 "NPR Shipping Provider Services"
 {
     Access = Public;
-    Caption = 'Services Combination';
-    ObsoleteState = Removed;
-    ObsoleteReason = 'Table replaced by table 6014692 NPR Shipping Provider Services';
+    Caption = 'Shipping Provider Services';
+
     fields
     {
         field(1; "Shipping Agent"; Code[10])
@@ -16,7 +15,7 @@
             TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent"));
             DataClassification = CustomerContent;
         }
-        field(3; "Service Code"; Code[10])
+        field(3; "Service Code"; Code[40])
         {
             DataClassification = CustomerContent;
         }

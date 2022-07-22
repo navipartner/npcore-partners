@@ -40,6 +40,21 @@
             Caption = 'Package Type Required';
             DataClassification = CustomerContent;
         }
+        field(52; "LxWxH Dimensions Required"; Boolean)
+        {
+            Caption = 'Length_Width_Height Dimensions Required';
+            DataClassification = CustomerContent;
+        }
+        field(53; "Volume Required"; Boolean)
+        {
+            Caption = ' Volume cubic metres ';
+            DataClassification = CustomerContent;
+        }
+        field(54; "running_metre required"; Boolean)
+        {
+            Caption = 'running_metre';
+            DataClassification = CustomerContent;
+        }
         field(60; "Email Mandatory"; Boolean)
         {
             Caption = 'Email Mandatory';
