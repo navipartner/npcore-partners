@@ -33,7 +33,7 @@ To set up CS UIs, follow the provided steps:
 
 ## Video walkthrough
 
-> [!video https://www.youtube.com/watch?v=TV-fvUlQ8Ik]
+You can access a video walkthrough for creating CS UIs via the following [link](https://www.youtube.com/watch?v=TV-fvUlQ8Ik).
 
 ### Related links
 
