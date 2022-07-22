@@ -22,7 +22,7 @@ All users working on the [mobile apps](/Documentation/public/wms/howto/install-m
 
 ## Video walkthrough
 
-> [!video https://youtu.be/11YtGLyGVxI]
+You can access a video walkthrough for creating CS UIs via the following [link](video https://youtu.be/11YtGLyGVxI).
 
 
 ### Related links
