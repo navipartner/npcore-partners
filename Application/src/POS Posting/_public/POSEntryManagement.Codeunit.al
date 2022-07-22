@@ -54,6 +54,7 @@
         if POSEntry."Post Entry Status" >= POSEntry."Post Entry Status"::Posted then
             exit;
 
+        POSSalesLine.SetLoadFields("Exclude from Posting", Type, Quantity, "Line Discount Amount Excl. VAT", "Amount Excl. VAT", "Amount Incl. VAT", "Amount Incl. VAT (LCY)");
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSSalesLine.SetRange("Exclude from Posting", false);
         if POSSalesLine.FindSet() then
@@ -84,17 +85,13 @@
 
         POSTaxAmountLine.Reset();
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSTaxAmountLine.FindSet() then
-            repeat
-                CalcTotalVATAmount := CalcTotalVATAmount + POSTaxAmountLine."Tax Amount";
-            until POSTaxAmountLine.Next() = 0;
+        POSTaxAmountLine.CalcSums("Tax Amount");
+        CalcTotalVATAmount := POSTaxAmountLine."Tax Amount";
 
         POSPaymentLine.Reset();
         POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSPaymentLine.FindSet() then
-            repeat
-                CalcTotalPaymentAmountLCY := CalcTotalPaymentAmountLCY + POSPaymentLine."Amount (LCY)";
-            until POSPaymentLine.Next() = 0;
+        POSPaymentLine.CalcSums("Amount (LCY)");
+        CalcTotalPaymentAmountLCY := POSPaymentLine."Amount (LCY)";
 
         if (CalcItemSalesAmount <> POSEntry."Item Sales (LCY)") then begin
             POSEntry.Validate("Item Sales (LCY)", CalcItemSalesAmount);
