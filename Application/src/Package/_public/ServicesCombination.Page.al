@@ -2,7 +2,7 @@
 {
     Extensible = true;
     PageType = ListPart;
-    SourceTable = "NPR Services Combination";
+    SourceTable = "NPR Shipping Provider Services";
     Caption = 'NPR Services Combination';
     UsageCategory = None;
 

@@ -55,6 +55,14 @@ tableextension 6014403 "NPR Sales Shipment Header" extends "Sales Shipment Heade
             InitValue = 1;
             DataClassification = CustomerContent;
         }
+        field(6014451; "NPR Package Quantity"; Integer)
+        {
+            Caption = 'Package Quantity';
+            FieldClass = FlowField;
+            Editable = false;
+            CalcFormula = Sum("NPR Package Dimension".Quantity where("Document Type" = CONST(Shipment),
+                                                                           "Document No." = FIELD("No.")));
+        }
         field(6014452; "NPR Delivery Instructions"; Text[50])
         {
             Caption = 'Delivery Instructions';

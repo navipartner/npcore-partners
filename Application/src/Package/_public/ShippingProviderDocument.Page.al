@@ -155,6 +155,11 @@ page 6014486 "NPR Shipping Provider Document"
                     ToolTip = 'Specifies the value of the Package Code field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Package Quantity"; Rec."Package Quantity")
+                {
+                    ToolTip = 'Specifies the value of the Detailed Package Quantity field.';
+                    ApplicationArea = All;
+                }
 
                 field("Parcel Qty."; Rec."Parcel Qty.")
                 {
