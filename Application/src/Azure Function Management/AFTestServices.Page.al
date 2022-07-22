@@ -3,11 +3,10 @@
     Extensible = False;
     Caption = 'AF Test Services';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR AF Args: Spire Barcode";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {

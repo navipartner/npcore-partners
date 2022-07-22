@@ -6,8 +6,7 @@
     InsertAllowed = false;
     PageType = Card;
     SourceTable = "NPR HC Retail Setup";
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
 
 
     layout
