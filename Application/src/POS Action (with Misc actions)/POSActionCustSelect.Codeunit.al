@@ -27,6 +27,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
         ParameterOperation_NameCaptionLbl: Label 'Operation';
         ParameterOperation_NameDescriptionLbl: Label 'Operation to perform';
         ParameterOperation_OptionCaptionsLbl: Label 'Attach,Remove';
+        ParameterCheckCustBalanceCaptionLbl: Label 'Check Customer Balance Overdue';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -40,6 +41,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter(ParameterCustomerTableView_Name(), '', ParameterCustomerTableView_NameCaptionLbl, ParameterCustomerTableView_NameDescriptionLbl);
         WorkflowConfig.AddIntegerParameter(ParameterCustomerLookupPage_Name(), 0, ParameterCustomerLookupPage_NameCaptionLbl, ParameterCustomerLookupPage_NameDescriptionLbl);
         WorkflowConfig.AddTextParameter(ParameterCustomerNo_Name(), '', ParameterCustomerNo_NameCaptionLbl, ParameterCustomerNo_NameDescriptionLbl);
+        WorkflowConfig.AddBooleanParameter(ParameterCheckCustomerBalance_Name(), false, ParameterCheckCustBalanceCaptionLbl, ParameterCheckCustBalanceCaptionLbl);
     end;
 
     local procedure GetActionScript(): Text
@@ -58,16 +60,18 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
         CustomerLookupPage: Integer;
         CustomerTableView: Text;
         SpecificCustomerNo: Text;
+        CustomerOverdueCheck: Boolean;
     begin
         CustomerTableView := Context.GetStringParameter(ParameterCustomerTableView_Name());
         CustomerLookupPage := Context.GetIntegerParameter(ParameterCustomerLookupPage_Name());
         Operation := Context.GetIntegerParameter(ParameterOperation_Name());
         SpecificCustomerNo := Context.GetStringParameter(ParameterCustomerNo_Name());
+        CustomerOverdueCheck := Context.GetBooleanParameter(ParameterCheckCustomerBalance_Name());
 
         Sale.GetCurrentSale(SalePOS);
         case Operation of
             Operation::Attach:
-                PosActionBusinessLogic.AttachCustomer(SalePOS, CustomerTableView, CustomerLookupPage, SpecificCustomerNo);
+                PosActionBusinessLogic.AttachCustomer(SalePOS, CustomerTableView, CustomerLookupPage, SpecificCustomerNo, CustomerOverdueCheck);
             Operation::Remove:
                 PosActionBusinessLogic.RemoveCustomer(SalePOS);
         end;
@@ -226,5 +230,10 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
     local procedure ParameterCustomerLookupPage_Name(): Text[30]
     begin
         exit('CustomerLookupPage');
+    end;
+
+    local procedure ParameterCheckCustomerBalance_Name(): Text[30]
+    begin
+        exit('CheckCustomerBalance');
     end;
 }
