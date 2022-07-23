@@ -135,7 +135,7 @@
     begin
         User.Get(UserSecurityId());
         User."Expiry Date" := GetExpirationDateTime();
-        User.Modify();
+
     end;
 
     local procedure GetExpirationDateTime(): DateTime
