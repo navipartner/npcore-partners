@@ -24,6 +24,8 @@
     href: explanation/fifo_and_lifo.md
   - name: Inventory adjustments
     href: explanation/inventory_adjustments.md
+  - name: Inventory setup
+    href: explanation/inventory_setup.md
 
 - name: How-to
   items: 
