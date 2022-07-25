@@ -20,3 +20,8 @@ The posting buffer keeps track of all transactions handled by the NP WMS module.
 During the inventory pick, you have the option to post a document. If you choose to do so, a shipping note with all necessary data will be created and ready for printing, so that it can be sent to the shipping company. 
 
 The documents containing this data are preserved in the **Print Buffer** log, so that they can be reprinted if needed. 
+
+### Related links
+
+- [CS setup](cs-setup.md)
+- [Inventory adjustments](inventory_adjustments.md)
