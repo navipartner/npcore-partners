@@ -23,6 +23,8 @@ All users working on the [mobile apps](/Documentation/public/wms/howto/install-m
 ## Video walkthrough
 
 > [!Video https://www.youtube.com/embed/11YtGLyGVxI]
+
+
 ### Related links
 
 - [CS Users](../explanation/cs-users.md)
