@@ -5,3 +5,4 @@
 - [Container Culture and Time Zone](./Crane-Features/Container-Culture-and-Time-Zone.md) - You can set container Culture and/or Time Zone.
 - [AAD Integration](./Crane-Features/AAD-Integration.md) - With **ADD Integration** you can access all your containers with a common *AAD credential* and benefit from **Single Sign-On**.
 - [Open PSSession](./Crane-Features/PSSession-to-Container.md) - **Open PSSession** feature lets you access the PowerShell of the container.
+- [Azure Restore Templates](./Crane-Features/Azure-Database-Restore-Templates.md) - **Azure Restore Templates** is a feature that should be used mainly by **Hosting** to deploy Azure restores of tenant databases to the right place (and use correct pricing tier).
