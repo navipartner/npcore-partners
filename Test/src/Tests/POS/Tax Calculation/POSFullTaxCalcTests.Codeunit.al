@@ -124,7 +124,7 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] Add Item to active sale
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -168,7 +168,7 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] Add Item to active sale
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);

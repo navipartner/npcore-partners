@@ -104,7 +104,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -207,7 +207,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -318,7 +318,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -424,7 +424,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -529,7 +529,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -674,7 +674,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -842,7 +842,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -1009,7 +1009,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -1176,7 +1176,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -1343,7 +1343,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
@@ -1601,7 +1601,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         //First Debit Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -1858,7 +1858,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         //First Debit Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -2120,7 +2120,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         //First Debit Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");

@@ -1,3 +1,4 @@
+#IF NOT BC17
 codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provider"
 {
     SingleInstance = true;
@@ -220,3 +221,4 @@ codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         Error(ParamValidationErr, GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
     end;
 }
+#ENDIF

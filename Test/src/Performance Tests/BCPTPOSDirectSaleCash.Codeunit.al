@@ -1,3 +1,4 @@
+#IF NOT BC17
 codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Provider"
 {
     SingleInstance = true;
@@ -219,3 +220,4 @@ codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
         Error(ParamValidationErr, GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
     end;
 }
+#ENDIF

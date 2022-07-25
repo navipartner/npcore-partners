@@ -36,7 +36,6 @@ codeunit 85039 "NPR French Compliance Tests"
         SignatureBaseValueParts: List of [Text];
         PreviousSignature: Text;
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that multiple successful cash sales are signed correctly in a chain when FR audit handler is enabled on POS unit.
 
         // [Given] POS and FR audit setup, and initialized JET 
@@ -91,7 +90,6 @@ codeunit 85039 "NPR French Compliance Tests"
         SignatureBaseValueParts: List of [Text];
         PreviousSignature: Text;
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that grand total events from multiple successful cash sales are signed correctly in a chain when FR audit handler is enabled on POS unit.
 
         // [Given] POS and FR audit setup, and initialized JET 
@@ -144,7 +142,6 @@ codeunit 85039 "NPR French Compliance Tests"
         PreviousSignature: Text;
         POSEntryManagement: Codeunit "NPR POS Entry Management";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that reprints of tickets are correctly signed
 
         // [Given] POS and FR audit setup, and initialized JET
@@ -202,7 +199,6 @@ codeunit 85039 "NPR French Compliance Tests"
         SignatureBaseValueParts: List of [Text];
         PreviousSignature: Text;
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that return of tickets are correctly signed
 
         // [Given] POS and FR audit setup, and initialized JET 
@@ -284,7 +280,6 @@ codeunit 85039 "NPR French Compliance Tests"
         POSSaleRecord: Record "NPR POS Sale";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that daily Z reports are correctly signed
 
         // [Given] POS and FR audit setup, and initialized JET 
@@ -328,7 +323,6 @@ codeunit 85039 "NPR French Compliance Tests"
         FRAuditSetup: Record "NPR FR Audit Setup";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that monthly reports are correctly signed
 
         // [Given] POS and FR audit setup, and initialized JET . We trigger the monthly workshift by setting a minus workshift duration
@@ -377,7 +371,6 @@ codeunit 85039 "NPR French Compliance Tests"
         FRAuditSetup: Record "NPR FR Audit Setup";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that yearly reports are correctly signed
 
         // [Given] POS and FR audit setup, and initialized JET . We trigger the yearly workshift by setting a minus workshift duration
@@ -429,7 +422,6 @@ codeunit 85039 "NPR French Compliance Tests"
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         FrenchArchiveHandler: Codeunit "NPR French Archive Handler";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that monthly reports archives are correctly signed
 
         // [Given] A monthly period
@@ -485,7 +477,6 @@ codeunit 85039 "NPR French Compliance Tests"
         FRAuditSetup: Record "NPR FR Audit Setup";
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that POS logins is correctly safeguarded against non-compliant setup
 
         // [Given] POS and FR audit setup, and initialized JET. But someone switches setup to a non-compliant state
@@ -524,7 +515,6 @@ codeunit 85039 "NPR French Compliance Tests"
         POSActionLogin: Codeunit "NPR POS Action - Login";
         POSSetup: Codeunit "NPR POS Setup";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that POS logins are correctly signed
 
         // [Given] POS and FR audit setup, and initialized JET. 
@@ -569,7 +559,6 @@ codeunit 85039 "NPR French Compliance Tests"
         FRAuditSetup: Record "NPR FR Audit Setup";
         ActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that POS sale cancellations are correctly signed
 
         // [Given] POS and FR audit setup, initialized JET and active sale
@@ -605,7 +594,6 @@ codeunit 85039 "NPR French Compliance Tests"
         SignatureBaseValueParts: List of [Text];
         PreviousSignature: Text;
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that a sale with both voucher and item has correctly signed events
 
         // [Given] POS and FR audit setup, initialized JET 
@@ -646,7 +634,6 @@ codeunit 85039 "NPR French Compliance Tests"
         PreviousSignature: Text;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that a broken signature chain can be detected
 
         // [Given] POS and FR audit setup, initialized JET, 3 completed sales with a valid chain
@@ -691,7 +678,6 @@ codeunit 85039 "NPR French Compliance Tests"
         PreviousSignature: Text;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that partner modification logs are signed correctly
 
         // [Given] POS and FR audit setup, initialized JET,
@@ -733,7 +719,6 @@ codeunit 85039 "NPR French Compliance Tests"
         Chunk: Text;
         XmlArchive: Text;
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that monthly archive is validating against the schema provided to InfoCert 
 
         // [Given] Finished monthly period
@@ -776,7 +761,6 @@ codeunit 85039 "NPR French Compliance Tests"
         POSAuditLog: Record "NPR POS Audit Log";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
     begin
-        exit; //[Test result: FAIL] Fixing in progress
         // [Scenario] Check that JET init is signed
 
         // [Given] POS, FR audit setup and JET init

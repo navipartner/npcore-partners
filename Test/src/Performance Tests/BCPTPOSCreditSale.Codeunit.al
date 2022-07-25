@@ -1,3 +1,4 @@
+#IF NOT BC17
 codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
 {
     SingleInstance = true;
@@ -139,7 +140,7 @@ codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         POSSession.GetSale(SalePOS);
         SalePOS.GetCurrentSale(POSSale);
         Customer.Get('10000');
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
         BCPTTestContext.EndScenario('Select Customer');
         Commit();
         BCPTTestContext.UserWait();
@@ -238,3 +239,4 @@ codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         Error(ParamValidationErr, GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
     end;
 }
+#ENDIF

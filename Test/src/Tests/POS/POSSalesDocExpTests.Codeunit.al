@@ -46,7 +46,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.", false);
 
         // [When] Exporting to sales order without posting                
         _POSSession.GetSale(POSSale);
@@ -107,7 +107,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.", false);
 
         // [When] Exporting to sales order with posting                
         _POSSession.GetSale(POSSale);
