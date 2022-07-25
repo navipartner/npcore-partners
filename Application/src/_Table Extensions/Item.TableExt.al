@@ -14,6 +14,7 @@ tableextension 6014427 "NPR Item" extends Item
                         if ItemCategory.Get(Rec."Item Category Code") then begin
                             ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
                             Rec.Validate("Base Unit of Measure", Rec."Base Unit of Measure");
+                            Rec.Modify();
                         end;
             end;
         }
