@@ -31,6 +31,10 @@ The initial setup of NP WMS consists of the following steps:
 
 After the necessary setup is performed, you can explore the rest of the available options to personalize your WMS instance.
 
+## Video introduction
+
+> [!Video https://www.youtube.com/embed/O2Lt-tCaOxY]
+
 ### Related Links
 
 - [NP WMS Role Center](./explanation/role-center.md)
