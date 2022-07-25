@@ -222,7 +222,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -300,7 +300,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -585,7 +585,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -697,7 +697,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -808,7 +808,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -919,7 +919,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1092,7 +1092,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] Customer applied to sale
         POSSaleUnit.GetCurrentSale(POSSale);
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1170,7 +1170,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1354,7 +1354,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1465,7 +1465,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1774,7 +1774,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1878,7 +1878,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -2233,7 +2233,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -2363,7 +2363,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -2575,7 +2575,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 2;
@@ -2660,7 +2660,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 2;
@@ -2856,7 +2856,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 2;
@@ -2974,7 +2974,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 2;
@@ -3159,7 +3159,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 2;
@@ -3243,7 +3243,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 2;
@@ -3439,7 +3439,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 2;
@@ -3556,7 +3556,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 2;
@@ -3782,7 +3782,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 2;
@@ -4031,7 +4031,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 2;
@@ -4245,7 +4245,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4317,7 +4317,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4450,7 +4450,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4522,7 +4522,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 1;
@@ -4688,7 +4688,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [GIVEN] Add Item to active sale
         Qty := 1;

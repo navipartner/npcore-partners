@@ -1,3 +1,4 @@
+#IF NOT BC17
 codeunit 85064 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Provider"
 {
     SingleInstance = true;
@@ -190,3 +191,4 @@ codeunit 85064 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
         Error(ParamValidationErr, GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
     end;
 }
+#ENDIF

@@ -1,3 +1,4 @@
+#IF NOT BC17
 enumextension 85000 "NPR BCPT Test Param. Enum" extends "BCPT Test Param. Enum"
 {
     value(85058; "BCPT POS Direct Sale Cash")
@@ -25,3 +26,4 @@ enumextension 85000 "NPR BCPT Test Param. Enum" extends "BCPT Test Param. Enum"
         Implementation = "BCPT Test Param. Provider" = "NPR BCPT POS DS Ticket Issue";
     }
 }
+#ENDIF
