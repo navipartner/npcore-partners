@@ -17,37 +17,37 @@
                 field("No."; Rec."No.")
                 {
 
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the number of the POS Payment Bin.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the POS Payment Bin, which will be diplayed when balancing the POS Unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Store Code field';
+                    ToolTip = 'Specifies which POS Store Code that the POS Payment Bin belongs to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Attached to POS Unit No."; Rec."Attached to POS Unit No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Attached to POS Unit No. field';
+                    ToolTip = 'Specifies which POS Unit is attached to the POS Payment Bin.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Eject Method"; Rec."Eject Method")
                 {
 
-                    ToolTip = 'Specifies the value of the Eject Method field';
+                    ToolTip = 'Specifies which method is used to physically eject the POS Payment Bin, if it is a cash drawer.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Bin Type"; Rec."Bin Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Bin Type field';
+                    ToolTip = 'Specifies which retail operations the POS Payment Bin will be involved in.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -69,7 +69,7 @@
                 RunObject = Page "NPR POS Posting Setup";
                 RunPageLink = "POS Payment Bin Code" = FIELD("No.");
 
-                ToolTip = 'Executes the POS Posting Setup action';
+                ToolTip = 'Open the POS Posting Setup page filtered on the selected POS Payment Bin Code.';
                 ApplicationArea = NPRRetail;
             }
             action(EjectMethodParameters)
@@ -81,7 +81,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Eject Method Parameters action';
+                ToolTip = 'Opens the page for setting the Eject Method Parameters.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -104,7 +104,7 @@
                 PromotedCategory = Process;
                 Visible = false;
 
-                ToolTip = 'Executes the Transfer Out From Bin action';
+                ToolTip = 'Executes the Transfer Out From Bin action.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -121,7 +121,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Insert Initial Float action';
+                ToolTip = 'Executes the Insert Initial Float action.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
