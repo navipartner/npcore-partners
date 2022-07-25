@@ -1,6 +1,7 @@
 ﻿codeunit 6014467 "NPR Retail Journal Code"
 {
     Access = Internal;
+
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
 
@@ -27,7 +28,7 @@
         Dialog.Close();
     end;
 
-    local procedure GetInitialJournalLineNo (JournalHeaderNo: Code[40]) LineNo: Integer
+    local procedure GetInitialJournalLineNo(JournalHeaderNo: Code[40]) LineNo: Integer
     var
         RetailJournalLine: Record "NPR Retail Journal Line";
     begin
@@ -626,6 +627,35 @@
             repeat
                 CreateRetailJournalLine(RetailJournalLine, RetailJournalNo, LineNo);
             until RetailJournalLine.Next() = 0;
+    end;
+
+    procedure UpdateDiscount(var RetailJournalLine: Record "NPR Retail Journal Line")
+    var
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        MixDiscountLine: Record "NPR Mixed Discount Line";
+        MixDiscount: Record "NPR Mixed Discount";
+        RetailJournalHeader: Record "NPR Retail Journal Header";
+    begin
+        RetailJournalHeader.Get(RetailJournalLine."No.");
+
+        PeriodDiscountLine.Reset();
+        PeriodDiscountLine.SetFilter(PeriodDiscountLine."Starting Date", '<=%1', RetailJournalHeader."Date of creation");
+        PeriodDiscountLine.SetFilter(PeriodDiscountLine."Ending Date", '>=%1', RetailJournalHeader."Date of creation");
+        PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.", RetailJournalLine."Item No.");
+
+        if PeriodDiscountLine.FindFirst() then
+            RetailJournalLine.SetDiscountType(1, PeriodDiscountLine.Code, PeriodDiscountLine."Campaign Unit Price", 1, PeriodDiscountLine."Unit Price Incl. VAT")
+        else begin
+            MixDiscountLine.Reset();
+            MixDiscountLine.SetFilter(MixDiscountLine."No.", RetailJournalLine."Item No.");
+            MixDiscountLine.SetRange("Disc. Grouping Type", MixDiscountLine."Disc. Grouping Type"::Item);
+            if not MixDiscountLine.FindFirst() then begin
+                RetailJournalLine.SetDiscountType(0, '', RetailJournalLine."Unit Price", 1, true);
+                exit;
+            end;
+            if MixDiscount.Get(MixDiscountLine.Code) and ((MixDiscount."Starting date" <= RetailJournalHeader."Date of creation") and (MixDiscount."Ending date" >= RetailJournalHeader."Date of creation")) then
+                RetailJournalLine.SetDiscountType(2, MixDiscountLine.Code, MixDiscountLine."Unit price", MixDiscountLine.Quantity, MixDiscountLine."Unit price incl. VAT");
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Label Library", 'OnBeforePrintRetailJournal', '', true, true)]

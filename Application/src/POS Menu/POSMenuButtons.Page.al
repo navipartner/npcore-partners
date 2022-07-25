@@ -16,6 +16,7 @@
             {
                 IndentationColumn = Rec.Level;
                 IndentationControls = Caption;
+                Caption = 'Group';
                 field(Caption; Rec.Caption)
                 {
                     ToolTip = 'Specifies the caption which will be displayed on the button';
