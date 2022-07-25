@@ -54,4 +54,5 @@ Each UI can be associated with one handling codeunit. Codeunits govern the back-
 ### Related links
 
 - [Set up UIs](../howto/set-up-cs-uis.md)
+- [Set up CS UIs - video walkthrough](https://www.youtube.com/watch?v=TV-fvUlQ8Ik)
 - [Set up Data Pattern Code](../howto/set-up-datapatterncode.md)

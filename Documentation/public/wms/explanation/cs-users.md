@@ -8,3 +8,4 @@ All users who will should have access to NP WMS should be created in the **CS Us
 # Related Links
 
 - [Set up CS Users](../howto/set-up-cs-users.md)
+- [Set up CS Users - video walkthrough](https://www.youtube.com/watch?v=11YtGLyGVxI)
