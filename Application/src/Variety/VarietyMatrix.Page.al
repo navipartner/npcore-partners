@@ -31,7 +31,7 @@
                     trigger OnDrillDown()
                     begin
                         if PAGE.RunModal(0, CurrVRTField) = ACTION::LookupOK then
-                            UpdateMatrix(false); //-NPR5.36 Parameter added;
+                            UpdateMatrix(false);
                     end;
                 }
                 field(ShowAsCrossVRT; ShowAsCrossVRT)
@@ -44,11 +44,9 @@
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.31 [271133]
                         MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
-                        //+NPR5.31 [271133]
 
-                        UpdateMatrix(false); //-NPR5.36 Parameter added
+                        UpdateMatrix(false);
                     end;
                 }
                 field(HideInactive; HideInactive)
@@ -60,11 +58,9 @@
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.31 [271133]
                         MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
-                        //+NPR5.31 [271133]
 
-                        UpdateMatrix(true); //-NPR5.36 Parameter added
+                        UpdateMatrix(true);
                     end;
                 }
                 field(ShowColumnNames; ShowColumnNames)
@@ -146,7 +142,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(1); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(1);
                     end;
 
                     trigger OnValidate()
@@ -160,6 +156,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[2] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 2);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -169,7 +166,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(2); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(2);
                     end;
 
                     trigger OnValidate()
@@ -183,6 +180,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[3] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 3);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -192,7 +190,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(3); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(3);
                     end;
 
                     trigger OnValidate()
@@ -206,6 +204,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[4] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 4);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -215,7 +214,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(4); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(4);
                     end;
 
                     trigger OnValidate()
@@ -229,6 +228,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[5] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 5);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -238,7 +238,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(5); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(5);
                     end;
 
                     trigger OnValidate()
@@ -252,6 +252,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[6] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 6);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -261,7 +262,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(6); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(6);
                     end;
 
                     trigger OnValidate()
@@ -275,6 +276,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[7] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 7);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -284,7 +286,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(7); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(7);
                     end;
 
                     trigger OnValidate()
@@ -298,6 +300,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[8] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 8);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -307,7 +310,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(8); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(8);
                     end;
 
                     trigger OnValidate()
@@ -321,6 +324,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[9] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 9);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -330,7 +334,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(9); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(9);
                     end;
 
                     trigger OnValidate()
@@ -344,6 +348,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[10] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 10);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -353,7 +358,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(10); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(10);
                     end;
 
                     trigger OnValidate()
@@ -367,6 +372,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[11] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 11);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -376,7 +382,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(11); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(11);
                     end;
 
                     trigger OnValidate()
@@ -390,6 +396,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[12] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 12);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -399,7 +406,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(12); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(12);
                     end;
 
                     trigger OnValidate()
@@ -413,6 +420,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[13];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[13] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 13);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -422,7 +430,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(13); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(13);
                     end;
 
                     trigger OnValidate()
@@ -436,6 +444,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[14];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[14] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 14);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -445,7 +454,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(14); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(14);
                     end;
 
                     trigger OnValidate()
@@ -459,6 +468,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[15];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[15] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 15);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -468,7 +478,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(15); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(15);
                     end;
 
                     trigger OnValidate()
@@ -482,6 +492,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[16];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[16] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 16);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -491,7 +502,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(16); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(16);
                     end;
 
                     trigger OnValidate()
@@ -505,6 +516,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[17];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[17] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 17);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -514,7 +526,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(17); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(17);
                     end;
 
                     trigger OnValidate()
@@ -528,6 +540,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[18];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[18] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 18);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -537,7 +550,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(18); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(18);
                     end;
 
                     trigger OnValidate()
@@ -551,6 +564,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[19];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[19] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 19);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -560,7 +574,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(19); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(19);
                     end;
 
                     trigger OnValidate()
@@ -574,6 +588,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[20];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[20] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 20);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -583,7 +598,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(20); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(20);
                     end;
 
                     trigger OnValidate()
@@ -597,6 +612,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[21];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[21] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 21);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -606,7 +622,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(21); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(21);
                     end;
 
                     trigger OnValidate()
@@ -620,6 +636,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[22];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[22] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 22);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -629,7 +646,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(22); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(22);
                     end;
 
                     trigger OnValidate()
@@ -643,6 +660,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[23];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[23] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 23);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -652,7 +670,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(23); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(23);
                     end;
 
                     trigger OnValidate()
@@ -666,6 +684,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[24];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[24] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 24);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -675,7 +694,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(24); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(24);
                     end;
 
                     trigger OnValidate()
@@ -689,6 +708,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[25];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[25] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 25);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -698,7 +718,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(25); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(25);
                     end;
 
                     trigger OnValidate()
@@ -712,6 +732,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[26];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[26] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 26);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -721,7 +742,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(26); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(26);
                     end;
 
                     trigger OnValidate()
@@ -735,6 +756,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[27];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[27] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 27);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -744,7 +766,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(27); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(27);
                     end;
 
                     trigger OnValidate()
@@ -758,6 +780,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[28];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[28] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 28);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -767,7 +790,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(28); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(28);
                     end;
 
                     trigger OnValidate()
@@ -781,6 +804,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[29];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[29] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 29);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -790,7 +814,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(29); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(29);
                     end;
 
                     trigger OnValidate()
@@ -804,6 +828,7 @@
                     CaptionClass = '3,' + MATRIX_CaptionSet[30];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[30] field';
+                    Visible = (MATRIX_CurrentNoOfColumns >= 30);
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -813,7 +838,7 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        MATRIX_OnLookup(30); //-NPR5.47 [324997]
+                        MATRIX_OnLookup(30);
                     end;
 
                     trigger OnValidate()
@@ -849,9 +874,7 @@
                         field(Total; Total)
                         {
 
-                            //BlankZero = true;
                             Caption = 'Total';
-                            //DecimalPlaces = 0:5;
                             Enabled = ShowTotal;
                             ToolTip = 'Specifies the value of the Total field';
                             ApplicationArea = NPRRetail;
@@ -1195,7 +1218,7 @@
         end;
 
         FieldValue := MATRIX_CellData[MATRIX_ColumnOrdinal];
-        VRTMatrixMgt.OnDrillDown(TempVRTBuffer, CurrVRTField, FieldValue, ItemFilters); //-NPR5.47 [327541] Added itemFilters
+        VRTMatrixMgt.OnDrillDown(TempVRTBuffer, CurrVRTField, FieldValue, ItemFilters);
         if FieldValue = MATRIX_CellData[MATRIX_ColumnOrdinal] then
             exit;
         MATRIX_CellData[MATRIX_ColumnOrdinal] := FieldValue;
