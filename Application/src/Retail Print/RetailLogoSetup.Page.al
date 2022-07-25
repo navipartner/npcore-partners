@@ -42,25 +42,25 @@
                 field(Sequence; Rec.Sequence)
                 {
 
-                    ToolTip = 'Specifies the value of the Sequence field';
+                    ToolTip = 'Specifies the value of the Sequence field.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Keyword; Rec.Keyword)
                 {
 
-                    ToolTip = 'Specifies the value of the Keyword field';
+                    ToolTip = 'Specifies the keyword used to display the logo in a Retail Print Template.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Start Date"; Rec."Start Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Start Date field';
+                    ToolTip = 'Specifies the first date on which the retail logo will be displayed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("End Date"; Rec."End Date")
                 {
 
-                    ToolTip = 'Specifies the value of the End Date field';
+                    ToolTip = 'Specifies the last date on which the retail logo will be displayed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Boca Compatible"; Rec.OneBitLogo.HasValue())
@@ -68,7 +68,7 @@
 
                     Caption = 'Boca Compatible';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Boca Compatible field';
+                    ToolTip = 'Specifies if the logo is compatible with Boca printers.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -98,7 +98,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Import Logo action';
+                ToolTip = 'Import an image file to use as a logo.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -118,7 +118,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Export Logo action';
+                ToolTip = 'Export the selected line as a bitmap image file (.bmp).';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
