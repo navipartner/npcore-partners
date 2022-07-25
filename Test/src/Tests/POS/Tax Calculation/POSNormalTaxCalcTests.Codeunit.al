@@ -47,7 +47,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         AmountToPay: Decimal;
         SaleEnded: Boolean;
     begin
-        exit; //[Test result: FAIL] Fixing in progress
+        exit; //TODO: [Test result: FAIL] Fixing in progress
         // [SCENARIO] Verify Tax Calculation has been posted backward for debit sale with tax calculation type set as normal vat including discount
 
         // [GIVEN] POS, Payment & Tax Setup
@@ -95,7 +95,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
@@ -146,7 +146,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalesPOS);
-        SelectCustomerAction.AttachCustomer(SalesPOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalesPOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price 0
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -195,7 +195,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalesPOS);
-        SelectCustomerAction.AttachCustomer(SalesPOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalesPOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price 0
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -398,7 +398,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalesPOS);
-        SelectCustomerAction.AttachCustomer(SalesPOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalesPOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -476,7 +476,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -625,7 +625,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -704,7 +704,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalesPOS);
-        SelectCustomerAction.AttachCustomer(SalesPOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalesPOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with Unit Price    
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -901,7 +901,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
@@ -999,7 +999,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
@@ -1176,7 +1176,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
 
         // [WHEN] End of Sale
@@ -1230,7 +1230,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] Add Item to active sale
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -1280,7 +1280,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] Add Item to active sale
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -1407,7 +1407,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -1485,7 +1485,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -1634,7 +1634,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -1713,7 +1713,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
         // [GIVEN] Customer applied to sale
         POSSale.GetCurrentSale(SalePOS);
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [GIVEN] Item with Unit Price    
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", true);
@@ -1908,7 +1908,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
@@ -2000,7 +2000,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
@@ -2179,7 +2179,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
@@ -2272,7 +2272,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         POSSale.GetCurrentSale(SalePOS);
 
         // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.");
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
