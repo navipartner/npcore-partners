@@ -20,6 +20,7 @@
             trigger OnValidate()
             var
                 Item: Record Item;
+                RetailJnlCode: Codeunit "NPR Retail Journal Code";
             begin
 
                 if "Item No." = '' then begin
@@ -48,6 +49,7 @@
 
                 "Quantity to Print" := 1;
                 Validate("Quantity for Discount Calc", 1);
+                RetailJnlCode.UpdateDiscount(Rec);
             end;
         }
         field(3; "Quantity to Print"; Decimal)
