@@ -723,6 +723,7 @@
                         Membership: Record "NPR MM Membership";
                     begin
                         Membership.SetRange("Membership Code", Rec."Membership Code");
+                        Membership.SetRange("External Membership No.", Rec."External Membership No.");
                         Membership.SetFilter("Date Filter", '01-01-0000..');
                         Report.Run(Report::"NPR MM Membership Points Det.", true, false, Membership);
                     end;
