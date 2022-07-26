@@ -116,6 +116,9 @@ xmlport 6151150 "NPR M2 Authenticate"
                         fieldelement(Email; TmpContactResponse."E-Mail")
                         {
                         }
+                        fieldelement(PhoneNo; TmpContactResponse."Phone No.")
+                        {
+                        }
                         textelement(accountstatus)
                         {
                             XmlName = 'Status';
