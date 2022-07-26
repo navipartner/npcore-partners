@@ -40,6 +40,32 @@
         ChildRecRef.GetTable(TempItemVariant);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Mgt.", 'OnSetupGenericChildTable', '', true, true)]
+    local procedure FilterVariantsForStockUpdate(NpXmlElement: Record "NPR NpXml Element"; ParentRecRef: RecordRef; var ChildRecRef: RecordRef; var Handled: Boolean)
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+    begin
+        if Handled then
+            exit;
+
+        if not IsElementSubscriber(NpXmlElement, 'FilterVariantsForStockUpdate') then
+            exit;
+        Handled := true;
+        Clear(ChildRecRef);
+        case ParentRecRef.Number of
+            DATABASE::Item:
+                begin
+                    ParentRecRef.SetTable(Item);
+                    ItemVariant.SetFilter(ItemVariant."Item No.", Item."No.");
+                    ItemVariant.SetFilter(Code, Item.GetFilter("Variant Filter"));
+                    if not ItemVariant.FindFirst() then
+                        exit;
+                end;
+        end;
+        ChildRecRef.GetTable(ItemVariant);
+    end;
+
     local procedure IsElementSubscriber(NpXmlElement: Record "NPR NpXml Element"; GenericTableFunction: Text): Boolean
     begin
         if NpXmlElement."Generic Child Codeunit ID" <> CurrCodeunitId() then
