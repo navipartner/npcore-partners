@@ -17,7 +17,7 @@
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the value of the Code field. This is what connects a Item to the ticket module.';
                 }
                 field(Description; Rec.Description)
                 {
@@ -33,62 +33,65 @@
                 field("Print Ticket"; Rec."Print Ticket")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Print Ticket field';
+                    ToolTip = 'Specifies if the ticket should be printed or not. Print often happens during sale on POS.';
                 }
                 field("Print Object Type"; Rec."Print Object Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Print Objekt Type field';
+                    ToolTip = 'Specifies if print should be handled by Codeunit, Retail print template, or a Report.';
                 }
                 field("RP Template Code"; Rec."RP Template Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the RP Template Code field';
+                    ToolTip = 'Specifies the value of the RP Template Code used to print the ticket.';
                 }
                 field("Print Object ID"; Rec."Print Object ID")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Print Object ID field';
+                    ToolTip = 'Specifies the value of the object ID, if printing is done by Codeunit or Report.';
                 }
                 field("Admission Registration"; Rec."Admission Registration")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Admission Registration field';
+                    Caption = 'Ticket Admission Registration';
+                    ToolTip = 'Specifies if the ticket should be issued as individual tickets, or as one group ticket.';
                 }
                 field("No. Series"; Rec."No. Series")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the No. Series field';
+                    ToolTip = 'Specifies the numberseries used to issue the ticket.';
                 }
                 field("External Ticket Pattern"; Rec."External Ticket Pattern")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the External Ticket Pattern field';
+                    ToolTip = 'Specifies the External Ticket Pattern. The pattern can include fixed text, the original ticket number and random characters. Any characters not within the [ and ] will be treated as fixed text. [S] – Will be substituted with the original ticket number from no. series. The following modifiers can be used. [N] – Random number, [N*4] – 4 random numbers, [A] – Random character, [A*4] – 4 random characters An example could be: TK-[S]-[N*4] which would result in TK-<ticket number>-<four random numbers>';
                 }
                 field("Activation Method"; Rec."Activation Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Activation Method field';
+                    Caption = 'Ticket Activation Method';
+                    ToolTip = 'Specifies the Activation Method. POS (Default), will admit the default admission after sale from POS. POS (All Admissions), Will admit all the admissions after sale on POS. Scan will require the ticket to be scanned for admission.';
                 }
                 field("Ticket Configuration Source"; Rec."Ticket Configuration Source")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Ticket Configuration Source field';
+                    ToolTip = 'Specifies Ticket Configuration Source. Ticket Type, will use the settings defined on the specific Type. Ticket BOM, will use the settings defined per ticket item on Ticket BOM table.';
                 }
                 field("Duration Formula"; Rec."Duration Formula")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Duration Formula field';
+                    Caption = 'Ticket Duration Formula';
+                    ToolTip = 'Specifies the value of the Ticket Duration Formula field. The following modifiers apply. C, D, M and Y. Use 1Y for a validity of 1 year. or 30D for 30 days.';
                 }
                 field("Ticket Entry Validation"; Rec."Ticket Entry Validation")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Ticket Entry Validation field';
+                    ToolTip = 'Specifies Ticket Entry Validation. Single will allow for one single use per admission. Same day will allow for unlimited uses per admission, on the same date as first admission. Multiple will allow for a number of uses per admission, as specified in "Max No of entried" spanning across multiple days.';
                 }
                 field("Max No. Of Entries"; Rec."Max No. Of Entries")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Max No. Of Entries field';
+                    ToolTip = 'Specifies the Max No. Of Entries allowed, when Ticket entry validation is set for "Multiple';
                 }
                 field("Is Ticket"; Rec."Is Ticket")
                 {
@@ -99,22 +102,22 @@
                 field("Membership Sales Item No."; Rec."Membership Sales Item No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Membership Sales Item No. field';
+                    ToolTip = 'Specifies the Membership Sales Item No. This is used only for selling Tickets as "Gift Memberships" where customers exchange them to a specific membership product, within the ticket valid to period. ';
                 }
                 field("DIY Print Layout Code"; Rec."DIY Print Layout Code")
                 {
-                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Ticket Layout Code field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the Ticket Layout Code from the Online Ticket designer. This needs to be filled if you want to export a ticket URL when doing Prepaid/Postpaid ticket. Or if you want the ticket URL to be published to notifications during create. This Ticket designer code, can be different from the Ticket Type Code. ';
                 }
                 field("eTicket Activated"; Rec."eTicket Activated")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the eTicket Activated field';
+                    ToolTip = 'Specifies if eTicket should be activated on this ticket type. If activated a Wallet Template file, needs to be imported under "Process"';
                 }
                 field("eTicket Type Code"; Rec."eTicket Type Code")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the eTicket Type Code field';
+                    ToolTip = 'Specifies the value of the eTicket Type Code used to create the eTicket. This value should correspond to a template design on the PassServer.';
                 }
             }
         }
@@ -142,7 +145,7 @@
             }
             action(Items)
             {
-                ToolTip = 'Navigate to Item List.';
+                ToolTip = 'Navigate to Items configured with the selected Ticket Type.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Items';
                 Image = ItemLines;
@@ -181,7 +184,7 @@
             }
             action("Ticket BOM")
             {
-                ToolTip = 'Navigate to ticket contents setup.';
+                ToolTip = 'Navigate to Ticket BOM, showing Tickets configured with the selected Ticket Type';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Admission BOM';
                 Image = BOM;
@@ -193,7 +196,7 @@
 
             action("E-Mail Templates")
             {
-                ToolTip = 'Setup templates for ticket e-mail.';
+                ToolTip = 'Navigate to Email templates';
                 ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Caption = 'E-Mail Templates';
                 Image = InteractionTemplate;
@@ -205,7 +208,7 @@
             }
             action("SMS Template")
             {
-                ToolTip = 'Setup templates for ticket SMS.';
+                ToolTip = 'Navigate to SMS templates';
                 ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Caption = 'SMS Template';
                 Image = InteractionTemplate;
@@ -258,7 +261,7 @@
             action("Import File")
             {
                 Caption = 'Import Wallet Template File';
-                ToolTip = 'Define information sent to wallet.';
+                ToolTip = 'Import a new template to be used to send information to wallet.';
                 Image = ImportCodes;
                 ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Promoted = true;
