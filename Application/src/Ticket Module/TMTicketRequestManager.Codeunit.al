@@ -1295,6 +1295,8 @@
         if (Ticket.Blocked) then
             exit(false);
 
+        LockResources('POS_CreateRevokeRequest');
+
         TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
         TicketBOM.FindSet();
@@ -1779,6 +1781,8 @@
 
         if (not (GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token))) then
             exit;
+
+        LockResources('POS_OnModifyQuantity');
 
         ReservationRequest.SetCurrentKey("Session Token ID");
         ReservationRequest.SetFilter("Session Token ID", '=%1', Token);
