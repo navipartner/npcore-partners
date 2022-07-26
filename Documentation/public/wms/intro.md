@@ -35,7 +35,10 @@ After the necessary setup is performed, you can explore the rest of the availabl
 
 > [!Video https://www.youtube.com/embed/O2Lt-tCaOxY]
 
-### Related Links
+### Highlighted articles
 
 - [NP WMS Role Center](./explanation/role-center.md)
 - [Capture service UIs](./explanation/cs-uis.md)
+- [CS UI structure](explanation/cs_ui_structure.md)
+- [Inventory setup](explanation/inventory_setup.md)
+- [Perform stock count](./howto/perform_stock_count.md)
