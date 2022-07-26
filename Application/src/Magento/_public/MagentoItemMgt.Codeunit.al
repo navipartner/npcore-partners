@@ -708,6 +708,7 @@
         Item: Record Item;
         TempSalesLine: Record "Sales Line" temporary;
         ItemNo: Code[20];
+        VariantCode: Code[10];
         Handled: Boolean;
     begin
         if not TempItem.IsTemporary then
@@ -735,6 +736,7 @@
                         exit;
 
                     ItemNo := ItemLedgerEntry."Item No.";
+                    VariantCode := ItemLedgerEntry."Variant Code";
                 end;
             DATABASE::"Sales Line":
                 begin
@@ -752,6 +754,7 @@
                         exit;
 
                     ItemNo := TempSalesLine."No.";
+                    VariantCode := TempSalesLine."Variant Code";
                 end;
             else
                 exit;
@@ -766,6 +769,9 @@
         TempItem.Init();
         TempItem := Item;
         TempItem.Insert();
+
+        if VariantCode <> '' then
+            TempItem.SetFilter("Variant Filter", VariantCode);
     end;
 
     local procedure RecRef2TempSalesLine(RecRef: RecordRef; var TempSalesLine: Record "Sales Line" temporary): Boolean
