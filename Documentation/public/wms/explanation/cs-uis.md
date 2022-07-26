@@ -21,7 +21,7 @@ There are several customizable **Form Types** that exist in NP WMS. These UI typ
     ![example](../images/menu-type-ui.jpg)   
 
 > [!Tip]
-> Selection lists don't have the **Next UI** link like the **Card** pages, as they typically give users the option of navigating to multiple pages in no specific order. To specify which UIs users can navigate to from the selection list, specify the UI IDs in the **Call UI** column of the **CS UI Subform**. 
+> Selection lists don't have the **Next UI** link like the **Card** pages, as they typically give users the option of navigating to multiple pages in no specific order. To specify which UIs users can navigate to from the selection list, provide the UI IDs in the **Call UI** column of the **CS UI Subform**. 
 
 - **Data List** (a dynamic list of information that relies on the documents created in Business Central e.g. Inventory pick list)
 

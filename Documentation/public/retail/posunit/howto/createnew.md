@@ -37,16 +37,7 @@ The new POS unit is created, attached to the POS store, and is now fully operati
 
 ### Related links
 
-- [Create a new POS unit (from the top)](../../../../public/404.md)
-- [Configure a payment terminal for a POS unit](../../../../public/404.md)
-- [POS unit profiles](../../../../public/404.md)
-
-
-
-
-
-
-
-
-
+- [Create a new item button in the POS](./Create_a_new_item_button_in_the_POS.md)
+- [Create a POS payment bin](./create_pos_payment_bin.md)
+- [Balance the POS (Z-report)](./balance_the_pos.md)
   

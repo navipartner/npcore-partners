@@ -64,7 +64,7 @@ This section contains the settings related to price calculation of items.
 | ----------- | ----------- |
 | **Price Calc. Customer No.**  | Specifies the customer number that will be used when performing price calculation on mobile devices once the item has been scanned. |
 
-## Search 
+## Search
 
 This section contains the settings related to grouping of search results.
 
@@ -100,7 +100,7 @@ This section contains the settings related to printing.
 
 | Field Name      | Description |
 | ----------- | ----------- |
-| **Azure Print Container**     | Specify the container used for printing the shipping document. |
+| **Azure Print Container**     | Specifies the container used for printing the shipping document. |
 | **Azure Print Tested**   | Specifies whether the container has been tested.  |
 
 From the **CS Setup** you can also set up [CS users](../howto/set-up-cs-users.md), devices, and [mobile app UI](../howto/set-up-cs-uis.md).
