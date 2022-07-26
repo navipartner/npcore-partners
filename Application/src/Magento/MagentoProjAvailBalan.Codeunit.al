@@ -347,6 +347,7 @@
         TempServiceLine: Record "Service Line" temporary;
         TempPlanningComponent: Record "Planning Component" temporary;
         ItemNo: Code[20];
+        VariantCode: Code[10];
     begin
         if Handled then
             exit;
@@ -365,6 +366,7 @@
                         exit;
 
                     ItemNo := ItemLedgerEntry."Item No.";
+                    VariantCode := ItemLedgerEntry."Variant Code";
                 end;
             DATABASE::"Sales Line":
                 begin
@@ -382,6 +384,7 @@
                         exit;
 
                     ItemNo := TempSalesLine."No.";
+                    VariantCode := TempSalesLine."Variant Code";
                 end;
             DATABASE::"Purchase Line":
                 begin
@@ -399,6 +402,7 @@
                         exit;
 
                     ItemNo := TempPurchLine."No.";
+                    VariantCode := TempPurchLine."Variant Code";
                 end;
             DATABASE::"Requisition Line":
                 begin
@@ -415,6 +419,7 @@
                         exit;
 
                     ItemNo := TempReqLine."No.";
+                    VariantCode := TempReqLine."Variant Code";
                 end;
             DATABASE::"Assembly Header":
                 begin
@@ -430,6 +435,7 @@
                         exit;
 
                     ItemNo := TempAssemblyHeader."Item No.";
+                    VariantCode := TempAssemblyHeader."Variant Code";
                 end;
             DATABASE::"Assembly Line":
                 begin
@@ -446,6 +452,7 @@
                         exit;
 
                     ItemNo := TempAssemblyLine."No.";
+                    VariantCode := TempAssemblyLine."Variant Code";
                 end;
             DATABASE::"Job Planning Line":
                 begin
@@ -462,6 +469,7 @@
                         exit;
 
                     ItemNo := TempJobPlanningLine."No.";
+                    VariantCode := TempJobPlanningLine."Variant Code";
                 end;
             DATABASE::"Prod. Order Line":
                 begin
@@ -477,6 +485,7 @@
                         exit;
 
                     ItemNo := TempProdOrderLine."Item No.";
+                    VariantCode := TempProdOrderLine."Variant Code";
                 end;
             DATABASE::"Prod. Order Component":
                 begin
@@ -492,6 +501,7 @@
                         exit;
 
                     ItemNo := TempProdOrderComponent."Item No.";
+                    VariantCode := TempProdOrderComponent."Variant Code";
                 end;
             DATABASE::"Transfer Line":
                 begin
@@ -511,6 +521,7 @@
                     end;
 
                     ItemNo := TempTransLine."Item No.";
+                    VariantCode := TempTransLine."Variant Code";
                 end;
             DATABASE::"Service Line":
                 begin
@@ -527,6 +538,7 @@
                         exit;
 
                     ItemNo := TempServiceLine."No.";
+                    VariantCode := TempServiceLine."Variant Code";
                 end;
             DATABASE::"Planning Component":
                 begin
@@ -542,6 +554,7 @@
                         exit;
 
                     ItemNo := TempPlanningComponent."Item No.";
+                    VariantCode := TempPlanningComponent."Variant Code";
                 end;
             else
                 exit;
@@ -558,6 +571,9 @@
         TempItem.Init();
         TempItem := Item;
         TempItem.Insert();
+
+        if VariantCode <> '' then
+            TempItem.SetFilter("Variant Filter", VariantCode);
     end;
 
     local procedure CurrCodeunitId(): Integer
