@@ -14,8 +14,6 @@
     href: explanation/cs-users.md
   - name: CS logs
     href: explanation/cs_logs.md
-  - name: Main header setup
-    href: explanation/main-header-setup.md
   - name: Warehouse and inventory putaways
     href: explanation/warehouse_putaway.md
   - name: Inventory and warehouse picks
