@@ -5,7 +5,7 @@
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Statistics Per Variety.rdlc';
-    Caption = 'Sales Statistics Variant';
+    Caption = 'Sales Stats Per Variety';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
@@ -212,7 +212,7 @@
 
     labels
     {
-        Report_Caption = 'Sales Statistics Variant';
+        Report_Caption = 'Sales Stats Per Variety';
         HeaderNote_Caption = 'This report also includes items that are not sold.';
         No_Caption = 'No.';
         Description_Caption = 'Description';
@@ -223,10 +223,11 @@
         SaleLCY_Caption = 'Sales (LCY)';
         Profit_Caption = 'Profit';
         ProfitPct_Caption = 'Profit %';
-        Inventory_Caption = 'Invent.';
-        Total_Caption = 'Total';
+        Inventory_Caption = 'Inventory';
+        TotalForGroup_Caption = 'Total for Group';
         Page_Caption = 'Page';
         COGS_Caption = 'COGS (LCY)';
+        Total_Caption = 'Total';
     }
 
     trigger OnPreReport()
