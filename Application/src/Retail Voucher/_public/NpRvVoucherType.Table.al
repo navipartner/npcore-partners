@@ -145,6 +145,11 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR NpRv Voucher Module".Code WHERE(Type = CONST("Apply Payment"));
         }
+        field(200; "Max Voucher Count"; Integer)
+        {
+            Caption = 'Max Voucher Count';
+            DataClassification = CustomerContent;
+        }
         field(300; "Voucher Message"; Text[250])
         {
             Caption = 'Voucher Message';
