@@ -947,6 +947,8 @@
         ReferenceNo: Text;
         ReferenceErr: Label 'Generated reference no. %1 is too long. Max length is %2.';
     begin
+        CheckVoucherTypeQty(VoucherType.Code);
+
         TempVoucher.Init();
         TempVoucher."No." := '';
         TempVoucher.Validate("Voucher Type", VoucherType.Code);
@@ -1275,6 +1277,19 @@
                             NpRvVoucherEntry.DeleteAll();
                     end;
                 end;
+    end;
+
+    procedure CheckVoucherTypeQty(VoucherTypeCode: Code[20])
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        MaxCountErr: Label '%1 for %2 %3 is exceeded.';
+    begin
+        VoucherType.Get(VoucherTypeCode);
+        if VoucherType."Max Voucher Count" = 0 then
+            exit;
+        VoucherType.CalcFields("Voucher Qty. (Open)", "Voucher Qty. (Closed)", "Arch. Voucher Qty.");
+        if (VoucherType."Voucher Qty. (Closed)" + VoucherType."Voucher Qty. (Open)" + VoucherType."Arch. Voucher Qty.") >= VoucherType."Max Voucher Count" then
+            Error(MaxCountErr, VoucherType.FieldCaption("Max Voucher Count"), VoucherType.TableCaption, VoucherType.Code);
     end;
 
     internal procedure IssueReturnVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Text; Amount: Decimal; Email: Text[80]; PhoneNo: Text[30]; SendMethodPrint: Boolean; SendMethodEmail: Boolean; SendMethodSMS: Boolean)

@@ -849,6 +849,33 @@
         Assert.AreEqual(VoucherAmount * 2, NpRvVoucher.Amount, 'Voucher amount not according to test scenario.');
     end;
 
+    [Test]
+    procedure TestMaxVoucherCountPerVoucherType()
+    // [SCENARIO] Issue Voucher In POS Transaction, set Max Voucher Count on Voucher Type and exceed it
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        Assert: Codeunit "Assert";
+        VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
+        MaxCountErr: Label '%1 for %2 %3 is exceeded.';
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
+        // Create voucher should not fail
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+        //set Max Qty on Voucher Type to all vouchers + 2
+        SetMaxVoucherCountOnVoucherType(_VoucherTypePartial);
+        // Create voucher should not fail - 1
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+        // Create voucher should not fail - 2
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+        // Create voucher should  fail
+        asserterror CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+        Assert.ExpectedError(StrSubstNo(MaxCountErr, _VoucherTypePartial.FieldCaption("Max Voucher Count"), _VoucherTypePartial.TableCaption, _VoucherTypePartial.Code));
+    end;
+
 
     procedure Initialize()
     var
@@ -926,6 +953,14 @@
         POSPaymentMethod.Get(PaymentMethod);
         //Avoid lower limit to be zero for those cases where discount amount is greater then zero
         exit(Round(LibraryRandom.RandDecInRange(100, 10000, LibraryRandom.RandIntInRange(0, 2)), POSPaymentMethod."Rounding Precision"));
+    end;
+
+    local procedure SetMaxVoucherCountOnVoucherType(_VoucherTypePartial: Record "NPR NpRv Voucher Type")
+
+    begin
+        _VoucherTypePartial.CalcFields("Voucher Qty. (Closed)", "Voucher Qty. (Open)", "Arch. Voucher Qty.");
+        _VoucherTypePartial."Max Voucher Count" := _VoucherTypePartial."Voucher Qty. (Closed)" + _VoucherTypePartial."Voucher Qty. (Open)" + _VoucherTypePartial."Arch. Voucher Qty." + 2;
+        _VoucherTypePartial.Modify();
     end;
 
 

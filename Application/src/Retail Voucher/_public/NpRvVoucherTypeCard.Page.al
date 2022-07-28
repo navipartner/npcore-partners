@@ -90,6 +90,11 @@
                         ToolTip = 'Specifies the value of the Minimum Amount Issue field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Max Voucher Count"; Rec."Max Voucher Count")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Max Voucher Count field. If value in this field is 0, there will be no checks.';
+                    }
                 }
                 group(Control6014426)
                 {

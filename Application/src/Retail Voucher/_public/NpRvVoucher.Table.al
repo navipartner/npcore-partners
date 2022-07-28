@@ -466,8 +466,11 @@
     var
         VoucherType: Record "NPR NpRv Voucher Type";
         NoSeriesMgt: Codeunit NoSeriesManagement;
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
         TestField("Voucher Type");
+        NpRvVoucherMgt.CheckVoucherTypeQty("Voucher Type");
+
         if "No." = '' then begin
             VoucherType.Get("Voucher Type");
             VoucherType.TestField("No. Series");
