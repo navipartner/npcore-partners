@@ -1,6 +1,10 @@
 # Create a capture service user
 
-All users working on the [mobile apps](/Documentation/public/wms/howto/install-mobile-apps) should be first created as CS Users.
+
+All users who will should have access to the [mobile apps](/Documentation/public/wms/howto/install-mobile-apps) should be created in the **CS Users** setup section. Each CS user should also be an active BC user. 
+
+> [!NOTE]
+> Each device which uses NP WMS will be assigned a BC user. This user should be active and have their **License Type** set to be **Device Only User** (ISV).
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **CS Users** and choose the related link.        
    The list of the configured users is displayed.     
@@ -27,5 +31,5 @@ All users working on the [mobile apps](/Documentation/public/wms/howto/install-m
 
 ### Related links
 
-- [CS Users](../explanation/cs-users.md)
+- [CS Setup](../explanation/cs-setup.md)
 - [CS UIs](../explanation/cs-uis.md)
