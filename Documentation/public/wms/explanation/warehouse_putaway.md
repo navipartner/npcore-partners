@@ -22,3 +22,4 @@ Like the warehouse putaway, inventory putaway relates to processes of receiving 
 
 - [Inventory and warehouse picks](inventory_warehouse_pick.md)
 - [Inventory adjustments](inventory_adjustments.md)
+- [Putting items away](https://docs.microsoft.com/en-us/dynamics365/business-central/warehouse-put-away-items)

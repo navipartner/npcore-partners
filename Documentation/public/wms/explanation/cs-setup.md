@@ -13,8 +13,8 @@ This section contains general settings for the Capture Service.
 | **Enable Capture Service**       | Make sure this toggle switch is active if you wish to enable usage of handheld devices for scanning the warehouse components.  |
 | **Log Communication**   | Use this option if you wish to record communication between Business Central and the WMS mobile app. Its main purpose is for troubleshooting and debugging scripts, as well as for tracking transactions handled by the NP WMS module.      |
 | **Warehouse Type**  | Specifies the type of warehouse that you can apply to your environment. You can choose between the **Basic**, **Advanced** or **Advanced (Bins)**. |
-| **Zero Def. Qty. to Handle** | Apply this option if you wish to set the default quantity to 0 in your handle documents.  |
-| **Sum Qty. to Handle** | Apply this option to sum the quantity of all scanned items of the same type. If disabled, each scanned item will be displayed in a distinct row in the warehouse documents. |
+| **Zero Def. Qty. to Handle** | Apply this option if you wish to set 0 as the default quantity in **Quantity to Handle** in your warehouse documents.  |
+| **Sum Qty. to Handle** | Apply this option to sum the quantity of all scanned items of the same type. If disabled, each scanned item will be displayed in a distinct row in the NP WMS app. |
 | **Autofill Qty. to Handle** | Enable users to automatically add the item quantity every time an item is scanned. If the toggle is disabled, users will be prompted to manually add quantity after each scan. | 
 | **Lock Documents** | Specifies the type of locking that is applied to the warehouse documents when handled from the NP WMS mobile app. Locking prevents other users from accessing the same documents on the mobile device. You can choose between **No Lock**, **Lock & Assign** (automatically assigns the document to the current user) or **Lock & Assign/Unassign** (automatically assigns the document to the current user, and unassigns it from the previous user). |
 | **Notify Ready for Posting** | If active, a notification will be displayed when a warehouse document is ready to be posted. |
@@ -42,8 +42,8 @@ This section contains settings related to the radio-frequency identification.
 
 | Field Name      | Description |
 | ----------- | ----------- |
-| **Stock-Take Template**     | Specifies the selected stock-take template that will be used for scanning. |
-| **Counting Method**   | Specifies the preferred method. The available options are **Shop And Stock** and **Shop**. |
+| **Stock-Take Template**     | Specifies the selected stock-take template that will be used for RFID scanning. |
+| **Counting Method**   | Specifies the preferred counting method. The available options are **Shop And Stock** and **Shop**. |
 | **Disable Counting Authenticate**  | If active, the counting authentication will be disabled. |
 
 
@@ -64,7 +64,7 @@ This section contains the settings related to price calculation of items.
 | ----------- | ----------- |
 | **Price Calc. Customer No.**  | Specifies the customer number that will be used when performing price calculation on mobile devices once the item has been scanned. |
 
-## Search
+## Searching
 
 This section contains the settings related to grouping of search results.
 
@@ -89,7 +89,7 @@ This section contains the settings related to the job queue processing.
 
 | Field Name      | Description |
 | ----------- | ----------- |
-| **Post with Job Queue**     | Enable the job queue for posting in the app. |
+| **Post with Job Queue**     | If enabled, all Business Central postings triggered from the NP WMS app will be scheduled in the **Job Queue** for processing. |
 | **Job Queue Category Code**   | Provide the code of the job queue category that the posting jobs belong to.|
 | **Notify on Success**  | If active, a notification will be displayed after each successful posting. |
 | **Run in User Session** | If active, the job queue will be run during the user session. |

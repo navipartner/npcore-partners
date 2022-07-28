@@ -8,6 +8,8 @@ This log can be accessed from [**CS Setup**](cs-setup.md), and it is used to tra
 
 If something goes wrong, and you're not sure what caused it, it's possible to activate the **Log Communication** toggle switch in the **General** section of the **CS Setup**. Once active, the necessary data will be gathered from the devices and sent to the **CS Communication Log List** in XML format. This data is used to learn what exactly had caused the issue, which greatly helps in resolving it. 
 
+
+> [!Video https://www.youtube.com/embed/y7dvMQfFIX4]
 ## Posting Buffer
 
 The posting buffer keeps track of all transactions handled by the NP WMS module. Every time a user posts a sales order, inventory pick etc. the record of the transaction will be logged in the **Posting Buffer** along with the user ID and timestamp. This log also records failed transactions. 
