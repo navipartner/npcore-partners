@@ -10,8 +10,6 @@
     href: explanation/cs-uis.md
   - name: CS UI structure
     href: explanation/cs_ui_structure.md
-  - name: CS users
-    href: explanation/cs-users.md
   - name: CS logs
     href: explanation/cs_logs.md
   - name: Warehouse and inventory putaways
@@ -41,7 +39,11 @@
     href: howto/set-up-cs-uis.md
   - name: Set up warehouse users
     href: howto/set-up-warehouse-users.md
-  - name: Perform stock count
-    href: howto/perform_stock_count.md
   - name: Set up CS Data Pattern Code
     href: howto/set-up-datapatterncode.md
+  - name: Post inventory adjustments (Item Journal)
+    href: howto/post_inventory_adjustment_item_journal.md
+  - name: Perform stock count (Physical Inventory Journal and mobile apps)
+    href: howto/perform_stock_count.md
+  - name: Reclassify items (Item reclassification journal)
+    href: howto/reclassify_items.md

@@ -2,12 +2,11 @@
 
 Inventory adjustments refer to all modifications of the stock level, which occur for various reasons. These can be results of sales, purchases, or positive and negative adjustments.
 
-All inventory adjustments need to be recorded in the item journals.
+Some companies tend to make minor inventory adjustments throughout the fiscal year, while others make them as a regular part of their business process.
 
+To post adjustments to the item stock, you can use the [Item Journals](../howto/post_inventory_adjustment_item_journal.md), to perform item counting, you can use the [Physical Inventory Journals](../howto/perform_stock_count.md), and to change information attached to the items, use the [Item Reclassification Journal](../howto/reclassify_items.md).
 
-## Item journals
-
-Item journals are used for updating stock levels when they are increased or decreased. Each line you add to the **Item Journal** will state when and from where the items were purchased, sold, or subjected to positive or negative adjustments. 
+## Adjustment types
   
 - Positive adjustments refer to scenarios in which excess stock needs to be recorded and sold.     
 
@@ -18,19 +17,16 @@ Item journals are used for updating stock levels when they are increased or decr
 > [!Note]
 > When recording a positive or negative adjustment, the **Unit Amount**, **Amount**, **Discount Amount**, and the **Unit Cost** will be populated automatically. 
 
-- Purchases are processes of procuring goods at a certain price. The **Purchase** entry type is used rarely in warehousing. Both purchases and positive adjustments indicate raise in the stock level, but this raise is recorded either in the purchase account or adjustment account respectively in the **General Posting Setup**. 
+- Purchases are for posting positive inventory adjustments that work as purchase order transactions. Both purchases and positive adjustments indicate raise in the stock level, but this raise is recorded either in the purchase account or adjustment account respectively in the **General Posting Setup**. 
 
 ![item journal purchase](../images/item_journal_purchase.PNG)
 
-- Sales are processes of exchanging your goods for a certain amount of money. The **Sale** entry type is used rarely in warehousing. As soon as you provide the number of the item you wish to sell, as well as its quantity, the unit price of that item will be displayed in the **Unit Amount** field, and the full price for that quantity in the **Amount** field. The **Unit Cost** field will contain the amount at which the item was previously procured. 
+- Sales are for posting negative inventory adjustments that work as sales order transactions. As soon as you provide the number of the item you wish to sell, as well as the item quantity, the unit price of that item will be displayed in the **Unit Amount** field, and the full price for that quantity in the **Amount** field. The **Unit Cost** field will contain the amount at which the item was previously procured. 
 
 ![bc sale item journal](../images/bc_sale_item_journal.PNG)
-
-
-Once you're done adding new journal entries, you can post them by clicking **Post/Print** in the ribbon, followed by **Post**. The posted entries will be displayed in the **Item Ledger Entries**. 
-
 
 ### Related links
 
 - [Inventory and warehouse putaway](warehouse_putaway.md)
 - [Inventory and warehouse pick](inventory_warehouse_pick.md)
+- [Perform stock count (Physical Inventory Journal and mobile apps)](../howto/perform_stock_count.md)
