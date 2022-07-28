@@ -26,7 +26,7 @@ However, to enable MobilePay, the following procedure needs to be performed in N
 > [!NOTE]
 > The list is populated according to the data in the MobilePay database.  
   
-9. Proceed to the registration of the POS unit in the MobilePay backend.  
+9. Proceed to the registration of the POS unit in the MobilePay backend. Please, keep in mind that selected **POS Unit** requires the field **Name** to be informed for MobilePay purposes.
   
 > [!NOTE]
 > Mobile payments can be integrated via existing payment systems or automatic payment points on-site.  
