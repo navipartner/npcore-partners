@@ -25,7 +25,8 @@ stages:
         - BC1800
         - BC1804
         - BC1905
-        - BC1905_CLOUD
+        - BC2002
+        - BC2002_CLOUD
       analyzers: 'AppSourceCop,UICop,CodeCop'
       keyVaultCert:
         certPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
