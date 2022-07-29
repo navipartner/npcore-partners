@@ -83,7 +83,12 @@
                     ToolTip = 'Specifies the value of the Description 2 field';
                     ApplicationArea = NPRRetail;
                 }
-
+                field("Serial No."; Rec."Serial No.")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies the value of the Serial No. field.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Location Code"; Rec."Location Code")
                 {
 
