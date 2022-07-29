@@ -7,7 +7,7 @@ codeunit 6059842 "NPR POS Menu Mgt."
 
     procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session"; ActionCode: Code[20]): Text
     begin
-        POSMenuImpl.GetPOSMenuButtonLocationFilter(POSSession, ActionCode);
+        exit(POSMenuImpl.GetPOSMenuButtonLocationFilter(POSSession, ActionCode));
     end;
 
 }
