@@ -4,10 +4,10 @@ report 6060121 "NPR TM Ticket Reservation List"
     Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = '.\src\_Reports\layouts\TM Ticket Reservation List.rdlc';
+    RDLCLayout = './src/_Reports/layouts/TM Ticket Reservation List.rdlc';
     UsageCategory = ReportsAndAnalysis;
     Caption = 'Ticket Reservation List';
-    ApplicationArea = all;
+    ApplicationArea = NPRRetail;
 
     dataset
     {
@@ -227,14 +227,6 @@ report 6060121 "NPR TM Ticket Reservation List"
                 }
             }
         }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnInitReport()
