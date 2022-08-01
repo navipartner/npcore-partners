@@ -60,11 +60,10 @@
         DataType: Enum "NPR Data Type";
         Dimension: Record Dimension;
     begin
-
         if (DimensionCode = '') then
             exit;
-
-        Dimension.Get(DimensionCode);
+        if not Dimension.Get(DimensionCode) then
+            exit;
         DataSource.AddColumn(DimensionCode, Dimension.Description, DataType::String, false);
         DataSource.AddColumn(ShortcutNumber, Dimension.Description, DataType::String, false);
     end;
