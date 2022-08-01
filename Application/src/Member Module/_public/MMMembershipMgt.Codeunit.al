@@ -5334,4 +5334,13 @@
 
         exit(Member."Entry No.");
     end;
+
+    internal procedure ThrowException_AmbiguousItemUsage()
+    var
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        UsageErr: Label 'You cannot use the same item for both %1 and %2', Comment = '%1 - MembershipAlterationSetup table caption, %2 - MembershipSalesSetup table caption';
+    begin
+        Error(UsageErr, MembershipAlterationSetup.TableCaption, MembershipSalesSetup.TableCaption);
+    end;
 }
