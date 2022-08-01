@@ -189,11 +189,17 @@
     local procedure SetEndOfDayPeriodRegister(POSUnit: Record "NPR POS Unit")
     var
         POSPeriodRegister: Record "NPR POS Period Register";
+        POSPeriodRegister2: Record "NPR POS Period Register";
     begin
+        POSPeriodRegister.SetCurrentKey("POS Unit No.");
         POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
         POSPeriodRegister.SetFilter(Status, '=%1', POSPeriodRegister.Status::OPEN);
 
-        POSPeriodRegister.ModifyAll("End of Day Date", CurrentDateTime);
-        POSPeriodRegister.ModifyAll(Status, POSPeriodRegister.Status::EOD);
+        if (POSPeriodRegister.FindSet()) then begin
+            POSPeriodRegister2.Get(POSPeriodRegister."No.");
+            POSPeriodRegister2.Status := POSPeriodRegister2.Status::EOD;
+            POSPeriodRegister2."End of Day Date" := CurrentDateTime();
+            POSPeriodRegister2.Modify();
+        end;
     end;
 }
