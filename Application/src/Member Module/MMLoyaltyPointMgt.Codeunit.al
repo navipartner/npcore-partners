@@ -7,7 +7,6 @@
 
     var
         RuleType: Option INCLUDE,EXCLUDE,NO_RULE;
-        NO_COUPON_AVAILABLE: Label 'No coupons are available. Remaining points %1, threshold %2.';
         SELECT_COUPON: Label 'Select Discount Coupon';
         POINT_ASSIGNMENT: Label 'Point assignment on finish sale as opposed to point assignment during posting.', MaxLength = 100;
         LoyaltyPostingSourceEnum: Option VALUE_ENTRY,MEMBERSHIP_ENTRY,POS_ENDOFSALE;
@@ -1023,18 +1022,21 @@
         LoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup";
         ApplyCouponsInOrder: Integer;
         RemainingPoints: Integer;
+        NO_COUPON_AVAILABLE: Label 'No coupons are available. Remaining points %1, general loyalty threshold is %2 points.';
+        NO_COUPON_AVAILABLE_2: Label 'No coupons are available with threshold less than %1 points.';
     begin
 
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
+
         if (ThresholdPoints < LoyaltySetup."Voucher Point Threshold") then
             exit(ErrorExit(ReasonText, StrSubstNo(NO_COUPON_AVAILABLE, ThresholdPoints, LoyaltySetup."Voucher Point Threshold")));
 
         LoyaltyPointsSetup.SetFilter(Code, '=%1', LoyaltySetup.Code);
         LoyaltyPointsSetup.SetFilter("Points Threshold", '%1..%2', 0, Abs(ThresholdPoints));
         if (LoyaltyPointsSetup.IsEmpty()) then
-            exit(ErrorExit(ReasonText, StrSubstNo(NO_COUPON_AVAILABLE, ThresholdPoints, LoyaltySetup."Voucher Point Threshold")));
+            exit(ErrorExit(ReasonText, StrSubstNo(NO_COUPON_AVAILABLE_2, ThresholdPoints)));
 
         LoyaltyPointsSetup.Reset();
         LoyaltyPointsSetup.SetFilter(Code, '=%1', LoyaltySetup.Code);
@@ -1646,9 +1648,6 @@
             ExpiredPoints := Membership."Expired Points";
 
             AvailablePoints := EarnedPoints + ExpiredPoints + RedeemedPoints + RefundedPoints;
-            if (ForThreshold) then
-                AvailablePoints := EarnedPoints + RefundedPoints;
-
         end;
 
         exit(AvailablePoints);
