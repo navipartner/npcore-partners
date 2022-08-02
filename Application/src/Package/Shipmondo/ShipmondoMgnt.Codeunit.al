@@ -8,7 +8,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         ApiKey: Text;
         RequestString: Text;
         RequestURL: Text;
-        Text0001: Label 'Login Details Missing';
+        Text0001: Label 'Shipmondo Login Details Missing';
 
 
     local procedure SetProductAndServices(var PakkelabelsShipment: Record "NPR Shipping Provider Document") services: Text;

@@ -54,16 +54,22 @@ codeunit 6059829 "NPR Upgrade Shipping Provider"
             exit;
         end;
 
-        if ShippingProviderSetup."Package Service Codeunit ID" = Codeunit::"NPR Shipmondo Mgnt." then
+        if ShippingProviderSetup."Package Service Codeunit ID" = Codeunit::"NPR Shipmondo Mgnt." then begin
             ShippingProviderSetup."Shipping Provider" := ShippingProviderSetup."Shipping Provider"::Shipmondo;
+            if (ShippingProviderSetup."Api User" <> '') and (ShippingProviderSetup."Api Key" <> '') then
+                ShippingProviderSetup."Enable Shipping" := true;
+        end;
 
-        if ShippingProviderSetup."Use Pacsoft integration" then
+        if ShippingProviderSetup."Use Pacsoft integration" then begin
             ShippingProviderSetup."Shipping Provider" := ShippingProviderSetup."Shipping Provider"::Pacsoft;
+            ShippingProviderSetup."Enable Shipping" := true;
+        end;
 
-        if ShippingProviderSetup."Use Consignor" then
+        if ShippingProviderSetup."Use Consignor" then begin
             ShippingProviderSetup."Shipping Provider" := ShippingProviderSetup."Shipping Provider"::Consignor;
+            ShippingProviderSetup."Enable Shipping" := true;
+        end;
 
-        ShippingProviderSetup."Enable Shipping" := true;
         ShippingProviderSetup.Modify();
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRShippingProvider'));
