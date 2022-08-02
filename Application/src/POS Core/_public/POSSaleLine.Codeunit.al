@@ -157,7 +157,7 @@
         Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
 
         if (Line.Type = Line.Type::Item) and (Line."Variant Code" = '') then begin
-            Line."Variant Code" := FillVariantThroughLookUp(Line."No.");
+            Line."Variant Code" := FillVariantThroughLookUp(Line."No.", Rec."Location Code");
             Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
         end;
 
@@ -428,7 +428,7 @@
         POSSale.RefreshCurrent();
     end;
 
-    local procedure FillVariantThroughLookUp(ItemNo: Code[20]): Code[10]
+    local procedure FillVariantThroughLookUp(ItemNo: Code[20]; LocationCode: Code[10]): Code[10]
     var
         ItemVariantBuffer: Record "NPR Item Variant Buffer";
     begin
@@ -436,6 +436,7 @@
         if ItemVariantBuffer.IsEmpty() then
             exit('');
 
+        ItemVariantBuffer.SetRange("Location Filter", LocationCode);
         if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then
             exit(ItemVariantBuffer.Code)
         else
@@ -445,7 +446,11 @@
     local procedure FillVariantBuffer(ItemNo: Code[20]; var TempItemVariantBuffer: Record "NPR Item Variant Buffer")
     var
         ItemVariantsQuery: Query "NPR Item Variants";
+        VarietySetup: Record "NPR Variety Setup";
     begin
+        if not VarietySetup.Get() then
+            VarietySetup.Init();
+
         ItemVariantsQuery.SetRange(Item_No_, ItemNo);
         ItemVariantsQuery.Open();
 
@@ -454,6 +459,7 @@
             TempItemVariantBuffer.Code := ItemVariantsQuery.Code;
             TempItemVariantBuffer.Description := ItemVariantsQuery.Description;
             TempItemVariantBuffer."Description 2" := ItemVariantsQuery.Description_2;
+            TempItemVariantBuffer."Item No." := ItemNo;
             TempItemVariantBuffer.Insert();
         end;
         ItemVariantsQuery.Close();

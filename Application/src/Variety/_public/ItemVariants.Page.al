@@ -21,26 +21,22 @@
                 }
                 field("Code"; Rec.Code)
                 {
-
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-
                     Visible = true;
                     ToolTip = 'Specifies the value of the Description 2 field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Inventory)
                 {
-
                     Caption = 'Inventory';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Inventory field';
@@ -48,13 +44,11 @@
                 }
                 field(NetChange; NetChange)
                 {
-
                     Caption = 'Net Change';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Net Change field';
                     ApplicationArea = NPRRetail;
                 }
-
             }
         }
     }
@@ -74,7 +68,6 @@
                     RunObject = Page "Item Translations";
                     RunPageLink = "Item No." = FIELD("Item No."),
                                   "Variant Code" = FIELD(Code);
-
                     ToolTip = 'Executes the Translations action';
                     ApplicationArea = NPRRetail;
                 }
