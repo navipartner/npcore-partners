@@ -557,7 +557,7 @@ codeunit 85039 "NPR French Compliance Tests"
         POSSaleWrapper: Codeunit "NPR POS Sale";
         POSSaleRecord: Record "NPR POS Sale";
         FRAuditSetup: Record "NPR FR Audit Setup";
-        ActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
+        ActionCancelSale: Codeunit "NPR POSAction: Cancel Sale B";
     begin
         // [Scenario] Check that POS sale cancellations are correctly signed
 

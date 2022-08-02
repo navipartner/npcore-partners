@@ -2252,7 +2252,7 @@ codeunit 85004 "NPR EFT Tests"
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         EntryNo: Integer;
         Assert: Codeunit Assert;
-        POSActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
+        POSActionCancelSale: Codeunit "NPR POSAction: Cancel Sale B";
     begin
         // [Scenario] Check that a lost purchase in a sale that has been cancelled, is handled correctly when looked up.
 
