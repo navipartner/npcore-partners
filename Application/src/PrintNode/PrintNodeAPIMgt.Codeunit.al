@@ -1,8 +1,6 @@
 ﻿codeunit 6151220 "NPR PrintNode API Mgt."
 {
     Access = Internal;
-    // NPR5.53/THRO/20200106 CASE 383562 Object Created
-
 
     trigger OnRun()
     begin
@@ -69,9 +67,9 @@
         Headers := Client.DefaultRequestHeaders();
         Headers.Add('Authorization', GetBasicAuthInfo());
         if PrinterId <> '' then
-            Client.Get(BaseUrl() + 'printers/' + PrinterId, ResponseMessage)
+            Client.Get(BaseUrl() + 'printers/' + PrinterId + '?limit=999999', ResponseMessage)
         else
-            Client.Get(BaseUrl() + 'printers', ResponseMessage);
+            Client.Get(BaseUrl() + 'printers' + '?limit=999999', ResponseMessage);
 
         ResponseMessage.Content().ReadAs(ResponseText);
 
