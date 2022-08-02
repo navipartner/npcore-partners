@@ -1,6 +1,7 @@
 ﻿codeunit 6150883 "NPR Item Action" implements "NPR IAction", "NPR IJsonSerializable"
 {
     Access = Internal;
+
     var
         _code: Text;
         _base: Codeunit "NPR Base Action";
@@ -49,11 +50,26 @@
         Metadata: JsonObject;
         Instance: Codeunit "NPR Item Action";
     begin
+        AddItemInfoToMetadata(MenuButton, Metadata);
         MenuButton.OnRetrieveItemMetadata(Metadata);
 
         Instance.SetCode(MenuButton."Action Code");
         Instance.Content().Add('Metadata', Metadata);
 
         ActionOut := Instance;
+    end;
+
+    local procedure AddItemInfoToMetadata(MenuButton: Record "NPR POS Menu Button"; Metadata: JsonObject)
+    var
+        Item: Record Item;
+    begin
+        if (MenuButton."Action Type" <> MenuButton."Action Type"::Item) or (MenuButton."Action Code" = '') then
+            exit;
+        if not Item.Get(MenuButton."Action Code") then
+            exit;
+        if Item.Description <> '' then
+            Metadata.Add('ItemDescription', Item.Description);
+        if Item."Description 2" <> '' then
+            Metadata.Add('ItemDescription2', Item."Description 2");
     end;
 }
