@@ -8,7 +8,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -17,31 +16,26 @@
             {
                 field("Variety Enabled"; Rec."Variety Enabled")
                 {
-
                     ToolTip = 'Specifies the value of the Variety Enabled field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Journal Blocking"; Rec."Item Journal Blocking")
                 {
-
                     ToolTip = 'Specifies the value of the Item Journal Blocking field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Description"; Rec."Variant Description")
                 {
-
                     ToolTip = 'Specifies the value of the Variant Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Description 2"; Rec."Variant Description 2")
                 {
-
                     ToolTip = 'Specifies the value of the Variant Description 2 field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Create Variant Code From"; Rec."Create Variant Code From")
                 {
-
                     ToolTip = 'Specifies the value of the Create Variant Code From field';
                     ApplicationArea = NPRRetail;
                 }
@@ -57,8 +51,12 @@
                 }
                 field("Variant No. Series"; Rec."Variant No. Series")
                 {
-
                     ToolTip = 'Specifies the value of the Variant Std. No. Serie field. Number series must be maximum 10 characters long.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Activate Inventory"; Rec."Activate Inventory")
+                {
+                    ToolTip = 'Activate Inventory in Variety Lookup on POS ';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -67,20 +65,17 @@
                 Caption = 'Barcode (Item Ref.)';
                 field("Create Item Cross Ref. auto."; Rec."Create Item Cross Ref. auto.")
                 {
-
                     ToolTip = 'Specifies the value of the Create Item Cross Ref. auto. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Barcode Type (Item Cross Ref.)"; Rec."Barcode Type (Item Cross Ref.)")
                 {
-
                     Editable = Rec."Create Item Cross Ref. auto.";
                     ToolTip = 'Specifies the value of the Barcode Type (Item Cross Ref.) field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Cross Ref. No. Series (I)"; Rec."Item Cross Ref. No. Series (I)")
                 {
-
                     Editable = Rec."Create Item Cross Ref. auto.";
                     ToolTip = 'If value is set, then item reference with type Bar Code will be created for Item. For details, please check an actions on Item Card - Add Missing Barcode(s).';
                     ApplicationArea = NPRRetail;
@@ -93,44 +88,37 @@
                 }
                 field("Item Cross Ref. No. Series (V)"; Rec."Item Cross Ref. No. Series (V)")
                 {
-
                     Editable = Rec."Create Item Cross Ref. auto.";
                     ToolTip = 'If value is set, then item reference with type Bar Code will be created for each Item Variant. For details, please check an actions on Item Card - Add Missing Barcode(s).';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Cross Ref. Description(I)"; Rec."Item Cross Ref. Description(I)")
                 {
-
                     ToolTip = 'Specifies the value of the Item Cross Ref. Description (Item) field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Cross Ref. Description(V)"; Rec."Item Cross Ref. Description(V)")
                 {
-
                     ToolTip = 'Specifies the value of the Item Cross Ref. Description (Variant) field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Internal EAN No. Series"; Rec."Internal EAN No. Series")
                 {
-
                     ToolTip = 'Specifies the value of the Internal EAN No. Series field';
                     ApplicationArea = NPRRetail;
                 }
                 field("External EAN No. Series"; Rec."External EAN No. Series")
                 {
-
                     ToolTip = 'Specifies the value of the External EAN No. Series field';
                     ApplicationArea = NPRRetail;
                 }
                 field("EAN-Internal"; Rec."EAN-Internal")
                 {
-
                     ToolTip = 'Specifies the value of the EAN-Internal field';
                     ApplicationArea = NPRRetail;
                 }
                 field("EAN-External"; Rec."EAN-External")
                 {
-
                     ToolTip = 'Specifies the value of the EAN-External field';
                     ApplicationArea = NPRRetail;
                 }
@@ -186,7 +174,6 @@
                     PromotedOnly = true;
                     PromotedCategory = New;
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the EAN13 External action';
                     ApplicationArea = NPRRetail;
 
@@ -205,7 +192,6 @@
                 {
                     Caption = 'Show Original Setup';
                     Image = History;
-
                     ToolTip = 'Executes the Show Original Setup action';
                     ApplicationArea = NPRRetail;
 
@@ -225,7 +211,6 @@
                     PromotedCategory = Category4;
                     RunObject = Page "Item Reference Entries";
                     RunPageView = SORTING("Reference Type", "Reference No.");
-
                     ToolTip = 'Executes the Item Cross Reference action';
                     ApplicationArea = NPRRetail;
                 }
@@ -241,7 +226,6 @@
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the Item Variant Descriptions action';
                     ApplicationArea = NPRRetail;
 
@@ -260,7 +244,6 @@
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the Item Cross Reference Descriptions action';
                     ApplicationArea = NPRRetail;
 
@@ -280,7 +263,6 @@
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Report "NPR Update Barcodes";
-
                     ToolTip = 'Executes the Barcodes action';
                     ApplicationArea = NPRRetail;
                 }
@@ -300,7 +282,6 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety";
-
                     ToolTip = 'Executes the Variety action';
                     ApplicationArea = NPRRetail;
                 }
@@ -312,7 +293,6 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Fields Setup";
-
                     ToolTip = 'Executes the Field Setup action';
                     ApplicationArea = NPRRetail;
                 }
@@ -324,7 +304,6 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Group";
-
                     ToolTip = 'Executes the Groups action';
                     ApplicationArea = NPRRetail;
                 }
