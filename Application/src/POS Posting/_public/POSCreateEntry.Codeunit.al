@@ -895,6 +895,7 @@
     local procedure GetPOSPeriodRegisterForPOSUnit(POSUnitNo: Code[10]; var POSPeriodRegister: Record "NPR POS Period Register"; CheckOpen: Boolean): Boolean
     begin
         POSPeriodRegister.Reset();
+        POSPeriodRegister.SetCurrentKey("POS Unit No.");
         POSPeriodRegister.SetRange("POS Unit No.", POSUnitNo);
         if not POSPeriodRegister.FindLast() then
             exit(false);
