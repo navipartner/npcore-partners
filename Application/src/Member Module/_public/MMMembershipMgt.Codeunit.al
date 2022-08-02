@@ -3442,22 +3442,20 @@
                 MembershipRole.SetFilter("Wallet Pass Id", '<>%1', '');
                 if (not MembershipRole.IsEmpty()) then begin
 
-                    //MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
-                    if (MembershipLedgerEntry."Valid From Date" > TODAY) then
+                    if (MembershipLedgerEntry."Valid From Date" >= Today()) then
                         MemberNotification.CreateUpdateWalletNotification(Membership."Entry No.", 0, 0, MembershipLedgerEntry."Valid From Date");
 
-                    if (MembershipLedgerEntry."Valid From Date" <> TODAY) then
-                        MemberNotification.CreateUpdateWalletNotification(Membership."Entry No.", 0, 0, TODAY);
+                    if (MembershipLedgerEntry."Valid From Date" <> Today()) then
+                        MemberNotification.CreateUpdateWalletNotification(Membership."Entry No.", 0, 0, Today());
 
                 end;
 
                 MembershipRole.SetFilter("Wallet Pass Id", '=%1', '');
                 if (not MembershipRole.IsEmpty()) then begin
 
-                    //MemberNotification.CreateWalletSendNotification (Membership."Entry No.", 0, 0);
-                    MemberNotification.CreateWalletSendNotification(Membership."Entry No.", 0, 0, TODAY);
+                    MemberNotification.CreateWalletSendNotification(Membership."Entry No.", 0, 0, Today());
 
-                    if (MembershipLedgerEntry."Valid From Date" > TODAY) then
+                    if (MembershipLedgerEntry."Valid From Date" > Today()) then
                         MemberNotification.CreateUpdateWalletNotification(Membership."Entry No.", 0, 0, MembershipLedgerEntry."Valid From Date");
 
                 end;
