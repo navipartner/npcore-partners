@@ -163,8 +163,6 @@
 
                     VoucherQty := SaleLinePOS.Quantity;
                     VoucherAmount := SaleLinePOS."Unit Price";
-                    if not SaleLinePOS."Price Includes VAT" then
-                        VoucherAmount *= 1 + SaleLinePOS."VAT %" / 100;
                 end;
             NpRvSalesLine."Document Source"::"Sales Document":
                 begin

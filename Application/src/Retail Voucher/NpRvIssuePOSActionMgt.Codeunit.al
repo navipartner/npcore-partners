@@ -259,6 +259,7 @@
                     SaleLinePOS."Discount %" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode()));
                 end;
         end;
+        SaleLinePOS."Price Includes VAT" := true;
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         if SaleLinePOS."Discount Amount" > 0 then
             SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
