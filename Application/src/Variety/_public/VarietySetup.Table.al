@@ -189,6 +189,11 @@
             Caption = 'Pop up Variety Matrix';
             DataClassification = CustomerContent;
         }
+        field(100; "Activate Inventory"; Boolean)
+        {
+            Caption = 'Activate Inventory in Variety Lookup on POS';
+            DataClassification = CustomerContent;
+        }
         field(750; "Variant No. Series"; Code[20])
         {
             Caption = 'Variant Std. No. Serie';

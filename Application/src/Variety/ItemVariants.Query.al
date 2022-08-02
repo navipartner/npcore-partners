@@ -12,7 +12,7 @@
             filter(Item_No_; "Item No.")
             {
             }
-            column(Code; Code)
+            column("Code"; Code)
             {
             }
             column(Description; Description)
