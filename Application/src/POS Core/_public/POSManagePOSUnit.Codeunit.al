@@ -78,6 +78,7 @@
         if (not POSUnit.Get(POSUnitNo)) then
             exit;
 
+        POSPeriodRegister.SetCurrentKey("POS Unit No.");
         POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
         POSPeriodRegister.FindLast();
 
@@ -159,6 +160,7 @@
     var
         POSPeriodRegister: Record "NPR POS Period Register";
     begin
+        POSPeriodRegister.SetCurrentKey("POS Unit No.");
         POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnitNo);
         POSPeriodRegister.SetFilter(Status, '=%1', POSPeriodRegister.Status::OPEN);
         if (POSPeriodRegister.FindLast()) then begin
