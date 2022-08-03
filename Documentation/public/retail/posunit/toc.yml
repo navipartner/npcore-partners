@@ -22,6 +22,10 @@
     href: explanation/POS_End_of_Day_Profile.md
   - name: POS posting setup
     href: explanation/POS_posting_setup.md
+  - name: POS Payment View Event Setup
+    href: explanation/POS_Payment_View_Event_Setup.md
+  - name: EFT setup
+    href: explanation/EFT_setup.md
 - name: How-To  
   items:
   - name: Create a new POS Unit

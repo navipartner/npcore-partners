@@ -3442,22 +3442,20 @@
                 MembershipRole.SetFilter("Wallet Pass Id", '<>%1', '');
                 if (not MembershipRole.IsEmpty()) then begin
 
-                    //MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
-                    if (MembershipLedgerEntry."Valid From Date" > TODAY) then
+                    if (MembershipLedgerEntry."Valid From Date" >= Today()) then
                         MemberNotification.CreateUpdateWalletNotification(Membership."Entry No.", 0, 0, MembershipLedgerEntry."Valid From Date");
 
-                    if (MembershipLedgerEntry."Valid From Date" <> TODAY) then
-                        MemberNotification.CreateUpdateWalletNotification(Membership."Entry No.", 0, 0, TODAY);
+                    if (MembershipLedgerEntry."Valid From Date" <> Today()) then
+                        MemberNotification.CreateUpdateWalletNotification(Membership."Entry No.", 0, 0, Today());
 
                 end;
 
                 MembershipRole.SetFilter("Wallet Pass Id", '=%1', '');
                 if (not MembershipRole.IsEmpty()) then begin
 
-                    //MemberNotification.CreateWalletSendNotification (Membership."Entry No.", 0, 0);
-                    MemberNotification.CreateWalletSendNotification(Membership."Entry No.", 0, 0, TODAY);
+                    MemberNotification.CreateWalletSendNotification(Membership."Entry No.", 0, 0, Today());
 
-                    if (MembershipLedgerEntry."Valid From Date" > TODAY) then
+                    if (MembershipLedgerEntry."Valid From Date" > Today()) then
                         MemberNotification.CreateUpdateWalletNotification(Membership."Entry No.", 0, 0, MembershipLedgerEntry."Valid From Date");
 
                 end;
@@ -5333,5 +5331,14 @@
         end;
 
         exit(Member."Entry No.");
+    end;
+
+    internal procedure ThrowException_AmbiguousItemUsage()
+    var
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        UsageErr: Label 'You cannot use the same item for both %1 and %2', Comment = '%1 - MembershipAlterationSetup table caption, %2 - MembershipSalesSetup table caption';
+    begin
+        Error(UsageErr, MembershipAlterationSetup.TableCaption, MembershipSalesSetup.TableCaption);
     end;
 }

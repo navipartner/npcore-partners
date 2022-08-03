@@ -269,7 +269,8 @@
                 Caption = 'Event List';
                 Image = CustomerList;
                 RunObject = Report "NPR TM Admission List";
-
+                ObsoleteState = Pending;
+                ObsoleteReason = 'NPR TM Admission List is going to be deleted.';
             }
         }
     }

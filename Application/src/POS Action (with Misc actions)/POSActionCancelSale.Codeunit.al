@@ -1,93 +1,53 @@
-﻿codeunit 6150797 "NPR POSAction: Cancel Sale"
+﻿codeunit 6150797 "NPR POSAction: Cancel Sale" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescriptionLbl: Label 'Cancel Sale';
+        ParamSecurityOptions: Label 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', Locked = true;
+        ParamSecurity_NameLbl: Label 'Security';
+        ParamSecurity_DescLbl: Label 'Defines security type.';
         TitleLbl: Label 'Cancel Sale';
         PromptLbl: Label 'Are you sure you want to cancel this sales? All lines will be deleted.';
-        PartlyPaidErr: Label 'This sales can''t be deleted. It has been partly paid. You must first void the payment.';
-        CANCEL_SALELbl: Label 'Sale was canceled %1';
-        AltSaleCancelDescription: Text;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescriptionLbl,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('', 'confirm(labels.title, labels.prompt).respond();');
-            Sender.RegisterDataBinding();
-            Sender.RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
-            Sender.RegisterWorkflow(true);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
+        WorkflowConfig.AddLabel('title', TitleLbl);
+        WorkflowConfig.AddLabel('prompt', PromptLbl);
+        WorkflowConfig.AddOptionParameter(
+            'Security',
+            ParamSecurityOptions,
+            SelectStr(1, ParamSecurityOptions),
+            ParamSecurity_NameLbl,
+            ParamSecurity_DescLbl,
+            ParamSecurityOptions);
+    end;
+
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    begin
+        case Step of
+            'CheckSaleBeforeCancel':
+                CheckSaleBeforeCancel();
+            'CancelSale':
+                FrontEnd.WorkflowResponse(CancelSaleAndStartNew());
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        CancelSaleAndStartNew(POSSession);
-        Handled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-        Captions.AddActionCaption(ActionCode(), 'title', TitleLbl);
-        Captions.AddActionCaption(ActionCode(), 'prompt', PromptLbl);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure CheckSaleBeforeCancel()
     var
-        Context: Codeunit "NPR POS JSON Management";
+        POSActionCancelSaleB: Codeunit "NPR POSAction: Cancel Sale B";
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        CheckSaleBeforeCancel(POSSession);
-
-        FrontEnd.SetActionContext(ActionCode(), Context);
-        Handled := true;
+        POSActionCancelSaleB.CheckSaleBeforeCancel();
     end;
 
-    local procedure ActionCode(): Code[20]
-    var
-        CancelPosSalesLbl: Label 'CANCEL_POS_SALE', Locked = true;
-    begin
-        exit(CancelPosSalesLbl);
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.2');
-    end;
-
-    procedure CheckSaleBeforeCancel(POSSession: Codeunit "NPR POS Session")
-    var
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-        PaidAmount: Decimal;
-        ReturnAmount: Decimal;
-        SaleAmount: Decimal;
-        Subtotal: Decimal;
-    begin
-        POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
-        if (PaidAmount <> 0) then
-            Error(PartlyPaidErr);
-    end;
-
-    procedure CancelSaleAndStartNew(POSSession: Codeunit "NPR POS Session"): Boolean
+    procedure CancelSaleAndStartNew(): Boolean
     var
         POSSale: Codeunit "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
+        POSActionCancelSaleB: Codeunit "NPR POSAction: Cancel Sale B";
     begin
-        if not CancelSale(POSSession) then
+        if not POSActionCancelSaleB.CancelSale(POSSession) then
             exit(false);
 
         POSSession.GetSale(POSSale);
@@ -95,39 +55,11 @@
         exit(true);
     end;
 
-    procedure CancelSale(POSSession: Codeunit "NPR POS Session"): Boolean
-    var
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
-        Line: Record "NPR POS Sale Line";
-        SalePOS: Record "NPR POS Sale";
-        WaiterPad: Record "NPR NPRE Waiter Pad";
-        WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
+    local procedure GetActionScript(): Text
     begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
-            WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
-            WaiterPadManagement.CloseWaiterPad(WaiterPad, true, "NPR NPRE W/Pad Closing Reason"::"Cancelled Sale");
-        end;
-
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.DeleteAll();
-
-        Line.Type := Line.Type::Comment;
-        if AltSaleCancelDescription <> '' then begin
-            Line.Description := CopyStr(AltSaleCancelDescription, 1, MaxStrLen(Line.Description));
-            Line."Description 2" := CopyStr(AltSaleCancelDescription, MaxStrLen(Line.Description) + 1, MaxStrLen(Line."Description 2"));
-        end else
-            Line.Description := StrSubstNo(CANCEL_SALELbl, CurrentDateTime);
-        Line."Sale Type" := Line."Sale Type"::Cancelled;
-        POSSaleLine.InsertLine(Line);
-
-        exit(POSSale.TryEndSale(POSSession, false));
-    end;
-
-    procedure SetAlternativeDescription(NewAltSaleCancelDescription: Text)
-    begin
-        AltSaleCancelDescription := NewAltSaleCancelDescription;
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionCancelSale.js###
+'let main=async({workflow:e,captions:a,popup:t})=>{debugger;if(await t.confirm({title:a.title,caption:a.prompt}))await e.respond("CheckSaleBeforeCancel"),await e.respond("CancelSale");else return" "};'
+        );
     end;
 }
