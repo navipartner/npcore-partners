@@ -78,6 +78,7 @@
         if (not POSUnit.Get(POSUnitNo)) then
             exit;
 
+        POSPeriodRegister.SetCurrentKey("POS Unit No.");
         POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
         POSPeriodRegister.FindLast();
 
@@ -105,21 +106,30 @@
             exit;
 
         POSUnit.Validate(Status, POSUnit.Status::CLOSED);
-        ClosePeriodRegister(POSUnit, ClosingEntryNo);
+        ClosePeriodRegister(POSUnit."No.", ClosingEntryNo);
 
         POSUnit.Modify();
     end;
 
-    local procedure ClosePeriodRegister(POSUnit: Record "NPR POS Unit"; ClosingEntryNo: Integer)
+    local procedure ClosePeriodRegister(POSUnitNo: Code[10]; ClosingEntryNo: Integer)
     var
         POSPeriodRegister: Record "NPR POS Period Register";
+        POSPeriodRegister2: Record "NPR POS Period Register";
     begin
-        POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
+        POSPeriodRegister.SetCurrentKey("POS Unit No.");
+        POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnitNo);
         POSPeriodRegister.SetFilter(Status, '<>%1', POSPeriodRegister.Status::CLOSED);
 
-        POSPeriodRegister.ModifyAll("Closing Entry No.", ClosingEntryNo);
-        POSPeriodRegister.ModifyAll(Status, POSPeriodRegister.Status::CLOSED);
+        if (POSPeriodRegister.FindSet()) then begin
+            repeat
+                POSPeriodRegister2.Get(POSPeriodRegister."No.");
+                POSPeriodRegister2.Status := POSPeriodRegister2.Status::CLOSED;
+                POSPeriodRegister2."Closing Entry No." := ClosingEntryNo;
+                POSPeriodRegister2.Modify();
+            until (POSPeriodRegister.Next() = 0)
+        end;
     end;
+
 
     [Obsolete('Use the ClosePOSUnitOpenPeriods(POSStoreCode, POSUnitNo) function instead.', '537839')]
     procedure ClosePOSUnitOpenPeriods(POSUnitNo: Code[10])
@@ -134,7 +144,6 @@
 
     procedure ClosePOSUnitOpenPeriods(POSStoreCode: Code[10]; POSUnitNo: Code[10])
     var
-        POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
         ClosingEntryNo: Integer;
     begin
@@ -144,18 +153,14 @@
         if (POSEntry.FindLast()) then
             ClosingEntryNo := POSEntry."Entry No.";
 
-        POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnitNo);
-        POSPeriodRegister.SetFilter(Status, '<>%1', POSPeriodRegister.Status::CLOSED);
-
-        if (ClosingEntryNo <> 0) then
-            POSPeriodRegister.ModifyAll("Closing Entry No.", ClosingEntryNo);
-        POSPeriodRegister.ModifyAll(Status, POSPeriodRegister.Status::CLOSED);
+        ClosePeriodRegister(POSUnitNo, ClosingEntryNo);
     end;
 
     procedure SetOpeningEntryNo(POSUnitNo: Code[10]; OpeningEntryNo: Integer)
     var
         POSPeriodRegister: Record "NPR POS Period Register";
     begin
+        POSPeriodRegister.SetCurrentKey("POS Unit No.");
         POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnitNo);
         POSPeriodRegister.SetFilter(Status, '=%1', POSPeriodRegister.Status::OPEN);
         if (POSPeriodRegister.FindLast()) then begin
@@ -189,11 +194,19 @@
     local procedure SetEndOfDayPeriodRegister(POSUnit: Record "NPR POS Unit")
     var
         POSPeriodRegister: Record "NPR POS Period Register";
+        POSPeriodRegister2: Record "NPR POS Period Register";
     begin
+        POSPeriodRegister.SetCurrentKey("POS Unit No.");
         POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
         POSPeriodRegister.SetFilter(Status, '=%1', POSPeriodRegister.Status::OPEN);
 
-        POSPeriodRegister.ModifyAll("End of Day Date", CurrentDateTime);
-        POSPeriodRegister.ModifyAll(Status, POSPeriodRegister.Status::EOD);
+        if (POSPeriodRegister.FindSet()) then begin
+            repeat
+                POSPeriodRegister2.Get(POSPeriodRegister."No.");
+                POSPeriodRegister2.Status := POSPeriodRegister2.Status::EOD;
+                POSPeriodRegister2."End of Day Date" := CurrentDateTime();
+                POSPeriodRegister2.Modify();
+            until (POSPeriodRegister.Next() = 0)
+        end;
     end;
 }

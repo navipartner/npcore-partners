@@ -57,6 +57,9 @@
         key(Key1; "POS Payment Method Code", "POS Unit No.", "Denomination Type", Denomination)
         {
         }
+        key(Key2; "POS Unit No.")
+        {
+        }
     }
 
     fieldgroups

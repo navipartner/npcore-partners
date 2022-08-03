@@ -1,14 +1,15 @@
 ﻿report 6060126 "NPR TM Admission List"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Admission List.rdlc';
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
     Caption = 'TM Admission List';
+    UsageCategory = None;
     DataAccessIntent = ReadOnly;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This report does not work correctly.';
 
     dataset
     {

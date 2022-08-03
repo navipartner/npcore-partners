@@ -33,7 +33,7 @@
     local procedure ResumeAndCancelSale(SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
-        POSActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
+        POSActionCancelSale: Codeunit "NPR POSAction: Cancel Sale B";
         POSFrontEndMgt: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -50,7 +50,7 @@
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.Init(SalePOS."Register No.", SalePOS."Sales Ticket No.", POSSale, Setup, POSFrontEndMgt);
 
-        POSActionCancelSale.CheckSaleBeforeCancel(POSSession);
+        POSActionCancelSale.CheckSaleBeforeCancel();
         POSActionCancelSale.SetAlternativeDescription(AltSaleCancelDescription);
         if not POSActionCancelSale.CancelSale(POSSession) then
             Error('');

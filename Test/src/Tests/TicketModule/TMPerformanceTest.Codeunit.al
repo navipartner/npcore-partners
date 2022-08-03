@@ -120,7 +120,7 @@ codeunit 85050 "NPR TM Performance Test"
         Item: Record Item;
 
         POSSale: Codeunit "NPR POS Sale";
-        ActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
+        ActionCancelSale: Codeunit "NPR POSAction: Cancel Sale B";
         Ticket: Record "NPR TM Ticket";
         CountBefore, CountAfter : Integer;
         UnitPrice: Decimal;
@@ -240,7 +240,7 @@ codeunit 85050 "NPR TM Performance Test"
         TempCoupon: Record "NPR NpDc Coupon" temporary;
 
         POSSale: Codeunit "NPR POS Sale";
-        ActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
+        ActionCancelSale: Codeunit "NPR POSAction: Cancel Sale B";
         Ticket: Record "NPR TM Ticket";
         CountBefore, CountAfter : Integer;
         UnitPrice: Decimal;

@@ -143,6 +143,12 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SALE_DIMENSION', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Sale Dimension";
     }
+    value(22; SWITCH_REGISTER)
+    {
+        Caption = 'SWITCH_REGISTER', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Switch Regist.";
+    }
+
     value(23; ITEM_PRICE)
     {
         Caption = 'ITEM_PRICE', Locked = true, MaxLength = 20;
@@ -155,11 +161,24 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Item Prompt";
 
     }
+
+    value(26; RUN_REPORT)
+    {
+        Caption = 'RUN_REPORT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Run Report";
+    }
+
     value(27; ITEM_UNIT_PRICE)
     {
         Caption = 'ITEM_UNIT_PRICE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Item UnitPrice";
 
+    }
+
+    value(28; SS_PAYMENT_CASH)
+    {
+        Caption = 'SS_PAYMENT_CASH', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: SS Paym. Cash";
     }
 
     value(29; ITEM_QTY)
@@ -178,25 +197,15 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ITEM', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Insert Item";
     }
-    value(22; SWITCH_REGISTER)
-    {
-        Caption = 'SWITCH_REGISTER', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Switch Regist.";
-    }
-    value(26; RUN_REPORT)
-    {
-        Caption = 'RUN_REPORT', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Run Report";
-    }
-    value(6014600; BALANCE_V4)
-    {
-        Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: EndOfDay V4";
-    }
     value(37; LOAD_FROM_POS_QUOTE)
     {
         Caption = 'LOAD_FROM_POS_QUOTE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: LoadPOSSvSl";
+    }
+    value(38; CANCEL_POS_SALE)
+    {
+        Caption = 'CANCEL_POS_SALE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Cancel Sale";
     }
     value(39; SAVE_AS_POS_QUOTE)
     {
@@ -208,9 +217,10 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'BACKGND_TASK_EXAMPLE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction - Task Example";
     }
-    value(28; SS_PAYMENT_CASH)
+
+    value(6014600; BALANCE_V4)
     {
-        Caption = 'SS_PAYMENT_CASH', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: SS Paym. Cash";
+        Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: EndOfDay V4";
     }
 }

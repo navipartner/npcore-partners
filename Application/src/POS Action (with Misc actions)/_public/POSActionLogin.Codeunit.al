@@ -133,6 +133,7 @@
                         exit;
                     end;
 
+                    POSPeriodRegister.SetCurrentKey("POS Unit No.");
                     POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
                     MissingPeriodRegister := not POSPeriodRegister.FindLast();
                     if (MissingPeriodRegister) or ((not MissingPeriodRegister) and (POSPeriodRegister.Status <> POSPeriodRegister.Status::OPEN)) then begin

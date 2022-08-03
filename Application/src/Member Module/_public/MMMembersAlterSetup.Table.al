@@ -36,7 +36,15 @@
             trigger OnValidate()
             var
                 Item: Record Item;
+                MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+                MembershipManagement: Codeunit "NPR MM Membership Mgt.";
             begin
+                if "Sales Item No." <> '' then begin
+                    MembershipSalesSetup.SetRange(Type, MembershipSalesSetup.Type::ITEM);
+                    MembershipSalesSetup.SetRange("No.", "Sales Item No.");
+                    if not MembershipSalesSetup.IsEmpty() then
+                        MembershipManagement.ThrowException_AmbiguousItemUsage();
+                end;
 
                 if (Item.Get("Sales Item No.")) then
                     Description := Item.Description;

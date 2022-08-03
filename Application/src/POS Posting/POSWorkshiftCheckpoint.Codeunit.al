@@ -707,10 +707,11 @@
     local procedure StoreCountedDenominations(UnitNo: Code[10]; WorkshiftEntryNo: Integer)
     var
         EODDenomination: Record "NPR EOD Denomination";
+        EODDenomination2: Record "NPR EOD Denomination";
         POSPaymentBinDenomination: Record "NPR POS Paym. Bin Denomin.";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
-
+        EODDenomination.SetCurrentKey("POS Unit No.");
         EODDenomination.SetFilter("POS Unit No.", '=%1', UnitNo);
         if (EODDenomination.IsEmpty()) then
             exit;
@@ -742,8 +743,15 @@
             until (POSPaymentBinCheckpoint.Next() = 0);
         end;
         EODDenomination.Reset();
+        EODDenomination.SetCurrentKey("POS Unit No.");
         EODDenomination.SetFilter("POS Unit No.", '=%1', UnitNo);
-        EODDenomination.DeleteAll();
+        if (EODDenomination.FindSet()) then begin
+            repeat
+                if (EODDenomination2.Get(EODDenomination."POS Payment Method Code", EODDenomination."POS Unit No.", EODDenomination."Denomination Type", EODDenomination.Denomination)) then
+                    EODDenomination2.Delete();
+            until (EODDenomination.Next() = 0)
+        end;
+
     end;
 
     local procedure CalculateCheckpointStatistics(POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
