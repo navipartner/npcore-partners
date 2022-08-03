@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/reportdefinition">
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="DataSource">
@@ -88,7 +88,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Admission Code</Value>
+                                  <Value>Admission Code</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -118,7 +118,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Schedule Code</Value>
+                                  <Value>Schedule Code</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -148,7 +148,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Admission Start Date</Value>
+                                  <Value>Admission Start Date</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -178,7 +178,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Admission Start Time</Value>
+                                  <Value>Admission Start Time</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -208,7 +208,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Sales Date Time</Value>
+                                  <Value>Sales Date Time</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -238,7 +238,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Ticket Number</Value>
+                                  <Value>Ticket Number</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -268,7 +268,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Ticket Status</Value>
+                                  <Value>Ticket Status</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -298,7 +298,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Notification Address</Value>
+                                  <Value>Notification Address</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -328,7 +328,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Admitted Date</Value>
+                                  <Value>Admitted Date</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -358,7 +358,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Admitted Time</Value>
+                                  <Value>Admitted Time</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -388,7 +388,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Member No</Value>
+                                  <Value>Member No</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -418,7 +418,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Customer No</Value>
+                                  <Value>Customer No</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -448,7 +448,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">External Order No</Value>
+                                  <Value>External Order No</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -478,7 +478,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Name</Value>
+                                  <Value>Name</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -508,7 +508,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Address</Value>
+                                  <Value>Address</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -538,7 +538,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Zip Code</Value>
+                                  <Value>Zip Code</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -568,7 +568,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">City</Value>
+                                  <Value>City</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -598,7 +598,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Country</Value>
+                                  <Value>Country</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -628,7 +628,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">Phone Number</Value>
+                                  <Value>Phone Number</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -663,7 +663,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!AdmissionCode.Value</Value>
+                                  <Value>=Fields!AdmissionCode.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -693,7 +693,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!ScheduleCode.Value</Value>
+                                  <Value>=Fields!ScheduleCode.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -723,7 +723,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=FormatDateTime(Fields!AdmissionStartDate.Value, DateFormat.ShortDate)</Value>
+                                  <Value>=FormatDateTime(Fields!AdmissionStartDate.Value, DateFormat.ShortDate)</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -753,7 +753,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=FormatDateTime(Fields!AdmissionStartTime.Value, DateFormat.ShortTime)</Value>
+                                  <Value>=FormatDateTime(Fields!AdmissionStartTime.Value, DateFormat.ShortTime)</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -783,7 +783,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!SalesDateTime.Value</Value>
+                                  <Value>=Fields!SalesDateTime.Value</Value>
                                   <Style>
                                     <Format>g</Format>
                                   </Style>
@@ -817,7 +817,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TicketNumber.Value</Value>
+                                  <Value>=Fields!TicketNumber.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -847,7 +847,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TicketStatus.Value</Value>
+                                  <Value>=Fields!TicketStatus.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -877,7 +877,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!NotificationAddress.Value</Value>
+                                  <Value>=Fields!NotificationAddress.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -907,7 +907,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!AdmittedDate.Value</Value>
+                                  <Value>=Fields!AdmittedDate.Value</Value>
                                   <Style>
                                     <Format>dd-MM-yyyy</Format>
                                   </Style>
@@ -941,7 +941,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!AdmittedTime.Value</Value>
+                                  <Value>=FormatDateTime(Fields!AdmittedTime.Value, DateFormat.ShortTime)</Value>
                                   <Style>
                                     <Format>T</Format>
                                   </Style>
@@ -975,7 +975,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!MemberNo.Value</Value>
+                                  <Value>=Fields!MemberNo.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -1007,7 +1007,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!CustomerNo.Value</Value>
+                                  <Value>=Fields!CustomerNo.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -1039,7 +1039,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!ExternalOrderNo.Value</Value>
+                                  <Value>=Fields!ExternalOrderNo.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -1071,7 +1071,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Name.Value</Value>
+                                  <Value>=Fields!Name.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -1103,7 +1103,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Address.Value</Value>
+                                  <Value>=Fields!Address.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -1135,7 +1135,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!ZipCode.Value</Value>
+                                  <Value>=Fields!ZipCode.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -1167,7 +1167,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!City.Value</Value>
+                                  <Value>=Fields!City.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -1199,7 +1199,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Country.Value</Value>
+                                  <Value>=Fields!Country.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -1231,7 +1231,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!PhoneNumber.Value</Value>
+                                  <Value>=Fields!PhoneNumber.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>

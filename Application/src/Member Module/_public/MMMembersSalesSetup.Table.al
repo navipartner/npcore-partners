@@ -23,6 +23,18 @@
             TableRelation = IF (Type = CONST(ITEM)) Item WHERE(Blocked = CONST(false))
             ELSE
             IF (Type = CONST(ACCOUNT)) "G/L Account" WHERE(Blocked = CONST(false));
+
+            trigger OnValidate()
+            var
+                MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+                MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+            begin
+                if (Type = Type::ITEM) and ("No." <> '') then begin
+                    MembershipAlterationSetup.SetRange("Sales Item No.", "No.");
+                    if not MembershipAlterationSetup.IsEmpty() then
+                        MembershipManagement.ThrowException_AmbiguousItemUsage();
+                end;
+            end;
         }
         field(10; "Membership Code"; Code[20])
         {

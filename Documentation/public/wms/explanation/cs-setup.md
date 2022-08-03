@@ -77,7 +77,6 @@ This section contains the settings related to grouping of search results.
 
 This section contains the settings related to the templates used in regards to the stock count.
 
-
 ## Physical Inventory Counting 
 
 This section contains the settings related to the templates used in regards to the physical inventory count.
