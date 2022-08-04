@@ -45,5 +45,7 @@
     href: howto/post_inventory_adjustment_item_journal.md
   - name: Perform stock count (Physical Inventory Journal and mobile apps)
     href: howto/perform_stock_count.md
-  - name: Reclassify items (Item reclassification journal)
+  - name: Reclassify items (Item Reclassification Journal)
     href: howto/reclassify_items.md
+  - name: Revalue items (Item Revaluation Journal)
+    href: howto/revaluation_journal.md
