@@ -38,6 +38,8 @@
     href: howto/balance_the_pos.md
   - name: Configure an opening mechanism for a POS unit cash drawer
     href: howto/ConfigureCashDrawerOpening.md
+  - name: Create a POS payment method
+    href: howto/POS_payment_methods.md
   - name: Change the POS unit receipt footer text
     href: howto/POSUnitReceiptFooter.md
   - name: Set up job queue to post POS entries
