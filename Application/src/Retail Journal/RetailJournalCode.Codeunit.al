@@ -636,7 +636,8 @@
         MixDiscount: Record "NPR Mixed Discount";
         RetailJournalHeader: Record "NPR Retail Journal Header";
     begin
-        RetailJournalHeader.Get(RetailJournalLine."No.");
+        if not RetailJournalHeader.Get(RetailJournalLine."No.") then
+            exit;
 
         PeriodDiscountLine.Reset();
         PeriodDiscountLine.SetFilter(PeriodDiscountLine."Starting Date", '<=%1', RetailJournalHeader."Date of creation");
