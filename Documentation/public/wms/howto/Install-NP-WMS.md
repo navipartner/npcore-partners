@@ -13,7 +13,6 @@ Once NP WMS is installed, you can proceed with other necessary setups.
 ## Next steps
 
 - You can [fetch preset configurations](fetch-setup-data.md) on your environment, and in that way avoid custom setup. 
-- 
 
 ### Related Links
 
