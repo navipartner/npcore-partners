@@ -51,10 +51,9 @@
 
         if not IsElementSubscriber(NpXmlElement, 'FilterVariantsForStockUpdate') then
             exit;
-        Handled := true;
-        Clear(ChildRecRef);
+
         case ParentRecRef.Number of
-            DATABASE::Item:
+            Database::Item:
                 begin
                     ParentRecRef.SetTable(Item);
                     ItemVariant.SetFilter(ItemVariant."Item No.", Item."No.");
@@ -62,7 +61,12 @@
                     if not ItemVariant.FindFirst() then
                         exit;
                 end;
+            else
+                exit;
         end;
+
+        Handled := true;
+        Clear(ChildRecRef);
         ChildRecRef.GetTable(ItemVariant);
     end;
 
