@@ -1,6 +1,7 @@
 ﻿codeunit 6151463 "NPR M2 Account Lookup Mgt."
 {
     Access = Internal;
+
     var
         Text000: Label '%1 %2 does not exist ';
 
@@ -270,7 +271,7 @@
             exit;
 
         M2ValueBufferList.GetRecord(TempM2ValueBuffer);
-        Contact."NPR Magento Customer Group" := UpperCase(CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Contact."NPR Magento Customer Group")));
+        Contact."NPR Magento Customer Group" := CopyStr(UpperCase(TempM2ValueBuffer.Value), 1, MaxStrLen(Contact."NPR Magento Customer Group"));
     end;
 
     local procedure SetupCustomerGroups(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)
@@ -342,7 +343,9 @@
         if MagentoSetup."Magento Version" = MagentoSetup."Magento Version"::"1" then begin
             if MagentoStore.Get(Customer."NPR Magento Store Code") then;
             if PAGE.RunModal(0, MagentoStore) = ACTION::LookupOK then
+#pragma warning disable AA0139
                 Customer."NPR Magento Store Code" := MagentoStore.Code;
+#pragma warning restore
 
             exit;
         end;

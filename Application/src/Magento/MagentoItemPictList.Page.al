@@ -81,8 +81,10 @@
         case MagentoSetup."Picture Variety Type" of
             MagentoSetup."Picture Variety Type"::Fixed:
                 begin
+#pragma warning disable AA0139
                     CurrPage.MagentoPictureLinkSubform.PAGE.SetVariantValueCode(Rec.Name);
                     CurrPage.MagentoPictureDragDropAddin.PAGE.SetVariantValueCode(Rec.Name);
+#pragma warning restore
                 end;
             else begin
                     if (Rec.Name = '') then begin
@@ -91,8 +93,10 @@
                         CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters('', '', '');
                         CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters('', '', '');
                     end else begin
+#pragma warning disable AA0139
                         CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters(Variety, VarietyTable, Rec.Name);
                         CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters(Variety, VarietyTable, Rec.Name);
+#pragma warning restore
                     end;
                 end;
         end;

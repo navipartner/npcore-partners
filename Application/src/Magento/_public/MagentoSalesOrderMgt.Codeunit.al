@@ -474,7 +474,7 @@
         XNodeList: XmlNodeList;
         OrderNo: Code[20];
         CurrencyFactor: Decimal;
-        InvoiceEmail: Text;
+        InvoiceEmail: Text[80];
     begin
         Initialize();
         Clear(SalesHeader);
@@ -535,7 +535,7 @@
         SetFieldText(RecRef, 13630, NpXmlDomMgt.GetXmlText(XmlElement2, 'ean', MaxStrLen(Customer.GLN), false));
         RecRef.SetTable(SalesHeader);
 
-        InvoiceEmail := NpXmlDomMgt.GetXmlText(XmlElement2, 'invoice_email', MaxStrLen(SalesHeader."NPR Bill-to E-mail"), false);
+        InvoiceEmail := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement2, 'invoice_email', 0, false), 1, MaxStrLen(InvoiceEmail));
         if InvoiceEmail <> '' then
             SalesHeader."NPR Bill-to E-mail" := InvoiceEmail;
 

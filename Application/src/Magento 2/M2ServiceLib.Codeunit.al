@@ -1,6 +1,7 @@
 ﻿codeunit 6151153 "NPR M2 Service Lib."
 {
     Access = Internal;
+
     procedure GetEstimatedDeliveryDate(ItemNo: Code[20]; CustomerNo: Code[20]; ReferenceDate: Date; var EstimatedDateFromVendor: Text[20]; var VendorCode: Text[20]; var EstimatedDateFromLocation: Text[20]; var LocationCode: Text[20]): Boolean
     var
         Item: Record Item;
@@ -55,7 +56,7 @@
     local procedure GetNextWorkDay(ReferenceDate: Date; SourceType: Enum "Calendar Source Type"; SourceNo: Code[20]): Date
     var
         CalendarManagement: Codeunit "Calendar Management";
-        NonWorkingDescription: Text;
+        NonWorkingDescription: Text[30];
         CalendarCode: Code[10];
         SearchLength: Integer;
         TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;

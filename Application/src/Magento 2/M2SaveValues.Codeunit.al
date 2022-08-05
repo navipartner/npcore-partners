@@ -1,6 +1,7 @@
 ﻿codeunit 6059834 "NPR M2 Save Values"
 {
     Access = Internal;
+
     trigger OnRun()
     begin
         ShowContactBuffer();
@@ -25,9 +26,9 @@
                     if Customer.FindFirst() then begin
                         TempMagentoContactBuffer."Entry No." += 1;
                         TempMagentoContactBuffer."Customer No." := Customer."No.";
-                        TempMagentoContactBuffer."Customer Name" := Customer.Name;
+                        TempMagentoContactBuffer."Customer Name" := CopyStr(Customer.Name, 1, MaxStrLen(TempMagentoContactBuffer."Customer Name"));
                         TempMagentoContactBuffer."Contact No." := Contact."No.";
-                        TempMagentoContactBuffer."Contact Name" := Contact.Name;
+                        TempMagentoContactBuffer."Contact Name" := CopyStr(Contact.Name, 1, MaxStrLen(TempMagentoContactBuffer."Contact Name"));
                         TempMagentoContactBuffer."Contact Email" := Contact."E-Mail";
                         TempMagentoContactBuffer."Magento Contact" := Contact."NPR Magento Contact";
                         TempMagentoContactBuffer."Magento Store Code" := Customer."NPR Magento Store Code";

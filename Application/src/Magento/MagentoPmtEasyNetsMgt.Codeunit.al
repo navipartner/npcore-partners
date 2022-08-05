@@ -101,7 +101,9 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
     begin
         // Try to get the payment's charge id.
         if PaymentLine."Charge ID" = '' then begin
+#pragma warning disable AA0139
             PaymentLine."Charge ID" := GetChargeId(PaymentGateway, PaymentLine."No.");
+#pragma warning restore
             PaymentLine.Modify(true);
             Commit();
         end;

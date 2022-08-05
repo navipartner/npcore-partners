@@ -1,6 +1,7 @@
 ﻿codeunit 6151465 "NPR M2 Brand Mgt."
 {
     Access = Internal;
+
     trigger OnRun()
     begin
         UpdateBrands();
@@ -20,6 +21,7 @@
         BrandId: Code[20];
         PrevRec: Text;
         TypeHelper: Codeunit "Type Helper";
+        BrandName: Text;
     begin
         MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
@@ -29,7 +31,7 @@
         DataLogMgt.DisableDataLog(true);
         XmlDoc.SelectNodes('//brand', XNodeList);
         foreach XNode in XNodeList do begin
-            BrandId := NpXmlDomMgt.GetAttributeCode(XNode.AsXmlElement(), '', 'id', MaxStrLen(MagentoBrand.Id), true);
+            BrandId := CopyStr(NpXmlDomMgt.GetAttributeCode(XNode.AsXmlElement(), '', 'id', 0, true), 1, MaxStrLen(BrandId));
             if not MagentoBrand.Get(BrandId) then begin
                 MagentoBrand.Init();
                 MagentoBrand.Id := BrandId;
@@ -38,8 +40,8 @@
 
             PrevRec := Format(MagentoBrand);
 
-            MagentoBrand.Name := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), 'name', MaxStrLen(MagentoBrand.Name), false);
-            MagentoBrand.Name := TypeHelper.HtmlDecode(MagentoBrand.Name);
+            BrandName := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), 'name', MaxStrLen(MagentoBrand.Name), false);
+            MagentoBrand.Name := CopyStr(TypeHelper.HtmlDecode(BrandName), 1, MaxStrLen(MagentoBrand.Name));
             MagentoBrand.Sorting := NpXmlDomMgt.GetElementInt(XNode.AsXmlElement(), 'sort_order', false);
 
             if PrevRec <> Format(MagentoBrand) then
