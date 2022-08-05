@@ -49,3 +49,5 @@
     href: howto/reclassify_items.md
   - name: Revalue items (Item Revaluation Journal)
     href: howto/revaluation_journal.md
+  - name: Create inventory picks
+    href: howto/create_inventory_pick.md
