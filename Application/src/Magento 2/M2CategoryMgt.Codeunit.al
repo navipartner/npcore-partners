@@ -49,7 +49,7 @@
             MagentoCategory."Parent Category Id" := NpXmlDomMgt.GetElementCode(XNode.AsXmlElement(), 'parent', 0, false);
             MagentoCategory.Path := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), 'path', 0, false);
             MagentoCategory."Root No." := NpXmlDomMgt.GetElementCode(XNode.AsXmlElement(), 'root', 0, false);
-#pragma warning disable
+#pragma warning restore AA0139
             MagentoCategory.Root := MagentoCategory.Id = MagentoCategory."Root No.";
 
             if PrevRec <> Format(MagentoCategory) then
