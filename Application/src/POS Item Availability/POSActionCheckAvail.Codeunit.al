@@ -42,7 +42,7 @@ codeunit 6059785 "NPR POS Action: Check Avail."
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         Clear(PosItemCheckAvail);
-        BindSubscription(PosItemCheckAvail);
+        if BindSubscription(PosItemCheckAvail) then;
         PosItemCheckAvail.SetIgnoreProfile(true);
         PosItemCheckAvail.CheckAvailability_PosSale(SalePOS, false);
         if not PosItemCheckAvail.GetAvailabilityIssuesFound() then

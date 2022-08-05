@@ -1057,11 +1057,10 @@
         exit(POSUnit."Default POS Payment Bin");
     end;
 
-    local procedure IsCancelledSale(SalePOS: Record "NPR POS Sale"): Boolean
+    procedure IsCancelledSale(SalePOS: Record "NPR POS Sale"): Boolean
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-
         if SalePOS."Sale type" = SalePOS."Sale type"::Annullment then
             exit(true);
 
@@ -1071,7 +1070,6 @@
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Comment);
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Cancelled);
         exit(not SaleLinePOS.IsEmpty());
-
     end;
 
     local procedure IsUniqueDocumentNo(SalePOS: Record "NPR POS Sale"): Boolean

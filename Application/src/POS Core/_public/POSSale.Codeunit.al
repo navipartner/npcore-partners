@@ -350,8 +350,6 @@
             Error('POS Sale codeunit not initialized. This is a programming bug, not a user error');
         RefreshCurrent();
 
-        CheckItemAvailability();
-
         OnAttemptEndSale(Rec);
 
         PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
@@ -393,8 +391,6 @@
             Error('POS Sale codeunit not initialized. This is a programming bug, not a user error');
         RefreshCurrent();
 
-        CheckItemAvailability();
-
         OnAttemptEndSale(Rec);
 
         PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
@@ -424,6 +420,8 @@
         StartTime: DateTime;
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
     begin
+        CheckItemAvailability();
+
         PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
         RetailSalesDocMgt.HandleLinkedDocuments(POSSession);
@@ -752,18 +750,24 @@
         POSSession.AddServerStopwatch(Keyword, Duration);
     end;
 
-    local procedure CheckItemAvailability()
+    procedure CheckItemAvailability()
     var
         ItemCheckAvail: Codeunit "Item-Check Avail.";
+        PosCreateEntry: Codeunit "NPR POS Create Entry";
         PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
+        Success: Boolean;
     begin
         if SkipItemAvailabilityCheck then
             exit;
+        if POSCreateEntry.IsCancelledSale(Rec) then
+            exit;
+
         Clear(PosItemCheckAvail);
-        BindSubscription(PosItemCheckAvail);
-        if not PosItemCheckAvail.CheckAvailability_PosSale(Rec, true) then
-            ItemCheckAvail.RaiseUpdateInterruptedError();
+        if BindSubscription(PosItemCheckAvail) then;
+        Success := PosItemCheckAvail.CheckAvailability_PosSale(Rec, true);
         UnbindSubscription(PosItemCheckAvail);
+        if not Success then
+            ItemCheckAvail.RaiseUpdateInterruptedError();
     end;
 
     internal procedure SetSkipItemAvailabilityCheck(Set: Boolean)

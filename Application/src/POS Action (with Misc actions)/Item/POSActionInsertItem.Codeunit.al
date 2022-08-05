@@ -113,9 +113,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         Success: Boolean;
         GetPromptSerial: Boolean;
         BaseLineNo: Integer;
-
     begin
-
         ItemIdentifier := Context.GetStringParameter('itemNo');
         ItemIdentifierType := Context.GetIntegerParameter('itemIdentifierType');
         ItemQuantity := Context.GetDecimalParameter('itemQuantity');
@@ -190,6 +188,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
             PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
             if PosInventoryProfile."Stockout Warning" then
                 PosItemCheckAvail.SetxDataset(POSSession);
+            POSSession.SetAvailabilityCheckState(PosItemCheckAvail);
         end;
 
         POSActionInsertItemB.AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd);
@@ -211,9 +210,11 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         SkipItemAvailabilityCheck := Context.GetBooleanParameter('SkipItemAvailabilityCheck');
 
         if not SkipItemAvailabilityCheck then begin
+            POSSession.GetAvailabilityCheckState(PosItemCheckAvail);
             PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
             if PosInventoryProfile."Stockout Warning" then
                 PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
+            POSSession.ClearAvailabilityCheckState();
         end;
     end;
 

@@ -7,6 +7,7 @@
         _FrontEnd: Codeunit "NPR POS Front End Management";
         _Sale: Codeunit "NPR POS Sale";
         _Setup: Codeunit "NPR POS Setup";
+        _PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
         _ActionStateInt: Dictionary of [Text, Integer];
         _ActionStateDec: Dictionary of [Text, Decimal];
         _ActionStateText: Dictionary of [Text, Text];
@@ -712,6 +713,21 @@
     begin
         ErrorIfNotInitialized();
         POSBackgroundTaskAPIOut := _POSBackgroundTaskAPI;
+    end;
+
+    internal procedure SetAvailabilityCheckState(var PosItemCheckAvailIn: Codeunit "NPR POS Item-Check Avail.")
+    begin
+        _PosItemCheckAvail := PosItemCheckAvailIn;
+    end;
+
+    internal procedure GetAvailabilityCheckState(var PosItemCheckAvailOut: Codeunit "NPR POS Item-Check Avail.")
+    begin
+        PosItemCheckAvailOut := _PosItemCheckAvail;
+    end;
+
+    internal procedure ClearAvailabilityCheckState()
+    begin
+        Clear(_PosItemCheckAvail);
     end;
 
     //#region Event Publishers
