@@ -2,9 +2,9 @@
   href: intro.md
 - name: How-To  
   items:
-  - name: Example
-    href: howto/examplehowto.md
-- name: Explanation  
-  items:
-  - name: Example
-    href: explanation/exampleexplanation.md    
+  - name: Create a brand
+    href: howto/create_brand.md
+- name: Reference guides
+  items: 
+  - name: Brands reference guide
+    href: reference/brands_reference_table.md
