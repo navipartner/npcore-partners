@@ -75,9 +75,7 @@
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
-
     begin
-
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
@@ -113,6 +111,8 @@
 
         if not ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code") then
             POSPaymentMethod.Testfield("Return Payment Method Code");
+
+        POSSale.CheckItemAvailability();
 
         OnBeforeActionWorkflow(POSPaymentMethod, Parameters, POSSession, FrontEnd, Context, SubTotal, Handled);
 
@@ -663,7 +663,9 @@
         if POSPaymentMethod."Auto End Sale" then begin
             POSUnit.Get(POSSetup.GetPOSUnitNo());
             ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
+            POSSale.SetSkipItemAvailabilityCheck(true);
             POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);
+            POSSale.SetSkipItemAvailabilityCheck(false);
         end;
     end;
 }
