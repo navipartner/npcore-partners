@@ -1,6 +1,7 @@
 ﻿codeunit 6151460 "NPR M2 Setup Mgt."
 {
     Access = Internal;
+
     var
         Text000: Label 'Root Categoery is missing for Website %1';
 
@@ -19,24 +20,28 @@
 
         if XmlElement.SelectNodes('stores/store', NodeList) then
             foreach XmlElement2 in NodeList do begin
-                RootItemGroupNo := NpXmlDomMgt.GetXmlText(XmlElement, 'root_category', MaxStrLen(RootItemGroupNo), true);
+                RootItemGroupNo := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'root_category', 0, true), 1, MaxStrLen(RootItemGroupNo));
                 if not NpXmlDomMgt.FindNode(XmlElement.AsXmlNode(), 'root_category', XmlElement3) then
                     Error(Text000, MagentoWebsite.Code);
+#pragma warning disable AA0139
                 RootItemGroupNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement3, 'external_id', true);
+#pragma warning restore
                 CreateRootItemGroup(RootItemGroupNo, CopyStr(MagentoWebsite.Name, 1, 50));
                 XmlElement2.AsXmlElement().Attributes().Get('code', CodeAttribute);
 
                 if not MagentoStore.Get(UpperCase(CodeAttribute.Value)) then begin
                     MagentoStore.Init();
+#pragma warning disable AA0139
                     MagentoStore.Code := CodeAttribute.Value;
+#pragma warning restore
                     MagentoStore."Website Code" := MagentoWebsite.Code;
-                    MagentoStore.Name := XmlElement2.AsXmlElement().InnerText();
+                    MagentoStore.Name := CopyStr(XmlElement2.AsXmlElement().InnerText(), 1, MaxStrLen(MagentoStore.Name));
                     MagentoStore."Root Item Group No." := RootItemGroupNo;
                     MagentoStore.Insert(true);
                 end else
                     if (MagentoStore."Website Code" <> MagentoWebsite.Code) or (MagentoStore.Name <> XmlElement2.AsXmlElement().InnerText()) or (MagentoStore."Root Item Group No." <> RootItemGroupNo) then begin
                         MagentoStore."Website Code" := MagentoWebsite.Code;
-                        MagentoStore.Name := XmlElement2.AsXmlElement().InnerText();
+                        MagentoStore.Name := CopyStr(XmlElement2.AsXmlElement().InnerText(), 1, MaxStrLen(MagentoStore.Name));
                         MagentoStore."Root Item Group No." := RootItemGroupNo;
                         MagentoStore.Modify(true);
                     end;
@@ -130,13 +135,17 @@
         XmlDoc.AsXmlNode().SelectNodes('//payment_method', XmlNodeList);
         foreach XmlElement in XmlNodeList do begin
             XmlElement.AsXmlElement().Attributes().Get('code', Attribute);
+#pragma warning disable AA0139
             PaymentCode := Attribute.Value;
+#pragma warning restore
 
             // We need to wrap this in an if since AL native methods throws a runtime exception
             // if the specified attribute does not exist. Since this is the "subtype" of the 
             // payment method, we can accept this attribute missing
             if XmlElement.AsXmlElement().Attributes().Get('type', Attribute) then
+#pragma warning disable AA0139
                 PaymentType := Attribute.Value;
+#pragma warning restore
 
             if not PaymentMapping.Get(PaymentCode, PaymentType) then begin
                 PaymentMapping.Init();
@@ -165,7 +174,9 @@
         XmlDoc.AsXmlNode().SelectNodes('//shipping_method', XmlNodeList);
         foreach XmlElement in XmlNodeList do begin
             XmlElement.AsXmlElement().Attributes().Get('carrier', Attribute);
+#pragma warning disable AA0139
             ShipmentCode := Attribute.Value;
+#pragma warning restore
             if not ShipmentMapping.Get(ShipmentCode) then begin
                 ShipmentMapping.Init();
                 ShipmentMapping."External Shipment Method Code" := ShipmentCode;
@@ -216,7 +227,9 @@
         MagentoSetup.AuthType := MagentoSetup.AuthType::Custom;
         MagentoSetup."Api Username" := '';
         MagentoSetup.RemoveApiPassword();
+#pragma warning disable AA0139
         MagentoSetup."Api Authorization" := Authentication;
+#pragma warning restore
         if PrevRec <> Format(MagentoSetup) then
             MagentoSetup.Modify();
     end;
@@ -280,12 +293,14 @@
             Node.AsXmlElement().Attributes().Get('code', Attribute);
             if not MagentoWebsite.Get(Attribute.Value) then begin
                 MagentoWebsite.Init();
+#pragma warning disable AA0139
                 MagentoWebsite.Code := Attribute.Value;
-                MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name', 0, false);
+#pragma warning restore
+                MagentoWebsite.Name := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name', 0, false), 1, MaxStrLen(MagentoWebsite.Name));
                 MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'is_default', 0, false) = '1';
                 MagentoWebsite.Insert(true);
             end else begin
-                MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name', 0, false);
+                MagentoWebsite.Name := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name', 0, false), 1, MaxStrLen(MagentoWebsite.Name));
                 MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'is_default', 0, false) = '1';
                 MagentoWebsite.Modify(true);
             end;
@@ -349,7 +364,7 @@
         InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Brands", CODEUNIT::"NPR M2 Brand Mgt.", 'SetupM2Brands');
     end;
 
-    local procedure InitMagentoSetupEvent(Type: Enum "NPR Mag. Setup Event Sub. Type"; CodeunitId: Integer; FunctionName: Text)
+    local procedure InitMagentoSetupEvent(Type: Enum "NPR Mag. Setup Event Sub. Type"; CodeunitId: Integer; FunctionName: Text[80])
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
     begin

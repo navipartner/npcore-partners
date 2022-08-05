@@ -1,6 +1,7 @@
 ﻿codeunit 6151464 "NPR M2 Category Mgt."
 {
     Access = Internal;
+
     trigger OnRun()
     begin
         UpdateCategories();
@@ -20,6 +21,7 @@
         CategoryId: Code[20];
         PrevRec: Text;
         TypeHelper: Codeunit "Type Helper";
+        CategoryName: Text;
     begin
         MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
@@ -29,7 +31,7 @@
         DataLogMgt.DisableDataLog(true);
         XmlDoc.SelectNodes('//category', XNodeList);
         foreach XNode in XNodeList do begin
-            CategoryId := NpXmlDomMgt.GetAttributeCode(XNode.AsXmlElement(), '', 'id', MaxStrLen(MagentoCategory.Id), true);
+            CategoryId := CopyStr(NpXmlDomMgt.GetAttributeCode(XNode.AsXmlElement(), '', 'id', 0, true), 1, MaxStrLen(CategoryId));
             MagentoCategory.LockTable();
             if not MagentoCategory.Get(CategoryId) then begin
                 MagentoCategory.Init();
@@ -39,13 +41,15 @@
 
             PrevRec := Format(MagentoCategory);
 
-            MagentoCategory.Name := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), 'name', MaxStrLen(MagentoCategory.Name), false);
-            MagentoCategory.Name := TypeHelper.HtmlDecode(MagentoCategory.Name);
-            MagentoCategory."Parent Category Id" := NpXmlDomMgt.GetElementCode(XNode.AsXmlElement(), 'parent', MaxStrLen(MagentoCategory."Parent Category Id"), false);
+            CategoryName := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), 'name', MaxStrLen(MagentoCategory.Name), false);
+            MagentoCategory.Name := CopyStr(TypeHelper.HtmlDecode(CategoryName), 1, MaxStrLen(MagentoCategory.Name));
             MagentoCategory.Level := NpXmlDomMgt.GetElementInt(XNode.AsXmlElement(), 'level', false);
-            MagentoCategory.Path := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), 'path', MaxStrLen(MagentoCategory.Path), false);
             MagentoCategory.Sorting := NpXmlDomMgt.GetElementInt(XNode.AsXmlElement(), 'position', false);
-            MagentoCategory."Root No." := NpXmlDomMgt.GetElementCode(XNode.AsXmlElement(), 'root', MaxStrLen(MagentoCategory."Root No."), false);
+#pragma warning disable AA0139
+            MagentoCategory."Parent Category Id" := NpXmlDomMgt.GetElementCode(XNode.AsXmlElement(), 'parent', 0, false);
+            MagentoCategory.Path := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), 'path', 0, false);
+            MagentoCategory."Root No." := NpXmlDomMgt.GetElementCode(XNode.AsXmlElement(), 'root', 0, false);
+#pragma warning disable
             MagentoCategory.Root := MagentoCategory.Id = MagentoCategory."Root No.";
 
             if PrevRec <> Format(MagentoCategory) then
