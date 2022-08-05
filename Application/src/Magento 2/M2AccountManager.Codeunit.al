@@ -1,6 +1,7 @@
 ﻿codeunit 6151151 "NPR M2 Account Manager"
 {
     Access = Internal;
+
     trigger OnRun()
     begin
         case SelectedAccountFunction of
@@ -206,9 +207,9 @@
                     if Customer.FindFirst() then begin
                         TempMagentoContactBuffer."Entry No." += 1;
                         TempMagentoContactBuffer."Customer No." := Customer."No.";
-                        TempMagentoContactBuffer."Customer Name" := Customer.Name;
+                        TempMagentoContactBuffer."Customer Name" := CopyStr(Customer.Name, 1, MaxStrLen(TempMagentoContactBuffer."Customer Name"));
                         TempMagentoContactBuffer."Contact No." := Contact."No.";
-                        TempMagentoContactBuffer."Contact Name" := Contact.Name;
+                        TempMagentoContactBuffer."Contact Name" := CopyStr(Contact.Name, 1, MaxStrLen(TempMagentoContactBuffer."Contact Name"));
                         TempMagentoContactBuffer."Contact Email" := Contact."E-Mail";
                         TempMagentoContactBuffer."Magento Contact" := Contact."NPR Magento Contact";
                         TempMagentoContactBuffer."Magento Store Code" := Customer."NPR Magento Store Code";
@@ -1343,7 +1344,7 @@
 
     #endregion
 
-    procedure CreateSecurityToken(EMail: Text[80]) Token: Text[40]
+    procedure CreateSecurityToken(EMail: Text[80]) Token: Text[80]
     var
         OneTimePassword: Record "NPR M2 One Time Password";
         AccountSetup: Record "NPR M2 Account Setup";
@@ -1353,7 +1354,7 @@
         if (AccountSetup."OTP Validity (Hours)" = 0) then
             AccountSetup."OTP Validity (Hours)" := 24;
 
-        OneTimePassword."Password (Hash)" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        OneTimePassword."Password (Hash)" := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(OneTimePassword."Password (Hash)"));
         OneTimePassword."E-Mail" := LowerCase(EMail);
         OneTimePassword."Created At" := CurrentDateTime;
         OneTimePassword."Valid Until" := CurrentDateTime + AccountSetup."OTP Validity (Hours)" * 3600 * 1000;
@@ -1369,7 +1370,7 @@
     var
         AccountComTemplate: Record "NPR M2 Account Com. Template";
         AccountSetup: Record "NPR M2 Account Setup";
-        Base65: Codeunit "Base64 Convert";
+        Base64: Codeunit "Base64 Convert";
     begin
         if (not AccountSetup.Get()) then;
 
@@ -1382,7 +1383,9 @@
         AccountComTemplate."Last Name" := Contact.Surname;
         AccountComTemplate."E-Mail" := LowerCase(Contact."E-Mail");
         AccountComTemplate."Security Token" := Token;
-        AccountComTemplate."B64 Email" := Base65.ToBase64(LowerCase(Contact."E-Mail"));
+#pragma warning disable AA0139
+        AccountComTemplate."B64 Email" := Base64.ToBase64(LowerCase(Contact."E-Mail"));
+#pragma warning restore
         AccountComTemplate.URL1 := StrSubstNo(AccountSetup."Reset Password URL", Token, AccountComTemplate."B64 Email");
 
         AccountComTemplate.Insert();
@@ -1401,7 +1404,7 @@
         AuthenticationLog."Account Id" := EMail;
         AuthenticationLog.Status := Status;
         AuthenticationLog."Result Message" := CopyStr(ReasonText, 1, MaxStrLen(AuthenticationLog."Result Message"));
-        AuthenticationLog.UserId := CopyStr(UserId, 1, MaxStrLen(AuthenticationLog."Result Message"));
+        AuthenticationLog.UserId := CopyStr(UserId, 1, MaxStrLen(AuthenticationLog.UserId));
         AuthenticationLog.Insert();
     end;
 
