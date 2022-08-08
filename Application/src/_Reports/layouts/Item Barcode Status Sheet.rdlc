@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>d5ab6f85-39e7-4c40-97f0-f8357e2fbb28</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -128,7 +129,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!Inventory.Value &amp; " " &amp; Fields!Inventory_TMPRetailJournalLineCol2.Value</Value>
+                                  <Value>=Parameters!Inventory.Value &amp; " " &amp;  Fields!Inventory_TMPRetailJournalLineCol2.Value</Value>
                                   <Style>
                                     <FontFamily>Arial Narrow</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -293,7 +294,7 @@
                   <Width>0.19313cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>2.32598cm</Width>
+                  <Width>2.13074cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -539,7 +540,7 @@
             <Top>0.07056cm</Top>
             <Left>13.65196cm</Left>
             <Height>3.00621cm</Height>
-            <Width>6.82598cm</Width>
+            <Width>6.63074cm</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
@@ -817,10 +818,10 @@
         <Height>3.07677cm</Height>
         <Style />
       </Body>
-      <Width>20.62937cm</Width>
+      <Width>20.30942cm</Width>
       <Page>
         <PageHeader>
-          <Height>2.52829cm</Height>
+          <Height>3.85121cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -842,8 +843,7 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox1</rd:DefaultName>
-              <Top>0.24611cm</Top>
-              <Left>0.4579cm</Left>
+              <Top>0.16703cm</Top>
               <Height>0.7cm</Height>
               <Width>9.24688cm</Width>
               <Style>
@@ -870,12 +870,14 @@
                       </Style>
                     </TextRun>
                   </TextRuns>
-                  <Style />
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox2</rd:DefaultName>
-              <Top>0.93731cm</Top>
-              <Left>0.4579cm</Left>
+              <Top>0.16703cm</Top>
+              <Left>11.03853cm</Left>
               <Height>0.5cm</Height>
               <Width>9.24688cm</Width>
               <ZIndex>1</ZIndex>
@@ -907,10 +909,9 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox6</rd:DefaultName>
-              <Top>2.06058cm</Top>
-              <Left>0.43389cm</Left>
+              <Top>3.01308cm</Top>
               <Height>0.46771cm</Height>
-              <Width>19.85152cm</Width>
+              <Width>20.30942cm</Width>
               <ZIndex>2</ZIndex>
               <Style>
                 <Border>
@@ -942,46 +943,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox7</rd:DefaultName>
-              <Top>0.35306cm</Top>
+              <Top>0.70231cm</Top>
               <Left>15.90687cm</Left>
               <Height>0.49305cm</Height>
               <Width>4.37854cm</Width>
               <ZIndex>3</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <VerticalAlign>Middle</VerticalAlign>
-                <PaddingLeft>2pt</PaddingLeft>
-                <PaddingRight>2pt</PaddingRight>
-                <PaddingTop>2pt</PaddingTop>
-                <PaddingBottom>2pt</PaddingBottom>
-              </Style>
-            </Textbox>
-            <Textbox Name="Textbox8">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Parameters!PageNo.Value &amp; " " &amp; Globals!PageNumber</Value>
-                      <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox8</rd:DefaultName>
-              <Top>0.88251cm</Top>
-              <Left>15.90687cm</Left>
-              <Height>0.52833cm</Height>
-              <Width>4.37854cm</Width>
-              <ZIndex>4</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -1012,11 +978,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>1.44612cm</Top>
+              <Top>1.22387cm</Top>
               <Left>15.90687cm</Left>
               <Height>0.49305cm</Height>
               <Width>4.37854cm</Width>
-              <ZIndex>5</ZIndex>
+              <ZIndex>4</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -1045,15 +1011,49 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox10</rd:DefaultName>
-              <Top>1.6137cm</Top>
-              <Left>0.4579cm</Left>
+              <Top>2.43953cm</Top>
               <Height>0.57355cm</Height>
-              <Width>2.02375cm</Width>
+              <Width>2.48165cm</Width>
+              <ZIndex>5</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+                <PaddingTop>2pt</PaddingTop>
+                <PaddingBottom>2pt</PaddingBottom>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox8">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>="Page " &amp; Globals!PageNumber &amp; " of " &amp; Globals!TotalPages</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox8</rd:DefaultName>
+              <Top>1.73817cm</Top>
+              <Left>15.90416cm</Left>
+              <Height>0.52833cm</Height>
+              <Width>4.37854cm</Width>
               <ZIndex>6</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
                 </Border>
+                <VerticalAlign>Middle</VerticalAlign>
                 <PaddingLeft>2pt</PaddingLeft>
                 <PaddingRight>2pt</PaddingRight>
                 <PaddingTop>2pt</PaddingTop>
@@ -1160,6 +1160,7 @@
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>26130668-674c-4b5d-bed3-5d4760587e73</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
