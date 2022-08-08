@@ -7,3 +7,6 @@ This section contains questions and answers pertaining to some of the common iss
 - [Coupon troubleshooting](coupons_troubleshooting.md)
 - [Credit memo troubleshooting](credit_memo_troubleshooting.md)
 - [End of day report troubleshooting](end_of_day_troubleshooting.md)
+- [Printer troubleshooting](printer_troubleshooting.md)
+- [Label printer troubleshooting](label_printer_troubleshooting.md)
+- [A4 printer troubleshooting](a4_print_troubleshooting.md)

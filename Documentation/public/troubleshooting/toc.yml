@@ -10,3 +10,7 @@
   href: printer_troubleshooting.md
 - name: Receipt printer troubleshooting
   href: receipt_printer_troubleshooting.md
+- name: Label printer troubleshooting
+  href: label_printer_troubleshooting.md
+- name: A4 printer troubleshooting
+  href: a4_print_troubleshooting.md
