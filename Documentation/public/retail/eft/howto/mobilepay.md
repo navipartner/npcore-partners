@@ -23,6 +23,8 @@ However, to enable MobilePay, the following procedure needs to be performed in N
 7. Open the **POS Unit Parameters**.  
    These parameters need to be configured for each POS unit.
 8. Select the store by clicking the ellipsis button next to the **Store ID** field and finding the one you want in the list.
+
+
 > [!NOTE]
 > The list is populated according to the data in the MobilePay database.  
   
@@ -31,12 +33,17 @@ However, to enable MobilePay, the following procedure needs to be performed in N
 > [!NOTE]
 > Mobile payments can be integrated via existing payment systems or automatic payment points on-site.  
 
-- If you are using a Bluetooth device or an existing QR code, and you have a **Beacon ID (Box/QR)**, enter it into the corresponding field.
-- If you’re using an MPOS, or another setup able to render QR code automatically, keep the field blank, as it will be automatically populated.
-- You can also leave it empty if you don’t use a physical device, and print it once it’s being set in MobilePay.
+   - If you are using a Bluetooth device or an existing QR code, and you have a **Beacon ID (Box/QR)**, enter it into the corresponding field.
+   - If you’re using an MPOS, or another setup able to render QR code automatically, keep the field blank, as it will be automatically populated.
+   - You can also leave it empty if you don’t use a physical device, and print it once it’s being set in MobilePay.
 10. Enable the **Only QR** toggle switch if you’re sure you’re only using the QR code (no physical device). 
 11. Once you’re finished with the creation of the MobilePay unit, click **Create in MobilePay** in **Actions**.   
     A confirmation message is displayed.
 
 **Next steps:**
  - If you decide you need to unregister a POS unit in MobilePay, you simply need to click **Delete in MobilePay** option in **Actions**. The **Beacon ID (Box/QR)** will be preserved locally, and it will be possible to reuse it.
+
+
+### Related links
+
+- [Electronic Funds Transfer](../intro.md)

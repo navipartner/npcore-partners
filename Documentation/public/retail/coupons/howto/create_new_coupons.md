@@ -22,4 +22,5 @@ Coupons can give customers a discount on items which they add to shopping carts.
 
 ### Related links
 
+- [Coupon types (Reference guide)](../reference/coupon_types.md)
 - [Coupon troubleshooting](../../../troubleshooting/coupons_troubleshooting.md)

@@ -26,5 +26,7 @@ To import a new reconciliation file:
 - Once the entries are matched, reconciliation can be posted with the **Post** action.
 
 ### Related links
+
 - [Electronic Funds Transfer](../intro.md)
 - [EFT lookup](../explanation/lookup.md)
+- [EFT setup](../explanation/EFT_setup.md)

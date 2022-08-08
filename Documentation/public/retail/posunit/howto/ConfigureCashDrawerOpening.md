@@ -14,20 +14,20 @@ The following procedure walks you through the process of setting up the cash dra
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List** and choose the related link.     
    A list of all existing POS units is displayed.  
-2. Click on the POS unit you wish to configure the cash drawer opening mechanism for.
-3. Click on the dropdown next to the **POS Scenarios Profile** and then **Select from full list**.  
+2. Click the POS unit you wish to configure the cash drawer opening mechanism for.
+3. Click the dropdown next to the **POS Scenarios Profile** and then **Select from full list**.  
 4. Click **New**, or select an existing profile, then click **Manage** followed by **Edit**.
 5. Select the **POS Scenarios Set Entries** line with **Workflow Code** FINISH_SALE.
-6. Click **Manage** and then click on **POS Scenario Steps**.
-7. Add the **Subscriber Function** EjectPaymentBin.
-8. Go back and select the edited **POS Scenarios Profile** for the POS unit.
-9. Go back to the POS unit card.
-10. Click on the dropdown next to the **Default POS Payment Bin** and then **Select from full list**.  
+6. Click **Manage**, and then click **POS Scenario Steps**.
+7. Add **EjectPaymentBin** in **Subscriber Function**.
+8. Navigate back and select the edited **POS Scenarios Profile** for the POS unit.
+9. Navigate back to the **POS Unit** card.
+10. Click the dropdown next to the **Default POS Payment Bin** and then **Select from full list**.  
 11. Click **Edit List**.
-12. Go to the field **Eject Method** and input TEMPLATE, then click **OK**.
+12. In the field **Eject Method** input **TEMPLATE**, then click **OK**.
 
 ### Related links
 
-- [**POS units**](../explanation/POSUnit.md)
-- [**Create a new POS unit (by using the existing one for reference)**](./createnew.md)  
-- [**How to set up the POS Customer Display**](./POSCustomerDisplay.md)
+- [POS units](../explanation/POSUnit.md)
+- [Create a new POS unit (by using the existing one for reference)](./createnew.md)  
+- [How to set up the POS Customer Display](./POSCustomerDisplay.md)

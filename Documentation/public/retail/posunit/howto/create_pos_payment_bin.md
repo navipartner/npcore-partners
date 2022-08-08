@@ -2,7 +2,9 @@
 
 Each POS unit can have multiple payment bins and different setup. You can set cash drawers and virtual drawers.
 
-To create cash drawers, banks, or safes:
+## Create cash drawers/banks/safes
+
+To create cash drawers, banks, or safes, follow the provided steps:
 
 1.  Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Payment Bins** and open the related link.
 2. Create **New**.
@@ -25,8 +27,9 @@ To create cash drawers, banks, or safes:
 
 ![POS_eject1](../images/POS_Eject1.png)
 
+## Create virtual bins
 
-To create virtual bins: 
+To create virtual bins, follow the provided steps:
 
 > [!Note]
 > Virtual bins are used for payment by card.

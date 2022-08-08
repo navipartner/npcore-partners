@@ -9,7 +9,7 @@ Each POS store can contain multiple POS units. Most of the time, these units hav
  - Have at least one existing POS unit in the system that you can copy values from.
 
  
-To create a new POS unit:
+To create a new POS unit, follow the provided steps:
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List** and choose the related link.     
    A list of all existing POS units is displayed.  
