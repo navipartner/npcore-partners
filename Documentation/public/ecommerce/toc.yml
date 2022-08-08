@@ -4,6 +4,10 @@
   items:
   - name: Create a brand
     href: howto/create_brand.md
+  - name: Edit a brand
+    href: howto/edit_brand.md
+  - name: Delete a brand
+    href: howto/delete_brand.md
 - name: Reference guides
   items: 
   - name: Brands (Reference guide)
