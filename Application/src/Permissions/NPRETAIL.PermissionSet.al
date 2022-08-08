@@ -2383,7 +2383,6 @@ report "NPR Item Barcode Status Sheet" = X,
 report "NPR Item Barcode Status Sheet" = X,
 #endif
 report "NPR Item Categ. List. M/Y new" = X,
-report "NPR Item Category Overview" = X,
 report "NPR Item Category Top" = X,
 report "NPR Item Cat. Inv. Value" = X,
 report "NPR Item - Loss" = X,

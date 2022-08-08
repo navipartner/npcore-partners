@@ -651,14 +651,6 @@
                             ApplicationArea = NPRRetail;
                             ToolTip = 'Executes the Item Category Listing M/Y action.';
                         }
-                        action("NPR Item Category Overview")
-                        {
-                            Caption = 'Item Category Overview';
-                            Image = Report;
-                            RunObject = report "NPR Item Category Overview";
-                            ApplicationArea = NPRRetail;
-                            ToolTip = 'Executes the Item Category Overview action.';
-                        }
                     }
                     group(Discount)
                     {
