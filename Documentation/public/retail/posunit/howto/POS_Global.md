@@ -37,5 +37,5 @@ There's a way to track all POS transactions from other companies in the master c
 
 - [POS unit](../explanation/POSUnit.md)
 - [Set up the POS Named Action Profile](Named_Action_Code.md)
-- [POS view profile](../explanation/POS_view_profile.md)
+- [POS view profile](../reference/POS_view_profile.md)
 - [POS unit Receipt Text Profile](../explanation/POS_unit_Receipt_profile.md)

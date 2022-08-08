@@ -4,7 +4,7 @@ POS menus are used for defining buttons used in the POS.
 All menus can be divided into main menus and supporting menus.
 Main menus are used in the POS view and those are:
 
-1. LOGIN
+- LOGIN
 
 ![POSmenu](../images/LOGIN.png)
 
@@ -31,11 +31,9 @@ It's also possible to create support menus. They are used as popup menus.
 ![POPUP](../images/POPUP%20MENU.png)
 
 All menus are created in **POS Menus** page in Business Central.
-This page contains the list of all created menus. Menus can be defined for all POS units or for specific ones, in which case it is necessary to provide the **POS Unit No.** of that specific POS unit.    
-It is also possible to provide access to some menus to specific salespeople only, in which case the **Salesperson code** needs to be provided.  
+This page contains the list of all created menus. Menus can be defined for all POS units or for specific ones, in which case it is necessary to provide the **POS Unit No.** of that specific POS unit. It is also possible to provide access to some menus to specific salespeople only, in which case the **Salesperson code** needs to be provided.  
 
 ### Related links
-
 
 - [POS unit](POSUnit.md)
 - [Create a new button in the POS menu](../howto/add_button_to_pos_menu.md)

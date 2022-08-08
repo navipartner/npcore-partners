@@ -17,3 +17,7 @@ Yes. To enable time-based validation of coupons, follow the provided steps:
    3. Insert the start time and end time for this coupon type in the **Valid Time Intervals** popup window.   
 
    <img src="./images/coupon_validate_time.PNG" width="550">
+
+### Related link
+
+- [Coupon types (Reference guide)](../retail/coupons/reference/coupon_types.md)
