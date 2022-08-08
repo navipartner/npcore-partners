@@ -1,14 +1,17 @@
 report 6014408 "NPR Item Category Overview"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Category Overview.rdlc';
     Caption = 'Item Category Overview';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
+    ObsoleteReason = 'Not used.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '17.0';
 
     dataset
     {
