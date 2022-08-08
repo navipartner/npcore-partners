@@ -8,24 +8,24 @@
     href: explanation/POS_Self_Service_Actions.md
   - name: POS menu
     href: explanation/POS_menu.md
-  - name: POS Unit Receipt Text Profile
-    href: explanation/POS_unit_Receipt_profile.md
-  - name: POS Input Box profile
+  - name: POS Input Box Profile
     href: explanation/POS_input_box_profile.md
-  - name: POS Audit Profile
-    href: explanation/POS_audit_profile.md
-  - name: POS View Profile
-    href: explanation/POS_view_profile.md
   - name: POS Display Profile
     href: explanation/POS_Display_profile.md
-  - name: POS End of Day Profile
-    href: explanation/POS_End_of_Day_Profile.md
-  - name: POS posting setup
+  - name: POS Posting Setup
     href: explanation/POS_posting_setup.md
-  - name: POS Payment View Event Setup
-    href: explanation/POS_Payment_View_Event_Setup.md
-  - name: EFT setup
-    href: explanation/EFT_setup.md
+  - name: POS Unit Receipt Text Profile (Reference guide)
+    href: explanation/POS_unit_Receipt_profile.md
+- name: Reference
+  items:
+  - name: POS Audit Profile (Reference guide)
+    href: reference/POS_audit_profile.md
+  - name: POS View Profile (Reference guide)
+    href: reference/POS_view_profile.md
+  - name: POS Payment View Event Setup (Reference guide)
+    href: reference/POS_Payment_View_Event_Setup.md
+  - name: POS End of Day Profile (Reference guide)
+    href: reference/POS_End_of_Day_Profile.md
 - name: How-To  
   items:
   - name: Create a new POS Unit

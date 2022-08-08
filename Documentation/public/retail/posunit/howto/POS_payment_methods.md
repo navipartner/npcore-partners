@@ -40,4 +40,4 @@ To create new POS payment method, follow the provided steps:
 
 ### Related links
 
-- [EFT setup](../explanation/EFT_setup.md)
+- [EFT setup](../../eft/explanation/EFT_setup.md

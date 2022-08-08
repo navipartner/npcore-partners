@@ -3,23 +3,26 @@
 In order to have a working POS unit, certain actions need to be set correctly. This is done with the POS Named Actions profile.   
 Follow the provided steps to set all actions that need to be set in order to have a fully operational POS unit.
 
-Fist thing that needs to be done is create and set **POS Named Action Profile**.
+First, you need to create and set the **POS Named Action Profile**.
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Actions Profiles** and choose the related link.
 2. Create **New**.    
    The **POS Named Actions Profile** window is displayed.
 3. Type in the code in the **General** section.
 4. Populate the fields in the **Actions** section with the correct actions:
-   - **Login Action Code** (required) - add the action *LOGIN*.
-   - **Text Enter Action Code** (required) - add the action *TEXT_ENTER*.
-   - **Item Insert Action Code** (required) - add the action *ITEM*.
-   - **Payment Action Code** (required) - add the action *PAYMENT*.
-   - **Customer Action Code** (required) - add the action *INSERT_CUSTOMER* or *CUSTOMER_SELECT*.
-   - **Lock POS Action Code** - add the action *LOCK_POS*.
-   - **Unlock POS Action Code** - add the action *UNLOCK_POS*.
-   - **On Before Payment View Action Code** - populate this field with an action that should work before finishing the payment in the POS.
-   - **Idle Timeout Action Code** - add the action *SS_IDLE_TIMEOUT*.
-   - **Admin Menu Action Code** - add the action *SS_ADMIN_MENU*.
+
+| Field Name      | Description |
+| ----------- | ----------- |
+| **Login Action Code** (required)       | Add the action *LOGIN*.     |
+| **Text Enter Action Code** (required)   | Add the action *TEXT_ENTER*.        |
+| **Item Insert Action Code** (required)  | Add the action *ITEM*. |
+| **Payment Action Code** (required) | Add the action *PAYMENT*. |
+| **Customer Action Code** (required) | Add the action *INSERT_CUSTOMER* or *CUSTOMER_SELECT*. |
+| **Lock POS Action Code** | Add the action *LOCK_POS*. |
+| **Unlock POS Action Code** | Add the action *UNLOCK_POS* |
+| **On Before Payment View Action Code** | Populate this field with an action that should work before finishing the payment in the POS. |
+| **Idle Timeout Action Code** | Add the action *SS_IDLE_TIMEOUT*. |
+| **Admin Menu Action Code** | Add the action *SS_ADMIN_MENU*. |
 
 > [!Note]
 > All fields that are not marked as **(required)** are optional.
@@ -42,5 +45,5 @@ After setting up the POS Named Actions Profile, you need to add it to the POS Un
 ### Related links
 
 - [Set up the POS Global Sales Profile](POS_Global.md)
-- [POS view profile](../explanation/POS_view_profile.md)
+- [POS view profile](../reference/POS_view_profile.md)
 - [POS unit Receipt Text Profile](../explanation/POS_unit_Receipt_profile.md)
