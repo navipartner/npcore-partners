@@ -25,3 +25,5 @@ Brands are created and managed from the Magento Admin Panel. To create a new bra
 ### Related links
 
 - [Brands reference table](../reference/brands_reference_table.md)
+- [Edit a brand](edit_brand.md)
+- [Delete a brand](delete_brand.md)
