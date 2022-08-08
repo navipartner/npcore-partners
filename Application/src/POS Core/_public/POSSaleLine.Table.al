@@ -1849,7 +1849,7 @@
         ItemLedgerEntry.SetRange(Open, true);
         ItemLedgerEntry.SetRange(Positive, true);
         ItemLedgerEntry.SetRange("Serial No.", SerialNo);
-        if ItemLedgerEntry.FindFirst() then begin
+        if not ItemLedgerEntry.IsEmpty() then begin
             ItemLedgerEntry.CalcSums(Quantity);
             TotalItemLedgerEntryQuantity := ItemLedgerEntry.Quantity;
             if ItemLedgerEntry.Count() > 1 then
@@ -1865,7 +1865,7 @@
     begin
         POSSalesLine.SetRange("Item Entry No.", 0);
         POSSalesLine.SetRange("Serial No.", "Serial No.");
-        if POSSalesLine.FindFirst() then
+        if not POSSalesLine.IsEmpty() then
             POSSalesLine.CalcSums(Quantity);
         TotalAuditRollQuantity := POSSalesLine.Quantity;
 
