@@ -1,11 +1,18 @@
 # Inventory costing methods
 
-Different costing methods can cater to different business use cases in which you will be required to assign the unit cost differently. 
+Different costing methods can cater to different business use cases in which you will be required to assign the unit cost differently. The default costing method selection is performed in the **Inventory Setup** administrative section of Business Central.
+
+![inventory_setup_costing_method_selection](../images/inventory_setup_costing_method_selection.PNG)
 
 > [!Note]
-> Once selected, the costing method for an item can't be changed after it's been included in the transaction which included that item. 
+> Once selected, the costing method for an item can't be changed after it's been included in the transaction which included that item. You need to ensure that you've selected the correct costing method before proceeding with any further setup. 
 
+## Specific
 
+In the specific method, items are usually sold individually and serialized. To apply the specific costing method, you first need to specify the **Item Tracking Code**. Each item that is costed with the **Specific** method may have its unique price determined by its unique serial number. 
+
+> [!Tip]
+> The **Item Tracking Code** is defined in the **Item Tracking** section of the **Item Card**.
 
 ## FIFO
 
@@ -44,16 +51,25 @@ The **Average Cost Period** field determines the period over which a single aver
 
 You can view the detailed **Average Cost Calculation Overview** by clicking the **Unit Cost** value in the **Item Card** of your choice.
 
-> [!Important]
-> If **FIFO**, **LIFO** or **Average** costing methods are applied, the **Adjust Cost - Item Entries** report needs to be run. It is used for recalculating the unit cost after one of these costing methods are applied. To make sure all costs are up-to-date, it's recommended to schedule a recurring job which will adjust all modified cost each time it is automatically run. Jobs can be scheduled in the **Job Queue Entries** administrative section or from the **Automatic Cost Adjustment** field in **Inventory Setup**.
+### Automatic cost adjustment
 
-## Specific
+If **FIFO**, **LIFO** or **Average** costing methods are applied, the report for automatic cost adjustment needs to be run. It is used for recalculating the unit cost after one of these costing methods are applied. To make sure all costs are up-to-date, it's recommended to schedule a recurring job which will adjust all modified cost each time it is automatically run. 
 
-In the specific method, items are usually sold individually and serialized. To apply the specific costing method, you first need to specify the **Item Tracking Code**. Each item that is costed with the **Specific** method may have its unique price determined by its unique serial number. 
+Jobs can be scheduled in the following ways:
 
-> [!Tip]
-> The **Item Tracking Code** is defined in the **Item Tracking** section of the **Item Card**.
+- In the **Job Queue Entries**, you can select the **Adjust Cost - Item Entries** object to be run at the specified time and date. You can also set up intervals for a recurring job, if you wish to run it multiple times.
+
+<img src="../images/job_queue_entries_set_up_auto_cost_adjustment.PNG" width="600">
+
+> [!Note]
+> If you select **Always**, the cost will be automatically adjusted each time you post an item ledger entry.
+
+- In the **Inventory Setup** administrative section, you can set whether the automatic cost adjustments will be run, as well as the frequency of automatic cost adjustment jobs.
+
+<img src="../images/auto_cost_adjustment_intervals.PNG" width="600">
+
 
 ### Related links
 
 - [Inventory adjustments](inventory_adjustments.md)
+- [Revalue items (Item Revaluation Journal)](../howto/revaluation_journal.md)
