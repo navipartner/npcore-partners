@@ -99,7 +99,7 @@
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
         POSSalesLine.SetRange("No.", ItemVar."Item No.");
         POSSalesLine.SetRange("Variant Code", ItemVar.Code);
-        if POSSalesLine.FindFirst() then
+        if not POSSalesLine.IsEmpty() then
             Error(Text003, POSSalesLine.TableCaption, ItemVar.TableCaption, ItemVar.Code);
     end;
 
