@@ -8,9 +8,10 @@ After requesting an inventory pick, you can create a new inventory pick based on
 4. Select the type of the source document that will provide the necessary shipping information.   
    It is also possible to use the **Get Source Document** action from the ribbon, and select the document from the list of prepared documents.      
 
-   <img src="../images/get_source_document.png" width="400">    
+   <img src="../images/get_source_document.png" width="550">    
 
 5. Click **OK**.
+   An inventory pick is now created.
 
 ## Next steps
 
