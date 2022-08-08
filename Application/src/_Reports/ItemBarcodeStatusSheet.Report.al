@@ -15,6 +15,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
     {
         dataitem(Item; Item)
         {
+            CalcFields = "Net Change";
             column(CompanyName; CompanyName)
             {
             }
@@ -47,6 +48,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
                 if ItemVariant.IsEmpty() then
                     AddToBuffer("No.", '');
             end;
+
         }
         dataitem(TMPRetail_Journal_Line_Col1; "NPR Retail Journal Line")
         {
@@ -73,17 +75,19 @@ report 6014455 "NPR Item Barcode Status Sheet"
             column(BarCodeTempBlobCol1; TempBlobBuffer."Buffer 1")
             {
             }
-
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol1);
                 TempBlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
             end;
+
+
         }
         dataitem(TMPRetail_Journal_Line_Col2; "NPR Retail Journal Line")
         {
             DataItemTableView = SORTING("No.", "Line No.");
             UseTemporary = true;
+
             column(ItemNo_TMPRetailJournalLineCol2; TMPRetail_Journal_Line_Col2."Item No.")
             {
             }
@@ -144,6 +148,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
                 TempBlobBuffer.GetFromTempBlob(TempBlobCol3, 3);
             end;
         }
+
     }
 
     requestpage
@@ -156,8 +161,13 @@ report 6014455 "NPR Item Barcode Status Sheet"
                 field("Show Inventory"; ShowInventory)
                 {
                     Caption = 'Show Inventory';
-
-                    ToolTip = 'Specifies the value of the Show Inventory field';
+                    ToolTip = 'Displays inventory for items';
+                    ApplicationArea = NPRRetail;
+                }
+                field("End Date"; EndDate)
+                {
+                    Caption = 'End Date';
+                    ToolTip = 'Specifices the date for which inventory will be displayed';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -172,6 +182,13 @@ report 6014455 "NPR Item Barcode Status Sheet"
         Filters = 'Filters:';
         Variant = 'Variant:';
     }
+
+    trigger OnInitReport()
+    begin
+        EndDate := Today();
+    end;
+
+
 
     trigger OnPreReport()
     begin
@@ -201,6 +218,8 @@ report 6014455 "NPR Item Barcode Status Sheet"
         ItemVariantFilter: Text;
         TempBlobBuffer: Record "NPR BLOB buffer" temporary;
         Pct1Lbl: Label '%1: %2', locked = true;
+        EndDate: Date;
+
 
     local procedure AddToBuffer(ItemNo: Code[20]; VariantCode: Code[10])
     begin
@@ -212,13 +231,14 @@ report 6014455 "NPR Item Barcode Status Sheet"
                     TMPRetail_Journal_Line_Col1."No." := 'temp';
                     TMPRetail_Journal_Line_Col1."Line No." := LineNo;
                     TMPRetail_Journal_Line_Col1.Validate("Item No.", ItemNo);
-                    if StrLen(VariantCode) > 0 then begin
-                        TMPRetail_Journal_Line_Col1.Validate("Variant Code", VariantCode);
-                        if ShowInventory then
-                            TMPRetail_Journal_Line_Col1."Quantity to Print" := CalcVariantInventory(VariantCode);
-                    end else
-                        TMPRetail_Journal_Line_Col1."Quantity to Print" := Item.Inventory;
+                    if ShowInventory then
+                        if StrLen(VariantCode) > 0 then begin
+                            TMPRetail_Journal_Line_Col1.Validate("Variant Code", VariantCode);
 
+                            if ShowInventory then
+                                TMPRetail_Journal_Line_Col1."Quantity to Print" := CalcVariantInventory(VariantCode);
+                        end else
+                            TMPRetail_Journal_Line_Col1."Quantity to Print" := Item.Inventory;
                     TMPRetail_Journal_Line_Col1.Insert();
                 end;
             2:
@@ -227,13 +247,14 @@ report 6014455 "NPR Item Barcode Status Sheet"
                     TMPRetail_Journal_Line_Col2."No." := 'temp';
                     TMPRetail_Journal_Line_Col2."Line No." := LineNo;
                     TMPRetail_Journal_Line_Col2.Validate("Item No.", ItemNo);
-                    if StrLen(VariantCode) > 0 then begin
-                        TMPRetail_Journal_Line_Col2.Validate("Variant Code", VariantCode);
-                        if ShowInventory then
-                            TMPRetail_Journal_Line_Col2."Quantity to Print" := CalcVariantInventory(VariantCode);
-                    end else
-                        TMPRetail_Journal_Line_Col2."Quantity to Print" := Item.Inventory;
 
+                    if ShowInventory then
+                        if StrLen(VariantCode) > 0 then begin
+                            TMPRetail_Journal_Line_Col2.Validate("Variant Code", VariantCode);
+                            if ShowInventory then
+                                TMPRetail_Journal_Line_Col2."Quantity to Print" := CalcVariantInventory(VariantCode);
+                        end else
+                            TMPRetail_Journal_Line_Col2."Quantity to Print" := Item.Inventory;
                     TMPRetail_Journal_Line_Col2.Insert();
                 end;
             3:
@@ -242,12 +263,13 @@ report 6014455 "NPR Item Barcode Status Sheet"
                     TMPRetail_Journal_Line_Col3."No." := 'temp';
                     TMPRetail_Journal_Line_Col3."Line No." := LineNo;
                     TMPRetail_Journal_Line_Col3.Validate("Item No.", ItemNo);
-                    if StrLen(VariantCode) > 0 then begin
-                        TMPRetail_Journal_Line_Col3.Validate("Variant Code", VariantCode);
-                        if ShowInventory then
-                            TMPRetail_Journal_Line_Col3."Quantity to Print" := CalcVariantInventory(VariantCode);
-                    end else
-                        TMPRetail_Journal_Line_Col3."Quantity to Print" := Item.Inventory;
+                    if ShowInventory then
+                        if StrLen(VariantCode) > 0 then begin
+                            TMPRetail_Journal_Line_Col3.Validate("Variant Code", VariantCode);
+                            if ShowInventory then
+                                TMPRetail_Journal_Line_Col3."Quantity to Print" := CalcVariantInventory(VariantCode);
+                        end else
+                            TMPRetail_Journal_Line_Col3."Quantity to Print" := Item.Inventory;
 
                     TMPRetail_Journal_Line_Col3.Insert();
                     i := 0;
@@ -263,8 +285,9 @@ report 6014455 "NPR Item Barcode Status Sheet"
     begin
         Item2.Copy(Item);
         Item2.SetRange("Variant Filter", VariantCode);
-        Item2.CalcFields(Inventory);
-        exit(Item2.Inventory);
+        Item2.CalcFields("Inventory");
+        exit(Item2."Inventory");
+
     end;
 }
 #endif

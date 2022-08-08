@@ -11,6 +11,100 @@
       <rd:DataSourceID>8873fa1b-c8d1-4567-a1a4-e1e9f58cd095</rd:DataSourceID>
     </DataSource>
   </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+      <Fields>
+        <Field Name="CompanyName">
+          <DataField>CompanyName</DataField>
+        </Field>
+        <Field Name="ItemFilter">
+          <DataField>ItemFilter</DataField>
+        </Field>
+        <Field Name="ItemVariantFilter">
+          <DataField>ItemVariantFilter</DataField>
+        </Field>
+        <Field Name="ShowInventory">
+          <DataField>ShowInventory</DataField>
+        </Field>
+        <Field Name="ItemNo_TMPRetailJournalLineCol1">
+          <DataField>ItemNo_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="Description_TMPRetailJournalLineCol1">
+          <DataField>Description_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="Description2_TMPRetailJournalLineCol1">
+          <DataField>Description2_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="Inventory_TMPRetailJournalLineCol1">
+          <DataField>Inventory_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="Inventory_TMPRetailJournalLineCol1Format">
+          <DataField>Inventory_TMPRetailJournalLineCol1Format</DataField>
+        </Field>
+        <Field Name="VariantCode_TMPRetailJournalLineCol1">
+          <DataField>VariantCode_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="ShowVariantInfo_TMPRetailJournalLineCol1">
+          <DataField>ShowVariantInfo_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="BarCodeTempBlobCol1">
+          <DataField>BarCodeTempBlobCol1</DataField>
+        </Field>
+        <Field Name="ItemNo_TMPRetailJournalLineCol2">
+          <DataField>ItemNo_TMPRetailJournalLineCol2</DataField>
+        </Field>
+        <Field Name="Description_TMPRetailJournalLineCol2">
+          <DataField>Description_TMPRetailJournalLineCol2</DataField>
+        </Field>
+        <Field Name="Description2_TMPRetailJournalLineCol2">
+          <DataField>Description2_TMPRetailJournalLineCol2</DataField>
+        </Field>
+        <Field Name="Inventory_TMPRetailJournalLineCol2">
+          <DataField>Inventory_TMPRetailJournalLineCol2</DataField>
+        </Field>
+        <Field Name="Inventory_TMPRetailJournalLineCol2Format">
+          <DataField>Inventory_TMPRetailJournalLineCol2Format</DataField>
+        </Field>
+        <Field Name="VariantCode_TMPRetailJournalLineCol2">
+          <DataField>VariantCode_TMPRetailJournalLineCol2</DataField>
+        </Field>
+        <Field Name="ShowVariantInfo_TMPRetailJournalLineCol2">
+          <DataField>ShowVariantInfo_TMPRetailJournalLineCol2</DataField>
+        </Field>
+        <Field Name="BarCodeTempBlobCol2">
+          <DataField>BarCodeTempBlobCol2</DataField>
+        </Field>
+        <Field Name="ItemNo_TMPRetailJournalLineCol3">
+          <DataField>ItemNo_TMPRetailJournalLineCol3</DataField>
+        </Field>
+        <Field Name="Description_TMPRetailJournalLineCol3">
+          <DataField>Description_TMPRetailJournalLineCol3</DataField>
+        </Field>
+        <Field Name="Description2_TMPRetailJournalLineCol3">
+          <DataField>Description2_TMPRetailJournalLineCol3</DataField>
+        </Field>
+        <Field Name="Inventory_TMPRetailJournalLineCol3">
+          <DataField>Inventory_TMPRetailJournalLineCol3</DataField>
+        </Field>
+        <Field Name="Inventory_TMPRetailJournalLineCol3Format">
+          <DataField>Inventory_TMPRetailJournalLineCol3Format</DataField>
+        </Field>
+        <Field Name="VariantCode_TMPRetailJournalLineCol3">
+          <DataField>VariantCode_TMPRetailJournalLineCol3</DataField>
+        </Field>
+        <Field Name="ShowVariantInfo_TMPRetailJournalLineCol3">
+          <DataField>ShowVariantInfo_TMPRetailJournalLineCol3</DataField>
+        </Field>
+        <Field Name="BarCodeTempBlobCol3">
+          <DataField>BarCodeTempBlobCol3</DataField>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -860,13 +954,13 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>3.07677cm</Height>
+        <Height>3.36781cm</Height>
         <Style />
       </Body>
       <Width>20.62937cm</Width>
       <Page>
         <PageHeader>
-          <Height>2.52829cm</Height>
+          <Height>3.90412cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -889,7 +983,6 @@
               </Paragraphs>
               <rd:DefaultName>Textbox1</rd:DefaultName>
               <Top>0.24611cm</Top>
-              <Left>0.4579cm</Left>
               <Height>0.7cm</Height>
               <Width>9.24688cm</Width>
               <Style>
@@ -916,14 +1009,16 @@
                       </Style>
                     </TextRun>
                   </TextRuns>
-                  <Style />
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox2</rd:DefaultName>
-              <Top>0.93731cm</Top>
-              <Left>0.4579cm</Left>
+              <Top>0.59419cm</Top>
+              <Left>12.60689cm</Left>
               <Height>0.5cm</Height>
-              <Width>9.24688cm</Width>
+              <Width>7.87105cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
                 <Border>
@@ -953,10 +1048,9 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox6</rd:DefaultName>
-              <Top>2.06058cm</Top>
-              <Left>0.43389cm</Left>
+              <Top>3.33058cm</Top>
               <Height>0.46771cm</Height>
-              <Width>19.85152cm</Width>
+              <Width>20.02004cm</Width>
               <ZIndex>2</ZIndex>
               <Style>
                 <Border>
@@ -988,8 +1082,8 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox7</rd:DefaultName>
-              <Top>0.35306cm</Top>
-              <Left>15.90687cm</Left>
+              <Top>1.12947cm</Top>
+              <Left>16.0994cm</Left>
               <Height>0.49305cm</Height>
               <Width>4.37854cm</Width>
               <ZIndex>3</ZIndex>
@@ -1010,7 +1104,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!PageNo.Value &amp; " " &amp; Globals!PageNumber</Value>
+                      <Value>="Page " &amp; Globals!PageNumber &amp; " of " &amp; Globals!TotalPages</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -1023,8 +1117,8 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox8</rd:DefaultName>
-              <Top>0.88251cm</Top>
-              <Left>15.90687cm</Left>
+              <Top>1.65892cm</Top>
+              <Left>16.0994cm</Left>
               <Height>0.52833cm</Height>
               <Width>4.37854cm</Width>
               <ZIndex>4</ZIndex>
@@ -1058,8 +1152,8 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>1.44612cm</Top>
-              <Left>15.90687cm</Left>
+              <Top>2.22253cm</Top>
+              <Left>16.0994cm</Left>
               <Height>0.49305cm</Height>
               <Width>4.37854cm</Width>
               <ZIndex>5</ZIndex>
@@ -1091,8 +1185,7 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox10</rd:DefaultName>
-              <Top>1.6137cm</Top>
-              <Left>0.4579cm</Left>
+              <Top>2.68647cm</Top>
               <Height>0.57355cm</Height>
               <Width>2.02375cm</Width>
               <ZIndex>6</ZIndex>
@@ -1207,98 +1300,4 @@
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>0ddd538c-2e1c-4b19-9bdd-80ed5f3d62d5</rd:ReportID>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Fields>
-        <Field Name="CompanyName">
-          <DataField>CompanyName</DataField>
-        </Field>
-        <Field Name="ItemFilter">
-          <DataField>ItemFilter</DataField>
-        </Field>
-        <Field Name="ItemVariantFilter">
-          <DataField>ItemVariantFilter</DataField>
-        </Field>
-        <Field Name="ShowInventory">
-          <DataField>ShowInventory</DataField>
-        </Field>
-        <Field Name="ItemNo_TMPRetailJournalLineCol1">
-          <DataField>ItemNo_TMPRetailJournalLineCol1</DataField>
-        </Field>
-        <Field Name="Description_TMPRetailJournalLineCol1">
-          <DataField>Description_TMPRetailJournalLineCol1</DataField>
-        </Field>
-        <Field Name="Description2_TMPRetailJournalLineCol1">
-          <DataField>Description2_TMPRetailJournalLineCol1</DataField>
-        </Field>
-        <Field Name="Inventory_TMPRetailJournalLineCol1">
-          <DataField>Inventory_TMPRetailJournalLineCol1</DataField>
-        </Field>
-        <Field Name="Inventory_TMPRetailJournalLineCol1Format">
-          <DataField>Inventory_TMPRetailJournalLineCol1Format</DataField>
-        </Field>
-        <Field Name="VariantCode_TMPRetailJournalLineCol1">
-          <DataField>VariantCode_TMPRetailJournalLineCol1</DataField>
-        </Field>
-        <Field Name="ShowVariantInfo_TMPRetailJournalLineCol1">
-          <DataField>ShowVariantInfo_TMPRetailJournalLineCol1</DataField>
-        </Field>
-        <Field Name="BarCodeTempBlobCol1">
-          <DataField>BarCodeTempBlobCol1</DataField>
-        </Field>
-        <Field Name="ItemNo_TMPRetailJournalLineCol2">
-          <DataField>ItemNo_TMPRetailJournalLineCol2</DataField>
-        </Field>
-        <Field Name="Description_TMPRetailJournalLineCol2">
-          <DataField>Description_TMPRetailJournalLineCol2</DataField>
-        </Field>
-        <Field Name="Description2_TMPRetailJournalLineCol2">
-          <DataField>Description2_TMPRetailJournalLineCol2</DataField>
-        </Field>
-        <Field Name="Inventory_TMPRetailJournalLineCol2">
-          <DataField>Inventory_TMPRetailJournalLineCol2</DataField>
-        </Field>
-        <Field Name="Inventory_TMPRetailJournalLineCol2Format">
-          <DataField>Inventory_TMPRetailJournalLineCol2Format</DataField>
-        </Field>
-        <Field Name="VariantCode_TMPRetailJournalLineCol2">
-          <DataField>VariantCode_TMPRetailJournalLineCol2</DataField>
-        </Field>
-        <Field Name="ShowVariantInfo_TMPRetailJournalLineCol2">
-          <DataField>ShowVariantInfo_TMPRetailJournalLineCol2</DataField>
-        </Field>
-        <Field Name="BarCodeTempBlobCol2">
-          <DataField>BarCodeTempBlobCol2</DataField>
-        </Field>
-        <Field Name="ItemNo_TMPRetailJournalLineCol3">
-          <DataField>ItemNo_TMPRetailJournalLineCol3</DataField>
-        </Field>
-        <Field Name="Description_TMPRetailJournalLineCol3">
-          <DataField>Description_TMPRetailJournalLineCol3</DataField>
-        </Field>
-        <Field Name="Description2_TMPRetailJournalLineCol3">
-          <DataField>Description2_TMPRetailJournalLineCol3</DataField>
-        </Field>
-        <Field Name="Inventory_TMPRetailJournalLineCol3">
-          <DataField>Inventory_TMPRetailJournalLineCol3</DataField>
-        </Field>
-        <Field Name="Inventory_TMPRetailJournalLineCol3Format">
-          <DataField>Inventory_TMPRetailJournalLineCol3Format</DataField>
-        </Field>
-        <Field Name="VariantCode_TMPRetailJournalLineCol3">
-          <DataField>VariantCode_TMPRetailJournalLineCol3</DataField>
-        </Field>
-        <Field Name="ShowVariantInfo_TMPRetailJournalLineCol3">
-          <DataField>ShowVariantInfo_TMPRetailJournalLineCol3</DataField>
-        </Field>
-        <Field Name="BarCodeTempBlobCol3">
-          <DataField>BarCodeTempBlobCol3</DataField>
-        </Field>
-      </Fields>
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-    </DataSet>
-  </DataSets>
 </Report>
