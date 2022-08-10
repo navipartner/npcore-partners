@@ -1,7 +1,9 @@
 ﻿codeunit 6014456 "NPR Item Category Mgt."
 {
-    #region Item Category creation and modification management
+    var
+        ConfirmationManagement: Codeunit "Confirm Management";
 
+    #region Item Category creation and modification management
     internal procedure UpdateItemDiscGroupOnItems(ItemCategory: Record "Item Category"; ItemDiscGroupCode: Code[20]; xItemDiscGroupCode: Code[20])
     var
         Item: Record Item;
@@ -16,7 +18,7 @@
         if not Item.IsEmpty() then begin
             Item.SetFilter("Item Disc. Group", '<>%1', xItemDiscGroupCode);
             if not Item.IsEmpty() then
-                if ConfirmedOrGuiNotAlloved(
+                if ConfirmationManagement.GetResponseOrDefault(
                         StrSubstNo(ConfirmQst, ItemCategory.TableCaption(), ItemCategory.Code, xItemDiscGroupCode, Item.FieldCaption("Item Disc. Group"), ItemDiscGroupCode),
                         false)
                 then
@@ -40,7 +42,7 @@
         ParentItemCategory.Get(ItemCategory."Parent Category");
 
         if (not Silent) then
-            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+            if not ConfirmationManagement.GetResponseOrDefault(ConfirmQst, false) then
                 exit;
 
         CopyItemCategory(ParentItemCategory, ItemCategory);
@@ -57,7 +59,7 @@
             exit;
 
         if not Silent then
-            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+            if not ConfirmationManagement.GetResponseOrDefault(ConfirmQst, false) then
                 exit;
 
         ChildItemCategory.FindSet();
@@ -87,19 +89,20 @@
     internal procedure SetBlockedOnChildren(ParentCode: Code[20]; IsBlocked: Boolean; Silent: Boolean)
     var
         ItemCategory: Record "Item Category";
-        ConfirmQst: Label 'Do you wish to set %1 to %2  on Item Categories below this level?';
+        ConfirmQst: Label 'Do you wish to set %1 to %2 on Item Categories below this level?';
     begin
         ItemCategory.SetRange("Parent Category", ParentCode);
         if ItemCategory.IsEmpty() then
             exit;
 
         if not Silent then
-            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+            if not ConfirmationManagement.GetResponseOrDefault(StrSubstNo(ConfirmQst, ItemCategory.FieldCaption("NPR Blocked"), IsBlocked), false) then
                 exit;
 
         if ItemCategory.FindSet(true) then
             repeat
                 ItemCategory."NPR Blocked" := IsBlocked;
+                ItemCategory.Modify(true);
                 SetBlockedOnChildren(ItemCategory.Code, IsBlocked, true);
             until ItemCategory.Next() = 0;
     end;
@@ -462,7 +465,7 @@
             exit;
 
         if not Silent then
-            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+            if not ConfirmationManagement.GetResponseOrDefault(ConfirmQst, false) then
                 exit;
 
         ChildItemCategory.FindSet();
@@ -500,7 +503,7 @@
             exit;
 
         if not Silent then
-            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+            if not ConfirmationManagement.GetResponseOrDefault(ConfirmQst, false) then
                 exit;
 
         DefaultDimension.FindSet();
@@ -536,7 +539,7 @@
             exit;
 
         if not Silent then
-            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+            if not ConfirmationManagement.GetResponseOrDefault(ConfirmQst, false) then
                 exit;
 
         repeat
@@ -549,18 +552,6 @@
             DefaultDimension2."No." := Item."No.";
             DefaultDimension2.Insert(true);
         until DefaultDimension.Next() = 0;
-    end;
-
-    #endregion
-
-    #region misc 
-
-    internal procedure ConfirmedOrGuiNotAlloved(Qst: Text; Default: Boolean): Boolean
-    begin
-        if not GuiAllowed() then
-            exit(Default);
-
-        exit(Confirm(Qst));
     end;
 
     #endregion
