@@ -80,6 +80,11 @@
                     ToolTip = 'Set up whether a copy is printed or not. Available options are: Always, Once, Never.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Do Not Print Receipt on Sale"; Rec."Do Not Print Receipt on Sale")
+                {
+                    ToolTip = 'Specifies whether printing of receipts on POS sale end is suppressed.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Require Item Return Reason"; Rec."Require Item Return Reason")
                 {
                     ApplicationArea = NPRRetail;

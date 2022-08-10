@@ -314,6 +314,7 @@
         POSAuditProfile.TestField("Balancing Fiscal No. Series");
         POSAuditProfile.TestField("Fill Sale Fiscal No. On", POSAuditProfile."Fill Sale Fiscal No. On"::Successful);
         POSAuditProfile.TestField("Print Receipt On Sale Cancel", false);
+        POSAuditProfile.TestField("Do Not Print Receipt on Sale", false);
 
         if POSEndofDayProfile.Get(POSUnit."POS End of Day Profile") then
             POSEndofDayProfile.TestField(POSEndofDayProfile."End of Day Type", POSEndofDayProfile."End of Day Type"::INDIVIDUAL);

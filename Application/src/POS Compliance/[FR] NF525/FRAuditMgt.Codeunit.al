@@ -1302,6 +1302,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSAuditProfile.TestField("Balancing Fiscal No. Series");
         POSAuditProfile.TestField("Fill Sale Fiscal No. On", POSAuditProfile."Fill Sale Fiscal No. On"::Successful);
         POSAuditProfile.TestField("Print Receipt On Sale Cancel", false);
+        POSAuditProfile.TestField("Do Not Print Receipt on Sale", false);
         POSAuditProfile.TestField("Allow Zero Amount Sales", false);
         POSAuditProfile.TestField("Require Item Return Reason", true);
 
