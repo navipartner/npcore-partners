@@ -29,7 +29,9 @@
       {
         "files": [
           "images/**",
-          "**/images/**"
+          "**/images/**",
+          "files/**",
+          "**/files/**"
         ],
         "src": "../../public"
       }

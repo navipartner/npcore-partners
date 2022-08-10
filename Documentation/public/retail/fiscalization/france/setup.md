@@ -1,3 +1,4 @@
+# Setup
 This article details how to configure NP Retail for compliance in France in relation to NF 525 legislation.
 
 ## BC Permissions
@@ -18,6 +19,7 @@ This will automatically block opening of the POS on that POS Unit if any other s
 ## Certificate generation and upload.
 Reach out to NaviPartner for a self-signed certificate that is specific to your customer with the proper algorithm. 
 On the "FR Compliance Setup" page, a password protected export of the certificate must be uploaded with correct password inserted in field "Signing Certificate Password".
+
 ## Number Series
 On the "FR Compliance Setup" page you can setup POS unit specific number series under action "Unit No. Series Setup". 
 

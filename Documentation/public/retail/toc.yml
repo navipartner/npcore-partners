@@ -12,8 +12,8 @@
   href: coupons/toc.yml
 - name: Vouchers
   href: vouchers/toc.yml
-- name: POS fiscalization
-  href: posfiscalization/toc.yml
+- name: Loyalty
+  href: loyalty/toc.yml
 - name: End user communication
   href: sms/toc.yml
 - name: GDPR in NP Retail
@@ -24,3 +24,5 @@
   href: webshopintegrations/toc.yml
 - name: Varieties in NP Retail
   href: varieties/toc.yml
+- name: Fiscalization
+  href: fiscalization/toc.yml

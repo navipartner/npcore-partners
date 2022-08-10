@@ -1,9 +1,5 @@
 - name: Introduction
   href: intro.md
-- name: Germany  
-  items:
-  - name: Setup
-    href: germany/setup.md
 - name: France
   items:
   - name: Compliance Info
@@ -12,3 +8,5 @@
     href: france/setup.md    
   - name: Archive
     href: france/archive.md
+  - name: Archive (French)
+    href: france/archive_fr.md

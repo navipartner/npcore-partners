@@ -1,3 +1,4 @@
+# NF 525 compliance
 This article provides a technical overview of NP Retail and french NF 525 compliance.
 
 ## Certification Details
@@ -75,6 +76,7 @@ See below sections for breakdown of data in these events.
 
 ### JET Events
 List of supported JET events in NP Retail:
+
 | Code | Event | Data in "Additional Info" |
 |-----|-----|-----|
 | 20 | Monthly Archive Attempt | Sequence number of the balancing POS Entry |
@@ -89,7 +91,8 @@ List of supported JET events in NP Retail:
 | 240 | Partner Modification | A description of the modification made |
 | 260 | JET Initialization | Blank |
 | 320 | Cancel Sale | Salesperson code |
-| 910 | Non item amount | Blank |
+| 910 | Non item amount | Ticket Fiscal Number, a pipe separator and the non-item amount decimal |
+
 
 List of data included in a signed JET event, in order, separated by comma:
 - Sequential Number
@@ -151,7 +154,7 @@ Note:
 The "Additional Info" field consists of one value: This is the reprint number.
 
 ### TICKET Events
-A TICKET event is a POS sale. Return sales are included, but carry a negative amount.
+A ticket event is a POS sale. Return sales are included, but carry a negative amount.
 
 List of data included in a signed TICKET event, in order of separation:
 - A breakdown of all tax amounts per VAT rate.
@@ -164,7 +167,7 @@ List of data included in a signed TICKET event, in order of separation:
 
 
 ### ARCHIVE Events
-The archive event is created when an archive of a monthly period is created.
+An archive event is created when an archive of a monthly period is created.
 
 
 List of data included in a signed ARCHIVE event, in order of separation:
