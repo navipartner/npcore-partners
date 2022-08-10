@@ -10,7 +10,7 @@ trigger:
     - Documentation/internal/*
 
 pool:
-  name: NP Core Pipelines
+  vmImage: "windows-2022"
 
 variables:
   docfxUrl: 'https://github.com/dotnet/docfx/releases/download/v2.58.4/docfx.zip'
