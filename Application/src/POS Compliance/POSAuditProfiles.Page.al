@@ -65,6 +65,11 @@
                     ToolTip = 'Specifies the value of the Print Receipt On Sale Cancel field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Do Not Print Receipt on Sale"; Rec."Do Not Print Receipt on Sale")
+                {
+                    ToolTip = 'Specifies whether printing of receipts on POS sale end is suppressed.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Allow Printing Receipt Copy"; Rec."Allow Printing Receipt Copy")
                 {
                     ToolTip = 'Specifies the value of the Allow Printing Receipt Copy field';
