@@ -6,27 +6,28 @@ pageextension 6014446 "NPR Item Categories" extends "Item Categories"
         {
             field("NPR Global Dimension 1 Code"; Rec."NPR Global Dimension 1 Code")
             {
-
                 ToolTip = 'Specifies the value of the NPR Global Dimension 1 Code field';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Global Dimension 2 Code"; Rec."NPR Global Dimension 2 Code")
             {
-
                 ToolTip = 'Specifies the value of the NPR Global Dimension 2 Code field';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Item Template Code"; Rec."NPR Item Template Code")
             {
-
                 ToolTip = 'Specifies the value of the NPR Item Template Code field';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Blocked"; Rec."NPR Blocked")
             {
-
                 ToolTip = 'Specifies the value of the NPR Blocked field';
                 ApplicationArea = NPRRetail;
+
+                trigger OnValidate()
+                begin
+                    CurrPage.Update(false);
+                end;
             }
         }
     }
