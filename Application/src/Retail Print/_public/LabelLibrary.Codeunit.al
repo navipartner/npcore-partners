@@ -1,16 +1,9 @@
 ﻿codeunit 6014413 "NPR Label Library"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
-        Text00001: Label 'Please enter quantity.';
-        TmpSelectionBuffer: RecordRef;
-        SelectionBufferOpen: Boolean;
-        Err_NoShippingLabelFound: Label 'No label setup for the selected shipping agent';
-        Err_InvalidShippingLabel: Label 'The selected shipping label cannot be printed from table: %1 ';
-        TmpRetailJnlCode: Code[40];
+        _TmpSelectionBuffer: RecordRef;
+        _SelectionBufferOpen: Boolean;
+        _TmpRetailJnlCode: Code[40];
 
     procedure ResolveVariantAndPrintItem(var Item: Record Item; ReportType: Integer) PrintedQty: Decimal
     var
@@ -91,6 +84,8 @@
         tmpCustRef: RecordRef;
         MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
         Customer: Record Customer;
+        Err_NoShippingLabelFound: Label 'No label setup for the selected shipping agent';
+        Err_InvalidShippingLabel: Label 'The selected shipping label cannot be printed from table: %1 ';
     begin
         case RecRef.Number of
             DATABASE::"Sales Header":
@@ -139,13 +134,13 @@
 
     internal procedure ToggleLine(var RecRefIn: RecordRef)
     begin
-        if not SelectionBufferOpen then begin
-            TmpSelectionBuffer.Open(RecRefIn.Number, true);
-            SelectionBufferOpen := true;
+        if not _SelectionBufferOpen then begin
+            _TmpSelectionBuffer.Open(RecRefIn.Number, true);
+            _SelectionBufferOpen := true;
         end;
 
-        if TmpSelectionBuffer.Get(RecRefIn.RecordId) then
-            TmpSelectionBuffer.Delete()
+        if _TmpSelectionBuffer.Get(RecRefIn.RecordId) then
+            _TmpSelectionBuffer.Delete()
         else
             TransferSelectionFields(RecRefIn);
     end;
@@ -154,9 +149,9 @@
     var
         RecRef: RecordRef;
     begin
-        if not SelectionBufferOpen then begin
-            TmpSelectionBuffer.Open(RecRefIn.Number, true);
-            SelectionBufferOpen := true;
+        if not _SelectionBufferOpen then begin
+            _TmpSelectionBuffer.Open(RecRefIn.Number, true);
+            _SelectionBufferOpen := true;
         end;
 
         if RecRefIn.FindSet() then
@@ -170,12 +165,12 @@
 
     internal procedure SelectionContains(var RecRefIn: RecordRef): Boolean
     begin
-        if not SelectionBufferOpen then begin
-            TmpSelectionBuffer.Open(RecRefIn.Number, true);
-            SelectionBufferOpen := true;
+        if not _SelectionBufferOpen then begin
+            _TmpSelectionBuffer.Open(RecRefIn.Number, true);
+            _SelectionBufferOpen := true;
         end;
 
-        exit(TmpSelectionBuffer.Get(RecRefIn.RecordId));
+        exit(_TmpSelectionBuffer.Get(RecRefIn.RecordId));
     end;
 
     local procedure TransferSelectionFields(var RecRefIn: RecordRef)
@@ -184,35 +179,29 @@
         FieldRefFrom: FieldRef;
         FieldRefTo: FieldRef;
     begin
-        if RecRefIn.Number <> TmpSelectionBuffer.Number then
+        if RecRefIn.Number <> _TmpSelectionBuffer.Number then
             exit;
 
-        TmpSelectionBuffer.Init();
+        _TmpSelectionBuffer.Init();
 
         Field.SetRange(TableNo, RecRefIn.Number);
-        //-NPR5.51 [367416]
         Field.SetRange(Enabled, true);
-        //+NPR5.51 [367416]
         if Field.FindSet() then
             repeat
-                //-NPR5.51 [367416]
                 if not FieldIsObsolete(Field.TableNo, Field."No.") then begin
-                    //+NPR5.51 [367416]
                     FieldRefFrom := RecRefIn.Field(Field."No.");
-                    FieldRefTo := TmpSelectionBuffer.Field(Field."No.");
+                    FieldRefTo := _TmpSelectionBuffer.Field(Field."No.");
                     FieldRefTo.Value(FieldRefFrom);
                 end;
             until Field.Next() = 0;
 
-        TmpSelectionBuffer.Insert();
+        _TmpSelectionBuffer.Insert();
     end;
 
     internal procedure SetSelectionBuffer(RecVariant: Variant)
     begin
-        //-NPR5.53 [374290]
-        TmpSelectionBuffer.GetTable(RecVariant);
-        SelectionBufferOpen := true;
-        //+NPR5.53 [374290]
+        _TmpSelectionBuffer.GetTable(RecVariant);
+        _SelectionBufferOpen := true;
     end;
 
     internal procedure PrintSelection(ReportType: Integer)
@@ -229,18 +218,18 @@
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         WarehouseActivityLine: Record "Warehouse Activity Line";
     begin
-        if not SelectionBufferOpen then
+        if not _SelectionBufferOpen then
             exit;
 
-        if TmpSelectionBuffer.FindSet() then begin
-            case TmpSelectionBuffer.Number of
+        if _TmpSelectionBuffer.FindSet() then begin
+            case _TmpSelectionBuffer.Number of
                 DATABASE::"NPR Retail Journal Line":
                     begin
                         repeat
-                            if RetailJournalLine.Get(TmpSelectionBuffer.RecordId) then begin
+                            if RetailJournalLine.Get(_TmpSelectionBuffer.RecordId) then begin
                                 RetailJournalLine.Mark(true);
                             end;
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         RetailJournalLine.MarkedOnly(true);
                         if RetailJournalLine.FindSet() then
                             PrintRetailJournal(RetailJournalLine, ReportType);
@@ -248,10 +237,10 @@
                 DATABASE::"Purchase Line":
                     begin
                         repeat
-                            if PurchaseLine.Get(TmpSelectionBuffer.RecordId) then begin
+                            if PurchaseLine.Get(_TmpSelectionBuffer.RecordId) then begin
                                 PurchaseLine.Mark(true);
                             end;
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         PurchaseLine.MarkedOnly(true);
                         if PurchaseLine.FindSet() then
                             PrintPurchaseOrder(PurchaseLine, ReportType);
@@ -259,44 +248,39 @@
                 DATABASE::"Transfer Line":
                     begin
                         repeat
-                            if TransferLine.Get(TmpSelectionBuffer.RecordId) then
+                            if TransferLine.Get(_TmpSelectionBuffer.RecordId) then
                                 TransferLine.Mark(true);
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         TransferLine.MarkedOnly(true);
                         if TransferLine.FindSet() then
                             PrintTransferOrder(TransferLine, ReportType);
                     end;
-                //-NPR5.29 [253966]
                 DATABASE::Bin:
                     begin
                         repeat
-                            if Bin.Get(TmpSelectionBuffer.RecordId) then
+                            if Bin.Get(_TmpSelectionBuffer.RecordId) then
                                 Bin.Mark(true);
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         Bin.MarkedOnly(true);
                         if Bin.FindSet() then
                             PrintBin(Bin, ReportType);
                     end;
-                //+NPR5.29 [253966]
-                //-NPR5.43 [317852]
                 DATABASE::"Item Journal Line":
                     begin
                         repeat
-                            if ItemJournalLine.Get(TmpSelectionBuffer.RecordId) then
+                            if ItemJournalLine.Get(_TmpSelectionBuffer.RecordId) then
                                 ItemJournalLine.Mark(true);
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         ItemJournalLine.MarkedOnly(true);
                         if ItemJournalLine.FindSet() then
                             PrintItemJournal(ItemJournalLine, ReportType);
                     end;
-                //+NPR5.43 [317852]
-                //-NPR5.46 [294354]
                 DATABASE::"Transfer Shipment Line":
                     begin
                         repeat
-                            if TransferShipmentLine.Get(TmpSelectionBuffer.RecordId) then
+                            if TransferShipmentLine.Get(_TmpSelectionBuffer.RecordId) then
                                 TransferShipmentLine.Mark(true);
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         TransferShipmentLine.MarkedOnly(true);
                         if TransferShipmentLine.IsEmpty then
                             exit;
@@ -305,9 +289,9 @@
                 DATABASE::"Transfer Receipt Line":
                     begin
                         repeat
-                            if TransferReceiptLine.Get(TmpSelectionBuffer.RecordId) then
+                            if TransferReceiptLine.Get(_TmpSelectionBuffer.RecordId) then
                                 TransferReceiptLine.Mark(true);
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         TransferReceiptLine.MarkedOnly(true);
                         if TransferReceiptLine.IsEmpty then
                             exit;
@@ -316,52 +300,45 @@
                 DATABASE::"NPR Period Discount Line":
                     begin
                         repeat
-                            if PeriodDiscountLine.Get(TmpSelectionBuffer.RecordId) then
+                            if PeriodDiscountLine.Get(_TmpSelectionBuffer.RecordId) then
                                 PeriodDiscountLine.Mark(true);
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         PeriodDiscountLine.MarkedOnly(true);
                         if PeriodDiscountLine.IsEmpty then
                             exit;
                         PrintPeriodDiscount(PeriodDiscountLine, ReportType);
                     end;
-                //+NPR5.46 [294354]
-                //-NPR5.51 [358287]
                 DATABASE::"Purch. Inv. Line":
                     begin
                         repeat
-                            if PurchInvLine.Get(TmpSelectionBuffer.RecordId) then begin
+                            if PurchInvLine.Get(_TmpSelectionBuffer.RecordId) then begin
                                 PurchInvLine.Mark(true);
                             end;
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         PurchInvLine.MarkedOnly(true);
                         if PurchInvLine.FindSet() then
                             PrintPostedPurchaseInvoice(PurchInvLine, ReportType);
                     end;
-                //-NPR5.51 [358287]
-                //-NPR5.52 [366969]
                 DATABASE::"NPR Item Worksheet Line":
                     begin
                         repeat
-                            if ItemWorksheetLine.Get(TmpSelectionBuffer.RecordId) then
+                            if ItemWorksheetLine.Get(_TmpSelectionBuffer.RecordId) then
                                 ItemWorksheetLine.Mark(true);
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         ItemWorksheetLine.MarkedOnly(true);
                         if ItemWorksheetLine.FindSet() then
                             PrintItemWorksheetLine(ItemWorksheetLine, ReportType);
                     end;
-                //+NPR5.52 [366969]
-                //-NPR5.55 [414268]
                 DATABASE::"Warehouse Activity Line":
                     begin
                         repeat
-                            if WarehouseActivityLine.Get(TmpSelectionBuffer.RecordId) then
+                            if WarehouseActivityLine.Get(_TmpSelectionBuffer.RecordId) then
                                 WarehouseActivityLine.Mark(true);
-                        until TmpSelectionBuffer.Next() = 0;
+                        until _TmpSelectionBuffer.Next() = 0;
                         WarehouseActivityLine.MarkedOnly(true);
                         if WarehouseActivityLine.FindSet() then
                             PrintWarehouseActivityLine(WarehouseActivityLine, ReportType);
                     end;
-            //-NPR5.55 [414268]
             end;
         end;
     end;
@@ -378,90 +355,60 @@
         PurchInvLine: Record "Purch. Inv. Line";
         WarehouseActivityLine: Record "Warehouse Activity Line";
     begin
-        //-NPR5.46 [294354]
-        TmpRetailJnlCode := Format(CreateGuid());
-        RetailJournalMgt.SetRetailJnlTemp(TmpRetailJnlCode);
-        //+NPR5.46 [294354]
+        _TmpRetailJnlCode := Format(CreateGuid());
+        RetailJournalMgt.SetRetailJnlTemp(_TmpRetailJnlCode);
 
-        //-NPR5.30 [262533]
         case RecRef.Number of
             DATABASE::"Purchase Line":
                 begin
                     RecRef.SetTable(PurchaseLine);
-                    //-NPR5.46.05 [334681]
                     if PurchaseLine.FindFirst() then;
-                    //+NPR5.46.05 [334681]
 
-                    //-NPR5.46 [294354]
-                    //PurchaseLineToRetailJnlLine(PurchaseLine, RetailJnlLine);
-                    RetailJournalMgt.PurchaseOrder2RetailJnl(PurchaseLine."Document Type", PurchaseLine."Document No.", TmpRetailJnlCode);
-                    //+NPR5.46 [294354]
+                    RetailJournalMgt.PurchaseOrder2RetailJnl(PurchaseLine."Document Type", PurchaseLine."Document No.", _TmpRetailJnlCode);
                 end;
             DATABASE::"Transfer Line":
                 begin
                     RecRef.SetTable(TransferLine);
-                    //-NPR5.46.05 [334681]
                     if TransferLine.FindFirst() then;
-                    //+NPR5.46.05 [334681]
 
-                    //-NPR5.46 [294354]
-                    //TransferLineToRetailJnlLine(TransferLine, RetailJnlLine);
-                    RetailJournalMgt.TransferOrder2RetailJnl(TransferLine."Document No.", TmpRetailJnlCode);
-                    //+NPR5.46 [294354]
-
+                    RetailJournalMgt.TransferOrder2RetailJnl(TransferLine."Document No.", _TmpRetailJnlCode);
                 end;
-            //-NPR5.46 [294354]
             DATABASE::"Transfer Shipment Line":
                 begin
                     RecRef.SetTable(TransferShipmentLine);
-                    //-NPR5.46.05 [334681]
                     if TransferShipmentLine.FindFirst() then;
-                    //+NPR5.46.05 [334681]
-
-                    RetailJournalMgt.TransferShipment2RetailJnl(TransferShipmentLine."Document No.", TmpRetailJnlCode);
+                    RetailJournalMgt.TransferShipment2RetailJnl(TransferShipmentLine."Document No.", _TmpRetailJnlCode);
                 end;
             DATABASE::"Transfer Receipt Line":
                 begin
                     RecRef.SetTable(TransferReceiptLine);
-                    //-NPR5.46.05 [334681]
                     if TransferReceiptLine.FindFirst() then;
-                    //+NPR5.46.05 [334681]
-
-                    RetailJournalMgt.TransferReceipt2RetailJnl(TransferReceiptLine."Document No.", TmpRetailJnlCode);
+                    RetailJournalMgt.TransferReceipt2RetailJnl(TransferReceiptLine."Document No.", _TmpRetailJnlCode);
                 end;
             DATABASE::"NPR Period Discount Line":
                 begin
                     RecRef.SetTable(PeriodDiscountLine);
-                    //-NPR5.46.05 [334681]
                     if PeriodDiscountLine.FindFirst() then;
-                    //+NPR5.46.05 [334681]
-
-                    RetailJournalMgt.Campaign2RetailJnl(PeriodDiscountLine.Code, TmpRetailJnlCode);
+                    RetailJournalMgt.Campaign2RetailJnl(PeriodDiscountLine.Code, _TmpRetailJnlCode);
                 end;
-            //-NPR5.51 [358287]
             DATABASE::"Purch. Inv. Line":
                 begin
                     RecRef.SetTable(PurchInvLine);
                     if PurchInvLine.FindFirst() then;
-                    RetailJournalMgt.PostedPurchaseInvoice2RetailJnl(PurchInvLine."Document No.", TmpRetailJnlCode);
+                    RetailJournalMgt.PostedPurchaseInvoice2RetailJnl(PurchInvLine."Document No.", _TmpRetailJnlCode);
                 end;
-            //+NPR5.51 [358287]
-            //-NPR5.55 [414268]
             DATABASE::"Warehouse Activity Line":
                 begin
                     RecRef.SetTable(WarehouseActivityLine);
                     if WarehouseActivityLine.FindFirst() then;
 #if BC17 or BC18 or BC19 
-                    RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.", TmpRetailJnlCode);
+                    RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.", _TmpRetailJnlCode);
 #else
-                    RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type".AsInteger(), WarehouseActivityLine."No.", TmpRetailJnlCode);
+                    RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type".AsInteger(), WarehouseActivityLine."No.", _TmpRetailJnlCode);
 #endif
                 end;
-            //+NPR5.55 [414268]
             else
                 Error('table %1 is not supported for selected Printing', RecRef.Number);
-        //+NPR5.46 [294354]
-
         end;
 
         Commit();
@@ -472,7 +419,6 @@
         PAGE.RunModal(PAGE::"NPR Retail Journal Print", RetailJnlLine);
 
         RetailJnlLine.DeleteAll();
-        //+NPR5.30 [262533]
     end;
 
     local procedure FieldIsObsolete(TableNo: Integer; FieldNo: Integer): Boolean
@@ -480,7 +426,6 @@
         FieldRecRef: RecordRef;
         FieldRef: FieldRef;
     begin
-        //-NPR5.51 [367416]
         FieldRecRef.Open(DATABASE::Field);
         if not FieldRecRef.FieldExist(25) then
             exit(false);
@@ -495,7 +440,6 @@
         FieldRef.SetFilter('<>%1', 2); //Option 2 = Removed
 
         exit(FieldRecRef.IsEmpty());
-        //+NPR5.51 [367416]
     end;
 
     internal procedure ItemToRetailJnlLine(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; PK: Code[40]; var RetailJournalLineOut: Record "NPR Retail Journal Line")
@@ -505,7 +449,6 @@
         ItemLedgerEntry: Record "Item Ledger Entry";
         POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.37 [289725]
         Item.Get(ItemNo);
 
         RetailJournalLine.SetRange("No.", PK);
@@ -529,7 +472,6 @@
         end;
 
         RetailJournalLineOut.Insert(true);
-        //+NPR5.37 [289725]
     end;
 
     internal procedure PrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
@@ -559,17 +501,10 @@
         TempRetailJnlNo: Code[40];
         RetailJournalCode: Codeunit "NPR Retail Journal Code";
     begin
-        //-NPR5.46 [294354]
-        // PurchaseLineToRetailJnlLine(PurchLine, RetailJnlLine);
-        // IF RetailJnlLine.FindSet() THEN BEGIN
-        //  PrintRetailJournal(RetailJnlLine,ReportType);
-        //  RetailJnlLine.DeleteAll();
-        // END;
         Evaluate(TempRetailJnlNo, CreateGuid());
         RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
         RetailJournalCode.CopyPurchaseOrder2RetailJnlLines(PurchLine, TempRetailJnlNo);
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
-        //+NPR5.46 [294354]
     end;
 
     local procedure PrintTransferOrder(var TransferLine: Record "Transfer Line"; ReportType: Integer)
@@ -577,42 +512,37 @@
         TempRetailJnlNo: Code[40];
         RetailJournalCode: Codeunit "NPR Retail Journal Code";
     begin
-        //-NPR5.46 [294354]
         Evaluate(TempRetailJnlNo, CreateGuid());
         RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
         RetailJournalCode.CopyTransferOrder2RetailJnlLines(TransferLine, TempRetailJnlNo);
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
-        //+NPR5.46 [294354]
     end;
 
     local procedure QuantityPrompt(var QuantityOut: Integer): Boolean
     var
         InputDialog: Page "NPR Input Dialog";
         ID: Integer;
+        QuantityLbl: Label 'Please enter quantity.';
     begin
-        //-NPR5.37 [289725]
         InputDialog.LookupMode := true;
-        InputDialog.SetInput(1, QuantityOut, Text00001);
+        InputDialog.SetInput(1, QuantityOut, QuantityLbl);
         repeat
             if InputDialog.RunModal() = ACTION::LookupOK then
                 ID := InputDialog.InputInteger(1, QuantityOut);
         until (QuantityOut > 0) or (ID = 0);
 
         exit(ID <> 0);
-        //+NPR5.37 [289725]
     end;
 
     local procedure PrintItemJournal(var ItemJournalLine: Record "Item Journal Line"; ReportType: Integer)
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.43 [317852]
         ItemJournalLineToRetailJnlLine(ItemJournalLine, RetailJnlLine);
         if ItemJournalLine.FindSet() then begin
             PrintRetailJournal(RetailJnlLine, ReportType);
             RetailJnlLine.DeleteAll();
         end;
-        //+NPR5.43 [317852]
     end;
 
     local procedure ItemJournalLineToRetailJnlLine(var ItemJournalLine: Record "Item Journal Line"; var RetailJnlLine: Record "NPR Retail Journal Line")
@@ -787,31 +717,28 @@
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer; var Skip: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
-    begin
-    end;
-
     internal procedure ChooseLabel(VarRec: Variant)
+    var
+        LabelLibrary: Codeunit "NPR Label Library";
+        RecRef: RecordRef;
     begin
-        ApplyFilterAndRun(VarRec, 0, false);
+        ApplyFilter(VarRec, RecRef);
+        LabelLibrary.RunPrintPage(RecRef);
     end;
 
     internal procedure PrintLabel(VarRec: Variant; ReportType: Option)
+    var
+        LabelLibrary: Codeunit "NPR Label Library";
+        RecRef: RecordRef;
     begin
-        ApplyFilterAndRun(VarRec, ReportType, true);
+        ApplyFilter(VarRec, RecRef);
+        LabelLibrary.InvertAllLines(RecRef);
+        LabelLibrary.PrintSelection(ReportType);
     end;
 
-    local procedure ApplyFilterAndRun(VarRec: Variant; ReportType: Option; FromPrintLabelFunction: Boolean)
+    local procedure ApplyFilter(VarRec: Variant; var FilteredLineRecRef: RecordRef)
     var
-        RecRef: RecordRef;
         RecRef2: RecordRef;
-        LabelLibrary: Codeunit "NPR Label Library";
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         TransferHeader: Record "Transfer Header";
@@ -834,9 +761,7 @@
                     RecRef2.SetTable(PurchaseHeader);
                     PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
                     PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
-                    if FromPrintLabelFunction then
-                        PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
-                    RecRef.GetTable(PurchaseLine);
+                    FilteredLineRecRef.GetTable(PurchaseLine);
 
                 end;
             DATABASE::"Transfer Header":
@@ -844,52 +769,55 @@
                     RecRef2.SetTable(TransferHeader);
                     TransferLine.SetRange("Document No.", TransferHeader."No.");
                     TransferLine.SetRange("Derived From Line No.", 0);
-                    RecRef.GetTable(TransferLine);
+                    FilteredLineRecRef.GetTable(TransferLine);
                 end;
             DATABASE::"Transfer Shipment Header":
                 begin
                     RecRef2.SetTable(TransferShipmentHeader);
                     TransferShipmentLine.SetRange("Document No.", TransferShipmentHeader."No.");
-                    RecRef.GetTable(TransferShipmentLine);
+                    FilteredLineRecRef.GetTable(TransferShipmentLine);
                 end;
             DATABASE::"Transfer Receipt Header":
                 begin
                     RecRef2.SetTable(TransferReceiptHeader);
                     TransferReceiptLine.SetRange("Document No.", TransferReceiptHeader."No.");
-                    RecRef.GetTable(TransferReceiptLine);
+                    FilteredLineRecRef.GetTable(TransferReceiptLine);
                 end;
             DATABASE::"NPR Period Discount":
                 begin
                     RecRef2.SetTable(PeriodDiscount);
                     PeriodDiscountLine.SetRange(Code, PeriodDiscount.Code);
-                    RecRef.GetTable(PeriodDiscountLine);
+                    FilteredLineRecRef.GetTable(PeriodDiscountLine);
                 end;
 
             DATABASE::"Purch. Inv. Header":
                 begin
                     RecRef2.SetTable(PurchInvHeader);
                     PurchInvLine.SetRange("Document No.", PurchInvHeader."No.");
-                    if FromPrintLabelFunction then
-                        PurchInvLine.SetRange(Type, PurchInvLine.Type::Item);
-                    RecRef.GetTable(PurchInvLine);
+                    FilteredLineRecRef.GetTable(PurchInvLine);
                 end;
             DATABASE::"Warehouse Activity Header":
                 begin
                     RecRef2.SetTable(WarehouseActivityHeader);
                     WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityHeader.Type);
                     WarehouseActivityLine.SetRange("No.", WarehouseActivityHeader."No.");
-                    RecRef.GetTable(WarehouseActivityLine);
+                    FilteredLineRecRef.GetTable(WarehouseActivityLine);
                 end;
             else begin
-                    RecRef := RecRef2;
-                    RecRef.SetRecFilter();
+                    FilteredLineRecRef := RecRef2;
+                    FilteredLineRecRef.SetRecFilter();
                 end;
         end;
-        if FromPrintLabelFunction then begin
-            LabelLibrary.InvertAllLines(RecRef);
-            LabelLibrary.PrintSelection(ReportType);
-        end else
-            LabelLibrary.RunPrintPage(RecRef);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer; var Skip: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
+    begin
     end;
 }
 
