@@ -1578,6 +1578,11 @@
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }
+        field(10014; "Orig.POS Entry S.Line SystemId"; Guid)
+        {
+            Caption = 'Original POS Entry Sale Line SystemId';
+            DataClassification = CustomerContent;
+        }
         field(6014511; "Label No."; Code[8])
         {
             Caption = 'Label Number';
@@ -1592,7 +1597,6 @@
             Editable = false;
             SQLTimestamp = true;
         }
-
     }
 
     keys
