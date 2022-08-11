@@ -1272,9 +1272,10 @@
         Quantity: Decimal;
         UnitPrice: Decimal;
         VatPct: Decimal;
-        CustomOptionLineNo: Integer;
         SalesType: Enum "Sales Line Type";
+        CustomOptionTxt: Text;
         CustomOptionNo: Code[20];
+        CustomOptionLineNo: Integer;
         SalesNo: Code[20];
         UnitofMeasure: Code[10];
         ExternalItemNo: Text;
@@ -1283,15 +1284,18 @@
         Position := StrPos(ExternalItemNo, '#');
         CustomOptionLineNo := 0;
         if Position = 0 then
-            CustomOptionNo := CopyStr(ExternalItemNo, 1, MaxStrLen(MagentoCustomOption."No."))
+            CustomOptionTxt := ExternalItemNo
         else
-            CustomOptionNo := CopyStr(ExternalItemNo, Position + 1, MaxStrLen(MagentoCustomOption."No."));
+            CustomOptionTxt := CopyStr(ExternalItemNo, Position + 1);
 
-        Position2 := StrPos(ExternalItemNo, '_');
+        Position2 := StrPos(CustomOptionTxt, '_');
+
         if Position2 <> 0 then begin
-            CustomOptionNo := CopyStr(CopyStr(CustomOptionNo, 1, StrPos(CustomOptionNo, '_') - 1), 1, MaxStrLen(CustomOptionNo));
-            Evaluate(CustomOptionLineNo, CopyStr(ExternalItemNo, Position2 + 1, 10), 9);
-        end;
+            CustomOptionNo := CopyStr(CustomOptionTxt, 1, Position2 - 1);
+            Evaluate(CustomOptionLineNo, CopyStr(CustomOptionTxt, Position2 + 1), 9);
+        end else
+            CustomOptionNo := CopyStr(CustomOptionTxt, 1, MaxStrLen(MagentoCustomOption."No."));
+
         MagentoCustomOption.Get(CustomOptionNo);
 
         case MagentoCustomOption.Type of
@@ -1302,7 +1306,7 @@
                     MagentoCustomOptionValue.TestField("Sales No.");
                     SalesType := MagentoCustomOptionValue."Sales Type";
                     SalesNo := MagentoCustomOptionValue."Sales No.";
-                end
+                end;
             else begin
                     MagentoCustomOption.TestField("Sales No.");
                     SalesType := MagentoCustomOption."Sales Type";

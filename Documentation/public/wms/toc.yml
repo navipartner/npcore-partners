@@ -49,5 +49,9 @@
     href: howto/reclassify_items.md
   - name: Revalue items (Item Revaluation Journal)
     href: howto/revaluation_journal.md
-  - name: Create inventory picks
+  - name: Create inventory picks based on the source document
     href: howto/create_inventory_pick.md
+  - name: Create inventory pick from Sales Orders
+    href: howto/create_inventory_pick_sales_order.md
+  - name: Create inventory pick with the Create Inventory Put Away/Pick/Movement action
+    href: howto/create_inventory_pick_action.md
