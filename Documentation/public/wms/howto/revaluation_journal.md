@@ -3,17 +3,17 @@
 The Item Revaluation Journal is used when you wish to change cost of items in the inventory. There are several instances in which it's necessary to perform inventory revaluation - for instance if you wish to revalue the remaining quantity of a certain item in inventory, or if you wish to check validity of a single decrease/increase in item costs. 
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Revaluation Journals** and choose the related link.        
-    Once you're in the **Item Revaluation Journal** administrative section, you can see the posting lines with respective unit costs that need to be revalued. 
 
 > [!Note]
 > Make sure that all items are adjusted via the **Adjust Cost - Item Entries** action before you start revaluing them. 
 
-2. Click **Process** in the ribbon, and then **Calculate Inventory Value**.    
+1. Click **Process** in the ribbon, and then **Calculate Inventory Value**.    
    The **Calculate Inventory Value** popup is displayed.
 
 <img src="../images/calculate_inventory_value.PNG" width="600">
 
 3. Once you've set up the calculation parameters according to your business needs, click **OK**.    
+   All **Open** entries from the Item Ledger are now added in this Revaluation Journal.
    
    > [!Note]
    > Bear in mind that the **Average Costing Method** isn't compatible with the calculations per **Item Ledger Entry**.
