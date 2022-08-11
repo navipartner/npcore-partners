@@ -1,0 +1,6 @@
+- name: Discounts
+  items:
+  - name: How-to
+    items:
+    - name: Set up period discounts
+      href: howto/Period_discount.md
