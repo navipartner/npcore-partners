@@ -253,7 +253,7 @@
             Codeunit::"NPR UPG E-Mail Setup":
                 Exit('NPRUPGUPGEMailSetup-20220312');
             Codeunit::"NPR UPG Aux Tables":
-                Exit('NPRUPGAuxTables');
+                Exit('NPRUPGToAuxTables');
             Codeunit::"NPR UPG Object Output":
                 Exit('NPRUPGObjectOutput-6e45a4a7887c4210be8059396b7ac71c');
             Codeunit::"NPR UPG MPOS QR Code":
