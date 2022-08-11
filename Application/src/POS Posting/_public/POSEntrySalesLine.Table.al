@@ -565,6 +565,11 @@
             DataClassification = CustomerContent;
             TableRelation = "Return Reason";
         }
+        field(10014; "Orig.POS Entry S.Line SystemId"; Guid)
+        {
+            Caption = 'Original POS Entry Sale Line SystemId';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

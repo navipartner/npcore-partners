@@ -261,6 +261,7 @@
         SaleLinePOS."Shortcut Dimension 1 Code" := POSSalesLine."Shortcut Dimension 1 Code";
         SaleLinePOS."Shortcut Dimension 2 Code" := POSSalesLine."Shortcut Dimension 2 Code";
         SaleLinePOS."Dimension Set ID" := POSSalesLine."Dimension Set ID";
+        SaleLinePOS."Orig.POS Entry S.Line SystemId" := POSSalesLine.SystemId;
     end;
 
     local procedure SelectReturnReason(): Code[20]
@@ -343,7 +344,7 @@
         if (SaleLinePOS.FindSet()) then begin
             repeat
                 if ((SaleLinePOS.Quantity < 0) and (SaleLinePOS.Type = SaleLinePOS.Type::Item) and (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale)) then begin
-                    AdjustedQty := GetRemainingQtyToReturn(OriginalSalesTicketNo, Abs(SaleLinePOS.Quantity), SaleLinePOS."Line No.") * -1;
+                    AdjustedQty := GetRemainingQtyToReturn(OriginalSalesTicketNo, Abs(SaleLinePOS.Quantity), SaleLinePOS."Line No.", SaleLinePOS."Orig.POS Entry S.Line SystemId") * -1;
                     if (AdjustedQty <> SaleLinePOS.Quantity) then begin
                         SaleLinePOS.Validate(Quantity, AdjustedQty);
                         SaleLinePOS.Modify();
@@ -356,14 +357,12 @@
         exit(QtyIsAdjusted);
     end;
 
-    local procedure GetRemainingQtyToReturn(SalesTicketNo: Code[20]; OriginalQty: Decimal; LineNo: Integer) MaxQuantity: Decimal
+    local procedure GetRemainingQtyToReturn(SalesTicketNo: Code[20]; OriginalQty: Decimal; LineNo: Integer; OriginalSystemId: Guid) MaxQuantity: Decimal
     var
         POSSalesLine: Record "NPR POS Entry Sales Line";
         PosRmaLine: Record "NPR POS RMA Line";
     begin
-        POSSalesLine.SetFilter("Document No.", '=%1', SalesTicketNo);
-        POSSalesLine.SetFilter("Line No.", '=%1', LineNo);
-        if (not POSSalesLine.FindFirst()) then
+        if not POSSalesLine.GetBySystemId(OriginalSystemId) then
             exit(OriginalQty);
 
         MaxQuantity := POSSalesLine.Quantity;

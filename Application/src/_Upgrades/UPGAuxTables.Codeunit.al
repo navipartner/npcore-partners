@@ -294,7 +294,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Item AddOn No.");
-        FromMigrationRec.SetRange("NPR Item AddOn No.", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Item AddOn No.", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -313,7 +313,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Variety Group");
-        FromMigrationRec.SetRange("NPR Variety Group", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Variety Group", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -332,7 +332,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Item Status");
-        FromMigrationRec.SetRange("NPR Item Status", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Item Status", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -351,7 +351,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Magento Brand");
-        FromMigrationRec.SetRange("NPR Magento Brand", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Magento Brand", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -389,7 +389,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR NPRE Item Routing Profile");
-        FromMigrationRec.SetRange("NPR NPRE Item Routing Profile", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR NPRE Item Routing Profile", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -408,7 +408,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Ticket Type");
-        FromMigrationRec.SetRange("NPR Ticket Type", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Ticket Type", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -427,7 +427,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Variety 1");
-        FromMigrationRec.SetRange("NPR Variety 1", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Variety 1", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -446,7 +446,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Variety 2");
-        FromMigrationRec.SetRange("NPR Variety 2", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Variety 2", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -465,7 +465,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Variety 3");
-        FromMigrationRec.SetRange("NPR Variety 3", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Variety 3", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -484,7 +484,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Variety 4");
-        FromMigrationRec.SetRange("NPR Variety 4", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Variety 4", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -503,7 +503,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Variety 1 Table");
-        FromMigrationRec.SetRange("NPR Variety 1 Table", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Variety 1 Table", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -522,7 +522,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Variety 2 Table");
-        FromMigrationRec.SetRange("NPR Variety 2 Table", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Variety 2 Table", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -541,7 +541,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Variety 3 Table");
-        FromMigrationRec.SetRange("NPR Variety 3 Table", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Variety 3 Table", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";
@@ -560,7 +560,7 @@ codeunit 6014436 "NPR UPG Aux Tables"
             exit;
 
         FromMigrationRec.SetLoadFields("No.", "NPR Variety 4 Table");
-        FromMigrationRec.SetRange("NPR Variety 4 Table", '<>%1', '');
+        FromMigrationRec.SetFilter("NPR Variety 4 Table", '<>%1', '');
         if FromMigrationRec.FindSet() then
             repeat
                 ToMigrationRec."Item No." := FromMigrationRec."No.";

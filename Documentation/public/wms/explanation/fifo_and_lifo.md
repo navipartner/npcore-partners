@@ -5,7 +5,7 @@ Different costing methods can cater to different business use cases in which you
 ![inventory_setup_costing_method_selection](../images/inventory_setup_costing_method_selection.PNG)
 
 > [!Note]
-> Once selected, the costing method for an item can't be changed after it's been included in the transaction which included that item. You need to ensure that you've selected the correct costing method before proceeding with any further setup. 
+> In the **Inventory Setup**, the costing method attached to the item is used by default. Different costing methods can be used for different items. Once selected, the costing method for an item can't be changed after the entries have been posted in the Item Ledger. You need to ensure that you've selected the correct costing method on the item itself before proceeding to the transaction posting for that item. 
 
 ## Specific
 
@@ -53,11 +53,11 @@ You can view the detailed **Average Cost Calculation Overview** by clicking the 
 
 ### Automatic cost adjustment
 
-If **FIFO**, **LIFO** or **Average** costing methods are applied, the report for automatic cost adjustment needs to be run. It is used for recalculating the unit cost after one of these costing methods are applied. To make sure all costs are up-to-date, it's recommended to schedule a recurring job which will adjust all modified cost each time it is automatically run. 
+If **FIFO**, **LIFO** or **Average** costing methods are applied, the report for automatic cost adjustment needs to be run. It is used for readjusting the unit cost (if needed) after transactions are posted. To make sure all costs are up-to-date, it's recommended to schedule a recurring job which will adjust all modified cost each time it is automatically run. 
 
 Jobs can be scheduled in the following ways:
 
-- In the **Job Queue Entries**, you can select the **Adjust Cost - Item Entries** object to be run at the specified time and date. You can also set up intervals for a recurring job, if you wish to run it multiple times.
+- In the **Job Queue Entries**, you can select the **Adjust Cost - Item Entries** object to be run at the specified time and date (normally after working hours). You can also set up intervals for a recurring job, if you wish to run it multiple times.
 
 <img src="../images/job_queue_entries_set_up_auto_cost_adjustment.PNG" width="600">
 

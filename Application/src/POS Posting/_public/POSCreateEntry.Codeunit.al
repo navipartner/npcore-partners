@@ -330,6 +330,7 @@
         POSSalesLine."Retail Serial No." := SaleLinePOS."Serial No. not Created";
         POSSalesLine."Return Reason Code" := SaleLinePOS."Return Reason Code";
         POSSalesLine."NPRE Seating Code" := SaleLinePOS."NPRE Seating Code";
+        POSSalesLine."Orig.POS Entry S.Line SystemId" := SaleLinePOS."Orig.POS Entry S.Line SystemId";
 
         CreateRMAEntry(POSEntry, SalePOS, SaleLinePOS);
 

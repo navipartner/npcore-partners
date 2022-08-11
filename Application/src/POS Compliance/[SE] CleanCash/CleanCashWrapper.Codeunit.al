@@ -1,6 +1,7 @@
 ﻿codeunit 6184500 "NPR CleanCash Wrapper"
 {
     Access = Internal;
+
     var
         Text000: Label 'Create Sales in CleanCash';
 
@@ -118,7 +119,6 @@
     var
         PosUnit: Record "NPR POS Unit";
         PosAuditProfile: Record "NPR POS Audit Profile";
-        CleanCashXCCSP: Codeunit "NPR CleanCash XCCSP Protocol";
     begin
         if (not PosUnit.Get(PosUnitNo)) then
             exit(false);
@@ -129,11 +129,14 @@
         if (not PosAuditProfile.Get(PosUnit."POS Audit Profile")) then
             exit(false);
 
-        if (PosAuditProfile."Audit Handler" <> UpperCase(CleanCashXCCSP.HandlerCode())) then
-            exit(false);
+        exit(IsCleanCashXCCSPComplianceEnabled(PosAuditProfile));
+    end;
 
-        exit(true);
-
+    local procedure IsCleanCashXCCSPComplianceEnabled(PosAuditProfile: Record "NPR POS Audit Profile"): Boolean
+    var
+        CleanCashXCCSP: Codeunit "NPR CleanCash XCCSP Protocol";
+    begin
+        exit(PosAuditProfile."Audit Handler" = UpperCase(CleanCashXCCSP.HandlerCode()));
     end;
 
     // Check that CleanCash Setup is valid when Audit Handler is actived
@@ -164,6 +167,25 @@
             ResponseMessage := StrSubstNo(FieldMustHaveValue, CleanCashSetup.TableName, CleanCashSetup.FieldName("Organization ID"), PosUnit.TableName(), PosUnitNo);
 
         exit(ResponseMessage = '');
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Setup Safety Check", 'OnAfterValidateSetup', '', false, false)]
+    local procedure OnBeforeLogin()
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        //Error upon POS login if any configuration is missing or clearly not set according to compliance
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        if not POSUnit.GetProfile(POSAuditProfile) then
+            exit;
+        if not IsCleanCashXCCSPComplianceEnabled(POSAuditProfile) then
+            exit;
+
+        POSAuditProfile.TestField("Do Not Print Receipt on Sale", false);
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR POS Audit Profiles", 'OnHandlePOSAuditProfileAdditionalSetup', '', true, true)]
