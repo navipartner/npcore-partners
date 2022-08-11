@@ -643,7 +643,11 @@
         CalculateTransactionAmountLCY(POSBinEntry);
         POSBinEntry.Comment := Comment;
 
+        OnBeforeInsertBinDifference(POSBinEntry);
+
         POSBinEntry.Insert();
+
+        OnAfterInsertBinDifference(POSBinEntry);
     end;
 
     local procedure InsertFloatEntry(CheckpointBinEntry: Record "NPR POS Bin Entry"; TransactionAmount: Decimal; Comment: Text[50])
@@ -1295,6 +1299,16 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreatePOSEntryFromExternalPOSSale(var ExtSalePOS: Record "NPR External POS Sale")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertBinDifference(var POSBinEntry: Record "NPR POS Bin Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertBinDifference(var POSBinEntry: Record "NPR POS Bin Entry")
     begin
     end;
 
