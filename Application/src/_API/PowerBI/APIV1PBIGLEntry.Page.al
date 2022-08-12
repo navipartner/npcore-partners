@@ -1,16 +1,16 @@
-page 6059929 NPRPBIItemledgerEntry
+page 6059925 "NPR APIV1 PBIGLEntry"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'itemLedgerEntry';
-    EntitySetName = 'itemLedgerEntries';
-    Caption = 'PowerBI Item Ledger Entry';
+    EntityName = 'gLEntry';
+    EntitySetName = 'gLEntries';
+    Caption = 'PowerBI G/L Entry';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "Item Ledger Entry";
+    SourceTable = "G/L Entry";
     Extensible = false;
     Editable = false;
 
@@ -24,29 +24,33 @@ page 6059929 NPRPBIItemledgerEntry
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(dimensionSetID; Rec."Dimension Set ID")
+                field(amount; Rec.Amount)
                 {
-                    Caption = 'Dimension Set ID', Locked = true;
+                    Caption = 'Amount', Locked = true;
                 }
-                field(entryNo; Rec."Entry No.")
+                field(balAccountNo; Rec."Bal. Account No.")
                 {
-                    Caption = 'Entry No.', Locked = true;
+                    Caption = 'Bal. Account No.', Locked = true;
                 }
-                field(entryType; Rec."Entry Type")
+                field(balAccountType; Rec."Bal. Account Type")
                 {
-                    Caption = 'Entry Type', Locked = true;
+                    Caption = 'Bal. Account Type', Locked = true;
                 }
-                field(quantity; Rec.Quantity)
+                field(creditAmount; Rec."Credit Amount")
                 {
-                    Caption = 'Quantity', Locked = true;
+                    Caption = 'Credit Amount', Locked = true;
                 }
-                field(sourceType; Rec."Source Type")
+                field(debitAmount; Rec."Debit Amount")
                 {
-                    Caption = 'Source Type', Locked = true;
+                    Caption = 'Debit Amount', Locked = true;
                 }
-                field(sourceNo; Rec."Source No.")
+                field(gLAccountNo; Rec."G/L Account No.")
                 {
-                    Caption = 'Source No.', Locked = true;
+                    Caption = 'G/L Account No.', Locked = true;
+                }
+                field(gLAccountName; Rec."G/L Account Name")
+                {
+                    Caption = 'G/L Account Name', Locked = true;
                 }
                 field(globalDimension1Code; Rec."Global Dimension 1 Code")
                 {
@@ -60,19 +64,14 @@ page 6059929 NPRPBIItemledgerEntry
                 {
                     Caption = 'Posting Date', Locked = true;
                 }
-                field(itemNo; Rec."Item No.")
+                field(sourceNo; Rec."Source No.")
                 {
-                    Caption = 'Item No.', Locked = true;
+                    Caption = 'Source No.', Locked = true;
                 }
-                field(open; Rec.Open)
+                field(entryNo; Rec."Entry No.")
                 {
-                    Caption = 'Open', Locked = true;
+                    Caption = 'Entry No.', Locked = true;
                 }
-                field(remainingQuantity; Rec."Remaining Quantity")
-                {
-                    Caption = 'Remaining Quantity', Locked = true;
-                }
-
             }
         }
     }

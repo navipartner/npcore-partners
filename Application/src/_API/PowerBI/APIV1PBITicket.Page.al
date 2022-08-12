@@ -1,4 +1,4 @@
-page 6059939 NPRPBITicket
+page 6059939 "NPR APIV1 PBITicket"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';

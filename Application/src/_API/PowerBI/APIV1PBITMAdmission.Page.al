@@ -1,19 +1,18 @@
-page 6059912 NPRPBICompanyInformation
+page 6059965 "NPR APIV1 PBITMAdmission"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'companyInfo';
-    EntitySetName = 'companyInfos';
-    Caption = 'PowerBI Company Information';
+    EntityName = 'tmAdmission';
+    EntitySetName = 'tmAdmissions';
+    Caption = 'PowerBI TM Admission';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "Company Information";
+    SourceTable = "NPR TM Admission";
     Extensible = false;
     Editable = false;
-
     layout
     {
         area(Content)
@@ -24,13 +23,17 @@ page 6059912 NPRPBICompanyInformation
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(name; Rec.Name)
+                field(admissionCode; Rec."Admission Code")
                 {
-                    Caption = 'Name', Locked = true;
+                    Caption = 'Admission Code', Locked = true;
                 }
-                field(locationCode; Rec."Location Code")
+                field(description; Rec.Description)
                 {
-                    Caption = 'Location Code', Locked = true;
+                    Caption = 'Description', Locked = true;
+                }
+                field(type; Rec."Type")
+                {
+                    Caption = 'Type', Locked = true;
                 }
             }
         }
