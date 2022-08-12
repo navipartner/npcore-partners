@@ -164,7 +164,7 @@
     end;
 
     local procedure RemoveStarFromQuantity(var Quantity: Text)
-    var 
+    var
         Position: Integer;
     begin
         Position := StrPos(Quantity, '*');
