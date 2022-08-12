@@ -248,4 +248,36 @@
                 POSAction.SetWorkflowInvocationParameter(EanBoxParameter.Name, EanBoxParameter.Value, FrontEnd);
         end;
     end;
+
+    internal procedure GetEanBox(EanBoxValue: Text; var POSAction: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var SetupCode: Code[20]; var EventCode: Code[20])
+    var
+        EanBoxSetup: Record "NPR Ean Box Setup";
+        TempEanBoxSetupEvent: Record "NPR Ean Box Setup Event" temporary;
+        ActionCodeMissingErr: label 'For Ean Box Event %1 %2 Action Code is missing.';
+    begin
+        FrontEnd.SetOption('doNotClearTextBox', false);
+        if not FindEanBoxSetup(POSSession, EanBoxSetup) then
+            Error(Text001, EanBoxValue);
+
+        if not FindEnabledEanBoxEvents(EanBoxSetup, EanBoxValue, TempEanBoxSetupEvent) then
+            Error(Text001, EanBoxValue);
+
+        if not SelectEanBoxEvent(TempEanBoxSetupEvent) then
+            Error(Text001, EanBoxValue);
+
+        if TempEanBoxSetupEvent."Action Code" = '' then
+            Error(ActionCodeMissingErr, TempEanBoxSetupEvent."Setup Code", TempEanBoxSetupEvent."Event Code");
+
+        if not POSSession.RetrieveSessionAction(TempEanBoxSetupEvent."Action Code", POSAction) then
+            POSAction.Get(TempEanBoxSetupEvent."Action Code");
+
+        SetupCode := TempEanBoxSetupEvent."Setup Code";
+        EventCode := TempEanBoxSetupEvent."Event Code";
+
+    end;
+
+    internal procedure SetEanParametersToPOSAction(EanBoxValue: Text; var POSAction: Record "NPR POS Action"; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"): Boolean
+    begin
+        SetPOSActionParametersV3(EanBoxValue, EanBoxSetupEvent, POSAction);
+    end;
 }
