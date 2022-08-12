@@ -15,9 +15,11 @@
         DescPdf2NavDoc: Label 'Use Pdf2Nav to send the posted document';
         CaptionAutoQtyToInvoice: Label 'Auto. Qty. to Invoice';
         CaptionAutoQtyToShip: Label 'Auto. Qty. to Ship';
-        DescAutoQtyToInvoice: Label 'Configure if the document lines quantity to invoice should be handled automatically ';
-        DescAutoQtyToShip: Label 'Configure if the document lines quantity to ship should be handled automatically ';
-        ContinueWithInvoicing: Label 'One or more lines is set to be invoiced, not just shipped. Do you want to continue?';
+        CaptionAutoQtyToReceive: Label 'Auto. Qty. to Receive';
+        DescAutoQtyToInvoice: Label 'Configure if the document lines quantity to invoice should be handled automatically';
+        DescAutoQtyToShip: Label 'Configure if the document lines quantity to ship should be handled automatically';
+        DescAutoQtyToReceive: Label 'Configure if the document lines quantity to receive should be handled automatically';
+        ContinueWithInvoicing: Label 'One or more lines is set to be invoiced, not just shipped or received. Do you want to continue?';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -26,7 +28,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.4');
+        exit('1.5');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -49,6 +51,7 @@
             Sender.RegisterBooleanParameter('ConfirmInvDiscAmt', false);
             Sender.RegisterOptionParameter('AutoQtyToInvoice', 'Disabled,None,All', 'Disabled');
             Sender.RegisterOptionParameter('AutoQtyToShip', 'Disabled,None,All', 'Disabled');
+            Sender.RegisterOptionParameter('AutoQtyToReceive', 'Disabled,None,All', 'Disabled');
 
         end;
     end;
@@ -61,6 +64,7 @@
         SelectCustomer, OpenDocument, PrintDocument, Send, Pdf2Nav, ConfirmInvDiscAmt : Boolean;
         AutoQtyToInvoice: Integer;
         AutoQtyToShip: Integer;
+        AutoQtyToReceive: Integer;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -75,6 +79,7 @@
         ConfirmInvDiscAmt := JSON.GetBooleanParameterOrFail('ConfirmInvDiscAmt', ActionCode());
         AutoQtyToInvoice := JSON.GetIntegerParameterOrFail('AutoQtyToInvoice', ActionCode());
         AutoQtyToShip := JSON.GetIntegerParameterOrFail('AutoQtyToShip', ActionCode());
+        AutoQtyToReceive := JSON.GetIntegerParameterOrFail('AutoQtyToReceive', ActionCode());
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
@@ -82,7 +87,7 @@
         if not SelectDocument(POSSession, SalesHeader) then
             exit;
 
-        SetLinesToShipAndInvoice(SalesHeader, AutoQtyToInvoice, AutoQtyToShip); //Commits
+        SetLinesToPost(SalesHeader, AutoQtyToInvoice, AutoQtyToShip, AutoQtyToReceive); //Commits
 
         if not ConfirmDocument(SalesHeader, OpenDocument) then
             exit;
@@ -140,11 +145,11 @@
         exit(RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GetView(false), SalesHeader));
     end;
 
-    local procedure SetLinesToShipAndInvoice(SalesHeader: Record "Sales Header"; AutoQtyToInvoice: Option Disabled,None,All; AutoQtyToShip: Option Disabled,None,All)
+    local procedure SetLinesToPost(SalesHeader: Record "Sales Header"; AutoQtyToInvoice: Option Disabled,None,All; AutoQtyToShip: Option Disabled,None,All; AutoQtyToReceive: Option Disabled,None,All)
     var
         SalesLine: Record "Sales Line";
     begin
-        if (AutoQtyToInvoice = AutoQtyToInvoice::Disabled) and (AutoQtyToShip = AutoQtyToShip::Disabled) then
+        if (AutoQtyToInvoice = AutoQtyToInvoice::Disabled) and (AutoQtyToShip = AutoQtyToShip::Disabled) and (AutoQtyToReceive = AutoQtyToReceive::Disabled) then
             exit;
 
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -153,19 +158,6 @@
             exit;
 
         repeat
-            case AutoQtyToInvoice of
-                AutoQtyToInvoice::Disabled:
-                    ;
-                AutoQtyToInvoice::All:
-                    begin
-                        SalesLine.Validate("Qty. to Invoice", SalesLine.Quantity - SalesLine."Quantity Invoiced");
-                    end;
-                AutoQtyToInvoice::None:
-                    begin
-                        SalesLine.Validate("Qty. to Invoice", 0);
-                    end;
-            end;
-
             case AutoQtyToShip of
                 AutoQtyToShip::Disabled:
                     ;
@@ -176,6 +168,32 @@
                 AutoQtyToShip::None:
                     begin
                         SalesLine.Validate("Qty. to Ship", 0);
+                    end;
+            end;
+
+            case AutoQtyToReceive of
+                AutoQtyToReceive::Disabled:
+                    ;
+                AutoQtyToReceive::All:
+                    begin
+                        SalesLine.Validate("Return Qty. to Receive", SalesLine.Quantity - SalesLine."Return Qty. Received");
+                    end;
+                AutoQtyToReceive::None:
+                    begin
+                        SalesLine.Validate("Return Qty. to Receive", 0);
+                    end;
+            end;
+
+            case AutoQtyToInvoice of
+                AutoQtyToInvoice::Disabled:
+                    ;
+                AutoQtyToInvoice::All:
+                    begin
+                        SalesLine.Validate("Qty. to Invoice", SalesLine.Quantity - SalesLine."Quantity Invoiced");
+                    end;
+                AutoQtyToInvoice::None:
+                    begin
+                        SalesLine.Validate("Qty. to Invoice", 0);
                     end;
             end;
 
@@ -231,8 +249,27 @@
     local procedure CreateDocumentPaymentLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
+        Ship: Boolean;
+        Receive: Boolean;
+        Invoice: Boolean;
+        SalesLine: Record "Sales Line";
     begin
-        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, Print, Pdf2Nav, Send, true);
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+
+        SalesLine.SetFilter("Qty. to Ship", '>%1', 0);
+        Ship := not SalesLine.IsEmpty;
+        SalesLine.SetRange("Qty. to Ship");
+
+        SalesLine.SetFilter("Qty. to Invoice", '>%1', 0);
+        Invoice := not SalesLine.IsEmpty;
+        SalesLine.SetRange("Qty. to Invoice");
+
+        SalesLine.SetFilter("Return Qty. to Receive", '>%1', 0);
+        Receive := not SalesLine.IsEmpty;
+        SalesLine.SetRange("Return Qty. Received");
+
+        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, Invoice, Ship, Receive, Print, Pdf2Nav, Send, true);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
@@ -260,6 +297,8 @@
                 Caption := CaptionAutoQtyToInvoice;
             'AutoQtyToShip':
                 Caption := CaptionAutoQtyToShip;
+            'AutoQtyToReceive':
+                Caption := CaptionAutoQtyToReceive;
         end;
     end;
 
@@ -288,6 +327,8 @@
                 Caption := DescAutoQtyToInvoice;
             'AutoQtyToShip':
                 Caption := DescAutoQtyToShip;
+            'AutoQtyToReceive':
+                Caption := DescAutoQtyToReceive;
         end;
     end;
 }
