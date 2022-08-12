@@ -6,7 +6,8 @@ page 6184624 NPRPowerBITMticketAccessEntry
     UsageCategory = Lists;
     SourceTable = "NPR TM Ticket Access Entry";
     Editable = false;
-
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
     layout
     {
         area(Content)

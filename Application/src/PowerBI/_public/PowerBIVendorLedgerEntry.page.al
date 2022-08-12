@@ -6,6 +6,8 @@ page 6184627 NPRPowerBIVendorLedgerEntry
     UsageCategory = Lists;
     SourceTable = "Vendor Ledger Entry";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

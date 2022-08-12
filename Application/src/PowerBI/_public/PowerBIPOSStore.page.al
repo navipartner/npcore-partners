@@ -6,6 +6,8 @@ page 6184618 NPRPowerBIPOSStore
     UsageCategory = Lists;
     SourceTable = "NPR POS Store";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

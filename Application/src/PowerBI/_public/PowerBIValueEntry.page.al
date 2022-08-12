@@ -6,6 +6,8 @@ page 6184625 NPRPowerBIValueEntry
     UsageCategory = Lists;
     SourceTable = "Value Entry";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

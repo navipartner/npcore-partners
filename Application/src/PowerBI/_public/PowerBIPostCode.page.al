@@ -6,6 +6,8 @@ page 6184619 NPRPowerBIPostCode
     UsageCategory = Lists;
     SourceTable = "Post Code";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

@@ -6,6 +6,8 @@ page 6184603 NPRPowerBIDimension
     UsageCategory = Lists;
     SourceTable = Dimension;
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

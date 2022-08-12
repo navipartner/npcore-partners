@@ -6,6 +6,8 @@ page 6184606 NPRPowerBIDimensionSetTreeNode
     UsageCategory = Lists;
     SourceTable = "Dimension Set Tree Node";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

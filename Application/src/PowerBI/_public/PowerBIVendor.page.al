@@ -6,6 +6,8 @@ page 6184626 NPRPowerBIVendor
     UsageCategory = Lists;
     SourceTable = Vendor;
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

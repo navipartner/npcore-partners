@@ -6,6 +6,8 @@ page 6184604 NPRPowerBIDimensionSet
     UsageCategory = Administration;
     SourceTable = "Dimension Set Entry";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

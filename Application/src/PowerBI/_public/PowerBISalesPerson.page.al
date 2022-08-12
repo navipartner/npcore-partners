@@ -6,6 +6,8 @@ page 6184620 NPRPowerBISalesPerson_Purc
     UsageCategory = Lists;
     SourceTable = "Salesperson/Purchaser";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

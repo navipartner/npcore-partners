@@ -6,6 +6,8 @@ page 6184622 NPRPowerBITMAdmission
     UsageCategory = Lists;
     SourceTable = "NPR TM Admission";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

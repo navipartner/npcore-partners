@@ -6,6 +6,8 @@ page 6184600 NPRPowerBICompanyInformaion
     UsageCategory = Lists;
     SourceTable = "Company Information";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

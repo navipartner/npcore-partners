@@ -1,0 +1,78 @@
+page 6059925 NPRPBIG_LEntry
+{
+    APIGroup = 'powerBI';
+    APIPublisher = 'navipartner';
+    APIVersion = 'v1.0';
+    PageType = API;
+    EntityName = 'gLEntry';
+    EntitySetName = 'gLEntries';
+    Caption = 'PowerBI G/L Entry';
+    DataAccessIntent = ReadOnly;
+    ODataKeyFields = SystemId;
+    DelayedInsert = true;
+    SourceTable = "G/L Entry";
+    Extensible = false;
+    Editable = false;
+
+    layout
+    {
+        area(Content)
+        {
+            repeater(GroupName)
+            {
+                field(id; Rec.SystemId)
+                {
+                    Caption = 'SystemId', Locked = true;
+                }
+                field(amount; Rec.Amount)
+                {
+                    Caption = 'Amount', Locked = true;
+                }
+                field(balAccountNo; Rec."Bal. Account No.")
+                {
+                    Caption = 'Bal. Account No.', Locked = true;
+                }
+                field(balAccountType; Rec."Bal. Account Type")
+                {
+                    Caption = 'Bal. Account Type', Locked = true;
+                }
+                field(creditAmount; Rec."Credit Amount")
+                {
+                    Caption = 'Credit Amount', Locked = true;
+                }
+                field(debitAmount; Rec."Debit Amount")
+                {
+                    Caption = 'Debit Amount', Locked = true;
+                }
+                field(gLAccountNo; Rec."G/L Account No.")
+                {
+                    Caption = 'G/L Account No.', Locked = true;
+                }
+                field(gLAccountName; Rec."G/L Account Name")
+                {
+                    Caption = 'G/L Account Name', Locked = true;
+                }
+                field(globalDimension1Code; Rec."Global Dimension 1 Code")
+                {
+                    Caption = 'Global Dimension 1 Code', Locked = true;
+                }
+                field(globalDimension2Code; Rec."Global Dimension 2 Code")
+                {
+                    Caption = 'Global Dimension 2 Code', Locked = true;
+                }
+                field(postingDate; Rec."Posting Date")
+                {
+                    Caption = 'Posting Date', Locked = true;
+                }
+                field(sourceNo; Rec."Source No.")
+                {
+                    Caption = 'Source No.', Locked = true;
+                }
+                field(entryNo; Rec."Entry No.")
+                {
+                    Caption = 'Entry No.', Locked = true;
+                }
+            }
+        }
+    }
+}
