@@ -1538,10 +1538,15 @@
     local procedure SetAppliesToDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer")
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
+        GLSetup: Record "General Ledger Setup";
     begin
         if POSPostingBuffer."Applies-to Doc. No." = '' then
             exit;
         if POSPostingBuffer.Type <> POSPostingBuffer.Type::Customer then
+            exit;
+
+        GLSetup.Get();
+        if not (POSPostingBuffer."Currency Code" in [GLSetup."LCY Code", '']) then
             exit;
 
         CustLedgerEntry.SetAutoCalcFields("Remaining Amount");
@@ -1550,6 +1555,7 @@
         CustLedgerEntry.SetRange("Customer No.", POSPostingBuffer."No.");
         CustLedgerEntry.SetRange(Open, true);
         CustLedgerEntry.SetRange("Document No.", POSPostingBuffer."Applies-to Doc. No.");
+        CustLedgerEntry.SetFilter("Currency Code", '=%1|=%2', GLSetup."LCY Code", '');
         if CustLedgerEntry.IsEmpty() then
             exit;
 
@@ -1562,9 +1568,9 @@
                 exit;
         end;
 
-
         GenJournalLine.Validate("Applies-to Doc. Type", POSPostingBuffer."Applies-to Doc. Type");
         GenJournalLine.Validate("Applies-to Doc. No.", POSPostingBuffer."Applies-to Doc. No.");
+        GenJournalLine.Validate("Currency Code", CustLedgerEntry."Currency Code"); //one might be blank while other is LCY
         GenJournalLine.Modify();
     end;
 
