@@ -74,7 +74,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             field("NPR Package Code"; Rec."NPR Package Code")
             {
                 ToolTip = 'Specifies the value of the Package Code field.';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
             }
             field("NPR Kolli"; Rec."NPR Kolli")
             {
@@ -85,7 +85,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             field("NPR Package Quantity"; Rec."NPR Package Quantity")
             {
                 ToolTip = 'Specifies the value of the Package Quantity field.';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
 
             }
         }
@@ -164,7 +164,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 begin
                     if not InventorySetup.Get() then
                         exit;
-                    
+
                     RecRef.GetTable(Rec);
                     ScannerImportMgt.ImportFromScanner(InventorySetup."NPR Scanner Provider", Enum::"NPR Scanner Import"::SALES, RecRef);
                 end;

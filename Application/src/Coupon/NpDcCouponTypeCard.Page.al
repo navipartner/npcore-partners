@@ -116,7 +116,7 @@
                     field("Match POS Store Group"; Rec."Match POS Store Group")
                     {
                         ToolTip = 'Specifies the behavior of generating Coupon when Issue Coupon Module is On-Sale, if Match is selected, only from Stores that match POS Store Group coupon will be generated.';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6014427)

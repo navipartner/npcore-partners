@@ -18,26 +18,26 @@ report 6014438 "NPR POS Posting Action"
                     {
                         Caption = 'Inventory Post';
                         ToolTip = 'If checked system will try to post entries in Item Ledger Entry';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                     field("Finance Posting"; FinancePosting)
                     {
                         Caption = 'Finance Post';
                         ToolTip = 'If checked system will try to post entries in G/L Entry, etc...';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                     }
                     field("Compress Posting"; CompressPosting)
                     {
                         Caption = 'Post Compressed';
                         ToolTip = 'If checked system will post entries compressed';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         Editable = CompressPostingEditable;
                     }
                     field("Show Error During Posting"; ShowErrorDuringPosting)
                     {
                         Caption = 'Stop on Error';
                         ToolTip = 'If checked system will stop on first error';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         Editable = false;
                     }
                 }

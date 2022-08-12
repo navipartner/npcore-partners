@@ -160,7 +160,7 @@
             }
             part("Attached Documents"; "Document Attachment Factbox")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = CONST(167),
                               "No." = FIELD("No.");

@@ -31,12 +31,12 @@ page 6059891 "NPR DE Connection Param. Sets"
         {
             systempart(LinksFactBox; Links)
             {
-                ApplicationArea = RecordLinks;
+                ApplicationArea = NPRRetail;
                 Visible = false;
             }
             systempart(NotesFactBox; Notes)
             {
-                ApplicationArea = Notes;
+                ApplicationArea = NPRRetail;
                 Visible = false;
             }
         }

@@ -189,40 +189,40 @@ report 6060121 "NPR TM Ticket Reservation List"
                 {
                     Caption = 'Admission Code';
                     TableRelation = "NPR TM Admission" WHERE(Type = CONST(OCCASION));
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Admission Code field.';
                 }
                 field(ScheduleCode; Schedule_Code)
                 {
                     Caption = 'Schedule Code';
                     TableRelation = "NPR TM Admis. Schedule";
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Schedule Code field.';
                 }
                 field(AdmissionStartDateLow; AdmissionStart_DateLow)
                 {
                     Caption = 'Admission Start Date';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Admission Start Date field.';
                 }
                 field(AdmissionStartDateHigh; AdmissionStart_DateHigh)
                 {
                     Caption = 'Admission Until Date';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Admission Until Date field.';
                 }
                 field(Admitted; Admitted_)
                 {
                     Caption = 'Admitted';
                     OptionCaption = 'Either,Admitted,Not Admitted';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Admitted field.';
                 }
                 field(TopXRows; TopX_Rows)
                 {
                     Caption = 'Max Number of Rows';
                     MinValue = 1;
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Max Number of Rows field.';
                 }
             }
