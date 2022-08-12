@@ -9,7 +9,7 @@ report 6014437 "NPR Item Categ. List. M/Y new"
     Caption = 'Item Category Listing M/Y';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = Suite;
+    ApplicationArea = NPRRetail;
 #IF NOT BC17
     DataAccessIntent = ReadOnly;
 #ENDIF
@@ -189,26 +189,26 @@ report 6014437 "NPR Item Categ. List. M/Y new"
                     field(ShowSubGroups; ShowSubGroups_)
                     {
                         Caption = 'Show Sub Item Groups';
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Show Sub Item Groups field.';
                     }
                     field(StartDate; StartDate_)
                     {
                         Caption = 'Start Date';
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Start Date field.';
                     }
                     field(EndDate; EndDate_)
                     {
                         Caption = 'End Date';
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the End Date field.';
                     }
                     field("Salesperson.Code"; Salesperson.Code)
                     {
                         Caption = 'Salesperson Code';
                         TableRelation = "Salesperson/Purchaser";
-                        ApplicationArea = Suite;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Salesperson Code field.';
                     }
                 }

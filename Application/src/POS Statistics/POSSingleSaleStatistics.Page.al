@@ -55,7 +55,7 @@ page 6059861 "NPR POS Single Sale Statistics"
                         field("POS Unit No."; Rec."POS Unit No.")
                         {
                             ToolTip = 'Specifies the value of the POS Unit No.';
-                            ApplicationArea = NPPRRetail;
+                            ApplicationArea = NPRRetail;
                             StyleExpr = 'Strong';
                         }
                         field("Document No."; Rec."Document No.")

@@ -28,12 +28,12 @@ page 6059866 "NPR TM Dynamic Price Rules"
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies a short description of the intention of this rule.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                 }
                 field(Blocked; Rec.Blocked)
                 {
                     ToolTip = 'Specifies the value of the Blocked field. Blocked rules are ignored during rule selection.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                 }
                 field(BookingDateFrom; Rec.BookingDateFrom)
                 {

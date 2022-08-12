@@ -67,7 +67,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         {
             action("NPR Item Ledger Entries")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Caption = 'Item Ledger Entries';
                 Image = ItemLedger;
                 RunObject = Page "Item Ledger Entries";

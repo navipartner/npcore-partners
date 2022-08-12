@@ -78,7 +78,7 @@
 
             action(ImportReplicationSetups)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Import Replication Setups';
                 Image = Import;
                 Promoted = true;
@@ -96,7 +96,7 @@
 
             action(ExportSetup)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Caption = 'Export Replication Setups';
                 Image = Export;
                 Promoted = true;

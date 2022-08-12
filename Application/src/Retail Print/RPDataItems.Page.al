@@ -75,7 +75,7 @@
                 }
                 field("Has Constraints"; Rec."Has Constraints")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Checked if the data item line has any constraints applied to it.';
                 }
             }

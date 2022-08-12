@@ -127,13 +127,13 @@ xmlport 6014402 "NPR Import Replication Setup"
             {
                 field(UpdateSetupsField; UpdateSetups)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Update existing setups';
                     ToolTip = 'Specifies if the existing setups will be updated (merged) with the imported ones.';
                 }
                 field(UpdateReplicationCounterField; UpdateReplicationCounter)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Update replication counter';
                     ToolTip = 'Specifies if the replication couter of the endpoints will be updated with the imported ones.';
                 }

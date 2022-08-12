@@ -11,14 +11,14 @@ pageextension 6014402 "NPR Config. Template Header" extends "Config. Template He
         {
             part(NPRConfigTemplateSubform; "Config. Template Subform")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 SubPageLink = "Data Template Code" = FIELD(Code), "NPR Aux Table ID" = const(0);
                 SubPageView = SORTING("Data Template Code", "Line No.")
                               ORDER(Ascending);
             }
             part("NPR Aux Conf. Template Subform"; "NPR Aux Conf. Template Subform")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Visible = IsAuxLinesVisible;
                 Enabled = IsAuxLinesVisible;
                 SubPageLink = "Data Template Code" = FIELD(Code);

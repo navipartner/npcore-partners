@@ -8,7 +8,7 @@ report 6014418 "NPR Sale Time Report POS"
 
     Caption = 'Sale Time Report';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = Suite;
+    ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
 
     dataset
@@ -197,85 +197,85 @@ report 6014418 "NPR Sale Time Report POS"
                         field(TimeArray_1; TimeArray[1])
                         {
                             Caption = '1';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 1 field.';
                         }
                         field(TimeArray_2; TimeArray[2])
                         {
                             Caption = '2';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 2 field.';
                         }
                         field(TimeArray_3; TimeArray[3])
                         {
                             Caption = '3';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 3 field.';
                         }
                         field(TimeArray_4; TimeArray[4])
                         {
                             Caption = '4';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 4 field.';
                         }
                         field(TimeArray_5; TimeArray[5])
                         {
                             Caption = '5';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 5 field.';
                         }
                         field(TimeArray_6; TimeArray[6])
                         {
                             Caption = '6';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 6 field.';
                         }
                         field(TimeArray_7; TimeArray[7])
                         {
                             Caption = '7';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 7 field.';
                         }
                         field(TimeArray_8; TimeArray[8])
                         {
                             Caption = '8';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 8 field.';
                         }
                         field(TimeArray_9; TimeArray[9])
                         {
                             Caption = '9';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 9 field.';
                         }
                         field(TimeArray_10; TimeArray[10])
                         {
                             Caption = '10';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 10 field.';
                         }
                         field(TimeArray_11; TimeArray[11])
                         {
                             Caption = '11';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 11 field.';
                         }
                         field(TimeArray_12; TimeArray[12])
                         {
                             Caption = '12';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 12 field.';
                         }
                         field(TimeArray_13; TimeArray[13])
                         {
                             Caption = '13';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 13 field.';
                         }
                         field(TimeArray_14; TimeArray[14])
                         {
                             Caption = '14';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the 14 field.';
                         }
                     }
@@ -285,43 +285,43 @@ report 6014418 "NPR Sale Time Report POS"
                         field(DayArray_1; DayArray[1])
                         {
                             Caption = 'Monday';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the Monday field.';
                         }
                         field(DayArray_2; DayArray[2])
                         {
                             Caption = 'Tuesday';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the Tuesday field.';
                         }
                         field(DayArray_3; DayArray[3])
                         {
                             Caption = 'Wednesday';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the Wednesday field.';
                         }
                         field(DayArray_4; DayArray[4])
                         {
                             Caption = 'Thursday';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the Thursday field.';
                         }
                         field(DayArray_5; DayArray[5])
                         {
                             Caption = 'Friday';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the Friday field.';
                         }
                         field(DayArray_6; DayArray[6])
                         {
                             Caption = 'Saturday';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the Saturday field.';
                         }
                         field(DayArray_7; DayArray[7])
                         {
                             Caption = 'Sunday';
-                            ApplicationArea = Suite;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the Sunday field.';
                         }
                     }

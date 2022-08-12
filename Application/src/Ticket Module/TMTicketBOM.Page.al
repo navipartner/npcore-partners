@@ -188,7 +188,7 @@
                 field("Admission Inclusion"; Rec."Admission Inclusion")
                 {
                     ToolTip = 'Specifies the value of the Admission Inclusion field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
 
             }

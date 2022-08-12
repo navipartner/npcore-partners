@@ -29,7 +29,7 @@ page 6059892 "NPR POS Current Sale Stats"
                         field("POS Unit No."; Rec."POS Unit No.")
                         {
                             ToolTip = 'Specifies the value of the POS Unit No.';
-                            ApplicationArea = NPPRRetail;
+                            ApplicationArea = NPRRetail;
                             StyleExpr = 'Strong';
                         }
                         field("Document No."; Rec."Document No.")

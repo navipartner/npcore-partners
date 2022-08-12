@@ -158,7 +158,7 @@ page 6014486 "NPR Shipping Provider Document"
                 field("Package Quantity"; Rec."Package Quantity")
                 {
                     ToolTip = 'Specifies the value of the Detailed Package Quantity field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("Parcel Qty."; Rec."Parcel Qty.")
@@ -198,7 +198,7 @@ page 6014486 "NPR Shipping Provider Document"
                 field("Delivery Instructions"; Rec."Delivery Instructions")
                 {
                     ToolTip = 'Specifies the value of the Delivery Instructions field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print Return Label"; Rec."Print Return Label")
                 {
