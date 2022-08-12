@@ -1,4 +1,4 @@
-page 6059936 NPRPBIPOSStore
+page 6059936 "NPR APIV1 PBIPOSStore"
 {
     Editable = false;
     APIGroup = 'powerBI';

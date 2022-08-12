@@ -1,16 +1,16 @@
-page 6059931 NPRPBIItemledgerEntryAux
+page 6059929 "NPR APIV1 PBIItemledgerEntry"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'itemLedgerEntryAux';
-    EntitySetName = 'itemLedgerEntriesAux';
-    Caption = 'PowerBI Item Ledger Entry Aux.';
+    EntityName = 'itemLedgerEntry';
+    EntitySetName = 'itemLedgerEntries';
+    Caption = 'PowerBI Item Ledger Entry';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "NPR Aux. Item Ledger Entry";
+    SourceTable = "Item Ledger Entry";
     Extensible = false;
     Editable = false;
 
@@ -23,6 +23,10 @@ page 6059931 NPRPBIItemledgerEntryAux
                 field(id; Rec.SystemId)
                 {
                     Caption = 'SystemId', Locked = true;
+                }
+                field(dimensionSetID; Rec."Dimension Set ID")
+                {
+                    Caption = 'Dimension Set ID', Locked = true;
                 }
                 field(entryNo; Rec."Entry No.")
                 {
@@ -60,25 +64,13 @@ page 6059931 NPRPBIItemledgerEntryAux
                 {
                     Caption = 'Item No.', Locked = true;
                 }
-                field(salespersPurchCode; Rec."Salespers./Purch. Code")
+                field(open; Rec.Open)
                 {
-                    Caption = 'Salespers./Purch. Code', Locked = true;
+                    Caption = 'Open', Locked = true;
                 }
-                field(documentTime; Rec."Document Time")
+                field(remainingQuantity; Rec."Remaining Quantity")
                 {
-                    Caption = 'Document Time', Locked = true;
-                }
-                field(vendorNo; Rec."Vendor No.")
-                {
-                    Caption = 'Vendor No.', Locked = true;
-                }
-                field(systemCreatedAt; Rec.SystemCreatedAt)
-                {
-                    Caption = 'SystemCreatedAt', Locked = true;
-                }
-                field(systemCreatedBy; Rec.SystemCreatedBy)
-                {
-                    Caption = 'SystemCreatedBy', Locked = true;
+                    Caption = 'Remaining Quantity', Locked = true;
                 }
 
             }

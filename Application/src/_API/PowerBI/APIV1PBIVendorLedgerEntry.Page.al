@@ -1,16 +1,16 @@
-page 6059925 NPRPBIG_LEntry
+page 6059981 "NPR APIV1 PBIVendorLedgerEntry"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'gLEntry';
-    EntitySetName = 'gLEntries';
-    Caption = 'PowerBI G/L Entry';
+    EntityName = 'vendorLedgerEntry';
+    EntitySetName = 'vendorsLedgerEntries';
+    Caption = 'PowerBI Vendor Ledger Entry';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "G/L Entry";
+    SourceTable = "Vendor ledger Entry";
     Extensible = false;
     Editable = false;
 
@@ -24,33 +24,21 @@ page 6059925 NPRPBIG_LEntry
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(amount; Rec.Amount)
+                field(buyfromVendorNo; Rec."Buy-from Vendor No.")
                 {
-                    Caption = 'Amount', Locked = true;
+                    Caption = 'Buy-from Vendor No.', Locked = true;
                 }
-                field(balAccountNo; Rec."Bal. Account No.")
+                field(closedbyAmountLCY; Rec."Closed by Amount (LCY)")
                 {
-                    Caption = 'Bal. Account No.', Locked = true;
+                    Caption = 'Closed by Amount (LCY)', Locked = true;
                 }
-                field(balAccountType; Rec."Bal. Account Type")
+                field(closedbyEntryNo; Rec."Closed by Entry No.")
                 {
-                    Caption = 'Bal. Account Type', Locked = true;
+                    Caption = 'Closed by Entry No.', Locked = true;
                 }
-                field(creditAmount; Rec."Credit Amount")
+                field(dimensionSetID; Rec."Dimension Set ID")
                 {
-                    Caption = 'Credit Amount', Locked = true;
-                }
-                field(debitAmount; Rec."Debit Amount")
-                {
-                    Caption = 'Debit Amount', Locked = true;
-                }
-                field(gLAccountNo; Rec."G/L Account No.")
-                {
-                    Caption = 'G/L Account No.', Locked = true;
-                }
-                field(gLAccountName; Rec."G/L Account Name")
-                {
-                    Caption = 'G/L Account Name', Locked = true;
+                    Caption = 'Dimension Set ID', Locked = true;
                 }
                 field(globalDimension1Code; Rec."Global Dimension 1 Code")
                 {
@@ -64,9 +52,21 @@ page 6059925 NPRPBIG_LEntry
                 {
                     Caption = 'Posting Date', Locked = true;
                 }
-                field(sourceNo; Rec."Source No.")
+                field(purchaseLCY; Rec."Purchase (LCY)")
                 {
-                    Caption = 'Source No.', Locked = true;
+                    Caption = 'Purchase (LCY)', Locked = true;
+                }
+                field(vendorName; Rec."Vendor Name")
+                {
+                    Caption = 'Vendor Name', Locked = true;
+                }
+                field(vendorNo; Rec."Vendor No.")
+                {
+                    Caption = 'Vendor No.', Locked = true;
+                }
+                field(vendorPostingGroup; Rec."Vendor Posting Group")
+                {
+                    Caption = 'Vendor Posting Group', Locked = true;
                 }
                 field(entryNo; Rec."Entry No.")
                 {

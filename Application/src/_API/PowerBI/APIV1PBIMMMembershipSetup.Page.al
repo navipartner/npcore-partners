@@ -1,18 +1,19 @@
-page 6059938 NPRPBISalesPerson_Purc
+page 6059934 "NPR APIV1 PBIMMMembershipSetup"
 {
+    Editable = false;
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'salesPerson';
-    EntitySetName = 'salesPersons';
-    Caption = 'PowerBI SalesPerson/Purchaser';
+    EntityName = 'mmMembershipSetup';
+    EntitySetName = 'mmMembershipSetups';
+    Caption = 'PowerBI MM Membership Setup';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "Salesperson/Purchaser";
+    SourceTable = "NPR MM Membership Setup";
     Extensible = false;
-    Editable = false;
+
     layout
     {
         area(Content)
@@ -27,9 +28,9 @@ page 6059938 NPRPBISalesPerson_Purc
                 {
                     Caption = 'Code', Locked = true;
                 }
-                field(name; Rec.Name)
+                field(description; Rec.Description)
                 {
-                    Caption = 'Name', Locked = true;
+                    Caption = 'Description', Locked = true;
                 }
             }
         }

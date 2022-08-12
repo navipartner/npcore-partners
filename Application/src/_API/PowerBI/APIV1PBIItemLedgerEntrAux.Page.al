@@ -1,16 +1,16 @@
-page 6059981 NPRPBIVendorLedgerEntry
+page 6059931 "NPR APIV1 PBIItemLedgerEntrAux"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'vendorLedgerEntry';
-    EntitySetName = 'vendorsLedgerEntries';
-    Caption = 'PowerBI Vendor Ledger Entry';
+    EntityName = 'itemLedgerEntryAux';
+    EntitySetName = 'itemLedgerEntriesAux';
+    Caption = 'PowerBI Item Ledger Entry Aux.';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "Vendor ledger Entry";
+    SourceTable = "NPR Aux. Item Ledger Entry";
     Extensible = false;
     Editable = false;
 
@@ -24,21 +24,25 @@ page 6059981 NPRPBIVendorLedgerEntry
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(buyfromVendorNo; Rec."Buy-from Vendor No.")
+                field(entryNo; Rec."Entry No.")
                 {
-                    Caption = 'Buy-from Vendor No.', Locked = true;
+                    Caption = 'Entry No.', Locked = true;
                 }
-                field(closedbyAmountLCY; Rec."Closed by Amount (LCY)")
+                field(entryType; Rec."Entry Type")
                 {
-                    Caption = 'Closed by Amount (LCY)', Locked = true;
+                    Caption = 'Entry Type', Locked = true;
                 }
-                field(closedbyEntryNo; Rec."Closed by Entry No.")
+                field(quantity; Rec.Quantity)
                 {
-                    Caption = 'Closed by Entry No.', Locked = true;
+                    Caption = 'Quantity', Locked = true;
                 }
-                field(dimensionSetID; Rec."Dimension Set ID")
+                field(sourceType; Rec."Source Type")
                 {
-                    Caption = 'Dimension Set ID', Locked = true;
+                    Caption = 'Source Type', Locked = true;
+                }
+                field(sourceNo; Rec."Source No.")
+                {
+                    Caption = 'Source No.', Locked = true;
                 }
                 field(globalDimension1Code; Rec."Global Dimension 1 Code")
                 {
@@ -52,26 +56,31 @@ page 6059981 NPRPBIVendorLedgerEntry
                 {
                     Caption = 'Posting Date', Locked = true;
                 }
-                field(purchaseLCY; Rec."Purchase (LCY)")
+                field(itemNo; Rec."Item No.")
                 {
-                    Caption = 'Purchase (LCY)', Locked = true;
+                    Caption = 'Item No.', Locked = true;
                 }
-                field(vendorName; Rec."Vendor Name")
+                field(salespersPurchCode; Rec."Salespers./Purch. Code")
                 {
-                    Caption = 'Vendor Name', Locked = true;
+                    Caption = 'Salespers./Purch. Code', Locked = true;
+                }
+                field(documentTime; Rec."Document Time")
+                {
+                    Caption = 'Document Time', Locked = true;
                 }
                 field(vendorNo; Rec."Vendor No.")
                 {
                     Caption = 'Vendor No.', Locked = true;
                 }
-                field(vendorPostingGroup; Rec."Vendor Posting Group")
+                field(systemCreatedAt; Rec.SystemCreatedAt)
                 {
-                    Caption = 'Vendor Posting Group', Locked = true;
+                    Caption = 'SystemCreatedAt', Locked = true;
                 }
-                field(entryNo; Rec."Entry No.")
+                field(systemCreatedBy; Rec.SystemCreatedBy)
                 {
-                    Caption = 'Entry No.', Locked = true;
+                    Caption = 'SystemCreatedBy', Locked = true;
                 }
+
             }
         }
     }

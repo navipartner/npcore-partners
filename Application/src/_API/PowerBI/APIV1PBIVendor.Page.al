@@ -1,16 +1,16 @@
-page 6059914 NPRPBICustomer
+page 6059980 "NPR APIV1 PBIVendor"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'customer';
-    EntitySetName = 'customers';
-    Caption = 'PowerBI Customer';
+    EntityName = 'vendor';
+    EntitySetName = 'vendors';
+    Caption = 'PowerBI Vendor';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = Customer;
+    SourceTable = "Vendor";
     Extensible = false;
     Editable = false;
 
@@ -24,13 +24,17 @@ page 6059914 NPRPBICustomer
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(address; Rec.Address)
+                field(vendorPostingGroup; Rec."Vendor Posting Group")
                 {
-                    Caption = 'Address', Locked = true;
+                    Caption = 'Vendor Posting Group', Locked = true;
                 }
-                field(address2; Rec."Address 2")
+                field(no; Rec."No.")
                 {
-                    Caption = 'Address 2', Locked = true;
+                    Caption = 'No.', Locked = true;
+                }
+                field(name; Rec.Name)
+                {
+                    Caption = 'Name', Locked = true;
                 }
                 field(city; Rec.City)
                 {
@@ -40,21 +44,21 @@ page 6059914 NPRPBICustomer
                 {
                     Caption = 'Country/Region Code', Locked = true;
                 }
-                field(name; Rec.Name)
+                field(county; Rec.County)
                 {
-                    Caption = 'Name', Locked = true;
-                }
-                field(no; Rec."No.")
-                {
-                    Caption = 'No.', Locked = true;
-                }
-                field(name2; Rec."Name 2")
-                {
-                    Caption = 'Name 2', Locked = true;
+                    Caption = 'County', Locked = true;
                 }
                 field(postCode; Rec."Post Code")
                 {
                     Caption = 'Post Code', Locked = true;
+                }
+                field(globalDimension1Code; Rec."Global Dimension 1 Code")
+                {
+                    Caption = 'Global Dimension 1 Code', Locked = true;
+                }
+                field(globalDimension2Code; Rec."Global Dimension 2 Code")
+                {
+                    Caption = 'Global Dimension 2 Code', Locked = true;
                 }
             }
         }

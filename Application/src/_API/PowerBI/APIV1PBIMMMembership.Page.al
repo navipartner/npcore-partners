@@ -1,16 +1,16 @@
-page 6059935 NPRPBIPOSEntry
+page 6059933 "NPR APIV1 PBIMMMembership"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'posEntry';
-    EntitySetName = 'posEntries';
-    Caption = 'PowerBI POS Entry';
+    EntityName = 'mmMembership';
+    EntitySetName = 'mmMemberships';
+    Caption = 'PowerBI MM Membership';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "NPR POS entry";
+    SourceTable = "NPR MM Membership";
     Extensible = false;
     Editable = false;
 
@@ -28,24 +28,15 @@ page 6059935 NPRPBIPOSEntry
                 {
                     Caption = 'Customer No.', Locked = true;
                 }
-                field(description; Rec.Description)
-                {
-                    Caption = 'Description', Locked = true;
-                }
                 field(entryNo; Rec."Entry No.")
                 {
                     Caption = 'Entry No.', Locked = true;
                 }
-                field(entryType; Rec."Entry Type")
+                field(membershipCode; Rec."Membership Code")
                 {
-                    Caption = 'Entry Type', Locked = true;
-                }
-                field(eventNo; Rec."Event No.")
-                {
-                    Caption = 'Event No.', Locked = true;
+                    Caption = 'Membership Code', Locked = true;
                 }
             }
         }
     }
-
 }

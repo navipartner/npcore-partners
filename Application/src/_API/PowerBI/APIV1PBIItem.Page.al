@@ -1,4 +1,4 @@
-page 6059926 NPRPBIItem
+page 6059926 "NPR APIV1 PBIItem"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
@@ -52,7 +52,7 @@ page 6059926 NPRPBIItem
                 {
                     Caption = 'Sales (Qty.)', Locked = true;
                 }
-                field("type"; Rec."Type")
+                field(type; Rec."Type")
                 {
                     Caption = 'Type', Locked = true;
                 }

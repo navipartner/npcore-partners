@@ -1,4 +1,4 @@
-page 6059915 NPRPBIDimension
+page 6059915 "NPR APIV1 PBIDimension"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';

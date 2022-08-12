@@ -1,4 +1,4 @@
-page 6059913 NPRPBICust_LedgerEntry
+page 6059913 "NPR APIV1 PBICustLedgerEntry"
 {
     APIGroup = 'powerbi';
     APIPublisher = 'navipartner';

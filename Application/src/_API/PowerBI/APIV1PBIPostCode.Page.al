@@ -1,16 +1,16 @@
-page 6059980 NPRPBIVendor
+page 6059937 "NPR APIV1 PBIPostCode"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'vendor';
-    EntitySetName = 'vendors';
-    Caption = 'PowerBI Vendor';
+    EntityName = 'posCode';
+    EntitySetName = 'posCodes';
+    Caption = 'PowerBI Post Code';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "Vendor";
+    SourceTable = "Post Code";
     Extensible = false;
     Editable = false;
 
@@ -24,21 +24,13 @@ page 6059980 NPRPBIVendor
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(vendorPostingGroup; Rec."Vendor Posting Group")
-                {
-                    Caption = 'Vendor Posting Group', Locked = true;
-                }
-                field(no; Rec."No.")
-                {
-                    Caption = 'No.', Locked = true;
-                }
-                field(name; Rec.Name)
-                {
-                    Caption = 'Name', Locked = true;
-                }
                 field(city; Rec.City)
                 {
                     Caption = 'City', Locked = true;
+                }
+                field("code"; Rec."Code")
+                {
+                    Caption = 'Code', Locked = true;
                 }
                 field(countryRegionCode; Rec."Country/Region Code")
                 {
@@ -48,17 +40,25 @@ page 6059980 NPRPBIVendor
                 {
                     Caption = 'County', Locked = true;
                 }
-                field(postCode; Rec."Post Code")
+                field(searchCity; Rec."Search City")
                 {
-                    Caption = 'Post Code', Locked = true;
+                    Caption = 'Search City', Locked = true;
                 }
-                field(globalDimension1Code; Rec."Global Dimension 1 Code")
+                field(systemCreatedAt; Rec.SystemCreatedAt)
                 {
-                    Caption = 'Global Dimension 1 Code', Locked = true;
+                    Caption = 'SystemCreatedAt', Locked = true;
                 }
-                field(globalDimension2Code; Rec."Global Dimension 2 Code")
+                field(systemModifiedBy; Rec.SystemModifiedBy)
                 {
-                    Caption = 'Global Dimension 2 Code', Locked = true;
+                    Caption = 'SystemModifiedBy', Locked = true;
+                }
+                field(timeZone; Rec."Time Zone")
+                {
+                    Caption = 'Time Zone', Locked = true;
+                }
+                field(systemModifiedAt; Rec.SystemModifiedAt)
+                {
+                    Caption = 'SystemModifiedAt', Locked = true;
                 }
             }
         }

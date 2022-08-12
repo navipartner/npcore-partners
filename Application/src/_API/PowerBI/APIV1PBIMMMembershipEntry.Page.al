@@ -1,4 +1,4 @@
-page 6059932 NPRPBIMM_MembershipEntry
+page 6059932 "NPR APIV1 PBIMMMembershipEntry"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';

@@ -1,4 +1,4 @@
-page 6059927 NPRPBIItemApplication
+page 6059927 "NPR APIV1 PBIItemApplication"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';

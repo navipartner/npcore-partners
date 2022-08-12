@@ -1,16 +1,16 @@
-page 6059965 NPRPBITMAdmission
+page 6059938 "NPR APIV1 PBISalesPersonPurc"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'tmAdmission';
-    EntitySetName = 'tmAdmissions';
-    Caption = 'PowerBI TM Admission';
+    EntityName = 'salesPerson';
+    EntitySetName = 'salesPersons';
+    Caption = 'PowerBI SalesPerson/Purchaser';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "NPR TM Admission";
+    SourceTable = "Salesperson/Purchaser";
     Extensible = false;
     Editable = false;
     layout
@@ -23,17 +23,13 @@ page 6059965 NPRPBITMAdmission
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(admissionCode; Rec."Admission Code")
+                field("code"; Rec."Code")
                 {
-                    Caption = 'Admission Code', Locked = true;
+                    Caption = 'Code', Locked = true;
                 }
-                field(description; Rec.Description)
+                field(name; Rec.Name)
                 {
-                    Caption = 'Description', Locked = true;
-                }
-                field(type; Rec."Type")
-                {
-                    Caption = 'Type', Locked = true;
+                    Caption = 'Name', Locked = true;
                 }
             }
         }

@@ -1,4 +1,4 @@
-page 6059917 NPRPBIDimensionSetTreeNode
+page 6059917 "NPR APIV1 PBIDimSetTreeNode"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';

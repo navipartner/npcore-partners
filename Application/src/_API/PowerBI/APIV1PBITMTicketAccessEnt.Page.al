@@ -1,4 +1,4 @@
-page 6059968 NPRPBITMticketAccessEntry
+page 6059968 "NPR APIV1 PBITMTicketAccessEnt"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
