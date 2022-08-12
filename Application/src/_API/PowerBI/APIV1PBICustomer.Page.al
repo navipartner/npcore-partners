@@ -1,18 +1,18 @@
-page 6059936 NPRPBIPOSStore
+page 6059914 "NPR APIV1 PBICustomer"
 {
-    Editable = false;
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'posStore';
-    EntitySetName = 'posStores';
-    Caption = 'PowerBI POS Store';
+    EntityName = 'customer';
+    EntitySetName = 'customers';
+    Caption = 'PowerBI Customer';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "NPR POS Store";
+    SourceTable = Customer;
     Extensible = false;
+    Editable = false;
 
     layout
     {
@@ -28,17 +28,13 @@ page 6059936 NPRPBIPOSStore
                 {
                     Caption = 'Address', Locked = true;
                 }
+                field(address2; Rec."Address 2")
+                {
+                    Caption = 'Address 2', Locked = true;
+                }
                 field(city; Rec.City)
                 {
                     Caption = 'City', Locked = true;
-                }
-                field("code"; Rec."Code")
-                {
-                    Caption = 'Code', Locked = true;
-                }
-                field(contact; Rec.Contact)
-                {
-                    Caption = 'Contact', Locked = true;
                 }
                 field(countryRegionCode; Rec."Country/Region Code")
                 {
@@ -48,17 +44,17 @@ page 6059936 NPRPBIPOSStore
                 {
                     Caption = 'Name', Locked = true;
                 }
-                field(openingDate; Rec."Opening Date")
+                field(no; Rec."No.")
                 {
-                    Caption = 'Opening Date', Locked = true;
+                    Caption = 'No.', Locked = true;
+                }
+                field(name2; Rec."Name 2")
+                {
+                    Caption = 'Name 2', Locked = true;
                 }
                 field(postCode; Rec."Post Code")
                 {
                     Caption = 'Post Code', Locked = true;
-                }
-                field(storeSize; Rec."Store Size")
-                {
-                    Caption = 'Store Size', Locked = true;
                 }
             }
         }

@@ -1,18 +1,18 @@
-page 6059980 NPRPBIVendor
+page 6059936 "NPR APIV1 PBIPOSStore"
 {
+    Editable = false;
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'vendor';
-    EntitySetName = 'vendors';
-    Caption = 'PowerBI Vendor';
+    EntityName = 'posStore';
+    EntitySetName = 'posStores';
+    Caption = 'PowerBI POS Store';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "Vendor";
+    SourceTable = "NPR POS Store";
     Extensible = false;
-    Editable = false;
 
     layout
     {
@@ -24,41 +24,41 @@ page 6059980 NPRPBIVendor
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(vendorPostingGroup; Rec."Vendor Posting Group")
+                field(address; Rec.Address)
                 {
-                    Caption = 'Vendor Posting Group', Locked = true;
-                }
-                field(no; Rec."No.")
-                {
-                    Caption = 'No.', Locked = true;
-                }
-                field(name; Rec.Name)
-                {
-                    Caption = 'Name', Locked = true;
+                    Caption = 'Address', Locked = true;
                 }
                 field(city; Rec.City)
                 {
                     Caption = 'City', Locked = true;
                 }
+                field("code"; Rec."Code")
+                {
+                    Caption = 'Code', Locked = true;
+                }
+                field(contact; Rec.Contact)
+                {
+                    Caption = 'Contact', Locked = true;
+                }
                 field(countryRegionCode; Rec."Country/Region Code")
                 {
                     Caption = 'Country/Region Code', Locked = true;
                 }
-                field(county; Rec.County)
+                field(name; Rec.Name)
                 {
-                    Caption = 'County', Locked = true;
+                    Caption = 'Name', Locked = true;
+                }
+                field(openingDate; Rec."Opening Date")
+                {
+                    Caption = 'Opening Date', Locked = true;
                 }
                 field(postCode; Rec."Post Code")
                 {
                     Caption = 'Post Code', Locked = true;
                 }
-                field(globalDimension1Code; Rec."Global Dimension 1 Code")
+                field(storeSize; Rec."Store Size")
                 {
-                    Caption = 'Global Dimension 1 Code', Locked = true;
-                }
-                field(globalDimension2Code; Rec."Global Dimension 2 Code")
-                {
-                    Caption = 'Global Dimension 2 Code', Locked = true;
+                    Caption = 'Store Size', Locked = true;
                 }
             }
         }

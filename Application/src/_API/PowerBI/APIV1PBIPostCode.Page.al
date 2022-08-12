@@ -1,4 +1,4 @@
-page 6059937 NPRPBIPostCode
+page 6059937 "NPR APIV1 PBIPostCode"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';

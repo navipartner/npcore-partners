@@ -1,4 +1,4 @@
-page 6059916 NPRPBIDimensionSet
+page 6059916 "NPR APIV1 PBIDimensionSet"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
@@ -24,11 +24,11 @@ page 6059916 NPRPBIDimensionSet
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field("dimensionSetID"; Rec."Dimension Set ID")
+                field(dimensionSetID; Rec."Dimension Set ID")
                 {
                     Caption = 'Dimension Set ID', Locked = true;
                 }
-                field("dimensionCode"; Rec."Dimension Code")
+                field(dimensionCode; Rec."Dimension Code")
                 {
                     Caption = 'Dimension Code', Locked = true;
                 }

@@ -1,4 +1,4 @@
-page 6059928 NPRPBIItemCategory
+page 6059928 "NPR APIV1 PBIItemCategory"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';

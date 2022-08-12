@@ -1,16 +1,16 @@
-page 6059919 NPRPBIG_LAccount
+page 6059918 "NPR APIV1 PBIDimensionValues"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'glAccount';
-    EntitySetName = 'glAccounts';
-    Caption = 'PowerBI G/L Account';
+    EntityName = 'dimensionValue';
+    EntitySetName = 'dimensionValues';
+    Caption = 'PowerBI Dimension Values';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "G/L Account";
+    SourceTable = "Dimension Value";
     Extensible = false;
     Editable = false;
 
@@ -24,27 +24,29 @@ page 6059919 NPRPBIG_LAccount
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(no; Rec."No.")
+                field("code"; Rec."Code")
                 {
-                    Caption = 'No.', Locked = true;
+                    Caption = 'Code', Locked = true;
                 }
                 field(name; Rec.Name)
                 {
                     Caption = 'Name', Locked = true;
                 }
-                field(accountType; Rec."Account Type")
+                field(globalDimensionNo; Rec."Global Dimension No.")
                 {
-                    Caption = 'Account Type', Locked = true;
+                    Caption = 'Global Dimension No.', Locked = true;
                 }
-                field(blocked; Rec.Blocked)
+                field(dimensionCode; Rec."Dimension Code")
                 {
-                    Caption = 'Blocked', Locked = true;
+                    Caption = 'Dimension Code', Locked = true;
                 }
-                field(totaling; Rec.Totaling)
+                field(dimensionValueID; Rec."Dimension Value ID")
                 {
-                    Caption = 'Totaling', Locked = true;
+                    Caption = 'Dimension Value ID', Locked = true;
                 }
+
             }
         }
+
     }
 }

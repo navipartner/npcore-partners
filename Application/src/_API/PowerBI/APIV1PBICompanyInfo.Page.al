@@ -1,18 +1,18 @@
-page 6059934 NPRBIMM_Membership_Setup
+page 6059912 "NPR APIV1 PBICompanyInfo"
 {
-    Editable = false;
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'mmMembershipSetup';
-    EntitySetName = 'mmMembershipSetups';
-    Caption = 'PowerBI MM Membership Setup';
+    EntityName = 'companyInfo';
+    EntitySetName = 'companyInfos';
+    Caption = 'PowerBI Company Information';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "NPR MM Membership Setup";
+    SourceTable = "Company Information";
     Extensible = false;
+    Editable = false;
 
     layout
     {
@@ -24,13 +24,13 @@ page 6059934 NPRBIMM_Membership_Setup
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field("code"; Rec."Code")
+                field(name; Rec.Name)
                 {
-                    Caption = 'Code', Locked = true;
+                    Caption = 'Name', Locked = true;
                 }
-                field(description; Rec.Description)
+                field(locationCode; Rec."Location Code")
                 {
-                    Caption = 'Description', Locked = true;
+                    Caption = 'Location Code', Locked = true;
                 }
             }
         }
