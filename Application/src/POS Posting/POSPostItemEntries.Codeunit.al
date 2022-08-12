@@ -234,7 +234,7 @@
         ReservationEntry."Serial No." := ItemJournalLine."Serial No.";
         ReservationEntry."Lot No." := ItemJournalLine."Lot No.";
         ReservationEntry."Created By" := UserId;
-        ReservationEntry."Qty. per Unit of Measure" := ItemJournalLine.Quantity;
+        ReservationEntry."Qty. per Unit of Measure" := ItemJournalLine."Qty. per Unit of Measure";
         ReservationEntry.Quantity := -ItemJournalLine.Quantity;
         ReservationEntry."Qty. to Handle (Base)" := -ItemJournalLine.Quantity;
         ReservationEntry."Qty. to Invoice (Base)" := -ItemJournalLine.Quantity;
