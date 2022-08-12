@@ -41,6 +41,6 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
         Customer.SetFilter("Date Filter", '..%1', WorkDate());
         Customer.CalcFields("Balance Due (LCY)");
         BalanceAmount := Customer."Balance Due (LCY)";
-        exit(BalanceAmount <> 0);
+        exit(BalanceAmount > 0);
     end;
 }
