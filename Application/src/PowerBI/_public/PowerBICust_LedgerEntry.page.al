@@ -6,6 +6,8 @@ page 6184601 NPRPowerBICust_LedgerEntry
     UsageCategory = Lists;
     SourceTable = "Cust. Ledger Entry";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

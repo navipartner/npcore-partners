@@ -6,6 +6,8 @@ page 6184628 NPRPowerBIItemApplication
     SourceTable = "Item Application Entry";
     UsageCategory = Lists;
     editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

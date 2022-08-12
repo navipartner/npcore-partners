@@ -6,6 +6,8 @@ page 6184615 NPRPowerBIMM_Membership
     UsageCategory = Lists;
     SourceTable = "NPR MM Membership";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {

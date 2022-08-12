@@ -5,7 +5,8 @@ page 6184612 NPRPowerBIItemledgerEntry
     ApplicationArea = All;
     UsageCategory = Lists;
     SourceTable = "Item Ledger Entry";
-
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
     layout
     {
         area(Content)

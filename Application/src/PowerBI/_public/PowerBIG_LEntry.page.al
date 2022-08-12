@@ -6,6 +6,8 @@ page 6184609 NPRPowerBIG_LEntry
     UsageCategory = Lists;
     SourceTable = "G/L Entry";
     Editable = false;
+    ObsoleteState = pending;
+    ObsoleteReason = 'Page type changed to API';
 
     layout
     {
