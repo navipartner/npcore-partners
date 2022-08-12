@@ -12,7 +12,7 @@ page 6059863 "NPR MPOS Connector"
         {
             field(PageCaption; _Caption)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Caption = 'Page Caption';
                 Style = Strong;
                 StyleExpr = TRUE;
@@ -20,7 +20,7 @@ page 6059863 "NPR MPOS Connector"
             }
             usercontrol(MPOSConnector; "NPR MPOS Connector")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
 
                 trigger ControlAddInReady()
                 begin

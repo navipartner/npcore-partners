@@ -1256,7 +1256,7 @@
         {
             part("Attached Documents"; "Document Attachment Factbox")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = CONST(167),
                               "No." = FIELD("No.");
@@ -1498,7 +1498,7 @@
                 }
                 action(Attachments)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Attachments';
                     Image = Attach;
                     ToolTip = 'Add a file as an attachment. You can attach images as well as documents.';

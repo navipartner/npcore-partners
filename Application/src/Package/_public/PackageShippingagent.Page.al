@@ -84,17 +84,17 @@
                 field("LxWxH Dimensions Required"; Rec."LxWxH Dimensions Required")
                 {
                     ToolTip = 'Specifies the value of the Length_Width_Height Dimensions Required field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("running_metre required"; Rec."running_metre required")
                 {
                     ToolTip = 'Specifies the value of the running_metre field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Volume Required"; Rec."Volume Required")
                 {
                     ToolTip = 'Specifies the value of the  Volume cubic metres  field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
             }
             part("NPR Services Combination"; "NPR Services Combination")

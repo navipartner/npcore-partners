@@ -33,7 +33,7 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
             field("NPR Package Quantity"; Rec."NPR Package Quantity")
             {
                 ToolTip = 'Specifies the value of the Package Quantity field.';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Shipment Date")

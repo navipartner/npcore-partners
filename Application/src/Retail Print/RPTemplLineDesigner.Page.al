@@ -227,7 +227,7 @@ page 6014630 "NPR RP Templ. Line Designer"
                 }
                 field("Processing Codeunit Name"; Rec."Processing Codeunit Name")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Name of the selected processing codeunit';
                 }
                 field("Processing Function ID"; Rec."Processing Function ID")

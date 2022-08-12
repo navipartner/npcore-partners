@@ -80,7 +80,7 @@ page 6014440 "NPR Shipping Provider Docs"
                 field("Package Quantity"; Rec."Package Quantity")
                 {
                     ToolTip = 'Specifies the value of the Detailed Package Quantity field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
                 field(Reference; Rec.Reference)
                 {

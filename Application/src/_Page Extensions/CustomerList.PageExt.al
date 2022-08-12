@@ -59,7 +59,7 @@ pageextension 6014492 "NPR Customer List" extends "Customer List"
         {
             action("NPR Item Ledger Entries")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Caption = 'Item Ledger Entries';
                 Image = ItemLedger;
                 RunObject = Page "Item Ledger Entries";
