@@ -181,6 +181,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ITEM_QTY', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Item Qty.";
     }
+    value(30; EFT_EXT_TERMNL)
+    {
+        Caption = 'EFT_EXT_TERMNL', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Ext.Terminal";
+    }
     value(31; LOOKUP)
     {
         Caption = 'LOOKUP', Locked = true, MaxLength = 20;
