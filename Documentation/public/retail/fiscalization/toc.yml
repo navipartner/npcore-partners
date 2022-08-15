@@ -1,12 +1,5 @@
-- name: Introduction
+- name: Country-specific fiscalization requirements
   href: intro.md
 - name: France
-  items:
-  - name: Compliance Info
-    href: france/info.md
-  - name: Setup
-    href: france/setup.md    
-  - name: Archive
-    href: france/archive.md
-  - name: Archive (French)
-    href: france/archive_fr.md
+  href: france/toc.yml
+
