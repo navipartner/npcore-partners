@@ -1,0 +1,12 @@
+- name: How-To  
+  items:
+  - name: Set up NP Retail fiscalization compliance - France
+    href: howto/setup.md
+- name: Explanations
+  items:
+  - name: Compliance info
+    href: explanation/info.md
+  - name: Data archive
+    href: explanation/archive.md
+  - name: Data archive (FR)
+    href: explanation/archive_fr.md
