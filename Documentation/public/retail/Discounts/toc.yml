@@ -4,3 +4,9 @@
     items:
     - name: Set up period discounts
       href: howto/Period_discount.md
+    - name: Set up mix discounts
+      href: howto/Mix_discount.md
+  - name: Explanations
+    items:
+    - name: Mix discount types
+      href: explanation/discount_types.md
