@@ -5,7 +5,7 @@
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item - Loss - Top 10.rdlc';
-    Caption = 'Item Shrinkage - Top 10';
+    Caption = 'Item - Loss - Top 10';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
@@ -15,11 +15,6 @@
         dataitem(Item; Item)
         {
             RequestFilterFields = "Date Filter", "Item Category Code", "Vendor No.", "No.";
-
-            trigger OnAfterGetRecord()
-            begin
-                ItemShrinkage();
-            end;
 
             trigger OnPreDataItem()
             begin
@@ -39,17 +34,34 @@
                 ItemReportSorting.Reset();
                 ItemReportSorting.DeleteAll();
             end;
+
+            trigger OnAfterGetRecord()
+            begin
+                ItemShrinkage();
+            end;
+
+            trigger OnPostDataItem()
+            var
+                ValueEntryTotal: Record "Value Entry";
+            begin
+                ValueEntryTotal.SetCurrentKey("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
+                if Item.GetFilter("Date Filter") <> '' then
+                    ValueEntryTotal.SetRange("Posting Date", Item.GetRangeMin("Date Filter"),
+                                          Item.GetRangeMax("Date Filter"));
+
+                if Item.GetFilter("Location Filter") <> '' then
+                    ValueEntryTotal.SetRange("Location Code", Item.GetRangeMin("Location Filter"),
+                                          Item.GetRangeMax("Location Filter"));
+
+                ValueEntryTotal.SetRange("Item Ledger Entry Type", ValueEntryTotal."Item Ledger Entry Type"::Sale);
+                ValueEntryTotal.CalcSums("Cost Amount (Actual)");
+                ItemCostAmountTotal := -ValueEntryTotal."Cost Amount (Actual)";
+            end;
         }
         dataitem(ItemReportSorting; "NPR TEMP Buffer")
         {
             DataItemTableView = SORTING(Template, "Line No.");
             UseTemporary = true;
-            column(USERID; UserId)
-            {
-            }
-            column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
-            {
-            }
             column(COMPANYNAME; CompanyName)
             {
             }
@@ -59,9 +71,6 @@
             column(SortBy; SortBy)
             {
             }
-            column(ProgressText; ProgressText)
-            {
-            }
             column(ItemCostAmount; ItemCostAmount)
             {
                 AutoFormatType = 1;
@@ -69,20 +78,16 @@
             column(ItemDescription; ItemDescription)
             {
             }
-            column(ItemNo__; ItemNo)
+            column(ItemNo; ItemNo)
             {
             }
             column(Rank; Rank)
             {
             }
-            column(Item_Report_Sorting_Quantity; "Decimal 3")
+            column(ItemQuantity; "Decimal 3")
             {
             }
             column(ShrinkagePct; ShrinkagePct)
-            {
-                DecimalPlaces = 1 : 1;
-            }
-            column(ItemCostAmount_Pct; ItemCostAmount_Pct)
             {
                 DecimalPlaces = 1 : 1;
             }
@@ -90,72 +95,6 @@
             {
                 AutoFormatType = 1;
             }
-            column(ItemCostAmountTotal_Top; ItemCostAmountTotal_Top)
-            {
-                AutoFormatType = 1;
-            }
-            column(Vare_Svind___Top_10Caption; Vare_Svind___Top_10CaptionLbl)
-            {
-            }
-            column(Page_Caption; Page_CaptionLbl)
-            {
-            }
-            column(Item_NoCaption; Item_NoCaptionLbl)
-            {
-            }
-            column(Item_DescriptionCaption; Item_DescriptionCaptionLbl)
-            {
-            }
-            column(Cost_AmountCaption; Cost_AmountCaptionLbl)
-            {
-            }
-            column(Sales_AmountCaption; Sales_AmountCaptionLbl)
-            {
-            }
-            column(Item_Report_Sorting_QuantityCaption; Item_Report_Sorting_QuantityCaptionLbl)
-            {
-            }
-            column(Svind__Caption; Svind__CaptionLbl)
-            {
-            }
-            column(ItemCostAmount_PctCaption; ItemCostAmount_PctCaptionLbl)
-            {
-            }
-            column(ItemCostAmountTotalCaption; ItemCostAmountTotalCaptionLbl)
-            {
-            }
-            column(ItemCostAmountTotal_TopCaption; ItemCostAmountTotal_TopCaptionLbl)
-            {
-            }
-            column(Item_Report_Sorting_Template; Template)
-            {
-            }
-            column(Item_Report_Sorting_Line_No_; "Line No.")
-            {
-            }
-
-            trigger OnAfterGetRecord()
-            begin
-                Rank += 1;
-                ItemNo := CopyStr(ItemReportSorting.Template, 1, MaxStrLen(ItemNo));
-                ItemDescription := '';
-                if Item1.Get(ItemNo) then
-                    ItemDescription := Item1.Description;
-                ItemCostAmount := ItemReportSorting."Decimal 2";
-                ShrinkagePct := Pct("Decimal 3", "Decimal 4");
-
-                if Rank = 1 then
-                    MaxAmt := ItemCostAmount;
-                if ItemCostAmount > 0 then
-                    ProgressText := PadStr('', Round(ItemCostAmount / MaxAmt * 45, 1), '*')
-                else
-                    ProgressText := '';
-
-                if Rank <= NoOfRecordsToPrint then
-                    ItemCostAmountTotal_Top := ItemCostAmountTotal_Top + ItemReportSorting."Decimal 2";
-                ItemCostAmountTotal := ItemCostAmountTotal + ItemReportSorting."Decimal 2";
-                ItemCostAmount_Pct := Pct(ItemCostAmountTotal_Top, ItemCostAmountTotal);
-            end;
 
             trigger OnPreDataItem()
             begin
@@ -164,6 +103,17 @@
                 SetCurrentKey(Template, "Line No.");
                 SetCurrentKey("Decimal 1", "Short Code 1");
                 Ascending := false;
+            end;
+
+            trigger OnAfterGetRecord()
+            begin
+                Rank += 1;
+                ItemNo := CopyStr(ItemReportSorting.Template, 1, MaxStrLen(ItemNo));
+                ItemCostAmount := ItemReportSorting."Decimal 2";
+                ShrinkagePct := Pct("Decimal 3", "Decimal 4");
+
+                if Rank <= NoOfRecordsToPrint then
+                    ItemCostAmountTotal_Top := ItemCostAmountTotal_Top + ItemReportSorting."Decimal 2";
             end;
         }
     }
@@ -202,6 +152,22 @@
         }
     }
 
+    labels
+    {
+        ReportCaptionLbl = 'Item - Loss - Top 10';
+        PageLbl = 'Page.';
+        OfLbl = 'of';
+        ShrinkageCaptionLbl = 'Shrinkage %';
+        ItemCostAmountCaptionLbl = 'Cost Amount';
+        ItemCostAmountTotalListedCaptionLbl = 'Total Listed';
+        ItemCostAmountTotalCostCaptionLbl = 'Total Cost';
+        ItemCostAmount_PctCaptionLbl = '% of Total Cost';
+        ItemssQuantityCaptionLbl = 'Quantity';
+        ItemNoCaptionLbl = 'Item No';
+        SalesAmountCaptionLbl = 'No.';
+        ItemDescriptionCaptionLbl = 'Item Description';
+    }
+
     trigger OnInitReport()
     begin
         NoOfRecordsToPrint := 10;
@@ -220,18 +186,15 @@
     end;
 
     var
-        Item1: Record Item;
         ItemNo: Code[20];
         SourceCodeFilter: Code[10];
         ItemDescription: Text[100];
         ItemFilters: Text;
-        ProgressText: Text;
         SortBy: Text[30];
         SortOrder: Option Quantity,CostAmount,Shrinkage;
         ItemCostAmount: Decimal;
         ItemCostAmountTotal: Decimal;
         ItemCostAmountTotal_Top: Decimal;
-        ItemCostAmount_Pct: Decimal;
         NoOfRecordsToPrint: Integer;
         Text001: Label 'Source Code Filter:  ';
         Text002: Label 'Sorted by ''Quantity''';
@@ -239,18 +202,6 @@
         Text004: Label 'Sorted by ''Shrinkage %''';
         ShrinkagePct: Decimal;
         Rank: Integer;
-        MaxAmt: Decimal;
-        Vare_Svind___Top_10CaptionLbl: Label 'Item Shrinkage - Top 10';
-        Page_CaptionLbl: Label 'Page.';
-        Item_NoCaptionLbl: Label 'Item No';
-        Item_DescriptionCaptionLbl: Label 'Item Description';
-        Cost_AmountCaptionLbl: Label 'Cost Amount';
-        Sales_AmountCaptionLbl: Label 'No.';
-        Item_Report_Sorting_QuantityCaptionLbl: Label 'Quantity';
-        Svind__CaptionLbl: Label 'Shrinkage %';
-        ItemCostAmount_PctCaptionLbl: Label '% of Total Cost';
-        ItemCostAmountTotalCaptionLbl: Label 'Total Cost';
-        ItemCostAmountTotal_TopCaptionLbl: Label 'Total Listed';
 
     internal procedure ItemShrinkage()
     var
@@ -263,18 +214,13 @@
     begin
         ItemLedgerEntry.SetCurrentKey("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
         ItemLedgerEntry.SetRange("Item No.", Item."No.");
-
-        if Item.GetFilter("Date Filter") <> '' then
-            ItemLedgerEntry.SetRange("Posting Date", Item.GetRangeMin("Date Filter"),
-                                  Item.GetRangeMax("Date Filter"));
-
-        if Item.GetFilter("Location Filter") <> '' then
-            ItemLedgerEntry.SetRange("Location Code", Item.GetRangeMin("Location Filter"),
-                                  Item.GetRangeMax("Location Filter"));
-
+        ItemLedgerEntry.SetFilter("Posting Date", Item.GetFilter("Date Filter"));
+        ItemLedgerEntry.SetFilter("Location Code", Item.GetFilter("Location Filter"));
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
+
         ItemLedgerEntry.CalcSums("Invoiced Quantity");
         SalesQty := ItemLedgerEntry."Invoiced Quantity";
+
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::"Negative Adjmt.");
         if ItemLedgerEntry.FindFirst() then begin
             repeat
@@ -316,6 +262,7 @@
                         ItemReportSorting.Init();
                         ItemReportSorting.Template := ItemLedgerEntry."Item No.";
                         ItemReportSorting."Line No." := 1;
+                        ItemReportSorting.Description := Item.Description;
                         ItemReportSorting."Short Code 1" := ItemLedgerEntry."Item No.";
                         ItemReportSorting."Decimal 3" := -ItemLedgerEntry.Quantity;
                         ItemReportSorting."Decimal 4" := -SalesQty;
@@ -344,4 +291,3 @@
         exit(Round(Numeral1 / Numeral2 * 100, 0.1));
     end;
 }
-
