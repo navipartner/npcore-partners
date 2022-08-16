@@ -56,7 +56,7 @@
   - name: Create inventory pick with the Create Inventory Put Away/Pick/Movement action
     href: howto/create_inventory_pick_action.md
 
-  - name: Videos
-    items:
-    - name: WMS video training materials
-      href: videos/intro.md
+- name: Videos
+  items:
+  - name: WMS video training materials
+    href: videos/intro.md
