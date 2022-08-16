@@ -90,6 +90,25 @@
 
     actions
     {
+        area(Processing)
+        {
+            action("UnConsume Item")
+            {
+                ToolTip = 'Unconsume the complimentary item linked with this ticket.';
+                ApplicationArea = NPRTicketAdvanced;
+                Caption = 'Unconsume Item';
+                Image = ConsumptionJournal;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                Scope = Repeater;
+                trigger OnAction()
+                begin
+                    UnConsumeItem();
+                end;
+            }
+        }
+
         area(navigation)
         {
             action("Admission Schedule Entry")
@@ -108,7 +127,7 @@
             }
             action("Ticket Request")
             {
-                ToolTip = 'Navigate to list of ticket requests for thie time entry.';
+                ToolTip = 'Navigate to list of ticket requests for this time entry.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Request';
                 Image = Navigate;
@@ -121,18 +140,20 @@
                     OpenTicketRequest(Rec);
                 end;
             }
-            action("Unconsume Item")
+
+            action(FindRelatedMembership)
             {
-                ToolTip = 'Unconsume the complimenatry item linked with this ticket.';
-                ApplicationArea = NPRTicketAdvanced;
-                Caption = 'Unconsume Item';
+                ToolTip = 'This action finds the related membership created when the ticket is used as voucher for memberships.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Caption = 'Find Related Membership';
                 Image = ConsumptionJournal;
                 Promoted = true;
                 PromotedOnly = true;
-                PromotedCategory = Process;
+                PromotedCategory = Category4;
+                Scope = Repeater;
                 trigger OnAction()
                 begin
-                    UnconsumeItem();
+                    FindMembership();
                 end;
             }
         }
@@ -153,9 +174,8 @@
         ScheduledTime: Text[30];
         ScheduledTimeLbl: Label '%1 %2', Locked = true;
 
-    local procedure UnconsumeItem()
+    local procedure UnConsumeItem()
     begin
-
         Rec.TestField(Type, Rec.Type::CONSUMED);
         if (Rec.Type = Rec.Type::CONSUMED) then
             Rec.Delete();
@@ -167,15 +187,48 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketRequest: Page "NPR TM Ticket Request";
     begin
-
-        //-TM1.48 [416096]
         Ticket.Get(DetTicketAccessEntry."Ticket No.");
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
 
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
         TicketRequest.SetTableView(TicketReservationRequest);
         TicketRequest.Run();
-        //+TM1.48 [416096]
+    end;
+
+    local procedure FindMembership()
+    var
+        MembershipLedgerEntry: Record "NPR MM Membership Entry";
+        Membership: Record "NPR MM Membership";
+        Ticket: Record "NPR TM Ticket";
+        MembershipList: Page "NPR MM Memberships";
+        MembershipCard: Page "NPR MM Membership Card";
+        MembershipCount: Integer;
+    begin
+        Ticket.Get(Rec."Ticket No.");
+        MembershipLedgerEntry.SetFilter("Document No.", '=%1', Ticket."External Ticket No.");
+        if (not MembershipLedgerEntry.FindSet()) then
+            exit;
+
+        repeat
+            if (Membership.Get(MembershipLedgerEntry."Membership Entry No.")) then begin
+                Membership.Mark(true);
+                MembershipCount += 1;
+            end;
+        until (MembershipLedgerEntry.Next() = 0);
+
+        Membership.MarkedOnly(true);
+        if (Membership.FindSet()) then
+            case MembershipCount of
+                1:
+                    begin
+                        MembershipCard.SetRecord(Membership);
+                        MembershipCard.Run();
+                    end;
+                else begin
+                        MembershipList.SetTableView(Membership);
+                        MembershipList.Run();
+                    end;
+            end;
     end;
 }
 
