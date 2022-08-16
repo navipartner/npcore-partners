@@ -7,6 +7,7 @@ Each line in the **Ticket BOM** table can share a common notification profile, o
 The notification rules are collected in a profile. A profile may have multiple lines per a type. It is thus possible to distribute one type of notification at a time.
 
 There are different types of reminders to target the three use-cases:
+
 - **Reservation Reminder** is a reminder for an upcoming event. It requires a ticket reservation. The date and time calculations are based on the admission start and the notification is scheduled to be sent before the _admission start_;
 - **First Admission** is meant to send a notification including a follow-up evaluation of the visit experience. Date and time calculations are based on _admission end_ and the notification is scheduled to be sent after the admission ends;
 - **Revoke** – is meant to send a follow-up evaluation of the ticket-holder's reason for revoking the ticket. The date and time values are based on when the revocation occurred (now) and notification is scheduled to be sent with some delay after that;
