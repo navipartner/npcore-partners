@@ -116,7 +116,8 @@
                     Caption = 'Sales Return Orders';
                     ShowCaption = true;
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Sales Return Orders field.';
+                    ToolTip = 'Displays the number of the Sales Return Orders. If you click you can drilldown to the list of the Sales Return Orders.';
+
 
                     trigger OnDrillDown()
                     begin
@@ -128,7 +129,8 @@
                     Caption = 'Posted Sales Invoices';
                     ShowCaption = true;
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Posted Sales Invoices field.';
+                    ToolTip = 'Displays the number of the Posted Sales Invoices. If you click you can drilldown to the list of the Posted Sales Invoices.';
+
                 }
                 field(SalesCreditMemos; Rec."Sales Credit Memos")
                 {
@@ -136,14 +138,16 @@
                     ShowCaption = true;
                     ApplicationArea = NPRRetail;
                     DrillDownPageId = "Sales Credit Memos";
-                    ToolTip = 'Specifies the value of the Sales Credit Memos field.';
+                    ToolTip = 'Displays the number of the Sales Credit Memos. If you click you can drilldown to the list of the Sales Credit Memos.';
+
                 }
                 field(CollectDocumentList; Rec."Collect Document List")
                 {
                     Caption = 'Collect Document List';
                     ShowCaption = true;
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Collect Document List field.';
+                    ToolTip = 'Specifies the number of the Collect Documents. If you click you can drilldown to the list of Collect Documents.';
+
                 }
             }
             cuegroup("Incoming Documents")
