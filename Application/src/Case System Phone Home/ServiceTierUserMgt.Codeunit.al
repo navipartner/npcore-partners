@@ -2,6 +2,10 @@
 {
     Access = Internal;
 
+    var
+        ClientDiagnostic: Record "NPR Client Diagnostic";
+        Initialized: Boolean;
+
 #if BC20
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, false)]
     local procedure HandleOnAfterLogin()
@@ -52,6 +56,16 @@
             exit;
 
         TestUserOnPOSSessionInitialize();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::User, 'OnAfterDeleteEvent', '', true, false)]
+    local procedure UserOnAfterDelete(var Rec: Record User; RunTrigger: Boolean)
+    var
+        ClientDiag: Record "NPR Client Diagnostic";
+    begin
+        ClientDiag.SetRange("User Security ID", Rec."User Security ID");
+        if not ClientDiag.IsEmpty() then
+            ClientDiag.Delete();
     end;
 
     local procedure ValidateBCOnlineTenant()
@@ -119,23 +133,79 @@
     var
         ExpirationMessage: Text;
     begin
-        if not TrySendRequest('GetUserExpirationMessage', UserId(), GetDatabaseName(), TenantId(), ExpirationMessage) then
-            exit;
-        if ExpirationMessage = '' then
+        UpdateExpirationMessage(ExpirationMessage);
+        if ExpirationMessage <> '' then
+            Message(ExpirationMessage);
+
+        UpdateExpirationDate();
+        PreventLoginIfUserIsExpired();
+    end;
+
+    local procedure UpdateExpirationMessage(var ExpirationMessage: Text)
+    var
+        ExpirationMessageLastChecked: DateTime;
+        DurationFromLastCheck: Duration;
+        DurationCondition: Integer;
+    begin
+        InitClientDiagnostic();
+
+        ExpirationMessageLastChecked := ClientDiagnostic."Expirat. Message Last Checked";
+        if ExpirationMessageLastChecked = 0DT then
+            Evaluate(ExpirationMessageLastChecked, '1970-01-01T00:00:00Z', 9);
+
+        //In order to reduce number of calls to externall services (case system), send the request on login only:
+        //  if user wasn't set to expire and if last check was done more than an hour ago
+        //  but if user was set to be expired (and now it should be unlocked) skip checking if an hour has passed and send the request
+        DurationFromLastCheck := CurrentDateTime() - ExpirationMessageLastChecked;
+        DurationCondition := 1000 * 60 * 60; //miliseconds * seconds * minutes = one hour
+
+        if (ClientDiagnostic."Expiration Message" = '') and (DurationFromLastCheck <= DurationCondition) then
             exit;
 
-        if LowerCase(ExpirationMessage) <> 'false' then
-            Message(ExpirationMessage);
-        UpdateExpirationDate();
+        if not TrySendRequest('GetUserExpirationMessage', UserId(), GetDatabaseName(), TenantId(), ExpirationMessage) then
+            exit;
+
+        if LowerCase(ExpirationMessage) = 'false' then
+            ExpirationMessage := '';
+
+        if ClientDiagnostic."Expiration Message" <> ExpirationMessage then begin
+            ClientDiagnostic."Expiration Message" := CopyStr(ExpirationMessage, 1, MaxStrLen(ClientDiagnostic."Expiration Message"));
+            ClientDiagnostic."Expirat. Message Last Updated" := CurrentDateTime();
+        end;
+        ClientDiagnostic."Expirat. Message Last Checked" := CurrentDateTime();
+        ClientDiagnostic.Modify();
     end;
 
     local procedure UpdateExpirationDate()
     var
-        User: Record User;
+        ExpirationDateTime: DateTime;
+        ExpiryDateLastChecked: DateTime;
+        DurationFromLastCheck: Duration;
+        DurationCondition: Integer;
     begin
-        User.Get(UserSecurityId());
-        User."Expiry Date" := GetExpirationDateTime();
+        InitClientDiagnostic();
 
+        ExpiryDateLastChecked := ClientDiagnostic."Expiry Date Last Checked";
+        if ExpiryDateLastChecked = 0DT then
+            Evaluate(ExpiryDateLastChecked, '1970-01-01T00:00:00Z', 9);
+
+        //In order to reduce number of calls to externall services (case system), send the request on login only:
+        //  if user wasn't set to expire and if last check was done more than an hour ago
+        //  but if user was set to be expired (and now it should be unlocked) skip checking if an hour has passed and send the request
+        DurationFromLastCheck := CurrentDateTime() - ExpiryDateLastChecked;
+        DurationCondition := 1000 * 60 * 60; //miliseconds * seconds * minutes = one hour
+
+        if (ClientDiagnostic."Expiry Date" = 0DT) and (DurationFromLastCheck <= DurationCondition) then
+            exit;
+
+        ExpirationDateTime := GetExpirationDateTime();
+        if ClientDiagnostic."Expiry Date" <> ExpirationDateTime then begin
+            ClientDiagnostic."Expiry Date" := ExpirationDateTime;
+            ClientDiagnostic."Expiry Date Last Updated" := CurrentDateTime();
+        end;
+        ClientDiagnostic."Expiry Date Last Checked" := CurrentDateTime();
+        ClientDiagnostic.Modify();
+        Commit();
     end;
 
     local procedure GetExpirationDateTime(): DateTime
@@ -166,20 +236,81 @@
         exit(CreateDateTime(DMY2Date(Day, Month, Year), ExpirationTime));
     end;
 
+    local procedure InitClientDiagnostic()
+    begin
+        if Initialized then
+            exit;
+
+        if ClientDiagnostic.Get(UserSecurityId()) then begin
+            Initialized := true;
+            exit;
+        end;
+
+        ClientDiagnostic.Init();
+        ClientDiagnostic."User Security ID" := UserSecurityId();
+        ClientDiagnostic.Insert();
+        Initialized := true;
+    end;
+
+    local procedure PreventLoginIfUserIsExpired()
+    var
+        UserExpired: Label 'Your account has expired on %1. Expiration Message was: "%2". In order to continue, contact NaviPartner support or uninstall NP Retail extension.', Comment = '%1 = Expiration Date, %2 = Expiration Message';
+    begin
+        if ClientDiagnostic."Expiry Date" = 0DT then
+            exit;
+
+        if CurrentDateTime >= ClientDiagnostic."Expiry Date" then
+            Error(UserExpired, ClientDiagnostic."Expiry Date", ClientDiagnostic."Expiration Message");
+    end;
+
     local procedure TestUserLocked(ThrowAnError: Boolean)
     var
         LockedMessage: Text;
     begin
-        if not TrySendRequest('GetUserLockedMessage', UserId(), GetDatabaseName(), TenantId(), LockedMessage) then
-            exit;
+        UpdateUserLockedMessage(LockedMessage);
         if LockedMessage = '' then
             exit;
 
-        if LowerCase(LockedMessage) <> 'false' then
-            if ThrowAnError then
-                Error(LockedMessage)
-            else
-                Message(LockedMessage);
+        if ThrowAnError then
+            Error(LockedMessage)
+        else
+            Message(LockedMessage);
+    end;
+
+    local procedure UpdateUserLockedMessage(var LockedMessage: Text)
+    var
+        LockedMessageLastChecked: DateTime;
+        DurationFromLastCheck: Duration;
+        DurationCondition: Integer;
+    begin
+        InitClientDiagnostic();
+
+        LockedMessageLastChecked := ClientDiagnostic."Locked Message Last Checked";
+        if LockedMessageLastChecked = 0DT then
+            Evaluate(LockedMessageLastChecked, '1970-01-01T00:00:00Z', 9);
+
+        //In order to reduce number of calls to externall services (case system), send the request on login only:
+        //  if user wasn't locked and if last check was done more than an hour ago
+        //  but if user was set to be locked (and now it should be unlocked) skip checking if an hour has passed and send the request
+        DurationFromLastCheck := CurrentDateTime() - LockedMessageLastChecked;
+        DurationCondition := 1000 * 60 * 60; //miliseconds * seconds * minutes = one hour
+
+        if (ClientDiagnostic."Locked Message" = '') and (DurationFromLastCheck <= DurationCondition) then
+            exit;
+
+        if not TrySendRequest('GetUserLockedMessage', UserId(), GetDatabaseName(), TenantId(), LockedMessage) then
+            exit;
+
+        if LowerCase(LockedMessage) = 'false' then
+            LockedMessage := '';
+
+        if ClientDiagnostic."Locked Message" <> LockedMessage then begin
+            ClientDiagnostic."Locked Message" := CopyStr(LockedMessage, 1, MaxStrLen(ClientDiagnostic."Locked Message"));
+            ClientDiagnostic."Locked Message Last Updated" := CurrentDateTime();
+        end;
+        ClientDiagnostic."Locked Message Last Checked" := CurrentDateTime();
+        ClientDiagnostic.Modify();
+        Commit();
     end;
 
     [TryFunction]
