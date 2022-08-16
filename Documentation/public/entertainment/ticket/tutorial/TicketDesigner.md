@@ -1,6 +1,6 @@
 # Ticket Designer
 
-This article will go though the **Ticket Designer** functionalities and the procedure for creating a new ticket.
+This article lists the **Ticket Designer** functionalities and provides the instructions for designing, duplicating, and deleting tickets.
 
 ## Shortcut Keys and Tools  
   
@@ -131,7 +131,7 @@ The **Preview** window will show you how the ticket will look after compiling. Y
 
 To reload, click <img src="../images/reload.png" width="40">.   
 
-Assume you started editing an existing ticket and then you realised that you are doing it all wrong. You can always reload the ticket which will bring the ticket back to it status when last published.
+Assume you started editing an existing ticket and then you realized that you are doing it all wrong. You can always reload the ticket which will bring the ticket back to it status when last published.
 
 ### Publish
 
@@ -152,3 +152,4 @@ For creating a mobile ticket the procedure is just like creating a printed ticke
 ### Related links
 
 - [Ticket module](../intro.md)
+- [Set up DIY printed tickets](../howto/SetUpDIYPrintedTicket.md)
