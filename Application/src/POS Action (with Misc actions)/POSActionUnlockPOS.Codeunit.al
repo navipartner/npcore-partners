@@ -1,6 +1,9 @@
 ﻿codeunit 6150836 "NPR POS Action: UnlockPOS"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used.';
+
     var
         ActionDescription: Label 'This built in function unlocks the POS';
         IllegalPassword: Label 'Illegal password.';
