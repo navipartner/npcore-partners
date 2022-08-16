@@ -61,7 +61,6 @@
         CONCURRENT_CAPACITY_EXCEEDED_NO: Label '-1030';
         RESCHEDULE_NOT_ALLOWED_NO: Label '-1031';
         INVALID_ADMISSION_CODE_NO: Label '-1032';
-        INVOICE_TEXT2: Label 'Admission on %1 {%2,...}';
         POSTPAID_RESULT: Label 'Number of postpaid tickets: %1\\Number of invoices: %2\\Invoices created: %3';
         gAccessEntryPaymentType: Option PAYMENT,PREPAID,POSTPAID;
         HANDLE_POSTPAID: Label 'Do you want to generate invoices for postpaid ticket?';
@@ -2904,6 +2903,8 @@
         InvoiceDetailsMessage: Text;
         ShowDialog: Boolean;
         FromToInvLbl: Label '{%1..%2}', Locked = true;
+        InvoiceListPage: Page "Sales Invoice List";
+        SalesHeader: Record "Sales Header";
     begin
         if (not Confirm(HANDLE_POSTPAID)) then
             Error('');
@@ -2917,7 +2918,7 @@
         AggregatePaymentEntries(ShowDialog, TempTicket, TempAggregatedPerRequest, TempAdmissionPerDate);
 
         if (not PreviewDocument) then begin
-            CreatePostpaidTicketInvoice(ShowDialog, TempAggregatedPerRequest, TempAdmissionPerDate);
+            CreatePostpaidTicketInvoice(ShowDialog, TempAggregatedPerRequest, TempAdmissionPerDate, TempTicket);
             MarkPostpaidTicketAsInvoiced(ShowDialog, TempDetailedAccessEntries, TempAggregatedPerRequest, TempTicket);
             if (not TempAggregatedPerRequest.IsEmpty()) then begin
                 TempAggregatedPerRequest.FindFirst();
@@ -2925,13 +2926,17 @@
                 TempAggregatedPerRequest.FindLast();
                 LastInvoiceNo := CopyStr(TempAggregatedPerRequest.Description, 1, 20);
                 InvoiceDetailsMessage := StrSubstNo(FromToInvLbl, FirstInvoiceNo, LastInvoiceNo);
+
+                SalesHeader.SetRange("No.", FirstInvoiceNo, LastInvoiceNo);
+                InvoiceListPage.SetTableView(SalesHeader);
+                InvoiceListPage.Run();
             end;
         end;
-
         if (ShowDialog) then
             gWindow.Close();
 
         Message(POSTPAID_RESULT, TempTicket.Count(), TempAggregatedPerRequest.Count(), InvoiceDetailsMessage);
+
     end;
 
     local procedure CollectUnhandledPostpaidTickets(ShowDialog: Boolean; var TmpPostpaidTickets: Record "NPR TM Ticket" temporary; var TmpDetailedAccessEntries: Record "NPR TM Det. Ticket AccessEntry" temporary)
@@ -3036,6 +3041,9 @@
                         TmpAdmissionsPerDate."Ticket No." := TicketAccessEntry."Ticket No.";
                         TmpAdmissionsPerDate.Insert();
                     end;
+
+                    TmpPostpaidTickets."Line No." := TmpAdmissionsPerDate."Entry No.";
+                    TmpPostpaidTickets.Modify();
                 end;
             end;
 
@@ -3047,14 +3055,16 @@
         until (TmpPostpaidTickets.Next() = 0);
     end;
 
-    local procedure CreatePostpaidTicketInvoice(ShowDialog: Boolean; var TmpAggregatedPerRequest: Record "NPR TM Ticket Access Entry" temporary; var TmpAdmissionsPerDate: Record "NPR TM Det. Ticket AccessEntry" temporary)
+    local procedure CreatePostpaidTicketInvoice(ShowDialog: Boolean; var TmpAggregatedPerRequest: Record "NPR TM Ticket Access Entry" temporary; var TmpAdmissionsPerDate: Record "NPR TM Det. Ticket AccessEntry" temporary; var TmpTicket: Record "NPR TM Ticket" temporary)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
+        ItemDescription: Text;
         LineNo: Integer;
         MaxCount: Integer;
         Index: Integer;
+        INVOICE_TEXT: Label 'Admitted on %1 - %2';
     begin
         TmpAggregatedPerRequest.Reset();
         if (not TmpAggregatedPerRequest.FindSet()) then
@@ -3087,18 +3097,34 @@
                 if (TmpAdmissionsPerDate.FindSet()) then begin
                     repeat
                         LineNo += 10000;
+                        SalesLine.Init();
                         SalesLine."Document Type" := SalesHeader."Document Type";
                         SalesLine."Document No." := SalesHeader."No.";
                         SalesLine."Line No." := LineNo;
-                        SalesLine.Insert(true);
 
-                        SalesLine.Type := SalesLine.Type::Item;
+                        SalesLine.Validate(Type, SalesLine.Type::Item);
                         SalesLine.Validate("No.", TicketReservationRequest."Item No.");
                         SalesLine.Validate("Variant Code", TicketReservationRequest."Variant Code");
+                        ItemDescription := SalesLine.Description;
 
                         SalesLine.Validate(Quantity, TmpAdmissionsPerDate.Quantity);
-                        SalesLine.Description := StrSubstNo(INVOICE_TEXT2, TmpAdmissionsPerDate."Posting Date", TmpAdmissionsPerDate."Ticket No.");
-                        SalesLine.Modify(true);
+                        SalesLine.Description := CopyStr(StrSubstNo(INVOICE_TEXT, TmpAdmissionsPerDate."Posting Date", ItemDescription), 1, MaxStrLen(SalesLine.Description));
+                        SalesLine.Insert(true);
+
+                        TmpTicket.SetFilter("Line No.", '=%1', TmpAdmissionsPerDate."Entry No.");
+                        if (TmpTicket.FindSet()) then begin
+                            repeat
+                                LineNo += 10000;
+                                SalesLine.Init();
+                                SalesLine."Document Type" := SalesHeader."Document Type";
+                                SalesLine."Document No." := SalesHeader."No.";
+                                SalesLine."Line No." := LineNo;
+                                SalesLine.Validate(Type, SalesLine.Type::" ");
+                                SalesLine.Description := TmpTicket."External Ticket No.";
+                                SalesLine.Insert(true);
+                            until (TmpTicket.Next() = 0)
+                        end;
+
                     until (TmpAdmissionsPerDate.Next() = 0);
                 end;
             end;
