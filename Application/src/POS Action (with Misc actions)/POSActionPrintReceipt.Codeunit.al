@@ -15,7 +15,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.8');
+        exit('1.9');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -39,7 +39,7 @@
             Sender.RegisterBooleanParameter('Print Tickets', false);
             Sender.RegisterBooleanParameter('Print Memberships', false);
             Sender.RegisterBooleanParameter('Print Terminal Receipt', false);
-            Sender.RegisterOptionParameter('ReceiptListFilter', 'None,Current POS Store,Current POS Unit,Current Salesperson', 'None');
+            Sender.RegisterOptionParameter('ReceiptListFilter', 'None,Current POS Store,Current POS Unit,Current Salesperson', 'Current POS Unit');
             Sender.RegisterTextParameter('ReceiptListView', '');
             Sender.RegisterOptionParameter('SelectionDialogType', 'TextField,List', 'List');
             Sender.RegisterOptionParameter('ObfuscationMethod', 'None,MI', 'None');
