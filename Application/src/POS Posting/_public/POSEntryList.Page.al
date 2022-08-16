@@ -308,6 +308,15 @@
                 ToolTip = 'Executes the Payment Lines action';
                 ApplicationArea = NPRRetail;
             }
+            action("Sales & Payment Lines")
+            {
+                Caption = 'Sales & Payment Lines';
+                Image = AllLines;
+                RunObject = Page "NPR POS Entry Sales & Payments";
+                RunPageLink = "POS Entry No." = FIELD("Entry No.");
+                ToolTip = 'Executes the Sales & Payment Lines action';
+                ApplicationArea = NPRRetail;
+            }
             action("Tax Lines")
             {
                 Caption = 'Tax Lines';
@@ -558,6 +567,18 @@
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry Pmt. Line List";
                     ToolTip = 'Executes the Payment Line List action';
+                    ApplicationArea = NPRRetail;
+                }
+                action("Sales & Payment Line List")
+                {
+                    Caption = 'Sales & Payment Line List';
+                    Image = AllLines;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    RunObject = Page "NPR POS Entry Sales & Payments";
+                    ToolTip = 'Executes the Sales & Payment Line List action';
                     ApplicationArea = NPRRetail;
                 }
                 action("Tax Line List")
