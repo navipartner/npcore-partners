@@ -3,19 +3,19 @@
 To create a ticket price profile, follow the provided steps.
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Ticket Price Profiles** and choose the related link.
-2. Click the **Ticket Price Profiles** page and choose the **New** action.
-
-    The **Ticket Price Profile Card** page opens.
-
-3. Proceed to fill out **Profile Code** and **Description** fields.
-
+2. Click the **Ticket Price Profiles** page and choose the **New** action.       
+The **Ticket Price Profile Card** page opens.
+3. Proceed to fill out **Profile Code** and **Description** fields.        
     Proceed with filling out the fields on the line according to the price rule you want to create.
-    Hover over a field to read a short description.
 
 >[!Tip]
 >Click the **Price Simulator** on top of the page to see a list of dates and which rule applies to that date.
 
-The **Ticket Price Profile** has now been created and must be assigned to one or more of the lines in **Admission Schedule Lines**.
+The **Ticket Price Profile** has now been created and needs to be assigned to one or more lines in **Admission Schedule Lines**.
+
+## Next steps
+
+## Assign the notification profile to Admission Schedule Lines
 
 To assign the notification profile to one or more lines in **Admission Schedule Lines**, follow the provided steps.
 
@@ -30,3 +30,4 @@ To assign the notification profile to one or more lines in **Admission Schedule 
 ### Related Links
 
 - [Ticket pricing](../explanation/TicketPricing.md)
+- [Create ticket notification profile](CreateNotificationProfile.md)

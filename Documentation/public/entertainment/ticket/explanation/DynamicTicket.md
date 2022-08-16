@@ -8,5 +8,6 @@ A **Dynamic Ticket** is a ticket which has flexible admission setup. It can have
 > Each ticket needs to include at least one default ticket admission.
 
 ### Related links
+
 - [Ticket module](../intro.md)
 - [Create a dynamic ticket](../howto/CreateDynamicTicket.md)

@@ -12,17 +12,17 @@ This tutorial will teach you how to create the setup for a fully functional tick
 > You can create a new ticket type in the **Ticket Setup Wizard** by typing the name of choice in the **Code** field, and then filling out the **Ticket Type** fields in the **Advanced** section of the window.
 
 4. In the **No.** field, write the item number of your choice or opt for automatic generation.     
-   By default, a generic next-in-line item number will be generated and set to **<GENERATE>**. This number can be changed to an item number of your choice.  
+   By default, a generic next-in-line item number will be generated and set to `<GENERATE>`. This number can be changed to an item number of your choice.  
 5. Fill in **Description** with the description for your ticket. 
 
 > [!IMPORTANT]
-> This description will also be the name on the webshop. However, you can change this in the **Item Card** under the **Magento** tab.
+> This description will also be the name on the web shop. However, you can change this in the **Item Card** under the **Magento** tab.
 
-6.	Choose the **Item Group** for your ticket.
-7.	Fill out the **Unit Price** for the ticket.
-8.	Pick the **Start Date** and **Until Date**.
-9.	Move on to the **Schedules** table and set the **Start Time** and the **Stop Time** of the ticket.
-10.	Check off which weekdays the tickets will be usable on.
+6. Choose the **Item Group** for your ticket.
+7. Fill out the **Unit Price** for the ticket.
+8. Pick the **Start Date** and **Until Date**.
+9. Move on to the **Schedules** table and set the **Start Time** and the **Stop Time** of the ticket.
+10. Check off which weekdays the tickets will be usable on.
 
 > [!NOTE] 
 > If needed, you can create several schedule lines with different start and stop times, and different weekdays, but still within the period between the start and until dates.
@@ -40,10 +40,12 @@ This tutorial will teach you how to create the setup for a fully functional tick
 
 
 ## Next Steps
- - [Issue tickets from Business Central](../howto/issue_ticket.md)
- - [Issue tickets from POS](../../../../public/404.md)
+
+- [Issue tickets from Business Central](../howto/issue_ticket.md)
+- [Issue tickets from POS](../../../../public/404.md)
 
 ### Related links
+
 - [Ticket admission](../explanation/admission.md)
 - [Admission dependency code](../explanation/AdmissionDependencyCode.md)
 - [Set up refund policy](../howto/SetUpRefundPolicy.md)

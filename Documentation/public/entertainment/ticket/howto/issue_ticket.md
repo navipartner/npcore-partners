@@ -19,7 +19,7 @@ To issue tickets from Business Central:
    - create offline ticket validation entries;
    - create printable tickets on ticket server.
 
-The **Ticket List** pages opens with the created tickets.
+The created tickets are displayed in the **Ticket List** page.
 
 ### Related Links:
 

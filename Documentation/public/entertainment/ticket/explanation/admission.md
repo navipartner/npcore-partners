@@ -10,5 +10,6 @@ Ticket types work in the same way, but there are a few exceptions. A key differe
 > Each ticket needs to include at least one ticket admission.
 
 ### Related links
+
 - [Ticket module](../intro.md)
 - [Dynamic Ticket](./DynamicTicket.md)
