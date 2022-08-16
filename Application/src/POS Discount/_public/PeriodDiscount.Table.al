@@ -10,6 +10,7 @@
         {
             Caption = 'Code';
             DataClassification = CustomerContent;
+            NotBlank = true;
 
             trigger OnValidate()
             begin

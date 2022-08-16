@@ -428,6 +428,8 @@
     var
         QtyDiscLine: Record "NPR Quantity Discount Line";
     begin
+        TestField(Code);
+
         QtyDiscLine.SetRange("Item No.", "Item No.");
         if QtyDiscLine.Find('-') then
             Message(Text1060005);
