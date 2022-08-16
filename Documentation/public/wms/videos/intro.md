@@ -13,3 +13,27 @@ This section contains all WMS-related video training materials. The videos mainl
 ### Welcome to NP WMS - Español
 
 > [!Video https://share.synthesia.io/embeds/videos/1b4f8da1-7a59-4d7e-b06a-5165bad3b281]
+
+### CS setup
+
+> [!Video https://www.youtube.com/embed/6EXqbu1jeTI]
+
+### CS UI setup
+
+> [!Video https://www.youtube.com/embed/O2Lt-tCaOxY]
+
+### CS user setup
+
+> [!Video https://www.youtube.com/embed/11YtGLyGVxI]
+
+### Communication log
+
+> [!Video https://www.youtube.com/embed/y7dvMQfFIX4]
+
+### Posting buffer
+
+> [!Video https://www.youtube.com/embed/n65bodoD-fA]
+
+### Print buffer
+
+> [!Video https://www.youtube.com/embed/1Bq4jv8hAGo]

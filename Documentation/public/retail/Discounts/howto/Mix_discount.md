@@ -51,7 +51,7 @@ To set up mix discounts, follow the provided steps:
 | **No.** | The field be populated with information depending on what is selected as the **Dis. Grouping Type**. |
 | **Variant Code** | Enter the variant code of the item if there's any specific variant to which you want the discount to apply. If you leave this field empty, all the variants will be affected. |
 | **Description** | The description of the item, item group or item discount group. |
-| **Description 2** - The description of the variant. |
+| **Description 2** | The description of the variant. |
 | **Unit Cost** | If an item is inserted, the unit cost will be taken from the relevant **Item Card**. |
 | **Unit Price** | If an item is inserted, the unit price will be taken from the relevant **Item Card**. |
 | **Priority** | The priority which you wish to assign to a mixed discount line. For example, if we have two lines with priorities 1 and 2, minimum and maximum quantities are 2, and we bought 4 items (two from the first, and two from second line), only the item with the priority 1 will get the discount. |
