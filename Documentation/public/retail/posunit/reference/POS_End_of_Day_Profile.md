@@ -17,7 +17,7 @@ In the POS End of Day profile it is defined how and how often the End of Day wil
 | **Z-Report Number Series** | The number series used for creating the **Document No.** in the POS entry for entries created from running the Z report. |
 | **X-Report Number series** | The number series used for creating the **Document No.** in the POS entry for entries created from running the X report. |
 | **Show Zero Amount Lines** | All payment methods will be shown on the balancing page even if they haven’t been used. |
-| **Hide Turnover Section** |  If this field is checked, the turnover section will be hidden on the summary page.
+| **Hide Turnover Section** |  If this field is checked, the turnover section will be hidden on the summary page. |
 
 ![endofday](../images/End%20of%20day%20profile.PNG)
 

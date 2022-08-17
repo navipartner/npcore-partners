@@ -2,23 +2,9 @@
 
 Variety is a tool that assists users in creating and associating different characteristics with items. The most common characteristics, or variants, of items are **Color**, **Size**, **Waist**, and **Length**. There are also other variants that are specific to certain types of merchandise, for example **Label**, **Wash**, and **Fit** in regards to clothes. 
 
-NP Retail has a tool that can be used for defining the variants associated with various items. The stock is maintained per a combination of variants, and is sold in these particular combinations. The tool doesn't affect price calculations. Rather, it simply represents the item characteristics in a more structured way. It also allows users to apply all item variants to the item at the same time.
+NP Retail has a tool that can be used for defining the variants associated with various items. The stock is maintained per a combination of variants, and is sold in these particular combinations. The tool doesn't affect any calculation routines (e.g. finding sales prices/cost prices, posting routines etc.). Rather, it represents variants in a more structured way. It also allows users to apply all item variants to an item simultaneously.
 
-## How varieties work
+### Related links
 
-You can create as many varieties as you need, but a single item is limited to 4 varieties. Normally, 2 or 3 varieties are used for a single item. A variety can have an unlimited number of variety tables, and each variety table can have an (almost) unlimited number of values, but the recommended limit is 100 values per a table.
-
-> [!Note]
-> Adding more than 100 values per a table may require customization, so it's not recommended. 
-
-There are two different types of variety tables according to the item characteristics they describe:
-
-- Tables that always contain the same values     
-  Example: 
-    - Size (37, 39, 40 or S, L, XXXL)
-    - Waist (38, 40, 46)
-    - Length (38, 40, 46)
-
-- Tables that always contain different values     
-  Example:
-    - Colors (it's almost impossible to determine what colors will each item be in advance)
+- [Create a new variety](howto/create_variety.md)
+- [Assign a variety to an item](howto/assign_variety_to_item.md)
