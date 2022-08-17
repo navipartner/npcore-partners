@@ -1,6 +1,7 @@
 ﻿codeunit 6150794 "NPR POS Action: Tax Free"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This is a built-in action for toggling tax free before completing sale';
         Caption_Enabled: Label 'Enabled';
@@ -205,7 +206,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeReverseSalesTicket', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev.Dir.Sale B", 'OnBeforeReverseSalesTicket', '', false, false)]
     local procedure OnBeforeReverseSalesTicket(SalesTicketNo: Code[20])
     var
         TaxFreeMgt: Codeunit "NPR Tax Free Handler Mgt.";
