@@ -56,7 +56,7 @@ codeunit 6059809 "NPR Stripe Refresh Data"
         StripeSetup.GetSetup();
         ShouldRefresh := true;
         if StripeSetup."Last Synchronized" <> 0DT then
-            ShouldRefresh := (CurrentDateTime() - StripeSetup."Last Synchronized") > (1 * 60 * 60 * 1000);
+            ShouldRefresh := (CurrentDateTime() - StripeSetup."Last Synchronized") > (1 * 60 * 30 * 1000);
     end;
 
     [IntegrationEvent(false, false)]
