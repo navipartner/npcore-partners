@@ -18,28 +18,28 @@
                 {
 
                     Caption = 'No.';
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the number of the event.';
                     ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
 
                     Caption = 'From User';
-                    ToolTip = 'Specifies the value of the From User field';
+                    ToolTip = 'Specifies the from user.';
                     ApplicationArea = NPRRetail;
                 }
                 field("To User ID"; Rec."To User ID")
                 {
 
                     Caption = 'To User';
-                    ToolTip = 'Specifies the value of the To User field';
+                    ToolTip = 'Specifies the to user.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
                     Caption = 'Note';
-                    ToolTip = 'Specifies the value of the Note field';
+                    ToolTip = 'Specifies the note.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -56,7 +56,7 @@
                 Image = View;
                 RunPageMode = View;
 
-                ToolTip = 'Executes the View Event action';
+                ToolTip = 'View the event.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

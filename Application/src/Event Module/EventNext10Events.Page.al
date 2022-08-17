@@ -20,7 +20,7 @@
                 {
 
                     Caption = 'Filters';
-                    ToolTip = 'Specifies the value of the Filters field';
+                    ToolTip = 'Specifies the filter set on attributes.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -29,37 +29,37 @@
                 field("No."; Rec."No.")
                 {
 
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the number for the next 10 events.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description for the next 10 events.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Bill-to Customer No. field';
+                    ToolTip = 'Specifies the Bill-to Customer No. for the next 10 events.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Event Status"; Rec."NPR Event Status")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Event Status field';
+                    ToolTip = 'Specifies the status for the next 10 events.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Starting Date field';
+                    ToolTip = 'Specifies the starting date for the next 10 events.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Total Amount"; Rec."NPR Total Amount")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR Total Amount field';
+                    ToolTip = 'Specifies the total amount to be charged for the next 10 events.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -78,7 +78,7 @@
                 RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
 
-                ToolTip = 'Executes the View action';
+                ToolTip = 'View filters which are already set on the specific attributes.';
                 ApplicationArea = NPRRetail;
             }
             group("Select Filter")
@@ -90,7 +90,7 @@
                     Caption = 'Select Responsible Person';
                     Image = JobResponsibility;
 
-                    ToolTip = 'Executes the Select Responsible Person action';
+                    ToolTip = 'Select the responsible person.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -111,7 +111,7 @@
                 Caption = 'Clear Filter';
                 Image = ClearFilter;
 
-                ToolTip = 'Executes the Clear Filter action';
+                ToolTip = 'Clear all filters.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
