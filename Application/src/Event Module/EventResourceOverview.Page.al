@@ -18,14 +18,14 @@
                 {
 
                     Caption = 'Starting Date';
-                    ToolTip = 'Specifies the value of the Starting Date field';
+                    ToolTip = 'Specifies the starting date on which data is filtered.';
                     ApplicationArea = NPRRetail;
                 }
                 field(EndingDate; EndingDate)
                 {
 
                     Caption = 'Ending Date';
-                    ToolTip = 'Specifies the value of the Ending Date field';
+                    ToolTip = 'Specifies the date on which data stops being filtered.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -34,32 +34,32 @@
                 field("No."; Rec."No.")
                 {
 
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the code of the resource.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the name of the resource.';
                     ApplicationArea = NPRRetail;
                 }
                 field("E-Mail"; Rec."NPR E-Mail")
                 {
 
-                    ToolTip = 'Specifies the value of the NPR E-Mail field';
+                    ToolTip = 'Specifies the e-mail of the resource.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Capacity; Rec.Capacity)
                 {
 
-                    ToolTip = 'Specifies the value of the Capacity field';
+                    ToolTip = 'Specifies the capacity of the resource.';
                     ApplicationArea = NPRRetail;
                 }
                 field(QtyOnEvent; QtyOnEvent)
                 {
 
                     Caption = 'Qty. on Event';
-                    ToolTip = 'Specifies the value of the Qty. on Event field';
+                    ToolTip = 'Specifies the quantity booked of the resource.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -76,7 +76,7 @@
                 {
 
                     Caption = 'Available';
-                    ToolTip = 'Specifies the value of the Available field';
+                    ToolTip = 'Specifies the quantity available of the resource.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -95,7 +95,7 @@
                 RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
 
-                ToolTip = 'Executes the View action';
+                ToolTip = 'View the availability of the selected resource.';
                 ApplicationArea = NPRRetail;
             }
             group("Period Length")
@@ -106,7 +106,7 @@
                 {
                     Caption = 'Day';
 
-                    ToolTip = 'Filters by day';
+                    ToolTip = 'View the availability of the selected resource by day.';
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -120,7 +120,7 @@
                 {
                     Caption = 'Week';
 
-                    ToolTip = 'Filters by week';
+                    ToolTip = 'View the availability of the selected resource by week.';
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -134,7 +134,7 @@
                 {
                     Caption = 'Month';
 
-                    ToolTip = 'Filters by month';
+                    ToolTip = 'View the availability of the selected resource by month.';
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -148,7 +148,7 @@
                 {
                     Caption = 'Quarter';
 
-                    ToolTip = 'Filters by quarter';
+                    ToolTip = 'View the availability of the selected resource by quarter.';
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -162,7 +162,7 @@
                 {
                     Caption = 'Year';
 
-                    ToolTip = 'Filters by year';
+                    ToolTip = 'View the availability of the selected resource by year.';
                     Image = Filter;
                     ApplicationArea = NPRRetail;
 
@@ -178,7 +178,7 @@
                 Caption = 'Previous';
                 Image = PreviousRecord;
 
-                ToolTip = 'Executes the Previous action';
+                ToolTip = 'View the availability of the previous period for the selected resource.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -191,7 +191,7 @@
                 Caption = 'Next';
                 Image = NextRecord;
 
-                ToolTip = 'Executes the Next action';
+                ToolTip = 'View the availability of the next period for the selected resource.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
