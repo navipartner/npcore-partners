@@ -82,11 +82,15 @@
 
     local procedure TestUserOnLogin()
     var
-        EnvironmentInformation: Codeunit "Environment Information";
-        Handled: Boolean;
+        CheckIsUsingRegularInvoicing, UsingRegularInvoicing, WebServiceCallSucceeded, Handled : Boolean;
     begin
-        if EnvironmentInformation.IsProduction() and EnvironmentInformation.IsSaaS() then begin
-            OnBeforeTestUserOnLogin(IsUsingRegularInvoicing(), Handled);
+        OnShouldCheckIsUsingRegularInvoicing(CheckIsUsingRegularInvoicing);
+        if CheckIsUsingRegularInvoicing then begin
+            IsUsingRegularInvoicing(UsingRegularInvoicing, WebServiceCallSucceeded);
+            if not WebServiceCallSucceeded then
+                exit;
+
+            OnBeforeTestUserOnLogin(UsingRegularInvoicing, Handled);
             if Handled then
                 exit;
         end;
@@ -97,12 +101,16 @@
 
     local procedure TestUserOnPOSSessionInitialize()
     var
-        EnvironmentInformation: Codeunit "Environment Information";
         POSSession: Codeunit "NPR POS Session";
-        Handled: Boolean;
+        CheckIsUsingRegularInvoicing, UsingRegularInvoicing, WebServiceCallSucceeded, Handled : Boolean;
     begin
-        if EnvironmentInformation.IsProduction() and EnvironmentInformation.IsSaaS() then begin
-            OnBeforeTestUserOnPOSSessionInitialize(IsUsingRegularInvoicing(), Handled);
+        OnShouldCheckIsUsingRegularInvoicing(CheckIsUsingRegularInvoicing);
+        if CheckIsUsingRegularInvoicing then begin
+            IsUsingRegularInvoicing(UsingRegularInvoicing, WebServiceCallSucceeded);
+            if not WebServiceCallSucceeded then
+                exit;
+
+            OnBeforeTestUserOnPOSSessionInitialize(UsingRegularInvoicing, Handled);
             if Handled then
                 exit;
         end;
@@ -112,21 +120,18 @@
             POSSession.SetErrorOnInitialize(true);
     end;
 
-    local procedure IsUsingRegularInvoicing(): Boolean
+    local procedure IsUsingRegularInvoicing(var UsingRegularInvoicing: Boolean; var WebServiceCallSucceeded: Boolean)
     var
-        UsingRegularInvoicing: Boolean;
         UseRegularInvoicing: Text;
     begin
         if not TrySendRequest('GetTenantUseRegularInvoicing', '', '', TenantId(), UseRegularInvoicing) then
             exit;
 
-        if UseRegularInvoicing = '' then
-            exit(false);
+        WebServiceCallSucceeded := true;
 
-        if not Evaluate(UsingRegularInvoicing, UseRegularInvoicing) then
-            exit(false);
-
-        exit(UsingRegularInvoicing);
+        if UseRegularInvoicing <> '' then
+            if not Evaluate(UsingRegularInvoicing, UseRegularInvoicing) then
+                WebServiceCallSucceeded := false;
     end;
 
     local procedure TestUserExpired()
@@ -413,6 +418,11 @@
                 activeSession.Get(ServiceInstanceId(), SessionId());
             end;
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShouldCheckIsUsingRegularInvoicing(var CheckIsUsingRegularInvoicing: Boolean)
+    begin
     end;
 
     [IntegrationEvent(false, false)]
