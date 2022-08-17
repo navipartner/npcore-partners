@@ -107,7 +107,7 @@
                 var
                     TicketManagement: Codeunit "NPR TM Ticket Management";
                 begin
-                    TicketManagement.ValidateTicketForArrival(0, Rec."Ticket No.", Rec."Admission Code", -1);
+                    TicketManagement.ValidateTicketForArrival(0, Rec."Ticket No.", Rec."Admission Code", -1, Today(), Time());
                 end;
             }
             action("Register Departure")

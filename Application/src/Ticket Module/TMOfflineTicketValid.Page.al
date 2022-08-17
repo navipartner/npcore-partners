@@ -1,9 +1,6 @@
 ﻿page 6060093 "NPR TM Offline Ticket Valid."
 {
     Extensible = False;
-    // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
-    // TM90.1.46/TSA /20200203 CASE 383196 Added mass modify on event date and event time
-
     Caption = 'Offline Ticket Validation';
     PageType = List;
     SourceTable = "NPR TM Offline Ticket Valid.";
@@ -37,6 +34,18 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Code field';
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        Ticket: Record "NPR TM Ticket";
+                        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+                    begin
+                        Ticket.SetRange("External Ticket No.", Rec."Ticket Reference No.");
+                        if Ticket.FindFirst() then begin
+                            TicketAccessEntry.SetRange("Ticket No.", Ticket."No.");
+                            if PAGE.RunModal(0, TicketAccessEntry) = ACTION::LookupOK then
+                                Rec."Admission Code" := TicketAccessEntry."Admission Code";
+                        end;
+                    end;
                 }
                 field("Member Reference Type"; Rec."Member Reference Type")
                 {
@@ -62,8 +71,6 @@
 
                     trigger OnValidate()
                     begin
-
-                        //-TM90.1.46 [383196]
                         OfflineTicketValidationRec.Reset();
                         OfflineTicketValidationRec.CopyFilters(Rec);
                         OfflineTicketValidationRec.SetFilter("Import Reference No.", '=%1', Rec."Import Reference No.");
@@ -73,7 +80,6 @@
                                 OfflineTicketValidationRec.ModifyAll("Event Date", Rec."Event Date");
                                 CurrPage.Update(false);
                             end;
-                        //+TM90.1.46 [383196]
                     end;
                 }
                 field("Event Time"; Rec."Event Time")
@@ -83,8 +89,6 @@
 
                     trigger OnValidate()
                     begin
-
-                        //-TM90.1.46 [383196]
                         OfflineTicketValidationRec.Reset();
                         OfflineTicketValidationRec.CopyFilters(Rec);
                         OfflineTicketValidationRec.SetFilter("Import Reference No.", '=%1', Rec."Import Reference No.");
@@ -94,7 +98,6 @@
                                 OfflineTicketValidationRec.ModifyAll("Event Time", Rec."Event Time");
                                 CurrPage.Update(false);
                             end;
-                        //+TM90.1.46 [383196]
                     end;
                 }
                 field("Process Status"; Rec."Process Status")
@@ -104,8 +107,6 @@
 
                     trigger OnValidate()
                     begin
-
-                        //-TM90.1.46 [383196]
                         OfflineTicketValidationRec.Reset();
                         OfflineTicketValidationRec.CopyFilters(Rec);
                         OfflineTicketValidationRec.SetFilter("Import Reference No.", '=%1', Rec."Import Reference No.");
@@ -114,7 +115,6 @@
                                 OfflineTicketValidationRec.ModifyAll("Process Status", Rec."Process Status");
                                 CurrPage.Update(false);
                             end;
-                        //+TM90.1.46 [383196]
                     end;
                 }
                 field("Process Response Text"; Rec."Process Response Text")
@@ -156,10 +156,8 @@
                 PromotedOnly = true;
                 PromotedIsBig = true;
 
-
                 trigger OnAction()
                 begin
-
                     OfflineTicketValidation.ProcessEntry(Rec."Entry No.");
                     CurrPage.Update(false);
                 end;
@@ -175,14 +173,13 @@
                 PromotedOnly = true;
                 PromotedIsBig = true;
 
-
                 trigger OnAction()
                 begin
-
                     OfflineTicketValidation.ProcessImportBatch(Rec."Import Reference No.");
                     CurrPage.Update(false);
                 end;
             }
+
         }
         area(navigation)
         {
@@ -198,14 +195,12 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "External Ticket No." = FIELD("Ticket Reference No.");
-
             }
         }
     }
 
     trigger OnOpenPage()
     begin
-
         Rec.SetFilter("Process Status", '<>%1', Rec."Process Status"::VALID);
     end;
 

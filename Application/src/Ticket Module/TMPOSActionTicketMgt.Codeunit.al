@@ -721,7 +721,7 @@
                 TicketManagement.RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, 1);
 
         end else begin
-            TicketManagement.ValidateTicketForArrival(1, ExternalTicketNumber, AdmissionCode, -1);
+            TicketManagement.ValidateTicketForArrival(1, ExternalTicketNumber, AdmissionCode, -1, Today(), Time());
         end;
 
         if (WithPrint) then begin

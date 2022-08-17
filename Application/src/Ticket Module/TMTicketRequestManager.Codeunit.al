@@ -816,7 +816,7 @@
                     TicketReservationRequest2.SetFilter("Variant Code", '=%1', TicketReservationRequest."Variant Code");
                     TicketReservationRequest2.FindSet();
                     repeat
-                        TicketManagement.ValidateTicketForArrival(0, Ticket."No.", TicketReservationRequest2."Admission Code", TicketReservationRequest2."External Adm. Sch. Entry No.");
+                        TicketManagement.ValidateTicketForArrival(0, Ticket."No.", TicketReservationRequest2."Admission Code", TicketReservationRequest2."External Adm. Sch. Entry No.", Today(), Time());
                     until (TicketReservationRequest2.Next() = 0);
 
                 until (Ticket.Next() = 0);

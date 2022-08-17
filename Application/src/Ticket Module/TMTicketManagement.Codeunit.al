@@ -288,7 +288,7 @@
         exit(AttemptTicket.AttemptValidateTicketForArrival(TicketIdentifierType, TicketIdentifier, AdmissionCode, AdmissionScheduleEntryNo, ResponseMessage));
     end;
 
-    procedure ValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer)
+    procedure ValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time)
     var
         Admission: Record "NPR TM Admission";
         Ticket: Record "NPR TM Ticket";
@@ -310,9 +310,9 @@
             RaiseError(StrSubstNo(INVALID_ADMISSION_CODE, Ticket."External Ticket No.", AdmissionCode), INVALID_ADMISSION_CODE_NO);
 
         ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo);
-        ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo);
+        ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, EventDate, EventTime);
 
-        RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo);
+        RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, EventDate, EventTime);
 
         ValidateAdmissionDependencies(TicketAccessEntryNo);
 
@@ -325,6 +325,7 @@
         ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionScheduleEntryNo, _TicketExecutionContext::ADMISSION, AllowAdmissionOverAllocation);
 
     end;
+
 
     procedure ValidateTicketForDeparture(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20])
     var
@@ -1060,7 +1061,7 @@
 
     local procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]): Boolean
     begin
-        ValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1); // Throws error on fail
+        ValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, Today(), Time()); // Throws error on fail
         exit(true);
     end;
 
@@ -1241,7 +1242,7 @@
         end;
     end;
 
-    local procedure ValidateScheduleReference(TicketAccessEntryNo: Integer; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer)
+    local procedure ValidateScheduleReference(TicketAccessEntryNo: Integer; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time)
     var
         Admission: Record "NPR TM Admission";
         AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
@@ -1277,7 +1278,7 @@
 
             // find the todays/now entry
             if (AdmissionScheduleEntryNo < 0) then begin
-                ReferenceTime := CreateDateTime(Today, Time);
+                ReferenceTime := CreateDateTime(EventDate, EventTime);
                 AdmissionStartTime := CreateDateTime(ReservationSchEntry."Admission Start Date", ReservationSchEntry."Admission Start Time");
                 AdmissionEndTime := CreateDateTime(ReservationSchEntry."Admission End Date", ReservationSchEntry."Admission End Time");
 
@@ -1330,16 +1331,17 @@
                 // Get the current admission schedule
                 AdmissionScheduleEntryNo := GetCurrentScheduleEntry(Ticket, AdmissionCode, true);
                 if (not AdmissionSchEntry.Get(AdmissionScheduleEntryNo)) then
-                    RaiseError(StrSubstNo(ADM_NOT_OPEN, AdmissionCode, Today), ADM_NOT_OPEN_NO2);
+                    RaiseError(StrSubstNo(ADM_NOT_OPEN, AdmissionCode, EventDate), ADM_NOT_OPEN_NO2);
             end;
 
         end;
 
         if (AdmissionSchEntry."Admission Is" <> AdmissionSchEntry."Admission Is"::Open) then
-            RaiseError(StrSubstNo(ADM_NOT_OPEN, AdmissionCode, Today), ADM_NOT_OPEN_NO);
+            RaiseError(StrSubstNo(ADM_NOT_OPEN, AdmissionCode, EventDate), ADM_NOT_OPEN_NO);
 
         exit
     end;
+
 
     local procedure ValidateAdmissionDependencies(TicketAccessEntryNo: Integer)
     var
@@ -1732,7 +1734,7 @@
 #pragma warning restore
     end;
 
-    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer)
+    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; EventDate: Date; EventTime: Time)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -1746,8 +1748,8 @@
         FirstAdmission := (TicketAccessEntry."Access Date" = 0D);
 
         if (TicketAccessEntry."Access Date" = 0D) then begin
-            TicketAccessEntry."Access Date" := Today();
-            TicketAccessEntry."Access Time" := Time;
+            TicketAccessEntry."Access Date" := EventDate;
+            TicketAccessEntry."Access Time" := EventTime;
             TicketAccessEntry.Modify();
         end;
 
@@ -1761,6 +1763,8 @@
         AdmittedTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
         AdmittedTicketAccessEntry.Open := true;
         AdmittedTicketAccessEntry.Insert(true);
+        AdmittedTicketAccessEntry."Created Datetime" := CreateDateTime(EventDate, EventTime);
+        AdmittedTicketAccessEntry.Modify();
 
         OnDetailedTicketEvent(AdmittedTicketAccessEntry);
         CloseReservationEntry(AdmittedTicketAccessEntry);
@@ -1768,6 +1772,7 @@
         if (FirstAdmission) then
             NotifyParticipant.CreateFirstAdmissionNotification(TicketAccessEntry);
     end;
+
 
     local procedure RegisterReservation_Worker(Ticket: Record "NPR TM Ticket"; TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer): Integer
     var
@@ -2056,6 +2061,7 @@
         exit(GetCurrentScheduleEntry(Ticket."Item No.", Ticket."Variant Code", AdmissionCode, WithCreate));
     end;
 
+
     procedure GetCurrentScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; WithCreate: Boolean): Integer
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
@@ -2078,6 +2084,7 @@
 
         exit(0);
     end;
+
 
     local procedure GetAdmScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean): Boolean
     var
@@ -3301,6 +3308,72 @@
         TicketReservationRequest.SetRange("Receipt No.", SalesReceiptNo);
         TicketReservationRequest.FindLast();
         exit(SalesLineNo = TicketReservationRequest."Line No.");
+    end;
+
+
+    internal procedure TicketAdmissionSimulation(Ticket: Record "NPR TM Ticket")
+    var
+        TMTicketCheck: Page "NPR TM Ticket Admission Sim";
+    begin
+        TMTicketCheck.SetTicket(Ticket."External Ticket No.");
+        TMTicketCheck.RunModal();
+    end;
+
+    procedure ShowTicketAccess(Ticket: Record "NPR TM Ticket")
+    var
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        AdmisScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TxtBuilder: TextBuilder;
+        AdmissionLbl: Label '%1 - Admission is valid between %2 %3 and %4 %5', Comment = '%1 = Admission code, %2 = Start date, %3 = Start time, %4 = End date, %5 = End time';
+        ScheduledStartLbl: Label 'Scheduled Start date and time is %1 %2', Comment = '%1 = Start date, %2 = Start time';
+        ScheduledEndLbl: Label 'Scheduled End date and time is %1 %2', Comment = '%1 = End date, %2 = End time';
+        AllowedStartLbl: Label 'Allowed Start date and time of entry is %1 %2', Comment = '%1 = Start date, %2 = Start time';
+        AllowedEndLbl: Label 'Allowed End date and time of entry is %1 %2', Comment = '%1 = End date, %2 = End time';
+        TicketStartLbl: Label 'Ticket Valid From date and time is %1 %2', Comment = '%1 = Start date, %2 = Start time';
+        TicketEndLbl: Label 'Ticket Valid Until date and time is %1 %2', Comment = '%1 = End date, %2 = End time';
+        StartTime, EndTime : Time;
+    begin
+        TicketAccessEntry.SetRange("Ticket No.", Ticket."No.");
+        if TicketAccessEntry.FindSet(false, false) then
+            repeat
+                //from reservation
+                DetTicketAccessEntry.SetRange("Ticket No.", Ticket."No.");
+                DetTicketAccessEntry.SetRange(Type, DetTicketAccessEntry.Type::RESERVATION);
+                DetTicketAccessEntry.SetRange("Ticket Access Entry No.", TicketAccessEntry."Entry No.");
+                if DetTicketAccessEntry.FindFirst() then begin
+                    AdmisScheduleEntry.SetRange("External Schedule Entry No.", DetTicketAccessEntry."External Adm. Sch. Entry No.");
+                    if AdmisScheduleEntry.FindFirst() then begin
+                        if AdmisScheduleEntry."Event Arrival From Time" <> 0T then
+                            StartTime := AdmisScheduleEntry."Event Arrival From Time"
+                        else
+                            StartTime := AdmisScheduleEntry."Admission Start Time";
+                        if AdmisScheduleEntry."Event Arrival Until Time" <> 0T then
+                            EndTime := AdmisScheduleEntry."Event Arrival Until Time"
+                        else
+                            EndTime := AdmisScheduleEntry."Admission End Time";
+                        //schedule    
+                        TxtBuilder.AppendLine(StrSubstNo(AdmissionLbl, TicketAccessEntry.Description, AdmisScheduleEntry."Admission Start Date", StartTime, AdmisScheduleEntry."Admission End Date", EndTime));
+                        TxtBuilder.AppendLine('');
+                        TxtBuilder.AppendLine(StrSubstNo(ScheduledStartLbl, AdmisScheduleEntry."Admission Start Date", AdmisScheduleEntry."Admission Start Time"));
+                        TxtBuilder.AppendLine(StrSubstNo(ScheduledEndLbl, AdmisScheduleEntry."Admission End Date", AdmisScheduleEntry."Admission End Time"));
+                        //event arrival
+                        if AdmisScheduleEntry."Event Arrival From Time" <> 0T then
+                            TxtBuilder.AppendLine(StrSubstNo(AllowedStartLbl, AdmisScheduleEntry."Admission Start Date", AdmisScheduleEntry."Event Arrival From Time"));
+                        if AdmisScheduleEntry."Event Arrival Until Time" <> 0T then
+                            TxtBuilder.AppendLine(StrSubstNo(AllowedEndLbl, AdmisScheduleEntry."Admission End Date", AdmisScheduleEntry."Event Arrival Until Time"));
+                        TxtBuilder.AppendLine('');
+                    end;
+                end else begin
+                    //from ticket
+                    TxtBuilder.AppendLine(StrSubstNo(AdmissionLbl, TicketAccessEntry.Description, Ticket."Valid From Date", Ticket."Valid From Time", Ticket."Valid To Date", Ticket."Valid To Time"));
+                    TxtBuilder.AppendLine('');
+                    TxtBuilder.AppendLine(StrSubstNo(TicketStartLbl, Ticket."Valid From Date", Ticket."Valid From Time"));
+                    TxtBuilder.AppendLine(StrSubstNo(TicketEndLbl, Ticket."Valid To Date", Ticket."Valid To Time"));
+                    TxtBuilder.AppendLine('');
+                end;
+            until TicketAccessEntry.Next() = 0;
+        Message(TxtBuilder.ToText());
     end;
 }
 
