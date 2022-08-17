@@ -1,6 +1,7 @@
 ﻿codeunit 6151450 "NPR Magento NpXml Setup Mgt"
 {
     Access = Internal;
+
     var
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
 
@@ -14,14 +15,21 @@
         if (TemplateCode = '') or (not MagentoSetup.Get()) then
             exit;
 
+        MagentoSetup.TestField("Magento Url");
         if NcSetup.Get() then;
 
         NpXmlTemplate.Get(TemplateCode);
         NpXmlTemplate."File Transfer" := false;
         NpXmlTemplate."FTP Transfer" := false;
         NpXmlTemplate."API Transfer" := true;
-        NpXmlTemplate."API Url" := CopyStr(MagentoSetup."Api Url" + NpXmlTemplate."Xml Root Name", 1, MaxStrLen(NpXmlTemplate."API Url"));
-        NpXmlTemplate."API Url" := CopyStr(NpXmlTemplate."API Url".Replace('stock_updates', 'stock'), 1, MaxStrLen(NpXmlTemplate."API Url"));
+#pragma warning disable AA0139
+        if (MagentoSetup."Magento Url" = '') and (NpXmlTemplate."API Url"[1] <> '/') then
+            MagentoSetup."Magento Url" := '/'
+        else
+            if (MagentoSetup."Magento Url"[StrLen(MagentoSetup."Magento Url")] <> '/') and (NpXmlTemplate."API Url"[1] <> '/') then
+                MagentoSetup."Magento Url" += '/';
+        NpXmlTemplate."API Url" := MagentoSetup."Magento Url" + NpXmlTemplate."API Url";
+#pragma warning restore AA0139
         NpXmlTemplate.AuthType := MagentoSetup.AuthType;
         NpXmlTemplate."API Username" := MagentoSetup."Api Username";
         WebServiceAuthHelper.SetApiPassword(MagentoSetup.GetApiPassword(), NpXmlTemplate."API Password Key");
