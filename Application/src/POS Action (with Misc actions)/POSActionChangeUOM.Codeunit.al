@@ -1,92 +1,97 @@
-﻿codeunit 6151140 "NPR POS Action: Change UOM"
+﻿codeunit 6151140 "NPR POS Action: Change UOM" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
     var
-        ActionDescriptionCaption: Label 'Change unit of measure for POS sales line';
+        ActionDescription: Label 'Change unit of measure for POS sales line';
+        DefaultUOM_CptLbl: Label 'Default UOM';
+        DefaultUOM_DescLbl: Label 'Specifies to which UOM it will be changed.';
 
-    local procedure ActionCode(): Code[20]
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
+    var
+
     begin
-        exit('CHANGE_UOM');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddTextParameter('DefaultUOM', '', DefaultUOM_CptLbl, DefaultUOM_DescLbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-          ActionCode(),
-          ActionDescriptionCaption,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('Select', 'respond();');
-            Sender.RegisterWorkflow(false);
+        case Step of
+            'ChangeUOM':
+                FrontEnd.WorkflowResponse(ChangeUOM(Context, SaleLine));
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-
-        ChangeUOM(POSSession);
-
-        POSSession.RequestRefreshData();
-    end;
-
-    local procedure ChangeUOM(var POSSession: Codeunit "NPR POS Session")
+    local procedure ChangeUOM(Context: codeunit "NPR POS JSON Helper"; SaleLine: codeunit "NPR POS Sale Line"): JsonObject
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        UnitofMeasure: Record "Unit of Measure";
-        UnitsofMeasure: Page "Units of Measure";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
+        ItemUnitofMeasure: Record "Item Unit of Measure";
+        ItemUnitsofMeasure: Page "Item Units of Measure";
+        DefaultUOM: Code[10];
     begin
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        DefaultUOM := copystr(Context.GetStringParameter('DefaultUOM'), 1, MaxStrLen(SaleLinePOS."Unit of Measure Code"));
+        IF DefaultUOM = '' THEN begin
+            ItemUnitofMeasure.SetRange("Item No.", SaleLinePOS."No.");
+            ItemUnitsofMeasure.Editable(false);
+            ItemUnitsofMeasure.LookupMode(true);
+            ItemUnitsofMeasure.SetTableView(ItemUnitofMeasure);
+            if ItemUnitsofMeasure.RunModal() <> ACTION::LookupOK then
+                exit;
+            ItemUnitsofMeasure.GetRecord(ItemUnitofMeasure);
+        end else
+            ItemUnitofMeasure.Get(SaleLinePOS."No.", DefaultUOM);
 
-        UnitofMeasure.SetFilter(Code, GetItemCodes(SaleLinePOS."No."));
-
-        UnitsofMeasure.Editable(false);
-        UnitsofMeasure.LookupMode(true);
-        UnitsofMeasure.SetTableView(UnitofMeasure);
-        if UnitsofMeasure.RunModal() <> ACTION::LookupOK then
+        if SaleLinePOS."Unit of Measure Code" = ItemUnitofMeasure.Code then
             exit;
 
-        UnitsofMeasure.GetRecord(UnitofMeasure);
-
-        if SaleLinePOS."Unit of Measure Code" = UnitofMeasure.Code then
-            exit;
-
-        SaleLinePOS.Validate("Unit of Measure Code", UnitofMeasure.Code);
+        SaleLinePOS.Validate("Unit of Measure Code", ItemUnitofMeasure.Code);
         SaleLinePOS.Modify(true);
 
-        POSSaleLine.RefreshCurrent();
     end;
 
-    local procedure GetItemCodes(ItemNo: Code[20]) Codes: Text
-    var
-        ItemUnitofMeasure: Record "Item Unit of Measure";
+    local procedure GetActionScript(): Text
     begin
-        ItemUnitofMeasure.SetRange("Item No.", ItemNo);
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionChangeUOM.js###
+'let main=async({})=>{await workflow.respond("ChangeUOM")};'
+        )
+    end;
 
-        if ItemUnitofMeasure.FindSet() then
-            repeat
-                Codes += '|' + ItemUnitofMeasure.Code;
-            until ItemUnitofMeasure.Next() = 0;
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, true)]
+    local procedure OnValidateDefaultUOM(var POSParameterValue: Record "NPR POS Parameter Value")
+    var
+        UnitofMeasure: Record "Unit of Measure";
+    begin
+        if POSParameterValue."Action Code" <> FORMAT(ENUM::"NPR POS Workflow"::CHANGE_UOM) then
+            exit;
+        if POSParameterValue.Name <> 'DefaultUOM' then
+            exit;
+        if POSParameterValue.Value = '' then
+            exit;
 
-        Codes := CopyStr(Codes, 2);
+        POSParameterValue.Value := UpperCase(POSParameterValue.Value);
+        if not UnitofMeasure.Get(POSParameterValue.Value) then begin
+            UnitofMeasure.SetFilter(Code, '%1', POSParameterValue.Value + '*');
+            if UnitofMeasure.FindFirst() then
+                POSParameterValue.Value := UnitofMeasure.Code;
+        end;
+
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
+    local procedure OnLookupDefaultUOM(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
+    var
+        UnitofMeasure: Record "Unit of Measure";
+    begin
+        if POSParameterValue."Action Code" <> FORMAT(ENUM::"NPR POS Workflow"::CHANGE_UOM) then
+            exit;
+        if POSParameterValue.Name <> 'DefaultUOM' then
+            exit;
+
+        if PAGE.RunModal(0, UnitofMeasure) = ACTION::LookupOK then
+            POSParameterValue.Value := UnitofMeasure.Code;
     end;
 }
-
