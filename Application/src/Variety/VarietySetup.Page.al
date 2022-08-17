@@ -74,34 +74,6 @@
                     ToolTip = 'Specifies the value of the Barcode Type (Item Cross Ref.) field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Item Cross Ref. No. Series (I)"; Rec."Item Cross Ref. No. Series (I)")
-                {
-                    Editable = Rec."Create Item Cross Ref. auto.";
-                    ToolTip = 'If value is set, then item reference with type Bar Code will be created for Item. For details, please check an actions on Item Card - Add Missing Barcode(s).';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-                        if Rec."Item Cross Ref. No. Series (V)" = '' then
-                            Rec."Item Cross Ref. No. Series (V)" := Rec."Item Cross Ref. No. Series (I)";
-                    end;
-                }
-                field("Item Cross Ref. No. Series (V)"; Rec."Item Cross Ref. No. Series (V)")
-                {
-                    Editable = Rec."Create Item Cross Ref. auto.";
-                    ToolTip = 'If value is set, then item reference with type Bar Code will be created for each Item Variant. For details, please check an actions on Item Card - Add Missing Barcode(s).';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Item Cross Ref. Description(I)"; Rec."Item Cross Ref. Description(I)")
-                {
-                    ToolTip = 'Specifies the value of the Item Cross Ref. Description (Item) field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Item Cross Ref. Description(V)"; Rec."Item Cross Ref. Description(V)")
-                {
-                    ToolTip = 'Specifies the value of the Item Cross Ref. Description (Variant) field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Internal EAN No. Series"; Rec."Internal EAN No. Series")
                 {
                     ToolTip = 'Specifies the value of the Internal EAN No. Series field';
@@ -121,6 +93,58 @@
                 {
                     ToolTip = 'Specifies the value of the EAN-External field';
                     ApplicationArea = NPRRetail;
+                }
+                group(ItemReferences)
+                {
+                    Caption = 'Item References';
+                    field("Item Cross Ref. No. Series (I)"; Rec."Item Cross Ref. No. Series (I)")
+                    {
+                        Caption = 'No. Series';
+                        Editable = Rec."Create Item Cross Ref. auto.";
+                        ToolTip = 'If value is set, then item reference with type Bar Code will be created for Item. For details, please check an actions on Item Card - Add Missing Barcode(s).';
+                        ApplicationArea = NPRRetail;
+
+                        trigger OnValidate()
+                        begin
+                            if Rec."Item Cross Ref. No. Series (V)" = '' then
+                                Rec."Item Cross Ref. No. Series (V)" := Rec."Item Cross Ref. No. Series (I)";
+                        end;
+                    }
+                    field("Item Cross Ref. Description(I)"; Rec."Item Cross Ref. Description(I)")
+                    {
+                        Caption = 'Description';
+                        ToolTip = 'Specifies the way item reference description is filled in, when item reference is created for an item.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Item Ref. Description 2 (I)"; Rec."Item Ref. Description 2 (I)")
+                    {
+                        Caption = 'Description 2';
+                        ToolTip = 'Specifies the way item reference description 2 is filled in, when item reference is created for an item.';
+                        ApplicationArea = NPRRetail;
+                    }
+                }
+                group(ItemVariantReferences)
+                {
+                    Caption = 'Item Variant References';
+                    field("Item Cross Ref. No. Series (V)"; Rec."Item Cross Ref. No. Series (V)")
+                    {
+                        Caption = 'No. Series';
+                        Editable = Rec."Create Item Cross Ref. auto.";
+                        ToolTip = 'If value is set, then item reference with type Bar Code will be created for each Item Variant. For details, please check an actions on Item Card - Add Missing Barcode(s).';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Item Cross Ref. Description(V)"; Rec."Item Cross Ref. Description(V)")
+                    {
+                        Caption = 'Description';
+                        ToolTip = 'Specifies the way item reference description is filled in, when item reference is created for an item variant.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Item Ref. Description 2 (V)"; Rec."Item Ref. Description 2 (V)")
+                    {
+                        Caption = 'Description 2';
+                        ToolTip = 'Specifies the way item reference description 2 is filled in, when item reference is created for an item variant.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
             group(View)
@@ -244,7 +268,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the Item Cross Reference Descriptions action';
+                    ToolTip = 'Updates fields Description and Description 2 for all item references according to current variety setup.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

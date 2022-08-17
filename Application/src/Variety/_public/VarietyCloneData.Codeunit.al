@@ -887,6 +887,12 @@
                         VRTSetup."Item Cross Ref. Description(I)"::ItemDescription2:
                             ItemRef.Description := Item."Description 2";
                     end;
+                    case VRTSetup."Item Ref. Description 2 (I)" of
+                        VRTSetup."Item Ref. Description 2 (I)"::ItemDescription1:
+                            ItemRef."Description 2" := CopyStr(Item.Description, 1, MaxStrLen(ItemRef."Description 2"));
+                        VRTSetup."Item Ref. Description 2 (I)"::ItemDescription2:
+                            ItemRef."Description 2" := Item."Description 2";
+                    end;
                 end else begin
                     if not ItemVar.Get(ItemRef."Item No.", ItemRef."Variant Code") then
                         Clear(ItemVar);
@@ -899,6 +905,16 @@
                             ItemRef.Description := ItemVar.Description;
                         VRTSetup."Item Cross Ref. Description(V)"::VariantDescription2:
                             ItemRef.Description := ItemVar."Description 2";
+                    end;
+                    case VRTSetup."Item Ref. Description 2 (V)" of
+                        VRTSetup."Item Ref. Description 2 (V)"::ItemDescription1:
+                            ItemRef."Description 2" := CopyStr(Item.Description, 1, MaxStrLen(ItemRef."Description 2"));
+                        VRTSetup."Item Ref. Description 2 (V)"::ItemDescription2:
+                            ItemRef."Description 2" := Item."Description 2";
+                        VRTSetup."Item Ref. Description 2 (V)"::VariantDescription1:
+                            ItemRef."Description 2" := CopyStr(ItemVar.Description, 1, MaxStrLen(ItemRef."Description 2"));
+                        VRTSetup."Item Ref. Description 2 (V)"::VariantDescription2:
+                            ItemRef."Description 2" := ItemVar."Description 2";
                     end;
                 end;
                 ItemRef.Modify();

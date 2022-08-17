@@ -91,6 +91,20 @@
             OptionCaption = 'Item Description 1,Item Description 2,Variant Description 1,Variant Description 2';
             OptionMembers = ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2;
         }
+        field(36; "Item Ref. Description 2 (I)"; Option)
+        {
+            Caption = 'Item Ref. Description 2 (Item)';
+            DataClassification = CustomerContent;
+            OptionCaption = ' ,Item Description 1,Item Description 2';
+            OptionMembers = " ",ItemDescription1,ItemDescription2;
+        }
+        field(37; "Item Ref. Description 2 (V)"; Option)
+        {
+            Caption = 'Item Ref. Description 2 (Variant)';
+            DataClassification = CustomerContent;
+            OptionCaption = ' ,Item Description 1,Item Description 2,Variant Description 1,Variant Description 2';
+            OptionMembers = " ",ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2;
+        }
         field(40; "Hide Inactive Values"; Boolean)
         {
             Caption = 'Hide Inactive Values';
