@@ -288,49 +288,68 @@
 
     [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnAfterValidateEvent', 'Description', false, false)]
     local procedure ItemVariantsOnAfterValidateDescription(var Rec: Record "Item Variant"; var xRec: Record "Item Variant"; CurrFieldNo: Integer)
-    var
-        ItemReference: Record "Item Reference";
-        VRTSetup: Record "NPR Variety Setup";
-        Item: Record Item;
     begin
-        if Item.Get(Rec."Item No.") then;
-        VRTSetup.Get();
-        if (VRTSetup."Create Item Cross Ref. auto.") and
-           (VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::VariantDescription1) then begin
-            ItemReference.Reset();
-            ItemReference.SetRange("Item No.", Rec."Item No.");
-            ItemReference.SetRange("Variant Code", Rec.Code);
-            ItemReference.SetRange("Unit of Measure", Item."Base Unit of Measure");
-            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-            if ItemReference.FindFirst() then begin
-                ItemReference.Description := Rec.Description;
-                ItemReference.Modify();
-            end;
-        end;
-
+        if Rec.IsTemporary() then
+            exit;
+        UpdateItemRefDescriptions(Rec, Rec.FieldNo(Description));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnAfterValidateEvent', 'Description 2', false, false)]
-    local procedure ItemVariantsOnAfterValidateDescription2(var Rec: Record "Item Variant"; var xRec: Record "Item Variant"; CurrFieldNo: Integer)
+    local procedure ItemVariantsOnAfterValidateDescription2(var Rec: Record "Item Variant")
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        UpdateItemRefDescriptions(Rec, Rec.FieldNo("Description 2"));
+    end;
+
+    local procedure UpdateItemRefDescriptions(ItemVariant: Record "Item Variant"; ChangedFieldNo: Integer)
     var
+        Item: Record Item;
         ItemReference: Record "Item Reference";
         VRTSetup: Record "NPR Variety Setup";
-        Item: Record Item;
+        Handled: Boolean;
     begin
-        if Item.Get(Rec."Item No.") then;
-        VRTSetup.Get();
-        if (VRTSetup."Create Item Cross Ref. auto.") and
-           (VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::VariantDescription2) then begin
-            ItemReference.Reset();
-            ItemReference.SetRange("Item No.", Rec."Item No.");
-            ItemReference.SetRange("Variant Code", Rec.Code);
-            ItemReference.SetRange("Unit of Measure", Item."Base Unit of Measure");
-            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-            if ItemReference.FindFirst() then begin
-                ItemReference.Description := Rec."Description 2";
-                ItemReference.Modify();
-            end;
+        if not Item.Get(ItemVariant."Item No.") then
+            exit;
+        if not (VRTSetup.Get() and VRTSetup."Create Item Cross Ref. auto.") then
+            exit;
+        if not (
+            ((ChangedFieldNo = ItemVariant.FieldNo(Description)) and
+             ((VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::VariantDescription1) or
+              (VRTSetup."Item Ref. Description 2 (V)" = VRTSetup."Item Ref. Description 2 (V)"::VariantDescription1)))
+            or
+            ((ChangedFieldNo = ItemVariant.FieldNo("Description 2")) and
+             ((VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::VariantDescription2) or
+              (VRTSetup."Item Ref. Description 2 (V)" = VRTSetup."Item Ref. Description 2 (V)"::VariantDescription2))))
+        then
+            exit;
 
+        ItemReference.SetRange("Item No.", ItemVariant."Item No.");
+        ItemReference.SetRange("Variant Code", ItemVariant.Code);
+        ItemReference.SetRange("Unit of Measure", Item."Base Unit of Measure");
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        OnBeforeUpdateItemVariantReferenceDescriptions(ItemReference, Item, ItemVariant, ChangedFieldNo, Handled);
+        if Handled then
+            exit;
+        if ItemReference.IsEmpty() then
+            exit;
+
+        case true of
+            (ChangedFieldNo = ItemVariant.FieldNo(Description)) and
+            (VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::VariantDescription1):
+                ItemReference.ModifyAll(Description, ItemVariant.Description);
+
+            (ChangedFieldNo = ItemVariant.FieldNo("Description 2")) and
+            (VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::VariantDescription2):
+                ItemReference.ModifyAll(Description, ItemVariant."Description 2");
+
+            (ChangedFieldNo = ItemVariant.FieldNo(Description)) and
+            (VRTSetup."Item Ref. Description 2 (V)" = VRTSetup."Item Ref. Description 2 (V)"::VariantDescription1):
+                ItemReference.ModifyAll("Description 2", CopyStr(ItemVariant.Description, 1, MaxStrLen(ItemReference."Description 2")));
+
+            (ChangedFieldNo = ItemVariant.FieldNo("Description 2")) and
+            (VRTSetup."Item Ref. Description 2 (V)" = VRTSetup."Item Ref. Description 2 (V)"::VariantDescription2):
+                ItemReference.ModifyAll("Description 2", ItemVariant."Description 2");
         end;
     end;
 
@@ -386,5 +405,10 @@
             exit(Format(DateIn));
 
         exit(Format(WorkDate()));
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateItemVariantReferenceDescriptions(var ItemReference: Record "Item Reference"; Item: Record Item; ItemVariant: Record "Item Variant"; ChangedFieldNo: Integer; var Handled: Boolean)
+    begin
     end;
 }
