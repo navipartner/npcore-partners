@@ -92,6 +92,7 @@ codeunit 85021 "NPR NpXml Tests"
         end;
 
         MagentoSetup."Magento Enabled" := true;
+        MagentoSetup."Magento Url" := 'http://dummy-url.com/';
         MagentoSetup.Modify();
     end;
 
