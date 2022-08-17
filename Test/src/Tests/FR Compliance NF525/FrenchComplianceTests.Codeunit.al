@@ -828,7 +828,7 @@ codeunit 85039 "NPR French Compliance Tests"
         POSSaleWrapper: Codeunit "NPR POS Sale";
         POSSaleRecord: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
-        POSActionRevDirSale: Codeunit "NPR POS Action: Rev. Dir. Sale";
+        POSActionRevDirSale: Codeunit "NPR POS Action: Rev.Dir.Sale B";
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         ChangeAmount: Decimal;
