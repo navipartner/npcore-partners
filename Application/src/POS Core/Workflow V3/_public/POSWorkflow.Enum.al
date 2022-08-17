@@ -196,6 +196,12 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ITEM', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Insert Item";
     }
+
+    value(34; CHANGE_UOM)
+    {
+        Caption = 'CHANGE_UOM', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Change UOM";
+    }
     value(37; LOAD_FROM_POS_QUOTE)
     {
         Caption = 'LOAD_FROM_POS_QUOTE', Locked = true, MaxLength = 20;
