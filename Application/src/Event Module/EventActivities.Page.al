@@ -34,7 +34,7 @@
                 field("Event List"; Rec."Event List")
                 {
 
-                    ToolTip = 'Specifies the value of the Event List field';
+                    ToolTip = 'Specifies the number of the events. By clicking you can view the list of events.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -45,7 +45,7 @@
                 field("Upcoming Events"; Rec."Upcoming Events")
                 {
 
-                    ToolTip = 'Specifies the value of the Upcoming Events field';
+                    ToolTip = 'Specifies the number of the Upcoming Events. By clicking you can view the list of Upcoming Events.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -56,7 +56,7 @@
                 field("Completed Events"; Rec."Completed Events")
                 {
 
-                    ToolTip = 'Specifies the value of the Completed Events field';
+                    ToolTip = 'Specifies the number of the Completed Events. By clicking you can view the list of Completed Events.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -68,7 +68,7 @@
                 field("Cancelled Events"; Rec."Cancelled Events")
                 {
 
-                    ToolTip = 'Specifies the value of the Cancelled Events field';
+                    ToolTip = 'Specifies the number of the Cancelled Events. By clicking you can view the list of Cancelled Events.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
