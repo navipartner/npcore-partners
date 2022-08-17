@@ -155,7 +155,7 @@
                     Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
                     if (Ticket.FindSet()) then begin
                         repeat
-                            TicketManagement.ValidateTicketForArrival(0, Ticket."No.", '', 0);
+                            TicketManagement.ValidateTicketForArrival(0, Ticket."No.", '', 0, Today(), Time());
                         until (Ticket.Next() = 0);
                     end;
                 until (TicketReservationRequest.Next() = 0);
@@ -175,7 +175,7 @@
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
-        TicketManagement.ValidateTicketForArrival(TicketIdentifierType, TicketIdentifier, AdmissionCode, AdmissionScheduleEntryNo);
+        TicketManagement.ValidateTicketForArrival(TicketIdentifierType, TicketIdentifier, AdmissionCode, AdmissionScheduleEntryNo, Today(), Time());
     end;
 
     local procedure DoIssueTicketFromReservationToken(Token: Text[100])
