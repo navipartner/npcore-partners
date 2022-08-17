@@ -428,6 +428,30 @@
                 PromotedCategory = "Report";
                 RunObject = Page "NPR TM Admis. Forecast Matrix";
             }
+            Action(TicketAccessInformation)
+            {
+                ToolTip = 'This tool will show access information on the specific ticket, this helps to understand under what circumstances, and when the ticket will be valid for admission. This is only information; no admission data will be stored.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Ticket Access Information';
+                Image = Calendar;
+                trigger OnAction()
+                begin
+                    TicketManagement.ShowTicketAccess(Rec);
+                end;
+            }
+            action("Check Ticket")
+            {
+                ToolTip = 'This tool allows for a simulation of admission, on a specified date and time, giving a response as if the ticket was validated by ticket holder. With this you can make sure a ticket works as expected when the guest arrives in the future.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Ticket Admission Simulation';
+                Image = CalcWorkCenterCalendar;
+
+                trigger OnAction()
+                begin
+                    TicketManagement.TicketAdmissionSimulation(Rec);
+                end;
+            }
+
         }
     }
     var
@@ -599,6 +623,8 @@
         end;
     end;
 
+
+
     internal procedure ShowTicketSalesTransaction(Ticket: Record "NPR TM Ticket")
     var
         SalesInvHeader: Record "Sales Invoice Header";
@@ -631,5 +657,7 @@
             end;
         end;
     end;
+
+
 }
 

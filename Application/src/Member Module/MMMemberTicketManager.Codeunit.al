@@ -346,7 +346,7 @@
         // Create new ticket
         if (not TicketIsReused) then begin
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
-            TicketManagement.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1);
+            TicketManagement.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1, Today(), Time());
 
             TicketToPrint.Get(TicketNo);
             TicketToPrint.SetRecFilter();

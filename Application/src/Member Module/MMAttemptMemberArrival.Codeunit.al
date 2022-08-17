@@ -135,7 +135,7 @@
             exit(-1);
 
         Ticket.Get(TicketNo);
-        TicketMgr.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1);
+        TicketMgr.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1, Today(),Time());
 
         if (AdmissionCode = '') then
             AdmissionCode := '-default-';
