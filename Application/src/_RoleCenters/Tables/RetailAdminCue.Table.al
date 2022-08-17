@@ -127,6 +127,12 @@
             Caption = 'EFT Setups';
             FieldClass = FlowField;
         }
+        field(93; "POS Users"; Integer)
+        {
+            CalcFormula = Count("NPR Stripe POS User");
+            Caption = 'POS Users';
+            FieldClass = FlowField;
+        }
     }
 
     keys
