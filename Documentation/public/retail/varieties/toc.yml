@@ -1,2 +1,20 @@
-- name: Introduction
+- name: Varieties in NP Retail
   href: intro.md
+- name: How-to
+  items: 
+  - name: Create varieties in Business Central
+    href: howto/create_variety.md
+  - name: Assign a variety to an item
+    href: howto/assign_variety_to_item.md
+- name: Reference
+  items:
+  - name: Variety setup (reference guide)
+    href: reference/variety_setup.md
+  - name: Variety (reference guide)
+    href: reference/variety.md
+  - name: Variety table (reference guide)
+    href: reference/variety_table.md
+  - name: Variety group (reference guide)
+    href: reference/variety_group.md
+  - name: Variety values (reference guide)
+    href: reference/variety_values.md
