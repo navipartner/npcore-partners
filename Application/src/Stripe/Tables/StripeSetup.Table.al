@@ -56,13 +56,10 @@ table 6014649 "NPR Stripe Setup"
 
     internal procedure IsStripeActive(): Boolean
     var
-        EnvironmentInformation: Codeunit "Environment Information";
+        StripeIntegration: Codeunit "NPR Stripe Integration";
     begin
-        // Following line makes sure that Stripe is used only for app installed in production SaaS environment. 
-        // Apps in sandbox do not integrate with Stripe in this case.
         // Stripe can be disabled if Use Regular Invoicing is marked for the tenant in the case system
-        // Note: if need to test this in own container comment the code below
         GetSetup();
-        exit(not Disabled and EnvironmentInformation.IsProduction() and EnvironmentInformation.IsSaaS());
+        exit(not Disabled and StripeIntegration.ShouldStripeBeUsed());
     end;
 }

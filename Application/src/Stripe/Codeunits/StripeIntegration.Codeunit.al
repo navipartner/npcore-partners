@@ -2,6 +2,12 @@ codeunit 6059807 "NPR Stripe Integration"
 {
     Access = Internal;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Service Tier User Mgt.", 'OnShouldCheckIsUsingRegularInvoicing', '', false, false)]
+    local procedure HandleOnShouldCheckIsUsingRegularInvoicing(var CheckIsUsingRegularInvoicing: Boolean)
+    begin
+        CheckIsUsingRegularInvoicing := ShouldStripeBeUsed();
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Service Tier User Mgt.", 'OnBeforeTestUserOnLogin', '', false, false)]
     local procedure HandleOnBeforeTestUserOnLogin(UsingRegularInvoicing: Boolean; var Handled: Boolean)
     begin
@@ -29,11 +35,6 @@ codeunit 6059807 "NPR Stripe Integration"
         OnCheckSubscriptionStatus(true);
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnCheckSubscriptionStatus(ThrowSubscriptionIsNotValidErr: Boolean)
-    begin
-    end;
-
     local procedure UpdateStripeSetup(UsingRegularInvoicing: Boolean)
     var
         StripeSetup: Record "NPR Stripe Setup";
@@ -42,12 +43,42 @@ codeunit 6059807 "NPR Stripe Integration"
         StripeSetup.GetSetup();
         ShouldUpdate := true;
         if StripeSetup."Last Updated" <> 0DT then
-            ShouldUpdate := (CurrentDateTime() - StripeSetup."Last Updated") > (1 * 60 * 60 * 1000);
+            ShouldUpdate := (CurrentDateTime() - StripeSetup."Last Updated") > (1 * 60 * 10 * 1000);
 
         if ShouldUpdate then begin
             StripeSetup.Disabled := UsingRegularInvoicing;
             StripeSetup."Last Updated" := CurrentDateTime();
             StripeSetup.Modify();
         end;
+    end;
+
+    internal procedure ShouldStripeBeUsed(): Boolean
+    var
+        Company: Record Company;
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        // Following line makes sure that Stripe is used only for app installed in production SaaS environment for companies which are not Cronus or evaluation. 
+        // Apps in sandbox do not integrate with Stripe in this case.
+        // Stripe can be disabled if Use Regular Invoicing is marked for the tenant in the case system
+        // Note: if need to test this in own container comment the code below accordingly
+        if not EnvironmentInformation.IsSaaS() then
+            exit(false);
+
+        if not EnvironmentInformation.IsProduction() then
+            exit(false);
+
+        if CompanyName().ToUpper().Contains('CRONUS') then
+            exit(false);
+
+        if Company.Get(CompanyName()) then
+            if Company."Evaluation Company" then
+                exit(false);
+
+        exit(true);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckSubscriptionStatus(ThrowSubscriptionIsNotValidErr: Boolean)
+    begin
     end;
 }
