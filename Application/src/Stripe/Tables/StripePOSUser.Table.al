@@ -2,6 +2,7 @@ table 6014549 "NPR Stripe POS User"
 {
     Access = Internal;
     Caption = 'POS User';
+    DrillDownPageId = "NPR Stripe POS Users";
     LookupPageId = "NPR Stripe POS Users";
 
     fields
