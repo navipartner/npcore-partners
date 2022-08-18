@@ -929,12 +929,11 @@
 
                     trigger OnAction()
                     var
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                         RecRef: RecordRef;
                     begin
                         RecRef.GetTable(Rec);
                         LabelLibrary.ToggleLine(RecRef);
-                        LabelLibrary.PrintSelection(ReportSelectionRetail."Report Type"::"Shelf Label");
+                        LabelLibrary.PrintSelection("NPR Report Selection Type"::"Shelf Label".AsInteger());
                     end;
                 }
                 action("Price Label")
@@ -951,12 +950,11 @@
 
                     trigger OnAction()
                     var
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                         RecRef: RecordRef;
                     begin
                         RecRef.GetTable(Rec);
                         LabelLibrary.ToggleLine(RecRef);
-                        LabelLibrary.PrintSelection(ReportSelectionRetail."Report Type"::"Price Label");
+                        LabelLibrary.PrintSelection("NPR Report Selection Type"::"Price Label".AsInteger());
                     end;
                 }
             }

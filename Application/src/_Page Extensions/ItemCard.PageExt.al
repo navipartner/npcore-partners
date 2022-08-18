@@ -1057,10 +1057,9 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                         PrintLabelAndDisplay: Codeunit "NPR Label Library";
                     begin
-                        PrintLabelAndDisplay.ResolveVariantAndPrintItem(Rec, ReportSelectionRetail."Report Type"::"Price Label");
+                        PrintLabelAndDisplay.ResolveVariantAndPrintItem(Rec, "NPR Report Selection Type"::"Price Label".AsInteger());
                     end;
 
                 }
