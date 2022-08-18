@@ -108,7 +108,6 @@
     procedure PrintTerminalReceipt()
     var
         RetailReportSelMgt: Codeunit "NPR Retail Report Select. Mgt.";
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
         RecRef: RecordRef;
     begin
         if not Rec.FindSet() then
@@ -116,7 +115,7 @@
 
         RecRef.GetTable(Rec);
         RetailReportSelMgt.SetRegisterNo(Rec."Register No.");
-        RetailReportSelMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Terminal Receipt");
+        RetailReportSelMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Terminal Receipt".AsInteger());
     end;
 }
 

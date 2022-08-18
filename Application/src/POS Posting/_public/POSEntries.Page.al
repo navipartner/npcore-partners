@@ -259,16 +259,15 @@
                     trigger OnAction()
                     var
                         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                         RecRef: RecordRef;
                     begin
                         RecRef.GetTable(Rec);
                         RetailReportSelectionMgt.SetRegisterNo(Rec."POS Unit No.");
                         case Rec."Entry Type" of
                             Rec."Entry Type"::"Direct Sale":
-                                RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
+                                RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Sales Receipt (POS Entry)".AsInteger());
                             Rec."Entry Type"::"Credit Sale":
-                                RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Sales Doc. Confirmation (POS Entry)");
+                                RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Sales Doc. Confirmation (POS Entry)".AsInteger());
                         end;
                     end;
                 }
@@ -287,13 +286,12 @@
                     trigger OnAction()
                     var
                         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                         RecRef: RecordRef;
                     begin
                         RecRef.GetTable(Rec);
                         RetailReportSelectionMgt.SetRegisterNo(Rec."POS Unit No.");
                         if Rec."Entry Type" = Rec."Entry Type"::"Direct Sale" then
-                            RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Large Sales Receipt (POS Entry)");
+                            RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Large Sales Receipt (POS Entry)".AsInteger());
                     end;
                 }
                 action("Balancing ")
@@ -312,7 +310,6 @@
                     var
                         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
                         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                         RecRef: RecordRef;
                     begin
                         Rec.TestField("Entry Type", Rec."Entry Type"::Balancing);
@@ -322,7 +319,7 @@
                         RecRef.GetTable(POSWorkshiftCheckpoint);
 
                         RetailReportSelectionMgt.SetRegisterNo(Rec."POS Unit No.");
-                        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
+                        RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Balancing (POS Entry)".AsInteger());
                     end;
                 }
                 action("EFT Receipt")

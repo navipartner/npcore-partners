@@ -1,6 +1,7 @@
 ﻿codeunit 6150789 "NPR POS Action: Print Item"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'Print item-based prints.';
         Title: Label 'Item Print';
@@ -147,6 +148,6 @@
 
         Commit();
 
-        LabelLibrary.PrintRetailJournal(RetailJnlLine, ReportSelectionRetail."Report Type");
+        LabelLibrary.PrintRetailJournal(RetailJnlLine, ReportSelectionRetail."Report Type".AsInteger());
     end;
 }

@@ -192,7 +192,6 @@ codeunit 6059860 "NPR End Of Day Worker"
     var
         POSEntry: Record "NPR POS Entry";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         RecRef: RecordRef;
     begin
@@ -204,7 +203,7 @@ codeunit 6059860 "NPR End Of Day Worker"
         RecRef.GetTable(POSWorkshiftCheckpoint);
 
         RetailReportSelectionMgt.SetRegisterNo(UnitNo);
-        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
+        RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Balancing (POS Entry)".AsInteger());
     end;
 
     local procedure LineExists(var SalePOS: Record "NPR POS Sale"): Boolean

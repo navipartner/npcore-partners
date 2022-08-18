@@ -42,7 +42,6 @@
         POSEntry: Record "NPR POS Entry";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         RecRef: RecordRef;
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
     begin
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         if not POSEntry.FindFirst() then
@@ -53,7 +52,7 @@
 
         RecRef.GetTable(POSEntry);
         RetailReportSelectionMgt.SetRegisterNo(POSEntry."POS Unit No.");
-        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
+        RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Sales Receipt (POS Entry)".AsInteger());
     end;
 
     local procedure SkipReceiptPrint(POSEntry: Record "NPR POS Entry"): Boolean

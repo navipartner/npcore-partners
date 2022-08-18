@@ -13,7 +13,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 ToolTip = 'Specifies the item''s No.';
             }
         }
-        
+
         modify(Control1)
         {
             Editable = false;
@@ -310,12 +310,11 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     trigger OnAction()
                     var
                         Item: Record Item;
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                         LabelLibrary: Codeunit "NPR Label Library";
                     begin
                         Item := Rec;
                         Item.SetRecFilter();
-                        LabelLibrary.ResolveVariantAndPrintItem(Item, ReportSelectionRetail."Report Type"::"Price Label");
+                        LabelLibrary.ResolveVariantAndPrintItem(Item, "NPR Report Selection Type"::"Price Label".AsInteger());
                     end;
                 }
                 action("NPR Shelf Label")
@@ -333,12 +332,11 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     trigger OnAction()
                     var
                         Item: Record Item;
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                         LabelLibrary: Codeunit "NPR Label Library";
                     begin
                         Item := Rec;
                         Item.SetRecFilter();
-                        LabelLibrary.ResolveVariantAndPrintItem(Item, ReportSelectionRetail."Report Type"::"Shelf Label");
+                        LabelLibrary.ResolveVariantAndPrintItem(Item, "NPR Report Selection Type"::"Shelf Label".AsInteger());
                     end;
                 }
             }
