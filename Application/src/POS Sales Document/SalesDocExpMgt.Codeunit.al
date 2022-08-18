@@ -352,6 +352,8 @@
 
         TransferInfoFromSalePOS(SalePOS, SalesHeader);
 
+        GetImportedFromInvoiceNo(SalePOS, SalesHeader);
+
         SalesHeader.Modify();
     end;
 
@@ -1194,6 +1196,44 @@ then
             CreditSalePostProcessing.SetInvokeOnFinishCreditSaleSubsribers(POSSalesWorkflowStep);
             if CreditSalePostProcessing.Run(SalePOS) then;
         until POSSalesWorkflowStep.Next() = 0;
+    end;
+
+
+    local procedure GetImportedFromInvoiceNo(SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalesInvHdr: Record "Sales Invoice Header";
+        InvoiceClosedMsg: Label 'Invoice %1 is closed. The corrective credit memo will not be applied to the invoice. Do you want to continue?', Comment = '%1 - invoice no.';
+        InvoicePartiallyPaidMsg: Label 'Invoice %1 is partially paid or credited. The corrective credit memo may not be fully closed by the invoice. Do you want to continue?', Comment = '%1 - invoice no.';
+    begin
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
+        SaleLinePOS.SetFilter("Imported from Invoice No.", '<>%1', '');
+
+        if SaleLinePOS.FindFirst() then begin
+
+            if not SalesInvHdr.Get(SaleLinePOS."Imported from Invoice No.") then
+                exit;
+            if not SalesInvHdr.IsFullyOpen() then begin
+                SalesInvHdr.CalcFields(Closed);
+                if SalesInvHdr.Closed then begin
+                    if not confirm(StrSubstNo(InvoiceClosedMsg, SalesInvHdr."No.")) then
+                        Error('')
+                    else
+                        exit;
+
+                end else
+                    if not confirm(StrSubstNo(InvoicePartiallyPaidMsg, SalesInvHdr."No.")) then
+                        Error('');
+
+
+            end;
+            SalesHeader.Validate("Applies-to Doc. Type", SalesHeader."Applies-to Doc. Type"::Invoice);
+            SalesHeader.Validate("Applies-to Doc. No.", SaleLinePOS."Imported from Invoice No.");
+        end;
+
     end;
 
     [IntegrationEvent(true, false)]

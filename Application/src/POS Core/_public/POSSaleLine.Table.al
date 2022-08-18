@@ -1130,6 +1130,11 @@
             Caption = 'Dimension Set ID';
             DataClassification = CustomerContent;
         }
+        field(490; "Imported from Invoice No."; Code[20])
+        {
+            Caption = 'Imported from Invoice No.';
+            DataClassification = CustomerContent;
+        }
         field(500; "EFT Approved"; Boolean)
         {
             Caption = 'Cash Terminal Approved';
