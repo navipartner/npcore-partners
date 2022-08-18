@@ -125,6 +125,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'BOARDINGPASS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Boarding Pass";
     }
+
     value(19; TAKE_PHOTO)
     {
         Caption = 'TAKE_PHOTO', Locked = true, MaxLength = 20;
@@ -216,6 +217,16 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'SAVE_AS_POS_QUOTE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: SavePOSSvSl";
+    }
+    value(41; IMPORT_POSTED_INV)
+    {
+        Caption = 'IMPORT_POSTED_INV', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Imp. Pstd. Inv";
+    }
+    value(43; REVERSE_CREDIT_SALE)
+    {
+        Caption = 'REVERSE_CREDIT_SALE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Reverse Sale";
     }
     value(40; BACKGND_TASK_EXAMPLE)
     {
