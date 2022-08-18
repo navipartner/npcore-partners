@@ -258,18 +258,18 @@
 
         case AdmissionDefinition of
             0:
-                TicketStatistics.CalcFields("Sum Admission Count");
-            1:
                 TicketStatistics.CalcFields("Sum Admission Count", "Sum Admission Count (Neg)");
+            1:
+                TicketStatistics.CalcFields("Sum Admission Count");
             2:
                 TicketStatistics.CalcFields("Sum Admission Count", "Sum Admission Count (Re-Entry)");
         end;
 
         case AdmissionDefinition of
             0:
-                SumAdmissionCount := TicketStatistics."Sum Admission Count";
-            1:
                 SumAdmissionCount := TicketStatistics."Sum Admission Count" - TicketStatistics."Sum Admission Count (Neg)";
+            1:
+                SumAdmissionCount := TicketStatistics."Sum Admission Count";
             2:
                 SumAdmissionCount := TicketStatistics."Sum Admission Count" + TicketStatistics."Sum Admission Count (Re-Entry)";
         end;
@@ -296,18 +296,18 @@
 
         case AdmissionDefinition of
             0:
-                TicketStatistics.CalcFields("Sum Admission Count");
-            1:
                 TicketStatistics.CalcFields("Sum Admission Count", "Sum Admission Count (Neg)");
+            1:
+                TicketStatistics.CalcFields("Sum Admission Count");
             2:
                 TicketStatistics.CalcFields("Sum Admission Count", "Sum Admission Count (Re-Entry)");
         end;
 
         case AdmissionDefinition of
             0:
-                AdmissionTotal := TicketStatistics."Sum Admission Count";
-            1:
                 AdmissionTotal := TicketStatistics."Sum Admission Count" - TicketStatistics."Sum Admission Count (Neg)";
+            1:
+                AdmissionTotal := TicketStatistics."Sum Admission Count";
             2:
                 AdmissionTotal := TicketStatistics."Sum Admission Count" + TicketStatistics."Sum Admission Count (Re-Entry)";
         end;
