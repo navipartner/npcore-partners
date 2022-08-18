@@ -1,6 +1,8 @@
 ﻿codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
 {
     Access = Internal;
+
+
     var
         ActionDescription: Label 'Create a payment line to balance an open sales order and post the order upon POS sale end.';
         CaptionPrintDocument: Label 'Print Document';
@@ -148,6 +150,7 @@
     local procedure SetLinesToPost(SalesHeader: Record "Sales Header"; AutoQtyToInvoice: Option Disabled,None,All; AutoQtyToShip: Option Disabled,None,All; AutoQtyToReceive: Option Disabled,None,All)
     var
         SalesLine: Record "Sales Line";
+        NoLinesErr: Label 'Selected Document %1 has no lines.', Comment = '%1 = Sales Header No.';
     begin
         if (AutoQtyToInvoice = AutoQtyToInvoice::Disabled) and (AutoQtyToShip = AutoQtyToShip::Disabled) and (AutoQtyToReceive = AutoQtyToReceive::Disabled) then
             exit;
@@ -155,7 +158,8 @@
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         if not SalesLine.FindSet(true) then
-            exit;
+            Error(NoLinesErr, SalesHeader."No.");
+
 
         repeat
             case AutoQtyToShip of
