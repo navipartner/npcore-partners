@@ -14,10 +14,9 @@ pageextension 6014478 "NPR Bins" extends Bins
 
                 trigger OnAction()
                 var
-                    ReportSelectionRetail: Enum "NPR Report Selection Type";
                     LabelLibrary: Codeunit "NPR Label Library";
                 begin
-                    LabelLibrary.PrintLabel(Rec, ReportSelectionRetail::"Bin Label");
+                    LabelLibrary.PrintLabel(Rec, "NPR Report Selection Type"::"Bin Label".AsInteger());
                 end;
             }
         }

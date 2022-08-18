@@ -1,6 +1,7 @@
 ﻿codeunit 6014498 "NPR Exchange Label Mgt."
 {
     Access = Internal;
+
     var
         Text00001: Label 'The item was not found. Use manual procedure in order to return the item.';
 
@@ -167,7 +168,6 @@
     local procedure PrintLabel(var ExchangeLabel: Record "NPR Exchange Label"): Boolean
     var
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
         RecRef: RecordRef;
         ExchangeLabelRec: Record "NPR Exchange Label";
         UserSetup: Record "User Setup";
@@ -181,14 +181,14 @@
                 ExchangeLabelRec := ExchangeLabel;
                 ExchangeLabelRec.SetRecFilter();
                 RecRef.GetTable(ExchangeLabelRec);
-                RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Exchange Label");
+                RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Exchange Label".AsInteger());
                 Clear(RecRef);
             until ExchangeLabel.Next() = 0;
 
         ExchangeLabel.SetRange("Packaged Batch", true);
         if ExchangeLabel.FindSet() then begin
             RecRef.GetTable(ExchangeLabel);
-            RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Exchange Label");
+            RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Exchange Label".AsInteger());
         end;
     end;
 

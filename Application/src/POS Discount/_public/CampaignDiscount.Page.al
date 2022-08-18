@@ -254,10 +254,9 @@
 
                     trigger OnAction()
                     var
-                        ReportSelectionRetail: Enum "NPR Report Selection Type";
                         LabelLibrary: Codeunit "NPR Label Library";
                     begin
-                        LabelLibrary.PrintLabel(Rec, ReportSelectionRetail::"Price Label");
+                        LabelLibrary.PrintLabel(Rec, "NPR Report Selection Type"::"Price Label".AsInteger());
                     end;
                 }
             }

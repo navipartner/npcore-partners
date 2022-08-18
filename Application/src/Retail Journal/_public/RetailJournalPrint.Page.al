@@ -127,10 +127,8 @@
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
-                    var
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                     begin
-                        PrintSelection(ReportSelectionRetail."Report Type"::"Price Label");
+                        PrintSelection("NPR Report Selection Type"::"Price Label".AsInteger());
                     end;
                 }
                 action(ShelfLabel)
@@ -146,10 +144,8 @@
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
-                    var
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                     begin
-                        PrintSelection(ReportSelectionRetail."Report Type"::"Shelf Label");
+                        PrintSelection("NPR Report Selection Type"::"Shelf Label".AsInteger());
                     end;
                 }
                 action(Sign)
@@ -165,10 +161,8 @@
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
-                    var
-                        ReportSelectionRetail: Record "NPR Report Selection Retail";
                     begin
-                        PrintSelection(ReportSelectionRetail."Report Type"::Sign);
+                        PrintSelection("NPR Report Selection Type"::Sign.AsInteger());
                     end;
                 }
             }

@@ -264,7 +264,6 @@
     internal procedure PrintEntry(POSEntry: Record "NPR POS Entry"; Large: Boolean)
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
         POSEntryOutputLog: Record "NPR POS Entry Output Log";
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
@@ -297,12 +296,12 @@
         case POSEntry."Entry Type" of
             POSEntry."Entry Type"::"Direct Sale":
                 if Large then
-                    RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Large Sales Receipt (POS Entry)")
+                    RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Large Sales Receipt (POS Entry)".AsInteger())
                 else
-                    RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
+                    RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Sales Receipt (POS Entry)".AsInteger());
 
             POSEntry."Entry Type"::"Credit Sale":
-                RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Sales Doc. Confirmation (POS Entry)");
+                RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Sales Doc. Confirmation (POS Entry)".AsInteger());
 
             POSEntry."Entry Type"::Balancing:
                 begin
@@ -312,9 +311,9 @@
                     RecRef.GetTable(POSWorkshiftCheckpoint);
                     if Large then begin
                         RetailReportSelectionMgt.SetRequestWindow(true);
-                        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Large Balancing (POS Entry)")
+                        RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Large Balancing (POS Entry)".AsInteger())
                     end else
-                        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
+                        RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Balancing (POS Entry)".AsInteger());
                 end;
         end;
 

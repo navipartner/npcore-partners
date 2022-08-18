@@ -256,6 +256,6 @@
         POSWorkshiftCheckpoint.SetFilter("Entry No.", '=%1', POSWorkshiftCheckpoint."Entry No.");
         POSWorkshiftCheckpoint.FindFirst();
         RecRef.GetTable(POSWorkshiftCheckpoint);
-        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Begin Workshift (POS Entry)");
+        RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Begin Workshift (POS Entry)".AsInteger());
     end;
 }

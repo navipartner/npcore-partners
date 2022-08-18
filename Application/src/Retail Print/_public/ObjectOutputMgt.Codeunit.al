@@ -49,7 +49,7 @@ codeunit 6014580 "NPR Object Output Mgt."
         ObjectOutputSelection: Record "NPR Object Output Selection";
     begin
         if TryGetOutputRec(ObjectType, ObjectID, PrintCode, UserId, ObjectOutputSelection) then
-            exit(ObjectOutputSelection."Output Type")
+            exit(ObjectOutputSelection."Output Type".AsInteger())
         else begin
             ObjectOutputSelection."Object Type" := ObjectType;
             Error(ErrNoOutputFound, Format(ObjectOutputSelection."Object Type"), ObjectID, PrintCode);
