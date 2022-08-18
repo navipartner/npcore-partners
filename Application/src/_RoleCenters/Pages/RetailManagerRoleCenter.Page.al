@@ -815,6 +815,18 @@
                     ApplicationArea = NPRRetail;
 
                 }
+                action("POS Entry Sales & Payment List")
+                {
+                    Caption = 'POS Entry Sales & Payment List';
+                    Image = RegisteredDocs;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    RunObject = page "NPR POS Entry Sales & Payments";
+                    ToolTip = 'View POS Entry Sales & Payment List that have been done.';
+                    ApplicationArea = NPRRetail;
+
+                }
                 action("EFT Transaction Request")
                 {
                     Caption = 'EFT Transaction Request';
