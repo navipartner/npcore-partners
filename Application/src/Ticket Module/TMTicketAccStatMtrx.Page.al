@@ -16,7 +16,7 @@
                 group(MatrixGroup)
                 {
                     Caption = 'Matrix';
-                    field("fld_LineFactOption"; LineFactOption)
+                    field(fld_LineFactOption; LineFactOption)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Show as Lines';
@@ -34,7 +34,7 @@
                             UpdateMatrixSubForm();
                         end;
                     }
-                    field("fld_ColumnFactOption"; ColumnFactOption)
+                    field(fld_ColumnFactOption; ColumnFactOption)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Show as Columns';
@@ -56,7 +56,7 @@
                 group(Display)
                 {
                     Caption = 'Display';
-                    field("fld_FactNameAsColumnHeading"; FactNameAsColumnHeading)
+                    field(fld_FactNameAsColumnHeading; FactNameAsColumnHeading)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Fact Name As Column Heading';
@@ -69,7 +69,7 @@
                             UpdateMatrixSubForm();
                         end;
                     }
-                    field("fld_HideAdmission"; HideLinesWithZeroAdmissionCount)
+                    field(fld_HideAdmission; HideLinesWithZeroAdmissionCount)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Hide Lines having Zero Admitted';
@@ -101,7 +101,7 @@
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Admission Count Def.';
                         Importance = Additional;
-                        OptionCaption = 'Admitted Count,Admitted minus Revoked,Admitted incl. Revisits';
+                        OptionCaption = 'Admitted Count,Admitted count with Revoked,Admitted incl. Revisits';
                         ToolTip = 'Specifies the value of the Admission Count Def. field';
 
                         trigger OnValidate()
@@ -110,7 +110,7 @@
                             UpdateMatrixSubForm();
                         end;
                     }
-                    field("fld_DisplayOption"; DisplayOption)
+                    field(fld_DisplayOption; DisplayOption)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Show Value As';
@@ -124,7 +124,7 @@
                             UpdateMatrixSubForm();
                         end;
                     }
-                    field("fld_PeriodType"; PeriodType)
+                    field(fld_PeriodType; PeriodType)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'View by';
@@ -142,7 +142,7 @@
                             UpdateMatrixSubForm();
                         end;
                     }
-                    field("fld_TrendPeriodType"; TrendPeriodType)
+                    field(fld_TrendPeriodType; TrendPeriodType)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Trend Period Type';
