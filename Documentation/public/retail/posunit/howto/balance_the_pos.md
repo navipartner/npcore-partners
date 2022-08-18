@@ -1,6 +1,6 @@
 # Balance the POS (Z-report)
 
-The Z-report, or the end of day report, calculates and displays the payments received through that register for the entirety of a day. After this report is run, the cash count is reset to the initial amount you've set to begin the following day with. 
+The Z-report, or the end of day report, calculates and displays the payments received through that register for the entirety of a day. 
 
 You can define the payment bins like Bank and Safe, and then a common payment bin, where on posting the cash balancing, we transfer them out of the default bin.
 

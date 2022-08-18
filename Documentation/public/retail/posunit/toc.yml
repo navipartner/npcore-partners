@@ -64,3 +64,5 @@
     href: howto/add_logo_to_pos_login_screen.md
   - name: Set up the POS Security Profile
     href: howto/POS_Security_Profile.md
+  - name: Insert the initial float for a POS unit
+    href: howto/insert_the_initial_float.md
