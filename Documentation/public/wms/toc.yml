@@ -20,8 +20,6 @@
     href: explanation/fifo_and_lifo.md
   - name: Inventory adjustments
     href: explanation/inventory_adjustments.md
-  - name: Inventory setup
-    href: explanation/inventory_setup.md
 
 - name: How-to
   items: 
@@ -55,6 +53,13 @@
     href: howto/create_inventory_pick_sales_order.md
   - name: Create inventory pick with the Create Inventory Put Away/Pick/Movement action
     href: howto/create_inventory_pick_action.md
+  - name: Create a new sales order
+    href: howto/create_sales_order.md
+
+- name: Reference
+  items: 
+  - name: Inventory setup (reference guide)
+    href: reference/inventory_setup_reference.md
 
 - name: Videos
   items:
