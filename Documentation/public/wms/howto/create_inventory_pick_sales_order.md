@@ -19,3 +19,4 @@ To create inventory picks from sales orders, follow the provided steps:
 
 - [Inventory and warehouse picks](../explanation/inventory_warehouse_pick.md)
 - [Create inventory pick based on the source document](create_inventory_pick.md)
+- [Create a new sales order](create_sales_order.md)
