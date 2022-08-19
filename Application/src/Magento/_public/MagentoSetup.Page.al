@@ -6,8 +6,6 @@
     SourceTable = "NPR Magento Setup";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-
-
     layout
     {
         area(content)
@@ -66,9 +64,15 @@
                     {
                         ShowCaption = false;
                         Visible = IsBasicAuthVisible;
+
+                        field("Automatic Username"; Rec."Automatic Username")
+                        {
+                            ToolTip = 'Specifies if the Basic Username is automatically generated';
+                            ApplicationArea = NPRRetail;
+                        }
                         field("Api Username"; Rec."Api Username")
                         {
-                            Enabled = false;
+                            Enabled = not Rec."Automatic Username";
                             Importance = Additional;
                             ToolTip = 'Specifies the API Username.';
                             ApplicationArea = NPRRetail;
@@ -77,7 +81,6 @@
                         {
                             Caption = 'API Password';
                             Importance = Additional;
-                            ExtendedDatatype = Masked;
                             ToolTip = 'Specifies the API Password.';
                             ApplicationArea = NPRRetail;
 
