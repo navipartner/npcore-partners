@@ -1,53 +1,52 @@
 # Create new POS store
 
-To create new POS store follow next steps:
+To create new POS store follow the provided steps:
 
-1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS store** and choose the related link. A list of all existing POS stores will be displayed.  
-2. Click on the New action for creating a new one. The **POS Store Card** popup window will be displayed.
-3. Fill all necessary fields in **General** tab:
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS store**, and choose the related link.        
+   A list of all existing POS stores will be displayed.  
+2. Click **New**.        
+    The **POS Store Card** popup window will be displayed.
+3. Fill all necessary fields in the **General** tab.
 
-![general_store](../images/General%20store.png)
+| Field Name      | Description |
+| ----------- | ----------- |
+| **Code**       | The unique code for the POS store.     |
+| **Name**   | Specifies the name of the POS store.       |
+| **Name 2**  | The second name of a store. |
+| **Address** | Specifies the store address |
+| **Address 2** | Specifies an additional address line. |
+| **Post Code** | Specifies the postal code of the store. |
+| **City** | Specifies the name of the city in which the store is located. |
+| **Contact** | Specifies the contact of the store. |
+| **Country** | Specifies the country in which the store is located. |
+| **Country/Region code** | Specifies the code of the country/region the store is located in. |
+| **Location Code** | Specifies the code of the location the store uses for inventory. |
+| **Language Code** | Specifies the code of the language used in the POS store. |
+| **Registration No.** | Specifies the registration number used for the store. |
 
-- **Code** - unique code for a store.
-- **Name** - name of a store.
-- **Name 2** - second name of a store.
-- **Address** - Address of store.
-- **Address 2** - Address 2 of a store.
-- **Post Code** - Post code of a store.
-- **City** - City in which store is located.
-- **Contact** - contact in a store.
-- **County** - County in which store is located.
-- **Country/Region code** - Country/region in which store is located.
-- **Location code** - Location which store uses for inventory.
-- **Language code** -languge used in POS store.
-- **VAT Registration No.** - VAT Registration number for store.
-- **Registration No.** - Registration No. for store.
+4. Fill all necessary fields in the **Communication** tab.
 
-4. Fill all necessary fields in **Communication** tab:
+| Field Name      | Description |
+| ----------- | ----------- |
+| **Phone No.**       |  Specifies the phone number of the store.     |
+| **E-mail**   | Specifies the email address used in the store.       |
+| **Home Page**  | Specifies the link to the store's website. |
 
-![communication](../images/Communication%20store.png)
-
-- **Phone No.** - Phone number of store.
-- **E-mail** - E-mail used in store.
-- **Home page** - link for a web site of store.
-
-5. Fill all necessary fields in **Profiles** tab:
-
-![profiles](../images/Profiles%20store.png)
+5. Fill all necessary fields in **Profiles** tab.
 
 - **POS Restaurant Profile** - Profile defined for restaurants. Defines restaurant and seats for restaurant.
 - **POS Posting Profile** - Profile defined for postings. In this profile is defined: which business groups store will use for postings (VAT business and General business posting group), source code, will entries be compressed after posting or not, accounts for rounding and differences.
 
-6. Fill all necessary fields in **Reporting** tab:
+6. Fill all necessary fields in the **Reporting** tab.
 
-![reporting](../images/Reporting%20store.png)
-
-- **Department Code** - Global dimension which will be assigned to all entries from this store.
-- **Project Code** - Global dimension which will be assigned to all entries from this store.
-- **Store Group Code** - Stores can be grouped and used for reporting.
-- **Store Category Code** - Stores can be categorised and used for reporting.
-- **Store Locality Code** - Stores can have different Locality and that can be used for reporting.
-- **Store Size** - Size of store.
-- **Opening date** - Opening date of store.
-- **Geolocation Latitude** - Latitude of store.
-- **Geolocation Longitude** - Longitude of store.
+| Field Name      | Description |
+| ----------- | ----------- |
+| **Department Code**   | Specifies the global dimension which will be assigned to all entries from this store.     |
+| **Project Code**   | Specifies the global dimension which will be assigned to all entries from this store.      |
+| **Store Group Code**  | The code of the group that this store belongs to. It is used for reports. |
+|  **Store Category Code** | Specifies the category that this store belongs to. It is used for reports. |
+| **Store Locality Code** | Specifies the store locality used for reports. |
+| **Store Size** | Specifies the size of the store |
+| **Opening Date** | Specifies the date on which the store is opened. |
+| **Geolocation Latitude** | Specifies the latitude of the store. |
+| **Geolocation Longitude** | Specifies the longitude of the store |

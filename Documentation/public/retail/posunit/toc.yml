@@ -66,3 +66,5 @@
     href: howto/POS_Security_Profile.md
   - name: Insert the initial float for a POS unit
     href: howto/insert_the_initial_float.md
+  - name: Create a new POS store
+    href: howto/Create_new_POS_store.md
