@@ -10,7 +10,7 @@ The sales order creation flow is dependent on how the **Warehouse** section has 
    The list of all the sales orders in the environment which have not yet been posted is displayed.
 2. Click **New**.      
    The **Sales Order** card is displayed.     
-   The **No.**, **Posting Date**, and **Order Date** fields are automatically populated, as soon as you click anywhere on the window. 
+   The **No.**, **Posting Date**, and **Order Date** fields are automatically populated, as soon as you click anywhere on the window.      
    The **Status** field indicates whether the sales order can be modified (if it's **Open**) or not (**Released**).
 3. Populate the **Customer Name** with one of the available customers in the environment.     
    The **Contact** field is automatically populated as a result.
@@ -18,9 +18,9 @@ The sales order creation flow is dependent on how the **Warehouse** section has 
 5. In the **Lines** section, you can list the shipment components, and add accompanying information. Start by setting the **Type**.     
    - **G/L Account** - used if freight/insurance charges (or other additional charges) need to be applied to the sales order.
    - **Item** - used when an inventory item is sold; when the sales order with this line type is posted, the results will be reflected in the inventory level.
-   - **Resource**
-   - **Fixed Asset** - used then the sales order should include some fixed assets. 
-   - **Charge (Item)**
+   - **Resource** -  used if you are selling man hours/machine hours linked to a resource on BC.
+   - **Fixed Asset** - used then the sales order should include some fixed assets already registered in Business Central.
+   - **Charge (Item)** - used for additional cost paid on the sales of the item (e.g insurance, freight) if these aren't included in the selling price of the item. The Charge(Item) cost is then added to the initial cost of the item.
 6. Use the dropdown in the **No.** field to find the entry you wish to include in the line.     
    Depending on the previous selections, some fields will be populated. For example, if an **Item** entry type is selected, the information from the selected item's **Item Card** will be applied in the relevant fields. 
 7. Make sure that the **Location Code** corresponds to the correct location. 
@@ -38,3 +38,11 @@ The sales order creation flow is dependent on how the **Warehouse** section has 
 13. Choose whether the order should be shipped, invoiced or both, in the popup window. 
     The order is posted as a result, and moved to the **Posted Sales Invoices** administrative section.
     You can now print, email or attach the posted invoice as a PDF file. 
+
+    > [!Note]
+    > In the **Customer Card** you can set up the preferred method of sending documents in the **Document Sending Profile** field. Once set up, that customer will always automatically receive sales orders and other documents via that method.
+
+
+### Related links
+
+- [Create inventory pick](create_inventory_pick_sales_order.md)
