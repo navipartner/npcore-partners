@@ -286,8 +286,24 @@
             VRTCloneData.InsertDefaultBarcode(Rec."Item No.", Rec.Code, true);
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Description', false, false)]
+    local procedure ItemsOnAfterValidateDescription(var Rec: Record Item)
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        UpdateItemRefDescriptions(Rec, Rec.FieldNo(Description));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Description 2', false, false)]
+    local procedure ItemsOnAfterValidateDescription2(var Rec: Record Item)
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        UpdateItemRefDescriptions(Rec, Rec.FieldNo("Description 2"));
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnAfterValidateEvent', 'Description', false, false)]
-    local procedure ItemVariantsOnAfterValidateDescription(var Rec: Record "Item Variant"; var xRec: Record "Item Variant"; CurrFieldNo: Integer)
+    local procedure ItemVariantsOnAfterValidateDescription(var Rec: Record "Item Variant")
     begin
         if Rec.IsTemporary() then
             exit;
@@ -300,6 +316,82 @@
         if Rec.IsTemporary() then
             exit;
         UpdateItemRefDescriptions(Rec, Rec.FieldNo("Description 2"));
+    end;
+
+    local procedure UpdateItemRefDescriptions(Item: Record Item; ChangedFieldNo: Integer)
+    var
+        ItemReference: Record "Item Reference";
+        ItemReference2: Record "Item Reference";
+        VRTSetup: Record "NPR Variety Setup";
+        Handled: Boolean;
+    begin
+        if not (VRTSetup.Get() and VRTSetup."Create Item Cross Ref. auto.") then
+            exit;
+        if not (
+            ((ChangedFieldNo = Item.FieldNo(Description)) and
+             ((VRTSetup."Item Cross Ref. Description(I)" = VRTSetup."Item Cross Ref. Description(I)"::ItemDescription1) or
+              (VRTSetup."Item Ref. Description 2 (I)" = VRTSetup."Item Ref. Description 2 (I)"::ItemDescription1) or
+              (VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::ItemDescription1) or
+              (VRTSetup."Item Ref. Description 2 (V)" = VRTSetup."Item Ref. Description 2 (V)"::ItemDescription1)))
+            or
+            ((ChangedFieldNo = Item.FieldNo("Description 2")) and
+             ((VRTSetup."Item Cross Ref. Description(I)" = VRTSetup."Item Cross Ref. Description(I)"::ItemDescription2) or
+              (VRTSetup."Item Ref. Description 2 (I)" = VRTSetup."Item Ref. Description 2 (I)"::ItemDescription2) or
+              (VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::ItemDescription2) or
+              (VRTSetup."Item Ref. Description 2 (V)" = VRTSetup."Item Ref. Description 2 (V)"::ItemDescription2))))
+        then
+            exit;
+
+        ItemReference.SetRange("Item No.", Item."No.");
+        ItemReference.SetFilter("Unit of Measure", '%1|%2', '', Item."Base Unit of Measure");
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        OnBeforeUpdateItemReferenceDescriptions(ItemReference, Item, ChangedFieldNo, Handled);
+        if Handled then
+            exit;
+        if not ItemReference.FindSet(true) then
+            exit;
+        repeat
+            ItemReference2 := ItemReference;
+            if ItemReference2."Variant Code" = '' then begin
+                case true of
+                    (ChangedFieldNo = Item.FieldNo(Description)) and
+                    (VRTSetup."Item Cross Ref. Description(I)" = VRTSetup."Item Cross Ref. Description(I)"::ItemDescription1):
+                        ItemReference2.Description := Item.Description;
+
+                    (ChangedFieldNo = Item.FieldNo("Description 2")) and
+                    (VRTSetup."Item Cross Ref. Description(I)" = VRTSetup."Item Cross Ref. Description(I)"::ItemDescription2):
+                        ItemReference2.Description := Item."Description 2";
+
+                    (ChangedFieldNo = Item.FieldNo(Description)) and
+                    (VRTSetup."Item Ref. Description 2 (I)" = VRTSetup."Item Ref. Description 2 (I)"::ItemDescription1):
+                        ItemReference2."Description 2" := CopyStr(Item.Description, 1, MaxStrLen(ItemReference2."Description 2"));
+
+                    (ChangedFieldNo = Item.FieldNo("Description 2")) and
+                    (VRTSetup."Item Ref. Description 2 (I)" = VRTSetup."Item Ref. Description 2 (I)"::ItemDescription2):
+                        ItemReference2."Description 2" := Item."Description 2";
+                end;
+            end else begin
+                case true of
+                    (ChangedFieldNo = Item.FieldNo(Description)) and
+                    (VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::ItemDescription1):
+                        ItemReference2.Description := Item.Description;
+
+                    (ChangedFieldNo = Item.FieldNo("Description 2")) and
+                    (VRTSetup."Item Cross Ref. Description(V)" = VRTSetup."Item Cross Ref. Description(V)"::ItemDescription2):
+                        ItemReference2.Description := Item."Description 2";
+
+                    (ChangedFieldNo = Item.FieldNo(Description)) and
+                    (VRTSetup."Item Ref. Description 2 (V)" = VRTSetup."Item Ref. Description 2 (V)"::ItemDescription1):
+                        ItemReference2."Description 2" := CopyStr(Item.Description, 1, MaxStrLen(ItemReference2."Description 2"));
+
+                    (ChangedFieldNo = Item.FieldNo("Description 2")) and
+                    (VRTSetup."Item Ref. Description 2 (V)" = VRTSetup."Item Ref. Description 2 (V)"::ItemDescription2):
+                        ItemReference2."Description 2" := Item."Description 2";
+                end;
+            end;
+            if Format(ItemReference) <> Format(ItemReference2) then
+                ItemReference2.Modify();
+        until ItemReference.Next() = 0;
     end;
 
     local procedure UpdateItemRefDescriptions(ItemVariant: Record "Item Variant"; ChangedFieldNo: Integer)
@@ -326,7 +418,7 @@
 
         ItemReference.SetRange("Item No.", ItemVariant."Item No.");
         ItemReference.SetRange("Variant Code", ItemVariant.Code);
-        ItemReference.SetRange("Unit of Measure", Item."Base Unit of Measure");
+        ItemReference.SetFilter("Unit of Measure", '%1|%2', '', Item."Base Unit of Measure");
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
         OnBeforeUpdateItemVariantReferenceDescriptions(ItemReference, Item, ItemVariant, ChangedFieldNo, Handled);
         if Handled then
@@ -405,6 +497,11 @@
             exit(Format(DateIn));
 
         exit(Format(WorkDate()));
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateItemReferenceDescriptions(var ItemReference: Record "Item Reference"; Item: Record Item; ChangedFieldNo: Integer; var Handled: Boolean)
+    begin
     end;
 
     [IntegrationEvent(false, false)]
