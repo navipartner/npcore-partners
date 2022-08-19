@@ -528,7 +528,7 @@
         ItemRef.Validate("Reference Type No.", CrossRefTypeNo);
         ItemRef."Reference No." := Barcode;
         Item.Get(ItemNo);
-        ItemRef.Description := Item.Description;
+        UpdateDescriptions(ItemRef, Item);
         ItemRef."Unit of Measure" := GetUnitOfMeasure(ItemNo, 1);
         if not ItemRef.Get(ItemRef."Item No.", ItemRef."Variant Code", ItemRef."Unit of Measure", ItemRef."Reference Type", ItemRef."Reference Type No.", ItemRef."Reference No.") then
             ItemRef.Insert(true);
@@ -858,12 +858,10 @@
         NoOfRecords: Integer;
         LineCount: Integer;
         Item: Record Item;
-        ItemVar: Record "Item Variant";
         Dia: Dialog;
     begin
         if not Confirm(Text009, false, ItemRef.TableCaption) then
             exit;
-        GetVRTSetup();
 
         NoOfRecords := ItemRef.Count();
 
@@ -880,48 +878,58 @@
                 if Item."No." <> ItemRef."Item No." then
                     if not Item.Get(ItemRef."Item No.") then
                         Clear(Item);
-                if ItemRef."Variant Code" = '' then begin
-                    case VRTSetup."Item Cross Ref. Description(I)" of
-                        VRTSetup."Item Cross Ref. Description(I)"::ItemDescription1:
-                            ItemRef.Description := Item.Description;
-                        VRTSetup."Item Cross Ref. Description(I)"::ItemDescription2:
-                            ItemRef.Description := Item."Description 2";
-                    end;
-                    case VRTSetup."Item Ref. Description 2 (I)" of
-                        VRTSetup."Item Ref. Description 2 (I)"::ItemDescription1:
-                            ItemRef."Description 2" := CopyStr(Item.Description, 1, MaxStrLen(ItemRef."Description 2"));
-                        VRTSetup."Item Ref. Description 2 (I)"::ItemDescription2:
-                            ItemRef."Description 2" := Item."Description 2";
-                    end;
-                end else begin
-                    if not ItemVar.Get(ItemRef."Item No.", ItemRef."Variant Code") then
-                        Clear(ItemVar);
-                    case VRTSetup."Item Cross Ref. Description(V)" of
-                        VRTSetup."Item Cross Ref. Description(V)"::ItemDescription1:
-                            ItemRef.Description := Item.Description;
-                        VRTSetup."Item Cross Ref. Description(V)"::ItemDescription2:
-                            ItemRef.Description := Item."Description 2";
-                        VRTSetup."Item Cross Ref. Description(V)"::VariantDescription1:
-                            ItemRef.Description := ItemVar.Description;
-                        VRTSetup."Item Cross Ref. Description(V)"::VariantDescription2:
-                            ItemRef.Description := ItemVar."Description 2";
-                    end;
-                    case VRTSetup."Item Ref. Description 2 (V)" of
-                        VRTSetup."Item Ref. Description 2 (V)"::ItemDescription1:
-                            ItemRef."Description 2" := CopyStr(Item.Description, 1, MaxStrLen(ItemRef."Description 2"));
-                        VRTSetup."Item Ref. Description 2 (V)"::ItemDescription2:
-                            ItemRef."Description 2" := Item."Description 2";
-                        VRTSetup."Item Ref. Description 2 (V)"::VariantDescription1:
-                            ItemRef."Description 2" := CopyStr(ItemVar.Description, 1, MaxStrLen(ItemRef."Description 2"));
-                        VRTSetup."Item Ref. Description 2 (V)"::VariantDescription2:
-                            ItemRef."Description 2" := ItemVar."Description 2";
-                    end;
-                end;
+                UpdateDescriptions(ItemRef, Item);
                 ItemRef.Modify();
             until ItemRef.Next() = 0;
 
         if GuiAllowed then
             Dia.Close();
+    end;
+
+    local procedure UpdateDescriptions(var ItemRef: Record "Item Reference"; Item: Record Item)
+    var
+        ItemVariant: Record "Item Variant";
+    begin
+        GetVRTSetup();
+
+        if ItemRef."Variant Code" = '' then begin
+            case VRTSetup."Item Cross Ref. Description(I)" of
+                VRTSetup."Item Cross Ref. Description(I)"::ItemDescription1:
+                    ItemRef.Description := Item.Description;
+                VRTSetup."Item Cross Ref. Description(I)"::ItemDescription2:
+                    ItemRef.Description := Item."Description 2";
+            end;
+            case VRTSetup."Item Ref. Description 2 (I)" of
+                VRTSetup."Item Ref. Description 2 (I)"::ItemDescription1:
+                    ItemRef."Description 2" := CopyStr(Item.Description, 1, MaxStrLen(ItemRef."Description 2"));
+                VRTSetup."Item Ref. Description 2 (I)"::ItemDescription2:
+                    ItemRef."Description 2" := Item."Description 2";
+            end;
+            exit;
+        end;
+
+        if not ItemVariant.Get(ItemRef."Item No.", ItemRef."Variant Code") then
+            Clear(ItemVariant);
+        case VRTSetup."Item Cross Ref. Description(V)" of
+            VRTSetup."Item Cross Ref. Description(V)"::ItemDescription1:
+                ItemRef.Description := Item.Description;
+            VRTSetup."Item Cross Ref. Description(V)"::ItemDescription2:
+                ItemRef.Description := Item."Description 2";
+            VRTSetup."Item Cross Ref. Description(V)"::VariantDescription1:
+                ItemRef.Description := ItemVariant.Description;
+            VRTSetup."Item Cross Ref. Description(V)"::VariantDescription2:
+                ItemRef.Description := ItemVariant."Description 2";
+        end;
+        case VRTSetup."Item Ref. Description 2 (V)" of
+            VRTSetup."Item Ref. Description 2 (V)"::ItemDescription1:
+                ItemRef."Description 2" := CopyStr(Item.Description, 1, MaxStrLen(ItemRef."Description 2"));
+            VRTSetup."Item Ref. Description 2 (V)"::ItemDescription2:
+                ItemRef."Description 2" := Item."Description 2";
+            VRTSetup."Item Ref. Description 2 (V)"::VariantDescription1:
+                ItemRef."Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(ItemRef."Description 2"));
+            VRTSetup."Item Ref. Description 2 (V)"::VariantDescription2:
+                ItemRef."Description 2" := ItemVariant."Description 2";
+        end;
     end;
 
 
