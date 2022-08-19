@@ -2,7 +2,6 @@
 {
     Caption = 'Magento Setup';
     DataClassification = CustomerContent;
-
     fields
     {
         field(1; "Primary Key"; Code[10])
@@ -136,13 +135,6 @@
             Caption = 'Auth. Type';
             InitValue = Custom;
             DataClassification = CustomerContent;
-            trigger OnValidate()
-            begin
-                if Rec.AuthType = Rec.AuthType::Basic then
-                    Rec."Api Username" := GetApiUsername();
-                if Rec.AuthType <> Rec.AuthType::Custom then
-                    Rec."Api Authorization" := '';
-            end;
         }
 
         field(70; "Api Username"; Text[250])
@@ -168,12 +160,25 @@
             Caption = 'Api Authorization';
             DataClassification = CustomerContent;
         }
-
         field(78; "OAuth2 Setup Code"; Code[20])
         {
             DataClassification = CustomerContent;
             TableRelation = "NPR OAuth Setup";
             Caption = 'OAuth2.0 Setup Code';
+        }
+        field(79; "Automatic Username"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Automatic Username';
+            trigger OnValidate()
+            begin
+                if (Rec.AuthType = Rec.AuthType::Basic) then begin
+                    if Rec."Automatic Username" then
+                        Rec."Api Username" := GetApiUsername()
+                    else
+                        Rec."Api Username" := '';
+                end;
+            end;
         }
         field(80; "Managed Nav Modules Enabled"; Boolean)
         {
@@ -892,7 +897,10 @@
         case Rec.AuthType of
             Rec.AuthType::Basic:
                 begin
-                    exit(CopyStr(NpXmlMgt.GetAutomaticUsername(), 1, 250));
+                    if Rec."Automatic Username" then
+                        exit(CopyStr(NpXmlMgt.GetAutomaticUsername(), 1, 250))
+                    Else
+                        exit(Rec."Api Username");
                 end;
             else
                 exit('');
