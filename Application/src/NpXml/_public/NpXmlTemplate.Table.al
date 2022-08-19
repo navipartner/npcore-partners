@@ -353,10 +353,6 @@
             Caption = 'Auth. Type';
             InitValue = Custom;
             DataClassification = CustomerContent;
-            trigger OnValidate()
-            begin
-                UpdateApiUsername();
-            end;
         }
 
         field(5236; "API Password Key"; GUID)
@@ -370,6 +366,16 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR OAuth Setup";
             Caption = 'OAuth2.0 Setup Code';
+        }
+
+        field(5238; "Automatic Username"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Automatic Username';
+            trigger OnValidate()
+            begin
+                UpdateApiUsername();
+            end;
         }
 
         field(5250; "API Response Path"; Text[250])
@@ -622,7 +628,12 @@
     begin
         case Rec.AuthType of
             Rec.AuthType::Basic:
-                exit(NpXmlMgt.GetAutomaticUsername());
+                begin
+                    if Rec."Automatic Username" then
+                        exit(NpXmlMgt.GetAutomaticUsername())
+                    else
+                        exit(Rec."API Username");
+                end;
             else
                 exit('');
         end;
@@ -667,11 +678,12 @@
 
     local procedure UpdateApiUsername()
     begin
-        if Rec.AuthType = Rec.AuthType::Basic then
-            Rec."API Username" := GetApiUsername();
-
-        if Rec.AuthType <> Rec.AuthType::Custom then
-            Rec."API Authorization" := '';
+        if (Rec.AuthType = Rec.AuthType::Basic) then begin
+            if Rec."Automatic Username" then
+                Rec."API Username" := GetApiUsername()
+            else
+                Rec."Api Username" := '';
+        end;
     end;
 
     internal procedure UpdateNaviConnectSetup()

@@ -413,9 +413,14 @@
                         {
                             ShowCaption = false;
                             Visible = IsBasicAuthVisible;
+                            field("Automatic Username"; Rec."Automatic Username")
+                            {
+                                ToolTip = 'Specifies if the Basic Username is automatically generated';
+                                ApplicationArea = NPRRetail;
+                            }
                             field("API Username"; Rec."API Username")
                             {
-                                Enabled = false;
+                                Enabled = Not Rec."Automatic Username";
                                 ToolTip = 'Specifies the value of the API Username field';
                                 ApplicationArea = NPRRetail;
                             }

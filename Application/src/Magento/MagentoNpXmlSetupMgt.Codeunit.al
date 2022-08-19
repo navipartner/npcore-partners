@@ -31,6 +31,7 @@
         NpXmlTemplate."API Url" := MagentoSetup."Magento Url" + NpXmlTemplate."API Url";
 #pragma warning restore AA0139
         NpXmlTemplate.AuthType := MagentoSetup.AuthType;
+        NpXmlTemplate."Automatic Username" := MagentoSetup."Automatic Username";
         NpXmlTemplate."API Username" := MagentoSetup."Api Username";
         WebServiceAuthHelper.SetApiPassword(MagentoSetup.GetApiPassword(), NpXmlTemplate."API Password Key");
         NpXmlTemplate."API Authorization" := MagentoSetup."Api Authorization";
