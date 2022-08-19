@@ -2,9 +2,10 @@
 
 Sales orders are orders which contain important information about shipments, such as customer information, shipped item specifications, and pricing details. From the **Sales Orders** administrative section, you can perform multiple actions, such as creating, editing, posting, and invoicing sales orders.
 
-While this article focuses on the manual creation process of a sales order, it can also be created automatically (by being imported from the Web store).
+While this article focuses on the manual creation process of a sales order, it can also be created [automatically](../explanation/auto_web_sales_order.md) (by being imported from the Web store).
 
-The sales order creation flow is dependent on how the **Warehouse** section has been set up in the **Location Card** of the locations included in the sales order. 
+> [!Note]
+> The sales order creation flow is dependent on how the **Warehouse** section has been set up in the **Location Card** of the locations included in the sales order. 
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Sales Orders**, and choose the related link.      
    The list of all the sales orders in the environment which have not yet been posted is displayed.

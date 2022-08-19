@@ -20,6 +20,8 @@
     href: explanation/fifo_and_lifo.md
   - name: Inventory adjustments
     href: explanation/inventory_adjustments.md
+  - name: Automatic sales order creation - Import list
+    href: explanation/auto_web_sales_order.md
 
 - name: How-to
   items: 
