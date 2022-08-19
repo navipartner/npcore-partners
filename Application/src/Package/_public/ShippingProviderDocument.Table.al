@@ -489,6 +489,7 @@ table 6014452 "NPR Shipping Provider Document"
         PacsoftSetup: Record "NPR Shipping Provider Setup";
         CreateShipmentDocument: Page "NPR Shipping Provider Document";
         ShippingAgentServicesCode: Code[10];
+        DocFound: Boolean;
     begin
         if not PacsoftSetup.Get() then
             exit;
@@ -500,18 +501,30 @@ table 6014452 "NPR Shipping Provider Document"
             Error(TextNotActivated);
 
         Clear(ShipmentDocument);
-        ShipmentDocument.Init();
-        ShipmentDocument.Validate("Entry No.", 0);
-        ShipmentDocument.Validate("Table No.", RecRef.Number);
-        ShipmentDocument.Validate(RecordID, RecRef.RecordId);
-        ShipmentDocument.Validate("Creation Time", CurrentDateTime);
-        ShipmentDocument.Insert(true);
+        ShipmentDocument.SetRange("Table No.", RecRef.Number);
+        ShipmentDocument.SetRange(RecordID, RecRef.RecordId);
+        if ShipmentDocument.FindLast() then
+            DocFound := true
+        else begin
+            Clear(ShipmentDocument);
+            ShipmentDocument.Init();
+            ShipmentDocument.Validate("Entry No.", 0);
+            ShipmentDocument.Validate("Table No.", RecRef.Number);
+            ShipmentDocument.Validate(RecordID, RecRef.RecordId);
+            ShipmentDocument.Validate("Creation Time", CurrentDateTime);
+        end;
 
         case RecRef.Number of
-            DATABASE::"Sales Shipment Header":
+            Database::"Sales Shipment Header":
                 begin
                     RecRef.SetTable(SalesShipmentHeader);
                     if SalesShipmentHeader.Find() then begin
+                        if SalesShipmentHeader."Shipment Method Code" = '' then exit;
+                        if SalesShipmentHeader."Shipping Agent Code" = '' then exit;
+
+                        if not DocFound then
+                            ShipmentDocument.Insert(true);
+
                         Customer.Get(SalesShipmentHeader."Sell-to Customer No.");
                         ShippingAgentServicesCode := SalesShipmentHeader."Shipping Agent Service Code";
 
