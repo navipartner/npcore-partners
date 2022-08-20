@@ -370,7 +370,7 @@
         exit(LineNo);
     end;
 
-    internal procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]) NewVariantCode: Code[10]
+    procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]) NewVariantCode: Code[10]
     var
         VarietySetup: Record "NPR Variety Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -385,7 +385,7 @@
         exit(CopyStr(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true), 1, MaxStrLen(NewVariantCode)));
     end;
 
-    internal procedure FillDescription(var ItemVariant: Record "Item Variant"; Item: Record Item)
+    procedure FillDescription(var ItemVariant: Record "Item Variant"; Item: Record Item)
     var
         TempDesc: Text[250];
     begin

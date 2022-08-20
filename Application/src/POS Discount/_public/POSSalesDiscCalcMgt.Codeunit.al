@@ -335,6 +335,21 @@
         POSSession.AddServerStopwatch(Keyword, Duration);
     end;
 
+    procedure InitializeDiscountPriority()
+    var
+        DiscountPriority: Record "NPR Discount Priority";
+    begin
+        InitDiscountPriority(DiscountPriority);
+    end;
+
+    procedure DeleteAllDiscountPriorities()
+    var
+        DiscountPriority: Record "NPR Discount Priority";    
+    begin
+        if not DiscountPriority.IsEmpty() then
+            DiscountPriority.DeleteAll();
+    end;
+
     [IntegrationEvent(false, false)]
     internal procedure InitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
     begin
