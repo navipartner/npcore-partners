@@ -125,7 +125,7 @@
         exit('import_type');
     end;
 
-    internal procedure ParamDownloadFtp(): Text
+    procedure ParamDownloadFtp(): Text
     begin
         exit('download_ftp');
     end;
