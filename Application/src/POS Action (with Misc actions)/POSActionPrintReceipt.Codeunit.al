@@ -157,13 +157,17 @@
                 begin
                     if IsPrimaryKey then begin
                         POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
-                        if POSUnit.Get(FilterEntityCode) then
-                            POSEntry.SetRange("POS Store Code", POSUnit."POS Store Code");
+                        POSUnit.Get(FilterEntityCode);
+                        POSEntry.SetRange("POS Store Code", POSUnit."POS Store Code");
                     end;
                     POSEntry.SetRange("POS Unit No.", FilterEntityCode);
                 end;
             ReceiptListFilterOption::Salesperson:
-                POSEntry.SetRange("Salesperson Code", FilterEntityCode);
+                begin
+                    if IsPrimaryKey then
+                        if POSEntry.SetCurrentKey("Salesperson Code") then;
+                    POSEntry.SetRange("Salesperson Code", FilterEntityCode);
+                end;
         end;
         POSEntry.SetRange("System Entry", false);
         POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::"Direct Sale");

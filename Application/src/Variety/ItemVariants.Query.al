@@ -2,7 +2,6 @@
 {
     Access = Internal;
     Caption = 'Item Variants';
-    OrderBy = descending(Code);
 
     elements
     {
