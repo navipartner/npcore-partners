@@ -300,8 +300,9 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
             exit;
 
-        // if this line is missing the sales ticket reference, all the other lines must also not have have a reference
+        // if this line is missing the sales ticket reference, all the other lines must also not have a reference
         if (SaleLinePOS."Return Sale Sales Ticket No." = '') then begin
+            SaleLinePOSCopy.SetRange("Register No.", SaleLinePOS."Register No.");
             SaleLinePOSCopy.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
             SaleLinePOSCopy.SetRange("Sale Type", SaleLinePOSCopy."Sale Type"::Sale);
             SaleLinePOSCopy.SetRange(Type, SaleLinePOSCopy.Type::Item);
