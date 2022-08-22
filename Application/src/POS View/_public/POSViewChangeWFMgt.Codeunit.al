@@ -184,6 +184,8 @@
 
         Item.SetRange("Variant Filter", TempSaleLinePOS."Variant Code");
         Item.SetRange("Location Filter", TempSaleLinePOS."Location Code");
+        if TempSaleLinePOS."Serial No." <> '' then
+            Item.SetRange("Serial No. Filter", TempSaleLinePOS."Serial No.");
         Item.CalcFields(Inventory);
         exit(Item.Inventory);
     end;
