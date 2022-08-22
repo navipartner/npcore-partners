@@ -130,6 +130,7 @@
         key(Key1; ID)
         {
         }
+        key(Key2; Type, "Register Filter") { }
     }
 
     trigger OnInsert()
