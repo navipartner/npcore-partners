@@ -65,6 +65,7 @@
     begin
         if (MenuButton."Action Type" <> MenuButton."Action Type"::Item) or (MenuButton."Action Code" = '') then
             exit;
+        Item.SetLoadFields(Description, "Description 2");
         if not Item.Get(MenuButton."Action Code") then
             exit;
         if Item.Description <> '' then
