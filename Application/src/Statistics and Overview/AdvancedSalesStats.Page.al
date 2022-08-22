@@ -121,7 +121,7 @@
                 ShowCaption = false;
                 field(Dim1Filter; Dim1Filter)
                 {
-
+                    CaptionClass = '1,2,1';
                     Caption = 'Dept. Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
                     ToolTip = 'Specifies the value of the Dept. Code field';
@@ -134,7 +134,7 @@
                 }
                 field(Dim2Filter; Dim2Filter)
                 {
-
+                    CaptionClass = '1,2,2';
                     Caption = 'Project Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
                     ToolTip = 'Specifies the value of the Project Code field';
