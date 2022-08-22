@@ -742,10 +742,11 @@
     var
         POSAction: Record "NPR POS Action";
     begin
-        if POSAction.Get(ActionIn."Code") then begin
-            POSAction."Requires POS Type" := ActionIn."Requires POS Type";
-            POSAction.Modify();
-        end;
+        if POSAction.Get(ActionIn."Code") then
+            if POSAction."Requires POS Type" <> ActionIn."Requires POS Type" then begin
+                POSAction."Requires POS Type" := ActionIn."Requires POS Type";
+                POSAction.Modify();
+            end;
     end;
 
     internal procedure GetWorkflowType(): Integer
