@@ -930,8 +930,9 @@
     local procedure SetSalesLineFilter(SaleLinePOS: Record "NPR POS Sale Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     begin
         Clear(NpRvSalesLine);
-        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
+        NpRvSalesLine.SetCurrentKey("Retail ID");
         NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
     end;
 
     internal procedure SetSalesLineReferenceFilter(NpRvSalesLine: Record "NPR NpRv Sales Line"; var NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.")

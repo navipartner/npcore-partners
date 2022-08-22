@@ -446,11 +446,7 @@
     local procedure FillVariantBuffer(ItemNo: Code[20]; var TempItemVariantBuffer: Record "NPR Item Variant Buffer")
     var
         ItemVariantsQuery: Query "NPR Item Variants";
-        VarietySetup: Record "NPR Variety Setup";
     begin
-        if not VarietySetup.Get() then
-            VarietySetup.Init();
-
         ItemVariantsQuery.SetRange(Item_No_, ItemNo);
         ItemVariantsQuery.Open();
 
