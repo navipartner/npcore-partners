@@ -83,6 +83,7 @@
                 exit(true);
         end;
 
+        DefaultView.SetCurrentKey(Type, "Register Filter");
         DefaultView.SetRange(Type, ViewType);
         if DefaultView.IsEmpty then
             exit(false);
