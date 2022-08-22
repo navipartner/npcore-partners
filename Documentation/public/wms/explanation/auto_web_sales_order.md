@@ -1,10 +1,10 @@
 # Automatic sales order creation - Import list
 
-Sales orders can be created automatically if imported from a web store. If you navigate to the **Import List** administrative section, you can see the list of all documents that were sent from the web store.
+Web sales orders are automatically created in Business Central upon arrival from the web stores. This integration is achieved with the Naviconnect module of NP Retail. It is configured to accept sales orders arriving from the web stores in XML files. If you navigate to the **Import List** administrative section, you can see the list of all documents that were sent from the web store. It is indicated which entries were successfully processed in Business Central, and which ones have errors. 
 
 ![import_list](../images/import_list.PNG)
 
-These documents can be referenced from sales order by adding the Magento order number to the **External Document No.** field in the **Sales Order** card. 
+The **External Document No.** field in the **Sales Order** card is used for storing the web reference numbers.
 
 ![external_doc_sales](../images/sales_order_external_number.PNG)
 

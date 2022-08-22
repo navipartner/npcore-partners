@@ -57,13 +57,15 @@
     href: howto/create_inventory_pick_action.md
   - name: Create a new sales order
     href: howto/create_sales_order.md
-  - name: Create a stockkeeping unit\
+  - name: Create a stockkeeping unit
     href: howto/set_up_sku.md
 
 - name: Reference
   items: 
   - name: Inventory setup (reference guide)
     href: reference/inventory_setup_reference.md
+  - name: Item card (reference guide)
+    href: reference/item_card_reference.md
 
 - name: Videos
   items:
