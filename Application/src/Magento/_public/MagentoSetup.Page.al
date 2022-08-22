@@ -73,14 +73,12 @@
                         field("Api Username"; Rec."Api Username")
                         {
                             Enabled = not Rec."Automatic Username";
-                            Importance = Additional;
                             ToolTip = 'Specifies the API Username.';
                             ApplicationArea = NPRRetail;
                         }
                         field(Password; Password)
                         {
                             Caption = 'API Password';
-                            Importance = Additional;
                             ToolTip = 'Specifies the API Password.';
                             ApplicationArea = NPRRetail;
 

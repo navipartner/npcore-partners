@@ -133,6 +133,7 @@
         field(66; AuthType; Enum "NPR API Auth. Type")
         {
             Caption = 'Auth. Type';
+            ValuesAllowed = Basic, Custom;
             InitValue = Custom;
             DataClassification = CustomerContent;
         }
