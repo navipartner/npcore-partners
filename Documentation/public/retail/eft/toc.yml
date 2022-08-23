@@ -8,5 +8,7 @@
     href: howto/reconciliation.md
 - name: Explanations
   items:
+  - name: EFT setup
+    href: explanation/EFT_setup.md
   - name: Transaction lookup
     href: explanation/lookup.md

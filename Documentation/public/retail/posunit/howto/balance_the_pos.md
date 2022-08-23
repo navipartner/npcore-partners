@@ -55,5 +55,6 @@ This article focuses on making a Z-report and counting the contents of the payme
 ### Related links
 
 - [POS units](../explanation/POSUnit.md)
+- [POS Display Profile](../reference/POS_Display_profile.md)
 - [Create a new POS unit (by using the existing one for reference)](./createnew.md)   
 - [Configure an opening mechanism for a POS unit cash drawer](./ConfigureCashDrawerOpening.md)

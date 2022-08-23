@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Retail Vouchers';
+    ContextSensitiveHelpPage = 'retail/Vouchers/intro.html';
     CardPageID = "NPR NpRv Voucher Card";
     Editable = false;
     PageType = List;

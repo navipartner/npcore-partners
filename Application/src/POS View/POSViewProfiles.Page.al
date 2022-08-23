@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS View Profiles';
+    ContextSensitiveHelpPage = 'retail/posunit/reference/POS_view_profile.html';
     CardPageID = "NPR POS View Profile Card";
     PageType = List;
     UsageCategory = Administration;

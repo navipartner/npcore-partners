@@ -2,6 +2,7 @@
 {
     UsageCategory = None;
     Caption = 'POS Unit Card';
+    ContextSensitiveHelpPage = 'retail/posunit/explanation/POSUnit.html';
     RefreshOnActivate = true;
     SourceTable = "NPR POS Unit";
 

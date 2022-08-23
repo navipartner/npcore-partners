@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Tax Free Profiles';
+    ContextSensitiveHelpPage = 'retail/postaxfree/intro.html';
     PageType = List;
     SourceTable = "NPR Tax Free POS Unit";
     UsageCategory = Administration;

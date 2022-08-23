@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Mix Discount List';
+    ContextSensitiveHelpPage = 'retail/Discounts/howto/Mix_discount.html';
     CardPageID = "NPR Mixed Discount";
     Editable = true;
     InsertAllowed = false;
