@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Menu Filter List';
+    ContextSensitiveHelpPage = 'retail/posunit/explanation/POS_menu.html';
     CardPageID = "NPR POS Menu Filter";
     InsertAllowed = false;
     ModifyAllowed = false;

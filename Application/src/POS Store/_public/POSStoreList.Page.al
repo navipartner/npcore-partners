@@ -1,6 +1,7 @@
 ﻿page 6150614 "NPR POS Store List"
 {
     Caption = 'POS Store List';
+    ContextSensitiveHelpPage = 'retail/posunit/howto/Create_new_POS_store.html';
     CardPageID = "NPR POS Store Card";
     Editable = false;
     PageType = List;

@@ -1,4 +1,4 @@
-# POS View Profile (Reference guide)
+# POS View Profile (reference guide)
 
 In the **POS View Profile** there are two sections: **General** and **Name and Date Formatting**.
 

@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Pricing Profile';
+    ContextSensitiveHelpPage = 'retail/posunit/howto/POS_Pricing_profile.html';
     PageType = Card;
     SourceTable = "NPR POS Pricing Profile";
     UsageCategory = None;

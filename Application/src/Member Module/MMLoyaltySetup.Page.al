@@ -3,6 +3,7 @@
     Extensible = False;
 
     Caption = 'Loyalty Setup';
+    ContextSensitiveHelpPage = 'retail/loyalty/explanation/Loyalty.html';
     PageType = List;
     UsageCategory = Administration;
 

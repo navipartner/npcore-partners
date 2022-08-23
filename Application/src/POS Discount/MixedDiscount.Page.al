@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Mix Discount';
+    ContextSensitiveHelpPage = 'retail/Discounts/explanation/discount_types.html';
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR Mixed Discount";

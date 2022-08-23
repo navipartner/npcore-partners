@@ -4,6 +4,7 @@
     // NPR5.51/TJ  /20190618 CASE 353761 New object
 
     Caption = 'POS Payment Bin Set Float';
+    ContextSensitiveHelpPage = 'retail/posunit/howto/Insert_the_initial_float.html';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;

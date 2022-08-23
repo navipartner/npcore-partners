@@ -16,7 +16,7 @@ POS units are a central part of the POS sales solution. They consist of hardware
 - [Set up the POS customer display](howto/POSCustomerDisplay.md)
 - [Change the POS unit receipt footer text](howto/POSUnitReceiptFooter.md)
 - [POS audit profile](reference/POS_audit_profile.md)
-- [POS display profile](explanation/POS_Display_profile.md)
+- [POS display profile](reference/POS_Display_profile.md)
 - [POS end-of-day profile](reference/POS_End_of_Day_Profile.md)
 - [POS input box profile](explanation/POS_input_box_profile.md)
 - [POS Posting Setup](explanation/POS_posting_setup.md)

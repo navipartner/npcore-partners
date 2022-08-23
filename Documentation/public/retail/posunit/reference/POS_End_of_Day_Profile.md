@@ -1,4 +1,4 @@
-# POS End of Day Profile (Reference guide)
+# POS End of Day Profile (reference guide)
 
 In the POS End of Day profile it is defined how and how often the End of Day will be performed. The following fields should be set up to define it: 
 
@@ -24,7 +24,7 @@ In the POS End of Day profile it is defined how and how often the End of Day wil
 ### Related links
 
 - [Balance the POS (Z-report)](../howto/balance_the_pos.md)
-- [POS Display Profile](../explanation/POS_Display_profile.md)
+- [POS Display Profile](POS_Display_profile.md)
 - [POS Input Box Profile](../explanation/POS_input_box_profile.md)
 - [POS Unit Receipt Profile](../explanation/POS_unit_Receipt_profile.md)
 - [POS View Profile](POS_view_profile.md)

@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Menus';
+    ContextSensitiveHelpPage = 'retail/posunit/explanation/POS_menu.html';
     PageType = List;
     SourceTable = "NPR POS Menu";
     UsageCategory = Administration;
