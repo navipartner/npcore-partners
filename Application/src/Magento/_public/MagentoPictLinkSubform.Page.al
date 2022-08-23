@@ -18,31 +18,26 @@
                 ShowCaption = false;
                 field("Picture Name"; Rec."Picture Name")
                 {
-
                     ToolTip = 'Specifies the value of the Picture Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Base Image"; Rec."Base Image")
                 {
-
                     ToolTip = 'Specifies the value of the Base Image field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Small Image"; Rec."Small Image")
                 {
-
                     ToolTip = 'Specifies the value of the Small Image field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Thumbnail; Rec.Thumbnail)
                 {
-
                     ToolTip = 'Specifies the value of the Thumbnail field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Short Text"; Rec."Short Text")
                 {
-
                     ToolTip = 'Specifies the value of the Short Text field';
                     ApplicationArea = NPRRetail;
 
@@ -53,7 +48,6 @@
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-
                     ToolTip = 'Specifies the value of the Sorting field';
                     ApplicationArea = NPRRetail;
                 }
@@ -61,21 +55,8 @@
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    begin
-        if MiniatureSinglePicture and not MiniatureLinePicture then
-            DownloadMiniature();
-    end;
-
-    trigger OnAfterGetRecord()
-    begin
-        if MiniatureLinePicture then
-            DownloadMiniature();
-    end;
-
     trigger OnInit()
     begin
-        GetMiniatureSetup();
         SetVariantFilters();
     end;
 
@@ -88,16 +69,11 @@
         Rec."Variety Type" := VarietyTypeCode;
         Rec."Variety Table" := VarietyTableCode;
         Rec."Variety Value" := VarietyValueCode;
-        Clear(TempMagentoPicture);
     end;
 
     var
-        TempMagentoPicture: Record "NPR Magento Picture" temporary;
-        MagentoSetup: Record "NPR Magento Setup";
         VariantValueCode: Code[20];
         ItemNo: Code[20];
-        MiniatureLinePicture: Boolean;
-        MiniatureSinglePicture: Boolean;
         VarietyTypeCode: Code[10];
         VarietyTableCode: Code[40];
         VarietyValueCode: Code[50];
@@ -133,37 +109,5 @@
         VarietyTableCode := NewVarietyTableCode;
         VarietyValueCode := NewVarietyValueCode;
         SetVariantFilters();
-    end;
-
-    local procedure DownloadMiniature()
-    var
-        MagentoPicture: Record "NPR Magento Picture";
-    begin
-        if TempMagentoPicture.Get(MagentoPicture.Type::Item, Rec."Picture Name") then begin
-            TempMagentoPicture.DownloadPicture(TempMagentoPicture);
-            exit;
-        end;
-
-        if MagentoPicture.Get(MagentoPicture.Type::Item, Rec."Picture Name") then begin
-            TempMagentoPicture.Init();
-            TempMagentoPicture := MagentoPicture;
-            TempMagentoPicture.Insert();
-        end else begin
-            TempMagentoPicture.Init();
-            TempMagentoPicture.Type := MagentoPicture.Type::Item;
-            TempMagentoPicture.Name := Rec."Picture Name";
-            TempMagentoPicture.Insert();
-        end;
-
-        TempMagentoPicture.DownloadPicture(TempMagentoPicture);
-        TempMagentoPicture.Modify();
-    end;
-
-    local procedure GetMiniatureSetup()
-    begin
-        if not MagentoSetup.Get() then
-            exit;
-        MiniatureSinglePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
-        MiniatureLinePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::LinePicture, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
     end;
 }

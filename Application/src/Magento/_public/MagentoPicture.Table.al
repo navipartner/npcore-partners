@@ -125,6 +125,7 @@
         Text000: Label 'Picture Size exceeds max.';
         ErrorCannotAccesUrl: Label 'Cannot access URL %1.\\Failed with HTTP status code %2';
 
+    [Obsolete('Use method with TempBlob instead of using Image media field', 'v20')]
     procedure DownloadPicture(var TempMagentoPicture: Record "NPR Magento Picture" temporary): Boolean
     var
         Stream: InStream;
@@ -139,6 +140,25 @@
 
         TempMagentoPicture.Image.ImportStream(Stream, Rec.FieldName(Image));
         exit(TempMagentoPicture.Image.HasValue());
+    end;
+
+    procedure DownloadPicture(var TempBlob: Codeunit "Temp Blob"): Boolean
+    var
+        PictureUrl: Text;
+        InStr: InStream;
+        OutStr: OutStream;
+    begin
+        Clear(TempBlob);
+        PictureUrl := Rec.GetMagentoUrl();
+        if (PictureUrl = '') then
+            exit(false);
+
+        if (not TryDownloadPicture(PictureUrl, InStr)) then
+            exit(false);
+
+        TempBlob.CreateOutStream(OutStr);
+        CopyStream(OutStr, InStr);
+        exit(TempBlob.HasValue());
     end;
 
     [TryFunction]
@@ -211,13 +231,13 @@
             exit(MagentoUrl);
 
         MagentoUrl := '';
-        if Name = '' then
+        if Rec.Name = '' then
             exit('');
 
         if MagentoSetup."Magento Url" = '' then
             MagentoSetup.Get();
-        MagentoUrl := MagentoSetup."Magento Url" + 'media/catalog/' + GetMagentoType() + '/api/' + Name;
-        exit(MagentoUrl);
+
+        MagentoUrl := MagentoSetup."Magento Url" + 'media/catalog/' + Rec.GetMagentoType() + '/api/' + Rec.Name;
     end;
 
     internal procedure TestPictureSize()

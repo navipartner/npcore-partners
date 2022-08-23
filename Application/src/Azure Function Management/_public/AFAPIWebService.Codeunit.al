@@ -204,6 +204,7 @@
             exit;
 
         repeat
+            Clear(JsonObjChld);
             JsonObjChld.Add('ItemNo', ItemVariant."Item No.");
             JsonObjChld.Add('Code', ItemVariant.Code);
             JsonObjChld.Add('Description', ItemVariant.Description);
@@ -263,6 +264,7 @@
             exit;
 
         repeat
+            Clear(JsonObjChld);
             JsonObjChld.Add('ItemNo', ItemVariant."Item No.");
             JsonObjChld.Add('Code', ItemVariant.Code);
             JsonObjChld.Add('Description', ItemVariant.Description);
