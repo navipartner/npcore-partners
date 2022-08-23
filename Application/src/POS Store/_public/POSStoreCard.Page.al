@@ -2,6 +2,7 @@
 {
     UsageCategory = None;
     Caption = 'POS Store Card';
+    ContextSensitiveHelpPage = 'retail/posunit/howto/Create_new_POS_store.html';
     RefreshOnActivate = true;
     SourceTable = "NPR POS Store";
 

@@ -20,7 +20,7 @@ The **POS Sales Ticket Receipt Text** section is used for entering text which wi
 ### Related links
 
 - [Balance the POS (Z-report)](../howto/balance_the_pos.md)
-- [POS Display Profile](POS_Display_profile.md)
+- [POS Display Profile](../reference/POS_Display_profile.md)
 - [POS Input Box Profile](POS_input_box_profile.md)
 - [POS End-of-Day Profile](../reference/POS_End_of_Day_Profile.md)
 - [POS View Profile](../reference/POS_view_profile.md)

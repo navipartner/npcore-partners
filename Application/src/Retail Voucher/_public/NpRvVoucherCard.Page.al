@@ -3,6 +3,7 @@
     Extensible = true;
     UsageCategory = None;
     Caption = 'Retail Voucher Card';
+    ContextSensitiveHelpPage = 'retail/Vouchers/intro.html';
     SourceTable = "NPR NpRv Voucher";
 
     layout

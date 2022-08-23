@@ -30,7 +30,7 @@ The created POS Pricing Profile needs to be set on a POS unit for the settings t
 ### Related links
 
 - [Balance the POS (Z-report)](../howto/balance_the_pos.md)
-- [POS Display Profile](../explanation/POS_Display_profile.md)
+- [POS Display Profile](../reference/POS_Display_profile.md)
 - [POS Unit Receipt Profile](../explanation/POS_unit_Receipt_profile.md)
 - [POS View Profile](../reference/POS_view_profile.md)
 - [POS Audit Profile](../reference/POS_audit_profile.md)

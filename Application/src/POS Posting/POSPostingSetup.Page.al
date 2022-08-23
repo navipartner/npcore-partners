@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Posting Setup';
+    ContextSensitiveHelpPage = 'retail/posunit/explanation/POS_posting_setup.html';
     PageType = List;
     SourceTable = "NPR POS Posting Setup";
     UsageCategory = Administration;

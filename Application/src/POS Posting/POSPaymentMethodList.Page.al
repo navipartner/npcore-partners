@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Payment Method List';
+    ContextSensitiveHelpPage = 'retail/posunit/explanation/POS_Display_profile.html';
     CardPageID = "NPR POS Payment Method Card";
     Editable = false;
     PageType = List;

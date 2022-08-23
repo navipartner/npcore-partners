@@ -5,6 +5,7 @@
     // NPR5.41/TS  /20180105 CASE 300893 ActionContainers cannot have captions
 
     Caption = 'Variety';
+    ContextSensitiveHelpPage = 'retail/varieties/intro.html';
     PageType = List;
     SourceTable = "NPR Variety";
     UsageCategory = Administration;

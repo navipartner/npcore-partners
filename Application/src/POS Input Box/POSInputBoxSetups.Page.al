@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Input Box Setups';
+    ContextSensitiveHelpPage = 'retail/posunit/explanation/POS_input_box_profile.html';
     CardPageID = "NPR POS Input Box Setup";
     Editable = false;
     PageType = List;

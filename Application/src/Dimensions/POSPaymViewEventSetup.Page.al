@@ -3,6 +3,7 @@
     Extensible = False;
 
     Caption = 'POS Payment View Event Setup';
+    ContextSensitiveHelpPage = 'retail/posunit/reference/POS_Payment_View_Event_Setup.html';
     PageType = Card;
     SourceTable = "NPR POS Paym. View Event Setup";
     UsageCategory = Administration;

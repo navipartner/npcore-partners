@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Audit Profiles';
+    ContextSensitiveHelpPage = 'retail/posunit/reference/POS_audit_profile.html';
     CardPageID = "NPR POS Audit Profile";
     Editable = false;
     PageType = List;

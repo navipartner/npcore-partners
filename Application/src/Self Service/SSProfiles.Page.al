@@ -6,6 +6,7 @@
 
     SourceTable = "NPR SS Profile";
     Caption = 'POS Self Service Profiles';
+    ContextSensitiveHelpPage = 'retail/posunit/explanation/POS_Self_Service_Actions.html';
     Editable = false;
     CardPAgeID = "NPR SS Profile Card";
     ApplicationArea = NPRRetail;

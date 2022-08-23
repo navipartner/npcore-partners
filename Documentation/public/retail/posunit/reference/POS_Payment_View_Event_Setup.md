@@ -1,4 +1,4 @@
-# POS Payment View Event Setup (Reference guide)
+# POS Payment View Event Setup (reference guide)
 
 **POS Payment View Event Setup** can be used for entering a certain dimension in a POS transaction. For example, you can create a setup in which you can analyze each transaction based on the postal code you provide. You can also define how often the dimension popup is going to be displayed in POS transactions. 
 

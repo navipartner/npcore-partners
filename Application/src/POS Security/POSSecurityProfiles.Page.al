@@ -6,6 +6,7 @@
 
     SourceTable = "NPR POS Security Profile";
     Caption = 'NPR POS Security Profiles';
+    ContextSensitiveHelpPage = 'retail/posunit/howto/POS_Security_Profile.html';
     Editable = false;
     CardPAgeID = "NPR POS Security Profile";
     ApplicationArea = NPRRetail;

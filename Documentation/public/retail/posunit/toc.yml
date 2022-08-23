@@ -10,8 +10,6 @@
     href: explanation/POS_menu.md
   - name: POS Input Box Profile
     href: explanation/POS_input_box_profile.md
-  - name: POS Display Profile
-    href: explanation/POS_Display_profile.md
   - name: POS Posting Setup
     href: explanation/POS_posting_setup.md
   - name: POS Unit Receipt Text Profile (Reference guide)
@@ -26,6 +24,8 @@
     href: reference/POS_Payment_View_Event_Setup.md
   - name: POS End of Day Profile (Reference guide)
     href: reference/POS_End_of_Day_Profile.md
+  - name: POS Display Profile
+    href: reference/POS_Display_profile.md
 - name: How-To  
   items:
   - name: Create a new POS Unit

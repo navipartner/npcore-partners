@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Named Actions Profile';
+    ContextSensitiveHelpPage = 'retail/posunit/howto/Named_Action_Code.html';
     PageType = Card;
     SourceTable = "NPR POS Setup";
     UsageCategory = None;

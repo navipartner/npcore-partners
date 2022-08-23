@@ -1,6 +1,7 @@
 ﻿page 6059973 "NPR Variety Value"
 {
     Caption = 'Variety Value';
+    ContextSensitiveHelpPage = 'retail/varieties/intro.html';
     PageType = List;
     UsageCategory = Administration;
     SourceTable = "NPR Variety Value";

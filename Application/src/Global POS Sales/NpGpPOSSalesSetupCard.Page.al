@@ -3,6 +3,7 @@
     Extensible = False;
     UsageCategory = None;
     Caption = 'Global POS Sales Setup Card';
+    ContextSensitiveHelpPage = 'retail/posunit/howto/POS_Global.html';
     PageType = Card;
     SourceTable = "NPR NpGp POS Sales Setup";
 

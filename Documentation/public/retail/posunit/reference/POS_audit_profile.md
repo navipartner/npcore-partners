@@ -1,4 +1,4 @@
-# POS Audit Profile (Reference guide)
+# POS Audit Profile (reference guide)
 
 The POS Audit Profile is used so different number series and different rules for printing can be assigned to different POS units.
 
@@ -25,7 +25,7 @@ The following options can be set up in the **General** section:
 
 ### Related links
 
-- [POS Display Profile](../explanation/POS_Display_profile.md)
+- [POS Display Profile](POS_Display_profile.md)
 - [POS End-of-Day Profile](POS_End_of_Day_Profile.md)
 - [POS Input Box Profile](../explanation/POS_input_box_profile.md)
 - [POS Unit Receipt Profile](../explanation/POS_unit_Receipt_profile.md)

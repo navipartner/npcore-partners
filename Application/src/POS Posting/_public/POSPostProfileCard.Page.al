@@ -1,6 +1,7 @@
 ﻿page 6150639 "NPR POS Post. Profile Card"
 {
     Caption = 'POS Posting Profile Card';
+    ContextSensitiveHelpPage = 'retail/posunit/howto/POS_Pos_Prof.html';
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR POS Posting Profile";

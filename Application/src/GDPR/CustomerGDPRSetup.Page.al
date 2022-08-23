@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Customer GDPR Setup';
+    ContextSensitiveHelpPage = 'retail/gdpr/intro.html';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
