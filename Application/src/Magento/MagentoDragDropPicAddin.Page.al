@@ -17,11 +17,10 @@
             {
                 ApplicationArea = NPRRetail;
 
-
                 trigger AddInReady();
                 begin
                     ControlAddInReady := true;
-                    CurrPage.DragDropAddin.SetCaption('drop-text', Text003);
+                    CurrPage.DragDropAddin.SetCaption('drop-text', DragAndDropPictureLbl);
                     DisplayPicture();
                     CurrPage.Update(false);
                 end;
@@ -73,6 +72,7 @@
     end;
 
     var
+        Base64Images: Dictionary of [Text, Text];
         MagentoSetup: Record "NPR Magento Setup";
         TempMagentoPicture: Record "NPR Magento Picture" temporary;
         MagentoPictureMgt: Codeunit "NPR Magento Picture Mgt.";
@@ -83,15 +83,16 @@
         IsLogoPicture: Boolean;
         Overwrite: Boolean;
         PictureDataUri: Text;
-        Text001: Label '%1 pictures already exist:';
+        PicturesAlreadyExistLbl: Label '%1 pictures already exist:', Comment = '%1 = number of pictures';
         PictureName: Text;
         PictureLinkNo: Code[20];
         PictureLinkVariantValueCode: Code[20];
         PictureType: Integer;
         Text00101: Label '\  - %1';
-        Text00102: Label '\\Overwrite?';
-        Text003: Label 'DragAndDrop Picture';
-        Text004: Label '&Item,&Brand,Item &Group,&Customer';
+        ConfirmOverwriteLbl: Label '\\Overwrite?';
+        DragAndDropPictureLbl: Label 'DragAndDrop Picture';
+        SelectPictureTypeLbl: Label '&Item,&Brand,Item &Group,&Customer';
+        PictureNamesMustBeUniqueErr: Label 'Picture names must be unique. Please rename your pictures, so the same name does not occur!';
         PictureSize: Decimal;
         IsIconPicture: Boolean;
         VarietyTypeCode: Code[10];
@@ -122,7 +123,7 @@
         if ExistingCount = 0 then
             exit(true);
 
-        ConfirmText := StrSubstNo(Text001, ExistingCount) + ConfirmText + Text00102;
+        ConfirmText := StrSubstNo(PicturesAlreadyExistLbl, ExistingCount) + ConfirmText + ConfirmOverwriteLbl;
         exit(Confirm(ConfirmText));
     end;
 
@@ -130,10 +131,12 @@
     var
         MagentoPicture: Record "NPR Magento Picture";
         Skip: Boolean;
+        Base64: Text;
     begin
         Clear(TempMagentoPicture);
-        if not TempMagentoPicture.FindSet() then
+        if (TempMagentoPicture.IsEmpty()) then
             exit;
+
         if PictureType < 0 then
             PictureType := SelectPictureType();
         if PictureType < 0 then
@@ -144,29 +147,28 @@
         repeat
             Skip := MagentoPicture.Get(PictureType, TempMagentoPicture.Name) and not Overwrite;
             if not Skip then begin
-                SavePicture(PictureType, TempMagentoPicture);
+                Base64Images.Get(TempMagentoPicture.Name, Base64);
+                SavePicture(PictureType, Base64, TempMagentoPicture);
                 SavePictureLinks(PictureType, TempMagentoPicture);
                 Commit();
             end;
         until TempMagentoPicture.Next() = 0;
     end;
 
-    local procedure SavePicture(PictureType: Integer; var TempMagentoPicture2: Record "NPR Magento Picture" temporary)
+    local procedure SavePicture(PictureType: Integer; Base64: Text; var TempMagentoPicture2: Record "NPR Magento Picture" temporary)
     var
         MagentoPicture: Record "NPR Magento Picture";
     begin
         if MagentoPicture.Get(PictureType, TempMagentoPicture2.Name) then begin
             MagentoPicture."Size (kb)" := TempMagentoPicture."Size (kb)";
-            Clear(MagentoPicture.Image);
             MagentoPicture.Modify(true);
         end else begin
             MagentoPicture.Init();
             MagentoPicture := TempMagentoPicture2;
             MagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
-            Clear(MagentoPicture.Image);
             MagentoPicture.Insert(true);
         end;
-        MagentoPictureMgt.DragDropPicture(MagentoPicture.Name, MagentoPicture.GetMagentoType(), TempMagentoPicture2.GetBase64());
+        MagentoPictureMgt.DragDropPicture(MagentoPicture.Name, MagentoPicture.GetMagentoType(), Base64);
         Commit();
     end;
 
@@ -226,21 +228,21 @@
         MagentoPictureLink.SetRange("Variety Type", VarietyTypeCode);
         MagentoPictureLink.SetRange("Variety Table", VarietyTableCode);
         MagentoPictureLink.SetRange("Variety Value", VarietyValueCode);
-
         MagentoPictureLink.SetRange("Picture Name", TempMagentoPicture2.Name);
-        if not MagentoPictureLink.FindFirst() then begin
-            LineNo += 10000;
-            MagentoPictureLink.Init();
-            MagentoPictureLink."Item No." := PictureLinkNo;
-            MagentoPictureLink."Variant Value Code" := PictureLinkVariantValueCode;
-            MagentoPictureLink."Variety Type" := VarietyTypeCode;
-            MagentoPictureLink."Variety Table" := VarietyTableCode;
-            MagentoPictureLink."Variety Value" := VarietyValueCode;
-            MagentoPictureLink."Line No." := LineNo;
-            MagentoPictureLink."Picture Name" := TempMagentoPicture2.Name;
-            MagentoPictureLink."Short Text" := TempMagentoPicture2.Name;
-            MagentoPictureLink.Insert(true);
-        end;
+        if (not MagentoPictureLink.IsEmpty()) then
+            exit;
+
+        LineNo += 10000;
+        MagentoPictureLink.Init();
+        MagentoPictureLink."Item No." := PictureLinkNo;
+        MagentoPictureLink."Variant Value Code" := PictureLinkVariantValueCode;
+        MagentoPictureLink."Variety Type" := VarietyTypeCode;
+        MagentoPictureLink."Variety Table" := VarietyTableCode;
+        MagentoPictureLink."Variety Value" := VarietyValueCode;
+        MagentoPictureLink."Line No." := LineNo;
+        MagentoPictureLink."Picture Name" := TempMagentoPicture2.Name;
+        MagentoPictureLink."Short Text" := TempMagentoPicture2.Name;
+        MagentoPictureLink.Insert(true);
     end;
 
     internal procedure DisplayPicture()
@@ -252,32 +254,7 @@
             exit;
         end;
 
-        if Rec.Image.HasValue() then begin
-            CurrPage.DragDropAddin.DisplayData(GetDataUri());
-            exit;
-        end;
-
         CurrPage.DragDropAddin.DisplayData(Rec.GetMagentoUrl());
-    end;
-
-    internal procedure GetDataUri() DataUri: Text
-    var
-        Convert: Codeunit "Base64 Convert";
-        ImageHelpers: Codeunit "Image Helpers";
-        TempBlob: Codeunit "Temp Blob";
-        InStr: InStream;
-        OutStr: OutStream;
-    begin
-        if not Rec.Image.HasValue() then
-            exit;
-
-        TempBlob.CreateOutStream(OutStr);
-        Rec.Image.ExportStream(OutStr);
-        TempBlob.CreateInStream(InStr);
-
-        DataUri := 'data:image/' + ImageHelpers.GetImageType(InStr);
-        DataUri += ';base64,' + Convert.ToBase64(InStr);
-        exit(DataUri);
     end;
 
     local procedure IsWebClient(): Boolean
@@ -291,7 +268,7 @@
 
     local procedure SelectPictureType() NewPictureType: Integer
     begin
-        NewPictureType := StrMenu(Text004) - 1;
+        NewPictureType := StrMenu(SelectPictureTypeLbl) - 1;
     end;
 
     internal procedure SetAutoOverwrite(NewAutoOverwrite: Boolean)
@@ -342,18 +319,35 @@
     end;
 
     local procedure EndDataStream()
+    var
+        NpRegEx: Codeunit "NPR RegEx";
+        Base64: Text;
     begin
-        SaveTempPicture();
+        // We are done receiving data for each picture.
+        if not Initialized then
+            exit;
+
+        Base64 := NpRegEx.ExtractMagentoPicture(PictureDataUri, PictureName, PictureSize, PictureType, TempMagentoPicture);
+        Base64Images.Set(PictureName, Base64);
+
+        // Reset data for next picture.
+        PictureDataUri := '';
+        PictureName := '';
+        PictureSize := 0;
     end;
 
     internal procedure EndDataTransfer()
     begin
+        // We are done receiving data for all pictures.
         PictureName := '';
         PictureDataUri := '';
+        PictureSize := 0;
+
         if not Initialized then begin
             TempMagentoPicture.DeleteAll();
             exit;
         end;
+
         if not TempMagentoPicture.FindSet() then begin
             Initialized := false;
             exit;
@@ -366,6 +360,10 @@
 
     local procedure InitDataStream(Filename: Text; Filesize: Decimal)
     begin
+        // We are initiating a new stream of data of a picture.
+        if (TempMagentoPicture.Get(PictureType, Filename)) then
+            Error(PictureNamesMustBeUniqueErr);
+
         PictureName := Filename;
         PictureDataUri := '';
         PictureSize := Filesize;
@@ -373,28 +371,16 @@
 
     internal procedure InitDataTransfer()
     begin
+        // We are initiating a new transfer of a batch of pictures.
         PictureName := '';
         PictureDataUri := '';
         TempMagentoPicture.DeleteAll();
         Initialized := true;
     end;
 
-    internal procedure SaveTempPicture()
-    var
-        DataUri: Text;
-        NpRegEx: Codeunit "NPR RegEx";
-    begin
-        if not Initialized then
-            exit;
-
-        DataUri := PictureDataUri;
-        NpRegEx.ExtractMagentoPicture(DataUri, PictureName, PictureSize, PictureType, TempMagentoPicture);
-        PictureDataUri := '';
-        PictureName := '';
-    end;
-
     local procedure WriteDataStream(NewData: Text)
     begin
+        // Write more data to the existing data we received.
         PictureDataUri := PictureDataUri + Format(NewData);
     end;
 }

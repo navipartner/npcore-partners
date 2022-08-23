@@ -110,37 +110,27 @@
 
     procedure GetMagentoItemImage(var Item: Record Item; var PictureFileName: Text) Base64String: Text
     var
-        TempMagentoPicture: Record "NPR Magento Picture" temporary;
         MagentoPicture: Record "NPR Magento Picture";
         MagentoPictureLink: Record "NPR Magento Picture Link";
         Base64Convert: codeunit "Base64 Convert";
         TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
-        OutStr: OutStream;
     begin
         MagentoPictureLink.SetRange("Item No.", Item."No.");
         MagentoPictureLink.SetRange("Base Image", true);
         if not MagentoPictureLink.FindFirst() then
-            exit(Base64String);
+            exit;
 
         if not MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then
-            exit(Base64String);
+            exit;
 
-        if MagentoPicture.DownloadPicture(TempMagentoPicture) then begin
-            TempBlob.CreateOutStream(OutStr);
-            TempMagentoPicture.Image.ExportStream(OutStr);
-            TempBlob.CreateInStream(InStr);
-            Base64String := Base64Convert.ToBase64(InStr);
+        if (not MagentoPicture.DownloadPicture(TempBlob)) then
+            exit;
 
-            PictureFileName := MagentoPicture.Name;
-
-            exit(Base64String);
-
-        end;
-
-        exit(Base64String);
+        TempBlob.CreateInStream(InStr);
+        Base64String := Base64Convert.ToBase64(InStr);
+        PictureFileName := MagentoPicture.Name;
     end;
-
 
     procedure ConvertValueFromBase64(base64Value: Text) stringValue: Text
     var
