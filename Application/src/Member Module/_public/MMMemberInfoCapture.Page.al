@@ -923,6 +923,7 @@
         if (CloseAction = ACTION::LookupOK) then begin
             if (Rec."Receipt No." <> '') then begin
                 Rec.Modify();
+                MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
                 MemberInfoCapture.SetFilter("Receipt No.", '=%1', Rec."Receipt No.");
                 MemberInfoCapture.SetFilter("Line No.", '=%1', Rec."Line No.");
                 RequiredFields := true;
