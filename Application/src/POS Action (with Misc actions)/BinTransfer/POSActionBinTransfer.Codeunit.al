@@ -2,6 +2,9 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    var
+        PrintTransferNameLbl: Label 'PrintTransfer', Locked = true;
+
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'Transfer funds from one bin to another using the POS.';
@@ -11,6 +14,8 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         SourceBinOptions_CptLbl: Label 'POS Unit Default Bin,User Selection,Fixed Parametar';
         SourceBin_NameLbl: Label 'SourceBin';
         SourceBin_CptLbl: Label 'Source Bin';
+        PrintTransferCaptionNameLbl: Label 'Print Transfer';
+        PrintTransferCaptionDescriptionLbl: Label 'Print template from Report Selection - Retail, after transferring content to bin. Template need to be built on top of "Workshift Checkpoint" table.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -21,6 +26,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
             SourceBinSelection_NameLbl,
             SourceBinSelection_NameLbl,
             SourceBinOptions_CptLbl);
+        WorkflowConfig.AddBooleanParameter(PrintTransferNameLbl, false, PrintTransferCaptionNameLbl, PrintTransferCaptionDescriptionLbl);
         WorkflowConfig.AddTextParameter(SourceBin_NameLbl, '', SourceBin_CptLbl, SourceBin_CptLbl);
 
     end;
@@ -43,12 +49,13 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         FromBinNo: Code[10];
         POSSession: Codeunit "NPR POS Session";
         POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
+        PrintTransfer: Boolean;
     begin
-
         FromBinNo := CopyStr(Context.GetString('FROM_BIN'), 1, MaxStrLen(FromBinNo));
         CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(FromBinNo);
         POSActionBinTransferB.TransferContentsToBin(POSSession, FromBinNo, CheckpointEntryNo);
-
+        if Context.GetBooleanParameter(PrintTransferNameLbl, PrintTransfer) and PrintTransfer then
+            POSActionBinTransferB.PrintBinTransfer(CheckpointEntryNo);
     end;
 
     local procedure SelectSourceBin(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
