@@ -269,6 +269,7 @@
             DataError := true;
         end;
 
+        MMAdmissionServiceEntry.SetCurrentKey("Key", Token);
         if MMAdmissionServiceSetup."Validate Scanner Station" then
             MMAdmissionServiceEntry.SetRange("Scanner Station Id", MMAdmissionServiceLog."Scanner Station Id");
         MMAdmissionServiceEntry.SetRange(Key, MMAdmissionServiceLog.Key);
@@ -384,6 +385,7 @@
             DataError := true;
         end;
 
+        MMAdmissionServiceEntry.SetCurrentKey("Key", Token);
         if MMAdmissionServiceSetup."Validate Scanner Station" then
             MMAdmissionServiceEntry.SetRange("Scanner Station Id", MMAdmissionServiceLog."Scanner Station Id");
         MMAdmissionServiceEntry.SetRange(Key, MMAdmissionServiceLog.Key);

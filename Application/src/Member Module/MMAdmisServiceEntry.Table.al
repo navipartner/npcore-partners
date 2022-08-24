@@ -145,6 +145,9 @@
         key(Key1; "Entry No.")
         {
         }
+        key(Key2; "Key", Token)
+        {
+        }
     }
 
     fieldgroups
