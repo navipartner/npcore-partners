@@ -84,10 +84,9 @@
     }
     fieldgroups
     {
-        fieldgroup(Brick; Name, "Service Flow Profile")
+        fieldgroup(Brick; Code, Name)
         {
         }
-
     }
 
     procedure ShowKitchenRequests()
