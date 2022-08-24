@@ -23,6 +23,7 @@
 
         ValidateBCOnlineTenant();
         TestUserOnLogin();
+        SendPosUnitQty();
     end;
 #else
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
@@ -41,6 +42,7 @@
 
         ValidateBCOnlineTenant();
         TestUserOnLogin();
+        SendPosUnitQty();
     end;
 #endif
 
@@ -68,6 +70,76 @@
             ClientDiag.Delete();
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterInsertEvent', '', true, false)]
+    local procedure PosUnitOnAFterInsert(var Rec: Record "NPR POS Unit")
+    begin
+        UpdatePosUnitsInTenantDiagnostic(Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterDeleteEvent', '', true, false)]
+    local procedure PosUnitOnAFterDelete(var Rec: Record "NPR POS Unit")
+    begin
+        UpdatePosUnitsInTenantDiagnostic(Rec);
+    end;
+
+    local procedure UpdatePosUnitsInTenantDiagnostic(PosUnit: Record "NPR POS Unit")
+    var
+        TenantDiagnostic: Record "NPR Tenant Diagnostic";
+        PosUnits: Integer;
+    begin
+        PosUnits := PosUnit.Count();
+        InitTenantDiagnostic(TenantDiagnostic);
+
+        if TenantDiagnostic."POS Units" = PosUnits then
+            exit;
+
+        TenantDiagnostic."POS Units" := PosUnits;
+        TenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
+        TenantDiagnostic.Modify();
+        SendPosUnitQty();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnAfterInsertEvent', '', true, false)]
+    local procedure PosStoreOnAFterInsert(var Rec: Record "NPR POS Store")
+    begin
+        UpdatePosStoresInTenantDiagnostic(Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnAfterDeleteEvent', '', true, false)]
+    local procedure PosStoreOnAFterDelete(var Rec: Record "NPR POS Store")
+    begin
+        UpdatePosStoresInTenantDiagnostic(Rec);
+    end;
+
+    local procedure UpdatePosStoresInTenantDiagnostic(PosStore: Record "NPR POS Store")
+    var
+        TenantDiagnostic: Record "NPR Tenant Diagnostic";
+        PosStores: Integer;
+    begin
+        PosStores := PosStore.Count();
+        InitTenantDiagnostic(TenantDiagnostic);
+
+        if TenantDiagnostic."POS Stores" = PosStores then
+            exit;
+
+        TenantDiagnostic."POS Stores" := PosStores;
+        TenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
+        TenantDiagnostic.Modify();
+        SendPosUnitQty();
+    end;
+
+    [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', true, false)]
+    local procedure ResetTenantDiagnostic_OnAfterCopyCompany(NewCompanyName: Text[30])
+    var
+        TenantDiagnostic: Record "NPR Tenant Diagnostic";
+    begin
+        if not TenantDiagnostic.ChangeCompany(NewCompanyName) then
+            exit;
+
+        if not TenantDiagnostic.IsEmpty() then
+            TenantDiagnostic.DeleteAll();
+    end;
+
     local procedure ValidateBCOnlineTenant()
     var
         EnvironmentInformation: Codeunit "Environment Information";
@@ -76,7 +148,7 @@
         if not EnvironmentInformation.IsSaaS() then
             exit;
 
-        if not TrySendRequest('ValidateBCOnlineTenant', '', '', TenantId(), ResponseMessage) then
+        if not TryInitAndSendRequest('ValidateBCOnlineTenant', '', '', TenantId(), ResponseMessage) then
             exit;
     end;
 
@@ -124,7 +196,7 @@
     var
         UseRegularInvoicing: Text;
     begin
-        if not TrySendRequest('GetTenantUseRegularInvoicing', '', '', TenantId(), UseRegularInvoicing) then
+        if not TryInitAndSendRequest('GetTenantUseRegularInvoicing', '', '', TenantId(), UseRegularInvoicing) then
             exit;
 
         WebServiceCallSucceeded := true;
@@ -167,7 +239,7 @@
         if (ClientDiagnostic."Expiration Message" = '') and (DurationFromLastCheck <= DurationCondition) then
             exit;
 
-        if not TrySendRequest('GetUserExpirationMessage', UserId(), GetDatabaseName(), TenantId(), ExpirationMessage) then
+        if not TryInitAndSendRequest('GetUserExpirationMessage', UserId(), GetDatabaseName(), TenantId(), ExpirationMessage) then
             exit;
 
         if LowerCase(ExpirationMessage) = 'false' then
@@ -224,7 +296,7 @@
         Second: Text[2];
         ExpirationTime: Time;
     begin
-        if not TrySendRequest('GetUserExpirationDate', UserId(), GetDatabaseName(), TenantId(), ExpirationDate) then
+        if not TryInitAndSendRequest('GetUserExpirationDate', UserId(), GetDatabaseName(), TenantId(), ExpirationDate) then
             exit(0DT);
         if (ExpirationDate = '') or (ExpirationDate = '0001-01-01T00:00:00') then
             exit(0DT);
@@ -303,7 +375,7 @@
         if (ClientDiagnostic."Locked Message" = '') and (DurationFromLastCheck <= DurationCondition) then
             exit;
 
-        if not TrySendRequest('GetUserLockedMessage', UserId(), GetDatabaseName(), TenantId(), LockedMessage) then
+        if not TryInitAndSendRequest('GetUserLockedMessage', UserId(), GetDatabaseName(), TenantId(), LockedMessage) then
             exit;
 
         if LowerCase(LockedMessage) = 'false' then
@@ -324,18 +396,83 @@
         TestUserLocked(true);
     end;
 
-    [NonDebuggable]
+    local procedure SendPosUnitQty()
+    var
+        TenantDiagnostic: Record "NPR Tenant Diagnostic";
+        PosStore: Record "NPR POS Store";
+        PosUnit: Record "NPR POS Unit";
+        ResponseMessage: Text;
+        ShouldSendRequest: Boolean;
+    begin
+        InitTenantDiagnostic(TenantDiagnostic);
+
+        //In order to reduce number of calls to externall services (case system), send the request on login only:
+        //  if it wasn't sent at least once in the past (because of initial sync after new App version is installed or new company is created) 
+        //  and when there is a difference between current POS Store qty and POS Store qty previously sent through API. (same condition for POS Unit)
+        if (TenantDiagnostic."POS Units Last Sent" = 0DT) or (TenantDiagnostic."POS Stores Last Sent" = 0DT) then begin
+            ShouldSendRequest := true;
+            TenantDiagnostic."POS Stores" := PosStore.Count();
+            TenantDiagnostic."POS Units" := PosUnit.Count();
+            TenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
+            TenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
+        end;
+
+        if (TenantDiagnostic."POS Stores" <> TenantDiagnostic."POS Stores Sent on Last Upd.") or (TenantDiagnostic."POS Units" <> TenantDiagnostic."POS Units Sent on Last Upd.") then
+            ShouldSendRequest := true;
+
+        if not ShouldSendRequest then
+            exit;
+
+        if not TryInitAndSendRequest('UpdatePosStoresAndUnits', GetDatabaseName(), TenantId(), CompanyName(), Format(TenantDiagnostic."POS Stores"), Format(TenantDiagnostic."POS Units"), ResponseMessage) then
+            exit;
+
+        if LowerCase(ResponseMessage) = 'true' then begin
+            TenantDiagnostic."POS Stores Sent on Last Upd." := TenantDiagnostic."POS Stores";
+            TenantDiagnostic."POS Units Sent on Last Upd." := TenantDiagnostic."POS Units";
+            TenantDiagnostic."POS Stores Last Sent" := CurrentDateTime();
+            TenantDiagnostic."POS Units Last Sent" := CurrentDateTime();
+            TenantDiagnostic.Modify();
+        end;
+    end;
+
+    local procedure InitTenantDiagnostic(var TenantDiagnostic: Record "NPR Tenant Diagnostic")
+    var
+        AzureADTenant: Codeunit "Azure AD Tenant";
+    begin
+        if not TenantDiagnostic.Get(TenantId()) then begin
+            TenantDiagnostic.Init();
+            TenantDiagnostic."Tenant ID" := CopyStr(TenantId(), 1, MaxStrLen(TenantDiagnostic."Tenant ID"));
+            TenantDiagnostic."Azure AD Tenant ID" := CopyStr(AzureADTenant.GetAadTenantId(), 1, MaxStrLen(TenantDiagnostic."Azure AD Tenant ID"));
+            TenantDiagnostic.Insert();
+        end;
+    end;
+
     [TryFunction]
-    local procedure TrySendRequest(serviceMethod: Text; ThisUserId: Text; DatabaseName: Text; ThisTenantId: Text; var responseMessage: Text)
+    local procedure TryInitAndSendRequest(serviceMethod: Text; ThisUserId: Text; DatabaseName: Text; ThisTenantId: Text; var responseMessage: Text)
+    var
+        Content: HttpContent;
+    begin
+        Content.WriteFrom(InitRequestContent(serviceMethod, ThisUserId, DatabaseName, ThisTenantId));
+        TrySendRequest(Content, serviceMethod, responseMessage)
+    end;
+
+    [TryFunction]
+    local procedure TryInitAndSendRequest(serviceMethod: Text; DatabaseName: Text; ThisTenantId: Text; ThisCompanyName: Text; ThisPosStores: Text; ThisPosUnits: Text; var responseMessage: Text)
+    var
+        Content: HttpContent;
+    begin
+        Content.WriteFrom(InitRequestContent(serviceMethod, DatabaseName, ThisTenantId, ThisCompanyName, ThisPosStores, ThisPosUnits));
+        TrySendRequest(Content, serviceMethod, responseMessage)
+    end;
+
+    [TryFunction]
+    local procedure TrySendRequest(var Content: HttpContent; serviceMethod: Text; var responseMessage: Text)
     var
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Client: HttpClient;
         Response: HttpResponseMessage;
         ContentHeaders: HttpHeaders;
-        Content: HttpContent;
     begin
-        Content.WriteFrom(InitRequestContent(serviceMethod, ThisUserId, DatabaseName, ThisTenantId));
-
         Content.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'text/xml; charset=utf-8');
@@ -371,6 +508,38 @@
 
         if ThisTenantId <> '' then
             Builder.Append('      <tenantIDIn>' + ThisTenantId + '</tenantIDIn>');
+
+        Builder.Append('    </' + serviceMethod + '>');
+        Builder.Append('  </soapenv:Body>');
+        Builder.Append('</soapenv:Envelope>');
+
+        exit(Builder.ToText());
+    end;
+
+    local procedure InitRequestContent(serviceMethod: Text; DatabaseName: Text; ThisTenantId: Text; ThisCompanyName: Text; ThisPosStores: Text; ThisPosUnits: Text): Text
+    var
+        Builder: TextBuilder;
+    begin
+        Builder.Append('<?xml version="1.0" encoding="UTF-8"?>');
+        Builder.Append('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" >');
+        Builder.Append('  <soapenv:Header/>');
+        Builder.Append('  <soapenv:Body>');
+        Builder.Append('    <' + serviceMethod + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser">');
+
+        if DatabaseName <> '' then
+            Builder.Append('      <databaseNameIn>' + DatabaseName + '</databaseNameIn>');
+
+        if ThisTenantId <> '' then
+            Builder.Append('      <tenantIDIn>' + ThisTenantId + '</tenantIDIn>');
+
+        if ThisCompanyName <> '' then
+            Builder.Append('      <companyNameIn>' + ThisCompanyName + '</companyNameIn>');
+
+        if ThisPosStores <> '' then
+            Builder.Append('      <posStoresIn>' + ThisPosStores + '</posStoresIn>');
+
+        if ThisPosUnits <> '' then
+            Builder.Append('      <posUnitsIn>' + ThisPosUnits + '</posUnitsIn>');
 
         Builder.Append('    </' + serviceMethod + '>');
         Builder.Append('  </soapenv:Body>');
