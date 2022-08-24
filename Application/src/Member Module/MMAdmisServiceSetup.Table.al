@@ -12,6 +12,7 @@
             Caption = 'No.';
             DataClassification = CustomerContent;
             Editable = false;
+            NotBlank = true;
         }
         field(11; "Validate Members"; Boolean)
         {
