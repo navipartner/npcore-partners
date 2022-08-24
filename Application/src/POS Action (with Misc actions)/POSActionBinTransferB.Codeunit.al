@@ -68,6 +68,21 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         end;
     end;
 
+    procedure PrintBinTransfer(CheckpointEntryNo: Integer)
+    var
+        RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        RecRef: RecordRef;
+    begin
+        POSWorkshiftCheckpoint.SetRange("Entry No.", CheckpointEntryNo);
+        POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::TRANSFER);
+        if not POSWorkshiftCheckpoint.FindFirst() then
+            exit;
+        RecRef.GetTable(POSWorkshiftCheckpoint);
+        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Bin Transfer".AsInteger());
+    end;
+
     procedure UserSelectBin(POSSession: Codeunit "NPR POS Session"): Code[10]
     var
         POSSetup: Codeunit "NPR POS Setup";

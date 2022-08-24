@@ -163,4 +163,8 @@ enum 6014493 "NPR Report Selection Type"
     {
         Caption = 'Inventory PutAway Label';
     }
+    value(40; "Bin Transfer")
+    {
+        Caption = 'Bin Transfer';
+    }    
 }
