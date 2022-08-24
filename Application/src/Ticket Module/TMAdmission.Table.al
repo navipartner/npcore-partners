@@ -12,6 +12,7 @@
         {
             Caption = 'Admission Code';
             DataClassification = CustomerContent;
+            NotBlank = true;
         }
         field(2; Type; Option)
         {
