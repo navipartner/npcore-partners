@@ -78,27 +78,27 @@
                     field("Ticket Title"; Rec."Ticket Title")
                     {
                         ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                        ToolTip = 'Specifies the value of the Ticket Title field';
+                        Tooltip = 'Specifies the source of Ticket Title for tickets rendered by Ticket Server';
                     }
                     field("Ticket Sub Title"; Rec."Ticket Sub Title")
                     {
                         ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                        ToolTip = 'Specifies the value of the Ticket Sub Title field';
+                        ToolTip = 'Specifies the source of Ticket Sub Title for tickets rendered by Ticket Server';
                     }
                     field("Ticket Name"; Rec."Ticket Name")
                     {
                         ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                        ToolTip = 'Specifies the value of the Ticket Name field';
+                        ToolTip = 'Specifies the source of Ticket Name for tickets rendered by Ticket Server';
                     }
                     field("Ticket Description"; Rec."Ticket Description")
                     {
                         ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                        ToolTip = 'Specifies the value of the Ticket Description field';
+                        ToolTip = 'Specifies the source of Ticket Description for tickets rendered by Ticket Server';
                     }
                     field("Ticket Full Description"; Rec."Ticket Full Description")
                     {
                         ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                        ToolTip = 'Specifies the value of the Ticket Full Description field';
+                        ToolTip = 'Specifies the source of Ticket Full Description for tickets rendered by Ticket Server';
                     }
                 }
             }
