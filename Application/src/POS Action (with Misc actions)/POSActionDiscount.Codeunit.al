@@ -519,7 +519,7 @@
         repeat
             ApplyDiscountOnLine(SaleLinePOS, DiscountType, Discount);
             if DiscountType = DiscountType::DiscountPct then begin
-                AdjustedDiscountAmt := SaleLinePOS."Unit Price" * Discount / 100 + RoundingRemainder;
+                AdjustedDiscountAmt := SaleLinePOS.Quantity * SaleLinePOS."Unit Price" * Discount / 100 + RoundingRemainder;
                 if SaleLinePOS."Discount Amount" <> Round(AdjustedDiscountAmt) then
                     SetLineDiscountAmount(SaleLinePOS, Round(AdjustedDiscountAmt), true);
                 RoundingRemainder := AdjustedDiscountAmt - SaleLinePOS."Discount Amount";
