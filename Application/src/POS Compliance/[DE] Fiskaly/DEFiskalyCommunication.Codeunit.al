@@ -534,7 +534,7 @@
         RefreshToken: Text;
         AccessTokenRefreshErr: Label 'Error while trying to get authentication token from the server.\%1';
     begin
-        if FiskalyJWT.GetToken(AccessToken, RefreshToken) then
+        if FiskalyJWT.GetToken(ConnectionParameters.SystemId, AccessToken, RefreshToken) then
             exit(AccessToken);
 
         if RefreshToken <> '' then
@@ -545,7 +545,7 @@
         end;
         ClearLastError();
         if RefreshJwtToken(RefreshTokenJson, JWTResponseJson, ConnectionParameters) then begin
-            FiskalyJWT.SetJWT(JWTResponseJson, AccessToken);
+            FiskalyJWT.SetJWT(ConnectionParameters.SystemId, JWTResponseJson, AccessToken);
             exit(AccessToken);
         end else
             Error(AccessTokenRefreshErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
