@@ -47,6 +47,8 @@
     href: howto/perform_stock_count.md
   - name: Reclassify items (Item Reclassification Journal)
     href: howto/reclassify_items.md
+  - name: Create a new transfer order
+    href: howto/create_transfer_order.md
   - name: Revalue items (Item Revaluation Journal)
     href: howto/revaluation_journal.md
   - name: Create inventory picks based on the source document
