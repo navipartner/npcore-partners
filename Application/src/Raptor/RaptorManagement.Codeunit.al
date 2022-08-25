@@ -290,7 +290,7 @@
         if Enabled then begin
             AddDataLogSubscribers();
 
-            JobQueueCategory.InsertRec('RAPTOR', CopyStr(SendDataToRaptrorLbl, 1, MaxStrLen(JobQueueEntry.Description)));
+            JobQueueCategory.InsertRec('RAPTOR', CopyStr(SendDataToRaptrorLbl, 1, MaxStrLen(JobQueueCategory.Description)));
             if JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
                 CODEUNIT::"NPR Raptor Send Data",
