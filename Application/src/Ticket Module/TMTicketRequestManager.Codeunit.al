@@ -2454,7 +2454,7 @@
 
     begin
 
-        if (not (NPPassServerInvokeApi('Get', TicketNotificationEntry, ReasonMessage, '', JSONResult))) then
+        if (not (NPPassServerInvokeApi('GET', TicketNotificationEntry, ReasonMessage, '', JSONResult))) then
             exit(false);
 
         if (JSONResult = '') then
@@ -2780,7 +2780,7 @@
         if (RequestMethod = 'PUT') then
             RequestOk := Client.Put(Url, Content, Response);
 
-        if (RequestMethod = 'Get') then
+        if (RequestMethod = 'GET') then
             RequestOk := Client.Get(Url, Response);
 
         if (RequestOk) then begin
