@@ -1250,7 +1250,7 @@
                 Admission."Default Schedule"::TODAY,
                 Admission."Default Schedule"::NEXT_AVAILABLE:
                     begin
-                        if (AdmSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(ItemNo, VariantCode, Admission."Admission Code", true))) then begin
+                        if (AdmSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(ItemNo, VariantCode, Admission."Admission Code", true, 1))) then begin
                             if (AdmSchEntry."Admission Is" = AdmSchEntry."Admission Is"::OPEN) then begin
                                 ReservationRequest."External Adm. Sch. Entry No." := AdmSchEntry."External Schedule Entry No.";
                                 ReservationRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time");
