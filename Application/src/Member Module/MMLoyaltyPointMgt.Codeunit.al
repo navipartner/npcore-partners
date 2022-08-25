@@ -1600,6 +1600,7 @@
         RedeemedPoints: Integer;
         RefundedPoints: Integer;
         EarnedPoints: Integer;
+        DepositedPoints: Integer;
         PeriodStart: Date;
         PeriodEnd: Date;
     begin
@@ -1613,8 +1614,8 @@
             CalculatePointsValidPeriod(LoyaltySetup, ReferenceDate, PeriodStart, PeriodEnd); // Current period
             Membership.SetFilter("Date Filter", '%1..%2', PeriodStart, PeriodEnd);
 
-            Membership.CalcFields("Redeemed Points (Withdrawl)", "Awarded Points (Refund)", "Awarded Points (Sale)");
-            // RedeemedPoints := Membership."Redeemed Points (Withdrawl)";
+            Membership.CalcFields("Redeemed Points (Deposit)", "Awarded Points (Refund)", "Awarded Points (Sale)");
+            DepositedPoints := Membership."Redeemed Points (Withdrawl)";
             RefundedPoints := Membership."Awarded Points (Refund)";
             EarnedPoints := Membership."Awarded Points (Sale)";
 
@@ -1629,25 +1630,26 @@
                 ExpiredPoints := Membership."Expired Points";
             end;
 
-            AvailablePoints := EarnedPoints + ExpiredPoints + RedeemedPoints + RefundedPoints;
+            AvailablePoints := EarnedPoints + ExpiredPoints + RedeemedPoints + RefundedPoints + DepositedPoints;
             if (ForThreshold) then
-                AvailablePoints := EarnedPoints + RefundedPoints;
+                AvailablePoints := EarnedPoints + RefundedPoints + DepositedPoints;
 
         end;
 
         if (LoyaltySetup."Collection Period" = LoyaltySetup."Collection Period"::AS_YOU_GO) then begin
 
-            GetSpendPeriodToday(LoyaltySetup, PeriodStart, PeriodEnd);
+            GetSpendPeriodForReferenceDate(LoyaltySetup, Today(), PeriodStart, PeriodEnd);
             Membership.SetFilter("Date Filter", '%1..%2', PeriodStart, PeriodEnd);
 
-            Membership.CalcFields("Redeemed Points (Withdrawl)", "Awarded Points (Refund)", "Awarded Points (Sale)", "Expired Points");
+            Membership.CalcFields("Redeemed Points (Withdrawl)", "Redeemed Points (Deposit)", "Awarded Points (Refund)", "Awarded Points (Sale)", "Expired Points");
 
             RefundedPoints := Membership."Awarded Points (Refund)";
             EarnedPoints := Membership."Awarded Points (Sale)";
             RedeemedPoints := Membership."Redeemed Points (Withdrawl)";
             ExpiredPoints := Membership."Expired Points";
+            DepositedPoints := Membership."Redeemed Points (Deposit)";
 
-            AvailablePoints := EarnedPoints + ExpiredPoints + RedeemedPoints + RefundedPoints;
+            AvailablePoints := EarnedPoints + ExpiredPoints + RedeemedPoints + RefundedPoints + DepositedPoints;
         end;
 
         exit(AvailablePoints);
@@ -1773,10 +1775,7 @@
 
         if ((LoyaltySetup."Collection Period" = LoyaltySetup."Collection Period"::AS_YOU_GO) and (LoyaltySetup."Expire Uncollected Points")) then begin
             Period := 0;
-            repeat
-                CalculateFixedPeriodPointsTransaction(LoyaltySetup, Membership, Period, TmpMembershipPointsSummary);
-                Period := Period - 1;
-            until ((TmpMembershipPointsSummary."Points Expired" = 0) and (TmpMembershipPointsSummary."Points Remaining" = 0) and (TmpMembershipPointsSummary."Points Earned" = 0));
+            CalculateFixedPeriodPointsTransaction(LoyaltySetup, Membership, Period, TmpMembershipPointsSummary);
             TmpMembershipPointsSummary.Delete();
         end;
     end;
@@ -1837,11 +1836,10 @@
         GetRelativePeriodRefDate(LoyaltySetup, RelativePeriodNo, Today(), PeriodStart, PeriodEnd);
     end;
 
-    local procedure GetSpendPeriodToday(LoyaltySetup: Record "NPR MM Loyalty Setup"; var PeriodStart: Date; var PeriodEnd: Date)
-    var
-        ReferenceDate: Date;
+    local procedure GetSpendPeriodForReferenceDate(LoyaltySetup: Record "NPR MM Loyalty Setup"; ReferenceDate: Date; var PeriodStart: Date; var PeriodEnd: Date)
     begin
-        ReferenceDate := Today();
+        if (ReferenceDate = 0D) then
+            ReferenceDate := Today();
 
         if (LoyaltySetup."Collection Period" = LoyaltySetup."Collection Period"::AS_YOU_GO) then begin
             PeriodStart := 0D;
