@@ -131,6 +131,10 @@ xmlport 6060130 "NPR MM Get Members. Members"
                             {
                                 fieldelement(cardnumber; tmpMemberInfoResponse."External Card No.")
                                 {
+                                    fieldattribute(membershipnumber; tmpMemberInfoResponse."External Membership No.")
+                                    {
+                                        XmlName = 'membershipnumber';
+                                    }
                                 }
                             }
                         }
@@ -204,6 +208,60 @@ xmlport 6060130 "NPR MM Get Members. Members"
                                 }
                             }
                         }
+                        textelement(Wallets)
+                        {
+                            XmlName = 'wallets';
+                            MinOccurs = Zero;
+                            MaxOccurs = Once;
+
+                            tableelement(TempWallet; "NPR MM Membership Role")
+                            {
+                                XmlName = 'wallet';
+                                MinOccurs = Zero;
+                                MaxOccurs = Unbounded;
+                                LinkTable = tmpMemberInfoResponse;
+                                LinkFields = "Membership Entry No." = field("Membership Entry No."), "Member Entry No." = field("Member Entry No");
+                                UseTemporary = true;
+                                CalcFields = "Membership Code";
+
+                                fieldattribute(MembershipNo; TempWallet."External Membership No.")
+                                {
+                                    XmlName = 'membershipnumber';
+                                    Occurrence = Required;
+                                }
+                                textattribute(_available)
+                                {
+                                    XmlName = 'available';
+                                    Occurrence = Required;
+                                    trigger OnBeforePassVariable()
+                                    var
+                                        MembershipSetup: Record "NPR MM Membership Setup";
+                                    begin
+                                        _available := format(false, 0, 9);
+                                        if (MembershipSetup.Get(TempWallet."Membership Code")) then
+                                            _available := format(MembershipSetup."Enable NP Pass Integration", 0, 9);
+                                    end;
+                                }
+                                textattribute(_created)
+                                {
+                                    XmlName = 'created';
+                                    Occurrence = Required;
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        _created := Format((TempWallet."Wallet Pass Id" <> ''), 0, 9);
+                                    end;
+                                }
+                                textattribute(_walletId)
+                                {
+                                    XmlName = 'id';
+                                    Occurrence = Optional;
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        _walletId := TempWallet."Wallet Pass Id";
+                                    end;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -263,6 +321,9 @@ xmlport 6060130 "NPR MM Get Members. Members"
 
         if (MembershipRole.FindSet()) then begin
             repeat
+                TempWallet.TransferFields(MembershipRole, true);
+                TempWallet.Insert();
+
                 tmpMemberInfoResponse.Init();
                 Member.Get(MembershipRole."Member Entry No.");
 
