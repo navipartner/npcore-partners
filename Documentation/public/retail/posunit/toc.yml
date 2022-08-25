@@ -14,6 +14,8 @@
     href: explanation/POS_posting_setup.md
   - name: POS Unit Receipt Text Profile (Reference guide)
     href: explanation/POS_unit_Receipt_profile.md
+  - name: POS stores
+    href: explanation/POS_store.md
 - name: Reference
   items:
   - name: POS Audit Profile (Reference guide)
