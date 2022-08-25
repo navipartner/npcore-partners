@@ -1244,6 +1244,15 @@
 
     local procedure ValidateScheduleReference(TicketAccessEntryNo: Integer; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time)
     var
+        ReasonText: Text;
+        ReasonCode: Text;
+    begin
+        if (not (CheckScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, EventDate, EventTime, ReasonText, ReasonCode))) then
+            RaiseError(ReasonText, ReasonCode);
+    end;
+
+    local procedure CheckScheduleReference(TicketAccessEntryNo: Integer; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time; var ReasonText: Text; var ReasonCode: Text): Boolean
+    var
         Admission: Record "NPR TM Admission";
         AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
         ReservationSchEntry: Record "NPR TM Admis. Schedule Entry";
@@ -1265,14 +1274,16 @@
         if (Admission."Prebook Is Required") then begin
             // Fast check-in, get events current schedule
             // reservation
-            if (not GetReservationEntry(TicketAccessEntryNo, ReservationAccessEntry)) then
-                RaiseError(StrSubstNo(RESERVATION_NOT_FOUND, Ticket."External Ticket No.", Admission.Description), RESERVATION_NOT_FOUND_NO);
+            if (not GetReservationEntry(TicketAccessEntryNo, ReservationAccessEntry)) then begin
+                ReasonText := StrSubstNo(RESERVATION_NOT_FOUND, Ticket."External Ticket No.", Admission.Description);
+                ReasonCode := RESERVATION_NOT_FOUND_NO;
+                exit(false);
+            end;
 
             ReservationAccessEntry.SetCurrentKey("External Adm. Sch. Entry No.");
 
             ReservationSchEntry.SetFilter(Cancelled, '=%1', false);
             ReservationSchEntry.SetFilter("Admission Is", '=%1', ReservationSchEntry."Admission Is"::Open);
-
             ReservationSchEntry.SetFilter("External Schedule Entry No.", '=%1', ReservationAccessEntry."External Adm. Sch. Entry No.");
             ReservationSchEntry.FindFirst();
 
@@ -1295,24 +1306,35 @@
                 if (ReservationSchEntry."Event Arrival Until Time" <> 0T) then
                     AdmissionEndTime := CreateDateTime(ReservationSchEntry."Admission End Date", ReservationSchEntry."Event Arrival Until Time");
 
-                if (not ((ReferenceTime >= AdmissionStartTime) and (ReferenceTime <= AdmissionEndTime))) then
-                    RaiseError(StrSubstNo(RESERVATION_NOT_FOR_NOW, DT2Time(AdmissionStartTime), DT2Time(AdmissionEndTime), DT2Date(AdmissionStartTime), AdmissionCode, Time), RESERVATION_NOT_FOR_NOW_NO);
+                if (not ((ReferenceTime >= AdmissionStartTime) and (ReferenceTime <= AdmissionEndTime))) then begin
+                    ReasonText := StrSubstNo(RESERVATION_NOT_FOR_NOW, DT2Time(AdmissionStartTime), DT2Time(AdmissionEndTime), DT2Date(AdmissionStartTime), AdmissionCode, Time);
+                    ReasonCode := RESERVATION_NOT_FOR_NOW_NO;
+                    exit(false);
+                end;
 
                 AdmissionScheduleEntryNo := ReservationSchEntry."Entry No.";
             end;
 
-            if (AdmissionScheduleEntryNo = 0) then
-                RaiseError(StrSubstNo(RESERVATION_NOT_FOR_TODAY, Admission."Admission Code", ReservationSchEntry."Admission Start Date", ReservationSchEntry."Admission Start Time"), RESERVATION_NOT_FOR_TODAY_NO);
+            if (AdmissionScheduleEntryNo = 0) then begin
+                ReasonText := StrSubstNo(RESERVATION_NOT_FOR_TODAY, Admission."Admission Code", ReservationSchEntry."Admission Start Date", ReservationSchEntry."Admission Start Time");
+                ReasonCode := RESERVATION_NOT_FOR_TODAY_NO;
+                exit(false);
+            end;
 
             if (not AdmissionSchEntry.Get(AdmissionScheduleEntryNo)) then
                 RaiseError(StrSubstNo(RESERVATION_NOT_FOUND, Ticket."External Ticket No.", Admission.Description), RESERVATION_NOT_FOUND_NO);
 
             if (AdmissionSchEntry."External Schedule Entry No." <> ReservationAccessEntry."External Adm. Sch. Entry No.") then
                 if (not GuiAllowed()) then begin
-                    RaiseError(StrSubstNo(RESERVATION_MISMATCH), RESERVATION_MISMATCH_NO);
+                    ReasonText := StrSubstNo(RESERVATION_MISMATCH);
+                    ReasonCode := RESERVATION_MISMATCH_NO;
+                    exit(false);
                 end else begin
-                    if (not Confirm(CONF_RES_NOT_FOR_TODAY, true, Admission.Description, ReservationSchEntry."Admission Start Date", ReservationSchEntry."Admission Start Time")) then
-                        RaiseError(StrSubstNo(RESERVATION_MISMATCH), RESERVATION_MISMATCH_NO);
+                    if (not Confirm(CONF_RES_NOT_FOR_TODAY, true, Admission.Description, ReservationSchEntry."Admission Start Date", ReservationSchEntry."Admission Start Time")) then begin
+                        ReasonText := StrSubstNo(RESERVATION_MISMATCH);
+                        ReasonCode := RESERVATION_MISMATCH_NO;
+                        exit(false);
+                    end;
                     AdmissionScheduleEntryNo := ReservationSchEntry."Entry No.";
                 end;
 
@@ -1324,22 +1346,30 @@
                 AdmissionSchEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
                 AdmissionSchEntry.SetFilter(Cancelled, '=%1', false);
                 AdmissionSchEntry.SetFilter("Admission Is", '=%1', AdmissionSchEntry."Admission Is"::Open);
-                if (not AdmissionSchEntry.FindFirst()) then
-                    RaiseError(StrSubstNo(ADM_NOT_OPEN_ENTRY, AdmissionCode, AdmissionScheduleEntryNo), ADM_NOT_OPEN_NO2);
+                if (not AdmissionSchEntry.FindFirst()) then begin
+                    ReasonText := StrSubstNo(ADM_NOT_OPEN_ENTRY, AdmissionCode, AdmissionScheduleEntryNo);
+                    ReasonCode := ADM_NOT_OPEN_NO2;
+                    exit(false);
+                end;
 
             end else begin
                 // Get the current admission schedule
                 AdmissionScheduleEntryNo := GetCurrentScheduleEntry(Ticket, AdmissionCode, true);
-                if (not AdmissionSchEntry.Get(AdmissionScheduleEntryNo)) then
-                    RaiseError(StrSubstNo(ADM_NOT_OPEN, AdmissionCode, EventDate), ADM_NOT_OPEN_NO2);
+                if (not AdmissionSchEntry.Get(AdmissionScheduleEntryNo)) then begin
+                    ReasonText := StrSubstNo(ADM_NOT_OPEN, AdmissionCode, EventDate);
+                    ReasonCode := ADM_NOT_OPEN_NO2;
+                    exit(false);
+                end;
             end;
-
         end;
 
-        if (AdmissionSchEntry."Admission Is" <> AdmissionSchEntry."Admission Is"::Open) then
-            RaiseError(StrSubstNo(ADM_NOT_OPEN, AdmissionCode, EventDate), ADM_NOT_OPEN_NO);
+        if (AdmissionSchEntry."Admission Is" <> AdmissionSchEntry."Admission Is"::Open) then begin
+            ReasonText := StrSubstNo(ADM_NOT_OPEN, AdmissionCode, EventDate);
+            ReasonCode := ADM_NOT_OPEN_NO;
+            exit(false);
+        end;
 
-        exit
+        exit(true);
     end;
 
 
@@ -2058,18 +2088,17 @@
 
     procedure GetCurrentScheduleEntry(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; WithCreate: Boolean): Integer
     begin
-        exit(GetCurrentScheduleEntry(Ticket."Item No.", Ticket."Variant Code", AdmissionCode, WithCreate));
+        exit(GetCurrentScheduleEntry(Ticket."Item No.", Ticket."Variant Code", AdmissionCode, WithCreate, 0));
     end;
 
-
-    procedure GetCurrentScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; WithCreate: Boolean): Integer
+    procedure GetCurrentScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; WithCreate: Boolean; ScheduleContext: Option Admit,Sale): Integer
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
     begin
 
         Clear(AdmissionScheduleEntry);
-        if (GetAdmScheduleEntry(ItemNo, VariantCode, AdmissionCode, Today, Time, AdmissionScheduleEntry, WithCreate)) then
+        if (GetAdmScheduleEntry(ItemNo, VariantCode, AdmissionCode, Today, Time, AdmissionScheduleEntry, WithCreate, ScheduleContext)) then
             exit(AdmissionScheduleEntry."Entry No.");
 
         if (Admission."Default Schedule"::NEXT_AVAILABLE = GetAdmissionSchedule(ItemNo, VariantCode, AdmissionCode)) then begin
@@ -2086,7 +2115,7 @@
     end;
 
 
-    local procedure GetAdmScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean): Boolean
+    local procedure GetAdmScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean; ScheduleContext: Option Admit,Sale): Boolean
     var
         Admission: Record "NPR TM Admission";
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
@@ -2129,18 +2158,20 @@
                 AdmissionStartTime := CreateDateTime(AdmissionSchEntry."Admission Start Date", AdmissionSchEntry."Admission Start Time");
                 AdmissionEndTime := CreateDateTime(AdmissionSchEntry."Admission End Date", AdmissionSchEntry."Admission End Time");
 
-                if (AdmissionScheduleLines.Get(AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code")) then begin
-                    if (AdmissionSchEntry."Event Arrival From Time" = 0T) then
-                        AdmissionSchEntry."Event Arrival From Time" := AdmissionScheduleLines."Event Arrival From Time";
-                    if (AdmissionSchEntry."Event Arrival Until Time" = 0T) then
-                        AdmissionSchEntry."Event Arrival Until Time" := AdmissionScheduleLines."Event Arrival Until Time";
+                if (ScheduleContext = ScheduleContext::Admit) then begin
+                    if (AdmissionScheduleLines.Get(AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code")) then begin
+                        if (AdmissionSchEntry."Event Arrival From Time" = 0T) then
+                            AdmissionSchEntry."Event Arrival From Time" := AdmissionScheduleLines."Event Arrival From Time";
+                        if (AdmissionSchEntry."Event Arrival Until Time" = 0T) then
+                            AdmissionSchEntry."Event Arrival Until Time" := AdmissionScheduleLines."Event Arrival Until Time";
+                    end;
+
+                    if (AdmissionSchEntry."Event Arrival From Time" <> 0T) then
+                        AdmissionStartTime := CreateDateTime(AdmissionSchEntry."Admission Start Date", AdmissionSchEntry."Event Arrival From Time");
+
+                    if (AdmissionSchEntry."Event Arrival Until Time" <> 0T) then
+                        AdmissionEndTime := CreateDateTime(AdmissionSchEntry."Admission End Date", AdmissionSchEntry."Event Arrival Until Time");
                 end;
-
-                if (AdmissionSchEntry."Event Arrival From Time" <> 0T) then
-                    AdmissionStartTime := CreateDateTime(AdmissionSchEntry."Admission Start Date", AdmissionSchEntry."Event Arrival From Time");
-
-                if (AdmissionSchEntry."Event Arrival Until Time" <> 0T) then
-                    AdmissionEndTime := CreateDateTime(AdmissionSchEntry."Admission End Date", AdmissionSchEntry."Event Arrival Until Time");
 
                 if ((ReferenceTime > AdmissionStartTime) and
                     (ReferenceTime > AdmissionEndTime) and

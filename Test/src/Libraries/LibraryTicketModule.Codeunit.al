@@ -1,6 +1,14 @@
 codeunit 85011 "NPR Library - Ticket Module"
 {
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Clone Data", 'CheckIfSkipCreateDefaultBarcode', '', true, true)]
+    local procedure CheckIfSkipCreateDefaultBarcode(ItemNo: Code[20]; VariantCode: Code[10]; var SkipCreateDefaultBarcode: Boolean; var Handled: Boolean)
+    begin
+        // Variety number series vs data are messed-up in default dev container
+        SkipCreateDefaultBarcode := true;
+        Handled := true;
+    end;
+
     procedure CreateScenario_DynamicPrice() SalesItemNo: Code[20]
     var
         TicketType: Record "NPR TM Ticket Type";
