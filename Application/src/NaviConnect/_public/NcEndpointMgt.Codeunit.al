@@ -1,6 +1,5 @@
 ﻿codeunit 6151519 "NPR Nc Endpoint Mgt."
 {
-    Access = Internal;
     procedure HasInitEndpoint(NcEndpoint: Record "NPR Nc Endpoint"): Boolean
     var
         EndpointHasInit: Boolean;
