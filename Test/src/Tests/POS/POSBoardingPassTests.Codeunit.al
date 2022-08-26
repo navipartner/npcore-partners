@@ -24,8 +24,6 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
         PlaceHolder2Lbl: Label '\%1 > %2 (%3) %4', Locked = true;
         TestMsg: Text;
 
-
-
     [Test]
     [HandlerFunctions('ClickOnOKMsg1Leg')]
     procedure BoardingPassReqToday1Leg()
@@ -45,8 +43,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
     begin
         //[Scenario] Boarding pass with 1 travel leg, Required Travel Today = true
 
-        InitializeData();
-        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
         //[Given parametars from setup]
@@ -94,7 +91,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
     begin
         //[Scenario] Boarding pass with 1 travel leg and parametar Info Code = TEST, Show Message = false
 
-        InitializeData();
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
@@ -164,7 +161,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
     begin
         //[Scenario] Boarding pass with 1 travel leg, Required LEG Airport Code = 'AGP'
 
-        InitializeData();
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
@@ -211,7 +208,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
     begin
         //[Scenario] Boarding pass with 1 travel leg, Required Travel Today = true
 
-        InitializeData();
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
 
@@ -244,32 +241,6 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
                                                         POSSale,
                                                         POSSaleLine);
         ClearAll();
-    end;
-
-
-
-
-    procedure InitializeData()
-    var
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
-    begin
-        if Initialized then begin
-            //Clean any previous mock session
-            POSSession.ClearAll();
-            Clear(POSSession);
-        end;
-
-        if not Initialized then begin
-            NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
-            NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-            NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
-            NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
-            Initialized := true;
-        end;
-
-        Commit();
     end;
 
     [MessageHandler]

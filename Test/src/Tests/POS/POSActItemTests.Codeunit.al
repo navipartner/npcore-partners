@@ -10,7 +10,6 @@ codeunit 85085 "NPR POS Act. Item Tests"
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSSession: Codeunit "NPR POS Session";
         POSStore: Record "NPR POS Store";
-        POSSetup: Record "NPR POS Setup";
 
     [Test]
     procedure AddSalesLine()
@@ -34,7 +33,7 @@ codeunit 85085 "NPR POS Act. Item Tests"
         SalePOS: Record "NPR POS Sale";
     begin
         // [Given] POS & Payment setup
-        InitializeData();
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
 
         // [Given] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
@@ -71,28 +70,4 @@ codeunit 85085 "NPR POS Act. Item Tests"
         Assert.IsTrue(SaleLinePOS.Description = CustomDescription, 'New description inserted');
         Assert.IsTrue(SaleLinePOS."Description 2" = CustomDescription2, 'New description 2 inserted');
     end;
-
-    procedure InitializeData()
-    var
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
-    begin
-        if Initialized then begin
-            //Clean any previous mock session
-            POSSession.ClearAll();
-            Clear(POSSession);
-        end;
-
-        if not Initialized then begin
-            NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
-            NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-            NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
-            NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
-            Initialized := true;
-        end;
-
-        Commit();
-    end;
-
 }

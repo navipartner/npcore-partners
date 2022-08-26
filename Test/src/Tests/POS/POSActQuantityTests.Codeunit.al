@@ -9,7 +9,6 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSSession: Codeunit "NPR POS Session";
         POSStore: Record "NPR POS Store";
-        POSSetup: Record "NPR POS Setup";
 
     [Test]
     procedure QuantityPositive()
@@ -29,7 +28,6 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         SaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        InitializeData();
         //[parameters]
         //ReturnReasonCode = '';
         //Quantity = random positive
@@ -39,6 +37,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         //SkipItemAvailCheck = true
 
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore, POSPaymentMethod);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -78,7 +77,6 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         SaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        InitializeData();
         //[parameters]
         //ReturnReasonCode = '';
         //Quantity = random positive
@@ -88,6 +86,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         //SkipItemAvailCheck = true
 
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore, POSPaymentMethod);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -123,7 +122,6 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         SaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        InitializeData();
         //[parameters]
         //ReturnReasonCode = '';
         //Quantity = random positive
@@ -133,6 +131,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         //SkipItemAvailCheck = true
 
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore, POSPaymentMethod);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -173,7 +172,6 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         SaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        InitializeData();
         //[parameters]
         //ReturnReasonCode = '';
         //Quantity = random positive
@@ -183,6 +181,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         //SkipItemAvailCheck = true
 
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore, POSPaymentMethod);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -223,7 +222,6 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         SaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        InitializeData();
         //[parameters]
         //ReturnReasonCode = '';
         //Quantity = random positive
@@ -234,6 +232,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
 
 
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore, POSPaymentMethod);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -271,7 +270,6 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         ReturnReason: Record "Return Reason";
     begin
-        InitializeData();
         //[parameters]
         //ReturnReasonCode = '';
         //Quantity = random positive
@@ -281,6 +279,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         //SkipItemAvailCheck = true
 
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore, POSPaymentMethod);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
@@ -300,31 +299,5 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
 
         Assert.IsTrue(SaleLinePOS.Quantity = Quantity, 'Quantity changed');
         Assert.IsTrue(SaleLinePOS."Return Reason Code" = ReturnReasonCode, 'Return Reason Code is inserted');
-    end;
-
-    procedure InitializeData()
-    var
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
-        POSAuditProfile: Record "NPR POS Audit Profile";
-    begin
-        if Initialized then begin
-            //Clean any previous mock session
-            POSSession.ClearAll();
-            Clear(POSSession);
-        end;
-
-        if not Initialized then begin
-            NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
-            NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-            NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
-            NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
-            NPRLibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
-            NPRLibraryPOSMasterData.CreatePOSAuditProfile(POSAuditProfile);
-            Initialized := true;
-        end;
-
-        Commit();
     end;
 }
