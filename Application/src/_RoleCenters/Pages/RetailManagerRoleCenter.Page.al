@@ -255,7 +255,7 @@
                             Caption = 'Sale Time Report';
                             Image = Report;
                             RunObject = report "NPR Sale Time Report POS";
-                            ToolTip = 'Executes the Sale Time Report action.';
+                            ToolTip = 'Generate the sale time report.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Turnover Rate")
@@ -909,7 +909,7 @@
                     Caption = 'Campaign Discount List';
                     RunObject = page "NPR Campaign Discount List";
 
-                    ToolTip = 'Executes the Campaign Discount List action.';
+                    ToolTip = 'Displays the campaign discount list.';
                     ApplicationArea = NPRRetail;
                 }
 
@@ -918,7 +918,7 @@
                     Caption = 'Mixed Discount List';
                     RunObject = page "NPR Mixed Discount List";
 
-                    ToolTip = 'Executes the Mixed Discount List action.';
+                    ToolTip = 'Displays the mixed discount list.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Coupon List")
@@ -926,7 +926,7 @@
                     Caption = 'Coupon List';
                     RunObject = page "NPR NpDc Coupons";
 
-                    ToolTip = 'Executes the Coupon List action.';
+                    ToolTip = 'Displays the coupon list.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Voucher List")
@@ -934,7 +934,7 @@
                     Caption = 'Voucher List';
                     RunObject = page "NPR NpRv Vouchers";
 
-                    ToolTip = 'Executes the Voucher List action.';
+                    ToolTip = 'Displays the voucher list.';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -16,43 +16,43 @@
                 field("Item Template Name"; Rec."Item Template Name")
                 {
 
-                    ToolTip = 'Specifies the value of the Item Template Name field.';
+                    ToolTip = 'Specifies the item template name.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field.';
+                    ToolTip = 'Specifies the name of the worksheet.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field.';
+                    ToolTip = 'Specifies the description of the worksheet.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Vendor No. field.';
+                    ToolTip = 'Specifies the vendor number suggested for this line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Prefix Code"; Rec."Prefix Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Prefix Code field.';
+                    ToolTip = 'Specifies the prefix code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("No. Series"; Rec."No. Series")
                 {
 
-                    ToolTip = 'Specifies the value of the No. Series field.';
+                    ToolTip = 'Specifies the number of series used for this line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Group"; Rec."Item Group")
                 {
 
-                    ToolTip = 'Specifies the value of the Item Group field.';
+                    ToolTip = 'Specifies the item group of the item.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -72,7 +72,7 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ToolTip = 'Executes the Edit Item Worksheet action.';
+                ToolTip = 'Open the related item worksheet.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -90,7 +90,7 @@
                               "Item Worksheet Template" = FIELD("Item Template Name");
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);
-                ToolTip = 'Executes the Registered Worksheets action.';
+                ToolTip = 'View the registered worksheets.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -101,7 +101,7 @@
 
                 Caption = 'Field Setup';
                 Image = MapAccounts;
-                ToolTip = 'Executes the Field Setup action.';
+                ToolTip = 'View the field setup for the selected line.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
