@@ -39,39 +39,39 @@
                 {
 
                     StyleExpr = Style;
-                    ToolTip = 'Specifies the value of the Entry No. field';
+                    ToolTip = 'Specifies the entry number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Integration Type"; Rec."Integration Type")
                 {
 
                     StyleExpr = Style;
-                    ToolTip = 'Specifies the value of the Integration Type field';
+                    ToolTip = 'Specifies the integration type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Processing Type"; Rec."Processing Type")
                 {
 
                     StyleExpr = Style;
-                    ToolTip = 'Specifies the value of the Processing Type field';
+                    ToolTip = 'Specifies the processing type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Auxiliary Operation Desc."; Rec."Auxiliary Operation Desc.")
                 {
 
-                    ToolTip = 'Specifies the value of the Auxiliary Operation Desc. field';
+                    ToolTip = 'Specifies the auxiliary operation description.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Started; Rec.Started)
                 {
 
-                    ToolTip = 'Specifies the value of the Started field';
+                    ToolTip = 'Specifies when the entry transfer to BC started.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Finished; Rec.Finished)
                 {
 
-                    ToolTip = 'Specifies the value of the Finished field';
+                    ToolTip = 'Specifies when the entry transfer to BC finished.';
                     ApplicationArea = NPRRetail;
                 }
                 field(TransDuration; TransDuration)
@@ -79,292 +79,292 @@
 
                     Caption = 'Duration';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Duration field';
+                    ToolTip = 'Specifies the duration of entry transfer to BC.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Result Amount"; Rec."Result Amount")
                 {
 
-                    ToolTip = 'Specifies the value of the Result Amount field';
+                    ToolTip = 'Specifies the result amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
+                    ToolTip = 'Specifies the sales ticket number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies the POS unit number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
 
-                    ToolTip = 'Specifies the value of the User ID field';
+                    ToolTip = 'Specifies the user ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Successful; Rec.Successful)
                 {
 
-                    ToolTip = 'Specifies the value of the Successful field';
+                    ToolTip = 'Specifies if the entry was successful or not.';
                     ApplicationArea = NPRRetail;
                 }
                 field("External Result Known"; Rec."External Result Known")
                 {
 
-                    ToolTip = 'Specifies the value of the External Result Known field';
+                    ToolTip = 'Specifies the external result known.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Result Processed"; Rec."Result Processed")
                 {
 
-                    ToolTip = 'Specifies the value of the Result Processed field';
+                    ToolTip = 'Specifies if the entry result is processed or not.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Force Closed"; Rec."Force Closed")
                 {
 
-                    ToolTip = 'Specifies the value of the Force Closed field';
+                    ToolTip = 'Specifies if the entry is force closed or not.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Reversed; Rec.Reversed)
                 {
 
-                    ToolTip = 'Specifies the value of the Reversed field';
+                    ToolTip = 'Specifies if the entry is reversed or not.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Recovered; Rec.Recovered)
                 {
 
-                    ToolTip = 'Specifies the value of the Recovered field';
+                    ToolTip = 'Specifies if the entry is reversed or not.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Result Display Text"; Rec."Result Display Text")
                 {
 
-                    ToolTip = 'Specifies the value of the Result Display Text field';
+                    ToolTip = 'Specifies display text of the result.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NST Error"; Rec."NST Error")
                 {
 
-                    ToolTip = 'Specifies the value of the NST Error field';
+                    ToolTip = 'Specifies the NST error.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Client Error"; Rec."Client Error")
                 {
 
-                    ToolTip = 'Specifies the value of the Client Error field';
+                    ToolTip = 'Specifies the client error.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Result Code"; Rec."Result Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Result Code field';
+                    ToolTip = 'Specifies the result code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Result Description"; Rec."Result Description")
                 {
 
-                    ToolTip = 'Specifies the value of the Result Description field';
+                    ToolTip = 'Specifies the result description.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Card Type"; Rec."Card Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Card Type field';
+                    ToolTip = 'Specifies the card type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Card Name"; Rec."Card Name")
                 {
 
-                    ToolTip = 'Specifies the value of the Card Name field';
+                    ToolTip = 'Specifies the card name.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Card Number"; Rec."Card Number")
                 {
 
-                    ToolTip = 'Specifies the value of the Card Number field';
+                    ToolTip = 'Specifies the card number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Card Expiry Date"; Rec."Card Expiry Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Card Expiry Date field';
+                    ToolTip = 'Specifies the card expiry date.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reference Number Input"; Rec."Reference Number Input")
                 {
 
-                    ToolTip = 'Specifies the value of the Reference Number Input field';
+                    ToolTip = 'Specifies the reference number input.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reference Number Output"; Rec."Reference Number Output")
                 {
 
-                    ToolTip = 'Specifies the value of the Reference Number Output field';
+                    ToolTip = 'Specifies the reference number output.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Authorisation Number"; Rec."Authorisation Number")
                 {
 
-                    ToolTip = 'Specifies the value of the Authorisation Number field';
+                    ToolTip = 'Specifies the authorisation number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Auxiliary Operation ID"; Rec."Auxiliary Operation ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Auxiliary Operation ID field';
+                    ToolTip = 'Specifies the auxiliary operation ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Mode; Rec.Mode)
                 {
 
-                    ToolTip = 'Specifies the value of the Mode field';
+                    ToolTip = 'Specifies the mode.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Offline mode"; Rec."Offline mode")
                 {
 
-                    ToolTip = 'Specifies the value of the Offline mode field';
+                    ToolTip = 'Specifies if the request is in offline mode.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Integration Version Code"; Rec."Integration Version Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Integration Version Code field';
+                    ToolTip = 'Specifies the integration version code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Client Assembly Version"; Rec."Client Assembly Version")
                 {
 
-                    ToolTip = 'Specifies the value of the Client Assembly Version field';
+                    ToolTip = 'Specifies the client assembly version.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pepper Terminal Code"; Rec."Pepper Terminal Code")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Pepper Terminal Code field';
+                    ToolTip = 'Specifies the pepper terminal code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pepper Transaction Type Code"; Rec."Pepper Transaction Type Code")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Pepper Transaction Type Code field';
+                    ToolTip = 'Specifies the pepper transaction type code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pepper Trans. Subtype Code"; Rec."Pepper Trans. Subtype Code")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Pepper Transaction Subtype Code field';
+                    ToolTip = 'Specifies the pepper transaction subtype code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("External Transaction ID"; Rec."External Transaction ID")
                 {
 
-                    ToolTip = 'Specifies the value of the External Transaction ID field';
+                    ToolTip = 'Specifies the external transaction ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field("External Customer ID"; Rec."External Customer ID")
                 {
 
-                    ToolTip = 'Specifies the value of the External Customer ID field';
+                    ToolTip = 'Specifies the external customer ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Hardware ID"; Rec."Hardware ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Hardware ID field';
+                    ToolTip = 'Specifies the hardware ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Transaction Date"; Rec."Transaction Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Transaction Date field';
+                    ToolTip = 'Specifies the transaction date.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Transaction Time"; Rec."Transaction Time")
                 {
 
-                    ToolTip = 'Specifies the value of the Transaction Time field';
+                    ToolTip = 'Specifies the transaction time.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Authentication Method"; Rec."Authentication Method")
                 {
 
-                    ToolTip = 'Specifies the value of the Authentication Method field';
+                    ToolTip = 'Specifies the authentication method.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Bookkeeping Period"; Rec."Bookkeeping Period")
                 {
 
-                    ToolTip = 'Specifies the value of the Bookkeeping Period field';
+                    ToolTip = 'Specifies the bookkeeping period.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Amount Input"; Rec."Amount Input")
                 {
 
-                    ToolTip = 'Specifies the value of the Amount Input field';
+                    ToolTip = 'Specifies the input amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Amount Output"; Rec."Amount Output")
                 {
 
-                    ToolTip = 'Specifies the value of the Amount Output field';
+                    ToolTip = 'Specifies the output amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Currency Code field';
+                    ToolTip = 'Specifies the currency code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Cashback Amount"; Rec."Cashback Amount")
                 {
 
-                    ToolTip = 'Specifies the value of the Cashback Amount field';
+                    ToolTip = 'Specifies the cashback amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Fee Amount"; Rec."Fee Amount")
                 {
 
-                    ToolTip = 'Specifies the value of the Fee Amount field';
+                    ToolTip = 'Specifies the fee amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Financial Impact"; Rec."Financial Impact")
                 {
 
-                    ToolTip = 'Specifies the value of the Financial Impact field';
+                    ToolTip = 'Specifies the financial impact.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Processed Entry No."; Rec."Processed Entry No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Processed Entry No. field';
+                    ToolTip = 'Specifies the processed entry number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reversed by Entry No."; Rec."Reversed by Entry No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Reversed by Entry No. field';
+                    ToolTip = 'Specifies the reversed by entry number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Recovered by Entry No."; Rec."Recovered by Entry No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Recovered by Entry No. field';
+                    ToolTip = 'Specifies the recovered by entry number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Initiated from Entry No."; Rec."Initiated from Entry No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Initiated from Entry No. field';
+                    ToolTip = 'Specifies the initiated from entry number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Receipt 1"; Rec."Receipt 1".HasValue)
@@ -372,7 +372,7 @@
 
                     Caption = 'Receipt 1';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Receipt 1.HasValue() field';
+                    ToolTip = 'Specifies if you can print the format Receipt 1 for the entry.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Receipt 2"; Rec."Receipt 2".HasValue)
@@ -380,31 +380,31 @@
 
                     Caption = 'Receipt 2';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Receipt 2.HasValue() field';
+                    ToolTip = 'Specifies if you can print the format Receipt 2 for the entry.';
                     ApplicationArea = NPRRetail;
                 }
                 field("No. of Reprints"; Rec."No. of Reprints")
                 {
 
-                    ToolTip = 'Specifies the value of the No. of Reprints field';
+                    ToolTip = 'Specifies the number of Reprints for the entry.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Token; Rec.Token)
                 {
 
-                    ToolTip = 'Specifies the value of the Token field';
+                    ToolTip = 'Specifies the token ID number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Number of Attempts"; Rec."Number of Attempts")
                 {
 
-                    ToolTip = 'Specifies the value of the Number of Attempts field';
+                    ToolTip = 'Specifies the number of attempts.';
                     ApplicationArea = NPRRetail;
                 }
                 field("FF Moved to POS Entry"; Rec."FF Moved to POS Entry")
                 {
 
-                    ToolTip = 'Specifies the value of the Moved to POS Entry field';
+                    ToolTip = 'Specifies if the entry is moved to POS.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -441,7 +441,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Show Receipt 1 action';
+                ToolTip = 'Displays the format of Receipt 1 for the entry.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -464,7 +464,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Show Receipt 2 action';
+                ToolTip = 'Displays the format of Receipt 2 for the entry.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -487,7 +487,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Reprint action';
+                ToolTip = 'Reprints the entry.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -502,7 +502,7 @@
                 Caption = 'Download Logs';
                 Image = CreateXMLFile;
 
-                ToolTip = 'Executes the Download Logs action';
+                ToolTip = 'Downloads the logs for the entry.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

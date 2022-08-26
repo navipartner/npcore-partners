@@ -18,115 +18,115 @@
                 field("POS Store Code"; Rec."POS Store Code")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Store Code field';
+                    ToolTip = 'Specifies the POS store code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies the POS unit number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Document No. field';
+                    ToolTip = 'Specifies the document number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Posting Date field';
+                    ToolTip = 'Specifies the posting date.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Fiscal No."; Rec."Fiscal No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Fiscal No. field';
+                    ToolTip = 'Specifies the fiscal number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ToolTip = 'Specifies the salesperson code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Currency Code field';
+                    ToolTip = 'Specifies the currency code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Currency Factor"; Rec."Currency Factor")
                 {
 
-                    ToolTip = 'Specifies the value of the Currency Factor field';
+                    ToolTip = 'Specifies the currency factor.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Amount"; Rec."Sales Amount")
                 {
 
-                    ToolTip = 'Specifies the value of the Sales Amount field';
+                    ToolTip = 'Specifies the sales amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
 
-                    ToolTip = 'Specifies the value of the Discount Amount field';
+                    ToolTip = 'Specifies the discount amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Quantity"; Rec."Sales Quantity")
                 {
 
-                    ToolTip = 'Specifies the value of the Sales Quantity field';
+                    ToolTip = 'Specifies the sales quantity.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Return Sales Quantity"; Rec."Return Sales Quantity")
                 {
 
-                    ToolTip = 'Specifies the value of the Return Sales Quantity field';
+                    ToolTip = 'Specifies the return sales quantity.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Total Amount"; Rec."Total Amount")
                 {
 
-                    ToolTip = 'Specifies the value of the Total Amount field';
+                    ToolTip = 'Specifies the total amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Total Tax Amount"; Rec."Total Tax Amount")
                 {
 
-                    ToolTip = 'Specifies the value of the Total Tax Amount field';
+                    ToolTip = 'Specifies the total tax amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Total Amount Incl. Tax"; Rec."Total Amount Incl. Tax")
                 {
 
-                    ToolTip = 'Specifies the value of the Total Amount Incl. Tax field';
+                    ToolTip = 'Specifies the total amount including tax.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Entry No. field';
+                    ToolTip = 'Specifies the entry number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry Time"; Rec."Entry Time")
                 {
 
-                    ToolTip = 'Specifies the value of the Entry Time field';
+                    ToolTip = 'Specifies the entry time.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Entry Type field';
+                    ToolTip = 'Specifies the entry type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("System Id"; Rec.SystemId)
                 {
 
-                    ToolTip = 'Specifies the value of the System Id field';
+                    ToolTip = 'Specifies the system ID.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -150,7 +150,7 @@
                 Image = List;
                 RunObject = Page "NPR NpGp POS Info POS Entry";
 
-                ToolTip = 'Executes the POS Info action';
+                ToolTip = 'Displays the global POS informattion entries page.';
                 ApplicationArea = NPRRetail;
                 //RunPageLink = "POS Entry No."=FIELD("Entry No.");
             }

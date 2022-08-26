@@ -16,7 +16,7 @@
                 {
 
                     AssistEdit = true;
-                    ToolTip = 'Specifies the value of the Report No. field';
+                    ToolTip = 'Specifies the report number.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -34,7 +34,7 @@
 
                     AssistEdit = true;
                     Caption = 'Name';
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the report name.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -55,7 +55,7 @@
                 Caption = 'Run Report';
                 Image = Report2;
 
-                ToolTip = 'Executes the Run Report action';
+                ToolTip = 'Executes the selected report.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

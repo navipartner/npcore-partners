@@ -17,7 +17,7 @@
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = true;
-                ToolTip = 'Specifies the value of the StatusText field';
+                ToolTip = 'Specifies the period on which you want filter data.';
                 ApplicationArea = NPRRetail;
                 Editable = false;
             }
@@ -123,7 +123,7 @@
                 Caption = 'Previous';
                 Image = PreviousRecord;
 
-                ToolTip = 'Executes the Previous action';
+                ToolTip = 'Displays data for the previous period.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -137,7 +137,7 @@
                 Caption = 'Next';
                 Image = NextRecord;
 
-                ToolTip = 'Executes the Next action';
+                ToolTip = 'Displays data for the next period.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

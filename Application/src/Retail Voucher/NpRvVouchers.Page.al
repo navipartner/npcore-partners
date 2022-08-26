@@ -20,117 +20,117 @@
                 field("No."; Rec."No.")
                 {
 
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies number of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Voucher Type"; Rec."Voucher Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Voucher Type field';
+                    ToolTip = 'Specifies the voucher type.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Issue Date"; Rec."Issue Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Issue Date field';
+                    ToolTip = 'Specifies the issue date of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Open; Rec.Open)
                 {
 
-                    ToolTip = 'Specifies the value of the Open field';
+                    ToolTip = 'Specifies if the voucher is open or not.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Initial Amount"; Rec."Initial Amount")
                 {
 
                     Visible = true;
-                    ToolTip = 'Specifies the value of the Initial Amount field';
+                    ToolTip = 'Specifies the initial amount of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
 
-                    ToolTip = 'Specifies the value of the Amount field';
+                    ToolTip = 'Specifies the amount of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Starting Date field';
+                    ToolTip = 'Specifies the starting date of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Ending Date field';
+                    ToolTip = 'Specifies the ending date of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reference No."; Rec."Reference No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Reference No. field';
+                    ToolTip = 'Specifies the reference number of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the name of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Issue Register No."; Rec."Issue Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Issue Register No. field';
+                    ToolTip = 'Specifies the issue register number of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Issue Document Type"; Rec."Issue Document Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Issue Document Type field';
+                    ToolTip = 'Specifies the issue document type of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Issue Document No."; Rec."Issue Document No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Issue Document No. field';
+                    ToolTip = 'Specifies the issue document number of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Issue External Document No."; Rec."Issue External Document No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Issue External Document No. field';
+                    ToolTip = 'Specifies the issue external document number of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Issue User ID"; Rec."Issue User ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Issue User ID field';
+                    ToolTip = 'Specifies the issue user ID of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Issue Partner Code"; Rec."Issue Partner Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Issue Partner Code field';
+                    ToolTip = 'Specifies the issue partner code of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Partner Clearing"; Rec."Partner Clearing")
                 {
 
-                    ToolTip = 'Specifies the value of the Partner Clearing field';
+                    ToolTip = 'Specifies if the partner clearing exists or not.';
                     ApplicationArea = NPRRetail;
                 }
                 field("No. Send"; Rec."No. Send")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the No. Send field';
+                    ToolTip = 'Specifies how many times a voucher has been sent via email, SMS or printer.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -150,7 +150,7 @@
                     Caption = 'Archive Vouchers';
                     Image = Post;
 
-                    ToolTip = 'Executes the Archive Vouchers action';
+                    ToolTip = 'Archive the selected voucher/s.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -170,7 +170,7 @@
                     Caption = 'Show Expired Vouchers';
                     Image = "Filter";
 
-                    ToolTip = 'Executes the Show Expired Vouchers action';
+                    ToolTip = 'Displays the expired vouchers.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -190,7 +190,7 @@
                 RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
 
-                ToolTip = 'Executes the Voucher Entries action';
+                ToolTip = 'Displays the voucher entries of the selected record.';
                 ApplicationArea = NPRRetail;
             }
             action("Sending Log")
@@ -201,7 +201,7 @@
                 RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+F7';
 
-                ToolTip = 'Executes the Sending Log action';
+                ToolTip = 'Displays the sending log of the selected record.';
                 ApplicationArea = NPRRetail;
             }
             action("Show Archived Vouchers")
@@ -210,7 +210,7 @@
                 Image = PostedPutAway;
                 RunObject = Page "NPR NpRv Arch. Vouchers";
 
-                ToolTip = 'Executes the Show Archived Vouchers action';
+                ToolTip = 'Displays the archived vouchers.';
                 ApplicationArea = NPRRetail;
             }
         }

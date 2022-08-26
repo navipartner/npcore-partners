@@ -21,60 +21,60 @@
                 field("No."; Rec."No.")
                 {
 
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the number of the coupon.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Coupon Type"; Rec."Coupon Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Coupon Type field';
+                    ToolTip = 'Specifies the coupon type.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the coupon.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Open; Rec.Open)
                 {
 
-                    ToolTip = 'Specifies the value of the Open field';
+                    ToolTip = 'Specifies if the coupon is open or not.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Remaining Quantity"; Rec."Remaining Quantity")
                 {
 
-                    ToolTip = 'Specifies the value of the Remaining Quantity field';
+                    ToolTip = 'Specifies the remaining quantity of the coupon.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Starting Date field';
+                    ToolTip = 'Specifies the starting date of the coupon.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Ending Date field';
+                    ToolTip = 'Specifies the ending date of the coupon.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reference No."; Rec."Reference No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Reference No. field';
+                    ToolTip = 'Specifies the reference number of the coupon.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Customer No. field';
+                    ToolTip = 'Specifies the customer number of the coupon.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Store Group"; Rec."POS Store Group")
                 {
-                    ToolTip = 'Specifies the group of POS Stores where Coupon can be used.';
+                    ToolTip = 'Specifies the group of POS stores where coupon can be used.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -98,7 +98,7 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
 
-                    ToolTip = 'Executes the Print action';
+                    ToolTip = 'Prints the selected coupon.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -125,7 +125,7 @@
                     Caption = 'Archive Coupons';
                     Image = Post;
 
-                    ToolTip = 'Executes the Archive Coupons action';
+                    ToolTip = 'Archives the selected coupons.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -145,7 +145,7 @@
                     Caption = 'Show Expired Coupons';
                     Image = "Filter";
 
-                    ToolTip = 'Executes the Show Expired Coupons action';
+                    ToolTip = 'Displays only the expired coupons.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -165,7 +165,7 @@
                 RunPageLink = "Coupon No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
 
-                ToolTip = 'Executes the Coupon Entries action';
+                ToolTip = 'Displays the coupon entries for the selected coupon.';
                 ApplicationArea = NPRRetail;
             }
             action("Show Archived Coupon")
@@ -174,7 +174,7 @@
                 Image = PostedPutAway;
                 RunObject = Page "NPR NpDc Arch. Coupons";
 
-                ToolTip = 'Executes the Show Archived Coupons action';
+                ToolTip = 'Displays the archived coupons.';
                 ApplicationArea = NPRRetail;
             }
         }
