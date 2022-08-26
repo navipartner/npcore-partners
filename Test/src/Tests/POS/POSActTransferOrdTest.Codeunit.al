@@ -6,7 +6,6 @@ codeunit 85060 "NPR POS Act. Transfer Ord Test"
         Assert: Codeunit "Assert";
         Initialized: Boolean;
         POSSession: Codeunit "NPR POS Session";
-        POSSetup: Record "NPR POS Setup";
         POSStore: Record "NPR POS Store";
         POSUnit: Record "NPR POS Unit";
 
@@ -31,7 +30,7 @@ codeunit 85060 "NPR POS Act. Transfer Ord Test"
         UpdateExistingRecords: Integer;
     begin
         //initialize POS
-        InitializeData();
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         POSMenuButton.SetRange("Action Code", 'TRANSFER_ORDER');
         if POSMenuButton.FindFirst() then;
@@ -52,32 +51,6 @@ codeunit 85060 "NPR POS Act. Transfer Ord Test"
         Assert.IsTrue(ExistingRecords + 1 = UpdateExistingRecords, 'New Transfer Order is created');
 
     end;
-
-    procedure InitializeData()
-    var
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        NPRLibraryPOSMasterData:
-                Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT:
-                Codeunit "NPR Library - EFT";
-    begin
-        if Initialized then begin
-            //Clean any previous mock session
-            POSSession.ClearAll();
-            Clear(POSSession);
-        end;
-
-        if not Initialized then begin
-            NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
-            NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-            NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
-            NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
-            Initialized := true;
-        end;
-
-        Commit();
-    end;
-
 
     [PageHandler]
     procedure OpenTransferOrder(var TransferOrderCard: Page "Transfer Order")
