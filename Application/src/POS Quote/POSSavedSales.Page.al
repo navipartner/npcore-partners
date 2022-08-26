@@ -20,85 +20,85 @@
                 field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
+                    ToolTip = 'Specifies the sales ticket number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies the POS unit number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Created at"; Rec."Created at")
                 {
 
-                    ToolTip = 'Specifies the value of the Created at field';
+                    ToolTip = 'Specifies the creation date of the entry.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ToolTip = 'Specifies the salesperson code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer Type"; Rec."Customer Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Customer Type field';
+                    ToolTip = 'Specifies the customer type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Customer No. field';
+                    ToolTip = 'Specifies the customer number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer Price Group"; Rec."Customer Price Group")
                 {
 
-                    ToolTip = 'Specifies the value of the Customer Price Group field';
+                    ToolTip = 'Specifies the customer price group.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer Disc. Group"; Rec."Customer Disc. Group")
                 {
 
-                    ToolTip = 'Specifies the value of the Customer Disc. Group field';
+                    ToolTip = 'Specifies the customer discount group.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Attention; Rec.Attention)
                 {
 
-                    ToolTip = 'Specifies the value of the Attention field';
+                    ToolTip = 'Specifies the attention for this entry';
                     ApplicationArea = NPRRetail;
                 }
                 field(Reference; Rec.Reference)
                 {
 
-                    ToolTip = 'Specifies the value of the Reference field';
+                    ToolTip = 'Specifies the reference of the entry.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
 
-                    ToolTip = 'Specifies the value of the Amount field';
+                    ToolTip = 'Specifies the sales amount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
 
-                    ToolTip = 'Specifies the value of the Amount Including VAT field';
+                    ToolTip = 'Specifies the amount including VAT.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Entry No. field';
+                    ToolTip = 'Specifies the entry number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contains EFT Approval"; Rec."Contains EFT Approval")
                 {
 
-                    ToolTip = 'Specifies the value of the Contains EFT Approval field';
+                    ToolTip = 'Specifies if the entry contains EFT approval.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -114,7 +114,7 @@
                 Caption = 'View POS Sales Data';
                 Image = XMLFile;
 
-                ToolTip = 'Executes the View POS Sales Data action';
+                ToolTip = 'Displays the POS sales data.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

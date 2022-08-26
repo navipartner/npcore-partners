@@ -49,7 +49,7 @@
                 Editable = false;
                 field("External Card No."; Rec."External Card No.")
                 {
-                    ToolTip = 'Specifies the value of the External Card No. field';
+                    ToolTip = 'Specifies the value of the External Card No.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     trigger OnDrillDown()
                     var
@@ -70,42 +70,42 @@
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
-                    ToolTip = 'Specifies the value of the Valid Until field';
+                    ToolTip = 'Specifies until when the card will be valid.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
 
                 field("External Membership No."; Rec."External Membership No.")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the External Membership No.';
+                    ToolTip = 'Specifies the external number of the membership.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Membership Code field';
+                    ToolTip = 'Specifies the code for the member.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the External Member No.';
+                    ToolTip = 'Specifies the external member number.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }
                 field("Display Name"; Rec."Display Name")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Display Name.';
+                    ToolTip = 'Specifies the name to be displayed.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the member E-Mail Address';
+                    ToolTip = 'Specifies the e-mail address for the member.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }

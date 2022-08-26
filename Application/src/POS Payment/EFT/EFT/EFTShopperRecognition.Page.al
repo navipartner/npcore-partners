@@ -23,37 +23,37 @@
                 field("Integration Type"; Rec."Integration Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Integration Type field';
+                    ToolTip = 'Specifies the integration type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Shopper Reference"; Rec."Shopper Reference")
                 {
 
-                    ToolTip = 'Specifies the value of the Shopper Reference field';
+                    ToolTip = 'Specifies the shopper reference.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contract ID"; Rec."Contract ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Contract ID field';
+                    ToolTip = 'Specifies the contract ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contract Type"; Rec."Contract Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Contract Type field';
+                    ToolTip = 'Specifies the contract type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entity Type"; Rec."Entity Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Entity Type field';
+                    ToolTip = 'Specifies the entity type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entity Key"; Rec."Entity Key")
                 {
 
-                    ToolTip = 'Specifies the value of the Entity Key field';
+                    ToolTip = 'Specifies the entity key.';
                     ApplicationArea = NPRRetail;
                 }
             }

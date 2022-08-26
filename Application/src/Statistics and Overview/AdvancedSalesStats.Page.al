@@ -22,7 +22,7 @@
 
                     Caption = 'Period Type';
                     OptionCaption = 'Day,Week,Month,Quarter,Year,Period';
-                    ToolTip = 'Specifies the value of the Period Type field';
+                    ToolTip = 'Specifies the period type used as a filter.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -60,7 +60,7 @@
                 {
 
                     Caption = 'Period';
-                    ToolTip = 'Specifies the value of the Period field';
+                    ToolTip = 'Specifies the period used as a filter.';
                     ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
@@ -71,7 +71,7 @@
                 {
 
                     Caption = 'Period (Last Year)';
-                    ToolTip = 'Specifies the value of the Period (Last Year) field';
+                    ToolTip = 'Specifies the last year period used as a filter.';
                     ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
@@ -83,7 +83,7 @@
 
                     Caption = 'Hide Empty Lines';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Hide Empty Lines field';
+                    ToolTip = 'Hide the empty lines from the report.';
                     ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
@@ -95,7 +95,7 @@
 
                     Caption = 'Item No. Filter';
                     TableRelation = Item."No.";
-                    ToolTip = 'Specifies the value of the Item No. Filter field';
+                    ToolTip = 'Specifies the item number used as a filter.';
                     ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
@@ -108,7 +108,7 @@
 
                     Caption = 'Item Category Code';
                     TableRelation = "Item Category";
-                    ToolTip = 'Specifies the value of the Item Category Code field';
+                    ToolTip = 'Specifies the item category used as a filter.';
                     ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
@@ -124,7 +124,7 @@
                     CaptionClass = '1,2,1';
                     Caption = 'Dept. Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-                    ToolTip = 'Specifies the value of the Dept. Code field';
+                    ToolTip = 'Specifies the department used as a filter.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -137,7 +137,7 @@
                     CaptionClass = '1,2,2';
                     Caption = 'Project Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-                    ToolTip = 'Specifies the value of the Project Code field';
+                    ToolTip = 'Specifies the project used as a filter.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -149,7 +149,7 @@
                 {
 
                     Caption = 'Show Previous Year';
-                    ToolTip = '"Display Sales Statistics from the Previous Year';
+                    ToolTip = '"Display sales statistics from the previous year.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -161,7 +161,7 @@
                 {
 
                     Caption = 'Show the Same Weekday from the Previous Year';
-                    ToolTip = 'Display Sales Statistics from the Same Weekday of the Previous Year.';
+                    ToolTip = 'Display sales statistics from the same weekday of the previous year.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -178,7 +178,7 @@
                 field("Period Name"; Rec."Period Name")
                 {
 
-                    ToolTip = 'Specifies the value of the Period Name field';
+                    ToolTip = 'Specifies the period name.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -189,14 +189,14 @@
                 field("Period Start"; Rec."Period Start")
                 {
 
-                    ToolTip = 'Specifies the value of the Period Start field';
+                    ToolTip = 'Specifies the beginning of the period.';
                     ApplicationArea = NPRRetail;
                 }
                 field("-Sale (QTY)"; -"Sale (QTY)")
                 {
 
                     Caption = 'Sale (QTY)';
-                    ToolTip = 'Specifies the value of the Sale (QTY) field';
+                    ToolTip = 'Specifies the total quantity of sales.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -216,14 +216,14 @@
 
                     Caption = '-> Last Year';
                     Visible = PLYSaleQty;
-                    ToolTip = 'Specifies the value of the -> Last Year field';
+                    ToolTip = 'Specifies the total quantity of sales for the last year.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sale (LCY)"; "Sale (LCY)")
                 {
 
                     Caption = 'Sale(LCY)';
-                    ToolTip = 'Specifies the value of the Sale(LCY) field';
+                    ToolTip = 'Specifies the total amount of sales in local currency.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -243,14 +243,14 @@
 
                     Caption = 'LastYear Sale (LCY)';
                     Visible = PLYSale;
-                    ToolTip = 'Specifies the value of the LastYear Sale (LCY) field';
+                    ToolTip = 'Specifies the total amount of sales for the last year in local currency.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Profit (LCY)"; "Profit (LCY)")
                 {
 
                     Caption = 'Profit (LCY)';
-                    ToolTip = 'Specifies the value of the Profit (LCY) field';
+                    ToolTip = 'Specifies the profit in local currency.';
                     ApplicationArea = NPRRetail;
                 }
                 field("LastYear Profit (LCY)"; "LastYear Profit (LCY)")
@@ -258,14 +258,14 @@
 
                     Caption = 'Last Year Profit(LCY)';
                     Visible = PLYProfit;
-                    ToolTip = 'Specifies the value of the Last Year Profit(LCY) field';
+                    ToolTip = 'Specifies the profit for the last year in local currency.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Profit %"; "Profit %")
                 {
 
                     Caption = 'Profit %';
-                    ToolTip = 'Specifies the value of the Profit % field';
+                    ToolTip = 'Specifies profit percentage.';
                     ApplicationArea = NPRRetail;
                 }
                 field("LastYear Profit %"; "LastYear Profit %")
@@ -273,7 +273,7 @@
 
                     Caption = 'LastYear Profit %';
                     Visible = "PLYProfit%";
-                    ToolTip = 'Specifies the value of the LastYear Profit % field';
+                    ToolTip = 'Specifies the percentage of the profit for the last year in local currency.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -291,7 +291,7 @@
                     Caption = 'Advanced Sales Statistics';
                     Image = Statistics;
 
-                    ToolTip = 'Executes the Advanced Sales Statistics action';
+                    ToolTip = 'Displays the Advanced Sales Statistics report.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -332,7 +332,7 @@
                     PromotedCategory = Process;
                     PromotedOnly = true;
 
-                    ToolTip = 'Executes the Salesperson Statisticts action';
+                    ToolTip = 'Displays Salesperson Statisticts report.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -355,7 +355,7 @@
                     PromotedCategory = Process;
                     PromotedOnly = true;
 
-                    ToolTip = 'Executes the Item Statistics action';
+                    ToolTip = 'Displays the Item Statistics report.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -378,7 +378,7 @@
                     PromotedCategory = Process;
                     PromotedOnly = true;
 
-                    ToolTip = 'Executes the Customer Statistics action';
+                    ToolTip = 'Displays the Customer Statistics report.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -402,7 +402,7 @@
                     PromotedCategory = Process;
                     PromotedOnly = true;
 
-                    ToolTip = 'Executes the Vendor Statistics action';
+                    ToolTip = 'Displays the Vendor Statistics report.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -426,7 +426,7 @@
                     PromotedCategory = Process;
                     PromotedOnly = true;
 
-                    ToolTip = 'Executes the Item Category Code Statistics action';
+                    ToolTip = 'Displays the Item Category Code Statistics report.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -449,7 +449,7 @@
                     PromotedCategory = Process;
                     PromotedOnly = true;
 
-                    ToolTip = 'Executes the Product Group Code Statistics action';
+                    ToolTip = 'Displays the Product Group Code Statistics report.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

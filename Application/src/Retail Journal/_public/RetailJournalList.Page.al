@@ -18,19 +18,19 @@
                 field("No."; Rec."No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the retail journal type.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the retail journal type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Salesperson field';
+                    ToolTip = 'Specifies the salesperson of the retail journal type.';
                     ApplicationArea = NPRRetail;
                 }
             }

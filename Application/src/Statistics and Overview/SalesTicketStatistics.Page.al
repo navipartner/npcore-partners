@@ -23,7 +23,7 @@
                     CaptionClass = '1,2,1';
                     Caption = 'Dept. Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-                    ToolTip = 'Specifies the value of the Dept. Code field';
+                    ToolTip = 'Specifies the department used as a filter.';
                     ApplicationArea = NPRRetail;
                     Trigger OnValidate()
                     begin
@@ -36,7 +36,7 @@
                     CaptionClass = '1,2,2';
                     Caption = 'Project Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-                    ToolTip = 'Specifies the value of the Project Code field';
+                    ToolTip = 'Specifies the project used as a filter.';
                     ApplicationArea = NPRRetail;
                     Trigger OnValidate()
                     begin
@@ -48,7 +48,7 @@
 
                     Caption = 'Period Type';
                     OptionCaption = 'Day,Week,Month,Year';
-                    ToolTip = 'Specifies the value of the Period Type field';
+                    ToolTip = 'Specifies the period type used as a filter.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -96,13 +96,13 @@
                 field("Period Start"; Rec."Period Start")
                 {
 
-                    ToolTip = 'Specifies the value of the Period Start field';
+                    ToolTip = 'Specifies the beginning of the period.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Period Name"; Rec."Period Name")
                 {
 
-                    ToolTip = 'Specifies the value of the Period Name field';
+                    ToolTip = 'Specifies the name of the period.';
                     ApplicationArea = NPRRetail;
                 }
 
@@ -110,14 +110,14 @@
                 {
 
                     Caption = 'Number of Transactions';
-                    ToolTip = 'Specifies the value of the Number of Transactions field';
+                    ToolTip = 'Specifies the total number of the transactions.';
                     ApplicationArea = NPRRetail;
                 }
                 field(CalculatedAverage; CalcAverage())
                 {
 
                     Caption = 'Average of Transactions';
-                    ToolTip = 'Specifies the value of the Average of Transactions field';
+                    ToolTip = 'Specifies the average value of the transactions.';
                     ApplicationArea = NPRRetail;
                 }
             }
