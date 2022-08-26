@@ -6,10 +6,8 @@ codeunit 85072 "NPR POS Act. Change UOM Tests"
         Assert: Codeunit "Assert";
         Initialized: Boolean;
         POSUnit: Record "NPR POS Unit";
-        POSPaymentMethod: Record "NPR POS Payment Method";
         POSSession: Codeunit "NPR POS Session";
         POSStore: Record "NPR POS Store";
-        POSSetup: Record "NPR POS Setup";
 
     [Test]
     procedure ChangeUOM()
@@ -26,7 +24,7 @@ codeunit 85072 "NPR POS Act. Change UOM Tests"
         Quantity: Decimal;
     begin
         // [Given] POS & Payment setup
-        InitializeData();
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
 
         // [Given] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
@@ -45,28 +43,4 @@ codeunit 85072 "NPR POS Act. Change UOM Tests"
 
         Assert.IsTrue(SaleLinePOS."Unit of Measure Code" = UnitOfMeasure.Code, 'Unit of Measure is changed.')
     end;
-
-    procedure InitializeData()
-    var
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
-    begin
-        if Initialized then begin
-            //Clean any previous mock session
-            POSSession.ClearAll();
-            Clear(POSSession);
-        end;
-
-        if not Initialized then begin
-            NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
-            NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-            NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
-            NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
-            Initialized := true;
-        end;
-
-        Commit();
-    end;
-
 }

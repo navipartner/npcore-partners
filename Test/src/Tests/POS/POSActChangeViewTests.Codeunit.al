@@ -7,10 +7,8 @@ codeunit 85070 "NPR POS Act. Change View Tests"
         Quantity: Decimal;
         Initialized: Boolean;
         POSUnit: Record "NPR POS Unit";
-        POSPaymentMethod: Record "NPR POS Payment Method";
         POSSession: Codeunit "NPR POS Session";
         POSStore: Record "NPR POS Store";
-        POSSetup: Record "NPR POS Setup";
 
     [Test]
     procedure ChangeViewLogin()
@@ -27,11 +25,11 @@ codeunit 85070 "NPR POS Act. Change View Tests"
         //ViewType := Login
 
         // [Given] POS & Payment setup
-        InitializeData();
         ViewType := ViewType::Login;
         ViewCode := '';
 
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
         POSActionChangeViewB.ChangeView(ViewType, ViewCode);
@@ -56,20 +54,17 @@ codeunit 85070 "NPR POS Act. Change View Tests"
         //ViewType := Sale
 
         // [Given] POS & Payment setup
-        InitializeData();
         ViewType := ViewType::Sale;
         ViewCode := '';
 
-
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
-
 
         POSActionChangeViewB.ChangeView(ViewType, ViewCode);
         POSSession.GetCurrentView(CurrentView);
 
         Assert.IsTrue(CurrentView.Type() = CurrentView.Type() ::Sale, Format(CurrentView.Type()));
-
     end;
 
     [Test]
@@ -87,11 +82,11 @@ codeunit 85070 "NPR POS Act. Change View Tests"
         //ViewType := Payment
 
         // [Given] POS & Payment setup
-        InitializeData();
         ViewType := ViewType::Payment;
         ViewCode := '';
 
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
         POSActionChangeViewB.ChangeView(ViewType, ViewCode);
@@ -115,11 +110,11 @@ codeunit 85070 "NPR POS Act. Change View Tests"
         //ViewType := Balance
 
         // [Given] POS & Payment setup
-        InitializeData();
         ViewType := ViewType::Balance;
         ViewCode := '';
 
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
         POSActionChangeViewB.ChangeView(ViewType, ViewCode);
@@ -143,41 +138,16 @@ codeunit 85070 "NPR POS Act. Change View Tests"
         //ViewType := Locked
 
         // [Given] POS & Payment setup
-        InitializeData();
         ViewType := ViewType::Locked;
         ViewCode := '';
 
         // [Given] Active POS session & sale
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
         POSActionChangeViewB.ChangeView(ViewType, ViewCode);
         POSSession.GetCurrentView(CurrentView);
 
         Assert.IsTrue(CurrentView.Type() = CurrentView.Type() ::Locked, Format(CurrentView.Type()));
-    end;
-
-
-
-    procedure InitializeData()
-    var
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
-    begin
-        if Initialized then begin
-            //Clean any previous mock session
-            POSSession.ClearAll();
-            Clear(POSSession);
-        end;
-
-        if not Initialized then begin
-            NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
-            NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-            NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
-            NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
-            Initialized := true;
-        end;
-
-        Commit();
     end;
 }

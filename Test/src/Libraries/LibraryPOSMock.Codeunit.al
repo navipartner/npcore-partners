@@ -424,4 +424,56 @@ codeunit 85003 "NPR Library - POS Mock"
         POSPostMock.Initialize(true, true);
         POSPostMock.Run(SalePOS);
     end;
+
+
+    procedure InitializeData(var Initialized: Boolean; var POSUnit: Record "NPR POS Unit"; var POSStore: Record "NPR POS Store")
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        NPRLibraryEFT: Codeunit "NPR Library - EFT";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Record "NPR POS Setup";
+    begin
+        if Initialized then begin
+            //Clean any previous mock session
+            POSSession.ClearAll();
+            Clear(POSSession);
+        end;
+
+        if not Initialized then begin
+            NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
+            NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+            NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
+            NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
+            Initialized := true;
+        end;
+
+        Commit();
+    end;
+
+    procedure InitializeData(var Initialized: Boolean; var POSUnit: Record "NPR POS Unit"; var POSStore: Record "NPR POS Store"; var POSPaymentMethod: Record "NPR POS Payment Method")
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        NPRLibraryEFT: Codeunit "NPR Library - EFT";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Record "NPR POS Setup";
+    begin
+        if Initialized then begin
+            //Clean any previous mock session
+            POSSession.ClearAll();
+            Clear(POSSession);
+        end;
+
+        if not Initialized then begin
+            NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
+            NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+            NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
+            NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
+            NPRLibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
+            Initialized := true;
+        end;
+
+        Commit();
+    end;
 }
