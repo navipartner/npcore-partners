@@ -2,7 +2,7 @@
 
 Retail vouchers can be used as a payment type in their own right, so the owner of the voucher can use them to purchase various goods and services.
 
-Retailers offer different types of vouchers. The most common ones are gift vouchers and credit vouchers. There are four sections in the **Retail Voucher Type Card**:
+Retailers offer different types of vouchers. The most common ones are gift vouchers and credit vouchers. There are five sections in the **Retail Voucher Type Card**:
 
 - **General**      
   In the **General** section you can define the **Code** and **Description** of a voucher. This section also contains a number of open, closed, and archived vouchers.
@@ -14,6 +14,12 @@ Retailers offer different types of vouchers. The most common ones are gift vouch
   In the **Send Voucher** section you can define the **Reference No.** - the account number under which the sale of the voucher will be posted. This section also contains the method used for sending the retail voucher. Vouchers can be sent to a printer via email or SMS. The template and the code unit for sending needs to be set up in relation to all methods.
 
 ![Send](../images/Send.png)
+
+- **Setup Voucher**
+
+In the **Setup Voucher** section you can define voucher amount  (if amount is entered, all vouchers created from this voucher type will be created with value entered in this field), POS stores in which vouchers can be used (if POS store group is entered, voucher can be used only in stores set up in POS store group) and fixed date period during vouchers will be valid (starting and ending date).
+
+![Setup](../images/Setup%20voucher.PNG)
 
 - **Validate Voucher**
 
