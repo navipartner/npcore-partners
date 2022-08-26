@@ -1,105 +1,52 @@
-﻿codeunit 6150724 "NPR POS Action - Change View"
+codeunit 6150724 "NPR POS Action - Change View" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'Changes the current view.';
-        CancelSaleLbl: Label 'There is an active sale. If you continue the sale will be automatically cancelled. Are you sure you want to continue?';
-
-    local procedure ActionCode(): Code[20]
+        ParamViewCode_CptLbl: Label 'View Code';
+        ParamViewCode_DescLbl: Label 'Specifies View Code';
+        ParamViewType_OptLbl: Label 'Login,Sale,Payment,Balance,Locked';
+        ParamViewType_CptLbl: Label 'View Type';
+        ParamViewType_DescLbl: Label 'Specifies View Type';
     begin
-        exit('CHANGE_VIEW');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddTextParameter('ViewCode', '', ParamViewCode_CptLbl, ParamViewCode_DescLbl);
+        WorkflowConfig.AddOptionParameter('ViewType',
+                                           ParamViewType_OptLbl,
+                                           SelectStr(1, ParamViewType_OptLbl),
+                                           ParamViewType_CptLbl,
+                                           ParamViewType_DescLbl,
+                                           ParamViewType_OptLbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     begin
-        exit('1.1');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Single)
-        then begin
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterOptionParameter('ViewType', 'Login,Sale,Payment,Balance,Locked', '');
-            Sender.RegisterTextParameter('ViewCode', '');
+        case Step of
+            'ChangeView':
+                ChangeView(Context);
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        ChangeView(Context, POSSession, FrontEnd);
-
-        Handled := true;
-
-    end;
-
-    local procedure ChangeView(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure ChangeView(Context: Codeunit "NPR POS JSON Helper")
     var
-        POSDefaultUserView: Record "NPR POS Default User View";
-        POSUnit: Record "NPR POS Unit";
-        POSSetup: Codeunit "NPR POS Setup";
-        JSON: Codeunit "NPR POS JSON Management";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
         ViewType: Option Login,Sale,Payment,Balance,Locked;
-        CurrentView: Codeunit "NPR POS View";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSTryCancelSale: Codeunit "NPR POS Resume Sale Mgt.";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-
+        ViewCode: Code[10];
+        POSActionChangeViewB: Codeunit "NPR POS Action: Change View-B";
     begin
-        JSON.InitializeJObjectParser(Context, FrontEnd);
+        ViewType := Context.GetIntegerParameter('ViewType');
+        ViewCode := CopyStr(Context.GetStringParameter('ViewCode'), 1, 10);
 
-        ViewType := JSON.GetIntegerParameterOrFail('ViewType', ActionCode());
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetPOSUnit(POSUnit);
-        POSDefaultUserView.SetDefault(ViewType, POSUnit."No.", CopyStr(JSON.GetStringParameter('ViewCode'), 1, 10));
+        POSActionChangeViewB.ChangeView(ViewType, ViewCode);
+    end;
 
-        POSSession.GetCurrentView(CurrentView);
-
-        case ViewType of
-            ViewType::Login:
-                begin
-
-                    if (CurrentView.Type() = CurrentView.Type() ::Sale) or (CurrentView.Type() = CurrentView.Type() ::Payment) then begin
-                        POSSession.GetSaleLine(POSSaleLine);
-
-                        // if there are lines to delete
-                        if (POSSaleLine.RefreshCurrent()) then
-                            if not Confirm(CancelSaleLbl, true) then
-                                Error('');
-
-                        POSSession.GetSale(POSSale);
-                        POSSale.GetCurrentSale(SalePOS);
-                        POSTryCancelSale.DoCancelSale(SalePOS, POSSession);
-                    end;
-
-                    POSCreateEntry.InsertUnitLogoutEntry(POSUnit."No.", POSSetup.Salesperson());
-                    POSSession.StartPOSSession();
-
-                end;
-            ViewType::Sale:
-                POSSession.ChangeViewSale();
-            ViewType::Payment:
-                POSSession.ChangeViewPayment();
-            ViewType::Balance:
-                POSSession.ChangeViewBalancing();
-            ViewType::Locked:
-                begin
-                    POSCreateEntry.InsertUnitLockEntry(POSUnit."No.", POSSetup.Salesperson());
-                    POSSession.ChangeViewLocked();
-                end;
-        end;
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionChangeView.js###
+        'let main=async({})=>{await workflow.respond("ChangeView")};'
+        )
     end;
 }
