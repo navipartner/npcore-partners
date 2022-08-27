@@ -303,6 +303,7 @@
         if not TempSaleLinePOS.IsTemporary then
             exit;
 
+        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", Date, "Sale Type", Type, "Discount Type");
         SaleLinePOS.SetFilter("Discount Type", '<>%1&<>%2&<>%3', SaleLinePOS."Discount Type"::Manual, SaleLinePOS."Discount Type"::Combination, SaleLinePOS."Discount Type"::"BOM List");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -344,7 +345,7 @@
 
     procedure DeleteAllDiscountPriorities()
     var
-        DiscountPriority: Record "NPR Discount Priority";    
+        DiscountPriority: Record "NPR Discount Priority";
     begin
         if not DiscountPriority.IsEmpty() then
             DiscountPriority.DeleteAll();
