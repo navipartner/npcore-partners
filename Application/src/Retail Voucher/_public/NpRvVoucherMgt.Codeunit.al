@@ -333,7 +333,7 @@
         VoucherEntry.Amount := VoucherAmount;
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := DT2Date(Voucher."Starting Date");
+        VoucherEntry."Posting Date" := Workdate();
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
         VoucherEntry."Register No." := NpRvSalesLine."Register No.";
         case NpRvSalesLine."Document Source" of
@@ -381,7 +381,7 @@
         VoucherEntry.Amount := VoucherAmount;
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := DT2Date(Voucher."Starting Date");
+        VoucherEntry."Posting Date" := WorkDate();
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
         VoucherEntry."Register No." := NpRvSalesLine."Register No.";
 
@@ -1101,7 +1101,7 @@
         VoucherEntry.Amount := VoucherAmount;
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := DT2Date(RetailVoucher."Starting Date");
+        VoucherEntry."Posting Date" := WorkDate();
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
         VoucherEntry."Partner Code" := VoucherType."Partner Code";
         VoucherEntry."Closed by Entry No." := 0;
@@ -1153,6 +1153,8 @@
         NpRvSalesLine: Record "NPR NpRv Sales Line";
     begin
         VoucherType.Get(VoucherTypeCode);
+        CheckVoucherType(VoucherType, SalePOS);
+
         PrepareVoucherBuffer(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
         ValidateVoucher(TempNpRvVoucherBuffer);
 
@@ -1276,6 +1278,17 @@
                             NpRvVoucherEntry.DeleteAll();
                     end;
                 end;
+    end;
+
+    local procedure CheckVoucherType(VoucherType: Record "NPR NpRv Voucher Type"; var SalePOS: Record "NPR POS Sale")
+    var
+        POSStoreGroupLine: Record "NPR POS Store Group Line";
+        NotAllowedErr: Label '%1 %2 is not allowed to be used in store %3', Comment = '%1 = Voucher Type Caption, %2 = Voucher Type Code, %3 = Store Code';
+    begin
+        if VoucherType."POS Store Group" = '' then
+            exit;
+        if not POSStoreGroupLine.Get(VoucherType."POS Store Group", SalePOS."POS Store Code") then
+            Error(NotAllowedErr, VoucherType.TableCaption(), VoucherType.Code, SalePOS."POS Store Code");
     end;
 
     procedure CheckVoucherTypeQty(VoucherTypeCode: Code[20])
@@ -1485,4 +1498,5 @@
     local procedure OnBeforeInsertArchiveEntry(var ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry"; NpRvVoucherEntry: Record "NPR NpRv Voucher Entry")
     begin
     end;
+
 }

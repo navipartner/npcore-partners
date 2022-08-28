@@ -195,6 +195,31 @@
                     }
                 }
             }
+            group("Setup Voucher")
+            {
+                Caption = 'Setup Voucher';
+
+                field("Voucher Amount"; Rec."Voucher Amount")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Voucher Amount field. If this field is specified all vouchers will be issued with this amount.';
+                }
+                field("POS Store Group"; Rec."POS Store Group")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the POS Store Group field. If this field is populated, vouchers can be used only in stores that are assigned to selected POS Store Group.';
+                }
+                field("Starting Date"; Rec."Starting Date")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Starting Date field. If this field is specified all vouchers will be issued with this Starting Date.';
+                }
+                field("Ending Date"; Rec."Ending Date")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Ending Date field. If this field is specified all vouchers will be issued with this Ending Date.';
+                }
+            }
             group("Validate Voucher")
             {
                 Caption = 'Validate Voucher';

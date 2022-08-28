@@ -19,26 +19,8 @@
             TableRelation = "NPR NpRv Voucher Type";
 
             trigger OnValidate()
-            var
-                VoucherType: Record "NPR NpRv Voucher Type";
             begin
-                VoucherType.Get("Voucher Type");
-                Description := VoucherType.Description;
-                if "Starting Date" = 0DT then
-                    "Starting Date" := CreateDateTime(Today, 0T);
-                if Format(VoucherType."Valid Period") <> '' then
-                    "Ending Date" := CreateDateTime(CalcDate(VoucherType."Valid Period", DT2Date("Starting Date")), DT2Time("Starting Date"));
-
-                "No. Series" := VoucherType."No. Series";
-                "Arch. No. Series" := VoucherType."Arch. No. Series";
-                "Print Object Type" := VoucherType."Print Object Type";
-                "Print Object ID" := VoucherType."Print Object ID";
-                "Print Template Code" := VoucherType."Print Template Code";
-                "E-mail Template Code" := VoucherType."E-mail Template Code";
-                "SMS Template Code" := VoucherType."SMS Template Code";
-                "Account No." := VoucherType."Account No.";
-                "Voucher Message" := VoucherType."Voucher Message";
-                "Allow Top-up" := VoucherType."Allow Top-up";
+                ValidateVoucherType();
             end;
         }
         field(10; Description; Text[50])
@@ -552,6 +534,33 @@
             "Language Code" := Cust."Language Code";
             exit;
         end;
+    end;
+
+    local procedure ValidateVoucherType()
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        VoucherType.Get("Voucher Type");
+        Description := VoucherType.Description;
+
+        "Starting Date" := VoucherType."Starting Date";
+        if "Starting Date" = 0DT then
+            "Starting Date" := CreateDateTime(Today, 0T);
+
+        "Ending Date" := VoucherType."Ending Date";
+        if ((Format(VoucherType."Valid Period") <> '') and ("Ending Date" = 0DT)) then
+            "Ending Date" := CreateDateTime(CalcDate(VoucherType."Valid Period", DT2Date("Starting Date")), DT2Time("Starting Date"));
+
+        "No. Series" := VoucherType."No. Series";
+        "Arch. No. Series" := VoucherType."Arch. No. Series";
+        "Print Object Type" := VoucherType."Print Object Type";
+        "Print Object ID" := VoucherType."Print Object ID";
+        "Print Template Code" := VoucherType."Print Template Code";
+        "E-mail Template Code" := VoucherType."E-mail Template Code";
+        "SMS Template Code" := VoucherType."SMS Template Code";
+        "Account No." := VoucherType."Account No.";
+        "Voucher Message" := VoucherType."Voucher Message";
+        "Allow Top-up" := VoucherType."Allow Top-up";
     end;
 
     procedure CalcInUseQty() InUseQty: Integer
