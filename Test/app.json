@@ -42,5 +42,6 @@
   "contextSensitiveHelpUrl": "https://Test.com/help/",
   "showMyCode": true,
   "runtime": "6.0",
-  "keyVaultUrls": ["https://npcore.vault.azure.net/"]
+  "keyVaultUrls": ["https://npcore.vault.azure.net/"],
+  "preprocessorSymbols": ["BC17"]
 }

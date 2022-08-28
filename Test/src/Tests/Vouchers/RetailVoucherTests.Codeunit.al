@@ -874,7 +874,99 @@
         // Create voucher should  fail
         asserterror CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
         Assert.ExpectedError(StrSubstNo(MaxCountErr, _VoucherTypePartial.FieldCaption("Max Voucher Count"), _VoucherTypePartial.TableCaption, _VoucherTypePartial.Code));
+        SetMaxVoucherCountOnVoucherType(_VoucherTypePartial, 0); //cleanup
     end;
+
+
+    [Test]
+    procedure TestAmountPerVoucherType()
+    // [SCENARIO] Set fixed amount on Voucher Type, create Voucher with random amount and created Voucher should have fixed amount
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        Assert: Codeunit "Assert";
+        FixedVoucherAmount, RandomVoucherAmount : Decimal;
+        TransactionEnded: Boolean;
+        MaxCountErr: Label '%1 for %2 %3 is exceeded.';
+    begin
+        Initialize();
+        FixedVoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
+        RandomVoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
+        //set Voucher Amount on Voucher Type 
+        SetVoucherAmountVoucherType(FixedVoucherAmount);
+
+        // Create voucher with any amount
+        CreateVoucherInPOSTransaction(NpRvVoucher, RandomVoucherAmount, FixedVoucherAmount, _VoucherTypePartial.Code);
+        NpRvVoucher.CalcFields("Initial Amount");
+        Assert.AreEqual(_VoucherTypePartial."Voucher Amount", NpRvVoucher."Initial Amount", 'Issued Voucher Initial Amount not according to test scenario.');
+        SetVoucherAmountVoucherType(0); //cleanup
+    end;
+
+    [Test]
+    procedure TestDatesPerVoucherType()
+    // [SCENARIO] Set fixed amount on Voucher Type, create Voucher with random amount and created Voucher should have fixed amount
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        Assert: Codeunit "Assert";
+        VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
+        MaxCountErr: Label '%1 for %2 %3 is exceeded.';
+        StartingDateTime, EndingDateTime : DateTime;
+        LibraryRandom: Codeunit "Library - Random";
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
+        // Date different than today
+        StartingDateTime := CreateDateTime(20210101D, Time());
+        EndingDateTime := CreateDateTime(20250101D, Time());
+        // set Dates on Voucher Type 
+        SetDatesToVoucherType(StartingDateTime, EndingDateTime);
+        // Create voucher with any amount
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+        // Check
+        Assert.AreEqual(_VoucherTypePartial."Starting Date", NpRvVoucher."Starting Date", 'Issued Voucher Starting Date not according to test scenario.');
+        Assert.AreEqual(_VoucherTypePartial."Ending Date", NpRvVoucher."Ending Date", 'Issued Voucher Ending Date not according to test scenario.');
+        SetDatesToVoucherType(0DT, 0DT); //cleanup
+    end;
+
+    [Test]
+    procedure TestStoreGroupPerVoucherType()
+    // [SCENARIO] Set Store Group on Voucher Type, try to use voucher in wrong company
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        Assert: Codeunit "Assert";
+        VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
+        NotAllowedErr: Label '%1 %2 is not allowed to be used in store %3', Comment = '%1 = Voucher Type Caption, %2 = Voucher Type Code, %3 = Store Code';
+    begin
+        Initialize();
+        SetStoreGroupPerVoucherType(CreateStoreGroup());
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
+        // [GIVEN] Voucher created in POS Transaction
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+        //Create new transaction use whole voucher amount
+        CreateItemTransaction(VoucherAmount);
+        //Usage of the voucher should fail 
+        asserterror TransactionEnded := NPRLibraryPOSMock.PayWithVoucherAndTryEndSaleAndStartNew(_POSSession, _VoucherTypePartial.Code, NpRvVoucher."Reference No.");
+        Assert.ExpectedError(StrSubstNo(NotAllowedErr, _VoucherTypePartial.TableCaption(), _VoucherTypePartial.Code, _POSStore.Code));
+        //Usage of the voucher should succeed after adding store to store group 
+        CreateStoreGroupLine(_VoucherTypePartial."POS Store Group", _POSStore.Code);
+        TransactionEnded := NPRLibraryPOSMock.PayWithVoucherAndTryEndSaleAndStartNew(_POSSession, _VoucherTypePartial.Code, NpRvVoucher."Reference No.");
+        // [THEN] Check ifTransaction ended, Archived Retail Voucher Exist and Retail Voucher doesn't Exist
+        Assert.AreEqual(true, TransactionEnded, 'Transaction end not according to test scenario.');
+        NpRvArchVoucher.SetRange("Reference No.");
+        Assert.Istrue(NpRvArchVoucher.FindFirst(), 'Archived Voucher exists ');
+        Assert.AreEqual(false, NpRvVoucher.Get(NpRvVoucher."No."), 'Voucher record not according to test scenario.');
+        SetStoreGroupPerVoucherType('');//cleanup
+    end;
+
+
+
 
 
     procedure Initialize()
@@ -931,6 +1023,28 @@
         NpRvVoucher.FindFirst();
     end;
 
+    local procedure CreateVoucherInPOSTransaction(var NpRvVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal; PaymentAmount: Decimal; VoucherTypeCode: Code[20])
+    var
+        POSEntry: Record "NPR POS Entry";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+    begin
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        // [WHEN] Create line with issue voucher, finish transaction
+        NPRLibraryPOSMock.CreateVoucherLine(_POSSession, VoucherTypeCode, 1, VoucherAmount, '', 0);
+        NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, PaymentAmount, '');
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.FindFirst();
+
+        NpRvVoucher.Setrange("Issue Register No.", SalePOS."Register No.");
+        NpRvVoucher.SetRange("Issue Document Type", NpRvVoucher."Issue Document Type"::"Audit Roll");
+        NpRvVoucher.Setrange("Issue Document No.", POSEntry."Document No.");
+        NpRvVoucher.Setrange("Voucher Type", VoucherTypeCode);
+        NpRvVoucher.FindFirst();
+    end;
+
 
     local procedure CreateItemTransaction(VoucherAmount: Decimal)
     var
@@ -956,11 +1070,62 @@
     end;
 
     local procedure SetMaxVoucherCountOnVoucherType(_VoucherTypePartial: Record "NPR NpRv Voucher Type")
-
     begin
+        _VoucherTypePartial.Get(_VoucherTypePartial.Code);
         _VoucherTypePartial.CalcFields("Voucher Qty. (Closed)", "Voucher Qty. (Open)", "Arch. Voucher Qty.");
         _VoucherTypePartial."Max Voucher Count" := _VoucherTypePartial."Voucher Qty. (Closed)" + _VoucherTypePartial."Voucher Qty. (Open)" + _VoucherTypePartial."Arch. Voucher Qty." + 2;
         _VoucherTypePartial.Modify();
+    end;
+
+    local procedure SetMaxVoucherCountOnVoucherType(_VoucherTypePartial: Record "NPR NpRv Voucher Type"; MaxCount: Integer)
+    begin
+        _VoucherTypePartial.Get(_VoucherTypePartial.Code);
+        _VoucherTypePartial."Max Voucher Count" := MaxCount;
+        _VoucherTypePartial.Modify();
+    end;
+
+    local procedure SetVoucherAmountVoucherType(VoucherAmount: Decimal)
+    begin
+        _VoucherTypePartial.Get(_VoucherTypePartial.Code);
+        _VoucherTypePartial."Voucher Amount" := VoucherAmount;
+        _VoucherTypePartial.Modify();
+    end;
+
+    local procedure SetDatesToVoucherType(StartingDateTime: DateTime; EndingDateTime: DateTime)
+    begin
+        _VoucherTypePartial.Get(_VoucherTypePartial.Code);
+        _VoucherTypePartial."Starting Date" := StartingDateTime;
+        _VoucherTypePartial."Ending Date" := EndingDateTime;
+        _VoucherTypePartial.Modify();
+    end;
+
+    local procedure SetStoreGroupPerVoucherType(StoreGroup: Code[20])
+    begin
+        _VoucherTypePartial.Get(_VoucherTypePartial.Code);
+        _VoucherTypePartial."POS Store Group" := StoreGroup;
+        _VoucherTypePartial.Modify();
+    end;
+
+    local procedure CreateStoreGroup(): Code[20]
+    var
+        POSStoreGroup: Record "NPR POS Store Group";
+    begin
+        if not POSStoreGroup.Get('TEST') then begin
+            POSStoreGroup.Init();
+            POSStoreGroup."No." := 'TEST';
+            POSStoreGroup.Insert();
+        end;
+        exit(POSStoreGroup."No.");
+    end;
+
+    local procedure CreateStoreGroupLine(POSStoreGroup: Code[20]; POSStoreCode: Code[10])
+    var
+        POSStoreGroupLine: Record "NPR POS Store Group Line";
+    begin
+        POSStoreGroupLine.Init();
+        POSStoreGroupLine."No." := POSStoreGroup;
+        POSStoreGroupLine."POS Store" := POSStoreCode;
+        POSStoreGroupLine.Insert();
     end;
 
 

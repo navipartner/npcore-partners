@@ -14,13 +14,13 @@ page 6059985 "NPR TM Ticket Admission Sim"
             {
                 field("Ticket Reference No."; Rec."Ticket Reference No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Insert External ticket no for simulation of admission.';
                     Caption = 'External Ticket No.';
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Select the admission you wish to simulate for admission.';
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -37,12 +37,12 @@ page 6059985 "NPR TM Ticket Admission Sim"
                 }
                 field("Event Date"; Rec."Event Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Select the date you wish to simulate for admission.';
                 }
                 field("Event Time"; Rec."Event Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Select the time you wish to simulate for admission.';
                 }
             }
@@ -54,7 +54,7 @@ page 6059985 "NPR TM Ticket Admission Sim"
         {
             action(SimulateTicketArrival)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Caption = 'Simulate Ticket Arrival';
                 ToolTip = 'Simulate arrival with selected ticket parameters.';
                 Image = Simulate;
