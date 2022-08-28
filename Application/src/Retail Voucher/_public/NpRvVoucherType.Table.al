@@ -150,6 +150,27 @@
             Caption = 'Max Voucher Count';
             DataClassification = CustomerContent;
         }
+        field(210; "Voucher Amount"; Decimal)
+        {
+            Caption = 'Voucher Amount';
+            DataClassification = CustomerContent;
+        }
+        field(220; "POS Store Group"; Code[20])
+        {
+            Caption = 'POS Store Group';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Store Group"."No.";
+        }
+        field(230; "Starting Date"; DateTime)
+        {
+            Caption = 'Starting Date';
+            DataClassification = CustomerContent;
+        }
+        field(235; "Ending Date"; DateTime)
+        {
+            Caption = 'Ending Date';
+            DataClassification = CustomerContent;
+        }
         field(300; "Voucher Message"; Text[250])
         {
             Caption = 'Voucher Message';

@@ -186,6 +186,14 @@
         end;
     end;
 
+
+    local procedure OverrideVoucherAmount(VoucherType: Record "NPR NpRv Voucher Type"; var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        if VoucherType."Voucher Amount" = 0 then
+            exit;
+        SaleLinePOS."Unit Price" := VoucherType."Voucher Amount";
+    end;
+
     local procedure ContactInfo(SaleLinePOS: Record "NPR POS Sale Line")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -260,6 +268,9 @@
                 end;
         end;
         SaleLinePOS."Price Includes VAT" := true;
+
+        OverrideVoucherAmount(VoucherType, SaleLinePOS);
+
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         if SaleLinePOS."Discount Amount" > 0 then
             SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
