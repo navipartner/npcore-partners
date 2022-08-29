@@ -17,7 +17,7 @@
         NOT_IMPLEMENTED: Label '%1 %2 not implemented.';
         BAD_REFERENCE: Label 'The field reference {:%1} in the textline "%2" does correspond to a valid field number.';
         INLINE_NOTIFICATION: Label 'Sends Inline Member Notifications on End of Sales.';
-        REFRESH_NOTIFICATION: Label '';
+        REFRESH_NOTIFICATION: Label 'Renew Memberships %#1 ';
 
     internal procedure HandleBatchNotifications(ReferenceDate: Date)
     var
@@ -557,7 +557,7 @@
         Membership.SetFilter("Membership Code", '=%1', MembershipCode);
         if (Membership.FindSet()) then begin
             if (GuiAllowed()) then
-                Window.Open(REFRESH_NOTIFICATION);
+                Window.Open(REFRESH_NOTIFICATION, CurrentCount);
 
             MaxCount := Membership.Count();
             MembershipSetup.Get(MembershipCode);
@@ -574,7 +574,7 @@
                         AddMembershipRenewalNotificationWorker(MembershipEntry, MembershipSetup, CommunitySetup);
 
                 if (GuiAllowed()) then
-                    Window.Update(1, Round(CurrentCount / MaxCount * 10000, 1));
+                    Window.Update(1, Round(CurrentCount / MaxCount * 100, 1));
 
                 CurrentCount += 1;
 
