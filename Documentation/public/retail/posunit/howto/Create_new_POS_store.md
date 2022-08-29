@@ -6,7 +6,7 @@ To create new POS store follow the provided steps:
    A list of all existing POS stores will be displayed.  
 2. Click **New**.        
     The **POS Store Card** popup window will be displayed.
-3. Fill all necessary fields in the **General** tab.
+3. Fill all necessary fields in the **General** section.
 
 | Field Name      | Description |
 | ----------- | ----------- |
@@ -24,7 +24,7 @@ To create new POS store follow the provided steps:
 | **Language Code** | Specifies the code of the language used in the POS store. |
 | **Registration No.** | Specifies the registration number used for the store. |
 
-4. Fill all necessary fields in the **Communication** tab.
+4. Fill all necessary fields in the **Communication** section.
 
 | Field Name      | Description |
 | ----------- | ----------- |
@@ -34,10 +34,10 @@ To create new POS store follow the provided steps:
 
 5. Fill all necessary fields in **Profiles** tab.
 
-- **POS Restaurant Profile** - Profile defined for restaurants. Defines restaurant and seats for restaurant.
-- **POS Posting Profile** - Profile defined for postings. In this profile is defined: which business groups store will use for postings (VAT business and General business posting group), source code, will entries be compressed after posting or not, accounts for rounding and differences.
+- **POS Restaurant Profile** - The profile defined for restaurants. Defines restaurant and seats for restaurant.
+- **POS Posting Profile** - The profile defined for postings. In this profile you can define which business groups store will be used for postings (VAT business and General business posting group), source code; whether the entries will be compressed after posting or not, and which accounts will be used for rounding and differences.
 
-6. Fill all necessary fields in the **Reporting** tab.
+6. Fill all necessary fields in the **Reporting** section.
 
 | Field Name      | Description |
 | ----------- | ----------- |
@@ -50,3 +50,7 @@ To create new POS store follow the provided steps:
 | **Opening Date** | Specifies the date on which the store is opened. |
 | **Geolocation Latitude** | Specifies the latitude of the store. |
 | **Geolocation Longitude** | Specifies the longitude of the store |
+
+### Related links
+
+- [POS stores](../explanation/POS_store.md)

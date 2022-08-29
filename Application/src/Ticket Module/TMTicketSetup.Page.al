@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Ticket Setup';
+    ContextSensitiveHelpPage = 'entertainment/ticket/tutorial/ticket_tutorial.html';
     PageType = Card;
     SourceTable = "NPR TM Ticket Setup";
     UsageCategory = Administration;
