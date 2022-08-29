@@ -22,6 +22,8 @@
   href: gdpr/toc.yml
 - name: Click & Collect module
   href: clickandcollect/toc.yml
+- name: Reports
+  href: reports/toc.yml
 - name: Webshop integrations
   href: webshopintegrations/toc.yml
 - name: Varieties in NP Retail
