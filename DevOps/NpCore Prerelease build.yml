@@ -27,17 +27,14 @@ stages:
         - Agent.OS -equals Windows_NT
         - Agent.OSVersion -equals 10.0.17763
       containerDefinitions:
-        - name: Auto
-
-        - name: BC1804
-
-        - name: BC1905
-
-        - name: vLatest_CLOUD
-          compareAppWithSpecificCompareAppVersion: true
-
-        - name: Insider_CLOUD
-          compareAppWithSpecificCompareAppVersion: true
+        - Auto
+        - BC1700
+        - BC1704
+        - BC1711 
+        - BC1804
+        - BC1905
+        - vLatest_CLOUD
+        - Insider_CLOUD
         
       analyzers: 'AppSourceCop,UICop,CodeCop'
       keyVaultCert:
