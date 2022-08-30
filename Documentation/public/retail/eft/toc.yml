@@ -10,5 +10,7 @@
   items:
   - name: EFT setup
     href: explanation/EFT_setup.md
+  - name: EFT integration types
+    href: explanation/EFT_Integration_Type.md
   - name: Transaction lookup
     href: explanation/lookup.md
