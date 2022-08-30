@@ -124,7 +124,7 @@ codeunit 6059829 "NPR Upgrade Shipping Provider"
 
     local procedure UpdatePackageServices()
     var
-        ServicesCombination: Record "NPR Package Dimension";
+        ServicesCombination: Record "NPR Services Combination";
         ShippingProviderservices: Record "NPR Shipping Provider Services";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Upgrade Package Code', 'OnUpgradePerCompany');
