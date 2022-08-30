@@ -1,56 +1,34 @@
-﻿codeunit 6151175 "NPR POS Action: Change LineAm."
+﻿codeunit 6151175 "NPR POS Action: Change LineAm." implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
-        ActionDescriptionCaption: Label 'This action is used to change line amount VIA EAN Box events';
-        NoSaleLineErr: Label 'A sale line must exist in order to change the amount';
-
-    local procedure ActionCode(): Code[20]
+        ActionDescription: Label 'This action is used to change line amount VIA EAN Box events';
+        ParamNewLineAmt_CptLbl: Label 'New Line Amount';
+        ParamNewLineAmt_DescLbl: Label 'Defines a new line amount';
     begin
-        exit('CHANGE_AMOUNT');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddDecimalParameter('NewLineAmount', 0, ParamNewLineAmt_CptLbl, ParamNewLineAmt_DescLbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescriptionCaption,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('', 'respond();');
-            Sender.RegisterWorkflow(false);
-
-            Sender.RegisterDecimalParameter('NewLineAmount', 0);
+        case Step of
+            'ChangeAmount':
+                ChangeAmount(Context, SaleLine);
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure ChangeAmount(Context: codeunit "NPR POS JSON Helper"; POSSaleLine: codeunit "NPR POS Sale Line")
     var
-        SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        JSON: Codeunit "NPR POS JSON Management";
         LineAmount: Decimal;
+        NoSaleLineErr: Label 'A sale line must exist in order to change the amount';
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
+        LineAmount := Context.GetDecimalParameter('NewLineAmount');
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        LineAmount := JSON.GetDecimalParameterOrFail('NewLineAmount', ActionCode());
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         if SaleLinePOS.IsEmpty then
@@ -60,10 +38,6 @@
         SaleLinePOS.Modify();
 
         POSSaleLine.ResendAllOnAfterInsertPOSSaleLine();
-        POSSale.RefreshCurrent();
-        POSSession.RequestRefreshData();
-
-        Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
@@ -112,5 +86,18 @@
     local procedure EanEventCode(): Code[20]
     begin
         exit('saleprice');
+    end;
+
+    local procedure ActionCode(): Code[20]
+    begin
+        exit(Format(Enum::"NPR POS Workflow"::CHANGE_AMOUNT));
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionChangeAmount.js###
+        'let main=async({})=>{await workflow.respond("ChangeAmount")};'
+        )
     end;
 }

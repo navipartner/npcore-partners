@@ -125,7 +125,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'BOARDINGPASS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Boarding Pass";
     }
-
     value(19; TAKE_PHOTO)
     {
         Caption = 'TAKE_PHOTO', Locked = true, MaxLength = 20;
@@ -136,7 +135,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'TRANSFER_ORDER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Transf. Order";
     }
-
     value(21; SALE_DIMENSION)
     {
         Caption = 'SALE_DIMENSION', Locked = true, MaxLength = 20;
@@ -202,11 +200,15 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ITEM', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Insert Item";
     }
-
     value(34; CHANGE_UOM)
     {
         Caption = 'CHANGE_UOM', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Change UOM";
+    }
+    value(35; CHANGE_AMOUNT)
+    {
+        Caption = 'CHANGE_AMOUNT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Change LineAm.";
     }
     value(37; LOAD_FROM_POS_QUOTE)
     {
@@ -223,36 +225,30 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SAVE_AS_POS_QUOTE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: SavePOSSvSl";
     }
+    value(40; BACKGND_TASK_EXAMPLE)
+    {
+        Caption = 'BACKGND_TASK_EXAMPLE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction - Task Example";
+    }
     value(41; IMPORT_POSTED_INV)
     {
         Caption = 'IMPORT_POSTED_INV', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Imp. Pstd. Inv";
+    }
+    value(42; REVERSE_DIRECT_SALE)
+    {
+        Caption = 'REVERSE_DIRECT_SALE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Rev. Dir. Sale";
     }
     value(43; REVERSE_CREDIT_SALE)
     {
         Caption = 'REVERSE_CREDIT_SALE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Reverse Sale";
     }
-    value(40; BACKGND_TASK_EXAMPLE)
-    {
-        Caption = 'BACKGND_TASK_EXAMPLE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POSAction - Task Example";
-    }
     value(44; QUANTITY)
     {
         Caption = 'QUANTITY', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Quantity";
-    }
-
-    value(42; REVERSE_DIRECT_SALE)
-    {
-        Caption = 'REVERSE_DIRECT_SALE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Rev. Dir. Sale";
-    }
-    value(45; INSERT_COMMENT)
-    {
-        Caption = 'INSERT_COMMENT', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Insert Comm.";
     }
     value(6014600; BALANCE_V4)
     {
