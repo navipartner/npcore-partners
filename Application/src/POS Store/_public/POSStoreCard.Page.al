@@ -5,7 +5,10 @@
     ContextSensitiveHelpPage = 'retail/posunit/howto/Create_new_POS_store.html';
     RefreshOnActivate = true;
     SourceTable = "NPR POS Store";
-
+#if not BC17
+    AboutTitle = 'POS Store';
+    AboutText = 'POS stores are the highest in the store setup hierarchy, and everything you set up in the POS Store Card should match the specifics of a physical store. After the POS store and POS units are created, they need to be connected to each other. A POS store can have multiple POS units, but a POS unit can be attached to only one POS store.';
+#endif
     layout
     {
         area(content)
@@ -13,6 +16,10 @@
             group(General)
             {
                 Caption = 'General';
+#if not BC17
+                AboutTitle = 'General information';
+                AboutText = 'In the General section, you should provide basic information such as the store name, address, location, and registration number.';
+#endif
                 field("Code"; Rec.Code)
                 {
 
@@ -101,6 +108,10 @@
             group(Communication)
             {
                 Caption = 'Communication';
+#if not BC17
+                AboutTitle = 'Contact information';
+                AboutText = 'In the Communication section, you should provide the necessary information for establishing communication with the store, such as an email, phone number, and a website homepage.';
+#endif
                 field("Phone No."; Rec."Phone No.")
                 {
 
@@ -123,6 +134,10 @@
             group(Profiles)
             {
                 Caption = 'Profiles';
+#if not BC17
+                AboutTitle = 'Restaurant and Posting profiles';
+                AboutText = 'If there is a restaurant in the building represented by the POS Store Card, you should provide the Restaurant Profile in the indicated field. Additionally, you are required to provide the profile that is going to be used for postings in the POS Posting Profile field.';
+#endif
                 field("POS Restaurant Profile"; Rec."POS Restaurant Profile")
                 {
 
@@ -140,6 +155,10 @@
             group(Reporting)
             {
                 Caption = 'Reporting';
+#if not BC17
+                AboutTitle = 'Reporting information';
+                AboutText = 'In this section, you can provide the global dimensions assigned to the store entries, group, category, and locality codes (if needed), as well as details such as store size, opening date, and geolocation. The information you provide here will be useful when generating reports.';
+#endif
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
 
