@@ -85,7 +85,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         if BaseCalculationDate = 0D then
             BaseCalculationDate := WorkDate();
 
-        FillDataLastDay(POSTurnoverCalcBuffer, BaseCalculationDate);
+        FillDataCurrentDay(POSTurnoverCalcBuffer, BaseCalculationDate);
 
         FillDataCurrentWeek(POSTurnoverCalcBuffer, BaseCalculationDate);
         FillDataLastWeek(POSTurnoverCalcBuffer, BaseCalculationDate);
@@ -97,17 +97,17 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         FillDataLastYear(POSTurnoverCalcBuffer, BaseCalculationDate);
     end;
 
-    local procedure FillDataLastDay(var POSTurnoverCalcBuffer: Record "NPR POS Turnover Calc. Buffer"; BaseDate: Date)
+    local procedure FillDataCurrentDay(var POSTurnoverCalcBuffer: Record "NPR POS Turnover Calc. Buffer"; BaseDate: Date)
     var
         FromDateCurrent: Date;
         ToDateCurrent: Date;
         FromDateLast: Date;
         ToDateLast: Date;
-        DayLastText: Label 'Day - Last';
+        DayLastText: Label 'Day - This Current';
     begin
-        FromDateCurrent := BaseDate - 1;
+        FromDateCurrent := BaseDate;
         ToDateCurrent := FromDateCurrent;
-        FromDateLast := CalcDate('<-1Y>', BaseDate - 1);
+        FromDateLast := CalcDate('<-1Y>', BaseDate);
         ToDateLast := FromDateLast;
 
         CreateHeaderRow(POSTurnoverCalcBuffer, DayLastText, Format(FromDateCurrent), Format(FromDateLast));
