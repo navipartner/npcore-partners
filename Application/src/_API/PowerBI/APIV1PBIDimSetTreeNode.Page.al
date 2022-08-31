@@ -6,7 +6,7 @@ page 6059917 "NPR APIV1 PBIDimSetTreeNode"
     PageType = API;
     EntityName = 'dimensionsSetTreeNode';
     EntitySetName = 'dimensionsSetTreeNodes';
-    Caption = 'Dimension Set Tree Node';
+    Caption = ' PowerBI Dimension Set Tree Node';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
