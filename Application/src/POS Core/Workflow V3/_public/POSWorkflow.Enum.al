@@ -260,6 +260,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'INSERT_COMMENT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action - Insert Comm.";
     }
+    value(46; "SS-PAY-SCREEN")
+    {
+        Caption = 'SS-PAY-SCREEN', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR SS Action: Payment Screen";
+    }
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;

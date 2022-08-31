@@ -1,50 +1,36 @@
-﻿codeunit 6151284 "NPR SS Action: Payment Screen"
+﻿codeunit 6151284 "NPR SS Action: Payment Screen" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This built in function changes to payment view';
-
-    local procedure ActionCode(): Text[20]
     begin
-
-        exit('SS-PAY-SCREEN');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.SetWorkflowTypeUnattended();
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
-
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction20(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion())
-        then begin
-            Sender.RegisterWorkflow20('workflow.respond();');
-            Sender.SetWorkflowTypeUnattended();
+        case Step of
+            'ChangeToPaymentView':
+                Frontend.WorkflowResponse(ChangeToPaymentView(POSSession));
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    internal procedure ChangeToPaymentView(POSSession: Codeunit "NPR POS Session"): JsonObject
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        ChangeToPaymentView(POSSession);
-    end;
-
-    procedure ChangeToPaymentView(POSSession: Codeunit "NPR POS Session")
-    begin
-
         POSSession.ChangeViewPayment();
     end;
-}
 
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionPayScreenSS.js###
+'let main=async({})=>await workflow.respond("ChangeToPaymentView");'
+        )
+    end;
+}
