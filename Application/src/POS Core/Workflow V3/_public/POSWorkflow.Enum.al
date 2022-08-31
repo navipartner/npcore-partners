@@ -210,6 +210,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'CHANGE_AMOUNT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Change LineAm.";
     }
+    value(36; "SS-SALE-SCREEN")
+    {
+        Caption = 'SS-SALE-SCREEN', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR SS Action - Sale Screen";
+    }
     value(37; LOAD_FROM_POS_QUOTE)
     {
         Caption = 'LOAD_FROM_POS_QUOTE', Locked = true, MaxLength = 20;
@@ -249,6 +254,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'QUANTITY', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Quantity";
+    }
+    value(45; INSERT_COMMENT)
+    {
+        Caption = 'INSERT_COMMENT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Insert Comm.";
     }
     value(6014600; BALANCE_V4)
     {
