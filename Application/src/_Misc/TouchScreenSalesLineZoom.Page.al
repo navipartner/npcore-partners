@@ -41,12 +41,6 @@
                     ToolTip = 'Specifies the value of the Serial No. field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Serial No. not Created"; Rec."Serial No. not Created")
-                {
-
-                    ToolTip = 'Specifies the value of the Serial No. not Created field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Variant Code"; Rec."Variant Code")
                 {
 
