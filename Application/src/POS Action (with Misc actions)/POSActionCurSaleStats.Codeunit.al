@@ -37,8 +37,8 @@ codeunit 6059870 "NPR POS Action: Cur Sale Stats"
 
         POSSession.GetSale(SalePOS);
         SalePOS.GetCurrentSale(POSSale);
-        
+
         POSStatisticsMgt.FillCurrentStatsBuffer(POSCurrentStatsBuffer, POSSale);
-        Page.Run(Page::"NPR POS Current Sale Stats", POSCurrentStatsBuffer);
+        Page.RunModal(Page::"NPR POS Current Sale Stats", POSCurrentStatsBuffer);
     end;
 }
