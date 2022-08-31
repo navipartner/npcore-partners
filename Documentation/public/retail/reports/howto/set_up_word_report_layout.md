@@ -1,6 +1,6 @@
-# Customize report layout in Word
+# Customize report layout in Microsoft Word
 
-Business Central has a possibility to utilize Microsoft Word for report layouts. In this way it can be quite easy to design sales invoice, credit memo, or any other report with specific layout. 
+Business Central has a possibility to utilize Microsoft Word for report layouts. In this way, it can be quite easy to design sales invoices, credit memos, or any other reports with specific layouts. 
 
 To set up report layouts in Business Central, follow the provided steps:
 
