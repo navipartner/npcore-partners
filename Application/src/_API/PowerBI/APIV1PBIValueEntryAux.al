@@ -1,0 +1,97 @@
+page 6059989 "NPR APIV1 PBI Value Entry Aux"
+{
+    APIGroup = 'powerBI';
+    APIPublisher = 'navipartner';
+    APIVersion = 'v1.0';
+    DelayedInsert = true;
+    EntityName = 'valueEntryAux';
+    EntitySetName = 'valueEntriesAux';
+    Caption = 'PowerBI ValueEntryAux';
+    DataAccessIntent = ReadOnly;
+    ODataKeyFields = SystemId;
+    PageType = API;
+    SourceTable = "NPR Aux. Value Entry";
+    Extensible = false;
+    Editable = false;
+    layout
+    {
+        area(content)
+        {
+            repeater(General)
+            {
+                field(systemId; Rec.SystemId)
+                {
+                    Caption = 'SystemId';
+                }
+                field(entryNo; Rec."Entry No.")
+                {
+                    Caption = 'Entry No.';
+                }
+                field(entryType; Rec."Entry Type")
+                {
+                    Caption = 'Entry Type';
+                }
+                field(globalDimension1Code; Rec."Global Dimension 1 Code")
+                {
+                    Caption = 'Global Dimension 1 Code';
+                }
+                field(globalDimension2Code; Rec."Global Dimension 2 Code")
+                {
+                    Caption = 'Global Dimension 2 Code';
+                }
+                field(postingDate; Rec."Posting Date")
+                {
+                    Caption = 'Posting Date';
+                }
+                field(valuationDate; Rec."Valuation Date")
+                {
+                    Caption = 'Valuation Date';
+                }
+                field(invoicedQuantity; Rec."Invoiced Quantity")
+                {
+                    Caption = 'Invoiced Quantity';
+                }
+                field(itemCategoryCode; Rec."Item Category Code")
+                {
+                    Caption = 'Item Category Code';
+                }
+                field(itemLedgerEntryNo; Rec."Item Ledger Entry No.")
+                {
+                    Caption = 'Item Ledger Entry No.';
+                }
+                field(itemLedgerEntryType; Rec."Item Ledger Entry Type")
+                {
+                    Caption = 'Item Ledger Entry Type';
+                }
+                field(itemNo; Rec."Item No.")
+                {
+                    Caption = 'Item No.';
+                }
+                field(variantCode; Rec."Variant Code")
+                {
+                    Caption = 'Variant Code';
+                }
+                field(groupSale; Rec."Group Sale")
+                {
+                    Caption = 'Group Sale';
+                }
+                field(itemChargeNo; Rec."Item Charge No.")
+                {
+                    Caption = 'Item Charge No.';
+                }
+                field(locationCode; Rec."Location Code")
+                {
+                    Caption = 'Location Code';
+                }
+                field(posUnitNo; Rec."POS Unit No.")
+                {
+                    Caption = 'POS Unit No.';
+                }
+                field(salespersPurchCode; Rec."Salespers./Purch. Code")
+                {
+                    Caption = 'Salespers./Purch. Code';
+                }
+            }
+        }
+    }
+}
