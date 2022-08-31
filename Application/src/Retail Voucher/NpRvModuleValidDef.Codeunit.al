@@ -1,10 +1,11 @@
 ﻿codeunit 6151015 "NPR NpRv Module Valid.: Def."
 {
     Access = Internal;
+
     var
         Text000: Label 'Validate Voucher - Default';
         Text001: Label 'Voucher is being used';
-        Text002: Label 'Voucher has already been used';
+        Text002: Label 'The voucher has already been used. No amount remains on the voucher.';
         Text003: Label 'Voucher is not valid yet';
         Text004: Label 'Voucher is not valid anymore';
         Text005: Label 'Invalid Reference No. %1';
