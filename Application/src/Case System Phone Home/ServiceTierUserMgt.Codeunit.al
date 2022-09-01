@@ -231,10 +231,10 @@
             Evaluate(ExpirationMessageLastChecked, '1970-01-01T00:00:00Z', 9);
 
         //In order to reduce number of calls to externall services (case system), send the request on login only:
-        //  if user wasn't set to expire and if last check was done more than an hour ago
-        //  but if user was set to be expired (and now it should be unlocked) skip checking if an hour has passed and send the request
+        //  if user wasn't set to expire and if last check was done more than a day ago
+        //  but if user was set to be expired (and now it should be unlocked) skip checking if one day has passed and send the request
         DurationFromLastCheck := CurrentDateTime() - ExpirationMessageLastChecked;
-        DurationCondition := 1000 * 60 * 60; //miliseconds * seconds * minutes = one hour
+        DurationCondition := 1000 * 60 * 60 * 24; //miliseconds * seconds * minutes * hours = one day
 
         if (ClientDiagnostic."Expiration Message" = '') and (DurationFromLastCheck <= DurationCondition) then
             exit;
@@ -267,10 +267,10 @@
             Evaluate(ExpiryDateLastChecked, '1970-01-01T00:00:00Z', 9);
 
         //In order to reduce number of calls to externall services (case system), send the request on login only:
-        //  if user wasn't set to expire and if last check was done more than an hour ago
-        //  but if user was set to be expired (and now it should be unlocked) skip checking if an hour has passed and send the request
+        //  if user wasn't set to expire and if last check was done more than a day ago
+        //  but if user was set to be expired (and now it should be unlocked) skip checking if one day has passed and send the request
         DurationFromLastCheck := CurrentDateTime() - ExpiryDateLastChecked;
-        DurationCondition := 1000 * 60 * 60; //miliseconds * seconds * minutes = one hour
+        DurationCondition := 1000 * 60 * 60 * 24; //miliseconds * seconds * minutes * hours = one day
 
         if (ClientDiagnostic."Expiry Date" = 0DT) and (DurationFromLastCheck <= DurationCondition) then
             exit;
@@ -367,10 +367,10 @@
             Evaluate(LockedMessageLastChecked, '1970-01-01T00:00:00Z', 9);
 
         //In order to reduce number of calls to externall services (case system), send the request on login only:
-        //  if user wasn't locked and if last check was done more than an hour ago
-        //  but if user was set to be locked (and now it should be unlocked) skip checking if an hour has passed and send the request
+        //  if user wasn't locked and if last check was done more than a day ago
+        //  but if user was set to be locked (and now it should be unlocked) skip checking if day has passed and send the request
         DurationFromLastCheck := CurrentDateTime() - LockedMessageLastChecked;
-        DurationCondition := 1000 * 60 * 60; //miliseconds * seconds * minutes = one hour
+        DurationCondition := 1000 * 60 * 60 * 24; //miliseconds * seconds * minutes * hours = one day
 
         if (ClientDiagnostic."Locked Message" = '') and (DurationFromLastCheck <= DurationCondition) then
             exit;
