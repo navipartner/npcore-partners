@@ -87,10 +87,6 @@
             {
                 Caption = 'Print Card';
                 Image = PrintVoucher;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-
                 ToolTip = 'Executes the Print Card action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
@@ -105,9 +101,6 @@
             {
                 Caption = 'Card Card';
                 Image = Voucher;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
                 RunObject = Page "NPR MM Member Card Card";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Entry No.");

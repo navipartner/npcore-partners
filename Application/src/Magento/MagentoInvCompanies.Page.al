@@ -86,11 +86,6 @@
             {
                 Caption = 'Test Api Url';
                 Image = TestFile;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                PromotedIsBig = true;
-
                 ToolTip = 'Executes the Test Api Url action';
                 ApplicationArea = NPRRetail;
 

@@ -8,10 +8,6 @@ pageextension 6014449 "NPR Sales Invoice Subform" extends "Sales Invoice Subform
             {
                 Caption = 'Variety';
                 Image = ItemVariant;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
 
                 ToolTip = 'View the variety matrix for the item used on the Sales Invoice Line.';

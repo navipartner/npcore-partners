@@ -95,9 +95,6 @@
             {
                 Caption = 'Open Card';
                 ApplicationArea = NPRRetail;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
                 Image = Card;
                 RunObject = Page "NPR Replication Endpoint";
                 RunPageLink = "EndPoint ID" = field("EndPoint ID");
@@ -107,9 +104,6 @@
             {
                 Caption = 'Special Field Mappings';
                 ApplicationArea = NPRRetail;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
                 Image = MapAccounts;
                 ToolTip = 'Open Special Field Mappings.';
                 trigger OnAction()
@@ -122,9 +116,6 @@
             {
                 Caption = 'Get Last Replication Counter';
                 ApplicationArea = NPRRetail;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
                 Image = GetSourceDoc;
                 ToolTip = 'Updates the Replication Counter on the Endpoint to the Last Replication Counter from the Source database table. This should be used if the starting point of the Replication needs to be changed.';
                 trigger OnAction()
@@ -139,10 +130,6 @@
                 ToolTip = 'View endpoint error log entries.';
                 Image = ErrorLog;
                 Caption = 'Error Log';
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-
                 trigger OnAction()
                 var
                     ReplicationAPI: Codeunit "NPR Replication API";

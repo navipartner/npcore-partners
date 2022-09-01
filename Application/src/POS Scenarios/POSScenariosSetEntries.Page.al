@@ -43,14 +43,9 @@
             {
                 Caption = 'POS Scenarios Steps';
                 Image = List;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 RunObject = Page "NPR POS Scenarios Steps";
                 RunPageLink = "Set Code" = FIELD("Set Code"),
                               "Workflow Code" = FIELD("Workflow Code");
-
                 ToolTip = 'Executes the Workflow Steps action';
                 ApplicationArea = NPRRetail;
             }
