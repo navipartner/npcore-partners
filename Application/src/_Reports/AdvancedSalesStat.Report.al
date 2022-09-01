@@ -223,17 +223,19 @@
                     ToolTip = 'Specifies the value of the Lines field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Global Dimension 1"; Dim1Filter)
+                field("Global Dimension 1 Filter"; Dim1Filter)
                 {
-                    Caption = 'Global Dimension 1';
-                    ToolTip = 'Specifies the default Global Dimension 1 Code';
+                    CaptionClass = '1,1,1';
+                    Caption = 'Global Dimension 1 Code';
+                    ToolTip = 'Specifies Global Dimension 1 Filter';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
                     ApplicationArea = NPRRetail;
                 }
-                field("Global Dimension 2"; Dim2Filter)
+                field("Global Dimension 2 Filter"; Dim2Filter)
                 {
-                    Caption = 'Global Dimension 2';
-                    ToolTip = 'Specifies the default Global Dimension 2 Code';
+                    CaptionClass = '1,1,2';
+                    Caption = 'Global Dimension 2 Code';
+                    ToolTip = 'Specifies Global Dimension 2 Filter';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
                     ApplicationArea = NPRRetail;
                 }
@@ -252,8 +254,8 @@
     {
         Report_Caption = 'Advanced Sales Statistics';
         Page_Caption = 'Page';
-        GlobalDim1_Caption = 'Global dim. 1:';
-        GlobalDim2_Caption = 'Global dim. 2:';
+        GlobalDim1_Caption = 'Global Dimension 1 Code:';
+        GlobalDim2_Caption = 'Global Dimension 2 Code:';
         ItemCategoryFilter_Caption = 'Item Category filter:';
         Period_Caption = 'Period:';
         No_Caption = 'No.';
