@@ -79,11 +79,6 @@
             {
                 Caption = 'Show Document';
                 Image = ViewDetails;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
                 ToolTip = 'Executes the Show Document action';
                 ApplicationArea = NPRRetail;
 

@@ -79,11 +79,6 @@
             {
                 Caption = 'Show Document';
                 Image = ViewDetails;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
                 ToolTip = 'Executes the Show Document action';
                 ApplicationArea = NPRRetail;
 
@@ -99,11 +94,6 @@
             {
                 Caption = 'Show Sales Tax Calculation';
                 Image = TaxDetail;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
                 ToolTip = 'Show sales tax calculation for active sale line.';
                 ApplicationArea = NPRRetail;
 

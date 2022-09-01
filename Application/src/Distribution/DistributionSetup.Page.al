@@ -69,10 +69,6 @@
             {
                 Caption = 'Create SKUs';
                 Image = SKU;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-
                 ToolTip = 'Executes the Create SKUs action';
                 ApplicationArea = NPRRetail;
             }
@@ -80,10 +76,6 @@
             {
                 Caption = 'Create Demands';
                 Image = CreateLinesFromJob;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-
                 ToolTip = 'Executes the Create Demands action';
                 ApplicationArea = NPRRetail;
 
@@ -99,9 +91,6 @@
             {
                 Caption = 'Demand Lines';
                 Image = Line;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Item Hierachy" = FIELD("Item Hiearachy"),
                               "Distribution Group" = FIELD("Distribution Group");

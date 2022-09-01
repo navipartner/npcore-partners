@@ -48,8 +48,6 @@
 
                 Caption = 'Done!';
                 InFooterBar = True;
-                Promoted = true;
-                PromotedOnly = true;
                 Image = Completed;
                 ToolTip = 'Close the welcome window.';
 

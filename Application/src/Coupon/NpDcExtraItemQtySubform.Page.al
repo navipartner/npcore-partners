@@ -69,11 +69,6 @@
             {
                 Caption = 'Add Items';
                 Image = Add;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
                 ToolTip = 'Executes the Add Items action';
                 ApplicationArea = NPRRetail;
 

@@ -57,9 +57,6 @@
             {
                 Caption = 'Distribution Items';
                 Image = SKU;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
                 RunObject = Page "NPR Retail Replenish. SKU List";
                 RunPageLink = "Location Code" = FIELD(Location);
 
@@ -70,9 +67,6 @@
             {
                 Caption = 'Distribution Lines';
                 Image = ItemAvailbyLoc;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
                 RunObject = Page "NPR Distribution Lines";
 
                 ToolTip = 'Executes the Distribution Lines action';
@@ -83,9 +77,6 @@
             action("Demand Lines")
             {
                 Image = ItemAvailability;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Location Code" = FIELD(Location);
 

@@ -159,10 +159,6 @@
             action("New Part")
             {
                 Image = NewItem;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                PromotedIsBig = true;
                 Visible = (MixType = 1);
 
                 ToolTip = 'Executes the New Part action';
@@ -189,14 +185,9 @@
             action("Part Card")
             {
                 Image = Item;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                PromotedIsBig = true;
                 RunObject = Page "NPR Mixed Discount";
                 RunPageLink = Code = FIELD("No.");
                 Visible = (MixType = 1);
-
                 ToolTip = 'Executes the Part Card action';
                 ApplicationArea = NPRRetail;
             }

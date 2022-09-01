@@ -60,7 +60,7 @@
                         CurrPage.Update(false);
                     end;
                 }
-                field("ScheduledTimeDescription_PrimaryRequest"; Rec."Scheduled Time Description")
+                field(ScheduledTimeDescription_PrimaryRequest; Rec."Scheduled Time Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
@@ -81,7 +81,7 @@
                         CurrPage.Update(false);
                     end;
                 }
-                field("ScheduledTimeDescription_ChangeRequest"; Rec."Scheduled Time Description")
+                field(ScheduledTimeDescription_ChangeRequest; Rec."Scheduled Time Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
@@ -327,11 +327,6 @@
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Select Schedule';
                 Image = ChangeDate;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                PromotedIsBig = true;
-
                 trigger OnAction()
                 begin
 

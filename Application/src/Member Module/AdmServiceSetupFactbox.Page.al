@@ -54,11 +54,6 @@
                 Caption = 'Guest Avatar Image';
                 action(ImportGuestAvatarImage)
                 {
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-
                     Caption = 'Import guest avatar image';
                     Image = Import;
                     ToolTip = 'Executes the Import guest avatar image action';
@@ -72,11 +67,6 @@
 
                 action(DeleteGuestAvatarImage)
                 {
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-
                     Caption = 'Delete guest avatar image';
                     Image = Delete;
                     ToolTip = 'Executes the Delete guest avatar image action';
@@ -92,11 +82,6 @@
                 Caption = 'Default Turnstile Image';
                 action(ImportDefaultTurnstileImage)
                 {
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-
                     Caption = 'Import default turnstile image';
                     Image = Import;
                     ToolTip = 'Executes the Import default turnstile image action';
@@ -110,11 +95,6 @@
 
                 action(DeleteDefaultTurnstileImage)
                 {
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-
                     Caption = 'Delete default turnstile image';
                     Image = Delete;
                     ToolTip = 'Executes the Delete default turnstile image action';
@@ -131,11 +111,6 @@
                 Caption = 'Turnstile Error Image';
                 action(ImportErrorImageofTurnstile)
                 {
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-
                     Caption = 'Import turnstile error image';
                     Image = Import;
                     ToolTip = 'Executes the Import turnstile error image action';
@@ -149,11 +124,6 @@
 
                 action(DeleteErrorImageofTurnstile)
                 {
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-
                     Caption = 'Delete turnstile error image';
                     Image = Delete;
                     ToolTip = 'Executes the Delete turnstile error image action';

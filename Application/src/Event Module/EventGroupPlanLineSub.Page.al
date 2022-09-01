@@ -574,10 +574,6 @@
                 {
                     Caption = 'Event &Task Lines';
                     Image = TaskList;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
                     RunObject = Page "NPR Event Task Lines";
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
@@ -716,11 +712,6 @@
                 {
                     Caption = 'Create Job &Journal Lines';
                     Image = PostOrder;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-
                     ToolTip = 'Executes the Create Job &Journal Lines action';
                     ApplicationArea = NPRRetail;
 
@@ -751,9 +742,6 @@
                 {
                     Caption = '&Open Job Journal';
                     Image = Journals;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Job Journal";
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
@@ -769,11 +757,6 @@
                     Caption = 'Create &Sales Invoice';
                     Ellipsis = true;
                     Image = Invoice;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-
                     ToolTip = 'Executes the Create &Sales Invoice action';
                     ApplicationArea = NPRRetail;
 
@@ -787,10 +770,6 @@
                     Caption = 'Create Sales &Credit Memo';
                     Ellipsis = true;
                     Image = CreditMemo;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-
                     ToolTip = 'Executes the Create Sales &Credit Memo action';
                     ApplicationArea = NPRRetail;
 
@@ -804,10 +783,6 @@
                     Caption = 'Sales &Documents';
                     Ellipsis = true;
                     Image = GetSourceDoc;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-
                     ToolTip = 'Executes the Sales &Documents action';
                     ApplicationArea = NPRRetail;
 

@@ -218,10 +218,9 @@
             {
                 Caption = 'Sales &Order';
                 Image = Document;
-                Promoted = false;
+
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
-
                 ToolTip = 'View or edit the Sales &Order';
                 ApplicationArea = NPRRetail;
             }

@@ -46,11 +46,6 @@
             {
                 Caption = 'Download';
                 Image = CreateXMLFile;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
                 ToolTip = 'Executes the Download action';
                 ApplicationArea = NPRRetail;
 

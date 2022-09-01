@@ -807,9 +807,6 @@
                 {
                     Caption = 'POS Entry List';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
                     RunObject = page "NPR POS Entry List";
                     ToolTip = 'View POS Entry that have been done.';
                     ApplicationArea = NPRRetail;
@@ -819,9 +816,6 @@
                 {
                     Caption = 'POS Entry Sales & Payment List';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
                     RunObject = page "NPR POS Entry Sales & Payments";
                     ToolTip = 'View POS Entry Sales & Payment List that have been done.';
                     ApplicationArea = NPRRetail;
@@ -831,9 +825,6 @@
                 {
                     Caption = 'EFT Transaction Request';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
                     RunObject = page "NPR EFT Transaction Requests";
                     ToolTip = 'View EFT Transaction Requests.';
                     ApplicationArea = NPRRetail;
@@ -843,9 +834,6 @@
                 {
                     Caption = 'Global POS Sales Entries';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
                     RunObject = page "NPR NpGp POS Sales Entries";
                     ToolTip = 'View Global POS Sales Entries.';
                     ApplicationArea = NPRRetail;
@@ -855,9 +843,6 @@
                 {
                     Caption = 'POS Saved Sales';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
                     RunObject = page "NPR POS Saved Sales";
                     ToolTip = 'View POS Saved Sales that have been done.';
                     ApplicationArea = NPRRetail;
@@ -868,9 +853,6 @@
                 {
                     Caption = 'Posted Sales Invoices List';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Posted Sales Invoices";
                     ToolTip = 'View Sales Invoices that have been done.';
                     ApplicationArea = NPRRetail;
@@ -881,9 +863,6 @@
                 {
                     Caption = 'Posted Sales Shipment List';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Posted Sales Shipments";
                     ToolTip = 'View Posted Sales Shipments that have been done.';
                     ApplicationArea = NPRRetail;
@@ -893,9 +872,6 @@
                 {
                     Caption = 'Posted Sales Credit Memos List';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Posted Sales Credit Memos";
                     ToolTip = 'View Sales Credit Memos that have been done.';
                     ApplicationArea = NPRRetail;
@@ -945,7 +921,6 @@
             {
                 Caption = 'Sales &Order';
                 Image = Document;
-                Promoted = false;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
 
@@ -986,7 +961,6 @@
             {
                 Caption = '&Purchase Order';
                 Image = Document;
-                Promoted = false;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
 
