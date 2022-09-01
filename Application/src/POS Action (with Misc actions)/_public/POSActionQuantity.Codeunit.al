@@ -2,6 +2,8 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
 {
     var
         MustBePositiveErr: Label 'Quantity must be positive.';
+        QuantityGlobal: Decimal;
+        InitializedQty: Boolean;
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
@@ -77,7 +79,6 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
     local procedure ChangeQty(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line")
     var
         Quantity: Decimal;
-        QuantityText: Text;
         UnitPrice: Decimal;
         ConstraintOption: Option "No Constraint","Positive Quantity Only","Negative Quantity Only";
         ReturnReasonCode: Code[20];
@@ -86,14 +87,12 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         POSActQuantityB: Codeunit "NPR POS Action: Quantity B";
         PromptUnitPriceOnNegativeInput: Boolean;
     begin
-        ReturnReasonCode := CopyStr(Context.GetString('ReturnReasonCode'), 1, MaxStrLen(ReturnReasonCode));
-        QuantityText := Context.GetString('PromptQuantity');
+        if (Context.GetBoolean('PromptForReason') = true) then
+            ReturnReasonCode := CopyStr(Context.GetString('ReturnReasonCode'), 1, MaxStrLen(ReturnReasonCode));
+
         PromptUnitPriceOnNegativeInput := Context.GetBooleanParameter('PromptUnitPriceOnNegativeInput');
 
-        if not Evaluate(Quantity, QuantityText) then begin
-            POSActQuantityB.RemoveStarFromQuantity(QuantityText);
-            Evaluate(Quantity, QuantityText);
-        end;
+        Quantity := GetQty(Context);
 
         NegativeInput := Context.GetBooleanParameter('NegativeInput');
 
@@ -107,14 +106,35 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
 
     end;
 
+    local procedure GetQty(Context: Codeunit "NPR POS JSON Helper"): Decimal
+    var
+        QuantityText: Text;
+        POSActQuantityB: Codeunit "NPR POS Action: Quantity B";
+    begin
+        if not InitializedQty then begin
+            QuantityText := Context.GetString('PromptQuantity');
+
+            if not Evaluate(QuantityGlobal, QuantityText) then begin
+                POSActQuantityB.RemoveStarFromQuantity(QuantityText);
+                Evaluate(QuantityGlobal, QuantityText);
+            end;
+            InitializedQty := true;
+        end;
+
+        exit(QuantityGlobal);
+    end;
+
     local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
         POSSetup: Codeunit "NPR POS Setup";
         POSSession: Codeunit "NPR POS Session";
+        Quantity: Decimal;
     begin
-        if not Context.GetBooleanParameter('NegativeInput') then begin
+        Quantity := GetQty(Context);
+
+        if (Context.GetBooleanParameter('NegativeInput') = false) and (Quantity > 0) then begin
             Response.Add('PromptForReason', false);
             exit;
         end;
@@ -221,7 +241,7 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionQuantity.Codeunit.js###
-'let main=async({workflow:a,context:n,popup:i,parameters:t,captions:u})=>{let y,o=await a.respond("AddPresetValuesToContext"),l=runtime.getData("BUILTIN_SALELINE"),e=parseFloat(l._current[12]);if(t.Constraint==t.Constraint["Positive Quantity Only"]&&e<0){i.error(u.MustBePositive);return}if(t.Constraint==t.Constraint["Negative Quantity Only"]&&e>0){i.error(u.MustBeNegative);return}if(n.PromptQuantity=t.InputType==0?await i.numpad({caption:u.QtyCaption,value:e}):t.InputType==1?t.ChangeToQuantity:t.InputType==2?e+t.IncrementQuantity:null,!!n.PromptQuantity){if(t.MaxQuantityAllowed&&t.MaxQuantityAllowed!=0&&Math.abs(n.PromptQuantity)>t.MaxQuantityAllowed){i.error(u.CannotExceedMaxQty+" "+t.MaxQuantityAllowed);return}t.PromptUnitPriceOnNegativeInput&&(t.NegativeInput?n.PromptQuantity>0:n.PromptQuantity<0)&&(n.PromptUnitPrice=await i.numpad({caption:u.PriceCaption,value:l._current[15]})),o&&(y=await a.respond("AskForReturnReason")),await a.respond("ChangeQty",y,o)}};'
+'let main=async({workflow:a,context:n,popup:i,parameters:t,captions:e})=>{let o,r=runtime.getData("BUILTIN_SALELINE"),u=parseFloat(r._current[12]);if(t.Constraint==t.Constraint["Positive Quantity Only"]&&u<0){i.error(e.MustBePositive);return}if(t.Constraint==t.Constraint["Negative Quantity Only"]&&u>0){i.error(e.MustBeNegative);return}if(n.PromptQuantity=t.InputType==0?await i.numpad({caption:e.QtyCaption,value:u}):t.InputType==1?t.ChangeToQuantity:t.InputType==2?u+t.IncrementQuantity:null,!n.PromptQuantity)return;if(t.MaxQuantityAllowed&&t.MaxQuantityAllowed!=0&&Math.abs(n.PromptQuantity)>t.MaxQuantityAllowed){i.error(e.CannotExceedMaxQty+" "+t.MaxQuantityAllowed);return}let y=await a.respond("AddPresetValuesToContext");t.PromptUnitPriceOnNegativeInput&&(t.NegativeInput?n.PromptQuantity>0:n.PromptQuantity<0)&&(n.PromptUnitPrice=await i.numpad({caption:e.PriceCaption,value:r._current[15]})),y.PromptForReason?(o=await a.respond("AskForReturnReason"),n.PromptForReason=!0):(n.PromptForReason=!1,o=""),await a.respond("ChangeQty",o)};'
           );
     end;
 

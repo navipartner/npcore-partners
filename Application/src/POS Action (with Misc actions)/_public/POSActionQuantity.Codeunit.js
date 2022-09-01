@@ -1,8 +1,6 @@
 let main = async ({workflow, context, popup, parameters, captions}) => {
 
-    let ReturnReasonCode;
-    let PromptForReason = await workflow.respond("AddPresetValuesToContext");
-    
+    let ReturnReasonCode;    
     let saleLines = runtime.getData("BUILTIN_SALELINE");
     let currentQty = parseFloat(saleLines._current[12]);
     if (
@@ -43,6 +41,7 @@ let main = async ({workflow, context, popup, parameters, captions}) => {
             return;
         }
     }
+    let PromptForReason = await workflow.respond("AddPresetValuesToContext");
     if (
         parameters.PromptUnitPriceOnNegativeInput &&
         (parameters.NegativeInput
@@ -55,8 +54,15 @@ let main = async ({workflow, context, popup, parameters, captions}) => {
         });
     }
 
-    if (PromptForReason) {
+    if (PromptForReason["PromptForReason"]) {
         ReturnReasonCode = await workflow.respond("AskForReturnReason");
+        context.PromptForReason = true;
     }
-    await workflow.respond("ChangeQty",ReturnReasonCode,PromptForReason);
+    else
+    {
+        context.PromptForReason = false;
+        ReturnReasonCode = "";
+    }
+
+    await workflow.respond("ChangeQty",ReturnReasonCode);
 };
