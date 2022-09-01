@@ -59,6 +59,8 @@
     href: howto/create_inventory_pick_action.md
   - name: Create a new sales order
     href: howto/create_sales_order.md
+  - name: Create a sales invoice
+    href: howto/create_sales_invoice.md
   - name: Create a stockkeeping unit
     href: howto/set_up_sku.md
 
