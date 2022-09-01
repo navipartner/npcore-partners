@@ -60,10 +60,6 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
             {
                 Caption = 'Variety';
                 Image = ItemVariant;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
 
                 ToolTip = 'View the variety matrix for the item used on the Purchase Order Line.';

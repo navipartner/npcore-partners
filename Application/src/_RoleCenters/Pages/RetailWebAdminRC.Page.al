@@ -746,7 +746,6 @@ page 6059871 "NPR Retail Web Admin RC"
             {
                 Caption = 'Sales &Order';
                 Image = Document;
-                Promoted = false;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
 

@@ -139,10 +139,6 @@
             {
                 Caption = 'Select Options';
                 Image = List;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 RunObject = Page "NPR NpIa ItemAddOn Line Opt.";
                 RunPageLink = "AddOn No." = FIELD("AddOn No."),
                               "AddOn Line No." = FIELD("Line No.");
@@ -155,12 +151,7 @@
             action("Before Insert Setup")
             {
                 Image = Setup;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 Visible = HasBeforeInsertSetup;
-
                 ToolTip = 'View or edit setup for current add-on line. If setup doesn''t exist for current line, then this action will create setup entry';
                 ApplicationArea = NPRRetail;
 

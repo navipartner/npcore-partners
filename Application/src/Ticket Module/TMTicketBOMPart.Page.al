@@ -5,7 +5,6 @@ page 6059885 "NPR TM Ticket BOM Part"
     UsageCategory = None;
     SourceTable = "NPR TM Ticket Admission BOM";
     CardPageId = "NPR TM Ticket BOM Card";
-    PromotedActionCategories = 'New,Process,Report,Create Tickets,Navigate';
     layout
     {
         area(Content)
@@ -88,9 +87,6 @@ page 6059885 "NPR TM Ticket BOM Part"
                 Scope = Repeater;
                 Caption = 'Admission';
                 Image = WorkCenter;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category5;
                 RunObject = Page "NPR TM Ticket Admissions";
                 RunPageLink = "Admission Code" = field("Admission Code");
             }
@@ -101,9 +97,6 @@ page 6059885 "NPR TM Ticket BOM Part"
                 Scope = Repeater;
                 Caption = 'Admission Schedules';
                 Image = CalendarWorkcenter;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category5;
                 RunObject = Page "NPR TM Admis. Schedule Lines";
                 RunPageLink = "Admission Code" = field("Admission Code");
             }
@@ -114,9 +107,6 @@ page 6059885 "NPR TM Ticket BOM Part"
                 Scope = Repeater;
                 Caption = 'Schedule Entries';
                 Image = WorkCenterLoad;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category5;
                 RunObject = Page "NPR TM Admis. Schedule Entry";
                 RunPageLink = "Admission Code" = field("Admission Code");
             }

@@ -5,7 +5,6 @@
     CardPageID = "Item Card";
     Editable = false;
     PageType = ListPart;
-    PromotedActionCategories = 'New,Process,Report,Item,History,Special Prices & Discounts,Request Approval,Periodic Activities,Inventory,Attributes';
     RefreshOnActivate = true;
     SourceTable = Item;
     UsageCategory = None;
