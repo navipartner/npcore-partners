@@ -1,6 +1,6 @@
 # Create an inventory pick based on the source document 
 
-After requesting an inventory pick, you can create a new inventory pick based on the source document that is in the **Released** status if there's sufficient inventory to fulfil the demand. To do this, follow the provided steps:
+You can create a new inventory pick based on the source document that is in the **Released** status if there's sufficient inventory to fulfil the demand. To do this, follow the provided steps:
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Inventory Picks** and choose the related link. 
 2. Click **New**.
