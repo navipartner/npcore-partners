@@ -63,6 +63,8 @@
     href: howto/create_sales_invoice.md
   - name: Create a stockkeeping unit
     href: howto/set_up_sku.md
+  - name: Receive items at a warehouse location
+    href: howto/receive_items.md
 
 - name: Reference
   items: 
@@ -70,6 +72,8 @@
     href: reference/inventory_setup_reference.md
   - name: Item card (reference guide)
     href: reference/item_card_reference.md
+  - name: Location card (reference guide)
+    href: reference/location_card.md
 
 - name: Videos
   items:
