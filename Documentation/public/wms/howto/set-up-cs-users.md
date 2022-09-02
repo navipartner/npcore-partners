@@ -11,6 +11,7 @@ All users who will should have access to the [mobile apps](/Documentation/public
  
 2. Click **New** located in the ribbon in the top part of the screen.
 3. Fill out the necessary fields with the following information:
+
     - **Name** - select the name of a valid Business Central user from the dropdown list.
     - **Password** - provide the password that the user needs to log into Business Central. 
     - **View Documents** - provide the user with access to all warehouse documents or only those assigned to them.     

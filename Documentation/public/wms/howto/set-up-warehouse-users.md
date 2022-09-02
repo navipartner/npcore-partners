@@ -10,9 +10,11 @@ The list of the configured users is displayed.
 
 3. Fill out the necessary fields with the following information:
 
-- **User ID** - select the user to be added as a warehouse employee from the dropdown list. 
-- **Location Code** - select the location in which the employee will be working.
-- **Default** - tick the checkbox to define the location as the only one in which the employee can perform warehouse activities.
+   | Field Name      | Description |
+   | ----------- | ----------- |
+   | **User ID**   | Select the user to be added as a warehouse employee from the dropdown list.    |
+   | **Location Code**   | Select the location in which the employee will be working.      |
+   | **Default**  | Tick the checkbox to define the location as the only one in which the employee can perform warehouse activities. |
 
 4. Repeat **Step 3** for other warehouse employees that you wish to assign to specific locations, or assign non-default locations to the existing warehouse employees.
 
