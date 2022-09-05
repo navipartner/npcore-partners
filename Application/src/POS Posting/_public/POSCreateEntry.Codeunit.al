@@ -859,37 +859,33 @@
     local procedure CalculateTransactionAmountLCY(var POSBinEntry: Record "NPR POS Bin Entry")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
+        CurrExchRate: Record "Currency Exchange Rate";
+        Currency: Record Currency;
     begin
 
         POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount";
 
-        if (POSBinEntry."Transaction Amount" = 0) then
+        if POSBinEntry."Transaction Amount" = 0 then
             exit;
 
-        if (POSBinEntry."Transaction Currency Code" = '') then
+        if POSBinEntry."Transaction Currency Code" = '' then
             exit;
 
-        // ** Legacy Way
         if not POSPaymentMethod.Get(POSBinEntry."Payment Type Code") then
             exit;
 
-        if (POSPaymentMethod."Fixed Rate" <> 0) then
-            POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount" * POSPaymentMethod."Fixed Rate" / 100;
-
-        if (POSPaymentMethod."Rounding Precision" = 0) then
-            exit;
-
-        POSBinEntry."Transaction Amount (LCY)" := Round(POSBinEntry."Transaction Amount (LCY)", POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType());
-        exit;
-
-        // ** End Legacy
-
-        // ** Future way
-        // IF (NOT Currency.Get() (CurrencyCode)) THEN
-        //  EXIT;
-        //
-        // EXIT (ROUND (CurrExchRate.ExchangeAmtFCYToLCY (TransactionDate, CurrencyCode, Amount,
-        //                                               1 / CurrExchRate.ExchangeRate (TransactionDate, CurrencyCode))));
+        if POSPaymentMethod."Use Stand. Exc. Rate for Bal." then begin
+            Currency.Get(POSBinEntry."Transaction Currency Code");
+            POSBinEntry."Transaction Amount (LCY)" := CurrExchRate.ExchangeAmtFCYToLCY(POSBinEntry."Transaction Date", POSBinEntry."Transaction Currency Code", POSBinEntry."Transaction Amount",
+                                                       1 / CurrExchRate.ExchangeRate(POSBinEntry."Transaction Date", POSBinEntry."Transaction Currency Code"));
+            if Currency."Amount Rounding Precision" <> 0 then
+                POSBinEntry."Transaction Amount (LCY)" := Round(POSBinEntry."Transaction Amount (LCY)", Currency."Amount Rounding Precision", Currency.InvoiceRoundingDirection());    
+        end else begin
+            if POSPaymentMethod."Fixed Rate" <> 0 then
+                POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount" * POSPaymentMethod."Fixed Rate" / 100;
+            if POSPaymentMethod."Rounding Precision" <> 0 then
+                POSBinEntry."Transaction Amount (LCY)" := Round(POSBinEntry."Transaction Amount (LCY)", POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType());
+        end;
     end;
 
     local procedure GetPOSPeriodRegister(var SalePOS: Record "NPR POS Sale"; var POSPeriodRegister: Record "NPR POS Period Register"; CheckOpen: Boolean): Boolean
