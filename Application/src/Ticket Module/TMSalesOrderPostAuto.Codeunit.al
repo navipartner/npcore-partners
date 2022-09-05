@@ -96,7 +96,7 @@
             repeat
                 if Item.Get(SalesLine."No.") then begin
                     Item.NPR_GetAuxItem(AuxItem);
-                    if AuxItem."TM Ticket Type" <> '' then
+                    if AuxItem."TM Ticket Type" = '' then
                         exit(true);
                 end;
             until SalesLine.Next() = 0;
@@ -140,27 +140,20 @@
         PaymentLine: Record "NPR Magento Payment Line";
     begin
         if SkipPaymentCheck then
-            exit;
+            exit(true);
 
         PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
-        if not PaymentLine.IsEmpty() then
-            exit(true);
-
-        PaymentLine.SetRange("Payment Gateway Code");
-
-        PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::"Payment Method");
-        exit(PaymentLine.IsEmpty());
+        exit(not PaymentLine.IsEmpty());
     end;
 
     local procedure PostSalesOrder(SalesHeader: Record "Sales Header")
     var
         SalesPost: Codeunit "Sales-Post";
     begin
-        if not SkipPaymentCheck then
-            if not PaymentIsAuthorized(SalesHeader) then
-                exit;
+        if not PaymentIsAuthorized(SalesHeader) then
+            exit;
 
         SalesHeader.Ship := true;
         SalesHeader.Invoice := true;
