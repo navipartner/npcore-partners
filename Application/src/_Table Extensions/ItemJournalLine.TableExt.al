@@ -8,6 +8,11 @@ tableextension 6014452 "NPR Item Journal Line" extends "Item Journal Line"
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
+        field(6014402; "NPR Description 2"; Text[50])
+        {
+            Caption = 'Description 2';
+            DataClassification = CustomerContent;
+        }
         field(6014404; "NPR Discount Type"; Option)
         {
             Caption = 'Discount Type';
