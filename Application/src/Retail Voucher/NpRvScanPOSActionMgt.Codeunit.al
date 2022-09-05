@@ -1,12 +1,14 @@
 ﻿codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
 {
     Access = Internal;
+
     var
         Text000: Label 'This action handles Scan Retail Vouchers (Payment).';
         Text001: Label 'Retail Voucher Payment';
         Text002: Label 'Enter Reference No.';
         ReadingErr: Label 'reading in %1';
         SettingScopeErr: Label 'setting scope in %1';
+        BlankReferenceNoErr: label 'Reference No. can''t be blank';
 
     local procedure ObjectIdentifier(): Text
     begin
@@ -35,7 +37,7 @@
           Sender."Subscriber Instances Allowed"::Multiple) then
             exit;
 
-        Sender.RegisterWorkflowStep('voucher_input', 'if(!param.ReferenceNo) {input({title: labels.VoucherPaymentTitle,caption: labels.ReferenceNo,value: "",notBlank: true}).cancel(abort)} ' +
+        Sender.RegisterWorkflowStep('voucher_input', 'if(!param.ReferenceNo) {input({title: labels.VoucherPaymentTitle,caption: labels.ReferenceNo,value: ""}).cancel(abort)} ' +
                                                     'else {context.$voucher_input = {"input": param.ReferenceNo}};');
         Sender.RegisterWorkflowStep('voucher_payment', 'respond ();');
         Sender.RegisterWorkflowStep('end_sale', 'if(param.EndSale) {respond()};');
@@ -44,6 +46,7 @@
         Sender.RegisterTextParameter('VoucherTypeCode', '');
         Sender.RegisterTextParameter('ReferenceNo', '');
         Sender.RegisterBooleanParameter('EndSale', true);
+        Sender.RegisterBooleanParameter('EnableVoucherList', false);
     end;
 
     local procedure InitializeVoucherPaymentCaptions(var Captions: Codeunit "NPR POS Caption Management")
@@ -126,6 +129,7 @@
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         POSLine: Record "NPR POS Sale Line";
+        VoucherListEnabled: Boolean;
     begin
         JSON.SetScopeParameters(ObjectIdentifier());
         VoucherType := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ObjectIdentifier())));
@@ -135,9 +139,15 @@
 
         JSON.SetScopeRoot();
         JSON.SetScope('$voucher_input', StrSubstNo(SettingScopeErr, ObjectIdentifier()));
+
         ReferenceNo := UpperCase(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ObjectIdentifier())));
+        VoucherListEnabled := JSON.GetBooleanParameter('EnableVoucherList');
+
         if ReferenceNo = '' then
-            exit;
+            if VoucherListEnabled then
+                ReferenceNo := SetReferenceNo(VoucherType)
+            else
+                Error(BlankReferenceNoErr);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -193,7 +203,28 @@
 
     local procedure VoucherPaymentActionVersion(): Code[20]
     begin
-        exit('1.0');
+        exit('1.1');
     end;
 
+    local procedure SetReferenceNo(VoucherType: Text): text[50]
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        NpRvVouchers: Page "NPR NpRv Vouchers";
+        ReferenceNo: Text;
+    begin
+        Voucher.SetCurrentKey("Voucher Type");
+        Voucher.SetRange("Voucher Type", VoucherType);
+
+        Clear(NpRvVouchers);
+        NpRvVouchers.LookupMode := true;
+        NpRvVouchers.SetTableView(Voucher);
+        if NpRvVouchers.RunModal() = Action::LookupOK then begin
+            NpRvVouchers.GetRecord(Voucher);
+            ReferenceNo := Voucher."Reference No.";
+        end;
+        if ReferenceNo = '' then
+            Error(BlankReferenceNoErr);
+        exit(ReferenceNo);
+
+    end;
 }
