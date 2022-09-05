@@ -22,14 +22,18 @@
         {
             Caption = 'Processing Type';
             DataClassification = CustomerContent;
-            //OptionCaption = 'Cash,Voucher,Check,EFT,CUSTOMER,PayOut,Foreign Voucher';
-            //OptionMembers = CASH,VOUCHER,CHECK,EFT,CUSTOMER,PAYOUT,"FOREIGN VOUCHER";
         }
         field(15; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
             DataClassification = CustomerContent;
             TableRelation = Currency;
+
+            trigger OnValidate()
+            begin
+                if Rec."Currency Code" <> '' then                
+                    Rec."Use Stand. Exc. Rate for Bal." := ConfirmUsageOfStandardExchangeRate();
+            end;            
         }
         field(20; "Vouched By"; Option)
         {
@@ -70,8 +74,18 @@
         {
             Caption = 'Fixed Rate';
             DataClassification = CustomerContent;
-
         }
+        field(32; "Use Stand. Exc. Rate for Bal."; Boolean)
+        {
+            Caption = 'Use Standard Exchange Rate for Balancing';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if Rec."Use Stand. Exc. Rate for Bal." then                
+                    Rec."Use Stand. Exc. Rate for Bal." := ConfirmUsageOfStandardExchangeRate();
+            end;
+        }        
         field(35; "Bin for Virtual-Count"; Code[10])
         {
             Caption = 'Bin for Virtual-Count';
@@ -291,5 +305,23 @@
         end;
     end;
 
+    local procedure ConfirmUsageOfStandardExchangeRate(): Boolean
+    var
+        CurrExchRate: Record "Currency Exchange Rate";
+        Currency: Record Currency;
+        GLSetup: Record "General Ledger Setup";
+        EnableStandardExchRateQst: Label 'Standard Exchange Rates will apply for %1 in balancing. With current exchange rate setup 1 %1 is equivalent to %2 %3.\Do you want to proceed?', Comment = '%1=Rec.FieldCaption("Currency Code");%2=Exchange Rate;%3=GLSetup."LCY Code"';
+    begin
+        if not GuiAllowed() then
+            exit;
+
+        GLSetup.Get();
+        Currency.Get(Rec."Currency Code");            
+        exit(Confirm(EnableStandardExchRateQst,
+                        false,
+                        Rec."Currency Code",
+                        Round(1 / CurrExchRate.ExchangeRate(Today(), Rec."Currency Code"), Currency."Amount Rounding Precision", Currency.InvoiceRoundingDirection()),
+                        GLSetup."LCY Code"));        
+    end;
 }
 

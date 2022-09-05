@@ -80,6 +80,11 @@
                     ToolTip = 'You can specify the Fixed Rate which will be used to convert 100 units of foreign currency into local currency. For example 1 FCY = 6.15 LCY , hence the value to be inserted = 100 x 6.15 = 615 instead of 6.15.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Use Stand. Exc. Rate for Bal."; Rec."Use Stand. Exc. Rate for Bal.")
+                {
+                    ToolTip = 'Specify whether fixed rate should be applied on transaction amount.';
+                    ApplicationArea = NPRRetail;
+                }                
                 field("Post Condensed"; Rec."Post Condensed")
                 {
 
