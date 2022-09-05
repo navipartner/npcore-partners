@@ -8,18 +8,24 @@ A QR code is a machine-readable optical label that can contain information about
    You can find the QR code in the **NPRW CS QR Code FactBox** section for configured users.
 2. Click **New** located in the ribbon in the top part of the screen if you wish to create a new user and QR code.
 3. Fill out the necessary fields with the following information:
-    - User ID for a valid Business Central user
-    - Password used by the user to log into Business Central. 
-    - Name of the default company the user will log into. 
-    - Tenant ID
-    - Database URL
-    - Webservice URL for the database       
+
+   | Field Name      | Description |
+   | ----------- | ----------- |
+   |  **User ID**   | Specifies the ID used for identifying the active user.   |
+   |  **Password**  | Specifies the password the active user can use to log in.   |
+   |  **Company**  |   Specifies the name of the company the user is associated with.   |
+   |  **Tenant**  |  Specifies the ID of the default tenant associated with the active user. |
+   |  **URL**  | Specifies the URL used for establishing connection with the database. |
+   |  **Webservice URL**  | Specifies the webservice endpoint where the database can be accessed by the client application. |
 
 > [!NOTE]
 > The **URL** and the **WebService URL** can be defaulted by clicking **Set Defaults** in the ribbon.
 
-4. Click **Create QR Code**.         
+1. Click **Create QR Code**.         
    The QR code is displayed in the **NPRW CS QR Code FactBox** section of the page.    
 
 ### Related links
+
 - [Fetch setup data](./fetch-setup-data.md)
+- [CS setup](../reference/cs-setup.md)
+- [CS users](set-up-cs-users.md)
