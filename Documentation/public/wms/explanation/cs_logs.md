@@ -4,7 +4,7 @@ There are several types of logs that are maintained in the NP WMS:
 
 ## Communication Log (Troubleshooting)
 
-This log can be accessed from [**CS Setup**](cs-setup.md), and it is used to track any unforeseen issues that may occur in the environment. 
+This log can be accessed from [**CS Setup**](../reference/cs-setup.md), and it is used to track any unforeseen issues that may occur in the environment. 
 
 If something goes wrong, and you're not sure what caused it, it's possible to activate the **Log Communication** toggle switch in the **General** section of the **CS Setup**. Once active, the necessary data will be gathered from the devices and sent to the **CS Communication Log List** in XML format. This data is used to learn what exactly had caused the issue, which greatly helps in resolving it. 
 
@@ -30,5 +30,5 @@ The documents containing this data are preserved in the **Print Buffer** log, so
 
 ### Related links
 
-- [CS setup](cs-setup.md)
+- [CS setup](../reference/cs-setup.md)
 - [Inventory adjustments](inventory_adjustments.md)

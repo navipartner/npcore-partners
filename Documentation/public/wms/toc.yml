@@ -4,8 +4,6 @@
   items:
   - name: NP WMS Role Center
     href: explanation/role-center.md
-  - name: CS setup
-    href: explanation/cs-setup.md
   - name: CS UIs
     href: explanation/cs-uis.md
   - name: CS UI structure
@@ -55,7 +53,7 @@
     href: howto/create_inventory_pick.md
   - name: Create inventory pick from Sales Orders
     href: howto/create_inventory_pick_sales_order.md
-  - name: Create inventory pick with the Create Inventory Put Away/Pick/Movement action
+  - name: Create inventory pick/put-away with the Create Inventory Put Away/Pick/Movement action
     href: howto/create_inventory_pick_action.md
   - name: Create a new sales order
     href: howto/create_sales_order.md
@@ -65,9 +63,13 @@
     href: howto/set_up_sku.md
   - name: Receive items at a warehouse location
     href: howto/receive_items.md
+  - name: Set up bin usage per location
+    href: howto/set_up_location_for_bins.md
 
 - name: Reference
   items: 
+  - name: CS setup
+    href: reference/cs-setup.md
   - name: Inventory setup (reference guide)
     href: reference/inventory_setup_reference.md
   - name: Item card (reference guide)

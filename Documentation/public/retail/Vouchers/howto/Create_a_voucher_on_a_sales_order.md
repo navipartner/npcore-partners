@@ -13,9 +13,9 @@ Vouchers can be generated through a sales order. To do so, follow the provided s
 - **Salesperson Code**
 
 > [!NOTE]
-> if some of the fields other than those mentioned above are mandatory, please fill them in. 
+> If some of the fields other than those mentioned above are mandatory, fill them in. 
 
-2. To generate a voucher, click **Action** in the ribbon, followed by **Retail Voucher**, and finally **Issue Voucher**.
+4. To generate a voucher, click **Action** in the ribbon, followed by **Retail Voucher**, and finally **Issue Voucher**.
 
     ![Sales order issue voucher](../images/Issuse%20voucher%20on%20SO.png)
 
@@ -24,7 +24,7 @@ Vouchers can be generated through a sales order. To do so, follow the provided s
     ![Sales order issue voucher](../images/retail_voucher_types.png)
 
 
-3. Select the appropriate type of voucher (e.g gift voucher) and click **OK**.       
+5. Select the appropriate type of voucher (e.g gift voucher) and click **OK**.       
    A notification that the voucher has been created will be displayed. 
 
     ![Sales order issue voucher](../images/Voucher%20issued%20on%20new%20SO.png)
@@ -34,13 +34,13 @@ Vouchers can be generated through a sales order. To do so, follow the provided s
 > [!NOTE]
 > If necessary, new sales lines for items and G/L accounts can be added.
 
-4. Enter the voucher amount on the created sales order line in the **Unit Price Excl. VAT** field.
+6. Enter the voucher amount on the created sales order line in the **Unit Price Excl. VAT** field.
 
-5. In the **Action** section, select **Posting**, and then click **Post**. 
+7. In the **Action** section, select **Posting**, and then click **Post**. 
 
-6. Select the **Ship and invoice** option.
+8. Select the **Ship and invoice** option.
 
-7. Click **OK**.       
+9. Click **OK**.       
    The sales order is now posted, and a sales invoice created. 
 
 ### Related links

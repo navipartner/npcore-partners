@@ -22,5 +22,5 @@ Likewise, if you wish to remove a certain CS UI from the structure, you can do s
 
 - [CS UIs](cs-uis.md)
 - [Set up CS UIs](../howto/set-up-cs-uis.md)
-- [CS Setup](cs-setup.md)
+- [CS Setup](../reference/cs-setup.md)
 - [CS printing](cs-printing.md)

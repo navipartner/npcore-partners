@@ -105,7 +105,7 @@ This section contains the settings related to printing.
 From the **CS Setup** you can also set up [CS users](../howto/set-up-cs-users.md), devices, and [mobile app UI](../howto/set-up-cs-uis.md).
 
 > [!Note]
-> You can also access one of the [logs](cs_logs.md) in **CS Setup** if you encounter unforeseen issues in the environment. 
+> You can also access one of the [logs](../explanation/cs_logs.md) in **CS Setup** if you encounter unforeseen issues in the environment. 
 
 ## Video walkthrough
 
