@@ -117,7 +117,7 @@
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ZReportNoSerie: Record "No. Series";
-                        ZReportNoSeries: Page "No. Series List";
+                        ZReportNoSeries: Page "No. Series";
                     begin
                         ZReportNoSeries.LookupMode := true;
 
@@ -140,7 +140,7 @@
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         XReportNoSerie: Record "No. Series";
-                        XReportNoSeries: Page "No. Series List";
+                        XReportNoSeries: Page "No. Series";
                     begin
                         XReportNoSeries.LookupMode := true;
 
