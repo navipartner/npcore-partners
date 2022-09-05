@@ -20,7 +20,7 @@ The initial setup of NP WMS consists of the following steps:
 > [!Note]
 > For pricing details refer to [our website](https://www.navipartner.com/np-wms-pricing/). A trial period is offered to test the functionalities.
 
-4. Set the main parameters for your instance of NP WMS in [CS setup](./explanation/cs-setup.md). These parameters include, but aren't limited to:
+4. Set the main parameters for your instance of NP WMS in [CS setup](./reference/cs-setup.md). These parameters include, but aren't limited to:
 
     - [CS UIs](./howto/set-up-cs-uis.md) - user interface of the mobile apps. 
     - [Warehouse employees](./howto/set-up-warehouse-users.md) - entities in BC which correspond to warehouse employees.

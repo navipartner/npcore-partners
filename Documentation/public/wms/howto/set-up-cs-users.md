@@ -32,5 +32,5 @@ All users who will should have access to the [mobile apps](/Documentation/public
 
 ### Related links
 
-- [CS Setup](../explanation/cs-setup.md)
+- [CS Setup](../reference/cs-setup.md)
 - [CS UIs](../explanation/cs-uis.md)
