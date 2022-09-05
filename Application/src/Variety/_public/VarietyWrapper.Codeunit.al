@@ -491,6 +491,30 @@
         VrtFieldSetup.UpdateToLatestVersion();
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Item Journal Line", 'OnAfterOnValidateItemNoAssignByEntryType', '', false, false)]
+    local procedure CopyFromItem(var ItemJournalLine: Record "Item Journal Line"; var Item: Record Item)
+    begin
+        if ItemJournalLine."Variant Code" = '' then
+            ItemJournalLine."NPR Description 2" := Item."Description 2";
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Journal Line", 'OnAfterValidateEvent', 'Variant Code', false, false)]
+    local procedure CopyFromItemVariant(var Rec: Record "Item Journal Line"; var xRec: Record "Item Journal Line")
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+    begin
+        if (Rec."Variant Code" = xRec."Variant Code") or (Rec."Item No." = '') then
+            exit;
+        if Rec."Variant Code" <> '' then begin
+            if ItemVariant.Get(Rec."Item No.", Rec."Variant Code") then
+                Rec."NPR Description 2" := ItemVariant."Description 2";
+        end else begin
+            if Item.Get(Rec."Item No.") then
+                Rec."NPR Description 2" := Item."Description 2";
+        end;
+    end;
+
     local procedure GetCalculationDate(DateIn: Date): Text
     begin
         if DateIn <> 0D then
