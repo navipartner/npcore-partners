@@ -33,7 +33,7 @@
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         NoSeries: Record "No. Series";
-                        NoSeriesList: Page "No. Series List";
+                        NoSeriesList: Page "No. Series";
                     begin
                         NoSeriesList.LookupMode := true;
 
@@ -56,7 +56,7 @@
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         NoSeries: Record "No. Series";
-                        NoSeriesList: Page "No. Series List";
+                        NoSeriesList: Page "No. Series";
                     begin
                         NoSeriesList.LookupMode := true;
 
@@ -79,7 +79,7 @@
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         NoSeries: Record "No. Series";
-                        NoSeriesList: Page "No. Series List";
+                        NoSeriesList: Page "No. Series";
                     begin
                         NoSeriesList.LookupMode := true;
 
@@ -108,7 +108,7 @@
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         NoSeries: Record "No. Series";
-                        NoSeriesList: Page "No. Series List";
+                        NoSeriesList: Page "No. Series";
                     begin
                         NoSeriesList.LookupMode := true;
 
