@@ -53,7 +53,6 @@
     var
         ContBusRel: Record "Contact Business Relation";
         Contact: Record Contact;
-        POSEntry: Record "NPR POS Entry";
     begin
         ContBusRel.SetCurrentKey("Link to Table", "No.");
         ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
@@ -66,13 +65,8 @@
             Contact.SetRange("No.", ContBusRel."Contact No.");
             Contact.SetRange("NPR Magento Contact", true);
             if not Contact.IsEmpty() then begin
-                POSEntry.Reset();
-                POSEntry.SetRange("Contact No.", ContBusRel."No.");
-                POSEntry.SetFilter("Customer No.", '%1', '');
-                if POSEntry.IsEmpty() then begin
-                    Contact.ModifyAll("E-Mail", '');
-                    Contact.ModifyAll("E-Mail 2", '');
-                end;
+                Contact.ModifyAll("E-Mail", '');
+                Contact.ModifyAll("E-Mail 2", '');
                 Contact.ModifyAll("NPR Magento Contact", false);
             end;
         until ContBusRel.Next() = 0;
