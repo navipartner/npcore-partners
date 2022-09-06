@@ -6,7 +6,7 @@ Item journals can be used for updating stock levels when they are increased or d
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Item Journals** and choose the related link.     
    Here, you can see a list of positive and negative adjustments in the environment.
-2. Select the **Entry Type** according to the [type of adjustment](../explanation/inventory_adjustments.md) you wish to post.
+2. Select the **Entry Type** according to the type of adjustment you wish to post.
 3. Provide the **Item No.** of the item for which you need to adjust quantity.    
    The **Description**, **Unit Amount**, and **Unit Cost** fields are populated automatically as a result.
 4. Provide the code of the warehouse or shop in which the adjusted item is physically stored in the **Location Code** field.
@@ -20,7 +20,3 @@ Item journals can be used for updating stock levels when they are increased or d
    The item journal line is be posted as a result. 
 10. (Optional) To see the changes, navigate to the **Item Ledger Entries** of the item for which the quantity is adjusted and check the records inside. 
 
-### Related links
-
-- [Inventory adjustments](../explanation/inventory_adjustments.md)
-- [Costing methods](../explanation/fifo_and_lifo.md)

@@ -36,4 +36,4 @@ To perform the planned stock count on the mobile device, follow the provided ste
 
 - [Set up Capture Service (CS)](set-up-cssetup.md)
 - [Inventory adjustments](../explanation/inventory_adjustments.md)
-- [Post inventory adjustments with the Item Journal](post_inventory_adjustment_item_journal.md)
+- [Post inventory adjustments with the Item Journal](https://docs.microsoft.com/en-us/dynamics365/business-central/inventory-how-count-adjust-reclassify)

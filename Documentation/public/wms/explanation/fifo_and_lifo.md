@@ -68,8 +68,3 @@ Jobs can be scheduled in the following ways:
 
 <img src="../images/auto_cost_adjustment_intervals.PNG" width="600">
 
-
-### Related links
-
-- [Inventory adjustments](inventory_adjustments.md)
-- [Revalue items (Item Revaluation Journal)](../howto/revaluation_journal.md)

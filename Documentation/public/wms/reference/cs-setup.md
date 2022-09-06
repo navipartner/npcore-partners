@@ -114,8 +114,6 @@ From the **CS Setup** you can also set up [CS users](../howto/set-up-cs-users.md
 ### Related links
 
 - [Create QR codes](../howto/create-qr-codes.md)
-- [Set up Warehouse users](../howto/set-up-warehouse-users.md)
 - [Set up CS](../howto/set-up-cssetup.md)
 - [Set up CS Users](../howto/set-up-cs-users.md)
 - [Create QR codes](../howto/create-qr-codes.md)
-- [Set up warehouse users](../howto/set-up-warehouse-users.md)

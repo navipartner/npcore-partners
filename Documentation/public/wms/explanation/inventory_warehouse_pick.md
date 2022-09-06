@@ -11,12 +11,12 @@ An inventory pick is used for specifying the instructions that need to be follow
 
 Inventory picks can be created in several ways:
 
-- In the **Inventory Pick** page you can post the information necessary for [performing picks and shipment](../howto/create_inventory_pick.md). This information is placed in relevant outbound source documents, such as transfer orders, purchase return orders, and production orders.
+- In the **Inventory Pick** page you can post the information necessary for performing picks and shipment. This information is placed in relevant outbound source documents, such as transfer orders, purchase return orders, and production orders.
 
 > [!Note]
 > Inventory picks are used in relation to locations which require pick processing, but not shipment processing.
 
-- Inventory picks can be [created and posted](../howto/create_inventory_pick_sales_order.md) directly from **Sales Orders**, however each sales order can be associated with only one inventory pick. Until you release the sales order, you can change the provided information such as quantity and the bin codes manually. 
+- Inventory picks can be created and posted directly from **Sales Orders**, however each sales order can be associated with only one inventory pick. Until you release the sales order, you can change the provided information such as quantity and the bin codes manually. 
 
 - You can also create inventory picks by running the **Create Inventory Put Away/Pick/Movement** action.
 
@@ -28,9 +28,3 @@ If the location is set up require warehouse pick processing and warehouse shipme
 
 > [!Note]
 > If your company deals with multiple orders and shipments, a warehouse pick is a better option than inventory pick, since it's more stable from a technical standpoint.
-
-### Related links
-
-- [Inventory adjustments](inventory_adjustments.md)
-- [Warehouse and inventory putaway](warehouse_putaway.md)
-- [Create inventory picks](../howto/create_inventory_pick.md)

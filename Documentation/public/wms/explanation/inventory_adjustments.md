@@ -4,7 +4,7 @@ Inventory adjustments refer to all modifications of the stock level, which occur
 
 Some companies tend to make minor inventory adjustments throughout the fiscal year, while others make them as a regular part of their business process.
 
-To post adjustments to the item stock, you can use the [Item Journals](../howto/post_inventory_adjustment_item_journal.md), to perform item counting, you can use the [Physical Inventory Journals](../howto/perform_stock_count.md), and to change information attached to the items, use the [Item Reclassification Journal](../howto/reclassify_items.md).
+To post adjustments to the item stock, you can use the Item Journals, to perform item counting, you can use the Physical Inventory Journals, and to change information attached to the items, use the Item Reclassification Journal.
 
 ## Adjustment types
   
@@ -27,6 +27,4 @@ To post adjustments to the item stock, you can use the [Item Journals](../howto/
 
 ### Related links
 
-- [Inventory and warehouse putaway](warehouse_putaway.md)
-- [Inventory and warehouse pick](inventory_warehouse_pick.md)
-- [Perform stock count (Physical Inventory Journal and mobile apps)](../howto/perform_stock_count.md)
+- [Count, Adjust, and Reclassify Inventory Using Journals - Microsoft Docs](https://docs.microsoft.com/en-us/dynamics365/business-central/inventory-how-count-adjust-reclassify)

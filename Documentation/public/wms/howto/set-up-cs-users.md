@@ -1,7 +1,7 @@
 # Create a capture service user
 
 
-All users who will should have access to the [mobile apps](/Documentation/public/wms/howto/install-mobile-apps) should be created in the **CS Users** setup section. Each CS user should also be an active BC user. Warehouse employees need to be created before CS users. 
+All users who will should have access to the [mobile apps](/Documentation/public/wms/howto/install-mobile-apps) should be created in the **CS Users** setup section. Each CS user should also be an active BC user. [Warehouse employees](https://docs.microsoft.com/en-us/dynamics365/business-central/warehouse-how-to-set-up-warehouse-employees) need to be created before CS users. 
 
 > [!NOTE]
 > Each device which uses NP WMS will be assigned a BC user. This user should be active and have their **License Type** set to be **Device Only User** (ISV).

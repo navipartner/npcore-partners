@@ -23,7 +23,7 @@ The initial setup of NP WMS consists of the following steps:
 4. Set the main parameters for your instance of NP WMS in [CS setup](./reference/cs-setup.md). These parameters include, but aren't limited to:
 
     - [CS UIs](./howto/set-up-cs-uis.md) - user interface of the mobile apps. 
-    - [Warehouse employees](./howto/set-up-warehouse-users.md) - entities in BC which correspond to warehouse employees.
+    - [Warehouse employees](https://docs.microsoft.com/en-us/dynamics365/business-central/warehouse-how-to-set-up-warehouse-employees) - entities in BC which correspond to warehouse employees.
     - [CS users](./howto/set-up-cs-users.md) - users who will have access to the mobile devices used for warehouse management. CS users are based on the existing warehouse employees.
  
 
@@ -40,5 +40,4 @@ After the necessary setup is performed, you can explore the rest of the availabl
 - [NP WMS Role Center](./explanation/role-center.md)
 - [Capture service UIs](./explanation/cs-uis.md)
 - [CS UI structure](explanation/cs_ui_structure.md)
-- [Inventory setup](explanation/inventory_setup.md)
 - [Perform stock count](./howto/perform_stock_count.md)

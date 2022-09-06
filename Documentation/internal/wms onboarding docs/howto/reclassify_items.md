@@ -14,9 +14,3 @@ To post an Item Reclassification Journal entry, follow the provided steps:
    The item reclassification journal line is now posted. 
 6. (Optional) To see the changes, navigate to the **Item Ledger Entries** of the item for which the quantity is adjusted and check the records inside. 
 
-
-### Related links
-
-- [Post inventory adjustments (Item Journal)](post_inventory_adjustment_item_journal.md)
-- [Perform stock count (Physical Inventory Journal and mobile apps)](perform_stock_count.md)
-- [Inventory adjustments](../explanation/inventory_adjustments.md)

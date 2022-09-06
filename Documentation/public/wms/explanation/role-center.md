@@ -19,5 +19,4 @@ From this page you can access all the available setups for NP WMS, download the 
 - [Fetch preset CS data](../howto/fetch-setup-data.md)
 - [Set up CS users](../howto/set-up-cs-users.md)
 - [Set up CS UIs](../howto/set-up-cs-uis.md)
-- [Set up warehouse employees](../howto/set-up-warehouse-users.md)
 - [CS setup](../reference/cs-setup.md)

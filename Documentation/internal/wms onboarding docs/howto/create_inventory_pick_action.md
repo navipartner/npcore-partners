@@ -6,9 +6,3 @@ It's possible to create a batch job for creating multiple inventory picks or put
 2. In the **Options** section, enable the **Create Invt. Pick**/**Create Invt. Put-away** toggle switch. 
 3. Click **OK**.    
    You can also schedule a report for the inventory put-away/pick/movement creation by clicking **Schedule**, and adding the necessary data in the popup. 
-
-### Related links
-
-- [Inventory and warehouse picks](../explanation/inventory_warehouse_pick.md)
-- [Create inventory pick from Sales Orders](create_inventory_pick_sales_order.md)
-- [Create inventory pick based on the source document](create_inventory_pick.md)

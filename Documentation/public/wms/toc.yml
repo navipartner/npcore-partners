@@ -18,8 +18,6 @@
     href: explanation/fifo_and_lifo.md
   - name: Inventory adjustments
     href: explanation/inventory_adjustments.md
-  - name: Automatic sales order creation - Import list
-    href: explanation/auto_web_sales_order.md
 
 - name: How-to
   items: 
@@ -35,47 +33,15 @@
     href: howto/create-qr-codes.md
   - name: Set up CS UIs
     href: howto/set-up-cs-uis.md
-  - name: Set up warehouse users
-    href: howto/set-up-warehouse-users.md
   - name: Set up CS Data Pattern Code
     href: howto/set-up-datapatterncode.md
-  - name: Post inventory adjustments (Item Journal)
-    href: howto/post_inventory_adjustment_item_journal.md
   - name: Perform stock count (Physical Inventory Journal and mobile apps)
     href: howto/perform_stock_count.md
-  - name: Reclassify items (Item Reclassification Journal)
-    href: howto/reclassify_items.md
-  - name: Create a new transfer order
-    href: howto/create_transfer_order.md
-  - name: Revalue items (Item Revaluation Journal)
-    href: howto/revaluation_journal.md
-  - name: Create inventory picks based on the source document
-    href: howto/create_inventory_pick.md
-  - name: Create inventory pick from Sales Orders
-    href: howto/create_inventory_pick_sales_order.md
-  - name: Create inventory pick/put-away with the Create Inventory Put Away/Pick/Movement action
-    href: howto/create_inventory_pick_action.md
-  - name: Create a new sales order
-    href: howto/create_sales_order.md
-  - name: Create a sales invoice
-    href: howto/create_sales_invoice.md
-  - name: Create a stockkeeping unit
-    href: howto/set_up_sku.md
-  - name: Receive items at a warehouse location
-    href: howto/receive_items.md
-  - name: Set up bin usage per location
-    href: howto/set_up_location_for_bins.md
 
 - name: Reference
   items: 
   - name: CS setup
     href: reference/cs-setup.md
-  - name: Inventory setup (reference guide)
-    href: reference/inventory_setup_reference.md
-  - name: Item card (reference guide)
-    href: reference/item_card_reference.md
-  - name: Location card (reference guide)
-    href: reference/location_card.md
 
 - name: Videos
   items:
