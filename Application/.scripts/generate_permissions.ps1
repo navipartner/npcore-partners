@@ -58,6 +58,58 @@ function AddToArray {
     }
 }
 
+function Find-FirstOccurrenceOfProperty {
+    param (        
+        [Parameter(Mandatory = $true)]
+        [Object] $file
+    )
+    [System.Collections.ArrayList]$fileLines = Get-Content -LiteralPath $file.FullName -Encoding UTF8;
+
+    $lineCount = 0;
+
+    foreach ($line in $fileLines) {  
+        $lineCount += 1;
+        if ($line -match "^.*=.*;$") {
+            break;
+        }
+    }
+
+    return $lineCount;
+}
+
+function Skip-ObsoletedObject {
+    param (        
+        [Parameter(Mandatory = $true)]
+        [Object] $file
+    )
+    
+    [System.Collections.ArrayList]$fileLines = Get-Content -LiteralPath $file.FullName -Encoding UTF8;
+
+    $lineToStart = Find-FirstOccurrenceOfProperty $file
+    $propertiesArray = @()
+
+    for ($index = $lineToStart; $index -le $fileLines.Count; $index++) {
+
+        $line = $fileLines[$index]
+
+        if ($line -match "^.*#if*" -or $line -match "^.*#endif*" -or $line -match "^.*//*" -or [string]::IsNullOrWhiteSpace($line)) {
+            continue;
+        }
+
+        if (-not ($line -match "^.*=.*$")) {
+            break;
+        }
+
+        $property = $line -replace "\s","";
+
+        $propertiesArray += $property;
+    }
+
+    if ($propertiesArray -contains "ObsoleteState=Removed;") {
+        return $true;
+    }
+    return $false;
+}
 
 function AddFileToArray {
     param (        
@@ -65,6 +117,10 @@ function AddFileToArray {
         [Object] $file
     )
 
+    if (Skip-ObsoletedObject $file)
+    {
+        return;
+    }
            
     [System.Collections.ArrayList]$fileLines = Get-Content -LiteralPath $file.FullName -Encoding UTF8
     $insertedObject = 0
@@ -76,7 +132,14 @@ function AddFileToArray {
 
         if ($line -match '^(\bcodeunit\b|\bpage\b|\bquery\b|\btable\b|\bxmlport\b|\breport\b)[\s\n]*') {
             $insertedObject = 1
-            $fileName = '"' + ($line -split '(?<=\d ")(.*?)(?=")')[1] + '"'
+            if(!($line -split '(?<=\d ")(.*?)(?=")')[1])
+            {
+                $fileName = '"' + ($line -split '(\s)')[4] + '"'
+            } 
+            else
+            {
+                $fileName = '"' + ($line -split '(?<=\d ")(.*?)(?=")')[1] + '"'
+            }
             $objectType = Get-ObjectType $fileLines
                 
             AddToArray $objectType $fileName $pragmaExist $pragmaText
