@@ -21,7 +21,3 @@ After posting, you can delete inventory pick lines which correspond to items in 
 
 If serial numbers associated with certain inventory pick lines aren't available, they shouldn't be deleted. Rather, the **Qty. to Handle** field value should be set to 0, the picks should be posted, and then the inventory pick document can be deleted. If you do this, the inventory pick lines for those serial numbers can be recreated from the sales order later on. 
 
-
-### Related links
-
-- [Inventory and warehouse picks](../explanation/inventory_warehouse_pick.md)

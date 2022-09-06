@@ -16,11 +16,3 @@ Warehouse putaways entail all processes that occur after a supply of goods from 
 Inventory putaways are by default created from source documents (purchase orders, sales return orders or transfer orders) via the **Create Inventory Put-away/Pick** action.
 
 Like the warehouse putaway, inventory putaway relates to processes of receiving and allocating the stock to the adequate storage spaces. There is a one-to-one relation between inventory putaways and the source documents related to them.
-
-### Related links
-
-- [Inventory and warehouse picks](inventory_warehouse_pick.md)
-- [Inventory adjustments](inventory_adjustments.md)
-- [Putting items away](https://docs.microsoft.com/en-us/dynamics365/business-central/warehouse-put-away-items)
-- [Receive items at a warehouse location](../howto/receive_items.md)
-- [Location card (reference guide)](../reference/location_card.md)

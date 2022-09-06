@@ -33,5 +33,4 @@ To create a new transfer order, follow the provided steps:
 
 ### Related links
 
-- [Inventory and warehouse putaways](../explanation/warehouse_putaway.md)
 - [Item Reclassification Journal](reclassify_items.md)
