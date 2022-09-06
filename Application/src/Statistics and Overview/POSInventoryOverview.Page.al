@@ -170,6 +170,24 @@
 
     actions
     {
+        area(processing)
+        {
+            group(Functions)
+            {
+                Caption = 'Transfer Orders';
+                action("Transfer Orders")
+                {
+                    Caption = 'Transfer Orders';
+                    Image = Order;
+                    RunObject = Page "Transfer Orders";
+                    ToolTip = 'Displays Transfer Orders page';
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = New;
+                    ApplicationArea = NPRRetail;
+                }
+            }
+        }
     }
 
     trigger OnOpenPage()
