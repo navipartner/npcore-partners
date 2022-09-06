@@ -587,6 +587,7 @@
         EmailAddress: Text;
         Handled: Boolean;
         Customer: Record Customer;
+        CustomerNo: Code[20];
     begin
         GetEmailAddressEvent(RecRef, EmailAddress, Handled);
         if Handled then
@@ -604,15 +605,21 @@
             DATABASE::"Service Shipment Header":
                 exit(RecRef.Field(5916).Value);
             DATABASE::"Issued Fin. Charge Memo Header":
-                if Customer.Get(RecRef.Field(2).Value) then
-                    exit(Customer."E-Mail")
-                else
-                    exit('');
+                begin
+                    CustomerNo := RecRef.Field(2).Value;
+                    if Customer.Get(CustomerNo) then
+                        exit(Customer."E-Mail")
+                    else
+                        exit('');
+                end;
             DATABASE::"Issued Reminder Header":
-                if Customer.Get(RecRef.Field(2).Value) then
-                    exit(Customer."E-Mail")
-                else
-                    exit('');
+                begin
+                    CustomerNo := RecRef.Field(2).Value;
+                    if Customer.Get(CustomerNo) then
+                        exit(Customer."E-Mail")
+                    else
+                        exit('');
+                end;
         end;
     end;
 

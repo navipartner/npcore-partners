@@ -227,9 +227,11 @@
     var
         ItemVariant: Record "Item Variant";
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
-        FRef: FieldRef;
         RecRef2: RecordRef;
+        FRef: FieldRef;
         FRef2: FieldRef;
+        ItemNo: Code[20];
+        ItemVariantCode: Code[10];
         ItemNoField: Integer;
         ItemVariantField: Integer;
         Int: Integer;
@@ -251,10 +253,10 @@
 
         if RecRef2.FindSet(false, false) then
             repeat
-                FRef := RecRef2.Field(ItemNoField);
-                FRef2 := RecRef2.Field(ItemVariantField);
+                ItemNo := RecRef2.Field(ItemNoField).Value;
+                ItemVariantCode := RecRef2.Field(ItemVariantField).Value;
                 if (Format(FRef2.Value) <> '') then begin
-                    ItemVariant.Get(FRef.Value, FRef2.Value);
+                    ItemVariant.Get(ItemVariantCode, ItemNo);
                     TempVRTBuffer.Get(ItemVariant."NPR Variety 1 Value", ItemVariant."NPR Variety 2 Value",
                                      ItemVariant."NPR Variety 3 Value", ItemVariant."NPR Variety 4 Value");
                     TempVRTBuffer."Record ID (TMP)" := RecRef2.RecordId;

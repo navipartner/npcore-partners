@@ -1,6 +1,7 @@
 ﻿codeunit 6151050 "NPR Item Hierarchy Mgmt."
 {
     Access = Internal;
+
     var
         TextUpdateRetailCampHieracy: Label 'Do you want to update the Item Hierachy %1 with the items from retail Campaign %2';
         TextCancelledByUser: Label 'Cancelled by user!';
@@ -21,6 +22,7 @@
         DescFldRef: FieldRef;
         ParentRecRef: RecordRef;
         ParentFldRef: FieldRef;
+        ItemNo: Code[20];
     begin
         ItemHierarchyLine.SetRange("Item Hierarchy Code", ItemHierarchy."Hierarchy Code");
         if not ItemHierarchyLine.IsEmpty then
@@ -72,8 +74,8 @@
                                         ItemHierarchyLine."Linked Table Value Desc." := ParentFldRef.Value;
                                         ItemHierarchyLine."Item Hierachy Description" := DescFldRef.Value;
                                         if ItemHierarchyLevel."Table No." = 27 then begin
-                                            DescFldRef := RecRef.Field(1);
-                                            Item.Get(DescFldRef.Value);
+                                            ItemNo := RecRef.Field(1).Value;
+                                            Item.Get(ItemNo);
                                             ItemHierarchyLine."Item No." := Item."No.";
                                             ItemHierarchyLine."Related Table Desc Field Value" := Item."No.";
                                             ItemHierarchyLine."Item Desc." := Item.Description;
