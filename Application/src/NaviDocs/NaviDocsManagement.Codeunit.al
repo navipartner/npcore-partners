@@ -886,7 +886,7 @@
         ReportLayoutSelection: Record "Report Layout Selection";
         CustomReportLayout: Record "Custom Report Layout";
         EmailNaviDocsMgtWrapper: Codeunit "NPR E-mail NaviDocs Mgt.Wrap.";
-        CustomReportLayoutVariant: Variant;
+        CustomReportLayoutVariant: Code[20];
     begin
         if RecRef.Number in [18, 36, 112, 114] then begin
             CustomReportSelection.SetRange("Source Type", DATABASE::Customer);

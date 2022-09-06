@@ -6,9 +6,9 @@
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Member: Record "NPR MM Member";
         RecRef: RecordRef;
-        FRec: FieldRef;
         MCSPersonBusinessEntities: Record "NPR MCS Person Bus. Entit.";
         PersonId: text[50];
+        EntryNo: Integer;
     begin
         MemberEntryNo := 0;
         PersonId := MembershipManagement.FindPersonByFacialRecognition(Database::"NPR MM Member");
@@ -17,8 +17,8 @@
             exit(false);
 
         RecRef.Get(MCSPersonBusinessEntities.Key);
-        FRec := RecRef.Field(1);
-        Member.Get(FRec.Value);
+        Evaluate(EntryNo, Format(RecRef.Field(1).Value));
+        Member.Get(EntryNo);
         MemberEntryNo := Member."Entry No.";
 
         exit(true);
