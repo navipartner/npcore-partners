@@ -7,7 +7,3 @@ A user can be assigned to additional non-default locations for which the employe
 
 > [!Note]
 > One default location should be assigned to the user. This will be the location set on the mobile device. The user has the possibility to change the default location on the mobile device to any locations that has been set for him in Warehouse Employees.
-
-# Related Links
-
-[Set up Warehouse Employees](../howto/set-up-warehouse-users.md)

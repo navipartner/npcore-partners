@@ -9,9 +9,3 @@ The **Inventory Setup** administrative section serves as a tool for the establis
 - **Automatic Cost Adjustment** - if activated, the cost on the **Outbound Ledger Entries** will be updated with the cost of inbound ledger entries when an item transaction is posted. This option is the most useful when used with the FIFO cost updates.
   - **Never** - cost adjustment will not occur automatically. You can schedule cost adjustment in the **Adjust Cost - Item Entries** administrative section.
   - **Always** - as soon as you post an entry to the **Item Ledger Entries**, the cost adjustment report will be triggered. 
-
-
-### Related links
-
-- [Inventory adjustments](inventory_adjustments.md)
-- [Inventory warehouse pick](inventory_warehouse_pick.md)

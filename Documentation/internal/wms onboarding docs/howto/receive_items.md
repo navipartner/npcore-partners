@@ -58,8 +58,3 @@ This approach to receipting presents a combination of the two aforementioned met
 
 > [!Note] 
 > It is possible to have warehouse put-aways created automatically when the warehouse receipt is posted. This is defined on the **Location Card** of the locations involved in the process.
-
-### Related links
-
-- [Inventory and warehouse putaway](../explanation/warehouse_putaway.md)
-- [Location card (reference guide)](../reference/location_card.md)

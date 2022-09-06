@@ -18,6 +18,3 @@ The **Inventory Setup** administrative section serves as a tool for the establis
 | **Direct Transfer Posting** |  Specifies whether direct transfer is posted separately in forms of shipment and receipt or as a single direct transfer document. |
 
 
-### Related links
-
-- [Inventory adjustments](../explanation/inventory_adjustments.md)

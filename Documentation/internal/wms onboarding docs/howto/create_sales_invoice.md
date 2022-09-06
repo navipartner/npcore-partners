@@ -28,7 +28,3 @@ To create a sales invoice, follow the provided steps.
 
 > [!Note]
 > After being posted, sales invoices are moved from the **Sales Invoices** to the **Posted Sales Invoices** page. The **No.** of the sales invoice will be changed to a different one when posted, and that final **No** will be the one customers see in the final document.
-
-### Related links
-
-- [Create a sales order](create_sales_order.md)

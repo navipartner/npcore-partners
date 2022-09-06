@@ -17,8 +17,3 @@ The list of the configured users is displayed.
    | **Default**  | Tick the checkbox to define the location as the only one in which the employee can perform warehouse activities. |
 
 4. Repeat **Step 3** for other warehouse employees that you wish to assign to specific locations, or assign non-default locations to the existing warehouse employees.
-
-### Related links:
-
-- [Set up CS users](./set-up-cs-users.md)
-- [Set up RFID](./set-up-rfid.md)
