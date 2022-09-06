@@ -38,6 +38,8 @@ table 6014663 "NPR POS Single Stats Buffer"
         {
             Caption = 'Profit %';
             DataClassification = CustomerContent;
+            AutoFormatExpression = '<precision,0:2><Standard Format,0>%';
+            AutoFormatType = 10;
         }
         field(7; "Discount Amount"; Decimal)
         {
@@ -62,6 +64,11 @@ table 6014663 "NPR POS Single Stats Buffer"
         field(11; "Return Sales Quantity"; Decimal)
         {
             Caption = 'Return Sales Quantity';
+            DataClassification = CustomerContent;
+        }
+        field(12; "Profit Amount"; Decimal)
+        {
+            Caption = 'Profit Amount';
             DataClassification = CustomerContent;
         }
     }

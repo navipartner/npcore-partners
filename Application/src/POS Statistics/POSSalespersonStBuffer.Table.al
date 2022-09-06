@@ -36,11 +36,15 @@ table 6014671 "NPR POS Salesperson St Buffer"
         {
             Caption = 'Discount %';
             DataClassification = CustomerContent;
+            AutoFormatExpression = '<precision,0:2><Standard Format,0>%';
+            AutoFormatType = 10;
         }
         field(7; "Profit %"; Decimal)
         {
             Caption = 'Profit %';
             DataClassification = CustomerContent;
+            AutoFormatExpression = '<precision,0:2><Standard Format,0>%';
+            AutoFormatType = 10;
         }
     }
 
