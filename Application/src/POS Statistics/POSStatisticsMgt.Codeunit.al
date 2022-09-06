@@ -38,7 +38,8 @@ codeunit 6059818 "NPR POS Statistics Mgt."
             POSCurrentStatsBuffer."Discount Amount" += POSSaleLine."Discount Amount";
             POSCurrentStatsBuffer."Tax Amount" += POSSaleLine."Amount Including VAT" - POSSaleLine.Amount;
             POSCurrentStatsBuffer."Amount Incl. Tax" += POSSaleLine."Amount Including VAT";
-            
+            POSCurrentStatsBuffer."Profit Amount" += POSSaleLine.Amount - GetCostAmount(POSSaleLine);
+
             if POSSaleLine.Quantity > 0 then
                 POSCurrentStatsBuffer."Sales Quantity" += POSSaleLine.Quantity
             else
@@ -71,7 +72,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         end;
 
         if POSSingleStatsBuffer."Sales Amount" <> 0 then
-            POSSingleStatsBuffer."Profit %" := (POSSingleStatsBuffer."Sales Amount" - POSSingleStatsBuffer."Cost Amount") / POSSingleStatsBuffer."Sales Amount" * 100
+            POSSingleStatsBuffer."Profit %" := (POSSingleStatsBuffer."Sales Amount" - POSSingleStatsBuffer."Cost Amount") / POSSingleStatsBuffer."Sales Amount"
         else
             POSSingleStatsBuffer."Profit %" := 0;
     end;
@@ -385,7 +386,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         if (Amount = 0) or (Total = 0) then
             exit(0);
 
-        exit(Amount / Total * 100);
+        exit(Amount / Total);
     end;
 
     local procedure GetCostAmount(POSSaleLine: Record "NPR POS Sale Line") Cost: Decimal

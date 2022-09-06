@@ -58,7 +58,13 @@ page 6059892 "NPR POS Current Sale Stats"
                         {
                             ToolTip = 'Specifies the value of the Profit %';
                             ApplicationArea = NPRRetail;
-                            StyleExpr = 'Strong';
+                            StyleExpr = 'Favorable';
+                        }
+                        field("Profit Amount"; Rec."Profit Amount")
+                        {
+                            ToolTip = 'Specifies the value of the Profit Amount';
+                            ApplicationArea = NPRRetail;
+                            StyleExpr = 'Favorable';
                         }
                         field("Discount Amount"; Rec."Discount Amount")
                         {
@@ -71,7 +77,7 @@ page 6059892 "NPR POS Current Sale Stats"
                         {
                             ToolTip = 'Specifies the value of the Tax Amount field';
                             ApplicationArea = NPRRetail;
-                            StyleExpr = 'Favorable';
+                            StyleExpr = 'Strong';
                         }
                         field("Amount Incl. Tax"; Rec."Amount Incl. Tax")
                         {
