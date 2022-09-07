@@ -4,10 +4,9 @@
 
     Caption = 'Loyalty Item Point Setup';
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR MM Loy. Item Point Setup";
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
