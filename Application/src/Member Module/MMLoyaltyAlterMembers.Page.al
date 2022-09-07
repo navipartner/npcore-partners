@@ -4,10 +4,9 @@
 
     Caption = 'Loyalty Alter Membership';
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR MM Loyalty Alter Members.";
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {

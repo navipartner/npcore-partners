@@ -57,7 +57,7 @@
             column(PageCaption; PageCaption)
             {
             }
-            column(GetFilters; GetFilters)
+            column("GetFilters"; GetFilters)
             {
             }
             column(ExtMembershipNo_MMMembership; "External Membership No.")
@@ -79,10 +79,9 @@
 
     requestpage
     {
-        SaveValues = true;
         trigger OnOpenPage()
         begin
-            "MM Membership".SetRange("Date Filter", 0D, ToDate);
+            "MM Membership".SetRange("Date Filter", 0D, Today());
             "MM Membership".SetFilter("Awarded Points (Sale)", '>0');
         end;
     }
@@ -94,7 +93,6 @@
 
     var
         Customer: Record Customer;
-        ToDate: Date;
         CustomerNameCaption: Label 'Customer Name';
         MembershipNoCaption: Label 'Membership';
         PageCaption: Label 'Page %1 of %2';

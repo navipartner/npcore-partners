@@ -11,6 +11,7 @@
     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     DataAccessIntent = ReadOnly;
 
+
     dataset
     {
         dataitem("MM Membership"; "NPR MM Membership")
@@ -44,7 +45,7 @@
             column(PageCaption; PageCaption)
             {
             }
-            column(GetFilters; GetFilters)
+            column("GetFilters"; GetFilters)
             {
             }
             column(PointsToRedeemCaption; PointsToRedeemCaption)
@@ -122,7 +123,6 @@
 
                         trigger OnAfterGetRecord()
                         var
-                            i: Integer;
                             LoopCount: Integer;
                         begin
 
@@ -135,12 +135,10 @@
                             if LoopCount = 0 then
                                 CurrReport.Skip();
 
-                            for i := 1 to LoopCount do begin
-                                TotalPoints := TotalPoints - Indent;
-                                PerPointDistributionCount := PerPointDistributionCount + 1;
-                                PointDistribution += Indent;
-                                PointsToRedeem += Indent;
-                            end;
+                            TotalPoints := TotalPoints - (Indent * LoopCount);
+                            PerPointDistributionCount := LoopCount;
+                            PointDistribution := (Indent * LoopCount);
+                            PointsToRedeem += (Indent * LoopCount);
 
                             PerPointDistributionValue := PerPointDistributionCount * "Decimal 1";
                             TotalPointDistributionValue += PerPointDistributionValue;
@@ -242,7 +240,6 @@
 
     requestpage
     {
-        SaveValues = true;
         trigger OnOpenPage()
         begin
             "MM Membership".SetRange("Date Filter", 0D, Today);

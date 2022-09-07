@@ -6,10 +6,9 @@
     Caption = 'Loyalty Points Setup';
     ContextSensitiveHelpPage = 'retail/loyalty/explanation/Loyalty.html';
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR MM Loyalty Point Setup";
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
     {
