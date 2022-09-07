@@ -2315,6 +2315,7 @@
 
         //TSD is numbering lines differently. Implmented "Main Line No." as reference
         // NOTE: TSD Allows auto split key on new lines
+        SaleLinePOS.LockTable(true);
         SaleLinePOS.SetFilter("Register No.", '=%1', "Register No.");
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', "Sales Ticket No.");
         SaleLinePOS.SetFilter("Sale Type", '=%1', "Sale Type"::Sale);
