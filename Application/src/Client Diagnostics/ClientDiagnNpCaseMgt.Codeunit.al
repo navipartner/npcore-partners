@@ -216,12 +216,21 @@
         end;
     end;
 
+#if BC17 or BC18 or BC19
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
-    local procedure OnBeforeLogInStart()
+    local procedure OnBeforeLogInStart();
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, false)]
+    local procedure OnAfterLogin();
+#endif
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
     begin
+#if BC17 or BC18 or BC19
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Client Diagn. NpCase Mgt.', 'OnBeforeLogInStart');
+#else
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Client Diagn. NpCase Mgt.', 'OnAfterLogin');
+#endif
 
         if not GuiAllowed then begin
             LogMessageStopwatch.LogFinish();
