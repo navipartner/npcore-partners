@@ -632,10 +632,11 @@
     procedure UpdateDiscount(var RetailJournalLine: Record "NPR Retail Journal Line")
     var
         PeriodDiscountLine: Record "NPR Period Discount Line";
-        MixDiscountLine: Record "NPR Mixed Discount Line";
-        MixDiscount: Record "NPR Mixed Discount";
         RetailJournalHeader: Record "NPR Retail Journal Header";
+        MixDiscCalcMgt: codeunit "NPR Mix Discount Calc. Mgt.";
+        TempPOSSaleLine: Record "NPR POS Sale Line" temporary;
     begin
+
         if not RetailJournalHeader.Get(RetailJournalLine."No.") then
             exit;
 
@@ -647,15 +648,10 @@
         if PeriodDiscountLine.FindFirst() then
             RetailJournalLine.SetDiscountType(1, PeriodDiscountLine.Code, PeriodDiscountLine."Campaign Unit Price", 1, PeriodDiscountLine."Unit Price Incl. VAT")
         else begin
-            MixDiscountLine.Reset();
-            MixDiscountLine.SetFilter(MixDiscountLine."No.", RetailJournalLine."Item No.");
-            MixDiscountLine.SetRange("Disc. Grouping Type", MixDiscountLine."Disc. Grouping Type"::Item);
-            if not MixDiscountLine.FindFirst() then begin
+            if MixDiscCalcMgt.CalculateMixedDiscountLine(RetailJournalLine, TempPOSSaleLine, RetailJournalHeader."Date of creation", true) then
+                RetailJournalLine.SetDiscountType(2, TempPOSSaleLine."Discount Code", RetailJournalLine."Unit Price", 1, true)
+            else
                 RetailJournalLine.SetDiscountType(0, '', RetailJournalLine."Unit Price", 1, true);
-                exit;
-            end;
-            if MixDiscount.Get(MixDiscountLine.Code) and ((MixDiscount."Starting date" <= RetailJournalHeader."Date of creation") and (MixDiscount."Ending date" >= RetailJournalHeader."Date of creation")) then
-                RetailJournalLine.SetDiscountType(2, MixDiscountLine.Code, MixDiscountLine."Unit price", MixDiscountLine.Quantity, MixDiscountLine."Unit price incl. VAT");
         end;
     end;
 
