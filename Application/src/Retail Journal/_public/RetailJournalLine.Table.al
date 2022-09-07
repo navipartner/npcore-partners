@@ -48,7 +48,7 @@
                 end;
 
                 "Quantity to Print" := 1;
-                Validate("Quantity for Discount Calc", 1);
+                                    
                 RetailJnlCode.UpdateDiscount(Rec);
             end;
         }
