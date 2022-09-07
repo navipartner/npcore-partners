@@ -95,7 +95,7 @@
         Setup.GetSalespersonRecord(SalespersonPurchaser);
         CheckPosUnitGroup(SalespersonPurchaser, POSUnit."No.");
 
-        BalanceAge := DaysSinceLastBalance(POSUnit."No.");
+        BalanceAge := DaysSinceLastBalance(POSUnit);
 
         POSEndofDayProfile.Init();
         if (POSUnit."POS End of Day Profile" <> '') then begin
@@ -104,7 +104,7 @@
                 IsManagedPOS := (POSEndofDayProfile."Master POS Unit No." <> POSUnit."No.");
             if (IsManagedPOS) then begin
                 ManagedByPOSUnit.Get(POSEndofDayProfile."Master POS Unit No.");
-                BalanceAge := DaysSinceLastBalance(ManagedByPOSUnit."No.");
+                BalanceAge := DaysSinceLastBalance(ManagedByPOSUnit);
             end;
         end;
 
@@ -240,26 +240,29 @@
         FrontEnd.InvokeWorkflow(POSAction);
     end;
 
-    local procedure DaysSinceLastBalance(PosUnitNo: Code[10]): Integer
+    local procedure DaysSinceLastBalance(POSUnit: Record "NPR POS Unit"): Integer
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSEntry: record "NPR POS Entry";
     begin
-        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', PosUnitNo);
+        POSWorkshiftCheckpoint.SetCurrentKey("POS Unit No.", Open, "Type");
+        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
         POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
         POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
 
         if (not POSWorkshiftCheckpoint.FindLast()) then
             exit(-1); // Never been balanced
 
-        POSEntry.SETFILTER("POS Unit No.", '=%1', PosUnitNo);
-        POSEntry.SETFILTER("Entry No.", '>%1', POSWorkshiftCheckpoint."POS Entry No.");
-        POSEntry.SETRANGE("System Entry", FALSE);
-        POSEntry.SETFILTER("Entry Type", '<>%1', POSEntry."Entry Type"::"Cancelled Sale");
-        IF NOT POSEntry.FINDFIRST() THEN
-            EXIT(0);
+        POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
+        POSEntry.SetRange("POS Store Code", POSUnit."POS Store Code");
+        POSEntry.SetRange("POS Unit No.", POSUnit."No.");
+        POSEntry.SetFilter("Entry No.", '>%1', POSWorkshiftCheckpoint."POS Entry No.");
+        POSEntry.SetRange("System Entry", false);
+        POSEntry.SetFilter("Entry Type", '<>%1', POSEntry."Entry Type"::"Cancelled Sale");
+        if not POSEntry.FindFirst() then
+            exit(0);
 
-        IF TODAY - POSEntry."Entry Date" >= 1 THEN
+        if Today - POSEntry."Entry Date" >= 1 then
             exit(Today - DT2Date(POSWorkshiftCheckpoint."Created At"));
     end;
 
