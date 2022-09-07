@@ -1,8 +1,8 @@
 ﻿report 6014439 "NPR Item Sales Postings"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Sales Postings.rdlc';
     Caption = 'Item Sales Postings';
@@ -108,7 +108,7 @@
                 ValueEntry.CalcSums("Invoiced Quantity", "Sales Amount (Actual)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)");
                 ItemSalesQty := -ValueEntry."Invoiced Quantity";
                 ItemSalesAmount := ValueEntry."Sales Amount (Actual)";
-                if Item.Type = Item.Type::Service then
+                if Item.Type <> Item.Type::Inventory then
                     ItemCOG := -ValueEntry."Cost Amount (Non-Invtbl.)"
                 else
                     ItemCOG := -ValueEntry."Cost Amount (Actual)";
@@ -119,7 +119,6 @@
                     ItemProfitPct := 0;
                 SetRange("Item No.", "Item No.");
                 FindLast();
-                //+NPR4.21
                 SetFilter("Item No.", Reportfilter);
                 VendorItemNo := '';
                 if ShowVendorItemNo then

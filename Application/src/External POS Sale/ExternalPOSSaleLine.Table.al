@@ -176,10 +176,10 @@
                             "Qty. per Unit of Measure" := 1;
                         end;
                     else begin
-                            GetItem();
-                            "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
-                            "Quantity (Base)" := CalcBaseQty(Quantity);
-                        end;
+                        GetItem();
+                        "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
+                        "Quantity (Base)" := CalcBaseQty(Quantity);
+                    end;
                 end;
             end;
 
@@ -754,10 +754,10 @@
                         "VAT Prod. Posting Group" := '';
                     end;
                 else begin
-                        VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
-                        "VAT Identifier" := VATPostingSetup."VAT Identifier";
-                        "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
-                    end;
+                    VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+                    "VAT Identifier" := VATPostingSetup."VAT Identifier";
+                    "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
+                end;
             end;
         end else begin
             VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
@@ -793,7 +793,7 @@
         Item.Get("No.");
         Item.TestField(Blocked, false);
         Item.TestField("Gen. Prod. Posting Group");
-        if Item.Type <> Item.Type::Service then
+        if Item.Type = Item.Type::Inventory then
             Item.TestField("Inventory Posting Group");
         if Item."Price Includes VAT" then
             Item.TestField(Item."VAT Bus. Posting Gr. (Price)");
