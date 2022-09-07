@@ -228,7 +228,7 @@
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;
-        if Item.Type = Item.Type::Service then
+        if Item.Type <> Item.Type::Inventory then
             exit;
         if Item."NPR Group sale" then
             exit;
