@@ -227,29 +227,26 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-
                 trigger OnAction()
                 begin
-
                     ConfirmAndPrint();
                 end;
             }
-            action(Pay)
+
+            action(PostPay)
             {
-                ToolTip = 'Transfer to POS to handle payment.';
+                ToolTip = 'Mark ticket to be post paid.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Pay';
+                Caption = 'Postpaid';
                 Image = Payment;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-
                 trigger OnAction()
                 begin
-
-                    CreatePosSale();
+                    MarkAsPostPaid();
                 end;
             }
             action(Print)
@@ -263,10 +260,8 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-
                 trigger OnAction()
                 begin
-
                     PrintTicket();
                 end;
             }
@@ -339,22 +334,27 @@
 
     local procedure ConfirmAndPrint()
     begin
-
         Rec.TestField("Admission Created", true);
-        if (Rec."Payment Option" = Rec."Payment Option"::DIRECT) then
+        if (Rec."Payment Option" = Rec."Payment Option"::UNPAID) then
             Error(NOT_PAID, Rec."External Ticket Number");
 
         if (Rec."Request Status" = Rec."Request Status"::RESERVED) then
             Rec."Request Status" := Rec."Request Status"::CONFIRMED;
 
         PrintTicket();
+        CurrPage.Update(true);
     end;
 
-    local procedure CreatePosSale()
+    local procedure MarkAsPostPaid()
     begin
-
-        if (Rec."Payment Option" <> Rec."Payment Option"::DIRECT) then
+        if (Rec."Payment Option" = Rec."Payment Option"::DIRECT) then
             Error(TICKET_IS_PAID, Rec."External Ticket Number");
+
+        Rec.TestField("Customer No.");
+        Rec.TestField("External Order No.");
+        Rec."Payment Option" := Rec."Payment Option"::POSTPAID;
+        Rec."Request Status" := Rec."Request Status"::CONFIRMED;
+        CurrPage.Update(true);
     end;
 
     local procedure PrintTicket()

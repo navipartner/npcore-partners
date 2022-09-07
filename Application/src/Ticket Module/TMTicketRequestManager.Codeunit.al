@@ -255,9 +255,12 @@
     procedure IssueTicketFromReservation(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
         Ticket: Record "NPR TM Ticket";
+        TicketManager: Codeunit "NPR TM Ticket Request Manager";
         AdmissionUnitPrice: Decimal;
         AdmissionAllowOverAllocationConfirmed: Enum "NPR TM Ternary";
     begin
+
+        TicketManager.LockResources('IssueTicketFromReservation');
 
         TicketReservationRequest.Get(TicketReservationRequest."Entry No.");
         if (TicketReservationRequest."Admission Created") then
