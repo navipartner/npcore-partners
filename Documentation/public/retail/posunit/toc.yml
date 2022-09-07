@@ -62,11 +62,11 @@
     href: howto/create_pos_payment_bin.md
   - name: Set up POS Posting Profile
     href: howto/POS_Pos_Prof.md
-  - name: Add a logo to the POS login screen
-    href: howto/add_logo_to_pos_login_screen.md
   - name: Set up the POS Security Profile
     href: howto/POS_Security_Profile.md
   - name: Insert the initial float for a POS unit
     href: howto/insert_the_initial_float.md
   - name: Create a new POS store
     href: howto/Create_new_POS_store.md
+  - name: Add logo to the POS screen
+    href: howto/How_to_add_logo_to_the_POS_screen.md
