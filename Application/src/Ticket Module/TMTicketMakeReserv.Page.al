@@ -194,12 +194,9 @@
 
                     trigger OnValidate()
                     begin
-
                         Rec.ModifyAll("Customer No.", Rec."Customer No.");
                         CurrPage.Update(false);
-
                         gReservationEdited := true;
-
                     end;
                 }
                 field("External Order No."; Rec."External Order No.")
@@ -210,12 +207,9 @@
 
                     trigger OnValidate()
                     begin
-
                         Rec.ModifyAll("External Order No.", Rec."External Order No.");
                         CurrPage.Update(false);
-
                         gReservationEdited := true;
-
                     end;
                 }
                 field("Payment Option"; Rec."Payment Option")
@@ -226,10 +220,8 @@
 
                     trigger OnValidate()
                     begin
-
                         Rec.ModifyAll("Payment Option", Rec."Payment Option");
                         CurrPage.Update(false);
-
                         gReservationEdited := true;
                     end;
                 }
@@ -289,9 +281,26 @@
                     Editable = false;
                 }
             }
+            group(PaymentOptions)
+            {
+                ShowCaption = true;
+                Visible = gTourTicket;
+                field(gTourTicketPaymentOptions; gTourTicketPaymentOptions)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Payment Options';
+                    ToolTip = 'Specifies the Payment Option for Ticket Request.';
+                    OptionCaption = 'Unpaid,Post Paid';
+                    trigger OnValidate()
+                    begin
+                        Rec.ModifyAll("Payment Option", Rec."Payment Option");
+                        CurrPage.Update(false);
+                        gReservationEdited := true;
+                    end;
+                }
+            }
             group(Control6014406)
             {
-
                 ShowCaption = false;
                 Visible = gShowDeliverTo;
                 field(gDeliverTicketTo; gDeliverTicketTo)
@@ -414,6 +423,8 @@
         gTicketItemNo: Code[20];
         gLimitToDateSelected: Date;
         gTicketRequestEntryNo: Integer;
+        gTourTicket: Boolean;
+        gTourTicketPaymentOptions: Option UNPAID,POSTPAID;
         NOT_REQUIRED: Label '%1 can not be changed to required when initial value was optional.';
         NOT_EDITABLE: Label '%1 can not be changed when admission is required.';
         DIFFERENT_DATES_WARNING: Label 'Please note that the selected time schedules have different dates.';
