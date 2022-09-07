@@ -9,7 +9,7 @@
         INVALID_ADMISSION: Label 'Parameter %1 specifies an invalid value for admission code. %2 not found.';
         TicketNumberPrompt: Label 'Enter Ticketnumber';
         TicketTitle: Label '%1 - Ticket Management.';
-        TicketQtyPrompt: Label 'Confirm group ticket quantity (max %1)';
+        TicketQtyPrompt: Label 'Confirm new group ticket quantity (current quantity is %1)';
         ReferencePrompt: Label 'Enter Ticket Reference Number';
         ActionDescription: Label 'This action handles ticket management functions.';
         NotAGroupTicket: Label 'Ticket %1 is not a group ticket.';
@@ -919,6 +919,7 @@
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         IsAdmitted: Boolean;
     begin
@@ -927,6 +928,7 @@
             Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
 
         Ticket.TestField(Blocked, false);
+        TicketType.Get(Ticket."Ticket Type Code");
 
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         if (AdmissionCode <> '') then
@@ -946,7 +948,7 @@
         DetTicketAccessEntry.FindFirst();
         TicketMaxQty := DetTicketAccessEntry.Quantity;
 
-        ShowQtyDialogOut := ((not IsAdmitted) and (TicketMaxQty > 1));
+        ShowQtyDialogOut := ((not IsAdmitted) and (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP));
         if (FunctionId = 2) then
             ShowQtyDialogOut := false;
 
@@ -1028,21 +1030,20 @@
             // Create a POS sales line which needs to be paid.
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetNewSaleLine(SaleLinePos);
-
-            TicketReservationRequest2.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
-            TicketReservationRequest2.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
-
-            TicketReservationRequest2.ModifyAll("Receipt No.", SaleLinePos."Sales Ticket No.");
-            TicketReservationRequest2.ModifyAll("Line No.", SaleLinePos."Line No." + 10000);
-            TicketReservationRequest2.ModifyAll("Request Status", TicketReservationRequest2."Request Status"::RESERVED);
+            POSSaleLine.SetUsePresetLineNo(true);
 
             SaleLinePos.Type := SaleLinePos.Type::Item;
             SaleLinePos."No." := TicketReservationRequest."Item No.";
             SaleLinePos."Variant Code" := TicketReservationRequest."Variant Code";
-
             SaleLinePos.Quantity := TicketReservationRequest.Quantity;
-            POSSaleLine.InsertLine(SaleLinePos);
 
+            TicketReservationRequest2.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
+            TicketReservationRequest2.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
+            TicketReservationRequest2.ModifyAll("Receipt No.", SaleLinePos."Sales Ticket No.");
+            TicketReservationRequest2.ModifyAll("Line No.", SaleLinePos."Line No.");
+            TicketReservationRequest2.ModifyAll("Request Status", TicketReservationRequest2."Request Status"::RESERVED);
+
+            POSSaleLine.InsertLine(SaleLinePos);
             exit;
         end;
 

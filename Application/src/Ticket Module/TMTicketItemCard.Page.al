@@ -131,6 +131,24 @@ page 6059884 "NPR TM Ticket Item Card"
                     TicketBomPage.MakeTickets(_TicketPaymentType::POSTPAID, Rec."Item No.", Rec.Code);
                 end;
             }
+            Action(CreateTourTickets)
+            {
+                ToolTip = 'Create a tickets that is suitable for tours.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Scope = Repeater;
+                Caption = 'Create Tour Ticket';
+                Image = CustomerGroup;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                trigger OnAction()
+                var
+                    TicketBomPage: Page "NPR TM Ticket BOM";
+                begin
+                    TicketBomPage.MakeTourTicket(Rec."Item No.", Rec.Code);
+                end;
+            }
         }
         area(Creation)
         {

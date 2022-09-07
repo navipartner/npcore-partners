@@ -10,61 +10,6 @@
       <rd:DataSourceID>46c3cef4-077c-42e9-89c2-de55f9fae7d8</rd:DataSourceID>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="AdmissionCode_TMAdmissionScheduleEntry">
-          <DataField>AdmissionCode_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="AdmissionStartDate_TMAdmissionScheduleEntry">
-          <DataField>AdmissionStartDate_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="AdmissionStartTime_TMAdmissionScheduleEntry">
-          <DataField>AdmissionStartTime_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="OpenReservations_TMAdmissionScheduleEntry">
-          <DataField>OpenReservations_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="OpenReservations_TMAdmissionScheduleEntryFormat">
-          <DataField>OpenReservations_TMAdmissionScheduleEntryFormat</DataField>
-        </Field>
-        <Field Name="OpenAdmitted_TMAdmissionScheduleEntry">
-          <DataField>OpenAdmitted_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="OpenAdmitted_TMAdmissionScheduleEntryFormat">
-          <DataField>OpenAdmitted_TMAdmissionScheduleEntryFormat</DataField>
-        </Field>
-        <Field Name="TotalLbl_OpenAdmitted_TMAdmissionScheduleEntry">
-          <DataField>TotalLbl_OpenAdmitted_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="TotalOpenReservations_TMAdmisSchedEntry">
-          <DataField>TotalOpenReservations_TMAdmisSchedEntry</DataField>
-        </Field>
-        <Field Name="TotalOpenAdmitted_TMAdmisSchedEntry">
-          <DataField>TotalOpenAdmitted_TMAdmisSchedEntry</DataField>
-        </Field>
-        <Field Name="ReportFilters">
-          <DataField>ReportFilters</DataField>
-        </Field>
-        <Field Name="TheCompanyName">
-          <DataField>TheCompanyName</DataField>
-        </Field>
-        <Field Name="EntryNo_TMDetTicketAccessEntry">
-          <DataField>EntryNo_TMDetTicketAccessEntry</DataField>
-        </Field>
-        <Field Name="Quantity_TMDetTicketAccessEntry">
-          <DataField>Quantity_TMDetTicketAccessEntry</DataField>
-        </Field>
-        <Field Name="Quantity_TMDetTicketAccessEntryFormat">
-          <DataField>Quantity_TMDetTicketAccessEntryFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -996,4 +941,59 @@ End Function
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>e48103e8-4062-4735-8ff9-976b92fc9f4e</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="AdmissionCode_TMAdmissionScheduleEntry">
+          <DataField>AdmissionCode_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="AdmissionStartDate_TMAdmissionScheduleEntry">
+          <DataField>AdmissionStartDate_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="AdmissionStartTime_TMAdmissionScheduleEntry">
+          <DataField>AdmissionStartTime_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="OpenReservations_TMAdmissionScheduleEntry">
+          <DataField>OpenReservations_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="OpenReservations_TMAdmissionScheduleEntryFormat">
+          <DataField>OpenReservations_TMAdmissionScheduleEntryFormat</DataField>
+        </Field>
+        <Field Name="OpenAdmitted_TMAdmissionScheduleEntry">
+          <DataField>OpenAdmitted_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="OpenAdmitted_TMAdmissionScheduleEntryFormat">
+          <DataField>OpenAdmitted_TMAdmissionScheduleEntryFormat</DataField>
+        </Field>
+        <Field Name="TotalLbl_OpenAdmitted_TMAdmissionScheduleEntry">
+          <DataField>TotalLbl_OpenAdmitted_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="TotalOpenReservations_TMAdmisSchedEntry">
+          <DataField>TotalOpenReservations_TMAdmisSchedEntry</DataField>
+        </Field>
+        <Field Name="TotalOpenAdmitted_TMAdmisSchedEntry">
+          <DataField>TotalOpenAdmitted_TMAdmisSchedEntry</DataField>
+        </Field>
+        <Field Name="ReportFilters">
+          <DataField>ReportFilters</DataField>
+        </Field>
+        <Field Name="TheCompanyName">
+          <DataField>TheCompanyName</DataField>
+        </Field>
+        <Field Name="EntryNo_TMDetTicketAccessEntry">
+          <DataField>EntryNo_TMDetTicketAccessEntry</DataField>
+        </Field>
+        <Field Name="Quantity_TMDetTicketAccessEntry">
+          <DataField>Quantity_TMDetTicketAccessEntry</DataField>
+        </Field>
+        <Field Name="Quantity_TMDetTicketAccessEntryFormat">
+          <DataField>Quantity_TMDetTicketAccessEntryFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

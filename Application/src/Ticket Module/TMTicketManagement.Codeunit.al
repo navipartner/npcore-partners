@@ -22,6 +22,8 @@
         ADM_NOT_OPEN_ENTRY: Label 'Admission code %1 does not have a schedule that is open for entry %2';
         NOT_CONFIRMED: Label 'Ticket %1 has not been confirmed.';
         MISSING_PAYMENT: Label 'Ticket %1 is missing the payment transaction.';
+
+        HAS_PAYMENT: Label 'Ticket %1 has already been paid so group quantity may not be increased.';
         TICKET_CANCELED: Label 'Ticket %1 has been canceled and is not valid.';
         ADMISSION_MISMATCH: Label 'The Schedule Entry %1 is for admission to %2, but the Ticket Access Entry requires %3.';
         NO_SCHEDULE_FOR_ADM: Label 'There is no valid admission schedule available for %1 today.';
@@ -30,7 +32,6 @@
         TICKET_EXPIRED: Label 'Ticket %1 expired on %2.';
         SHOULD_NOT_BE_ZERO: Label 'Should not be zero.';
         QTY_CHANGE_NOT_ALLOWED: Label 'Ticket %1 has been used and quantity cannot be changed. %2 %3.';
-        QTY_TOO_LARGE: Label 'The new ticket quantity cannot be greater than %1.';
         SCHEDULE_ENTRY_EXPIRED: Label 'The schedule entry %1 specifies a time in the past (%2) and cant be used for ticket reservation at this time (%3).';
         TICKET_CALENDAR: Label 'Ticket calendar defined for %1 %2 %3 states that ticket is not valid for %4.';
         RESERVATION_NOT_FOR_NOW: Label 'The ticket reservation for %4 allows admission from %1 until %2 on %3.\\Current time is: %5';
@@ -51,7 +52,6 @@
         TICKET_NOT_VALID_YET_NO: Label '-1017';
         TICKET_EXPIRED_NO: Label '-1018';
         QTY_CHANGE_NOT_ALLOWED_NO: Label '-1019';
-        QTY_TOO_LARGE_NO: Label '-1020';
         NO_DEFAULT_SCHEDULE_NO: Label '-1021';
         MISSING_PAYMENT_NO: Label '-1022';
         SCHEDULE_ENTRY_EXPIRED_NO: Label '-1023';
@@ -61,6 +61,7 @@
         CONCURRENT_CAPACITY_EXCEEDED_NO: Label '-1030';
         RESCHEDULE_NOT_ALLOWED_NO: Label '-1031';
         INVALID_ADMISSION_CODE_NO: Label '-1032';
+        HAS_PAYMENT_NO: Label '-1033';
         POSTPAID_RESULT: Label 'Number of postpaid tickets: %1\\Number of invoices: %2\\Invoices created: %3';
         gAccessEntryPaymentType: Option PAYMENT,PREPAID,POSTPAID;
         HANDLE_POSTPAID: Label 'Do you want to generate invoices for postpaid ticket?';
@@ -76,6 +77,9 @@
 
         _TicketExecutionContext: Option SALES,ADMISSION;
 
+    /**
+    * Finalize ticket from end of sale
+    **/
     [EventSubscriber(ObjectType::"Codeunit", Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, true)]
     local procedure IssueTicketsFromPosEntrySaleLine(POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     var
@@ -645,10 +649,12 @@
         NewDetTicketAccessEntry."Entry No." := 0;
         NewDetTicketAccessEntry."External Adm. Sch. Entry No." := OldDetTicketAccessEntry."External Adm. Sch. Entry No.";
         NewDetTicketAccessEntry.Quantity := OldDetTicketAccessEntry.Quantity * -1;
+        NewDetTicketAccessEntry.Open := false;
         NewDetTicketAccessEntry.Insert();
 
         // link original entry with reversal entry instead of payment entry
         OldDetTicketAccessEntry."Closed By Entry No." := NewDetTicketAccessEntry."Entry No.";
+        OldDetTicketAccessEntry.Open := false;
         OldDetTicketAccessEntry.Modify();
 
 
@@ -672,7 +678,6 @@
                 ValidateTicketAdmissionCapacityExceeded(Ticket, NewAdmissionScheduleEntry."Entry No.", _TicketExecutionContext::SALES, AllowAdmissionAllowOverAllocation);
 
         ValidateTicketAdmissionReservationDate(TicketAccessEntry."Entry No.", NewAdmissionScheduleEntry."Entry No.");
-
         ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", NewAdmissionScheduleEntry."Admission Start Date");
 
     end;
@@ -870,10 +875,6 @@
     var
         AdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        AuxItem: Record "NPR Auxiliary Item";
-        Item: Record Item;
-        TicketType: Record "NPR TM Ticket Type";
-        Admission: Record "NPR TM Admission";
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
     begin
 
@@ -881,10 +882,6 @@
         AdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
         AdmissionBOM.FindSet();
         repeat
-            Item.Get(Ticket."Item No.");
-            Item.NPR_GetAuxItem(AuxItem);
-            TicketType.Get(AuxItem."TM Ticket Type");
-            Admission.Get(AdmissionBOM."Admission Code");
             TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
             TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
             TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionBOM."Admission Code");
@@ -914,36 +911,81 @@
 
     procedure ChangeConfirmedTicketQuantity(TicketNo: Code[20]; AdmissionCode: Code[20]; NewTicketQuantity: Integer)
     var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntryNo: Integer;
+        AllowAdmissionOverAllocation: Enum "NPR TM Ternary";
+        OriginalQty: Integer;
+        ExtAdmSchEntryNo: Integer;
     begin
 
-        ValidateTicketReference(0, TicketNo, AdmissionCode, TicketAccessEntryNo);
+        ValidateTicketReference(0, TicketNo, AdmissionCode, TicketAccessEntryNo, true);
+        Ticket.Get(TicketNo);
 
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
         if (AdmissionCode <> '') then
             TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         TicketAccessEntry.FindSet();
         repeat
+
+            TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code");
+
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
             if (DetTicketAccessEntry.FindFirst()) then
                 RaiseError(StrSubstNo(QTY_CHANGE_NOT_ALLOWED, TicketNo, DetTicketAccessEntry.TableCaption(), DetTicketAccessEntry."Entry No."), QTY_CHANGE_NOT_ALLOWED_NO);
-        until (TicketAccessEntry.Next() = 0);
 
-        DetTicketAccessEntry.Reset();
-        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
-        DetTicketAccessEntry.FindFirst();
-        if (NewTicketQuantity > DetTicketAccessEntry.Quantity) then
-            RaiseError(StrSubstNo(QTY_TOO_LARGE, DetTicketAccessEntry.Quantity), QTY_TOO_LARGE_NO);
+            DetTicketAccessEntry.Reset();
+            DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+            DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+            DetTicketAccessEntry.SetFilter(Open, '=%1', true);
+            DetTicketAccessEntry.SetFilter(Quantity, '>0');
+            DetTicketAccessEntry.SetFilter("Closed By Entry No.", '=%1', 0);
+            DetTicketAccessEntry.FindFirst();
 
-        TicketAccessEntry.FindSet();
-        repeat
+            OriginalQty := DetTicketAccessEntry.Quantity;
+            ExtAdmSchEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+            DetTicketAccessEntry.Quantity := NewTicketQuantity;
+            DetTicketAccessEntry.Modify();
+
+            DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+            if (DetTicketAccessEntry.FindFirst()) then begin
+                ExtAdmSchEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+                DetTicketAccessEntry.Quantity := NewTicketQuantity;
+                DetTicketAccessEntry.Modify();
+            end;
+
+            if (NewTicketQuantity > OriginalQty) then begin
+                DetTicketAccessEntry.Reset();
+                DetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
+                DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+                DetTicketAccessEntry.SetFilter(Type, '=%1|=%2|%3', DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::PREPAID, DetTicketAccessEntry.Type::POSTPAID);
+                if (not DetTicketAccessEntry.IsEmpty()) then
+                    RaiseError(StrSubstNo(HAS_PAYMENT, Ticket."External Ticket No."), HAS_PAYMENT_NO);
+
+                AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_FALSE;
+                if (TicketBom."POS Sale May Exceed Capacity") then
+                    AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_UNKNOWN;
+                AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtAdmSchEntryNo);
+                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                AdmissionScheduleEntry.FindFirst();
+                ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionScheduleEntry."Entry No.", _TicketExecutionContext::SALES, AllowAdmissionOverAllocation);
+            end;
+
             TicketAccessEntry.Quantity := NewTicketQuantity;
             TicketAccessEntry.Modify();
+
         until (TicketAccessEntry.Next() = 0);
+
+        TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
+        TicketRequest.SetCurrentKey("Session Token ID");
+        TicketRequest.SetFilter("Session Token ID", '=%1', TicketRequest."Session Token ID");
+        TicketRequest.SetFilter("Ext. Line Reference No.", '=%1', TicketRequest."Ext. Line Reference No.");
+        TicketRequest.ModifyAll(Quantity, NewTicketQuantity);
 
     end;
 
@@ -1113,6 +1155,15 @@
         TicketIdentifier: Text[50];
         AdmissionCode: Code[20];
         var TicketAccessEntryNo: Integer)
+    begin
+        ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo, false);
+    end;
+
+    internal procedure ValidateTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO;
+        TicketIdentifier: Text[50];
+        AdmissionCode: Code[20];
+        var TicketAccessEntryNo: Integer;
+        SkipPaymentCheck: Boolean)
     var
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -1148,11 +1199,13 @@
         if (TicketAccessEntry.Status = TicketAccessEntry.Status::BLOCKED) then
             RaiseError(StrSubstNo(TICKET_CANCELED, TicketIdentifier), TICKET_CANCELED_NO);
 
-        DetailedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
-        DetailedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-        DetailedTicketAccessEntry.SetFilter(Type, '=%1|=%2|%3', DetailedTicketAccessEntry.Type::PAYMENT, DetailedTicketAccessEntry.Type::PREPAID, DetailedTicketAccessEntry.Type::POSTPAID);
-        if (DetailedTicketAccessEntry.IsEmpty()) then
-            RaiseError(StrSubstNo(MISSING_PAYMENT, TicketIdentifier), MISSING_PAYMENT_NO);
+        if (not SkipPaymentCheck) then begin
+            DetailedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
+            DetailedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+            DetailedTicketAccessEntry.SetFilter(Type, '=%1|=%2|%3', DetailedTicketAccessEntry.Type::PAYMENT, DetailedTicketAccessEntry.Type::PREPAID, DetailedTicketAccessEntry.Type::POSTPAID);
+            if (DetailedTicketAccessEntry.IsEmpty()) then
+                RaiseError(StrSubstNo(MISSING_PAYMENT, TicketIdentifier), MISSING_PAYMENT_NO);
+        end;
 
         TicketAccessEntryNo := TicketAccessEntry."Entry No.";
         exit;
@@ -1670,8 +1723,8 @@
                                 PatternOut := StrSubstNo(PlaceHolderLbl, PatternOut, GenerateRandom(Left));
                         end;
                     else begin
-                            PatternOut := StrSubstNo(PlaceHolderLbl, PatternOut, Pattern);
-                        end;
+                        PatternOut := StrSubstNo(PlaceHolderLbl, PatternOut, Pattern);
+                    end;
                 end;
             end;
 
@@ -2052,13 +2105,20 @@
     local procedure CloseTicketAccessEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; ClosingEntryType: Option) Closed: Boolean
     var
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        EntryNo: Integer;
     begin
 
         DetailedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type, Open, "Posting Date");
         DetailedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', ClosedByAccessEntry."Ticket Access Entry No.");
         DetailedTicketAccessEntry.SetFilter(Type, '=%1', ClosingEntryType);
         DetailedTicketAccessEntry.SetFilter(Open, '=%1', true);
-        if (DetailedTicketAccessEntry.FindFirst()) then begin
+        if (DetailedTicketAccessEntry.FindLast()) then begin
+            EntryNo := DetailedTicketAccessEntry."Entry No.";
+            DetailedTicketAccessEntry.SetFilter("Closed By Entry No.", '=%1', 0);
+            DetailedTicketAccessEntry.SetFilter(Quantity, '=%1', ClosedByAccessEntry.Quantity);
+            if (not DetailedTicketAccessEntry.FindFirst()) then
+                DetailedTicketAccessEntry.Get(EntryNo);
+
             DetailedTicketAccessEntry."Closed By Entry No." := ClosedByAccessEntry."Entry No.";
             DetailedTicketAccessEntry.Open := false;
             DetailedTicketAccessEntry.Modify();
@@ -2454,8 +2514,10 @@
         if (TicketExecutionContext = TicketExecutionContext::ADMISSION) and (CapacityControl = Admission."Capacity Control"::SALES) then
             exit;
 
-        AdmittedCount := CalculateCurrentCapacity(CapacityControl, AdmissionScheduleEntryNo);
+        if (TicketExecutionContext = TicketExecutionContext::SALES) and (CapacityControl = Admission."Capacity Control"::ADMITTED) then
+            CapacityControl := Admission."Capacity Control"::SALES;
 
+        AdmittedCount := CalculateCurrentCapacity(CapacityControl, AdmissionScheduleEntryNo);
         if (AdmittedCount = 0) then
             Error(UNEXPECTED, AdmissionScheduleEntry.TableCaption(), Admission."Admission Code", AdmittedCount, SHOULD_NOT_BE_ZERO, 0, 0);
 

@@ -138,7 +138,14 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Initial Entry field';
+                    ToolTip = 'Specifies the value of the Initial Entry field. This includes paid entries only.';
+                }
+                field("Initial Entry (All)"; Rec."Initial Entry (All)")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Initial Entry (All) field. This is a temporary number since unpaid requests are listed. This includes f.ex. tour tickets and incomplete ticket web requests.';
+                    Visible = false;
                 }
                 field("Open Reservations"; Rec."Open Reservations")
                 {

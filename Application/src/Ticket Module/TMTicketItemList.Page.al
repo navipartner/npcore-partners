@@ -83,7 +83,7 @@ page 6059888 "NPR TM Ticket Item List"
                 RunPageLink = "Item No." = field("Item No."), "Code" = field("Code");
                 Image = Item;
             }
-            Action("Create Prepaid Tickets")
+            Action(CreatePrepaidTickets)
             {
                 ToolTip = 'Create a set of tickets for which payment has already been handled. (F.ex. free tickets.) ';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -101,7 +101,7 @@ page 6059888 "NPR TM Ticket Item List"
                     TicketBomPage.MakeTickets(_TicketPaymentType::PREPAID, Rec."Item No.", Rec.Code);
                 end;
             }
-            Action("Create Postpaid Tickets")
+            Action(CreatePostpaidTickets)
             {
                 ToolTip = 'Create a set of tickets that can be invoiced after ticket has been used.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -117,6 +117,24 @@ page 6059888 "NPR TM Ticket Item List"
                     TicketBomPage: Page "NPR TM Ticket BOM";
                 begin
                     TicketBomPage.MakeTickets(_TicketPaymentType::POSTPAID, Rec."Item No.", Rec.Code);
+                end;
+            }
+            Action(CreateTourTickets)
+            {
+                ToolTip = 'Create a tickets that is suitable for tours.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Scope = Repeater;
+                Caption = 'Create Tour Ticket';
+                Image = CustomerGroup;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                trigger OnAction()
+                var
+                    TicketBomPage: Page "NPR TM Ticket BOM";
+                begin
+                    TicketBomPage.MakeTourTicket(Rec."Item No.", Rec.Code);
                 end;
             }
         }

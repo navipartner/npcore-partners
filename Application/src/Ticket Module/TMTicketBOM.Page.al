@@ -317,6 +317,21 @@
                     MakeTickets(TicketPaymentType::POSTPAID, Rec."Item No.", Rec."Variant Code");
                 end;
             }
+            Action("Create Tour Ticket")
+            {
+                ToolTip = 'Create a tour ticket.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Create Tour Ticket';
+                Image = CustomerGroup;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
+                PromotedIsBig = true;
+                trigger OnAction()
+                begin
+                    MakeTourTicket(Rec."Item No.", Rec."Variant Code");
+                end;
+            }
         }
     }
 
@@ -336,6 +351,59 @@
         OFFLINE_VALIDATION: Label 'Do you want to create offline ticket validation entries to be able to create admissions.';
         TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
+
+    procedure MakeTourTicket(ItemNo: Code[20]; VariantCode: Code[10])
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Item: Record "Item";
+        AuxItem: Record "NPR Auxiliary Item";
+        TicketType: Record "NPR TM Ticket Type";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        Token: Text[100];
+        ResponseMessage: Text;
+    begin
+        Item.Get(ItemNo);
+        Item.NPR_GetAuxItem(AuxItem);
+        TicketType.Get(AuxItem."TM Ticket Type");
+        TicketType.TestField("Admission Registration", TicketType."Admission Registration"::GROUP);
+
+        Token := TicketRequestManager.GetNewToken();
+
+        if (not FinalizeReservation(CreateTicketRequest(TicketReservationRequest."Payment Option"::UNPAID, Token, ItemNo, VariantCode), ItemNo, VariantCode)) then begin
+            TicketRequestManager.DeleteReservationRequest(Token, true);
+            exit;
+        end;
+
+        if (not TicketRequestManager.ConfirmReservationRequest(Token, ResponseMessage)) then begin
+            TicketRequestManager.DeleteReservationRequest(Token, true);
+            Error(ResponseMessage);
+        end;
+
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.FindFirst();
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+        Ticket.FindFirst();
+
+        // "Initial Entry" flow field (on Admission Schedule Entry page) lists only closed entries (ie paid entries)
+        // A tour ticket is unpaid but should be listed anyway.
+        DetTicketAccessEntry.SetCurrentKey("Ticket No.");
+        DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+        if (DetTicketAccessEntry.FindSet(true)) then begin
+            repeat
+                DetTicketAccessEntry.Open := false;
+                DetTicketAccessEntry.Modify();
+            until (DetTicketAccessEntry.Next() = 0);
+        end;
+
+        Commit();
+        Page.Run(Page::"NPR TM Ticket List", Ticket);
+
+    end;
+
 
     procedure MakeTickets(PaymentType: Option; ItemNo: Code[20]; VariantCode: Code[10])
     var
@@ -403,6 +471,7 @@
             Commit();
             Page.Run(Page::"NPR TM Ticket List", Ticket);
         end;
+
     end;
 
     local procedure CreateTicketRequest(PaymentType: Option; Token: Text[100]; ItemNo: Code[20]; VariantCode: Code[10]): Text[100]
