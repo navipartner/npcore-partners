@@ -6,28 +6,13 @@
         ClientDiagnostic: Record "NPR Client Diagnostic";
         Initialized: Boolean;
 
-#if BC20
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, false)]
-    local procedure HandleOnAfterLogin()
-    var
-        EnvironmentInformation: Codeunit "Environment Information";
-    begin
-        if NavApp.IsInstalling() then
-            exit;
-
-        if not (CurrentClientType in [ClientType::Windows, ClientType::Web, ClientType::Tablet, ClientType::Phone, ClientType::Desktop]) then
-            exit;
-
-        if EnvironmentInformation.IsSandbox() then
-            exit;
-
-        ValidateBCOnlineTenant();
-        TestUserOnLogin();
-        SendPosUnitQty();
-    end;
-#else
+#if BC17 or BC18 or BC19
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
     local procedure HandleOnBeforeLogInStart()
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', false, false)]
+    local procedure OnAfterLogin();
+#endif
     var
         EnvironmentInformation: Codeunit "Environment Information";
     begin
@@ -44,7 +29,6 @@
         TestUserOnLogin();
         SendPosUnitQty();
     end;
-#endif
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Session", 'OnInitialize', '', false, false)]
     local procedure HandleOnInitialize()
