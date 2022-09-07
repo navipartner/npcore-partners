@@ -10,19 +10,16 @@
     begin
     end;
 
-#if BC20
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, false)]
-    local procedure OnAfterLogin()
-    begin
-        EnableAllowHttpInSandbox();
-    end;
-#else
+#if BC17 or BC18 or BC19
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, true)]
     local procedure OnBeforeLoginStart()
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, false)]
+    local procedure OnAfterLogin()
+#endif
     begin
         EnableAllowHttpInSandbox();
     end;
-#endif
 
     internal procedure EnableAllowHttpInSandbox()
     var
