@@ -42,6 +42,8 @@
   items: 
   - name: CS setup
     href: reference/cs-setup.md
+  - name: Handling codeunits (reference guide)
+    href: reference/handling_codeunits.md
 
 - name: Videos
   items:
