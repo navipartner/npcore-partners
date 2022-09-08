@@ -1975,7 +1975,8 @@
             InitialTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
             InitialTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntryNo);
             InitialTicketAccessEntry.SetFilter(Type, '=%1', InitialTicketAccessEntry.Type::INITIAL_ENTRY);
-            InitialTicketAccessEntry.FindFirst();
+            InitialTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
+            InitialTicketAccessEntry.FindLast();
 
             AdmittedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
             AdmittedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntryNo);
@@ -2056,12 +2057,14 @@
 
                     OpenTicketAccessEntry.Type::INITIAL_ENTRY:
                         begin
-                            CancelTicketAccessEntry."Closed By Entry No." := ClosedByEntryNo;
-                            CancelTicketAccessEntry."Entry No." := 0;
-                            CancelTicketAccessEntry.Type := CancelTicketAccessEntry.Type::INITIAL_ENTRY;
-                            CancelTicketAccessEntry.Quantity := -QtyToCancel;
-                            CancelTicketAccessEntry."External Adm. Sch. Entry No." := InitialTicketAccessEntry."External Adm. Sch. Entry No.";
-                            CancelTicketAccessEntry.Insert(true);
+                            if not CheckIfInitialEntryIsClosedByAnother(OpenTicketAccessEntry) then begin
+                                CancelTicketAccessEntry."Closed By Entry No." := ClosedByEntryNo;
+                                CancelTicketAccessEntry."Entry No." := 0;
+                                CancelTicketAccessEntry.Type := CancelTicketAccessEntry.Type::INITIAL_ENTRY;
+                                CancelTicketAccessEntry.Quantity := -QtyToCancel;
+                                CancelTicketAccessEntry."External Adm. Sch. Entry No." := InitialTicketAccessEntry."External Adm. Sch. Entry No.";
+                                CancelTicketAccessEntry.Insert(true);
+                            end;
                         end;
                 end;
 
@@ -3467,6 +3470,17 @@
                 end;
             until TicketAccessEntry.Next() = 0;
         Message(TxtBuilder.ToText());
+    end;
+
+    local procedure CheckIfInitialEntryIsClosedByAnother(OpenTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"): Boolean
+    var
+        RelatedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        if not RelatedTicketAccessEntry.Get(OpenTicketAccessEntry."Closed By Entry No.") then
+            exit(false);
+        if RelatedTicketAccessEntry.Type = RelatedTicketAccessEntry.Type::INITIAL_ENTRY then
+            exit(true);
+        exit(false);
     end;
 }
 
