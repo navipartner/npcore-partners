@@ -152,7 +152,7 @@
                     PromotedOnly = true;
                     PromotedCategory = "Report";
 
-                    ToolTip = 'Executes the Shelf Label action';
+                    ToolTip = 'Runs the Shelf Label report to display prices for shelf labels.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -185,11 +185,12 @@
                     PromotedOnly = true;
                     PromotedCategory = "Report";
 
-                    ToolTip = 'Executes the Sign Print action';
+                    ToolTip = 'Runs the Sign Print report to display sign prices.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
+
                         CurrPage.SubLine.PAGE.PrintSelection("NPR Report Selection Type"::Sign.AsInteger());
                     end;
                 }
@@ -219,9 +220,7 @@
 
                     trigger OnAction()
                     begin
-                        //-NPR5.46 [294354]
                         Rec.SetPrintQuantityByInventory();
-                        //+NPR5.46 [294354]
                     end;
                 }
                 separator(Separator6014407)
@@ -240,10 +239,9 @@
 
                     trigger OnAction()
                     begin
-                        //-NPR5.53 [375557]
                         CurrPage.SubLine.PAGE.SetSkipConfirm(true);
                         CurrPage.SubLine.PAGE.PrintSelection(REPORT::"NPR Retail Journal List");
-                        //+NPR5.53 [375557]
+
                     end;
                 }
             }
@@ -284,19 +282,14 @@
                     var
                         RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
-                        //-NPR5.46 [294354]
-                        // RetailJournalHeader := Rec;
-                        // RetailJournalHeader.SetRecFilter();
-                        // RetJnlImpPerDisc.SETTABLEVIEW(RetailJournalHeader);
-                        // RetJnlImpPerDisc.RunModal();
-                        // CLEAR(RetJnlImpPerDisc);
                         RetailJournalCode.Campaign2RetailJnl('', Rec."No.");
                         CurrPage.Update(true);
-                        //+NPR5.46 [294354]
                     end;
                 }
                 action(ImportFromMixedDiscount)
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Removed';
                     Caption = 'Mixed Discounts';
                     Enabled = false;
                     Image = Discount;
@@ -307,13 +300,7 @@
 
                     trigger OnAction()
                     begin
-                        //-NPR5.46 [294354]
-                        // RetailJournalHeader := Rec;
-                        // RetailJournalHeader.SetRecFilter();
-                        // RetJnlImpMixDisc.SETTABLEVIEW(RetailJournalHeader);
-                        // RetJnlImpMixDisc.RunModal();
-                        // CLEAR(RetJnlImpMixDisc);
-                        //+NPR5.46 [294354]
+
                     end;
                 }
                 action(ImportFromTransferOrder)

@@ -388,25 +388,29 @@
         RecRef: RecordRef;
     begin
         if IsWebClient then begin
+            RetailJnlLine.SetView(Rec.GetView());
             CurrPage.SetSelectionFilter(RetailJnlLine);
-            if RetailJnlLine.FindSet() then
-                    repeat
-                        TempRetailJnlLine.Init();
-                        TempRetailJnlLine := RetailJnlLine;
-                        TempRetailJnlLine.Insert();
-                    until RetailJnlLine.Next() = 0;
+            if RetailJnlLine.FindSet() then begin
+                TempRetailJnlLine.SetView(RetailJnlLine.GetView());
+                repeat
+                    TempRetailJnlLine.Init();
+                    TempRetailJnlLine := RetailJnlLine;
+                    TempRetailJnlLine.Insert();
+                until RetailJnlLine.Next() = 0;
+            end;
             LabelLibrary.SetSelectionBuffer(TempRetailJnlLine);
         end;
 
         LabelLibrary.PrintSelection(ReportType);
 
-        if SkipConfirm then
+        If SkipConfirm then
             exit;
+
         if Confirm(Caption_DeletePrintedLines) then begin
             RetailJnlLine.SetRange("No.", Rec."No.");
             if RetailJnlLine.FindSet() then
                 repeat
-                        RecRef.GetTable(RetailJnlLine);
+                    RecRef.GetTable(RetailJnlLine);
                     if LabelLibrary.SelectionContains(RecRef) then
                         RetailJnlLine.Delete(true);
                     RecRef.Close();
