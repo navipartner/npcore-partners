@@ -70,3 +70,5 @@
     href: howto/Create_new_POS_store.md
   - name: Add logo to the POS screen
     href: howto/How_to_add_logo_to_the_POS_screen.md
+  - name: Configure master/slave POS units
+    href: howto/Configuration_of_master_slave_POS_units.md
