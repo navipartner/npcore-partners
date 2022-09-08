@@ -1,16 +1,16 @@
-page 6059916 "NPR APIV1 PBIDimensionSet"
+page 6059990 "NPR APIV1 PBIDefaultDim"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'dimensionsSetEntry';
-    EntitySetName = 'dimensionsSetEntries';
-    Caption = 'PowerBI Dimensions Set Entry';
+    EntityName = 'defaultDimension';
+    EntitySetName = 'defaultDimensions';
+    Caption = 'PowerBI Default Dimensions';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "Dimension Set Entry";
+    SourceTable = "Default Dimension";
     Extensible = false;
     Editable = false;
 
@@ -24,9 +24,13 @@ page 6059916 "NPR APIV1 PBIDimensionSet"
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(dimensionSetID; Rec."Dimension Set ID")
+                field(tableId; Rec."Table ID")
                 {
-                    Caption = 'Dimension Set ID', Locked = true;
+                    Caption = 'Table ID', Locked = true;
+                }
+                field(no; Rec."No.")
+                {
+                    Caption = 'No.', Locked = true;
                 }
                 field(dimensionCode; Rec."Dimension Code")
                 {
@@ -36,9 +40,17 @@ page 6059916 "NPR APIV1 PBIDimensionSet"
                 {
                     Caption = 'Dimension Value Code', Locked = true;
                 }
-                field(dimensionValueID; Rec."Dimension Value ID")
+                field(parentId; Rec.ParentId)
                 {
-                    Caption = 'Dimension Value ID', Locked = true;
+                    Caption = 'Parent Id', Locked = true;
+                }
+                field(dimensionId; Rec.DimensionId)
+                {
+                    Caption = 'Dimension Id', Locked = true;
+                }
+                field(dimensionValueId; Rec.DimensionValueId)
+                {
+                    Caption = 'Dimension Value Id', Locked = true;
                 }
             }
         }

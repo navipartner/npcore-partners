@@ -1,4 +1,4 @@
-page 6059989 "NPR APIV1 PBI Value Entry Aux"
+page 6059989 "NPR APIV1 PBIValueEntryAux"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
@@ -90,6 +90,38 @@ page 6059989 "NPR APIV1 PBI Value Entry Aux"
                 field(salespersPurchCode; Rec."Salespers./Purch. Code")
                 {
                     Caption = 'Salespers./Purch. Code';
+                }
+                field(sourceNo; Rec."Source No.")
+                {
+                    Caption = 'Source No.';
+                }
+                field(valuedQuantity; Rec."Valued Quantity")
+                {
+                    Caption = 'Valued Quantity';
+                }
+                field(costPerUnit; Rec."Cost per Unit")
+                {
+                    Caption = 'Cost per Unit';
+                }
+                field(salesAmountActual; Rec."Sales Amount (Actual)")
+                {
+                    Caption = 'Sales Amount (Actual)';
+                }
+                field(discountAmount; Rec."Discount Amount")
+                {
+                    Caption = 'Discount Amount';
+                }
+                field(costAmountActual; Rec."Cost Amount (Actual)")
+                {
+                    Caption = 'Cost Amount (Actual)';
+                }
+                field(documentType; Rec."Document Type")
+                {
+                    Caption = 'Document Type';
+                }
+                field(vendorNo; Rec."Vendor No.")
+                {
+                    Caption = 'Vendor No.';
                 }
             }
         }

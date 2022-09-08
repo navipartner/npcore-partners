@@ -72,6 +72,14 @@ page 6059931 "NPR APIV1 PBIItemLedgerEntrAux"
                 {
                     Caption = 'Vendor No.', Locked = true;
                 }
+                field(discountCode; Rec."Discount Code")
+                {
+                    Caption = 'Discount Code', Locked = true;
+                }
+                field(posUnitNo; Rec."POS Unit No.")
+                {
+                    Caption = 'POS Unit No.', Locked = true;
+                }
                 field(systemCreatedAt; Rec.SystemCreatedAt)
                 {
                     Caption = 'SystemCreatedAt', Locked = true;
@@ -80,7 +88,6 @@ page 6059931 "NPR APIV1 PBIItemLedgerEntrAux"
                 {
                     Caption = 'SystemCreatedBy', Locked = true;
                 }
-
             }
         }
     }

@@ -64,6 +64,10 @@ page 6059929 "NPR APIV1 PBIItemledgerEntry"
                 {
                     Caption = 'Item No.', Locked = true;
                 }
+                field(variantCode; Rec."Variant Code")
+                {
+                    Caption = 'Variant Code', Locked = true;
+                }
                 field(open; Rec.Open)
                 {
                     Caption = 'Open', Locked = true;
@@ -72,7 +76,50 @@ page 6059929 "NPR APIV1 PBIItemledgerEntry"
                 {
                     Caption = 'Remaining Quantity', Locked = true;
                 }
-
+                field(description; Rec.Description)
+                {
+                    Caption = 'Description', Locked = true;
+                }
+                field(documentNo; Rec."Document No.")
+                {
+                    Caption = 'Document No.', Locked = true;
+                }
+                field(documentType; Rec."Document Type")
+                {
+                    Caption = 'Document Type', Locked = true;
+                }
+                field(invoicedQuantity; Rec."Invoiced Quantity")
+                {
+                    Caption = 'Invoiced Quantity', Locked = true;
+                }
+                field(itemCategoryCode; Rec."Item Category Code")
+                {
+                    Caption = 'Item Category Code', Locked = true;
+                }
+                field(locationCode; Rec."Location Code")
+                {
+                    Caption = 'Location Code', Locked = true;
+                }
+                field(prodOrderCompLineNo; Rec."Prod. Order Comp. Line No.")
+                {
+                    Caption = 'Prod. Order Comp. Line No.', Locked = true;
+                }
+                field(purchasingCode; Rec."Purchasing Code")
+                {
+                    Caption = 'Purchasing Code', Locked = true;
+                }
+                field(qtyPerUnitOfMeasure; Rec."Qty. per Unit of Measure")
+                {
+                    Caption = 'Qty. per Unit of Measure', Locked = true;
+                }
+                field(transactionSpecification; Rec."Transaction Specification")
+                {
+                    Caption = 'Transaction Specification', Locked = true;
+                }
+                field(transactionType; Rec."Transaction Type")
+                {
+                    Caption = 'Transaction Type', Locked = true;
+                }
             }
         }
     }
