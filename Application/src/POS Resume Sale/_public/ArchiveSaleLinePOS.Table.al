@@ -730,7 +730,7 @@
             OptionMembers = " ",Betaling,Faktura,Kreditnota,Rentenota,Rykker;
             DataClassification = CustomerContent;
         }
-        field(6001; "Buffer ID"; Code[20])
+        field(6001; "Buffer ID"; Code[50])
         {
             Caption = 'Buffer ID';
             DataClassification = CustomerContent;

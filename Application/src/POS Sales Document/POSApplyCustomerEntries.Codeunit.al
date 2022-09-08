@@ -39,7 +39,7 @@
         SalePOS: Record "NPR POS Sale";
         CustLedgEntry: Record "Cust. Ledger Entry";
         POSApplyCustomerEntries: Page "NPR POS Apply Cust. Entries";
-        AppliesToID: Code[20];
+        AppliesToID: Code[50];
         Confirmed: Boolean;
         AppliesToIDLbl: Label '%1-%2', Locked = true;
     begin
@@ -221,7 +221,7 @@
             until AppliedCustLedgEntry.Next() = 0;
     end;
 
-    local procedure RestoreAppliesToIDMarks(SalePOS: Record "NPR POS Sale"; AppliesToID: Code[20])
+    local procedure RestoreAppliesToIDMarks(SalePOS: Record "NPR POS Sale"; AppliesToID: Code[50])
     var
         ApplyingCustLedgEntry: Record "Cust. Ledger Entry";
         CustLedgEntry: Record "Cust. Ledger Entry";

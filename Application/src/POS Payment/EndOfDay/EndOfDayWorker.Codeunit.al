@@ -89,7 +89,7 @@ codeunit 6059860 "NPR End Of Day Worker"
         Exit(Result);
     end;
 
-    procedure CreateReport(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift; POSUnitNo: Code[10]; SalesPersonCode: Code[10]; SaleDimSetID: Integer; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") EntryNo: Integer;
+    procedure CreateReport(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift; POSUnitNo: Code[10]; SalesPersonCode: Code[20]; SaleDimSetID: Integer; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") EntryNo: Integer;
     var
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
     begin

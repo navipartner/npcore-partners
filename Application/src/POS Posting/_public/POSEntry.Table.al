@@ -286,7 +286,7 @@
             Description = 'NPR5.53 [376035]';
             TableRelation = Job WHERE("NPR Event" = CONST(true));
         }
-        field(200; "Customer Posting Group"; Code[10])
+        field(200; "Customer Posting Group"; Code[20])
         {
             Caption = 'Customer Posting Group';
             DataClassification = CustomerContent;

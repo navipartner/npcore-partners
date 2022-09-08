@@ -258,7 +258,7 @@
         end;
     end;
 
-    local procedure InitJournalLine(PostingDate: Date; DocumentNo: Code[20]; SourceCode: Code[10]; ReasonCode: Code[10]; PostingNoSeries: Code[10]; var GenJnlLine: Record "Gen. Journal Line")
+    local procedure InitJournalLine(PostingDate: Date; DocumentNo: Code[20]; SourceCode: Code[10]; ReasonCode: Code[10]; PostingNoSeries: Code[20]; var GenJnlLine: Record "Gen. Journal Line")
     begin
         GenJnlLine.Init();
         GenJnlLine."Source Code" := SourceCode;

@@ -404,7 +404,7 @@
             Caption = 'Customer Mapping';
             DataClassification = CustomerContent;
         }
-        field(505; "Customer Posting Group"; Code[10])
+        field(505; "Customer Posting Group"; Code[20])
         {
             Caption = 'Customer Posting Group';
             DataClassification = CustomerContent;
