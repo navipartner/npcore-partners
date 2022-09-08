@@ -1,18 +1,19 @@
-page 6059938 "NPR APIV1 PBISalesPersonPurc"
+page 6059994 "NPR APIV1 PBISeatWaiterPadLink"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'salesPerson';
-    EntitySetName = 'salesPersons';
-    Caption = 'PowerBI SalesPerson/Purchaser';
+    EntityName = 'seatWaiterPadLink';
+    EntitySetName = 'seatWaiterPadLinks';
+    Caption = 'PowerBI Seat WaiterPadLink';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "Salesperson/Purchaser";
+    SourceTable = "NPR NPRE Seat.: WaiterPadLink";
     Extensible = false;
     Editable = false;
+
     layout
     {
         area(Content)
@@ -23,17 +24,17 @@ page 6059938 "NPR APIV1 PBISalesPersonPurc"
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field("code"; Rec."Code")
+                field(seatingCode; Rec."Seating Code")
                 {
-                    Caption = 'Code', Locked = true;
+                    Caption = 'Seating Code', Locked = true;
                 }
-                field(name; Rec.Name)
+                field(waiterPadNo; Rec."Waiter Pad No.")
                 {
-                    Caption = 'Name', Locked = true;
+                    Caption = 'Waiter Pad No.', Locked = true;
                 }
-                field(jobTitle; Rec."Job Title")
+                field(closed; Rec.Closed)
                 {
-                    Caption = 'Job Title', Locked = true;
+                    Caption = 'Closed', Locked = true;
                 }
             }
         }

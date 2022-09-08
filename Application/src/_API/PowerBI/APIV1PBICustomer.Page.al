@@ -24,6 +24,18 @@ page 6059914 "NPR APIV1 PBICustomer"
                 {
                     Caption = 'SystemId', Locked = true;
                 }
+                field(no; Rec."No.")
+                {
+                    Caption = 'No.', Locked = true;
+                }
+                field(name; Rec.Name)
+                {
+                    Caption = 'Name', Locked = true;
+                }
+                field(name2; Rec."Name 2")
+                {
+                    Caption = 'Name 2', Locked = true;
+                }
                 field(address; Rec.Address)
                 {
                     Caption = 'Address', Locked = true;
@@ -40,21 +52,21 @@ page 6059914 "NPR APIV1 PBICustomer"
                 {
                     Caption = 'Country/Region Code', Locked = true;
                 }
-                field(name; Rec.Name)
-                {
-                    Caption = 'Name', Locked = true;
-                }
-                field(no; Rec."No.")
-                {
-                    Caption = 'No.', Locked = true;
-                }
-                field(name2; Rec."Name 2")
-                {
-                    Caption = 'Name 2', Locked = true;
-                }
                 field(postCode; Rec."Post Code")
                 {
                     Caption = 'Post Code', Locked = true;
+                }
+                field(paymentTermsCode; Rec."Payment Terms Code")
+                {
+                    Caption = 'Payment Terms Code', Locked = true;
+                }
+                field(invoiceDiscCode; Rec."Invoice Disc. Code")
+                {
+                    Caption = 'Invoice Disc. Code', Locked = true;
+                }
+                field(customerPostingGroup; Rec."Customer Posting Group")
+                {
+                    Caption = 'Customer Posting Group', Locked = true;
                 }
             }
         }
