@@ -271,6 +271,12 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SS-IDLE-TIMEOUT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR SS Action: Idle Timeout";
     }
+    value(50; "SS-QTY+")
+    {
+        Caption = 'SS-QTY+', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR SS Action - Qty Increase";
+    }
+
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;

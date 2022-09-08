@@ -1,64 +1,50 @@
-﻿codeunit 6151280 "NPR SS Action - Qty Increase"
+﻿codeunit 6151280 "NPR SS Action - Qty Increase" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This is a build in function to change quantity.';
-
-    local procedure ActionCode(): Text[20]
+        IncreaseByDescLbl: Label 'Specifies how much the Quantity will increase.';
+        IncreaseByCaptionLbl: Label 'Increase By';
     begin
-
-        exit('SS-QTY+');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddDecimalParameter('increaseBy', 1.0, IncreaseByCaptionLbl, IncreaseByDescLbl);
+        WorkflowConfig.SetWorkflowTypeUnattended();
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     begin
-
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction20(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion())
-        then begin
-            Sender.RegisterWorkflow20('workflow.respond();');
-            Sender.RegisterDecimalParameter('increaseBy', 1.0);
-
-            Sender.SetWorkflowTypeUnattended();
+        case Step of
+            'IncreaseQty':
+                Frontend.WorkflowResponse(IncreaseQuantity(Context, SaleLine));
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    internal procedure IncreaseQuantity(Context: codeunit "NPR POS JSON Helper"; SaleLine: codeunit "NPR POS Sale Line"): JsonObject
     var
+        POSSession: Codeunit "NPR POS Session";
         Qty: Decimal;
     begin
-
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        Qty := Context.GetDecimalParameterOrFail('increaseBy', ActionCode());
-        IncreaseSalelineQuantity(POSSession, Qty);
+        Qty := Context.GetDecimalParameter('increaseBy');
+        IncreaseSalelineQuantity(POSSession, Qty, SaleLine);
     end;
 
-    procedure IncreaseSalelineQuantity(POSSession: Codeunit "NPR POS Session"; IncreaseBy: Decimal)
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:SSActionQtyIncreaseSS.js###
+'let main=async({})=>await workflow.respond("IncreaseQty");'
+        )
+    end;
+
+    internal procedure IncreaseSalelineQuantity(POSSession: Codeunit "NPR POS Session"; IncreaseBy: Decimal; SaleLine: codeunit "NPR POS Sale Line")
     var
-        SaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-
         // This function should be "not local", so test framework can invoke it
-
-        POSSession.GetSaleLine(SaleLine);
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
         SaleLine.SetQuantity(SaleLinePOS.Quantity + IncreaseBy);
-
-        POSSession.RequestRefreshData();
     end;
 }
 

@@ -417,7 +417,7 @@
         if (SaleLinePOS.Quantity + IncreaseByQty > ItemMaxQuantity) and (ItemMaxQuantity > 0) then
             Error(TooBigQtyErr, ItemMaxQuantity);
 
-        SSActionQtyIncrease.IncreaseSalelineQuantity(POSSession, IncreaseByQty);
+        SSActionQtyIncrease.IncreaseSalelineQuantity(POSSession, IncreaseByQty, POSSaleLine);
 
         POSSession.RequestRefreshData();
         exit(true);
