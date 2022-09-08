@@ -60,6 +60,18 @@ page 6059936 "NPR APIV1 PBIPOSStore"
                 {
                     Caption = 'Store Size', Locked = true;
                 }
+                field(locationCode; Rec."Location Code")
+                {
+                    Caption = 'Location Code', Locked = true;
+                }
+                field(globalDimension1Code; Rec."Global Dimension 1 Code")
+                {
+                    Caption = 'Global Dimension 1 Code', Locked = true;
+                }
+                field(globalDimension2Code; Rec."Global Dimension 2 Code")
+                {
+                    Caption = 'Global Dimension 2 Code', Locked = true;
+                }
             }
         }
     }

@@ -1,18 +1,19 @@
-page 6059938 "NPR APIV1 PBISalesPersonPurc"
+page 6059991 "NPR APIV1 PBIFlowStatus"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'salesPerson';
-    EntitySetName = 'salesPersons';
-    Caption = 'PowerBI SalesPerson/Purchaser';
+    EntityName = 'flowStatus';
+    EntitySetName = 'flowStatuses';
+    Caption = 'PowerBI Flow Status';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "Salesperson/Purchaser";
+    SourceTable = "NPR NPRE Flow Status";
     Extensible = false;
     Editable = false;
+
     layout
     {
         area(Content)
@@ -23,17 +24,17 @@ page 6059938 "NPR APIV1 PBISalesPersonPurc"
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field("code"; Rec."Code")
+                field("code"; Rec.Code)
                 {
                     Caption = 'Code', Locked = true;
                 }
-                field(name; Rec.Name)
+                field(statusObject; Rec."Status Object")
                 {
-                    Caption = 'Name', Locked = true;
+                    Caption = 'Status Object', Locked = true;
                 }
-                field(jobTitle; Rec."Job Title")
+                field(description; Rec.Description)
                 {
-                    Caption = 'Job Title', Locked = true;
+                    Caption = 'Description', Locked = true;
                 }
             }
         }

@@ -24,6 +24,14 @@ page 6059926 "NPR APIV1 PBIItem"
                 {
                     Caption = 'SystemId', Locked = true;
                 }
+                field(no; Rec."No.")
+                {
+                    Caption = 'No.', Locked = true;
+                }
+                field(description; Rec.Description)
+                {
+                    Caption = 'Description', Locked = true;
+                }
                 field(globalDimension1Code; Rec."Global Dimension 1 Code")
                 {
                     Caption = 'Global Dimension 1 Code', Locked = true;
@@ -35,14 +43,6 @@ page 6059926 "NPR APIV1 PBIItem"
                 field(blocked; Rec.Blocked)
                 {
                     Caption = 'Blocked', Locked = true;
-                }
-                field(description; Rec.Description)
-                {
-                    Caption = 'Description', Locked = true;
-                }
-                field(no; Rec."No.")
-                {
-                    Caption = 'No.', Locked = true;
                 }
                 field(itemCategoryCode; Rec."Item Category Code")
                 {
@@ -71,6 +71,38 @@ page 6059926 "NPR APIV1 PBIItem"
                 field(vendorItemNo; Rec."Vendor Item No.")
                 {
                     Caption = 'Vendor Item No.', Locked = true;
+                }
+                field(inventoryPostingGroup; Rec."Inventory Posting Group")
+                {
+                    Caption = 'Inventory Posting Group', Locked = true;
+                }
+                field(itemDiscGroup; Rec."Item Disc. Group")
+                {
+                    Caption = 'Item Disc. Group', Locked = true;
+                }
+                field(profit; Rec."Profit %")
+                {
+                    Caption = 'Profit %', Locked = true;
+                }
+                field(priceIncludesVat; Rec."Price Includes VAT")
+                {
+                    Caption = 'Price Includes VAT', Locked = true;
+                }
+                field(genProdPostingGroup; Rec."Gen. Prod. Posting Group")
+                {
+                    Caption = 'Gen. Prod. Posting Group', Locked = true;
+                }
+                field(countryRegionOfOriginCode; Rec."Country/Region of Origin Code")
+                {
+                    Caption = 'Country/Region of Origin Code', Locked = true;
+                }
+                field(nprItemBrand; Rec."NPR Item Brand")
+                {
+                    Caption = 'Item Brand', Locked = true;
+                }
+                field(nprMagentoName; Rec."NPR Magento Name")
+                {
+                    Caption = 'Magento Name', Locked = true;
                 }
             }
         }
