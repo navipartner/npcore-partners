@@ -67,7 +67,7 @@
                 Validate("Bal. VAT Prod. Posting Group", GLAccount."VAT Prod. Posting Group");
             end;
         }
-        field(205; "Bal. Gen. Prod. Posting Group"; Code[10])
+        field(205; "Bal. Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Bal. Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
