@@ -107,26 +107,34 @@
         DataRow.Add(GetCompanyNameText(), CompanyName);
 
         Sale.GetCurrentSale(SalePOS);
-        if (not SalespersonPurchaser.Get(SalePOS."Salesperson Code")) then
+
+        SalespersonPurchaser.SetLoadFields(Name);
+        if not SalespersonPurchaser.Get(SalePOS."Salesperson Code") then
             SalespersonPurchaser.Name := 'Unknown';
-        DataRow.Add(GetSalespersonNameText(), SalespersonPurchaser.Name);
 
-        Sale.GetCurrentSale(SalePOS);
-
+        POSUnit.SetLoadFields(Name);
         if not POSUnit.Get(SalePOS."Register No.") then
             clear(POSUnit);
-        if not Customer.Get(SalePOS."Customer No.") then
-            Clear(Customer);
-        Clear(Contact);
-        if not Contact.Get(SalePOS."Contact No.") then
-            if Customer."No." <> '' then begin
-                ContactBusinessRelation.SetCurrentKey("Link to Table", "No.");
-                ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
-                ContactBusinessRelation.SetRange("No.", Customer."No.");
-                if ContactBusinessRelation.FindFirst() then
-                    if Contact.Get(ContactBusinessRelation."Contact No.") then;
-            end;
+        
+        if SalePOS."Customer No." <> '' then begin
+            Customer.SetLoadFields(Name, "Customer Posting Group");
+            if not Customer.Get(SalePOS."Customer No.") then
+                Clear(Customer);
+        end;
 
+        if SalePOS."Contact No." <> '' then begin      
+            Contact.SetLoadFields(Name);  
+            if not Contact.Get(SalePOS."Contact No.") then
+                if Customer."No." <> '' then begin
+                    ContactBusinessRelation.SetCurrentKey("Link to Table", "No.");
+                    ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
+                    ContactBusinessRelation.SetRange("No.", Customer."No.");
+                    if ContactBusinessRelation.FindFirst() then
+                        if Contact.Get(ContactBusinessRelation."Contact No.") then;
+                end;
+        end;
+
+        DataRow.Add(GetSalespersonNameText(), SalespersonPurchaser.Name);
         DataRow.Add(GetRegisterNameText(), POSUnit.Name);
         DataRow.Add(GetCustomerNameText(), Customer.Name);
         DataRow.Add(GetCustomerPostingGroup(), Customer."Customer Posting Group");
