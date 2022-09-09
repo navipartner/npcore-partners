@@ -88,7 +88,7 @@
         if not JArray.ReadFrom(Result) then
             Error(InvalidRespErr, Result);
         foreach JToken in JArray do begin
-            OnProcessRaptorDataLine(RaptorAction, UserIdentifier, JToken.AsValue().AsText(), RaptorDataBuffer, Handled);
+            OnProcessRaptorDataLine(RaptorAction, UserIdentifier, JToken, RaptorDataBuffer, Handled);
 
             if not Handled then begin
                 JObject := JToken.AsObject();
@@ -471,7 +471,7 @@
     end;
 
     [IntegrationEvent(true, false)]
-    internal procedure OnProcessRaptorDataLine(RaptorAction: Record "NPR Raptor Action"; UserIdentifier: Text; JObjectAsText: Text; var RaptorDataBuffer: Record "NPR Raptor Data Buffer"; var Handled: Boolean)
+    internal procedure OnProcessRaptorDataLine(RaptorAction: Record "NPR Raptor Action"; UserIdentifier: Text; RaptorDataLineJToken: JsonToken; var RaptorDataBuffer: Record "NPR Raptor Data Buffer"; var Handled: Boolean)
     begin
     end;
 
