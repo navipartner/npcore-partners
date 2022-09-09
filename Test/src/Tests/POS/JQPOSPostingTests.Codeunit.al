@@ -3,6 +3,9 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     // [Feature] POS Posting via job queue
 
     Subtype = Test;
+    Permissions = tabledata "VAT Entry" = rd,
+                    tabledata "G/L Entry" = rd,
+                    tabledata "G/L Entry - VAT Entry Link" = rd;
 
     var
         _Initialized: Boolean;
@@ -355,8 +358,30 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
         NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
         NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
+        
+        DeletePostedEntries();
+        
         _Initialized := true;
 
         Commit();
     end;
+
+    local procedure DeletePostedEntries()
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+        GLEntry: Record "G/L Entry";
+        VATEntry: Record "VAT Entry";
+        GLVATEntryLink: Record "G/L Entry - VAT Entry Link";
+    begin
+        POSEntry.DeleteAll();
+        POSEntrySalesLine.DeleteAll();
+        POSEntryPaymentLine.DeleteAll();
+        POSEntryTaxLine.DeleteAll();
+        VATEntry.DeleteAll();
+        GLEntry.DeleteAll();
+        GLVATEntryLink.DeleteAll();
+    end;    
 }
