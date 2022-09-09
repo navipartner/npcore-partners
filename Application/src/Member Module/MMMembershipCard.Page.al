@@ -686,14 +686,23 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
-                    RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Source No." = FIELD("Customer No.");
-                    RunPageView = SORTING("Source Type", "Source No.", "Posting Date")
-                                  ORDER(Descending)
-                                  WHERE("Source Type" = CONST(Customer));
-
                     ToolTip = 'Executes the Item Ledger Entries action';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnAction()
+                    var
+                        NoCustomerLbl: Label 'No Customer added to this Membership';
+                        ItemLedgerEntry: Record "Item Ledger Entry";
+                        ItemLedgerEntries: Page "Item Ledger Entries";
+                    begin
+                        if Rec."Customer No." = '' then begin
+                            Message(NoCustomerLbl);
+                            exit;
+                        end;
+                        ItemLedgerEntry.SetRange("Source No.", Rec."Customer No.");
+                        ItemLedgerEntries.SetTableView(ItemLedgerEntry);
+                        ItemLedgerEntries.RunModal();
+                    end;
                 }
                 action(Statistics)
                 {
