@@ -50,7 +50,7 @@ stages:
         translationRepoUser: AzureDevOpsCI
         translationRepoPassword: $(GitLab-TranslationRepositoryAccessToken)
         translationsRepoBranchName: i10n_master
-        translationsRepoTargetBranchName: master
+        translationsTargetRepoBranchName: master
       combinedAppsNuGetSourceUri: https://pkgs.dev.azure.com/navipartner/_packaging/NaviPartner.NavApps/nuget/v3/index.json
       generatePermissions:
         enabled: true
