@@ -2188,6 +2188,8 @@
         ReferenceTime: DateTime;
         AdmissionStartTime: DateTime;
         AdmissionEndTime: DateTime;
+        ReasonCode: Enum "NPR TM Sch. Block Sales Reason";
+        RemainingQty: Integer;
     begin
 
         if (AdmissionSchEntry."Entry No." = 0) then begin
@@ -2236,20 +2238,25 @@
                         AdmissionEndTime := CreateDateTime(AdmissionSchEntry."Admission End Date", AdmissionSchEntry."Event Arrival Until Time");
                 end;
 
-                if ((ReferenceTime > AdmissionStartTime) and
-                    (ReferenceTime > AdmissionEndTime) and
-                    (CurrentAdmissionEntryNo = 0)) then begin
-                end;
+                if ((ScheduleContext = ScheduleContext::Admit) or
+                    ((ScheduleContext = ScheduleContext::Sale) and (ValidateAdmSchEntryForSales(AdmissionSchEntry, ItemNo, VariantCode, AdmissionDate, AdmissionTime, ReasonCode, RemainingQty)))) then begin
 
-                if ((ReferenceTime >= AdmissionStartTime) and
-                    (ReferenceTime <= AdmissionEndTime)) then begin
-                    CurrentAdmissionEntryNo := AdmissionSchEntry."Entry No.";
-                end;
+                    if ((ReferenceTime > AdmissionStartTime) and
+                        (ReferenceTime > AdmissionEndTime) and
+                        (CurrentAdmissionEntryNo = 0)) then begin
+                    end;
 
-                if ((ReferenceTime < AdmissionStartTime) and
-                    (ReferenceTime < AdmissionStartTime) and
-                    (NextAdmissionEntryNo = 0)) then begin
-                    NextAdmissionEntryNo := AdmissionSchEntry."Entry No.";
+                    if ((ReferenceTime >= AdmissionStartTime) and
+                        (ReferenceTime <= AdmissionEndTime)) then begin
+                        CurrentAdmissionEntryNo := AdmissionSchEntry."Entry No.";
+                    end;
+
+                    if ((ReferenceTime < AdmissionStartTime) and
+                        (ReferenceTime < AdmissionStartTime) and
+                        (NextAdmissionEntryNo = 0)) then begin
+                        NextAdmissionEntryNo := AdmissionSchEntry."Entry No.";
+                    end;
+
                 end;
 
             until (AdmissionSchEntry.Next() = 0);
@@ -2432,6 +2439,11 @@
                         exit(false);
                     end;
             end;
+            if ((AdmissionScheduleEntry."Sales From Date" = 0D) and (AdmissionScheduleEntry."Sales From Time" <> 0T)) then
+                if (AdmissionScheduleEntry."Sales From Time" > ReferenceTime) then begin
+                    ReasonCode := ReasonCode::AdmissionSaleHasNotStartedTime;
+                    exit(false);
+                end;
 
             if (AdmissionScheduleEntry."Sales Until Date" <> 0D) then begin
                 if (ReferenceDate > AdmissionScheduleEntry."Sales Until Date") then begin
@@ -2444,6 +2456,12 @@
                         exit(false);
                     end;
             end;
+            if ((AdmissionScheduleEntry."Sales Until Date" = 0D) and (AdmissionScheduleEntry."Sales Until Time" <> 0T)) then
+                if (ReferenceTime > AdmissionScheduleEntry."Sales Until Time") then begin
+                    ReasonCode := ReasonCode::AdmissionSalesHasEndedTime;
+                    exit(false);
+                end;
+
         end;
 
         if (AdmissionScheduleEntry."Event Arrival From Time" = 0T) then
