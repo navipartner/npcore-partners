@@ -1,6 +1,7 @@
 ﻿codeunit 6014457 "NPR Event Subscriber (Service)"
 {
     Access = Internal;
+#pragma warning disable AL0432
     [EventSubscriber(ObjectType::Table, Database::"Service Connection", 'OnRegisterServiceConnection', '', false, false)]
     local procedure T1400OnRegisterServiceConnection(var ServiceConnection: Record "Service Connection")
     begin
@@ -130,5 +131,6 @@
             HostName, PAGE::"NPR Dependency Mgt. Setup");
     end;
 #endif
+#pragma warning restore
 }
 
