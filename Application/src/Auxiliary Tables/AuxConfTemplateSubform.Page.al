@@ -1,3 +1,4 @@
+#if CLOUD
 page 6059859 "NPR Aux Conf. Template Subform"
 {
     Extensible = False;
@@ -29,7 +30,6 @@ page 6059859 "NPR Aux Conf. Template Subform"
                         AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
                     begin
                         NPRSelectFieldName();
-                        Rec.Validate("Table ID", AuxTablesMgt.GetAuxTableIdFromParentTable(Rec."Table ID"));
                     end;
                 }
                 field("Field Caption"; Rec."Field Caption")
@@ -72,12 +72,10 @@ page 6059859 "NPR Aux Conf. Template Subform"
 
     trigger OnOpenPage()
     begin
-        Rec.SetRange("NPR Aux Table ID", AuxTableId);
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        Rec."NPR Aux Table ID" := AuxTableId;
     end;
 
     procedure SetAuxTableId(_AuxTableId: Integer)
@@ -105,7 +103,6 @@ page 6059859 "NPR Aux Conf. Template Subform"
             Rec."Table ID" := Field.TableNo;
             Rec.Validate("Field ID", Field."No.");
             Rec.Validate("Field Name", Field.FieldName);
-            Rec.Validate("NPR Aux Table ID", AuxTableId);
         end;
     end;
 
@@ -121,4 +118,4 @@ page 6059859 "NPR Aux Conf. Template Subform"
         Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
     end;
 }
-
+#endif

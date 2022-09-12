@@ -1702,7 +1702,6 @@
 
     var
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
         POSUnitGlobal: Record "NPR POS Unit";
         CustomerGlobal: Record Customer;
         SalePOS: Record "NPR POS Sale";
@@ -2185,7 +2184,6 @@
 
         TestItem();
         GetItem();
-        GetAuxItem();
 
         "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
@@ -2198,7 +2196,7 @@
             "Unit of Measure Code" := Item."Base Unit of Measure";
 
         GetDescription();
-        "Magento Brand" := AuxItem."Magento Brand";
+        "Magento Brand" := Item."NPR Magento Brand";
     end;
 
     local procedure InitFromItemCategory()
@@ -2366,11 +2364,6 @@
                 SaleLinePOS.SetSkipCalcDiscount(true);
                 SaleLinePOS.Modify();
             until SaleLinePOS.Next() = 0;
-    end;
-
-    local procedure GetAuxItem()
-    begin
-        Item.NPR_GetAuxItem(AuxItem);
     end;
 
     local procedure GetDescription()

@@ -47,7 +47,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
         addafter("Price/Profit Calculation")
         {
-            field("NPR Ticket Type"; AuxItem."TM Ticket Type")
+            field("NPR Ticket Type"; Rec."NPR Ticket Type")
             {
 
                 ToolTip = 'Specifies the ticket type.';
@@ -64,7 +64,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 ApplicationArea = NPRRetail;
             }
 
-            field("NPR Item Status"; AuxItem."Item Status")
+            field("NPR Item Status"; Rec."NPR Item Status")
             {
 
                 ToolTip = 'Specifies if the item is active or not as a Magento Item.';
@@ -153,19 +153,15 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         }
         addbefore("Base Unit of Measure")
         {
-            field("NPR Main Item/Variation"; AuxItem."Main Item/Variation")
+            field("NPR Main Item/Variation"; Rec."NPR Main Item/Variation")
             {
-                Caption = 'Main Item/Variation';
                 ToolTip = 'Specifies if the item is a main item or a variation of another item.';
                 ApplicationArea = NPRRetail;
-                Editable = false;
             }
-            field("NPR Main Item No."; AuxItem."Main Item No.")
+            field("NPR Main Item No."; Rec."NPR Main Item No.")
             {
-                Caption = 'Main Item No.';
-                ToolTip = 'Specifies the number of the main item.';
+                ToolTip = 'Specifies the number of the main item, if this item is a variation of another item.';
                 ApplicationArea = NPRRetail;
-                Editable = false;
             }
         }
     }
@@ -447,7 +443,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             action("NPR ShowMainItemVariations")
             {
                 Caption = 'Main Item Variations';
-                ToolTip = 'View or edit main item variations related to currently selected item card.';
+                ToolTip = 'View or edit main item variations related to currently selected item.';
                 ApplicationArea = NPRRetail;
                 Image = CoupledItem;
 
@@ -455,9 +451,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 var
                     MainItemVariationMgt: Codeunit "NPR Main Item Variation Mgt.";
                 begin
-                    Rec.NPR_SaveAuxItem();
-                    Commit();
-                    MainItemVariationMgt.OpenMainItemVariationList(AuxItem);
+                    MainItemVariationMgt.OpenMainItemVariationList(Rec);
                 end;
             }
         }
@@ -474,8 +468,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 var
                     MainItemVariationMgt: Codeunit "NPR Main Item Variation Mgt.";
                 begin
-                    MainItemVariationMgt.AddAsVariation(Rec, AuxItem);
-                    Rec.NPR_SetAuxItem(AuxItem);
+                    MainItemVariationMgt.AddAsVariation(Rec);
                 end;
             }
         }
@@ -487,11 +480,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     begin
         RetailInventoryEnabled := NPRRetailInventorySetMgt.IsRetailInventoryEnabled();
         NPR_SetMagentoEnabled();
-    end;
-
-    trigger OnAfterGetRecord()
-    begin
-        Rec.NPR_GetAuxItem(AuxItem);
     end;
 
     internal procedure NPR_SetMagentoEnabled()
@@ -534,7 +522,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
     var
         ItemAvlByLocation: Decimal;
-        AuxItem: Record "NPR Auxiliary Item";
         ItemFilter: Record Item;
         MagentoEnabled: Boolean;
         MagentoEnabledDisplayConfig: Boolean;

@@ -11,6 +11,8 @@ page 6059858 "NPR APIV1 - Aux Item"
     ODataKeyFields = SystemId;
     PageType = API;
     SourceTable = "NPR Auxiliary Item";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Rollback of Auxiliary Item table back to Item table extension.';
 
     layout
     {

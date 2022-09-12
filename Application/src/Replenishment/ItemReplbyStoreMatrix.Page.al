@@ -634,17 +634,15 @@
         VarietyWrapper: Codeunit "NPR Variety Wrapper";
         ItemReplenishByStore: Record "NPR Item Repl. by Store";
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
         VarietyExists: Boolean;
     begin
         //this block of code can be removed when TestItemIsVariety function in VarietyWrapper is finished
         //from here
         Item.Get(Rec."Item No.");
-        Item.NPR_GetAuxItem(AuxItem);
-        VarietyExists := ((AuxItem."Variety 1" <> '') and (AuxItem."Variety 1 Table" <> '')) or
-                         ((AuxItem."Variety 2" <> '') and (AuxItem."Variety 2 Table" <> '')) or
-                         ((AuxItem."Variety 3" <> '') and (AuxItem."Variety 3 Table" <> '')) or
-                         ((AuxItem."Variety 4" <> '') and (AuxItem."Variety 4 Table" <> ''));
+        VarietyExists := ((Item."NPR Variety 1" <> '') and (Item."NPR Variety 1 Table" <> '')) or
+                         ((Item."NPR Variety 2" <> '') and (Item."NPR Variety 2 Table" <> '')) or
+                         ((Item."NPR Variety 3" <> '') and (Item."NPR Variety 3 Table" <> '')) or
+                         ((Item."NPR Variety 4" <> '') and (Item."NPR Variety 4 Table" <> ''));
         if not VarietyExists then
             exit;
         //to here

@@ -550,49 +550,41 @@
         ItemWorksheetFieldSetup.SetRange("Target Table No. Update", DATABASE::Item);
         if ItemWorksheetFieldSetup.FindFirst() then
             repeat
-                if IsWarnAndIgnoreField(ItemWorksheetFieldSetup) then begin
+                if IsWarnAndIgnoreField(ItemWorksheetFieldSetup."Target Field Number Update") then begin
                     ItemWorksheetFieldSetup.Validate("Process Update", ItemWorksheetFieldSetup."Process Update"::"Warn and Ignore");
                     ItemWorksheetFieldSetup.Modify(true);
                 end;
             until ItemWorksheetFieldSetup.Next() = 0;
     end;
 
-    local procedure IsWarnAndIgnoreField(ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup"): Boolean
+    local procedure IsWarnAndIgnoreField(TargetFieldNumber: Integer): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
-        AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
     begin
-        case ItemWorksheetFieldSetup."Target Table No. Update" of
-            Database::Item:
-                if ItemWorksheetFieldSetup."Target Field Number Update" in [
+        if TargetFieldNumber in [
                   Item.FieldNo("Inventory Posting Group"),
                   Item.FieldNo("Costing Method"),
                   Item.FieldNo("Unit Cost"),
                   Item.FieldNo("Gen. Prod. Posting Group"),
                   Item.FieldNo("VAT Prod. Posting Group"),
                   Item.FieldNo("Item Tracking Code"),
-
                   Item.FieldNo("NPR Cross Variety No."),
                   Item.FieldNo("Indirect Cost %"),
                   Item.FieldNo("No. Series"),
                   Item.FieldNo(Reserve),
-                  Item.FieldNo("Item Category Code")] then
-                    exit(true);
-            AuxTablesMgt.GetAuxTableIdFromParentTable(Database::Item):
-                if ItemWorksheetFieldSetup."Target Field Number Update" in [
-                  AuxItem.FieldNo("Variety Group"),
-                  AuxItem.FieldNo("Variety 1"),
-                  AuxItem.FieldNo("Variety 2"),
-                  AuxItem.FieldNo("Variety 3"),
-                  AuxItem.FieldNo("Variety 4"),
-                  AuxItem.FieldNo("Variety 1 Table"),
-                  AuxItem.FieldNo("Variety 2 Table"),
-                  AuxItem.FieldNo("Variety 3 Table"),
-                  AuxItem.FieldNo("Variety 4 Table")] then
-                    exit(true);
-        end;
-        exit(false);
+                  Item.FieldNo("Item Category Code"),
+                  Item.FieldNo("NPR Variety Group"),
+                  Item.FieldNo("NPR Variety 2"),
+                  Item.FieldNo("NPR Variety 1"),
+                  Item.FieldNo("NPR Variety 3"),
+                  Item.FieldNo("NPR Variety 4"),
+                  Item.FieldNo("NPR Variety 1 Table"),
+                  Item.FieldNo("NPR Variety 2 Table"),
+                  Item.FieldNo("NPR Variety 3 Table"),
+                  Item.FieldNo("NPR Variety 4 Table")] then
+            exit(true)
+        else
+            exit(false);
     end;
 
     internal procedure IsDoNotMapField(TableNumber: Integer; FieldNumber: Integer): Boolean

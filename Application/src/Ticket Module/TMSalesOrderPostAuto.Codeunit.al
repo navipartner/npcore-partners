@@ -63,7 +63,6 @@
     local procedure HasTicketItem(SalesHeader: Record "Sales Header"): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
         SalesLine: Record "Sales Line";
     begin
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -72,11 +71,8 @@
         SalesLine.SetFilter("No.", '<>%1', '');
         if SalesLine.FindSet() then
             repeat
-                if Item.Get(SalesLine."No.") then begin
-                    Item.NPR_GetAuxItem(AuxItem);
-                    if AuxItem."TM Ticket Type" <> '' then
-                        exit(true);
-                end
+                if Item.Get(SalesLine."No.") and (Item."NPR Ticket Type" <> '') then
+                    exit(true);
             until SalesLine.Next() = 0;
 
         exit(false);
@@ -85,7 +81,6 @@
     local procedure HasNonTicketItem(SalesHeader: Record "Sales Header"): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
         SalesLine: Record "Sales Line";
     begin
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -94,11 +89,9 @@
         SalesLine.SetFilter("No.", '<>%1', '');
         if SalesLine.FindSet() then
             repeat
-                if Item.Get(SalesLine."No.") then begin
-                    Item.NPR_GetAuxItem(AuxItem);
-                    if AuxItem."TM Ticket Type" = '' then
-                        exit(true);
-                end;
+                if Item.Get(SalesLine."No.") and (Item."NPR Ticket Type" = '') then
+                
+                    exit(true);
             until SalesLine.Next() = 0;
 
         exit(false);

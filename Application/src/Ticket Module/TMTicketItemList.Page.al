@@ -35,7 +35,7 @@ page 6059888 "NPR TM Ticket Item List"
                     ToolTip = 'Specifies the value of Item Description field.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("TM Ticket Type"; _AuxItem."TM Ticket Type")
+                field("TM Ticket Type"; _Item."NPR Ticket Type")
                 {
                     ToolTip = 'Specifies the value of the Ticket Type field.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -141,50 +141,38 @@ page 6059888 "NPR TM Ticket Item List"
     }
 
     var
-        _AuxItem: Record "NPR Auxiliary Item";
+        _Item: Record Item;
         _TicketPaymentType: Option DIRECT,PREPAID,POSTPAID;
 
     trigger OnInit()
     var
         Item: Record "Item";
         ItemVariant: Record "Item Variant";
-        AuxItem: Record "NPR Auxiliary Item";
     begin
-        AuxItem.SetFilter("TM Ticket Type", '<>%1', '');
-        if (not AuxItem.FindSet()) then
+        Item.SetFilter("NPR Ticket Type", '<>%1', '');
+        if (not Item.FindSet()) then
             exit;
 
         repeat
-            if (Item.Get(AuxItem."Item No.")) then begin
-                ItemVariant.SetFilter("Item No.", '=%1', AuxItem."Item No.");
-                if (ItemVariant.FindSet()) then begin
-                    repeat
-                        Rec.TransferFields(ItemVariant, true);
-                        Rec.Insert();
-                    until (ItemVariant.Next() = 0);
-                end else begin
-                    Clear(Rec);
-                    Rec."Item No." := Item."No.";
-                    Rec.Description := Item.Description;
+            ItemVariant.SetFilter("Item No.", '=%1', Item."No.");
+            if (ItemVariant.FindSet()) then begin
+                repeat
+                    Rec.TransferFields(ItemVariant, true);
                     Rec.Insert();
-                end;
+                until (ItemVariant.Next() = 0);
+            end else begin
+                Clear(Rec);
+                Rec."Item No." := Item."No.";
+                Rec.Description := Item.Description;
+                Rec.Insert();
             end;
-        until (AuxItem.Next() = 0);
+        until (Item.Next() = 0);
 
         if (not Rec.FindFirst()) then;
     end;
 
-    trigger OnOpenPage()
-    begin
-
-    end;
-
     trigger OnAfterGetRecord()
-    var
-        Item: Record "Item";
     begin
-        Clear(_AuxItem);
-        if (Item.Get(Rec."Item No.")) then
-            Item.NPR_GetAuxItem(_AuxItem);
+        if _Item.Get(Rec."Item No.") then;
     end;
 }

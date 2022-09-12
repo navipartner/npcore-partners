@@ -14,17 +14,10 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
         addafter(Type)
         {
-            field("NPR Item Status"; AuxItem."Item Status")
+            field("NPR Item Status"; Rec."NPR Item Status")
             {
                 ToolTip = 'Specifies the actions allowed for the item.';
                 ApplicationArea = NPRRetail;
-                TableRelation = "NPR Item Status";
-                trigger OnValidate()
-                begin
-                    AuxItem.Validate("Item Status");
-                    Rec.NPR_SetAuxItem(AuxItem);
-                    SaveAuxItemChanges := true;
-                end;
             }
 
             field("NPR Item Brand"; Rec."NPR Item Brand")
@@ -151,9 +144,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             group("NPR DiscountonPOS")
             {
                 Caption = 'Discounts on POS';
-                field("NPR Has Mixed Discount"; HasMixedDiscount)
+                field("NPR Has Mixed Discount"; Rec."NPR Has Mixed Discount")
                 {
-                    Caption = 'Has Mixed Discount';
                     ToolTip = 'Specifies whether the item has Mixed Discount lines defined.';
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
@@ -169,9 +161,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     end;
                 }
 
-                field("NPR Has Quantity Discount"; HasQuantityDiscount)
+                field("NPR Has Quantity Discount"; Rec."NPR Has Quantity Discount")
                 {
-                    Caption = 'Has Quantity Discount';
                     ToolTip = 'Specifies whether the item has Quantity Discount lines defined.';
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
@@ -187,9 +178,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     end;
                 }
 
-                field("NPR Has Period Discount"; NPRHasPeriodDiscount)
+                field("NPR Has Period Discount"; Rec."NPR Has Period Discount")
                 {
-                    Caption = 'Has Period Discount';
                     ToolTip = 'Specifies whether the item has Period Discount lines defined.';
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
@@ -211,197 +201,55 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             group("NPR Variety")
             {
                 Caption = 'Variety';
-                field("NPR Has Variants"; HasVariants)
+                field("NPR Has Variants"; Rec."NPR Has Variants")
                 {
-                    Caption = 'Has Variants';
                     ToolTip = 'Specifies whether the item has Variant lines defined.';
                     ApplicationArea = NPRRetail;
-                    Editable = false;
                 }
-                field("NPR Variety Group"; AuxItem."Variety Group")
+                field("NPR Variety Group"; Rec."NPR Variety Group")
                 {
-                    Caption = 'Variety Group';
                     ToolTip = 'Specifies the value of the Variety Group.';
                     ApplicationArea = NPRRetail;
-                    TableRelation = "NPR Variety Group";
-                    trigger OnValidate()
-                    begin
-                        AuxItem.Validate("Variety Group");
-                        Rec.NPR_SetAuxItem(AuxItem);
-                        SaveAuxItemChanges := true;
-                    end;
                 }
-                field("NPR Variety 1"; AuxItem."Variety 1")
+                field("NPR Variety 1"; Rec."NPR Variety 1")
                 {
-                    Caption = 'Variety 1';
                     ToolTip = 'Specifies the value of the Variety 1.';
                     ApplicationArea = NPRRetail;
-                    TableRelation = "NPR Variety";
-                    trigger OnValidate()
-                    begin
-                        AuxItem.Validate("Variety 1");
-                        Rec.NPR_SetAuxItem(AuxItem);
-                        SaveAuxItemChanges := true;
-                    end;
                 }
-                field("NPR Variety 1 Table"; AuxItem."Variety 1 Table")
+                field("NPR Variety 1 Table"; Rec."NPR Variety 1 Table")
                 {
-                    Caption = 'Variety 1 Table';
                     ToolTip = 'Specifies the value to be used for the Variety 1.';
                     ApplicationArea = NPRRetail;
-                    DrillDown = true;
-                    trigger OnDrillDown()
-                    var
-                        VarietyTable: Record "NPR Variety Table";
-                        VarietyTablePage: Page "NPR Variety Table";
-                    begin
-                        VarietyTable.SetRange(Type, AuxItem."Variety 1");
-                        if VarietyTable.IsEmpty() then
-                            exit;
-                        VarietyTablePage.SetTableView(VarietyTable);
-                        VarietyTablePage.LookupMode(true);
-                        if VarietyTablePage.RunModal() = Action::LookupOK then begin
-                            VarietyTablePage.GetRecord(VarietyTable);
-                            AuxItem."Variety 1 Table" := VarietyTable.Code;
-                            Rec.NPR_SetAuxItem(AuxItem);
-                        end;
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        AuxItem.Validate("Variety 1 Table");
-                        Rec.NPR_SetAuxItem(AuxItem);
-                        SaveAuxItemChanges := true;
-                    end;
                 }
-                field("NPR Variety 2"; AuxItem."Variety 2")
+                field("NPR Variety 2"; Rec."NPR Variety 2")
                 {
-                    Caption = 'Variety 2';
                     ToolTip = 'Specifies the value of the Variety 2.';
                     ApplicationArea = NPRRetail;
-                    TableRelation = "NPR Variety";
-                    trigger OnValidate()
-                    begin
-                        AuxItem.Validate("Variety 2");
-                        Rec.NPR_SetAuxItem(AuxItem);
-                        SaveAuxItemChanges := true;
-                    end;
                 }
-                field("NPR Variety 2 Table"; AuxItem."Variety 2 Table")
+                field("NPR Variety 2 Table"; Rec."NPR Variety 2 Table")
                 {
-                    Caption = 'Variety 2 Table';
                     ToolTip = 'Specifies the value to be used for the Variety 2.';
                     ApplicationArea = NPRRetail;
-                    DrillDown = true;
-                    trigger OnDrillDown()
-                    var
-                        VarietyTable: Record "NPR Variety Table";
-                        VarietyTablePage: Page "NPR Variety Table";
-                    begin
-                        VarietyTable.SetRange(Type, AuxItem."Variety 2");
-                        if VarietyTable.IsEmpty() then
-                            exit;
-                        VarietyTablePage.SetTableView(VarietyTable);
-                        VarietyTablePage.LookupMode(true);
-                        if VarietyTablePage.RunModal() = Action::LookupOK then begin
-                            VarietyTablePage.GetRecord(VarietyTable);
-                            AuxItem."Variety 2 Table" := VarietyTable.Code;
-                            Rec.NPR_SetAuxItem(AuxItem);
-                        end;
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        AuxItem.Validate("Variety 2 Table");
-                        Rec.NPR_SetAuxItem(AuxItem);
-                        SaveAuxItemChanges := true;
-                    end;
                 }
-                field("NPR Variety 3"; AuxItem."Variety 3")
+                field("NPR Variety 3"; Rec."NPR Variety 3")
                 {
-                    Caption = 'Variety 3';
                     ToolTip = 'Specifies the value of the Variety 3.';
                     ApplicationArea = NPRRetail;
-                    TableRelation = "NPR Variety";
-                    trigger OnValidate()
-                    begin
-                        AuxItem.Validate("Variety 3");
-                        Rec.NPR_SetAuxItem(AuxItem);
-                        SaveAuxItemChanges := true;
-                    end;
                 }
-                field("NPR Variety 3 Table"; AuxItem."Variety 3 Table")
+                field("NPR Variety 3 Table"; Rec."NPR Variety 3 Table")
                 {
-                    Caption = 'Variety 3 Table';
                     ToolTip = 'Specifies the value to be used for the Variety 3.';
                     ApplicationArea = NPRRetail;
-                    DrillDown = true;
-                    trigger OnDrillDown()
-                    var
-                        VarietyTable: Record "NPR Variety Table";
-                        VarietyTablePage: Page "NPR Variety Table";
-                    begin
-                        VarietyTable.SetRange(Type, AuxItem."Variety 3");
-                        if VarietyTable.IsEmpty() then
-                            exit;
-                        VarietyTablePage.SetTableView(VarietyTable);
-                        VarietyTablePage.LookupMode(true);
-                        if VarietyTablePage.RunModal() = Action::LookupOK then begin
-                            VarietyTablePage.GetRecord(VarietyTable);
-                            AuxItem."Variety 3 Table" := VarietyTable.Code;
-                            Rec.NPR_SetAuxItem(AuxItem);
-                        end;
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        AuxItem.Validate("Variety 3 Table");
-                        Rec.NPR_SetAuxItem(AuxItem);
-                        SaveAuxItemChanges := true;
-                    end;
                 }
-                field("NPR Variety 4"; AuxItem."Variety 4")
+                field("NPR Variety 4"; Rec."NPR Variety 4")
                 {
-                    Caption = 'Variety 4';
                     ToolTip = 'Specifies the value of the Variety 4.';
                     ApplicationArea = NPRRetail;
-                    TableRelation = "NPR Variety";
-                    trigger OnValidate()
-                    begin
-                        AuxItem.Validate("Variety 4");
-                        Rec.NPR_SetAuxItem(AuxItem);
-                        SaveAuxItemChanges := true;
-                    end;
                 }
-                field("NPR Variety 4 Table"; AuxItem."Variety 4 Table")
+                field("NPR Variety 4 Table"; Rec."NPR Variety 4 Table")
                 {
-                    Caption = 'Variety 4 Table';
                     ToolTip = 'Specifies the value to be used for the Variety 4';
                     ApplicationArea = NPRRetail;
-                    DrillDown = true;
-                    trigger OnDrillDown()
-                    var
-                        VarietyTable: Record "NPR Variety Table";
-                        VarietyTablePage: Page "NPR Variety Table";
-                    begin
-                        VarietyTable.SetRange(Type, AuxItem."Variety 4");
-                        if VarietyTable.IsEmpty() then
-                            exit;
-                        VarietyTablePage.SetTableView(VarietyTable);
-                        VarietyTablePage.LookupMode(true);
-                        if VarietyTablePage.RunModal() = Action::LookupOK then begin
-                            VarietyTablePage.GetRecord(VarietyTable);
-                            AuxItem."Variety 4 Table" := VarietyTable.Code;
-                            Rec.NPR_SetAuxItem(AuxItem);
-                        end;
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        AuxItem.Validate("Variety 4 Table");
-                        Rec.NPR_SetAuxItem(AuxItem);
-                        SaveAuxItemChanges := true;
-                    end;
                 }
                 field("NPR Cross Variety No."; Rec."NPR Cross Variety No.")
                 {
@@ -415,18 +263,17 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 {
                     ShowCaption = false;
 
-                    field("NPR Main Item/Variation"; AuxItem."Main Item/Variation")
+                    field("NPR Main Item/Variation"; Rec."NPR Main Item/Variation")
                     {
                         Caption = 'Main Item/Variation';
                         ToolTip = 'Specifies if the item is a main item or a variation of another item.';
                         ApplicationArea = NPRRetail;
                         Importance = Additional;
-                        Editable = false;
                     }
-                    field("NPR Main Item No."; AuxItem."Main Item No.")
+                    field("NPR Main Item No."; Rec."NPR Main Item No.")
                     {
                         Caption = 'Main Item No.';
-                        ToolTip = 'Specifies the number of the main item.';
+                        ToolTip = 'Specifies the number of the main item, if this item is a variation of another item.';
                         ApplicationArea = NPRRetail;
                         Importance = Additional;
                         Editable = false;
@@ -437,30 +284,15 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 {
                     ShowCaption = false;
 
-                    field("NPR Item AddOn No."; AuxItem."Item Addon No.")
+                    field("NPR Item AddOn No."; Rec."NPR Item Addon No.")
                     {
-                        Caption = 'Item AddOn No.';
                         ToolTip = 'Allows the user to link additional items.';
                         ApplicationArea = NPRRetail;
-                        TableRelation = "NPR NpIa Item AddOn";
-                        trigger OnValidate()
-                        begin
-                            AuxItem.Validate("Item Addon No.");
-                            Rec.NPR_SetAuxItem(AuxItem);
-                            SaveAuxItemChanges := true;
-                        end;
                     }
-                    field("NPR NPRE Item Routing Profile"; AuxItem."NPRE Item Routing Profile")
+                    field("NPR NPRE Item Routing Profile"; Rec."NPR NPRE Item Routing Profile")
                     {
                         ToolTip = 'Specifies the NPRE Item Routing Profile.';
                         ApplicationArea = NPRRetail;
-                        TableRelation = "NPR NPRE Item Routing Profile";
-                        trigger OnValidate()
-                        begin
-                            AuxItem.Validate("NPRE Item Routing Profile");
-                            Rec.NPR_SetAuxItem(AuxItem);
-                            SaveAuxItemChanges := true;
-                        end;
                     }
                 }
 
@@ -478,18 +310,10 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ToolTip = 'Specifies if the No is printed on the receipt.';
                         ApplicationArea = NPRRetail;
                     }
-                    field("NPR Ticket Type"; AuxItem."TM Ticket Type")
+                    field("NPR Ticket Type"; Rec."NPR Ticket Type")
                     {
-                        Caption = 'Ticket Type';
                         ToolTip = 'Specifies the ticket type that will be used with the item.';
                         ApplicationArea = NPRRetail;
-                        TableRelation = "NPR TM Ticket Type";
-                        trigger OnValidate()
-                        begin
-                            AuxItem.Validate("TM Ticket Type");
-                            Rec.NPR_SetAuxItem(AuxItem);
-                            SaveAuxItemChanges := true;
-                        end;
                     }
                     field("NPR Print Tags"; Rec."NPR Print Tags")
                     {
@@ -591,18 +415,11 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                             end;
                         end;
                     }
-                    field("NPR Magento Brand"; AuxItem."Magento Brand")
+                    field("NPR Magento Brand"; Rec."NPR Magento Brand")
                     {
                         Visible = MagentoEnabledBrand;
                         ToolTip = 'Specifies the item Magento Brand.';
                         ApplicationArea = NPRRetail;
-                        TableRelation = "NPR Magento Brand";
-                        trigger OnValidate()
-                        begin
-                            AuxItem.Validate("Magento Brand");
-                            Rec.NPR_SetAuxItem(AuxItem);
-                            SaveAuxItemChanges := true;
-                        end;
                     }
                     field("NPR MagentoUnitPrice"; Rec."Unit Price")
                     {
@@ -648,7 +465,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ToolTip = 'Specifies the end date for the item to apply the special price.';
                         ApplicationArea = NPRRetail;
                     }
-                    field("NPR Custom Options"; NPRCustomOptionCount)
+                    field("NPR Custom Options"; Rec."NPR Custom Options")
                     {
                         Caption = 'Custom Options';
                         Visible = MagentoEnabledCustomOptions;
@@ -693,28 +510,18 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ToolTip = 'Specifies the value of the Meta Description field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("NPR Attribute Set ID"; AuxItem."Attribute Set ID")
+                    field("NPR Attribute Set ID"; Rec."NPR Attribute Set ID")
                     {
                         AssistEdit = true;
-                        Editable = IsNotMagentoItem;
+                        Editable = not Rec."NPR Magento Item";
                         Visible = MagentoEnabledAttributeSet;
                         ToolTip = 'Specifies the attribute to be assigned to the Magento item.';
                         ApplicationArea = NPRRetail;
-                        TableRelation = "NPR Magento Attribute Set";
-                        trigger OnValidate()
-                        begin
-                            AuxItem.Validate("Attribute Set ID");
-                            Rec.NPR_SetAuxItem(AuxItem);
-                            SaveAuxItemChanges := true;
-                        end;
-
                         trigger OnAssistEdit()
                         var
-                            AuxItem: Record "NPR Auxiliary Item";
                             MagentoAttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
                         begin
-                            Rec.NPR_GetAuxItem(AuxItem);
-                            if AuxItem."Attribute Set ID" <> 0 then begin
+                            if Rec."NPR Attribute Set ID" <> 0 then begin
                                 CurrPage.Update(true);
                                 MagentoAttributeSetMgt.EditItemAttributes(Rec."No.", '');
                             end;
@@ -1086,8 +893,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     var
                         VRTWrapper: Codeunit "NPR Variety Wrapper";
                     begin
-                        Rec.NPR_SaveAuxItem();
-                        Commit();
                         VRTWrapper.ShowVarietyMatrix(Rec, 0);
                     end;
                 }
@@ -1106,8 +911,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     var
                         VRTWrapper: Codeunit "NPR Variety Wrapper";
                     begin
-                        Rec.NPR_SaveAuxItem();
-                        Commit();
                         VRTWrapper.ShowMaintainItemMatrix(Rec, 0);
                     end;
                 }
@@ -1347,10 +1150,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 var
                     MainItemVariationMgt: Codeunit "NPR Main Item Variation Mgt.";
                 begin
-                    Rec.NPR_SaveAuxItem();
-                    Commit();
-                    MainItemVariationMgt.OpenMainItemVariationList(AuxItem);
-                    Rec.NPR_GetAuxItem(AuxItem, true);
+                    CurrPage.SaveRecord();
+                    MainItemVariationMgt.OpenMainItemVariationList(Rec);
                     CurrPage.Update(false);
                 end;
             }
@@ -1369,8 +1170,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 var
                     MainItemVariationMgt: Codeunit "NPR Main Item Variation Mgt.";
                 begin
-                    MainItemVariationMgt.AddAsVariation(Rec, AuxItem);
-                    Rec.NPR_SetAuxItem(AuxItem);
+                    MainItemVariationMgt.AddAsVariation(Rec);
+                    CurrPage.Update(false);
                 end;
             }
             action("NPR Add to Purchase Order")
@@ -1416,19 +1217,11 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         MagentoEnabledProductRelations: Boolean;
         MagentoEnabledSpecialPrices: Boolean;
         MagentoPictureVarietyTypeVisible: Boolean;
-        NPRHasPeriodDiscount: Boolean;
-        IsNotMagentoItem: Boolean;
-        HasMixedDiscount: Boolean;
-        HasQuantityDiscount: Boolean;
-        HasVariants: Boolean;
         OriginalRec: Record Item;
         AccessorySparePart: Record "NPR Accessory/Spare Part";
-        AuxItem: Record "NPR Auxiliary Item";
         ItemCostMgt: Codeunit ItemCostManagement;
-        NPRCustomOptionCount: Integer;
         AverageCostACY: Decimal;
         Text6151400: Label 'Update Seo Link?';
-        SaveAuxItemChanges: Boolean;
 
     trigger OnOpenPage()
     begin
@@ -1448,26 +1241,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         NPRAttrEditable := CurrPage.EDITABLE();
     end;
 
-    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
-    begin
-        Rec.NPR_SaveAuxItem();
-    end;
-
-    trigger OnModifyRecord(): Boolean
-    begin
-        Rec.NPR_SaveAuxItem();
-    end;
-
-    trigger OnClosePage()
-    begin
-        Rec.NPR_SaveAuxItem();
-    end;
-
     trigger OnAfterGetRecord()
     begin
-        if SaveAuxItemChanges then
-            Rec.NPR_SaveAuxItem();
-        SaveAuxItemChanges := false;
         NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Item, Rec."No.");
         NPRAttrEditable := CurrPage.EDITABLE();
         CheckIfDiscountExist();
@@ -1480,9 +1255,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
     begin
         MixedDiscountLine.SetRange("No.", Rec."No.");
-        HasMixedDiscount := not MixedDiscountLine.IsEmpty();
         QuantityDiscountLine.SetRange("Item No.", Rec."No.");
-        HasQuantityDiscount := not QuantityDiscountLine.IsEmpty();
     end;
 
     local procedure CheckIfVariantExist()
@@ -1490,18 +1263,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         ItemVariant: Record "Item Variant";
     begin
         ItemVariant.SetRange("Item No.", Rec."No.");
-        HasVariants := not ItemVariant.IsEmpty();
-        CalcMagentoItemCustomOption();
         CheckIfHasPeriodDiscount();
-    end;
-
-    local procedure CalcMagentoItemCustomOption()
-    var
-        NPRMagentoItemCustomOption: Record "NPR Magento Item Custom Option";
-    begin
-        NPRMagentoItemCustomOption.SetRange("Item No.", Rec."No.");
-        NPRMagentoItemCustomOption.SetRange(Enabled, true);
-        NPRCustomOptionCount := NPRMagentoItemCustomOption.Count();
     end;
 
     local procedure CheckIfHasPeriodDiscount()
@@ -1509,7 +1271,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         PeriodDiscountLine: Record "NPR Period Discount Line";
     begin
         PeriodDiscountLine.SetRange("Item No.", Rec."No.");
-        NPRHasPeriodDiscount := not PeriodDiscountLine.IsEmpty();
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -1518,7 +1279,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         CurrPage.NPRMagentoPictureDragDropAddin.Page.SetItemNo(Rec."No.");
         CurrPage.NPRMagentoPictureDragDropAddin.Page.SetHidePicture(true);
         ItemCostMgt.CalculateAverageCost(Rec, AverageCostACY, AverageCostACY);
-        Rec.NPR_GetAuxItem(AuxItem);
     end;
 
     internal procedure NPR_SetMagentoEnabled()
@@ -1539,7 +1299,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         MagentoPictureVarietyTypeVisible :=
           (MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety) and
           (MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::"Select on Item");
-        IsNotMagentoItem := not Rec."NPR Magento Item";
     end;
 
     local procedure NPR_ValidateSEOLink()

@@ -11,7 +11,7 @@
             Caption = 'Accessory Item No.';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Auxiliary Item"."Item No.";
+            TableRelation = Item where("NPR Has Accessories" = const(true));
         }
         field(5; "Item Ledger Entry No."; Integer)
         {

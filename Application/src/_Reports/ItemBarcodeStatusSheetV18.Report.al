@@ -14,6 +14,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
     {
         dataitem(Item; Item)
         {
+            CalcFields = "NPR Has Variants";
             column(CompanyName; CompanyName)
             {
             }
@@ -39,11 +40,8 @@ report 6014455 "NPR Item Barcode Status Sheet"
             }
 
             trigger OnAfterGetRecord()
-            var
-                ItemVariant: Record "Item Variant";
             begin
-                ItemVariant.SetRange("Item No.", "No.");
-                if ItemVariant.IsEmpty() then
+if not "NPR Has Variants" then
                     AddToBuffer("No.", '');
             end;
         }

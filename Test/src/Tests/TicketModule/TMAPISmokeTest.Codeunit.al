@@ -454,7 +454,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     procedure GetComplementaryItem()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
-        NprItem: Record "NPR Auxiliary Item";
+        Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         WebService: Codeunit "NPR TM Ticket WebService";
@@ -491,8 +491,8 @@ codeunit 85013 "NPR TM API SmokeTest"
         Status := WebService.GetComplementaryMembershipItemNo(TmpCreatedTickets."External Ticket No.", ComplementaryItemNo);
         Assert.AreEqual(-12, status, 'Action must return status -12 when default complementary item is not setup.');
 
-        NprItem.Get(ItemNo);
-        TicketType.Get(NprItem."TM Ticket Type");
+        Item.Get(ItemNo);
+        TicketType.Get(Item."NPR Ticket Type");
         TicketType."Membership Sales Item No." := ItemNo;
         TicketType.Modify();
 
@@ -551,7 +551,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     procedure ConsumeComplementaryItem()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
-        NprItem: Record "NPR Auxiliary Item";
+        Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         WebService: Codeunit "NPR TM Ticket WebService";
@@ -584,8 +584,8 @@ codeunit 85013 "NPR TM API SmokeTest"
         // [Test]
         TmpCreatedTickets.FindFirst();
 
-        NprItem.Get(ItemNo);
-        TicketType.Get(NprItem."TM Ticket Type");
+        Item.Get(ItemNo);
+        TicketType.Get(Item."NPR Ticket Type");
         TicketType."Membership Sales Item No." := ItemNo;
         TicketType.Modify();
 
