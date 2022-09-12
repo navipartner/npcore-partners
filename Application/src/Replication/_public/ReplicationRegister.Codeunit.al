@@ -25,12 +25,8 @@ codeunit 6014608 "NPR Replication Register"
 
         #region Item related endpoints data
         ItemsEndPointIDLbl: Label 'GetItems', Locked = true;
-        ItemsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemsRead/?$expand=picture&$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+        ItemsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/items/?$expand=picture&$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
         ItemsEndPointDescriptionLbl: Label 'Gets Items from related company. ', Locked = true;
-
-        AuxItemEndPointIDLbl: Label 'GetAuxItems', Locked = true;
-        AuxItemEndPointDescriptionLbl: Label 'Gets Aux. Items from related company.', Locked = true;
-        AuxItemPathLbl: Label '/navipartner/core/v1.0/companies(%1)/auxItemsRead/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         ItemCategoriesEndPointIDLbl: Label 'GetItemCategories', Locked = true;
         ItemCategoriesEndPointDescriptionLbl: Label 'Gets Item Categories from related company. ', Locked = true;
@@ -276,7 +272,6 @@ codeunit 6014608 "NPR Replication Register"
     var
         ServiceSetup: Record "NPR Replication Service Setup";
         ServiceEndPoint: Record "NPR Replication Endpoint";
-        AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
     begin
         ServiceSetup.SetRange("API Version", ItemsServiceCodeLbl);
         if ServiceSetup.IsEmpty() then
@@ -309,10 +304,6 @@ codeunit 6014608 "NPR Replication Register"
         ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemsEndPointIDLbl, ItemsPathLbl,
                     ItemsEndPointDescriptionLbl, true, 300, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
                     10000, Database::Item, false, false);
-
-        ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, AuxItemEndPointIDLbl, AuxItemPathLbl,
-                    AuxItemEndPointDescriptionLbl, true, 310, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
-                    10000, AuxTablesMgt.GetAuxTableIdFromParentTable(Database::Item), false, false);
 
         ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemsUOMEndPointIDLbl, ItemsUOMPathLbl,
                     ItemsUOMEndPointDescriptionLbl, true, 400, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
@@ -484,24 +475,13 @@ codeunit 6014608 "NPR Replication Register"
          Rec.FieldNo("Scrap %"), 'scrapPct', 0, false, false);
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+                 Rec.FieldNo("NPR Attribute Set ID"), 'nprAttributeSetID', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
            Rec.FieldNo("NPR Magento Desc."), 'nprMagentoDescription@odata.mediaReadLink', 0, false, false);
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
            Rec.FieldNo("NPR Magento Short Desc."), 'nprMagentoShortDescription@odata.mediaReadLink', 0, false, false);
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
-    local procedure RegisterAuxItemSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
-    var
-        Rec: Record "NPR Auxiliary Item";
-        Mapping: Record "NPR Rep. Special Field Mapping";
-        AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
-    begin
-        if sender."Table ID" <> AuxTablesMgt.GetAuxTableIdFromParentTable(Database::Item) then
-            exit;
-
-        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
-            Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]

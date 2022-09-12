@@ -6,17 +6,17 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
         {
             trigger OnAfterValidate()
             var
+                Item: Record Item;
                 NPRVarietySetup: Record "NPR Variety Setup";
-                ItemVariant: Record "Item Variant";
                 VRTWrapper: Codeunit "NPR Variety Wrapper";
             begin
                 if not NPRVarietySetup.Get() then
                     exit;
                 if not NPRVarietySetup."Pop up Variety Matrix" then
                     exit;
-                if Rec.Type = Rec.Type::Item then begin
-                    ItemVariant.SetRange("Item No.", Rec."No.");
-                    if not ItemVariant.IsEmpty() then
+                if (Rec.Type = Rec.Type::Item) and Item.Get(Rec."No.") then begin
+                    Item.CalcFields("NPR Has Variants");
+                    if Item."NPR Has Variants" then
                         VRTWrapper.PurchLineShowVariety(Rec, 0);
                 end;
             end;

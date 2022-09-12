@@ -293,7 +293,6 @@
     local procedure _IssueNewTickets(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; RequestEntryNo: Integer; AdditionCost: Decimal)
     var
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
         TicketType: Record "NPR TM Ticket Type";
         TicketSetup: Record "NPR TM Ticket Setup";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -309,12 +308,11 @@
     begin
 
         Item.Get(ItemNo);
-        Item.NPR_GetAuxItem(AuxItem);
-        if (not TicketType.Get(AuxItem."TM Ticket Type")) then
-            Error(NOT_TICKET_ITEM, ItemNo, AuxItem.FieldCaption("TM Ticket Type"), AuxItem."TM Ticket Type");
+        if (not TicketType.Get(Item."NPR Ticket Type")) then
+            Error(NOT_TICKET_ITEM, ItemNo, Item.FieldCaption("NPR Ticket Type"), Item."NPR Ticket Type");
 
         if ((not TicketType."Is Ticket") or (TicketType.Code = '')) then
-            Error(NOT_TICKET_ITEM, ItemNo, AuxItem.FieldCaption("TM Ticket Type"), AuxItem."TM Ticket Type");
+            Error(NOT_TICKET_ITEM, ItemNo, Item.FieldCaption("NPR Ticket Type"), Item."NPR Ticket Type");
 
         TicketBom.SetFilter("Item No.", '=%1', ItemNo);
         TicketBom.SetFilter("Variant Code", '=%1', VariantCode);

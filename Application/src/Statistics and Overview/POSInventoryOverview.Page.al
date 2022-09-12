@@ -226,7 +226,6 @@
     var
         Location: Record Location;
         ItemVariant: Record "Item Variant";
-        AuxItem: Record "NPR Auxiliary Item";
         HasVariants: Boolean;
         POSInventoryOverview: Page "NPR POS Inventory Overview";
     begin
@@ -244,11 +243,10 @@
         end;
 
         Item.Get(ItemCode);
-        Item.NPR_GetAuxItem(AuxItem);
-        Variety1ValueVisible := AuxItem."Variety 1" <> '';
-        Variety2ValueVisible := AuxItem."Variety 2" <> '';
-        Variety3ValueVisible := AuxItem."Variety 3" <> '';
-        Variety4ValueVisible := AuxItem."Variety 4" <> '';
+        Variety1ValueVisible := Item."NPR Variety 1" <> '';
+        Variety2ValueVisible := Item."NPR Variety 2" <> '';
+        Variety3ValueVisible := Item."NPR Variety 3" <> '';
+        Variety4ValueVisible := Item."NPR Variety 4" <> '';
 
         ItemVariant.Reset();
         ItemVariant.SetRange("Item No.", ItemCode);
@@ -317,7 +315,6 @@
     local procedure LookupField(FieldType: Option ItemNo,VariantCode,Variety1,Variety2,Variety3,Variety4): Code[20]
     var
         LookupItem: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
         VarietyValuePage: Page "NPR Variety Value";
@@ -357,9 +354,8 @@
                 begin
                     if not Item.Get(ItemCode) then
                         Error(TextSelectItemFirst);
-                    Item.NPR_GetAuxItem(AuxItem);
-                    VarietyValue.SetRange(Type, AuxItem."Variety 1");
-                    VarietyValue.SetRange(Table, AuxItem."Variety 1 Table");
+                    VarietyValue.SetRange(Type, Item."NPR Variety 1");
+                    VarietyValue.SetRange(Table, Item."NPR Variety 1 Table");
                     VarietyValue.SetCurrentKey(Type, Table, "Sort Order");
                     VarietyValuePage.LookupMode := true;
                     VarietyValuePage.SetRecord(VarietyValue);
@@ -374,9 +370,8 @@
                 begin
                     if not Item.Get(ItemCode) then
                         Error(TextSelectItemFirst);
-                    Item.NPR_GetAuxItem(AuxItem);
-                    VarietyValue.SetRange(Type, AuxItem."Variety 2");
-                    VarietyValue.SetRange(Table, AuxItem."Variety 2 Table");
+                    VarietyValue.SetRange(Type, Item."NPR Variety 2");
+                    VarietyValue.SetRange(Table, Item."NPR Variety 2 Table");
                     VarietyValue.SetCurrentKey(Type, Table, "Sort Order");
                     VarietyValuePage.LookupMode := true;
                     VarietyValuePage.SetRecord(VarietyValue);
@@ -391,9 +386,8 @@
                 begin
                     if not Item.Get(ItemCode) then
                         Error(TextSelectItemFirst);
-                    Item.NPR_GetAuxItem(AuxItem);
-                    VarietyValue.SetRange(Type, AuxItem."Variety 3");
-                    VarietyValue.SetRange(Table, AuxItem."Variety 3 Table");
+                    VarietyValue.SetRange(Type, Item."NPR Variety 3");
+                    VarietyValue.SetRange(Table, Item."NPR Variety 3 Table");
                     VarietyValue.SetCurrentKey(Type, Table, "Sort Order");
                     VarietyValuePage.LookupMode := true;
                     VarietyValuePage.SetRecord(VarietyValue);
@@ -408,9 +402,8 @@
                 begin
                     if not Item.Get(ItemCode) then
                         Error(TextSelectItemFirst);
-                    Item.NPR_GetAuxItem(AuxItem);
-                    VarietyValue.SetRange(Type, AuxItem."Variety 4");
-                    VarietyValue.SetRange(Table, AuxItem."Variety 4 Table");
+                    VarietyValue.SetRange(Type, Item."NPR Variety 4");
+                    VarietyValue.SetRange(Table, Item."NPR Variety 4 Table");
                     VarietyValue.SetCurrentKey(Type, Table, "Sort Order");
                     VarietyValuePage.LookupMode := true;
                     VarietyValuePage.SetRecord(VarietyValue);

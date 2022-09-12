@@ -1186,7 +1186,6 @@
             trigger OnValidate()
             var
                 ItemCategory: Record "Item Category";
-                AuxItem: Record "NPR Auxiliary Item";
                 TempItem: Record Item temporary;
                 ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
             begin
@@ -1212,8 +1211,7 @@
                 "Purch. Unit of Measure" := TempItem."Purch. Unit of Measure";
                 "Costing Method" := TempItem."Costing Method";
                 "No. Series" := TempItem."No. Series";
-                TempItem.NPR_GetAuxItem(AuxItem);
-                Validate("Variety Group", AuxItem."Variety Group");
+                Validate("Variety Group", Item."NPR Variety Group");
             end;
         }
         field(5704; "Product Group Code"; Code[10])
@@ -3192,7 +3190,6 @@
 
     local procedure ValidateExistingItemNo()
     var
-        AuxItem: Record "NPR Auxiliary Item";
         ItemWorksheetTemplate2: Record "NPR Item Worksh. Template";
     begin
         TestField("Line No.");
@@ -3228,8 +3225,7 @@
             if ItemWorksheetItemMgt.ItemVarietyExists("Existing Item No.") then
                 "Use Variant" := true;
 
-        Item.NPR_GetAuxItem(AuxItem);
-        "Variety Group" := AuxItem."Variety Group";
+        "Variety Group" := Item."NPR Variety Group";
         "Cross Variety No." := Item."NPR Cross Variety No.";
         "Gross Weight" := Item."Gross Weight";
         "Net Weight" := Item."Net Weight";
@@ -3243,43 +3239,43 @@
 
         CopyItemAttributes(Item."No.");
 
-        "Variety 1" := AuxItem."Variety 1";
-        if VRTTable.Get("Variety 1", AuxItem."Variety 1 Table") then
+        "Variety 1" := Item."NPR Variety 1";
+        if VRTTable.Get("Variety 1", Item."NPR Variety 1 Table") then
             if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
                 Validate("Variety 1 Table (Base)", VRTTable."Copy from");
                 "Create Copy of Variety 1 Table" := true;
             end else begin
-                Validate("Variety 1 Table (Base)", AuxItem."Variety 1 Table");
+                Validate("Variety 1 Table (Base)", Item."NPR Variety 1 Table");
                 "Create Copy of Variety 1 Table" := false;
             end;
 
-        "Variety 2" := AuxItem."Variety 2";
-        if VRTTable.Get("Variety 2", AuxItem."Variety 2 Table") then
+        "Variety 2" := Item."NPR Variety 2";
+        if VRTTable.Get("Variety 2", Item."NPR Variety 2 Table") then
             if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
                 Validate("Variety 2 Table (Base)", VRTTable."Copy from");
                 "Create Copy of Variety 2 Table" := true;
             end else begin
-                Validate("Variety 2 Table (Base)", AuxItem."Variety 2 Table");
+                Validate("Variety 2 Table (Base)", Item."NPR Variety 2 Table");
                 "Create Copy of Variety 2 Table" := false;
             end;
 
-        "Variety 3" := AuxItem."Variety 3";
-        if VRTTable.Get("Variety 3", AuxItem."Variety 3 Table") then
+        "Variety 3" := Item."NPR Variety 3";
+        if VRTTable.Get("Variety 3", Item."NPR Variety 3 Table") then
             if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
                 Validate("Variety 3 Table (Base)", VRTTable."Copy from");
                 "Create Copy of Variety 3 Table" := true;
             end else begin
-                Validate("Variety 3 Table (Base)", AuxItem."Variety 3 Table");
+                Validate("Variety 3 Table (Base)", Item."NPR Variety 3 Table");
                 "Create Copy of Variety 3 Table" := false;
             end;
 
-        "Variety 4" := AuxItem."Variety 4";
-        if VRTTable.Get("Variety 4", AuxItem."Variety 4 Table") then
+        "Variety 4" := Item."NPR Variety 4";
+        if VRTTable.Get("Variety 4", Item."NPR Variety 4 Table") then
             if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
                 Validate("Variety 4 Table (Base)", VRTTable."Copy from");
                 "Create Copy of Variety 4 Table" := true;
             end else begin
-                Validate("Variety 4 Table (Base)", AuxItem."Variety 4 Table");
+                Validate("Variety 4 Table (Base)", Item."NPR Variety 4 Table");
                 "Create Copy of Variety 4 Table" := false;
             end;
 

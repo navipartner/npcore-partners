@@ -9,6 +9,8 @@ query 6014410 "NPR APIV1 - Items Read"
     OrderBy = ascending(replicationCounter);
     QueryType = API;
     ReadState = ReadShared;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Rollback of Auxiliary Item table back to Item table extension.';
 
     elements
     {
@@ -574,15 +576,9 @@ query 6014410 "NPR APIV1 - Items Read"
             {
                 Caption = 'Last Modified Date', Locked = true;
             }
-
-            dataitem(auxItem; "NPR Auxiliary Item")
+            column(replicationCounter; "NPR Replication Counter")
             {
-                DataItemLink = "Item No." = item."No.";
-                SqlJoinType = InnerJoin;
-                column(replicationCounter; "Replication Counter")
-                {
-                    Caption = 'replicationCounter', Locked = true;
-                }
+                Caption = 'replicationCounter', Locked = true;
             }
         }
     }

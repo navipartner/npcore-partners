@@ -178,12 +178,10 @@
 
     procedure SetupVariant(Item: Record Item; var VRTBuffer: Record "NPR Variety Buffer"; Value: Text[50]) RecordID: Text[250]
     var
-        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         CreateVariant: Boolean;
         RecRef: RecordRef;
     begin
-        Item.NPR_GetAuxItem(AuxItem);
         Evaluate(CreateVariant, Value);
         if not CreateVariant then
             exit;
@@ -197,17 +195,17 @@
         ItemVariant.Init();
         ItemVariant."Item No." := Item."No.";
         ItemVariant.Code := GetNextVariantCode(Item."No.", VRTBuffer."Variety 1 Value", VRTBuffer."Variety 2 Value", VRTBuffer."Variety 3 Value", VRTBuffer."Variety 4 Value");
-        ItemVariant."NPR Variety 1" := AuxItem."Variety 1";
-        ItemVariant."NPR Variety 1 Table" := AuxItem."Variety 1 Table";
+        ItemVariant."NPR Variety 1" := Item."NPR Variety 1";
+        ItemVariant."NPR Variety 1 Table" := Item."NPR Variety 1 Table";
         ItemVariant."NPR Variety 1 Value" := VRTBuffer."Variety 1 Value";
-        ItemVariant."NPR Variety 2" := AuxItem."Variety 2";
-        ItemVariant."NPR Variety 2 Table" := AuxItem."Variety 2 Table";
+        ItemVariant."NPR Variety 2" := Item."NPR Variety 2";
+        ItemVariant."NPR Variety 2 Table" := Item."NPR Variety 2 Table";
         ItemVariant."NPR Variety 2 Value" := VRTBuffer."Variety 2 Value";
-        ItemVariant."NPR Variety 3" := AuxItem."Variety 3";
-        ItemVariant."NPR Variety 3 Table" := AuxItem."Variety 3 Table";
+        ItemVariant."NPR Variety 3" := Item."NPR Variety 3";
+        ItemVariant."NPR Variety 3 Table" := Item."NPR Variety 3 Table";
         ItemVariant."NPR Variety 3 Value" := VRTBuffer."Variety 3 Value";
-        ItemVariant."NPR Variety 4" := AuxItem."Variety 4";
-        ItemVariant."NPR Variety 4 Table" := AuxItem."Variety 4 Table";
+        ItemVariant."NPR Variety 4" := Item."NPR Variety 4";
+        ItemVariant."NPR Variety 4 Table" := Item."NPR Variety 4 Table";
         ItemVariant."NPR Variety 4 Value" := VRTBuffer."Variety 4 Value";
 
         FillDescription(ItemVariant, Item);
@@ -615,58 +613,56 @@
 
     procedure CreateTableCopy(var Item: Record Item; VarietyNo: Option Ask,Variety1,Variety2,Variety3,Variety4; ExcludeLockedTables: Boolean)
     var
-        AuxItem: Record "NPR Auxiliary Item";
         VRTTable: Record "NPR Variety Table";
         TempVRTTable: Record "NPR Variety Table" temporary;
         VRTGroup: Record "NPR Variety Group";
         NewTableCode: Code[20];
         ItemVariant: Record "Item Variant";
     begin
-        Item.NPR_GetAuxItem(AuxItem);
         case VarietyNo of
             VarietyNo::Ask:
                 begin
-                    if VRTTable.Get(AuxItem."Variety 1", AuxItem."Variety 1 Table") then begin
+                    if VRTTable.Get(Item."NPR Variety 1", Item."NPR Variety 1 Table") then begin
                         TempVRTTable := VRTTable;
                         TempVRTTable.Insert();
                     end;
-                    if VRTTable.Get(AuxItem."Variety 2", AuxItem."Variety 2 Table") then begin
+                    if VRTTable.Get(Item."NPR Variety 2", Item."NPR Variety 2 Table") then begin
                         TempVRTTable := VRTTable;
                         TempVRTTable.Insert();
                     end;
-                    if VRTTable.Get(AuxItem."Variety 3", AuxItem."Variety 3 Table") then begin
+                    if VRTTable.Get(Item."NPR Variety 3", Item."NPR Variety 3 Table") then begin
                         TempVRTTable := VRTTable;
                         TempVRTTable.Insert();
                     end;
-                    if VRTTable.Get(AuxItem."Variety 4", AuxItem."Variety 4 Table") then begin
+                    if VRTTable.Get(Item."NPR Variety 4", Item."NPR Variety 4 Table") then begin
                         TempVRTTable := VRTTable;
                         TempVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety1:
                 begin
-                    if VRTTable.Get(AuxItem."Variety 1", AuxItem."Variety 1 Table") then begin
+                    if VRTTable.Get(Item."NPR Variety 1", Item."NPR Variety 1 Table") then begin
                         TempVRTTable := VRTTable;
                         TempVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety2:
                 begin
-                    if VRTTable.Get(AuxItem."Variety 2", AuxItem."Variety 2 Table") then begin
+                    if VRTTable.Get(Item."NPR Variety 2", Item."NPR Variety 2 Table") then begin
                         TempVRTTable := VRTTable;
                         TempVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety3:
                 begin
-                    if VRTTable.Get(AuxItem."Variety 3", AuxItem."Variety 3 Table") then begin
+                    if VRTTable.Get(Item."NPR Variety 3", Item."NPR Variety 3 Table") then begin
                         TempVRTTable := VRTTable;
                         TempVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety4:
                 begin
-                    if VRTTable.Get(AuxItem."Variety 4", AuxItem."Variety 4 Table") then begin
+                    if VRTTable.Get(Item."NPR Variety 4", Item."NPR Variety 4 Table") then begin
                         TempVRTTable := VRTTable;
                         TempVRTTable.Insert();
                     end;
@@ -700,35 +696,27 @@
         //Change the item
         ItemVariant.SetRange("Item No.", Item."No.");
         case true of
-            AuxItem."Variety 1" = TempVRTTable.Type:
+            Item."NPR Variety 1" = TempVRTTable.Type:
                 begin
-                    AuxItem."Variety 1 Table" := NewTableCode;
-                    Item.NPR_SetAuxItem(AuxItem);
-                    Item.NPR_SaveAuxItem();
+                    Item."NPR Variety 1 Table" := NewTableCode;
                     Item.Modify(false);
                     ItemVariant.ModifyAll("NPR Variety 1 Table", NewTableCode, false);
                 end;
-            AuxItem."Variety 2" = TempVRTTable.Type:
+            Item."NPR Variety 2" = TempVRTTable.Type:
                 begin
-                    AuxItem."Variety 2 Table" := NewTableCode;
-                    Item.NPR_SetAuxItem(AuxItem);
-                    Item.NPR_SaveAuxItem();
+                    Item."NPR Variety 2 Table" := NewTableCode;
                     Item.Modify(false);
                     ItemVariant.ModifyAll("NPR Variety 2 Table", NewTableCode, false);
                 end;
-            AuxItem."Variety 3" = TempVRTTable.Type:
+            Item."NPR Variety 3" = TempVRTTable.Type:
                 begin
-                    AuxItem."Variety 3 Table" := NewTableCode;
-                    Item.NPR_SetAuxItem(AuxItem);
-                    Item.NPR_SaveAuxItem();
+                    Item."NPR Variety 3 Table" := NewTableCode;
                     Item.Modify(false);
                     ItemVariant.ModifyAll("NPR Variety 3 Table", NewTableCode, false);
                 end;
-            AuxItem."Variety 4" = TempVRTTable.Type:
+            Item."NPR Variety 4" = TempVRTTable.Type:
                 begin
-                    AuxItem."Variety 4 Table" := NewTableCode;
-                    Item.NPR_SetAuxItem(AuxItem);
-                    Item.NPR_SaveAuxItem();
+                    Item."NPR Variety 4 Table" := NewTableCode;
                     Item.Modify(false);
                     ItemVariant.ModifyAll("NPR Variety 4 Table", NewTableCode, false);
                 end;

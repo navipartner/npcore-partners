@@ -85,7 +85,6 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                         trigger OnBeforeInsertRecord()
                         var
                             Item: Record Item;
-                            AuxItem: Record "NPR Auxiliary Item";
                             ItemVariant: Record "Item Variant";
                         begin
                             if TempSaleLinePOSReq.Description = '' then begin
@@ -94,8 +93,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                             end;
                             if TempSaleLinePOSReq."Magento Brand" = '' then begin
                                 Item.Get(TempSaleLinePOSReq."No.");
-                                Item.NPR_GetAuxItem(AuxItem);
-                                TempSaleLinePOSReq."Magento Brand" := AuxItem."Magento Brand";
+                                TempSaleLinePOSReq."Magento Brand" := Item."NPR Magento Brand";
                             end;
                             if (TempSaleLinePOSReq."Description 2" = '') and (TempSaleLinePOSReq."Variant Code" <> '') then begin
                                 ItemVariant.Get(TempSaleLinePOSReq."No.", TempSaleLinePOSReq."Variant Code");

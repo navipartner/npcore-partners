@@ -632,10 +632,8 @@
 
     var
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
         ExtSalePOS: Record "NPR External POS Sale";
         Currency: Record Currency;
-
         POSUnitGlobal: Record "NPR POS Unit";
         DimMgt: Codeunit DimensionManagement;
 
@@ -671,7 +669,6 @@
 
         TestItem();
         GetItem();
-        GetAuxItem();
 
         "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
@@ -681,7 +678,7 @@
         if "Unit of Measure Code" = '' then
             "Unit of Measure Code" := Item."Base Unit of Measure";
 
-        "Magento Brand" := AuxItem."Magento Brand";
+        "Magento Brand" := Item."NPR Magento Brand";
 
         if NOT Rec."Custom Descr" then begin
             if (Rec.Description = '') or (Rec.Description = ' ') then
@@ -903,11 +900,6 @@
         "VAT Bus. Posting Group" := ExtSalePOS."VAT Bus. Posting Group";
         "Tax Area Code" := ExtSalePOS."Tax Area Code";
         "Tax Liable" := ExtSalePOS."Tax Liable";
-    end;
-
-    local procedure GetAuxItem()
-    begin
-        Item.NPR_GetAuxItem(AuxItem);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])

@@ -116,7 +116,6 @@
         MagentoAttribute: Record "NPR Magento Attribute";
         MagentoItemAttribute: Record "NPR Magento Item Attr.";
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
         MagentoItemAttr: Record "NPR Magento Item Attr.";
         RecRef: RecordRef;
     begin
@@ -133,16 +132,14 @@
         if not Item.Get(ItemNo) then
             exit;
 
-        Item.NPR_GetAuxItem(AuxItem);
-
-        AuxItem.TestField("Attribute Set ID");
-        MagentoAttributeSetValue.SetRange("Attribute Set ID", AuxItem."Attribute Set ID");
+        Item.TestField("NPR Attribute Set ID");
+        MagentoAttributeSetValue.SetRange("Attribute Set ID", Item."NPR Attribute Set ID");
         if MagentoAttributeSetValue.FindSet() then
             repeat
                 MagentoAttribute.Get(MagentoAttributeSetValue."Attribute ID");
                 if not MagentoItemAttribute.Get(MagentoAttributeSetValue."Attribute Set ID", MagentoAttributeSetValue."Attribute ID", Item."No.", VariantCode) then begin
                     MagentoItemAttribute.Init();
-                    MagentoItemAttribute."Attribute Set ID" := AuxItem."Attribute Set ID";
+                    MagentoItemAttribute."Attribute Set ID" := Item."NPR Attribute Set ID";
                     MagentoItemAttribute."Attribute ID" := MagentoAttributeSetValue."Attribute ID";
                     MagentoItemAttribute."Item No." := Item."No.";
                     MagentoItemAttribute."Variant Code" := VariantCode;

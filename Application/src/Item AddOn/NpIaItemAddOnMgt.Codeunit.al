@@ -695,7 +695,6 @@
         Item: Record Item;
         SaleLinePOS2: Record "NPR POS Sale Line";
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
-        AuxItem: Record "NPR Auxiliary Item";
     begin
         Clear(ItemAddOn);
 
@@ -731,10 +730,9 @@
         if not Item.Get(SaleLinePOS2."No.") then
             exit(false);
 
-        Item.NPR_GetAuxItem(AuxItem);
-        if AuxItem."Item AddOn No." = '' then
+        if Item."NPR Item AddOn No." = '' then
             exit(false);
-        if not ItemAddOn.Get(AuxItem."Item AddOn No.") then
+        if not ItemAddOn.Get(Item."NPR Item AddOn No.") then
             exit(false);
 
         exit(ItemAddOn.Enabled);

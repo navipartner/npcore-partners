@@ -633,7 +633,6 @@
     internal procedure SetTicketItem(ItemNo: Code[20]; VariantCode: Code[10])
     var
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
         TicketType: Record "NPR TM Ticket Type";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
     begin
@@ -641,8 +640,7 @@
         gTicketVariantCode := VariantCode;
 
         if (Item.Get(ItemNo)) then begin
-            Item.NPR_GetAuxItem(AuxItem);
-            if (TicketType.Get(AuxItem."TM Ticket Type")) then
+            if (TicketType.Get(Item."NPR Ticket Type")) then
                 gShowDeliverTo := TicketType."eTicket Activated";
         end;
 

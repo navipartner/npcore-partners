@@ -11,13 +11,13 @@ query 6014408 "NPR APIV1 - TM Item Query"
 
     elements
     {
-        dataitem(auxItem; "NPR Auxiliary Item")
+        dataitem(item; Item)
         {
-            column(no; "Item No.")
+            column(no; "No.")
             {
                 Caption = 'No.', Locked = true;
             }
-            column(ticketType; "TM Ticket Type")
+            column(ticketType; "NPR Ticket Type")
             {
                 Caption = 'Ticket Type', Locked = true;
             }

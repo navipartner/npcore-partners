@@ -10,7 +10,6 @@
         RetailJournalHeader: Record "NPR Retail Journal Header";
         VRTWrapper: Codeunit "NPR Variety Wrapper";
         RetailJournalLine: Record "NPR Retail Journal Line";
-        ItemVariant: Record "Item Variant";
     begin
         RetailJournalHeader.SetRange("No.", '_' + UserId + '_');
         RetailJournalHeader.DeleteAll();
@@ -19,8 +18,8 @@
         RetailJournalLine.Reset();
         RetailJournalHeader.Reset();
 
-        ItemVariant.SetRange("Item No.", Item."No.");
-        if not ItemVariant.IsEmpty() then begin
+        Item.CalcFields("NPR Has Variants");
+        if Item."NPR Has Variants" then begin
             RetailJournalLine.Init();
             RetailJournalLine."No." := '_' + UserId + '_';
             RetailJournalLine.Validate("Item No.", Item."No.");

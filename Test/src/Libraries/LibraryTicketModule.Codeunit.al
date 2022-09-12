@@ -141,7 +141,6 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketItem: Record "Item";
         ItemVariant: Record "Item Variant";
         ItemReference: Record "Item Reference";
-        NprItem: Record "NPR Auxiliary Item";
         LibraryInventory: Codeunit "NPR Library - Inventory";
     begin
         LibraryInventory.CreateItem(TicketItem);
@@ -149,12 +148,8 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketItem."Unit Price" := UnitPrice;
         TicketItem.Blocked := false;
         TicketItem."NPR Group sale" := false;
+        TicketItem.VALIDATE("NPR Ticket Type", TicketTypeCode);
         TicketItem.Modify();
-
-        TicketItem.NPR_GetAuxItem(NprItem);
-        NprItem.VALIDATE("TM Ticket Type", TicketTypeCode);
-        TicketItem.NPR_SetAuxItem(NprItem);
-        TicketItem.NPR_SaveAuxItem();
 
         if (VariantCode <> '') then begin
             ItemVariant.INIT();

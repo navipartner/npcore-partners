@@ -1224,16 +1224,14 @@
     var
         TicketType: Record "NPR TM Ticket Type";
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
     begin
         if (not Item.Get(SaleLinePOS."No.")) then
             exit(false);
 
-        Item.NPR_GetAuxItem(AuxItem);
-        if (AuxItem."TM Ticket Type" = '') then
+        if (Item."NPR Ticket Type" = '') then
             exit(false);
 
-        if (not TicketType.Get(AuxItem."TM Ticket Type")) then
+        if (not TicketType.Get(Item."NPR Ticket Type")) then
             exit(false);
 
         exit(true);

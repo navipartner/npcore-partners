@@ -171,15 +171,13 @@
             trigger OnValidate()
             var
                 Item: Record Item;
-                AuxItem: Record "NPR Auxiliary Item";
                 TicketType: Record "NPR TM Ticket Type";
                 Admission: Record "NPR TM Admission";
             begin
                 if ("Publish As eTicket") then begin
 
                     Item.Get("Item No.");
-                    Item.NPR_GetAuxItem(AuxItem);
-                    TicketType.Get(AuxItem."TM Ticket Type");
+                    TicketType.Get(Item."NPR Ticket Type");
                     TicketType.TestField("eTicket Activated", true);
 
                     "eTicket Type Code" := TicketType."eTicket Type Code";
@@ -209,14 +207,12 @@
             trigger OnValidate()
             var
                 Item: Record Item;
-                AuxItem: Record "NPR Auxiliary Item";
                 TicketType: Record "NPR TM Ticket Type";
             begin
 
                 if ("Publish Ticket URL" >= "Publish Ticket URL"::PUBLISH) then begin
                     Item.Get("Item No.");
-                    Item.NPR_GetAuxItem(AuxItem);
-                    TicketType.Get(AuxItem."TM Ticket Type");
+                    TicketType.Get(Item."NPR Ticket Type");
                     TicketType.TestField(TicketType."DIY Print Layout Code");
                 end;
             end;

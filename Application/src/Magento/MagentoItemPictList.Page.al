@@ -178,27 +178,24 @@
     end;
 
     local procedure SetupVarietyFixed()
-    var
-        AuxItem: Record "NPR Auxiliary Item";
     begin
         if MagentoSetup."Variant Picture Dimension" = '' then
             exit;
 
-        Item.NPR_GetAuxItem(AuxItem);
         case MagentoSetup."Variant Picture Dimension" of
-            AuxItem."Variety 1":
+            Item."NPR Variety 1":
                 begin
                     SetupVariety1();
                 end;
-            AuxItem."Variety 2":
+            Item."NPR Variety 2":
                 begin
                     SetupVariety2();
                 end;
-            AuxItem."Variety 3":
+            Item."NPR Variety 3":
                 begin
                     SetupVariety3();
                 end;
-            AuxItem."Variety 4":
+            Item."NPR Variety 4":
                 begin
                     SetupVariety4();
                 end;
@@ -229,21 +226,19 @@
 
     local procedure SetupVariety1()
     var
-        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
-        Item.NPR_GetAuxItem(AuxItem);
-        if AuxItem."Variety 1" = '' then
+        if Item."NPR Variety 1" = '' then
             exit;
-        if AuxItem."Variety 1 Table" = '' then
+        if Item."NPR Variety 1 Table" = '' then
             exit;
 
-        Variety := AuxItem."Variety 1";
-        VarietyTable := AuxItem."Variety 1 Table";
+        Variety := Item."NPR Variety 1";
+        VarietyTable := Item."NPR Variety 1 Table";
 
-        VarietyValue.SetRange(Type, AuxItem."Variety 1");
-        VarietyValue.SetRange(Table, AuxItem."Variety 1 Table");
+        VarietyValue.SetRange(Type, Item."NPR Variety 1");
+        VarietyValue.SetRange(Table, Item."NPR Variety 1 Table");
         if (VarietyValue.IsEmpty()) then
             exit;
 
@@ -261,21 +256,19 @@
 
     local procedure SetupVariety2()
     var
-        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
-        Item.NPR_GetAuxItem(AuxItem);
-        if AuxItem."Variety 2" = '' then
+        if Item."NPR Variety 2" = '' then
             exit;
-        if AuxItem."Variety 2 Table" = '' then
+        if Item."NPR Variety 2 Table" = '' then
             exit;
 
-        Variety := AuxItem."Variety 2";
-        VarietyTable := AuxItem."Variety 2 Table";
+        Variety := Item."NPR Variety 2";
+        VarietyTable := Item."NPR Variety 2 Table";
 
-        VarietyValue.SetRange(Type, AuxItem."Variety 2");
-        VarietyValue.SetRange(Table, AuxItem."Variety 2 Table");
+        VarietyValue.SetRange(Type, Item."NPR Variety 2");
+        VarietyValue.SetRange(Table, Item."NPR Variety 2 Table");
         if (VarietyValue.IsEmpty()) then
             exit;
 
@@ -293,21 +286,19 @@
 
     local procedure SetupVariety3()
     var
-        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
-        Item.NPR_GetAuxItem(AuxItem);
-        if AuxItem."Variety 3" = '' then
+        if Item."NPR Variety 3" = '' then
             exit;
-        if AuxItem."Variety 3 Table" = '' then
+        if Item."NPR Variety 3 Table" = '' then
             exit;
 
-        Variety := AuxItem."Variety 3";
-        VarietyTable := AuxItem."Variety 3 Table";
+        Variety := Item."NPR Variety 3";
+        VarietyTable := Item."NPR Variety 3 Table";
 
-        VarietyValue.SetRange(Type, AuxItem."Variety 3");
-        VarietyValue.SetRange(Table, AuxItem."Variety 3 Table");
+        VarietyValue.SetRange(Type, Item."NPR Variety 3");
+        VarietyValue.SetRange(Table, Item."NPR Variety 3 Table");
         if (VarietyValue.IsEmpty()) then
             exit;
 
@@ -325,21 +316,19 @@
 
     local procedure SetupVariety4()
     var
-        AuxItem: Record "NPR Auxiliary Item";
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
     begin
-        Item.NPR_GetAuxItem(AuxItem);
-        if AuxItem."Variety 4" = '' then
+        if Item."NPR Variety 4" = '' then
             exit;
-        if AuxItem."Variety 4 Table" = '' then
+        if Item."NPR Variety 4 Table" = '' then
             exit;
 
-        Variety := AuxItem."Variety 4";
-        VarietyTable := AuxItem."Variety 4 Table";
+        Variety := Item."NPR Variety 4";
+        VarietyTable := Item."NPR Variety 4 Table";
 
-        VarietyValue.SetRange(Type, AuxItem."Variety 4");
-        VarietyValue.SetRange(Table, AuxItem."Variety 4 Table");
+        VarietyValue.SetRange(Type, Item."NPR Variety 4");
+        VarietyValue.SetRange(Table, Item."NPR Variety 4 Table");
         if (VarietyValue.IsEmpty()) then
             exit;
 

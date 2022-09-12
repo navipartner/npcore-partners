@@ -459,14 +459,12 @@
     var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
-        AuxItem: Record "NPR Auxiliary Item";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Token: Text[100];
     begin
 
         Item.Get(ItemNo);
-        Item.NPR_GetAuxItem(AuxItem);
-        if (not TicketType.Get(AuxItem."TM Ticket Type")) then
+        if (not TicketType.Get(Item."NPR Ticket Type")) then
             exit;
         if (not TicketType."Is Ticket") then
             exit;

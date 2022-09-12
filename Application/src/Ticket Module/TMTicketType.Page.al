@@ -152,24 +152,8 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Category4;
-                trigger OnAction()
-                var
-                    Item: Record Item;
-                    AuxItem: Record "NPR Auxiliary Item";
-                    ItemList: Page "Item List";
-                begin
-                    AuxItem.SetRange("TM Ticket Type", Rec.Code);
-                    if not AuxItem.FindSet() then
-                        exit;
-                    repeat
-                        if Item.Get(AuxItem."Item No.") then
-                            Item.Mark(true);
-                    until AuxItem.Next() = 0;
-                    Item.MarkedOnly(true);
-                    ItemList.SetRecord(Item);
-                    ItemList.SetTableView(Item);
-                    ItemList.RunModal();
-                end;
+                RunObject = Page "Item List";
+                RunPageLink = "NPR Ticket Type" = FIELD(Code);
             }
             action(Admissions)
             {

@@ -37,30 +37,28 @@
 
     procedure LookupVarietyValues(Item: Record Item; VarietyNo: Option Variety1,Variety2,Variety3,Variety4)
     var
-        AuxItem: Record "NPR Auxiliary Item";
         VarietyValue: Record "NPR Variety Value";
     begin
-        Item.NPR_GetAuxItem(AuxItem);
         case VarietyNo of
             VarietyNo::Variety1:
                 begin
-                    VarietyValue.SetRange(Type, AuxItem."Variety 1");
-                    VarietyValue.SetRange(Table, AuxItem."Variety 1 Table");
+                    VarietyValue.SetRange(Type, Item."NPR Variety 1");
+                    VarietyValue.SetRange(Table, Item."NPR Variety 1 Table");
                 end;
             VarietyNo::Variety2:
                 begin
-                    VarietyValue.SetRange(Type, AuxItem."Variety 2");
-                    VarietyValue.SetRange(Table, AuxItem."Variety 2 Table");
+                    VarietyValue.SetRange(Type, Item."NPR Variety 2");
+                    VarietyValue.SetRange(Table, Item."NPR Variety 2 Table");
                 end;
             VarietyNo::Variety3:
                 begin
-                    VarietyValue.SetRange(Type, AuxItem."Variety 3");
-                    VarietyValue.SetRange(Table, AuxItem."Variety 3 Table");
+                    VarietyValue.SetRange(Type, Item."NPR Variety 3");
+                    VarietyValue.SetRange(Table, Item."NPR Variety 3 Table");
                 end;
             VarietyNo::Variety4:
                 begin
-                    VarietyValue.SetRange(Type, AuxItem."Variety 4");
-                    VarietyValue.SetRange(Table, AuxItem."Variety 4 Table");
+                    VarietyValue.SetRange(Type, Item."NPR Variety 4");
+                    VarietyValue.SetRange(Table, Item."NPR Variety 4 Table");
                 end;
         end;
 

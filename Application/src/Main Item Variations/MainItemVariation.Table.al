@@ -88,73 +88,57 @@ table 6014695 "NPR Main Item Variation"
         if MainItemVariation.FindFirst() then
             Error(ItemIsVariationErr, "Main Item No.", MainItemVariation."Main Item No.");
 
-        MainItemVariationMgt.OnCheckMainItemVariation(Rec, Handled);
+        MainItemVariationMgt.OnCheckMainItemVariation2(Rec, Handled);
     end;
 
-    procedure AddNewItemVariation(Item: Record Item)
+    procedure AddNewItemVariation(var VariationItem: Record Item)
     var
-        AuxItem: Record "NPR Auxiliary Item";
-    begin
-        AuxItem."Item No." := Item."No.";
-        if not AuxItem.Find() then begin
-            AuxItem.Init();
-            AuxItem.Insert();
-        end;
-        AddNewItemVariation(AuxItem);
-    end;
-
-    procedure AddNewItemVariation(var VariationAuxItem: Record "NPR Auxiliary Item")
-    var
-        MainAuxItem: Record "NPR Auxiliary Item";
+        MainItem: Record Item;
         Handled: Boolean;
     begin
         TestField("Main Item No.");
 
-        VariationAuxItem."Main Item/Variation" := VariationAuxItem."Main Item/Variation"::Variation;
-        VariationAuxItem."Main Item No." := "Main Item No.";
-        VariationAuxItem.Modify(true);
+        VariationItem."NPR Main Item/Variation" := VariationItem."NPR Main Item/Variation"::Variation;
+        VariationItem."NPR Main Item No." := "Main Item No.";
+        VariationItem.Modify(true);
 
-        MainAuxItem."Item No." := "Main Item No.";
-        if not MainAuxItem.Find() then begin
-            MainAuxItem.Init();
-            MainAuxItem.Insert();
-        end;
-        MainAuxItem."Main Item/Variation" := MainAuxItem."Main Item/Variation"::"Main Item";
-        MainAuxItem."Main Item No." := "Main Item No.";
-        MainAuxItem.Modify(true);
+        MainItem.Get("Main Item No.");
+        MainItem."NPR Main Item/Variation" := MainItem."NPR Main Item/Variation"::"Main Item";
+        MainItem."NPR Main Item No." := "Main Item No.";
+        MainItem.Modify(true);
 
-        MainItemVariationMgt.OnAddNewItemVariation(Rec, VariationAuxItem, Handled);
+        MainItemVariationMgt.OnAddNewItemVariation2(Rec, VariationItem, Handled);
     end;
 
     LOCAL procedure RemoveItemVariation()
     var
-        MainAuxItem: Record "NPR Auxiliary Item";
-        VariationAuxItem: Record "NPR Auxiliary Item";
+        MainItem: Record Item;
+        VariationItem: Record Item;
         Handled: Boolean;
     begin
-        if VariationAuxItem.Get("Item No.") then begin
-            VariationAuxItem."Main Item/Variation" := VariationAuxItem."Main Item/Variation"::" ";
-            VariationAuxItem."Main Item No." := '';
-            VariationAuxItem.Modify(true);
+        if VariationItem.Get("Item No.") then begin
+            VariationItem."NPR Main Item/Variation" := VariationItem."NPR Main Item/Variation"::" ";
+            VariationItem."NPR Main Item No." := '';
+            VariationItem.Modify(true);
         end;
 
-        if not MainAuxItem.Get("Main Item No.") then
+        if not MainItem.Get("Main Item No.") then
             exit;
-        VariationAuxItem.SetCurrentKey("Main Item No.", "Main Item/Variation");
-        VariationAuxItem.SetRange("Main Item/Variation", VariationAuxItem."Main Item/Variation"::Variation);
-        VariationAuxItem.SetRange("Main Item No.", "Main Item No.");
-        if VariationAuxItem.IsEmpty() then begin
-            MainAuxItem."Main Item/Variation" := MainAuxItem."Main Item/Variation"::" ";
-            MainAuxItem."Main Item No." := '';
-            MainAuxItem.Modify(true);
+        VariationItem.SetCurrentKey("NPR Main Item No.", "NPR Main Item/Variation");
+        VariationItem.SetRange("NPR Main Item/Variation", VariationItem."NPR Main Item/Variation"::Variation);
+        VariationItem.SetRange("NPR Main Item No.", "Main Item No.");
+        if VariationItem.IsEmpty() then begin
+            MainItem."NPR Main Item/Variation" := MainItem."NPR Main Item/Variation"::" ";
+            MainItem."NPR Main Item No." := '';
+            MainItem.Modify(true);
         end else
-            if MainAuxItem."Main Item/Variation" <> MainAuxItem."Main Item/Variation"::"Main Item" then begin
-                MainAuxItem."Main Item/Variation" := MainAuxItem."Main Item/Variation"::"Main Item";
-                MainAuxItem."Main Item No." := "Main Item No.";
-                MainAuxItem.Modify(true);
+            if MainItem."NPR Main Item/Variation" <> MainItem."NPR Main Item/Variation"::"Main Item" then begin
+                MainItem."NPR Main Item/Variation" := MainItem."NPR Main Item/Variation"::"Main Item";
+                MainItem."NPR Main Item No." := "Main Item No.";
+                MainItem.Modify(true);
             end;
 
-        MainItemVariationMgt.OnRemoveItemVariation(Rec, Handled);
+        MainItemVariationMgt.OnRemoveItemVariation2(Rec, Handled);
     end;
 
     var
