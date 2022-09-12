@@ -2,6 +2,9 @@
 {
     Access = Internal;
     TableNo = "Job Queue Entry";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Trigger is also going to be removed.';
+    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
 
     trigger OnRun()
     var
@@ -55,6 +58,7 @@
         TaskEntryNo := NcTask."Entry No.";
     end;
 
+    [Obsolete('Function moved to codeunit "NC Task Mgt" because this codeunit will be obsoleted because of removing Nc Trigger module.', '20')]
     procedure AddResponse(var NcTask: Record "NPR Nc Task"; ResponseText: Text)
     var
         StreamOut: OutStream;
