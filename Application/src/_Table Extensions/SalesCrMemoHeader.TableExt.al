@@ -79,6 +79,14 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used.';
         }
+        field(6151400; "NPR Magento Payment Amount"; Decimal)
+        {
+            CalcFormula = Sum("NPR Magento Payment Line".Amount WHERE("Document Table No." = CONST(114),
+                                                                   "Document No." = FIELD("No.")));
+            Caption = 'Payment Amount';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(6151405; "NPR External Order No."; Code[20])
         {
             Caption = 'External Order No.';

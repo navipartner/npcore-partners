@@ -1,6 +1,6 @@
 - name: Introduction
   href: intro.md
-- name: Shopify
+- name: Shopify Integration
   items:
   - name: Introduction
     href: shopify/shopifyintegration.md
@@ -26,3 +26,11 @@
       href: shopify/howto/inventoryupdates.md
     - name: Sales Order integration area setup
       href: shopify/howto/salesordersetup.md
+- name: Payment Gateway integration
+  items:
+  - name: Introduction
+    href: payment_gateway/paymentgateway.md
+  - name: How-to
+    items:
+    - name: Set up Bambora payment integration
+      href: payment_gateway/howto/bambora.md
