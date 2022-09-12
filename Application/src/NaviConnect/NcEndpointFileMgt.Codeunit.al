@@ -1,6 +1,7 @@
 ﻿codeunit 6151526 "NPR Nc Endpoint File Mgt."
 {
     Access = Internal;
+
     var
         TextFileDownloadedLbl: Label 'The file was downloaded.';
         TextFileExportedLbl: Label 'The file was exported.';
@@ -98,14 +99,14 @@
 
     local procedure FileProcess(var NcTask: Record "NPR Nc Task"; NcEndpointFile: Record "NPR Nc Endpoint File"; OutputText: Text; Filename: Text)
     var
-        NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
+        NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         InStm: InStream;
         OutStm: OutStream;
         TempBlob: Codeunit "Temp Blob";
     begin
         NcEndpointFile.TestField(Path);
 
-        NcTriggerSyncMgt.AddResponse(NcTask, TextFileExportedLbl);
+        NcTaskMgt.AddResponse(NcTask, TextFileExportedLbl);
 
         TempBlob.CreateOutStream(OutStm);
         OutStm.WriteText(OutputText);
@@ -121,7 +122,7 @@
 
         if NcEndpointFile."Client Path" then begin
             DownloadFromStream(InStm, 'Save file as...', NcEndpointFile.Path, 'All Files|*.*', Filename);
-            NcTriggerSyncMgt.AddResponse(NcTask, NewLine() + TextFileDownloadedLbl);
+            NcTaskMgt.AddResponse(NcTask, NewLine() + TextFileDownloadedLbl);
         end;
     end;
 

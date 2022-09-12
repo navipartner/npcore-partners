@@ -69,6 +69,9 @@
 
                 ToolTip = 'Executes the Trigger Links action';
                 ApplicationArea = NPRNaviConnect;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Trigger is also going to be removed.';
+                ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
 
                 trigger OnAction()
                 begin

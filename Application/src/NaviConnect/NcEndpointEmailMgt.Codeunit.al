@@ -106,7 +106,7 @@
     var
         TextEmailFailedErr: Label 'File could not be emailed to %1. STMP returned error: %2.', Comment = '"NPR Nc Endpoint E-mail"."Recipient E-Mail Address";%2=Smtp.ErrorMessage';
         TextEmailSuccessLbl: Label 'File emailed to %1.';
-        NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
+        NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         TempEmailItem: Record "Email Item" temporary;
         TempErrorMessage: Record "Error Message" temporary;
         IStream: InStream;
@@ -138,7 +138,7 @@
         end;
 
         if EmailSendingHandler.Send(TempEmailItem, TempErrorMessage) then
-            NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextEmailSuccessLbl, NcEndpointEmail."Recipient E-Mail Address"))
+            NcTaskMgt.AddResponse(NcTask, StrSubstNo(TextEmailSuccessLbl, NcEndpointEmail."Recipient E-Mail Address"))
         else begin
             Error(TextEmailFailedErr, NcEndpointEmail."Recipient E-Mail Address", TempErrorMessage.ToString());
         end;
