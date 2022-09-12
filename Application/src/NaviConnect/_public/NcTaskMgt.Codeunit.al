@@ -663,4 +663,21 @@
         NcTask.SetFilter("Process Count", '>%1', 0);
         NcTask.ModifyAll("Process Count", 0);
     end;
+
+    internal procedure AddResponse(var NcTask: Record "NPR Nc Task"; ResponseText: Text)
+    var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        PreviousResponse: Text;
+    begin
+        NcTask.CalcFields(Response);
+        if NcTask.Response.HasValue() then begin
+            NcTask.Response.CreateInStream(StreamIn, TextEncoding::UTF8);
+            StreamIn.Read(PreviousResponse);
+        end else
+            PreviousResponse := '';
+
+        NcTask.Response.CreateOutStream(StreamOut, TextEncoding::UTF8);
+        StreamOut.Write(PreviousResponse + ResponseText);
+    end;
 }

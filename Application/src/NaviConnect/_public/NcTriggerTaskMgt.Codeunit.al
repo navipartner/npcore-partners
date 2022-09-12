@@ -1,6 +1,9 @@
 ﻿codeunit 6151522 "NPR Nc Trigger Task Mgt."
 {
     TableNo = "NPR Nc Task";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Trigger is also going to be removed.';
+    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
 
     trigger OnRun()
     var
@@ -158,7 +161,7 @@
         WriteArgsForManualTransferOutputNcTriggerTaskMgt(TempTaskOutput, NcTriggerCode, NcTask, Output, FileName, Subject, Body);
 
         Commit();
-        if not Codeunit.Run(Codeunit::"NPR Nc Try Catch Mgt.", TempTaskOutput) then begin
+        if not Codeunit.Run(Codeunit::"NPR Nc Task Try Catch Mgt.", TempTaskOutput) then begin
             ReadArgsForManualTransferOutputNcTriggerTaskMgt(TempTaskOutput, NcTriggerCode, NcTask, Output, FileName, Subject, Body, IsAssertError);
             exit(IsAssertError);
         end;

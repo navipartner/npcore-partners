@@ -107,6 +107,7 @@
         exit('FILE');
     end;
 
+    [Obsolete('Task Queue module is about to be removed from NpCore so NC Trigger is also going to be removed.', 'BC 20')]
     procedure ShowEndpointTriggerLinks()
     var
         NcEndpointTriggerLink: Record "NPR Nc Endpoint Trigger Link";
