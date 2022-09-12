@@ -63,14 +63,12 @@
     internal procedure UsedByItemDrillDown()
     var
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
         TempItem: Record Item temporary;
     begin
         TempItem.DeleteAll();
-        AuxItem.SetRange("Attribute Set ID", Rec."Attribute Set ID");
-        if AuxItem.FindSet() then
+        Item.SetRange("NPR Attribute Set ID", Rec."Attribute Set ID");
+        if Item.FindSet() then
             repeat
-                Item.Get(AuxItem."Item No.");
                 TempItem.Init();
                 TempItem := Item;
                 TempItem.Insert();

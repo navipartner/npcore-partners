@@ -875,6 +875,9 @@
     var
         AdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Item: Record Item;
+        TicketType: Record "NPR TM Ticket Type";
+        Admission: Record "NPR TM Admission";
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
     begin
 
@@ -882,6 +885,9 @@
         AdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
         AdmissionBOM.FindSet();
         repeat
+            Item.Get(Ticket."Item No.");
+            TicketType.Get(Item."NPR Ticket Type");
+            Admission.Get(AdmissionBOM."Admission Code");
             TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
             TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
             TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionBOM."Admission Code");
@@ -2379,7 +2385,6 @@
     var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
-        AuxItem: Record "NPR Auxiliary Item";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
         MaxCapacity: Integer;
@@ -2399,8 +2404,7 @@
         // Should this time slot be listed? 
         ActivateOnSales := false;
         if (Item.Get(TicketItemNo)) then begin
-            Item.NPR_GetAuxItem(AuxItem);
-            if (TicketType.Get(AuxItem."TM Ticket Type")) then begin
+            if (TicketType.Get(Item."NPR Ticket Type")) then begin
                 if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
                     DurationFormula := TicketBOM."Duration Formula";
                     ActivateOnSales := (TicketBOM."Activation Method" = TicketBOM."Activation Method"::POS);

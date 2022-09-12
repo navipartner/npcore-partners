@@ -138,8 +138,6 @@ tableextension 6014427 "NPR Item" extends Item
             CalcFormula = Exist("NPR Accessory/Spare Part" WHERE(Code = FIELD("No.")));
             Caption = 'Has Accessories';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6014508; "NPR Insurrance category"; Code[50])
         {
@@ -168,16 +166,12 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Rest. Item Routing Profile';
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Item Routing Profile";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "NPRE Item Routing Profile".';
         }
         field(6014609; "NPR Has Variants"; Boolean)
         {
             CalcFormula = Exist("Item Variant" WHERE("Item No." = FIELD("No.")));
             Caption = 'Has Variants';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6014625; "NPR Std. Sales Qty."; Decimal)
         {
@@ -224,68 +218,54 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Ticket Type';
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Ticket Type";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "TM Ticket Type".';
         }
         field(6059970; "NPR Variety 1"; Code[10])
         {
             Caption = 'Variety 1';
             DataClassification = CustomerContent;
             TableRelation = "NPR Variety";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Variety 1".';
         }
         field(6059971; "NPR Variety 1 Table"; Code[40])
         {
             Caption = 'Variety 1 Table';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Variety 1 Table".';
+            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("NPR Variety 1"));
         }
         field(6059973; "NPR Variety 2"; Code[10])
         {
             Caption = 'Variety 2';
             DataClassification = CustomerContent;
             TableRelation = "NPR Variety";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Variety 2".';
         }
         field(6059974; "NPR Variety 2 Table"; Code[40])
         {
             Caption = 'Variety 2 Table';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Variety 2 Table".';
+            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("NPR Variety 2"));
         }
         field(6059976; "NPR Variety 3"; Code[10])
         {
             Caption = 'Variety 3';
             DataClassification = CustomerContent;
             TableRelation = "NPR Variety";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Variety 3".';
         }
         field(6059977; "NPR Variety 3 Table"; Code[40])
         {
             Caption = 'Variety 3 Table';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Variety 3 Table".';
+            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("NPR Variety 3"));
         }
         field(6059979; "NPR Variety 4"; Code[10])
         {
             Caption = 'Variety 4';
             DataClassification = CustomerContent;
             TableRelation = "NPR Variety";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Variety 4".';
         }
         field(6059980; "NPR Variety 4 Table"; Code[40])
         {
             Caption = 'Variety 4 Table';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Variety 4 Table".';
+            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("NPR Variety 4"));
         }
         field(6059981; "NPR Cross Variety No."; Option)
         {
@@ -299,24 +279,18 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Variety Group';
             DataClassification = CustomerContent;
             TableRelation = "NPR Variety Group";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Variety Group".';
         }
         field(6060054; "NPR Item Status"; Code[10])
         {
             Caption = 'Item Status';
             DataClassification = CustomerContent;
             TableRelation = "NPR Item Status";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Item Status".';
         }
         field(6151125; "NPR Item AddOn No."; Code[20])
         {
             Caption = 'Item AddOn No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpIa Item AddOn";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "NPR Aux Item".';
         }
         field(6151400; "NPR Magento Item"; Boolean)
         {
@@ -337,8 +311,6 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Attribute Set ID';
             DataClassification = CustomerContent;
             TableRelation = "NPR Magento Attribute Set";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Attribute Set ID".';
         }
         field(6151415; "NPR Magento Description"; BLOB)
         {
@@ -374,8 +346,6 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Magento Brand';
             DataClassification = CustomerContent;
             TableRelation = "NPR Magento Brand";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions. The field moved to table 6014635 "Magento Brand".';
         }
         field(6151435; "NPR Seo Link"; Text[250])
         {
@@ -444,8 +414,6 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Custom Options';
             Editable = false;
             FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6151496; "NPR Has Mixed Discount"; Boolean)
         {
@@ -453,9 +421,6 @@ tableextension 6014427 "NPR Item" extends Item
             FieldClass = FlowField;
             CalcFormula = Exist("NPR Mixed Discount Line" where("No." = field("No.")));
             Editable = false;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions.';
-
         }
         field(6151497; "NPR Has Quantity Discount"; Boolean)
         {
@@ -463,8 +428,6 @@ tableextension 6014427 "NPR Item" extends Item
             FieldClass = FlowField;
             CalcFormula = Exist("NPR Quantity Discount Line" where("Item No." = field("No.")));
             Editable = false;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6151498; "NPR Has Period Discount"; Boolean)
         {
@@ -472,8 +435,6 @@ tableextension 6014427 "NPR Item" extends Item
             FieldClass = FlowField;
             CalcFormula = Exist("NPR Period Discount Line" where("Item No." = field("No.")));
             Editable = false;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6151500; "NPR Magento Pict. Variety Type"; Option)
         {
@@ -488,12 +449,37 @@ tableextension 6014427 "NPR Item" extends Item
             DataClassification = CustomerContent;
         }
 
+        field(6151510; "NPR Main Item/Variation"; enum "NPR Main Item/Variation")
+        {
+            Caption = 'Main Item/Variation';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(6151511; "NPR Main Item No."; Code[20])
+        {
+            Caption = 'Main Item No.';
+            DataClassification = CustomerContent;
+            TableRelation = Item."No.";
+
+            trigger OnValidate()
+            var
+                MainItemVariationMgt: Codeunit "NPR Main Item Variation Mgt.";
+                CannotChangeManuallyErr: Label 'The field "%2" cannot be changed manually.', Comment = 'Main Item No. field caption';
+            begin
+                if xRec."NPR Main Item No." = "NPR Main Item No." then
+                    exit;
+                TestField("NPR Main Item/Variation", "NPR Main Item/Variation"::" ");
+                if xRec."NPR Main Item No." <> '' then
+                    Error(CannotChangeManuallyErr, FieldCaption("NPR Main Item No."));
+                if "NPR Main Item No." <> '' then
+                    MainItemVariationMgt.AddAsVariation(Rec, "NPR Main Item No.");
+            end;
+        }
+
         field(6151479; "NPR Replication Counter"; BigInteger)
         {
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used anymore. Moved to Aux Item Table.';
         }
     }
     keys
@@ -514,7 +500,9 @@ tableextension 6014427 "NPR Item" extends Item
         }
         key("NPR Key3"; "NPR Replication Counter")
         {
-            Enabled = false;
+        }
+        key(MainItemVariationLinks; "NPR Main Item No.", "NPR Main Item/Variation")
+        {
         }
     }
 
@@ -579,7 +567,6 @@ tableextension 6014427 "NPR Item" extends Item
 
     var
         SalesSetup: Record "Sales & Receivables Setup";
-        _AuxItem: Record "NPR Auxiliary Item";
 
     local procedure UpdateVendorItemRef(var Item: Record Item; xItem: Record Item)
     var
@@ -615,41 +602,13 @@ tableextension 6014427 "NPR Item" extends Item
         end;
     end;
 
+    [Obsolete('Rollback of Auxiliary Item table back to Item table extension')]
     procedure NPR_GetAuxItem(var AuxItem: Record "NPR Auxiliary Item")
     begin
-        NPR_GetAuxItem(AuxItem, false);
     end;
 
+    [Obsolete('Rollback of Auxiliary Item table back to Item table extension')]
     procedure NPR_GetAuxItem(var AuxItem: Record "NPR Auxiliary Item"; Force: Boolean)
     begin
-        NPR_ReadAuxItem(Force);
-        AuxItem := _AuxItem;
-    end;
-
-    internal procedure NPR_SetAuxItem(var AuxItem: Record "NPR Auxiliary Item")
-    begin
-        _AuxItem := AuxItem;
-    end;
-
-    internal procedure NPR_SaveAuxItem()
-    begin
-        if _AuxItem."Item No." <> '' then
-            if not _AuxItem.Modify() then
-                _AuxItem.Insert(false, true);
-    end;
-
-    internal procedure NPR_DeleteAuxItem()
-    begin
-        NPR_ReadAuxItem(false);
-        if _AuxItem.Delete() then;
-    end;
-
-    local procedure NPR_ReadAuxItem(Force: Boolean)
-    begin
-        if (_AuxItem."Item No." <> "No.") or Force then
-            if not _AuxItem.Get("No.") then begin
-                _AuxItem.Init();
-                _AuxItem."Item No." := "No.";
-            end;
     end;
 }

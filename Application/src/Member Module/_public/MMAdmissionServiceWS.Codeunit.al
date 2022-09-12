@@ -34,7 +34,6 @@
         MMMemberWebService: Codeunit "NPR MM Member WebService";
         MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
-        AuxItem: Record "NPR Auxiliary Item";
         TMTicketWebService: Codeunit "NPR TM Ticket WebService";
         MMAdmissionServiceEntry: Record "NPR MM Admis. Service Entry";
         DataError: Boolean;
@@ -153,8 +152,7 @@
                     //        MMAdmissionServiceEntry."Ticket Type Description" := TMTicketType.Description;
                     //      END;
                     if Item.Get(TMTicket."Item No.") then begin
-                        Item.NPR_GetAuxItem(AuxItem);
-                        MMAdmissionServiceEntry."Ticket Type Code" := AuxItem."TM Ticket Type";
+                        MMAdmissionServiceEntry."Ticket Type Code" := Item."NPR Ticket Type";
                         if StrLen(Item.Description) > MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description") then
                             MMAdmissionServiceEntry."Ticket Type Description" := CopyStr(Item.Description, 1, MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description"))
                         else
@@ -607,7 +605,6 @@
     var
         MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
-        AuxItem: Record "NPR Auxiliary Item";
         TMTicketWebService: Codeunit "NPR TM Ticket WebService";
         MMAdmissionServiceEntry: Record "NPR MM Admis. Service Entry";
         DataError: Boolean;
@@ -720,8 +717,7 @@
                     MMAdmissionServiceEntry."External Card No." := TMTicket."External Member Card No.";
 
                     if Item.Get(TMTicket."Item No.") then begin
-                        Item.NPR_GetAuxItem(AuxItem);
-                        MMAdmissionServiceEntry."Ticket Type Code" := AuxItem."TM Ticket Type";
+                        MMAdmissionServiceEntry."Ticket Type Code" := Item."NPR Ticket Type";
                         if StrLen(Item.Description) > MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description") then
                             MMAdmissionServiceEntry."Ticket Type Description" := CopyStr(Item.Description, 1, MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description"))
                         else

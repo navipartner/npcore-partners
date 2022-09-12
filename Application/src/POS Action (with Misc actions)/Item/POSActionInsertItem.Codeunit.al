@@ -77,11 +77,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     end;
 
     local procedure IfAddItemAddOns(Item: Record Item): Boolean
-    var
-        AuxItem: Record "NPR Auxiliary Item";
     begin
-        Item.NPR_GetAuxItem(AuxItem);
-        exit(AuxItem."Item Addon No." <> '')
+        exit(Item."NPR Item Addon No." <> '')
     end;
 
     local procedure Step_AddSalesLine(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup") Response: JsonObject

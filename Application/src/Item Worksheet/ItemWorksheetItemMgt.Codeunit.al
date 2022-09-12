@@ -151,12 +151,10 @@
     procedure ItemVariantExists(ItemNo: Code[20]): Boolean
     var
         Item: Record Item;
-        ItemVariant: Record "Item Variant";
     begin
-        Item.SetLoadFields("No.");
         if Item.Get(ItemNo) then begin
-            ItemVariant.SetRange("Item No.", Item."No.");
-            exit(not ItemVariant.IsEmpty());
+            Item.CalcFields("NPR Has Variants");
+            exit(Item."NPR Has Variants");
         end else
             exit(false);
     end;
@@ -164,14 +162,12 @@
     procedure ItemVarietyExists(ItemNo: Code[20]): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
     begin
         if Item.Get(ItemNo) then begin
-            Item.NPR_GetAuxItem(AuxItem);
-            if (AuxItem."Variety 1" <> '') or
-               (AuxItem."Variety 2" <> '') or
-               (AuxItem."Variety 3" <> '') or
-               (AuxItem."Variety 4" <> '') then
+            if (Item."NPR Variety 1" <> '') or
+               (Item."NPR Variety 2" <> '') or
+               (Item."NPR Variety 3" <> '') or
+               (Item."NPR Variety 4" <> '') then
                 exit(true);
         end else
             exit(false);

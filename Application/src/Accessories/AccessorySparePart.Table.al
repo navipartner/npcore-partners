@@ -177,38 +177,17 @@
     {
     }
 
-    var
-        AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
-
     trigger OnInsert()
     begin
         if Quantity = 0 then
             Quantity := 1;
 
         "Add Extra Line Automatically" := true;
-        AuxTablesMgt.CreateAuxItemAccessoryLink(Code, '', true);
     end;
 
     trigger OnModify()
     begin
         "Last Date Modified" := Today();
-        if Code <> xRec.Code then
-            AuxTablesMgt.CreateAuxItemAccessoryLink(Code, xRec.Code, true)
-        else
-            AuxTablesMgt.CreateAuxItemAccessoryLink(Code, '', true);
-    end;
-
-    trigger OnRename()
-    begin
-        if Code <> xRec.Code then
-            AuxTablesMgt.CreateAuxItemAccessoryLink(Code, xRec.Code, true)
-        else
-            AuxTablesMgt.CreateAuxItemAccessoryLink(Code, '', true);
-    end;
-
-    trigger OnDelete()
-    begin
-        AuxTablesMgt.CreateAuxItemAccessoryLink(Code, '', false);
     end;
 }
 

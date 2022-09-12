@@ -9,6 +9,9 @@ query 6014409 "NPR APIV1 - Aux Items Read"
     OrderBy = ascending(replicationCounter);
     QueryType = API;
     ReadState = ReadShared;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Rollback of Auxiliary Item table back to Item table extension.';
+
 
     elements
     {

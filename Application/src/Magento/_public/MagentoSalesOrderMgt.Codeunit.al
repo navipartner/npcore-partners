@@ -1560,7 +1560,6 @@
     local procedure IsTicketLine(SalesLine: Record "Sales Line"): Boolean
     var
         Item: Record Item;
-        AuxItem: Record "NPR Auxiliary Item";
     begin
 
         if SalesLine.Type <> SalesLine.Type::Item then
@@ -1569,8 +1568,7 @@
         if not Item.Get(SalesLine."No.") then
             exit(false);
 
-        Item.NPR_GetAuxItem(AuxItem);
-        exit(AuxItem."TM Ticket Type" <> '');
+        exit(Item."NPR Ticket Type" <> '');
     end;
 
     local procedure IsMembershipLine(SalesLine: Record "Sales Line"): Boolean

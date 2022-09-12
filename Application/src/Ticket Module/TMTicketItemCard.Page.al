@@ -70,7 +70,7 @@ page 6059884 "NPR TM Ticket Item Card"
                         _Item.Modify();
                     end;
                 }
-                field("NPR Ticket Type"; _AuxItem."TM Ticket Type")
+                field("NPR Ticket Type"; _Item."NPR Ticket Type")
                 {
                     Caption = 'Ticket Type';
                     ToolTip = 'Specifies the ticket type that will be used with the item.';
@@ -78,8 +78,7 @@ page 6059884 "NPR TM Ticket Item Card"
                     TableRelation = "NPR TM Ticket Type";
                     trigger OnValidate()
                     begin
-                        _AuxItem.Validate("TM Ticket Type");
-                        _Item.NPR_SetAuxItem(_AuxItem);
+                        _Item.Modify();
                     end;
                 }
             }
@@ -205,29 +204,26 @@ page 6059884 "NPR TM Ticket Item Card"
     var
         Item: Record "Item";
         ItemVariant: Record "Item Variant";
-        AuxItem: Record "NPR Auxiliary Item";
     begin
-        AuxItem.SetFilter("TM Ticket Type", '<>%1', '');
-        if (not AuxItem.FindSet()) then
+        Item.SetFilter("NPR Ticket Type", '<>%1', '');
+        if (not Item.FindSet()) then
             exit;
 
         repeat
-            if (Item.Get(AuxItem."Item No.")) then begin
-                ItemVariant.SetFilter("Item No.", '=%1', AuxItem."Item No.");
-                if (ItemVariant.FindSet()) then begin
-                    repeat
-                        Rec.TransferFields(ItemVariant, true);
-                        Rec.Insert();
-                    until (ItemVariant.Next() = 0);
-                end else begin
-                    Clear(Rec);
-                    Rec."Item No." := Item."No.";
-                    Rec.Description := Item.Description;
-                    Rec."Description 2" := Item."Description 2";
+            ItemVariant.SetFilter("Item No.", '=%1', Item."No.");
+            if (ItemVariant.FindSet()) then begin
+                repeat
+                    Rec.TransferFields(ItemVariant, true);
                     Rec.Insert();
-                end;
+                until (ItemVariant.Next() = 0);
+            end else begin
+                Clear(Rec);
+                Rec."Item No." := Item."No.";
+                Rec.Description := Item.Description;
+                Rec."Description 2" := Item."Description 2";
+                Rec.Insert();
             end;
-        until (AuxItem.Next() = 0);
+        until (Item.Next() = 0);
 
         if (not Rec.FindFirst()) then;
     end;
@@ -236,9 +232,6 @@ page 6059884 "NPR TM Ticket Item Card"
     var
         ItemVariant: Record "Item Variant";
     begin
-        _AuxItem.TestField("TM Ticket Type");
-        _Item.NPR_SaveAuxItem();
-
         if (Rec."Code" <> '') then
             if (ItemVariant.Get(Rec."Item No.", Rec."Code")) then begin
                 ItemVariant.TransferFields(Rec, false);
@@ -247,19 +240,12 @@ page 6059884 "NPR TM Ticket Item Card"
 
     end;
 
-    trigger OnClosePage()
-    begin
-        _Item.NPR_SaveAuxItem();
-    end;
-
     trigger OnAfterGetRecord()
     begin
         _Item.Get(Rec."Item No.");
-        _Item.NPR_GetAuxItem(_AuxItem);
     end;
 
     var
-        _AuxItem: Record "NPR Auxiliary Item";
         _Item: Record "Item";
         _TicketPaymentType: Option DIRECT,PREPAID,POSTPAID;
 }
