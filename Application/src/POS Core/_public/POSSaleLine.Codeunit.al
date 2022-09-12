@@ -330,7 +330,8 @@
             SaleLine.SetFilter(Type, '<>%1', Rec.Type::Comment);
             if SaleLine.FindSet() then begin
                 repeat
-                    ItemCountWhenCalculatedBalance += SaleLine.Quantity;
+                    if SaleLine.Type = SaleLine.Type::Item then
+                        ItemCountWhenCalculatedBalance += SaleLine.Quantity;
                     if SaleLine."Sale Type" in [SaleLine."Sale Type"::Sale, SaleLine."Sale Type"::Deposit] then begin
                         AmountExclVAT += SaleLine.Amount;
                         TotalAmount += SaleLine."Amount Including VAT";
@@ -338,10 +339,11 @@
                         if SaleLine."Sale Type" = SaleLine."Sale Type"::"Out payment" then
                             if SaleLine."Discount Type" <> SaleLine."Discount Type"::Rounding then begin
                                 OutPaymentAmount += SaleLine."Amount Including VAT";
+                                AmountExclVAT += SaleLine.Amount;
                             end;
                 until SaleLine.Next() = 0;
+                TotalAmount += OutPaymentAmount;
                 VATAmount := TotalAmount - AmountExclVAT;
-                TotalAmount -= OutPaymentAmount;
             end;
         end;
     end;
