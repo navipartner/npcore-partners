@@ -22,14 +22,12 @@
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             TableRelation = "No. Series";
         }
         field(15; "Arch. No. Series"; Code[20])
         {
             Caption = 'Archivation No. Series';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             TableRelation = "No. Series";
         }
         field(20; "Reference No. Type"; Option)
@@ -65,14 +63,12 @@
         {
             Caption = 'Partner Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.49';
             TableRelation = "NPR NpRv Partner";
         }
         field(62; "Allow Top-up"; Boolean)
         {
             Caption = 'Allow Top-up';
             DataClassification = CustomerContent;
-            Description = 'NPR5.50';
         }
         field(63; "Print Object Type"; Enum "NPR Print Object Type")
         {
@@ -109,14 +105,12 @@
         {
             Caption = 'E-mail Template Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             TableRelation = "NPR E-mail Template Header" WHERE("Table No." = CONST(6151013));
         }
         field(80; "SMS Template Code"; Code[10])
         {
             Caption = 'SMS Template Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             TableRelation = "NPR SMS Template Header" WHERE("Table No." = CONST(6151013));
         }
         field(100; "Send Voucher Module"; Code[20])
@@ -129,7 +123,6 @@
         {
             Caption = 'Send Method via POS';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             OptionCaption = 'Print,E-mail,SMS,Ask';
             OptionMembers = Print,"E-mail",SMS,Ask;
         }
@@ -189,7 +182,6 @@
             CalcFormula = Count("NPR NpRv Voucher" WHERE("Voucher Type" = FIELD(Code),
                                                       Open = CONST(false)));
             Caption = 'Voucher Qty. (Closed)';
-            Description = 'NPR5.55';
             Editable = false;
             FieldClass = FlowField;
         }
