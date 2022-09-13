@@ -25,4 +25,9 @@ enum 6014491 "NPR Matrix Printer Device" implements "NPR IMatrix Printer"
         Caption = 'Epson';
         Implementation = "NPR IMatrix Printer" = "NPR RP Epson Label Device Lib.";
     }
+    value(4; Boca)
+    {
+        Caption = 'Boca';
+        Implementation = "NPR IMatrix Printer" = "NPR RP Boca Label Device Lib.";
+    }
 }
