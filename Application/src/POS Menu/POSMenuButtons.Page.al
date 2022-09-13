@@ -8,6 +8,11 @@
     SourceTable = "NPR POS Menu Button";
     SourceTableView = SORTING("Menu Code", Ordinal);
 
+#if not BC17
+    AboutTitle = 'About POS Buttons';
+    AboutText = 'This list shows the available POS menu buttons.';
+#endif
+
     layout
     {
         area(content)
@@ -132,6 +137,11 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
+#if not BC17
+                AboutTitle = 'Setting the button parameters';
+                AboutText = 'After selecting the **Action Type** and **Action Code**, you can set action-specific parameters for the selected button. Certain actions do not have parameters or require changes, while other actions depend on the customization for use.';
+#endif
+
                 ToolTip = 'Refreshes the Action Code Parameters';
                 ApplicationArea = NPRRetail;
 
@@ -192,6 +202,11 @@
 
                     ToolTip = 'Indents the selected button';
                     ApplicationArea = NPRRetail;
+
+#if not BC17
+                    AboutTitle = 'Creating submenus';
+                    AboutText = 'If you want to create submenu buttons, select the button that should be in the submenu and click **Indent**. You can not indent multiple buttons at a time. It is recommended to create a new button to make into a submenu button, as the action type and code is blanked when turned into a submenu button.';
+#endif
 
                     trigger OnAction()
                     begin

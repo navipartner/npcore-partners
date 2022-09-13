@@ -8,6 +8,11 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
+#if not BC17
+    AboutTitle = 'About POS Menus';
+    AboutText = 'This list shows all POS menus available for POS views and for pop-up buttons.';
+#endif
+
 
     layout
     {
@@ -45,6 +50,10 @@
         {
             action(Buttons)
             {
+#if not BC17
+                AboutTitle = 'Seeing the POS Buttons';
+                AboutText = 'After selecting a **POS Menu**, you need to click the **Buttons** action to open the list of **POS Buttons** in the selected **POS Menu**.';
+#endif
                 Caption = 'Buttons';
                 Image = Hierarchy;
                 Promoted = true;
@@ -61,6 +70,10 @@
             {
                 Caption = 'Export Package (Selected)';
                 Image = Export;
+#if not BC17
+                AboutTitle = 'Importing or exporting POS Menus';
+                AboutText = 'In **Actions** you can find options to import or export POS menus as JSON packages. When importing packages, be aware that non-existing POS menus or items used in POS buttons will not be automatically created.';
+#endif
 
                 ToolTip = 'Exports the selected package';
                 ApplicationArea = NPRRetail;
