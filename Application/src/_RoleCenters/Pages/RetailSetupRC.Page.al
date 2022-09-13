@@ -455,6 +455,22 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the Exchange Label Setup';
                     ApplicationArea = NPRRetail;
                 }
+                action("HWC Printers")
+                {
+                    Caption = 'Hardware Conn. Printer Setup';
+                    RunObject = Page "NPR HWC Printers";
+
+                    ToolTip = 'Executes the Hardware Connector Report Printer Setup action.';
+                    ApplicationArea = NPRRetail;
+                }
+                action("MPOS Report Printers")
+                {
+                    Caption = 'MPOS Printer Setup';
+                    RunObject = Page "NPR MPOS Report Printers";
+
+                    ToolTip = 'Executes the MPOS Report Printer Setup action.';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(Miscellaneous)
             {
