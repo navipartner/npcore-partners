@@ -16,6 +16,9 @@
         if RetailPriceLogSetup."Task Queue Activated" then
             EnableTaskQueue();
 
+        if RetailPriceLogSetup."Job Queue Activated" then
+            CreatePriceLogJobQueue(RetailPriceLogSetup."Job Queue Category Code");
+
         if RetailPriceLogSetup."Item Unit Price" then
             EnableItemUnitPriceLog();
 
@@ -61,6 +64,7 @@
         EnableChangeLogSetupTable(DATABASE::"NPR Period Discount Line");
     end;
 
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
     local procedure EnableTaskQueue()
     var
         TaskBatch: Record "NPR Task Batch";
@@ -119,6 +123,77 @@
             TaskQueue."Next Run time" := CurrentDateTime;
             TaskQueue.Modify();
         end;
+    end;
+
+    internal procedure CreatePriceLogJobQueue(JobCategory: Code[10])
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NoOfMinutesBetweenRuns: Integer;
+        JobQueueDescrLbl: Label 'Retail Price Log update';
+        NotBeforeDateTime: DateTime;
+    begin
+        if JobCategory = '' then
+            JobCategory := GetJobQueueCategoryCode();
+
+        NotBeforeDateTime := NowWithDelayInSeconds(5);
+        NoOfMinutesBetweenRuns := 15;
+
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR Retail Price Log Mgt.",
+            '',
+            JobQueueDescrLbl,
+            NotBeforeDateTime,
+            NoOfMinutesBetweenRuns,
+            JobCategory,
+            JobQueueEntry)
+        then begin
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+        end;
+    end;
+
+    local procedure GetJobQueueCategoryCode(): Code[10]
+    var
+        RetailPriceLogSetup: Record "NPR Retail Price Log Setup";
+        JobQueueCategory: Record "Job Queue Category";
+        DefMessJobCatLbl: Label 'NPR-PriceL', MaxLength = 10;
+        DefMessJobCatDescLbl: Label 'Default Price Log JQ Category';
+    begin
+        if not RetailPriceLogSetup.Get() then begin
+            RetailPriceLogSetup.Init();
+            RetailPriceLogSetup.Insert();
+        end;
+
+        if RetailPriceLogSetup."Job Queue Category Code" <> '' then
+            exit(RetailPriceLogSetup."Job Queue Category Code");
+
+        JobQueueCategory.InsertRec(
+            CopyStr(DefMessJobCatLbl, 1, MaxStrLen(JobQueueCategory.Code)),
+            CopyStr(DefMessJobCatDescLbl, 1, MaxStrLen(JobQueueCategory.Description)));
+
+        RetailPriceLogSetup."Job Queue Category Code" := DefMessJobCatLbl;
+        RetailPriceLogSetup.Modify();
+        exit(JobQueueCategory.Code);
+    end;
+
+    internal procedure DeletePriceLogJobQueue(JobCategory: Code[10])
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        PermissionErr: Label 'You do not have right permissions to set up Job Queue.';
+    begin
+        if not (JobQueueEntry.ReadPermission and JobQueueEntry.WritePermission) then
+            Error(PermissionErr);
+
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Retail Price Log Mgt.");
+        JobQueueEntry.Setfilter("Job Queue Category Code", '%1', JobCategory);
+        JobQueueEntry.DeleteAll(true);
+    end;
+
+    local procedure NowWithDelayInSeconds(NoOfSeconds: Integer): DateTime
+    begin
+        exit(CurrentDateTime() + NoOfSeconds * 1000);
     end;
 
     local procedure EnableChangeLog()
@@ -641,6 +716,9 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR Retail Price Log Setup", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertRetailUnitPriceLogSetup(var Rec: Record "NPR Retail Price Log Setup"; RunTrigger: Boolean)
     begin
+        if not RunTrigger then
+            exit;
+
         if Rec.IsTemporary then
             exit;
 
@@ -651,6 +729,9 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR Retail Price Log Setup", 'OnAfterModifyEvent', '', true, true)]
     local procedure OnModifyRetailUnitPriceLogSetup(var Rec: Record "NPR Retail Price Log Setup"; var xRec: Record "NPR Retail Price Log Setup"; RunTrigger: Boolean)
     begin
+        if not RunTrigger then
+            exit;
+
         if Rec.IsTemporary then
             exit;
 

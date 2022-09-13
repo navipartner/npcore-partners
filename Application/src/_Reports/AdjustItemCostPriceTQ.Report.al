@@ -1,12 +1,15 @@
 ﻿report 6059904 "NPR Adjust Item Cost/Price TQ"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     Caption = 'Adjust Item Costs/Prices';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = '20';
 
     dataset
     {

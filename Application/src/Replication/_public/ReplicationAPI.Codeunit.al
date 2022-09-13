@@ -23,6 +23,7 @@
 
         ImportListErr: Label 'There are one or more Import List entries with Processing Runtime Error for this Replication Endpoint.';
 
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     begin
         SendWebRequests(ImportType, '');

@@ -69,6 +69,11 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'TMRetentionJQCategory'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", 'NPRUpgradePriceLogTaskQue')) then begin
+            UpgradePriceLogTaskQue();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", 'NPRUpgradePriceLogTaskQue'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -315,5 +320,21 @@
         JobQueueEntry.SetRange("Job Queue Category Code", '');
         if not JobQueueEntry.IsEmpty() then
             JobQueueEntry.ModifyAll("Job Queue Category Code", JobQueueCategoryTok);
+    end;
+
+    local procedure UpgradePriceLogTaskQue()
+    var
+        PriceLogSetup: Record "NPR Retail Price Log Setup";
+        RetailPriceLogMgt: Codeunit "NPR Retail Price Log Mgt.";
+    begin
+        if not PriceLogSetup.Get() then
+            exit;
+
+        if not PriceLogSetup."Task Queue Activated" then
+            exit;
+
+        PriceLogSetup."Job Queue Activated" := true;
+        PriceLogSetup.Modify();
+        RetailPriceLogMgt.CreatePriceLogJobQueue('');
     end;
 }

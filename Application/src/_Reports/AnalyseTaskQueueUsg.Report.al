@@ -9,6 +9,9 @@
     ApplicationArea = NPRRetail;
     Caption = 'Analyse Task Queue Usage';
     DataAccessIntent = ReadOnly;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = '20';
 
     dataset
     {

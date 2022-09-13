@@ -11,6 +11,10 @@
     ProcessingOnly = true;
     UsageCategory = Tasks;
     ApplicationArea = NPRRetail;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = '20';
+
     dataset
     {
         dataitem("Task Line"; "NPR Task Line")

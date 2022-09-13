@@ -1,9 +1,6 @@
 ﻿table 6014475 "NPR Retail Price Log Setup"
 {
     Access = Internal;
-    // NPR5.40/MHA /20180316  CASE 304031 Object created
-    // NPR5.48/MHA /20181102  CASE 334573 Replaced 90 Days InitValue on field 15 "Delete Price Log Entries after" with function InitDeletePriceLogEntriesAfter()
-
     Caption = 'Retail Unit Price Log Setup';
     DataClassification = CustomerContent;
 
@@ -21,8 +18,33 @@
         }
         field(10; "Task Queue Activated"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead. There is a new field here, "Job Queue Activated';
+            ObsoleteTag = '20';
             Caption = 'Task Queue Activated';
             DataClassification = CustomerContent;
+        }
+        field(11; "Job Queue Activated"; Boolean)
+        {
+            Caption = 'Job Queue Activated';
+            DataClassification = CustomerContent;
+        }
+        field(12; "Job Queue Category Code"; Code[10])
+        {
+            Caption = 'Job Queue Category Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Job Queue Category";
+
+            trigger OnValidate()
+            var
+                RetailPriceLogMgt: Codeunit "NPR Retail Price Log Mgt.";
+            begin
+                if Rec."Job Queue Category Code" <> xRec."Job Queue Category Code" then begin
+                    RetailPriceLogMgt.DeletePriceLogJobQueue(xRec."Job Queue Category Code");
+                    if Rec."Job Queue Category Code" <> '' then
+                        RetailPriceLogMgt.CreatePriceLogJobQueue(Rec."Job Queue Category Code");
+                end;
+            end;
         }
         field(15; "Delete Price Log Entries after"; Duration)
         {
@@ -65,19 +87,15 @@
 
     trigger OnInsert()
     begin
-        //-NPR5.48 [334573]
         InitDeletePriceLogEntriesAfter();
-        //+NPR5.48 [334573]
     end;
 
     local procedure InitDeletePriceLogEntriesAfter()
     begin
-        //-NPR5.48 [334573]
         if "Delete Price Log Entries after" > 0 then
             exit;
 
         "Delete Price Log Entries after" := (CreateDateTime(Today, 0T) - CreateDateTime(CalcDate('<-90D>', Today), 010000T));
-        //+NPR5.48 [334573]
     end;
 }
 
