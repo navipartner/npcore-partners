@@ -1,9 +1,6 @@
 ﻿page 6014474 "NPR Retail Price Log Setup"
 {
     Extensible = False;
-    // NPR5.40/MHA /20180316  CASE 304031 Object created
-    // NPR5.48/MHA /20181102  CASE 334573 Insert with trigger in OnOpenPage()
-
     AccessByPermission = TableData "Change Log Setup" = RIM;
     Caption = 'Retail Price Log Setup';
     DeleteAllowed = false;
@@ -27,8 +24,20 @@
                 }
                 field("Task Queue Activated"; Rec."Task Queue Activated")
                 {
-
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
+                    ObsoleteTag = '20';
                     ToolTip = 'Specifies the value of the Task Queue Activated field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Job Queue Activated"; Rec."Job Queue Activated")
+                {
+                    ToolTip = 'Specifies the value of the Job Queue Activated field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Job Queue Category Code"; Rec."Job Queue Category Code")
+                {
+                    ToolTip = 'Specifies the value of the Job Queue Category Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Delete Price Log Entries after"; Rec."Delete Price Log Entries after")
@@ -100,10 +109,7 @@
         Rec.Reset();
         if not Rec.Get() then begin
             Rec.Init();
-            //-NPR5.48 [334573]
-            //INSERT;
             Rec.Insert(true);
-            //+NPR5.48 [334573]
         end;
     end;
 }

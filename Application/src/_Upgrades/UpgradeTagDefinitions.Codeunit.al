@@ -257,6 +257,8 @@
                 Exit('NPRUPGMPOSQRCode');
             Codeunit::"NPR UPG DE Audit Setup":
                 Exit('RemoveDEFiskalyPOSWorkflowStep');
+            Codeunit::"NPR Job Queue Upgrade":
+                Exit('NPRUpgradePriceLogTaskQue');
         end;
     end;
 }
