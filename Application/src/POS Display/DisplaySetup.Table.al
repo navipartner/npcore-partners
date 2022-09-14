@@ -24,17 +24,13 @@
             Caption = 'Display Content Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Display Content";
-
-            trigger OnValidate()
-            begin
-                if ("Display Content Code" <> xRec."Display Content Code") and ("Display Content Code" <> '') then
-                    "Media Downloaded" := false;
-            end;
         }
         field(12; "Screen No."; Integer)
         {
             Caption = 'Screen No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This is device specific and moved to ''table 6014698 "NPR POS Unit Display Helper"''';
         }
         field(13; "Receipt Duration"; Integer)
         {
@@ -57,10 +53,13 @@
             OptionCaption = 'Left,Center,Right';
             OptionMembers = Left,Center,Right;
         }
+
         field(16; "Media Downloaded"; Boolean)
         {
             Caption = 'Media Downloaded';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This is device specific and moved to ''table 6014698 "NPR POS Unit Display Helper"''';
         }
         field(17; "Receipt Description Padding"; Integer)
         {
@@ -97,12 +96,6 @@
         {
             Caption = 'Activate';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if (xRec.Activate) and (not Activate) then
-                    "Media Downloaded" := false;
-            end;
         }
         field(23; "Prices ex. VAT"; Boolean)
         {

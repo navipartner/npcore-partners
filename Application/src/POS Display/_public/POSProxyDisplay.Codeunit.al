@@ -433,7 +433,6 @@
         if not HideReceiptIsActivated then begin
             Clear(Line1);
             Clear(Line2);
-
             case Action of
                 Action::Login:
                     begin
@@ -503,10 +502,11 @@
         PaymentDetailsTxt: Text;
         RemainingAmtTxt: Text;
         NoOfFillterChars: Integer;
+        POSUnit: Record "NPR POS Unit";
     begin
         LineCounter := 0;
-
-        DisplaySetup.Get(Rec."Register No.");
+        POSUnit.Get(Rec."Register No.");
+        DisplaySetup.Get(POSUnit."POS Display Profile");
         if not DisplaySetup."Hide receipt" then begin
             if DisplaySetup."Custom Display Codeunit" <> 0 then begin
                 TempDisplayCustomContent.RecId := Rec.RecordId;
@@ -690,12 +690,31 @@
             Change := (Payment - GrandTotal) * -1;
     end;
 
+    local procedure GetUnitDisplayRecord(var POSUnitDisplayOut: Record "NPR POS Unit Display")
+    var
+        SetupOut: Codeunit "NPR POS Setup";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        POSSession.GetSetup(SetupOut);
+        if (POSUnitDisplayOut.Get(SetupOut.GetPOSUnitNo())) then begin
+            exit;
+        end else begin
+            POSUnitDisplayOut."Media Downloaded" := False;
+            POSUnitDisplayOut."Screen No." := 0;
+            POSUnitDisplayOut.POSUnit := SetupOut.GetPOSUnitNo();
+            POSUnitDisplayOut.Insert(true);
+            POSUnitDisplayOut.Get(SetupOut.GetPOSUnitNo());
+        end;
+    end;
+
     local procedure Login(var FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        POSSession: Codeunit "NPR POS Session";
         Request: Codeunit "NPR Front-End: HWC";
+        POSUnitDisplay: Record "NPR POS Unit Display";
+        POSSession: Codeunit "NPR POS Session";
     begin
-        if DisplaySetup."Media Downloaded" then
+        GetUnitDisplayRecord(POSUnitDisplay);
+        if POSUnitDisplay."Media Downloaded" then
             SetAction(0)
         else
             SetAction(6);
@@ -715,7 +734,7 @@
                 end;
             DisplayHandlerAction::DownloadFiles:
                 begin
-                    DisplaySetup."Media Downloaded" := true;
+                    POSUnitDisplay."Media Downloaded" := true;
                     DisplaySetup.Modify(true);
                 end;
         end;
@@ -795,9 +814,11 @@
     local procedure DisplayHandler()
     var
         jsonobj: JsonObject;
+        POSUnitDisplay: Record "NPR POS Unit Display";
     begin
         Clear(MediaDictionary);
-        jsonobj.Add('ScreenNo', DisplaySetup."Screen No.");
+        GetUnitDisplayRecord(POSUnitDisplay);
+        jsonobj.Add('ScreenNo', POSUnitDisplay."Screen No.");
         jsonobj.Add('ReceiptWidthPct', DisplaySetup."Receipt Width Pct.");
         jsonobj.Add('ReceiptPlacement', DisplaySetup."Receipt Placement");
         jsonobj.Add('DisplayAction', DisplayHandlerAction);
@@ -972,7 +993,7 @@
     begin
         MatrixIsActivated := false;
         if not MatrixIsActivated then
-            if DisplaySetup.Get(POSUnit."No.") then begin
+            if DisplaySetup.Get(POSUnit."POS Display Profile") then begin
                 DisplayIsActivated := DisplaySetup.Activate;
                 HideReceiptIsActivated := DisplaySetup."Hide receipt";
             end;
