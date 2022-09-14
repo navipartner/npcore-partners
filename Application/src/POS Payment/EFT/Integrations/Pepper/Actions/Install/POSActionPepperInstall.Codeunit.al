@@ -1,6 +1,5 @@
 codeunit 6184489 "NPR POS Action Pepper Install" implements "NPR IPOS Workflow"
 {
-
     Access = Internal;
 
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
@@ -53,7 +52,7 @@ codeunit 6184489 "NPR POS Action Pepper Install" implements "NPR IPOS Workflow"
         PepperLibrary.GetEFTSetup(POSUnit, EFTSetup);
         EFTIntegration.CreateVerifySetupRequest(EFTTransactionRequest, EFTSetup, POSUnit."No.", POSSale."Sales Ticket No.");
         PepperLibrary.MakeHwcDeviceRequest(EFTTransactionRequest, HwcRequest);
-        WorkflowContext.Add('hwcRequest', HwcRequest);
+        WorkflowContext.Add('request', HwcRequest);
     end;
 
     local procedure DownloadToClient(Context: codeunit "NPR POS JSON Helper") WorkflowContext: JsonObject
@@ -66,7 +65,7 @@ codeunit 6184489 "NPR POS Action Pepper Install" implements "NPR IPOS Workflow"
 
     begin
         HwcResponse := Context.GetJsonObject('hwcResponse');
-        HwcRequest := Context.GetJsonObject('hwcRequest');
+        HwcRequest := Context.GetJsonObject('request');
         HwcRequest.Get('EntryNo', JToken);
         EftTransactionRequest.Get(JToken.AsValue().AsInteger());
 
@@ -76,7 +75,7 @@ codeunit 6184489 "NPR POS Action Pepper Install" implements "NPR IPOS Workflow"
         HwcRequest.ReadFrom('{}');
         PepperLibrary.DownloadFileToClient(EftTransactionRequest, JToken.AsValue().AsText(), HwcRequest);
 
-        WorkflowContext.Add('hwcRequest', HwcRequest);
+        WorkflowContext.Add('request', HwcRequest);
     end;
 
     local procedure FinalizeRequest(Context: Codeunit "NPR POS JSON Helper") WorkflowContext: JsonObject
@@ -88,7 +87,7 @@ codeunit 6184489 "NPR POS Action Pepper Install" implements "NPR IPOS Workflow"
         JToken: JsonToken;
     begin
         HwcResponse := Context.GetJsonObject('hwcResponse');
-        HwcRequest := Context.GetJsonObject('hwcRequest');
+        HwcRequest := Context.GetJsonObject('request');
         HwcRequest.Get('EntryNo', JToken);
         EftTransactionRequest.Get(JToken.AsValue().AsInteger());
 
@@ -100,7 +99,7 @@ codeunit 6184489 "NPR POS Action Pepper Install" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPepperInstall.Codeunit.js###
-'let main=async({workflow:o,context:t,popup:i,runtime:u,hwc:a,data:c,parameters:d,captions:l,scope:w})=>{let s,r,R={Success:!1},n={Success:!1};s=i.simplePayment({showStatus:!0,title:l.workflowTitle,amount:" ",onAbort:async()=>{await i.confirm(l.confirmAbort)&&a.unregisterResponseHandler(r)},abortValue:{completed:"Aborted"}});try{r=a.registerResponseHandler(async e=>{switch(e.Type){case"DownloadFileRequest":({hwcRequest:t.hwcRequest}=await o.respond("DownloadToClient",{hwcResponse:e})),await a.invoke(t.hwcRequest.HwcName,t.hwcRequest,r);break;case"InstallComplete":n=await o.respond("FinalizeRequest",{hwcResponse:e}),e.ResultCode!=10&&i.message({title:l.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"}),e.ResultCode==10&&(i.message({caption:"<center><font color=green size=72>&#x2713;</font><h3>"+e.ResultString+"</h3></center>",title:l.workflowTitle}),t.hwcRequest.Operation="HWCRestartConnector",await a.invoke(t.hwcRequest.HwcName,t.hwcRequest,r)),a.unregisterResponseHandler(r);break;case"UpdateDisplay":s.updateStatus(e.Message);break}}),s.updateStatus(l.prepareInstall),s.enableAbort(!0),{hwcRequest:t.hwcRequest}=await o.respond("PrepareRequest");debugger;await a.invoke(t.hwcRequest.HwcName,t.hwcRequest,r),await a.waitForContextCloseAsync(r),s.close()}catch(e){throw console.error("[Pepper] Install Error: ",e),s&&s.close(),e}};'
+'let main=async({workflow:o,context:s,popup:l,runtime:u,hwc:r,data:d,parameters:f,captions:i,scope:p})=>{let t,a,c={Success:!1},n={Success:!1};t=await l.simplePayment({showStatus:!0,title:i.workflowTitle,amount:" ",onAbort:async()=>{await l.confirm(i.confirmAbort)&&r.unregisterResponseHandler(a)},abortValue:{completed:"Aborted"}});try{a=r.registerResponseHandler(async e=>{switch(e.Type){case"DownloadFileRequest":({request:s.request}=await o.respond("DownloadToClient",{hwcResponse:e})),await r.invoke("EFTPepper",s.request,a);break;case"InstallComplete":n=await o.respond("FinalizeRequest",{hwcResponse:e}),e.ResultCode!=10&&l.message({title:i.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"}),e.ResultCode==10&&(l.message({caption:"<center><font color=green size=72>&#x2713;</font><h3>"+e.ResultString+"</h3></center>",title:i.workflowTitle}),s.request.Operation="HWCRestartConnector",await r.invoke("EFTPepper",s.request,a)),r.unregisterResponseHandler(a);break;case"UpdateDisplay":t.updateStatus(e.Message);break}}),t.updateStatus(i.prepareInstall),t.enableAbort(!0),{request:s.request}=await o.respond("PrepareRequest");debugger;await r.invoke("EFTPepper",s.request,a),await r.waitForContextCloseAsync(a),t&&t.close()}catch(e){throw console.error("[Pepper] Install Error: ",e),t&&t.close(),e}};'
         );
     end;
 }

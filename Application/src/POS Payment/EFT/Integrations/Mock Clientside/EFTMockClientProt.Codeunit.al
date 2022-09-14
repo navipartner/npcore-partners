@@ -12,31 +12,31 @@
         exit('EFTMock');
     end;
 
-    procedure CreateHwcEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject)
+    procedure CreateHwcEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
         case EftTransactionRequest."Processing Type" of
             EftTransactionRequest."Processing Type"::OPEN:
-                OpenTerminal(EftTransactionRequest, HwcRequest);
+                OpenTerminal(EftTransactionRequest, HwcRequest, Workflow);
             EftTransactionRequest."Processing Type"::CLOSE:
-                CloseTerminal(EftTransactionRequest, HwcRequest);
+                CloseTerminal(EftTransactionRequest, HwcRequest, Workflow);
             EftTransactionRequest."Processing Type"::LOOK_UP:
-                LookupTransaction(EftTransactionRequest, HwcRequest);
+                LookupTransaction(EftTransactionRequest, HwcRequest, Workflow);
             EftTransactionRequest."Processing Type"::SETUP:
-                VerifySetup(EftTransactionRequest, HwcRequest);
+                VerifySetup(EftTransactionRequest, HwcRequest, Workflow);
             EftTransactionRequest."Processing Type"::GIFTCARD_LOAD:
-                PaymentTransaction(EftTransactionRequest, HwcRequest);
+                PaymentTransaction(EftTransactionRequest, HwcRequest, Workflow);
             EftTransactionRequest."Processing Type"::REFUND:
-                PaymentTransaction(EftTransactionRequest, HwcRequest);
+                PaymentTransaction(EftTransactionRequest, HwcRequest, Workflow);
             EftTransactionRequest."Processing Type"::PAYMENT:
-                PaymentTransaction(EftTransactionRequest, HwcRequest);
+                PaymentTransaction(EftTransactionRequest, HwcRequest, Workflow);
             EftTransactionRequest."Processing Type"::VOID:
-                VoidTransaction(EftTransactionRequest, HwcRequest);
+                VoidTransaction(EftTransactionRequest, HwcRequest, Workflow);
             EftTransactionRequest."Processing Type"::AUXILIARY:
                 case EftTransactionRequest."Auxiliary Operation ID" of
                     1:
-                        BalanceEnquiry(EftTransactionRequest, HwcRequest);
+                        BalanceEnquiry(EftTransactionRequest, HwcRequest, Workflow);
                     2:
-                        ReprintLastReceipt(EftTransactionRequest, HwcRequest);
+                        ReprintLastReceipt(EftTransactionRequest, HwcRequest, Workflow);
                 end;
         end;
 
@@ -52,14 +52,11 @@
 
     end;
 
-    local procedure PaymentTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject)
+    local procedure PaymentTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
-        HwcRequest.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_MOCK_CLIENT));
-        HwcRequest.Add('HwcName', HwcIntegrationName());
+        Workflow := Format(Enum::"NPR POS Workflow"::EFT_MOCK_CLIENT);
         HwcRequest.Add('Type', 'Transaction');
-        HwcRequest.Add('EntryNo', EFTTransactionRequest."Entry No.");
         HwcRequest.Add('ReceiptNo', EFTTransactionRequest."Sales Ticket No.");
-        //State.Captions.Amount := Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>');
         HwcRequest.Add('AmountIn', Round(EftTransactionRequest."Amount Input" * 100, 1));
         HwcRequest.Add('Timeout', 30 * 1000);
         HwcRequest.Add('CancelTimeout', 5 * 1000);
@@ -69,67 +66,56 @@
         HwcRequest.Add('CurrencyCode', EFTTransactionRequest."Currency Code");
     end;
 
-    local procedure OpenTerminal(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject)
+    local procedure OpenTerminal(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     var
         EFTSetup: Record "NPR EFT Setup";
     begin
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."POS Payment Type Code");
-
-        HwcRequest.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_GENERIC_OPEN));
-        HwcRequest.Add('HwcName', HwcIntegrationName());
+        Workflow := Format(Enum::"NPR POS Workflow"::EFT_GENERIC_OPEN);
         HwcRequest.Add('Type', 'Open');
-        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
-
+        HwcRequest.Add('HwcName', HwcIntegrationName());
         SetConnectionInitState(HwcRequest, EFTSetup);
     end;
 
-    local procedure CloseTerminal(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject)
+    local procedure CloseTerminal(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
-        HwcRequest.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_GENERIC_CLOSE));
-        HwcRequest.Add('HwcName', HwcIntegrationName());
+        Workflow := Format(Enum::"NPR POS Workflow"::EFT_GENERIC_CLOSE);
         HwcRequest.Add('Type', 'Close');
+        HwcRequest.Add('HwcName', HwcIntegrationName());
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
-        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
     end;
 
-    local procedure VerifySetup(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject)
+    local procedure VerifySetup(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
-        HwcRequest.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_GENERIC_AUX));
-        HwcRequest.Add('HwcName', HwcIntegrationName());
+        Workflow := Format(Enum::"NPR POS Workflow"::EFT_GENERIC_AUX);
         HwcRequest.Add('Type', 'VerifySetup');
+        HwcRequest.Add('HwcName', HwcIntegrationName());
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
-        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
     end;
 
-    local procedure LookupTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject)
+    local procedure LookupTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     var
         OriginalTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
-
-        HwcRequest.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_MOCK_CLIENT));
-        HwcRequest.Add('HwcName', HwcIntegrationName());
+        Workflow := Format(Enum::"NPR POS Workflow"::EFT_MOCK_CLIENT);
         HwcRequest.Add('Type', 'Lookup');
-        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
         HwcRequest.Add('OriginalRequestEntryNo', OriginalTransactionRequest."Entry No.");
         HwcRequest.Add('OriginalExternalReferenceNo', OriginalTransactionRequest."External Transaction ID");
         HwcRequest.Add('OriginalReceiptNo', OriginalTransactionRequest."Sales Ticket No.");
-
         HwcRequest.Add('SuggestedAmountUserLocal', Format(OriginalTransactionRequest."Amount Input"));
         HwcRequest.Add('CurrencyCode', OriginalTransactionRequest."Currency Code");
     end;
 
-    local procedure VoidTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject)
+    local procedure VoidTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     var
         OriginalTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
 
-        HwcRequest.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_MOCK_CLIENT));
-        HwcRequest.Add('HwcName', HwcIntegrationName());
+        Workflow := Format(Enum::"NPR POS Workflow"::EFT_MOCK_CLIENT);
         HwcRequest.Add('Type', 'Void');
-        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
         HwcRequest.Add('OriginalRequestEntryNo', OriginalTransactionRequest."Entry No.");
         HwcRequest.Add('OriginalExternalReferenceNo', OriginalTransactionRequest."External Transaction ID");
@@ -139,49 +125,43 @@
         HwcRequest.Add('CurrencyCode', OriginalTransactionRequest."Currency Code");
     end;
 
-    local procedure BalanceEnquiry(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject)
+    local procedure BalanceEnquiry(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
-        HwcRequest.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_GENERIC_AUX));
-        HwcRequest.Add('HwcName', HwcIntegrationName());
+        Workflow := Format(Enum::"NPR POS Workflow"::EFT_GENERIC_AUX);
         HwcRequest.Add('Type', 'BalanceEnquiry');
-        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
-        HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
-    end;
-
-    local procedure ReprintLastReceipt(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject)
-    begin
-        HwcRequest.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_GENERIC_AUX));
         HwcRequest.Add('HwcName', HwcIntegrationName());
-        HwcRequest.Add('Type', 'Reprint');
-        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnHwcEftDeviceResponse', '', false, false)]
-    local procedure OnDeviceResponse(HwcName: Text; HwcType: Text; Request: JsonObject; Response: JsonObject; Result: JsonObject; var Handled: Boolean)
+    local procedure ReprintLastReceipt(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
-        if (HwcName <> HwcIntegrationName()) then
+        Workflow := Format(Enum::"NPR POS Workflow"::EFT_GENERIC_AUX);
+        HwcRequest.Add('Type', 'Reprint');
+        HwcRequest.Add('HwcName', HwcIntegrationName());
+        HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnGenericWorkflowResponse', '', false, false)]
+    local procedure OnDeviceResponse(EFTTransactionRequest: Record "NPR EFT Transaction Request"; Request: JsonObject; Response: JsonObject; Result: JsonObject; var Handled: Boolean)
+    begin
+        if (EFTTransactionRequest."Integration Type" <> IntegrationType()) then
             exit;
         Handled := true;
 
-        HandleDeviceResponse(HwcName, HwcType, Request, Response, Result);
+        HandleDeviceResponse(EFTTransactionRequest, Request, Response, Result);
     end;
 
-    internal procedure HandleDeviceResponse(HwcName: Text; HwcType: Text; Request: JsonObject; Response: JsonObject; Result: JsonObject) EntryNo: Integer
+    internal procedure HandleDeviceResponse(EftTransactionRequest: Record "NPR EFT Transaction Request"; Request: JsonObject; Response: JsonObject; Result: JsonObject)
     var
-        EftTransactionRequest: Record "NPR EFT Transaction Request";
         JToken: JsonToken;
     begin
-        Request.Get('EntryNo', JToken);
-        EftTransactionRequest.Get(JToken.AsValue().AsInteger());
-
         if (Response.Get('ResultCode', JToken)) then
             EftTransactionRequest."Result Code" := JToken.AsValue().AsInteger();
 
         if (Response.Get('ExecutingAssemblyVersion', JToken)) then
             EftTransactionRequest."Client Assembly Version" := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(EftTransactionRequest."Client Assembly Version"));
 
-        if (not HandleResponseType(HwcType, Response, Result, EftTransactionRequest)) then begin
+        if (not HandleResponse(Response, Result, EftTransactionRequest)) then begin
             EftTransactionRequest."NST Error" := CopyStr(GetLastErrorText, 1, MaxStrLen(EftTransactionRequest."NST Error"));
             EftTransactionRequest."POS Description" := CopyStr(GetLastErrorText, 1, MaxStrLen(EftTransactionRequest."POS Description"));
             EftTransactionRequest.Successful := false;
@@ -196,32 +176,36 @@
         EftTransactionRequest.Modify();
 
         Result.Add('Success', EftTransactionRequest.Successful);
-        exit(EftTransactionRequest."Entry No.");
     end;
 
     [TryFunction]
-    local procedure HandleResponseType(HwcType: Text; Response: JsonObject; Result: JsonObject; var EftTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure HandleResponse(Response: JsonObject; Result: JsonObject; var EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
 
-        case HwcType of
-            'Open':
+        case EftTransactionRequest."Processing Type" of
+            EftTransactionRequest."Processing Type"::OPEN:
                 OpenTerminalEnd(EftTransactionRequest, Response, Result);
-            'Close':
+            EftTransactionRequest."Processing Type"::CLOSE:
                 CloseTerminalEnd(EftTransactionRequest, Response, Result);
-            'Transaction':
+            EftTransactionRequest."Processing Type"::PAYMENT,
+            EftTransactionRequest."Processing Type"::GIFTCARD_LOAD,
+            EftTransactionRequest."Processing Type"::REFUND:
                 PaymentTransactionEnd(EftTransactionRequest, Response, Result);
-            'Lookup':
+            EftTransactionRequest."Processing Type"::LOOK_UP:
                 LookupTransactionEnd(EftTransactionRequest, Response, Result);
-            'Void':
+            EftTransactionRequest."Processing Type"::VOID:
                 VoidTransactionEnd(EftTransactionRequest, Response, Result);
-            'VerifySetup':
+            EftTransactionRequest."Processing Type"::SETUP:
                 VerifySetupEnd(EftTransactionRequest, Response, Result);
-            'BalanceEnquiry':
-                BalanceEnquiryEnd(EftTransactionRequest, Response, Result);
-            'Reprint':
-                ReprintReceiptEnd(EftTransactionRequest, Response);
+            EftTransactionRequest."Processing Type"::AUXILIARY:
+                case EftTransactionRequest."Auxiliary Operation ID" of
+                    1: //BalanceEnquiry
+                        BalanceEnquiryEnd(EftTransactionRequest, Response, Result);
+                    2: //Reprint
+                        ReprintReceiptEnd(EftTransactionRequest, Response);
+                end;
             else
-                Error('%1 not handled.', HwcType);
+                Error('%1 not handled.', EftTransactionRequest."Processing Type");
         end;
     end;
 

@@ -36,7 +36,7 @@ codeunit 6059798 "NPR POS Refresh Workflows"
         ActionVersion := WorkflowConfig.CalculateWorkflowHash();
         POSAction.SetRange(Code, ActionCode);
         POSAction.SetRange(Version, ActionVersion);
-        if not POSAction.Find('=') then
+        if POSAction.IsEmpty() then
             RefreshAction(ActionCode, WorkflowConfig, ActionVersion, WorkflowOrdinal);
     end;
 
@@ -76,7 +76,8 @@ codeunit 6059798 "NPR POS Refresh Workflows"
         POSAction.Insert();
 
         ActionParameters.SetRange("POS Action Code", ActionCode);
-        ActionParameters.DeleteAll();
+        if not ActionParameters.IsEmpty() then
+            ActionParameters.DeleteAll();
 
         if TempParameters.FindSet() then
             repeat
@@ -85,7 +86,7 @@ codeunit 6059798 "NPR POS Refresh Workflows"
                 ActionParameters.Insert();
             until TempParameters.Next() = 0;
 
-        POSAction.OnAfterActionUpdated(POSAction); //triggers pos menu button parameter update pointing to this action
+        POSAction.OnAfterActionUpdated(POSAction); //triggers update of 'pos menu button', 'pos named action', 'pos ean box setup' parameters for this action.
     end;
 
     local procedure BufferCaptions(ActionCode: Text; WorkflowConfig: Codeunit "NPR POS Workflow Config")

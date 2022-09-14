@@ -24,7 +24,7 @@ enum 6014487 "NPR Payment Processing Type" implements "NPR POS IPaymentWFHandler
     value(3; EFT)
     {
         Caption = 'EFT';
-        Implementation = "NPR POS IPaymentWFHandler" = "NPR POS Action: EFT Payment";
+        Implementation = "NPR POS IPaymentWFHandler" = "NPR POS Action: EFT Trx";
     }
     value(5; PAYOUT)
     {

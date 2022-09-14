@@ -36,7 +36,6 @@ codeunit 6059862 "NPR POSAction - Task Example" implements "NPR IPOS Workflow", 
                 end;
             'cancelBackgroundTask':
                 begin
-                    Sleep(5 * 1000);
                     POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
                     POSBackgroundTaskAPI.CancelBackgroundTask(Context.GetInteger('taskId'));
                     FrontEnd.WorkflowResponse('');
@@ -110,7 +109,7 @@ codeunit 6059862 "NPR POSAction - Task Example" implements "NPR IPOS Workflow", 
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTaskExample.js###
-'let main=async({workflow:c,context:l})=>{let s=!1,t=[],a=(n,e)=>new Promise(async o=>{t.push({stepname:n,context:e,callback:o}),await k()}),k=async()=>{if(!s){for(s=!0;t.length!=0;)response=t.shift(),response.callback(await c.respond(response.stepname,response.context));s=!1}},{taskId:r}=await a("startBackgroundTask",l),i="",p=new Promise(async n=>{let e=async()=>{let{isDone:o,status:u}=await a("isTaskDone",{taskId:r});if(o){i=u,n();return}setTimeout(e,1e3)};setTimeout(e,1e3)});await popup.confirm("Attempt cancellation of background task?")&&await a("cancelBackgroundTask",{taskId:r}),await p,await popup.message("Background task is done with status: "+i)};'
+'let main=async({workflow:a,context:n})=>{let{taskId:t}=await a.respond("startBackgroundTask",n),s="",i=new Promise(async o=>{let e=async()=>{let{isDone:c,status:k}=await a.respond("isTaskDone",{taskId:t});if(c){s=k,o();return}setTimeout(e,1e3)};setTimeout(e,1e3)});await popup.confirm("Attempt cancellation of background task?")&&await a.respond("cancelBackgroundTask",{taskId:t}),await i,await popup.message("Background task is done with status: "+s)};'
         );
     end;
 }

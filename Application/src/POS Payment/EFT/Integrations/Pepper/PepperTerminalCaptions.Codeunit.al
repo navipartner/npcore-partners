@@ -42,6 +42,8 @@
         LblDownloading: Label 'Downloading...';
         LblFolderDeleteFailed: Label 'Removing the previous Pepper installation failed because the folder could not be moved. Close Pepper integration and try again.';
         LblPepperIsOpen: Label 'Pepper must be in closed state prior to install. Don''t forget to do end of day before installing the new version.';
+        LblDeclineTransactionResultText: Label 'Declined';
+        LblOkTransactionResultText: Label 'Ok';
 
     procedure GetLabels(var ProcessLabels: JsonObject)
     begin
@@ -85,7 +87,10 @@
         ProcessLabels.Add('LblInstalling', LblInstalling);
         ProcessLabels.Add('LblDownloading', LblDownloading);
         ProcessLabels.Add('LblFolderDeleteFailed', LblFolderDeleteFailed);
-        ProcessLabels.Add('LblPepperIsOpen', LblPepperIsOpen)
+        ProcessLabels.Add('LblPepperIsOpen', LblPepperIsOpen);
+        ProcessLabels.Add('LblDeclineTransactionResultText', LblDeclineTransactionResultText);
+        ProcessLabels.Add('LblOkTransactionResultText', LblOkTransactionResultText);
+
     end;
 
 }

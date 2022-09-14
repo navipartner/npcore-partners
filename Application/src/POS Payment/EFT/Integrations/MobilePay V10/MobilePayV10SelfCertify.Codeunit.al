@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6014508 "NPR MobilePayV10 SelfCertify"
+﻿codeunit 6014508 "NPR MobilePayV10 SelfCertify"
 {
     Access = Internal;
     Subtype = Test;
@@ -356,7 +355,6 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
     var
         mobilePayV10Protocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
-        mobilePayV10Protocol.SetRunningOutOfPosSession(true);
         mobilePayV10Protocol.SendTrxRequest(EftTrxRequest);
     end;
 
@@ -465,4 +463,3 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
     end;
     #endregion
 }
-#endif

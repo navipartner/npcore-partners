@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6014532 "NPR MobilePayV10 Capt. Payment"
+﻿codeunit 6014532 "NPR MobilePayV10 Capt. Payment"
 {
     Access = Internal;
     // POST  /v10/payments/{paymentid}/capture
@@ -78,4 +77,3 @@ codeunit 6014532 "NPR MobilePayV10 Capt. Payment"
         eftTrxRequest.Modify();
     end;
 }
-#endif

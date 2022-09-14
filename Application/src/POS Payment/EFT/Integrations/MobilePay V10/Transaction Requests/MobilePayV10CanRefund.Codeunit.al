@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6014507 "NPR MobilePayV10 Can. Refund"
+﻿codeunit 6014507 "NPR MobilePayV10 Can. Refund"
 {
     Access = Internal;
     // POST  /v10/refunds/{refundid}/cancel
@@ -64,4 +63,3 @@ codeunit 6014507 "NPR MobilePayV10 Can. Refund"
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, false, '');
     end;
 }
-#endif
