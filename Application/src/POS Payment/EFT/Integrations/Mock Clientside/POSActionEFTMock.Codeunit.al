@@ -33,41 +33,26 @@ codeunit 6059794 "NPR POS Action: EFT Mock" implements "NPR IPOS Workflow"
     var
         EftTransactionRequest: Record "NPR EFT Transaction Request";
         EftMockClientProtocol: Codeunit "NPR EFT Mock Client Prot.";
-        EftFramework: Codeunit "NPR EFT Framework Mgt.";
         HwcResponse: JsonObject;
         HwcRequest: JsonObject;
+        EftInterface: Codeunit "NPR EFT Interface";
     begin
         HwcResponse := Context.GetJsonObject('hwcResponse');
-        HwcRequest := Context.GetJsonObject('hwcRequest');
-        Context.SetScope('hwcRequest');
+        HwcRequest := Context.GetJsonObject('request');
+        Context.SetScope('request');
 
-        EftTransactionRequest.Get(
-           EftMockClientProtocol.HandleDeviceResponse(Context.GetString('HwcName'), Context.GetString('Type'), HwcRequest, HwcResponse, Result));
+        EftTransactionRequest.Get(Context.GetInteger('EntryNo'));
+        EftMockClientProtocol.HandleDeviceResponse(EftTransactionRequest, HwcRequest, HwcResponse, Result);
+        EftTransactionRequest.Find('=');
 
-        EftFramework.EftIntegrationResponseReceived(EftTransactionRequest);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnGetIntegrationRequestWorkflow', '', false, false)]
-    local procedure OnGetIntegrationRequestWorkflow(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var IntegrationWorkflow: Text; EftJsonRequest: JsonObject)
-    var
-        MockProtocol: Codeunit "NPR EFT Mock Client Prot.";
-    begin
-        if (not EFTTransactionRequest.IsType(MockProtocol.IntegrationType())) then
-            exit;
-
-        if (not (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT,
-                                                             EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD,
-                                                             EFTTransactionRequest."Processing Type"::REFUND])) then
-            exit;
-
-        IntegrationWorkflow := Format(Enum::"NPR POS Workflow"::EFT_MOCK_CLIENT);
+        EftInterface.EftIntegrationResponse(EftTransactionRequest);
     end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionEFTMock.Codeunit.js###
-'let main=async({workflow:o,hwc:n,popup:c,context:t,captions:a})=>{o.keepAlive();let s=c.simplePayment({showStatus:!0,title:a.workflowTitle,amount:t.hwcRequest.CurrencyCode+" "+t.hwcRequest.SuggestedAmountUserLocal,onAbort:async()=>{await c.confirm(a.confirmAbort)&&(s.updateStatus(a.statusAborting),await n.invoke(t.hwcRequest.HwcName,{Type:"RequestCancel",EntryNo:t.hwcRequest.EntryNo},r))},abortValue:{completed:"Aborted"}}),r,l={Success:!1},i={Success:!1};try{r=n.registerResponseHandler(async e=>{switch(e.Type){case"Lookup":case"Transaction":case"Void":try{if(console.log("[EFT Mock] Transaction Completed."),s.updateStatus(a.statusFinalizing),i=await o.respond("FinalizePaymentRequest",{hwcResponse:e}),e.Success||c.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"}),e.Success&&!i.Success&&c.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+i.Message+"</h3></center>"}),t.hwcRequest.AmountIn==704)throw"AmountIn with value 704 forces an exception in MOCK hwc response handler.";l=e,n.unregisterResponseHandler(r)}catch(u){n.unregisterResponseHandler(r,u)}break;case"UpdateDisplay":if(console.log("[EFT Mock] Update Display. "+e.DisplayLine),s.updateStatus(e.DisplayLine),t.hwcRequest.AmountIn==703)throw"AmountIn with value 703 forces an exception in MOCK hwc response handler.";break}}),s.updateStatus(a.statusAuthorizing),s.enableAbort(!0),await n.invoke(t.hwcRequest.HwcName,t.hwcRequest,r),await n.waitForContextCloseAsync(r),o.complete({success:l.Success,endSale:i.Success}),s.close()}catch(e){throw console.error("[EFT Mock] Error: ",e),s&&s.close(),o.complete({success:!1,endSale:!1}),e}};'
+'let main=async({workflow:l,hwc:a,popup:i,context:e,captions:r})=>{let t=await i.simplePayment({showStatus:!0,title:r.workflowTitle,amount:e.request.CurrencyCode+" "+e.request.SuggestedAmountUserLocal,onAbort:async()=>{await i.confirm(r.confirmAbort)&&(t.updateStatus(r.statusAborting),await a.invoke("EFTMock",{Type:"RequestCancel",EntryNo:e.request.EntryNo},n))},abortValue:{completed:"Aborted"}}),n,u={Success:!1},o={Success:!1};e.success=!1,e.tryEndSale=!1;try{n=a.registerResponseHandler(async s=>{switch(s.Type){case"Lookup":case"Transaction":case"Void":try{if(console.log("[EFT Mock] Transaction Completed."),t.updateStatus(r.statusFinalizing),o=await l.respond("FinalizePaymentRequest",{hwcResponse:s}),!s.Success)throw new Error(s.ResultString);if(s.Success&&!o.Success)throw new Error(o.Message);if(e.request.AmountIn==704)throw new Error("AmountIn with value 704 forces an exception in MOCK hwc response handler.");u=s,a.unregisterResponseHandler(n)}catch(c){a.unregisterResponseHandler(n,c)}break;case"UpdateDisplay":if(console.log("[EFT Mock] Update Display. "+s.DisplayLine),t.updateStatus(s.DisplayLine),e.request.AmountIn==703)throw"AmountIn with value 703 forces an exception in MOCK hwc response handler.";break}}),t.updateStatus(r.statusAuthorizing),t.enableAbort(!0),await a.invoke("EFTMock",e.request,n),await a.waitForContextCloseAsync(n),e.success=u.Success&&o.Success}catch(s){throw i.message({title:r.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+(s.message||"Unknown error")+"</h3></center>"}),s}finally{t&&t.close()}return{success:e.success,tryEndSale:e.success}};'
         );
     end;
 

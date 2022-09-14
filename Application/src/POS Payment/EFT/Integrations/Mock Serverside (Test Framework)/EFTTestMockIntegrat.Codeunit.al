@@ -1,13 +1,7 @@
 ﻿codeunit 6184543 "NPR EFT Test Mock Integrat."
 {
     Access = Internal;
-    // NPR5.54/MMV /20200129 CASE 364340 Created object
-
     EventSubscriberInstance = Manual;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         DeviceResponseMode: Option SUCCESS,FAILURE,HANDLED_ERROR;

@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6014478 "NPR MobilePayV10 CreatePOS"
+﻿codeunit 6014478 "NPR MobilePayV10 CreatePOS"
 {
     Access = Internal;
     // POST  /v10/pointofsales
@@ -116,4 +115,3 @@ codeunit 6014478 "NPR MobilePayV10 CreatePOS"
         eftTrxRequest.Modify();
     end;
 }
-#endif

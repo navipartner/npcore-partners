@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6014554 "NPR MobilePayV10 Poll Payment"
+﻿codeunit 6014554 "NPR MobilePayV10 Poll Payment"
 {
     Access = Internal;
     // GET  /v10/payments/{paymentid}
@@ -89,6 +88,12 @@ codeunit 6014554 "NPR MobilePayV10 Poll Payment"
                 paymentResult := paymentResult::RejectedByMobilePayDueToAgeRestrictions;
         end;
 
+        if jsonResponse.SelectToken('customerToken', jsonToken) then begin
+            eftTrxRequest."External Customer ID" := jsonToken.AsValue().AsText();
+            eftTrxRequest."External Customer ID Provider" := 'storebox';
+            eftTrxRequest.Modify();
+        end;
+
         if paymentResult.AsInteger() <> eftTrxRequest."Result Code" then begin
             eftTrxRequest."Result Code" := paymentResult.AsInteger();
 
@@ -120,4 +125,3 @@ codeunit 6014554 "NPR MobilePayV10 Poll Payment"
         exit('/pos/v10/payments/');
     end;
 }
-#endif

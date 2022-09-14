@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-page 6014405 "NPR MobilePayV10 Unit Setup"
+﻿page 6014405 "NPR MobilePayV10 Unit Setup"
 {
     Extensible = False;
     PageType = Card;
@@ -45,6 +44,7 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
                     Lookup = true;
                     ToolTip = 'Specifies the value of the MobilePay POS ID field';
                     ApplicationArea = NPRRetail;
+                    Editable = Rec."MobilePay POS ID" = ''; //Allow lookup from list when blank. Otherwise requires deletion via page action first.
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
@@ -117,4 +117,3 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
     var
         _eftSetup: Record "NPR EFT Setup";
 }
-#endif

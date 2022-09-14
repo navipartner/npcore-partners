@@ -15,7 +15,7 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.4');
+        exit('1.5');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -29,8 +29,6 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
         then begin
             Sender.RegisterWorkflow20(
               'let test = await workflow.respond("StartTrx");' +
-
-              'workflow.keepAlive();' +
 
               'let dialog = popup.open({' +
                   'title: "Payment",' +

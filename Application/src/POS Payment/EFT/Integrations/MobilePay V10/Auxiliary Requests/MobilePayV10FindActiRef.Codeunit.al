@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6014523 "NPR MobilePayV10 FindActi.Ref."
+﻿codeunit 6014523 "NPR MobilePayV10 FindActi.Ref."
 {
     Access = Internal;
     // GET /v10/refunds
@@ -78,4 +77,3 @@ codeunit 6014523 "NPR MobilePayV10 FindActi.Ref."
         eftTrxRequest.Modify();
     end;
 }
-#endif

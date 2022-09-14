@@ -1695,14 +1695,18 @@ codeunit 6184496 "NPR Pepper Library HWC"
     #endregion Helpers
 
     #region Subscribers
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateHwcEftDeviceRequest', '', false, false)]
-    local procedure OnCreateHwcEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var EftHwcRequest: JsonObject; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnPrepareRequestSend', '', false, false)]
+    local procedure OnCreateHwcEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject; var RequestMechanism: Enum "NPR EFT Request Mechanism"; var Workflow: Text)
+    var
+        JToken: JsonToken;
     begin
         if (not EftTransactionRequest.IsType(GetIntegrationType())) then
             exit;
-        Handled := true;
 
-        MakeHwcDeviceRequest(EftTransactionRequest, EftHwcRequest);
+        RequestMechanism := RequestMechanism::POSWorkflow;
+        MakeHwcDeviceRequest(EftTransactionRequest, Request);
+        Request.Get('WorkflowName', JToken);
+        Workflow := JToken.AsValue().AsText();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateBeginWorkshiftRequest', '', false, false)]
@@ -1834,15 +1838,17 @@ codeunit 6184496 "NPR Pepper Library HWC"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnEndOfDayCloseEft', '', false, false)]
-    local procedure OnEndOfDayCloseEft(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift; var EftWorkflowList: JsonArray)
+    local procedure OnEndOfDayCloseEft(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift; var EftWorkflows: Dictionary of [Text, JsonObject])
     var
         POSSetup: Codeunit "NPR POS Setup";
         POSSession: Codeunit "NPR POS Session";
         Sale: codeunit "NPR POS Sale";
         PosSale: Record "NPR POS Sale";
         EFTSetup: Record "NPR EFT Setup";
-        EftWorkflow, HwcRequest : JsonObject;
+        EftWorkflow, Request : JsonObject;
         EftTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
+        Mechanism: Enum "NPR EFT Request Mechanism";
+        Workflow: Text;
     begin
         if (EndOfDayType = EndOfDayType::"X-Report") then
             exit;
@@ -1859,16 +1865,12 @@ codeunit 6184496 "NPR Pepper Library HWC"
                 exit;
         end;
 
-        // It is sufficient to include "WorkflowName" only. It will cause the workflow to call its preparation stage
-        //EftWorkflow.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_PEPPER_CLOSE));
-
-        // But by including the the hwcRequest and if the workflow supports it, we can save a roundtrip
-        EftTransactionMgt.PrepareEndWorkshift(EFTSetup, PosSale, HwcRequest);
+        EftTransactionMgt.PrepareEndWorkshift(EFTSetup, PosSale, Request, Mechanism, Workflow);
         EftWorkflow.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_PEPPER_CLOSE));
         EftWorkflow.Add('showSuccessMessage', false);
         EftWorkflow.Add('hideFailureMessage', true);
-        EftWorkflow.Add('hwcRequest', HwcRequest);
-        EftWorkflowList.Add(EftWorkflow);
+        EftWorkflow.Add('request', Request);
+        EftWorkflows.Add(Workflow, EftWorkflow);
     end;
 
 
@@ -1916,6 +1918,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
         tmpEFTIntegrationType.Code := GetIntegrationType();
         tmpEFTIntegrationType.Description := StrSubstNo(EFTIntegrationTypeDescriptionLbl, 'Treibauf', 'Pepper', PepperDescription);
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR Pepper Library HWC";
+        tmpEFTIntegrationType."Version 2" := true;
         tmpEFTIntegrationType.Insert();
 
     end;

@@ -234,10 +234,19 @@ codeunit 6059860 "NPR End Of Day Worker"
         POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS, false);
     end;
 
-    procedure DiscoverEftIntegrationsForEndOfDay(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift) EftWorkflowList: JsonArray
+    procedure DiscoverEftIntegrationsForEndOfDay(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift) WorkflowsArray: JsonArray
     var
         EftInterface: Codeunit "NPR Eft Interface";
+        Workflows: Dictionary of [Text, JsonObject];
+        WorkflowName: Text;
+        WorkflowContext: JsonObject;
     begin
-        EftInterface.OnEndOfDayCloseEft(EndOfDayType, EftWorkflowList);
+        EftInterface.OnEndOfDayCloseEft(EndOfDayType, Workflows);
+        //turn the dictionary into a pure JSON array for easier parsing in workflow JS:
+        foreach WorkflowName in Workflows.Keys do begin
+            WorkflowContext := Workflows.Get(WorkflowName);
+            WorkflowContext.Add('WorkflowName', WorkflowName);
+            WorkflowsArray.Add(WorkflowContext);
+        end;
     end;
 }

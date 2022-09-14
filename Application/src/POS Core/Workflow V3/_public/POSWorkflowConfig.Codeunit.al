@@ -151,12 +151,12 @@ codeunit 6059786 "NPR POS Workflow Config"
         end;
 
         ValueToHash.Append('<js>' + _Javascript + '</js>');
-        ValueToHash.Append('<unattended>' + format(_Unattended) + '</unattended>');
-        ValueToHash.Append('<boundtodatasource>' + format(_BoundToDataSource) + '</boundtodatasource>');
+        ValueToHash.Append('<unattended>' + format(_Unattended, 0, 9) + '</unattended>');
+        ValueToHash.Append('<boundtodatasource>' + format(_BoundToDataSource, 0, 9) + '</boundtodatasource>');
         ValueToHash.Append('<datasourcename>' + _DataSourceName + '</datasourcename>');
         ValueToHash.Append('<customJSmethod>' + _CustomJSMethod + '</customJSmethod>');
         ValueToHash.Append('<customJScode>' + _CustomJSCode + '</customJScode>');
-        ValueToHash.Append('<nonblockingui>' + Format(_NonBlockingUI) + '</nonblockingui>');
+        ValueToHash.Append('<nonblockingui>' + Format(_NonBlockingUI, 0, 9) + '</nonblockingui>');
 
         Exit(CryptographyManagement.GenerateHash(ValueToHash.ToText(), HashAlgorithmType::MD5));
     end;

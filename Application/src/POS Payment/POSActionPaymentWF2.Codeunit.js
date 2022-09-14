@@ -1,7 +1,7 @@
 /*
     POSActionPaymentWF2.Codeunit.js
 */
-let main = async ({ workflow, popup, scope, parameters}) => {
+let main = async ({ workflow, popup, scope, parameters, context }) => {
 
     const {HideAmountDialog, HideZeroAmountDialog} = parameters;
     const {dispatchToWorkflow, paymentType, remainingAmount, paymentDescription, amountPrompt} = await workflow.respond("preparePaymentWorkflow");
@@ -14,7 +14,11 @@ let main = async ({ workflow, popup, scope, parameters}) => {
 
     let paymentResult = await workflow.run(dispatchToWorkflow, { context: {paymentType: paymentType, suggestedAmount: suggestedAmount}});
     
-    if (paymentResult.version == 1) await workflow.respond("doLegacyPaymentWorkflow");
-    if (paymentResult.version >= 2 && paymentResult.endSale) await workflow.respond("tryEndSale");
+    if (paymentResult.legacy) {
+        context.fallbackAmount = suggestedAmount;
+        await workflow.respond("doLegacyPaymentWorkflow");
+    } else if (paymentResult.tryEndSale) {
+        await workflow.respond("tryEndSale");
+    }
 };
 

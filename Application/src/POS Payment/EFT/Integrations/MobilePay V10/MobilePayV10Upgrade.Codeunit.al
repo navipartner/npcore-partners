@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6014565 "NPR MobilePayV10 Upgrade"
+﻿codeunit 6014565 "NPR MobilePayV10 Upgrade"
 {
     Access = Internal;
     // Subtype = Upgrade;
@@ -436,4 +435,3 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         TempOldEFTTypePaymentGenParam: Record "NPR EFT Type Pay. Gen. Param." temporary;
         MerchantVatNoEvalFormulaTok: Label '%1%2', Locked = true;
 }
-#endif
