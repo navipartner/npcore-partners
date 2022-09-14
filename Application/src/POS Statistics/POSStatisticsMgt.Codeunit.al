@@ -33,17 +33,17 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         POSCurrentStatsBuffer."POS Unit No." := POSSale."Register No.";
 
         repeat
-            POSCurrentStatsBuffer."Sales Amount" += POSSaleLine.Amount;
-            POSCurrentStatsBuffer."Cost Amount" += GetCostAmount(POSSaleLine);
-            POSCurrentStatsBuffer."Discount Amount" += POSSaleLine."Discount Amount";
-            POSCurrentStatsBuffer."Tax Amount" += POSSaleLine."Amount Including VAT" - POSSaleLine.Amount;
-            POSCurrentStatsBuffer."Amount Incl. Tax" += POSSaleLine."Amount Including VAT";
-            POSCurrentStatsBuffer."Profit Amount" += POSSaleLine.Amount - GetCostAmount(POSSaleLine);
-
             if POSSaleLine.Quantity > 0 then
                 POSCurrentStatsBuffer."Sales Quantity" += POSSaleLine.Quantity
             else
                 POSCurrentStatsBuffer."Return Sales Quantity" -= POSSaleLine.Quantity;
+
+            POSCurrentStatsBuffer."Sales Amount" += POSSaleLine.Amount;
+            POSCurrentStatsBuffer."Cost Amount" += GetCostAmount(POSSaleLine) * POSCurrentStatsBuffer."Sales Quantity";
+            POSCurrentStatsBuffer."Discount Amount" += POSSaleLine."Discount Amount";
+            POSCurrentStatsBuffer."Tax Amount" += POSSaleLine."Amount Including VAT" - POSSaleLine.Amount;
+            POSCurrentStatsBuffer."Amount Incl. Tax" += POSSaleLine."Amount Including VAT";
+            POSCurrentStatsBuffer."Profit Amount" += POSSaleLine.Amount - (GetCostAmount(POSSaleLine) * POSCurrentStatsBuffer."Sales Quantity");
         until POSSaleLine.Next() = 0;
 
         POSCurrentStatsBuffer."Profit %" := CalculatePercentAmount(POSCurrentStatsBuffer."Sales Amount" - POSCurrentStatsBuffer."Cost Amount", POSCurrentStatsBuffer."Sales Amount");
