@@ -46,6 +46,8 @@ codeunit 6184484 "NPR POS Action Pepper Aux" implements "NPR IPOS Workflow"
         PepperLibrary: Codeunit "NPR Pepper Library HWC";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         AuxCommand: Integer;
+        Mechanism: Enum "NPR EFT Request Mechanism";
+        Workflow: Text;
     begin
         SaleMgr.GetCurrentSale(Sale);
 
@@ -54,7 +56,7 @@ codeunit 6184484 "NPR POS Action Pepper Aux" implements "NPR IPOS Workflow"
             AuxCommand := 0; // StrMenu
 
         PepperLibrary.GetEFTSetup(Sale."Register No.", EFTSetup);
-        EFTTransactionRequest.Get(EFTTransactionMgt.PrepareAuxOperation(EFTSetup, Sale, AuxCommand, Result));
+        EFTTransactionRequest.Get(EFTTransactionMgt.PrepareAuxOperation(EFTSetup, Sale."Register No.", Sale."Sales Ticket No.", AuxCommand, Result, Mechanism, Workflow));
     end;
 
     local procedure FinalizeRequest(Context: Codeunit "NPR POS JSON Helper") WorkflowContext: JsonObject
@@ -66,7 +68,7 @@ codeunit 6184484 "NPR POS Action Pepper Aux" implements "NPR IPOS Workflow"
         JToken: JsonToken;
     begin
         HwcResponse := Context.GetJsonObject('hwcResponse');
-        HwcRequest := Context.GetJsonObject('hwcRequest');
+        HwcRequest := Context.GetJsonObject('request');
 
         HwcRequest.Get('EntryNo', JToken);
         EftTransactionRequest.Get(JToken.AsValue().AsInteger());
@@ -78,7 +80,7 @@ codeunit 6184484 "NPR POS Action Pepper Aux" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPepperAux.Codeunit.js###
-'let main=async({workflow:i,context:o,popup:u,runtime:d,hwc:a,data:g,parameters:f,captions:r,scope:p})=>{debugger;o.hwcRequest==null&&(o.hwcRequest=await i.respond("PrepareRequest"));debugger;let l,n={Success:!1},s={Success:!1},t=u.simplePayment({showStatus:!0,title:r.workflowTitle,amount:" "});try{return l=a.registerResponseHandler(async e=>{switch(e.Type){case"AuxiliaryComplete":try{if(console.log("[Pepper] AUX Operation Complete."),t.updateStatus(r.statusFinalizing),s=await i.respond("FinalizeRequest",{hwcResponse:e}),s.hasOwnProperty("WorkflowName")){t.close(),await i.run(s.WorkflowName,{context:{hwcRequest:s}});debugger}else e.ResultCode!=10&&u.message({title:r.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"}),e.ResultCode==10&&!s.Success&&u.message({title:r.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+s.Message+"</h3></center>"}),n=e;a.unregisterResponseHandler(l)}catch(c){a.unregisterResponseHandler(l,c)}break;case"UpdateDisplay":console.log("[Pepper] Update Display. "+e.Message),t.updateStatus(e.Message);break}}),t.updateStatus(r.statusExecuting),t.enableAbort(!0),await a.invoke(o.hwcRequest.HwcName,o.hwcRequest,l),await a.waitForContextCloseAsync(l),t.close(),{success:n.Success}}catch(e){throw console.error("[Pepper] Error: ",e),t&&t.close(),e}};'
+'let main=async({workflow:i,context:o,popup:n,runtime:d,hwc:r,data:g,parameters:f,captions:a,scope:p})=>{debugger;o.request==null&&(o.request=await i.respond("PrepareRequest"));debugger;let l,u={Success:!1},s={Success:!1},t=await n.simplePayment({showStatus:!0,title:a.workflowTitle,amount:" "});try{return l=r.registerResponseHandler(async e=>{switch(e.Type){case"AuxiliaryComplete":try{console.log("[Pepper] AUX Operation Complete."),t.updateStatus(a.statusFinalizing),s=await i.respond("FinalizeRequest",{hwcResponse:e}),s.hasOwnProperty("WorkflowName")?(t&&t.close(),await i.run(s.WorkflowName,{context:{request:s}})):(e.ResultCode!=10&&n.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"}),e.ResultCode==10&&!s.Success&&n.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+s.Message+"</h3></center>"}),u=e),r.unregisterResponseHandler(l)}catch(c){r.unregisterResponseHandler(l,c)}break;case"UpdateDisplay":console.log("[Pepper] Update Display. "+e.Message),t.updateStatus(e.Message);break}}),t.updateStatus(a.statusExecuting),t.enableAbort(!0),await r.invoke("EFTPepper",o.request,l),await r.waitForContextCloseAsync(l),t&&t.close(),{success:u.Success}}catch(e){throw console.error("[Pepper] Error: ",e),t&&t.close(),e}};'
         );
     end;
 

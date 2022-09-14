@@ -5,13 +5,13 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
 {
     debugger;
 
-    if (context.hwcRequest == null) {
-        ({hwcRequest: context.hwcRequest} = await workflow.respond ("PrepareCloseRequest"));
+    if (context.request == null) {
+        ({request: context.request } = await workflow.respond("PrepareCloseRequest"));
         debugger;
     }
     debugger;
 
-    let _dialogRef = popup.simplePayment({
+    let _dialogRef = await popup.simplePayment({
         showStatus: true, 
         title: captions.workflowTitle,
         amount: " ",
@@ -63,13 +63,16 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
         _dialogRef.enableAbort(true);
 
         await hwc.invoke(
-            context.hwcRequest.HwcName,
-            context.hwcRequest,
+            "EFTPepper",
+            context.request,
             _contextId
         );
         
         await hwc.waitForContextCloseAsync(_contextId);
-        _dialogRef.close();
+
+        if (_dialogRef) {
+            _dialogRef.close();
+        }
 
         return({"success": _hwcResponse.Success});
     }

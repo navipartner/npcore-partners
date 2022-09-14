@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-table 6014544 "NPR MobilePayV10 Unit Setup"
+﻿table 6014544 "NPR MobilePayV10 Unit Setup"
 {
     Access = Internal;
     Caption = 'MobilePayV10 Unit Setup';
@@ -64,7 +63,6 @@ table 6014544 "NPR MobilePayV10 Unit Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'MobilePay POS ID';
-            Editable = false;
         }
     }
 
@@ -76,4 +74,3 @@ table 6014544 "NPR MobilePayV10 Unit Setup"
         }
     }
 }
-#endif

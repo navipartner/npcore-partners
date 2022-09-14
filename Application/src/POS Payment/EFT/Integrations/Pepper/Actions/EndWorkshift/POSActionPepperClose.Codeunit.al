@@ -49,21 +49,19 @@ codeunit 6184483 "NPR POS Action Pepper Close" implements "NPR IPOS Workflow"
         PepperLibrary.GetEFTSetup(POSUnit, EFTSetup);
         EFTIntegration.CreateEndWorkshiftRequest(EFTTransactionRequest, EFTSetup, POSUnit."No.", POSSale."Sales Ticket No.");
         PepperLibrary.MakeHwcDeviceRequest(EFTTransactionRequest, HwcRequest);
-        WorkflowContext.Add('hwcRequest', HwcRequest);
+        WorkflowContext.Add('request', HwcRequest);
     end;
 
     local procedure FinalizeCloseRequest(Context: Codeunit "NPR POS JSON Helper") WorkflowContext: JsonObject
     var
         EftTransactionRequest: Record "NPR EFT Transaction Request";
         PepperLibrary: Codeunit "NPR Pepper Library HWC";
-
         HwcResponse: JsonObject;
         HwcRequest: JsonObject;
         JToken: JsonToken;
-
     begin
         HwcResponse := Context.GetJsonObject('hwcResponse');
-        HwcRequest := Context.GetJsonObject('hwcRequest');
+        HwcRequest := Context.GetJsonObject('request');
 
         HwcRequest.Get('EntryNo', JToken);
         EftTransactionRequest.Get(JToken.AsValue().AsInteger());
@@ -75,7 +73,7 @@ codeunit 6184483 "NPR POS Action Pepper Close" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPepperClose.Codeunit.js###
-'let main=async({workflow:u,context:s,popup:o,runtime:g,hwc:a,data:d,parameters:f,captions:r,scope:m})=>{debugger;if(s.hwcRequest==null){({hwcRequest:s.hwcRequest}=await u.respond("PrepareCloseRequest"));debugger}debugger;let t=o.simplePayment({showStatus:!0,title:r.workflowTitle,amount:" "}),l,n={Success:!1},i={Success:!1};try{return l=a.registerResponseHandler(async e=>{switch(e.Type){case"EndWorkshiftComplete":try{console.log("[Pepper] Transaction Completed."),t.updateStatus(r.statusFinalizing),i=await u.respond("FinalizeCloseRequest",{hwcResponse:e}),e.ResultCode!=10&&(s.hideFailureMessage||o.message({title:r.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"})),e.ResultCode==10&&!i.Success&&(s.hideFailureMessage||o.message({title:r.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+i.Message+"</h3></center>"})),(s.showSuccessMessage==null&&i.Success||s.showSuccessMessage&&i.Success)&&o.message({caption:"<center><font color=green size=72>&#x2713;</font><h3>"+i.Message+"</h3></center>",title:r.workflowTitle}),n=e,a.unregisterResponseHandler(l)}catch(c){a.unregisterResponseHandler(l,c)}break;case"AbortComplete":a.unregisterResponseHandler(l);break;case"UpdateDisplay":console.log("[Pepper] Update Display. "+e.Message),t.updateStatus(e.Message);break}}),t.updateStatus(r.statusClosing),t.enableAbort(!0),await a.invoke(s.hwcRequest.HwcName,s.hwcRequest,l),await a.waitForContextCloseAsync(l),t.close(),{success:n.Success}}catch(e){return console.error("[Pepper] Error: ",e),t&&t.close(),{success:!1}}};'
-        );
+'let main=async({workflow:n,context:t,popup:o,runtime:g,hwc:r,data:d,parameters:f,captions:a,scope:p})=>{debugger;if(t.request==null){({request:t.request}=await n.respond("PrepareCloseRequest"));debugger}debugger;let s=await o.simplePayment({showStatus:!0,title:a.workflowTitle,amount:" "}),l,u={Success:!1},i={Success:!1};try{return l=r.registerResponseHandler(async e=>{switch(e.Type){case"EndWorkshiftComplete":try{console.log("[Pepper] Transaction Completed."),s.updateStatus(a.statusFinalizing),i=await n.respond("FinalizeCloseRequest",{hwcResponse:e}),e.ResultCode!=10&&(t.hideFailureMessage||o.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"})),e.ResultCode==10&&!i.Success&&(t.hideFailureMessage||o.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+i.Message+"</h3></center>"})),(t.showSuccessMessage==null&&i.Success||t.showSuccessMessage&&i.Success)&&o.message({caption:"<center><font color=green size=72>&#x2713;</font><h3>"+i.Message+"</h3></center>",title:a.workflowTitle}),u=e,r.unregisterResponseHandler(l)}catch(c){r.unregisterResponseHandler(l,c)}break;case"AbortComplete":r.unregisterResponseHandler(l);break;case"UpdateDisplay":console.log("[Pepper] Update Display. "+e.Message),s.updateStatus(e.Message);break}}),s.updateStatus(a.statusClosing),s.enableAbort(!0),await r.invoke("EFTPepper",t.request,l),await r.waitForContextCloseAsync(l),s&&s.close(),{success:u.Success}}catch(e){return console.error("[Pepper] Error: ",e),s&&s.close(),{success:!1}}};'
+        )
     end;
 }

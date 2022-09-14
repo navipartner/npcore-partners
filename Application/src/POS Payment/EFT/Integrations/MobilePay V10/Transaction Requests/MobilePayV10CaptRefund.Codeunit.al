@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6014552 "NPR MobilePayV10 Capt. Refund"
+﻿codeunit 6014552 "NPR MobilePayV10 Capt. Refund"
 {
     Access = Internal;
     // POST  /v10/refunds/{refundid}/capture
@@ -77,4 +76,3 @@ codeunit 6014552 "NPR MobilePayV10 Capt. Refund"
         eftTrxRequest.Modify();
     end;
 }
-#endif

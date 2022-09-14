@@ -1,6 +1,8 @@
 ﻿codeunit 6150725 "NPR POS Action: Payment"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Will be replaced by codeunit 6059796 "NPR POS Action: Payment WF2"';
 
     var
         ActionDescription: Label 'This is a built-in action for inserting a payment line into the current transaction';
@@ -75,6 +77,7 @@
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
+        fallbackAmount: Decimal;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -133,6 +136,13 @@
                 else                    // provide a resonable default
                     Handled := ConfigureCashWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
             end;
+        end;
+
+        fallbackAmount := JSON.GetDecimal('fallbackAmount');
+        if (fallbackAmount <> 0) then begin
+            //This workflow has been started from payment v2, as a fallback due to old EFT integration. All amount logic has already ran in WF2, so we skip amount prompt/validation here.
+            Context.SetContext('capture_amount', false);
+            Context.SetContext('amounttocapture', fallbackAmount);
         end;
 
         FrontEnd.SetActionContext(ActionCode(), Context);

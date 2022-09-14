@@ -71,6 +71,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         POSAction.Get('PAYMENT');
 
         POSAction.SetWorkflowInvocationParameterUnsafe('paymentNo', Context.GetStringParameter('paymentNo'));
+        POSAction.SetWorkflowInvocationParameterUnsafe('fallbackAmount', Context.GetString('fallbackAmount'));
         FrontEnd.InvokeWorkflow(POSAction);
 
         Response.ReadFrom('{}');
@@ -81,7 +82,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWF2.Codeunit.js###
-'let main=async({workflow:e,popup:i,scope:l,parameters:o})=>{const{HideAmountDialog:p,HideZeroAmountDialog:m}=o,{dispatchToWorkflow:s,paymentType:r,remainingAmount:t,paymentDescription:u,amountPrompt:d}=await e.respond("preparePaymentWorkflow");let n=t;if(!p&&(!m||t>0)&&(n=await i.numpad({title:u,caption:d,value:t}),n===null))return;let a=await e.run(s,{context:{paymentType:r,suggestedAmount:n}});a.version==1&&await e.respond("doLegacyPaymentWorkflow"),a.version>=2&&a.endSale&&await e.respond("tryEndSale")};'
+'let main=async({workflow:e,popup:o,scope:d,parameters:i,context:m})=>{const{HideAmountDialog:p,HideZeroAmountDialog:l}=i,{dispatchToWorkflow:s,paymentType:u,remainingAmount:a,paymentDescription:r,amountPrompt:y}=await e.respond("preparePaymentWorkflow");let t=a;if(!p&&(!l||a>0)&&(t=await o.numpad({title:r,caption:y,value:a}),t===null))return;let n=await e.run(s,{context:{paymentType:u,suggestedAmount:t}});n.legacy?(m.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):n.tryEndSale&&await e.respond("tryEndSale")};'
         );
     end;
 }

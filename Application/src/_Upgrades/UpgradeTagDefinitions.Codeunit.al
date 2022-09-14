@@ -75,6 +75,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Object Output"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MPOS QR Code"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG DE Audit Setup"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PaymentV2"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -259,6 +260,8 @@
                 Exit('RemoveDEFiskalyPOSWorkflowStep');
             Codeunit::"NPR Job Queue Upgrade":
                 Exit('NPRUpgradePriceLogTaskQue');
+            Codeunit::"NPR UPG PaymentV2":
+                Exit('NPRUPGPaymentV2-20220913');
         end;
     end;
 }

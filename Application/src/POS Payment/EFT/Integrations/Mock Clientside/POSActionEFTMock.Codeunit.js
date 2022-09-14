@@ -1,18 +1,16 @@
-let main = async ({ workflow, hwc, popup, context, captions}) => {  
-    workflow.keepAlive();
-    
-    let _dialogRef = popup.simplePayment({
+let main = async ({ workflow, hwc, popup, context, captions }) => {  
+    let _dialogRef = await popup.simplePayment({
         showStatus: true, 
         title: captions.workflowTitle,
-        amount: context.hwcRequest.CurrencyCode + " " + context.hwcRequest.SuggestedAmountUserLocal,
+        amount: context.request.CurrencyCode + " " + context.request.SuggestedAmountUserLocal,
         onAbort: async () => {
             if (await popup.confirm(captions.confirmAbort)) {
                 _dialogRef.updateStatus (captions.statusAborting);
                 await hwc.invoke(
-                    context.hwcRequest.HwcName,
+                    "EFTMock",
                     {
                         Type: "RequestCancel",
-                        EntryNo: context.hwcRequest.EntryNo,
+                        EntryNo: context.request.EntryNo,
                     },
                     _contextId,
                 );
@@ -21,7 +19,12 @@ let main = async ({ workflow, hwc, popup, context, captions}) => {
         abortValue: {completed: "Aborted"},
     });
     
-    let _contextId, _hwcResponse = {"Success": false}, _bcResponse = {"Success": false};
+    let _contextId;
+    let _hwcResponse = { "Success": false };
+    let _bcResponse = { "Success": false };
+    context.success = false;
+    context.tryEndSale = false;
+
     try {
         _contextId = hwc.registerResponseHandler(async (hwcResponse) => {
             switch (hwcResponse.Type) {
@@ -35,13 +38,13 @@ let main = async ({ workflow, hwc, popup, context, captions}) => {
                         _bcResponse = await workflow.respond ("FinalizePaymentRequest", {hwcResponse: hwcResponse});
                         
                         if (!hwcResponse.Success)
-                            popup.message ({title: captions.workflowTitle, caption: "<center><font color=red size=72>&#x274C;</font><h3>"+hwcResponse.ResultString+"</h3></center>"})
+                            throw new Error(hwcResponse.ResultString);
 
                         if (hwcResponse.Success && !_bcResponse.Success)
-                            popup.message ({title: captions.workflowTitle, caption: "<center><font color=red size=72>&#x274C;</font><h3>"+_bcResponse.Message+"</h3></center>"})
+                            throw new Error(_bcResponse.Message);
 
-                        if (context.hwcRequest.AmountIn == 704) 
-                            throw "AmountIn with value 704 forces an exception in MOCK hwc response handler.";
+                        if (context.request.AmountIn == 704) 
+                            throw new Error("AmountIn with value 704 forces an exception in MOCK hwc response handler.");
                         
                         _hwcResponse = hwcResponse;
                         hwc.unregisterResponseHandler(_contextId);
@@ -54,7 +57,7 @@ let main = async ({ workflow, hwc, popup, context, captions}) => {
                 case "UpdateDisplay":
                     console.log ("[EFT Mock] Update Display. "+hwcResponse.DisplayLine);
                     _dialogRef.updateStatus(hwcResponse.DisplayLine);
-                    if (context.hwcRequest.AmountIn == 703) 
+                    if (context.request.AmountIn == 703) 
                         throw "AmountIn with value 703 forces an exception in MOCK hwc response handler.";
                     break;
             }
@@ -64,23 +67,21 @@ let main = async ({ workflow, hwc, popup, context, captions}) => {
         _dialogRef.enableAbort(true);
 
         await hwc.invoke(
-            context.hwcRequest.HwcName,
-            context.hwcRequest,
+            "EFTMock",
+            context.request,
             _contextId
         );
-        
         await hwc.waitForContextCloseAsync(_contextId);
-        workflow.complete({"success": _hwcResponse.Success, "endSale": _bcResponse.Success});
-        _dialogRef.close();
+        context.success = _hwcResponse.Success && _bcResponse.Success;
     }
-    catch (e) {
-        console.error ("[EFT Mock] Error: ", e);
-
-        if (_dialogRef)
+    catch (exception) {
+        popup.message({ title: captions.workflowTitle, caption: "<center><font color=red size=72>&#x274C;</font><h3>" + (exception.message || "Unknown error") + "</h3></center>" })
+        throw exception;
+    }
+    finally {
+        if (_dialogRef) {
             _dialogRef.close();
-
-        workflow.complete({"success": false, "endSale": false});
-        throw e;
+        }
     }
+    return ({ "success": context.success, "tryEndSale": context.success });
 }
-

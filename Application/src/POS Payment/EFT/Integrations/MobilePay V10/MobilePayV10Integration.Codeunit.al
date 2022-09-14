@@ -4,7 +4,6 @@
    Depending on the log level, these separate request/responses are visible in the logging factbox for the original trx.
    Everything else is treated as a separate transaction request.
 */
-#if not CLOUD
 codeunit 6014518 "NPR MobilePayV10 Integration"
 {
     Access = Internal;
@@ -27,6 +26,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         tmpEFTIntegrationType.Code := Tok_INTEGRATIONTYPE;
         tmpEFTIntegrationType.Description := Lbl_DESCRIPTION;
         tmpEFTIntegrationType."Codeunit ID" := Codeunit::"NPR MobilePayV10 Integration";
+        tmpEFTIntegrationType."Version 2" := true;
         tmpEFTIntegrationType.Insert();
     end;
 
@@ -167,12 +167,17 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateLookupTransactionRequest', '', false, false)]
     local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
+    var
+        OriginalEftTrxReq: Record "NPR EFT Transaction Request";
     begin
         if not EftTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
             exit;
         Handled := true;
 
         InitRequest(EftTransactionRequest);
+        OriginalEftTrxReq.Get(EftTransactionRequest."Processed Entry No.");
+        EftTransactionRequest."Reference Number Input" := OriginalEftTrxReq."Reference Number Input";
+        EftTransactionRequest."Reference Number Output" := OriginalEftTrxReq."Reference Number Output";
         EftTransactionRequest.Insert(true);
     end;
 
@@ -187,8 +192,25 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
-    local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnPrepareRequestSend', '', false, false)]
+    local procedure OnPrepareRequestSend(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject; var RequestMechanism: Enum "NPR EFT Request Mechanism"; var Workflow: Text)
+    var
+        EFTMobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
+    begin
+        if not EftTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
+            exit;
+
+        if (EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::PAYMENT, EftTransactionRequest."Processing Type"::REFUND]) then begin
+            RequestMechanism := RequestMechanism::POSWorkflow;
+            Workflow := Format(Enum::"NPR POS Workflow"::EFT_MOBILEPAY);
+            EFTMobilePayProtocol.CreateRequestJSON(EftTransactionRequest, Request);
+        end else begin
+            RequestMechanism := RequestMechanism::Synchronous;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendRequestSynchronously', '', false, false)]
+    local procedure OnSendRequestSynchronously(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         EFTMobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
@@ -197,6 +219,8 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         Handled := true;
 
         EFTMobilePayProtocol.SendTrxRequest(EftTransactionRequest);
+        EftTransactionRequest.Find('=');
+        HandleProtocolResponse(EftTransactionRequest);
     end;
 
     local procedure InitRequest(var eftTrxRequest: Record "NPR EFT Transaction Request")
@@ -240,7 +264,6 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
             MobilePayUnitSetupOut.Insert();
         end;
     end;
-
     internal procedure HandleProtocolResponse(var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
         eftInterface: Codeunit "NPR EFT Interface";
@@ -274,7 +297,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     begin
         eftFramework.CreateAuxRequest(eftTrxRequest, eftSetup, mobilePayAuxRequest::CreatePOSRequest.AsInteger(), eftSetup."POS Unit No.", '');
         Commit();
-        eftFramework.SendRequest(eftTrxRequest);
+        eftFramework.SendSynchronousRequest(eftTrxRequest);
         Commit();
         eftTrxRequest.Find();
         if eftTrxRequest.Successful then
@@ -289,7 +312,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     begin
         eftFramework.CreateAuxRequest(eftTrxRequest, eftSetup, mobilePayAuxRequest::DeletePOSRequest.AsInteger(), eftSetup."POS Unit No.", '');
         Commit();
-        eftFramework.SendRequest(eftTrxRequest);
+        eftFramework.SendSynchronousRequest(eftTrxRequest);
         Commit();
         eftTrxRequest.Find();
         if eftTrxRequest.Successful then begin
@@ -421,28 +444,4 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
             EFTInterface.OnDiscoverIntegrations(tmpEFTIntegrationType);
         end;
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnBeforePauseFrontEnd', '', false, false)]
-    local procedure OnBeforePauseFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
-    begin
-        if not EFTTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
-            exit;
-
-        Skip := not (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND])
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnBeforeResumeFrontEnd', '', false, false)]
-    local procedure OnBeforeResumeFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
-    var
-        POSSession: Codeunit "NPR POS Session";
-    begin
-        if not EFTTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
-            exit;
-        if not POSSession.GetSession(POSSession, false) then
-            exit;
-
-        Skip := not (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND])
-    end;
-
 }
-#endif

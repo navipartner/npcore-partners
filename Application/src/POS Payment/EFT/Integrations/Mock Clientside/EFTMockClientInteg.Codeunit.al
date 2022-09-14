@@ -40,6 +40,7 @@
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := Description;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT Mock Client Integ.";
+        tmpEFTIntegrationType."Version 2" := true;
         tmpEFTIntegrationType.Insert();
     end;
 
@@ -77,10 +78,8 @@
         GetVirtualCOM(EFTSetup);
         GetPOSUnitBlob1(EFTSetup, Blob1);
         GetPOSUnitBlob2(EFTSetup, Blob2);
-#if not CLOUD
         //Show the generic parameter page.
         EFTSetup.ShowEftPOSUnitParameters();
-#endif
     end;
 
 
@@ -203,7 +202,6 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateGiftCardLoadRequest', '', false, false)]
     local procedure OnCreateGiftCardLoadRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
-
         if (not EftTransactionRequest.IsType(IntegrationType())) then
             exit;
         Handled := true;
@@ -214,7 +212,6 @@
         EftTransactionRequest."Auto Voidable" := true;
         EftTransactionRequest."Manual Voidable" := true;
         EftTransactionRequest.Insert(true);
-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterFinancialCommit', '', false, false)]
@@ -227,25 +224,36 @@
         EftTransactionRequest.PrintReceipts(false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateHwcEftDeviceRequest', '', false, false)]
-    local procedure OnCreateHwcEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; EftHwcRequest: JsonObject; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnPrepareRequestSend', '', false, false)]
+    local procedure OnCreateHwcEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject; var RequestMechanism: Enum "NPR EFT Request Mechanism"; var Workflow: Text)
     var
         EFTMockClientProtocol: Codeunit "NPR EFT Mock Client Prot.";
     begin
         if (not EftTransactionRequest.IsType(IntegrationType())) then
             exit;
-        Handled := true;
-
-        EFTMockClientProtocol.CreateHwcEftDeviceRequest(EftTransactionRequest, EftHwcRequest);
+        RequestMechanism := RequestMechanism::POSWorkflow;
+        EFTMockClientProtocol.CreateHwcEftDeviceRequest(EftTransactionRequest, Request, Workflow);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnQueueCloseBeforeRegisterBalance', '', false, false)]
-    local procedure OnQueueCloseBeforeRegisterBalance(POSSession: Codeunit "NPR POS Session"; var tmpEFTSetup: Record "NPR EFT Setup" temporary)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnEndOfDayCloseEft', '', false, false)]
+    local procedure OnQueueCloseBeforeRegisterBalance(EndOfDayType: Option; var EftWorkflows: Dictionary of [Text, JsonObject])
     var
         POSSetup: Codeunit "NPR POS Setup";
+        POSSession: Codeunit "NPR POS Session";
+        Sale: codeunit "NPR POS Sale";
+        PosSale: Record "NPR POS Sale";
         EFTSetup: Record "NPR EFT Setup";
+        Request: JsonObject;
+        EftTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
+        Mechanism: Enum "NPR EFT Request Mechanism";
+        Workflow: Text;
     begin
+        if not (EndOfDayType = 1) then
+            exit;
+
         POSSession.GetSetup(POSSetup);
+        POSSession.GetSale(Sale);
+        Sale.GetCurrentSale(PosSale);
 
         EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", IntegrationType());
@@ -255,8 +263,8 @@
                 exit;
         end;
 
-        tmpEFTSetup := EFTSetup;
-        tmpEFTSetup.Insert();
+        EftTransactionMgt.PrepareEndWorkshift(EFTSetup, PosSale, Request, Mechanism, Workflow);
+        EftWorkflows.Add(Workflow, Request);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR EFTType Paym. BLOB Param.", 'OnGetParameterNameCaption', '', false, false)]

@@ -5,7 +5,7 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
     
     let _dialogRef, _contextId, _hwcResponse = { "Success": false }, _bcResponse = { "Success": false };
 
-    _dialogRef = popup.simplePayment({
+    _dialogRef = await popup.simplePayment({
         showStatus: true,
         title: captions.workflowTitle,
         amount: " ",
@@ -21,10 +21,10 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
         _contextId = hwc.registerResponseHandler(async (hwcResponse) => {
             switch (hwcResponse.Type) {
                 case "DownloadFileRequest":
-                    ({hwcRequest: context.hwcRequest} = await workflow.respond('DownloadToClient', { hwcResponse: hwcResponse }));
+                    ({ request: context.request } = await workflow.respond('DownloadToClient', { hwcResponse: hwcResponse }));
                     await hwc.invoke(
-                        context.hwcRequest.HwcName,
-                        context.hwcRequest,
+                        "EFTPepper",
+                        context.request,
                         _contextId
                     );
                     break;
@@ -37,10 +37,10 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
 
                     if (hwcResponse.ResultCode == 10) {
                         popup.message({ caption: "<center><font color=green size=72>&#x2713;</font><h3>" + hwcResponse.ResultString + "</h3></center>", title: captions.workflowTitle, });
-                        context.hwcRequest.Operation = "HWCRestartConnector";
+                        context.request.Operation = "HWCRestartConnector";
                         await hwc.invoke(
-                            context.hwcRequest.HwcName,
-                            context.hwcRequest,
+                            "EFTPepper",
+                            context.request,
                             _contextId
                         );
                     }
@@ -56,17 +56,20 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
 
         _dialogRef.updateStatus(captions.prepareInstall);
         _dialogRef.enableAbort(true);
-        ({hwcRequest: context.hwcRequest} = await workflow.respond('PrepareRequest'));
+        ({ request: context.request } = await workflow.respond('PrepareRequest'));
         
         debugger;
         await hwc.invoke(
-            context.hwcRequest.HwcName,
-            context.hwcRequest,
+            "EFTPepper",
+            context.request,
             _contextId
         );
 
         await hwc.waitForContextCloseAsync(_contextId);
-        _dialogRef.close();
+
+        if (_dialogRef) {
+            _dialogRef.close();
+        }
         
     } catch (e) {
         console.error("[Pepper] Install Error: ", e);

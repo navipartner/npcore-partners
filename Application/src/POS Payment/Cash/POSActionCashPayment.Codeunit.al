@@ -38,8 +38,7 @@ codeunit 6059793 "NPR POS Action: Cash Payment" implements "NPR POS IPaymentWFHa
 
         Response.ReadFrom('{}');
         Response.Add('success', CapturePayment(SalePOS, POSPaymentLine, POSPayment, POSPaymentMethod, AmountToCapture));
-        Response.Add('endSale', true);
-        Response.Add('version', 3);
+        Response.Add('tryEndSale', true);
         exit(Response);
     end;
 

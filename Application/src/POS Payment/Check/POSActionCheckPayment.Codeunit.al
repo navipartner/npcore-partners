@@ -33,7 +33,7 @@ codeunit 6059791 "NPR POS Action Check Payment" implements "NPR IPOS Workflow"
 
         Result.Add('to', Context.ToString());
         Result.Add('do', PaymentLineMgr.GetNextLineNo());
-        Result.Add('endSale', true);
+        Result.Add('tryEndSale', true);
         Result.Add('success', true);
     end;
 

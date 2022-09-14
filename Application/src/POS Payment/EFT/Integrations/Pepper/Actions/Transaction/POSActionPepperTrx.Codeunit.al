@@ -1,8 +1,6 @@
 codeunit 6184482 "NPR POS Action Pepper Trx" implements "NPR IPOS Workflow"
 {
-
     Access = Internal;
-
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'Pepper EFT Transaction';
@@ -28,9 +26,9 @@ codeunit 6184482 "NPR POS Action Pepper Trx" implements "NPR IPOS Workflow"
         case Step of
             'FinalizeTransactionRequest':
                 FrontEnd.WorkflowResponse(FinalizeTransactionRequest(Context));
+
             'FinalizeAbortRequest':
                 FrontEnd.WorkflowResponse(FinalizeAbortRequest());
-
         end;
     end;
 
@@ -38,21 +36,20 @@ codeunit 6184482 "NPR POS Action Pepper Trx" implements "NPR IPOS Workflow"
     var
         EftTransactionRequest: Record "NPR EFT Transaction Request";
         PepperLibrary: Codeunit "NPR Pepper Library HWC";
-        EftFramework: Codeunit "NPR EFT Framework Mgt.";
-
+        EftInterface: Codeunit "NPR EFT Interface";
         HwcResponse: JsonObject;
         HwcRequest: JsonObject;
         JToken: JsonToken;
     begin
         HwcResponse := Context.GetJsonObject('hwcResponse');
-        HwcRequest := Context.GetJsonObject('hwcRequest');
+        HwcRequest := Context.GetJsonObject('request');
 
         HwcRequest.Get('EntryNo', JToken);
         EftTransactionRequest.Get(JToken.AsValue().AsInteger());
         PepperLibrary.TrxResponse(EftTransactionRequest, HwcResponse, WorkflowContext);
 
         if (EftTransactionRequest."Result Code" <> -999) then
-            EftFramework.EftIntegrationResponseReceived(EftTransactionRequest);
+            EftInterface.EftIntegrationResponse(EftTransactionRequest);
     end;
 
     local procedure FinalizeAbortRequest() WorkflowResponse: JsonObject
@@ -67,7 +64,7 @@ codeunit 6184482 "NPR POS Action Pepper Trx" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPepperTrx.Codeunit.js###
-'let main=async({workflow:u,context:t,popup:s,runtime:m,hwc:l,data:f,parameters:q,captions:a,scope:R})=>{debugger;if(t.hwcRequest==null){({hwcRequest:t.hwcRequest}=await u.respond("PrepareTransactionRequest"));debugger}debugger;let o=!0,c=!1,i=s.simplePayment({showStatus:!0,title:a.workflowTitle,amount:t.hwcRequest.TransactionRequest.Currency+" "+t.hwcRequest.TransactionRequest.OriginalDecimalAmount,onAbort:async()=>{await s.confirm(a.confirmAbort)&&(c=!0,i.updateStatus(a.statusAborting),t.hwcRequest.TransactionRequest.Operation="AbortTransaction",await l.invoke(t.hwcRequest.HwcName,t.hwcRequest,n))},abortValue:{completed:"Aborted"}}),n,d={Success:!1},r={Success:!1};try{return n=l.registerResponseHandler(async e=>{switch(e.Type){case"TransactionComplete":try{if(c)return;o=!1,console.log("[Pepper] Transaction Completed."),i.updateStatus(a.statusFinalizing),r=await u.respond("FinalizeTransactionRequest",{hwcResponse:e}),d=e;debugger;if(r.hasOwnProperty("WorkflowName")){i.close(),await u.run(r.WorkflowName,{context:{hwcRequest:r}});debugger}else e.ResultCode<=0&&(console.warn("Got a negative response code from Pepper: "+e.ResultCode),s.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"})),e.ResultCode>0&&!r.Success&&(console.warn("Got a negative response code from BC on finalizing transaction: "+r.Message),s.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+r.Message+"</h3></center>"})),e.ResultCode==30&&t.hwcRequest.TransactionRequest.TrxType==0&&(console.info("Transaction was recovered OK."),s.message({title:a.workflowTitle,caption:"<center><font color=green size=72>&#x2713;</font><h3>Transaction was recovered OK.</h3></center>"}),r.Success=!1);t.hwcRequest.TransactionRequest.Operation="CommitTransaction",l.invoke(t.hwcRequest.HwcName,t.hwcRequest,n),i.updateStatus(a.statusCommitting)}catch(g){l.unregisterResponseHandler(n,g)}break;case"CommitComplete":l.unregisterResponseHandler(n);break;case"AbortComplete":o&&(r=await u.respond("FinalizeAbortRequest",{hwcResponse:e}),!e.ResultCode==10&&s.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"}),e.ResultCode==10&&s.message({caption:"<center><font color=green size=72>&#10003;</font><h3>"+r.Message+"</h3></center>",title:a.workflowTitle}),l.unregisterResponseHandler(n));break;case"UpdateDisplay":console.log("[Pepper] Update Display. "+e.Message),i.updateStatus(e.Message);break;case"TellerRequest":debugger;switch(e.TellerRequest.Type){case"NumPad":e.TellerRequest.NumPad.value=await s.numpad(e.TellerRequest.NumPad);break;case"StringPad":e.TellerRequest.StringPad.value=await s.stringpad(e.TellerRequest.StringPad);break;case"OptionMenu":({id:e.TellerRequest.OptionMenu.id}=await s.optionsMenu(e.TellerRequest.OptionMenu));break}t.hwcRequest.TellerResponse=e.TellerRequest,t.hwcRequest.TransactionRequest.Operation="TellerResponse";debugger;await l.invoke(t.hwcRequest.HwcName,t.hwcRequest,n);break;case"TellerRequestComplete":break}}),i.updateStatus(a.statusAuthorizing),i.enableAbort(!0),await l.invoke(t.hwcRequest.HwcName,t.hwcRequest,n),await l.waitForContextCloseAsync(n),i.close(),{success:d.Success,endSale:r.Success}}catch(e){throw console.error("[Pepper] Error: ",e),i&&i.close(),e}};'
+'let main=async({workflow:u,context:r,popup:n,runtime:f,hwc:l,data:T,parameters:m,captions:a,scope:b})=>{debugger;let c=!0,g=!1,s=await n.simplePayment({showStatus:!0,title:a.workflowTitle,amount:r.request.TransactionRequest.Currency+" "+r.request.TransactionRequest.OriginalDecimalAmount.toFixed(2),onAbort:async()=>{await n.confirm(a.confirmAbort)&&(g=!0,s.updateStatus(a.statusAborting),r.request.TransactionRequest.Operation="AbortTransaction",await l.invoke("EFTPepper",r.request,i))},abortValue:{completed:"Aborted"}}),i,d={Success:!1},t={Success:!1};try{i=l.registerResponseHandler(async e=>{try{switch(e.Type){case"TransactionComplete":try{if(g)return;c=!1,console.log("[Pepper] Transaction Completed."),s.updateStatus(a.statusFinalizing),t=await u.respond("FinalizeTransactionRequest",{hwcResponse:e}),d=e;debugger;if(t.hasOwnProperty("WorkflowName")){s&&s.close();let o=await u.run(t.WorkflowName,{context:{request:t}});d={Success:o.success},t={Success:o.endSale},l.unregisterResponseHandler(i)}else e.ResultCode<=0&&(console.warn("Got a negative response code from Pepper: "+e.ResultCode),n.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"})),e.ResultCode>0&&!t.Success&&(console.warn("Got a negative response code from BC on finalizing transaction: "+t.Message),n.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+t.Message+"</h3></center>"})),e.ResultCode==30&&r.request.TransactionRequest.TrxType==0&&(console.info("Transaction was recovered OK."),n.message({title:a.workflowTitle,caption:"<center><font color=green size=72>&#x2713;</font><h3>Transaction was recovered OK.</h3></center>"}),t.Success=!1),s.updateStatus(a.statusCommitting),r.request.TransactionRequest.Operation="CommitTransaction",l.invoke("EFTPepper",r.request,i)}catch(o){debugger;l.unregisterResponseHandler(i,o)}break;case"CommitComplete":debugger;l.unregisterResponseHandler(i);break;case"AbortComplete":debugger;c&&(t=await u.respond("FinalizeAbortRequest",{hwcResponse:e}),!e.ResultCode==10&&n.message({title:a.workflowTitle,caption:"<center><font color=red size=72>&#x274C;</font><h3>"+e.ResultString+"</h3></center>"}),e.ResultCode==10&&n.message({caption:"<center><font color=green size=72>&#10003;</font><h3>"+t.Message+"</h3></center>",title:a.workflowTitle}),l.unregisterResponseHandler(i));break;case"UpdateDisplay":console.log("[Pepper] Update Display. "+e.Message),s.updateStatus(e.Message);break;case"TellerRequest":debugger;switch(e.TellerRequest.Type){case"NumPad":e.TellerRequest.NumPad.value=await n.numpad(e.TellerRequest.NumPad);break;case"StringPad":e.TellerRequest.StringPad.value=await n.stringpad(e.TellerRequest.StringPad);break;case"OptionMenu":({id:e.TellerRequest.OptionMenu.id}=await n.optionsMenu(e.TellerRequest.OptionMenu));break}r.request.TellerResponse=e.TellerRequest,r.request.TransactionRequest.Operation="TellerResponse";debugger;await l.invoke("EFTPepper",r.request,i);break;case"TellerRequestComplete":break}}catch(o){console.error("[Pepper] Error in HWC handler ["+i+"] exception: "+o.toString())}}),s.updateStatus(a.statusAuthorizing),s.enableAbort(!0);debugger;return await l.invoke("EFTPepper",r.request,i),await l.waitForContextCloseAsync(i),s.close(),{success:d.Success,tryEndSale:t.Success}}catch(e){throw console.error("[Pepper] Error: ",e.toString()),s&&s.close(),e}};'
         );
     end;
 }

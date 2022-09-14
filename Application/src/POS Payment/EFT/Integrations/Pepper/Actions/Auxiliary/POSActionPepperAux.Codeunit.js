@@ -4,12 +4,12 @@
 let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, captions, scope}) => 
 {
     debugger;
-    if (context.hwcRequest == null) 
-        (context.hwcRequest = await workflow.respond ("PrepareRequest"));
+    if (context.request == null)
+        (context.request = await workflow.respond("PrepareRequest"));
     
     debugger;  
     let _contextId, _hwcResponse = {"Success": false}, _bcResponse = {"Success": false};
-    let _dialogRef = popup.simplePayment({
+    let _dialogRef = await popup.simplePayment({
         showStatus: true, 
         title: captions.workflowTitle,
         amount: " ",
@@ -27,9 +27,10 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
                         
                         if (_bcResponse.hasOwnProperty('WorkflowName')) {
                             
-                            _dialogRef.close();
-                            await workflow.run(_bcResponse.WorkflowName, {context: {hwcRequest: _bcResponse}});
-                            debugger;
+                            if (_dialogRef) {
+                                _dialogRef.close();
+                            }
+                            await workflow.run(_bcResponse.WorkflowName, { context: { request: _bcResponse } });                            
 
                         } else {
                             if (hwcResponse.ResultCode != 10)
@@ -58,13 +59,16 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
         _dialogRef.enableAbort(true);
 
         await hwc.invoke(
-            context.hwcRequest.HwcName,
-            context.hwcRequest,
+            "EFTPepper",
+            context.request,
             _contextId
         );
         
         await hwc.waitForContextCloseAsync(_contextId);        
-        _dialogRef.close();
+
+        if (_dialogRef) {
+            _dialogRef.close();
+        }
 
         return({"success": _hwcResponse.Success});
     }

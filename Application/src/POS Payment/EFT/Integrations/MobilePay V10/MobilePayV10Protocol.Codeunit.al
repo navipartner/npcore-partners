@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6014519 "NPR MobilePayV10 Protocol"
+﻿codeunit 6014519 "NPR MobilePayV10 Protocol"
 {
     Access = Internal;
 
@@ -11,9 +10,9 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         CANCELED_BY_USER_Err: Label 'Action canceled by user.';
 
         MobilePayResponseExpectedButEmptyErr: Label 'This is a programming bug!!!\MobilePay response content expected but empty.\Can''t read any JSON response content.';
-        IsRunningOutOfPosSession: Boolean;
         MobilePayJobQueueCategoryCode_Lbl: Label 'MOBILEPAY', Locked = true;
         MobilePayJobQueueCategoryDescription_Lbl: Label 'MOBILEPAY Tasks';
+
 
     internal procedure SendTrxRequest(EftTrxRequest: record "NPR EFT Transaction Request")
     var
@@ -23,16 +22,16 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         mobilePayCorrelation.GenerateNewID(); //For mobilepays backend to correlate create, polling, capture/cancel requests.
 
         case eftTrxRequest."Processing Type" of
-            eftTrxRequest."Processing Type"::PAYMENT:
-                StartPaymentTransaction(EftTrxRequest, false); //Via async dialog that polls trx result.
+            eftTrxRequest."Processing Type"::PAYMENT: //Invoked from workflow, with JS dialog that polls NST periodically
+                StartPaymentTransaction(EftTrxRequest, false);
 
-            EftTrxRequest."Processing Type"::REFUND:
-                StartRefundTransaction(EftTrxRequest); //Via async dialog that polls trx result.
+            EftTrxRequest."Processing Type"::REFUND: //Invoked from workflow, with JS dialog that polls NST periodically
+                StartRefundTransaction(EftTrxRequest);
 
-            EftTrxRequest."Processing Type"::LOOK_UP:
-                LookupTransaction(EftTrxRequest); //Via blocking ws invoke
+            EftTrxRequest."Processing Type"::LOOK_UP: //Via blocking ws invoke
+                LookupTransaction(EftTrxRequest);
 
-            EftTrxRequest."Processing Type"::AUXILIARY:
+            EftTrxRequest."Processing Type"::AUXILIARY: //Via blocking ws invoke
                 case EftTrxRequest."Auxiliary Operation ID" of
                     mobilePayAuxRequestType::AuthTokenRequest.AsInteger():
                         GetAuthToken(EftTrxRequest);
@@ -53,15 +52,8 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         eftSetup: Record "NPR EFT Setup";
         mobilePayStartPaymentRequest: Codeunit "NPR MobilePayV10 Start Payment";
         success: Boolean;
-        mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
-        mobilePayDialog: Codeunit "NPR MobilePayV10 Dialog";
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        rejected: Boolean;
     begin
-        if (not IsRunningOutOfPosSession) then begin
-            POSSession.GetSession(POSSession, true);
-            POSSession.GetFrontEnd(POSFrontEnd, true);
-        end;
         eftSetup.FindSetup(EftTrxRequest."Register No.", EftTrxRequest."Original POS Payment Type Code");
 
         success := mobilePayStartPaymentRequest.Run(EftTrxRequest);
@@ -80,18 +72,16 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
 
                 end;
                 if mobilePayStartPaymentRequest.GetResponseHttpCode() <> 200 then begin
-                    EftTrxRequest."External Result Known" := true; //We got an API response other than 200 - this means no trx was ever started.
+                    rejected := true; //We got an API response other than 200 - this means no trx was ever started.                    
                 end;
             end;
 
             HandleError(EftTrxRequest, GetLastErrorText);
+            if rejected then begin
+                EftTrxRequest."External Result Known" := true;
+                EftTrxRequest."Result Code" := Enum::"NPR MobilePayV10 Result Code"::CancelledByMobilePay.AsInteger();
+            end;
             EftTrxRequest.Modify();
-            mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
-            exit;
-        end;
-
-        if (not IsRunningOutOfPosSession) then begin
-            mobilePayDialog.Initialize(POSFrontEnd, EftTrxRequest);
         end;
     end;
 
@@ -100,15 +90,8 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         eftSetup: Record "NPR EFT Setup";
         mobilePayStartRefundRequest: Codeunit "NPR MobilePayV10 Start Refund";
         success: Boolean;
-        mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
-        mobilePayDialog: Codeunit "NPR MobilePayV10 Dialog";
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        rejected: Boolean;
     begin
-        if (not IsRunningOutOfPosSession) then begin
-            POSSession.GetSession(POSSession, true);
-            POSSession.GetFrontEnd(POSFrontEnd, true);
-        end;
         eftSetup.FindSetup(EftTrxRequest."Register No.", EftTrxRequest."Original POS Payment Type Code");
 
         success := mobilePayStartRefundRequest.Run(EftTrxRequest);
@@ -122,27 +105,22 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     TryCancelActiveTrx(eftSetup);
                 end;
                 if mobilePayStartRefundRequest.GetResponseHttpCode() <> 200 then begin
-                    EftTrxRequest."External Result Known" := true; //We got an API response other than 200 - this means no trx was ever started.
+                    rejected := true;
                 end;
             end;
 
             HandleError(EftTrxRequest, GetLastErrorText);
+            if rejected then begin
+                EftTrxRequest."External Result Known" := true;
+                EftTrxRequest."Result Code" := Enum::"NPR MobilePayV10 Result Code"::CancelledByMobilePay.AsInteger();
+            end;
             EftTrxRequest.Modify();
-            mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
-            exit;
-        end;
-
-        if (not IsRunningOutOfPosSession) then begin
-            mobilePayDialog.Initialize(POSFrontEnd, EftTrxRequest);
         end;
     end;
 
     local procedure LookupTransaction(EftTrxRequest: Record "NPR EFT Transaction Request")
     var
         eftSetup: Record "NPR EFT Setup";
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
     begin
         eftSetup.FindSetup(EftTrxRequest."Register No.", EftTrxRequest."Original POS Payment Type Code");
 
@@ -155,11 +133,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             if not FindTrx(EftTrxRequest, eftSetup, false, true) then begin
                 HandleError(EftTrxRequest, GetLastErrorText);
                 EftTrxRequest.Modify();
-
-                if POSSession.IsActiveSession(POSFrontEnd) then begin
-                    mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
-                end;
-
                 exit;
             end;
             Commit();
@@ -168,11 +141,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         if not PollTrxStatus(EftTrxRequest, eftSetup) then begin
             HandleError(EftTrxRequest, GetLastErrorText);
             EftTrxRequest.Modify();
-
-            if POSSession.IsActiveSession(POSFrontEnd) then begin
-                mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
-            end;
-
             exit;
         end;
         Commit();
@@ -193,12 +161,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             EftTrxRequest.Modify();
             Commit();
         end;
-
-        //mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);     // TODO: Causing problems when running CancelDead process (inside no POSSession!!!)
-
-        if POSSession.IsActiveSession(POSFrontEnd) then begin
-            mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
-        end;
     end;
 
     local procedure GetAuthToken(EftTrxRequest: Record "NPR EFT Transaction Request")
@@ -206,7 +168,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         eftSetup: Record "NPR EFT Setup";
         mobilePayAuthRequest: Codeunit "NPR MobilePayV10 Auth";
         success: Boolean;
-        mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
     begin
         eftSetup.FindSetup(EftTrxRequest."Register No.", EftTrxRequest."Original POS Payment Type Code");
 
@@ -224,7 +185,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         end;
 
         WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to get auth token', mobilePayAuthRequest.GetRequestResponse(), true);
-        mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
     end;
 
     internal procedure CreatePOSInBackend(EftTrxRequest: Record "NPR EFT Transaction Request")
@@ -232,7 +192,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         eftSetup: Record "NPR EFT Setup";
         mobilePayCreatePOSRequest: Codeunit "NPR MobilePayV10 CreatePOS";
         success: Boolean;
-        mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
     begin
         eftSetup.FindSetup(EftTrxRequest."Register No.", EftTrxRequest."Original POS Payment Type Code");
 
@@ -245,7 +204,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         end;
 
         WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayCreatePOSRequest.GetRequestResponse(), true);
-        mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
     end;
 
     internal procedure DeletePOSInBackend(EftTrxRequest: Record "NPR EFT Transaction Request")
@@ -253,7 +211,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         eftSetup: Record "NPR EFT Setup";
         mobilePayDeletePOSRequest: Codeunit "NPR MobilePayV10 Delete POS";
         success: Boolean;
-        mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
     begin
         eftSetup.FindSetup(EftTrxRequest."Register No.", EftTrxRequest."Original POS Payment Type Code");
 
@@ -266,7 +223,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         end;
 
         WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayDeletePOSRequest.GetRequestResponse(), true);
-        mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
     end;
 
     local procedure FindActivePayment(eftTrxRequest: Record "NPR EFT Transaction Request")
@@ -274,7 +230,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         eftSetup: Record "NPR EFT Setup";
         mobilePayFindActivePayment: Codeunit "NPR MobilePayV10 FindActi.Pay.";
         success: Boolean;
-        mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
     begin
         eftSetup.FindSetup(EftTrxRequest."Register No.", EftTrxRequest."Original POS Payment Type Code");
 
@@ -292,7 +247,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         end;
 
         WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayFindActivePayment.GetRequestResponse(), true);
-        mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
     end;
 
     local procedure FindActiveRefund(eftTrxRequest: Record "NPR EFT Transaction Request")
@@ -300,7 +254,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         eftSetup: Record "NPR EFT Setup";
         mobilePayFindActiveRefund: Codeunit "NPR MobilePayV10 FindActi.Ref.";
         success: Boolean;
-        mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
     begin
         eftSetup.FindSetup(EftTrxRequest."Register No.", EftTrxRequest."Original POS Payment Type Code");
 
@@ -313,7 +266,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         end;
 
         WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayFindActiveRefund.GetRequestResponse(), true);
-        mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
     end;
 
     internal procedure GetURL(eftSetup: Record "NPR EFT Setup"; AllowUrlSwitching: Boolean): Text;
@@ -341,6 +293,13 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
     internal procedure GetURL(eftSetup: Record "NPR EFT Setup"): Text;
     begin
         exit(GetURL(eftSetup, true));
+    end;
+
+    procedure CreateRequestJSON(EftTrxRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject)
+    begin
+        Request.Add('qr', GetQRBeaconId(EftTrxRequest));
+        Request.Add('formattedAmount', Format(EftTrxRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
+        Request.Add('transactionCaption', Format(EftTrxRequest."Processing Type"));
     end;
 
     internal procedure PollTrxStatus(var eftTrxRequest: Record "NPR EFT Transaction Request"; eftSetup: Record "NPR EFT Setup"): Boolean
@@ -443,16 +402,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         Exit(success);
     end;
 
-    internal procedure ForceAbort(EFTTransactionRequest: Record "NPR EFT Transaction Request")
-    var
-        mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
-    begin
-        EFTTransactionRequest."Force Closed" := true;
-        EFTTransactionRequest.Modify();
-
-        mobilePayIntegration.HandleProtocolResponse(EFTTransactionRequest);
-    end;
-
     internal procedure GetQRBeaconId(eftTrxRequest: Record "NPR EFT Transaction Request"): Text
     var
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
@@ -464,7 +413,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
 
     internal procedure GetClientVersion(): Text
     begin
-        exit('1.1.0');
+        exit('1.2.0');
     end;
 
     internal procedure WriteLogEntry(EFTSetup: Record "NPR EFT Setup"; IsError: Boolean; EntryNo: Integer; Description: Text; LogContents: Text; CommitChanges: Boolean)
@@ -502,7 +451,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
 
         eftFramework.CreateAuxRequest(eftTrxRequest, EFTSetup, mobilePayAuxRequest::AuthTokenRequest.AsInteger(), EFTSetup."POS Unit No.", '');
         Commit();
-        eftFramework.SendRequest(eftTrxRequest);
+        eftFramework.SendSynchronousRequest(eftTrxRequest);
         Commit();
 
         if mobilePayToken.TryGetToken(token) then
@@ -557,6 +506,8 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
     begin
         if jsonResponse.ReadFrom(response) then begin
             if jsonResponse.SelectToken('code', jsonToken) then begin
+                if jsonToken.AsValue().AsText() = '' then //has been observed to be empty string instead of integer in certain error scenarios
+                    exit(false);
                 exit(jsonToken.AsValue().AsInteger() = 1301); //Is the error for currently active transaction preventing a new one from starting.
             end;
         end;
@@ -570,11 +521,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         EFTTransactionRequest."Result Amount" := 0;
         EFTTransactionRequest."NST Error" := CopyStr(ErrorText, 1, MaxStrLen(EFTTransactionRequest."NST Error"));
         EFTTransactionRequest."Result Display Text" := CopyStr(ErrorText, 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
-    end;
-
-    internal procedure SetRunningOutOfPosSession(RunningOutOfPosSession: Boolean)
-    begin
-        IsRunningOutOfPosSession := RunningOutOfPosSession
     end;
 
     [NonDebuggable]
@@ -896,7 +842,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
     begin
         eftFramework.CreateAuxRequest(eftTrxRequest, eftSetup, mobilePayAuxRequest::FindActivePayment.AsInteger(), eftSetup."POS Unit No.", '');
         Commit();
-        eftFramework.SendRequest(eftTrxRequest);
+        eftFramework.SendSynchronousRequest(eftTrxRequest);
         Commit();
         eftTrxRequest.Find();
 
@@ -910,7 +856,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
 
         eftFramework.CreateAuxRequest(eftTrxRequest, eftSetup, mobilePayAuxRequest::FindActiveRefund.AsInteger(), eftSetup."POS Unit No.", '');
         Commit();
-        eftFramework.SendRequest(eftTrxRequest);
+        eftFramework.SendSynchronousRequest(eftTrxRequest);
         Commit();
         eftTrxRequest.Find();
 
@@ -929,4 +875,3 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
     begin
     end;
 }
-#endif

@@ -80,7 +80,7 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
         Result.ReadFrom('{}');
         Success := PayInPayOutMgr.CreatePayInOutPayment(SaleLine, Context.GetIntegerParameter('PayOption'), Context.GetString('accountNumber'), Context.GetString('description'), Context.GetDecimal('amount'), Context.GetString('reasonCode'));
 
-        Result.Add('endSale', false);
+        Result.Add('tryEndSale', false);
         Result.Add('success', Success);
     end;
 #pragma warning restore
