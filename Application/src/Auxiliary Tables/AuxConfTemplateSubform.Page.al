@@ -1,12 +1,16 @@
-#if CLOUD
+
 page 6059859 "NPR Aux Conf. Template Subform"
 {
+    PageType = ListPart;
+    SourceTable = "Config. Template Line";
+#if not CLOUD
+    UsageCategory = None;
+#endif
+#if CLOUD
     Extensible = False;
     AutoSplitKey = true;
     Caption = 'Aux Lines';
     LinksAllowed = false;
-    PageType = ListPart;
-    SourceTable = "Config. Template Line";
 
     layout
     {
@@ -117,5 +121,5 @@ page 6059859 "NPR Aux Conf. Template Subform"
         Field.SetRange(Enabled, true);
         Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
     end;
-}
 #endif
+}

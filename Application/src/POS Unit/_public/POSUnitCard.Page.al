@@ -217,6 +217,15 @@
                 ToolTip = 'Executes the POS Unit Bins action';
                 ApplicationArea = NPRRetail;
             }
+            action("POS Unit Display")
+            {
+                Caption = 'POS Unit Display';
+                Image = Administration;
+                RunObject = Page "NPR POS Unit Display";
+
+                ToolTip = 'Set unit-specific info for the POS Display Profile.';
+                ApplicationArea = NPRRetail;
+            }
         }
     }
 }

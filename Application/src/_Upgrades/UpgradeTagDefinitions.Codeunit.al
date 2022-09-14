@@ -262,6 +262,8 @@
                 Exit('NPRUpgradePriceLogTaskQue');
             Codeunit::"NPR UPG PaymentV2":
                 Exit('NPRUPGPaymentV2-20220913');
+            Codeunit::"NPR POS Display Profile Upg.":
+                Exit('NPRPOSDisplayProfileUpg.');
         end;
     end;
 }
