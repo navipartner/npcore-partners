@@ -1,9 +1,8 @@
-﻿#if BC17 or BC18
-codeunit 6014503 "NPR Enable Item Ref. Install"
+﻿codeunit 6014503 "NPR Enable Item Ref. Install"
 {
     Access = Internal;
+#if BC17 or BC18
     Subtype = Install;
-
     trigger OnInstallAppPerCompany()
     begin
         AutoEnableItemReference();
@@ -15,5 +14,5 @@ codeunit 6014503 "NPR Enable Item Ref. Install"
     begin
         EnableItemRefUpgr.AutoEnableItemReference();
     end;
-}
 #endif
+}

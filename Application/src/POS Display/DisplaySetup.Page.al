@@ -29,12 +29,6 @@
                     ToolTip = 'Specifies the Display Content Code group that will be used for this POS Display Profile. Display Content Codes are groupings of either images, videos, or URLs. This is where the media displayed on the Customer Display is uploaded or linked to.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Screen No."; Rec."Screen No.")
-                {
-
-                    ToolTip = 'Specifies the Windows display number that will be used. ''0'' is default and will auto-select a non-main display. It is recommended to leave it on ''0'' unless the POS Unit has more than 2 screens.';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Receipt Duration"; Rec."Receipt Duration")
                 {
 
@@ -81,12 +75,6 @@
                 {
 
                     ToolTip = 'Specifies the time-delay between the images, ie. the duration an image is displayed (in milliseconds).';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Media Downloaded"; Rec."Media Downloaded")
-                {
-
-                    ToolTip = 'Specifies whether the media from Display Content Code should be downloaded. If checked, the POS won''t download any media when loaded. The POS will NOT check if the local cache contains the images in the Display Content Code group. Instead it will "download and replace all, or do nothing". When adding new media to the Display Content Codes, you need to deactivate this field to see the new media.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Prices ex. VAT"; Rec."Prices ex. VAT")

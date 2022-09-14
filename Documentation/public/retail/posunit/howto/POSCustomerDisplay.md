@@ -24,10 +24,17 @@ You can set up the content of customer display in **Display Setup**. Here, it is
 5. Click the dropdown next to the **Display Content Code**, and then click the **Select from full list** button.
 5. From the page **Select - Display Content**, you click on the **Content Line** field on the far right to open another page called **Display Content Lines**.
 6. Click **New** to input a URL or to upload an image. Add more lines for a slideshow of images.
-7. Go back to the **POS Display Profile** and enable the field **Activate** to enable the customer displays of POS Units with this **POS Display Profile**.
+7. Go back to the **POS Display Profile** and enable the field **Activate** to enable the customer display of POS Units with using this **POS Display Profile**.
 
 > [!NOTE]
 > The fields in the panel **Receipt** are used to customize the display of sales lines to the customer.
+
+> [!NOTE]
+> If the customer display is blank, try pressing **Alt + Tab** to check if the window is displayed in the background.
+> If the Custommer display is displayed on the wrong screen or if the new media content is not showing, go to **POS Unit Display** and update information. See [POS Unit Display](../reference/POS_Unit_Display.md).
+
+> [!WARNING]
+> Remember to restart the POS when updating either **POS Display Profile** or **POS Unit Display**.
 
 ### Related links
 
@@ -36,3 +43,4 @@ You can set up the content of customer display in **Display Setup**. Here, it is
 - [Configure an opening mechanism for a POS unit cash drawer](./ConfigureCashDrawerOpening.md)
 - [POS menu](../explanation/POS_menu.md)
 - [POS Display Profile](../reference/POS_Display_profile.md)
+- [POS Unit Display](../reference/POS_Unit_Display.md)
