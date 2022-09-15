@@ -18,7 +18,7 @@ let main = async ({ workflow, context, captions, parameters }) => {
     if (parameters.PromptDiscountPct) {
         context.discountPct = await popup.numpad(captions.VoucherDiscount);        
     }
-    if (!context.discountPct || context.discountPct < 0 || context.discountPct > 100) {
+    if (!context.discountPct || context.discountPct <= 0 || context.discountPct > 100) {
         await popup.error(captions.InvalidDiscount);
         return;
     }

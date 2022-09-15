@@ -52,6 +52,8 @@
         Handled := true;
 
         EftTransactionRequest.TestField("Amount Input");
+        if EftTransactionRequest."Cashback Amount" = EftTransactionRequest."Amount Input" then
+            EftTransactionRequest.FieldError("Cashback Amount"); //100% cashback crashes terminal SDK from NETS...
         EftTransactionRequest.Insert(true);
     end;
 
