@@ -1135,6 +1135,11 @@
             Caption = 'Imported from Invoice No.';
             DataClassification = CustomerContent;
         }
+        field(495; "Created At"; DateTime)
+        {
+            Caption = 'Created At';
+            DataClassification = CustomerContent;
+        }
         field(500; "EFT Approved"; Boolean)
         {
             Caption = 'Cash Terminal Approved';
@@ -1655,6 +1660,11 @@
     fieldgroups
     {
     }
+
+    trigger OnInsert()
+    begin
+        "Created At" := CurrentDateTime; //Not the same as built-in SystemCreatedAt, as this timestamp stays intact across parking/loading and is kept on POS entry sales/payment lines.        
+    end;
 
     trigger OnDelete()
     var

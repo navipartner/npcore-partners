@@ -269,6 +269,11 @@
             Caption = 'Token';
             DataClassification = CustomerContent;
         }
+        field(510; "POS Payment Line Created At"; DateTime)
+        {
+            Caption = 'POS Payment Line Created At';
+            DataClassification = CustomerContent;
+        }
         field(600; "Entry Date"; Date)
         {
             CalcFormula = Lookup("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));

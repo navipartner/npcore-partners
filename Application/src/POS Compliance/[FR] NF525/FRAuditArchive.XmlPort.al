@@ -7,22 +7,32 @@
 
     schema
     {
-        tableelement(pcheckpoint; "NPR POS Workshift Checkpoint")
+        textelement(Archive)
         {
+            XmlName = 'Archive';
+
+            tableelement(pcheckpoint; "NPR POS Workshift Checkpoint")
+            {
             XmlName = 'GrandPeriod';
             textelement(archivesignature)
             {
-                XmlName = 'ArchiveFileSignature';
+                XmlName = 'ArchiveSignature';
             }
             fieldelement(SystemEntryKey; PCheckpoint."Entry No.")
             {
+                XmlName = 'SystemEntryNo';
             }
             textelement(pexternalid)
             {
-                XmlName = 'ID';
+                XmlName = 'SequentialID';
             }
-            fieldelement(CreatedAt; PCheckpoint."Created At")
+                textelement(pfromdate)
             {
+                XmlName = 'FromDate';
+            }
+                textelement(ptodate)
+            {
+                XmlName = 'ToDate';
             }
             textelement(pgrandtotal)
             {
@@ -38,337 +48,452 @@
             }
             textelement(psignature)
             {
-                XmlName = 'Signature';
+                XmlName = 'PeriodGrandTotalSignature';
             }
-            textelement(grandperiodtaxlines)
-            {
-                MaxOccurs = Once;
-                XmlName = 'TaxLines';
-                tableelement(grandperiodtaxline; "NPR POS Worksh. Tax Checkp.")
-                {
-                    LinkFields = "Workshift Checkpoint Entry No." = FIELD("Entry No.");
-                    LinkTable = PCheckpoint;
-                    MinOccurs = Zero;
-                    XmlName = 'TaxLine';
-                    fieldelement(TaxIdentifier; GrandPeriodTaxLine."VAT Identifier")
-                    {
-                    }
-                    fieldelement(TaxRate; GrandPeriodTaxLine."Tax %")
-                    {
-                    }
-                    fieldelement(TaxBaseAmount; GrandPeriodTaxLine."Tax Base Amount")
-                    {
-                    }
-                    fieldelement(TaxAmount; GrandPeriodTaxLine."Tax Amount")
-                    {
-                    }
-                }
-            }
-            tableelement(zcheckpoint; "NPR POS Workshift Checkpoint")
-            {
-                XmlName = 'Period';
-                fieldelement(SystemEntryKey; ZCheckpoint."Entry No.")
-                {
-                }
-                textelement(zexternalid)
-                {
-                    XmlName = 'ID';
-                }
-                fieldelement(CreatedAt; ZCheckpoint."Created At")
-                {
-                }
-                textelement(zgrandtotal)
-                {
-                    XmlName = 'GrandTotal';
-                }
-                textelement(zperpetualabsolutegrandtotal)
-                {
-                    XmlName = 'PerpetualAbsoluteGrandTotal';
-                }
-                textelement(zperpetualgrandtotal)
-                {
-                    XmlName = 'PerpetualGrandTotal';
-                }
-                textelement(zsignature)
-                {
-                    XmlName = 'Signature';
-                }
-                textelement(periodtaxlines)
-                {
-                    XmlName = 'TaxLines';
-                    tableelement(periodtaxline; "NPR POS Worksh. Tax Checkp.")
-                    {
-                        LinkFields = "Workshift Checkpoint Entry No." = FIELD("Entry No.");
-                        LinkTable = ZCheckpoint;
-                        MinOccurs = Zero;
-                        XmlName = 'TaxLine';
-                        fieldelement(TaxIdentifier; PeriodTaxLine."VAT Identifier")
-                        {
-                        }
-                        fieldelement(TaxRate; PeriodTaxLine."Tax %")
-                        {
-                        }
-                        fieldelement(TaxBaseAmount; PeriodTaxLine."Tax Base Amount")
-                        {
-                        }
-                        fieldelement(TaxAmount; PeriodTaxLine."Tax Amount")
-                        {
-                        }
-                    }
-                }
-                tableelement("POS Entry"; "NPR POS Entry")
-                {
-                    MinOccurs = Zero;
-                    XmlName = 'Ticket';
-                    fieldelement(SystemEntryKey; "POS Entry"."Entry No.")
-                    {
-                    }
-                    fieldelement(DocumentNumber; "POS Entry"."Fiscal No.")
-                    {
-                    }
-                    fieldelement(NoOfPrints; "POS Entry"."No. of Print Output Entries")
-                    {
-                    }
-                    fieldelement(SalespersonCode; "POS Entry"."Salesperson Code")
-                    {
-                    }
-                    fieldelement(POSCode; "POS Entry"."POS Unit No.")
-                    {
-                    }
-                    fieldelement(Date; "POS Entry"."Entry Date")
-                    {
-                    }
-                    fieldelement(Time; "POS Entry"."Ending Time")
-                    {
-                    }
-                    fieldelement(OperationType; "POS Entry"."Entry Type")
-                    {
-                    }
-                    textelement(documenttype)
-                    {
-                        XmlName = 'DocumentType';
-                    }
-                    fieldelement(NoOfSaleLines; "POS Entry"."No. of Sales Lines")
-                    {
-                    }
-                    textelement(tsignature)
-                    {
-                        XmlName = 'Signature';
-                    }
-                    tableelement("FR POS Audit Log Aux. Info"; "NPR FR POS Audit Log Aux. Info")
-                    {
-                        LinkFields = "POS Entry No." = FIELD("Entry No.");
-                        LinkTable = "POS Entry";
-                        MaxOccurs = Once;
-                        XmlName = 'RelatedInfo';
-                        fieldelement(SoftwareVersion; "FR POS Audit Log Aux. Info"."NPR Version")
-                        {
-                        }
-                        fieldelement(StoreName; "FR POS Audit Log Aux. Info"."Store Name")
-                        {
-                        }
-                        fieldelement(StoreName2; "FR POS Audit Log Aux. Info"."Store Name 2")
-                        {
-                        }
-                        fieldelement(StoreAddress; "FR POS Audit Log Aux. Info"."Store Address")
-                        {
-                        }
-                        fieldelement(StoreAddress2; "FR POS Audit Log Aux. Info"."Store Address 2")
-                        {
-                        }
-                        fieldelement(StorePostCode; "FR POS Audit Log Aux. Info"."Store Post Code")
-                        {
-                        }
-                        fieldelement(StoreCity; "FR POS Audit Log Aux. Info"."Store City")
-                        {
-                        }
-                        fieldelement(Siret; "FR POS Audit Log Aux. Info"."Store Siret")
-                        {
-                        }
-                        fieldelement(APE; "FR POS Audit Log Aux. Info".APE)
-                        {
-                        }
-                        fieldelement(IntraCommVATIdentifier; "FR POS Audit Log Aux. Info"."Intra-comm. VAT ID")
-                        {
-                        }
-                        fieldelement(SalespersonName; "FR POS Audit Log Aux. Info"."Salesperson Name")
-                        {
-                        }
-                    }
-                    textelement(SalesLines)
-                    {
-                        tableelement("POS Sales Line"; "NPR POS Entry Sales Line")
-                        {
-                            LinkFields = "POS Entry No." = FIELD("Entry No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'SalesLine';
-                            fieldelement(LineNo; "POS Sales Line"."Line No.")
-                            {
-                            }
-                            fieldelement(Type; "POS Sales Line".Type)
-                            {
-                            }
-                            fieldelement(ProductCode; "POS Sales Line"."No.")
-                            {
-                            }
-                            fieldelement(ProductLabel; "POS Sales Line".Description)
-                            {
-                            }
-                            fieldelement(Quantity; "POS Sales Line".Quantity)
-                            {
-                            }
-                            fieldelement(TaxIdentifier; "POS Sales Line"."VAT Identifier")
-                            {
-                            }
-                            fieldelement(TaxRate; "POS Sales Line"."VAT %")
-                            {
-                            }
-                            fieldelement(UnitPriceInclTax; "POS Sales Line"."Unit Price")
-                            {
-                            }
-                            fieldelement(DiscountCode; "POS Sales Line"."Discount Code")
-                            {
-                            }
-                            fieldelement(DiscountPercentage; "POS Sales Line"."Line Discount %")
-                            {
-                            }
-                            fieldelement(DiscountAmount; "POS Sales Line"."Line Discount Amount Incl. VAT")
-                            {
-                            }
-                            fieldelement(TotalExclTax; "POS Sales Line"."Amount Excl. VAT")
-                            {
-                            }
-                            fieldelement(TotalInclTax; "POS Sales Line"."Amount Incl. VAT")
-                            {
-                            }
-                            fieldelement(BaseQuantity; "POS Sales Line"."Quantity (Base)")
-                            {
-                            }
-                            fieldelement(UnitOfMeasureCode; "POS Sales Line"."Unit of Measure Code")
-                            {
-                            }
-                        }
-                    }
-                    textelement(TaxLines)
-                    {
-                        tableelement("POS Tax Amount Line"; "NPR POS Entry Tax Line")
-                        {
-                            LinkFields = "POS Entry No." = FIELD("Entry No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'TaxLine';
-                            fieldelement(TaxIdentifier; "POS Tax Amount Line"."VAT Identifier")
-                            {
-                            }
-                            fieldelement(TaxBaseAmount; "POS Tax Amount Line"."Tax Base Amount")
-                            {
-                            }
-                            fieldelement(TaxRate; "POS Tax Amount Line"."Tax %")
-                            {
-                            }
-                            fieldelement(TaxAmount; "POS Tax Amount Line"."Tax Amount")
-                            {
-                            }
-                            fieldelement(AmountInclTax; "POS Tax Amount Line"."Amount Including Tax")
-                            {
-                            }
-                        }
-                    }
-                    tableelement(ticketgrandtotal; "NPR POS Audit Log")
-                    {
-                        LinkFields = "Acted on POS Entry No." = FIELD("Entry No.");
-                        LinkTable = "POS Entry";
-                        MaxOccurs = Once;
-                        XmlName = 'TicketTotals';
-                        SourceTableView = WHERE("External Type" = CONST('GRANDTOTAL'));
-                        fieldelement(TotalInclTax; "POS Entry"."Amount Incl. Tax")
-                        {
-                        }
-                        fieldelement(TotalExclTax; "POS Entry"."Amount Excl. Tax")
-                        {
-                        }
-                        textelement(tgrandtotal)
-                        {
-                            XmlName = 'GrandTotal';
-                        }
-                        textelement(tperpetualabsolutegrandtotal)
-                        {
-                            XmlName = 'PerpetualAbsoluteGrandTotal';
-                        }
-                        textelement(tperpetualgrandtotal)
-                        {
-                            XmlName = 'PerpetualGrandTotal';
-                        }
-                        textelement(ttsignature)
-                        {
-                            XmlName = 'GrandTotalSignature';
-                        }
 
-                        trigger OnAfterGetRecord()
-                        var
-                            POSAuditLog: Record "NPR POS Audit Log";
-                        begin
-                            POSAuditLog.SetRange("Record ID", "POS Entry".RecordId);
-                            POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
-                            TTSignature := GetAuditSignature(POSAuditLog);
-                            TGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
-                            TPerpetualAbsoluteGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 2);
-                            TPerpetualGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 3);
-                        end;
-                    }
-                    textelement(PaymentLines)
+                textelement(tickets)
+                {
+                    XmlName = 'Tickets';
+                    tableelement(ticket; "NPR POS Audit Log")
                     {
-                        tableelement("POS Payment Line"; "NPR POS Entry Payment Line")
+                        MinOccurs = Zero;
+                        XmlName = 'Ticket';
+
+                        tableelement(ticket_pos_entry; "NPR POS Entry")
                         {
-                            LinkFields = "POS Entry No." = FIELD("Entry No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'PaymentLine';
-                            fieldelement(Code; "POS Payment Line"."POS Payment Method Code")
+                            MinOccurs = Once;
+                            MaxOccurs = Once;
+                            fieldelement(SystemEntryKey; ticket_pos_entry."Entry No.")
                             {
                             }
-                            textelement(paymentlinetype)
-                            {
-                                XmlName = 'Type';
-                            }
-                            fieldelement(Description; "POS Payment Line".Description)
+                            fieldelement(DocumentNumber; ticket_pos_entry."Fiscal No.")
                             {
                             }
-                            fieldelement(Amount; "POS Payment Line"."Amount (LCY)")
+                            fieldelement(NoOfPrints; ticket_pos_entry."No. of Print Output Entries")
                             {
                             }
-                            fieldelement(Currency; "POS Payment Line"."Currency Code")
+                            fieldelement(SalespersonCode; ticket_pos_entry."Salesperson Code")
                             {
                             }
-                            fieldelement(CurrencyAmount; "POS Payment Line"."Amount (Sales Currency)")
+                            fieldelement(POSCode; ticket_pos_entry."POS Unit No.")
                             {
                             }
-                            textelement(paymentlineexchrate)
+                            fieldelement(Date; ticket_pos_entry."Entry Date")
                             {
-                                XmlName = 'ExchangeRate';
+                            }
+                            fieldelement(Time; ticket_pos_entry."Ending Time")
+                            {
+                            }
+                            fieldelement(OperationType; ticket_pos_entry."Entry Type")
+                            {
+                            }
+                            textelement(documenttype)
+                            {
+                                XmlName = 'DocumentType';
+                            }
+                            fieldelement(NoOfSaleLines; ticket_pos_entry."No. of Sales Lines")
+                            {
+                            }
+                            fieldelement(TotalInclTax; ticket_pos_entry."Amount Incl. Tax")
+                            {
+                            }
+                            fieldelement(TotalExclTax; ticket_pos_entry."Amount Excl. Tax")
+                            {
+                            }
+                            textelement(tsignature)
+                            {
+                                XmlName = 'TicketSignature';
+                            }
+                            textelement(SalesLines)
+                            {
+                                tableelement("POS Sales Line"; "NPR POS Entry Sales Line")
+                                {
+                                    LinkFields = "POS Entry No." = FIELD("Entry No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'SalesLine';
+                                    fieldelement(LineNo; "POS Sales Line"."Line No.")
+                                    {
+                                    }
+                                    fieldelement(Type; "POS Sales Line".Type)
+                                    {
+                                    }
+                                    fieldelement(ProductCode; "POS Sales Line"."No.")
+                                    {
+                                    }
+                                    fieldelement(ProductLabel; "POS Sales Line".Description)
+                                    {
+                                    }
+                                    fieldelement(Quantity; "POS Sales Line".Quantity)
+                                    {
+                                    }
+                                    fieldelement(TaxIdentifier; "POS Sales Line"."VAT Identifier")
+                                    {
+                                    }
+                                    fieldelement(TaxRate; "POS Sales Line"."VAT %")
+                                    {
+                                    }
+                                    fieldelement(UnitPriceInclTax; "POS Sales Line"."Unit Price")
+                                    {
+                                    }
+                                    fieldelement(DiscountCode; "POS Sales Line"."Discount Code")
+                                    {
+                                    }
+                                    fieldelement(DiscountPercentage; "POS Sales Line"."Line Discount %")
+                                    {
+                                    }
+                                    fieldelement(DiscountAmount; "POS Sales Line"."Line Discount Amount Incl. VAT")
+                                    {
+                                    }
+                                    fieldelement(TotalExclTax; "POS Sales Line"."Amount Excl. VAT")
+                                    {
+                                    }
+                                    fieldelement(TotalInclTax; "POS Sales Line"."Amount Incl. VAT")
+                                    {
+                                    }
+                                    fieldelement(BaseQuantity; "POS Sales Line"."Quantity (Base)")
+                                    {
+                                    }
+                                    fieldelement(UnitOfMeasureCode; "POS Sales Line"."Unit of Measure Code")
+                                    {
+                                    }
+                                    fieldelement(CreatedAt; "POS Sales Line"."POS Sale Line Created At")
+                                    {
+                                    }
+                                }
+                            }
+                            textelement(TaxLines)
+                            {
+                                tableelement("POS Tax Amount Line"; "NPR POS Entry Tax Line")
+                                {
+                                    LinkFields = "POS Entry No." = FIELD("Entry No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'TaxLine';
+                                    fieldelement(TaxIdentifier; "POS Tax Amount Line"."VAT Identifier")
+                                    {
+                                    }
+                                    fieldelement(TaxBaseAmount; "POS Tax Amount Line"."Tax Base Amount")
+                                    {
+                                    }
+                                    fieldelement(TaxRate; "POS Tax Amount Line"."Tax %")
+                                    {
+                                    }
+                                    fieldelement(TaxAmount; "POS Tax Amount Line"."Tax Amount")
+                                    {
+                                    }
+                                    fieldelement(AmountInclTax; "POS Tax Amount Line"."Amount Including Tax")
+                                    {
+                                    }
+                                }
+                            }
+
+                            textelement(PaymentLines)
+                            {
+                                tableelement("POS Payment Line"; "NPR POS Entry Payment Line")
+                                {
+                                    LinkFields = "POS Entry No." = FIELD("Entry No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'PaymentLine';
+                                    fieldelement(Code; "POS Payment Line"."POS Payment Method Code")
+                                    {
+                                    }
+                                    textelement(paymentlinetype)
+                                    {
+                                        XmlName = 'Type';
+                                    }
+                                    fieldelement(Description; "POS Payment Line".Description)
+                                    {
+                                    }
+                                    fieldelement(Amount; "POS Payment Line"."Amount (LCY)")
+                                    {
+                                    }
+                                    fieldelement(Currency; "POS Payment Line"."Currency Code")
+                                    {
+                                    }
+                                    fieldelement(CurrencyAmount; "POS Payment Line"."Amount (Sales Currency)")
+                                    {
+                                    }
+                                    textelement(paymentlineexchrate)
+                                    {
+                                        XmlName = 'ExchangeRate';
+                                    }
+                                    fieldelement(CreatedAt; "POS Payment Line"."POS Payment Line Created At")
+                                    {
+                                    }
+
+                                    trigger OnAfterGetRecord()
+                                    var
+                                        POSPaymentMethod: Record "NPR POS Payment Method";
+                                    begin
+
+                                        POSPaymentMethod.Get("POS Payment Line"."POS Payment Method Code");
+
+                                        PaymentLineType := Format(POSPaymentMethod."Processing Type");
+                                        PaymentLineExchRate := Format(Round("POS Payment Line"."Amount (LCY)" / "POS Payment Line"."Amount (Sales Currency)", 0.00001, '='));
+                                    end;
+                                }
+                            }
+
+                            textelement(AssociatedDocuments)
+                            {
+                                tableelement(issuedgenericvoucher; "NPR NpRv Voucher Entry")
+                                {
+                                    LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'IssuedGenericVoucher';
+                                    SourceTableView = WHERE("Entry Type" = CONST("Issue Voucher"));
+                                    fieldelement(VoucherNo; IssuedGenericVoucher."Voucher No.")
+                                    {
+                                    }
+                                    fieldelement(VoucherType; IssuedGenericVoucher."Voucher Type")
+                                    {
+                                    }
+                                    fieldelement(Amount; IssuedGenericVoucher.Amount)
+                                    {
+                                    }
+                                }
+                                tableelement(archivedissuedgenericvoucher; "NPR NpRv Arch. Voucher Entry")
+                                {
+                                    LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'IssuedGenericVoucher';
+                                    SourceTableView = WHERE("Entry Type" = CONST("Issue Voucher"));
+                                    fieldelement(VoucherNo; archivedIssuedGenericVoucher."Arch. Voucher No.")
+                                    {
+                                    }
+                                    fieldelement(VoucherType; archivedIssuedGenericVoucher."Voucher Type")
+                                    {
+                                    }
+                                    fieldelement(Amount; archivedIssuedGenericVoucher.Amount)
+                                    {
+                                    }
+                                }
+                                tableelement(appliedgenericvoucher; "NPR NpRv Voucher Entry")
+                                {
+                                    LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'AppliedGenericVoucher';
+                                    SourceTableView = WHERE("Entry Type" = CONST(Payment));
+                                    fieldelement(VoucherNo; AppliedGenericVoucher."Voucher No.")
+                                    {
+                                    }
+                                    fieldelement(VoucherType; AppliedGenericVoucher."Voucher Type")
+                                    {
+                                    }
+                                    fieldelement(AppliedAmount; AppliedGenericVoucher.Amount)
+                                    {
+                                    }
+                                    fieldelement(RemainingAmount; AppliedGenericVoucher."Remaining Amount")
+                                    {
+                                    }
+                                }
+                                tableelement(archivedappliedgenericvoucher; "NPR NpRv Arch. Voucher Entry")
+                                {
+                                    LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'AppliedGenericVoucher';
+                                    SourceTableView = WHERE("Entry Type" = CONST(Payment));
+                                    fieldelement(VoucherNo; archivedAppliedGenericVoucher."Arch. Voucher No.")
+                                    {
+                                    }
+                                    fieldelement(VoucherType; archivedAppliedGenericVoucher."Voucher Type")
+                                    {
+                                    }
+                                    fieldelement(AppliedAmount; archivedAppliedGenericVoucher.Amount)
+                                    {
+                                    }
+                                    fieldelement(RemainingAmount; archivedAppliedGenericVoucher."Remaining Amount")
+                                    {
+                                    }
+                                }
+                                tableelement(issuedcoupon; "NPR NpDc Coupon Entry")
+                                {
+                                    LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'IssuedCoupon';
+                                    SourceTableView = WHERE("Entry Type" = CONST("Issue Coupon"), "Document Type" = CONST("POS Entry"));
+                                    fieldelement(CouponNo; IssuedCoupon."Coupon No.")
+                                    {
+                                    }
+                                    fieldelement(CouponType; IssuedCoupon."Coupon Type")
+                                    {
+                                    }
+                                    fieldelement(Quantity; IssuedCoupon.Quantity)
+                                    {
+                                    }
+                                    fieldelement(AmountPerQuantity; IssuedCoupon."Amount per Qty.")
+                                    {
+                                    }
+                                }
+                                tableelement(archivedissuedcoupon; "NPR NpDc Arch.Coupon Entry")
+                                {
+                                    LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'IssuedCoupon';
+                                    SourceTableView = WHERE("Entry Type" = CONST("Issue Coupon"), "Document Type" = CONST("POS Entry"));
+                                    fieldelement(CouponNo; archivedIssuedCoupon."Arch. Coupon No.")
+                                    {
+                                    }
+                                    fieldelement(CouponType; archivedIssuedCoupon."Coupon Type")
+                                    {
+                                    }
+                                    fieldelement(Quantity; archivedIssuedCoupon.Quantity)
+                                    {
+                                    }
+                                    fieldelement(AmountPerQuantity; archivedIssuedCoupon."Amount per Qty.")
+                                    {
+                                    }
+                                }
+                                tableelement(appliedcoupon; "NPR NpDc Coupon Entry")
+                                {
+                                    LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'AppliedCoupon';
+                                    SourceTableView = WHERE("Entry Type" = CONST("Discount Application"), "Document Type" = CONST("POS Entry"));
+                                    fieldelement(CouponNo; AppliedCoupon."Coupon No.")
+                                    {
+                                    }
+                                    fieldelement(CouponType; AppliedCoupon."Coupon Type")
+                                    {
+                                    }
+                                    fieldelement(AppliedQuantity; AppliedCoupon.Quantity)
+                                    {
+                                    }
+                                    fieldelement(RemainingQuantity; AppliedCoupon."Remaining Quantity")
+                                    {
+                                    }
+                                    fieldelement(AmountPerQuantity; AppliedCoupon."Amount per Qty.")
+                                    {
+                                    }
+                                }
+                                tableelement(archivedappliedcoupon; "NPR NpDc Arch.Coupon Entry")
+                                {
+                                    LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
+                                    LinkTable = ticket_pos_entry;
+                                    MinOccurs = Zero;
+                                    XmlName = 'AppliedCoupon';
+                                    SourceTableView = WHERE("Entry Type" = CONST("Discount Application"), "Document Type" = CONST("POS Entry"));
+                                    fieldelement(CouponNo; archivedAppliedCoupon."Arch. Coupon No.")
+                                    {
+                                    }
+                                    fieldelement(CouponType; archivedAppliedCoupon."Coupon Type")
+                                    {
+                                    }
+                                    fieldelement(AppliedQuantity; archivedAppliedCoupon.Quantity)
+                                    {
+                                    }
+                                    fieldelement(RemainingQuantity; archivedAppliedCoupon."Remaining Quantity")
+                                    {
+                                    }
+                                    fieldelement(AmountPerQuantity; archivedAppliedCoupon."Amount per Qty.")
+                                    {
+                                    }
+                                }
+                            }
+                            tableelement(ticket_additional_info; "NPR FR POS Audit Log Add. Info")
+                            {
+                                MinOccurs = Zero;
+                                MaxOccurs = Once;
+                                XmlName = 'RelatedInfo';
+                                fieldelement(SoftwareVersion; ticket_additional_info."NPR Version")
+                                {
+                                }
+                                fieldelement(StoreName; ticket_additional_info."Store Name")
+                                {
+                                }
+                                fieldelement(StoreName2; ticket_additional_info."Store Name 2")
+                                {
+                                }
+                                fieldelement(StoreAddress; ticket_additional_info."Store Address")
+                                {
+                                }
+                                fieldelement(StoreAddress2; ticket_additional_info."Store Address 2")
+                                {
+                                }
+                                fieldelement(StorePostCode; ticket_additional_info."Store Post Code")
+                                {
+                                }
+                                fieldelement(StoreCity; ticket_additional_info."Store City")
+                                {
+                                }
+                                fieldelement(StoreCountry; ticket_additional_info."Store Country/Region Code")
+                                {
+                                }
+                                fieldelement(Siret; ticket_additional_info."Store Siret")
+                                {
+                                }
+                                fieldelement(APE; ticket_additional_info.APE)
+                                {
+                                }
+                                fieldelement(IntraCommVATIdentifier; ticket_additional_info."Intra-comm. VAT ID")
+                                {
+                                }
+                                fieldelement(SalespersonName; ticket_additional_info."Salesperson Name")
+                                {
+                                }
+
+                                trigger OnPreXmlItem()
+                                begin
+                                    ticket_additional_info.SetRange("POS Audit Log Entry No.", ticket."Entry No.");
+                                end;
+
                             }
 
                             trigger OnAfterGetRecord()
                             var
-                                POSPaymentMethod: Record "NPR POS Payment Method";
+                                POSAuditLog: Record "NPR POS Audit Log";
                             begin
+                                POSAuditLog.SetRange("Record ID", ticket_pos_entry.RecordId);
+                                POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::DIRECT_SALE_END);
+                                POSAuditLog.FindFirst(); //ticket_pos_entry started from entry 1, looks like filter was not applied.
+                                DocumentType := POSAuditLog."External Type";
+                                TSignature := GetAuditSignature(POSAuditLog);
+                            end;
 
-                                POSPaymentMethod.Get("POS Payment Line"."POS Payment Method Code");
-
-                                PaymentLineType := Format(POSPaymentMethod."Processing Type");
-                                PaymentLineExchRate := Format(Round("POS Payment Line"."Amount (LCY)" / "POS Payment Line"."Amount (Sales Currency)", 0.00001, '='));
+                            trigger OnPreXmlItem()
+                            var
+                                RecRef: RecordRef;
+                                POSEntry: Record "NPR POS Entry";
+                            begin
+                                RecRef.GetTable(POSEntry);
+                                RecRef.Get(ticket."Record ID");
+                                RecRef.SetTable(POSEntry);
+                                ticket_pos_entry := POSEntry;
+                                ticket_pos_entry.SetRecFilter();
                             end;
                         }
+
+                        trigger OnPreXmlItem()
+                        begin
+                            ticket.SetRange("Entry No.", _FromPOSAuditLogEntryNo, _ToPOSAuditLogEntryNo);
+                            ticket.SetRange("Acted on POS Unit No.", _POSUnitNo);
+                            ticket.SetRange("Action Type", ticket."Action Type"::DIRECT_SALE_END);
+                        end;
+
                     }
-                    textelement(PrintDuplicates)
+                }
+                textelement(duplicates)
+                {
+                    XmlName = 'Duplicates';
+                    tableelement(duplicate; "NPR POS Audit Log")
                     {
-                        tableelement("POS Entry Output Log"; "NPR POS Entry Output Log")
+                        XmlName = 'Duplicate';
+                        MinOccurs = Zero;
+                        tableelement(POSEntryOutputLog; "NPR POS Entry Output Log")
                         {
-                            LinkFields = "POS Entry No." = FIELD("Entry No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'PrintDuplicate';
+                            LinkFields = "POS Entry No." = FIELD("Acted on POS Entry No.");
+                            LinkTable = duplicate;
+                            MinOccurs = Once;
+                            MaxOccurs = Once;
                             SourceTableView = WHERE("Output Method" = CONST(Print), "Output Type" = FILTER(SalesReceipt | LargeSalesReceipt));
                             textelement(outputexternalid)
                             {
@@ -378,316 +503,265 @@
                             {
                                 XmlName = 'ReprintNumber';
                             }
-                            fieldelement(SalespersonCode; "POS Entry Output Log"."Salesperson Code")
+                            fieldelement(SalespersonCode; POSEntryOutputLog."Salesperson Code")
                             {
                             }
-                            fieldelement(UserCode; "POS Entry Output Log"."User ID")
+                            fieldelement(UserCode; POSEntryOutputLog."User ID")
                             {
                             }
-                            fieldelement(Timestamp; "POS Entry Output Log"."Output Timestamp")
+                            fieldelement(Timestamp; POSEntryOutputLog."Output Timestamp")
                             {
                             }
                             textelement(outputsignature)
                             {
-                                XmlName = 'Signature';
+                                XmlName = 'DuplicateSignature';
                             }
 
                             trigger OnAfterGetRecord()
                             var
                                 POSAuditLog: Record "NPR POS Audit Log";
                             begin
-                                POSAuditLog.SetRange("Record ID", "POS Entry Output Log".RecordId);
-                                POSAuditLog.SetFilter("Action Type", '=%1|=%2', POSAuditLog."Action Type"::RECEIPT_COPY, POSAuditLog."Action Type"::RECEIPT_PRINT);
-                                POSAuditLog.FindFirst();
-
-                                if POSAuditLog."Action Type" = POSAuditLog."Action Type"::RECEIPT_PRINT then
-                                    currXMLport.Skip();
-
-                                OutputExternalID := POSAuditLog."External ID";
-                                OutputReprintNumber := POSAuditLog."Additional Information"; //Contains reprint no.
+                                OutputExternalID := duplicate."External ID";
+                                OutputReprintNumber := duplicate."Additional Information"; //Contains reprint no.
+                                POSAuditLog := duplicate;
+                                POSAuditLog.SetRecFilter();
                                 OutputSignature := GetAuditSignature(POSAuditLog);
                             end;
                         }
-                    }
-                    textelement(AssociatedDocuments)
-                    {
-                        tableelement(issuedgenericvoucher; "NPR NpRv Voucher Entry")
+                        tableelement(duplicate_additional_info; "NPR FR POS Audit Log Add. Info")
                         {
-                            LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
-                            LinkTable = "POS Entry";
+                            LinkTable = duplicate;
+                            LinkFields = "POS Audit Log Entry No." = FIELD("Entry No.");
                             MinOccurs = Zero;
-                            XmlName = 'IssuedGenericVoucher';
-                            SourceTableView = WHERE("Entry Type" = CONST("Issue Voucher"));
-                            fieldelement(VoucherNo; IssuedGenericVoucher."Voucher No.")
+                            MaxOccurs = Once;
+                            XmlName = 'RelatedInfo';
+                            fieldelement(SoftwareVersion; duplicate_additional_info."NPR Version")
                             {
                             }
-                            fieldelement(VoucherType; IssuedGenericVoucher."Voucher Type")
+                            fieldelement(StoreName; duplicate_additional_info."Store Name")
                             {
                             }
-                            fieldelement(Amount; IssuedGenericVoucher.Amount)
+                            fieldelement(StoreName2; duplicate_additional_info."Store Name 2")
+                            {
+                            }
+                            fieldelement(StoreAddress; duplicate_additional_info."Store Address")
+                            {
+                            }
+                            fieldelement(StoreAddress2; duplicate_additional_info."Store Address 2")
+                            {
+                            }
+                            fieldelement(StorePostCode; duplicate_additional_info."Store Post Code")
+                            {
+                            }
+                            fieldelement(StoreCity; duplicate_additional_info."Store City")
+                            {
+                            }
+                            fieldelement(StoreCountry; duplicate_additional_info."Store Country/Region Code")
+                            {
+                            }
+                            fieldelement(Siret; duplicate_additional_info."Store Siret")
+                            {
+                            }
+                            fieldelement(APE; duplicate_additional_info.APE)
+                            {
+                            }
+                            fieldelement(IntraCommVATIdentifier; duplicate_additional_info."Intra-comm. VAT ID")
+                            {
+                            }
+                            fieldelement(SalespersonName; duplicate_additional_info."Salesperson Name")
                             {
                             }
                         }
-                        tableelement(appliedgenericvoucher; "NPR NpRv Voucher Entry")
-                        {
-                            LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'AppliedGenericVoucher';
-                            SourceTableView = WHERE("Entry Type" = CONST(Payment));
-                            fieldelement(VoucherNo; AppliedGenericVoucher."Voucher No.")
-                            {
-                            }
-                            fieldelement(VoucherType; AppliedGenericVoucher."Voucher Type")
-                            {
-                            }
-                            fieldelement(AppliedAmount; AppliedGenericVoucher.Amount)
-                            {
-                            }
-                            fieldelement(RemainingAmount; AppliedGenericVoucher."Remaining Amount")
-                            {
-                            }
-                        }
-                        tableelement(issuedcoupon; "NPR NpDc Coupon Entry")
-                        {
-                            LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'IssuedCoupon';
-                            SourceTableView = WHERE("Entry Type" = CONST("Issue Coupon"), "Document Type" = CONST("POS Entry"));
-                            fieldelement(CouponNo; IssuedCoupon."Coupon No.")
-                            {
-                            }
-                            fieldelement(CouponType; IssuedCoupon."Coupon Type")
-                            {
-                            }
-                            fieldelement(Quantity; IssuedCoupon.Quantity)
-                            {
-                            }
-                            fieldelement(AmountPerQuantity; IssuedCoupon."Amount per Qty.")
-                            {
-                            }
-                        }
-                        tableelement(appliedcoupon; "NPR NpDc Coupon Entry")
-                        {
-                            LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'AppliedCoupon';
-                            SourceTableView = WHERE("Entry Type" = CONST("Discount Application"), "Document Type" = CONST("POS Entry"));
-                            fieldelement(CouponNo; AppliedCoupon."Coupon No.")
-                            {
-                            }
-                            fieldelement(CouponType; AppliedCoupon."Coupon Type")
-                            {
-                            }
-                            fieldelement(AppliedQuantity; AppliedCoupon.Quantity)
-                            {
-                            }
-                            fieldelement(RemainingQuantity; AppliedCoupon."Remaining Quantity")
-                            {
-                            }
-                            fieldelement(AmountPerQuantity; AppliedCoupon."Amount per Qty.")
-                            {
-                            }
-                        }
-                    }
 
-                    trigger OnAfterGetRecord()
-                    var
-                        POSAuditLog: Record "NPR POS Audit Log";
-                    begin
-                        POSAuditLog.SetRange("Record ID", "POS Entry".RecordId);
-                        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::DIRECT_SALE_END);
-                        POSAuditLog.FindFirst();
-                        DocumentType := POSAuditLog."External Type";
-                        TSignature := GetAuditSignature(POSAuditLog);
-                    end;
-
-                    trigger OnPreXmlItem()
-                    begin
-                        "POS Entry".SetRange("POS Entry"."Entry No.", FromPOSEntry, ToPOSEntry);
-                        "POS Entry".SetRange("POS Entry"."POS Unit No.", UnitNo);
-                        "POS Entry".SetRange("POS Entry"."Entry Type", "POS Entry"."Entry Type"::"Direct Sale");
-                    end;
+                        trigger OnPreXmlItem()
+                        begin
+                            duplicate.SetRange("Entry No.", _FromPOSAuditLogEntryNo, _ToPOSAuditLogEntryNo);
+                            duplicate.SetRange("Acted on POS Unit No.", _POSUnitNo);
+                            duplicate.SetRange("Action Type", duplicate."Action Type"::RECEIPT_COPY);
+                        end;
+                    }
                 }
-
-                trigger OnAfterGetRecord()
-                var
-                    POSAuditLog: Record "NPR POS Audit Log";
-                    LastZReport: Record "NPR POS Workshift Checkpoint";
-                begin
-                    if LastZReportEntryNo <> 0 then begin
-                        LastZReport.Get(LastZReportEntryNo);
-                        FromPOSEntry := LastZReport."POS Entry No.";
-                    end;
-                    ToPOSEntry := ZCheckpoint."POS Entry No.";
-
-                    POSAuditLog.SetRange("Record ID", ZCheckpoint.RecordId);
-                    POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
-                    POSAuditLog.FindFirst();
-                    ZExternalID := POSAuditLog."External ID";
-                    ZSignature := GetAuditSignature(POSAuditLog);
-                    ZGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
-                    ZPerpetualAbsoluteGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 2);
-                    ZPerpetualGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 3);
-
-
-                    LastZReportEntryNo := ZCheckpoint."Entry No.";
-                end;
-
-                trigger OnPreXmlItem()
-                begin
-                    ZCheckpoint.SetRange(Type, ZCheckpoint.Type::ZREPORT);
-                    ZCheckpoint.SetRange("POS Unit No.", UnitNo);
-                    ZCheckpoint.SetRange("Entry No.", FromZReportEntry, ToZReportEntry);
-                    ZCheckpoint.SetRange(Open, false);
-                end;
-            }
-            textelement(JET)
-            {
-                tableelement(jetentry; "NPR POS Audit Log")
+                textelement(grandtotals)
                 {
-                    XmlName = 'JETEntry';
-                    fieldelement(ID; JETEntry."External ID")
+                    XmlName = 'GrandTotals';
+                    tableelement(grandtotal; "NPR POS Audit Log")
                     {
-                    }
-                    fieldelement(Code; JETEntry."External Code")
-                    {
-                    }
-                    fieldelement(Description; JETEntry."External Description")
-                    {
-                    }
-                    fieldelement(Salesperson; JETEntry."Active Salesperson Code")
-                    {
-                    }
-                    fieldelement(Timestamp; JETEntry."Log Timestamp")
-                    {
-                    }
-                    fieldelement(AdditionalInfo; JETEntry."Additional Information")
-                    {
-                    }
-                    textelement(jsignature)
-                    {
-                        XmlName = 'Signature';
-                    }
+                        XmlName = 'GrandTotal';
+                        MinOccurs = Zero;
 
-                    trigger OnAfterGetRecord()
-                    var
-                        POSAuditLog: Record "NPR POS Audit Log";
-                    begin
-                        POSAuditLog := JETEntry;
-                        POSAuditLog.SetRecFilter();
-                        JSignature := GetAuditSignature(POSAuditLog);
-                    end;
+                        fieldelement(GrandTotalType; grandtotal."Action Custom Subtype")
+                        {
+                        }
+                        fieldelement(SequenceNumber; grandtotal."External ID")
+                        {
+                        }
+                        fieldelement(CreatedAt; grandtotal."Log Timestamp")
+                        {
+                        }
+                        textelement(grandtotalinclvat)
+                        {
+                            XmlName = 'GrandTotal';
+                        }
+                        textelement(perpetualabsolutegrandtotal)
+                        {
+                            XmlName = 'PerpetualAbsoluteGrandTotal';
+                        }
+                        textelement(perpetualgrandtotal)
+                        {
+                            XmlName = 'PerpetualGrandTotal';
+                        }
+                        textelement(grandtotalsignature)
+                        {
+                            XmlName = 'GrandTotalSignature';
+                        }
 
-                    trigger OnPreXmlItem()
-                    begin
-                        JETEntry.SetView(JETFilter);
-                    end;
+                        trigger OnAfterGetRecord()
+                        var
+                            POSAuditLog: Record "NPR POS Audit Log";
+                        begin
+                            POSAuditLog := grandtotal;
+                            POSAuditLog.SetRecFilter();
+                            grandtotalsignature := GetAuditSignature(POSAuditLog);
+                            grandtotalinclvat := GetSplitStringValue(grandtotal."Additional Information", '|', 1);
+                            perpetualabsolutegrandtotal := GetSplitStringValue(grandtotal."Additional Information", '|', 2);
+                            perpetualgrandtotal := GetSplitStringValue(grandtotal."Additional Information", '|', 3);
+                        end;
+
+                        trigger OnPreXmlItem()
+                        begin
+                            grandtotal.SetRange("Entry No.", _FromPOSAuditLogEntryNo, _ToPOSAuditLogEntryNo);
+                            grandtotal.SetRange("Acted on POS Unit No.", _POSUnitNo);
+                            grandtotal.SetRange("Action Type", grandtotal."Action Type"::GRANDTOTAL);
+                        end;
+                    }
                 }
+                textelement(jet)
+                {
+                    XmlName = 'JET';
+                    tableelement(jet_entry; "NPR POS Audit Log")
+                    {
+                        XmlName = 'JETEntry';
+                        MinOccurs = Zero;
+
+                        fieldelement(ID; jet_entry."External ID")
+                        {
+                        }
+                        fieldelement(Code; jet_entry."External Code")
+                        {
+                        }
+                        fieldelement(Description; jet_entry."External Description")
+                        {
+                        }
+                        fieldelement(Salesperson; jet_entry."Active Salesperson Code")
+                        {
+                        }
+                        fieldelement(Timestamp; jet_entry."Log Timestamp")
+                        {
+                        }
+                        fieldelement(AdditionalInfo; jet_entry."Additional Information")
+                        {
+                        }
+                        textelement(jsignature)
+                        {
+                            XmlName = 'JETSignature';
+                        }
+
+                        trigger OnAfterGetRecord()
+                        var
+                            POSAuditLog: Record "NPR POS Audit Log";
+                        begin
+                            POSAuditLog := jet_entry;
+                            POSAuditLog.SetRecFilter();
+                            JSignature := GetAuditSignature(POSAuditLog);
+                        end;
+
+                        trigger OnPreXmlItem()
+                        begin
+                            jet_entry.SetRange("Entry No.", _FromPOSAuditLogEntryNo, _ToPOSAuditLogEntryNo);
+                            jet_entry.SetRange("Acted on POS Unit No.", _POSUnitNo);
+                            jet_entry.SetFilter("Action Type", '%1|%2|%3|%4|%5|%6|%7|%8|%9|%10|%11',
+                                jet_entry."Action Type"::ARCHIVE_ATTEMPT,
+                                jet_entry."Action Type"::SIGN_IN,
+                                jet_entry."Action Type"::WORKSHIFT_END,
+                                jet_entry."Action Type"::DRAWER_COUNT,
+                                jet_entry."Action Type"::PARTNER_MODIFICATION,
+                                jet_entry."Action Type"::LOG_INIT,
+                                jet_entry."Action Type"::AUDIT_VERIFY_ERROR,
+                                jet_entry."Action Type"::CANCEL_SALE_END,
+                                jet_entry."Action Type"::SIGN_OUT,
+                                jet_entry."Action Type"::ITEM_RMA,
+                                jet_entry."Action Type"::CUSTOM);
+                        end;
+                    }
             }
 
             trigger OnAfterGetRecord()
-            var
-                LastWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+                var
                 POSAuditLog: Record "NPR POS Audit Log";
-                POSAuditLog2: Record "NPR POS Audit Log";
-                FromJETEntry: Integer;
-                ToJETEntry: Integer;
-                FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
             begin
-                //Find last checkpoint to set interval filter correctly for both JET entries, POS entries and Z report entries.
-
                 PCheckpoint.TestField(Type, PCheckpoint.Type::PREPORT);
                 PCheckpoint.TestField(Open, false);
-                PCheckpoint.SetRecFilter(); //Only one workshift being archived
-                ToZReportEntry := PCheckpoint."Entry No.";
-                UnitNo := PCheckpoint."POS Unit No.";
-
-                POSAuditLog2.SetRange("Record ID", PCheckpoint.RecordId);
-                POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::WORKSHIFT_END);
-                POSAuditLog2.SetRange("Acted on POS Unit No.", PCheckpoint."POS Unit No.");
-                POSAuditLog2.FindLast();
-                ToJETEntry := POSAuditLog2."Entry No.";
-
-                JETEntry.SetRange("Active POS Unit No.", PCheckpoint."POS Unit No.");
-                JETEntry.SetRange("External Type", 'JET');
-
-                LastWorkshiftCheckpoint.SetRange("POS Unit No.", PCheckpoint."POS Unit No.");
-                LastWorkshiftCheckpoint.SetRange(Type, PCheckpoint.Type);
-                LastWorkshiftCheckpoint.SetRange("Period Type", PCheckpoint."Period Type");
-                LastWorkshiftCheckpoint.SetRange(Open, false);
-                LastWorkshiftCheckpoint.SetFilter("Entry No.", '<%1', PCheckpoint."Entry No.");
-                if LastWorkshiftCheckpoint.FindLast() then begin
-                    POSAuditLog2.SetRange("Record ID", LastWorkshiftCheckpoint.RecordId);
-                    POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::WORKSHIFT_END);
-                    if POSAuditLog2.FindLast() then begin
-                        FromZReportEntry := LastWorkshiftCheckpoint."Entry No.";
-                        FromPOSEntry := LastWorkshiftCheckpoint."POS Entry No.";
-
-                        FromJETEntry := POSAuditLog2."Entry No.";
-                        JETEntry.SetFilter("Entry No.", '>%1&<=%2', FromJETEntry, ToJETEntry);
-                    end;
-                end;
-
-                if FromJETEntry = 0 then begin
-                    //Set filters to oldest entries after JET init
-
-                    POSAuditLog2.Reset();
-                    FRAuditMgt.GetJETInitRecord(POSAuditLog2, UnitNo, true);
-                    POSAuditLog2.Reset();
-                    POSAuditLog2.SetFilter("Entry No.", '>%1', POSAuditLog2."Entry No.");
-                    POSAuditLog2.SetRange("Acted on POS Unit No.", PCheckpoint."POS Unit No.");
-
-                    POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::DIRECT_SALE_END);
-                    POSAuditLog2.FindFirst();
-                    FromPOSEntry := POSAuditLog2."Acted on POS Entry No.";
-
-                    POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::DRAWER_COUNT);
-                    POSAuditLog2.FindFirst();
-                    LastWorkshiftCheckpoint.Reset();
-                    LastWorkshiftCheckpoint.Get(POSAuditLog2."Record ID");
-                    FromZReportEntry := LastWorkshiftCheckpoint."Entry No.";
-                    JETEntry.SetFilter("Entry No.", '<=%1', ToJETEntry);
-                end;
-
-                JETFilter := JETEntry.GetView(false);
+                    PCheckpoint.SetRecFilter();
 
                 POSAuditLog.SetRange("Record ID", PCheckpoint.RecordId);
                 POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
-                POSAuditLog.FindFirst();
+                POSAuditLog.FindLast();
+
+                    //Set globals and top level tableelement fields
+                    _POSUnitNo := PCheckpoint."POS Unit No.";
+                _ToPOSAuditLogEntryNo := POSAuditLog."Entry No.";
+                _PeriodType := POSAuditLog."Action Custom Subtype";
+                    ptodate := Format(DT2Date(POSAuditLog.SystemCreatedAt), 0, 9);
                 PExternalID := POSAuditLog."External ID";
                 PSignature := GetAuditSignature(POSAuditLog);
                 PGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
                 PPerpetualAbsoluteGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 2);
                 PPerpetualGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 3);
 
-                POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::ARCHIVE_CREATE);
+                    POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::ARCHIVE_CREATE);
+                    POSAuditLog.FindFirst();
                 ArchiveSignature := GetAuditSignature(POSAuditLog);
+
+                //Filter either from last period of same type on the same POS unit or, if it's the first, from the POS Unit JET Init.
+                POSAuditLog.Reset();
+                POSAuditLog.SetRange("Acted on POS Unit No.", _POSUnitNo);
+                    POSAuditLog.SetFilter("Entry No.", '<%1', _ToPOSAuditLogEntryNo);
+                POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
+                POSAuditLog.SetRange("Action Custom Subtype", _PeriodType);
+                if POSAuditLog.FindLast() then begin
+                    _FromPOSAuditLogEntryNo := POSAuditLog."Entry No." + 1;
+                        pfromdate := Format(DT2Date(POSAuditLog.SystemCreatedAt), 0, 9);
+                end else begin
+                    POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::LOG_INIT);
+                    POSAuditLog.SetRange("Action Custom Subtype");
+                    POSAuditLog.FindLast();
+                    _FromPOSAuditLogEntryNo := POSAuditLog."Entry No.";
+                        pfromdate := Format(DT2Date(POSAuditLog.SystemCreatedAt), 0, 9);
+                end;
             end;
+
+            }
         }
     }
 
     var
-        LastZReportEntryNo: Integer;
-        FromPOSEntry: Integer;
-        ToPOSEntry: Integer;
-        UnitNo: Code[10];
-        FromZReportEntry: Integer;
-        ToZReportEntry: Integer;
-        JETFilter: Text;
+        _FromPOSAuditLogEntryNo: Integer;
+        _ToPOSAuditLogEntryNo: Integer;
+        _POSUnitNo: Code[10];
+        _PeriodType: Text;
 
     local procedure GetAuditSignature(var POSAuditLog: Record "NPR POS Audit Log"): Text
     var
         InStream: InStream;
         Signature: Text;
+        SignatureChunk: Text;
     begin
-        POSAuditLog.SetAutoCalcFields("Electronic Signature");
-        POSAuditLog.FindFirst();
+        POSAuditLog.CalcFields("Electronic Signature");
         POSAuditLog."Electronic Signature".CreateInStream(InStream);
-        while (not InStream.EOS) do
-            InStream.Read(Signature);
+        while (not InStream.EOS) do begin
+            InStream.Read(SignatureChunk);
+            Signature += SignatureChunk;
+        end;
         exit(Signature);
     end;
 

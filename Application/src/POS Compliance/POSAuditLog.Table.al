@@ -39,8 +39,8 @@
             Caption = 'Type';
             DataClassification = CustomerContent;
             Editable = false;
-            OptionCaption = 'Salesperson Sign In,Salesperson Sign Out,Receipt Copy,Direct Sale End,Item RMA,Workshift End,Archive Attempt,Manual Cash Drawer Open,Audit Verification,Data Export,Permission Modification,Data Import,Drawer Count,Data Purge,Partner Modification,Audit Log Init,Compliance Modification,Setup Modification,Grand Total,Archive Create,Initial Receipt Print,Other POS Print,Unit Lock, Unit Unlock,Sale Park,Sale Load,Unit Open,Automatic Cash Drawer Open,Line Quantity Correction,Price Check,Manual Price Change,Credit Sale End,Cancel Sale End,Custom';
-            OptionMembers = SIGN_IN,SIGN_OUT,RECEIPT_COPY,DIRECT_SALE_END,ITEM_RMA,WORKSHIFT_END,ARCHIVE_ATTEMPT,MANUAL_DRAWER_OPEN,AUDIT_VERIFY,DATA_EXPORT,PERMISSION_MODIFY,DATA_IMPORT,DRAWER_COUNT,DATA_PURGE,PARTNER_MODIFICATION,LOG_INIT,COMPLIANCE_MODIFICATION,SETUP_MODIFICATION,GRANDTOTAL,ARCHIVE_CREATE,RECEIPT_PRINT,OTHER_POS_PRINT,UNIT_LOCK,UNIT_UNLOCK,SALE_PARK,SALE_LOAD,UNIT_OPEN,AUTO_DRAWER_OPEN,QUANTITY_CORRECTION,PRICE_CHECK,MANUAL_PRICE_CHANGE,CREDIT_SALE_END,CANCEL_SALE_END,CUSTOM;
+            OptionCaption = 'Salesperson Sign In,Salesperson Sign Out,Receipt Copy,Direct Sale End,Item RMA,Workshift End,Archive Attempt,Manual Cash Drawer Open,Audit Verification,Data Export,Permission Modification,Data Import,Drawer Count,Data Purge,Partner Modification,Audit Log Init,Compliance Modification,Setup Modification,Grand Total,Archive Create,Initial Receipt Print,Other POS Print,Unit Lock, Unit Unlock,Sale Park,Sale Load,Unit Open,Automatic Cash Drawer Open,Line Quantity Correction,Price Check,Manual Price Change,Credit Sale End,Cancel Sale End,Custom,Audit Verify Error';
+            OptionMembers = SIGN_IN,SIGN_OUT,RECEIPT_COPY,DIRECT_SALE_END,ITEM_RMA,WORKSHIFT_END,ARCHIVE_ATTEMPT,MANUAL_DRAWER_OPEN,AUDIT_VERIFY,DATA_EXPORT,PERMISSION_MODIFY,DATA_IMPORT,DRAWER_COUNT,DATA_PURGE,PARTNER_MODIFICATION,LOG_INIT,COMPLIANCE_MODIFICATION,SETUP_MODIFICATION,GRANDTOTAL,ARCHIVE_CREATE,RECEIPT_PRINT,OTHER_POS_PRINT,UNIT_LOCK,UNIT_UNLOCK,SALE_PARK,SALE_LOAD,UNIT_OPEN,AUTO_DRAWER_OPEN,QUANTITY_CORRECTION,PRICE_CHECK,MANUAL_PRICE_CHANGE,CREDIT_SALE_END,CANCEL_SALE_END,CUSTOM,AUDIT_VERIFY_ERROR;
         }
         field(6; "Acted on POS Entry No."; Integer)
         {
@@ -110,6 +110,8 @@
             Caption = 'Signature Base Hash';
             DataClassification = CustomerContent;
             Editable = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'No longer needed as we hash+sign with 1 call to external instead of 2 manual steps';
         }
         field(20; "External Implementation"; Text[30])
         {
@@ -153,6 +155,8 @@
             Caption = 'Original Signature Base Hash';
             DataClassification = CustomerContent;
             Editable = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'No longer needed as we hash+sign with 1 call to external instead of 2 manual steps';
         }
         field(29; "Handled by External Impl."; Boolean)
         {

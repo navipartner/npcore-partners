@@ -1,16 +1,18 @@
-﻿table 6184852 "NPR FR POS Audit Log Aux. Info"
+﻿table 6014699 "NPR FR POS Audit Log Add. Info"
 {
+    //This is a newer version of "NPR FR POS Audit Log Aux. Info" that does not link to POS Entry - to allow for more flexibility.
+
     Access = Internal;
-    Caption = 'FR POS Entry Aux. Info';
+    Caption = 'FR POS Audit Log Add. Info';
     DataClassification = CustomerContent;
 
     fields
     {
-        field(1; "POS Entry No."; Integer)
+        field(1; "POS Audit Log Entry No."; Integer)
         {
-            Caption = 'POS Entry No.';
+            Caption = 'POS Audit Log Entry No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Entry";
+            TableRelation = "NPR POS Audit Log";
         }
         field(2; "NPR Version"; Text[250])
         {
@@ -77,7 +79,7 @@
 
     keys
     {
-        key(Key1; "POS Entry No.")
+        key(Key1; "POS Audit Log Entry No.")
         {
         }
     }
