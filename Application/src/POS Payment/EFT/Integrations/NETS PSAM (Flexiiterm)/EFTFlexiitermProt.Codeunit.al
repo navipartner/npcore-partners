@@ -1,206 +1,95 @@
-﻿#if not CLOUD
-codeunit 6184516 "NPR EFT Flexiiterm Prot."
+﻿codeunit 6184516 "NPR EFT Flexiiterm Prot."
 {
     Access = Internal;
-    SingleInstance = true;
 
-    trigger OnRun()
-    begin
-    end;
-
+    procedure ConstructTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject)
     var
-
-    procedure SendRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request")
-    begin
-        case EFTTransactionRequest."Processing Type" of
-            EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD,
-          EFTTransactionRequest."Processing Type"::PAYMENT,
-          EFTTransactionRequest."Processing Type"::REFUND:
-                PaymentTransaction(EFTTransactionRequest);
-        end;
-    end;
-
-    local procedure PaymentTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request")
-    var
-        State: DotNet NPRNetState6;
-        GatewayRequest: DotNet NPRNetPaymentGatewayProcessRequest0;
-        EFTFlexiitermIntegration: Codeunit "NPR EFT Flexiiterm Integ.";
         EFTSetup: Record "NPR EFT Setup";
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        FlexiitermIntegration: Codeunit "NPR EFT Flexiiterm Integ.";
     begin
-        if not POSSession.IsActiveSession(POSFrontEnd) then
-            Error('Critical error');
-        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
+        EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
-        State := State.State();
-        State.RequestEntryNo := EFTTransactionRequest."Entry No.";
-        State.RegisterContactlessEnabled := true;
-        State.Amount := EFTTransactionRequest."Amount Input";
-        State.ConfirmCardBeforePayment := true;
-        State.RegisterNo := EFTTransactionRequest."Register No.";
-        State.ReceiptNo := EFTTransactionRequest."Sales Ticket No.";
-        State.VerificationMethod := EFTFlexiitermIntegration.GetCVM(EFTSetup);
-        State.TransactionType := EFTFlexiitermIntegration.GetTransactionType(EFTSetup);
-        State.IsBarcode := false;
-        State.CardSwipeActivatesTerminal := true;
-        State.Cashback := EFTTransactionRequest."Cashback Amount";
-        GatewayRequest := GatewayRequest.PaymentGatewayProcessRequest();
-        GatewayRequest.Path := EFTFlexiitermIntegration.GetFolderPath(EFTSetup);
-        GatewayRequest.State := State;
-
-        POSFrontEnd.InvokeDevice(GatewayRequest, 'Flexiiterm_EftTrx', 'EftTrx');
-    end;
-
-    #region Protocol Events
-
-    local procedure CloseForm(Data: Text)
-    var
-        State: DotNet NPRNetState6;
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTFlexiitermIntegration: Codeunit "NPR EFT Flexiiterm Integ.";
-        CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
-        POSPaymentMethod: Record "NPR POS Payment Method";
-        SalePOS: Record "NPR POS Sale";
-        NewCardNumber: Text;
-    begin
-
-        State := State.Deserialize(Data);
-
-        EFTTransactionRequest.Get(State.RequestEntryNo);
-        NewCardNumber := CreditCardHelper.CutCardPan(State.CardPan);
-
-        if (NewCardNumber <> '') and (EFTTransactionRequest."Card Number" <> NewCardNumber) then begin //Card was switched around during transaction
-            EFTTransactionRequest."Card Number" := NewCardNumber;
-
-            SalePOS.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
-            if CreditCardHelper.FindPaymentType(EFTTransactionRequest."Card Number", POSPaymentMethod, SalePOS."Location Code") then begin
-                EFTTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
-                EFTTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
-            end;
+        Request.Add('EntryNo', EftTransactionRequest."Entry No.");
+        Request.Add('Type', 'StartTransaction');
+        Request.Add('Amount', Round(EftTransactionRequest."Amount Input", 0.01));
+        Request.Add('FormattedAmount', Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
+        Request.Add('RegisterNo', EftTransactionRequest."Register No.");
+        Request.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
+        Request.Add('Cashback', EftTransactionRequest."Cashback Amount");
+        Request.Add('Path', FlexiitermIntegration.GetFolderPath(EFTSetup));
+        Request.Add('VAT', 0); //legacy: unsupported
+        Request.Add('Tips', 0); //legacy: unsupported
+        Request.Add('Surcharge', 0); //legacy: unsupported        
+        case FlexiitermIntegration.GetTransactionType(EFTSetup) of
+            0:
+                Request.Add('TransactionType', 'NotForced');
+            1:
+                Request.Add('TransactionType', 'ForcedOnline');
+            2:
+                Request.Add('TransactionType', 'ForcedOffline');
         end;
 
-        EFTTransactionRequest."Amount Output" := State.CapturedAmount;
-        EFTTransactionRequest."Result Amount" := State.CapturedAmount;
-        EFTTransactionRequest."POS Description" := EFTFlexiitermIntegration.GetPOSDescription(EFTTransactionRequest);
-        EFTTransactionRequest.Modify();
-
-        OnAfterProtocolResponse(EFTTransactionRequest);
+        case FlexiitermIntegration.GetCVM(EFTSetup) of
+            0:
+                Request.Add('VerificationMethod', 'NotForced');
+            1:
+                Request.Add('VerificationMethod', 'ForcedSignature');
+            2:
+                Request.Add('VerificationMethod', 'ForcedPin');
+        end;
     end;
 
-    local procedure FindPaymentType(Data: Text; var ReturnData: Text)
+    procedure HandleCardDataResponse(Response: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale") NewRequest: JsonObject
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR POS Sale";
-        State: DotNet NPRNetState6;
-        EFTSetup: Record "NPR EFT Setup";
+        POSSaleRecord: Record "NPR POS Sale";
+        CardPan: Text;
     begin
-
-        State := State.Deserialize(Data);
-
-        EFTTransactionRequest.Get(State.RequestEntryNo);
+        EFTTransactionRequest.Get(Response.GetInteger('EntryNo'));
+        CardPan := CreditCardHelper.CutCardPan(Response.GetString('CardPan'));
         POSUnit.Get(EFTTransactionRequest."Register No.");
+        POSSale.GetCurrentSale(POSSaleRecord);
 
-        State.CardPan := CreditCardHelper.CutCardPan(State.CardPan);
-
-        SalePOS.Get(State.RegisterNo, State.ReceiptNo);
-
-        if (CreditCardHelper.FindPaymentType(State.CardPan, POSPaymentMethod, SalePOS."Location Code")) then begin
-            State.SalesAmountInclVat := EFTTransactionRequest."Amount Input";
-            State.PaymentNo := POSPaymentMethod.Code;
-
-            State.MatchSalesAmount := POSPaymentMethod."Match Sales Amount";
-
-            EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
+        if (CreditCardHelper.FindPaymentType(CardPan, POSPaymentMethod, POSSaleRecord."Location Code")) then begin
             EFTTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
             EFTTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
-
             EFTTransactionRequest.Modify();
         end;
 
-        ReturnData := State.Serialize();
+        NewRequest.Add('Type', 'CardDataResult');
     end;
 
-    local procedure GetGiftVoucherBalance(var ReturnData: Text)
-    begin
-        ReturnData := SerializeJson(0);
-    end;
-
-    local procedure CheckTransactionFromCheckResult(Data: Text; var ReturnData: Text)
+    procedure HandleReceiptCheckResponse(Response: Codeunit "NPR POS JSON Helper") NewRequest: JsonObject
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Result: Boolean;
-        State: DotNet NPRNetState6;
     begin
-
-        State := State.Deserialize(Data);
-
-        Result := EFTTransactionRequest.Get(State.RequestEntryNo);
+        Result := EFTTransactionRequest.Get(Response.GetInteger('EntryNo'));
         if Result then
             Result := EFTTransactionRequest."Receipt 1".HasValue;
-        ReturnData := State.Serialize(Result);
+
+        NewRequest.Add('Type', 'ReceiptCheckResult');
+        NewRequest.Add('ReceiptFoundInDatabase', Result);
     end;
 
-    local procedure ModifyTransactionFromCheckResult(Data: Text)
+    procedure HandleReceiptDataResponse(Response: Codeunit "NPR POS JSON Helper") NewRequest: JsonObject
     var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
-        State: DotNet NPRNetState6;
-    begin
-
-        State := State.Deserialize(Data);
-        EFTTransactionRequest.Get(State.RequestEntryNo);
-
-        EFTTransactionRequest."Result Code" := 3;
-        EFTTransactionRequest.Successful := true;
-        EFTTransactionRequest."Result Display Text" := 'Approved';
-        EFTTransactionRequest."Card Number" := CreditCardHelper.CutCardPan(State.CardPan);
-        EFTTransactionRequest."Transaction Date" := Today();
-        EFTTransactionRequest."Transaction Time" := Time;
-        EFTTransactionRequest."External Result Known" := true;
-        EFTTransactionRequest.Modify();
-    end;
-
-    local procedure RejectTransactionIfFound(Data: Text)
-    var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
-        State: DotNet NPRNetState6;
-    begin
-
-        State := State.Deserialize(Data);
-        EFTTransactionRequest.Get(State.RequestEntryNo);
-
-        EFTTransactionRequest."Result Code" := 1;
-        EFTTransactionRequest.Successful := false;
-        EFTTransactionRequest."Result Display Text" := 'Declined';
-        EFTTransactionRequest."Card Number" := CreditCardHelper.CutCardPan(State.CardPan);
-        EFTTransactionRequest."Transaction Date" := Today();
-        EFTTransactionRequest."Transaction Time" := Time;
-        EFTTransactionRequest."External Result Known" := true;
-        EFTTransactionRequest.Modify();
-    end;
-
-    local procedure HandleReceipt(Data: Text)
-    var
-        Lines: DotNet NPRNetArray;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         OStream: OutStream;
+        ReceiptLineToken: JsonToken;
         ReceiptLine: Text;
         CreditCardTransaction: Record "NPR EFT Receipt";
         EntryNo: Integer;
         ReceiptNo: Integer;
-        State: DotNet NPRNetState6;
+        Lines: JsonArray;
     begin
-
-        State := State.Deserialize(Data);
-        EFTTransactionRequest.Get(State.RequestEntryNo);
+        EFTTransactionRequest.Get(Response.GetInteger('EntryNo'));
         EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
 
-        Lines := State.ReceiptData;
+        Lines := Response.GetJToken('ReceiptData').AsArray();
         EntryNo := 1;
 
         CreditCardTransaction.SetRange("Register No.", EFTTransactionRequest."Register No.");
@@ -220,7 +109,8 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         CreditCardTransaction."EFT Trans. Request Entry No." := EFTTransactionRequest."Entry No.";
         CreditCardTransaction."Receipt No." := ReceiptNo;
 
-        foreach ReceiptLine in Lines do begin
+        foreach ReceiptLineToken in Lines do begin
+            ReceiptLine := ReceiptLineToken.AsValue().AsText();
             OStream.Write(ReceiptLine);
 
             CreditCardTransaction."Entry No." := EntryNo;
@@ -237,56 +127,74 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         CreditCardTransaction.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
         CreditCardTransaction.SetRange("Receipt No.", ReceiptNo);
         CreditCardTransaction.PrintTerminalReceipt();
+
+        NewRequest.Add('Type', 'ReceiptDataCommitted');
     end;
 
-    local procedure SerializeJson("Object": Variant): Text
+    procedure HandleTransactionResultResponse(Response: Codeunit "NPR POS JSON Helper") NewRequest: JsonObject
     var
-        JsonConvert: DotNet NPRNetJsonConvert;
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
+        CardPan: Text;
+        TrxSuccess: Boolean;
     begin
-        exit(JsonConvert.SerializeObject(Object));
-    end;
+        if Response.GetString('CardPan', CardPan) then;
+        TrxSuccess := Response.GetBoolean('TrxSuccess');
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', false, false)]
-    local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
-    begin
-
-        if (ActionName <> 'Flexiiterm_EftTrx') then
-            exit;
-
-        Handled := true;
-
-        case EventName of
-            'CloseForm':
-                CloseForm(Data);
-            'FindPaymentType':
-                FindPaymentType(Data, ReturnData);
-            'InsertSaleLineFee':
-                ; //Delete when event is completely gone from stargate assembly.
-            'CheckTransactionFromCheckResult':
-                CheckTransactionFromCheckResult(Data, ReturnData);
-            'ModifyTransactionFromCheckResult':
-                ModifyTransactionFromCheckResult(Data);
-            'RejectTransactionIfFound':
-                RejectTransactionIfFound(Data);
-            'ReadReceipt':
-                HandleReceipt(Data);
-            'PrintReceipts':
-                ; //Delete when event is completely gone from stargate assembly.
-            'NumPad':
-                ; //Delete when event is completely gone from stargate assembly.
-                  //-NPR5.54 [387965]
-            'GetGiftVoucherBalance':
-                GetGiftVoucherBalance(ReturnData);
-            else
-                Error('Unhandled event sent from PaymentGateway %1', EventName);
+        EFTTransactionRequest.Get(Response.GetInteger('EntryNo'));
+        EFTTransactionRequest."Card Number" := CreditCardHelper.CutCardPan(CardPan);
+        EFTTransactionRequest."Transaction Date" := Today();
+        EFTTransactionRequest."Transaction Time" := Time;
+        EFTTransactionRequest."External Result Known" := true;
+        if (TrxSuccess) then begin
+            EFTTransactionRequest."Result Code" := 3;
+            EFTTransactionRequest.Successful := true;
+            EFTTransactionRequest."Result Display Text" := 'Approved';
+        end else begin
+            EFTTransactionRequest."Result Code" := 1;
+            EFTTransactionRequest.Successful := false;
+            EFTTransactionRequest."Result Display Text" := 'Declined';
         end;
+        EFTTransactionRequest.Modify();
+        Commit();
+
+        NewRequest.Add('Type', 'TransactionResultCommitted');
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterProtocolResponse(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    procedure HandleTransactionCompletedResponse(Response: Codeunit "NPR POS JSON Helper") NewRequest: JsonObject
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTFlexiitermIntegration: Codeunit "NPR EFT Flexiiterm Integ.";
+        CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        SalePOS: Record "NPR POS Sale";
+        NewCardNumber: Text;
+        EftInterface: Codeunit "NPR EFT Interface";
+        BCSuccess: Boolean;
+        CardPan: Text;
     begin
-    end;
+        EFTTransactionRequest.Get(Response.GetInteger('EntryNo'));
+        if Response.GetString('CardPan', CardPan) then;
+        NewCardNumber := CreditCardHelper.CutCardPan(CardPan);
 
-    #endregion
+        if (NewCardNumber <> '') and (EFTTransactionRequest."Card Number" <> NewCardNumber) then begin //Card was switched around during transaction
+            EFTTransactionRequest."Card Number" := NewCardNumber;
+
+            SalePOS.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
+            if CreditCardHelper.FindPaymentType(EFTTransactionRequest."Card Number", POSPaymentMethod, SalePOS."Location Code") then begin
+                EFTTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
+                EFTTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
+            end;
+        end;
+
+        EFTTransactionRequest."Amount Output" := Response.GetDecimal('CapturedAmount');
+        EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output";
+        EFTTransactionRequest."POS Description" := EFTFlexiitermIntegration.GetPOSDescription(EFTTransactionRequest);
+        EFTTransactionRequest.Modify();
+        BCSuccess := EFTTransactionRequest.Successful;
+
+        EftInterface.EftIntegrationResponse(EftTransactionRequest); //commits
+
+        NewRequest.Add('BCSuccess', BCSuccess);
+    end;
 }
-#endif

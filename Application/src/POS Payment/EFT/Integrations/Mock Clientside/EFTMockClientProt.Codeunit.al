@@ -55,6 +55,7 @@
     local procedure PaymentTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
         Workflow := Format(Enum::"NPR POS Workflow"::EFT_MOCK_CLIENT);
+        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('Type', 'Transaction');
         HwcRequest.Add('ReceiptNo', EFTTransactionRequest."Sales Ticket No.");
         HwcRequest.Add('AmountIn', Round(EftTransactionRequest."Amount Input" * 100, 1));
@@ -72,6 +73,7 @@
     begin
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."POS Payment Type Code");
         Workflow := Format(Enum::"NPR POS Workflow"::EFT_GENERIC_OPEN);
+        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('Type', 'Open');
         HwcRequest.Add('HwcName', HwcIntegrationName());
         SetConnectionInitState(HwcRequest, EFTSetup);
@@ -80,6 +82,7 @@
     local procedure CloseTerminal(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
         Workflow := Format(Enum::"NPR POS Workflow"::EFT_GENERIC_CLOSE);
+        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('Type', 'Close');
         HwcRequest.Add('HwcName', HwcIntegrationName());
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
@@ -88,6 +91,7 @@
     local procedure VerifySetup(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
         Workflow := Format(Enum::"NPR POS Workflow"::EFT_GENERIC_AUX);
+        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('Type', 'VerifySetup');
         HwcRequest.Add('HwcName', HwcIntegrationName());
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
@@ -99,6 +103,7 @@
     begin
         OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
         Workflow := Format(Enum::"NPR POS Workflow"::EFT_MOCK_CLIENT);
+        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('Type', 'Lookup');
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
         HwcRequest.Add('OriginalRequestEntryNo', OriginalTransactionRequest."Entry No.");
@@ -115,6 +120,7 @@
         OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
 
         Workflow := Format(Enum::"NPR POS Workflow"::EFT_MOCK_CLIENT);
+        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('Type', 'Void');
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
         HwcRequest.Add('OriginalRequestEntryNo', OriginalTransactionRequest."Entry No.");
@@ -128,6 +134,7 @@
     local procedure BalanceEnquiry(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
         Workflow := Format(Enum::"NPR POS Workflow"::EFT_GENERIC_AUX);
+        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('Type', 'BalanceEnquiry');
         HwcRequest.Add('HwcName', HwcIntegrationName());
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");
@@ -136,6 +143,7 @@
     local procedure ReprintLastReceipt(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
     begin
         Workflow := Format(Enum::"NPR POS Workflow"::EFT_GENERIC_AUX);
+        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('Type', 'Reprint');
         HwcRequest.Add('HwcName', HwcIntegrationName());
         HwcRequest.Add('ReceiptNo', EftTransactionRequest."Sales Ticket No.");

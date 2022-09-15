@@ -24,7 +24,6 @@ codeunit 6059883 "NPR POS Action: EFTGiftCard B."
 
         EntryNo := EFTPaymentMgt.PrepareGiftCardLoad(EFTSetup, Amount, '', SalePOS."Register No.", SalePOS."Sales Ticket No.", IntegrationRequest, Mechanism, Workflow);
         EFTTransactionRequest.Get(EntryNo);
-        IntegrationRequest.Add('EntryNo', EntryNo);
 
         EFTTransactionMgt.SendRequestIfSynchronous(EntryNo, IntegrationRequest, Mechanism);
 

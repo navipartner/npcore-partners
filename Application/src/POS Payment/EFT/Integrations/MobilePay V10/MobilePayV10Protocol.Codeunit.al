@@ -297,6 +297,7 @@
 
     procedure CreateRequestJSON(EftTrxRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject)
     begin
+        Request.Add('EntryNo', EftTrxRequest."Entry No.");
         Request.Add('qr', GetQRBeaconId(EftTrxRequest));
         Request.Add('formattedAmount', Format(EftTrxRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
         Request.Add('transactionCaption', Format(EftTrxRequest."Processing Type"));
