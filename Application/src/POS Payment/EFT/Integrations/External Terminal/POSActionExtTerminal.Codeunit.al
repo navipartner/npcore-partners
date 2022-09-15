@@ -31,13 +31,13 @@ codeunit 6184632 "NPR POS Action Ext.Terminal" implements "NPR IPOS Workflow"
     var
         EftTransactionRequest: Record "NPR EFT Transaction Request";
         EftFramework: Codeunit "NPR EFT Framework Mgt.";
-        HwcRequest: JsonObject;
+        Request: JsonObject;
         EFTExtTerminalInteg: Codeunit "NPR EFT Ext. Terminal Integ.";
         Success: Boolean;
     begin
-        HwcRequest := Context.GetJsonObject('hwcRequest');
+        Request := Context.GetJsonObject('request');
 
-        EftTransactionRequest.Get(EFTExtTerminalInteg.HandleResponse(HwcRequest, Result, Context));
+        EftTransactionRequest.Get(EFTExtTerminalInteg.HandleResponse(Request, Result, Context));
         EftFramework.EftIntegrationResponseReceived(EftTransactionRequest);
         Success := EftTransactionRequest.Successful;
 
@@ -53,7 +53,7 @@ codeunit 6184632 "NPR POS Action Ext.Terminal" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionExtTerminal.js###
-'let main=async({context:e,workflow:s,popup:a,captions:i})=>{let r={success:!1,endSale:!1};if(e.hwcRequest.AmountIn>0){if(e.hwcRequest.PromptCardDigits&&(e.hwcRequest.CardDigits=await a.intpad({caption:i.PromptCardDigits}),e.hwcRequest.CardDigits===null||e.hwcRequest.CardDigits===0)||e.hwcRequest.PromptCardHolder&&(e.hwcRequest.CardHolder=await a.input({caption:i.PromptCardHolder}),e.hwcRequest.CardHolder===null))return r;if(e.hwcRequest.PromptApprovalCode){if(confirmAns=await a.confirm(i.PromptConfirmation+e.hwcRequest.AmountIn+"?"),!confirmAns)return r;if(e.hwcRequest.ApprovalCode=await a.input({caption:i.PromptApprovalCode}),e.hwcRequest.ApprovalCode==="")return a.error(i.InvalidApprovalCode),r;if(e.hwcRequest.ApprovalCode===null)return r}}const{success:u,endSale:l}=await s.respond("FinalizeRequest");return r.success=u,r.endSale=l,r};'
+'let main=async({context:r,workflow:s,popup:a,captions:i})=>{let e={success:!1,tryEndSale:!1};if(r.request.AmountIn>0){if(r.request.PromptCardDigits&&(r.request.CardDigits=await a.intpad({caption:i.PromptCardDigits}),r.request.CardDigits===null||r.request.CardDigits===0)||r.request.PromptCardHolder&&(r.request.CardHolder=await a.input({caption:i.PromptCardHolder}),r.request.CardHolder===null))return e;if(r.request.PromptApprovalCode){if(confirmAns=await a.confirm(i.PromptConfirmation+r.request.AmountIn+"?"),!confirmAns)return e;if(r.request.ApprovalCode=await a.input({caption:i.PromptApprovalCode}),r.request.ApprovalCode==="")return a.error(i.InvalidApprovalCode),e;if(r.request.ApprovalCode===null)return e}}const{success:u,endSale:l}=await s.respond("FinalizeRequest");return e.success=u,e.tryEndSale=l,e};'
         );
     end;
 
