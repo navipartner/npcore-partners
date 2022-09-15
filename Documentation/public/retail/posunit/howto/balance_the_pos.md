@@ -28,7 +28,7 @@ This article focuses on making a Z-report and counting the contents of the payme
 > [!Note]
 > The **Workshift Details** table contains the details of all types of transactions - sales, X-report, Z-report etc. 
 
-3. Click ![ellipsis icon](../../../images/Icons/elipsis_icon.PNG "Three Dots Icon") and then P**Process** followed by **Balance Payment Bin...** in the dropdown list.     
+3. Click ![ellipsis icon](../../../images/Icons/elipsis_icon.PNG "Three Dots Icon") and then **Process** followed by **Balance Payment Bin...** in the dropdown list.     
    The **POS Payment Bin Checkpoint** window is displayed. It contains options for counting, transferring and closing of the attached payment bin's contents.    
 
 > [!Note]
