@@ -3,22 +3,22 @@ let main = async ({ workflow, context, captions, parameters }) => {
     if (parameters.PromptQuantity) {
         context.quantity = await popup.numpad(captions.VoucherQuantity);
     }
-    if (context.quantity > 100 || context.quantity < 1) {
+    if (!context.quantity || context.quantity > 100 || context.quantity < 1) {
         await popup.error(captions.InvalidQuantity);
         return;
     }
 
     context.amount = await popup.numpad(captions.VoucherAmount);
-    if (context.amount < 0) {
+    if (!context.amount || context.amount < 0) {
         await popup.error(captions.InvalidAmount);
         return;
     }
 
     context.discountPct = 0;
     if (parameters.PromptDiscountPct) {
-        context.discountPct = await popup.numpad(captions.VoucherDiscount);
+        context.discountPct = await popup.numpad(captions.VoucherDiscount);        
     }
-    if (context.discountPct < 0 || context.discountPct > 100) {
+    if (!context.discountPct || context.discountPct < 0 || context.discountPct > 100) {
         await popup.error(captions.InvalidDiscount);
         return;
     }

@@ -270,7 +270,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_MOBILEPAY', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action - MobilePay Trx";
     }
-
     value(48; "SS-IDLE-TIMEOUT")
     {
         Caption = 'SS-IDLE-TIMEOUT', Locked = true, MaxLength = 20;
@@ -286,7 +285,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_GIFT_CARD_2', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: EFTGiftCard 2";
     }
-
+    value(52; EFT_FLEXIITERM)
+    {
+        Caption = 'EFT_FLEXIITERM', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: EFT Flexiiterm";
+    }
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;

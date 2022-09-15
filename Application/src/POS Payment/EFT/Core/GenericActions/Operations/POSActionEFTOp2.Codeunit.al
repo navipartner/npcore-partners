@@ -139,7 +139,6 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         Workflow: Text;
     begin
         EntryNo := EFTTransactionMgt.PrepareBeginWorkshift(EFTSetup, SalePOS, IntegrationRequest, Mechanism, Workflow);
-        IntegrationRequest.Add('EntryNo', EntryNo);
         EFTTransactionMgt.SendRequestIfSynchronous(EntryNo, IntegrationRequest, Mechanism);
         WorkflowRequest.Add('workflowName', Workflow);
         WorkflowRequest.Add('integrationRequest', IntegrationRequest);
@@ -154,7 +153,6 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         Workflow: Text;
     begin
         EntryNo := EFTTransactionMgt.PrepareEndWorkshift(EFTSetup, SalePOS, IntegrationRequest, Mechanism, Workflow);
-        IntegrationRequest.Add('EntryNo', EntryNo);
         EFTTransactionMgt.SendRequestIfSynchronous(EntryNo, IntegrationRequest, Mechanism);
         WorkflowRequest.Add('workflowName', Workflow);
         WorkflowRequest.Add('integrationRequest', IntegrationRequest);
@@ -174,7 +172,6 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
             Error('');
 
         EntryNo := EFTTransactionMgt.PrepareVoid(EFTSetup, SalePOS, LastEFTTransactionRequest."Entry No.", true, IntegrationRequest, Mechanism, Workflow);
-        IntegrationRequest.Add('EntryNo', EntryNo);
         EFTTransactionMgt.SendRequestIfSynchronous(EntryNo, IntegrationRequest, Mechanism);
         WorkflowRequest.Add('workflowName', Workflow);
         WorkflowRequest.Add('integrationRequest', IntegrationRequest);
@@ -195,7 +192,6 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
             Error('');
 
         EntryNo := EFTTransactionMgt.PrepareVoid(EFTSetup, SalePOS, EFTTransactionRequest."Entry No.", true, IntegrationRequest, Mechanism, Workflow);
-        IntegrationRequest.Add('EntryNo', EntryNo);
         EFTTransactionMgt.SendRequestIfSynchronous(EntryNo, IntegrationRequest, Mechanism);
         WorkflowRequest.Add('workflowName', Workflow);
         WorkflowRequest.Add('integrationRequest', IntegrationRequest);
@@ -210,7 +206,6 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         Workflow: Text;
     begin
         EntryNo := EFTTransactionMgt.PrepareVerifySetup(EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", IntegrationRequest, Mechanism, Workflow);
-        IntegrationRequest.Add('EntryNo', EntryNo);
         EFTTransactionMgt.SendRequestIfSynchronous(EntryNo, IntegrationRequest, Mechanism);
         WorkflowRequest.Add('workflowName', Workflow);
         WorkflowRequest.Add('integrationRequest', IntegrationRequest);
@@ -230,7 +225,6 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
             exit;
 
         EntryNo := EFTTransactionMgt.PrepareReferencedRefund(EFTSetup, SalePOS, '', 0, EFTTransactionRequest."Entry No.", IntegrationRequest, Mechanism, Workflow);
-        IntegrationRequest.Add('EntryNo', EntryNo);
         EFTTransactionMgt.SendRequestIfSynchronous(EntryNo, IntegrationRequest, Mechanism);
         WorkflowRequest.Add('workflowName', Workflow);
         WorkflowRequest.Add('integrationRequest', IntegrationRequest);
@@ -245,7 +239,6 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         Workflow: Text;
     begin
         EntryNo := EFTTransactionMgt.PrepareAuxOperation(EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", AuxId, IntegrationRequest, Mechanism, Workflow);
-        IntegrationRequest.Add('EntryNo', EntryNo);
         EFTTransactionMgt.SendRequestIfSynchronous(EntryNo, IntegrationRequest, Mechanism);
         WorkflowRequest.Add('workflowName', Workflow);
         WorkflowRequest.Add('integrationRequest', IntegrationRequest);
@@ -285,7 +278,6 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         LookupEntryNo: Integer;
     begin
         LookupEntryNo := EFTTransactionMgt.PrepareLookup(EFTSetup, SalePOS, EntryNo, IntegrationRequest, Mechanism, Workflow);
-        IntegrationRequest.Add('EntryNo', LookupEntryNo);
         EFTTransactionMgt.SendRequestIfSynchronous(LookupEntryNo, IntegrationRequest, Mechanism);
         WorkflowRequest.Add('workflowName', Workflow);
         WorkflowRequest.Add('integrationRequest', IntegrationRequest);

@@ -3,12 +3,6 @@ codeunit 6059882 "NPR UPG PaymentV2"
     Access = Internal;
     Subtype = Upgrade;
 
-    trigger OnRun()
-    begin
-        UpgradePOSMenuPaymentButtons();
-        UpgradeNamedActionProfiles();
-        UpgradePOSMenuOperationButtons();
-    end;
 
     trigger OnUpgradePerCompany()
     var
@@ -23,8 +17,10 @@ codeunit 6059882 "NPR UPG PaymentV2"
             exit;
         end;
 
+        DiscoverNewActions();
         UpgradePOSMenuPaymentButtons();
         UpgradeNamedActionProfiles();
+        UpgradePOSMenuOperationButtons();
 
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG PaymentV2"));
         LogMessageStopwatch.LogFinish();
@@ -40,7 +36,7 @@ codeunit 6059882 "NPR UPG PaymentV2"
             exit;
 
         repeat
-            POSMenuButton.Validate("Action Code", Format(Enum::"NPR POS Workflow"::PAYMENT_2));
+            POSMenuButton."Action Code" := Format(Enum::"NPR POS Workflow"::PAYMENT_2);
             POSMenuButton.Modify(true);
             POSMenuButton.RefreshParameters();
         until POSMenuButton.Next() = 0;
@@ -73,9 +69,16 @@ codeunit 6059882 "NPR UPG PaymentV2"
             exit;
 
         repeat
-            POSNamedActionProfile.Validate("Payment Action Code", Format(Enum::"NPR POS Workflow"::PAYMENT_2));
+            POSNamedActionProfile."Payment Action Code" := Format(Enum::"NPR POS Workflow"::PAYMENT_2);
             POSNamedActionProfile.Modify(true);
             ParamMgt.RefreshParameters(POSNamedActionProfile.RecordId, '', POSNamedActionProfile.FieldNo("Payment Action Code"), POSNamedActionProfile."Payment Action Code");
         until POSNamedActionProfile.Next() = 0;
+    end;
+
+    local procedure DiscoverNewActions()
+    var
+        POSAction: Record "NPR POS Action";
+    begin
+        POSAction.DiscoverActions();
     end;
 }

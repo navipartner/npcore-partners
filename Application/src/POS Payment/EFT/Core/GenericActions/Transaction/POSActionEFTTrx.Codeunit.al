@@ -53,7 +53,6 @@ codeunit 6184474 "NPR POS Action: EFT Trx" implements "NPR POS IPaymentWFHandler
 
         EntryNo := EFTTransactionMgt.PreparePayment(EFTSetup, Context.GetDecimal('suggestedAmount'), '', SalePOS, IntegrationRequest, Mechanism, Workflow);
         EFTTransactionRequest.Get(EntryNo);
-        IntegrationRequest.Add('EntryNo', EntryNo);
 
         EFTTransactionMgt.SendRequestIfSynchronous(EntryNo, IntegrationRequest, Mechanism);
 
