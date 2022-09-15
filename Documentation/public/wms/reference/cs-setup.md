@@ -75,7 +75,7 @@ This section contains the settings related to grouping of search results.
 
 ## Worksheets 
 
-This section contains the settings related to the templates used in regards to the stock count.
+This section contains the settings related to the common templates used in regards to the stock count.
 
 ## Physical Inventory Counting 
 
@@ -95,7 +95,7 @@ This section contains the settings related to the job queue processing.
 
 ## Azure Printing 
 
-This section contains the settings related to printing.
+This section contains the settings related to printing. If you wish to be able to print from the envoy device, you can configure the Azure functionalities in this section. All WMS documents that you wish to print can be sent to the blob storage, from which they will be printed on a specific printer inside the warehouse.
 
 | Field Name      | Description |
 | ----------- | ----------- |

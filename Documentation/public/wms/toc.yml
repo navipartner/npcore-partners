@@ -37,12 +37,16 @@
     href: howto/set-up-datapatterncode.md
   - name: Perform stock count (Physical Inventory Journal and mobile apps)
     href: howto/perform_stock_count.md
+  - name: Create a CS RFID tag model
+    href: howto/create_rfid_tag_model.md
+  - name: Perform shop and stock count in NP RFID
+    href: howto/stock_count_rfid.md
 
 - name: Reference
   items: 
   - name: CS setup
     href: reference/cs-setup.md
-  - name: Handling codeunits (reference guide)
+  - name: Handling codeunits
     href: reference/handling_codeunits.md
 
 - name: Videos

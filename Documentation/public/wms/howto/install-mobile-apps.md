@@ -6,17 +6,29 @@ It is necessary to install two apps on mobile devices to connect them to the WMS
 
 <img src="../images/npwms-play-store.jpg" width="300">
 
+> [!Note]
+> Both NP WMS and NP RFID are Android-exclusive apps.
 
-2. Once downloaded and installed, open the **NP WMS** app and click **SETUP**.         
+2. Once downloaded and installed, open the **NP WMS**/**NP RFID** app and select whether you wish to use the SaaS or on-prem version. 
+
+3. Use the necessary authentication to proceed, and then select the tenant and company that you want to use.
+
+4. Press **SETUP**.         
    A window for setting up the profile is displayed.
 
-3. In the **PROFILE** window, click **SETUP ACCOUNT**.
+5. In the **PROFILE** window, press **SETUP ACCOUNT**.
 
-4. Click on the Camera icon in the upper right corner to scan the [QR Code](create-qr-codes.md).              
-   Following the successful QR scan, the required parameters will be saved in the Setup.
+6. Press the camera icon in the upper right corner to scan the [QR Code](create-qr-codes.md) that was previously created in Business Central.              
+   Following the successful QR scan, the required parameters will be saved in the **Setup**.
 
-As a result, NP WMS can now be accessed.
+7. Press **CONNECT A SCANNER** to select how the scanning will be performed.    
+   You can choose between a phone camera, or one of the listed scanners.
+   If you selected a camera, you also need to **REQUEST A SCANNER LICENSE**. Scanner licenses are then distributed to new devices by NaviPartner employees.
 
+> [!Note]
+> The only difference between the NP WMS and NP RFID scanner configuration is that the NP RFID app is connected to the Bluetooth scanner in the **SCANNER** portion of **SETUP**, where you can see the type of scanner in use, along with the RFID scanner ID, and multiple options for configuring the RFID scanner settings. 
+
+   Once the necessary steps are completed, you will be ready to log in and start using the app.
 ### Related links
 
 - [Warehouse Management System](../intro.md)
