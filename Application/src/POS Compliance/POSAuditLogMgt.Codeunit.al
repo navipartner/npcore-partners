@@ -2,9 +2,6 @@
 {
     Access = Internal;
 
-    var
-        ERROR_NO_LOG_VALIDATION: Label 'No log validation routine found';
-
     local procedure IsEnabled(POSAuditProfileCode: Code[20]): Boolean
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
@@ -14,16 +11,24 @@
         exit(POSAuditProfile."Audit Log Enabled");
     end;
 
-    procedure ValidateLog(var POSAuditLog: Record "NPR POS Audit Log")
+    procedure ValidateLog(var POSAuditLog: Record "NPR POS Audit Log"): Boolean
     var
-        Handled: Boolean;
         BlankRecordID: RecordID;
+        POSAuditLogVerify: Codeunit "NPR POS Audit Log Verify";
+        Error: Boolean;
     begin
         CreateEntry(BlankRecordID, POSAuditLog."Action Type"::AUDIT_VERIFY, 0, '', '');
         Commit();
-        OnValidateLogRecords(POSAuditLog, Handled);
-        if not Handled then
-            Error(ERROR_NO_LOG_VALIDATION);
+        if POSAuditLogVerify.Run(POSAuditLog) then; //will always return false because an error is needed to rollback DB changes while validating
+
+        Error := POSAuditLogVerify.VerificationError();        
+        if Error then begin
+            //The reason we use a global boolean in a codeunit to transfer error flag is because french compliance performs temporary DB re-calculations that HAS to be rolled back even when there is no error. 
+            //So it always errors in normal NAV terminology to trigger that rollback. 
+            CreateEntry(BlankRecordID, POSAuditLog."Action Type"::AUDIT_VERIFY_ERROR, 0, '', '');
+            Message(GetLastErrorText());
+        end;
+        exit(Error);
     end;
 
     procedure ArchiveWorkshiftPeriod(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
@@ -33,8 +38,8 @@
     begin
         POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
         CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::ARCHIVE_ATTEMPT, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
-        Commit();
         CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::ARCHIVE_CREATE, POSEntry."Entry No.", POSEntry."Fiscal No.", POSWorkshiftCheckpoint."POS Unit No.");
+        Commit();
         OnArchiveWorkshiftPeriod(POSWorkshiftCheckpoint);
     end;
 
@@ -101,8 +106,8 @@
         end;
 
         OnHandleAuditLogBeforeInsert(POSAuditLog);
-
-        POSAuditLog.Insert(true, true);
+        POSAuditLog.Insert(true);
+        OnHandleAuditLogAfterInsert(POSAuditLog);
     end;
 
     procedure ShowAuditLogForRecord(RecordIDIn: RecordID)
@@ -171,17 +176,27 @@
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnHandleAuditLogAfterInsert(var POSAuditLog: Record "NPR POS Audit Log")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnArchiveWorkshiftPeriod(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateLogRecords(var POSAuditLog: Record "NPR POS Audit Log"; var Handled: Boolean)
+    internal procedure OnValidateLogRecords(var POSAuditLog: Record "NPR POS Audit Log"; var Handled: Boolean; var Error: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnShowAdditionalInfo(POSAuditLog: Record "NPR POS Audit Log")
     begin
     end;
 }

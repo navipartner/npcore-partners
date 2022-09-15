@@ -89,11 +89,16 @@
         Variant: Variant;
         RecRef: RecordRef;
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
+        POSEntryOutputLogMgt: Codeunit "NPR POS Entry Output Log Mgt.";
     begin
-        if ReportSelection.FindSet() then
+        if ReportSelection.FindSet() then begin
+            POSEntryOutputLogMgt.LogOutput(RecRefIn, ReportSelection); //logs the print attempt before it is finalized, in case of error later it won't be rolled back.
+            Commit(); //printing should not read dirty data, worst case sending it out of the ERP system and rolling it back later
+
             repeat
                 RecRef := RecRefIn.Duplicate();
                 if not RecRef.IsEmpty() then begin
+
                     Variant := RecRef;
                     case true of
                         StrLen(ReportSelection."Print Template") > 0:
@@ -110,7 +115,8 @@
                 end;
             until ReportSelection.Next() = 0;
 
-        OnAfterRunReportSelectionType(ReportSelection, RecRefIn);
+            OnAfterRunReportSelectionType(ReportSelection, RecRefIn);
+        end
     end;
 
     [IntegrationEvent(false, false)]
@@ -123,4 +129,3 @@
     begin
     end;
 }
-

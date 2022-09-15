@@ -31,10 +31,8 @@
 
     local procedure ArchiveWorkshift(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
-        FRPeriodArchive: XMLport "NPR FR Audit Archive";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
-        OutStream: OutStream;
         Client: HttpClient;
         Content: HttpContent;
         Headers: HttpHeaders;
@@ -44,12 +42,9 @@
         XmlFile: Text;
         StatusMessage: Text;
         UriLbl: Label '%1/%2?%3', Locked = true;
+        FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
     begin
-        POSWorkshiftCheckpoint.SetRecFilter();
-        TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
-        FRPeriodArchive.SetDestination(OutStream);
-        FRPeriodArchive.SetTableView(POSWorkshiftCheckpoint);
-        FRPeriodArchive.Export();
+        FRAuditMgt.GenerateArchive(POSWorkshiftCheckpoint, TempBlob);
         TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
 
         while (not InStream.EOS) do begin

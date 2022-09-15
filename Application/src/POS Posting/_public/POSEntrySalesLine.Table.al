@@ -565,6 +565,11 @@
             DataClassification = CustomerContent;
             TableRelation = "Return Reason";
         }
+        field(6610; "POS Sale Line Created At"; DateTime)
+        {
+            Caption = 'POS Sale Line Created At';
+            DataClassification = CustomerContent;
+        }
         field(10014; "Orig.POS Entry S.Line SystemId"; Guid)
         {
             Caption = 'Original POS Entry Sale Line SystemId';

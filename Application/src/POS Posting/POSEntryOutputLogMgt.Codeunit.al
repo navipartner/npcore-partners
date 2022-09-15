@@ -2,7 +2,7 @@
 {
     Access = Internal;
 
-    local procedure CreatePOSEntryOutputLog(RecRef: RecordRef; ReportSelectionRetail: Record "NPR Report Selection Retail")
+    procedure LogOutput(RecRef: RecordRef; ReportSelectionRetail: Record "NPR Report Selection Retail")
     var
         POSEntry: Record "NPR POS Entry";
         POSEntryOutputLog: Record "NPR POS Entry Output Log";
@@ -11,10 +11,15 @@
         IsReprint: Boolean;
         POSAuditLog: Record "NPR POS Audit Log";
         POSSession: Codeunit "NPR POS Session";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
     begin
         if RecRef.Number <> DATABASE::"NPR POS Entry" then
+            exit;
+
+        if not (ReportSelectionRetail."Report Type" in [ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)",
+                                                      ReportSelectionRetail."Report Type"::"Large Sales Receipt (POS Entry)",
+                                                      ReportSelectionRetail."Report Type"::"Balancing (POS Entry)",
+                                                      ReportSelectionRetail."Report Type"::"Sales Doc. Confirmation (POS Entry)"]) then
             exit;
 
         RecRef.SetTable(POSEntry);
@@ -32,8 +37,7 @@
                 POSEntryOutputLog."Output Type" := POSEntryOutputLog."Output Type"::SalesDocReceipt;
         end;
 
-        if POSSession.IsActiveSession(POSFrontEnd) then begin
-            POSFrontEnd.GetSession(POSSession);
+        if POSSession.IsInitialized() then begin
             POSSession.GetSetup(POSSetup);
             POSEntryOutputLog."Salesperson Code" := POSSetup.Salesperson();
         end;
@@ -52,16 +56,6 @@
             else
                 POSAuditLogMgt.CreateEntry(POSEntryOutputLog.RecordId, POSAuditLog."Action Type"::RECEIPT_PRINT, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
         end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Retail Report Select. Mgt.", 'OnAfterRunReportSelectionType', '', false, false)]
-    local procedure OnAfterRunReportSelectionTypeCreatePOSEntryOutputLog(ReportSelectionRetail: Record "NPR Report Selection Retail"; RecRef: RecordRef)
-    begin
-        if ReportSelectionRetail."Report Type" in [ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)",
-                                                   ReportSelectionRetail."Report Type"::"Large Sales Receipt (POS Entry)",
-                                                   ReportSelectionRetail."Report Type"::"Balancing (POS Entry)",
-                                                   ReportSelectionRetail."Report Type"::"Sales Doc. Confirmation (POS Entry)"] then
-            CreatePOSEntryOutputLog(RecRef, ReportSelectionRetail);
     end;
 }
 

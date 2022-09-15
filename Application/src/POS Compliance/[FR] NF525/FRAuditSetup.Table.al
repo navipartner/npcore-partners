@@ -13,6 +13,8 @@
         }
         field(2; "Certification No."; Text[30])
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Hardcoded instead';
             Caption = 'Certification No.';
             DataClassification = CustomerContent;
             InitValue = '0274';
@@ -20,6 +22,8 @@
         }
         field(3; "Certification Category"; Text[30])
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Hardcoded instead';
             Caption = 'Certification Category';
             DataClassification = CustomerContent;
             InitValue = 'B';
