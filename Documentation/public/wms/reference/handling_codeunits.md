@@ -1,6 +1,6 @@
 # Handling codeunits (reference guide)
 
-| Codeunit Number| Codeunit Name      | Description | Limitations|
+| Codeunit Number| Codeunit Name      | Description | Restrictions |
 | ----------- | ----------- | -----------| ---------- |
 |   6185182   | **NPRW CS UI Store List**  |    Used in the context of RFID for listing the stores.  | Not used in the header. |
 |   6185203   | **NPRW CS UI Logon**       |    Used for the login UI.   | |
@@ -38,6 +38,6 @@
 |   6185249   | **NPRW CS UI Whse. Act. Ln. List**  | Displays the list of warehouse activity lines (pick/put-away lines).  | |
 |   6185250   | **NPRW CS UI Item Handling**  |  Updates the bar code of an item. | |
 |   6185259   | **NPRW CS UI Structure Mgt.**  | Lists the UI structure in the tree form. | Internal. Not used in the header. |
-|   6185265   | **NPRW CS UI Transf. Head Handl.**  |  Used for transfer head handling | | 
+|   6185265   | **NPRW CS UI Transf. Head Handl.**  |  Used for transfer head handling. | | 
 |   6185289   | **NPRW CS UI Reason List**  | Opens a list of reason codes.  | |
 |   6185291   | **NPRW CS UI Whse Item Handling**  | Used for item handling.  | |
