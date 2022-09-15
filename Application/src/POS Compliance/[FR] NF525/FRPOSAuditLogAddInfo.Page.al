@@ -1,7 +1,9 @@
-﻿page 6184852 "NPR FR POS Audit Log Aux. Info"
+﻿page 6060005 "NPR FR POS Audit Log Add. Info"
 {
+    //This is a newer version of "NPR FR POS Audit Log Aux. Info" that does not link to POS Entry - to allow for more flexibility.
+
     Extensible = False;
-    Caption = 'FR POS Entry Aux. Info';
+    Caption = 'FR POS Audit Log Add. Info';
     DeleteAllowed = false;
     Editable = false;
     InsertAllowed = false;
@@ -9,7 +11,7 @@
     PageType = List;
     UsageCategory = None;
 
-    SourceTable = "NPR FR POS Audit Log Aux. Info";
+    SourceTable = "NPR FR POS Audit Log Add. Info";
 
     layout
     {
@@ -17,10 +19,10 @@
         {
             repeater(Group)
             {
-                field("POS Entry No."; Rec."POS Entry No.")
+                field("POS Audit Log Entry No."; Rec."POS Audit Log Entry No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Entry No. field';
+                    ToolTip = 'Specifies the value of the POS Audit Log Entry No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Version"; Rec."NPR Version")

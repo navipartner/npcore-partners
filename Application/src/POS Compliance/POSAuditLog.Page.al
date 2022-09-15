@@ -61,6 +61,11 @@
                     ToolTip = 'Specifies the value of the Acted on POS Entry Fiscal No. field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Active POS Sale SystemId"; Rec."Active POS Sale SystemId")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'SystemID of the active POS sale header. Is transferred to POS Entry header SystemID when sale is completed';
+                }
                 field("Active POS Unit No."; Rec."Active POS Unit No.")
                 {
 
@@ -122,12 +127,6 @@
                     ToolTip = 'Specifies the value of the Signature Base Value field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Signature Base Hash"; Rec."Signature Base Hash")
-                {
-
-                    ToolTip = 'Specifies the value of the Signature Base Hash field';
-                    ApplicationArea = NPRRetail;
-                }
                 field(Signature; Signature)
                 {
 
@@ -166,11 +165,6 @@
                     ToolTip = 'Specifies the value of the Handled by External Impl. field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Active POS Sale SystemId"; Rec."Active POS Sale SystemId")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'SystemID of the active POS sale header. Is transferred to POS Entry header SystemID when sale is completed';
-                }
                 field("Acted on POS Unit No."; Rec."Acted on POS Unit No.")
                 {
 
@@ -206,6 +200,21 @@
                 begin
                     POSAuditLog.SetView(Rec.GetView());
                     POSAuditLogMgt.ValidateLog(POSAuditLog);
+                end;
+            }
+            action(ShowAdditionalInfo)
+            {
+                Caption = 'Additional Info';
+                Image = RelatedInformation;
+
+                ToolTip = 'Show additional info for the selected audit log record';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+                begin
+                    POSAuditLogMgt.OnShowAdditionalInfo(Rec);
                 end;
             }
         }

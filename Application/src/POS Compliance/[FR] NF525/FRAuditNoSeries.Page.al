@@ -4,10 +4,9 @@
     Caption = 'FR Audit No. Series';
     DelayedInsert = true;
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "NPR FR Audit No. Series";
-    ApplicationArea = NPRRetail;
 
     layout
     {

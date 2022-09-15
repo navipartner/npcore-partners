@@ -1,7 +1,7 @@
 ﻿page 6184850 "NPR FR Audit Setup"
 {
     Extensible = False;
-    Caption = 'FR Audit Setup';
+    Caption = 'FR Compliance Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
@@ -14,18 +14,6 @@
         {
             group(General)
             {
-                field("Certification No."; Rec."Certification No.")
-                {
-
-                    ToolTip = 'Specifies the value of the Certification No. field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Certification Category"; Rec."Certification Category")
-                {
-
-                    ToolTip = 'Specifies the value of the Certification Category field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Signing Certificate Password"; Rec."Signing Certificate Password")
                 {
 
@@ -201,19 +189,6 @@
                 RunObject = Page "NPR FR Audit No. Series";
 
                 ToolTip = 'Executes the Unit No. Series Setup action';
-                ApplicationArea = NPRRetail;
-            }
-            action(POSEntryRelatedInfo)
-            {
-                Caption = 'POS Entry Related Info List';
-                Image = CoupledQuote;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "NPR FR POS Audit Log Aux. Info";
-
-                ToolTip = 'Executes the POS Entry Related Info List action';
                 ApplicationArea = NPRRetail;
             }
         }

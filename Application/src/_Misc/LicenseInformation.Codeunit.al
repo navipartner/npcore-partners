@@ -12,7 +12,7 @@
 
     var
         Object: Record AllObj;
-        AppVersionLbl: Label 'NPR%1', locked = true;
+        AppVersionLbl: Label 'NPRETAIL%1', locked = true;
 
     procedure InLicenseFile("Object Type": Integer; "Object No": Integer): Boolean
     var

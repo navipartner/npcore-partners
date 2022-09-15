@@ -440,7 +440,13 @@ codeunit 85039 "NPR French Compliance Tests"
         WorkshiftCheckpoint.SetRange("Period Type", 'FR_NF525_MONTH');
         WorkshiftCheckpoint.FindFirst();
         BindSubscription(FrenchArchiveHandler);
-        POSAuditLogMgt.ArchiveWorkshiftPeriod(WorkshiftCheckpoint);
+#if not BC17
+        POSAuditLogMgt.ArchiveWorkshiftPeriod(WorkshiftCheckpoint);        
+#else
+        asserterror POSAuditLogMgt.ArchiveWorkshiftPeriod(WorkshiftCheckpoint); //only supported in later versions
+        _FRAuditMgt.Destruct();
+        exit;
+#endif
 
         // [Then] The archival is signed correctly
         POSAuditLog.SetRange("Record ID", WorkshiftCheckpoint.RecordId);
@@ -452,7 +458,6 @@ codeunit 85039 "NPR French Compliance Tests"
         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::ARCHIVE_CREATE);
         POSAuditLog.FindLast();
         Assert.IsTrue(POSAuditLog."Electronic Signature".HasValue, 'Archive file must be signed');
-        _FRAuditMgt.Destruct();
     end;
 
     [Test]
@@ -633,6 +638,7 @@ codeunit 85039 "NPR French Compliance Tests"
         SignatureBaseValueParts: List of [Text];
         PreviousSignature: Text;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        ValidationError: Boolean;
     begin
         // [Scenario] Check that a broken signature chain can be detected
 
@@ -640,9 +646,8 @@ codeunit 85039 "NPR French Compliance Tests"
         PurchaseSignature();
         POSAuditLog.SetRange("Handled by External Impl.", true);
         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::DIRECT_SALE_END);
-        ClearLastError();
-        AssertError POSAuditLogMgt.ValidateLog(POSAuditLog);
-        Assert.IsTrue(GetLastErrorText() = '', 'Validation must happen without actual error before data tamper');
+        ValidationError := POSAuditLogMgt.ValidateLog(POSAuditLog);
+        Assert.IsFalse(ValidationError, 'Validation must happen without actual error before data tamper');
 
         // [When] Editing 
         Clear(POSAuditLog);
@@ -653,10 +658,9 @@ codeunit 85039 "NPR French Compliance Tests"
         POSEntry."Amount Incl. Tax" := 0;
         POSEntry.Modify();
 
-        // [Then] Signature chain does not validate
-        ClearLastError();
-        AssertError POSAuditLogMgt.ValidateLog(POSAuditLog);
-        Assert.IsTrue(GetLastErrorText() <> '', 'Validation must happen with error after data tamper');
+        // [Then] Signature chain does not validate        
+        ValidationError := POSAuditLogMgt.ValidateLog(POSAuditLog);
+        Assert.IsTrue(ValidationError, 'Validation must happen with error after data tamper');
         _FRAuditMgt.Destruct();
     end;
 
@@ -730,7 +734,15 @@ codeunit 85039 "NPR French Compliance Tests"
         POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::PREPORT);
         POSWorkshiftCheckpoint.SetRange("Period Type", 'FR_NF525_MONTH');
         POSWorkshiftCheckpoint.FindLast();
-        POSAuditLogMgt.ArchiveWorkshiftPeriod(POSWorkshiftCheckpoint);
+
+#if not BC17
+        POSAuditLogMgt.ArchiveWorkshiftPeriod(POSWorkshiftCheckpoint);        
+#else
+        asserterror POSAuditLogMgt.ArchiveWorkshiftPeriod(POSWorkshiftCheckpoint); //only supported in later versions
+        _FRAuditMgt.Destruct();
+        exit;
+#endif
+
         FrenchArchiveHandler.GetBlob(TempBlob);
         TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
         while (not InStream.EOS) do begin

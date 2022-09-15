@@ -1,16 +1,19 @@
-#if BC17 or BC18
 codeunit 6184850 "NPR FR Audit Mgt."
 {
     Access = Internal;
     SingleInstance = true;
 
     var
-        FRCertificationSetup: Record "NPR FR Audit Setup";
-        X509Certificate2: DotNet NPRNetX509Certificate2;
-        RSACryptoServiceProvider: DotNet NPRNetRSACryptoServiceProvider;
-        Initialized: Boolean;
-        Enabled: Boolean;
-        CertificateLoaded: Boolean;
+        _FRCertificationSetup: Record "NPR FR Audit Setup";
+#if not BC17
+        _SignatureKey: Record "Signature Key";
+#else
+        _X509Certificate2: DotNet NPRNetX509Certificate2;
+        _RSACryptoServiceProvider: DotNet NPRNetRSACryptoServiceProvider;
+#endif
+        _Initialized: Boolean;
+        _Enabled: Boolean;
+        _CertificateLoaded: Boolean;
         ERROR_MISSING_SIGNATURE: Label '%1 %2 is missing a digital signature';
         ERROR_MISSING_KEY: Label 'The selected certificate does not contain the private key';
         ERROR_SIGNATURE_CHAIN: Label 'Broken signature chain for %1 entry %2';
@@ -31,19 +34,125 @@ codeunit 6184850 "NPR FR Audit Mgt."
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
-        if not Initialized then begin
+        if not _Initialized then begin
             if not POSAuditProfile.Get(POSAuditProfileCode) then
                 exit(false);
             if POSAuditProfile."Audit Handler" <> HandlerCode() then
                 exit(false);
-            FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
-            FRCertificationSetup.Get();
-            Initialized := true;
-            Enabled := true;
+            _FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
+            _FRCertificationSetup.Get();
+            _Initialized := true;
+            _Enabled := true;
         end;
-        exit(Enabled);
+        exit(_Enabled);
     end;
 
+#if not BC17
+    local procedure LoadCertificate()
+    var
+        X509Certificate2: Codeunit X509Certificate2;
+        InStr: InStream;
+        Base64Cert: Text;
+        Base64Cert2: Text;
+    begin
+        if not _CertificateLoaded then begin
+            _FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
+            _FRCertificationSetup.Get();
+            _FRCertificationSetup.TestField("Signing Certificate Thumbprint");
+            _FRCertificationSetup.TestField("Signing Certificate Password");
+            _FRCertificationSetup."Signing Certificate".CreateInStream(InStr, TextEncoding::UTF8);
+            InStr.ReadText(Base64Cert);
+            Base64Cert2 := Base64Cert; //Prevent below VAR from messing up the cert
+            if not X509Certificate2.VerifyCertificate(Base64Cert, _FRCertificationSetup."Signing Certificate Password", "X509 Content Type"::Cert) then
+                exit;
+
+            _SignatureKey.FromBase64String(Base64Cert2, _FRCertificationSetup."Signing Certificate Password", true);
+            _CertificateLoaded := true;
+        end;
+    end;
+
+    procedure VerifySignature(Data: Text; HashAlgo: Enum "Hash Algorithm"; SignatureBase64: Text): Boolean
+    var
+        CryptoMgt: Codeunit "Cryptography Management";
+        ConvertBase64: Codeunit "Base64 Convert";
+        OutStr: OutStream;
+        InStream: InStream;
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        LoadCertificate();
+        TempBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
+        ConvertBase64.FromBase64(SignatureBase64, OutStr);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
+        exit(CryptoMgt.VerifyData(Data, _SignatureKey, HashAlgo, InStream));
+    end;
+
+    procedure SignData(BaseValue: Text): Text
+    var
+        CryptoMgt: Codeunit "Cryptography Management";
+        OutStr: OutStream;        
+        InStr: InStream;
+        TempBLOB: Codeunit "Temp Blob";
+        ConvertBase64: Codeunit "Base64 Convert";
+    begin
+        TempBLOB.CreateOutStream(OutStr, TextEncoding::UTF8);
+        CryptoMgt.SignData(BaseValue, _SignatureKey, Enum::"Hash Algorithm"::SHA256, OutStr);
+        TempBLOB.CreateInStream(InStr, TextEncoding::UTF8);
+        exit(ConvertBase64.ToBase64(InStr));        
+    end;
+
+    procedure CalculateHash(BaseValue: Text): Text
+    var
+        CryptoMgt: Codeunit "Cryptography Management";
+    begin
+        exit(CryptoMgt.GenerateHashAsBase64String(BaseValue, 2));
+    end;
+
+    procedure ImportCertificate()
+    var
+        IStream: InStream;
+        OStream: OutStream;
+        Base64Cert: Text;
+        Base64Cert2: Text;
+        X509Certificate2: Codeunit X509Certificate2;
+        Base64Convert: Codeunit "Base64 Convert";
+        FileMgt: Codeunit "File Management";
+        TempBlob: Codeunit "Temp Blob";
+        DialCaption: Label 'Upload Certificate';
+        FileFilter: Label 'Certificate File (*.PFX)|*.PFX';
+        ExtFilter: Label 'pfx';
+        FileName: Text;
+        CertificateThumbprint: Text[250];
+    begin
+        _FRCertificationSetup.Get();
+        if _FRCertificationSetup."Signing Certificate".HasValue() then begin
+            if not Confirm(CAPTION_OVERWRITE_CERT) then
+                exit;
+            Clear(_FRCertificationSetup."Signing Certificate");
+        end;
+        FileName := FileMgt.BLOBImportWithFilter(TempBlob, DialCaption, '', FileFilter, ExtFilter);
+
+        if FileName = '' then
+            exit;
+
+        TempBlob.CreateInStream(IStream);
+        Base64Cert := Base64Convert.ToBase64(IStream);
+        Base64Cert2 := Base64Cert;
+
+        X509Certificate2.VerifyCertificate(Base64Cert2, _FRCertificationSetup."Signing Certificate Password", Enum::"X509 Content Type"::Cert);
+        if (not X509Certificate2.HasPrivateKey(Base64Cert, _FRCertificationSetup."Signing Certificate Password")) then
+            Error(ERROR_MISSING_KEY);
+
+        _FRCertificationSetup."Signing Certificate".CreateOutStream(OStream, TextEncoding::UTF8);
+        OStream.Write(Base64Cert);
+
+        CertificateThumbprint := _FRCertificationSetup."Signing Certificate Thumbprint";
+        X509Certificate2.GetCertificateThumbprint(Base64Cert, _FRCertificationSetup."Signing Certificate Password", CertificateThumbprint);
+        _FRCertificationSetup."Signing Certificate Thumbprint" := CertificateThumbprint;
+        _FRCertificationSetup.Modify(true);
+
+        Message(CAPTION_CERT_SUCCESS, _FRCertificationSetup."Signing Certificate Thumbprint");
+    end;
+#else
     local procedure LoadCertificate()
     var
         InStream: InStream;
@@ -51,30 +160,26 @@ codeunit 6184850 "NPR FR Audit Mgt."
         TempBlob: Codeunit "Temp Blob";
         MemoryStream: DotNet NPRNetMemoryStream;
         Base64Convert: Codeunit "Base64 Convert";
-        RegEx: Codeunit DotNet_Regex;
-        Match: Codeunit DotNet_Match;
         Base64Cert: Text;
-        Base64RegexCheckLbl: Label '^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$', Locked = true;
     begin
-        if not CertificateLoaded then begin
-            FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
-            FRCertificationSetup.Get();
-            FRCertificationSetup.TestField("Signing Certificate Thumbprint");
-            FRCertificationSetup.TestField("Signing Certificate Password");
-            FRCertificationSetup."Signing Certificate".CreateInStream(InStream, TextEncoding::UTF8);
+        if not _CertificateLoaded then begin
+            _FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
+            _FRCertificationSetup.Get();
+            _FRCertificationSetup.TestField("Signing Certificate Thumbprint");
+            _FRCertificationSetup.TestField("Signing Certificate Password");
+            _FRCertificationSetup."Signing Certificate".CreateInStream(InStream, TextEncoding::UTF8);
             InStream.Read(Base64Cert);
-            Regex.Regex(Base64RegexCheckLbl);
-            Regex.Match(Base64Cert, Match);
-            if Match.Success() then begin
-                TempBlob.CreateOutStream(OutStream);
-                Base64Convert.FromBase64(Base64Cert, OutStream);
-            end;
+            TempBlob.CreateOutStream(OutStream);
+            Base64Convert.FromBase64(Base64Cert, OutStream);
             MemoryStream := MemoryStream.MemoryStream();
             TempBlob.CreateInStream(InStream);
             CopyStream(MemoryStream, InStream);
-            X509Certificate2 := X509Certificate2.X509Certificate2(MemoryStream.ToArray(), FRCertificationSetup."Signing Certificate Password");
-            RSACryptoServiceProvider := X509Certificate2.PrivateKey;
-            CertificateLoaded := true;
+            _X509Certificate2 := _X509Certificate2.X509Certificate2(MemoryStream.ToArray(), _FRCertificationSetup."Signing Certificate Password");
+            _RSACryptoServiceProvider := _X509Certificate2.PrivateKey;
+#if not BC17
+            _SignatureKey.FromBase64String(Base64Cert2, _FRCertificationSetup."Signing Certificate Password", true);
+#endif
+            _CertificateLoaded := true;
         end;
     end;
 
@@ -85,8 +190,61 @@ codeunit 6184850 "NPR FR Audit Mgt."
         Encoding: DotNet NPRNetEncoding;
     begin
         LoadCertificate();
-        exit(RSACryptoServiceProvider.VerifyData(Encoding.Unicode.GetBytes(Data), CryptoConfig.MapNameToOID(HashAlgo), Convert.FromBase64String(SignatureBase64)));
+        exit(_RSACryptoServiceProvider.VerifyData(Encoding.UTF8.GetBytes(Data), CryptoConfig.MapNameToOID(HashAlgo), Convert.FromBase64String(SignatureBase64)));
     end;
+
+    procedure SignData(BaseValue: Text): Text
+    var
+        CryptoConfig: DotNet NPRNetCryptoConfig;
+        Convert: DotNet NPRNetConvert;
+        Encoding: DotNet Encoding;
+    begin
+        exit(Convert.ToBase64String(_RSACryptoServiceProvider.SignData(Encoding.UTF8.GetBytes(BaseValue), CryptoConfig.MapNameToOID('SHA256'))));
+    end;
+
+    procedure CalculateHash(BaseValue: Text): Text
+    var
+        SHA256CryptoServiceProvider: DotNet NPRNetSHA256CryptoServiceProvider;
+        Encoding: DotNet NPRNetEncoding;
+        Convert: DotNet NPRNetConvert;
+    begin
+        SHA256CryptoServiceProvider := SHA256CryptoServiceProvider.SHA256CryptoServiceProvider();
+        exit(Convert.ToBase64String(SHA256CryptoServiceProvider.ComputeHash(Encoding.Unicode.GetBytes(BaseValue))));
+    end;
+
+    procedure ImportCertificate()
+    var
+        InStream: InStream;
+        OutStream: OutStream;
+        NPRX509Certificate2: DotNet NPRNetX509Certificate2;
+        MemoryStream: DotNet NPRNetMemoryStream;
+        LocalRSACryptoServiceProvider: DotNet NPRNetRSACryptoServiceProvider;
+        FileName: Text;
+    begin
+        _FRCertificationSetup.Get();
+        if _FRCertificationSetup."Signing Certificate".HasValue() then begin
+            if not Confirm(CAPTION_OVERWRITE_CERT) then
+                exit;
+            Clear(_FRCertificationSetup."Signing Certificate");
+        end;
+        _FRCertificationSetup."Signing Certificate".CreateOutStream(OutStream, TextEncoding::UTF8);
+        if not UploadIntoStream('Upload Certificate', '', 'Certificate File (*.PFX)|*.PFX', FileName, InStream) then
+            exit;
+        MemoryStream := MemoryStream.MemoryStream();
+        CopyStream(MemoryStream, InStream);
+
+        NPRX509Certificate2 := NPRX509Certificate2.X509Certificate2(MemoryStream.ToArray(), _FRCertificationSetup."Signing Certificate Password");
+        if (not NPRX509Certificate2.HasPrivateKey) then
+            Error(ERROR_MISSING_KEY);
+        LocalRSACryptoServiceProvider := NPRX509Certificate2.PrivateKey;
+        _FRCertificationSetup."Signing Certificate Thumbprint" := NPRX509Certificate2.Thumbprint;
+        MemoryStream.Position := 0;
+        CopyStream(OutStream, MemoryStream);
+        _FRCertificationSetup.Modify(true);
+
+        Message(CAPTION_CERT_SUCCESS, _FRCertificationSetup."Signing Certificate Thumbprint");
+    end;
+#endif
 
     procedure GetLastUnitEventSignature(POSUnitNo: Code[10]; var POSAuditLogOut: Record "NPR POS Audit Log"; ExternalType: Code[20]): Boolean
     begin
@@ -115,57 +273,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
             EventType::YearPeriod:
                 exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Yearly Period No. Series", Today, true));
         end;
-    end;
-
-    procedure SignHash(BaseHash: Text): Text
-    var
-        CryptoConfig: DotNet NPRNetCryptoConfig;
-        Convert: DotNet NPRNetConvert;
-    begin
-        exit(Convert.ToBase64String(RSACryptoServiceProvider.SignHash(Convert.FromBase64String(BaseHash), CryptoConfig.MapNameToOID('SHA256'))));
-    end;
-
-    procedure CalculateHash(BaseValue: Text): Text
-    var
-        SHA256CryptoServiceProvider: DotNet NPRNetSHA256CryptoServiceProvider;
-        Encoding: DotNet NPRNetEncoding;
-        Convert: DotNet NPRNetConvert;
-    begin
-        SHA256CryptoServiceProvider := SHA256CryptoServiceProvider.SHA256CryptoServiceProvider();
-        exit(Convert.ToBase64String(SHA256CryptoServiceProvider.ComputeHash(Encoding.Unicode.GetBytes(BaseValue))));
-    end;
-
-    procedure ImportCertificate()
-    var
-        InStream: InStream;
-        OutStream: OutStream;
-        NPRX509Certificate2: DotNet NPRNetX509Certificate2;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        LocalRSACryptoServiceProvider: DotNet NPRNetRSACryptoServiceProvider;
-        FileName: Text;
-    begin
-        FRCertificationSetup.Get();
-        if FRCertificationSetup."Signing Certificate".HasValue() then begin
-            if not Confirm(CAPTION_OVERWRITE_CERT) then
-                exit;
-            Clear(FRCertificationSetup."Signing Certificate");
-        end;
-        FRCertificationSetup."Signing Certificate".CreateOutStream(OutStream, TextEncoding::UTF8);
-        if not UploadIntoStream('Upload Certificate', '', 'Certificate File (*.PFX)|*.PFX', FileName, InStream) then
-            exit;
-        MemoryStream := MemoryStream.MemoryStream();
-        CopyStream(MemoryStream, InStream);
-
-        NPRX509Certificate2 := NPRX509Certificate2.X509Certificate2(MemoryStream.ToArray(), FRCertificationSetup."Signing Certificate Password");
-        if (not NPRX509Certificate2.HasPrivateKey) then
-            Error(ERROR_MISSING_KEY);
-        LocalRSACryptoServiceProvider := NPRX509Certificate2.PrivateKey;
-        FRCertificationSetup."Signing Certificate Thumbprint" := NPRX509Certificate2.Thumbprint;
-        MemoryStream.Position := 0;
-        CopyStream(OutStream, MemoryStream);
-        FRCertificationSetup.Modify(true);
-
-        Message(CAPTION_CERT_SUCCESS, FRCertificationSetup."Signing Certificate Thumbprint");
     end;
 
     local procedure TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; PeriodType: Code[20]; PeriodDateCalcFormula: DateFormula; var FromWorkshiftEntryOut: Integer): Boolean
@@ -199,6 +306,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
     var
         BaseValue: Text;
         PreviousSignature: Text;
+        PreviousSignatureChunk: Text;
         PreviousEventLogRecord: Record "NPR POS Audit Log";
         InStream: InStream;
         OutStream: OutStream;
@@ -208,18 +316,20 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 POSAuditLog."Previous Electronic Signature" := PreviousEventLogRecord."Electronic Signature";
             POSAuditLog."External Implementation" := ImplementationCode();
             POSAuditLog."Certificate Implementation" := 'RSA_2048_SHA256';
-            POSAuditLog."Certificate Thumbprint" := FRCertificationSetup."Signing Certificate Thumbprint";
+            POSAuditLog."Certificate Thumbprint" := _FRCertificationSetup."Signing Certificate Thumbprint";
             POSAuditLog."Handled by External Impl." := true;
         end;
 
         if POSAuditLog."External Implementation" <> ImplementationCode() then //Can only validate the current version of the implementation as the rules & fields might have changed over time.
             Error(ERROR_VALIDATE_VERSION, ImplementationCode());
 
-        if POSAuditLog."Certificate Thumbprint" <> FRCertificationSetup."Signing Certificate Thumbprint" then
-            Error(ERROR_VALIDATE_CERT, FRCertificationSetup."Signing Certificate Thumbprint");
+        if POSAuditLog."Certificate Thumbprint" <> _FRCertificationSetup."Signing Certificate Thumbprint" then
+            Error(ERROR_VALIDATE_CERT, _FRCertificationSetup."Signing Certificate Thumbprint");
         POSAuditLog."Previous Electronic Signature".CreateInStream(InStream, TextEncoding::UTF8);
-        while (not InStream.EOS) do
-            InStream.ReadText(PreviousSignature);
+        while (not InStream.EOS) do begin
+            InStream.ReadText(PreviousSignatureChunk);
+            PreviousSignature += PreviousSignatureChunk;
+        end;
 
         case POSAuditLog."External Type" of
             'JET':
@@ -235,10 +345,8 @@ codeunit 6184850 "NPR FR Audit Mgt."
         end;
         POSAuditLog."Signature Base Value".CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(BaseValue);
-        POSAuditLog."Signature Base Hash" := CopyStr(EncodeBase64URL(CalculateHash(BaseValue)), 1, MaxStrLen(POSAuditLog."Signature Base Hash"));
 
         if IsInitialHandling then begin
-            POSAuditLog."Original Signature Base Hash" := POSAuditLog."Signature Base Hash";
             POSAuditLog."Original Signature Base Value" := POSAuditLog."Signature Base Value";
         end;
     end;
@@ -385,19 +493,28 @@ codeunit 6184850 "NPR FR Audit Mgt."
     local procedure SignRecord(var POSAuditLog: Record "NPR POS Audit Log")
     var
         Signature: Text;
-        OutStream: OutStream;
+        OStream: OutStream;
+        BaseValueChunk: Text;
+        BaseValue: Text;
+        IStream: InStream;
     begin
-        Signature := SignHash(DecodeBase64URL(POSAuditLog."Signature Base Hash"));
-        POSAuditLog."Electronic Signature".CreateOutStream(OutStream, TextEncoding::UTF8);
-        OutStream.WriteText(EncodeBase64URL(Signature));
+        POSAuditLog."Signature Base Value".CreateInStream(IStream, TextEncoding::UTF8);
+        while (not IStream.EOS) do begin
+            IStream.ReadText(BaseValueChunk);
+            BaseValue += BaseValueChunk;
+        end;
+
+        Signature := SignData(BaseValue);
+        POSAuditLog."Electronic Signature".CreateOutStream(OStream, TextEncoding::UTF8);
+        OStream.WriteText(EncodeBase64URL(Signature));
     end;
 
-    local procedure SignAuditVerify(var POSAuditLog: Record "NPR POS Audit Log")
+    local procedure SignAuditVerifyError(var POSAuditLog: Record "NPR POS Audit Log")
     begin
         POSAuditLog."External Code" := '90';
         POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
         POSAuditLog."External Type" := 'JET';
-        POSAuditLog."External Description" := 'Signature verification';
+        POSAuditLog."External Description" := 'Signature verification error';
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -555,8 +672,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
             POSAuditLog."External Description" := 'Sale (Ticket)'
         end;
 
-        CreatePOSEntryRelatedInfoRecord(POSEntry); //Store/company data needs to be persistent.
-
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
     end;
@@ -574,15 +689,18 @@ codeunit 6184850 "NPR FR Audit Mgt."
                     RecRef.SetTable(POSWorkshiftCheckpoint);
                     POSWorkshiftCheckpoint.Find();
                     if POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::ZREPORT then begin
+                        POSAuditLog."Action Custom Subtype" := 'GRANDTOTAL_ZREPORT';
                         POSAuditLog."External Description" := 'Period Grand Total';
                         POSAuditLog."External ID" := GetNextEventNoSeries(2, POSWorkshiftCheckpoint."POS Unit No.");
                     end else
                         if POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::PREPORT then begin
                             if POSWorkshiftCheckpoint."Period Type" = YearlyPeriodType() then begin
+                                POSAuditLog."Action Custom Subtype" := 'GRANDTOTAL_YEAR';
                                 POSAuditLog."External Description" := 'Yearly Grand Total';
                                 POSAuditLog."External ID" := GetNextEventNoSeries(4, POSWorkshiftCheckpoint."POS Unit No.");
                             end else
                                 if POSWorkshiftCheckpoint."Period Type" = MonthlyPeriodType() then begin
+                                    POSAuditLog."Action Custom Subtype" := 'GRANDTOTAL_MONTH';
                                     POSAuditLog."External Description" := 'Monthly Grand Total';
                                     POSAuditLog."External ID" := GetNextEventNoSeries(3, POSWorkshiftCheckpoint."POS Unit No.");
                                 end;
@@ -593,6 +711,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 begin
                     RecRef.SetTable(POSEntry);
                     POSEntry.Find();
+                    POSAuditLog."Action Custom Subtype" := 'GRANDTOTAL_TICKET';
                     POSAuditLog."External Description" := 'Ticket Grand Total';
                     POSAuditLog."External ID" := POSEntry."Fiscal No.";
                 end;
@@ -620,7 +739,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         SignRecord(POSAuditLog);
     end;
 
-    local procedure SignArchiveFile(var POSAuditLog: Record "NPR POS Audit Log"): Text
+    local procedure SignArchiveEvent(var POSAuditLog: Record "NPR POS Audit Log"): Text
     begin
         POSAuditLog."External ID" := '';
         POSAuditLog."External Code" := '';
@@ -663,7 +782,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
     begin
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
 
-        VATIDFilter := FRCertificationSetup.GetItemVATIDFilter();
+        VATIDFilter := _FRCertificationSetup.GetItemVATIDFilter();
         if OnlyIncludeItems then
             POSTaxAmountLine.SetFilter("VAT Identifier", VATIDFilter);
 
@@ -765,7 +884,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         //Implied only include item amounts as per audit requirements.
 
         POSWorkshiftTaxCheckpoint.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
-        VATIDFilter := FRCertificationSetup.GetItemVATIDFilter();
+        VATIDFilter := _FRCertificationSetup.GetItemVATIDFilter();
         POSWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", VATIDFilter);
         if POSWorkshiftTaxCheckpoint.FindSet() then
             repeat
@@ -810,36 +929,41 @@ codeunit 6184850 "NPR FR Audit Mgt."
         exit(POSWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)" + POSWorkshiftCheckpoint."Perpetual Dir. Item Ret. (LCY)");
     end;
 
-    local procedure CreatePOSEntryRelatedInfoRecord(POSEntry: Record "NPR POS Entry")
+    local procedure CreatePOSAuditLogAdditionalInfoRecord(POSAuditLog: Record "NPR POS Audit Log")
     var
-        FRPOSEntryRelatedInfo: Record "NPR FR POS Audit Log Aux. Info";
+        POSAuditLogAdditionalInfo: Record "NPR FR POS Audit Log Add. Info";
         POSStore: Record "NPR POS Store";
         CompanyInformation: Record "Company Information";
         Licenseinformation: Codeunit "NPR License Information";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         RecRef: RecordRef;
+        POSEntry: Record "NPR POS Entry";
     begin
-        POSStore.Get(POSEntry."POS Store Code");
-        SalespersonPurchaser.Get(POSEntry."Salesperson Code");
         CompanyInformation.Get();
 
-        FRPOSEntryRelatedInfo.Init();
-        FRPOSEntryRelatedInfo."POS Entry No." := POSEntry."Entry No.";
-        FRPOSEntryRelatedInfo."NPR Version" := CopyStr(Licenseinformation.GetRetailVersion(), 1, MaxStrLen(FRPOSEntryRelatedInfo."NPR Version"));
-        FRPOSEntryRelatedInfo."Store Name" := POSStore.Name;
-        FRPOSEntryRelatedInfo."Store Name 2" := POSStore."Name 2";
-        FRPOSEntryRelatedInfo."Store Address" := POSStore.Address;
-        FRPOSEntryRelatedInfo."Store Address 2" := POSStore."Address 2";
-        FRPOSEntryRelatedInfo."Store Post Code" := POSStore."Post Code";
-        FRPOSEntryRelatedInfo."Store City" := POSStore.City;
-        FRPOSEntryRelatedInfo."Store Siret" := POSStore."Registration No.";
-        FRPOSEntryRelatedInfo."Store Country/Region Code" := POSStore."Country/Region Code";
+        POSAuditLogAdditionalInfo.Init();
+        POSAuditLogAdditionalInfo."POS Audit Log Entry No." := POSAuditLog."Entry No.";
+        POSAuditLogAdditionalInfo."NPR Version" := Licenseinformation.GetRetailVersion();
         RecRef.GetTable(CompanyInformation);
         if RecRef.FieldExist(10802) then
-            FRPOSEntryRelatedInfo.APE := RecRef.Field(10802).Value;
-        FRPOSEntryRelatedInfo."Intra-comm. VAT ID" := CompanyInformation."VAT Registration No.";
-        FRPOSEntryRelatedInfo."Salesperson Name" := SalespersonPurchaser.Name;
-        FRPOSEntryRelatedInfo.Insert();
+            POSAuditLogAdditionalInfo.APE := RecRef.Field(10802).Value;
+        POSAuditLogAdditionalInfo."Intra-comm. VAT ID" := CompanyInformation."VAT Registration No.";
+        if POSAuditLog."Acted on POS Entry No." <> 0 then begin
+            POSEntry.Get(POSAuditLog."Acted on POS Entry No.");
+            POSStore.Get(POSEntry."POS Store Code");
+            SalespersonPurchaser.Get(POSEntry."Salesperson Code");
+
+            POSAuditLogAdditionalInfo."Store Name" := POSStore.Name;
+            POSAuditLogAdditionalInfo."Store Name 2" := POSStore."Name 2";
+            POSAuditLogAdditionalInfo."Store Address" := POSStore.Address;
+            POSAuditLogAdditionalInfo."Store Address 2" := POSStore."Address 2";
+            POSAuditLogAdditionalInfo."Store Post Code" := POSStore."Post Code";
+            POSAuditLogAdditionalInfo."Store City" := POSStore.City;
+            POSAuditLogAdditionalInfo."Store Siret" := POSStore."Registration No.";
+            POSAuditLogAdditionalInfo."Store Country/Region Code" := POSStore."Country/Region Code";
+            POSAuditLogAdditionalInfo."Salesperson Name" := SalespersonPurchaser.Name;
+        end;
+        POSAuditLogAdditionalInfo.Insert();
     end;
 
     local procedure DecodeBase64URL(Text: Text): Text
@@ -899,7 +1023,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure ImplementationCode(): Text[30]
     begin
-        exit(HandlerCode() + '_V4');
+        exit(HandlerCode() + '_V5');
     end;
 
     procedure GetJETInitRecord(var POSAuditLog: Record "NPR POS Audit Log"; POSUnitNo: Code[10]; WithError: Boolean): Boolean
@@ -975,13 +1099,65 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     procedure Destruct()
     begin
-        Clear(FRCertificationSetup);
-        Clear(X509Certificate2);
-        Clear(RSACryptoServiceProvider);
-        Clear(Initialized);
-        Clear(Enabled);
-        Clear(CertificateLoaded);
+#if not BC17 
+        Clear(_SignatureKey);
+#else
+        Clear(_X509Certificate2);
+        Clear(_RSACryptoServiceProvider);
+#endif
+        Clear(_FRCertificationSetup);
+        Clear(_Initialized);
+        Clear(_Enabled);
+        Clear(_CertificateLoaded);
     end;
+
+#if not BC17
+    procedure GenerateArchive(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; var TempBlob: Codeunit "Temp Blob")
+    var
+        FRPeriodArchive: XMLport "NPR FR Audit Archive";
+        OStream: OutStream;
+        IStream: InStream;
+        ArchiveBodyBlob: Codeunit "Temp BLob";
+        SignedArchive: XmlDocument;
+        SignedXml: Codeunit SignedXml;
+        SignatureELement: XmlElement;
+        ArchiveRoot: XmlElement;
+        GrandPeriodNode: XmlNode;
+        ReadOptions: XmlReadOptions;
+        WriteOptions: XmlWriteOptions;
+    begin
+        LoadCertificate();
+
+        POSWorkshiftCheckpoint.SetRecFilter();
+        ArchiveBodyBlob.CreateOutStream(OStream, TextEncoding::UTF8);
+        FRPeriodArchive.SetDestination(OStream);
+        FRPeriodArchive.SetTableView(POSWorkshiftCheckpoint);
+        FRPeriodArchive.Export();
+
+        ArchiveBodyBlob.CreateInStream(IStream, TextEncoding::UTF8);
+        ReadOptions.PreserveWhitespace(false);
+        XmlDocument.ReadFrom(IStream, ReadOptions, SignedArchive);
+        SignedXml.InitializeSignedXml(SignedArchive);
+        SignedXml.SetSigningKey(_SignatureKey);
+        SignedXml.InitializeReference('');
+        SignedXml.AddXmlDsigEnvelopedSignatureTransform();
+        SignedXml.ComputeSignature();
+        SignatureElement := SignedXml.GetXml();
+        SignedArchive.GetRoot(ArchiveRoot);
+        ArchiveRoot.GetChildElements().Get(1, GrandPeriodNode);
+        GrandPeriodNode.AddAfterSelf(SignatureELement);
+
+        Clear(OStream);
+        TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
+        WriteOptions.PreserveWhitespace(true); //Keep whitespace that was signed intact.
+        SignedArchive.WriteTo(WriteOptions, OStream);
+    end;
+#else
+    procedure GenerateArchive(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; var TempBlob: Codeunit "Temp Blob")
+    begin
+        Error('Archiving is not supported from BC17 version of npretail as the required Cryptography part of the system app is missing.');
+    end;
+#endif      
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnLookupAuditHandler', '', true, true)]
     local procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List" temporary)
@@ -994,8 +1170,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnArchiveWorkshiftPeriod', '', true, true)]
     local procedure OnArchiveWorkshiftPeriod(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
-        FRPeriodArchive: XMLport "NPR FR Audit Archive";
-        OutStream: OutStream;
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         FileName: Text;
@@ -1008,13 +1182,9 @@ codeunit 6184850 "NPR FR Audit Mgt."
             exit;
 
         POSWorkshiftCheckpoint.TestField(Type, POSWorkshiftCheckpoint.Type::PREPORT);
+        POSWorkshiftCheckpoint.TestField("Period Type", MonthlyPeriodType());
 
-        //Export Archive
-        POSWorkshiftCheckpoint.SetRecFilter();
-        TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
-        FRPeriodArchive.SetDestination(OutStream);
-        FRPeriodArchive.SetTableView(POSWorkshiftCheckpoint);
-        FRPeriodArchive.Export();
+        GenerateArchive(POSWorkshiftCheckpoint, TempBlob);
 
         OnBeforeDownloadArchive(TempBlob, Handled);
         if Handled then
@@ -1063,12 +1233,12 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 SignPartnerModification(POSAuditLog);
             POSAuditLog."Action Type"::LOG_INIT:
                 SignLogInit(POSAuditLog);
-            POSAuditLog."Action Type"::AUDIT_VERIFY:
-                SignAuditVerify(POSAuditLog);
+            POSAuditLog."Action Type"::AUDIT_VERIFY_ERROR:
+                SignAuditVerifyError(POSAuditLog);
             POSAuditLog."Action Type"::GRANDTOTAL:
                 SignGrandTotal(POSAuditLog); //Only item amount & item VAT amounts are stored and signed.
             POSAuditLog."Action Type"::ARCHIVE_CREATE:
-                SignArchiveFile(POSAuditLog);
+                SignArchiveEvent(POSAuditLog);
             POSAuditLog."Action Type"::CANCEL_SALE_END:
                 SignCancelSale(POSAuditLog);
             POSAuditLog."Action Type"::SIGN_OUT:
@@ -1085,6 +1255,12 @@ codeunit 6184850 "NPR FR Audit Mgt."
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnHandleAuditLogAfterInsert', '', false, false)]
+    local procedure OnHandleAuditLogAfterInsert(var POSAuditLog: Record "NPR POS Audit Log")
+    begin
+        CreatePOSAuditLogAdditionalInfoRecord(POSAuditLog);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Aux: Event Publishers", 'OnSalesReceiptFooter', '', true, true)]
     local procedure OnReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text; LinePrintMgt: Codeunit "NPR RP Line Print Mgt.")
     var
@@ -1093,7 +1269,9 @@ codeunit 6184850 "NPR FR Audit Mgt."
         PrintSignature: Text;
         InStream: InStream;
         Signature: Text;
+        SignatureChunk: Text;
         POSUnit: Record "NPR POS Unit";
+        Licenseinformation: Codeunit "NPR License Information";
     begin
         POSEntry.SetRange("Document No.", ReceiptNo);
         if not POSEntry.FindFirst() then
@@ -1108,29 +1286,39 @@ codeunit 6184850 "NPR FR Audit Mgt."
         LinePrintMgt.SetUnderLine(TemplateLine.Underline);
 
         AuditLog.SetRange("Acted on POS Entry No.", POSEntry."Entry No.");
-        AuditLog.SetRange("Action Type", AuditLog."Action Type"::DIRECT_SALE_END);
+        AuditLog.SetRange("Action Type", AuditLog."Action Type"::RECEIPT_COPY);
         AuditLog.SetAutoCalcFields("Electronic Signature");
-        if not AuditLog.FindLast() then
-            exit;
+        if not AuditLog.FindLast() then begin
+            AuditLog.SetRange("Action Type", AuditLog."Action Type"::DIRECT_SALE_END);
+            if not AuditLog.FindLast() then
+                exit;
+        end;
 
         if not AuditLog."Electronic Signature".HasValue() then
             Error(ERROR_MISSING_SIGNATURE, POSEntry.TableCaption, POSEntry."Entry No.");
 
         AuditLog."Electronic Signature".CreateInStream(InStream, TextEncoding::UTF8);
         while (not InStream.EOS) do begin
-            InStream.ReadText(Signature);
+            InStream.ReadText(SignatureChunk);
+            Signature += SignatureChunk;
         end;
 
+        LinePrintMgt.AddTextField(1, TemplateLine.Align, Format(AuditLog."Log Timestamp", 0, 3));
         PrintSignature := CopyStr(Signature, 3, 1) + CopyStr(Signature, 7, 1) + CopyStr(Signature, 13, 1) + CopyStr(Signature, 19, 1);
         LinePrintMgt.AddTextField(1, TemplateLine.Align, PrintSignature);
+        LinePrintMgt.AddTextField(1, TemplateLine.Align, 'NF525/0274-1 (B)');
+        LinePrintMgt.AddTextField(1, TemplateLine.Align, Licenseinformation.GetRetailVersion());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnValidateLogRecords', '', true, true)]
-    local procedure OnValidateLogRecords(var POSAuditLog: Record "NPR POS Audit Log"; var Handled: Boolean)
+    local procedure OnValidateLogRecords(var POSAuditLog: Record "NPR POS Audit Log"; var Handled: Boolean; var Error: Boolean)
     var
         BaseValue: Text;
+        BaseValueChunk: Text;
         Signature: Text;
+        SignatureChunk: Text;
         PreviousSignature: Text;
+        PreviousSignatureChunk: Text;
         InStream: InStream;
         First: Boolean;
         POSUnit: Record "NPR POS Unit";
@@ -1145,10 +1333,12 @@ codeunit 6184850 "NPR FR Audit Mgt."
             exit;
 
         Handled := true;
+        Error := true;
 
         POSAuditLog.SetAutoCalcFields("Electronic Signature", "Previous Electronic Signature", "Signature Base Value");
         POSAuditLog.SetCurrentKey("Entry No.");
         POSAuditLog.SetAscending("Entry No.", true);
+        POSAuditLog.LockTable();
 
         if POSAuditLog.FindSet() then
             repeat
@@ -1156,14 +1346,17 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 POSAuditLog.Modify();
             until POSAuditLog.Next() = 0;
 
-        //Check signatures against fresh data strings/hash
+        //Check signatures against fresh data strings/hash. 
+        //Perfoms actual data modifications on locked records that are ALWAYS rolled back at the end.
         if POSAuditLog.FindSet() then begin
             First := true;
             repeat
                 Clear(PreviousSignature);
                 POSAuditLog."Previous Electronic Signature".CreateInStream(InStream, TextEncoding::UTF8);
-                while (not InStream.EOS) do
-                    InStream.ReadText(PreviousSignature);
+                while (not InStream.EOS) do begin
+                    InStream.ReadText(PreviousSignatureChunk);
+                    PreviousSignature += PreviousSignatureChunk;
+                end;
                 Clear(InStream);
 
                 if not First then
@@ -1172,24 +1365,34 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
                 Clear(Signature);
                 POSAuditLog."Electronic Signature".CreateInStream(InStream, TextEncoding::UTF8);
-                while (not InStream.EOS) do
-                    InStream.ReadText(Signature);
+                while (not InStream.EOS) do begin
+                    InStream.ReadText(SignatureChunk);
+                    Signature += SignatureChunk;
+                end;
                 Clear(InStream);
 
                 Clear(BaseValue);
                 POSAuditLog."Signature Base Value".CreateInStream(InStream, TextEncoding::UTF8);
-                while (not InStream.EOS) do
-                    InStream.ReadText(BaseValue);
+                while (not InStream.EOS) do begin
+                    InStream.ReadText(BaseValueChunk);
+                    BaseValue += BaseValueChunk;
+                end;
                 Clear(InStream);
 
+#if not BC17
+                if not VerifySignature(BaseValue, Enum::"Hash Algorithm"::SHA256, DecodeBase64URL(Signature)) then
+                    Error(ERROR_SIGNATURE_VALUE, POSAuditLog.TableCaption, POSAuditLog."Entry No.");
+#else
                 if not VerifySignature(BaseValue, 'SHA256', DecodeBase64URL(Signature)) then
                     Error(ERROR_SIGNATURE_VALUE, POSAuditLog.TableCaption, POSAuditLog."Entry No.");
+#endif                    
 
                 First := false;
             until POSAuditLog.Next() = 0;
         end;
 
         Message(CAPTION_SIGNATURES_VALID, POSAuditLog.Count());
+        Error := false;
         Error(''); //Rollback modifications to entries done while recalculating & verifying signature.
     end;
 
@@ -1212,10 +1415,10 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
         POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
 
-        if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, MonthlyPeriodType(), FRCertificationSetup."Monthly Workshift Duration", FromWorkshiftEntry) then
+        if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, MonthlyPeriodType(), _FRCertificationSetup."Monthly Workshift Duration", FromWorkshiftEntry) then
             POSWorkshiftCheckpointMgt.CreatePeriodCheckpoint(POSWorkshiftCheckpoint."POS Entry No.", POSUnit."No.", FromWorkshiftEntry, POSWorkshiftCheckpoint."Entry No.", MonthlyPeriodType());
 
-        if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, YearlyPeriodType(), FRCertificationSetup."Yearly Workshift Duration", FromWorkshiftEntry) then
+        if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, YearlyPeriodType(), _FRCertificationSetup."Yearly Workshift Duration", FromWorkshiftEntry) then
             POSWorkshiftCheckpointMgt.CreatePeriodCheckpoint(POSWorkshiftCheckpoint."POS Entry No.", POSUnit."No.", FromWorkshiftEntry, POSWorkshiftCheckpoint."Entry No.", YearlyPeriodType());
     end;
 
@@ -1240,7 +1443,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
     begin
         //Error upon POS login if any configuration is missing or clearly not set according to compliance
 
-        POSSession.GetSession(POSSession, true);
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
         if not IsEnabled(POSUnit."POS Audit Profile") then
@@ -1252,8 +1454,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         FRAuditSetup.Get();
         FRAuditSetup.TestField("Monthly Workshift Duration");
         FRAuditSetup.TestField("Yearly Workshift Duration");
-        FRAuditSetup.TestField("Certification Category");
-        FRAuditSetup.TestField("Certification No.");
         FRAuditSetup.TestField("Signing Certificate Thumbprint");
         FRAuditSetup.TestField("Auto Archive URL");
         FRAuditSetup.TestField("Auto Archive API Key");
@@ -1330,19 +1530,37 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
-        FRAuditSetup: Record "NPR FR Audit Setup";
-        CurrentYear: Text;
-        DisplayVersionLbl: Label '%1-%2/%3', Locked = true;
+        VersionLbl: Label 'NF525/0274-1 (B)', Locked = true;
     begin
-        POSSession.GetSession(POSSession, true);
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
         if not IsEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        CurrentYear := CopyStr(Format(Date2DMY(Today, 3)), 3, 2);
-        FRAuditSetup.Get();
-        DisplayVersion += ',' + StrSubstNo(DisplayVersionLbl, FRAuditSetup."Certification Category", CurrentYear, FRAuditSetup."Certification No.");
+        DisplayVersion += ',' + VersionLbl;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnShowAdditionalInfo', '', false, false)]
+    local procedure OnShowAdditionalInfo(POSAuditLog: Record "NPR POS Audit Log")
+    var
+        POSAuditLogAddInfo: Record "NPR FR POS Audit Log Add. Info";
+    begin
+        if POSAuditLog."External Implementation" <> ImplementationCode() then
+            exit;
+
+        //Open "aux. info" table for TICKET events due to legacy. 
+        //Everything else is in "add. info" table that is newer and more flexible
+        case POSAuditLog."External Type" of
+            'TICKET',
+            'JET',
+            'GRANDTOTAL',
+            'DUPLICATE',
+            'ARCHIVE':
+                begin
+                    POSAuditLogAddInfo.SetRange("POS Audit Log Entry No.", POSAuditLog."Entry No.");
+                    Page.RunModal(Page::"NPR FR POS Audit Log Add. Info", POSAuditLogAddInfo);
+                end;
+        end;
     end;
 
     [IntegrationEvent(false, false)]
@@ -1350,4 +1568,3 @@ codeunit 6184850 "NPR FR Audit Mgt."
     begin
     end;
 }
-#endif
