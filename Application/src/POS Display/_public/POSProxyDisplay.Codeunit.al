@@ -735,7 +735,7 @@
             DisplayHandlerAction::DownloadFiles:
                 begin
                     POSUnitDisplay."Media Downloaded" := true;
-                    DisplaySetup.Modify(true);
+                    POSUnitDisplay.Modify();
                 end;
         end;
     end;

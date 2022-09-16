@@ -238,6 +238,17 @@
             Caption = 'POS Display Profile';
             DataClassification = CustomerContent;
             TableRelation = "NPR Display Setup";
+
+            trigger OnValidate()
+            var
+                UnitDisplay: Record "NPR POS Unit Display";
+            begin
+                if (Rec."POS Display Profile" <> '') then
+                    if (UnitDisplay.Get(Rec."POS Display Profile")) then begin
+                        UnitDisplay."Media Downloaded" := false;
+                        UnitDisplay.Modify();
+                    end;
+            end;
         }
         field(620; "POS Security Profile"; Code[20])
         {
