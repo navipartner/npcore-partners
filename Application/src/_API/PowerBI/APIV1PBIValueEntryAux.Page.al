@@ -1,4 +1,4 @@
-page 6059989 "NPR APIV1 PBIValueEntryAux"
+page 6060006 "NPR APIV1 PBIValueEntryAux"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
