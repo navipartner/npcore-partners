@@ -641,9 +641,12 @@
     procedure DisplayMemberInfoCaptureDialog(SaleLinePOS: Record "NPR POS Sale Line") LookupOK: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MembershipEvents: Codeunit "NPR MM Membership Events";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         MemberInfoCaptureListPage: Page "NPR MM Member Capture List";
         PageAction: Action;
+        InfoCaptureFilter: Text;
+        ShowStandardUserInterface: Boolean;
     begin
 
         MemberInfoCapture.Reset();
@@ -653,24 +656,31 @@
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
         MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
+        InfoCaptureFilter := MemberInfoCapture.GetFilters();
         MemberInfoCapture.FilterGroup(0);
         MemberInfoCapture.FindSet();
 
-        if (MemberInfoCapture.Count() > 1) then begin
-            MemberInfoCaptureListPage.SetTableView(MemberInfoCapture);
-            MemberInfoCaptureListPage.LookupMode(true);
-            MemberInfoCaptureListPage.Editable(true);
-            PageAction := MemberInfoCaptureListPage.RunModal();
+        ShowStandardUserInterface := true;
+        LookupOK := true;
+        MembershipEvents.OnBeforeMemberInfoCaptureDialog(InfoCaptureFilter, ShowStandardUserInterface);
 
-        end else begin
-            MemberInfoCapturePage.SetTableView(MemberInfoCapture);
-            MemberInfoCapturePage.LookupMode(true);
-            MemberInfoCapturePage.Editable(true);
-            PageAction := MemberInfoCapturePage.RunModal();
-
+        if (ShowStandardUserInterface) then begin
+            if (MemberInfoCapture.Count() > 1) then begin
+                MemberInfoCaptureListPage.SetTableView(MemberInfoCapture);
+                MemberInfoCaptureListPage.LookupMode(true);
+                MemberInfoCaptureListPage.Editable(true);
+                PageAction := MemberInfoCaptureListPage.RunModal();
+            end else begin
+                MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+                MemberInfoCapturePage.LookupMode(true);
+                MemberInfoCapturePage.Editable(true);
+                PageAction := MemberInfoCapturePage.RunModal();
+            end;
+            LookupOK := (PageAction = Action::LookupOK);
         end;
 
-        exit(PageAction = Action::LookupOK);
+        MembershipEvents.OnAfterMemberInfoCaptureDialog(InfoCaptureFilter, ShowStandardUserInterface, LookupOK);
+        exit(LookupOK);
     end;
 
     [EventSubscriber(ObjectType::"Codeunit", Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, true)]
