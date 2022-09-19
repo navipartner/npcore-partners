@@ -1,13 +1,18 @@
 
 page 6059859 "NPR Aux Conf. Template Subform"
 {
+    Extensible = False;
     PageType = ListPart;
     SourceTable = "Config. Template Line";
 #if not CLOUD
     UsageCategory = None;
+
+    [Obsolete('Only available in cloud version')]
+    procedure SetAuxTableId(_AuxTableId: Integer)
+    begin
+    end;
 #endif
 #if CLOUD
-    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Aux Lines';
     LinksAllowed = false;
