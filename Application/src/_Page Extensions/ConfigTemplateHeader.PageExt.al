@@ -1,4 +1,3 @@
-#if CLOUD
 pageextension 6014402 "NPR Config. Template Header" extends "Config. Template Header"
 {
     layout
@@ -20,4 +19,3 @@ pageextension 6014402 "NPR Config. Template Header" extends "Config. Template He
         }
     }
 }
-#endif
