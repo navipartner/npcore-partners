@@ -97,7 +97,7 @@
                         begin
                             RaptorDataBuffer.Init();
                             RaptorDataBuffer."Entry No." += 1;
-                            RaptorDataBuffer."Date-Time Created" := GetJsonToken(JObject, 'CreateDate').AsValue().AsDateTime();
+                            RaptorDataBuffer."Date-Time Created" := FormatRaptorDateTime(GetJsonToken(JObject, 'CreateDate').AsValue().AsText());
                             RaptorDataBuffer.Priority := GetJsonToken(JObject, 'Priority').AsValue().AsInteger();
                             ParseItemNo(GetJsonToken(JObject, 'RecommendedId').AsValue().AsText(), RaptorDataBuffer);
                             RaptorDataBuffer.Insert();
@@ -404,6 +404,21 @@
         ListOfTrackingServiceTypes.Insert();
 
         OnGetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
+    end;
+
+    local procedure FormatRaptorDateTime(RaptorDatetimeAsText: Text): DateTime
+    var
+        TypeHelper: Codeunit "Type Helper";
+        RaptorDate: Date;
+        RaptorTime: Time;
+        OffSet: Duration;
+    begin
+        if not Evaluate(RaptorDate, CopyStr(RaptorDatetimeAsText, 1, 10), 9) then
+            exit(0DT);
+        if not Evaluate(RaptorTime, CopyStr(RaptorDatetimeAsText, 12), 9) then
+            RaptorTime := 0T;
+        TypeHelper.GetUserTimezoneOffset(OffSet);
+        exit(CreateDateTime(RaptorDate, RaptorTime) + OffSet);
     end;
 
     procedure RaptorModule_GetUserIdHistory(): Text[50]
