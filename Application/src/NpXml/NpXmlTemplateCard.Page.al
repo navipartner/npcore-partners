@@ -287,64 +287,99 @@
                 }
                 group(FTP)
                 {
+                    Caption = 'SFTP/FTP';
                     field("FTP Transfer"; Rec."FTP Transfer")
                     {
 
                         Importance = Promoted;
-                        ToolTip = 'Specifies the value of the FTP Transfer field';
+                        ToolTip = 'Specifies the value of the FTP or SFTP Transfer field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("SFTP/FTP Nc Endpoint"; Rec."SFTP/FTP Nc Endpoint")
+                    {
+                        ToolTip = 'Specifies the value of the Nc Endpoint field for FTP or SFTP Transfer';
                         ApplicationArea = NPRRetail;
                     }
                     field("FTP Server"; Rec."FTP Server")
                     {
-
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+                        ObsoleteTag = '20';
+                        Visible = false;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the FTP Server field';
                         ApplicationArea = NPRRetail;
                     }
                     field("FTP Username"; Rec."FTP Username")
                     {
-
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+                        ObsoleteTag = '20';
+                        Visible = false;
                         ToolTip = 'Specifies the value of the FTP Username field';
                         ApplicationArea = NPRRetail;
                     }
                     field("FTP Password"; Rec."FTP Password")
                     {
-
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+                        ObsoleteTag = '20';
+                        Visible = false;
                         ToolTip = 'Specifies the value of the FTP Password field';
                         ApplicationArea = NPRRetail;
                     }
                     field("FTP Port"; Rec."FTP Port")
                     {
-
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+                        ObsoleteTag = '20';
+                        Visible = false;
                         ToolTip = 'Specifies the value of the FTP Port field';
                         ApplicationArea = NPRRetail;
                     }
                     field("FTP Passive"; Rec."FTP Passive")
                     {
-
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+                        ObsoleteTag = '20';
+                        Visible = false;
                         ToolTip = 'Specifies the value of the FTP Passive field';
                         ApplicationArea = NPRRetail;
                     }
                     field("FTP Encryption mode"; Rec."Ftp EncMode")
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+                        ObsoleteTag = '20';
+                        Visible = false;
                         ToolTip = 'Specifies which mode of encryption is used between client and server';
                         ApplicationArea = NPRRetail;
                     }
                     field("FTP Directory"; Rec."FTP Directory")
                     {
-
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+                        ObsoleteTag = '20';
+                        Visible = false;
                         ToolTip = 'Specifies the value of the FTP Directory field';
                         ApplicationArea = NPRRetail;
                     }
                     field("FTP Filename (Fixed)"; Rec."FTP Filename (Fixed)")
                     {
-
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+                        ObsoleteTag = '20';
+                        Visible = false;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the FTP Filename (Fixed) field';
                         ApplicationArea = NPRRetail;
                     }
                     field("FTP Files temporrary extension"; Rec."FTP Files temporrary extension")
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+                        ObsoleteTag = '20';
+                        Visible = false;
                         ApplicationArea = NPRRetail;
                         Importance = Additional;
                         ToolTip = 'Specifies temporrary file extension. If it is entered, file will be uploaded with this extension and then renamed to real (target) one.';

@@ -40,11 +40,25 @@
         }
         field(100; Type; Option)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Option type to be removed. Use new enum field "Protocol Type" instead.';
+            ObsoleteTag = '20';
             Caption = 'Type';
             DataClassification = CustomerContent;
             Description = 'NC2.01';
             OptionCaption = 'DotNet,,,SharpSFTP';
             OptionMembers = DotNet,,,SharpSFTP;
+        }
+        field(101; "Protocol Type"; Enum "NPR Nc FTP Protocol Type")
+        {
+            Caption = 'Protocol Type';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if (Rec."Protocol Type" <> xRec."Protocol Type") and (Rec."Protocol Type" = Rec."Protocol Type"::SFTP) then
+                    Rec.EncMode := Rec.EncMode::None;
+            end;
         }
         field(110; Server; Text[250])
         {
@@ -111,6 +125,12 @@
             InitValue = ANSI;
             OptionCaption = 'ANSI,Unicode,UTF-8';
             OptionMembers = ANSI,Unicode,UTF8;
+        }
+        field(175; "File Temporary Extension"; Text[4])
+        {
+            Caption = 'File Temporary Extension';
+            DataClassification = CustomerContent;
+            CharAllowed = 'az';
         }
     }
 
