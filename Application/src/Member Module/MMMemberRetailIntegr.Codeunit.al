@@ -493,7 +493,7 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         i: Integer;
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MemberLinesToSuggest: Integer;
+        MemberLinesToSuggest, MemberInfoCaptureCount: Integer;
         ReasonMessage: Text;
         AttemptCreateMembership: Codeunit "NPR Membership Attempt Create";
     begin
@@ -540,8 +540,9 @@
                         (MembershipSalesSetup."Suggested Membercount In Sales" < MembershipSetup."Membership Member Cardinality")) then
                         MemberLinesToSuggest := MembershipSalesSetup."Suggested Membercount In Sales";
 
-                    if (MemberLinesToSuggest <> MemberInfoCapture.Count()) then begin
-                        if (MemberInfoCapture.FindFirst()) then
+                    MemberInfoCaptureCount := MemberInfoCapture.Count();
+                    if (MemberLinesToSuggest <> MemberInfoCaptureCount) then begin
+                        if MemberInfoCaptureCount > 0 then
                             MemberInfoCapture.DeleteAll();
 
                         for i := 1 to MemberLinesToSuggest do begin
@@ -558,7 +559,7 @@
                     MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
                     MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
                     MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
-                    MemberInfoCapture.FindSet();
+                    MemberInfoCapture.FindSet(true);
                     repeat
                         MemberInfoCapture."Item No." := SaleLinePOS."No.";
                         MemberInfoCapture."Membership Code" := MembershipSalesSetup."Membership Code";
