@@ -6,6 +6,7 @@
         FTPClient: Codeunit "NPR AF FTP Client";
         SFTPClient: Codeunit "NPR AF SFTP Client";
         AuthorizationFailedErrorErr: Label 'Authorization failed. Wrong FTP username/password.';
+        UploadedFileRenameLblErr: Label 'File %1 could not be renamed back to original file name %2 after it was uploaded with temporrary extension .%3.';
 
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; Filename: Text; var NcTask: Record "NPR Nc Task")
     var
@@ -101,18 +102,18 @@
     var
         ResponseDescriptionText: Text;
         ResponseCodeText: Text;
-        ConnectionString: Text;
         TextFTPServerResponseFailErr: Label 'File could not be uploaded. FTP server %1 returned error status %2 %3.', Comment = '%1=NcEndpointFTP.Server;%2=ResponseCodeText;%3=ResponseDescriptionText';
         TextFTPServerResponseSuccessLbl: Label 'The file %1 (%2 bytes) was successfully uploaded to the FTP server %3. Server returned status %4 %5.', Comment = '%1=ConnectionString;%2=StrLen(OutputText);%3=NcEndpointFTP.Server;%4=ResponseCodeText;%5=ResponseDescriptionText';
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         TextCouldnotFTPErr: Label 'File could not be uploaded. No error received from server.';
     begin
-        if SendFtp(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText, ConnectionString) then begin
-            case (CopyStr(ResponseDescriptionText, 1, 1)) of
+        if SendFtp(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText) then begin
+            case (CopyStr(ResponseCodeText, 1, 1)) of
                 '1', '2', '3':
                     begin
                         //Positive Response
-                        NcTaskMgt.AddResponse(NcTask, StrSubstNo(TextFTPServerResponseSuccessLbl, ConnectionString, StrLen(OutputText), NcEndpointFTP.Server, ResponseCodeText, ResponseDescriptionText));
+                        NcTaskMgt.AddResponse(NcTask, StrSubstNo(TextFTPServerResponseSuccessLbl, NcEndpointFTP.Directory + '/' + Filename, StrLen(OutputText), NcEndpointFTP.Server, ResponseCodeText, ResponseDescriptionText));
+                        NcTaskMgt.AddOutputToTask(NcTask, OutputText);
                     end;
                 else begin
                     //Negative Response
@@ -123,7 +124,7 @@
             Error(TextCouldnotFTPErr);
     end;
 
-    local procedure SendFtp(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text; var ConnectionString: Text): Boolean
+    local procedure SendFtp(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text): Boolean
     begin
         if not NcEndpointFTP.Enabled then
             exit(false);
@@ -132,19 +133,27 @@
         if Filename = '' then
             Filename := NcEndpointFTP.Filename;
 
-        case NcEndpointFTP.Type of
-            NcEndpointFTP.Type::DotNet:
-                SendDotNetFtp(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText, ConnectionString);
-            NcEndpointFTP.Type::SharpSFTP:
-                SendSharpSFTP(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText);
+        case NcEndpointFTP."Protocol Type" of
+            NcEndpointFTP."Protocol Type"::FTP:
+                begin
+                    if not SendAzureFtp(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText) then
+                        exit(false);
+                end;
+            NcEndpointFTP."Protocol Type"::SFTP:
+                begin
+                    if not SendAzureSFTP(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText) then
+                        exit(false);
+                end;
         end;
         exit(true);
     end;
 
-    local procedure SendDotNetFtp(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text; var ConnectionString: Text): Boolean
+    local procedure SendAzureFtp(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text): Boolean
     var
-        Servername: Text;
         TempBlob: Codeunit "Temp Blob";
+        Servername: Text;
+        RemotePath: Text;
+        OriginalFileName: Text;
         FTPResponse: JsonObject;
         JToken: JsonToken;
         InStr: InStream;
@@ -156,9 +165,14 @@
         Servername := BuildFTPServerName(NcEndpointFTP.Server);
 
         if NcEndpointFTP.Directory <> '' then
-            ConnectionString := (NcEndpointFTP.Directory + '/' + Filename)
+            RemotePath := '/' + NcEndpointFTP.Directory.TrimStart('/').TrimEnd('/') + '/'
         else
-            ConnectionString := (Filename);
+            RemotePath := '/';
+
+        if NcEndpointFTP."File Temporary Extension" <> '' then begin
+            OriginalFileName := Filename;
+            Filename := Filename + '.' + NcEndpointFTP."File Temporary Extension";
+        end;
 
         UseDefaultEncoding := false;
         case NcEndpointFTP."File Encoding" of
@@ -186,7 +200,7 @@
             FtpPort := 21;
 
         InitializeFTP(Servername, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive, NcEndpointFTP.EncMode);
-        FTPResponse := FTPClient.UploadFile(InStr, ConnectionString);
+        FTPResponse := FTPClient.UploadFile(InStr, RemotePath + Filename);
 
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
@@ -196,6 +210,21 @@
                 begin
                     FTPResponse.Get('Decription', JToken);
                     ResponseDescriptionText := JToken.AsValue().AsText();
+
+                    if NcEndpointFTP."File Temporary Extension" <> '' then begin
+                        FTPResponse := FTPClient.RenameFile(RemotePath + Filename, RemotePath + OriginalFileName);
+
+                        FTPResponse.Get('StatusCode', JToken);
+                        ResponseCodeText := JToken.AsValue().AsText();
+
+                        if ResponseCodeText <> '200' then begin
+                            FTPClient.Destruct();
+                            ResponseDescriptionText := StrSubstNo(UploadedFileRenameLblErr, Filename, OriginalFileName, NcEndpointFTP."File Temporary Extension");
+                            exit(false);
+                        end;
+                    end;
+
+                    FTPClient.Destruct();
                     exit(true);
                 end;
             '401':
@@ -206,12 +235,14 @@
             end;
         end;
 
+        FTPClient.Destruct();
         exit(false);
     end;
 
-    local procedure SendSharpSFTP(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text): Boolean
+    local procedure SendAzureSFTP(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text): Boolean
     var
         RemotePath: Text;
+        OriginalFileName: Text;
         TempBlob: Codeunit "Temp Blob";
         FTPResponse: JsonObject;
         JToken: JsonToken;
@@ -222,9 +253,14 @@
         UseDefaultEncoding: Boolean;
     begin
         if NcEndpointFTP.Directory <> '' then
-            RemotePath := '/' + NcEndpointFTP.Directory + '/'
+            RemotePath := '/' + NcEndpointFTP.Directory.TrimStart('/').TrimEnd('/') + '/'
         else
             RemotePath := '/';
+
+        if NcEndpointFTP."File Temporary Extension" <> '' then begin
+            OriginalFileName := Filename;
+            Filename := Filename + '.' + NcEndpointFTP."File Temporary Extension";
+        end;
 
         UseDefaultEncoding := false;
         case NcEndpointFTP."File Encoding" of
@@ -249,7 +285,7 @@
 
         FtpPort := NcEndpointFTP.Port;
         If FtpPort = 0 then
-            FtpPort := 21;
+            FtpPort := 22;
 
         InitializeSFTP(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort);
         FTPResponse := SFTPClient.UploadFile(InStr, RemotePath + Filename);
@@ -261,6 +297,21 @@
             '200':
                 begin
                     ResponseDescriptionText := '200 The requested action has been successfully completed';
+
+                    if NcEndpointFTP."File Temporary Extension" <> '' then begin
+                        FTPResponse := SFTPClient.MoveFile(RemotePath + Filename, RemotePath + OriginalFileName);
+
+                        FTPResponse.Get('StatusCode', JToken);
+                        ResponseCodeText := JToken.AsValue().AsText();
+
+                        if ResponseCodeText <> '200' then begin
+                            SFTPClient.Destruct();
+                            ResponseDescriptionText := StrSubstNo(UploadedFileRenameLblErr, Filename, OriginalFileName, NcEndpointFTP."File Temporary Extension");
+                            exit(false);
+                        end;
+                    end;
+
+                    SFTPClient.Destruct();
                     exit(true);
                 end;
             '401':
@@ -271,36 +322,47 @@
             end;
         end;
 
+        SFTPClient.Destruct();
         exit(false);
     end;
 
-    local procedure SendFtpOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP")
+    local procedure SendFtpOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP"; var Response: Text)
     begin
         if not NcEndpointFTP.Enabled then
             exit;
         if NcEndpointFTP.Server = '' then
             exit;
 
-        case NcEndpointFTP.Type of
-            NcEndpointFTP.Type::DotNet:
-                SendDotNetFtpOutput(NcTaskOutput, NcEndpointFTP);
-            NcEndpointFTP.Type::SharpSFTP:
-                SendSFTPOutput(NcTaskOutput, NcEndpointFTP);
+        case NcEndpointFTP."Protocol Type" of
+            NcEndpointFTP."Protocol Type"::FTP:
+                SendAzureFtpOutput(NcTaskOutput, NcEndpointFTP, Response);
+            NcEndpointFTP."Protocol Type"::SFTP:
+                SendAzureSFTPOutput(NcTaskOutput, NcEndpointFTP, Response);
         end;
     end;
 
-    local procedure SendDotNetFtpOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP"): Boolean
+    local procedure SendAzureFtpOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP"; var ResponseErrorDescriptionText: Text)
     var
         FtpPort: Integer;
         InStr: InStream;
+        FTPResponse: JsonObject;
+        JToken: JsonToken;
         ServerName: Text;
         FilePath: Text;
+        OriginalFileName: Text;
+        ResponseCodeText: Text;
     begin
         ServerName := BuildFTPServerName(NcEndpointFTP.Server);
 
-        FilePath := (NcTaskOutput.Name);
+        if NcEndpointFTP."File Temporary Extension" <> '' then begin
+            OriginalFileName := NcTaskOutput.Name;
+            NcTaskOutput.Name := NcTaskOutput.Name + '.' + NcEndpointFTP."File Temporary Extension";
+        end;
+
         if NcEndpointFTP.Directory <> '' then
-            FilePath := (NcEndpointFTP.Directory + '/' + NcTaskOutput.Name);
+            FilePath := '/' + NcEndpointFTP.Directory.TrimStart('/').TrimEnd('/') + '/'
+        else
+            FilePath := '/';
 
         NcTaskOutput.Data.CreateInStream(InStr);
 
@@ -309,7 +371,39 @@
             FtpPort := 21;
 
         InitializeFTP(ServerName, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive, NcEndpointFTP.EncMode);
-        FTPClient.UploadFile(InStr, FilePath);
+        FTPResponse := FTPClient.UploadFile(InStr, FilePath + NcTaskOutput.Name);
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue().AsText();
+
+        case ResponseCodeText of
+            '200':
+                begin
+                    if NcEndpointFTP."File Temporary Extension" <> '' then begin
+                        FTPResponse := FTPClient.RenameFile(FilePath + NcTaskOutput.Name, FilePath + OriginalFileName);
+
+                        FTPResponse.Get('StatusCode', JToken);
+                        ResponseCodeText := JToken.AsValue().AsText();
+
+                        if ResponseCodeText <> '200' then begin
+                            FTPClient.Destruct();
+                            ResponseErrorDescriptionText := StrSubstNo(UploadedFileRenameLblErr, NcTaskOutput.Name, OriginalFileName, NcEndpointFTP."File Temporary Extension");
+                            Error(ResponseErrorDescriptionText);
+                        end;
+                    end;
+
+                    FTPClient.Destruct();
+                    exit;
+                end;
+            '401':
+                ResponseErrorDescriptionText := AuthorizationFailedErrorErr;
+            else begin
+                FTPResponse.Get('Error', JToken);
+                ResponseErrorDescriptionText := JToken.AsValue().AsText();
+            end;
+        end;
+        FTPClient.Destruct();
+        Error(ResponseErrorDescriptionText);
     end;
 
     local procedure BuildFTPServerName(Servername: Text): Text
@@ -333,24 +427,34 @@
         FtpPath: Text;
         DirectoryList: List of [Text];
         FtpPort: Integer;
+        IsSecureFTP: Boolean;
     begin
         FtpPath := '/';
+        IsSecureFTP := NcEndpointFTP."Protocol Type" = NcEndpointFTP."Protocol Type"::SFTP;
 
         FtpPort := NcEndpointFTP.Port;
-        If FtpPort = 0 then
-            FtpPort := 21;
+        If FtpPort = 0 then begin
+            if IsSecureFTP then
+                FtpPort := 22
+            else
+                FtpPort := 21;
+        end;
 
-        InitializeFTP(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive, NcEndpointFTP.EncMode);
-        TryListFtpDirectory(DirectoryList);
+        if IsSecureFTP then
+            InitializeSFTP(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort)
+        else
+            InitializeFTP(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive, NcEndpointFTP.EncMode);
+
+        TryListFtpOrSftpDirectory(DirectoryList, IsSecureFTP);
 
         if NcEndpointFTP.Directory = '' then
             exit;
 
         FtpFolders := NcEndpointFTP.Directory;
-        CreateFtpFolders(NcEndpointFTP.Server, FtpFolders);
+        CreateFtpOrSftpFolders(NcEndpointFTP.Server, FtpFolders, IsSecureFTP);
     end;
 
-    local procedure CreateFtpFolders(FtpServer: Text; FtpFolders: Text)
+    local procedure CreateFtpOrSftpFolders(FtpServer: Text; FtpFolders: Text; IsSecureFTP: Boolean)
     var
         FtpFolder: Text;
         FtpPath: Text;
@@ -359,8 +463,8 @@
         FtpPath := FtpServer;
         while CutNextFtpFolder(FtpFolders, FtpFolder) do begin
             FtpPath += '/' + FtpFolder;
-            if (not TryListFtpDirectory(DirectoryList)) or (DirectoryList.Count = 0) then
-                TryCreateFtpFolder(FtpPath);
+            if (not TryListFtpOrSftpDirectory(DirectoryList, IsSecureFTP)) or (DirectoryList.Count = 0) then
+                TryCreateFtpOrSftpFolder(FtpPath, IsSecureFTP);
         end;
     end;
 
@@ -388,13 +492,16 @@
     end;
 
     [TryFunction]
-    local procedure TryCreateFtpFolder(FtpPath: Text)
+    local procedure TryCreateFtpOrSftpFolder(FtpPath: Text; IsSecureFTP: Boolean)
     var
         FTPResponse: JsonObject;
         ResponseCodeText: Text;
         JToken: JsonToken;
     begin
-        FTPResponse := FTPClient.CreateDirectory(FtpPath);
+        if IsSecureFTP then
+            FTPResponse := SFTPClient.CreateDirectory(FtpPath)
+        else
+            FTPResponse := FTPClient.CreateDirectory(FtpPath);
 
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
@@ -412,7 +519,7 @@
     end;
 
     [TryFunction]
-    local procedure TryListFtpDirectory(var DirectoryList: List of [Text])
+    local procedure TryListFtpOrSftpDirectory(var DirectoryList: List of [Text]; IsSecureFTP: Boolean)
     var
         FTPResponse: JsonObject;
         FileObject: JsonObject;
@@ -421,7 +528,10 @@
         i: Integer;
         ResponseCodeText: Text;
     begin
-        FTPResponse := FTPClient.ListDirectory('/');
+        if IsSecureFTP then
+            FTPResponse := SFTPClient.ListDirectory('/')
+        else
+            FTPResponse := FTPClient.ListDirectory('/');
 
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
@@ -436,9 +546,9 @@
                         JArray.Get(i, JToken);
                         FileObject := JToken.AsObject();
 
-                        FileObject.Get('Directory', JToken);
-                        if Jtoken.AsValue().AsBoolean() then begin
-                            FileObject.Get('File', JToken);
+                        FileObject.Get('IsDirectory', JToken);
+                        if not Jtoken.AsValue().AsBoolean() then begin
+                            FileObject.Get('Name', JToken);
                             DirectoryList.Add(JToken.AsValue().AsText());
                         end;
                     end;
@@ -482,20 +592,61 @@
         InitEndpoint(NcEndpointFTP);
     end;
 
-    local procedure SendSFTPOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP")
+    local procedure SendAzureSFTPOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP"; var ResponseErrorDescriptionText: Text)
     var
         AFSFTPClient: Codeunit "NPR AF SFTP Client";
         Istream: InStream;
+        FTPResponse: JsonObject;
+        JToken: JsonToken;
         RemotePath: Text;
+        OriginalFileName: Text;
+        ResponseCodeText: Text;
     begin
         AFSFTPClient.Construct(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, NcEndpointFTP.Port, 10000);
+        if NcEndpointFTP."File Temporary Extension" <> '' then begin
+            OriginalFileName := NcTaskOutput.Name;
+            NcTaskOutput.Name := NcTaskOutput.Name + '.' + NcEndpointFTP."File Temporary Extension";
+        end;
+
         if NcEndpointFTP.Directory <> '' then
             RemotePath := '/' + NcEndpointFTP.Directory.TrimStart('/').TrimEnd('/') + '/'
         else
             RemotePath := '/';
+
         NcTaskOutput.Data.CreateInStream(Istream);
-        AFSFTPClient.UploadFile(Istream, RemotePath + NcTaskOutput.Name);
+        FTPResponse := AFSFTPClient.UploadFile(Istream, RemotePath + NcTaskOutput.Name);
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue().AsText();
+
+        case ResponseCodeText of
+            '200':
+                begin
+                    if NcEndpointFTP."File Temporary Extension" <> '' then begin
+                        FTPResponse := AFSFTPClient.MoveFile(RemotePath + NcTaskOutput.Name, RemotePath + OriginalFileName);
+
+                        FTPResponse.Get('StatusCode', JToken);
+                        ResponseCodeText := JToken.AsValue().AsText();
+
+                        if ResponseCodeText <> '200' then begin
+                            AFSFTPClient.Destruct();
+                            ResponseErrorDescriptionText := StrSubstNo(UploadedFileRenameLblErr, NcTaskOutput.Name, OriginalFileName, NcEndpointFTP."File Temporary Extension");
+                            Error(ResponseErrorDescriptionText);
+                        end;
+                    end;
+
+                    AFSFTPClient.Destruct();
+                    exit;
+                end;
+            '401':
+                ResponseErrorDescriptionText := AuthorizationFailedErrorErr;
+            else begin
+                FTPResponse.Get('Error', JToken);
+                ResponseErrorDescriptionText := JToken.AsValue().AsText();
+            end;
+        end;
         AFSFTPClient.Destruct();
+        Error(ResponseErrorDescriptionText);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Trigger Task Mgt.", 'OnAfterGetOutputTriggerTask', '', false, false)]
@@ -551,7 +702,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Endpoint Mgt.", 'OnRunEndpoint', '', true, true)]
-    local procedure OnRunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint")
+    local procedure OnRunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint"; var Response: Text)
     var
         NcEndpointFTP: Record "NPR Nc Endpoint FTP";
     begin
@@ -560,7 +711,7 @@
         if not NcEndpointFTP.Get(NcEndpoint.Code) then
             exit;
 
-        SendFtpOutput(NcTaskOutput, NcEndpointFTP);
+        SendFtpOutput(NcTaskOutput, NcEndpointFTP, Response);
     end;
 
     local procedure InitializeFTP(ServerName: Text; Username: Text; Password: Text; FtpPort: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode")

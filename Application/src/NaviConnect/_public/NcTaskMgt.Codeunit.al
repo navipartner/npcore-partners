@@ -680,4 +680,13 @@
         NcTask.Response.CreateOutStream(StreamOut, TextEncoding::UTF8);
         StreamOut.Write(PreviousResponse + ResponseText);
     end;
+
+    procedure AddOutputToTask(var NcTask: Record "NPR Nc Task"; Output: Text)
+    var
+        OStream: OutStream;
+    begin
+        NcTask."Data Output".CreateOutStream(OStream, TEXTENCODING::UTF8);
+        OStream.WriteText(Output);
+        NcTask.Modify(true);
+    end;
 }
