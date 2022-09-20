@@ -1,12 +1,10 @@
 ﻿page 6151221 "NPR PrintNode Printer List"
 {
     Extensible = False;
-    // NPR5.53/THRO/20200106 CASE 383562 Object Created
-
     Caption = 'PrintNode Printer List';
     PageType = List;
     UsageCategory = Administration;
-
+    DelayedInsert = true;
     SourceTable = "NPR PrintNode Printer";
     ApplicationArea = NPRRetail;
 

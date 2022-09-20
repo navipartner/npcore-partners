@@ -12,6 +12,7 @@
         {
             Caption = 'Id';
             DataClassification = CustomerContent;
+            NotBlank = true;
             trigger OnLookup()
             var
                 PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
@@ -72,10 +73,6 @@
         key(Key1; Id, "Object Type", "Object ID")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
