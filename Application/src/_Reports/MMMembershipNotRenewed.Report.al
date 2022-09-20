@@ -23,6 +23,7 @@
                     dataitem("MM Member"; "NPR MM Member")
                     {
                         DataItemLink = "Entry No." = FIELD("Member Entry No.");
+                        RequestFilterFields = "E-Mail News Letter";
 
                         trigger OnAfterGetRecord()
                         begin
