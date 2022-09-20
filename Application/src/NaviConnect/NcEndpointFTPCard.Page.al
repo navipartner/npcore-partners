@@ -39,9 +39,22 @@
                 Caption = 'FTP';
                 field(Type; Rec.Type)
                 {
-
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Option type to be removed. Use new enum field "Protocol Type" instead.';
+                    ObsoleteTag = '20';
+                    Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
                     ApplicationArea = NPRNaviConnect;
+                }
+                field("Protocol Type"; Rec."Protocol Type")
+                {
+                    ToolTip = 'Specifies if File sending will be done using regular or secure FTP';
+                    ApplicationArea = NPRNaviConnect;
+
+                    trigger OnValidate()
+                    begin
+                        EncryptionModeEnabled := Rec."Protocol Type" = Rec."Protocol Type"::FTP;
+                    end;
                 }
                 field(Server; Rec.Server)
                 {
@@ -77,6 +90,7 @@
                 {
                     ToolTip = 'Specifies which mode of encryption is used between client and server';
                     ApplicationArea = NPRRetail;
+                    Editable = EncryptionModeEnabled;
                 }
                 field(Directory; Rec.Directory)
                 {
@@ -89,6 +103,12 @@
 
                     ToolTip = 'Specifies the value of the Filename field';
                     ApplicationArea = NPRNaviConnect;
+                }
+                field("FTP Files temporrary extension"; Rec."File Temporary Extension")
+                {
+                    ApplicationArea = NPRRetail;
+                    Importance = Additional;
+                    ToolTip = 'Specifies temporary file extension. If it is entered, file will be uploaded with this extension and then renamed to real (target) one.';
                 }
                 field("File Encoding"; Rec."File Encoding")
                 {
@@ -121,5 +141,13 @@
             }
         }
     }
+
+    trigger OnOpenPage()
+    begin
+        EncryptionModeEnabled := Rec."Protocol Type" = Rec."Protocol Type"::FTP;
+    end;
+
+    var
+        EncryptionModeEnabled: Boolean;
 }
 

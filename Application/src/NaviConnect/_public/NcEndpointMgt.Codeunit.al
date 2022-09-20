@@ -25,7 +25,7 @@
 
     procedure RunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint"; var Response: Text) Success: Boolean
     begin
-        if TryRunEndpoint(NcTaskOutput, NcEndpoint) then begin
+        if TryRunEndpoint(NcTaskOutput, NcEndpoint, Response) then begin
             Response := NcEndpoint."Setup Summary" + ': ' + NcTaskOutput.Name;
             exit(true);
         end;
@@ -35,13 +35,13 @@
     end;
 
     [TryFunction]
-    local procedure TryRunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint")
+    local procedure TryRunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint"; var Response: Text)
     begin
-        OnRunEndpoint(NcTaskOutput, NcEndpoint);
+        OnRunEndpoint(NcTaskOutput, NcEndpoint, Response);
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint")
+    local procedure OnRunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint"; var Response: Text)
     begin
     end;
 }

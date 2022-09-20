@@ -253,58 +253,85 @@
         }
         field(5100; "FTP Transfer"; Boolean)
         {
-            Caption = 'FTP Transfer';
+            Caption = 'S/FTP Transfer';
             DataClassification = CustomerContent;
             Description = 'NC1.08';
         }
         field(5110; "FTP Server"; Text[250])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+            ObsoleteTag = '20';
             Caption = 'FTP Server';
             DataClassification = CustomerContent;
         }
         field(5120; "FTP Username"; Text[100])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+            ObsoleteTag = '20';
             Caption = 'FTP Username';
             DataClassification = CustomerContent;
             Description = 'NC1.21';
         }
         field(5130; "FTP Password"; Text[100])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+            ObsoleteTag = '20';
             Caption = 'FTP Password';
             DataClassification = CustomerContent;
             Description = 'NC1.21';
         }
         field(5140; "FTP Directory"; Text[100])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+            ObsoleteTag = '20';
             Caption = 'FTP Directory';
             DataClassification = CustomerContent;
             Description = 'NC1.21';
         }
         field(5145; "FTP Filename (Fixed)"; Text[100])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+            ObsoleteTag = '20';
             Caption = 'FTP Filename (Fixed)';
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
         field(5146; "FTP Files temporrary extension"; Text[4])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+            ObsoleteTag = '20';
             Caption = 'FTP Files temporrary extension';
             DataClassification = CustomerContent;
             CharAllowed = 'az';
         }
         field(5150; "FTP Port"; Integer)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+            ObsoleteTag = '20';
             Caption = 'FTP Port';
             DataClassification = CustomerContent;
             MinValue = 0;
         }
         field(5160; "FTP Passive"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+            ObsoleteTag = '20';
             Caption = 'FTP Passive';
             DataClassification = CustomerContent;
         }
         field(5161; "Ftp EncMode"; Enum "NPR Nc FTP Encryption mode")
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
+            ObsoleteTag = '20';
             Caption = 'FTP Encryption mode';
             DataClassification = CustomerContent;
             InitValue = "None";
@@ -478,6 +505,12 @@
             Caption = 'Use JSON Numbers';
             DataClassification = CustomerContent;
             Description = 'NC2.08';
+        }
+        field(5510; "SFTP/FTP Nc Endpoint"; Code[20])
+        {
+            Caption = 'SFTP/FTP Nc Endpoint';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Nc Endpoint";
         }
         field(6059906; "Task Processor Code"; Code[20])
         {

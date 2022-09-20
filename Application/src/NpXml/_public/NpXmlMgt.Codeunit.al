@@ -10,9 +10,6 @@
         OutputTempBlob: Codeunit "Temp Blob";
         ResponseTempBlob: Codeunit "Temp Blob";
         Error002: Label 'Record in %1 within the filters does not exist';
-        Error003: Label 'Upload failed with status code: %1 and description: %2';
-        Error004: Label 'Authorization failed. Wrong FTP username/password.';
-        Error005: Label 'File %1 could not be renamed back to original file name %2 after it was uploaded with temporrary extension .%3.';
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         NpXmlValueMgt: Codeunit "NPR NpXml Value Mgt.";
         RecRef: RecordRef;
@@ -738,72 +735,65 @@
         end;
     end;
 
-    local procedure SendFtp(NPXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument; Filename: Text)
+
+    local procedure SendFtpAndSftp(NPXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument; Filename: Text)
     var
         "Field": Record "Field";
-        FTPClient: Codeunit "NPR AF FTP Client";
-        FTPTempBlob: Codeunit "Temp Blob";
-        FTPResponse: JsonObject;
-        JToken: JsonToken;
-        InStr: InStream;
+        NcEndpoint: Record "NPR Nc Endpoint";
+        NcEndpointFtp: Record "NPR Nc Endpoint FTP";
+        TempNcTaskOutput: Record "NPR Nc Task Output" temporary;
+        NcEndpointMgt: Codeunit "NPR Nc Endpoint Mgt.";
+        SendFailedErr: Label 'Upload to Endpoint %1 failed with error description: %2', Comment = '%1 = NC Endpoint code, %2 = LastErrorText';
+        Encoding: TextEncoding;
         OutStr: OutStream;
-        StatusCode: Text;
-        ErrorDescription: Text;
-        OriginalFileName: Text;
+        UseDefaultEncoding: Boolean;
+        Response: Text;
+        FileContent: Text;
     begin
         if not NPXmlTemplate."FTP Transfer" then
             exit;
-        if NPXmlTemplate."FTP Server" = '' then
+        if not NcEndpoint.Get(NPXmlTemplate."SFTP/FTP Nc Endpoint") then
+            exit;
+        if not NcEndpointFtp.Get(NcEndpoint.Code) then
+            exit;
+        if NcEndpointFtp.Server = '' then
             exit;
 
-        if NPXmlTemplate."FTP Filename (Fixed)" <> '' then
-            Filename := NPXmlTemplate."FTP Filename (Fixed)";
+        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || S/FTP Transfer by NC Endpoint: ' + NPXmlTemplate."SFTP/FTP Nc Endpoint", NPXmlTemplate."Do Not Add Comment Line");
 
-        if NPXmlTemplate."FTP Files temporrary extension" <> '' then begin
-            OriginalFileName := Filename;
-            Filename := Filename + '.' + NPXmlTemplate."FTP Files temporrary extension";
+        if NcEndpointFtp.Filename <> '' then
+            Filename := NcEndpointFtp.Filename;
+
+        if not NcEndpointMgt.HasInitEndpoint(NcEndpoint) then
+            NcEndpointMgt.InitEndpoint(NcEndpoint);
+
+        case NcEndpointFTP."File Encoding" of
+            NcEndpointFTP."File Encoding"::ANSI:
+                Encoding := TextEncoding::Windows;
+            NcEndpointFTP."File Encoding"::UTF8:
+                Encoding := TextEncoding::UTF8;
+            else
+                UseDefaultEncoding := true;
         end;
 
-        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || Ftp Transfer: ' + NPXmlTemplate."FTP Server", NPXmlTemplate."Do Not Add Comment Line");
+        if UseDefaultEncoding then
+            TempNcTaskOutput.Data.CreateOutStream(OutStr)
+        else
+            TempNcTaskOutput.Data.CreateOutStream(OutStr, Encoding);
 
-        FTPTempBlob.CreateOutStream(OutStr, TEXTENCODING::UTF8);
-        XmlDoc.WriteTo(OutStr);
-        FTPTempBlob.CreateInStream(InStr);
+        XmlDoc.WriteTo(FileContent);
+        OutStr.WriteText(FileContent);
+        TempNcTaskOutput.Insert(false);
+        TempNcTaskOutput.Name := CopyStr(FileName, 1, MaxStrLen(TempNcTaskOutput.Name));
 
-        FTPClient.Construct(NPXmlTemplate."FTP Server", NPXmlTemplate."FTP Username", NPXmlTemplate."FTP Password", NPXmlTemplate."FTP Port", 10000, NPXmlTemplate."FTP Passive", NPXmlTemplate."Ftp EncMode");
-        FTPResponse := FTPClient.UploadFile(InStr, NPXmlTemplate."FTP Directory" + '/' + Filename);
-
-        FTPResponse.Get('StatusCode', JToken);
-        StatusCode := JToken.AsValue().AsText();
-
-        case StatusCode of
-            '200':
-                begin
-                    Field.Get(DATABASE::"NPR NpXml Template", NPXmlTemplate.FieldNo("FTP Transfer"));
-                    AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] ' + Field."Field Caption" + ': ' + NPXmlTemplate."FTP Server" + ' -->' + GetChar(13) + GetChar(10));
-
-                    if NPXmlTemplate."FTP Files temporrary extension" <> '' then begin
-                        FTPResponse := FTPClient.RenameFile(NPXmlTemplate."FTP Directory" + '/' + Filename, NPXmlTemplate."FTP Directory" + '/' + OriginalFileName);
-
-                        FTPResponse.Get('StatusCode', JToken);
-                        StatusCode := JToken.AsValue().AsText();
-
-                        if StatusCode <> '200' then
-                            Error(Error005, Filename, OriginalFileName, NPXmlTemplate."FTP Files temporrary extension");
-                    end;
-
-                    exit;
-                end;
-            '401':
-                ErrorDescription := Error004;
-            else begin
-                    FTPResponse.Get('Error', JToken);
-                    ErrorDescription := JToken.AsValue().AsText();
-                end;
+        if NcEndpointMgt.RunEndpoint(TempNcTaskOutput, NcEndpoint, Response) then begin
+            "Field".Get(DATABASE::"NPR NpXml Template", NPXmlTemplate.FieldNo("FTP Transfer"));
+            AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] ' + "Field"."Field Caption" + ': ' + NPXmlTemplate."SFTP/FTP Nc Endpoint" + ' -->' + GetChar(13) + GetChar(10));
+            exit;
         end;
 
-        AddTextToResponseTempBlob(StrSubstNo(Error003, StatusCode, ErrorDescription));
-        Error(Error003, StatusCode, ErrorDescription);
+        AddTextToResponseTempBlob(StrSubstNo(SendFailedErr, NcEndpoint.Code, Response));
+        Error(SendFailedErr, NcEndpoint.Code, Response);
     end;
 
     local procedure TransferXml(NpXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument; Filename: Text[250]): Boolean
@@ -818,7 +808,7 @@
             ExportToFile(NpXmlTemplate, XmlDoc, Filename);
 
         if NpXmlTemplate."FTP Transfer" then
-            SendFtp(NpXmlTemplate, XmlDoc, Filename);
+            SendFtpAndSftp(NpXmlTemplate, XmlDoc, Filename);
 
         if NpXmlTemplate."API Transfer" then
             SendApi(NpXmlTemplate, XmlDoc);
