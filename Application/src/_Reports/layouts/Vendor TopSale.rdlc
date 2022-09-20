@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>e524171d-8c5f-4e77-b9c0-49b07597715b</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -288,7 +289,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!Qty_Caption.Value</Value>
+                                  <Value>=Parameters!Qty_Caption.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -323,7 +324,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -778,7 +779,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!Qty_Inventory.Value</Value>
+                                  <Value>=Parameters!Qty_Inventory.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -813,7 +814,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1355,7 +1356,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1392,7 +1393,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1879,7 +1880,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1918,7 +1919,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2468,7 +2469,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Qty_Vendor.Value</Value>
+                                  <Value>=Fields!Qty_Vendor.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -2501,7 +2502,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -2944,7 +2945,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!StockQty.Value</Value>
+                                  <Value>=Fields!StockQty.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -2969,7 +2970,6 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -2981,7 +2981,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -3499,7 +3499,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Qty_Vendor.Value</Value>
+                                  <Value>=Fields!Qty_Vendor.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -3533,7 +3533,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -3989,7 +3989,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!StockQty.Value</Value>
+                                  <Value>=Fields!StockQty.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -4026,7 +4026,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -4397,6 +4397,7 @@
                           <rd:DefaultName>Textbox74</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4429,6 +4430,7 @@
                           <rd:DefaultName>Textbox75</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4461,6 +4463,7 @@
                           <rd:DefaultName>Textbox76</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4493,6 +4496,7 @@
                           <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4525,6 +4529,7 @@
                           <rd:DefaultName>Textbox78</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4544,7 +4549,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -4557,6 +4562,7 @@
                           <rd:DefaultName>Textbox215</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4576,7 +4582,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -4589,6 +4595,7 @@
                           <rd:DefaultName>Textbox207</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4621,6 +4628,7 @@
                           <rd:DefaultName>Textbox79</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4653,6 +4661,7 @@
                           <rd:DefaultName>Textbox80</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4687,6 +4696,7 @@
                           <rd:DefaultName>Textbox81</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4719,6 +4729,7 @@
                           <rd:DefaultName>Textbox82</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4753,6 +4764,7 @@
                           <rd:DefaultName>Textbox83</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4785,6 +4797,7 @@
                           <rd:DefaultName>Textbox84</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4817,6 +4830,7 @@
                           <rd:DefaultName>Textbox85</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4849,6 +4863,7 @@
                           <rd:DefaultName>Textbox86</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4881,6 +4896,7 @@
                           <rd:DefaultName>Textbox87</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4913,6 +4929,7 @@
                           <rd:DefaultName>Textbox88</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4947,6 +4964,7 @@
                           <rd:DefaultName>Textbox89</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4979,6 +4997,7 @@
                           <rd:DefaultName>Textbox90</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -4998,7 +5017,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -5013,6 +5032,7 @@
                           <rd:DefaultName>Textbox223</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5032,7 +5052,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -5047,6 +5067,7 @@
                           <rd:DefaultName>Textbox174</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5081,6 +5102,7 @@
                           <rd:DefaultName>Textbox91</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5113,6 +5135,7 @@
                           <rd:DefaultName>Textbox92</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5145,6 +5168,7 @@
                           <rd:DefaultName>Textbox93</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5177,6 +5201,7 @@
                           <rd:DefaultName>Textbox94</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5211,6 +5236,7 @@
                           <rd:DefaultName>Textbox95</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5243,6 +5269,7 @@
                           <rd:DefaultName>Textbox96</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5277,6 +5304,7 @@
                           <rd:DefaultName>Textbox97</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5309,6 +5337,7 @@
                           <rd:DefaultName>Textbox98</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5341,6 +5370,7 @@
                           <rd:DefaultName>Textbox99</rd:DefaultName>
                           <Style>
                             <Border>
+                              <Color>Silver</Color>
                               <Style>None</Style>
                             </Border>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5879,7 +5909,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                   </Style>
@@ -5918,7 +5948,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                   </Style>
@@ -6471,7 +6501,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -6503,7 +6533,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -6927,7 +6957,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -6961,7 +6991,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -7459,7 +7489,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -7491,7 +7521,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -7915,7 +7945,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -7949,7 +7979,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -8447,7 +8477,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -8479,7 +8509,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -8905,7 +8935,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -8939,7 +8969,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -9358,7 +9388,7 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>4.78671cm</Height>
+        <Height>4.70738cm</Height>
         <Style />
       </Body>
       <Width>27.44983cm</Width>
@@ -9408,13 +9438,14 @@
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Left</TextAlign>
+                    <TextAlign>Right</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>3.27651cm</Top>
+              <Top>3.70236cm</Top>
+              <Left>19.23579cm</Left>
               <Height>0.423cm</Height>
-              <Width>17.6197cm</Width>
+              <Width>8.20716cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
                 <Border />
@@ -9438,14 +9469,14 @@
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Left</TextAlign>
+                    <TextAlign>Right</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>2.85351cm</Top>
-              <Left>0.00686cm</Left>
+              <Top>4.16064cm</Top>
+              <Left>19.2358cm</Left>
               <Height>0.423cm</Height>
-              <Width>17.61284cm</Width>
+              <Width>8.20715cm</Width>
               <ZIndex>2</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
@@ -9467,14 +9498,14 @@
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Center</TextAlign>
+                    <TextAlign>Right</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>4.32917cm</Top>
-              <Left>0.00686cm</Left>
+              <Top>2.68151cm</Top>
+              <Left>19.23579cm</Left>
               <Height>0.423cm</Height>
-              <Width>27.4361cm</Width>
+              <Width>8.20716cm</Width>
               <ZIndex>3</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
@@ -9497,14 +9528,14 @@
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Center</TextAlign>
+                    <TextAlign>Left</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>4.92856cm</Top>
+              <Top>4.26647cm</Top>
               <Left>0.00686cm</Left>
               <Height>0.44946cm</Height>
-              <Width>27.44296cm</Width>
+              <Width>13.19347cm</Width>
               <ZIndex>4</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
@@ -9527,14 +9558,14 @@
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Center</TextAlign>
+                    <TextAlign>Left</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>5.51913cm</Top>
+              <Top>4.78888cm</Top>
               <Left>0.00686cm</Left>
               <Height>0.43182cm</Height>
-              <Width>27.44296cm</Width>
+              <Width>13.18661cm</Width>
               <ZIndex>5</ZIndex>
               <Visibility>
                 <Hidden>true</Hidden>
@@ -9548,29 +9579,6 @@
                 <PaddingRight>5pt</PaddingRight>
               </Style>
             </Textbox>
-            <Line Name="Line1">
-              <Top>1.94042in</Top>
-              <Left>0.0027in</Left>
-              <Height>0in</Height>
-              <Width>10.80431in</Width>
-              <ZIndex>6</ZIndex>
-              <Style>
-                <Border>
-                  <Style>Solid</Style>
-                </Border>
-              </Style>
-            </Line>
-            <Line Name="Line2">
-              <Top>2.35678in</Top>
-              <Height>0in</Height>
-              <Width>10.80431in</Width>
-              <ZIndex>7</ZIndex>
-              <Style>
-                <Border>
-                  <Style>Solid</Style>
-                </Border>
-              </Style>
-            </Line>
             <Image Name="Picutre">
               <Source>Database</Source>
               <Value>=Convert.ToBase64String(Fields!Picture_CompanyInfo.Value)</Value>
@@ -9580,7 +9588,7 @@
               <Left>19.2358cm</Left>
               <Height>74.75014pt</Height>
               <Width>8.21401cm</Width>
-              <ZIndex>8</ZIndex>
+              <ZIndex>6</ZIndex>
               <Visibility>
                 <Hidden>true</Hidden>
               </Visibility>
@@ -9613,50 +9621,18 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>3.27651cm</Top>
-              <Left>17.83018cm</Left>
+              <Top>3.18126cm</Top>
+              <Left>19.2358cm</Left>
               <Height>12.11783pt</Height>
-              <Width>9.61278cm</Width>
-              <ZIndex>9</ZIndex>
+              <Width>8.20716cm</Width>
+              <ZIndex>7</ZIndex>
               <Style>
                 <Border />
                 <FontFamily>Segoe UI</FontFamily>
                 <FontSize>8pt</FontSize>
                 <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="Date3">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value EvaluationMode="Constant" />
-                      <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                        <Format>D</Format>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <FontFamily>Segoe UI</FontFamily>
-                    <FontSize>8pt</FontSize>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.78734cm</Top>
-              <Left>17.83704cm</Left>
-              <Height>12.11783pt</Height>
-              <Width>9.60592cm</Width>
-              <ZIndex>10</ZIndex>
-              <Style>
-                <Border />
-                <FontFamily>Segoe UI</FontFamily>
-                <FontSize>8pt</FontSize>
-                <VerticalAlign>Middle</VerticalAlign>
+                <PaddingLeft>5pt</PaddingLeft>
+                <PaddingRight>5pt</PaddingRight>
               </Style>
             </Textbox>
             <Textbox Name="ExecutionTimeTextBox2">
@@ -9680,9 +9656,9 @@
                 </Paragraph>
               </Paragraphs>
               <Top>3.73411cm</Top>
-              <Height>0.423cm</Height>
-              <Width>27.44295cm</Width>
-              <ZIndex>11</ZIndex>
+              <Height>0.44946cm</Height>
+              <Width>13.19347cm</Width>
+              <ZIndex>8</ZIndex>
               <Style>
                 <Border />
                 <VerticalAlign>Middle</VerticalAlign>
@@ -10200,6 +10176,7 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>7d996df7-ef2e-4b8a-b680-d4070c9c54ff</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
