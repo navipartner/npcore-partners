@@ -172,10 +172,6 @@
         key(Key5; "Authorization Code", "Entry Type")
         {
         }
-    }
-
-    fieldgroups
-    {
+        key(Key7; "Document No.", "Posting Date") { }
     }
 }
-
