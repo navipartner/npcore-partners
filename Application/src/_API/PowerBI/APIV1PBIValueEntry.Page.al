@@ -28,6 +28,14 @@ page 6059969 "NPR APIV1 PBIValueEntry"
                 {
                     Caption = 'Cost Amount (Actual)', Locked = true;
                 }
+                field(documentNo; Rec."Document No.")
+                {
+                    Caption = 'Document No.';
+                }
+                field(documentType; Rec."Document Type")
+                {
+                    Caption = 'Document Type';
+                }
                 field(discountAmount; Rec."Discount Amount")
                 {
                     Caption = 'Discount Amount', Locked = true;
