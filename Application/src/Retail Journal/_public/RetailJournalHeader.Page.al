@@ -88,8 +88,103 @@
                         ToolTip = 'Specifies the value of the POS Unit No. field';
                         ApplicationArea = NPRRetail;
                     }
+                }
+            }
+            group("Line Filters")
+            {
+                Caption = 'Line Filters';
+                grid(Control6014422)
+                {
+                    GridLayout = Columns;
+                    ShowCaption = false;
+                    group("Vendor No.")
+                    {
+                        Caption = 'Vendor No.';
+                        //The GridLayout property is only supported on controls of type Grid
+                        //GridLayout = Rows;
+                        field(VendorFilter; VendorFilter)
+                        {
+                            ShowCaption = false;
+                            TableRelation = Vendor;
+                            ToolTip = 'Specifies the value of the VendorFilter field';
+                            ApplicationArea = NPRRetail;
 
+                            trigger OnValidate()
+                            begin
+                                VendorFilter := UpperCase(VendorFilter);
+                                SetLineFilters();
+                            end;
+                        }
+                    }
+                    group("Item Category")
+                    {
+                        Caption = 'Item Category';
+                        field(ItemCategoryFilter; ItemCategoryFilter)
+                        {
+                            Caption = 'Item Category';
+                            ShowCaption = false;
+                            TableRelation = "Item Category";
+                            ToolTip = 'Specifies the value of the Item Category field';
+                            ApplicationArea = NPRRetail;
 
+                            trigger OnValidate()
+                            begin
+                                ItemCategoryFilter := UpperCase(ItemCategoryFilter);
+                                SetLineFilters();
+                            end;
+                        }
+                    }
+                    group("Unknown Item No.")
+                    {
+                        Caption = 'Unknown Item No.';
+                        field(ShowUnknown; ShowUnknown)
+                        {
+                            Caption = 'Unknown Item No.';
+                            OptionCaption = 'All,Only existing items,Only unknown items';
+                            ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Unknown Item No. field';
+                            ApplicationArea = NPRRetail;
+
+                            trigger OnValidate()
+                            begin
+                                SetLineFilters();
+                            end;
+                        }
+                    }
+                    group("New Item")
+                    {
+                        Caption = 'New Item';
+                        field(ShowNew; ShowNew)
+                        {
+                            Caption = 'New Item';
+                            OptionCaption = 'All,Only existing items,Only new items';
+                            ShowCaption = false;
+                            ToolTip = 'Specifies the value of the New Item field';
+                            ApplicationArea = NPRRetail;
+
+                            trigger OnValidate()
+                            begin
+                                SetLineFilters();
+                            end;
+                        }
+                    }
+                    group("Inventory Status")
+                    {
+                        Caption = 'Inventory Status';
+                        field(ShowInventory; ShowInventory)
+                        {
+                            Caption = 'Inventory Status';
+                            OptionCaption = 'All,In stock,Not in stock';
+                            ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Inventory Status field';
+                            ApplicationArea = NPRRetail;
+
+                            trigger OnValidate()
+                            begin
+                                SetLineFilters();
+                            end;
+                        }
+                    }
                 }
             }
             group(Dimensions)
@@ -641,15 +736,14 @@
         }
     }
 
-    trigger OnOpenPage()
-    begin
-        //-NPR5.53 [374290]
-        //+NPR5.53 [374290]
-    end;
-
     var
         Text001: Label 'Discount Code and Type updated successfully';
         RetailJournalCode: Codeunit "NPR Retail Journal Code";
+        VendorFilter: Text;
+        ItemCategoryFilter: Text;
+        ShowUnknown: Option All,"Only existing items","Only unknown items";
+        ShowNew: Option All,"Only existing items","Only new items";
+        ShowInventory: Option All,"In stock","Not in stock";
 
     internal procedure UpdateDiscount(RetailJournalHeader: Record "NPR Retail Journal Header")
     var
@@ -702,6 +796,11 @@
         end;
         //+NPR5.31 [262904]
         Message(Text001);
+    end;
+
+    local procedure SetLineFilters()
+    begin
+        CurrPage.SubLine.PAGE.SetLineFilters(VendorFilter, ItemCategoryFilter, ShowUnknown, ShowNew, ShowInventory);
     end;
 }
 
