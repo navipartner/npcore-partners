@@ -680,12 +680,12 @@
             'content-length':
                 begin
                     Evaluate(BigIntBuffer, NpXmlApiHeader.Value);
-                    RequestHeaders.Add('ContentLength', format(BigIntBuffer));
+                    RequestHeaders.Add('Content-Length', format(BigIntBuffer));
                 end;
             'content-type':
                 begin
                     ContentHeaders.Remove('Content-Type');
-                    ContentHeaders.Add('ContentType', NpXmlApiHeader.Value);
+                    ContentHeaders.Add('Content-Type', NpXmlApiHeader.Value);
                 end;
             'date':
                 begin
@@ -705,7 +705,7 @@
                 begin
                     if not Evaluate(DateTimeBuffer, NpXmlApiHeader.Value, 9) then
                         Evaluate(DateTimeBuffer, NpXmlApiHeader.Value);
-                    RequestHeaders.Add('IfModifiedSince', format(DateTimeBuffer));
+                    RequestHeaders.Add('If-Modified-Since', format(DateTimeBuffer));
                 end;
             'referer':
                 begin
@@ -713,11 +713,11 @@
                 end;
             'transfer-encoding':
                 begin
-                    RequestHeaders.Add('TransferEncoding', NpXmlApiHeader.Value);
+                    RequestHeaders.Add('Transfer-Encoding', NpXmlApiHeader.Value);
                 end;
             'user-agent':
                 begin
-                    RequestHeaders.Add('UserAgent', NpXmlApiHeader.Value);
+                    RequestHeaders.Add('User-Agent', NpXmlApiHeader.Value);
                 end;
             'expect100continue':
                 begin
