@@ -290,12 +290,17 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_FLEXIITERM', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: EFT Flexiiterm";
     }
+    value(53; GET_EVENT)
+    {
+        Caption = 'GET_EVENT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Get Event";
+    }
     value(56; "SS-QTY-")
     {
         Caption = 'SS-QTY-', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR SS Action - Qty Decrease";
     }
-value(6014600; BALANCE_V4)
+    value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: EndOfDay V4";

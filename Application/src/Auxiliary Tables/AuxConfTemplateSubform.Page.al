@@ -35,8 +35,6 @@ page 6059859 "NPR Aux Conf. Template Subform"
                     ToolTip = 'Specifies the name of the field in the data template.';
 
                     trigger OnAssistEdit()
-                    var
-                        AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
                     begin
                         NPRSelectFieldName();
                     end;
