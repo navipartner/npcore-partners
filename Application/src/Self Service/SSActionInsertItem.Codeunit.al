@@ -447,7 +447,7 @@
         if SaleLinePOS.Quantity - Abs(DecreaseByQty) < ItemMinQuantity then begin
             SSActionDeletePOSLine.DeletePosLine(POSSession);
         end else begin
-            SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, Abs(DecreaseByQty));
+            SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, Abs(DecreaseByQty), POSSaleLine);
         end;
 
         POSSession.RequestRefreshData();
