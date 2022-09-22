@@ -493,7 +493,7 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         i: Integer;
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MemberLinesToSuggest, MemberInfoCaptureCount: Integer;
+        MemberLinesToSuggest, MemberInfoCaptureCount : Integer;
         ReasonMessage: Text;
         AttemptCreateMembership: Codeunit "NPR Membership Attempt Create";
     begin
@@ -589,11 +589,6 @@
         end;
 
         Commit();
-
-        // When a sales line is created as part of web service (f.ex coupon complimentary item)
-        if (not GuiAllowed()) then
-            exit(-1100);
-
         if (DisplayMemberInfoCaptureDialog(SaleLinePOS)) then begin
             Commit();
 
@@ -628,6 +623,13 @@
         end;
 
         DeleteMemberInfoCapture(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
+
+        // When a sales line is created as part of web service (f.ex coupon complimentary item)
+        if (not GuiAllowed()) then
+            exit(-1100);
+
+        // In non-gui mode, assume sale line management is handled by publisher.
+        // TODO invoke delete on sale line manager codeunit.
         if (SaleLinePOS.Delete()) then;
         Commit();
 
@@ -666,18 +668,22 @@
         MembershipEvents.OnBeforeMemberInfoCaptureDialog(InfoCaptureFilter, ShowStandardUserInterface);
 
         if (ShowStandardUserInterface) then begin
-            if (MemberInfoCapture.Count() > 1) then begin
-                MemberInfoCaptureListPage.SetTableView(MemberInfoCapture);
-                MemberInfoCaptureListPage.LookupMode(true);
-                MemberInfoCaptureListPage.Editable(true);
-                PageAction := MemberInfoCaptureListPage.RunModal();
+            if (GuiAllowed()) then begin
+                if (MemberInfoCapture.Count() > 1) then begin
+                    MemberInfoCaptureListPage.SetTableView(MemberInfoCapture);
+                    MemberInfoCaptureListPage.LookupMode(true);
+                    MemberInfoCaptureListPage.Editable(true);
+                    PageAction := MemberInfoCaptureListPage.RunModal();
+                end else begin
+                    MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+                    MemberInfoCapturePage.LookupMode(true);
+                    MemberInfoCapturePage.Editable(true);
+                    PageAction := MemberInfoCapturePage.RunModal();
+                end;
+                LookupOK := (PageAction = Action::LookupOK);
             end else begin
-                MemberInfoCapturePage.SetTableView(MemberInfoCapture);
-                MemberInfoCapturePage.LookupMode(true);
-                MemberInfoCapturePage.Editable(true);
-                PageAction := MemberInfoCapturePage.RunModal();
+                LookupOK := false;
             end;
-            LookupOK := (PageAction = Action::LookupOK);
         end;
 
         MembershipEvents.OnAfterMemberInfoCaptureDialog(InfoCaptureFilter, ShowStandardUserInterface, LookupOK);
