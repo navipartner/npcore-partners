@@ -109,6 +109,11 @@ tableextension 6014422 "NPR Job" extends Job
             DataClassification = CustomerContent;
             Description = 'NPR5.53';
         }
+        field(6151579; "NPR Allow POS Add. New Lines"; Boolean)
+        {
+            Caption = 'Allow POS Add. New Lines';
+            DataClassification = CustomerContent;
+        }
         field(6151580; "NPR Admission Code"; Code[20])
         {
             Caption = 'Admission Code';
