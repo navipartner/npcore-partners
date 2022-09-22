@@ -14,7 +14,7 @@
     begin
         GLSetup.Get();
         GLSetup.TestField("Amount Rounding Precision");
-
+        
         FindPotentiallyImpactedMixesAndLines(TempSaleLinePOS, TriggerRec, TempMixedDiscount, RecalculateAllLines, CalculationDate);
 
         if not FindMatchingMixedDiscounts(SalePOS, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS) then begin
@@ -42,6 +42,18 @@
 
         if (not CalculateOnly) then
             Clear(TempSaleLinePOS);
+    end;
+
+    procedure UpdateAppliedLinesFromTriggeredLine(var TempPOSSaleLine: Record "NPR POS Sale Line" temporary; var TriggerRec: Record "NPR POS Sale Line")
+    begin
+        TempPOSSaleLine.SetRange(SystemId, TriggerRec."Derived from Line");
+        if TempPOSSaleLine.FindSet(true) then
+            repeat
+                TempPOSSaleLine."Unit of Measure Code" := TriggerRec."Unit of Measure Code";
+                TempPOSSaleLine.Validate(Quantity, TempPOSSaleLine.Quantity);
+                TempPOSSaleLine.Modify();
+            until TempPOSSaleLine.Next() = 0;
+        TempPOSSaleLine.Reset();
     end;
 
     procedure FindPotentiallyImpactedMixesAndLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; RecalculateAllLines: Boolean)
@@ -1072,6 +1084,7 @@
         SaleLinePOS."Discount Amount" := 0;
         SaleLinePOS."Custom Disc Blocked" := false;
         SaleLinePOS.Validate(Quantity, Qty);
+        SaleLinePOS."Derived from Line" := FromSaleLinePOS.SystemId;
         SaleLinePOS.Modify();
 
         LastLineNo := SaleLinePOS."Line No.";
@@ -1399,6 +1412,10 @@
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
 
+        if (Rec.Quantity = xRec.Quantity) and (Rec."Unit of Measure Code" <> xRec."Unit of Measure Code") then begin
+            UpdateAppliedLinesFromTriggeredLine(TempSaleLinePOS, Rec); 
+        end;
+            
         ApplyMixDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines, false, Today);
     end;
 

@@ -46,10 +46,8 @@
 
         if SaleLinePOS."Unit of Measure Code" = ItemUnitofMeasure.Code then
             exit;
-
-        SaleLinePOS.Validate("Unit of Measure Code", ItemUnitofMeasure.Code);
-        SaleLinePOS.Modify(true);
-
+        
+        SaleLine.SetUoM(ItemUnitofMeasure.Code);
     end;
 
     local procedure GetActionScript(): Text
