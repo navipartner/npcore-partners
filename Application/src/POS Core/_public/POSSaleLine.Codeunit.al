@@ -289,6 +289,22 @@
         POSSale.RefreshCurrent();
     end;
 
+    procedure SetUoM(UoMCode: Code[10])
+    var
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+    begin
+        RefreshCurrent();
+        OnBeforeSetUoM(Rec, UoMCode);
+
+        xRec := Rec;
+        Rec.Validate("Unit of Measure Code", UoMCode);
+        Rec.Modify(true);
+        POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(Rec, xRec);
+        OnAfterSetUoM(Rec);
+
+        POSSale.RefreshCurrent();
+    end;
+
     procedure SetUnitPrice(UnitPriceLCY: Decimal)
     begin
         RefreshCurrent();
@@ -518,10 +534,19 @@
     end;
 
     [IntegrationEvent(true, false)]
+    procedure OnAfterSetUoM(var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
     internal procedure OnBeforeSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     begin
     end;
 
+    [IntegrationEvent(true, false)]
+    internal procedure OnBeforeSetUoM(var SaleLinePOS: Record "NPR POS Sale Line"; var UoM: Code[10])
+    begin
+    end;
     //--- POS Sales Workflow ---
 
     local procedure OnBeforeInsertSaleLineCode(): Code[20]

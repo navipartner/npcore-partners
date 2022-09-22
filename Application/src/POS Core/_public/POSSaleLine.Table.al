@@ -1135,6 +1135,11 @@
             Caption = 'Imported from Invoice No.';
             DataClassification = CustomerContent;
         }
+        field(491; "Derived from Line"; Guid)
+        {
+            Caption = 'Derived from Line';
+            DataClassification = SystemMetadata;
+        }        
         field(495; "Created At"; DateTime)
         {
             Caption = 'Created At';
