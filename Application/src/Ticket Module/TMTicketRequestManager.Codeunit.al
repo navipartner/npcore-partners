@@ -204,10 +204,9 @@
 
     local procedure ReverseInitialEntryStatistics(DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; MaxAccessEntryNo: Integer)
     var
-        TicketAccessStatistics: Record "NPR TM Ticket Access Stats";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
-        AggregateStatistics: Codeunit "NPR TM Ticket Access Stats";
+        StatisticsMgr: Codeunit "NPR TM Ticket Access Stats";
     begin
         if (DetailedTicketAccessEntry.type <> DetailedTicketAccessEntry.type::INITIAL_ENTRY) then
             exit;
@@ -221,7 +220,7 @@
         TicketAccessEntry."Access Date" := DT2Date(DetailedTicketAccessEntry."Created Datetime");
         TicketAccessEntry."Access Time" := DT2Time(DetailedTicketAccessEntry."Created Datetime");
         TicketAccessEntry.Quantity *= -1;
-        AggregateStatistics.AddAccessStatistic(TicketAccessStatistics, TicketAccessEntry, Ticket, MaxAccessEntryNo, DetailedTicketAccessEntry.Type, false);
+        StatisticsMgr.AdjustStatistics(TicketAccessEntry, Ticket, MaxAccessEntryNo, DetailedTicketAccessEntry.Type, false);
 
     end;
 

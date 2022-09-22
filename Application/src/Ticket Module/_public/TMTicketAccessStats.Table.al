@@ -1,15 +1,5 @@
 ﻿table 6060115 "NPR TM Ticket Access Stats"
 {
-    // NPR4.14/TSA/20150803/CASE214262 - Initial Version
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.17/TSA/20161025  CASE 256152 Conform to OMA Guidelines
-    // TM1.22/TSA/20170530  CASE 274464 Adjusted stat engine to handle non-linear time when aggregating, new field Highest Access Entry No. and key
-    // TM1.36/TSA /20180727 CASE 323024 Added Variant Code field
-    // TM1.36/TSA /20180727 CASE 323400 Added flowfield on "Sum Admission Count (Re-Entry)"
-    // #334163/JDH /20181109 CASE 334163 Added Caption to field Highest Access Entry No.
-    // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
-
     Caption = 'Ticket Access Statistics';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR TM Ticket Access Stats";
@@ -146,6 +136,32 @@
                                                                                                 "Admission Code" = FIELD("Admission Code Filter"),
                                                                                                 "Variant Code" = FIELD("Variant Code Filter")));
             Caption = 'Sum Admission Count (Re-Entry)';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+
+        field(130; "Sum Generated Count (Pos)"; Decimal)
+        {
+            CalcFormula = Sum("NPR TM Ticket Access Stats"."Generated Count (Pos)" WHERE("Item No." = FIELD("Item No. Filter"),
+                                                                                                "Ticket Type" = FIELD("Ticket Type Filter"),
+                                                                                                "Admission Date" = FIELD("Admission Date Filter"),
+                                                                                                "Admission Hour" = FIELD("Admission Hour Filter"),
+                                                                                                "Admission Code" = FIELD("Admission Code Filter"),
+                                                                                                "Variant Code" = FIELD("Variant Code Filter")));
+            Caption = 'Sum Generated Count (Pos)';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(131; "Sum Generated Count (Neg)"; Decimal)
+        {
+            CalcFormula = Sum("NPR TM Ticket Access Stats"."Generated Count (Neg)" WHERE("Item No." = FIELD("Item No. Filter"),
+                                                                                                "Ticket Type" = FIELD("Ticket Type Filter"),
+                                                                                                "Admission Date" = FIELD("Admission Date Filter"),
+                                                                                                "Admission Hour" = FIELD("Admission Hour Filter"),
+                                                                                                "Admission Code" = FIELD("Admission Code Filter"),
+                                                                                                "Variant Code" = FIELD("Variant Code Filter")));
+
+            Caption = 'Sum Generated Count (Neg)';
             Editable = false;
             FieldClass = FlowField;
         }

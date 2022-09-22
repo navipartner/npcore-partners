@@ -12,7 +12,6 @@
         Text002: Label 'Saving...';
         Text003: Label 'Statistics are not completly up to date for range %1.\Do you want to update them now?';
         Text004: Label 'There are no ticket statistics to display.';
-        EntryNoIndex: Integer;
         Window: Dialog;
         ProgressMaxCount: Integer;
         ProgressCurrentCount: Integer;
@@ -544,14 +543,14 @@
         end;
     end;
 
-    procedure BuildCompressedStatisticsAdHoc(FromDate: Date; UntilDate: Date; var TmpTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary)
+    procedure BuildCompressedStatisticsAdHoc(FromDate: Date; UntilDate: Date; var TempTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary)
     var
         DetailAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         FirstEntryNo: Integer;
         LastEntryNo: Integer;
     begin
 
-        if (not TmpTicketStatisticsResult.IsTemporary()) then
+        if (not TempTicketStatisticsResult.IsTemporary()) then
             Error('Result table must be temporary.');
 
         DetailAccessEntry.SetFilter("Created Datetime", '>=%1&<%2', CreateDateTime(FromDate, 0T), CreateDateTime(CalcDate('<+1D>', UntilDate), 0T));
@@ -563,11 +562,11 @@
         DetailAccessEntry.FindLast();
         LastEntryNo := DetailAccessEntry."Entry No.";
 
-        BuildCompressedStatisticsWorker(FirstEntryNo, LastEntryNo, true, TmpTicketStatisticsResult, true);
+        BuildCompressedStatisticsWorker(FirstEntryNo, LastEntryNo, true, TempTicketStatisticsResult, true);
 
         // The date span when translated to an entry number range might find transaction that belong outside the date range (time travel).
-        TmpTicketStatisticsResult.SetFilter("Admission Date", '<%1|>%2', FromDate, UntilDate);
-        TmpTicketStatisticsResult.DeleteAll();
+        TempTicketStatisticsResult.SetFilter("Admission Date", '<%1|>%2', FromDate, UntilDate);
+        TempTicketStatisticsResult.DeleteAll();
 
     end;
 
@@ -575,9 +574,7 @@
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetailAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        TempTicketStatistics: Record "NPR TM Ticket Access Stats" temporary;
-        TempRecBuf: Record "Record Buffer" temporary;
-        PreviousAdmissionDate: Date;
+        TicketStatistics: Dictionary of [Text, JSonObject];
         Ticket: Record "NPR TM Ticket";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         IsReEntry: Boolean;
@@ -592,7 +589,6 @@
 
         ProgressMaxCount := DetailAccessEntry.Count();
         ProgressCurrentCount := 0;
-        EntryNoIndex := 0;
         if (GuiAllowed and Verbose) then begin
             Window.Open(Dialog001);
             Window.Update(1, StrSubstNo(Text001, ProgressMaxCount));
@@ -617,6 +613,8 @@
                     if (not AdHoc) then
                         AddAccessFact(TicketAccessEntry);
 
+                    AggregateStatistics(TicketStatistics, TicketAccessEntry, Ticket, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
+
                     if (GuiAllowed and Verbose) then begin
                         if (ProgressCurrentCount mod 100 = 0) then begin
                             Window.Update(1, StrSubstNo(Text001, ProgressMaxCount - ProgressCurrentCount));
@@ -625,35 +623,11 @@
                     end;
                     ProgressCurrentCount += 1;
 
-                    if (PreviousAdmissionDate <> DT2Date(DetailAccessEntry."Created Datetime")) then begin
-                        if (PreviousAdmissionDate <> 0D) then begin
-                            SaveStatistics(TempTicketStatistics, AdHoc, TmpTicketStatisticsResult, Verbose);
-                            TempTicketStatistics.DeleteAll();
-                            TempRecBuf.DeleteAll();
-                            Commit();
-
-                            if (not AdHoc) then begin
-
-                                LockResource();
-                                ReSelectEntries(FirstEntryNo, LastEntryNo);
-                                DoneAggregating := (FirstEntryNo = 0);
-                                if (not DoneAggregating) then begin
-                                    DetailAccessEntry.SetRange("Entry No.", FirstEntryNo, LastEntryNo);
-                                    DetailAccessEntry.FindSet();
-                                end;
-
-                            end;
-                        end;
-                    end;
-
-                    AddAccessStatistic(TempTicketStatistics, TicketAccessEntry, Ticket, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
-                    PreviousAdmissionDate := DT2Date(DetailAccessEntry."Created Datetime");
-
                 end;
             end;
         until ((DetailAccessEntry.Next() = 0) or (DoneAggregating));
 
-        SaveStatistics(TempTicketStatistics, AdHoc, TmpTicketStatisticsResult, Verbose);
+        SaveStatistics(TicketStatistics, AdHoc, TmpTicketStatisticsResult, Verbose);
 
         if (GuiAllowed and Verbose) then
             Window.Close();
@@ -763,8 +737,10 @@
         end;
     end;
 
-    internal procedure AddAccessStatistic(var TicketStatistics: Record "NPR TM Ticket Access Stats"; TicketAccessEntry: Record "NPR TM Ticket Access Entry"; Ticket: Record "NPR TM Ticket"; MaxAdmissionEntryNo: Integer; AdmissionType: Option; IsReEntry: Boolean)
+    local procedure AggregateStatistics(var Statistics: Dictionary of [Text, JSonObject]; TicketAccessEntry: Record "NPR TM Ticket Access Entry"; Ticket: Record "NPR TM Ticket"; MaxAdmissionEntryNo: Integer; AdmissionType: Option; IsReEntry: Boolean)
     var
+        TicketStatisticsLeaf: JsonObject;
+        FactKey: Text;
         ItemFactCode: Code[20];
         TicketTypeFactCode: Code[20];
         VariantFactCode: Code[10];
@@ -799,93 +775,83 @@
 
         Evaluate(AdmissionHour, Format(TicketAccessEntry."Access Time", 0, '<Hours24>'));
 
-        TicketStatistics.Reset();
-        TicketStatistics.SetFilter("Item No.", '=%1', ItemFactCode);
-        TicketStatistics.SetFilter("Ticket Type", '=%1', TicketTypeFactCode);
-        TicketStatistics.SetFilter("Admission Code", '=%1', TicketAccessEntry."Admission Code");
-        TicketStatistics.SetFilter("Admission Date", '=%1', TicketAccessEntry."Access Date");
-        TicketStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
-        TicketStatistics.SetFilter("Variant Code", '=%1', VariantFactCode);
+        FactKey := StrSubstNo('[%1][%2][%3][%4][%5][%6]', ItemFactCode, TicketTypeFactCode, TicketAccessEntry."Admission Code", Format(TicketAccessEntry."Access Date", 0, 9), AdmissionHour, VariantFactCode);
+        if (not Statistics.ContainsKey(FactKey)) then begin
+            InitializeLeaf(TicketStatisticsLeaf, TicketAccessEntry."Admission Code", TicketAccessEntry."Access Date", MaxAdmissionEntryNo, ItemFactCode, TicketTypeFactCode, VariantFactCode, AdmissionHour);
+            ReplaceAdmissionCount(TicketStatisticsLeaf, AdmissionType, IsReEntry, TicketAccessEntry.Quantity);
 
-        if (TicketStatistics.FindFirst()) then begin
-            SetAdmissionCount(TicketStatistics, AdmissionType, IsReEntry, TicketAccessEntry.Quantity);
-
-            TicketStatistics."Highest Access Entry No." := MaxAdmissionEntryNo;
-            TicketStatistics.Modify();
+            Statistics.Add(FactKey, TicketStatisticsLeaf);
         end else begin
-            EntryNoIndex += 1;
-            TicketStatistics.Init();
-            TicketStatistics."Entry No." := 0;
-            if (TicketStatistics.IsTemporary()) then
-                TicketStatistics."Entry No." := EntryNoIndex;
-            TicketStatistics."Item No." := ItemFactCode;
-            TicketStatistics."Ticket Type" := TicketTypeFactCode;
-            TicketStatistics."Admission Code" := TicketAccessEntry."Admission Code";
-            TicketStatistics."Admission Date" := TicketAccessEntry."Access Date";
-            TicketStatistics."Admission Hour" := AdmissionHour;
-            TicketStatistics."Variant Code" := VariantFactCode;
-
-            SetAdmissionCount(TicketStatistics, AdmissionType, IsReEntry, TicketAccessEntry.Quantity);
-
-            TicketStatistics."Highest Access Entry No." := MaxAdmissionEntryNo;
-            TicketStatistics.Insert();
+            TicketStatisticsLeaf := Statistics.Get(FactKey);
+            ReplaceAdmissionCount(TicketStatisticsLeaf, AdmissionType, IsReEntry, TicketAccessEntry.Quantity);
+            TicketStatisticsLeaf.Replace('MaxAdmissionEntryNo', MaxAdmissionEntryNo);
         end;
+
     end;
 
-    local procedure SetAdmissionCount(var TmpTicketStatistics: Record "NPR TM Ticket Access Stats"; AdmissionType: Option; IsReEntry: Boolean; AdmissionCount: Decimal)
+    internal procedure AdjustStatistics(var TicketAccessEntry: Record "NPR TM Ticket Access Entry"; Ticket: Record "NPR TM Ticket"; MaxAdmissionEntryNo: Integer; AdmissionType: Option; IsReEntry: Boolean)
+    var
+        Statistics: Dictionary of [Text, JSonObject];
+        TempTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary;
+    begin
+        AggregateStatistics(Statistics, TicketAccessEntry, Ticket, MaxAdmissionEntryNo, AdmissionType, IsReEntry);
+        SaveStatistics(Statistics, false, TempTicketStatisticsResult, false);
+    end;
+
+    local procedure ReplaceAdmissionCount(var Statistics: JSonObject; AdmissionType: Option; IsReEntry: Boolean; AdmissionCount: Decimal)
     var
         DetailAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
         if (AdmissionType = DetailAccessEntry.Type::ADMITTED) then begin
             if (not IsReEntry) then begin
-                TmpTicketStatistics."Admission Count" += Abs(AdmissionCount);
+                Statistics.Replace('AdmissionCount', AsInteger(Statistics, 'AdmissionCount') + Abs(AdmissionCount));
             end;
 
             if (IsReEntry) then
-                TmpTicketStatistics."Admission Count (Re-Entry)" += Abs(AdmissionCount);
+                Statistics.Replace('AdmissionCountReEntry', AsInteger(Statistics, 'AdmissionCountReEntry') + Abs(AdmissionCount));
         end;
 
         if (AdmissionType = DetailAccessEntry.Type::CANCELED_ADMISSION) then begin
             if (not IsReEntry) then
-                TmpTicketStatistics."Admission Count (Neg)" += Abs(AdmissionCount);
+                Statistics.Replace('AdmissionCountNeg', AsInteger(Statistics, 'AdmissionCountNeg') + Abs(AdmissionCount));
         end;
 
         if (AdmissionType = DetailAccessEntry.Type::INITIAL_ENTRY) then begin
             if (AdmissionCount > 0) then
-                TmpTicketStatistics."Generated Count (Pos)" += AdmissionCount;
+                Statistics.Replace('GeneratedCountPos', AsInteger(Statistics, 'GeneratedCountPos') + AdmissionCount);
 
             if (AdmissionCount < 0) then
-                TmpTicketStatistics."Generated Count (Neg)" += Abs(AdmissionCount);
+                Statistics.Replace('GeneratedCountNeg', AsInteger(Statistics, 'GeneratedCountNeg') + Abs(AdmissionCount));
         end;
     end;
 
-    procedure SaveStatistics(var tmpTicketStatistics: Record "NPR TM Ticket Access Stats" temporary; AdHoc: Boolean; var TmpAdHocTicketStatistics: Record "NPR TM Ticket Access Stats"; Verbose: Boolean)
+
+    local procedure SaveStatistics(var Statistics: Dictionary of [Text, JSonObject]; AdHoc: Boolean; var TempAdHocTicketStatistics: Record "NPR TM Ticket Access Stats"; Verbose: Boolean)
     var
+        FactKey: Text;
+        TicketStatisticsJson: JsonObject;
         TicketStatistics: Record "NPR TM Ticket Access Stats";
     begin
 
-        // Transfer stats to DB
-        tmpTicketStatistics.Reset();
-        if (tmpTicketStatistics.FindSet()) then begin
+        if (GuiAllowed and Verbose) then
+            Window.Update(1, Text002);
 
-            if (GuiAllowed and Verbose) then
-                Window.Update(1, Text002);
+        foreach FactKey in Statistics.Keys do begin
 
-            repeat
-
-                if (not AdHoc) then begin
-                    TicketStatistics.TransferFields(tmpTicketStatistics, false);
-                    TicketStatistics."Entry No." := 0;
-                    TicketStatistics.Insert();
-                end else begin
-                    AdHocEntryCounter += 1;
-                    TmpAdHocTicketStatistics.TransferFields(tmpTicketStatistics, false);
-                    TmpAdHocTicketStatistics."Entry No." := AdHocEntryCounter;
-                    TmpAdHocTicketStatistics.Insert();
-                end;
-
-            until (tmpTicketStatistics.Next() = 0);
+            TicketStatisticsJson := Statistics.Get(FactKey);
+            if (not AdHoc) then begin
+                // Transfer to persistent table
+                TransferJsonToRecord(TicketStatisticsJson, TicketStatistics);
+                TicketStatistics."Entry No." := 0;
+                TicketStatistics.Insert();
+            end else begin
+                // Transfer from dictionary to temp table for further processing
+                TransferJsonToRecord(TicketStatisticsJson, TempAdHocTicketStatistics);
+                AdHocEntryCounter += 1;
+                TempAdHocTicketStatistics."Entry No." := AdHocEntryCounter;
+                TempAdHocTicketStatistics.Insert();
+            end;
         end;
     end;
 
@@ -927,7 +893,7 @@
         DetTicketAccessEntry2.SetFilter("Entry No.", '<%1', DetTicketAccessEntry."Entry No.");
 
         if (ReEntryOption = TicketAdmissionBOM."Revisit Condition (Statistics)"::DAILY_NONINITIAL) then
-            DetTicketAccessEntry2.SetFilter("Created Datetime", '>=%1', CreateDateTime(DT2Date(DetTicketAccessEntry."Created Datetime"), 0T));
+            DetTicketAccessEntry2.SetFilter("Created Datetime", '%1..%2', CreateDateTime(DT2Date(DetTicketAccessEntry."Created Datetime"), 0T), CreateDateTime(DT2Date(DetTicketAccessEntry."Created Datetime"), 235959.999T));
 
         exit(not DetTicketAccessEntry2.IsEmpty());
     end;
@@ -1017,32 +983,6 @@
         exit(LastEntryNo);
     end;
 
-    local procedure ReSelectEntries(var FirstEntryNo: Integer; var LastEntryNo: Integer): Integer
-    var
-        TicketAccessStatistics: Record "NPR TM Ticket Access Stats";
-        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-    begin
-
-        FirstEntryNo := 0;
-        LastEntryNo := 0;
-
-        TicketAccessStatistics.SetCurrentKey("Highest Access Entry No.");
-
-        if (TicketAccessStatistics.FindLast()) then
-            if (TicketAccessStatistics."Highest Access Entry No." = 0) then
-                exit(-1);
-
-        DetTicketAccessEntry.SetFilter("Entry No.", '>%1', TicketAccessStatistics."Highest Access Entry No.");
-        if (DetTicketAccessEntry.FindFirst()) then
-            FirstEntryNo := DetTicketAccessEntry."Entry No.";
-
-        if (DetTicketAccessEntry.FindLast()) then
-            LastEntryNo := DetTicketAccessEntry."Entry No.";
-
-        exit(LastEntryNo);
-
-    end;
-
     local procedure LockResource()
     var
         TicketAccessFact: Record "NPR TM Ticket Access Fact";
@@ -1054,5 +994,78 @@
         TicketAccessFact.LockTable();
         TicketAccessFact.FindFirst();
     end;
+
+    local procedure InitializeLeaf(var TicketStatisticsLeaf: JsonObject; AdmissionCode: Code[20]; AccessDate: Date; MaxAdmissionEntryNo: Integer; ItemFactCode: Code[20]; TicketTypeFactCode: Code[20]; VariantFactCode: Code[10]; AdmissionHour: Integer)
+    begin
+        TicketStatisticsLeaf.Add('ItemCode', ItemFactCode);
+        TicketStatisticsLeaf.Add('TicketTypeCode', TicketTypeFactCode);
+        TicketStatisticsLeaf.Add('AdmissionCode', AdmissionCode);
+        TicketStatisticsLeaf.Add('AccessDate', AccessDate);
+        TicketStatisticsLeaf.Add('AdmissionHour', AdmissionHour);
+        TicketStatisticsLeaf.Add('VariantCode', VariantFactCode);
+
+        TicketStatisticsLeaf.Add('MaxAdmissionEntryNo', MaxAdmissionEntryNo);
+
+        TicketStatisticsLeaf.Add('AdmissionCount', 0);
+        TicketStatisticsLeaf.Add('AdmissionCountReEntry', 0);
+        TicketStatisticsLeaf.Add('AdmissionCountNeg', 0);
+        TicketStatisticsLeaf.Add('GeneratedCountPos', 0);
+        TicketStatisticsLeaf.Add('GeneratedCountNeg', 0);
+    end;
+
+    local procedure TransferJsonToRecord(TicketStatisticsJson: JsonObject; var TicketStatistics: Record "NPR TM Ticket Access Stats")
+    begin
+        TicketStatistics."Item No." := AsCode20(TicketStatisticsJson, 'ItemCode');
+        TicketStatistics."Ticket Type" := AsCode20(TicketStatisticsJson, 'TicketTypeCode');
+        TicketStatistics."Admission Code" := AsCode20(TicketStatisticsJson, 'AdmissionCode');
+        TicketStatistics."Admission Date" := AsDate(TicketStatisticsJson, 'AccessDate');
+        TicketStatistics."Admission Hour" := AsInteger(TicketStatisticsJson, 'AdmissionHour');
+        TicketStatistics."Variant Code" := AsCode10(TicketStatisticsJson, 'ItemCode');
+
+        TicketStatistics."Highest Access Entry No." := AsInteger(TicketStatisticsJson, 'MaxAdmissionEntryNo');
+
+        TicketStatistics."Admission Count" := AsInteger(TicketStatisticsJson, 'AdmissionCount');
+        TicketStatistics."Admission Count (Re-Entry)" := AsInteger(TicketStatisticsJson, 'AdmissionCountReEntry');
+        TicketStatistics."Admission Count (Neg)" := AsInteger(TicketStatisticsJson, 'AdmissionCountNeg');
+        TicketStatistics."Generated Count (Pos)" := AsInteger(TicketStatisticsJson, 'GeneratedCountPos');
+        TicketStatistics."Generated Count (Neg)" := AsInteger(TicketStatisticsJson, 'GeneratedCountNeg');
+    end;
+
+    local procedure AsInteger(JObject: JsonObject; KeyName: Text): Integer
+    var
+        JToken: JsonToken;
+    begin
+        JObject.Get(KeyName, JToken);
+        exit(JToken.AsValue().AsInteger());
+    end;
+
+    local procedure AsDate(JObject: JsonObject; KeyName: Text): Date
+    var
+        JToken: JsonToken;
+    begin
+        JObject.Get(KeyName, JToken);
+        exit(JToken.AsValue().AsDate());
+    end;
+
+    local procedure AsCode10(JObject: JsonObject; KeyName: Text): Code[10]
+    var
+        JToken: JsonToken;
+        Result: Text;
+    begin
+        JObject.Get(KeyName, JToken);
+        Result := JToken.AsValue().AsText();
+        exit(Result);
+    end;
+
+    local procedure AsCode20(JObject: JsonObject; KeyName: Text): Code[20]
+    var
+        JToken: JsonToken;
+        Result: Text;
+    begin
+        JObject.Get(KeyName, JToken);
+        Result := JToken.AsValue().AsText();
+        exit(Result);
+    end;
+
 }
 

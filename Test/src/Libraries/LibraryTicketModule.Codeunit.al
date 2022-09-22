@@ -136,6 +136,55 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(ItemNo)
     end;
 
+
+    procedure CreateScenario_TicketStatistics(RevisitPolicy: Option NA,NONINITIAL,DAILY_NONINITIAL,NEVER) SalesItemNo: Code[20]
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        AdmissionSchedule: Record "NPR TM Admis. Schedule";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        TicketSetup: Record "NPR TM Ticket Setup";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        NprMasterData: Codeunit "NPR Library - POS Master Data";
+        ScheduleManager: Codeunit "NPR TM Admission Sch. Mgt.";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+    begin
+
+        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+        WorkDate(Today());
+
+        // Used for smoke testing
+        // This scenario creates a ticket which is always available today.
+
+        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
+        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
+        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
+        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
+
+        TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::MULTIPLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
+        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
+        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, true, true, true, true, true, true);
+        CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+10D>', 0, 0);
+
+        ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
+        CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE);
+
+        TicketBom.Get(ItemNo, '', AdmissionCode);
+        TicketBom."Revisit Condition (Statistics)" := RevisitPolicy;
+        TicketBom."Max No. Of Entries" := 100;
+        TicketBom."Revoke Policy" := TicketBom."Revoke Policy"::ALWAYS;
+        TicketBom.Modify();
+
+        ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
+
+        exit(ItemNo)
+    end;
+
+
     procedure CreateItem(VariantCode: Code[10]; TicketTypeCode: Code[10]; UnitPrice: Decimal) ItemNo: Code[20]
     var
         TicketItem: Record "Item";
