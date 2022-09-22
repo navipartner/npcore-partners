@@ -1,61 +1,51 @@
-﻿codeunit 6151281 "NPR SS Action - Qty Decrease"
+﻿codeunit 6151281 "NPR SS Action - Qty Decrease" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This is a build in function to change quantity.';
-
-    local procedure ActionCode(): Text[20]
+        DecreaseByDescLbl: Label 'Specifies how much the Quantity will decrease.';
+        DecreaseByCaptionLbl: Label 'Decrease By';
     begin
-
-        exit('SS-QTY-');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddDecimalParameter('decreaseBy', 1.0, DecreaseByCaptionLbl, DecreaseByDescLbl);
+        WorkflowConfig.SetWorkflowTypeUnattended();
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     begin
-
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction20(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion())
-        then begin
-            Sender.RegisterWorkflow20('workflow.respond();');
-            Sender.RegisterDecimalParameter('decreaseBy', 1.0);
-
-            Sender.SetWorkflowTypeUnattended();
+        case Step of
+            'DecreaseQty':
+                Frontend.WorkflowResponse(DecreaseQuantity(Context, SaleLine));
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    internal procedure DecreaseQuantity(Context: codeunit "NPR POS JSON Helper"; SaleLine: codeunit "NPR POS Sale Line"): JsonObject
     var
+        POSSession: Codeunit "NPR POS Session";
         Qty: Decimal;
     begin
-
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        Qty := Context.GetDecimalParameterOrFail('decreaseBy', ActionCode());
-        DecreaseSalelineQuantity(POSSession, Qty);
+        Qty := Context.GetDecimalParameter('decreaseBy');
+        DecreaseSalelineQuantity(POSSession, Qty, SaleLine);
     end;
 
-    procedure DecreaseSalelineQuantity(POSSession: Codeunit "NPR POS Session"; DecreaseBy: Decimal)
-    var
-        SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
+    local procedure GetActionScript(): Text
     begin
+        exit(
+//###NPR_INJECT_FROM_FILE:SSActionQtyDecreaseSS.js###
+'let main=async({})=>await workflow.respond("DecreaseQty");'
+        )
+    end;
 
+    internal procedure DecreaseSalelineQuantity(POSSession: Codeunit "NPR POS Session"; DecreaseBy: Decimal; SaleLine: codeunit "NPR POS Sale Line")
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        QuantityErr: Label 'This is a programming error. Please contact system vendor.';
+    begin
         // This function should be "not local", so test framework can invoke it
-
-        POSSession.GetSaleLine(SaleLine);
+        If DecreaseBy < 0 then
+            Error(QuantityErr);
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         if (SaleLinePOS.Quantity - DecreaseBy < 0) then
@@ -63,7 +53,6 @@
         else
             SaleLine.SetQuantity(SaleLinePOS.Quantity - DecreaseBy);
 
-        POSSession.RequestRefreshData();
     end;
 }
 
