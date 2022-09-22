@@ -374,6 +374,7 @@ codeunit 85050 "NPR TM Performance Test"
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
+        TicketRequestMgr: Codeunit "NPR TM Ticket Request Manager";
     begin
         if _Initialized then begin
             //Clean any previous mock session
@@ -387,6 +388,8 @@ codeunit 85050 "NPR TM Performance Test"
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
+
+            TicketRequestMgr.ExpireReservationRequests();
             _Initialized := true;
         end;
 
