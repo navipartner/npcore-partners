@@ -1296,5 +1296,10 @@
         if EventTransferExtText.MakeUpdate() then
             CurrPage.Update(true);
     end;
+
+    procedure GetSelectionFilter(var JobPlanningLine: Record "Job Planning Line")
+    begin
+        CurrPage.SetSelectionFilter(JobPlanningLine);
+    end;
 }
 

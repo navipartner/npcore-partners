@@ -446,7 +446,7 @@
         POSSale.RefreshCurrent();
     end;
 
-    local procedure FillVariantThroughLookUp(ItemNo: Code[20]; LocationCode: Code[10]): Code[10]
+    procedure FillVariantThroughLookUp(ItemNo: Code[20]; LocationCode: Code[10]): Code[10]
     var
         ItemVariantBuffer: Record "NPR Item Variant Buffer";
     begin

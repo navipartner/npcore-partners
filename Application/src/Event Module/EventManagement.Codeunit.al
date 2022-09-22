@@ -32,6 +32,7 @@
         POSDocErr: Label 'POS document %1 %2 no longer exists.';
         BlockDeleteErr: Label 'You can''t delete event %1 as it is in status %2. Please check %3 for blocked statuses.';
         BufferMode: Boolean;
+        CantIncQtyErr: Label 'You can''t change Quantity to be more than %1. If required, create another line.';
 
     [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterInsertEvent', '', false, false)]
     local procedure JobOnAfterInsert(var Rec: Record Job; RunTrigger: Boolean)
@@ -493,15 +494,12 @@
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
         JobPlanningLine: Record "Job Planning Line";
         SalePOS: Record "NPR POS Sale";
-        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
     begin
         if not RunTrigger then
             exit;
-        POSQuoteEntry.SetRange("Register No.", Rec."Register No.");
-        POSQuoteEntry.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
-        if not POSQuoteEntry.IsEmpty then
-            exit;
         SalePOS.Get(Rec."Register No.", Rec."Sales Ticket No.");
+        if SalePOS."Event No." = '' then
+            exit;
         JobPlanningLineInvoice.SetRange("Document Type", JobPlanningLineInvoice."Document Type"::Invoice);
         JobPlanningLineInvoice.SetRange("Document No.", Rec."Sales Ticket No.");
         JobPlanningLineInvoice.SetRange("Line No.", Rec."Line No.");
@@ -509,10 +507,11 @@
         JobPlanningLineInvoice.SetRange("NPR POS Store Code", SalePOS."POS Store Code");
         if JobPlanningLineInvoice.FindSet() then
             repeat
-                JobPlanningLine.Get(JobPlanningLineInvoice."Job No.", JobPlanningLineInvoice."Job Task No.", JobPlanningLineInvoice."Job Planning Line No.");
-                JobPlanningLineInvoice.Delete();
-                JobPlanningLine.UpdateQtyToTransfer();
-                JobPlanningLine.Modify();
+                if JobPlanningLine.Get(JobPlanningLineInvoice."Job No.", JobPlanningLineInvoice."Job Task No.", JobPlanningLineInvoice."Job Planning Line No.") then begin
+                    JobPlanningLineInvoice.Delete();
+                    JobPlanningLine.UpdateQtyToTransfer();
+                    JobPlanningLine.Modify();
+                end;
             until JobPlanningLineInvoice.Next() = 0;
     end;
 
@@ -520,30 +519,16 @@
     local procedure POSPostEntriesOnAfterPostPOSEntryBatch(var POSEntry: Record "NPR POS Entry"; PreviewMode: Boolean)
     var
         POSEntry2: Record "NPR POS Entry";
-        JobPlanningLineInvoice: Record "Job Planning Line Invoice";
-        POSSalesLine: Record "NPR POS Entry Sales Line";
-        PostedDocType: Enum "Job Planning Line Invoice Document Type";
-        SkipThisEntry: Boolean;
     begin
         if PreviewMode then
             exit;
-
+        if POSEntry."Event No." = '' then
+            exit;
         POSEntry2.Copy(POSEntry);
         POSEntry2.SetRange("Post Item Entry Status", POSEntry2."Post Item Entry Status"::Posted);
         if POSEntry2.FindSet() then
             repeat
-                POSSalesLine.SetRange("POS Entry No.", POSEntry2."Entry No.");
-                POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
-                SkipThisEntry := POSSalesLine.IsEmpty();
-                if not SkipThisEntry then begin
-                    JobPlanningLineInvoice.SetRange("NPR POS Unit No.", POSEntry2."POS Unit No.");
-                    JobPlanningLineInvoice.SetRange("NPR POS Store Code", POSEntry2."POS Store Code");
-                    SkipThisEntry := not JobPlanningLineInvoiceExists(DATABASE::"NPR POS Sale", Enum::"Sales Document Type".FromInteger(0), POSEntry2."Document No.", JobPlanningLineInvoice, PostedDocType);
-                end;
-                POSEntryNo := POSEntry2."Entry No.";
-                POSDocPostType := POSDocPostType::"POS Entry";
-                if not SkipThisEntry then
-                    PostEventSalesDoc(JobPlanningLineInvoice, PostedDocType, POSEntry2."Document No.", POSEntry2."Posting Date");
+                PostEventFromPOSEntry(POSEntry2);
             until POSEntry2.Next() = 0;
     end;
 
@@ -824,9 +809,6 @@
         end;
     end;
 
-
-
-
     local procedure GetOverCapacitateResourceSetup(JobPlanningLine: Record "Job Planning Line") SetupValue: Integer
     var
         Resource: Record Resource;
@@ -987,14 +969,6 @@
         exit(false);
     end;
 
-    local procedure CalcLineAmountLCY(JobPlanningLine: Record "Job Planning Line"; Qty: Decimal): Decimal
-    var
-        TotalPrice: Decimal;
-    begin
-        TotalPrice := Round(Qty * JobPlanningLine."Unit Price (LCY)", 0.01);
-        exit(TotalPrice - Round(TotalPrice * JobPlanningLine."Line Discount %" / 100, 0.01));
-    end;
-
     procedure PostEventSalesDoc(var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; PostedDocType: Enum "Job Planning Line Invoice Document Type"; PostedDocNo: Code[20];
                                                                                                                    PostingDate: Date)
     var
@@ -1063,6 +1037,7 @@
             until SalesLine.Next() = 0;
     end;
 
+
     local procedure JobPlanningLineInvoiceExists(DocTableID: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]; var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; var PostedDocType: Enum "Job Planning Line Invoice Document Type"): Boolean
     var
         SalesHeader: Record "Sales Header";
@@ -1100,6 +1075,7 @@
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
         JobPlanningLine: Record "Job Planning Line";
         LocalNextEntryNo: Integer;
+        JobPostLine: Codeunit "Job Post-Line";
     begin
         Clear(PostedJobPlanningLineInvoice);
         if NonPostedJobPlanningLineInvoice.FindSet() then
@@ -1112,7 +1088,7 @@
                 JobPlanningLineInvoice."Document No." := PostedDocNo;
                 JobPlanningLineInvoice.Insert(true);
                 JobPlanningLineInvoice."Invoiced Date" := PostingDate;
-                JobPlanningLineInvoice."Invoiced Amount (LCY)" := CalcLineAmountLCY(JobPlanningLine, JobPlanningLineInvoice."Quantity Transferred");
+                JobPlanningLineInvoice."Invoiced Amount (LCY)" := JobPostLine.CalcLineAmountLCY(JobPlanningLine, JobPlanningLineInvoice."Quantity Transferred");
                 JobPlanningLineInvoice."Invoiced Cost Amount (LCY)" := JobPlanningLineInvoice."Quantity Transferred" * JobPlanningLine."Unit Cost (LCY)";
                 JobPlanningLineInvoice."Job Ledger Entry No." := LocalNextEntryNo;
                 JobPlanningLineInvoice.Modify();
@@ -2031,6 +2007,200 @@
                 OutS.Write(OptionFilter);
             end;
             JobSetup.Modify();
+        end;
+    end;
+
+    local procedure PostEventFromPOSEntry(POSEntry: Record "NPR POS Entry")
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        JobPlanningLineInvoice: Record "Job Planning Line Invoice";
+        JobPlanningLineInvoice2: Record "Job Planning Line Invoice";
+        JobJnlLine: Record "Job Journal Line";
+        DocType: Enum "Sales Document Type";
+        PostedDocType: Enum "Job Planning Line Invoice Document Type";
+        LineType: Option;
+    begin
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.setrange(Type, POSEntrySalesLine.Type::Item);
+        if not POSEntrySalesLine.FindSet() then
+            exit;
+        repeat
+            if JobPlanningLineInvoiceExists(Database::"NPR POS Sale", DocType::Quote, POSEntrySalesLine."Document No.", JobPlanningLineInvoice, PostedDocType) then begin
+                LineType := JobJnlLine."Line Type"::" ";
+                JobPlanningLineInvoice.SetRange("Line No.", POSEntrySalesLine."Line No.");
+                ChangeJobPlanInvoiceFromNonpostedToPosted(JobPlanningLineInvoice, PostedDocType, POSEntrySalesLine."Document No.", POSEntry."Posting Date", JobPlanningLineInvoice2);
+                CreateJobJnlLineFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, JobJnlLine."Entry Type"::Usage, LineType, JobJnlLine);
+                Codeunit.Run(Codeunit::"Job Jnl.-Post Line", JobJnlLine);
+                CreateJobJnlLineFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, JobJnlLine."Entry Type"::Sale, LineType, JobJnlLine);
+                Codeunit.Run(Codeunit::"Job Jnl.-Post Line", JobJnlLine);
+                JobPlanningLineInvoice.SetRange("Line No.");
+            end else begin
+                LineType := JobJnlLine."Line Type"::"Both Budget and Billable";
+                CreateJobJnlLineFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, JobJnlLine."Entry Type"::Usage, LineType, JobJnlLine);
+                Codeunit.Run(Codeunit::"Job Jnl.-Post Line", JobJnlLine);
+                CreateJobJnlLineFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, JobJnlLine."Entry Type"::Sale, LineType, JobJnlLine);
+                Codeunit.Run(Codeunit::"Job Jnl.-Post Line", JobJnlLine);
+                CreateJobPlanningLineInvoiceFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, PostedDocType, LineType);
+            end;
+        until POSEntrySalesLine.Next() = 0;
+    end;
+
+    local procedure CreateJobJnlLineFromPOSEntrySalesLine(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; EntryType: Enum "Job Journal Line Entry Type"; LineType: Option; var JobJnlLine: Record "Job Journal Line")
+    var
+        SourceCodeSetup: Record "Source Code Setup";
+    begin
+        JobJnlLine."Job No." := POSEntry."Event No.";
+        JobJnlLine."Job Task No." := POSEntry."Event Task No.";
+        JobJnlLine."NPR POS Entry No." := POSEntry."Entry No.";
+        JobJnlLine."NPR POS Entry Sales Line No." := POSEntrySalesLine."Line No.";
+        JobJnlLine.Type := JobJnlLine.Type::Item;
+        JobJnlLine."No." := POSEntrySalesLine."No.";
+        JobJnlLine."Entry Type" := EntryType;
+        if JobJnlLine."Entry Type" = JobJnlLine."Entry Type"::Usage then
+            JobJnlLine."Job Posting Only" := true;
+        JobJnlLine."Serial No." := POSEntrySalesLine."Serial No.";
+        JobJnlLine."Lot No." := POSEntrySalesLine."Lot No.";
+        JobJnlLine."Posting Date" := POSEntry."Posting Date";
+        JobJnlLine."Document Date" := POSEntry."Document Date";
+        JobJnlLine."Document No." := POSEntrySalesLine."Document No.";
+        JobJnlLine."Posting Group" := POSEntrySalesLine."Posting Group";
+        JobJnlLine."Gen. Bus. Posting Group" := POSEntrySalesLine."Gen. Bus. Posting Group";
+        JobJnlLine."Gen. Prod. Posting Group" := POSEntrySalesLine."Gen. Prod. Posting Group";
+        JobJnlLine.Description := POSEntrySalesLine.Description;
+        JobJnlLine."Unit of Measure Code" := POSEntrySalesLine."Unit of Measure Code";
+        JobJnlLine.Validate("Qty. per Unit of Measure", POSEntrySalesLine."Qty. per Unit of Measure");
+        JobJnlLine."Variant Code" := POSEntrySalesLine."Variant Code";
+        JobJnlLine."Line Type" := LineType;
+        JobJnlLine."Currency Code" := POSEntrySalesLine."Currency Code";
+        JobJnlLine."Location Code" := POSEntrySalesLine."Location Code";
+        SourceCodeSetup.Get();
+        JobJnlLine."Source Code" := SourceCodeSetup.Sales;
+        JobJnlLine."Reason Code" := POSEntrySalesLine."Reason Code";
+        JobJnlLine."Country/Region Code" := POSEntry."Country/Region Code";
+        JobJnlLine.UpdateDimensions();
+        UpdateJobJnlDimWithPOSSalesLine(POSEntrySalesLine, JobJnlLine);
+        JobJnlLine.Validate(Quantity, POSEntrySalesLine.Quantity);
+        JobJnlLine.Validate("Unit Cost", POSEntrySalesLine."Unit Cost");
+        JobJnlLine.Validate("Unit Price", POSEntrySalesLine."Unit Price");
+        JobJnlLine.Validate("Line Discount %", POSEntrySalesLine."Line Discount %");
+    end;
+
+    local procedure UpdateJobJnlDimWithPOSSalesLine(POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var JobJnlLine: Record "Job Journal Line")
+    var
+        DimensionManagement: codeunit DimensionManagement;
+        DimSetEntryIDArray: array[10] of Integer;
+    begin
+        DimSetEntryIDArray[1] := POSEntrySalesLine."Dimension Set ID";
+        DimSetEntryIDArray[2] := JobJnlLine."Dimension Set ID";
+        JobJnlLine."Dimension Set ID" := DimensionManagement.GetCombinedDimensionSetID(DimSetEntryIDArray, JobJnlLine."Shortcut Dimension 1 Code", JobJnlLine."Shortcut Dimension 2 Code");
+    end;
+
+    local procedure CreateJobPlanningLineInvoiceFromPOSEntrySalesLine(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; PostedDocType: Enum "Job Planning Line Invoice Document Type"; LineType: Option)
+    var
+        JobPlanningLine: Record "Job Planning Line";
+        JobPlanningLineInvoice: Record "Job Planning Line Invoice";
+        JobPostLine: Codeunit "Job Post-Line";
+    begin
+        JobPlanningLine.SetAutoCalcFields("Qty. Transferred to Invoice");
+        JobPlanningLine.SetRange("Job No.", POSEntry."Event No.");
+        JobPlanningLine.SetRange("Job Task No.", POSEntry."Event Task No.");
+        JobPlanningLine.SetRange("Line Type", LineType - 1);
+        JobPlanningLine.SetRange("System-Created Entry", true);
+        JobPlanningLine.SetRange("Document No.", POSEntry."Document No.");
+        JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Item);
+        JobPlanningLine.SetRange("No.", POSEntrySalesLine."No.");
+        JobPlanningLine.SetRange("Quantity (Base)", POSEntrySalesLine."Quantity (Base)");
+        JobPlanningLine.SetRange("Qty. to Invoice", POSEntrySalesLine."Quantity (Base)");
+        JobPlanningLine.SetRange("Qty. Transferred to Invoice", 0);
+        if JobPlanningLine.FindFirst() then begin
+            JobPlanningLineInvoice."Job No." := JobPlanningLine."Job No.";
+            JobPlanningLineInvoice."Job Task No." := JobPlanningLine."Job Task No.";
+            JobPlanningLineInvoice."Job Planning Line No." := JobPlanningLine."Line No.";
+            JobPlanningLineInvoice."Document Type" := PostedDocType;
+            JobPlanningLineInvoice."Document No." := POSEntry."Document No.";
+            JobPlanningLineInvoice."Line No." := POSEntrySalesLine."Line No.";
+            JobPlanningLineInvoice."Quantity Transferred" := JobPlanningLine."Qty. to Transfer to Invoice";
+            JobPlanningLineInvoice."Transferred Date" := POSEntry."Posting Date";
+            JobPlanningLineInvoice."NPR POS Unit No." := POSEntry."POS Unit No.";
+            JobPlanningLineInvoice."NPR POS Store Code" := POSEntry."POS Store Code";
+            JobPlanningLineInvoice.Insert();
+            JobPlanningLineInvoice."Invoiced Date" := POSEntry."Posting Date";
+            JobPlanningLineInvoice."Invoiced Amount (LCY)" := JobPostLine.CalcLineAmountLCY(JobPlanningLine, JobPlanningLineInvoice."Quantity Transferred");
+            JobPlanningLineInvoice."Invoiced Cost Amount (LCY)" := JobPlanningLineInvoice."Quantity Transferred" * JobPlanningLine."Unit Cost (LCY)";
+            JobPlanningLineInvoice."Job Ledger Entry No." := JobPlanningLine."Job Ledger Entry No.";
+            JobPlanningLineInvoice.Modify();
+            JobPlanningLine.UpdateQtyToTransfer();
+            JobPlanningLine.UpdateQtyToInvoice();
+            JobPlanningLine.Modify();
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Jnl.-Post Line", 'OnGetJobConsumptionValueEntryFilter', '', false, false)]
+    local procedure JobJnlPostLineOnBeforeGetJobConsumptionValueEntry(var ValueEntry: Record "Value Entry"; JobJournalLine: Record "Job Journal Line")
+    begin
+        if JobJournalLine."NPR POS Entry No." = 0 then
+            exit;
+        ValueEntry.Reset();
+        ValueEntry.SetRange("Item No.", JobJournalLine."No.");
+        ValueEntry.SetRange("Document No.", JobJournalLine."Document No.");
+        ValueEntry.SetRange("Document Line No.", JobJournalLine."NPR POS Entry Sales Line No.");
+        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+        ValueEntry.SetRange("Job Ledger Entry No.", 0);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnBeforeInsertPOSEntry', '', false, false)]
+    local procedure OnBeforeInsertPOSEntry(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
+    begin
+        if (SalePOS."Event No." = '') or (SalePOS."Event Task No." = '') then
+            exit;
+        POSEntry."Event Task No." := SalePOS."Event Task No.";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', false, false)]
+    local procedure POSOnBeforeSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
+    var
+        SalePOS: Record "NPR POS Sale";
+        JobPlanningLineInvoice: Record "Job Planning Line Invoice";
+        PostedDocType: Enum "Job Planning Line Invoice Document Type";
+        DocType: Enum "Sales Document Type";
+    begin
+        SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
+        if SalePOS."Event No." = '' then
+            exit;
+        JobPlanningLineInvoice.SetRange("NPR POS Unit No.", SalePOS."Register No.");
+        JobPlanningLineInvoice.SetRange("NPR POS Store Code", SalePOS."POS Store Code");
+        JobPlanningLineInvoice.SetRange("Line No.", SaleLinePOS."Line No.");
+        if not JobPlanningLineInvoiceExists(Database::"NPR POS Sale", DocType::"Blanket Order", SalePOS."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType) then
+            exit;
+        if JobPlanningLineInvoice.FindFirst() and (NewQuantity > JobPlanningLineInvoice."Quantity Transferred") then
+            Error(CantIncQtyErr, JobPlanningLineInvoice."Quantity Transferred");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterSetQuantity', '', false, false)]
+    local procedure POSOnAfterSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        SalePOS: Record "NPR POS Sale";
+        JobPlanningLineInvoice: Record "Job Planning Line Invoice";
+        JobPlanningLine: Record "Job Planning Line";
+        PostedDocType: Enum "Job Planning Line Invoice Document Type";
+        DocType: Enum "Sales Document Type";
+    begin
+        SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
+        if SalePOS."Event No." = '' then
+            exit;
+        JobPlanningLineInvoice.SetRange("NPR POS Unit No.", SalePOS."Register No.");
+        JobPlanningLineInvoice.SetRange("NPR POS Store Code", SalePOS."POS Store Code");
+        JobPlanningLineInvoice.SetRange("Line No.", SaleLinePOS."Line No.");
+        if not JobPlanningLineInvoiceExists(Database::"NPR POS Sale", DocType::"Blanket Order", SalePOS."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType) then
+            exit;
+        if JobPlanningLineInvoice.FindFirst() then begin
+            if SaleLinePOS.Quantity = JobPlanningLineInvoice."Quantity Transferred" then
+                exit;
+            JobPlanningLineInvoice."Quantity Transferred" := SaleLinePOS.Quantity;
+            JobPlanningLineInvoice.Modify();
+            JobPlanningLine.Get(JobPlanningLineInvoice."Job No.", JobPlanningLineInvoice."Job Task No.", JobPlanningLineInvoice."Job Planning Line No.");
+            JobPlanningLine.UpdateQtyToTransfer();
+            JobPlanningLine.Modify();
         end;
     end;
 }

@@ -286,6 +286,13 @@
             Description = 'NPR5.53 [376035]';
             TableRelation = Job WHERE("NPR Event" = CONST(true));
         }
+        field(181; "Event Task No."; Code[20])
+        {
+            Caption = 'Event Task No.';
+            Editable = false;
+            DataClassification = CustomerContent;
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Event No."));
+        }
         field(200; "Customer Posting Group"; Code[20])
         {
             Caption = 'Customer Posting Group';

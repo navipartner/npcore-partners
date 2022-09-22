@@ -601,6 +601,12 @@
                   DATABASE::"Salesperson/Purchaser", "Salesperson Code");
             end;
         }
+        field(181; "Event Task No."; Code[20])
+        {
+            Caption = 'Event Task No.';
+            DataClassification = CustomerContent;
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Event No."));
+        }
         field(200; "Device ID"; Text[50])
         {
             Caption = 'Device ID';
