@@ -22,11 +22,9 @@
         if (Coupon."Ending Date" < Timestamp) and (Coupon."Ending Date" <> 0DT) then
             Error(Text000);
 
-        Coupon.CalcFields(Open);
-        if not Coupon.Open then
+        Coupon.CalcFields(Open, "Remaining Quantity");
+        if (not Coupon.Open) or (Coupon."Remaining Quantity" < 1) then
             Error(Text003);
-
-        Coupon.CalcFields("Remaining Quantity");
 
         if Coupon.CalcInUseQty() >= Coupon."Remaining Quantity" then
             Error(Text001);

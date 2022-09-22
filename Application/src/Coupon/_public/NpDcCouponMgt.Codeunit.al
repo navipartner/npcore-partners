@@ -6,6 +6,7 @@
         Text002: Label 'Discount Coupon';
         Text003: Label 'Coupon Reference No. is too long';
         Text004: Label 'Invalid Coupon Reference No.';
+        Text005: Label 'Coupon with Reference No. %1 is archived.';
 
     internal procedure ResetInUseQty(Coupon: Record "NPR NpDc Coupon")
     var
@@ -65,12 +66,19 @@
         NpDcModuleValidateDefault: Codeunit "NPR NpDc ModuleValid.: Defa.";
         SaleOut: Codeunit "NPR POS Sale";
         Handled: Boolean;
+        NpDcArchCoupon: Record "NPR NpDc Arch. Coupon";
     begin
         if StrLen(ReferenceNo) > MaxStrLen(Coupon."Reference No.") then
             Error(Text003);
         Coupon.SetRange("Reference No.", UpperCase(ReferenceNo));
-        if not Coupon.FindFirst() then
-            Error(Text004);
+        if not Coupon.FindFirst() then begin
+            NpDcArchCoupon.SetRange("Reference No.", UpperCase(ReferenceNo));
+            if NpDcArchCoupon.FindFirst() then
+                Error(Text005, ReferenceNo)
+            else
+                Error(Text004);
+        end;
+
 
         CouponType.Get(Coupon."Coupon Type");
         CouponType.TestField(Enabled, true);
@@ -377,7 +385,7 @@
         CouponEntry.Insert();
     end;
 
-    internal procedure PostDiscountApplication(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon")
+    internal procedure PostDiscountApplication(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; Quantity: Decimal)
     var
         Coupon: Record "NPR NpDc Coupon";
         CouponEntry: Record "NPR NpDc Coupon Entry";
@@ -386,13 +394,15 @@
         if not Coupon.Get(SaleLinePOSCoupon."Coupon No.") then
             exit;
 
+        CheckCouponQuantity(Coupon, Quantity);
+
         CouponEntry.Init();
         CouponEntry."Entry No." := 0;
         CouponEntry."Coupon No." := Coupon."No.";
         CouponEntry."Entry Type" := CouponEntry."Entry Type"::"Discount Application";
         CouponEntry."Coupon Type" := Coupon."Coupon Type";
-        CouponEntry.Quantity := -1;
-        CouponEntry."Remaining Quantity" := -1;
+        CouponEntry.Quantity := -Quantity;
+        CouponEntry."Remaining Quantity" := -Quantity;
         CouponEntry."Amount per Qty." := SaleLinePOSCoupon."Discount Amount";
         CouponEntry.Amount := CouponEntry."Amount per Qty." * CouponEntry.Quantity;
         CouponEntry.Positive := CouponEntry.Quantity > 0;
@@ -427,7 +437,7 @@
 
         SaleLinePOSCoupon.FindSet();
         repeat
-            PostDiscountApplication(SaleLinePOSCoupon);
+            PostDiscountApplication(SaleLinePOSCoupon, SaleLinePos.Quantity);
             SaleLinePOSCoupon.Delete();
         until SaleLinePOSCoupon.Next() = 0;
     end;
@@ -669,6 +679,13 @@
         ArchCouponEntry."User ID" := CouponEntry."User ID";
         ArchCouponEntry."Closed by Entry No." := CouponEntry."Closed by Entry No.";
         ArchCouponEntry.Insert();
+    end;
+
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterSetQuantity', '', true, true)]
+    local procedure NPRPOSSaleLineOnAfterSetQuantityCoupons(var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        ChangeConnectedLines(SaleLinePOS);
     end;
 
     #endregion Archivation
@@ -946,6 +963,67 @@
 
         NpDcCouponEntry.FindFirst();
         exit(NpDcCouponEntry."Amount per Qty.");
+    end;
+
+    local procedure CheckCouponQuantity(Coupon: Record "NPR NpDc Coupon"; Quantity: Decimal)
+    var
+        QtyErr: Label 'Coupon quantity is %1 but you want to use %2. Action aborted.';
+    begin
+        Coupon.CalcFields("Remaining Quantity");
+        if Quantity > Coupon."Remaining Quantity" then
+            Error(QtyErr, Coupon."Remaining Quantity", Quantity);
+    end;
+
+    local procedure ChangeConnectedLines(var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        CouponLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcCoupon: Record "NPR NpDc Coupon";
+    begin
+        if not FindCouponLine(SaleLinePOS, CouponLinePOSCoupon) then
+            exit;
+
+        NpDcCoupon.Get(CouponLinePOSCoupon."Coupon No.");
+        CheckCouponQuantity(NpDcCoupon, SaleLinePOS.Quantity);
+
+        ChangeDiscountedLines(CouponLinePOSCoupon, SaleLinePOS.Quantity);
+    end;
+
+    local procedure FindCouponLine(SaleLinePOS: Record "NPR POS Sale Line"; var CouponLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"): Boolean
+    begin
+        CouponLinePOSCoupon.SetRange("Register No.", SaleLinePOS."Register No.");
+        CouponLinePOSCoupon.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+        CouponLinePOSCoupon.SetRange("Sale Type", SaleLinePOS."Sale Type");
+        CouponLinePOSCoupon.SetRange("Sale Date", SaleLinePOS.Date);
+        CouponLinePOSCoupon.SetRange("Sale Line No.", SaleLinePOS."Line No.");
+        CouponLinePOSCoupon.SetRange(Type, CouponLinePOSCoupon.Type::Coupon);
+        exit(CouponLinePOSCoupon.FindFirst());
+    end;
+
+    local procedure ChangeDiscountedLines(CouponLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; Quantity: Decimal)
+    var
+        DisountLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+    begin
+        DisountLinePOSCoupon.SetRange("Register No.", CouponLinePOSCoupon."Register No.");
+        DisountLinePOSCoupon.SetRange("Sales Ticket No.", CouponLinePOSCoupon."Sales Ticket No.");
+        DisountLinePOSCoupon.SetRange("Sale Type", CouponLinePOSCoupon."Sale Type");
+        DisountLinePOSCoupon.SetRange("Sale Date", CouponLinePOSCoupon."Sale Date");
+        DisountLinePOSCoupon.SetRange("Applies-to Coupon Line No.", CouponLinePOSCoupon."Line No.");
+        DisountLinePOSCoupon.SetRange(Type, CouponLinePOSCoupon.Type::Discount);
+        if DisountLinePOSCoupon.FindSet() then
+            repeat
+                ApplyQtyChange(DisountLinePOSCoupon, Quantity);
+            until DisountLinePOSCoupon.Next() = 0;
+    end;
+
+    local procedure ApplyQtyChange(DisountLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; parQuantity: Decimal)
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        if not SaleLinePOS.Get(DisountLinePOSCoupon."Register No.", DisountLinePOSCoupon."Sales Ticket No.", DisountLinePOSCoupon."Sale Date", DisountLinePOSCoupon."Sale Type", DisountLinePOSCoupon."Sale Line No.") then
+            exit;
+
+        SaleLinePOS.Validate(Quantity, parQuantity);
+        SaleLinePOS.Modify();
     end;
 
     internal procedure GenerateReferenceNo(Coupon: Record "NPR NpDc Coupon") ReferenceNo: Text

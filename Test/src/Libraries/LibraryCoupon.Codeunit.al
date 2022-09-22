@@ -29,6 +29,27 @@ codeunit 85051 "NPR Library Coupon"
         end;
     end;
 
+    procedure IssueCouponMultipleQuantity(CouponType: Record "NPR NpDc Coupon Type"; Quantity: Integer; var TempCoupon: Record "NPR NpDc Coupon" temporary)
+    var
+        Coupon: Record "NPR NpDc Coupon";
+        CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+
+    begin
+
+        Coupon.Init();
+        Coupon.Validate("Coupon Type", CouponType.Code);
+        Coupon."No." := '';
+        Coupon.Insert(true);
+
+        CouponMgt.PostIssueCoupon2(Coupon, Quantity, CouponType."Discount Amount");
+
+        TempCoupon.Init();
+        TempCoupon := Coupon;
+        TempCoupon.Insert();
+
+    end;
+
+
 
     procedure CreateDiscountPctCouponType(CouponTypeCode: Code[20]; DiscountPct: Decimal): Code[20]
     var
