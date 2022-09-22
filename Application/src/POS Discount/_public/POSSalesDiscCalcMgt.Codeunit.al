@@ -189,7 +189,9 @@
     local procedure UpdateDiscOnSalesLine(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; RecalculateAllLines: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        POSSaleTax: Record "NPR POS Sale Tax";
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
     begin
         Clear(TempSaleLinePOS);
         if TempSaleLinePOS.IsEmpty then
@@ -217,6 +219,10 @@
                 TempSaleLinePOS.Delete();
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
 
+                if POSSaleTaxCalc.Find(POSSaleTax, SaleLinePOS.SystemId) then
+                    if POSSaleTax."Calculated Amount Excl. Tax" = 0 then
+                        POSSaleTaxCalc.DeleteAllLines(POSSaleTax); 
+                
                 SaleLinePOS.CreateDim(
                   NPRDimMgt.TypeToTableNPR(SaleLinePOS.Type), SaleLinePOS."No.",
                   NPRDimMgt.DiscountTypeToTableNPR(SaleLinePOS."Discount Type"), SaleLinePOS."Discount Code",
