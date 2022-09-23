@@ -946,6 +946,121 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    procedure ConfirmTicketChangeRequest_2()
+    var
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TmpCurrentRequest: Record "NPR TM Ticket Reservation Req." temporary;
+        TmpTargetRequest: Record "NPR TM Ticket Reservation Req." temporary;
+        TmpTicketReservationResponse: Record "NPR TM Ticket Reserv. Resp." temporary;
+        AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        ReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        DetailedTicketRequest: Record "NPR TM Det. Ticket AccessEntry";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        Assert: Codeunit "Assert";
+        ItemNo: Code[20];
+        ResponseToken: Text;
+        ChangeToken: Text;
+        ResponseMessage: Text;
+        ApiOk: Boolean;
+        NumberOfTicketOrders: Integer;
+        TicketQuantityPerOrder: Integer;
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        SendNotificationTo: Text;
+        ExternalOrderNo: Text;
+    begin
+
+        ItemNo := SelectSmokeTestScenario();
+        TicketBom.SetFilter("Item No.", '=%1', ItemNo);
+
+        NumberOfTicketOrders := 1;
+        TicketQuantityPerOrder := 1;
+
+        ApiOk := TicketApiLibrary.MakeReservation(NumberOfTicketOrders, ItemNo, TicketQuantityPerOrder, MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        ExternalOrderNo := 'abc'; // Note: Without External Order No., the ticket will not be valid for arrival, capacity will be allocated only.
+        ApiOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, SendNotificationTo, ExternalOrderNo, ScannerStation, TmpCreatedTickets, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        TmpCreatedTickets.FindFirst();
+        DetailedTicketRequest.SetFilter("Ticket No.", '=%1', TmpCreatedTickets."No.");
+        DetailedTicketRequest.SetFilter(Type, '=%1', DetailedTicketRequest.Type::INITIAL_ENTRY);
+        DetailedTicketRequest.FindFirst();
+
+        // Manipulate the timeslot to be expired
+        AdmScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', DetailedTicketRequest."External Adm. Sch. Entry No.");
+        AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        AdmScheduleEntry.FindFirst();
+        AdmScheduleEntry."Admission Start Date" := CalcDate('<-1D>');
+        AdmScheduleEntry."Admission End Date" := CalcDate('<-1D>');
+        AdmScheduleEntry.Modify();
+
+        // Getting the request should be ok - there is an element saying change is not allowed
+        ReservationRequest.Get(TmpCreatedTickets."Ticket Reservation Entry No.");
+        ApiOk := TicketApiLibrary.GetTicketChangeRequest(TmpCreatedTickets."External Ticket No.", ReservationRequest."Authorization Code", ChangeToken, TmpCurrentRequest, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        // [Test]
+        TicketBom.FindFirst();
+        TmpCurrentRequest.FindFirst();
+
+        // Select target time slot to be greater in time than the current time slot.
+        TmpTargetRequest.TransferFields(TmpCurrentRequest, true);
+        AdmScheduleEntry.SetFilter("Admission Code", '=%1', TmpTargetRequest."Admission Code");
+        AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        AdmScheduleEntry.SetFilter("External Schedule Entry No.", '>%1', TmpTargetRequest."External Adm. Sch. Entry No.");
+        AdmScheduleEntry.FindFirst();
+        TmpTargetRequest."External Adm. Sch. Entry No." := AdmScheduleEntry."External Schedule Entry No.";
+        TmpTargetRequest.Insert();
+
+        // Should fail
+        TicketBom."Reschedule Policy" := TicketBom."Reschedule Policy"::UNTIL_USED;
+        TicketBom.Modify();
+        ApiOk := TicketApiLibrary.ConfirmChangeTicketReservation(ChangeToken, TmpCurrentRequest, TmpTargetRequest, TmpTicketReservationResponse, ResponseMessage);
+        Assert.IsFalse(ApiOk, StrSubstNo('Confirm Change was expected to fail since policy excludes expired timeslots. %1', ResponseMessage));
+
+        // Should be successful
+        TicketBom."Reschedule Policy" := TicketBom."Reschedule Policy"::UNTIL_ADMITTED;
+        TicketBom.Modify();
+        ApiOk := TicketApiLibrary.ConfirmChangeTicketReservation(ChangeToken, TmpCurrentRequest, TmpTargetRequest, TmpTicketReservationResponse, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        // Admitt ticket and try again
+        // Manipulate the timeslot to be valid again
+        AdmScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', DetailedTicketRequest."External Adm. Sch. Entry No.");
+        AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        AdmScheduleEntry.FindFirst();
+        AdmScheduleEntry."Admission Start Date" := Today();
+        AdmScheduleEntry."Admission End Date" := Today();
+        AdmScheduleEntry.Modify();
+        ApiOk := TicketApiLibrary.ValidateTicketArrival(TmpCreatedTickets."External Ticket No.", '', ScannerStation, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        // Getting the request should be ok - there is an element saying change is not allowed
+        TmpCurrentRequest.DeleteAll();
+        ReservationRequest.Get(TmpCreatedTickets."Ticket Reservation Entry No.");
+        ApiOk := TicketApiLibrary.GetTicketChangeRequest(TmpCreatedTickets."External Ticket No.", ReservationRequest."Authorization Code", ChangeToken, TmpCurrentRequest, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        // Select target time slot to be greater in time than the current time slot.
+        TmpCurrentRequest.FindFirst();
+        TmpTargetRequest.TransferFields(TmpCurrentRequest, true);
+        AdmScheduleEntry.SetFilter("Admission Code", '=%1', TmpTargetRequest."Admission Code");
+        AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        AdmScheduleEntry.SetFilter("External Schedule Entry No.", '>%1', TmpTargetRequest."External Adm. Sch. Entry No.");
+        AdmScheduleEntry.FindFirst();
+        TmpTargetRequest."External Adm. Sch. Entry No." := AdmScheduleEntry."External Schedule Entry No.";
+        TmpTargetRequest.Insert();
+
+        // Should fail
+        ApiOk := TicketApiLibrary.ConfirmChangeTicketReservation(ChangeToken, TmpCurrentRequest, TmpTargetRequest, TmpTicketReservationResponse, ResponseMessage);
+        Assert.IsFalse(ApiOk, StrSubstNo('Confirm Change was expected to fail because ticket violates change policy. %1', ResponseMessage));
+    end;
+
+
+    [Test]
     procedure SetTicketAttribute()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";

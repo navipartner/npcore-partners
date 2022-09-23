@@ -780,6 +780,9 @@
         if (not Ticket.FindFirst()) then
             exit(false);
 
+        if (DT2Date(ReferenceDateTime) > Ticket."Valid To Date") then
+            exit(false);
+
         if ExtAdmSchEntryNo = 0 then
             exit(true);
 
@@ -816,6 +819,13 @@
 
                     ReferenceDateTime += TicketAdmissionBOM."Reschedule Cut-Off (Hours)" * 60 * 60 * 1000;
                     exit(not IsSelectedAdmissionSchEntryExpired(AdmissionScheduleEntry, DT2DATE(ReferenceDateTime), DT2TIME(ReferenceDateTime), ResponseMessage, ResponseCode));
+                end;
+            TicketAdmissionBOM."Reschedule Policy"::UNTIL_ADMITTED:
+                begin
+                    TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                    TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
+                    TicketAccessEntry.SetFilter("Access Date", '<>%1', 0D);
+                    exit(TicketAccessEntry.IsEmpty());
                 end;
         end;
 
