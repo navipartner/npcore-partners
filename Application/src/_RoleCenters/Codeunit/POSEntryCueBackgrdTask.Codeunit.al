@@ -18,7 +18,7 @@
         POSEntryCue.CalcFields(
             "Unposted Item Trans.", "Unposted G/L Trans.", "Failed Item Transaction.", "Failed G/L Posting Trans.",
             "EFT Reconciliation Errors", "Unfinished EFT Requests", "EFT Req. with Unknown Result",
-            "Campaign Discount List", "Mix Discount List");
+            "Campaign Discount List", "Mix Discount List", "Coupon List", "Voucher List");
 
         Result.Add(Format(POSEntryCue.FieldNo("Unposted Item Trans.")), Format(POSEntryCue."Unposted Item Trans.", 0, 9));
         Result.Add(Format(POSEntryCue.FieldNo("Unposted G/L Trans.")), Format(POSEntryCue."Unposted G/L Trans.", 0, 9));
@@ -29,6 +29,8 @@
         Result.Add(Format(POSEntryCue.FieldNo("EFT Req. with Unknown Result")), Format(POSEntryCue."EFT Req. with Unknown Result", 0, 9));
         Result.Add(Format(POSEntryCue.FieldNo("Campaign Discount List")), Format(POSEntryCue."Campaign Discount List", 0, 9));
         Result.Add(Format(POSEntryCue.FieldNo("Mix Discount List")), Format(POSEntryCue."Mix Discount List", 0, 9));
+        Result.Add(Format(POSEntryCue.FieldNo("Coupon List")), Format(POSEntryCue."Coupon List", 0, 9));
+        Result.Add(Format(POSEntryCue.FieldNo("Voucher List")), Format(POSEntryCue."Voucher List", 0, 9));
 
         Page.SetBackgroundTaskResult(Result);
     end;
