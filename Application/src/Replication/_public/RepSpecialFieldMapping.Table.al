@@ -1,6 +1,6 @@
 ﻿table 6014602 "NPR Rep. Special Field Mapping"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Replication Special Field Mapping';
     DataClassification = CustomerContent;
     Extensible = true;
