@@ -42,7 +42,7 @@
             exit;
         Handled := true;
 
-        DeletePosLine(POSSession);
+        DeletePosLine(POSSession, Context);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
@@ -57,7 +57,7 @@
         Captions.AddActionCaption(ActionCode(), 'Prompt', PromptLbl);
     end;
 
-    local procedure DeletePosLine(POSSession: Codeunit "NPR POS Session")
+    local procedure DeletePosLine(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
@@ -68,6 +68,7 @@
 
         if (CurrentView.Type() = CurrentView.Type() ::Sale) then begin
             POSSession.GetSaleLine(POSSaleLine);
+            SetPositionForPOSSaleLine(Context, POSSaleLine);
             OnBeforeDeleteSaleLinePOS(POSSaleLine);
             DeleteAccessories(POSSaleLine);
             POSSaleLine.DeleteLine();
@@ -107,6 +108,16 @@
 
         SaleLinePOS2.SetSkipCalcDiscount(true);
         SaleLinePOS2.DeleteAll(false);
+    end;
+
+    internal procedure SetPositionForPOSSaleLine(Context: Codeunit "NPR POS JSON Management"; var POSSaleLine: Codeunit "NPR POS Sale Line")
+    var
+        POSDataDriverSaleLine: Codeunit "NPR POS Data Driver: Sale Line";
+        Position: Text;
+    begin
+        Position := Context.GetPositionFromDataSource(POSDataDriverSaleLine.GetSourceNameText());
+        IF Position <> '' then
+            POSSaleLine.SetPosition(Position);
     end;
 
     [IntegrationEvent(false, false)]

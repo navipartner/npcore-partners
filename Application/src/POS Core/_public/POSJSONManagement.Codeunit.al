@@ -836,4 +836,25 @@
 
         Result := Token;
     end;
+
+    internal procedure GetPositionFromDataSource(SourceNameText: text[50]): Text
+    var
+        JsonObj: JsonObject;
+        JToken: JsonToken;
+        Position: Text;
+        JValue: JsonValue;
+    begin
+        If not SetScope('data') then
+            exit;
+        if not SetScope('positions') then
+            exit;
+        GetJObject(JsonObj);
+        if (JObject.Get(SourceNameText, JToken)) then begin
+            JValue := JToken.AsValue();
+            if (not JValue.IsNull()) and (not JValue.IsUndefined()) then begin
+                Position := JValue.AsText();
+            end;
+        end;
+        exit(Position);
+    end;
 }
