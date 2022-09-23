@@ -872,7 +872,7 @@ codeunit 85013 "NPR TM API SmokeTest"
         Assert: Codeunit "Assert";
         ItemNo: Code[20];
         ResponseToken: Text;
-        ChangeToken: Text;
+        ChangeToken, SuperseededToken : Text;
         ResponseMessage: Text;
         ApiOk: Boolean;
         NumberOfTicketOrders: Integer;
@@ -898,6 +898,10 @@ codeunit 85013 "NPR TM API SmokeTest"
 
         TmpCreatedTickets.FindFirst();
         ReservationRequest.Get(TmpCreatedTickets."Ticket Reservation Entry No.");
+        ApiOk := TicketApiLibrary.GetTicketChangeRequest(TmpCreatedTickets."External Ticket No.", ReservationRequest."Authorization Code", SuperseededToken, TmpCurrentRequest, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        ReservationRequest.Get(TmpCreatedTickets."Ticket Reservation Entry No.");
         ApiOk := TicketApiLibrary.GetTicketChangeRequest(TmpCreatedTickets."External Ticket No.", ReservationRequest."Authorization Code", ChangeToken, TmpCurrentRequest, ResponseMessage);
         Assert.IsTrue(ApiOk, ResponseMessage);
 
@@ -914,18 +918,21 @@ codeunit 85013 "NPR TM API SmokeTest"
         TmpTargetRequest."External Adm. Sch. Entry No." := AdmScheduleEntry."External Schedule Entry No.";
         TmpTargetRequest.Insert();
 
-
-        TicketBom."Reschedule Policy" := TicketBom."Reschedule Policy"::NOT_ALLOWED;
+        // Should fail
+        TicketBom."Reschedule Policy" := TicketBom."Reschedule Policy"::UNTIL_USED;
         TicketBom.Modify();
+        ApiOk := TicketApiLibrary.ConfirmChangeTicketReservation(SuperseededToken, TmpCurrentRequest, TmpTargetRequest, TmpTicketReservationResponse, ResponseMessage);
+        Assert.IsFalse(ApiOk, 'Confirm Change was expected to fail since the token used is not valid anymore (superseeded).');
 
         // Should fail
+        TicketBom."Reschedule Policy" := TicketBom."Reschedule Policy"::NOT_ALLOWED;
+        TicketBom.Modify();
         ApiOk := TicketApiLibrary.ConfirmChangeTicketReservation(ChangeToken, TmpCurrentRequest, TmpTargetRequest, TmpTicketReservationResponse, ResponseMessage);
         Assert.IsFalse(ApiOk, 'Confirm Change was expected to fail because policy does not allow change.');
 
+        // Should be successful
         TicketBom."Reschedule Policy" := TicketBom."Reschedule Policy"::UNTIL_USED;
         TicketBom.Modify();
-
-        // Should be successful
         ApiOk := TicketApiLibrary.ConfirmChangeTicketReservation(ChangeToken, TmpCurrentRequest, TmpTargetRequest, TmpTicketReservationResponse, ResponseMessage);
         Assert.IsTrue(ApiOk, ResponseMessage);
 
