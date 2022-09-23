@@ -686,6 +686,15 @@
             TicketReservationResponse.Status := true;
             TicketReservationResponse.Confirmed := false;
             TicketReservationResponse.Insert();
+        end else begin
+            // unconfirmed change request entry can be reused in order to invalidate the previous token.
+            if (TicketReservationResponse."Session Token ID" <> TicketReservationRequest2."Session Token ID") then begin
+                TicketReservationResponse."Session Token ID" := TicketReservationRequest2."Session Token ID";
+                TicketReservationResponse."Exires (Seconds)" := 1500;
+                TicketReservationResponse.Status := true;
+                TicketReservationResponse.Confirmed := false;
+                TicketReservationResponse.Modify();
+            end;
         end;
 
         exit(true);
