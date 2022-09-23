@@ -79,8 +79,8 @@
         {
             Caption = 'Reschedule Policy';
             DataClassification = CustomerContent;
-            OptionCaption = 'Not Allowed,Always (Until Used),Cut-Off (Hours)';
-            OptionMembers = NOT_ALLOWED,UNTIL_USED,CUTOFF_HOUR;
+            OptionCaption = 'Not Allowed,Until Admitted or Expired,Cut-Off (Hours),Until Admitted';
+            OptionMembers = NOT_ALLOWED,UNTIL_USED,CUTOFF_HOUR,UNTIL_ADMITTED;
         }
         field(32; "Reschedule Cut-Off (Hours)"; Decimal)
         {
