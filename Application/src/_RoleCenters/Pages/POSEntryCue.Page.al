@@ -182,6 +182,36 @@
                         CurrPage.Update(false);
                     end;
                 }
+                field(CouponList; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Coupon List"))))
+                {
+                    Caption = 'Coupon List';
+                    ToolTip = 'Specifies the number of the Coupon List. By clicking, you can drill down to the list of the Coupon List.';
+
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    var
+                        CouponList: Record "NPR NpDc Coupon";
+                    begin
+                        Page.RunModal(Page::"NPR NpDc Coupons", CouponList);
+                        CurrPage.Update(false);
+                    end;
+                }
+                field(VoucherList; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Voucher List"))))
+                {
+                    Caption = 'Voucher List';
+                    ToolTip = 'Specifies the number of the Voucher List. By clicking, you can drill down to the list of the Voucher List.';
+
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    var
+                        VoucherList: Record "NPR NpRv Voucher";
+                    begin
+                        Page.RunModal(Page::"NPR NpRv Vouchers", VoucherList);
+                        CurrPage.Update(false);
+                    end;
+                }
             }
         }
     }

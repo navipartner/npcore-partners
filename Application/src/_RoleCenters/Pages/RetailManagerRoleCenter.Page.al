@@ -899,14 +899,24 @@
                 }
                 action("Coupon List")
                 {
+                    Visible = false;
                     Caption = 'Coupon List';
                     RunObject = page "NPR NpDc Coupons";
 
                     ToolTip = 'Displays the coupon list.';
                     ApplicationArea = NPRRetail;
                 }
+                action("Coupon Types")
+                {
+                    Caption = 'Coupon Types';
+                    Image = List;
+                    RunObject = page "NPR NpDc Coupon Types";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'View or edit the Coupon Types';
+                }
                 action("Voucher List")
                 {
+                    Visible = false;
                     Caption = 'Voucher List';
                     RunObject = page "NPR NpRv Vouchers";
 
