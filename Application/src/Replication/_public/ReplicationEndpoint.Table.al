@@ -1,6 +1,6 @@
 ﻿table 6014589 "NPR Replication Endpoint"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Replication Endpoint';
     DataClassification = CustomerContent;
     Extensible = true;

@@ -1,6 +1,6 @@
 ﻿table 6014588 "NPR Replication Service Setup"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Replication API Setup';
     DataClassification = CustomerContent;
     Extensible = true;
