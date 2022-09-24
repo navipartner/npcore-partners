@@ -2,8 +2,8 @@
 {
     Caption = 'Variety Field Setup';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Variety Fields Lookup";
-    LookupPageID = "NPR Variety Fields Lookup";
+    DrillDownPageId = "NPR Variety Fields Lookup";
+    LookupPageId = "NPR Variety Fields Lookup";
 
     fields
     {
@@ -63,23 +63,19 @@
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.47 [324997]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR Variety Matrix Management");
+                EventSubscription.SetRange("Publisher Object ID", Codeunit::"NPR Variety Matrix Management");
                 EventSubscription.SetRange("Published Function", 'GetVarietyMatrixFieldValue');//no its not a mistake. it must be called DrillDown, even if its Lookup
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                if Page.RunModal(Page::"Event Subscriptions", EventSubscription) <> Action::LookupOK then
                     exit;
 
                 Validate("Variety Matrix Subscriber 1", EventSubscription."Subscriber Function");
-                //+NPR5.47 [324997]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.47 [327541]
                 if Type = Type::Subscriber then
                     Description := CopyStr("Variety Matrix Subscriber 1", 1, MaxStrLen(Description));
-                //+NPR5.47 [327541]
             end;
         }
         field(20; "Validate Field"; Boolean)
@@ -115,8 +111,8 @@
         }
         field(40; "Field Type Name"; Text[30])
         {
-            CalcFormula = Lookup(Field."Type Name" WHERE(TableNo = FIELD("Table No."),
-                                                          "No." = FIELD("Field No.")));
+            CalcFormula = lookup(Field."Type Name" where(TableNo = field("Table No."),
+                                                          "No." = field("Field No.")));
             Caption = 'Field Type Name';
             Editable = false;
             FieldClass = FlowField;
@@ -142,14 +138,12 @@
             var
                 "Field": Record "Field";
             begin
-                //-VRT1.10
                 if "Secondary Type" = "Secondary Type"::Internal then begin
                     case "Secondary Field No." of
                         1:
                             "Secondary Description" := Text001;
                     end;
                 end;
-                //+VRT1.10
 
                 if "Secondary Type" <> "Secondary Type"::Field then
                     exit;
@@ -175,23 +169,19 @@
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.47 [324997]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR Variety Matrix Management");
+                EventSubscription.SetRange("Publisher Object ID", Codeunit::"NPR Variety Matrix Management");
                 EventSubscription.SetRange("Published Function", 'GetVarietyMatrixFieldValue');//no its not a mistake. it must be called DrillDown, even if its Lookup
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                if Page.RunModal(Page::"Event Subscriptions", EventSubscription) <> Action::LookupOK then
                     exit;
 
                 Validate("Variety Matrix Subscriber 2", EventSubscription."Subscriber Function");
-                //+NPR5.47 [324997]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.47 [327541]
                 if "Secondary Type" = "Secondary Type"::Subscriber then
                     "Secondary Description" := CopyStr("Variety Matrix Subscriber 2", 1, MaxStrLen("Secondary Description"));
-                //+NPR5.47 [327541]
             end;
         }
         field(60; "Use Location Filter (Sec)"; Boolean)
@@ -240,15 +230,13 @@
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.47 [324997]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR Variety Matrix Management");
+                EventSubscription.SetRange("Publisher Object ID", Codeunit::"NPR Variety Matrix Management");
                 EventSubscription.SetRange("Published Function", 'OnDrillDownVarietyMatrix');//no its not a mistake. it must be called DrillDown, even if its Lookup
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                if Page.RunModal(Page::"Event Subscriptions", EventSubscription) <> Action::LookupOK then
                     exit;
 
                 Validate("OnLookup Subscriber", EventSubscription."Subscriber Function");
-                //+NPR5.47 [324997]
             end;
         }
         field(76; "Use OnLookup Return Value"; Boolean)
@@ -265,15 +253,13 @@
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.28 [255961]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR Variety Matrix Management");
+                EventSubscription.SetRange("Publisher Object ID", Codeunit::"NPR Variety Matrix Management");
                 EventSubscription.SetRange("Published Function", 'OnDrillDownEvent');
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                if Page.RunModal(Page::"Event Subscriptions", EventSubscription) <> Action::LookupOK then
                     exit;
 
                 Validate("OnDrillDown Codeunit ID", EventSubscription."Subscriber Codeunit ID");
-                //+NPR5.28 [255961]
             end;
         }
         field(85; "OnDrillDown Subscriber"; Text[60])
@@ -285,15 +271,13 @@
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.47 [324997]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR Variety Matrix Management");
+                EventSubscription.SetRange("Publisher Object ID", Codeunit::"NPR Variety Matrix Management");
                 EventSubscription.SetRange("Published Function", 'OnDrillDownVarietyMatrix');
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                if Page.RunModal(Page::"Event Subscriptions", EventSubscription) <> Action::LookupOK then
                     exit;
 
                 Validate("OnDrillDown Subscriber", EventSubscription."Subscriber Function");
-                //+NPR5.47 [324997]
             end;
         }
         field(86; "Use OnDrillDown Return Value"; Boolean)
@@ -439,7 +423,7 @@
 
         if VRTFieldsSetup.Get(1, 5401, 3) then
             VRTFieldsSetup.Delete();
-        InsertVarietyFields(3, 5401, 100000, false, true, false, 0, 0, 0, 'GetItemCrossReference', '', 'LookupItemCrossReference', true, '', false);
+        InsertVarietyFields(3, 5401, 100000, false, true, false, 0, 0, 0, 'GetItemReference', '', 'LookupItemReference', true, '', false);
 
         InsertVarietyFields(3, 5401, 100001, false, false, false, 3, 0, 0, 'GetExpectedInventory', 'GetPlannedOrderRcpt', 'LookupAvailabilityByEvent', false, 'LookupAvailabilityByLocation', false);
 
@@ -495,20 +479,16 @@
         VRTFieldsSetup.Validate("Field No.", FieldNo);
         VRTFieldsSetup."Validate Field" := ValidateField;
         VRTFieldsSetup."Editable Field" := EditField;
-        //-VRT1.10
         VRTFieldsSetup."Is Table Default" := TableDefault;
         VRTFieldsSetup."Secondary Type" := Type2;
         VRTFieldsSetup."Secondary Table No." := TableNo2;
         VRTFieldsSetup.Validate("Secondary Field No.", FieldNo2);
-        //+VRT1.10
-        //-NPR5.47 [327541]
         VRTFieldsSetup.Validate("Variety Matrix Subscriber 1", MatrixSubscriber1);
         VRTFieldsSetup.Validate("Variety Matrix Subscriber 2", MatrixSubscriber2);
         VRTFieldsSetup."OnLookup Subscriber" := CopyStr(MatrixSubscriberOnLookup, 1, MaxStrLen(VRTFieldsSetup."OnLookup Subscriber"));
         VRTFieldsSetup."Use OnLookup Return Value" := UseOnLookupValue;
         VRTFieldsSetup."OnDrillDown Subscriber" := CopyStr(MatrixSubscriberOnDrillDown, 1, MaxStrLen(VRTFieldsSetup."OnDrillDown Subscriber"));
         VRTFieldsSetup."Use OnDrillDown Return Value" := UseOnDrillDownalue;
-        //+NPR5.47 [327541]
 
         if VRTFieldsSetup.Insert() then;
     end;
@@ -517,17 +497,10 @@
     var
         VRTFieldsSetup: Record "NPR Variety Field Setup";
     begin
-        //-NPR5.32 [274170]
-        //make sure its only executing when there is actually a change
-        //-NPR5.36 [285733]
-        //IF VRTFieldsSetup.GET(1, 5401, 3) THEN
         if VRTFieldsSetup.Get(0, 83, 13) then
-            //+NPR5.36 [285733]
             exit;
 
-
         InitVarietyFields();
-        //+NPR5.32 [274170]
     end;
 
     local procedure SetDescription(Type: Integer; TableNo: Integer; FieldNo: Integer; NewDescription: Text)
