@@ -1,6 +1,6 @@
 ﻿codeunit 6150707 "NPR POS Payment Line"
 {
-    Access = Internal;
+    Access = Public;
 
     var
         Rec: Record "NPR POS Sale Line";
