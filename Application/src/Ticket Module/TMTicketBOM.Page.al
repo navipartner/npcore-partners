@@ -357,7 +357,6 @@
         Ticket: Record "NPR TM Ticket";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Item: Record "Item";
-        AuxItem: Record "NPR Auxiliary Item";
         TicketType: Record "NPR TM Ticket Type";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -365,8 +364,7 @@
         ResponseMessage: Text;
     begin
         Item.Get(ItemNo);
-        Item.NPR_GetAuxItem(AuxItem);
-        TicketType.Get(AuxItem."TM Ticket Type");
+        TicketType.Get(Item."NPR Ticket Type");
         TicketType.TestField("Admission Registration", TicketType."Admission Registration"::GROUP);
 
         Token := TicketRequestManager.GetNewToken();
