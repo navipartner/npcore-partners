@@ -295,6 +295,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'GET_EVENT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Get Event";
     }
+    value(54; CASHOUT_VOUCHER)
+    {
+        Caption = 'CASHOUT_VOUCHER', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Cash Voucher";
+    }
     value(56; "SS-QTY-")
     {
         Caption = 'SS-QTY-', Locked = true, MaxLength = 20;

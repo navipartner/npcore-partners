@@ -1479,6 +1479,34 @@
         WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR NpRv Ext. Voucher WS", 'external_voucher_services', true);
     end;
 
+    internal procedure PrepareForCashApplication(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line")
+    var
+        TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        Voucher: Record "NPR NpRv Voucher";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        VoucherType.Get(VoucherTypeCode);
+        PrepareVoucherBuffer(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
+        ValidateVoucher(TempNpRvVoucherBuffer);
+
+        POSLine."No." := VoucherType."Payment Type";
+        POSLine."Register No." := SalePOS."Register No.";
+        POSLine.Description := TempNpRvVoucherBuffer.Description;
+        POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
+        POSLine."Amount Including VAT" := TempNpRvVoucherBuffer.Amount;
+        POSPaymentLine.InsertPaymentLine(POSLine, 0);
+        POSPaymentLine.GetCurrentPaymentLine(POSLine);
+        PaymentLine."Discount Code" := TempNpRvVoucherBuffer."No.";
+        if FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then begin
+            UpdateTaxSetup(POSLine, SalePOS, Voucher."Account No.");
+            POSPaymentLine.ReverseUnrealizedSalesVAT(POSLine);
+            POSLine.Modify();
+        end;
+
+        InsertNpRvSalesLine(TempNpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertIssuedVoucher(var Voucher: Record "NPR NpRv Voucher"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
     begin
