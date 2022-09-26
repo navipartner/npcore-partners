@@ -602,6 +602,7 @@ tableextension 6014427 "NPR Item" extends Item
         end;
     end;
 
+#pragma warning disable AL0432
     [Obsolete('Rollback of Auxiliary Item table back to Item table extension')]
     procedure NPR_GetAuxItem(var AuxItem: Record "NPR Auxiliary Item")
     begin
@@ -611,4 +612,5 @@ tableextension 6014427 "NPR Item" extends Item
     procedure NPR_GetAuxItem(var AuxItem: Record "NPR Auxiliary Item"; Force: Boolean)
     begin
     end;
+#pragma warning restore
 }

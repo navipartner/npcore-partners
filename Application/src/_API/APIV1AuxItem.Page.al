@@ -1,3 +1,4 @@
+#pragma warning disable AL0432
 page 6059858 "NPR APIV1 - Aux Item"
 {
     APIGroup = 'core';
@@ -102,3 +103,4 @@ page 6059858 "NPR APIV1 - Aux Item"
     end;
 
 }
+#pragma warning restore

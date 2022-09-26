@@ -1,3 +1,4 @@
+#pragma warning disable AL0432
 query 6014409 "NPR APIV1 - Aux Items Read"
 {
     Access = Internal;
@@ -92,3 +93,4 @@ query 6014409 "NPR APIV1 - Aux Items Read"
         }
     }
 }
+#pragma warning restore

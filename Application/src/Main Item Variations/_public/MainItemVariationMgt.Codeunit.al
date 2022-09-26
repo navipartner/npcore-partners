@@ -106,6 +106,7 @@ Codeunit 6059856 "NPR Main Item Variation Mgt."
     #endregion
 
     #region Auxiliary Item (Obsolete)
+#pragma warning disable AL0432
     [Obsolete('Moving Auxiliary Item table fields back to Item table.')]
     procedure OpenMainItemVariationList(AuxItem: Record "NPR Auxiliary Item")
     var
@@ -175,5 +176,6 @@ Codeunit 6059856 "NPR Main Item Variation Mgt."
     procedure OnRemoveItemVariation(var MainItemVariation: Record "NPR Main Item Variation"; var Handled: Boolean);
     begin
     end;
+#pragma warning restore
     #endregion
 }
