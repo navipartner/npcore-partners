@@ -1,6 +1,6 @@
 # Install WMS and RFID apps on mobile devices
 
-It is necessary to install two apps on mobile devices to connect them to the WMS environments in Business Central, and to essentially turn them into RFID readers. To install the apps and connect devices to the WMS environment, follow the provided steps. 
+There are two available apps - NP WMS and NP RFID. NP WMS contains warehouse management features, and is also used for barcode scanning, while NP RFID is useful when RFID tags are attached to items. To install the apps and connect devices to the WMS environment, follow the provided steps. 
 
 1. To download and install the necessary WMS apps, you first need to find them in the Play Store. The apps you need are called **NP WMS** and **NP RFID**, both produced by **Navi Partner**, as indicated in the following screenshot.           
 
@@ -18,10 +18,10 @@ It is necessary to install two apps on mobile devices to connect them to the WMS
 
 5. In the **PROFILE** window, press **SETUP ACCOUNT**.
 
-6. Press the camera icon in the upper right corner to scan the [QR Code](create-qr-codes.md) that was previously created in Business Central.              
+6. In NP WMS, press the camera icon in the upper right corner to scan the [QR Code](create-qr-codes.md) that was previously created in Business Central.              
    Following the successful QR scan, the required parameters will be saved in the **Setup**.
 
-7. Press **CONNECT A SCANNER** to select how the scanning will be performed.    
+7. In the NP RFID app, press **CONNECT A SCANNER** to select how the scanning will be performed.    
    You can choose between a phone camera, or one of the listed scanners.
    If you selected a camera, you also need to **REQUEST A SCANNER LICENSE**. Scanner licenses are then distributed to new devices by NaviPartner employees.
 
