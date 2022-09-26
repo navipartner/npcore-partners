@@ -9,11 +9,11 @@
     begin
         if SalePOS.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.") then
             LocationCode := SalePOS."Location Code";
-
         if MatchBIN(EFTTransactionRequest, LocationCode, POSPaymentMethod) then
             exit(true);
-
         if MatchIssuerID(EFTTransactionRequest, LocationCode, POSPaymentMethod) then
+            exit(true);
+        if MatchApplicationID(EFTTransactionRequest, LocationCode, POSPaymentMethod) then
             exit(true);
     end;
 
@@ -48,6 +48,29 @@
 
         EFTBINGroup.SetRange("Card Issuer ID", EFTTransactionRequest."Card Issuer ID");
         if not EFTBINGroup.FindFirst() then
+            exit(false);
+
+        if not EFTBINGroupPaymentLink.Get(EFTBINGroup.Code, LocationCode) then
+            if LocationCode = '' then
+                exit(false)
+            else
+                if not EFTBINGroupPaymentLink.Get(EFTBINGroup.Code, '') then
+                    exit(false);
+
+        exit(POSPaymentMethod.Get(EFTBINGroupPaymentLink."Payment Type POS"));
+    end;
+
+    local procedure MatchApplicationID(EFTTransactionRequest: Record "NPR EFT Transaction Request"; LocationCode: Text; var POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
+    var
+        EFTAidMap: Record "NPR EFT AID Mapping";
+        EFTBINGroup: Record "NPR EFT BIN Group";
+        EFTBINGroupPaymentLink: Record "NPR EFT BIN Group Paym. Link";
+    begin
+        if EFTTransactionRequest."Card Application ID" = '' then
+            exit(false);
+        if (not EFTAidMap.Get(EFTTransactionRequest."Card Application ID")) then
+            exit(false);
+        if not EFTBINGroup.Get(EFTAidMap."Bin Group Code") then
             exit(false);
 
         if not EFTBINGroupPaymentLink.Get(EFTBINGroup.Code, LocationCode) then
