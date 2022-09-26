@@ -196,6 +196,12 @@
                     ToolTip = 'Specifies the card expiry date.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Card Application Id"; Rec."Card Application ID")
+                {
+
+                    ToolTip = 'Specifies the card application ID.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Reference Number Input"; Rec."Reference Number Input")
                 {
 

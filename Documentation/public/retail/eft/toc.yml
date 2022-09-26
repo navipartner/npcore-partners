@@ -1,11 +1,13 @@
 - name: Introduction
   href: intro.md
-- name: How-To  
+- name: How-To
   items:
   - name: Set up MobilePay
     href: howto/mobilepay.md
   - name: Import EFT reconciliation file, match and post it
     href: howto/reconciliation.md
+  - name: Softpay setup
+    href: howto/softpay.md
 - name: Explanations
   items:
   - name: EFT setup
@@ -14,3 +16,5 @@
     href: explanation/EFT_Integration_Type.md
   - name: Transaction lookup
     href: explanation/lookup.md
+  - name: Introduction to Softpay
+    href: explanation/softpay.md

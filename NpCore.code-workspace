@@ -40,6 +40,7 @@
 		"CRS.DisableCRSSnippets": true,
 		"CRS.OnSaveAlFileAction": "Rename",
 		"runOnSave.statusMessageTimeout": 3000,
+		"runOnSave.shell": "PowerShell",
 		"runOnSave.commands": [
 			{
 				"match": "POSAction.*\\.js$",

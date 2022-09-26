@@ -41,6 +41,11 @@
     {
         key(Key1; "Code")
         {
+
+        }
+        key(IssuerID; "Card Issuer ID")
+        {
+
         }
     }
 
