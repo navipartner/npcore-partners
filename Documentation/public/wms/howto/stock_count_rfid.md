@@ -26,7 +26,7 @@ Counting is the most commonly used feature in the mobile app. Follow the provide
 ### Shop counting procedure
 
 1. Press **SHOP**.
-   You will see the predicted number of items that should be found in the shop during the counting, as well as the inventory sorted according to type of items it consists of. 
+   You will see the predicted number of items that should be found in the shop during the counting, as well as the inventory sorted according to the item category.     
    ![NP RFID SHOP](../images/NP_RFID_SHOP.PNG)
 2. Press **START** to initiate the counting.   
    You can see how many tags have been counted so far, as well as the progress of the entire counting process in the upper part of the screen. The percentage bar indicates to which degree the predicted and the actual inventory match. 
