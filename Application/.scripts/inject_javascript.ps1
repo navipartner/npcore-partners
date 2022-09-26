@@ -24,6 +24,7 @@ foreach ($file in $fileList)
             }
 
             $alfileContent = Get-Content -Path $file.FullName
+            Write-Host ("'" + $minifiedJs.Replace("'","\'") + "'");
             $alfileContent[$find.LineNumber] = "'" + $minifiedJs.Replace("'","''") + "'";
 
             Write-Host "Replacing file " + $file.Name + ", line number" + $find.LineNumber

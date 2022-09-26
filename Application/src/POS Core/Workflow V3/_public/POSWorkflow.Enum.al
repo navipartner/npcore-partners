@@ -290,6 +290,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_FLEXIITERM', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: EFT Flexiiterm";
     }
+
     value(53; GET_EVENT)
     {
         Caption = 'GET_EVENT', Locked = true, MaxLength = 20;
@@ -299,6 +300,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'CASHOUT_VOUCHER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Cash Voucher";
+    }
+    value(55; SOFTPAY)
+    {
+        Caption = 'SOFTPAY', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: EFT Softpay";
     }
     value(56; "SS-QTY-")
     {
