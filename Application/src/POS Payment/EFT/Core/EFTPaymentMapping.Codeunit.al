@@ -9,11 +9,11 @@
     begin
         if SalePOS.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.") then
             LocationCode := SalePOS."Location Code";
-        if MatchBIN(EFTTransactionRequest, LocationCode, POSPaymentMethod) then
-            exit(true);
         if MatchIssuerID(EFTTransactionRequest, LocationCode, POSPaymentMethod) then
             exit(true);
         if MatchApplicationID(EFTTransactionRequest, LocationCode, POSPaymentMethod) then
+            exit(true);
+        if MatchBIN(EFTTransactionRequest, LocationCode, POSPaymentMethod) then
             exit(true);
     end;
 
