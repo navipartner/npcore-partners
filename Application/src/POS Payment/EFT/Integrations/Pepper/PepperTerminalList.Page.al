@@ -70,7 +70,6 @@
     {
         area(processing)
         {
-            #if not CLOUD
             group(Import)
             {
                 Caption = 'Import';
@@ -101,7 +100,6 @@
                     end;
                 }
             }
-            #endif
             group(Show)
             {
                 Caption = 'Additonal Parameters';
