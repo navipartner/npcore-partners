@@ -245,4 +245,27 @@
         end;
         exit('');
     end;
+
+    internal procedure PrintNonPostedDocument(SalesHeader: Record "Sales Header"; Type: Option Proforma,Draft)
+    var
+        VariantSH: Variant;
+        ReportUsage: Enum "Report Selection Usage";
+        CurstomerNoFieldNo: Integer;
+    begin
+        case Type of
+            Type::Proforma:
+                case SalesHeader."Document Type" of
+                    SalesHeader."Document Type"::Invoice,
+                        SalesHeader."Document Type"::Order:
+                        begin
+                            SalesHeader.SetRecFilter();
+                            VariantSH := SalesHeader;
+                            CurstomerNoFieldNo := SalesHeader.FieldNo("Bill-to Customer No.");
+                            ReportUsage := ReportUsage::"Pro Forma S. Invoice";
+                        end;
+                end;
+        end;
+        PrintReportSelection_Customer(ReportUsage, VariantSH, CurstomerNoFieldNo);
+
+    end;
 }

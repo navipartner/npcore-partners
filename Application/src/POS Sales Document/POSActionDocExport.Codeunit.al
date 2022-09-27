@@ -121,6 +121,7 @@
         OptionPaymentMethodCodeFrom: Label 'Sales Header Default,Force Blank Code,Specific Payment Method Code';
         CaptionPaymentMethodCodeFrom: Label 'Use Payment Method Code From';
         DescPaymentMethodCodeFrom: Label 'Select source of payment method code for sales document';
+        CaptionPrintProformaInvoice: Label 'Print Pro Forma Invoice';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -129,7 +130,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.17');
+        exit('1.18');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -202,6 +203,7 @@
             Sender.RegisterTextParameter('CustomerTableView', '');
             Sender.RegisterIntegerParameter('CustomerLookupPage', 0);
             Sender.RegisterBooleanParameter('EnforceCustomerFilter', false);
+            Sender.RegisterBooleanParameter('SetPrintProformaInvoice', false);
         end;
     end;
 
@@ -468,6 +470,7 @@
         RetailSalesDocMgt.SetSendICOrderConf(JSON.GetBooleanParameter('SendICOrderConfirmation'));
         RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('CheckCustomerCredit'));
         RetailSalesDocMgt.SetWarningCustomerCreditCheck(JSON.GetBooleanParameter('CheckCustomerCreditWarning'));
+        RetailSalesDocMgt.SetPrintProformaInvoice(JSON.GetBooleanParameterOrFail('SetPrintProformaInvoice', ActionCode()));
 
         if JSON.GetBooleanParameterOrFail('SetShowCreationMessage', ActionCode()) then
             RetailSalesDocMgt.SetShowCreationMessage();
@@ -725,6 +728,8 @@
                 Caption := CaptionCustomerLookupPage;
             'EnforceCustomerFilter':
                 Caption := CaptionEnforceCustomerFilter;
+            'SetPrintProformaInvoice':
+                Caption := CaptionPrintProformaInvoice;
         end;
     end;
 
@@ -827,6 +832,8 @@
                 Caption := DescCustomerLookupPage;
             'EnforceCustomerFilter':
                 Caption := DescEnforceCustomerFilter;
+            'SetPrintProformaInvoice':
+                Caption := CaptionPrintProformaInvoice;
         end;
     end;
 
