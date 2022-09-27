@@ -410,10 +410,8 @@
                     var
                         RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
-                        //-NPR5.46 [294354]
                         RetailJournalCode.TransferOrder2RetailJnl('', Rec."No.");
                         CurrPage.Update(true);
-                        //+NPR5.46 [294354]
                     end;
                 }
                 action(ImportFromTransferShipment)
@@ -428,10 +426,8 @@
                     var
                         RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
-                        //-NPR5.46 [294354]
                         RetailJournalCode.TransferShipment2RetailJnl('', Rec."No.");
                         CurrPage.Update(true);
-                        //+NPR5.46 [294354]
                     end;
                 }
                 action(ImportFromTransferReceipt)
@@ -446,10 +442,8 @@
                     var
                         RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
-                        //-NPR5.46 [294354]
                         RetailJournalCode.TransferReceipt2RetailJnl('', Rec."No.");
                         CurrPage.Update(true);
-                        //+NPR5.46 [294354]
                     end;
                 }
                 action(ImportFromPriceLog)
@@ -464,10 +458,8 @@
                     var
                         RetailPriceLogMgt: Codeunit "NPR Retail Price Log Mgt.";
                     begin
-                        //-NPR5.40 [304031]
                         RetailPriceLogMgt.RetailJnlImportFromPriceLog(Rec);
                         CurrPage.Update(false);
-                        //+NPR5.40 [304031]
                     end;
                 }
             }
@@ -484,13 +476,6 @@
                     ToolTip = 'Executes the Export to Item Card action';
                     ApplicationArea = NPRRetail;
 
-                    trigger OnAction()
-                    begin
-                        //-NPR5.46 [294354]
-                        //CurrPage.SubLine.PAGE.GetSelectionFilter(RetailJournalLine);
-                        //RetailJournalCode.ExportToItems(RetailJournalLine);
-                        //+NPR5.46 [294354]
-                    end;
                 }
                 action(ExportToOtherRetailJournal)
                 {
@@ -610,8 +595,6 @@
                         "Retail Journal Line": Record "NPR Retail Journal Line";
                         Item: Record Item;
                     begin
-
-                        //CurrForm.SubLine.FORM.GETRECORD("Retail Journal Line");
                         CurrPage.SubLine.PAGE.GetRecord("Retail Journal Line");
                         Clear(ItemCard);
                         Item.Reset();
@@ -639,8 +622,6 @@
                         t002: Label '@1@@@@@@@@@@';
                         OverflowErr: Label '%1 should not be over %2 characters.';
                     begin
-
-                        //CurrForm.SubLine.FORM.getSelectionFilter(jnlLines);
                         CurrPage.SubLine.PAGE.GetSelectionFilter(jnlLines);
                         d.Open(t001 + '\' + t002);
 
@@ -677,8 +658,6 @@
                         "Retail Journal Line": Record "NPR Retail Journal Line";
                         item: Record Item;
                     begin
-
-                        //CurrForm.SubLine.FORM.getSelectionFilter("Retail Journal Line");
                         CurrPage.SubLine.PAGE.GetSelectionFilter("Retail Journal Line");
                         if "Retail Journal Line".Find('-') then
                             repeat
@@ -709,10 +688,10 @@
                 }
                 action("Update Count Code/Type")
                 {
-                    Caption = 'Update Count Code/Type';
+                    Caption = 'Update Discount Code/Type';
                     Image = Discount;
 
-                    ToolTip = 'Executes the Update Count Code/Type action';
+                    ToolTip = 'Executes the Update Discount Code/Type action';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -735,7 +714,6 @@
             }
         }
     }
-
     var
         Text001: Label 'Discount Code and Type updated successfully';
         RetailJournalCode: Codeunit "NPR Retail Journal Code";
@@ -748,53 +726,18 @@
     internal procedure UpdateDiscount(RetailJournalHeader: Record "NPR Retail Journal Header")
     var
         RetailJournalLine: Record "NPR Retail Journal Line";
-        PeriodDiscountLine: Record "NPR Period Discount Line";
-        MixDiscountLine: Record "NPR Mixed Discount Line";
-        MixDiscount: Record "NPR Mixed Discount";
+
     begin
         RetailJournalLine.Reset();
         RetailJournalLine.SetFilter(RetailJournalLine."No.", RetailJournalHeader."No.");
-        //-NPR5.31 [262904]
-        //IF RetailJournalLine.FindFirst() THEN REPEAT
         if not RetailJournalLine.IsEmpty then begin
             RetailJournalLine.FindSet();
             repeat
-                //+NPR5.31 [262904]
-                PeriodDiscountLine.Reset();
-                PeriodDiscountLine.SetFilter(PeriodDiscountLine."Starting Date", '<=%1', RetailJournalHeader."Date of creation");
-                PeriodDiscountLine.SetFilter(PeriodDiscountLine."Ending Date", '>=%1', RetailJournalHeader."Date of creation");
-                PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.", RetailJournalLine."Item No.");
-
-                if PeriodDiscountLine.FindFirst() then begin
-                    RetailJournalLine."Discount Code" := PeriodDiscountLine.Code;
-                    RetailJournalLine."Discount Type" := RetailJournalLine."Discount Type"::Campaign;
-                end else begin
-                    MixDiscountLine.Reset();
-                    MixDiscountLine.SetFilter(MixDiscountLine."No.", RetailJournalLine."Item No.");
-                    //-NPR5.31 [262904]
-                    //IF MixDiscountLine.FindFirst() THEN REPEAT
-                    //  MixDiscount.Reset();
-                    MixDiscountLine.SetRange("Disc. Grouping Type", MixDiscountLine."Disc. Grouping Type"::Item);
-                    if MixDiscountLine.FindFirst() then begin
-                        //+NPR5.31 [262904]
-                        if MixDiscount.Get(MixDiscountLine.Code) and
-                            ((MixDiscount."Starting date" <= RetailJournalHeader."Date of creation") and
-                            (MixDiscount."Ending date" >= RetailJournalHeader."Date of creation")) then begin
-                            RetailJournalLine."Discount Code" := MixDiscountLine.Code;
-                            RetailJournalLine."Discount Type" := RetailJournalLine."Discount Type"::Mix;
-                            //-NPR5.31 [262904]
-                            //    MixDiscountLine.FindLast();
-                            //  END;
-                            //UNTIL MixDiscountLine.Next() = 0;
-                        end;
-                    end;
-                    //+NPR5.31 [262904]
-                end;
+                RetailJournalLine.FindItemSalesPrice();
+                RetailJournalLine.calcProfit();
                 RetailJournalLine.Modify();
             until RetailJournalLine.Next() = 0;
-            //-NPR5.31 [262904]
         end;
-        //+NPR5.31 [262904]
         Message(Text001);
     end;
 
