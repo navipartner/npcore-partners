@@ -23,6 +23,7 @@ codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         LibraryRandom: Codeunit "Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
         LibraryEFT: Codeunit "NPR Library - EFT";
+        POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
         NoOfSales, NoOfLinesPerSale : Integer;
         NoOfSalesParamLbl: Label 'NoOfSales', Locked = true;
@@ -44,6 +45,7 @@ codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         Item2.Get('100DFTBLK');
 
         POSUnit.Get('01');
+        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
         POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
         if not EFTSetup.Get(POSPaymentMethod.Code, POSUnit."No.") then
             LibraryEFT.CreateMockEFTSetup(EFTSetup, POSUnit."No.", POSPaymentMethod.Code);

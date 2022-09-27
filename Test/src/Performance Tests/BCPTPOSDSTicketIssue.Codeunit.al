@@ -21,6 +21,7 @@ codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         POSSession: Codeunit "NPR POS Session";
         LibraryRandom: Codeunit "Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
+        POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
         NoOfSales, NoOfLinesPerSale : Integer;
         NoOfSalesParamLbl: Label 'NoOfSales', Locked = true;
@@ -48,6 +49,7 @@ codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         end;
 
         POSUnit.Get('01');
+        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
         POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;
