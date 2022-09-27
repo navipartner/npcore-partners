@@ -178,6 +178,20 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 #endif
         addafter("&Warehouse Entries")
         {
+            action("NPR Update Description")
+            {
+                Caption = 'Update Magento Description';
+                Promoted = true;
+                PromotedCategory = Process;
+                Image = Import;
+                ApplicationArea = All;
+                ToolTip = 'Executes the Update Magento Description action.';
+
+                trigger OnAction()
+                begin
+                    Xmlport.Run(Xmlport::"NPR ImportMagentoDescription", false, true);
+                end;
+            }
             action("NPR POS Sales Entries")
             {
                 Caption = 'POS Sales Entries';
