@@ -21,6 +21,7 @@ codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
         POSSession: Codeunit "NPR POS Session";
         LibraryRandom: Codeunit "Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
+        POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
         NoOfSales, NoOfLinesPerSale : Integer;
         NoOfSalesParamLbl: Label 'NoOfSales', Locked = true;
@@ -41,6 +42,7 @@ codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
         Item2.Get('100DFTBLK');
 
         POSUnit.Get('01');
+        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
         POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;

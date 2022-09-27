@@ -19,6 +19,7 @@ codeunit 85063 "NPR BCPT POS DS Voucher Issue" implements "BCPT Test Param. Prov
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
+        POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
         NoOfSales: Integer;
         NoOfSalesParamLbl: Label 'NoOfSales', Locked = true;
@@ -37,6 +38,7 @@ codeunit 85063 "NPR BCPT POS DS Voucher Issue" implements "BCPT Test Param. Prov
         VoucherType.Get('CREDITVOUCHER');
 
         POSUnit.Get('01');
+        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
         POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;

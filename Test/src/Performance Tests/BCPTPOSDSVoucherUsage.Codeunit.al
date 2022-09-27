@@ -16,12 +16,12 @@ codeunit 85064 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
     var
         Item: Record Item;
         BarCodeItemReference: Record "Item Reference";
-        POSPaymentMethod: Record "NPR POS Payment Method";
         VoucherType: Record "NPR NpRv Voucher Type";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
         LibraryRandom: Codeunit "Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
+        POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
         NoOfSales: Integer;
         NoOfSalesParamLbl: Label 'NoOfSales', Locked = true;
@@ -35,11 +35,11 @@ codeunit 85064 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
         POSAuditProfile: Record "NPR POS Audit Profile";
         NoSeriesLine: Record "No. Series Line";
     begin
-        POSPaymentMethod.Get('K');
         VoucherType.Get('CREDITVOUCHER');
         Item.Get('100CHIMSTA');
 
         POSUnit.Get('01');
+        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
         POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;

@@ -47,12 +47,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeMemberInfoCaptureDialog(MemberInfoCaptureFilter: Text; var ShowStandardUserInterface: Boolean)
+    internal procedure OnBeforeMemberInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ShowStandardUserInterface: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnAfterMemberInfoCaptureDialog(MemberInfoCaptureFilter: Text; StandardUserInterface: Boolean; var LookupOK: Boolean);
+    internal procedure OnAfterMemberInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; StandardUserInterface: Boolean; var LookupOK: Boolean);
     begin
     end;
 
