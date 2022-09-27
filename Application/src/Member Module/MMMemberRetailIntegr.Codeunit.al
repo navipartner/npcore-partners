@@ -648,7 +648,6 @@
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         MemberInfoCaptureListPage: Page "NPR MM Member Capture List";
         PageAction: Action;
-        InfoCaptureFilter: Text;
         ShowStandardUserInterface: Boolean;
     begin
 
@@ -659,13 +658,12 @@
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
         MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
-        InfoCaptureFilter := MemberInfoCapture.GetFilters();
         MemberInfoCapture.FilterGroup(0);
         MemberInfoCapture.FindSet();
 
         ShowStandardUserInterface := true;
         LookupOK := true;
-        MembershipEvents.OnBeforeMemberInfoCaptureDialog(InfoCaptureFilter, ShowStandardUserInterface);
+        MembershipEvents.OnBeforeMemberInfoCaptureDialog(MemberInfoCapture, ShowStandardUserInterface);
 
         if (ShowStandardUserInterface) then begin
             if (GuiAllowed()) then begin
@@ -686,7 +684,7 @@
             end;
         end;
 
-        MembershipEvents.OnAfterMemberInfoCaptureDialog(InfoCaptureFilter, ShowStandardUserInterface, LookupOK);
+        MembershipEvents.OnAfterMemberInfoCaptureDialog(MemberInfoCapture, ShowStandardUserInterface, LookupOK);
         exit(LookupOK);
     end;
 

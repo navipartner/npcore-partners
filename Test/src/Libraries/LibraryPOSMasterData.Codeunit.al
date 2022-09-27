@@ -182,9 +182,9 @@
                     end;
                 end;
             else begin
-                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
-                    POSPostingSetup."Account No." := LibraryERM.CreateGLAccountNo;
-                end;
+                POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
+                POSPostingSetup."Account No." := LibraryERM.CreateGLAccountNo;
+            end;
         end;
         if POSPostingSetup."Difference Acc. No." = '' then begin
             POSPostingSetup."Difference Account Type" := POSPostingSetup."Account Type"::"G/L Account";
@@ -291,7 +291,7 @@
         Setup: Codeunit "NPR POS Setup";
         OpeningEntryNo: Integer;
     begin
-        POSOpenPOSUnit.ClosePOSUnitOpenPeriods(POSUnit."No."); // make sure pos period register is correct
+        POSOpenPOSUnit.ClosePOSUnitOpenPeriods(POSUnit."POS Store Code", POSUnit."No."); // make sure pos period register is correct
         POSOpenPOSUnit.OpenPOSUnit(POSUnit);
         OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry(POSUnit."No.", Setup.Salesperson());
         POSOpenPOSUnit.SetOpeningEntryNo(POSUnit."No.", OpeningEntryNo);
