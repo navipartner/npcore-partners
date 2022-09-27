@@ -48,6 +48,7 @@
         PaymentMethodCode: Code[10];
         CustomerCreditCheck: Boolean;
         WarningCustomerCreditCheck: Boolean;
+        PrintProformaInv: Boolean;
         CUSTOMER_CREDIT_CHECK_FAILED: Label 'Customer credit check failed';
 
     procedure SetAsk(AskIn: Boolean)
@@ -181,6 +182,11 @@
         PaymentMethodCode := NewPaymentMethodCode;
     end;
 
+    procedure SetPrintProformaInvoice(PrintIn: Boolean)
+    begin
+        PrintProformaInv := PrintIn;
+    end;
+
     procedure ProcessPOSSale(POSSale: Codeunit "NPR POS Sale")
     var
         SalesHeader: Record "Sales Header";
@@ -193,6 +199,7 @@
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
         Post: Boolean;
+        Type: Option Proforma,Draft;
     begin
         POSSale.GetCurrentSale(SalePOS);
         CreateSalesHeader(SalePOS, SalesHeader);
@@ -274,6 +281,9 @@
         Commit();
 
         PrintRetailReceipt(SalePOS);
+
+        if PrintProformaInv and (not Posted) then
+            POSSalesDocumentOutputMgt.PrintNonPostedDocument(SalesHeader, type::Proforma);
 
         InvokeOnFinishCreditSaleWorkflow(SalePOS);
 
