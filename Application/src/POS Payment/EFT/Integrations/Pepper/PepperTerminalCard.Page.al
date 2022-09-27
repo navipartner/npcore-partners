@@ -237,7 +237,6 @@
     {
         area(processing)
         {
-#if not CLOUD
             group(Import)
             {
                 action(ImportLicense)
@@ -269,7 +268,6 @@
                     end;
                 }
             }
-#endif
             group(Show)
             {
                 action(ShowLicense)
