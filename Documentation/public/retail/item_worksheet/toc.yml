@@ -1,0 +1,16 @@
+- name: Item worksheets (introduction)
+  href: intro.md
+- name: Explanation
+  items: 
+  - name: Item worksheet line creation
+    href: explanation/creating_item_worksheet_lines.md
+  - name: Adding variety values to the worksheet
+    href: explanation/adding_variety_values.md
+  - name: Worksheet line registration
+    href: explanation/worksheet_line_registration.md
+- name: Reference
+  items: 
+  - name: Item worksheet template
+    href: reference/item_worksheet_template.md
+  - name: Item worksheet
+    href: reference/item_worksheets.md
