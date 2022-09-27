@@ -72,7 +72,7 @@
             Regex.Match(Input, Match);
         end;
 #else
-        Regex.Match(Input, Pattern, 1, TempMatches);
+        Regex.Match(Input, Pattern, 0, TempMatches);
         if TempMatches.FindSet() then
             repeat
                 if TempMatches.Success then begin
